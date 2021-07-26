@@ -108,6 +108,7 @@ jobs:
         run: |
           make -C unit      test
           make -C jbmc/unit test
+          make TAGS="[z3]" -C unit test
       - name: Run expected failure unit tests
         run: |
           make TAGS="[!shouldfail]" -C unit test
@@ -332,7 +333,9 @@ jobs:
       - name: Print ccache stats
         run: ccache -s
       - name: Run unit tests
-        run: cd unit; ./unit_tests
+        run: |
+          cd unit; ./unit_tests
+          ./unit_tests "[z3]"
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
       - name: Run regression tests

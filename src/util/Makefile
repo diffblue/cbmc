@@ -58,6 +58,7 @@ SRC = allocate_objects.cpp \
       options.cpp \
       parse_options.cpp \
       parser.cpp \
+      piped_process.cpp \
       pointer_expr.cpp \
       pointer_offset_size.cpp \
       pointer_offset_sum.cpp \
