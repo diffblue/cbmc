@@ -176,6 +176,34 @@ void expr2ct::get_shorthands(const exprt &expr)
       has_collision=!ns_collision[func].insert(sh).second;
     }
 
+    if(!has_collision)
+    {
+      // We could also conflict with a function argument, the code below
+      // finds the function we're in, and checks we don't conflict with
+      // any argument to the function
+      const std::string symbol_str = id2string(symbol_id);
+      const std::string func = symbol_str.substr(0, symbol_str.find("::"));
+      const symbolt *func_symbol;
+      if(!ns.lookup(func, func_symbol))
+      {
+        if(can_cast_type<code_typet>(func_symbol->type))
+        {
+          const auto func_type =
+            type_checked_cast<code_typet>(func_symbol->type);
+          const auto params = func_type.parameters();
+          for(const auto &param : params)
+          {
+            const auto param_id = param.get_identifier();
+            if(param_id != symbol_id && sh == id_shorthand(param_id))
+            {
+              has_collision = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
     if(has_collision)
       sh = clean_identifier(symbol_id);
 
