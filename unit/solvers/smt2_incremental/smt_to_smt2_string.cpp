@@ -137,8 +137,19 @@ TEST_CASE(
   "Test smt_set_logic_commandt to string conversion",
   "[core][smt2_incremental]")
 {
-  const smt_logic_quantifier_free_bit_vectorst qf_bv;
+  const auto qf_uf = smt_logic_quantifier_free_uninterpreted_functionst{};
+  CHECK(smt_to_smt2_string(qf_uf) == "QF_UF");
+  const auto qf_bv = smt_logic_quantifier_free_bit_vectorst{};
   CHECK(smt_to_smt2_string(qf_bv) == "QF_BV");
+  const auto qf_ufbv =
+    smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{};
+  CHECK(smt_to_smt2_string(qf_ufbv) == "QF_UFBV");
+  const auto qf_abv = smt_logic_quantifier_free_bit_vectors_arrayst{};
+  CHECK(smt_to_smt2_string(qf_abv) == "QF_ABV");
+  const auto qf_aufbv =
+    smt_logic_quantifier_free_uninterpreted_functions_bit_vectors_arrayst{};
+  CHECK(smt_to_smt2_string(qf_aufbv) == "QF_AUFBV");
+  CHECK(smt_to_smt2_string(smt_logic_allt{}) == "ALL");
   CHECK(
     smt_to_smt2_string(smt_set_logic_commandt{qf_bv}) == "(set-logic QF_BV)");
 }
