@@ -2317,12 +2317,10 @@ std::string expr2ct::convert_rox(const shift_exprt &src, unsigned precedence)
     UNREACHABLE;
   }
   // Construct the "width(AAAA)" constant
-  const exprt width_expr =
-    from_integer(type_width, src.distance().type());
+  const exprt width_expr = from_integer(type_width, src.distance().type());
   // Apply modulo to n since shifting will overflow
   // That is: 0001 << 4 == 0, but 0001 rol 4 == 0001
-  const exprt distance_modulo_width =
-    mod_exprt(src.distance(), width_expr);
+  const exprt distance_modulo_width = mod_exprt(src.distance(), width_expr);
   // Now put the pieces together
   // width(AAAA) - (n % width(AAAA))
   const auto complement_width_expr =
