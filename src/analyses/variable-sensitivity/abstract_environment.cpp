@@ -84,6 +84,16 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
   }
 
+  if(
+    simplified_id == ID_side_effect &&
+    (simplified_expr.get(ID_statement) == ID_allocate))
+  {
+    return abstract_object_factory(
+      typet(ID_dynamic_object),
+      exprt(ID_dynamic_object, simplified_expr.type()),
+      ns);
+  }
+
   // No special handling required by the abstract environment
   // delegate to the abstract object
   if(!simplified_expr.operands().empty())

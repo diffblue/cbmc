@@ -9,6 +9,8 @@
 #include "constant_pointer_abstract_object.h"
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
@@ -33,8 +35,10 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
 }
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
+  const typet &new_type,
   const constant_pointer_abstract_objectt &old)
-  : abstract_pointer_objectt(old), value_stack(old.value_stack)
+  : abstract_pointer_objectt(new_type, old.is_top(), old.is_bottom()),
+    value_stack(old.value_stack)
 {
 }
 
@@ -121,6 +125,10 @@ void constant_pointer_abstract_objectt::output(
 
         out << symbol_pointed_to.get_identifier();
       }
+      else if(addressee.id() == ID_dynamic_object)
+      {
+        out << addressee.get(ID_identifier);
+      }
       else if(addressee.id() == ID_index)
       {
         auto const &array_index = to_index_expr(addressee);
@@ -201,12 +209,39 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
       abstract_object_pointert modified_value =
         environment.write(pointed_value, new_value, stack, ns, merging_write);
       environment.assign(value, modified_value, ns);
-
       // but the pointer itself does not change!
     }
-    return std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
-      shared_from_this());
+
+    return shared_from_this();
   }
+}
+
+abstract_object_pointert constant_pointer_abstract_objectt::typecast(
+  const typet &new_type,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
+
+  // Get an expression that we can assign to
+  exprt value = to_address_of_expr(value_stack.to_expression()).object();
+  if(value.id() == ID_dynamic_object)
+  {
+    auto &env = const_cast<abstract_environmentt &>(environment);
+
+    auto heap_array_type = array_typet(new_type.subtype(), nil_exprt());
+    auto array_object =
+      environment.abstract_object_factory(heap_array_type, ns, true, false);
+    auto heap_symbol = symbol_exprt(value.get(ID_identifier), heap_array_type);
+    env.assign(heap_symbol, array_object, ns);
+    auto heap_address = address_of_exprt(
+      index_exprt(heap_symbol, from_integer(0, signed_size_type())));
+    auto new_pointer = std::make_shared<constant_pointer_abstract_objectt>(
+      heap_address, env, ns);
+    return new_pointer;
+  }
+
+  return std::make_shared<constant_pointer_abstract_objectt>(new_type, *this);
 }
 
 void constant_pointer_abstract_objectt::get_statistics(

@@ -12,6 +12,7 @@
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
+#include <util/pointer_expr.h>
 
 #include "abstract_environment.h"
 
@@ -24,48 +25,20 @@ unwrap_and_extract_values(const abstract_object_sett &values);
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
-/// Recursively construct a combination \p sub_con from \p super_con and once
-///   constructed call \p f.
-/// \param super_con: vector of some containers storing the values
-/// \param sub_con: the one combination being currently constructed
-/// \param f: callable with side-effects
-template <typename Con, typename F>
-void apply_comb(
-  const std::vector<Con> &super_con,
-  std::vector<typename Con::value_type> &sub_con,
-  F f)
-{
-  size_t n = sub_con.size();
-  if(n == super_con.size())
-    f(sub_con);
-  else
-  {
-    for(const auto &value : super_con[n])
-    {
-      sub_con.push_back(value);
-      apply_comb(super_con, sub_con, f);
-      sub_con.pop_back();
-    }
-  }
-}
-
-/// Call the function \p f on every combination of elements in \p super_con.
-///   Hence the arity of \p f is `super_con.size()`. <{1,2},{1},{1,2,3}> ->
-///   f(1,1,1), f(1,1,2), f(1,1,3), f(2,1,1), f(2,1,2), f(2,1,3).
-/// \param super_con: vector of some containers storing the values
-/// \param f: callable with side-effects
-template <typename Con, typename F>
-void for_each_comb(const std::vector<Con> &super_con, F f)
-{
-  std::vector<typename Con::value_type> sub_con;
-  apply_comb(super_con, sub_con, f);
-}
-
 value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
   const typet &type)
   : abstract_pointer_objectt(type)
 {
   values.insert(std::make_shared<constant_pointer_abstract_objectt>(type));
+}
+
+value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
+  const typet &new_type,
+  bool top,
+  bool bottom,
+  const abstract_object_sett &new_values)
+  : abstract_pointer_objectt(new_type, top, bottom), values(new_values)
+{
 }
 
 value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
@@ -131,6 +104,26 @@ abstract_object_pointert value_set_pointer_abstract_objectt::write_dereference(
   }
 
   return shared_from_this();
+}
+
+abstract_object_pointert value_set_pointer_abstract_objectt::typecast(
+  const typet &new_type,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
+  abstract_object_sett new_values;
+  for(auto value : values)
+  {
+    if(value->is_top()) // multiple mallocs in the same scope can cause spurious
+      continue; // TOP values, which we can safely strip out during the cast
+
+    auto pointer =
+      std::dynamic_pointer_cast<const abstract_pointer_objectt>(value);
+    new_values.insert(pointer->typecast(new_type, environment, ns));
+  }
+  return std::make_shared<value_set_pointer_abstract_objectt>(
+    new_type, is_top(), is_bottom(), new_values);
 }
 
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(

@@ -1,0 +1,8 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --show
+^EXIT=0$
+^SIGNAL=0$
+main::1::p \(\) -> value-set-begin: ptr ->\(heap-allocation-0\[0\]\) :value-set-end
+main::1::q \(\) -> value-set-begin: ptr ->\(heap-allocation-1\[0\]\) :value-set-end
+--
