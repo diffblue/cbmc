@@ -1,8 +1,8 @@
 CORE
 main.c
 --slice-global-inits
-x = 0;$
-y = 0;$
+x := 0$
+y := 0$
 ^EXIT=0$
 ^SIGNAL=0$
 --

@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/find_symbols.h>
+#include <util/format_expr.h>
+#include <util/format_type.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -75,8 +77,7 @@ std::ostream &goto_programt::output_instruction(
   case INCOMPLETE_GOTO:
     if(!instruction.get_condition().is_true())
     {
-      out << "IF " << from_expr(ns, identifier, instruction.get_condition())
-          << " THEN ";
+      out << "IF " << format(instruction.get_condition()) << " THEN ";
     }
 
     out << "GOTO ";
@@ -103,22 +104,55 @@ std::ostream &goto_programt::output_instruction(
   case OTHER:
     if(instruction.get_other().id() == ID_code)
     {
-      const auto &code = to_code(instruction.get_other());
+      const auto &code = instruction.get_other();
       if(code.get_statement() == ID_havoc_object)
       {
-        out << "HAVOC_OBJECT " << from_expr(ns, identifier, code.op0()) << '\n';
+        out << "HAVOC_OBJECT " << format(code.op0()) << '\n';
         break;
       }
       // fallthrough
     }
-    // fallthrough
+    out << "OTHER " << format(instruction.get_other());
+    break;
 
   case RETURN:
+    out << "RETURN " << format(instruction.return_value()) << '\n';
+    break;
+
   case DECL:
+    out << "DECL " << format(instruction.decl_symbol()) << " : "
+        << format(instruction.decl_symbol().type()) << '\n';
+    break;
+
   case DEAD:
+    out << "DEAD " << format(instruction.dead_symbol()) << '\n';
+    break;
+
   case FUNCTION_CALL:
+    out << "CALL ";
+    {
+      auto &call = instruction.get_function_call();
+      if(call.lhs().is_not_nil())
+        out << format(call.lhs()) << " := ";
+      out << format(call.function());
+      out << '(';
+      bool first = true;
+      for(const auto &argument : call.arguments())
+      {
+        if(first)
+          first = false;
+        else
+          out << ", ";
+        out << format(argument);
+      }
+      out << ')';
+      out << '\n';
+    }
+    break;
+
   case ASSIGN:
-    out << from_expr(ns, identifier, instruction.get_code()) << '\n';
+    out << "ASSIGN " << format(instruction.assign_lhs())
+        << " := " << format(instruction.assign_rhs()) << '\n';
     break;
 
   case ASSUME:
@@ -129,7 +163,7 @@ std::ostream &goto_programt::output_instruction(
       out << "ASSERT ";
 
     {
-      out << from_expr(ns, identifier, instruction.get_condition());
+      out << format(instruction.get_condition());
 
       const irep_idt &comment=instruction.source_location.get_comment();
       if(!comment.empty())
@@ -163,7 +197,7 @@ std::ostream &goto_programt::output_instruction(
     }
 
     if(instruction.get_code().operands().size() == 1)
-      out << ": " << from_expr(ns, identifier, instruction.get_code().op0());
+      out << ": " << format(instruction.get_code().op0());
 
     out << '\n';
     break;
@@ -173,11 +207,8 @@ std::ostream &goto_programt::output_instruction(
     if(instruction.get_code().get_statement() == ID_exception_landingpad)
     {
       const auto &landingpad = to_code_landingpad(instruction.get_code());
-      out << "EXCEPTION LANDING PAD ("
-          << from_type(ns, identifier, landingpad.catch_expr().type())
-          << ' '
-          << from_expr(ns, identifier, landingpad.catch_expr())
-          << ")";
+      out << "EXCEPTION LANDING PAD (" << format(landingpad.catch_expr().type())
+          << ' ' << format(landingpad.catch_expr()) << ")";
     }
     else if(instruction.get_code().get_statement() == ID_push_catch)
     {

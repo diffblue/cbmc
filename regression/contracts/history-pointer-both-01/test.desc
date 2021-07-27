@@ -4,10 +4,10 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-ASSUME tmp_cc\$\d != \(\(signed int \*\)NULL\)
-ASSERT n != \(\(signed int \*\)NULL\)
-ASSUME tmp_cc == \*n
-ASSERT tmp_cc\$\d == \*tmp_cc\$\d
+ASSUME .*::tmp_cc\$\d ≠ NULL
+ASSERT foo::n ≠ NULL
+ASSUME .*::tmp_cc = \*foo::n
+ASSERT .*::tmp_cc\$\d = \*.*::tmp_cc\$\d
 --
 --
 Verification:

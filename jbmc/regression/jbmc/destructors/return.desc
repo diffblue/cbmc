@@ -2,7 +2,7 @@ CORE
 DestructorStackTests
 --show-goto-functions --function DestructorStackTests.mainTest --unwind 10
 activate-multi-line-match
-(?<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 18 function java::DestructorStackTests.mainTest:\(Z\)V bytecode-index 40)[\s]*dead minor[0-9]+;[\s]*(?P>comment_block)[\s]*dead new_tmp[0-9]+;[\s]*(?P>comment_block)[\s]*dead anonlocal::[0-9a-zA-Z]+;[\s]*(?P>comment_block)[\s]*dead new_tmp[0-9]+;[\s]*(?P>comment_block)[\s]*dead ex;[\s]*(?P>comment_block)[\s]*dead minor2;[\s]*(?P>comment_block)[\s]*dead minor1;[\s]*(?P>comment_block)[\s]*dead anonlocal::[0-9a-zA-Z]+;[\s]*(?P>comment_block)[\s]*GOTO [0-9]+
+(?<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 18 function java::DestructorStackTests.mainTest:\(Z\)V bytecode-index 40)[\s]*DEAD .*::minor[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*::new_tmp[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*anonlocal::[0-9a-zA-Z]+[\s]*(?P>comment_block)[\s]*DEAD .*::new_tmp[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*::ex[\s]*(?P>comment_block)[\s]*DEAD .*::minor2[\s]*(?P>comment_block)[\s]*DEAD .*::minor1[\s]*(?P>comment_block)[\s]*DEAD .*::anonlocal::[0-9a-zA-Z]+[\s]*(?P>comment_block)[\s]*GOTO [0-9]+
 ^EXIT=0$
 ^SIGNAL=0$
 --
@@ -10,21 +10,21 @@ activate-multi-line-match
 Checks for:
 
         // 98 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead minor5;
+        DEAD minor5
         // 99 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead new_tmp6;
+        DEAD new_tmp6
         // 100 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead anonlocal::6a;
+        DEAD anonlocal::6a
         // 101 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead new_tmp5;
+        DEAD new_tmp5
         // 102 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead ex;
+        DEAD ex
         // 103 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead minor2;
+        DEAD minor2
         // 104 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead minor1;
+        DEAD minor1
         // 105 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
-        dead anonlocal::4a;
+        DEAD anonlocal::4a
         // 106 file DestructorStackTests.java line 18 function java::DestructorStackTests.mainTest:(Z)V bytecode-index 40
         GOTO 13
 

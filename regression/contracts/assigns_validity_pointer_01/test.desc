@@ -6,19 +6,19 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 SUCCESS
 // bar
-ASSERT \*x > 0
-IF !\(\*x == 3\) THEN GOTO \d
-IF !\(\(signed int \*\)\(void \*\)0 == \(\(signed int \*\)NULL\)\) THEN GOTO \d
-tmp_if_expr = \*\(\(signed int \*\)\(void \*\)0\) == 5 \? TRUE \: FALSE;
-tmp_if_expr\$\d = tmp_if_expr \? TRUE : FALSE;
-ASSUME tmp_if_expr\$\d
+ASSERT \*foo::x > 0
+IF ¬\(\*foo::x = 3\) THEN GOTO \d
+IF ¬\(.*0.* = NULL\) THEN GOTO \d
+ASSIGN .*::tmp_if_expr := \(\*\(.*0.*\) = 5 \? true : false\)
+ASSIGN .*::tmp_if_expr\$\d := .*::tmp_if_expr \? true : false
+ASSUME .*::tmp_if_expr\$\d
 // baz
-IF !\(z == \(\(signed int \*\)NULL\)\) THEN GOTO \d
-tmp_if_expr\$\d = \*z == 7 \? TRUE : FALSE;
-ASSUME tmp_if_expr\$\d
+IF ¬\(z ≠ NULL\) THEN GOTO \d
+ASSIGN .*::tmp_if_expr\$\d := \(\*z = 7 \? true : false\)
+ASSUME .*::tmp_if_expr\$\d
 // foo
-ASSUME \*tmp_cc\$\d > 0
-ASSERT \*tmp_cc\$\d == 3
+ASSUME \*.*::tmp_cc\$\d > 0
+ASSERT \*.*::tmp_cc\$\d = 3
 --
 \[3\] file main\.c line 6 assertion: FAILURE
 --

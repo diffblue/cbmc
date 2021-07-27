@@ -3,8 +3,8 @@ Main
 --show-goto-functions --function Main.twoCandidatesNoDerefs
 ^EXIT=0$
 ^SIGNAL=0$
-a \. A\.f:\(\)V\(\);$
-a \. B\.f:\(\)V\(\);$
+CALL java::A\.f:\(\)V\(.*::a\)$
+CALL java::B\.f:\(\)V\(.*::a.*\)$
 --
 this_argument
 --

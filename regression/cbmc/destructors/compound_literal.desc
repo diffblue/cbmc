@@ -2,7 +2,7 @@ CORE
 main.c
 --unwind 10 --show-goto-functions
 activate-multi-line-match
-(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*dead newAlloc0;[\s]*(?P>comment_block)[\s]*dead pc;[\s]*(?P>comment_block)[\s]*dead literal;[\s]*(?P>comment_block)[\s]*9: END_FUNCTION
+(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*DEAD .*newAlloc0[\s]*(?P>comment_block)[\s]*DEAD .*pc[\s]*(?P>comment_block)[\s]*DEAD .*literal[\s]*(?P>comment_block)[\s]*9: END_FUNCTION
 ^EXIT=0$
 ^SIGNAL=0$
 --
@@ -10,11 +10,11 @@ activate-multi-line-match
 Checks for:
 
        // 49 file main.c line 44 function main
-       dead newAlloc0;
+       DEAD main::1::newAlloc0
        // 50 file main.c line 44 function main
-       dead pc;
+       DEAD main::1::pc
        // 51 file main.c line 44 function main
-       dead literal;
+       DEAD main::$tmp::literal
        // 52 file main.c line 45 function main
     9: END_FUNCTION
 

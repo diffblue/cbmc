@@ -6,9 +6,9 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 func3\(\)
 func4\(\)
-567;
-285;
-ret1.*=.*NONDET
+567\)
+285\)
+ret1 :=.*nondet.*
 --
 func1\(.*\)
 func2\(.*\)

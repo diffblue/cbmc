@@ -3,6 +3,6 @@ Break
 --show-goto-functions --function Break.main
 ^EXIT=0$
 ^SIGNAL=0$
-dead i;
+DEAD .*::i
 --
 GOTO 11

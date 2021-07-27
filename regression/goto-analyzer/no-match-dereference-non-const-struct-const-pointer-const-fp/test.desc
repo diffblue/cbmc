@@ -2,15 +2,15 @@ CORE
 main.c
 --show-goto-functions --pointer-check
 ^Removal of function pointers and virtual functions$
-^\s*IF \*container_container\.container == f1 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f2 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f3 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f4 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f5 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f6 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f7 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f8 THEN GOTO [0-9]$
-^\s*IF \*container_container\.container == f9 THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f1\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f2\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f3\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f4\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f5\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f6\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f7\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f8\) THEN GOTO [0-9]$
+^\s*IF \*\(.*::container_container\.container\) = address_of\(f9\) THEN GOTO [0-9]$
 ^EXIT=0$
 ^SIGNAL=0$
 --

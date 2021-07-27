@@ -1,7 +1,7 @@
 CORE
 test.c
 --show-goto-functions
-IF !\(\(signed int\)s\[\(.*\)len\] != 0\) THEN GOTO 2
+IF ¬\(cast\(\*\(strlen::s \+ cast\(strlen::1::len, signedbv\[.*\]\)\), signedbv\[32\]\) ≠ 0\) THEN GOTO 2
 ^EXIT=0$
 ^SIGNAL=0$
 --

@@ -3,10 +3,10 @@ Base
 --function Base.main --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-\(struct Impl1 \*\)b \. Impl1\.f:\(Ljava/lang/Object;\)V\(\(struct java\.lang\.Object \*\)this->genericData\);
-\(struct Impl2 \*\)b \. Impl2\.f:\(Ljava/lang/Object;\)V\(\(struct java\.lang\.Object \*\)this->genericData\);
-\(struct Impl2 \*\)b \. Impl2\.g:\(Ljava/lang/String;\)V\(this->nonGenericData\);
-\(struct Impl1 \*\)b \. Impl1\.g:\(Ljava/lang/String;\)V\(this->nonGenericData\);
+CALL java::Impl1\.f:\(Ljava/lang/Object;\)V\(cast\(.*::b, struct java::Impl1\*\), cast\(\*.*\.genericData, struct java::java\.lang\.Object\*\)\)
+CALL java::Impl2\.f:\(Ljava/lang/Object;\)V\(cast\(.*::b, struct java::Impl2\*\), cast\(\*.*\.genericData, struct java::java\.lang\.Object\*\)\)
+CALL java::Impl2\.g:\(Ljava/lang/String;\)V\(cast\(.*::b, struct java::Impl2\*\), \*.*\.nonGenericData\)
+CALL java::Impl1\.g:\(Ljava/lang/String;\)V\(cast\(.*::b, struct java::Impl1\*\), \*.*\.nonGenericData\)
 --
 --
 Both the implementation classes use a different generic token (Impl1::T and Impl2::T) to refer

@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 line 18 function func
-g_out = 1;
+g_out := 1
 line 24 function func
-g_out = 3;
+g_out := 3
 --

@@ -2,26 +2,26 @@ CORE
 main.c
 --unwind 10 --show-goto-functions
 activate-multi-line-match
-(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*6: test newAlloc4;[\s]*(?P>comment_block)[\s]*newAlloc4 = \{ \.id=4 \};[\s]*(?P>comment_block)[\s]*test newAlloc6;[\s]*(?P>comment_block)[\s]*newAlloc6 = \{ \.id=6 \};[\s]*(?P>comment_block)[\s]*test newAlloc7;[\s]*(?P>comment_block)[\s]*newAlloc7 = \{ \.id=7 \};[\s]*(?P>comment_block)[\s]*GOTO 3
+(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*6: .*newAlloc4 : struct tag-test[\s]*(?P>comment_block)[\s]*.*newAlloc4 := \{ 4 \}[\s]*(?P>comment_block)[\s]*.*newAlloc6 : struct tag-test[\s]*(?P>comment_block)[\s]*.*newAlloc6 := \{ 6 \}[\s]*(?P>comment_block)[\s]*.*newAlloc7 : struct tag-test[\s]*(?P>comment_block)[\s]*.*newAlloc7 := \{ 7 \}[\s]*(?P>comment_block)[\s]*GOTO 3
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
 Checks for:
 
-       // 31 file main.c line 34 function main
-    6: test newAlloc4;
-       // 32 file main.c line 34 function main
-       newAlloc4 = { .id=4 };
-       // 33 file main.c line 35 function main
-       test newAlloc6;
-       // 34 file main.c line 35 function main
-       newAlloc6 = { .id=6 };
-       // 35 file main.c line 36 function main
-       test newAlloc7;
-       // 36 file main.c line 36 function main
-       newAlloc7 = { .id=7 };
-       // 37 file main.c line 37 function main
+       // 37 file main.c line 36 function main
+    6: DECL main::1::2::2::newAlloc4 : struct tag-test
+       // 38 file main.c line 36 function main
+       ASSIGN main::1::2::2::newAlloc4 := { 4 }
+       // 39 file main.c line 37 function main
+       DECL main::1::2::2::newAlloc6 : struct tag-test
+       // 40 file main.c line 37 function main
+       ASSIGN main::1::2::2::newAlloc6 := { 6 }
+       // 41 file main.c line 38 function main
+       DECL main::1::2::2::newAlloc7 : struct tag-test
+       // 42 file main.c line 38 function main
+       ASSIGN main::1::2::2::newAlloc7 := { 7 }
+       // 43 file main.c line 39 function main
        GOTO 3
 
 This asserts that when the GOTO is going into a lexical block that destructors

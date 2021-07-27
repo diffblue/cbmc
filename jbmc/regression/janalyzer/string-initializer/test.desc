@@ -3,7 +3,7 @@ Basic1
 --location-sensitive --constants --show
 ^EXIT=0$
 ^SIGNAL=0$
-Hello_20 = \{ \.@class_identifier="java::java\.lang\.String" \};
+Hello_20 := \{ "java::java\.lang\.String" \}
 java::java\.lang\.String\.Literal\.Hello_20=\{ \.@class_identifier="java::java\.lang\.String" \}
 --
 ^warning: ignoring

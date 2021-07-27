@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-ASSERT tmp_if_expr
+ASSERT .*::tmp_if_expr
 --
 --
 Verification:

@@ -3,9 +3,9 @@ main.c
 --fp-reachability-slice c
 ^EXIT=0$
 ^SIGNAL=0$
-1: ASSUME FALSE
-dead e;
-dead d;
+1: ASSUME false
+DEAD .*::e
+DEAD .*::d
 --
 ^warning: ignoring
-dead f;
+DEAD .*::f

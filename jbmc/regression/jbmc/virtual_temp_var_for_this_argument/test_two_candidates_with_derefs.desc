@@ -3,10 +3,10 @@ Main
 --show-goto-functions --function Main.twoCandidatesWithDerefs
 ^EXIT=0$
 ^SIGNAL=0$
-struct A \*this_argument;$
-this_argument = aContainer->a_field;$
-this_argument \. A\.f:\(\)V\(\);$
-this_argument \. B\.f:\(\)V\(\);$
+DECL .*::this_argument : struct java::A\*$
+ASSIGN .*::this_argument := \*.*::aContainer\.a_field$
+CALL java::A\.f:\(\)V\(.*this_argument.*\)$
+CALL java::B\.f:\(\)V\(.*this_argument.*\)$
 --
 --
 The temporary variable `this_argument` should be created, because it

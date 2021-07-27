@@ -1,10 +1,10 @@
 CORE
 main.c
 --replace-calls f:g
-g\(0\);
+g\(0\)
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-f\(0\);
+f\(0\)
 ^warning: ignoring

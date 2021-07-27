@@ -3,7 +3,7 @@ main.c
 --vsd
 ^SIGNAL=0$
 ^EXIT=0$
-main#return_value = 0;
+main#return_value := 0
 --
 --
 Tests that a multiplication
