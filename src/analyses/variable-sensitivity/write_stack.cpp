@@ -14,7 +14,6 @@
 
 #include <unordered_set>
 
-#include <langapi/language_util.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>

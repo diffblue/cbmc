@@ -37,6 +37,12 @@ abstract_pointer_objectt::abstract_pointer_objectt(
   PRECONDITION(e.type().id() == ID_pointer);
 }
 
+static bool is_ptr_diff(const exprt &expr)
+{
+  return (expr.id() == ID_minus) &&
+         (expr.operands()[1].type().id() == ID_pointer);
+}
+
 abstract_object_pointert abstract_pointer_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -59,7 +65,7 @@ abstract_object_pointert abstract_pointer_objectt::expression_transform(
     }
   }
 
-  if(expr.id() == ID_ptr_diff)
+  if(is_ptr_diff(expr))
   {
     auto &rhs = operands[1];
     if(same_target(rhs))

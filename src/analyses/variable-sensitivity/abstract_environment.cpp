@@ -54,7 +54,12 @@ std::vector<abstract_object_pointert> eval_operands(
   const abstract_environmentt &env,
   const namespacet &ns);
 
-exprt simplify_vsd_expr(exprt src, const namespacet &ns);
+static bool is_ptr_diff(const exprt &expr)
+{
+  return (expr.id() == ID_minus) &&
+         (expr.operands()[0].type().id() == ID_pointer) &&
+         (expr.operands()[1].type().id() == ID_pointer);
+}
 
 abstract_object_pointert
 abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
@@ -71,7 +76,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
 
   if(
     simplified_id == ID_member || simplified_id == ID_index ||
-    simplified_id == ID_dereference || simplified_id == ID_ptr_diff)
+    simplified_id == ID_dereference || is_ptr_diff(simplified_expr))
   {
     auto access_expr = simplified_expr;
     auto target = eval(access_expr.operands()[0], ns);
@@ -831,7 +836,7 @@ exprt assume_greater_than(
 class simplify_vsd_exprt : public simplify_exprt
 {
 public:
-  simplify_vsd_exprt(const namespacet &_ns) : simplify_exprt(_ns)
+  explicit simplify_vsd_exprt(const namespacet &_ns) : simplify_exprt(_ns)
   {
     vsd_pointers = true;
   }
