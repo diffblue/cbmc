@@ -38,7 +38,6 @@ assigns_clause_targett::assigns_clause_targett(
   symbolt standin_symbol = contract.new_tmp_symbol(
     pointer_object.type(),
     function_symbol.location,
-    function_id,
     function_symbol.mode);
 
   local_target = standin_symbol.symbol_expr();

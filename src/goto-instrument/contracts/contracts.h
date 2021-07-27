@@ -84,7 +84,7 @@ public:
   /// it using `cbmc --function F`.
   ///
   /// \return `true` on failure, `false` otherwise
-  bool replace_calls(const std::set<std::string> &);
+  bool replace_calls(const std::set<std::string> &functions);
 
   /// \brief Turn requires & ensures into assumptions and assertions for each of
   ///        the named functions
@@ -102,7 +102,7 @@ public:
   /// then asserts `CF`'s `ensures` clause.
   ///
   /// \return `true` on failure, `false` otherwise
-  bool enforce_contracts(const std::set<std::string> &);
+  bool enforce_contracts(const std::set<std::string> &functions);
 
   /// \brief Call enforce_contracts() on all functions that have a contract
   /// \return `true` on failure, `false` otherwise
@@ -118,12 +118,10 @@ public:
   const symbolt &new_tmp_symbol(
     const typet &type,
     const source_locationt &source_location,
-    const irep_idt &function_id,
     const irep_idt &mode);
 
   void check_apply_loop_contracts(
     goto_functionst::goto_functiont &goto_function,
-    const irep_idt &function_name,
     const local_may_aliast &local_may_alias,
     const goto_programt::targett loop_head,
     const loopt &loop,
@@ -156,7 +154,7 @@ protected:
 
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.
-  bool check_for_looped_mallocs(const goto_programt &);
+  bool check_for_looped_mallocs(const goto_programt &program);
 
   /// Inserts an assertion statement into program before the assignment
   /// instruction_it, to ensure that the left-hand-side of the assignment
@@ -177,7 +175,6 @@ protected:
     goto_programt::instructionst::iterator &ins_it,
     goto_programt &program,
     exprt &assigns,
-    const irep_idt &function_id,
     std::set<irep_idt> &freely_assignable_symbols,
     assigns_clauset &assigns_clause);
 
@@ -201,19 +198,20 @@ protected:
     std::vector<exprt> &aliasable_references);
 
   void apply_loop_contract(
-    const irep_idt &function_name,
+    const irep_idt &function,
     goto_functionst::goto_functiont &goto_function);
 
   /// \brief Does the named function have a contract?
   bool has_contract(const irep_idt);
 
   bool apply_function_contract(
-    const irep_idt &function_id,
     goto_programt &goto_program,
     goto_programt::targett target);
 
-  void
-  add_contract_check(const irep_idt &, const irep_idt &, goto_programt &dest);
+  void add_contract_check(
+    const irep_idt &wrapper_function,
+    const irep_idt &mangled_function,
+    goto_programt &dest);
 
   /// This function recursively searches the expression to find nested or
   /// non-nested quantified expressions. When a quantified expression is found,
@@ -230,7 +228,6 @@ protected:
     exprt &expr,
     std::map<exprt, exprt> &parameter2history,
     source_locationt location,
-    const irep_idt &function,
     const irep_idt &mode,
     goto_programt &history);
 
@@ -240,7 +237,6 @@ protected:
   std::pair<goto_programt, goto_programt> create_ensures_instruction(
     codet &expression,
     source_locationt location,
-    const irep_idt &function,
     const irep_idt &mode);
 };
 
