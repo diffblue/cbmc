@@ -178,18 +178,6 @@ protected:
     std::set<irep_idt> &freely_assignable_symbols,
     assigns_clauset &assigns_clause);
 
-  /// Creates a local variable declaration for each expression in operands,
-  /// and stores them in created_declarations. Then creates assignment
-  /// statements to capture the memory addresses of each expression
-  /// in the assigns clause within the associated local variable,
-  /// populating a vector created_references of these local variables.
-  void populate_assigns_reference(
-    std::vector<exprt> operands,
-    const symbolt &function_symbol,
-    const irep_idt &function_id,
-    goto_programt &created_declarations,
-    std::vector<exprt> &created_references);
-
   /// Creates a boolean expression which is true when there exists an expression
   /// in aliasable_references with the same pointer object and pointer offset as
   /// the address of lhs.
