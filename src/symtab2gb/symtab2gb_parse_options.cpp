@@ -12,6 +12,8 @@ Author: Diffblue Ltd.
 #include <iostream>
 #include <string>
 
+#include <ansi-c/ansi_c_language.h>
+
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/link_goto_model.h>
@@ -113,6 +115,8 @@ int symtab2gb_parse_optionst::doit()
     gb_filename = cmdline.get_value(SYMTAB2GB_OUT_FILE_OPT);
   }
   register_language(new_json_symtab_language);
+  // Workaround to allow external front-ends to use "C" mode
+  register_language(new_ansi_c_language);
   config.set(cmdline);
   run_symtab2gb(symtab_filenames, gb_filename);
   return CPROVER_EXIT_SUCCESS;

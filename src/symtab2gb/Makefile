@@ -4,6 +4,7 @@ SRC = \
   # Empty last line
 
 OBJ += \
+  ../ansi-c/ansi-c$(LIBEXT) \
   ../util/util$(LIBEXT) \
   ../goto-programs/goto-programs$(LIBEXT) \
   ../big-int/big-int$(LIBEXT) \
