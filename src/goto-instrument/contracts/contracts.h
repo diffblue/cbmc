@@ -185,6 +185,8 @@ protected:
     const exprt &lhs,
     std::vector<exprt> &aliasable_references);
 
+  /// Apply loop contracts, whenever available, to all loops in `function`.
+  /// Loop invariants, loop variants, and loop assigns clauses.
   void apply_loop_contract(
     const irep_idt &function,
     goto_functionst::goto_functiont &goto_function);
@@ -192,10 +194,15 @@ protected:
   /// \brief Does the named function have a contract?
   bool has_contract(const irep_idt);
 
+  /// Replaces function calls with assertions based on requires clauses,
+  /// non-deterministic assignments for the write set, and assumptions
+  /// based on ensures clauses.
   bool apply_function_contract(
     goto_programt &goto_program,
     goto_programt::targett target);
 
+  /// Instruments `wrapper_function` adding assumptions based on requires
+  /// clauses and assertions based on ensures clauses.
   void add_contract_check(
     const irep_idt &wrapper_function,
     const irep_idt &mangled_function,
