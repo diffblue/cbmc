@@ -491,11 +491,6 @@ bool code_contractst::apply_function_contract(
   auto requires = conjunction(type.requires());
   auto ensures = conjunction(type.ensures());
 
-  // Check to see if the function contract actually constrains its effect on
-  // the program state; if not, return.
-  if(ensures.is_true() && assigns.is_nil())
-    return false;
-
   // Create a replace_symbolt object, for replacing expressions in the callee
   // with expressions from the call site (e.g. the return value).
   // This object tracks replacements that are common to ENSURES and REQUIRES.
@@ -559,7 +554,7 @@ bool code_contractst::apply_function_contract(
   is_fresh.create_declarations();
 
   // Insert assertion of the precondition immediately before the call site.
-  if(requires.is_not_nil())
+  if(!requires.is_true())
   {
     replace_symbolt replace(common_replace);
     code_contractst::add_quantified_variable(requires, replace, mode);
@@ -584,7 +579,7 @@ bool code_contractst::apply_function_contract(
   // Gather all the instructions required to handle history variables
   // as well as the ensures clause
   std::pair<goto_programt, goto_programt> ensures_pair;
-  if(ensures.is_not_nil())
+  if(!ensures.is_false())
   {
     replace_symbolt replace(common_replace);
     code_contractst::add_quantified_variable(ensures, replace, mode);
@@ -619,7 +614,7 @@ bool code_contractst::apply_function_contract(
 
   // To remove the function call, insert statements related to the assumption.
   // Then, replace the function call with a SKIP statement.
-  if(ensures.is_not_nil())
+  if(!ensures.is_false())
   {
     is_fresh.update_ensures(ensures_pair.first);
     auto lines_to_iterate = ensures_pair.first.instructions.size();
@@ -1072,11 +1067,6 @@ void code_contractst::add_contract_check(
   exprt requires = conjunction(code_type.requires());
   exprt ensures = conjunction(code_type.ensures());
 
-  INVARIANT(
-    !ensures.is_true() || assigns.is_not_nil(),
-    "Code contract enforcement is trivial without an ensures or assigns "
-    "clause.");
-
   // build:
   // if(nondet)
   //   decl ret
@@ -1148,7 +1138,7 @@ void code_contractst::add_contract_check(
   visitor.create_declarations();
 
   // Generate: assume(requires)
-  if(requires.is_not_nil())
+  if(!requires.is_false())
   {
     // extend common_replace with quantified variables in REQUIRES,
     // and then do the replacement
@@ -1168,7 +1158,7 @@ void code_contractst::add_contract_check(
   std::pair<goto_programt, goto_programt> ensures_pair;
 
   // Generate: copies for history variables
-  if(ensures.is_not_nil())
+  if(!ensures.is_true())
   {
     // extend common_replace with quantified variables in ENSURES,
     // and then do the replacement
