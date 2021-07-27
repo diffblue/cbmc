@@ -45,7 +45,7 @@ void validate_nondet_method_removed(
       }
     }
 
-    if(inst.is_return())
+    if(inst.is_set_return_value())
     {
       const auto &return_value = inst.return_value();
       if(return_value.id() == ID_side_effect)
@@ -94,7 +94,7 @@ void validate_nondets_converted(
     exprt target_expression =
       (inst.is_assign()
          ? inst.get_assign().rhs()
-         : inst.is_return() ? inst.return_value() : inst.get_code());
+         : inst.is_set_return_value() ? inst.return_value() : inst.get_code());
 
     if(
       const auto side_effect =

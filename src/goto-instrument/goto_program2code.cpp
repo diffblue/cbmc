@@ -180,8 +180,8 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case ASSIGN:
       return convert_assign(target, upper_bound, dest);
 
-    case RETURN:
-      return convert_return(target, upper_bound, dest);
+    case SET_RETURN_VALUE:
+      return convert_set_return_value(target, upper_bound, dest);
 
     case DECL:
       return convert_decl(target, upper_bound, dest);
@@ -410,7 +410,7 @@ void goto_program2codet::convert_assign_rec(
     dest.add(assign);
 }
 
-goto_programt::const_targett goto_program2codet::convert_return(
+goto_programt::const_targett goto_program2codet::convert_set_return_value(
   goto_programt::const_targett target,
   goto_programt::const_targett upper_bound,
   code_blockt &dest)

@@ -61,7 +61,7 @@ void local_cfgt::build(const goto_programt &goto_program)
       break; // no successor
 
     case CATCH:
-    case RETURN:
+    case SET_RETURN_VALUE:
     case ATOMIC_BEGIN:
     case ATOMIC_END:
     case LOCATION:

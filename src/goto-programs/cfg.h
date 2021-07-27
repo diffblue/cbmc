@@ -507,7 +507,7 @@ void cfg_baset<T, P, I>::compute_edges(
   case ASSIGN:
   case ASSERT:
   case OTHER:
-  case RETURN:
+  case SET_RETURN_VALUE:
   case SKIP:
   case LOCATION:
   case ATOMIC_BEGIN:

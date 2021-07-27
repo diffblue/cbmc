@@ -58,7 +58,7 @@ bool points_tot::transform(const cfgt::nodet &e)
 
   switch(instruction.type)
   {
-  case RETURN:
+  case SET_RETURN_VALUE:
     // TODO
     break;
 

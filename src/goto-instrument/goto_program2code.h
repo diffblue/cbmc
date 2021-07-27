@@ -141,7 +141,7 @@ protected:
 
   void convert_assign_rec(const code_assignt &assign, code_blockt &dest);
 
-  goto_programt::const_targett convert_return(
+  goto_programt::const_targett convert_set_return_value(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
     code_blockt &dest);

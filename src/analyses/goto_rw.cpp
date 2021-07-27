@@ -771,7 +771,7 @@ void goto_rw(
       target->get_condition());
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     rw_set.get_objects_rec(
       function, target, rw_range_sett::get_modet::READ, target->return_value());
     break;

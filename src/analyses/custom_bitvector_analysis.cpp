@@ -540,8 +540,8 @@ void custom_bitvector_domaint::transform(
   case THROW:
     DATA_INVARIANT(false, "Exceptions must be removed before analysis");
     break;
-  case RETURN:
-    DATA_INVARIANT(false, "Returns must be removed before analysis");
+  case SET_RETURN_VALUE:
+    DATA_INVARIANT(false, "SET_RETURN_VALUE must be removed before analysis");
     break;
   case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
   case ATOMIC_END:   // Ignoring is a valid over-approximation

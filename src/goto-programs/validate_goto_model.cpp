@@ -126,7 +126,9 @@ void validate_goto_modelt::check_returns_removed()
     for(const auto &instr : goto_function.body.instructions)
     {
       DATA_CHECK(
-        vm, !instr.is_return(), "no return instructions should be present");
+        vm,
+        !instr.is_set_return_value(),
+        "no SET_RETURN_VALUE instructions should be present");
 
       if(instr.is_function_call())
       {

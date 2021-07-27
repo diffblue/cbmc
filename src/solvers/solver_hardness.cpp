@@ -267,7 +267,10 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
     }
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
+    out << "SET RETURN VALUE" << format(instruction.return_value());
+    break;
+
   case OTHER:
   case DECL:
   case DEAD:

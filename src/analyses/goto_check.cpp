@@ -2032,7 +2032,7 @@ void goto_checkt::goto_check(
       // the call might invalidate any assertion
       assertions.clear();
     }
-    else if(i.is_return())
+    else if(i.is_set_return_value())
     {
       check(i.return_value());
       // the return value invalidate any assertion

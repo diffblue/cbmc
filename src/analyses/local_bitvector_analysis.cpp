@@ -307,9 +307,9 @@ void local_bitvector_analysist::build()
       DATA_INVARIANT(false, "Exceptions must be removed before analysis");
       break;
 #endif
-    case RETURN:
+    case SET_RETURN_VALUE:
 #if 0
-      DATA_INVARIANT(false, "Returns must be removed before analysis");
+      DATA_INVARIANT(false, "SET_RETURN_VALUE must be removed before analysis");
       break;
 #endif
     case ATOMIC_BEGIN: // Ignoring is a valid over-approximation

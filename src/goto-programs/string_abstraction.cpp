@@ -484,7 +484,7 @@ goto_programt::targett string_abstractiont::abstract(
     abstract_function_call(it);
     break;
 
-  case RETURN:
+  case SET_RETURN_VALUE:
     // use remove_returns
     UNREACHABLE;
     break;

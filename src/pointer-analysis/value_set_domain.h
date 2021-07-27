@@ -83,7 +83,7 @@ void value_set_domain_templatet<VST>::transform(
   }
 
   // Note intentional fall-through here:
-  case RETURN:
+  case SET_RETURN_VALUE:
   case OTHER:
   case ASSIGN:
   case DECL:

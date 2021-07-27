@@ -50,11 +50,11 @@ void invariant_set_domaint::transform(
     }
     break;
 
-  case RETURN:
-    // ignore
-    break;
+    case SET_RETURN_VALUE:
+      // ignore
+      break;
 
-  case ASSIGN:
+    case ASSIGN:
     {
       const code_assignt &assignment = from_l->get_assign();
       invariant_set.assignment(assignment.lhs(), assignment.rhs());
