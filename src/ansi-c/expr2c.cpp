@@ -2290,16 +2290,14 @@ std::string expr2ct::convert_initializer_list(const exprt &src)
   return dest;
 }
 
-std::string expr2ct::convert_rox(const exprt &src, unsigned precedence)
+std::string expr2ct::convert_rox(const shift_exprt &src, unsigned precedence)
 {
   // AAAA rox n ==   (AAAA lhs_op n % width(AAAA))
   //               | (AAAA rhs_op (width(AAAA) - n % width(AAAA)))
   // Where lhs_op and rhs_op depend on whether it is rol or ror
-  // auto rotate_expr = to_binary_expr(src);
-  auto rotate_expr = expr_checked_cast<shift_exprt>(src);
   // Get AAAA and if it's signed wrap it in a cast to remove
   // the sign since this messes with C shifts
-  exprt &op0 = rotate_expr.op();
+  exprt op0 = src.op();
   size_t type_width;
   if(can_cast_type<signedbv_typet>(op0.type()))
   {
@@ -2316,17 +2314,15 @@ std::string expr2ct::convert_rox(const exprt &src, unsigned precedence)
   }
   else
   {
-    // Type that can't be represented as bitvector
-    // get some kind of width in a potentially unsafe way
-    type_width = op0.type().get_size_t("width");
+    UNREACHABLE;
   }
   // Construct the "width(AAAA)" constant
   const exprt width_expr =
-    from_integer(type_width, rotate_expr.distance().type());
+    from_integer(type_width, src.distance().type());
   // Apply modulo to n since shifting will overflow
   // That is: 0001 << 4 == 0, but 0001 rol 4 == 0001
   const exprt distance_modulo_width =
-    mod_exprt(rotate_expr.distance(), width_expr);
+    mod_exprt(src.distance(), width_expr);
   // Now put the pieces together
   // width(AAAA) - (n % width(AAAA))
   const auto complement_width_expr =
@@ -3861,7 +3857,7 @@ std::string expr2ct::convert_with_precedence(
     return convert(src.type());
 
   else if(src.id() == ID_rol || src.id() == ID_ror)
-    return convert_rox(src, precedence);
+    return convert_rox(to_shift_expr(src), precedence);
 
   auto function_string_opt = convert_function(src);
   if(function_string_opt.has_value())
