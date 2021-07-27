@@ -1,0 +1,14 @@
+CORE
+test.json
+--dump-c
+^EXIT=0$
+^SIGNAL=0$
+int helper\$\$1\$\$var_2\$\$x;
+int helper\$\$1\$\$var_3\$\$x;
+--
+int x;
+--
+This tests that variable conflicts are correctly converted to ugly but
+no-collision names. The json file declares "x" in the arguments and also
+twice in the "helper" function, both instances inside "helper" should
+have non-collision names in the dump-c output.

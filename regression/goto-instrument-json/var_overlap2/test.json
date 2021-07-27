@@ -1,0 +1,335 @@
+{
+  "symbolTable": {
+    "x": {
+      "baseName": "x",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": false,
+      "isStaticLifetime": false,
+      "isThreadLocal": false,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "mode": "C",
+      "module": "",
+      "name": "x",
+      "prettyName": "x",
+      "type": {
+        "id": "code",
+        "namedSub": {
+          "parameters": {
+            "id": "",
+            "sub": [
+              {
+                "id": "parameter",
+                "namedSub": {
+                  "#base_name": {
+                    "id": "x::1::var_1::x"
+                  },
+                  "#identifier": {
+                    "id": "x::1::var_1::x"
+                  },
+                  "type": {
+                    "id": "unsignedbv",
+                    "namedSub": {
+                      "width": {
+                        "id": "32"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "return_type": {
+            "id": "empty"
+          }
+        }
+      },
+      "value": {
+        "id": "code",
+        "namedSub": {
+          "statement": {
+            "id": "block"
+          }
+        },
+        "sub": [
+          {
+            "id": "code",
+            "namedSub": {
+              "statement": {
+                "id": "decl"
+              }
+            },
+            "sub": [
+              {
+                "id": "symbol",
+                "namedSub": {
+                  "identifier": {
+                    "id": "x::1::var_2::x"
+                  },
+                  "type": {
+                    "id": "signedbv",
+                    "namedSub": {
+                      "width": {
+                        "id": "32"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "code",
+            "namedSub": {
+              "statement": {
+                "id": "decl"
+              }
+            },
+            "sub": [
+              {
+                "id": "symbol",
+                "namedSub": {
+                  "identifier": {
+                    "id": "x::1::var_3::x"
+                  },
+                  "type": {
+                    "id": "signedbv",
+                    "namedSub": {
+                      "width": {
+                        "id": "32"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "x::1::var_1::x": {
+      "baseName": "x",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": true,
+      "isStaticLifetime": false,
+      "isThreadLocal": true,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "mode": "C",
+      "module": "",
+      "name": "x::1::var_1::x",
+      "prettyName": "",
+      "type": {
+        "id": "unsignedbv",
+        "namedSub": {
+          "width": {
+            "id": "32"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    },
+    "x::1::var_2::x": {
+      "baseName": "x",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": true,
+      "isStaticLifetime": false,
+      "isThreadLocal": true,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "mode": "C",
+      "module": "",
+      "name": "x::1::var_2::x",
+      "prettyName": "",
+      "type": {
+        "id": "signedbv",
+        "namedSub": {
+          "width": {
+            "id": "32"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    },
+    "x::1::var_3::x": {
+      "baseName": "x",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": true,
+      "isStaticLifetime": false,
+      "isThreadLocal": true,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "mode": "C",
+      "module": "",
+      "name": "x::1::var_3::x",
+      "prettyName": "",
+      "type": {
+        "id": "signedbv",
+        "namedSub": {
+          "width": {
+            "id": "32"
+          }
+        }
+      },
+      "value": {
+        "id": "nil"
+      }
+    },
+    "main": {
+      "baseName": "main",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": false,
+      "isStaticLifetime": false,
+      "isThreadLocal": false,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "mode": "C",
+      "module": "",
+      "name": "main",
+      "prettyName": "main",
+      "type": {
+        "id": "code",
+        "namedSub": {
+          "parameters": {
+            "id": ""
+          },
+          "return_type": {
+            "id": "empty"
+          }
+        }
+      },
+      "value": {
+        "id": "code",
+        "namedSub": {
+          "statement": {
+            "id": "expression"
+          }
+        },
+        "sub": [
+          {
+            "id": "side_effect",
+            "namedSub": {
+              "statement": {
+                "id": "function_call"
+              },
+              "type": {
+                "id": "empty"
+              }
+            },
+            "sub": [
+              {
+                "id": "symbol",
+                "namedSub": {
+                  "identifier": {
+                    "id": "x"
+                  },
+                  "type": {
+                    "id": "code",
+                    "namedSub": {
+                      "parameters": {
+                        "id": "",
+                        "sub": [
+                          {
+                            "id": "parameter",
+                            "namedSub": {
+                              "type": {
+                                "id": "unsignedbv",
+                                "namedSub": {
+                                  "width": {
+                                    "id": "32"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "return_type": {
+                        "id": "empty"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "arguments",
+                "sub": [
+                  {
+                    "id": "constant",
+                    "namedSub": {
+                      "type": {
+                        "id": "unsignedbv",
+                        "namedSub": {
+                          "width": {
+                            "id": "32"
+                          }
+                        }
+                      },
+                      "value": {
+                        "id": "5"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
