@@ -14,8 +14,7 @@ _ensures_ clause.
 ### Parameters
 
 `__CPROVER_old` takes a single argument, which is the identifier corresponding to
-a parameter of the function. For now, only scalar, structs, or pointer types are supported.
-
+a parameter of the function. For now, only scalar or pointer types are supported.
 
 ### Semantics
 
@@ -24,13 +23,12 @@ bellow.  If the function returns a failure code, the value of `*out` should not
 have been modified.
 
 ```c
-int sum(uint32_t* a, uint32_t* b, uint32_t* out)
-
+int sum(const uint32_t a, const uint32_t b, uint32_t* out)
 /* Postconditions */
 __CPROVER_ensures((__CPROVER_return_value == FAILURE) ==> (*out == __CPROVER_old(*out)))
 /* Writable Set */
 __CPROVER_assigns(*out)
 {
-    /* ... */
+  /* ... */
 }
 ```

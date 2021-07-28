@@ -51,7 +51,6 @@ exprt get_size(const typet &type, const namespacet &ns, messaget &log)
 
 void code_contractst::check_apply_loop_contracts(
   goto_functionst::goto_functiont &goto_function,
-  const irep_idt &function_name,
   const local_may_aliast &local_may_alias,
   const goto_programt::targett loop_head,
   const loopt &loop,
@@ -161,12 +160,10 @@ void code_contractst::check_apply_loop_contracts(
   for(const auto &clause : decreases_clause.operands())
   {
     old_temporary_variables.push_back(
-      new_tmp_symbol(
-        clause.type(), loop_head->source_location, function_name, mode)
+      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
         .symbol_expr());
     new_temporary_variables.push_back(
-      new_tmp_symbol(
-        clause.type(), loop_head->source_location, function_name, mode)
+      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
         .symbol_expr());
   }
 
@@ -396,14 +393,12 @@ void code_contractst::replace_old_parameter(
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
   source_locationt location,
-  const irep_idt &function,
   const irep_idt &mode,
   goto_programt &history)
 {
   for(auto &op : expr.operands())
   {
-    replace_old_parameter(
-      op, parameter2history, location, function, mode, history);
+    replace_old_parameter(op, parameter2history, location, mode, history);
   }
 
   if(expr.id() == ID_old)
@@ -425,8 +420,7 @@ void code_contractst::replace_old_parameter(
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
-          new_tmp_symbol(dereference_expr.type(), location, function, mode)
-            .symbol_expr();
+          new_tmp_symbol(dereference_expr.type(), location, mode).symbol_expr();
 
         // 2. Associate the above temporary variable to it's corresponding
         // expression
@@ -458,15 +452,13 @@ std::pair<goto_programt, goto_programt>
 code_contractst::create_ensures_instruction(
   codet &expression,
   source_locationt location,
-  const irep_idt &function,
   const irep_idt &mode)
 {
   std::map<exprt, exprt> parameter2history;
   goto_programt history;
 
   // Find and replace "old" expression in the "expression" variable
-  replace_old_parameter(
-    expression, parameter2history, location, function, mode, history);
+  replace_old_parameter(expression, parameter2history, location, mode, history);
 
   // Create instructions corresponding to the ensures clause
   goto_programt ensures_program;
@@ -479,7 +471,6 @@ code_contractst::create_ensures_instruction(
 }
 
 bool code_contractst::apply_function_contract(
-  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -499,11 +490,6 @@ bool code_contractst::apply_function_contract(
   auto assigns = type.assigns();
   auto requires = conjunction(type.requires());
   auto ensures = conjunction(type.ensures());
-
-  // Check to see if the function contract actually constrains its effect on
-  // the program state; if not, return.
-  if(ensures.is_true() && assigns.is_nil())
-    return false;
 
   // Create a replace_symbolt object, for replacing expressions in the callee
   // with expressions from the call site (e.g. the return value).
@@ -568,7 +554,7 @@ bool code_contractst::apply_function_contract(
   is_fresh.create_declarations();
 
   // Insert assertion of the precondition immediately before the call site.
-  if(requires.is_not_nil())
+  if(!requires.is_true())
   {
     replace_symbolt replace(common_replace);
     code_contractst::add_quantified_variable(requires, replace, mode);
@@ -593,7 +579,7 @@ bool code_contractst::apply_function_contract(
   // Gather all the instructions required to handle history variables
   // as well as the ensures clause
   std::pair<goto_programt, goto_programt> ensures_pair;
-  if(ensures.is_not_nil())
+  if(!ensures.is_false())
   {
     replace_symbolt replace(common_replace);
     code_contractst::add_quantified_variable(ensures, replace, mode);
@@ -603,7 +589,6 @@ bool code_contractst::apply_function_contract(
     ensures_pair = create_ensures_instruction(
       assumption,
       ensures.source_location(),
-      function,
       symbol_table.lookup_ref(function).mode);
 
     // add all the history variable initialization instructions
@@ -617,9 +602,9 @@ bool code_contractst::apply_function_contract(
   // in the assigns clause.
   if(assigns.is_not_nil())
   {
-    assigns_clauset assigns_cause(assigns, *this, function_id, log);
+    assigns_clauset assigns_cause(assigns, *this, function, log);
     goto_programt assigns_havoc = assigns_cause.havoc_code(
-      function_symbol.location, function_id, function_symbol.mode);
+      function_symbol.location, function, function_symbol.mode);
 
     // Insert the non-deterministic assignment immediately before the call site.
     std::size_t lines_to_iterate = assigns_havoc.instructions.size();
@@ -629,7 +614,7 @@ bool code_contractst::apply_function_contract(
 
   // To remove the function call, insert statements related to the assumption.
   // Then, replace the function call with a SKIP statement.
-  if(ensures.is_not_nil())
+  if(!ensures.is_false())
   {
     is_fresh.update_ensures(ensures_pair.first);
     auto lines_to_iterate = ensures_pair.first.instructions.size();
@@ -644,7 +629,7 @@ bool code_contractst::apply_function_contract(
 }
 
 void code_contractst::apply_loop_contract(
-  const irep_idt &function_name,
+  const irep_idt &function,
   goto_functionst::goto_functiont &goto_function)
 {
   local_may_aliast local_may_alias(goto_function);
@@ -656,32 +641,25 @@ void code_contractst::apply_loop_contract(
   {
     check_apply_loop_contracts(
       goto_function,
-      function_name,
       local_may_alias,
       loop.first,
       loop.second,
-      symbol_table.lookup_ref(function_name).mode);
+      symbol_table.lookup_ref(function).mode);
   }
 }
 
 const symbolt &code_contractst::new_tmp_symbol(
   const typet &type,
   const source_locationt &source_location,
-  const irep_idt &function_id,
   const irep_idt &mode)
 {
   return get_fresh_aux_symbol(
     type,
-    id2string(function_id) + "::tmp_cc",
+    id2string(source_location.get_function()) + "::tmp_cc",
     "tmp_cc",
     source_location,
     mode,
     symbol_table);
-}
-
-const namespacet &code_contractst::get_namespace() const
-{
-  return ns;
 }
 
 symbol_tablet &code_contractst::get_symbol_table()
@@ -736,7 +714,6 @@ void code_contractst::instrument_call_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,
   exprt &assigns,
-  const irep_idt &function_id,
   std::set<irep_idt> &freely_assignable_symbols,
   assigns_clauset &assigns_clause)
 {
@@ -832,7 +809,7 @@ void code_contractst::instrument_call_statement(
 
     // check compatibility of assigns clause with the called function
     assigns_clauset called_assigns_clause(
-      called_assigns, *this, function_id, log);
+      called_assigns, *this, called_name, log);
     exprt compatible =
       assigns_clause.compatible_expression(called_assigns_clause);
     goto_programt alias_assertion;
@@ -997,7 +974,6 @@ void code_contractst::check_frame_conditions(
         instruction_it,
         program,
         assigns_expr,
-        target.name,
         freely_assignable_symbols,
         assigns);
     }
@@ -1078,23 +1054,18 @@ bool code_contractst::enforce_contract(const irep_idt &function)
 }
 
 void code_contractst::add_contract_check(
-  const irep_idt &wrapper_fun,
-  const irep_idt &mangled_fun,
+  const irep_idt &wrapper_function,
+  const irep_idt &mangled_function,
   goto_programt &dest)
 {
   PRECONDITION(!dest.instructions.empty());
 
-  const symbolt &function_symbol = ns.lookup(mangled_fun);
+  const symbolt &function_symbol = ns.lookup(mangled_function);
   const auto &code_type = to_code_with_contract_type(function_symbol.type);
 
   exprt assigns = code_type.assigns();
   exprt requires = conjunction(code_type.requires());
   exprt ensures = conjunction(code_type.ensures());
-
-  INVARIANT(
-    !ensures.is_true() || assigns.is_not_nil(),
-    "Code contract enforcement is trivial without an ensures or assigns "
-    "clause.");
 
   // build:
   // if(nondet)
@@ -1128,7 +1099,6 @@ void code_contractst::add_contract_check(
     symbol_exprt r = new_tmp_symbol(
                        code_type.return_type(),
                        skip->source_location,
-                       wrapper_fun,
                        function_symbol.mode)
                        .symbol_expr();
     check.add(goto_programt::make_decl(r, skip->source_location));
@@ -1142,7 +1112,7 @@ void code_contractst::add_contract_check(
 
   // decl parameter1 ...
   goto_functionst::function_mapt::iterator f_it =
-    goto_functions.function_map.find(mangled_fun);
+    goto_functions.function_map.find(mangled_function);
   PRECONDITION(f_it != goto_functions.function_map.end());
 
   const goto_functionst::goto_functiont &gf = f_it->second;
@@ -1153,7 +1123,6 @@ void code_contractst::add_contract_check(
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
                        skip->source_location,
-                       wrapper_fun,
                        parameter_symbol.mode)
                        .symbol_expr();
     check.add(goto_programt::make_decl(p, skip->source_location));
@@ -1165,11 +1134,11 @@ void code_contractst::add_contract_check(
     common_replace.insert(parameter_symbol.symbol_expr(), p);
   }
 
-  is_fresh_enforcet visitor(*this, log, wrapper_fun);
+  is_fresh_enforcet visitor(*this, log, wrapper_function);
   visitor.create_declarations();
 
   // Generate: assume(requires)
-  if(requires.is_not_nil())
+  if(!requires.is_false())
   {
     // extend common_replace with quantified variables in REQUIRES,
     // and then do the replacement
@@ -1189,7 +1158,7 @@ void code_contractst::add_contract_check(
   std::pair<goto_programt, goto_programt> ensures_pair;
 
   // Generate: copies for history variables
-  if(ensures.is_not_nil())
+  if(!ensures.is_true())
   {
     // extend common_replace with quantified variables in ENSURES,
     // and then do the replacement
@@ -1202,7 +1171,7 @@ void code_contractst::add_contract_check(
     auto assertion = code_assertt(ensures);
     assertion.add_source_location() = ensures.source_location();
     ensures_pair = create_ensures_instruction(
-      assertion, ensures.source_location(), wrapper_fun, function_symbol.mode);
+      assertion, ensures.source_location(), function_symbol.mode);
     ensures_pair.first.instructions.back().source_location.set_comment(
       "Check ensures clause");
     ensures_pair.first.instructions.back().source_location.set_property_class(
@@ -1213,7 +1182,7 @@ void code_contractst::add_contract_check(
     check.destructive_append(ensures_pair.second);
   }
 
-  // ret=mangled_fun(parameter1, ...)
+  // ret=mangled_function(parameter1, ...)
   check.add(goto_programt::make_function_call(call, skip->source_location));
 
   // Generate: assert(ensures)
@@ -1232,15 +1201,14 @@ void code_contractst::add_contract_check(
   dest.destructive_insert(dest.instructions.begin(), check);
 }
 
-bool code_contractst::replace_calls(
-  const std::set<std::string> &funs_to_replace)
+bool code_contractst::replace_calls(const std::set<std::string> &functions)
 {
   bool fail = false;
-  for(const auto &fun : funs_to_replace)
+  for(const auto &function : functions)
   {
-    if(!has_contract(fun))
+    if(!has_contract(function))
     {
-      log.error() << "Function '" << fun
+      log.error() << "Function '" << function
                   << "' does not have a contract; "
                      "not replacing calls with contract."
                   << messaget::eom;
@@ -1261,17 +1229,14 @@ bool code_contractst::replace_calls(
         if(call.function().id() != ID_symbol)
           continue;
 
-        const irep_idt &function_name =
+        const irep_idt &called_function =
           to_symbol_expr(call.function()).get_identifier();
         auto found = std::find(
-          funs_to_replace.begin(),
-          funs_to_replace.end(),
-          id2string(function_name));
-        if(found == funs_to_replace.end())
+          functions.begin(), functions.end(), id2string(called_function));
+        if(found == functions.end())
           continue;
 
-        fail |= apply_function_contract(
-          function_name, goto_function.second.body, ins);
+        fail |= apply_function_contract(goto_function.second.body, ins);
       }
     }
   }
@@ -1295,52 +1260,51 @@ void code_contractst::apply_loop_contracts()
 
 bool code_contractst::replace_calls()
 {
-  std::set<std::string> funs_to_replace;
+  std::set<std::string> functions;
   for(auto &goto_function : goto_functions.function_map)
   {
     if(has_contract(goto_function.first))
-      funs_to_replace.insert(id2string(goto_function.first));
+      functions.insert(id2string(goto_function.first));
   }
-  return replace_calls(funs_to_replace);
+  return replace_calls(functions);
 }
 
 bool code_contractst::enforce_contracts()
 {
-  std::set<std::string> funs_to_enforce;
+  std::set<std::string> functions;
   for(auto &goto_function : goto_functions.function_map)
   {
     if(has_contract(goto_function.first))
-      funs_to_enforce.insert(id2string(goto_function.first));
+      functions.insert(id2string(goto_function.first));
   }
-  return enforce_contracts(funs_to_enforce);
+  return enforce_contracts(functions);
 }
 
-bool code_contractst::enforce_contracts(
-  const std::set<std::string> &funs_to_enforce)
+bool code_contractst::enforce_contracts(const std::set<std::string> &functions)
 {
   bool fail = false;
-  for(const auto &fun : funs_to_enforce)
+  for(const auto &function : functions)
   {
-    auto goto_function = goto_functions.function_map.find(fun);
+    auto goto_function = goto_functions.function_map.find(function);
     if(goto_function == goto_functions.function_map.end())
     {
       fail = true;
-      log.error() << "Could not find function '" << fun
+      log.error() << "Could not find function '" << function
                   << "' in goto-program; not enforcing contracts."
                   << messaget::eom;
       continue;
     }
 
-    if(!has_contract(fun))
+    if(!has_contract(function))
     {
       fail = true;
-      log.error() << "Could not find any contracts within function '" << fun
-                  << "'; nothing to enforce." << messaget::eom;
+      log.error() << "Could not find any contracts within function '"
+                  << function << "'; nothing to enforce." << messaget::eom;
       continue;
     }
 
     if(!fail)
-      fail = enforce_contract(fun);
+      fail = enforce_contract(function);
   }
   return fail;
 }
