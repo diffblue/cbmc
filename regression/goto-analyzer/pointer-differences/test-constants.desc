@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-pointers constants --vsd-values constants --verify
+--variable-sensitivity --vsd-pointers constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line 16 assertion offset == 4: SUCCESS$
