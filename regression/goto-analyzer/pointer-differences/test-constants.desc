@@ -8,5 +8,5 @@ main.c
 ^\[main.assertion.3\] line 20 assertion offset == 1: SUCCESS$
 ^\[main.assertion.4\] line 22 assertion offset == 0: SUCCESS$
 ^\[main.assertion.5\] line 26 assertion offset == 2: SUCCESS$
-^\[main.assertion.6\] line 27 assertion q == p: UNKNOWN$
+^\[main.assertion.6\] line 27 assertion q == p: FAILURE
 ^\[main.assertion.7\] line 30 assertion offset == 0: FAILURE \(if reachable\)$

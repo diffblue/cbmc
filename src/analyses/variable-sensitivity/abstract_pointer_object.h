@@ -66,6 +66,10 @@ public:
   {
     return false;
   }
+  virtual exprt offset() const
+  {
+    return nil_exprt();
+  }
   virtual exprt offset_from(abstract_object_pointert other) const
   {
     return nil_exprt();
@@ -122,6 +126,11 @@ private:
     const abstract_environmentt &environment,
     const namespacet &ns) const;
   abstract_object_pointert eval_ptr_comparison(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+  exprt ptr_comparison_expr(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,

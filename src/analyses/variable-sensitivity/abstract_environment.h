@@ -22,6 +22,7 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 
 exprt simplify_vsd_expr(exprt src, const namespacet &ns);
+exprt invert_result(const exprt &result);
 bool is_ptr_diff(const exprt &expr);
 bool is_ptr_comparison(const exprt &expr);
 

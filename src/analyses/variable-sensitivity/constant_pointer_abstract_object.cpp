@@ -87,6 +87,13 @@ bool constant_pointer_abstract_objectt::same_target(
   return matching_pointer;
 }
 
+exprt constant_pointer_abstract_objectt::offset() const
+{
+  if(value_stack.is_top_value())
+    return nil_exprt();
+  return value_stack.offset_expression();
+}
+
 exprt constant_pointer_abstract_objectt::offset_from(
   abstract_object_pointert other) const
 {

@@ -211,7 +211,11 @@ exprt write_stackt::target_expression() const
 exprt write_stackt::offset_expression() const
 {
   PRECONDITION(!is_top_value());
-  return stack[1]->get_access_expr().operands()[1];
+  auto const &access = stack.back()->get_access_expr();
+  auto const &operands = access.operands();
+
+  return operands.empty() ? from_integer(0, unsigned_long_int_type())
+                          : operands.back();
 }
 
 /// Is the stack representing an unknown value and hence can't be written to
