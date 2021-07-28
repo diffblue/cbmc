@@ -109,6 +109,18 @@ public:
     const typet &new_type,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
+
+private:
+  abstract_object_pointert eval_typecast_from_void_ptr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+  abstract_object_pointert eval_ptr_diff(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_POINTER_OBJECT_H
