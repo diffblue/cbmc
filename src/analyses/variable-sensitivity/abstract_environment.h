@@ -22,6 +22,8 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 
 exprt simplify_vsd_expr(exprt src, const namespacet &ns);
+bool is_ptr_diff(const exprt &expr);
+bool is_ptr_comparison(const exprt &expr);
 
 class variable_sensitivity_object_factoryt;
 using variable_sensitivity_object_factory_ptrt =

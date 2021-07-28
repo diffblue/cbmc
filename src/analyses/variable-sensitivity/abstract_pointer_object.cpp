@@ -39,7 +39,6 @@ abstract_pointer_objectt::abstract_pointer_objectt(
 
 static bool is_dereference(const exprt &expr);
 static bool is_typecast_from_void_ptr(const exprt &expr);
-static bool is_ptr_diff(const exprt &expr);
 
 abstract_object_pointert abstract_pointer_objectt::expression_transform(
   const exprt &expr,
@@ -55,6 +54,9 @@ abstract_object_pointert abstract_pointer_objectt::expression_transform(
 
   if(is_ptr_diff(expr))
     return eval_ptr_diff(expr, operands, environment, ns);
+
+  if(is_ptr_comparison(expr))
+    return eval_ptr_comparison(expr, operands, environment, ns);
 
   return abstract_objectt::expression_transform(
     expr, operands, environment, ns);
@@ -147,6 +149,18 @@ abstract_object_pointert abstract_pointer_objectt::eval_ptr_diff(
     expr, operands, environment, ns);
 }
 
+abstract_object_pointert abstract_pointer_objectt::eval_ptr_comparison(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  auto eval_obj =
+    environment.abstract_object_factory(expr.type(), ns, true, false)
+      ->unwrap_context();
+  return eval_obj->expression_transform(expr, operands, environment, ns);
+}
+
 static bool is_dereference(const exprt &expr)
 {
   return expr.id() == ID_dereference;
@@ -159,10 +173,4 @@ static bool is_typecast_from_void_ptr(const exprt &expr)
 
   const typecast_exprt &tce = to_typecast_expr(expr);
   return tce.op().id() == ID_symbol && is_void_pointer(tce.op().type());
-}
-
-static bool is_ptr_diff(const exprt &expr)
-{
-  return (expr.id() == ID_minus) &&
-         (expr.operands()[1].type().id() == ID_pointer);
 }
