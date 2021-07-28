@@ -26,21 +26,21 @@ Take a look at the example below.
 
 int sum(const uint32_t a, const uint32_t b, uint32_t* out)
 {
-    const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
-    if (result > UINT32_MAX) return FAILURE;
-    *out = (uint32_t) result;
-    return SUCCESS;
+  const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
+  if (result > UINT32_MAX) return FAILURE;
+  *out = (uint32_t) result;
+  return SUCCESS;
 }
 
 int foo()
 {
-	uint32_t a;
-	uint32_t b;
-	uint32_t out;
-	int rval = sum(a, b, &out);
-	if (rval == SUCCESS) 
-		return out;
-	return rval;
+  uint32_t a;
+  uint32_t b;
+  uint32_t out;
+  int rval = sum(a, b, &out);
+  if (rval == SUCCESS)
+    return out;
+  return rval;
 }
 ```
 
@@ -112,21 +112,21 @@ __CPROVER_requires(__CPROVER_is_fresh(out, sizeof(*out)))
 /* Postconditions */
 __CPROVER_ensures(__CPROVER_return_value == SUCCESS || __CPROVER_return_value == FAILURE)
 __CPROVER_ensures((__CPROVER_return_value == SUCCESS) ==> (*out == (a + b)))
-__CPROVER_ensures((__CPROVER_return_value == SUCCESS) ==> (*out == __CPROVER_old(*out)))
+__CPROVER_ensures((__CPROVER_return_value == FAILURE) ==> (*out == __CPROVER_old(*out)))
 /* Write Set */
 __CPROVER_assigns(*out)
 {
-    const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
-    if (result > UINT32_MAX) return FAILURE;
-    *out = (uint32_t) result;
-    return SUCCESS;
+  const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
+  if (result > UINT32_MAX) return FAILURE;
+  *out = (uint32_t) result;
+  return SUCCESS;
 }
 ```
 
 First, we have to prove that the function satisfies the contract.
 
 ```shell
-   goto-cc -o sum.goto *.c
+   goto-cc -o sum.goto *.c --function sum
    goto-instrument --enforce-contract sum sum.goto sum-checking-contracts.goto
    cbmc sum-checking-contracts.goto --function sum
 ```
@@ -140,9 +140,9 @@ contract in place of the function implementation wherever the function is
 called.
 
 ```shell
-   goto-cc -o foo.goto *.c
-   goto-instrument --replace-call-with-contract foo foo.goto sum-using-contracts.goto
-   cbmc foo-using-contracts.goto --function foo
+   goto-cc -o foo.goto *.c --function foo
+   goto-instrument --replace-call-with-contract sum foo.goto foo-using-sum-contract.goto
+   cbmc foo-using-sum-contract.goto --function foo
 ```
 
 The first command just compiles the GOTO program as usual, the second command
@@ -157,4 +157,4 @@ program using contracts.
 - [Memory Predicates](contracts-memory-predicates.md)
 - [History Variables](contracts-history-variables.md)
 - [Quantifiers](contracts-quantifiers.md)
-- [Loop Invariants \& Loop Variants]()
+- [Loop Contracts]()

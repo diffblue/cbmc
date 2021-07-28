@@ -37,17 +37,17 @@ contexts: enforcement and replacement.  To illustrate these two perspectives,
 consider the following implementation of the `sum` function.
 
 ```c
-int sum(uint32_t a, uint32_t b, uint32_t* out)
-/* Preconditions */
+int sum(const uint32_t a, const uint32_t b, uint32_t* out)
+/* Precondition */
 __CPROVER_requires(__CPROVER_is_fresh(out, sizeof(*out)))
 /* Postconditions */
 __CPROVER_ensures(__CPROVER_return_value == SUCCESS || __CPROVER_return_value == FAILURE)
-__CPROVER_ensures((__CPROVER_return_value == SUCCESS) ==> (*out == (*a + *b)))
+__CPROVER_ensures((__CPROVER_return_value == SUCCESS) ==> (*out == (a + b)))
 {
-    const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
-    if (result > UINT32_MAX) return FAILURE;
-    *out = (uint32_t) result;
-    return SUCCESS;
+  const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
+  if (result > UINT32_MAX) return FAILURE;
+  *out = (uint32_t) result;
+  return SUCCESS;
 }
 ```
 
@@ -97,13 +97,13 @@ In our example, consider that a function `foo` may call `sum`.
 ```c
 int foo()
 {
-	uint32_t a;
-	uint32_t b;
-	uint32_t out;
-	int rval = sum(a, b, &out);
-	if (rval == SUCCESS) 
-		return out;
-	return rval;
+  uint32_t a;
+  uint32_t b;
+  uint32_t out;
+  int rval = sum(a, b, &out);
+  if (rval == SUCCESS) 
+    return out;
+  return rval;
 }
 ```
 
@@ -113,22 +113,22 @@ wherever the function is called.
 ```c
 int foo()
 {
-	uint32_t a;
-	uint32_t b;
-	uint32_t out;
+  uint32_t a;
+  uint32_t b;
+  uint32_t out;
 	
-	/* Function Contract Replacement */
-	/* Precondition */
-	__CPROVER_assert(__CPROVER_is_fresh(out, sizeof(*out)), "Check requires clause");
+  /* Function Contract Replacement */
+  /* Precondition */
+  __CPROVER_assert(__CPROVER_is_fresh(out, sizeof(*out)), "Check requires clause");
 	
-	/* Postconditions */
-       int return_value_sum = nondet_int();
-	__CPROVER_assume(return_value_sum == SUCCESS || return_value_sum == FAILURE);
-	__CPROVER_assume((return_value_sum == SUCCESS) ==> (*out == (*a + *b)));
+  /* Postconditions */
+  int return_value_sum = nondet_int();
+  __CPROVER_assume(return_value_sum == SUCCESS || return_value_sum == FAILURE);
+  __CPROVER_assume((return_value_sum == SUCCESS) ==> (*out == (*a + *b)));
 
-	int rval = return_value_sum;
-	if (rval == SUCCESS) 
-		return out;
-	return rval;
+  int rval = return_value_sum;
+  if (rval == SUCCESS) 
+    return out;
+  return rval;
 }
 ```
