@@ -62,18 +62,9 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
-  virtual bool same_target(abstract_object_pointert other) const
-  {
-    return false;
-  }
-  virtual exprt offset() const
-  {
-    return nil_exprt();
-  }
-  virtual exprt offset_from(abstract_object_pointert other) const
-  {
-    return nil_exprt();
-  }
+  virtual bool same_target(abstract_object_pointert other) const = 0;
+  virtual exprt offset() const = 0;
+  virtual exprt offset_from(abstract_object_pointert other) const = 0;
 
   /// A helper function to read elements from an array. More precise
   /// abstractions may override this to provide more precise results.
@@ -84,7 +75,7 @@ public:
   /// \return An abstract object representing the value being pointed to
   virtual abstract_object_pointert read_dereference(
     const abstract_environmentt &env,
-    const namespacet &ns) const;
+    const namespacet &ns) const = 0;
 
   /// Evaluate writing to a pointer's value. More precise abstractions
   /// may override this provide more precise results.
@@ -107,12 +98,12 @@ public:
     const namespacet &ns,
     const std::stack<exprt> &stack,
     const abstract_object_pointert &value,
-    bool merging_write) const;
+    bool merging_write) const = 0;
 
   virtual abstract_object_pointert typecast(
     const typet &new_type,
     const abstract_environmentt &environment,
-    const namespacet &ns) const;
+    const namespacet &ns) const = 0;
 
 private:
   abstract_object_pointert eval_typecast_from_void_ptr(

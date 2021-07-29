@@ -211,45 +211,47 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
   const abstract_object_pointert &new_value,
   bool merging_write) const
 {
-  if(is_top() || is_bottom() || value_stack.is_top_value())
+  if(is_top() || is_bottom())
   {
-    return abstract_pointer_objectt::write_dereference(
-      environment, ns, stack, new_value, merging_write);
+    environment.havoc("Writing to a 2value pointer");
+    return shared_from_this();
   }
-  else
-  {
-    if(stack.empty())
-    {
-      // We should not be changing the type of an abstract object
-      PRECONDITION(new_value->type() == ns.follow(type().subtype()));
 
-      // Get an expression that we can assign to
-      exprt value = to_address_of_expr(value_stack.to_expression()).object();
-      if(merging_write)
-      {
-        abstract_object_pointert pointed_value = environment.eval(value, ns);
-        abstract_object_pointert merged_value =
-          abstract_objectt::merge(pointed_value, new_value, widen_modet::no)
-            .object;
-        environment.assign(value, merged_value, ns);
-      }
-      else
-      {
-        environment.assign(value, new_value, ns);
-      }
+  if(value_stack.is_top_value())
+    return std::make_shared<constant_pointer_abstract_objectt>(
+      type(), true, false);
+
+  if(stack.empty())
+  {
+    // We should not be changing the type of an abstract object
+    PRECONDITION(new_value->type() == ns.follow(type().subtype()));
+
+    // Get an expression that we can assign to
+    exprt value = to_address_of_expr(value_stack.to_expression()).object();
+    if(merging_write)
+    {
+      abstract_object_pointert pointed_value = environment.eval(value, ns);
+      abstract_object_pointert merged_value =
+        abstract_objectt::merge(pointed_value, new_value, widen_modet::no)
+          .object;
+      environment.assign(value, merged_value, ns);
     }
     else
     {
-      exprt value = to_address_of_expr(value_stack.to_expression()).object();
-      abstract_object_pointert pointed_value = environment.eval(value, ns);
-      abstract_object_pointert modified_value =
-        environment.write(pointed_value, new_value, stack, ns, merging_write);
-      environment.assign(value, modified_value, ns);
-      // but the pointer itself does not change!
+      environment.assign(value, new_value, ns);
     }
-
-    return shared_from_this();
   }
+  else
+  {
+    exprt value = to_address_of_expr(value_stack.to_expression()).object();
+    abstract_object_pointert pointed_value = environment.eval(value, ns);
+    abstract_object_pointert modified_value =
+      environment.write(pointed_value, new_value, stack, ns, merging_write);
+    environment.assign(value, modified_value, ns);
+    // but the pointer itself does not change!
+  }
+
+  return shared_from_this();
 }
 
 abstract_object_pointert constant_pointer_abstract_objectt::typecast(

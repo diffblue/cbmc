@@ -59,6 +59,10 @@ public:
   /// either converted to interval or marked as `top`.
   static const size_t max_value_set_size = 10;
 
+  bool same_target(abstract_object_pointert other) const override;
+  exprt offset() const override;
+  exprt offset_from(abstract_object_pointert other) const override;
+
   abstract_object_pointert read_dereference(
     const abstract_environmentt &env,
     const namespacet &ns) const override;

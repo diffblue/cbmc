@@ -73,42 +73,6 @@ abstract_object_pointert abstract_pointer_objectt::write(
   return write_dereference(environment, ns, stack, value, merging_write);
 }
 
-abstract_object_pointert abstract_pointer_objectt::read_dereference(
-  const abstract_environmentt &env,
-  const namespacet &ns) const
-{
-  pointer_typet pointer_type(to_pointer_type(type()));
-  const typet &pointed_to_type = pointer_type.subtype();
-
-  return env.abstract_object_factory(pointed_to_type, ns, true, false);
-}
-
-abstract_object_pointert abstract_pointer_objectt::write_dereference(
-  abstract_environmentt &env,
-  const namespacet &ns,
-  const std::stack<exprt> &stack,
-  const abstract_object_pointert &value,
-  bool merging_write) const
-{
-  if(is_top() || is_bottom())
-  {
-    env.havoc("Writing to a 2value pointer");
-    return shared_from_this();
-  }
-
-  return std::make_shared<abstract_pointer_objectt>(type(), true, false);
-}
-
-abstract_object_pointert abstract_pointer_objectt::typecast(
-  const typet &new_type,
-  const abstract_environmentt &environment,
-  const namespacet &ns) const
-{
-  INVARIANT(is_void_pointer(type()), "Only allow pointer casting from void*");
-  return std::make_shared<abstract_pointer_objectt>(
-    new_type, is_top(), is_bottom());
-}
-
 void abstract_pointer_objectt::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

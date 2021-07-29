@@ -42,6 +42,26 @@ public:
     : abstract_pointer_objectt(expr, environment, ns)
   {
   }
+
+  bool same_target(abstract_object_pointert other) const override;
+  exprt offset() const override;
+  exprt offset_from(abstract_object_pointert other) const override;
+
+  abstract_object_pointert read_dereference(
+    const abstract_environmentt &env,
+    const namespacet &ns) const override;
+
+  abstract_object_pointert write_dereference(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> &stack,
+    const abstract_object_pointert &value,
+    bool merging_write) const override;
+
+  abstract_object_pointert typecast(
+    const typet &new_type,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_TWO_VALUE_POINTER_ABSTRACT_OBJECT_H
