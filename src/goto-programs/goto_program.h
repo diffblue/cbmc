@@ -1116,12 +1116,13 @@ public:
 
   /// Create a function call instruction
   static instructiont make_function_call(
+    exprt lhs,
     exprt function,
     code_function_callt::argumentst arguments,
     const source_locationt &l = source_locationt::nil())
   {
     return instructiont(
-      code_function_callt(std::move(function), std::move(arguments)),
+      code_function_callt(lhs, std::move(function), std::move(arguments)),
       l,
       FUNCTION_CALL,
       nil_exprt(),
