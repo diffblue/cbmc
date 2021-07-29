@@ -81,10 +81,16 @@ bool constant_pointer_abstract_objectt::same_target(
   if(value_stack.is_top_value() || cast_other->value_stack.is_top_value())
     return false;
 
-  bool matching_pointer = value_stack.target_expression() ==
-                          cast_other->value_stack.target_expression();
+  if(value_stack.depth() != cast_other->value_stack.depth())
+    return false;
 
-  return matching_pointer;
+  for(size_t d = 0; d != value_stack.depth() - 1; ++d)
+    if(
+      value_stack.target_expression(d) !=
+      cast_other->value_stack.target_expression(d))
+      return false;
+
+  return true;
 }
 
 exprt constant_pointer_abstract_objectt::offset() const
@@ -319,6 +325,21 @@ exprt struct_member_ptr_comparison_expr(
   return nil_exprt();
 }
 
+exprt symbol_ptr_comparison_expr(
+  irep_idt const &id,
+  exprt const &lhs,
+  exprt const &rhs)
+{
+  auto const &lhs_identifier = to_symbol_expr(lhs).get_identifier();
+  auto const &rhs_identifier = to_symbol_expr(rhs).get_identifier();
+
+  if(id == ID_equal)
+    return to_bool_expr(lhs_identifier == rhs_identifier);
+  if(id == ID_notequal)
+    return to_bool_expr(lhs_identifier != rhs_identifier);
+  return nil_exprt();
+}
+
 exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -347,6 +368,8 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
     if(lhs_offset.id() == ID_member)
       return struct_member_ptr_comparison_expr(
         expr.id(), lhs_offset, rhs_offset);
+    if(lhs_offset.id() == ID_symbol)
+      return symbol_ptr_comparison_expr(expr.id(), lhs_offset, rhs_offset);
 
     return binary_relation_exprt(lhs_offset, expr.id(), rhs_offset);
   }

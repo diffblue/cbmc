@@ -202,10 +202,15 @@ exprt write_stackt::to_expression() const
   return std::move(top_expr);
 }
 
-exprt write_stackt::target_expression() const
+size_t write_stackt::depth() const
+{
+  return stack.size();
+}
+
+exprt write_stackt::target_expression(size_t depth) const
 {
   PRECONDITION(!is_top_value());
-  return stack[0]->get_access_expr();
+  return stack[depth]->get_access_expr();
 }
 
 exprt write_stackt::offset_expression() const
@@ -213,7 +218,7 @@ exprt write_stackt::offset_expression() const
   PRECONDITION(!is_top_value());
   auto const &access = stack.back()->get_access_expr();
 
-  if(access.id() == ID_member)
+  if(access.id() == ID_member || access.id() == ID_symbol)
     return access;
 
   if(access.id() == ID_index)
