@@ -213,17 +213,13 @@ void goto_program_dereferencet::dereference_instruction(
   }
   else if(i.is_function_call())
   {
-    code_function_callt function_call = i.get_function_call();
+    if(as_const(i).call_lhs().is_not_nil())
+      dereference_expr(i.call_lhs(), checks_only);
 
-    if(function_call.lhs().is_not_nil())
-      dereference_expr(function_call.lhs(), checks_only);
+    dereference_expr(i.call_function(), checks_only);
 
-    dereference_expr(function_call.function(), checks_only);
-
-    for(auto &arg : function_call.arguments())
+    for(auto &arg : i.call_arguments())
       dereference_expr(arg, checks_only);
-
-    i.set_function_call(function_call);
   }
   else if(i.is_set_return_value())
   {

@@ -732,17 +732,19 @@ static void goto_rw(
 static void goto_rw(
   const irep_idt &function,
   goto_programt::const_targett target,
-  const code_function_callt &function_call,
+  const exprt &lhs,
+  const exprt &function_expr,
+  const exprt::operandst &arguments,
   rw_range_sett &rw_set)
 {
-  if(function_call.lhs().is_not_nil())
+  if(lhs.is_not_nil())
     rw_set.get_objects_rec(
-      function, target, rw_range_sett::get_modet::LHS_W, function_call.lhs());
+      function, target, rw_range_sett::get_modet::LHS_W, lhs);
 
   rw_set.get_objects_rec(
-    function, target, rw_range_sett::get_modet::READ, function_call.function());
+    function, target, rw_range_sett::get_modet::READ, function_expr);
 
-  for(const auto &argument : function_call.arguments())
+  for(const auto &argument : arguments)
   {
     rw_set.get_objects_rec(
       function, target, rw_range_sett::get_modet::READ, argument);
@@ -814,7 +816,13 @@ void goto_rw(
     break;
 
   case FUNCTION_CALL:
-    goto_rw(function, target, target->get_function_call(), rw_set);
+    goto_rw(
+      function,
+      target,
+      target->call_lhs(),
+      target->call_function(),
+      target->call_arguments(),
+      rw_set);
     break;
   }
 }

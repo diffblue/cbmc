@@ -132,13 +132,12 @@ std::ostream &goto_programt::output_instruction(
   case FUNCTION_CALL:
     out << "CALL ";
     {
-      auto &call = instruction.get_function_call();
-      if(call.lhs().is_not_nil())
-        out << format(call.lhs()) << " := ";
-      out << format(call.function());
+      if(instruction.call_lhs().is_not_nil())
+        out << format(instruction.call_lhs()) << " := ";
+      out << format(instruction.call_function());
       out << '(';
       bool first = true;
-      for(const auto &argument : call.arguments())
+      for(const auto &argument : instruction.call_arguments())
       {
         if(first)
           first = false;
@@ -992,20 +991,29 @@ void goto_programt::instructiont::transform(
 
   case FUNCTION_CALL:
   {
-    auto new_lhs = f(call_lhs());
+    auto new_lhs = f(as_const(*this).call_lhs());
     if(new_lhs.has_value())
       call_lhs() = *new_lhs;
 
-    auto new_call_function = f(call_function());
+    auto new_call_function = f(as_const(*this).call_function());
     if(new_call_function.has_value())
       call_function() = *new_call_function;
 
-    for(auto &a : call_arguments())
+    exprt::operandst new_arguments = as_const(*this).call_arguments();
+    bool argument_changed = false;
+
+    for(auto &a : new_arguments)
     {
       auto new_a = f(a);
       if(new_a.has_value())
+      {
         a = *new_a;
+        argument_changed = true;
+      }
     }
+
+    if(argument_changed)
+      call_arguments() = std::move(new_arguments);
   }
   break;
 

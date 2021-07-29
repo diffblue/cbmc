@@ -47,7 +47,7 @@ void show_call_sequences(
       continue; // seen it already
     if(t->is_function_call())
     {
-      const exprt &callee = t->get_function_call().function();
+      const exprt &callee = t->call_function();
       if(callee.id()==ID_symbol)
       {
         std::cout << caller << " -> "
@@ -199,7 +199,7 @@ void check_call_sequencet::operator()()
     }
     else if(e.pc->is_function_call())
     {
-      const exprt &function = e.pc->get_function_call().function();
+      const exprt &function = e.pc->call_function();
       if(function.id()==ID_symbol)
       {
         irep_idt identifier=to_symbol_expr(function).get_identifier();
@@ -277,9 +277,7 @@ static void list_calls_and_arguments(
     if(!instruction.is_function_call())
       continue;
 
-    const code_function_callt &call = instruction.get_function_call();
-
-    const exprt &f=call.function();
+    const exprt &f = instruction.call_function();
 
     if(f.id()!=ID_symbol)
       continue;
@@ -295,15 +293,15 @@ static void list_calls_and_arguments(
 
     std::cout << "found call to " << name;
 
-    if(!call.arguments().empty())
+    if(!instruction.call_arguments().empty())
     {
       std::cout << " with arguments ";
-      for(exprt::operandst::const_iterator
-          it=call.arguments().begin();
-          it!=call.arguments().end();
+      for(exprt::operandst::const_iterator it =
+            instruction.call_arguments().begin();
+          it != instruction.call_arguments().end();
           ++it)
       {
-        if(it!=call.arguments().begin())
+        if(it != instruction.call_arguments().begin())
           std::cout << ", ";
         std::cout << from_expr(ns, identifier, simplify_expr(*it, ns));
       }

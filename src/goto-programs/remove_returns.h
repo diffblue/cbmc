@@ -75,6 +75,8 @@ Date:   September 2009
 
 #include <functional>
 
+#include "goto_function.h"
+
 class code_function_callt;
 class goto_functionst;
 class goto_model_functiont;
@@ -115,6 +117,7 @@ bool is_return_value_symbol(const symbol_exprt &symbol_expr);
 /// Check if the \p function_call returns anything
 /// \param function_call: the function call to be investigated
 /// \return true if non-void return type and non-nil lhs
-bool does_function_call_return(const code_function_callt &function_call);
+bool does_function_call_return(
+  const goto_programt::instructiont &function_call);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H

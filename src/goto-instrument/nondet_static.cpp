@@ -105,8 +105,7 @@ void nondet_static(
     }
     else if(instruction.is_function_call())
     {
-      const code_function_callt &fct = instruction.get_function_call();
-      const symbol_exprt &fsym=to_symbol_expr(fct.function());
+      const symbol_exprt &fsym = to_symbol_expr(instruction.call_function());
 
       if(has_prefix(id2string(fsym.get_identifier()), "#ini#"))
         nondet_static(ns, goto_functions, fsym.get_identifier());

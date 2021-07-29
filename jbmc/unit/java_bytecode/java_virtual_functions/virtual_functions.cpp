@@ -31,9 +31,10 @@ void check_function_call(
   for(const auto &target : targets)
   {
     REQUIRE(target->type == goto_program_instruction_typet::FUNCTION_CALL);
-    const code_function_callt &call = target->get_function_call();
-    REQUIRE(call.function().id() == ID_symbol);
-    REQUIRE(to_symbol_expr(call.function()).get_identifier() == function_name);
+    REQUIRE(target->call_function().id() == ID_symbol);
+    REQUIRE(
+      to_symbol_expr(target->call_function()).get_identifier() ==
+      function_name);
   }
 }
 

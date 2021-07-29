@@ -543,9 +543,7 @@ goto_programt::targett string_abstractiont::abstract_assign(
 void string_abstractiont::abstract_function_call(
   goto_programt::targett target)
 {
-  code_function_callt call = target->get_function_call();
-
-  code_function_callt::argumentst &arguments=call.arguments();
+  auto arguments = as_const(*target).call_arguments();
   code_function_callt::argumentst str_args;
 
   for(const auto &arg : arguments)
@@ -582,12 +580,12 @@ void string_abstractiont::abstract_function_call(
   {
     arguments.insert(arguments.end(), str_args.begin(), str_args.end());
 
-    code_typet::parameterst &parameters =
-      to_code_type(call.function().type()).parameters();
+    auto &parameters =
+      to_code_type(target->call_function().type()).parameters();
     for(const auto &arg : str_args)
       parameters.push_back(code_typet::parametert{arg.type()});
 
-    target->set_function_call(call);
+    target->call_arguments() = std::move(arguments);
   }
 }
 

@@ -89,9 +89,7 @@ void remove_function_pointer(
   const std::set<symbol_exprt> &functions,
   goto_modelt &goto_model)
 {
-  const code_function_callt &code = target->get_function_call();
-
-  const exprt &function = code.function();
+  const exprt &function = as_const(*target).call_function();
   PRECONDITION(function.id() == ID_dereference);
 
   // this better have the right type
@@ -101,7 +99,7 @@ void remove_function_pointer(
   if(call_type.has_ellipsis() && call_type.parameters().empty())
   {
     call_type.remove_ellipsis();
-    for(const auto &argument : code.arguments())
+    for(const auto &argument : as_const(*target).call_arguments())
       call_type.parameters().push_back(code_typet::parametert(argument.type()));
   }
 
@@ -120,8 +118,11 @@ void remove_function_pointer(
   {
     // call function
     goto_programt::targett t1 =
-      new_code_calls.add(goto_programt::make_function_call(code));
-    to_code_function_call(t1->code_nonconst()).function() = fun;
+      new_code_calls.add(goto_programt::make_function_call(
+        as_const(*target).call_lhs(),
+        fun,
+        as_const(*target).call_arguments(),
+        target->source_location));
 
     // the signature of the function might not match precisely
     const namespacet ns(goto_model.symbol_table);
@@ -201,13 +202,13 @@ void value_set_fi_fp_removal(
     {
       if(target->is_function_call())
       {
-        const auto &call = target->get_function_call();
-        if(call.function().id() == ID_dereference)
+        const auto &function = as_const(*target).call_function();
+        if(function.id() == ID_dereference)
         {
           message.status() << "CALL at " << target->source_location << ":"
                            << messaget::eom;
 
-          const auto &pointer = to_dereference_expr(call.function()).pointer();
+          const auto &pointer = to_dereference_expr(function).pointer();
           auto addresses = value_sets.get_values(f.first, target, pointer);
 
           std::set<symbol_exprt> functions;

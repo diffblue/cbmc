@@ -56,14 +56,13 @@ void cover_cover_instrumentert::instrument(
   // turn __CPROVER_cover(x) into 'assert(!x)'
   if(i_it->is_function_call())
   {
-    const code_function_callt &code_function_call = i_it->get_function_call();
+    const auto &function = i_it->call_function();
     if(
-      code_function_call.function().id() == ID_symbol &&
-      to_symbol_expr(code_function_call.function()).get_identifier() ==
-        CPROVER_PREFIX "cover" &&
-      code_function_call.arguments().size() == 1)
+      function.id() == ID_symbol &&
+      to_symbol_expr(function).get_identifier() == CPROVER_PREFIX "cover" &&
+      i_it->call_arguments().size() == 1)
     {
-      const exprt c = code_function_call.arguments()[0];
+      const exprt c = i_it->call_arguments()[0];
       *i_it = make_assertion(not_exprt(c), i_it->source_location);
       std::string comment = "condition '" + from_expr(ns, function_id, c) + "'";
       initialize_source_location(i_it, comment, function_id);

@@ -21,15 +21,14 @@ static bool is_expected_virtualmethod_call(
 {
   if(instruction.type != FUNCTION_CALL)
     return false;
-  const auto &virtual_call = instruction.get_function_call();
-  const auto &called_function = virtual_call.function();
+  const auto &called_function = instruction.call_function();
   if(!can_cast_expr<class_method_descriptor_exprt>(called_function))
     return false;
   if(called_function.get(ID_identifier) != "java::B.virtualmethod:()V")
     return false;
-  if(virtual_call.arguments().size() != 1)
+  if(instruction.call_arguments().size() != 1)
     return false;
-  const auto &this_argument = virtual_call.arguments()[0];
+  const auto &this_argument = instruction.call_arguments()[0];
   if(this_argument.id() != ID_member)
     return false;
   if(to_member_expr(this_argument).compound().id() != ID_dereference)

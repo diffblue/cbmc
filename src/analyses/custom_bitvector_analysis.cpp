@@ -313,9 +313,7 @@ void custom_bitvector_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call =
-        instruction.get_function_call();
-      const exprt &function=code_function_call.function();
+      const exprt &function = instruction.call_function();
 
       if(function.id()==ID_symbol)
       {
@@ -327,10 +325,9 @@ void custom_bitvector_domaint::transform(
           identifier == CPROVER_PREFIX "set_may" ||
           identifier == CPROVER_PREFIX "clear_may")
         {
-          if(code_function_call.arguments().size()==2)
+          if(instruction.call_arguments().size() == 2)
           {
-            unsigned bit_nr=
-              cba.get_bit_nr(code_function_call.arguments()[1]);
+            unsigned bit_nr = cba.get_bit_nr(instruction.call_arguments()[1]);
 
             // initialize to make Visual Studio happy
             modet mode = modet::SET_MUST;
@@ -346,7 +343,7 @@ void custom_bitvector_domaint::transform(
             else
               UNREACHABLE;
 
-            exprt lhs=code_function_call.arguments()[0];
+            exprt lhs = instruction.call_arguments()[0];
 
             if(lhs.type().id()==ID_pointer)
             {
@@ -388,12 +385,12 @@ void custom_bitvector_domaint::transform(
         else if(identifier=="memcpy" ||
                 identifier=="memmove")
         {
-          if(code_function_call.arguments().size()==3)
+          if(instruction.call_arguments().size() == 3)
           {
             // we copy all tracked bits from op1 to op0
             // we do not consider any bits attached to the size op2
-            dereference_exprt lhs_deref(code_function_call.arguments()[0]);
-            dereference_exprt rhs_deref(code_function_call.arguments()[1]);
+            dereference_exprt lhs_deref(instruction.call_arguments()[0]);
+            dereference_exprt rhs_deref(instruction.call_arguments()[1]);
 
             assign_struct_rec(from, lhs_deref, rhs_deref, cba, ns);
           }
@@ -406,8 +403,8 @@ void custom_bitvector_domaint::transform(
             const code_typet &code_type=
               to_code_type(ns.lookup(identifier).type);
 
-            code_function_callt::argumentst::const_iterator arg_it=
-              code_function_call.arguments().begin();
+            code_function_callt::argumentst::const_iterator arg_it =
+              instruction.call_arguments().begin();
             for(const auto &param : code_type.parameters())
             {
               const irep_idt &p_identifier=param.get_identifier();
@@ -415,7 +412,7 @@ void custom_bitvector_domaint::transform(
                 continue;
 
               // there may be a mismatch in the number of arguments
-              if(arg_it==code_function_call.arguments().end())
+              if(arg_it == instruction.call_arguments().end())
                 break;
 
               // assignments arguments -> parameters

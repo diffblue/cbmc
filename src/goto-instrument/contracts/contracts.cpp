@@ -461,15 +461,14 @@ bool code_contractst::apply_function_contract(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  const code_function_callt &call = target->get_function_call();
-
   // Return if the function is not named in the call; currently we don't handle
   // function pointers.
-  PRECONDITION(call.function().id() == ID_symbol);
+  PRECONDITION(as_const(*target).call_function().id() == ID_symbol);
 
   // Retrieve the function type, which is needed to extract the contract
   // components.
-  const irep_idt &function = to_symbol_expr(call.function()).get_identifier();
+  const irep_idt &function =
+    to_symbol_expr(as_const(*target).call_function()).get_identifier();
   const symbolt &function_symbol = ns.lookup(function);
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
@@ -485,14 +484,15 @@ bool code_contractst::apply_function_contract(
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
-    if(call.lhs().is_not_nil())
+    if(as_const(*target).call_lhs().is_not_nil())
     {
       // If so, have it replaced appropriately.
       // For example, if foo() ensures that its return value is > 5, then
       // rewrite calls to foo as follows:
       // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
-      symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
-      common_replace.insert(ret_val, call.lhs());
+      symbol_exprt ret_val(
+        CPROVER_PREFIX "return_value", as_const(*target).call_lhs().type());
+      common_replace.insert(ret_val, as_const(*target).call_lhs());
     }
     else
     {
@@ -508,7 +508,7 @@ bool code_contractst::apply_function_contract(
           type.return_type(),
           id2string(function),
           "ignored_return_value",
-          call.source_location(),
+          target->source_location,
           symbol_table.lookup_ref(function).mode,
           ns,
           symbol_table);
@@ -519,9 +519,10 @@ bool code_contractst::apply_function_contract(
   }
 
   // Replace formal parameters
-  auto a_it = call.arguments().begin();
+  const auto &arguments = target->call_arguments();
+  auto a_it = arguments.begin();
   for(auto p_it = type.parameters().begin();
-      p_it != type.parameters().end() && a_it != call.arguments().end();
+      p_it != type.parameters().end() && a_it != arguments.end();
       ++p_it, ++a_it)
   {
     if(!p_it->get_identifier().empty())
@@ -704,16 +705,18 @@ void code_contractst::instrument_call_statement(
     "The first argument of instrument_call_statement should always be "
     "a function call");
 
-  code_function_callt call = instruction_iterator->get_function_call();
   irep_idt called_name;
-  if(call.function().id() == ID_dereference)
+  if(instruction_iterator->call_function().id() == ID_dereference)
   {
-    called_name = to_symbol_expr(to_dereference_expr(call.function()).pointer())
-                    .get_identifier();
+    called_name =
+      to_symbol_expr(
+        to_dereference_expr(instruction_iterator->call_function()).pointer())
+        .get_identifier();
   }
   else
   {
-    called_name = to_symbol_expr(call.function()).get_identifier();
+    called_name =
+      to_symbol_expr(instruction_iterator->call_function()).get_identifier();
   }
 
   if(called_name == "malloc")
@@ -742,12 +745,14 @@ void code_contractst::instrument_call_statement(
   }
 
   if(
-    call.lhs().is_not_nil() && call.lhs().id() == ID_symbol &&
+    instruction_iterator->call_lhs().is_not_nil() &&
+    instruction_iterator->call_lhs().id() == ID_symbol &&
     freely_assignable_symbols.find(
-      to_symbol_expr(call.lhs()).get_identifier()) ==
+      to_symbol_expr(instruction_iterator->call_lhs()).get_identifier()) ==
       freely_assignable_symbols.end())
   {
-    exprt alias_expr = assigns_clause.alias_expression(call.lhs());
+    exprt alias_expr =
+      assigns_clause.alias_expression(instruction_iterator->call_lhs());
 
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
@@ -771,10 +776,10 @@ void code_contractst::instrument_call_statement(
   if(called_assigns.is_not_nil())
   {
     replace_symbolt replace_formal_params;
-    auto a_it = call.arguments().begin();
+    const auto &arguments = instruction_iterator->call_arguments();
+    auto a_it = arguments.begin();
     for(auto p_it = called_type.parameters().begin();
-        p_it != called_type.parameters().end() &&
-        a_it != call.arguments().end();
+        p_it != called_type.parameters().end() && a_it != arguments.end();
         ++p_it, ++a_it)
     {
       if(!p_it->get_identifier().empty())
@@ -815,17 +820,18 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
     }
     if(instruction.is_function_call())
     {
-      code_function_callt call = instruction.get_function_call();
       irep_idt called_name;
-      if(call.function().id() == ID_dereference)
+      if(instruction.call_function().id() == ID_dereference)
       {
         called_name =
-          to_symbol_expr(to_dereference_expr(call.function()).pointer())
+          to_symbol_expr(
+            to_dereference_expr(instruction.call_function()).pointer())
             .get_identifier();
       }
       else
       {
-        called_name = to_symbol_expr(call.function()).get_identifier();
+        called_name =
+          to_symbol_expr(instruction.call_function()).get_identifier();
       }
 
       if(called_name == "malloc")
@@ -1194,13 +1200,11 @@ bool code_contractst::replace_calls(const std::set<std::string> &functions)
     {
       if(ins->is_function_call())
       {
-        const code_function_callt &call = ins->get_function_call();
-
-        if(call.function().id() != ID_symbol)
+        if(ins->call_function().id() != ID_symbol)
           continue;
 
         const irep_idt &called_function =
-          to_symbol_expr(call.function()).get_identifier();
+          to_symbol_expr(ins->call_function()).get_identifier();
         auto found = std::find(
           functions.begin(), functions.end(), id2string(called_function));
         if(found == functions.end())

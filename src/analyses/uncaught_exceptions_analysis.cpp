@@ -118,7 +118,7 @@ void uncaught_exceptions_domaint::transform(
   }
   case FUNCTION_CALL:
   {
-    const exprt &function_expr = instruction.get_function_call().function();
+    const exprt &function_expr = instruction.call_function();
     DATA_INVARIANT(
       function_expr.id()==ID_symbol,
       "identifier expected to be a symbol");

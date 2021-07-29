@@ -693,7 +693,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
 {
   const goto_programt::instructiont &instruction=*i_it;
 
-  const exprt &fun = instruction.get_function_call().function();
+  const exprt &fun = instruction.call_function();
   const irep_idt &fun_id=to_symbol_expr(fun).get_identifier();
   /* ignore recursive calls -- underapproximation */
   try

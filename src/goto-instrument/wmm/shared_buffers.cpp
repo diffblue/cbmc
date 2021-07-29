@@ -1326,7 +1326,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     }
     else if(instruction.is_function_call())
     {
-      const exprt &fun = instruction.get_function_call().function();
+      const exprt &fun = instruction.call_function();
       weak_memory(value_sets, to_symbol_expr(fun).get_identifier(), model);
     }
   }

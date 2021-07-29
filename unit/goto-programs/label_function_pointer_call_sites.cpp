@@ -46,14 +46,13 @@ TEST_CASE("Label function pointer call sites", "[core]")
       {
       case 0:
         // first call instruction
-        REQUIRE(it->get_function_call().function().id() == ID_symbol);
+        REQUIRE(it->call_function().id() == ID_symbol);
         break;
       case 1:
       {
         // second call instruction
         const auto &fp_symbol =
-          to_symbol_expr(
-            to_dereference_expr(it->get_function_call().function()).pointer())
+          to_symbol_expr(to_dereference_expr(it->call_function()).pointer())
             .get_identifier();
         REQUIRE(fp_symbol == "h.function_pointer_call.1");
         break;
@@ -62,8 +61,7 @@ TEST_CASE("Label function pointer call sites", "[core]")
       {
         // third call instruction
         const auto &fp_symbol =
-          to_symbol_expr(
-            to_dereference_expr(it->get_function_call().function()).pointer())
+          to_symbol_expr(to_dereference_expr(it->call_function()).pointer())
             .get_identifier();
         REQUIRE(fp_symbol == "h.function_pointer_call.2");
 

@@ -123,8 +123,9 @@ public:
   ///     Ends the life of the symbol denoted by the field `code`.
   ///     After a DEAD instruction the symbol must be DECL'd again before use.
   /// - FUNCTION_CALL:
-  ///     Invoke the function denoted by field `code` (an instance of
-  ///     code_function_callt).
+  ///     Invoke the function returned by `call_function` with the arguments
+  ///     returned by `call_arguments`, then assign the return value (if any)
+  ///     to `call_lhs`
   /// - ASSIGN:
   ///     Update the left-hand side of `code` (an instance of code_assignt) to
   ///     the value of the right-hand side.

@@ -199,7 +199,7 @@ bool remove_exceptionst::function_or_callees_may_throw(
 
     if(instruction.is_function_call())
     {
-      const exprt &function_expr = instruction.get_function_call().function();
+      const exprt &function_expr = instruction.call_function();
       DATA_INVARIANT(
         function_expr.id()==ID_symbol,
         "identifier expected to be a symbol");
@@ -443,13 +443,11 @@ remove_exceptionst::instrument_function_call(
   goto_programt::targett next_it=instr_it;
   next_it++;
 
-  const code_function_callt &function_call = instr_it->get_function_call();
+  const auto &function = instr_it->call_function();
 
   DATA_INVARIANT(
-    function_call.function().id()==ID_symbol,
-    "identified expected to be a symbol");
-  const irep_idt &callee_id=
-    to_symbol_expr(function_call.function()).get_identifier();
+    function.id() == ID_symbol, "identified expected to be a symbol");
+  const irep_idt &callee_id = to_symbol_expr(function).get_identifier();
 
   if(function_may_throw(callee_id))
   {

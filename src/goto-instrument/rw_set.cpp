@@ -57,19 +57,17 @@ void _rw_set_loct::compute()
   }
   else if(target->is_function_call())
   {
-    const code_function_callt &code_function_call = target->get_function_call();
-
-    read(code_function_call.function());
+    read(target->call_function());
 
     // do operands
-    for(code_function_callt::argumentst::const_iterator
-        it=code_function_call.arguments().begin();
-        it!=code_function_call.arguments().end();
+    for(code_function_callt::argumentst::const_iterator it =
+          target->call_arguments().begin();
+        it != target->call_arguments().end();
         it++)
       read(*it);
 
-    if(code_function_call.lhs().is_not_nil())
-      write(code_function_call.lhs());
+    if(target->call_lhs().is_not_nil())
+      write(target->call_lhs());
   }
 }
 

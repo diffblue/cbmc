@@ -78,43 +78,53 @@ protected:
   void do_sprintf(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_snprintf(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strcat(
     goto_programt &dest,
     goto_programt::targett it,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strncmp(
     goto_programt &dest,
     goto_programt::targett it,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strchr(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strrchr(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strstr(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strtok(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_strerror(
     goto_programt &dest,
     goto_programt::targett it,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
   void do_fscanf(
     goto_programt &dest,
     goto_programt::targett target,
-    const code_function_callt &);
+    const exprt &lhs,
+    const exprt::operandst &arguments);
 
   void do_format_string_read(
     goto_programt &dest,
@@ -200,9 +210,9 @@ void string_instrumentationt::do_function_call(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  const code_function_callt &call = target->get_function_call();
-  const exprt &function = call.function();
-  // const exprt &lhs=call.lhs();
+  const exprt &lhs = as_const(*target).call_lhs();
+  const exprt &function = as_const(*target).call_function();
+  const auto &arguments = as_const(*target).call_arguments();
 
   if(function.id()==ID_symbol)
   {
@@ -213,12 +223,12 @@ void string_instrumentationt::do_function_call(
     {
     }
     else if(identifier=="strncmp")
-      do_strncmp(dest, target, call);
+      do_strncmp(dest, target, lhs, arguments);
     else if(identifier=="strxfrm")
     {
     }
     else if(identifier=="strchr")
-      do_strchr(dest, target, call);
+      do_strchr(dest, target, lhs, arguments);
     else if(identifier=="strcspn")
     {
     }
@@ -226,22 +236,22 @@ void string_instrumentationt::do_function_call(
     {
     }
     else if(identifier=="strrchr")
-      do_strrchr(dest, target, call);
+      do_strrchr(dest, target, lhs, arguments);
     else if(identifier=="strspn")
     {
     }
     else if(identifier=="strerror")
-      do_strerror(dest, target, call);
+      do_strerror(dest, target, lhs, arguments);
     else if(identifier=="strstr")
-      do_strstr(dest, target, call);
+      do_strstr(dest, target, lhs, arguments);
     else if(identifier=="strtok")
-      do_strtok(dest, target, call);
+      do_strtok(dest, target, lhs, arguments);
     else if(identifier=="sprintf")
-      do_sprintf(dest, target, call);
+      do_sprintf(dest, target, lhs, arguments);
     else if(identifier=="snprintf")
-      do_snprintf(dest, target, call);
+      do_snprintf(dest, target, lhs, arguments);
     else if(identifier=="fscanf")
-      do_fscanf(dest, target, call);
+      do_fscanf(dest, target, lhs, arguments);
 
     remove_skip(dest);
   }
@@ -250,10 +260,9 @@ void string_instrumentationt::do_function_call(
 void string_instrumentationt::do_sprintf(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()<2)
   {
     throw incorrect_source_program_exceptiont(
@@ -272,13 +281,11 @@ void string_instrumentationt::do_sprintf(
 
   do_format_string_read(tmp, target, arguments, 1, 2, "sprintf");
 
-  if(call.lhs().is_not_nil())
+  if(lhs.is_not_nil())
   {
-    exprt rhs =
-      side_effect_expr_nondett(call.lhs().type(), target->source_location);
+    exprt rhs = side_effect_expr_nondett(lhs.type(), target->source_location);
 
-    tmp.add(
-      goto_programt::make_assignment(call.lhs(), rhs, target->source_location));
+    tmp.add(goto_programt::make_assignment(lhs, rhs, target->source_location));
   }
 
   target->turn_into_skip();
@@ -288,10 +295,9 @@ void string_instrumentationt::do_sprintf(
 void string_instrumentationt::do_snprintf(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()<3)
   {
     throw incorrect_source_program_exceptiont(
@@ -311,13 +317,11 @@ void string_instrumentationt::do_snprintf(
 
   do_format_string_read(tmp, target, arguments, 2, 3, "snprintf");
 
-  if(call.lhs().is_not_nil())
+  if(lhs.is_not_nil())
   {
-    exprt rhs =
-      side_effect_expr_nondett(call.lhs().type(), target->source_location);
+    exprt rhs = side_effect_expr_nondett(lhs.type(), target->source_location);
 
-    tmp.add(
-      goto_programt::make_assignment(call.lhs(), rhs, target->source_location));
+    tmp.add(goto_programt::make_assignment(lhs, rhs, target->source_location));
   }
 
   target->turn_into_skip();
@@ -327,10 +331,9 @@ void string_instrumentationt::do_snprintf(
 void string_instrumentationt::do_fscanf(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()<2)
   {
     throw incorrect_source_program_exceptiont(
@@ -341,13 +344,11 @@ void string_instrumentationt::do_fscanf(
 
   do_format_string_write(tmp, target, arguments, 1, 2, "fscanf");
 
-  if(call.lhs().is_not_nil())
+  if(lhs.is_not_nil())
   {
-    exprt rhs =
-      side_effect_expr_nondett(call.lhs().type(), target->source_location);
+    exprt rhs = side_effect_expr_nondett(lhs.type(), target->source_location);
 
-    tmp.add(
-      goto_programt::make_assignment(call.lhs(), rhs, target->source_location));
+    tmp.add(goto_programt::make_assignment(lhs, rhs, target->source_location));
   }
 
   target->turn_into_skip();
@@ -595,17 +596,17 @@ void string_instrumentationt::do_format_string_write(
 void string_instrumentationt::do_strncmp(
   goto_programt &,
   goto_programt::targett,
-  const code_function_callt &)
+  const exprt &,
+  const exprt::operandst &)
 {
 }
 
 void string_instrumentationt::do_strchr(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()!=2)
   {
     throw incorrect_source_program_exceptiont(
@@ -627,10 +628,9 @@ void string_instrumentationt::do_strchr(
 void string_instrumentationt::do_strrchr(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()!=2)
   {
     throw incorrect_source_program_exceptiont(
@@ -652,10 +652,9 @@ void string_instrumentationt::do_strrchr(
 void string_instrumentationt::do_strstr(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()!=2)
   {
     throw incorrect_source_program_exceptiont(
@@ -683,10 +682,9 @@ void string_instrumentationt::do_strstr(
 void string_instrumentationt::do_strtok(
   goto_programt &dest,
   goto_programt::targett target,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  const code_function_callt::argumentst &arguments=call.arguments();
-
   if(arguments.size()!=2)
   {
     throw incorrect_source_program_exceptiont(
@@ -714,9 +712,10 @@ void string_instrumentationt::do_strtok(
 void string_instrumentationt::do_strerror(
   goto_programt &dest,
   goto_programt::targett it,
-  const code_function_callt &call)
+  const exprt &lhs,
+  const exprt::operandst &arguments)
 {
-  if(call.lhs().is_nil())
+  if(lhs.is_nil())
   {
     it->turn_into_skip();
     return;
@@ -789,9 +788,9 @@ void string_instrumentationt::do_strerror(
   // assign address
   {
     exprt rhs=ptr;
-    make_type(rhs, call.lhs().type());
+    make_type(rhs, lhs.type());
     tmp.add(goto_programt::make_assignment(
-      code_assignt(call.lhs(), rhs), it->source_location));
+      code_assignt(lhs, rhs), it->source_location));
   }
 
   it->turn_into_skip();

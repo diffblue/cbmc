@@ -475,15 +475,13 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  const code_function_callt &code = target->get_function_call();
-
-  const exprt &function = code.function();
+  const exprt &function = as_const(*target).call_function();
   INVARIANT(
     can_cast_expr<class_method_descriptor_exprt>(function),
     "remove_virtual_function must take a function call instruction whose "
     "function is a class method descriptor ");
   INVARIANT(
-    !code.arguments().empty(),
+    !as_const(*target).call_arguments().empty(),
     "virtual function calls must have at least a this-argument");
 
   get_virtual_calleest get_callees(symbol_table, class_hierarchy);
@@ -678,9 +676,8 @@ bool remove_virtual_functionst::remove_virtual_functions(
   {
     if(target->is_function_call())
     {
-      const code_function_callt &code = target->get_function_call();
-
-      if(can_cast_expr<class_method_descriptor_exprt>(code.function()))
+      if(can_cast_expr<class_method_descriptor_exprt>(
+           as_const(*target).call_function()))
       {
         target = remove_virtual_function(function_id, goto_program, target);
         did_something=true;

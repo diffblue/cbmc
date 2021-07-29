@@ -47,12 +47,8 @@ bool value_set_domain_fit::transform(
     break;
 
   case FUNCTION_CALL:
-  {
-    const code_function_callt &code = from_l->get_function_call();
-
-    value_set.do_function_call(function_to, code.arguments(), ns);
+    value_set.do_function_call(function_to, from_l->call_arguments(), ns);
     break;
-  }
 
   case CATCH:
   case THROW:
