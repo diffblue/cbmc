@@ -169,7 +169,9 @@ exprt value_set_pointer_abstract_objectt::ptr_comparison_expr(
     for(auto const &rhsp : rhs->values)
     {
       auto ops = std::vector<abstract_object_pointert>{lhsp, rhsp};
-      comparisons.insert(lhsp->ptr_comparison_expr(expr, ops, environment, ns));
+      auto comparison = lhsp->ptr_comparison_expr(expr, ops, environment, ns);
+      auto result = simplify_vsd_expr(comparison, ns);
+      comparisons.insert(result);
     }
   }
 

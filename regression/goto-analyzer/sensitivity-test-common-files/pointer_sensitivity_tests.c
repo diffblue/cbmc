@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
   __CPROVER_assert(*x == 0, "*x==0");
   __CPROVER_assert(x == &a, "x==&a");
   __CPROVER_assert(x == &b, "x==&b");
+  __CPROVER_assert(x == &c, "x==&c");
 
   return 0;
 }

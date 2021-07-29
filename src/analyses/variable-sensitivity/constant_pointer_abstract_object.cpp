@@ -314,6 +314,9 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
   auto rhs = std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
     operands.back());
 
+  if(is_top() || rhs->is_top())
+    return nil_exprt();
+
   if(same_target(rhs)) // rewrite in terms of pointer offset
   {
     auto lhs_offset = offset();
@@ -322,9 +325,9 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
   }
 
   // not same target, can only eval == and !=
-  auto eval_obj =
-    environment.abstract_object_factory(expr.type(), ns, true, false)
-      ->unwrap_context();
-  return eval_obj->expression_transform(expr, operands, environment, ns)
-    ->to_constant();
+  if(expr.id() == ID_equal)
+    return false_exprt();
+  if(expr.id() == ID_notequal)
+    return true_exprt();
+  return nil_exprt();
 }

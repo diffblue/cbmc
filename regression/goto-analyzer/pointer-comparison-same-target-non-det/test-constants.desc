@@ -1,0 +1,23 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers constants --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion p == q: FAILURE
+^\[main.assertion.2\] .* assertion p == r: UNKNOWN
+^\[main.assertion.3\] .* assertion q == r: UNKNOWN
+^\[main.assertion.4\] .* assertion p != q: SUCCESS
+^\[main.assertion.5\] .* assertion p != r: UNKNOWN
+^\[main.assertion.6\] .* assertion q != r: UNKNOWN
+^\[main.assertion.7\] .* assertion p < q: SUCCESS
+^\[main.assertion.8\] .* assertion p < r: UNKNOWN
+^\[main.assertion.9\] .* assertion q < r: UNKNOWN
+^\[main.assertion.10\] .* assertion p <= q: SUCCESS
+^\[main.assertion.11\] .* assertion p <= r: UNKNOWN
+^\[main.assertion.12\] .* assertion q <= r: UNKNOWN
+^\[main.assertion.13\] .* assertion p > q: FAILURE
+^\[main.assertion.14\] .* assertion p > r: UNKNOWN
+^\[main.assertion.15\] .* assertion q > r: UNKNOWN
+^\[main.assertion.16\] .* assertion p >= q: FAILURE
+^\[main.assertion.17\] .* assertion p >= r: UNKNOWN
+^\[main.assertion.18\] .* assertion q >= r: UNKNOWN
