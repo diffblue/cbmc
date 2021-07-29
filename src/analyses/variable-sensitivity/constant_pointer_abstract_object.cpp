@@ -311,8 +311,8 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
     return invert_result(result);
   }
 
-  auto rhs =
-    std::dynamic_pointer_cast<const abstract_pointer_objectt>(operands.back());
+  auto rhs = std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
+    operands.back());
 
   if(same_target(rhs)) // rewrite in terms of pointer offset
   {

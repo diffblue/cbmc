@@ -14,10 +14,7 @@ class two_value_pointer_abstract_objectt : public abstract_pointer_objectt
 {
 public:
   /// \param type: the type the abstract_object is representing
-  explicit two_value_pointer_abstract_objectt(const typet &type)
-    : abstract_pointer_objectt(type)
-  {
-  }
+  explicit two_value_pointer_abstract_objectt(const typet &type);
 
   /// Start the abstract object at either top or bottom or neither
   /// Asserts if both top and bottom are true
@@ -25,10 +22,7 @@ public:
   /// \param type: the type the abstract_object is representing
   /// \param top: is the abstract_object starting as top
   /// \param bottom: is the abstract_object starting as bottom
-  two_value_pointer_abstract_objectt(const typet &type, bool top, bool bottom)
-    : abstract_pointer_objectt(type, top, bottom)
-  {
-  }
+  two_value_pointer_abstract_objectt(const typet &type, bool top, bool bottom);
 
   /// \param expr: the expression to use as the starting pointer for
   ///              an abstract object
@@ -38,10 +32,7 @@ public:
   two_value_pointer_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
-    const namespacet &ns)
-    : abstract_pointer_objectt(expr, environment, ns)
-  {
-  }
+    const namespacet &ns);
 
   bool same_target(abstract_object_pointert other) const override;
   exprt offset() const override;

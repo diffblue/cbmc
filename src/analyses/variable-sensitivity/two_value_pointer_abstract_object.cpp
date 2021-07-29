@@ -11,6 +11,28 @@
 
 #include <util/pointer_expr.h>
 
+two_value_pointer_abstract_objectt::two_value_pointer_abstract_objectt(
+  const typet &type)
+  : abstract_pointer_objectt(type)
+{
+}
+
+two_value_pointer_abstract_objectt::two_value_pointer_abstract_objectt(
+  const typet &type,
+  bool top,
+  bool bottom)
+  : abstract_pointer_objectt(type, top, bottom)
+{
+}
+
+two_value_pointer_abstract_objectt::two_value_pointer_abstract_objectt(
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+  : abstract_pointer_objectt(expr, environment, ns)
+{
+}
+
 bool two_value_pointer_abstract_objectt::same_target(
   abstract_object_pointert other) const
 {

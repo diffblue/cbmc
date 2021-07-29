@@ -149,7 +149,33 @@ exprt value_set_pointer_abstract_objectt::ptr_comparison_expr(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  return nil_exprt();
+  if(expr.id() == ID_not)
+  {
+    auto const &not_expr = to_not_expr(expr);
+    auto result = simplify_vsd_expr(
+      ptr_comparison_expr(not_expr.op(), operands, environment, ns), ns);
+    return invert_result(result);
+  }
+
+  auto rhs =
+    std::dynamic_pointer_cast<const value_set_pointer_abstract_objectt>(
+      operands.back());
+
+  auto comparisons = std::set<exprt>{};
+
+  for(auto &lhsv : values)
+  {
+    auto lhsp = std::dynamic_pointer_cast<const abstract_pointer_objectt>(lhsv);
+    for(auto const &rhsp : rhs->values)
+    {
+      auto ops = std::vector<abstract_object_pointert>{lhsp, rhsp};
+      comparisons.insert(lhsp->ptr_comparison_expr(expr, ops, environment, ns));
+    }
+  }
+
+  if(comparisons.size() > 1)
+    return nil_exprt();
+  return *comparisons.cbegin();
 }
 
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
