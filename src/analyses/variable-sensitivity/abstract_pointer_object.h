@@ -105,23 +105,24 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const = 0;
 
+  virtual exprt ptr_comparison_expr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const = 0;
+
 private:
-  abstract_object_pointert eval_typecast_from_void_ptr(
+  abstract_object_pointert typecast_from_void_ptr(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
-  abstract_object_pointert eval_ptr_diff(
+  abstract_object_pointert ptr_diff(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
-  abstract_object_pointert eval_ptr_comparison(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const;
-  exprt ptr_comparison_expr(
+  abstract_object_pointert ptr_comparison(
     const exprt &expr,
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,

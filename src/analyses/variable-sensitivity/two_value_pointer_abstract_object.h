@@ -62,6 +62,12 @@ public:
     const typet &new_type,
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
+
+  exprt ptr_comparison_expr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_TWO_VALUE_POINTER_ABSTRACT_OBJECT_H

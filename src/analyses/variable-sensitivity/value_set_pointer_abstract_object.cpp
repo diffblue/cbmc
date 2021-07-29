@@ -143,6 +143,15 @@ abstract_object_pointert value_set_pointer_abstract_objectt::typecast(
     new_type, is_top(), is_bottom(), new_values);
 }
 
+exprt value_set_pointer_abstract_objectt::ptr_comparison_expr(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  return nil_exprt();
+}
+
 abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
   const abstract_object_sett &new_values) const
 {

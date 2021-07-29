@@ -64,3 +64,12 @@ abstract_object_pointert two_value_pointer_abstract_objectt::typecast(
   return std::make_shared<two_value_pointer_abstract_objectt>(
     new_type, is_top(), is_bottom());
 }
+
+exprt two_value_pointer_abstract_objectt::ptr_comparison_expr(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  return nil_exprt();
+}
