@@ -212,10 +212,14 @@ exprt write_stackt::offset_expression() const
 {
   PRECONDITION(!is_top_value());
   auto const &access = stack.back()->get_access_expr();
-  auto const &operands = access.operands();
 
-  return operands.empty() ? from_integer(0, unsigned_long_int_type())
-                          : operands.back();
+  if(access.id() == ID_member)
+    return access;
+
+  if(access.id() == ID_index)
+    return to_index_expr(access).index();
+
+  return from_integer(0, unsigned_long_int_type());
 }
 
 /// Is the stack representing an unknown value and hence can't be written to

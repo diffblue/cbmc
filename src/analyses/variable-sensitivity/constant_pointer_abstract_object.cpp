@@ -297,6 +297,28 @@ void constant_pointer_abstract_objectt::get_statistics(
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }
 
+static exprt to_bool_expr(bool v)
+{
+  if(v)
+    return true_exprt();
+  return false_exprt();
+}
+
+exprt struct_member_ptr_comparison_expr(
+  irep_idt const &id,
+  exprt const &lhs,
+  exprt const &rhs)
+{
+  auto const &lhs_member = to_member_expr(lhs).get_component_name();
+  auto const &rhs_member = to_member_expr(rhs).get_component_name();
+
+  if(id == ID_equal)
+    return to_bool_expr(lhs_member == rhs_member);
+  if(id == ID_notequal)
+    return to_bool_expr(lhs_member != rhs_member);
+  return nil_exprt();
+}
+
 exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -321,7 +343,12 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
   {
     auto lhs_offset = offset();
     auto rhs_offset = rhs->offset();
-    return binary_relation_exprt(offset(), expr.id(), rhs->offset());
+
+    if(lhs_offset.id() == ID_member)
+      return struct_member_ptr_comparison_expr(
+        expr.id(), lhs_offset, rhs_offset);
+
+    return binary_relation_exprt(lhs_offset, expr.id(), rhs_offset);
   }
 
   // not same target, can only eval == and !=
