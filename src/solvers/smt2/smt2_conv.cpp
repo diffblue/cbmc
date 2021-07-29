@@ -4721,21 +4721,32 @@ void smt2_convt::find_symbols(const exprt &expr)
         convert_type(array_type);
         out << ")\n";
 
-        // use a quantifier-based initialization instead of lambda
-        out << "(assert (forall ((i ";
-        convert_type(array_type.size().type());
-        out << ")) (= (select " << id << " i) ";
-        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
+        // The code below only works in Z3 and CVC4, it was added (and
+        // approved/merged) despite breaking other solvers.
+        // This conditional removes this for other solvers
+        if(solver == solvert::CVC4 || solver == solvert::Z3)
         {
-          out << "(ite ";
-          convert_expr(array_of.what());
-          out << " #b1 #b0)";
+          // use a quantifier-based initialization instead of lambda
+          out << "(assert (forall ((i ";
+          convert_type(array_type.size().type());
+          out << ")) (= (select " << id << " i) ";
+          if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
+          {
+            out << "(ite ";
+            convert_expr(array_of.what());
+            out << " #b1 #b0)";
+          }
+          else
+          {
+            convert_expr(array_of.what());
+          }
+          out << ")))\n";
         }
-        else
-        {
-          convert_expr(array_of.what());
-        }
-        out << ")))\n";
+        // else
+        // {
+        //   // This is where an alternate for other solvers that does not use
+        //   // quantifiers should go.
+        // }
 
         defined_expressions[expr] = id;
       }
