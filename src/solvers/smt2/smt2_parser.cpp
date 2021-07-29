@@ -904,7 +904,7 @@ exprt smt2_parsert::bv_division(
 
   return let_exprt(
     {divisor},
-    {operands[1]},
+    operands[1],
     if_exprt(divisor_is_zero, all_ones, division_result));
 }
 
