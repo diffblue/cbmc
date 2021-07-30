@@ -2,6 +2,7 @@
 
 #include <testing-utils/use_catch.h>
 
+#include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 
 #include <util/mp_arith.h>
@@ -147,8 +148,7 @@ smt_bit_vector_constant_termt make_test_term<smt_bit_vector_constant_termt>()
 template <>
 smt_function_application_termt make_test_term<smt_function_application_termt>()
 {
-  return smt_function_application_termt{
-    smt_identifier_termt{"bar", smt_bool_sortt{}}, {}};
+  return smt_core_theoryt::make_not(smt_bool_literal_termt{true});
 }
 
 TEMPLATE_TEST_CASE(

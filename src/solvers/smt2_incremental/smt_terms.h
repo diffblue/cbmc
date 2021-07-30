@@ -113,13 +113,15 @@ public:
 
 class smt_function_application_termt : public smt_termt
 {
-public:
-  // Public access is deprecated and will be replaced with the `of` factory
-  // function which will perform checks relevant to the particular function
-  // being applied. To be fixed before the end of this PR.
+private:
+  /// Unchecked construction of function application terms. The public factoryt
+  /// sub class should be used to construct instances of this term with the
+  /// appropriate checks for the function being applied.
   smt_function_application_termt(
     smt_identifier_termt function_identifier,
     std::vector<smt_termt> arguments);
+
+public:
   const smt_identifier_termt &function_identifier() const;
   std::vector<std::reference_wrapper<const smt_termt>> arguments() const;
 
