@@ -62,10 +62,6 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
-  virtual bool same_target(abstract_object_pointert other) const = 0;
-  virtual exprt offset() const = 0;
-  virtual exprt offset_from(abstract_object_pointert other) const = 0;
-
   /// A helper function to read elements from an array. More precise
   /// abstractions may override this to provide more precise results.
   ///

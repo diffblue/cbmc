@@ -62,23 +62,6 @@ value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
     std::make_shared<constant_pointer_abstract_objectt>(expr, environment, ns));
 }
 
-bool value_set_pointer_abstract_objectt::same_target(
-  abstract_object_pointert other) const
-{
-  return false;
-}
-
-exprt value_set_pointer_abstract_objectt::offset() const
-{
-  return nil_exprt();
-}
-
-exprt value_set_pointer_abstract_objectt::offset_from(
-  abstract_object_pointert other) const
-{
-  return nil_exprt();
-}
-
 abstract_object_pointert value_set_pointer_abstract_objectt::read_dereference(
   const abstract_environmentt &env,
   const namespacet &ns) const

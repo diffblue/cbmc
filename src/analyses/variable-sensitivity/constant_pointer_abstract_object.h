@@ -143,13 +143,13 @@ protected:
     const abstract_object_pointert &op1,
     const widen_modet &widen_mode) const override;
 
-  bool same_target(abstract_object_pointert other) const override;
-  exprt offset() const override;
-  exprt offset_from(abstract_object_pointert other) const override;
-
   CLONE
 
 private:
+  bool same_target(abstract_object_pointert other) const;
+  exprt offset() const;
+  exprt offset_from(abstract_object_pointert other) const;
+
   /// Merges two constant pointers. If they are pointing at the same
   /// value, we merge, otherwise we set to top.
   ///

@@ -33,23 +33,6 @@ two_value_pointer_abstract_objectt::two_value_pointer_abstract_objectt(
 {
 }
 
-bool two_value_pointer_abstract_objectt::same_target(
-  abstract_object_pointert other) const
-{
-  return false;
-}
-
-exprt two_value_pointer_abstract_objectt::offset() const
-{
-  return nil_exprt();
-}
-
-exprt two_value_pointer_abstract_objectt::offset_from(
-  abstract_object_pointert other) const
-{
-  return nil_exprt();
-}
-
 abstract_object_pointert two_value_pointer_abstract_objectt::read_dereference(
   const abstract_environmentt &env,
   const namespacet &ns) const
