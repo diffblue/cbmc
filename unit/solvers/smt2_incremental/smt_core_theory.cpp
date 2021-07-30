@@ -40,6 +40,60 @@ TEST_CASE("SMT core theory implies.", "[core][smt2_incremental]")
   CHECK_THROWS(smt_core_theoryt::implies(true_term, two));
 }
 
+TEST_CASE("SMT core theory \"and\".", "[core][smt2_incremental]")
+{
+  const smt_bool_literal_termt true_term{true};
+  const smt_bool_literal_termt false_term{false};
+  const auto implies = smt_core_theoryt::make_and(true_term, false_term);
+  CHECK(implies.get_sort() == smt_bool_sortt{});
+  CHECK(
+    implies.function_identifier() ==
+    smt_identifier_termt{"and", smt_bool_sortt{}});
+  REQUIRE(implies.arguments().size() == 2);
+  CHECK(implies.arguments()[0].get() == true_term);
+  CHECK(implies.arguments()[1].get() == false_term);
+  cbmc_invariants_should_throwt invariants_throw;
+  const smt_bit_vector_constant_termt two{2, 8};
+  CHECK_THROWS(smt_core_theoryt::make_and(two, false_term));
+  CHECK_THROWS(smt_core_theoryt::make_and(true_term, two));
+}
+
+TEST_CASE("SMT core theory \"or\".", "[core][smt2_incremental]")
+{
+  const smt_bool_literal_termt true_term{true};
+  const smt_bool_literal_termt false_term{false};
+  const auto implies = smt_core_theoryt::make_or(true_term, false_term);
+  CHECK(implies.get_sort() == smt_bool_sortt{});
+  CHECK(
+    implies.function_identifier() ==
+    smt_identifier_termt{"or", smt_bool_sortt{}});
+  REQUIRE(implies.arguments().size() == 2);
+  CHECK(implies.arguments()[0].get() == true_term);
+  CHECK(implies.arguments()[1].get() == false_term);
+  cbmc_invariants_should_throwt invariants_throw;
+  const smt_bit_vector_constant_termt two{2, 8};
+  CHECK_THROWS(smt_core_theoryt::make_or(two, false_term));
+  CHECK_THROWS(smt_core_theoryt::make_or(true_term, two));
+}
+
+TEST_CASE("SMT core theory \"xor\".", "[core][smt2_incremental]")
+{
+  const smt_bool_literal_termt true_term{true};
+  const smt_bool_literal_termt false_term{false};
+  const auto implies = smt_core_theoryt::make_xor(true_term, false_term);
+  CHECK(implies.get_sort() == smt_bool_sortt{});
+  CHECK(
+    implies.function_identifier() ==
+    smt_identifier_termt{"xor", smt_bool_sortt{}});
+  REQUIRE(implies.arguments().size() == 2);
+  CHECK(implies.arguments()[0].get() == true_term);
+  CHECK(implies.arguments()[1].get() == false_term);
+  cbmc_invariants_should_throwt invariants_throw;
+  const smt_bit_vector_constant_termt two{2, 8};
+  CHECK_THROWS(smt_core_theoryt::make_xor(two, false_term));
+  CHECK_THROWS(smt_core_theoryt::make_xor(true_term, two));
+}
+
 TEST_CASE("SMT core theory \"=\".", "[core][smt2_incremental]")
 {
   SECTION("Bool sorted term comparison")

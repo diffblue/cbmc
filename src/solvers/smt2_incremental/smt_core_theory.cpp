@@ -48,6 +48,82 @@ void smt_core_theoryt::impliest::validate(
 const smt_function_application_termt::factoryt<smt_core_theoryt::impliest>
   smt_core_theoryt::implies{};
 
+const char *smt_core_theoryt::andt::identifier()
+{
+  return "and";
+}
+
+smt_sortt
+smt_core_theoryt::andt::return_sort(const smt_termt &, const smt_termt &)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_core_theoryt::andt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  INVARIANT(
+    lhs.get_sort() == smt_bool_sortt{},
+    "Left hand side of \"and\" must have bool sort.");
+  INVARIANT(
+    rhs.get_sort() == smt_bool_sortt{},
+    "Right hand side of \"and\" must have bool sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_core_theoryt::andt>
+  smt_core_theoryt::make_and{};
+
+const char *smt_core_theoryt::ort::identifier()
+{
+  return "or";
+}
+
+smt_sortt
+smt_core_theoryt::ort::return_sort(const smt_termt &, const smt_termt &)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_core_theoryt::ort::validate(const smt_termt &lhs, const smt_termt &rhs)
+{
+  INVARIANT(
+    lhs.get_sort() == smt_bool_sortt{},
+    "Left hand side of \"or\" must have bool sort.");
+  INVARIANT(
+    rhs.get_sort() == smt_bool_sortt{},
+    "Right hand side of \"or\" must have bool sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_core_theoryt::ort>
+  smt_core_theoryt::make_or{};
+
+const char *smt_core_theoryt::xort::identifier()
+{
+  return "xor";
+}
+
+smt_sortt
+smt_core_theoryt::xort::return_sort(const smt_termt &, const smt_termt &)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_core_theoryt::xort::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  INVARIANT(
+    lhs.get_sort() == smt_bool_sortt{},
+    "Left hand side of \"xor\" must have bool sort.");
+  INVARIANT(
+    rhs.get_sort() == smt_bool_sortt{},
+    "Right hand side of \"xor\" must have bool sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_core_theoryt::xort>
+  smt_core_theoryt::make_xor{};
+
 const char *smt_core_theoryt::equalt::identifier()
 {
   return "=";
