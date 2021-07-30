@@ -104,3 +104,23 @@ TEST_CASE("SMT core theory \"distinct\".", "[core][smt2_incremental]")
       smt_bit_vector_constant_termt{2, 8}, smt_bool_literal_termt{true}));
   }
 }
+
+TEST_CASE("SMT core theory if then else.", "[core][smt2_incremental]")
+{
+  const smt_bool_literal_termt false_term{false};
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bit_vector_constant_termt three{2, 8};
+  const auto if_then_else =
+    smt_core_theoryt::if_then_else(false_term, two, three);
+  CHECK(if_then_else.get_sort() == smt_bit_vector_sortt{8});
+  CHECK(
+    if_then_else.function_identifier() ==
+    smt_identifier_termt{"ite", smt_bit_vector_sortt{8}});
+  REQUIRE(if_then_else.arguments().size() == 3);
+  CHECK(if_then_else.arguments()[0].get() == false_term);
+  CHECK(if_then_else.arguments()[1].get() == two);
+  CHECK(if_then_else.arguments()[2].get() == three);
+  cbmc_invariants_should_throwt invariants_throw;
+  CHECK_THROWS(smt_core_theoryt::if_then_else(two, two, three));
+  CHECK_THROWS(smt_core_theoryt::if_then_else(false_term, false_term, three));
+}

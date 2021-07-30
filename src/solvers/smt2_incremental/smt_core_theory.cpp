@@ -67,3 +67,32 @@ void smt_core_theoryt::distinctt::validate(
 
 const smt_function_application_termt::factoryt<smt_core_theoryt::distinctt>
   smt_core_theoryt::distinct{};
+
+const char *smt_core_theoryt::if_then_elset::identifier()
+{
+  return "ite";
+}
+
+smt_sortt smt_core_theoryt::if_then_elset::return_sort(
+  const smt_termt &,
+  const smt_termt &then_term,
+  const smt_termt &)
+{
+  return then_term.get_sort();
+}
+
+void smt_core_theoryt::if_then_elset::validate(
+  const smt_termt &condition,
+  const smt_termt &then_term,
+  const smt_termt &else_term)
+{
+  INVARIANT(
+    condition.get_sort() == smt_bool_sortt{},
+    "Condition term must have bool sort.");
+  INVARIANT(
+    then_term.get_sort() == else_term.get_sort(),
+    "\"ite\" must have \"then\" and \"else\" terms of the same sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_core_theoryt::if_then_elset>
+  smt_core_theoryt::if_then_else;
