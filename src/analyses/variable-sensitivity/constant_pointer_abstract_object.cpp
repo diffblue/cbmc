@@ -361,14 +361,6 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  if(expr.id() == ID_not)
-  {
-    auto const &not_expr = to_not_expr(expr);
-    auto result = simplify_vsd_expr(
-      ptr_comparison_expr(not_expr.op(), operands, environment, ns), ns);
-    return invert_result(result);
-  }
-
   auto rhs = std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
     operands.back());
 
