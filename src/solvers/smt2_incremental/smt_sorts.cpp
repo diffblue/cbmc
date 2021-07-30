@@ -10,6 +10,29 @@
 #include <solvers/smt2_incremental/smt_sorts.def>
 #undef SORT_ID
 
+#define SORT_ID(the_id)                                                        \
+  template <>                                                                  \
+  const smt_##the_id##_sortt *smt_sortt::cast<smt_##the_id##_sortt>() const &  \
+  {                                                                            \
+    return id() == ID_smt_##the_id##_sort                                      \
+             ? static_cast<const smt_##the_id##_sortt *>(this)                 \
+             : nullptr;                                                        \
+  }
+#include <solvers/smt2_incremental/smt_sorts.def> // NOLINT(build/include)
+#undef SORT_ID
+
+#define SORT_ID(the_id)                                                        \
+  template <>                                                                  \
+  optionalt<smt_##the_id##_sortt> smt_sortt::cast<smt_##the_id##_sortt>() &&   \
+  {                                                                            \
+    if(id() == ID_smt_##the_id##_sort)                                         \
+      return {std::move(*static_cast<const smt_##the_id##_sortt *>(this))};    \
+    else                                                                       \
+      return {};                                                               \
+  }
+#include <solvers/smt2_incremental/smt_sorts.def> // NOLINT(build/include)
+#undef SORT_ID
+
 bool smt_sortt::operator==(const smt_sortt &other) const
 {
   return irept::operator==(other);

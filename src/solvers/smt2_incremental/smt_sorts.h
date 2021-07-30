@@ -8,6 +8,7 @@
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_SORTS_H
 
 #include <util/irep.h>
+#include <util/optional.h>
 
 #include <type_traits>
 
@@ -41,6 +42,12 @@ public:
     static irept upcast(smt_sortt sort);
     static const smt_sortt &downcast(const irept &);
   };
+
+  template <typename sub_classt>
+  const sub_classt *cast() const &;
+
+  template <typename sub_classt>
+  optionalt<sub_classt> cast() &&;
 
 protected:
   using irept::irept;
