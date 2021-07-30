@@ -121,11 +121,39 @@ public:
 class smt_function_application_termt : public smt_termt
 {
 public:
+  // Public access is deprecated and will be replaced with the `of` factory
+  // function which will perform checks relevant to the particular function
+  // being applied. To be fixed before the end of this PR.
   smt_function_application_termt(
     smt_identifier_termt function_identifier,
     std::vector<smt_termt> arguments);
   const smt_identifier_termt &function_identifier() const;
   std::vector<std::reference_wrapper<const smt_termt>> arguments() const;
+
+  template <typename functiont>
+  class factoryt
+  {
+  private:
+    functiont function;
+
+  public:
+    template <typename... function_type_argument_typest>
+    explicit factoryt(function_type_argument_typest &&... arguments)
+      : function{std::forward<function_type_argument_typest>(arguments)...}
+    {
+    }
+
+    template <typename... argument_typest>
+    smt_function_application_termt
+    operator()(argument_typest &&... arguments) const
+    {
+      function.validate(arguments...);
+      auto return_sort = function.return_sort(arguments...);
+      return smt_function_application_termt{
+        smt_identifier_termt{function.identifier(), std::move(return_sort)},
+        {std::forward<argument_typest>(arguments)...}};
+    }
+  };
 };
 
 class smt_term_const_downcast_visitort

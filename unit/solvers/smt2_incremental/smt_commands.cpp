@@ -94,3 +94,20 @@ TEST_CASE("smt_set_option_commandt getter", "[core][smt2_incremental]")
   CHECK(smt_set_option_commandt{models_on}.option() == models_on);
   CHECK(smt_set_option_commandt{models_off}.option() == models_off);
 }
+
+TEST_CASE("SMT2 function application factory tests", "[core][smt2_incremental]")
+{
+  const smt_identifier_termt arbitary{"arbitary", smt_bool_sortt{}};
+  const smt_declare_function_commandt function_declaration{
+    arbitary, std::vector<smt_sortt>{smt_bool_sortt{}, smt_bool_sortt{}}};
+  const smt_function_application_termt::factoryt<smt_command_functiont> factory{
+    function_declaration};
+  const smt_function_application_termt application =
+    factory(std::vector<smt_termt>{smt_bool_literal_termt{true},
+                                   smt_bool_literal_termt{false}});
+  CHECK(application.get_sort() == smt_bool_sortt{});
+  CHECK(application.function_identifier() == arbitary);
+  REQUIRE(application.arguments().size() == 2);
+  CHECK(application.arguments()[0].get() == smt_bool_literal_termt{true});
+  CHECK(application.arguments()[1].get() == smt_bool_literal_termt{false});
+}
