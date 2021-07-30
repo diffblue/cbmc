@@ -22,6 +22,24 @@ TEST_CASE("SMT core theory \"not\".", "[core][smt2_incremental]")
   CHECK_THROWS(smt_core_theoryt::make_not(smt_bit_vector_constant_termt{0, 1}));
 }
 
+TEST_CASE("SMT core theory implies.", "[core][smt2_incremental]")
+{
+  const smt_bool_literal_termt true_term{true};
+  const smt_bool_literal_termt false_term{false};
+  const auto implies = smt_core_theoryt::implies(true_term, false_term);
+  CHECK(implies.get_sort() == smt_bool_sortt{});
+  CHECK(
+    implies.function_identifier() ==
+    smt_identifier_termt{"=>", smt_bool_sortt{}});
+  REQUIRE(implies.arguments().size() == 2);
+  CHECK(implies.arguments()[0].get() == true_term);
+  CHECK(implies.arguments()[1].get() == false_term);
+  cbmc_invariants_should_throwt invariants_throw;
+  const smt_bit_vector_constant_termt two{2, 8};
+  CHECK_THROWS(smt_core_theoryt::implies(two, false_term));
+  CHECK_THROWS(smt_core_theoryt::implies(true_term, two));
+}
+
 TEST_CASE("SMT core theory \"=\".", "[core][smt2_incremental]")
 {
   SECTION("Bool sorted term comparison")

@@ -22,6 +22,32 @@ void smt_core_theoryt::nott::validate(const smt_termt &operand)
 const smt_function_application_termt::factoryt<smt_core_theoryt::nott>
   smt_core_theoryt::make_not{};
 
+const char *smt_core_theoryt::impliest::identifier()
+{
+  return "=>";
+}
+
+smt_sortt
+smt_core_theoryt::impliest::return_sort(const smt_termt &, const smt_termt &)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_core_theoryt::impliest::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  INVARIANT(
+    lhs.get_sort() == smt_bool_sortt{},
+    "Left hand side of \"=>\" must have bool sort.");
+  INVARIANT(
+    rhs.get_sort() == smt_bool_sortt{},
+    "Right hand side of \"=>\" must have bool sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_core_theoryt::impliest>
+  smt_core_theoryt::implies{};
+
 const char *smt_core_theoryt::equalt::identifier()
 {
   return "=";

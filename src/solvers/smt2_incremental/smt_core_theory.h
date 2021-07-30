@@ -16,6 +16,14 @@ public:
   };
   static const smt_function_application_termt::factoryt<nott> make_not;
 
+  struct impliest final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<impliest> implies;
+
   struct equalt final
   {
     static const char *identifier();
