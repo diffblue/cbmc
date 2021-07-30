@@ -16,13 +16,6 @@ TEST_CASE("Test smt_sortt to string conversion", "[core][smt2_incremental]")
   CHECK(smt_to_smt2_string(smt_bit_vector_sortt{16}) == "(_ BitVec 16)");
 }
 
-TEST_CASE("Test smt_not_termt to string conversion", "[core][smt2_incremental]")
-{
-  CHECK(
-    smt_to_smt2_string(smt_not_termt{
-      smt_identifier_termt{"foo", smt_bool_sortt{}}}) == "(not |foo|)");
-}
-
 TEST_CASE(
   "Test smt_bit_vector_constant_termt to string conversion",
   "[core][smt2_incremental]")

@@ -75,13 +75,6 @@ public:
   bool value() const;
 };
 
-class smt_not_termt : public smt_termt
-{
-public:
-  explicit smt_not_termt(smt_termt operand);
-  const smt_termt &operand() const;
-};
-
 /// Stores identifiers in unescaped and unquoted form. Any escaping or quoting
 /// required should be performed during printing.
 class smt_identifier_termt : public smt_termt

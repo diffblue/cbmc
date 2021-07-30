@@ -33,19 +33,6 @@ TEST_CASE(
   REQUIRE_FALSE(smt_bool_literal_termt{false}.value());
 }
 
-TEST_CASE("smt_not_termt sort.", "[core][smt2_incremental]")
-{
-  REQUIRE(
-    smt_not_termt{smt_bool_literal_termt{true}}.get_sort() == smt_bool_sortt{});
-}
-
-TEST_CASE("smt_not_termt operand getter.", "[core][smt2_incremental]")
-{
-  const smt_bool_literal_termt bool_term{true};
-  const smt_not_termt not_term{bool_term};
-  REQUIRE(not_term.operand() == bool_term);
-}
-
 TEST_CASE("smt_identifier_termt construction", "[core][smt2_incremental]")
 {
   cbmc_invariants_should_throwt invariants_throw;
@@ -78,11 +65,6 @@ TEST_CASE("smt_termt equality.", "[core][smt2_incremental]")
   CHECK(
     smt_bit_vector_constant_termt{42, 8} !=
     smt_bit_vector_constant_termt{12, 8});
-  smt_termt not_false = smt_not_termt{smt_bool_literal_termt{false}};
-  smt_termt not_true = smt_not_termt{smt_bool_literal_termt{true}};
-  CHECK_FALSE(not_false == true_term);
-  CHECK_FALSE(not_false == not_true);
-  CHECK(not_false == smt_not_termt{smt_bool_literal_termt{false}});
 }
 
 template <typename expected_termt>
@@ -95,18 +77,6 @@ public:
   void visit(const smt_bool_literal_termt &) override
   {
     if(std::is_same<expected_termt, smt_bool_literal_termt>::value)
-    {
-      expected_term_visited = true;
-    }
-    else
-    {
-      unexpected_term_visited = true;
-    }
-  }
-
-  void visit(const smt_not_termt &) override
-  {
-    if(std::is_same<expected_termt, smt_not_termt>::value)
     {
       expected_term_visited = true;
     }
@@ -163,12 +133,6 @@ smt_bool_literal_termt make_test_term<smt_bool_literal_termt>()
 }
 
 template <>
-smt_not_termt make_test_term<smt_not_termt>()
-{
-  return smt_not_termt{smt_bool_literal_termt{false}};
-}
-
-template <>
 smt_identifier_termt make_test_term<smt_identifier_termt>()
 {
   return smt_identifier_termt{"foo", smt_bool_sortt{}};
@@ -191,7 +155,6 @@ TEMPLATE_TEST_CASE(
   "smt_termt::accept(visitor)",
   "[core][smt2_incremental]",
   smt_bool_literal_termt,
-  smt_not_termt,
   smt_identifier_termt,
   smt_bit_vector_constant_termt,
   smt_function_application_termt)

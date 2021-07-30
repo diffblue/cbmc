@@ -3,6 +3,7 @@
 #include <testing-utils/use_catch.h>
 
 #include <solvers/smt2_incremental/smt_commands.h>
+#include <solvers/smt2_incremental/smt_core_theory.h>
 
 TEST_CASE("Test smt_commandt.pretty is accessible.", "[core][smt2_incremental]")
 {
@@ -32,11 +33,13 @@ TEST_CASE("smt_declare_function_commandt getters", "[core][smt2_incremental]")
 
 TEST_CASE("smt_define_function_commandt getters", "[core][smt2_incremental]")
 {
+  const auto not_x =
+    smt_core_theoryt::make_not(smt_identifier_termt{"x", smt_bool_sortt{}});
   const smt_define_function_commandt function_definition{
     "not first",
     {smt_identifier_termt{"x", smt_bool_sortt{}},
      smt_identifier_termt{"y", smt_bool_sortt{}}},
-    smt_not_termt{smt_identifier_termt{"x", smt_bool_sortt{}}}};
+    not_x};
   CHECK(
     function_definition.identifier() ==
     smt_identifier_termt{"not first", smt_bool_sortt{}});
@@ -46,9 +49,7 @@ TEST_CASE("smt_define_function_commandt getters", "[core][smt2_incremental]")
   CHECK(
     function_definition.parameters()[1].get() ==
     smt_identifier_termt{"y", smt_bool_sortt{}});
-  CHECK(
-    function_definition.definition() ==
-    smt_not_termt{smt_identifier_termt{"x", smt_bool_sortt{}}});
+  CHECK(function_definition.definition() == not_x);
 }
 
 TEST_CASE("smt_get_value_commandt getter", "[core][smt2_incremental]")

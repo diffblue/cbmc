@@ -87,6 +87,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/smt2/smt2_conv.cpp \
        solvers/smt2_incremental/smt_bit_vector_theory.cpp \
        solvers/smt2_incremental/smt_commands.cpp \
+       solvers/smt2_incremental/smt_core_theory.cpp \
        solvers/smt2_incremental/smt_sorts.cpp \
        solvers/smt2_incremental/smt_terms.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \
