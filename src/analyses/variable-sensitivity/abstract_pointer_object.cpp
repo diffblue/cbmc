@@ -53,10 +53,10 @@ abstract_object_pointert abstract_pointer_objectt::expression_transform(
     return typecast_from_void_ptr(expr, operands, environment, ns);
 
   if(is_ptr_diff(expr))
-    return ptr_diff(expr, operands, environment, ns);
+    return eval_ptr_diff(expr, operands, environment, ns);
 
   if(is_ptr_comparison(expr))
-    return ptr_comparison(expr, operands, environment, ns);
+    return eval_ptr_comparison(expr, operands, environment, ns);
 
   return abstract_objectt::expression_transform(
     expr, operands, environment, ns);
@@ -98,29 +98,26 @@ abstract_object_pointert abstract_pointer_objectt::typecast_from_void_ptr(
     expr, operands, environment, ns);
 }
 
-abstract_object_pointert abstract_pointer_objectt::ptr_diff(
+abstract_object_pointert abstract_pointer_objectt::eval_ptr_diff(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  auto &rhs = operands.back();
+  if(is_top() || operands[1]->is_top())
+    return environment.eval(nil_exprt(), ns);
 
-  if(same_target(rhs))
-    return environment.eval(offset_from(rhs), ns);
-
-  return abstract_objectt::expression_transform(
-    expr, operands, environment, ns);
+  return ptr_diff(expr, operands, environment, ns);
 }
 
-abstract_object_pointert abstract_pointer_objectt::ptr_comparison(
+abstract_object_pointert abstract_pointer_objectt::eval_ptr_comparison(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
   auto result = ptr_comparison_expr(expr, operands, environment, ns);
-  return environment.eval(result, ns)->unwrap_context();
+  return environment.eval(result, ns);
 }
 
 static bool is_dereference(const exprt &expr)

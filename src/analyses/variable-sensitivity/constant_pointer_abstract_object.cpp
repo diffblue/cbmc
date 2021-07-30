@@ -303,6 +303,21 @@ void constant_pointer_abstract_objectt::get_statistics(
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }
 
+abstract_object_pointert constant_pointer_abstract_objectt::ptr_diff(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  auto &rhs = operands.back();
+
+  if(same_target(rhs))
+    return environment.eval(offset_from(rhs), ns);
+
+  return abstract_objectt::expression_transform(
+    expr, operands, environment, ns);
+}
+
 static exprt to_bool_expr(bool v)
 {
   if(v)

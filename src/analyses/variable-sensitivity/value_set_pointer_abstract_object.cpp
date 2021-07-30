@@ -12,6 +12,7 @@
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
+#include <numeric>
 #include <util/pointer_expr.h>
 
 #include "abstract_environment.h"
@@ -141,6 +142,39 @@ abstract_object_pointert value_set_pointer_abstract_objectt::typecast(
   }
   return std::make_shared<value_set_pointer_abstract_objectt>(
     new_type, is_top(), is_bottom(), new_values);
+}
+
+abstract_object_pointert value_set_pointer_abstract_objectt::ptr_diff(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  auto rhs =
+    std::dynamic_pointer_cast<const value_set_pointer_abstract_objectt>(
+      operands.back());
+
+  auto differences = std::vector<abstract_object_pointert>{};
+
+  for(auto &lhsv : values)
+  {
+    auto lhsp = std::dynamic_pointer_cast<const abstract_pointer_objectt>(lhsv);
+    for(auto const &rhsp : rhs->values)
+    {
+      auto ops = std::vector<abstract_object_pointert>{lhsp, rhsp};
+      differences.push_back(lhsp->ptr_diff(expr, ops, environment, ns));
+    }
+  }
+
+  return std::accumulate(
+    differences.cbegin(),
+    differences.cend(),
+    differences.front(),
+    [](
+      const abstract_object_pointert &lhs,
+      const abstract_object_pointert &rhs) {
+      return abstract_objectt::merge(lhs, rhs, widen_modet::no).object;
+    });
 }
 
 exprt value_set_pointer_abstract_objectt::ptr_comparison_expr(

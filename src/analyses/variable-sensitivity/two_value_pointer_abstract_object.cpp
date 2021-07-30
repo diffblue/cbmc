@@ -87,6 +87,15 @@ abstract_object_pointert two_value_pointer_abstract_objectt::typecast(
     new_type, is_top(), is_bottom());
 }
 
+abstract_object_pointert two_value_pointer_abstract_objectt::ptr_diff(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  return environment.eval(nil_exprt(), ns);
+}
+
 exprt two_value_pointer_abstract_objectt::ptr_comparison_expr(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,

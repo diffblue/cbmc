@@ -1,0 +1,16 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --vsd-values intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion offset == 1: FAILURE
+^\[main.assertion.2\] .* assertion offset == 2: UNKNOWN
+^\[main.assertion.3\] .* assertion offset == 3: UNKNOWN
+^\[main.assertion.4\] .* assertion offset == 4: UNKNOWN
+^\[main.assertion.5\] .* assertion offset == 5: FAILURE
+^\[main.assertion.6\] .* assertion offset >= 2 && offset <= 4: SUCCESS
+^\[main.assertion.7\] .* assertion offset != 1: SUCCESS
+^\[main.assertion.8\] .* assertion offset != 2: UNKNOWN
+^\[main.assertion.9\] .* assertion offset != 3: UNKNOWN
+^\[main.assertion.10\] .* assertion offset != 4: UNKNOWN
+^\[main.assertion.11\] .* assertion offset != 5: SUCCESS
