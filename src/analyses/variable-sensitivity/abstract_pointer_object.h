@@ -129,11 +129,6 @@ private:
     const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
-  exprt eval_ptr_comparison_as_expr(
-    const exprt &expr,
-    const std::vector<abstract_object_pointert> &operands,
-    const abstract_environmentt &environment,
-    const namespacet &ns) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_POINTER_OBJECT_H

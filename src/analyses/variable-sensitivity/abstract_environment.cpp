@@ -46,8 +46,8 @@ static exprt assume_greater_than(
   const exprt &expr,
   const namespacet &ns);
 
-abstract_value_pointert as_value(const abstract_object_pointert &obj);
-bool is_value(const abstract_object_pointert &obj);
+static abstract_value_pointert as_value(const abstract_object_pointert &obj);
+static bool is_value(const abstract_object_pointert &obj);
 
 std::vector<abstract_object_pointert> eval_operands(
   const exprt &expr,
@@ -64,12 +64,6 @@ bool is_ptr_diff(const exprt &expr)
 bool is_ptr_comparison(const exprt &expr)
 {
   auto const &id = expr.id();
-  if(id == ID_not)
-  {
-    auto const &not_expr = to_not_expr(expr);
-    return is_ptr_comparison(not_expr.op());
-  }
-
   bool is_comparison = id == ID_equal || id == ID_notequal || id == ID_lt ||
                        id == ID_le || id == ID_gt || id == ID_ge;
 
@@ -110,10 +104,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     is_access_expr(simplified_id) || is_ptr_diff(simplified_expr) ||
     is_ptr_comparison(simplified_expr))
   {
-    auto const &operands_expr = (simplified_id != ID_not)
-                                  ? simplified_expr
-                                  : to_not_expr(simplified_expr).op();
-    auto const operands = eval_operands(operands_expr, *this, ns);
+    auto const operands = eval_operands(simplified_expr, *this, ns);
     auto const &target = operands.front();
 
     return target->expression_transform(simplified_expr, operands, *this, ns);
@@ -560,7 +551,7 @@ static auto inverse_operations =
                                {ID_ge, ID_lt},
                                {ID_gt, ID_le}};
 
-exprt invert_result(const exprt &result)
+static exprt invert_result(const exprt &result)
 {
   if(!result.is_boolean())
     return result;
@@ -570,7 +561,7 @@ exprt invert_result(const exprt &result)
   return true_exprt();
 }
 
-exprt invert_expr(const exprt &expr)
+static exprt invert_expr(const exprt &expr)
 {
   auto expr_id = expr.id();
 

@@ -116,24 +116,8 @@ abstract_object_pointert abstract_pointer_objectt::eval_ptr_comparison(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  auto result = eval_ptr_comparison_as_expr(expr, operands, environment, ns);
+  auto result = ptr_comparison_expr(expr, operands, environment, ns);
   return environment.eval(result, ns);
-}
-
-exprt abstract_pointer_objectt::eval_ptr_comparison_as_expr(
-  const exprt &expr,
-  const std::vector<abstract_object_pointert> &operands,
-  const abstract_environmentt &environment,
-  const namespacet &ns) const
-{
-  if(expr.id() == ID_not)
-  {
-    auto const &not_expr = to_not_expr(expr);
-    auto result = simplify_vsd_expr(
-      ptr_comparison_expr(not_expr.op(), operands, environment, ns), ns);
-    return invert_result(result);
-  }
-  return ptr_comparison_expr(expr, operands, environment, ns);
 }
 
 static bool is_dereference(const exprt &expr)

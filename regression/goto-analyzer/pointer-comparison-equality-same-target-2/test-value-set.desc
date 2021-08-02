@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion p == q || p == r: FAILURE
+^\[main.assertion.2\] .* assertion q == p || q == r: SUCCESS
+^\[main.assertion.3\] .* assertion p != q && p != r: SUCCESS
+^\[main.assertion.4\] .* assertion q != p && q != r: FAILURE

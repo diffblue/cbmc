@@ -86,6 +86,7 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
+  PRECONDITION(expr.operands().size() == operands.size());
   std::vector<abstract_object_pointert> child_operands;
 
   std::transform(
