@@ -17,5 +17,6 @@ sensitivity_test_constants_pointer.c
 ^\[main.assertion.12\] .* \*x==0: UNKNOWN$
 ^\[main.assertion.13\] .* x==&a: UNKNOWN$
 ^\[main.assertion.14\] .* x==&b: UNKNOWN$
+^\[main.assertion.15\] .* x==&c: UNKNOWN$
 --
 ^warning: ignoring

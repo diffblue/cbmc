@@ -10,6 +10,7 @@
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 
+#include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
@@ -102,6 +103,12 @@ abstract_object_pointert abstract_objectt::abstract_object_meet_internal(
   return shared_from_this();
 }
 
+static bool is_pointer_addition(const exprt &expr)
+{
+  return (expr.id() == ID_plus) && (expr.type().id() == ID_pointer) &&
+         (expr.operands().size() == 2) && is_number(expr.operands()[1].type());
+}
+
 abstract_object_pointert abstract_objectt::expression_transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -117,7 +124,8 @@ abstract_object_pointert abstract_objectt::expression_transform(
     op = const_op.is_nil() ? op : const_op;
   }
 
-  simplify(copy, ns);
+  if(!is_pointer_addition(copy))
+    copy = simplify_expr(copy, ns);
 
   for(const exprt &op : copy.operands())
   {

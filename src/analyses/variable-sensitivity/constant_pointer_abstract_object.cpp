@@ -72,6 +72,48 @@ abstract_object_pointert constant_pointer_abstract_objectt::merge(
   return abstract_pointer_objectt::merge(other, widen_mode);
 }
 
+bool constant_pointer_abstract_objectt::same_target(
+  abstract_object_pointert other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
+
+  if(value_stack.is_top_value() || cast_other->value_stack.is_top_value())
+    return false;
+
+  if(value_stack.depth() != cast_other->value_stack.depth())
+    return false;
+
+  for(size_t d = 0; d != value_stack.depth() - 1; ++d)
+    if(
+      value_stack.target_expression(d) !=
+      cast_other->value_stack.target_expression(d))
+      return false;
+
+  return true;
+}
+
+exprt constant_pointer_abstract_objectt::offset() const
+{
+  if(value_stack.is_top_value())
+    return nil_exprt();
+  return value_stack.offset_expression();
+}
+
+exprt constant_pointer_abstract_objectt::offset_from(
+  abstract_object_pointert other) const
+{
+  auto cast_other =
+    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
+
+  if(value_stack.is_top_value() || cast_other->value_stack.is_top_value())
+    return nil_exprt();
+
+  return minus_exprt(
+    value_stack.offset_expression(),
+    cast_other->value_stack.offset_expression());
+}
+
 abstract_object_pointert
 constant_pointer_abstract_objectt::merge_constant_pointers(
   const constant_pointer_abstract_pointert &other,
@@ -175,45 +217,47 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
   const abstract_object_pointert &new_value,
   bool merging_write) const
 {
-  if(is_top() || is_bottom() || value_stack.is_top_value())
+  if(is_top() || is_bottom())
   {
-    return abstract_pointer_objectt::write_dereference(
-      environment, ns, stack, new_value, merging_write);
+    environment.havoc("Writing to a 2value pointer");
+    return shared_from_this();
   }
-  else
-  {
-    if(stack.empty())
-    {
-      // We should not be changing the type of an abstract object
-      PRECONDITION(new_value->type() == ns.follow(type().subtype()));
 
-      // Get an expression that we can assign to
-      exprt value = to_address_of_expr(value_stack.to_expression()).object();
-      if(merging_write)
-      {
-        abstract_object_pointert pointed_value = environment.eval(value, ns);
-        abstract_object_pointert merged_value =
-          abstract_objectt::merge(pointed_value, new_value, widen_modet::no)
-            .object;
-        environment.assign(value, merged_value, ns);
-      }
-      else
-      {
-        environment.assign(value, new_value, ns);
-      }
+  if(value_stack.is_top_value())
+    return std::make_shared<constant_pointer_abstract_objectt>(
+      type(), true, false);
+
+  if(stack.empty())
+  {
+    // We should not be changing the type of an abstract object
+    PRECONDITION(new_value->type() == ns.follow(type().subtype()));
+
+    // Get an expression that we can assign to
+    exprt value = to_address_of_expr(value_stack.to_expression()).object();
+    if(merging_write)
+    {
+      abstract_object_pointert pointed_value = environment.eval(value, ns);
+      abstract_object_pointert merged_value =
+        abstract_objectt::merge(pointed_value, new_value, widen_modet::no)
+          .object;
+      environment.assign(value, merged_value, ns);
     }
     else
     {
-      exprt value = to_address_of_expr(value_stack.to_expression()).object();
-      abstract_object_pointert pointed_value = environment.eval(value, ns);
-      abstract_object_pointert modified_value =
-        environment.write(pointed_value, new_value, stack, ns, merging_write);
-      environment.assign(value, modified_value, ns);
-      // but the pointer itself does not change!
+      environment.assign(value, new_value, ns);
     }
-
-    return shared_from_this();
   }
+  else
+  {
+    exprt value = to_address_of_expr(value_stack.to_expression()).object();
+    abstract_object_pointert pointed_value = environment.eval(value, ns);
+    abstract_object_pointert modified_value =
+      environment.write(pointed_value, new_value, stack, ns, merging_write);
+    environment.assign(value, modified_value, ns);
+    // but the pointer itself does not change!
+  }
+
+  return shared_from_this();
 }
 
 abstract_object_pointert constant_pointer_abstract_objectt::typecast(
@@ -257,4 +301,90 @@ void constant_pointer_abstract_objectt::get_statistics(
     read_dereference(env, ns)->get_statistics(statistics, visited, env, ns);
   }
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
+}
+
+abstract_object_pointert constant_pointer_abstract_objectt::ptr_diff(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  auto &rhs = operands.back();
+
+  if(same_target(rhs))
+    return environment.eval(offset_from(rhs), ns);
+
+  return abstract_objectt::expression_transform(
+    expr, operands, environment, ns);
+}
+
+static exprt to_bool_expr(bool v)
+{
+  if(v)
+    return true_exprt();
+  return false_exprt();
+}
+
+exprt struct_member_ptr_comparison_expr(
+  irep_idt const &id,
+  exprt const &lhs,
+  exprt const &rhs)
+{
+  auto const &lhs_member = to_member_expr(lhs).get_component_name();
+  auto const &rhs_member = to_member_expr(rhs).get_component_name();
+
+  if(id == ID_equal)
+    return to_bool_expr(lhs_member == rhs_member);
+  if(id == ID_notequal)
+    return to_bool_expr(lhs_member != rhs_member);
+  return nil_exprt();
+}
+
+exprt symbol_ptr_comparison_expr(
+  irep_idt const &id,
+  exprt const &lhs,
+  exprt const &rhs)
+{
+  auto const &lhs_identifier = to_symbol_expr(lhs).get_identifier();
+  auto const &rhs_identifier = to_symbol_expr(rhs).get_identifier();
+
+  if(id == ID_equal)
+    return to_bool_expr(lhs_identifier == rhs_identifier);
+  if(id == ID_notequal)
+    return to_bool_expr(lhs_identifier != rhs_identifier);
+  return nil_exprt();
+}
+
+exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
+  const exprt &expr,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  auto rhs = std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(
+    operands.back());
+
+  if(is_top() || rhs->is_top())
+    return nil_exprt();
+
+  if(same_target(rhs)) // rewrite in terms of pointer offset
+  {
+    auto lhs_offset = offset();
+    auto rhs_offset = rhs->offset();
+
+    if(lhs_offset.id() == ID_member)
+      return struct_member_ptr_comparison_expr(
+        expr.id(), lhs_offset, rhs_offset);
+    if(lhs_offset.id() == ID_symbol)
+      return symbol_ptr_comparison_expr(expr.id(), lhs_offset, rhs_offset);
+
+    return binary_relation_exprt(lhs_offset, expr.id(), rhs_offset);
+  }
+
+  // not same target, can only eval == and !=
+  if(expr.id() == ID_equal)
+    return false_exprt();
+  if(expr.id() == ID_notequal)
+    return true_exprt();
+  return nil_exprt();
 }

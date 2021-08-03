@@ -11,6 +11,7 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/simplify_expr_class.h>
 
 #include <algorithm>
 #include <map>
@@ -45,13 +46,46 @@ static exprt assume_greater_than(
   const exprt &expr,
   const namespacet &ns);
 
-abstract_value_pointert as_value(const abstract_object_pointert &obj);
-bool is_value(const abstract_object_pointert &obj);
+static abstract_value_pointert as_value(const abstract_object_pointert &obj);
+static bool is_value(const abstract_object_pointert &obj);
 
 std::vector<abstract_object_pointert> eval_operands(
   const exprt &expr,
   const abstract_environmentt &env,
   const namespacet &ns);
+
+bool is_ptr_diff(const exprt &expr)
+{
+  return (expr.id() == ID_minus) &&
+         (expr.operands()[0].type().id() == ID_pointer) &&
+         (expr.operands()[1].type().id() == ID_pointer);
+}
+
+bool is_ptr_comparison(const exprt &expr)
+{
+  auto const &id = expr.id();
+  bool is_comparison = id == ID_equal || id == ID_notequal || id == ID_lt ||
+                       id == ID_le || id == ID_gt || id == ID_ge;
+
+  return is_comparison && (expr.operands()[0].type().id() == ID_pointer) &&
+         (expr.operands()[1].type().id() == ID_pointer);
+}
+
+static bool is_access_expr(const irep_idt &id)
+{
+  return id == ID_member || id == ID_index || id == ID_dereference;
+}
+
+static bool is_object_creation(const irep_idt &id)
+{
+  return id == ID_array || id == ID_struct || id == ID_constant ||
+         id == ID_address_of;
+}
+
+static bool is_dynamic_allocation(const exprt &expr)
+{
+  return expr.id() == ID_side_effect && expr.get(ID_statement) == ID_allocate;
+}
 
 abstract_object_pointert
 abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
@@ -67,45 +101,32 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return resolve_symbol(simplified_expr, ns);
 
   if(
-    simplified_id == ID_member || simplified_id == ID_index ||
-    simplified_id == ID_dereference)
+    is_access_expr(simplified_id) || is_ptr_diff(simplified_expr) ||
+    is_ptr_comparison(simplified_expr))
   {
-    auto access_expr = simplified_expr;
-    auto target = eval(access_expr.operands()[0], ns);
+    auto const operands = eval_operands(simplified_expr, *this, ns);
+    auto const &target = operands.front();
 
-    return target->expression_transform(
-      access_expr, eval_operands(access_expr, *this, ns), *this, ns);
+    return target->expression_transform(simplified_expr, operands, *this, ns);
   }
 
-  if(
-    simplified_id == ID_array || simplified_id == ID_struct ||
-    simplified_id == ID_constant || simplified_id == ID_address_of)
-  {
+  if(is_object_creation(simplified_id))
     return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
-  }
 
-  if(
-    simplified_id == ID_side_effect &&
-    (simplified_expr.get(ID_statement) == ID_allocate))
-  {
+  if(is_dynamic_allocation(simplified_expr))
     return abstract_object_factory(
       typet(ID_dynamic_object),
       exprt(ID_dynamic_object, simplified_expr.type()),
       ns);
-  }
 
   // No special handling required by the abstract environment
   // delegate to the abstract object
   if(!simplified_expr.operands().empty())
-  {
     return eval_expression(simplified_expr, ns);
-  }
-  else
-  {
-    // It is important that this is top as the abstract object may not know
-    // how to handle the expression
-    return abstract_object_factory(simplified_expr.type(), ns, true, false);
-  }
+
+  // It is important that this is top as the abstract object may not know
+  // how to handle the expression
+  return abstract_object_factory(simplified_expr.type(), ns, true, false);
 }
 
 abstract_object_pointert abstract_environmentt::resolve_symbol(
@@ -530,7 +551,7 @@ static auto inverse_operations =
                                {ID_ge, ID_lt},
                                {ID_gt, ID_le}};
 
-exprt invert_result(const exprt &result)
+static exprt invert_result(const exprt &result)
 {
   if(!result.is_boolean())
     return result;
@@ -540,7 +561,7 @@ exprt invert_result(const exprt &result)
   return true_exprt();
 }
 
-exprt invert_expr(const exprt &expr)
+static exprt invert_expr(const exprt &expr)
 {
   auto expr_id = expr.id();
 
@@ -573,7 +594,7 @@ exprt assume_not(
   const exprt &expr,
   const namespacet &ns)
 {
-  auto not_expr = to_not_expr(expr);
+  auto const &not_expr = to_not_expr(expr);
 
   auto inverse_expression = invert_expr(not_expr.op());
   if(inverse_expression.is_not_nil())

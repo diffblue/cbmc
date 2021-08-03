@@ -75,6 +75,18 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
+  abstract_object_pointert ptr_diff(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
+  exprt ptr_comparison_expr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 

@@ -1,0 +1,6 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers top-bottom --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion v == 1: UNKNOWN

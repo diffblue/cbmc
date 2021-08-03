@@ -1,0 +1,7 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers constants --vsd-values constants --verify 
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] line 11 assertion p - q == 0: SUCCESS
+^\[main.assertion.2\] line 14 assertion p - q == 0: UNKNOWN

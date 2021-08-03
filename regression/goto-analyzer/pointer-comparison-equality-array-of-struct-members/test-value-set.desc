@@ -1,0 +1,13 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers value-set --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion pa == &\(x\[0\].a\): SUCCESS
+^\[main.assertion.2\] .* assertion pa != &\(x\[0\].a\): FAILURE
+^\[main.assertion.3\] .* assertion pa == &\(x\[0\].b\): FAILURE
+^\[main.assertion.4\] .* assertion pa != &\(x\[0\].b\): SUCCESS
+^\[main.assertion.5\] .* assertion pa == &\(x\[1\].a\): FAILURE
+^\[main.assertion.6\] .* assertion pa != &\(x\[1\].a\): SUCCESS
+^\[main.assertion.7\] .* assertion pa == &\(x\[1\].b\): FAILURE
+^\[main.assertion.8\] .* assertion pa != &\(x\[1\].b\): SUCCESS

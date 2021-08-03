@@ -62,7 +62,7 @@ public:
     const abstract_environmentt &env,
     const namespacet &ns) const override;
 
-  /// Evaluate reading the pointer's value. More precise
+  /// A helper function to read elements from an array. More precise
   /// abstractions may override this to provide more precise results.
   ///
   /// \param env: the environment
@@ -71,7 +71,7 @@ public:
   /// \return An abstract object representing the value being pointed to
   virtual abstract_object_pointert read_dereference(
     const abstract_environmentt &env,
-    const namespacet &ns) const;
+    const namespacet &ns) const = 0;
 
   /// Evaluate writing to a pointer's value. More precise abstractions
   /// may override this provide more precise results.
@@ -94,10 +94,39 @@ public:
     const namespacet &ns,
     const std::stack<exprt> &stack,
     const abstract_object_pointert &value,
-    bool merging_write) const;
+    bool merging_write) const = 0;
 
   virtual abstract_object_pointert typecast(
     const typet &new_type,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const = 0;
+
+  virtual abstract_object_pointert ptr_diff(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const = 0;
+
+  virtual exprt ptr_comparison_expr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const = 0;
+
+private:
+  abstract_object_pointert typecast_from_void_ptr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+  abstract_object_pointert eval_ptr_diff(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+  abstract_object_pointert eval_ptr_comparison(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
 };

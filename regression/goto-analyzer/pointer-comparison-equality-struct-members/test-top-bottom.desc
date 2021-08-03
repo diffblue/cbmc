@@ -1,0 +1,13 @@
+CORE
+main.c
+--variable-sensitivity --vsd-pointers top-bottom --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion pa == &\(x.a\): UNKNOWN
+^\[main.assertion.2\] .* assertion pa != &\(x.a\): UNKNOWN
+^\[main.assertion.3\] .* assertion pb == &\(x.a\): UNKNOWN
+^\[main.assertion.4\] .* assertion pb != &\(x.a\): UNKNOWN
+^\[main.assertion.5\] .* assertion pa == &\(y.a\): UNKNOWN
+^\[main.assertion.6\] .* assertion pa != &\(y.a\): UNKNOWN
+^\[main.assertion.7\] .* assertion pb == &\(y.a\): UNKNOWN
+^\[main.assertion.8\] .* assertion pb != &\(y.a\): UNKNOWN

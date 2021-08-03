@@ -111,6 +111,18 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
+  abstract_object_pointert ptr_diff(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
+  exprt ptr_comparison_expr(
+    const exprt &expr,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
   void get_statistics(
     abstract_object_statisticst &statistics,
     abstract_object_visitedt &visited,
@@ -134,6 +146,10 @@ protected:
   CLONE
 
 private:
+  bool same_target(abstract_object_pointert other) const;
+  exprt offset() const;
+  exprt offset_from(abstract_object_pointert other) const;
+
   /// Merges two constant pointers. If they are pointing at the same
   /// value, we merge, otherwise we set to top.
   ///
