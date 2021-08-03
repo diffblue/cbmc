@@ -14,6 +14,7 @@
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
 #include <numeric>
 #include <util/pointer_expr.h>
+#include <util/simplify_expr.h>
 
 #include "abstract_environment.h"
 
@@ -179,7 +180,7 @@ exprt value_set_pointer_abstract_objectt::ptr_comparison_expr(
     {
       auto ops = std::vector<abstract_object_pointert>{lhsp, rhsp};
       auto comparison = lhsp->ptr_comparison_expr(expr, ops, environment, ns);
-      auto result = simplify_vsd_expr(comparison, ns);
+      auto result = simplify_expr(comparison, ns);
       comparisons.insert(result);
     }
   }

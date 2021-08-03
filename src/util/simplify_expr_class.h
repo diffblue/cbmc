@@ -73,13 +73,11 @@ class with_exprt;
 class simplify_exprt
 {
 public:
-  explicit simplify_exprt(const namespacet &_ns)
-    : do_simplify_if(true),
-      ns(_ns),
-      vsd_pointers(false)
+  explicit simplify_exprt(const namespacet &_ns):
+    do_simplify_if(true),
+    ns(_ns)
 #ifdef DEBUG_ON_DEMAND
-      ,
-      debug_on(false)
+    , debug_on(false)
 #endif
   {
 #ifdef DEBUG_ON_DEMAND
@@ -248,8 +246,6 @@ public:
 
 protected:
   const namespacet &ns;
-  bool vsd_pointers;
-
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif

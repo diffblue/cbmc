@@ -94,7 +94,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return abstract_object_factory(expr.type(), ns, false, true);
 
   // first try to canonicalise, including constant folding
-  const exprt &simplified_expr = simplify_vsd_expr(expr, ns);
+  const exprt &simplified_expr = simplify_expr(expr, ns);
 
   const irep_idt simplified_id = simplified_expr.id();
   if(simplified_id == ID_symbol)
@@ -844,19 +844,4 @@ exprt assume_greater_than(
     binary_relation_exprt(gt_expr.rhs(), symmetric_op, gt_expr.lhs());
 
   return assume_less_than(env, symmetric_expr, ns);
-}
-
-class simplify_vsd_exprt : public simplify_exprt
-{
-public:
-  explicit simplify_vsd_exprt(const namespacet &_ns) : simplify_exprt(_ns)
-  {
-    vsd_pointers = true;
-  }
-};
-
-exprt simplify_vsd_expr(exprt src, const namespacet &ns)
-{
-  simplify_vsd_exprt(ns).simplify(src);
-  return src;
 }
