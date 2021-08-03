@@ -91,7 +91,7 @@ memory-analyzer.dir: util.dir goto-programs.dir langapi.dir linking.dir \
 	                   ansi-c.dir
 
 symtab2gb.dir: util.dir goto-programs.dir langapi.dir linking.dir \
-               json.dir json-symtab-language.dir
+               json.dir json-symtab-language.dir ansi-c.dir
 
 # building for a particular directory
 
