@@ -16,6 +16,9 @@ Date: July 2021
 
 #include "contracts.h"
 
+#include <ansi-c/expr2c.h>
+#include <util/pointer_offset_size.h>
+
 /// \brief A base class for assigns clause targets
 class assigns_clause_targett
 {
@@ -57,7 +60,7 @@ public:
     messaget log_parameter);
   ~assigns_clauset();
 
-  assigns_clause_targett *add_target(exprt current_operation);
+  assigns_clause_targett *add_target(exprt target);
   assigns_clause_targett *add_pointer_target(exprt current_operation);
   goto_programt init_block(source_locationt location);
   goto_programt &temporary_declarations(
