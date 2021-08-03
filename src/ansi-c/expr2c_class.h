@@ -126,6 +126,15 @@ protected:
     const std::string &symbol2,
     unsigned precedence);
 
+  /// Conversion function from rol/ror expressions to C code strings
+  /// Note that this constructs a complex expression to do bit
+  /// twiddling since rol/ror operations are not native to ANSI-C.
+  /// The complex expression is then recursively converted.
+  /// \param src: is an exprt that must be either an rol or ror
+  /// \param precedence: precedence for bracketing
+  /// \returns string for performing rol/ror as bit twiddling with C
+  std::string convert_rox(const shift_exprt &src, unsigned precedence);
+
   std::string convert_overflow(
     const exprt &src, unsigned &precedence);
 

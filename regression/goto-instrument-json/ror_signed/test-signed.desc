@@ -1,0 +1,14 @@
+CORE
+test-signed.json
+--dump-c
+^EXIT=0$
+^SIGNAL=0$
+signed char ror8=\(unsigned char\)'8' >> 3 % 8 \| \(unsigned char\)'8' << 8 - 3 % 8;
+--
+irep
+--
+This tests that the ror goto operation is converted into suitable bit
+twiddling operations in C representation. This is also checks that
+signed rotations cast to unsigned to perform the shifts to avoid
+sign bit problems. Also the negative check for "irep" checks that no
+irep is failing conversion.
