@@ -691,7 +691,7 @@ void code_contractst::instrument_assign_statement(
     instruction_iterator->source_location));
   alias_assertion.instructions.back().source_location.set_comment(
     "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-  int lines_to_iterate = alias_assertion.instructions.size();
+  size_t lines_to_iterate = alias_assertion.instructions.size();
   program.insert_before_swap(instruction_iterator, alias_assertion);
   std::advance(instruction_iterator, lines_to_iterate);
 }
@@ -742,7 +742,7 @@ void code_contractst::instrument_call_statement(
         assigns_clause.add_pointer_target(rhs);
       goto_programt &pointer_capture = new_target->get_init_block();
 
-      int lines_to_iterate = pointer_capture.instructions.size();
+      size_t lines_to_iterate = pointer_capture.instructions.size();
       program.insert_before_swap(local_instruction_iterator, pointer_capture);
       std::advance(instruction_iterator, lines_to_iterate + 1);
     }
@@ -909,21 +909,27 @@ void code_contractst::check_frame_conditions(
 
   // Create a list of variables that are okay to assign.
   std::set<irep_idt> freely_assignable_symbols;
+  // Add all parameters that are not pointers to the freely assignable set
   for(code_typet::parametert param : type.parameters())
   {
-    freely_assignable_symbols.insert(param.get_identifier());
+    if(param.type().id() != ID_pointer)
+    {
+      freely_assignable_symbols.insert(param.get_identifier());
+    }
   }
-
-  goto_programt::instructionst::iterator instruction_it =
-    program.instructions.begin();
 
   // Create temporary variables to hold the assigns
   // clause targets before they can be modified.
   goto_programt standin_decls = assigns.init_block(target.location);
+  // Create dead statements for temporary variables
   goto_programt mark_dead =
     assigns.dead_stmts(target.location, target.name, target.mode);
 
-  int lines_to_iterate = standin_decls.instructions.size();
+  // Skip lines with temporary variable declarations
+  size_t lines_to_iterate = standin_decls.instructions.size();
+
+  goto_programt::instructionst::iterator instruction_it =
+    program.instructions.begin();
   program.insert_before_swap(instruction_it, standin_decls);
   std::advance(instruction_it, lines_to_iterate);
 
@@ -972,7 +978,6 @@ void code_contractst::check_frame_conditions(
   }
 
   // Make sure the temporary symbols are marked dead
-  lines_to_iterate = mark_dead.instructions.size();
   program.insert_before_swap(instruction_it, mark_dead);
 }
 
