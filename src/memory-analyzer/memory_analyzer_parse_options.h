@@ -37,6 +37,8 @@ public:
 
 protected:
   messaget message;
+
+  void register_languages() override;
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H

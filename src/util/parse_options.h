@@ -45,6 +45,10 @@ protected:
   ui_message_handlert ui_message_handler;
   messaget log;
 
+  virtual void register_languages()
+  {
+  }
+
 private:
   void unknown_option_msg();
 };

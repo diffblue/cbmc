@@ -27,6 +27,9 @@ public:
   symtab2gb_parse_optionst(int argc, const char *argv[]);
   void help() override;
   int doit() override;
+
+protected:
+  void register_languages() override;
 };
 
 #endif // CPROVER_SYMTAB2GB_SYMTAB2GB_PARSE_OPTIONS_H
