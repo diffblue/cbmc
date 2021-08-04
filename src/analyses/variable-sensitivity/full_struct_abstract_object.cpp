@@ -12,6 +12,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <util/std_expr.h>
 
 #include "full_struct_abstract_object.h"
+#include "map_visit.h"
 
 // #define DEBUG
 
@@ -282,18 +283,9 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   const auto &result =
     std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
-  bool modified = false;
-  for(auto &item : result->map.get_view())
-  {
-    auto newval = visitor.visit(item.second);
-    if(newval != item.second)
-    {
-      result->map.replace(item.first, std::move(newval));
-      modified = true;
-    }
-  }
+  bool is_modified = visit_map(result->map, visitor);
 
-  return modified ? result : shared_from_this();
+  return is_modified ? result : shared_from_this();
 }
 
 exprt full_struct_abstract_objectt::to_predicate_internal(
