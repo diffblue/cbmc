@@ -1,0 +1,25 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Staying unchanged @ \[0\]$
+^main.*x .* -> Strictly and monotonically increasing @ \[1\]$
+^main.*y .* -> Staying unchanged @ \[2\]$
+^main.*y .* -> TOP @ \[7\]$
+^main.*y .* -> TOP @ \[8\]$
+^increment.*x .* -> Strictly and monotonically increasing @ \[4\]$
+^increment.*x .* -> Strictly and monotonically increasing @ \[38\]$
+^increment.*x .* -> Strictly and monotonically increasing @ \[38, 40\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the predicate abstraction for monotonic change
+handles a function call properly. When the function "increment" is invoked, 
+the actual argument's abstract value is copied to the formal argument's initial
+abstract value. So, in this example, the initial abstract value of 
+increment::x is the same as the abstract value of main::1::x. 
+
+It is debatable whether this is a reasonable behavior for the abstract
+interpretation for monotonic change. It may be better if we can simply
+initialize the formal argument's abstract value to "unchanged," as opposed to
+the actual argument's abstract value. 

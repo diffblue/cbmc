@@ -1,0 +1,23 @@
+KNOWNBUG
+--function main --vsd --vsd-values monotonic-change --vsd-pointers constants --vsd-structs every-field --vsd-arrays every-element --show
+^EXIT=0$
+^SIGNAL=0$
+--
+Under the current implementation of monotonic-change abstract interpretation,
+this test case fails. Specifically, it will report a run-time error that one of
+the preconditions in the code base is violated. I will now explain the reason
+for the failure. 
+
+First of all, *p is expanded to *(p+0). Here, the offset 0 will be represented
+by an abstract value in whatever value domain we choose. This is due to the fact
+that memory addresses and array indices are treated as values just like
+integers. 
+
+In this test case, the value domain is monotonic-change. Hence, 0 will be
+represented by one of the abstract values in this abstract domain. However,
+unlike interval analysis, monotonic-change abstract interpretation does not keep
+track of variables' concrete values. It only keeps track of variables' abstract
+values (i.e. monotonicity statuses). Consequently, once we convert a concrete
+value (i.e. the offset 0) to an abstract value of monotonic-change abstract
+interpretation, we have no way to recover the concrete value back from the
+abstract value. This is why this test case results in a precondition violation. 

@@ -141,6 +141,25 @@ abstract_object_pointert abstract_objectt::expression_transform(
   return environment.abstract_object_factory(copy.type(), copy, ns);
 }
 
+abstract_object_pointert abstract_objectt::assign_expression_transform(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  return expression_transform(rhs, operands, environment, ns);
+}
+
+abstract_object_pointert abstract_objectt::read(
+  const abstract_environmentt &environment,
+  const exprt &specifier,
+  const namespacet &ns) const
+{
+  return environment.abstract_object_factory(type(), ns, false, true);
+}
+
 abstract_object_pointert abstract_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,

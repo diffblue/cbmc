@@ -287,8 +287,21 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const final;
 
+  abstract_object_pointert assign_expression_transform(
+    const abstract_object_pointert &lhs_abstract_object,
+    const exprt &lhs,
+    const exprt &rhs,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const final;
+
   virtual sharing_ptrt<const abstract_value_objectt>
   constrain(const exprt &lower, const exprt &upper) const = 0;
+
+  abstract_object_pointert read(
+    const abstract_environmentt &environment,
+    const exprt &specifier,
+    const namespacet &ns) const final;
 
   abstract_object_pointert write(
     abstract_environmentt &environment,
@@ -331,6 +344,11 @@ protected:
   sharing_ptrt<const abstract_value_objectt>
   as_value(const abstract_object_pointert &obj) const;
 };
+
+abstract_object_pointert monotonic_change_expression_transform(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs);
 
 using abstract_value_pointert = sharing_ptrt<const abstract_value_objectt>;
 

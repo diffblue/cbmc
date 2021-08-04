@@ -1,0 +1,14 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --vsd-structs every-field --show
+^main.*u .* -> \{\} @ \[0\]$
+^main.*u .* -> \{.x=Strictly and monotonically increasing @ \[4\]\} @ \[4\]$
+^main.*u .* -> \{.x=Strictly and monotonically increasing @ \[4\], .y=Strictly and monotonically decreasing @ \[5\]\} @ \[5\]$
+^main.*u .* -> \{.x=Strictly and monotonically increasing @ \[7\]\} @ \[7\]$
+^main.*u .* -> \{.x=Strictly and monotonically increasing @ \[4, 7\], .y=Strictly and monotonically decreasing @ \[5, 8\]\} @ \[5, 8\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the abstract interpretation of monotonic change
+can correctly handle structure members. 
