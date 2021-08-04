@@ -1,0 +1,24 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Declared but uninitialized @ \[0\]$
+^main.*x .* -> Monotonically increasing @ \[1, 3\]$
+^main.*x .* -> Monotonically increasing @ \[3\]$
+^main.*y .* -> Declared but uninitialized @ \[6\]$
+^main.*y .* -> Monotonically decreasing @ \[7, 9\]$
+^main.*y .* -> Monotonically decreasing @ \[9\]$
+^main.*z .* -> Declared but uninitialized @ \[12\]$
+^main.*z .* -> TOP @ \[13, 16\]$
+^main.*z .* -> TOP @ \[15\]$
+^main.*z .* -> TOP @ \[16\]$
+^main.*u .* -> Declared but uninitialized @ \[19\]$
+^main.*u .* -> Monotonically increasing @ \[20, 22\]$
+^main.*u .* -> Monotonically increasing @ \[22\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the monotonic-change predicate abstraction
+correctly computes an abstract value for (possibly divergent) loops. This hinges
+on a correct implementation of the widening operator (which is subsumed by the
+merge function).

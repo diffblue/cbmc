@@ -11,6 +11,7 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
+#include <analyses/variable-sensitivity/monotonic_change.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 
 #include <goto-programs/adjust_float_expressions.h>
@@ -156,6 +157,32 @@ bool any_intervals(const std::vector<abstract_object_pointert> &operands)
   return any_of_type<interval_abstract_valuet>(operands);
 }
 
+// Ideally, the implementation of this function should be just
+// return any_of_type<monotonic_changet>(operands);
+// However, this causes an error when we run
+// goto-cc toy.c -o toy.goto
+// goto-analyzer --function main --vsd --vsd-values --monotonic-change
+// --show toy.goto
+// in the following C code:
+// int main()
+// {
+//   int x = 0;
+//   int y = (x + 1) * (x - 1);
+// }
+bool any_monotonic_changes(
+  const std::vector<abstract_object_pointert> &operands)
+{
+  // return any_of_type<monotonic_changet>(operands);
+  return std::find_if(
+           operands.begin(),
+           operands.end(),
+           [](const abstract_object_pointert &p) {
+             return (
+               std::dynamic_pointer_cast<const monotonic_changet>(p) !=
+               nullptr);
+           }) != operands.end();
+}
+
 static abstract_object_pointert transform(
   const exprt &expr,
   const std::vector<abstract_object_pointert> &operands,
@@ -166,7 +193,26 @@ static abstract_object_pointert transform(
     return value_set_expression_transform(expr, operands, environment, ns);
   if(any_intervals(operands))
     return intervals_expression_transform(expr, operands, environment, ns);
+  if(any_monotonic_changes(operands))
+    return monotonic_change_expression_transform(nullptr, nil_exprt(), expr);
   return constants_expression_transform(expr, operands, environment, ns);
+}
+
+static abstract_object_pointert assign_transform(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns)
+{
+  if(any_value_sets(operands))
+    return value_set_expression_transform(rhs, operands, environment, ns);
+  if(any_intervals(operands))
+    return intervals_expression_transform(rhs, operands, environment, ns);
+  if(any_monotonic_changes(operands))
+    return monotonic_change_expression_transform(lhs_abstract_object, lhs, rhs);
+  return constants_expression_transform(rhs, operands, environment, ns);
 }
 
 abstract_object_pointert abstract_value_objectt::expression_transform(
@@ -176,6 +222,26 @@ abstract_object_pointert abstract_value_objectt::expression_transform(
   const namespacet &ns) const
 {
   return transform(expr, operands, environment, ns);
+}
+
+abstract_object_pointert abstract_value_objectt::assign_expression_transform(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  return assign_transform(
+    lhs_abstract_object, lhs, rhs, operands, environment, ns);
+}
+
+abstract_object_pointert abstract_value_objectt::read(
+  const abstract_environmentt &environment,
+  const exprt &specifier,
+  const namespacet &ns) const
+{
+  UNREACHABLE; // Should not ever call read on a value;
 }
 
 abstract_object_pointert abstract_value_objectt::write(
@@ -667,6 +733,153 @@ static abstract_object_pointert value_set_expression_transform(
   const namespacet &ns)
 {
   auto evaluator = value_set_evaluator(expr, operands, environment, ns);
+  return evaluator();
+}
+
+///////////////////////////////////////////////////////
+// Monotonic change expression transform
+class monotonic_change_evaluatort
+{
+public:
+  monotonic_change_evaluatort(
+    const abstract_object_pointert &l_object,
+    const exprt &l_expr,
+    const exprt &r_expr)
+    : lhs_abstract_object(l_object), lhs(l_expr), rhs(r_expr)
+  {
+    // PRECONDITION(rhs.operands().size() == operands.size());
+  }
+
+  abstract_object_pointert operator()() const
+  {
+    return transform(rhs);
+  }
+
+private:
+  using interval_abstract_value_pointert =
+    sharing_ptrt<const interval_abstract_valuet>;
+
+  abstract_object_pointert transform(const exprt &expr) const
+  {
+    // If we do not know the abstract object of the left-hand side of an
+    // assignment, we simply return the "top."
+    if(lhs_abstract_object == nullptr)
+      return make_top<monotonic_changet>(expr.type());
+
+    std::shared_ptr<const monotonic_changet> lhs_abstract_object_unwrapped =
+      std::dynamic_pointer_cast<const monotonic_changet>(
+        lhs_abstract_object->unwrap_context());
+
+    // If the left-hand side of an assignment is not a monotonic-change object,
+    // we simply return the "top." Can such a situation arise?
+    if(lhs_abstract_object_unwrapped == nullptr)
+      return make_top<monotonic_changet>(expr.type());
+
+    monotonicity_flags mvalue =
+      lhs_abstract_object_unwrapped->monotonicity_value;
+
+    // This case handles an assignment whose right-hand side is a ternary
+    // expression; e.g. x := bool_expr ? (x + 1) : (x - 1).
+    if(expr.id() == ID_if)
+    {
+      return evaluate_conditional();
+    }
+
+    // This case handles an assignment of the form x := x + n or x
+    // := x - n, where x is an lvalue and n is a constant number. When C is
+    // compiled to GOTO, x++ is translated to x := x + 1. Likewise, x-- is
+    // translated to x := x - 1. Hence, we do not need to be concerned with x++
+    // and x-- - we can focus on assignments of the form x := x + n and x := x -
+    // n.
+    // Is it correct to use == to test the equality of two expressions?
+    if(
+      (expr.id() == ID_plus || expr.id() == ID_minus) &&
+      expr.operands()[1].id() == ID_constant && expr.operands()[0] == lhs)
+    {
+      mp_integer constant_value =
+        numeric_cast_v<mp_integer>(to_constant_expr(expr.operands()[1]));
+
+      switch(mvalue)
+      {
+      case top_or_bottom:
+        if(lhs_abstract_object_unwrapped->is_bottom())
+          return std::make_shared<monotonic_changet>(expr.type(), false, true);
+        else
+          return make_top<monotonic_changet>(expr.type());
+        break;
+      case uninitialized:
+        return std::make_shared<monotonic_changet>(
+          expr.type(), false, false, constant);
+        break;
+      case increase:
+        if(
+          (expr.id() == ID_plus && constant_value >= 0) ||
+          (expr.id() == ID_minus && constant_value <= 0))
+          return std::make_shared<monotonic_changet>(
+            expr.type(), false, false, increase);
+        else
+          return make_top<monotonic_changet>(expr.type());
+        break;
+      case constant:
+        if(
+          (expr.id() == ID_plus && constant_value > 0) ||
+          (expr.id() == ID_minus && constant_value < 0))
+          return std::make_shared<monotonic_changet>(
+            expr.type(), false, false, increase);
+        else if(constant_value == 0)
+          return std::make_shared<monotonic_changet>(
+            expr.type(), false, false, constant);
+        else
+          return std::make_shared<monotonic_changet>(
+            expr.type(), false, false, decrease);
+        break;
+      case decrease:
+        if(
+          (expr.id() == ID_plus && constant_value <= 0) ||
+          (expr.id() == ID_minus && constant_value >= 0))
+          return std::make_shared<monotonic_changet>(
+            expr.type(), false, false, decrease);
+        else
+          return make_top<monotonic_changet>(expr.type());
+        break;
+      }
+    }
+
+    // This case handles an assignment whose left-hand side has the status
+    // "uninitialized."
+    if(mvalue == uninitialized)
+    {
+      return std::make_shared<monotonic_changet>(
+        expr.type(), false, false, constant);
+    }
+
+    return make_top<monotonic_changet>(expr.type());
+  }
+
+  abstract_object_pointert evaluate_conditional() const
+  {
+    const exprt &true_branch_expr = rhs.operands()[1];
+    const exprt &false_branch_expr = rhs.operands()[2];
+    abstract_object_pointert true_abstract_object = transform(true_branch_expr);
+    abstract_object_pointert false_abstract_object =
+      transform(false_branch_expr);
+
+    return abstract_objectt::merge(
+             true_abstract_object, false_abstract_object, widen_modet::no)
+      .object;
+  }
+
+  const abstract_object_pointert &lhs_abstract_object;
+  const exprt &lhs;
+  const exprt &rhs;
+};
+
+abstract_object_pointert monotonic_change_expression_transform(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs)
+{
+  auto evaluator = monotonic_change_evaluatort(lhs_abstract_object, lhs, rhs);
   return evaluator();
 }
 

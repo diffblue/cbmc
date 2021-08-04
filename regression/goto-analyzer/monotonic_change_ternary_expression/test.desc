@@ -1,0 +1,15 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Declared but uninitialized @ \[0\]$
+^main.*x .* -> Staying constant @ \[1\]$
+^main.*x .* -> Monotonically increasing @ \[4\]$
+^main.*y .* -> Declared but uninitialized @ \[5\]$
+^main.*y .* -> Staying constant @ \[6\]$
+^main.*y .* -> TOP @ \[9\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether we correctly compute the abstract value for a
+ternary expression; i.e. bool_expr() ? expr1 : expr2.

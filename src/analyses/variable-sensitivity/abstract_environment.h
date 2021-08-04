@@ -48,7 +48,7 @@ public:
   {
   }
 
-  /// These three are really the heart of the method
+  /// These four are really the heart of the method
 
   /// Evaluate the value of an expression relative to the current domain
   ///
@@ -58,6 +58,12 @@ public:
   /// \return The abstract_object representing the value of the expression
   virtual abstract_object_pointert
   eval(const exprt &expr, const namespacet &ns) const;
+
+  // assign_eval is the same as eval, except that assign_eval takes in not only
+  // the right-hand side but also the left-hand side of an assignment. This will
+  // be used for the predicate abstraction of monotonic change.
+  virtual abstract_object_pointert
+  assign_eval(const code_assignt &inst, const namespacet &ns) const;
 
   /// Assign a value to an expression
   ///
@@ -140,6 +146,34 @@ public:
   ///
   /// \param expr:  A symbol to delete from the map
   void erase(const symbol_exprt &expr);
+
+  // Compute the abstract value of the left-hand side of an assignment. If the
+  // left-hand side is a variable, its abstract value can be immediately found
+  // in the variable "map," which stores the abstract environment. Otherwise, if
+  // the left-hand side is an array element (e.g. arr[42]) or a struct member
+  // (e.g. struct.x), we need to dig deeper to compute its abstract value.
+  abstract_object_pointert
+  work_out_lhs(const exprt &expr, const namespacet &ns) const;
+
+  // Create an appropriate abstract object when a variable is declared in GOTO
+  // code. In most cases, it is equivalent to abstract_object_factory(type, ns,
+  // true, false). However, in the case of MONOTONIC_CHANGE, it must be treated
+  // differently.
+  abstract_object_pointert abstract_declared_object_factory(
+    const typet &type,
+    const exprt &e,
+    const namespacet &ns) const;
+
+  // Create an appropriate abstract object for an assignment where we do not
+  // care about the right-hand side. This function is used when we have a symbol
+  // or a constant on the right-hand side. In most cases, it is equivalent to
+  // abstract_object_factory(type, ns, true, false). However, in the case of
+  // MONOTONIC_CHANGE, it must be treated differently.
+  abstract_object_pointert abstract_object_factory_arbitrary_assignment(
+    const abstract_object_pointert &lhs_abstract_object,
+    const typet &type,
+    const exprt &e,
+    const namespacet &ns) const;
 
   /// Look at the configuration for the sensitivity and create an
   /// appropriate abstract_object
@@ -253,6 +287,16 @@ protected:
   // We may need to break out more of these cases into these
   virtual abstract_object_pointert
   eval_expression(const exprt &e, const namespacet &ns) const;
+
+  // assign_eval_expression is the same as eval_expressoin, except that the
+  // former is tailored to assignments. Specifically, it takes in two additinoal
+  // arguments: (i) the left-hand side's abstract object and (ii) the left-hand
+  // side's expression.
+  virtual abstract_object_pointert assign_eval_expression(
+    const abstract_object_pointert &lhs_abstract_object,
+    const exprt &lhs,
+    const exprt &rhs,
+    const namespacet &ns) const;
 
   abstract_object_pointert
   resolve_symbol(const exprt &e, const namespacet &ns) const;

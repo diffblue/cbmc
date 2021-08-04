@@ -160,6 +160,18 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const;
 
+  // assign_expression_transform is almost identical to expression_transform,
+  // except that the former is tailored to assignments. Specifically,
+  // assign_expression_transform takes in two additional arguments: (i) the
+  // left-hand side's abstract object and (ii) the left-hand side's expression.
+  virtual abstract_object_pointert assign_expression_transform(
+    const abstract_object_pointert &lhs_abstract_object,
+    const exprt &lhs,
+    const exprt &rhs,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
+
   /// Converts to a constant expression if possible
   ///
   /// \return Returns an exprt representing the value if the value is known and
@@ -194,6 +206,20 @@ public:
     const exprt &specifier,
     const abstract_object_pointert &value,
     bool merging_write) const;
+
+  // This function reads a component of an abstract object. For instance,
+  // suppose we want to read the abstract object of coordinate.x, where
+  // "coordinate" is a structure with two components (i.e. x and y), and x is a
+  // component. We first compute the abstract value of "coordinate." We then use
+  // the function "read" to extract the x-component of coordinate's abstract
+  // value. Why do we want to read an abstract object a structure's component?
+  // For MONOTONIC_CHANGE, in an assignment, we need to know the abstract object
+  // of the left-hand side. If the left-hand side is a struct's component, then
+  // we need to use the function "read."
+  virtual abstract_object_pointert read(
+    const abstract_environmentt &environment,
+    const exprt &specifier,
+    const namespacet &ns) const;
 
   /// Print the value of the abstract object
   ///
@@ -448,6 +474,7 @@ protected:
   void set_top()
   {
     top = true;
+    bottom = false;
     this->set_top_internal();
   }
   void set_not_top()

@@ -1,0 +1,26 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Declared but uninitialized @ \[0\]$
+^main.*x .* -> Staying constant @ \[1\]$
+^main.*x .* -> Monotonically increasing @ \[2\]$
+^main.*y .* -> Declared but uninitialized @ \[3\]$
+^main.*y .* -> Staying constant @ \[8\]$
+^main.*y .* -> Monotonically decreasing @ \[9\]$
+^increment.*x .* -> Monotonically increasing @ \[5\]$
+^increment.*x .* -> Monotonically increasing @ \[39\]$
+^increment.*x .* -> Monotonically increasing @ \[39, 41\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the predicate abstraction for monotonic change
+handles a function call properly. When the function "increment" is invoked, 
+the actual argument's abstract value is copied to the formal argument's initial
+abstract value. So, in this example, the initial abstract value of 
+increment::x is the same as the abstract value of main::1::x. 
+
+It is debatable whether this is a reasonable behavior for predicate abstraction
+for monotonic change. It may be better if we can simply initialize the formal
+argument's abstract value to "declared but uninitialized," as opposed to the
+actual argument's abstract value. 

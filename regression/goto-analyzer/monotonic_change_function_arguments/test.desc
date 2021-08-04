@@ -1,0 +1,20 @@
+CORE
+main.c
+--function foo --vsd --vsd-values monotonic-change --show
+^foo.*x .* -> Staying constant @ \[34\]$
+^foo.*x .* -> Monotonically increasing @ \[20\]$
+^foo.*x .* -> Monotonically increasing @ \[21\]$
+^foo.*y .* -> Staying constant @ \[34\]$
+^foo.*y .* -> Monotonically decreasing @ \[22\]$
+^foo.*y .* -> Monotonically decreasing @ \[23\]$
+^__CPROVER__start.*x .* -> Declared but uninitialized @ \[28\]$
+^__CPROVER__start.*x .* -> Staying constant @ \[29\]$
+^__CPROVER__start.*y .* -> Declared but uninitialized @ \[31\]$
+^__CPROVER__start.*y .* -> Staying constant @ \[32\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case tests whether formal arguments of a standalone function (i.e. a
+function that is not invoked by another function) are initialized to the abstrac
+value "constant" correctly. 

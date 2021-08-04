@@ -82,7 +82,7 @@
 
 // clang-format off
 #define HELP_VSD \
-    " --vsd-values                 value tracking - constants|intervals|set-of-constants\n" /* NOLINT(whitespace/line_length) */ \
+    " --vsd-values                 value tracking - constants|intervals|set-of-constants|monotonic-change\n" /* NOLINT(whitespace/line_length) */ \
     " --vsd-structs                struct field sensitive analysis - top-bottom|every-field\n" /* NOLINT(whitespace/line_length) */ \
     " --vsd-arrays                 array entry sensitive analysis - top-bottom|every-element\n" /* NOLINT(whitespace/line_length) */ \
     " --vsd-pointers               pointer sensitive analysis - top-bottom|constants|value-set\n" /* NOLINT(whitespace/line_length) */ \

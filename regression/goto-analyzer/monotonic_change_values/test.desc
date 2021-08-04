@@ -1,0 +1,25 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Declared but uninitialized @ \[0\]$
+^main.*x .* -> Staying constant @ \[1\]$
+^main.*x .* -> Monotonically increasing @ \[2\]$
+^main.*x .* -> Monotonically increasing @ \[3\]$
+^main.*y .* -> Declared but uninitialized @ \[4\]$
+^main.*y .* -> Staying constant @ \[5\]$
+^main.*y .* -> Monotonically decreasing @ \[6\]$
+^main.*y .* -> Monotonically decreasing @ \[7\]$
+^main.*z .* -> Declared but uninitialized @ \[8\]$
+^main.*z .* -> Staying constant @ \[9\]$
+^main.*z .* -> Monotonically increasing @ \[10\]$
+^main.*z .* -> TOP @ \[11\]$
+^main.*u .* -> Declared but uninitialized @ \[12\]$
+^main.*u .* -> Staying constant @ \[16\]$
+^main.*u .* -> Monotonically increasing @ \[17\]$
+^main.*u .* -> TOP @ \[18\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether monotinic increase and decrease are correctly
+detected for integer-typed variables. 

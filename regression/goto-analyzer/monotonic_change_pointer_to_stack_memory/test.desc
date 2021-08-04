@@ -1,0 +1,18 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --vsd-pointers constants --vsd-structs every-field --show
+^main.*u .* -> \{\} @ \[0\]$
+^main.*p .* -> TOP @ \[1\]$
+^main.*p .* -> ptr ->\(main::1::u\) @ \[2\]$
+^main.*u .* -> \{.x=Staying constant @ \[3\]\} @ \[3\]$
+^main.*u .* -> \{.x=Staying constant @ \[3\], .y=Staying constant @ \[4\]\} @ \[4\]$
+^main.*u .* -> \{.x=Monotonically increasing @ \[5\], .y=Staying constant @ \[4\]\} @ \[5\]$
+^main.*u .* -> \{.x=Monotonically increasing @ \[5\], .y=Monotonically decreasing @ \[6\]\} @ \[6\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether we correctly handle the predicate abstraction of
+monotonic change for a pointer. Note that the pointer pointers to a structure on
+a "stack" as opposed to a "heap." A separate test case handles the case where a
+structure is allocated on a heap. 

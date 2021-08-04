@@ -75,10 +75,22 @@ vsd_configt vsd_configt::intervals()
   return config;
 }
 
+vsd_configt vsd_configt::monotonic_change()
+{
+  vsd_configt config{};
+  config.context_tracking.last_write_context = true;
+  config.value_abstract_type = MONOTONIC_CHANGE;
+  config.pointer_abstract_type = POINTER_SENSITIVE;
+  config.struct_abstract_type = STRUCT_SENSITIVE;
+  config.array_abstract_type = ARRAY_SENSITIVE;
+  return config;
+}
+
 const vsd_configt::option_mappingt vsd_configt::value_option_mappings = {
   {"intervals", INTERVAL},
   {"constants", CONSTANT},
-  {"set-of-constants", VALUE_SET}};
+  {"set-of-constants", VALUE_SET},
+  {"monotonic-change", MONOTONIC_CHANGE}};
 
 const vsd_configt::option_mappingt vsd_configt::pointer_option_mappings = {
   {"top-bottom", POINTER_INSENSITIVE},

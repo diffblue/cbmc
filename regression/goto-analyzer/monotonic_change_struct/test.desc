@@ -1,0 +1,15 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --vsd-structs every-field --show
+^main.*u .* -> \{\} @ \[0\]$
+^main.*u .* -> \{\.x=Staying constant @ \[7\], .y=Staying constant @ \[7\]\} @ \[7\]$
+^main.*u .* -> \{\.x=Monotonically increasing @ \[11\], .y=Staying constant @ \[7\]\} @ \[11\]$
+^main.*u .* -> \{\.x=Monotonically increasing @ \[11\], .y=Monotonically decreasing @ \[12\]\} @ \[12\]$
+^main.*u .* -> \{\.x=Monotonically increasing @ \[14\], .y=Staying constant @ \[7\]\} @ \[14\]$
+^main.*u .* -> \{\.x=Monotonically increasing @ \[11, 14\], .y=Monotonically decreasing @ \[12, 15\]\} @ \[12, 15\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the predicate abstraction of monotonicity change
+can correctly handle structure members. 

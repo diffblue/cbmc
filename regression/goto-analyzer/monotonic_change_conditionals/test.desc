@@ -1,0 +1,28 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Declared but uninitialized @ \[0\]$
+^main.*x .* -> Staying constant @ \[1\]$
+^main.*x .* -> Monotonically increasing @ \[5\]$
+^main.*x .* -> Monotonically increasing @ \[5, 7\]$
+^main.*y .* -> Declared but uninitialized @ \[9\]$
+^main.*y .* -> Staying constant @ \[10\]$
+^main.*y .* -> Monotonically increasing @ \[14\]$
+^main.*y .* -> TOP @ \[14, 16\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the predicate abstraction of monotonicity change
+can correctly handle if-else statements. 
+
+Consider the location in code immediately after we have exited the if-else
+statement (i.e. when the two branches of the if-else statement join). At this
+point, the abstract object must be the "join" (in the terminology of lattice
+theory) of the abstract values corresponding to the two branches. 
+
+In the first if-else statement of this test case, the abstract objects 
+corresponding to the two branches are both "monotonic increase." Hence, their 
+join is monotonic increase. In the second if-else statement, the two abstract
+objects are "monotonic increase" and "monotonic decrease." Hence, their join is
+"top." 

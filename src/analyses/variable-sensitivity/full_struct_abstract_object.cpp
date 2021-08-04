@@ -80,13 +80,15 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   std::cout << "Reading component " << member_expr.get_component_name() << '\n';
 #endif
 
+  const member_exprt &member_expr = to_member_expr(expr);
+
   if(is_top())
   {
-    return environment.abstract_object_factory(expr.type(), ns, true, false);
+    return environment.abstract_declared_object_factory(
+      member_expr.type(), member_expr, ns);
   }
   else
   {
-    const member_exprt &member_expr = to_member_expr(expr);
     PRECONDITION(!is_bottom());
 
     const irep_idt c = member_expr.get_component_name();
@@ -99,8 +101,8 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
     }
     else
     {
-      return environment.abstract_object_factory(
-        member_expr.type(), ns, true, false);
+      return environment.abstract_declared_object_factory(
+        member_expr.type(), member_expr, ns);
     }
   }
 }

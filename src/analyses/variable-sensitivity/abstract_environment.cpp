@@ -129,6 +129,111 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
   return abstract_object_factory(simplified_expr.type(), ns, true, false);
 }
 
+abstract_object_pointert abstract_environmentt::assign_eval(
+  const code_assignt &inst,
+  const namespacet &ns) const
+{
+  const exprt lhs = inst.lhs();
+  const abstract_object_pointert lhs_abstract_object = work_out_lhs(lhs, ns);
+  const exprt expr = inst.rhs();
+
+  if(bottom)
+    return abstract_object_factory(expr.type(), ns, false, true);
+
+  // first try to canonicalise, including constant folding
+  const exprt &simplified_expr = simplify_expr(expr, ns);
+
+  const irep_idt simplified_id = simplified_expr.id();
+  if(simplified_id == ID_symbol)
+  {
+    if(object_factory->is_predicate_abstraction(simplified_expr.type(), ns))
+      return abstract_object_factory_arbitrary_assignment(
+        lhs_abstract_object->unwrap_context(),
+        simplified_expr.type(),
+        simplified_expr,
+        ns);
+    else
+      return resolve_symbol(simplified_expr, ns);
+  }
+
+  if(
+    simplified_id == ID_member || simplified_id == ID_index ||
+    simplified_id == ID_dereference)
+  {
+    auto access_expr = simplified_expr;
+    auto target = eval(access_expr.operands()[0], ns);
+
+    if(object_factory->is_predicate_abstraction(simplified_expr.type(), ns))
+      return target->assign_expression_transform(
+        lhs_abstract_object,
+        lhs,
+        access_expr,
+        eval_operands(access_expr, *this, ns),
+        *this,
+        ns);
+    else
+      return target->expression_transform(
+        access_expr, eval_operands(access_expr, *this, ns), *this, ns);
+  }
+
+  if(
+    simplified_id == ID_array || simplified_id == ID_struct ||
+    simplified_id == ID_constant || simplified_id == ID_address_of)
+  {
+    if(object_factory->is_predicate_abstraction(simplified_expr.type(), ns))
+      return abstract_object_factory_arbitrary_assignment(
+        lhs_abstract_object->unwrap_context(),
+        simplified_expr.type(),
+        simplified_expr,
+        ns);
+    else
+      return abstract_object_factory(
+        simplified_expr.type(), simplified_expr, ns);
+  }
+
+  if(
+    simplified_id == ID_side_effect &&
+    (simplified_expr.get(ID_statement) == ID_allocate))
+  {
+    if(object_factory->is_predicate_abstraction(simplified_expr.type(), ns))
+      return abstract_object_factory_arbitrary_assignment(
+        lhs_abstract_object->unwrap_context(),
+        simplified_expr.type(),
+        simplified_expr,
+        ns);
+    else
+      return abstract_object_factory(
+        typet(ID_dynamic_object),
+        exprt(ID_dynamic_object, simplified_expr.type()),
+        ns);
+  }
+
+  // No special handling required by the abstract environment
+  // delegate to the abstract object
+  if(!simplified_expr.operands().empty())
+  {
+    if(object_factory->is_predicate_abstraction(simplified_expr.type(), ns))
+      return assign_eval_expression(lhs_abstract_object, lhs, expr, ns);
+    else
+      return eval_expression(simplified_expr, ns);
+  }
+  else
+  {
+    // It is important that this is top as the abstract object may not know
+    // how to handle the expression.
+    if(object_factory->is_predicate_abstraction(simplified_expr.type(), ns))
+    {
+      return abstract_object_factory_arbitrary_assignment(
+        lhs_abstract_object->unwrap_context(),
+        simplified_expr.type(),
+        simplified_expr,
+        ns);
+    }
+    else
+      return abstract_object_factory(simplified_expr.type(), ns, true, false);
+  }
+}
+
 abstract_object_pointert abstract_environmentt::resolve_symbol(
   const exprt &expr,
   const namespacet &ns) const
@@ -137,8 +242,60 @@ abstract_object_pointert abstract_environmentt::resolve_symbol(
   const auto symbol_entry = map.find(symbol.get_identifier());
 
   if(symbol_entry.has_value())
+  {
     return symbol_entry.value();
-  return abstract_object_factory(expr.type(), ns, true, false);
+  }
+  else
+  {
+    return abstract_declared_object_factory(expr.type(), expr, ns);
+  }
+}
+
+abstract_object_pointert abstract_environmentt::work_out_lhs(
+  const exprt &expr,
+  const namespacet &ns) const
+{
+  abstract_object_pointert lhs_value = nullptr;
+  // Build a stack of index, member and dereference accesses which
+  // we will work through the relevant abstract objects
+  exprt s = expr;
+  std::stack<exprt> stactions; // I'm not a continuation, honest guv'
+  while(s.id() != ID_symbol)
+  {
+    if(s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
+    {
+      stactions.push(s);
+      s = s.operands()[0];
+    }
+    else
+    {
+      lhs_value = eval(s, ns);
+      break;
+    }
+  }
+
+  if(!lhs_value)
+  {
+    INVARIANT(s.id() == ID_symbol, "Have a symbol or a stack");
+    lhs_value = resolve_symbol(s, ns);
+  }
+
+  abstract_object_pointert result = lhs_value;
+  while(!stactions.empty())
+  {
+    const exprt &next_expr = stactions.top();
+    stactions.pop();
+
+    const irep_idt &stack_head_id = next_expr.id();
+    INVARIANT(
+      stack_head_id == ID_index || stack_head_id == ID_member ||
+        stack_head_id == ID_dereference,
+      "Read stack expressions must be index, member, or dereference");
+
+    result = result->read(*this, next_expr, ns);
+  }
+
+  return result;
 }
 
 bool abstract_environmentt::assign(
@@ -300,10 +457,39 @@ exprt abstract_environmentt::do_assume(const exprt &expr, const namespacet &ns)
 
   auto fn = assume_functions[expr_id];
 
+  // In the case of MONOTONIC_CHANGE (i.e. predicate abstraction for monotonic
+  // change), we must explicitly return nil_exprt(). Otherwise, without the
+  // following "if" statement, the function do_assume will sometimes return
+  // an expression that evaluates to false. This happens because those functions
+  // inside assume_functions (e.g. assume_eq) are not designed for
+  // MONOTONIC_CHANGE.
+  if(object_factory->is_predicate_abstraction(expr.type(), ns))
+    return nil_exprt();
+
   if(fn)
     return fn(*this, expr, ns);
 
   return eval(expr, ns)->to_constant();
+}
+
+abstract_object_pointert
+abstract_environmentt::abstract_declared_object_factory(
+  const typet &type,
+  const exprt &expr,
+  const namespacet &ns) const
+{
+  return object_factory->get_abstract_object_declaration(type, expr, *this, ns);
+}
+
+abstract_object_pointert
+abstract_environmentt::abstract_object_factory_arbitrary_assignment(
+  const abstract_object_pointert &lhs_abstract_object,
+  const typet &type,
+  const exprt &e,
+  const namespacet &ns) const
+{
+  return object_factory->get_abstract_object_arbitrary_assignment(
+    lhs_abstract_object, type, e, *this, ns);
 }
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
@@ -446,6 +632,24 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   auto operands = eval_operands(e, *this, ns);
 
   return eval_obj->expression_transform(e, operands, *this, ns);
+}
+
+abstract_object_pointert abstract_environmentt::assign_eval_expression(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs,
+  const namespacet &ns) const
+{
+  // We create a temporary top abstract object (according to the
+  // type of the expression), and call expression transform on it.
+  // The value of the temporary abstract object is ignored, its
+  // purpose is just to dispatch the expression transform call to
+  // a concrete subtype of abstract_objectt.
+  auto eval_obj = abstract_object_factory(rhs.type(), ns, true, false);
+  auto operands = eval_operands(rhs, *this, ns);
+
+  return eval_obj->assign_expression_transform(
+    lhs_abstract_object, lhs, rhs, operands, *this, ns);
 }
 
 void abstract_environmentt::erase(const symbol_exprt &expr)

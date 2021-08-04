@@ -22,6 +22,7 @@ enum ABSTRACT_OBJECT_TYPET
   TWO_VALUE,
   CONSTANT,
   INTERVAL,
+  MONOTONIC_CHANGE,
   ARRAY_SENSITIVE,
   ARRAY_INSENSITIVE,
   VALUE_SET_OF_POINTERS,
@@ -67,6 +68,7 @@ struct vsd_configt
   static vsd_configt constant_domain();
   static vsd_configt value_set();
   static vsd_configt intervals();
+  static vsd_configt monotonic_change();
 
   vsd_configt()
     : value_abstract_type{CONSTANT},

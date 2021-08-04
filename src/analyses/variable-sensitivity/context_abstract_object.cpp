@@ -34,6 +34,14 @@ void context_abstract_objectt::set_not_top_internal()
     set_child(child_abstract_object->clear_top());
 }
 
+abstract_object_pointert context_abstract_objectt::read(
+  const abstract_environmentt &environment,
+  const exprt &specifier,
+  const namespacet &ns) const
+{
+  return child_abstract_object->read(environment, specifier, ns);
+}
+
 /**
  * A helper function to evaluate writing to a component of an
  * abstract object. More precise abstractions may override this to
@@ -102,6 +110,38 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
 
   auto result = child_abstract_object->expression_transform(
     expr, child_operands, environment, ns);
+  return envelop(result);
+}
+
+// assign_expression_transform is almost identical to expression_transform,
+// except that the former is tailored to assignments. Specifically,
+// assign_expression_transform takes in two additional arguments: (i) the
+// left-hand side's abstract object and (ii) the left-hand side's expression.
+abstract_object_pointert context_abstract_objectt::assign_expression_transform(
+  const abstract_object_pointert &lhs_abstract_object,
+  const exprt &lhs,
+  const exprt &rhs,
+  const std::vector<abstract_object_pointert> &operands,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  PRECONDITION(rhs.operands().size() == operands.size());
+
+  std::vector<abstract_object_pointert> child_operands;
+
+  std::transform(
+    operands.begin(),
+    operands.end(),
+    std::back_inserter(child_operands),
+    [](const abstract_object_pointert &op) {
+      PRECONDITION(op != nullptr);
+      auto p = std::dynamic_pointer_cast<const context_abstract_objectt>(op);
+      INVARIANT(p, "Operand shall be of type context_abstract_objectt");
+      return p->child_abstract_object;
+    });
+
+  auto result = child_abstract_object->assign_expression_transform(
+    lhs_abstract_object, lhs, rhs, child_operands, environment, ns);
   return envelop(result);
 }
 
