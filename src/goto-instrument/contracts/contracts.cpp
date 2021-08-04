@@ -38,15 +38,46 @@ Date: February 2016
 // This is used in the implementation of multidimensional decreases clauses.
 static exprt create_lexicographic_less_than(
   const std::vector<symbol_exprt> &lhs,
-  const std::vector<symbol_exprt> &rhs);
-
-exprt get_size(const typet &type, const namespacet &ns, messaget &log)
+  const std::vector<symbol_exprt> &rhs)
 {
-  auto size_of_opt = size_of_expr(type, ns);
-  CHECK_RETURN(size_of_opt.has_value());
-  exprt result = size_of_opt.value();
-  result.add(ID_C_c_sizeof_type) = type;
-  return result;
+  PRECONDITION(lhs.size() == rhs.size());
+
+  if(lhs.empty())
+  {
+    return false_exprt();
+  }
+
+  // Store conjunctions of equalities.
+  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
+  // l2, l3>.
+  // Then this vector stores <s1 == l1, s1 == l1 && s2 == l2,
+  // s1 == l1 && s2 == l2 && s3 == l3>.
+  // In fact, the last element is unnecessary, so we do not create it.
+  exprt::operandst equality_conjunctions(lhs.size());
+  equality_conjunctions[0] = binary_relation_exprt(lhs[0], ID_equal, rhs[0]);
+  for(unsigned int i = 1; i < equality_conjunctions.size() - 1; i++)
+  {
+    binary_relation_exprt component_i_equality{lhs[i], ID_equal, rhs[i]};
+    equality_conjunctions[i] =
+      and_exprt(equality_conjunctions[i - 1], component_i_equality);
+  }
+
+  // Store inequalities between the i-th components of the input vectors
+  // (i.e. lhs and rhs).
+  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
+  // l2, l3>.
+  // Then this vector stores <s1 < l1, s1 == l1 && s2 < l2, s1 == l1 &&
+  // s2 == l2 && s3 < l3>.
+  exprt::operandst lexicographic_individual_comparisons(lhs.size());
+  lexicographic_individual_comparisons[0] =
+    binary_relation_exprt(lhs[0], ID_lt, rhs[0]);
+  for(unsigned int i = 1; i < lexicographic_individual_comparisons.size(); i++)
+  {
+    binary_relation_exprt component_i_less_than{lhs[i], ID_lt, rhs[i]};
+    lexicographic_individual_comparisons[i] =
+      and_exprt(equality_conjunctions[i - 1], component_i_less_than);
+  }
+  return disjunction(lexicographic_individual_comparisons);
 }
 
 void code_contractst::check_apply_loop_contracts(
@@ -67,10 +98,11 @@ void code_contractst::check_apply_loop_contracts(
       loop_end = t;
 
   // see whether we have an invariant and a decreases clause
-  exprt invariant = static_cast<const exprt &>(
+  auto invariant = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_loop_invariant));
-  exprt decreases_clause = static_cast<const exprt &>(
+  auto decreases_clause = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_decreases));
+
   if(invariant.is_nil())
   {
     if(decreases_clause.is_nil())
@@ -92,12 +124,12 @@ void code_contractst::check_apply_loop_contracts(
   }
 
   // Vector representing a (possibly multidimensional) decreases clause
-  const auto decreases_clause_vector = decreases_clause.operands();
+  const auto &decreases_clause_exprs = decreases_clause.operands();
 
   // Temporary variables for storing the multidimensional decreases clause
   // at the start of and end of a loop body
-  std::vector<symbol_exprt> old_temporary_variables;
-  std::vector<symbol_exprt> new_temporary_variables;
+  std::vector<symbol_exprt> old_decreases_vars;
+  std::vector<symbol_exprt> new_decreases_vars;
 
   // change
   //   H: loop;
@@ -159,10 +191,10 @@ void code_contractst::check_apply_loop_contracts(
   // decreases clause's value before and after the loop
   for(const auto &clause : decreases_clause.operands())
   {
-    old_temporary_variables.push_back(
+    old_decreases_vars.push_back(
       new_tmp_symbol(clause.type(), loop_head->source_location, mode)
         .symbol_expr());
-    new_temporary_variables.push_back(
+    new_decreases_vars.push_back(
       new_tmp_symbol(clause.type(), loop_head->source_location, mode)
         .symbol_expr());
   }
@@ -171,7 +203,7 @@ void code_contractst::check_apply_loop_contracts(
   {
     // Generate: declarations of the temporary variables that stores the
     // multidimensional decreases clause's value before the loop
-    for(const auto &old_temp_var : old_temporary_variables)
+    for(const auto &old_temp_var : old_decreases_vars)
     {
       havoc_code.add(
         goto_programt::make_decl(old_temp_var, loop_head->source_location));
@@ -179,10 +211,10 @@ void code_contractst::check_apply_loop_contracts(
 
     // Generate: assignments to store the multidimensional decreases clause's
     // value before the loop
-    for(size_t i = 0; i < old_temporary_variables.size(); i++)
+    for(size_t i = 0; i < old_decreases_vars.size(); i++)
     {
-      code_assignt old_decreases_assignment{old_temporary_variables[i],
-                                            decreases_clause_vector[i]};
+      code_assignt old_decreases_assignment{old_decreases_vars[i],
+                                            decreases_clause_exprs[i]};
       old_decreases_assignment.add_source_location() =
         loop_head->source_location;
       converter.goto_convert(old_decreases_assignment, havoc_code, mode);
@@ -217,7 +249,7 @@ void code_contractst::check_apply_loop_contracts(
     // Generate: declarations of temporary variables that stores the
     // multidimensional decreases clause's value after one arbitrary iteration
     // of the loop
-    for(const auto &new_temp_var : new_temporary_variables)
+    for(const auto &new_temp_var : new_decreases_vars)
     {
       havoc_code.add(
         goto_programt::make_decl(new_temp_var, loop_head->source_location));
@@ -225,10 +257,10 @@ void code_contractst::check_apply_loop_contracts(
 
     // Generate: assignments to store the multidimensional decreases clause's
     // value after one iteration of the loop
-    for(size_t i = 0; i < new_temporary_variables.size(); i++)
+    for(size_t i = 0; i < new_decreases_vars.size(); i++)
     {
-      code_assignt new_decreases_assignment{new_temporary_variables[i],
-                                            decreases_clause_vector[i]};
+      code_assignt new_decreases_assignment{new_decreases_vars[i],
+                                            decreases_clause_exprs[i]};
       new_decreases_assignment.add_source_location() =
         loop_head->source_location;
       converter.goto_convert(new_decreases_assignment, havoc_code, mode);
@@ -238,7 +270,7 @@ void code_contractst::check_apply_loop_contracts(
     // after the loop is smaller than the value before the loop.
     // Here, we use the lexicographic order.
     code_assertt monotonic_decreasing_assertion{create_lexicographic_less_than(
-      new_temporary_variables, old_temporary_variables)};
+      new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
       loop_head->source_location;
     converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
@@ -246,12 +278,12 @@ void code_contractst::check_apply_loop_contracts(
       "Check decreases clause on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
-    for(size_t i = 0; i < old_temporary_variables.size(); i++)
+    for(size_t i = 0; i < old_decreases_vars.size(); i++)
     {
       havoc_code.add(goto_programt::make_dead(
-        old_temporary_variables[i], loop_head->source_location));
+        old_decreases_vars[i], loop_head->source_location));
       havoc_code.add(goto_programt::make_dead(
-        new_temporary_variables[i], loop_head->source_location));
+        new_decreases_vars[i], loop_head->source_location));
     }
   }
 
@@ -266,52 +298,6 @@ void code_contractst::check_apply_loop_contracts(
     loop_end->set_condition(false_exprt());
   else
     loop_end->set_condition(boolean_negate(loop_end->get_condition()));
-}
-
-// Create a lexicographic less-than relation between two tuples of variables.
-// This is used in the implementation of multidimensional decreases clauses.
-static exprt create_lexicographic_less_than(
-  const std::vector<symbol_exprt> &lhs,
-  const std::vector<symbol_exprt> &rhs)
-{
-  PRECONDITION(lhs.size() == rhs.size());
-
-  if(lhs.empty())
-  {
-    return false_exprt();
-  }
-
-  // Store conjunctions of equalities.
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 == l1, s1 == l1 && s2 == l2,
-  // s1 == l1 && s2 == l2 && s3 == l3>.
-  // In fact, the last element is unnecessary, so we do not create it.
-  exprt::operandst equality_conjunctions(lhs.size());
-  equality_conjunctions[0] = binary_relation_exprt(lhs[0], ID_equal, rhs[0]);
-  for(unsigned int i = 1; i < equality_conjunctions.size() - 1; i++)
-  {
-    binary_relation_exprt component_i_equality{lhs[i], ID_equal, rhs[i]};
-    equality_conjunctions[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_equality);
-  }
-
-  // Store inequalities between the i-th components of the input vectors
-  // (i.e. lhs and rhs).
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 < l1, s1 == l1 && s2 < l2, s1 == l1 &&
-  // s2 == l2 && s3 < l3>.
-  exprt::operandst lexicographic_individual_comparisons(lhs.size());
-  lexicographic_individual_comparisons[0] =
-    binary_relation_exprt(lhs[0], ID_lt, rhs[0]);
-  for(unsigned int i = 1; i < lexicographic_individual_comparisons.size(); i++)
-  {
-    binary_relation_exprt component_i_less_than{lhs[i], ID_lt, rhs[i]};
-    lexicographic_individual_comparisons[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_less_than);
-  }
-  return disjunction(lexicographic_individual_comparisons);
 }
 
 bool code_contractst::has_contract(const irep_idt fun_name)
