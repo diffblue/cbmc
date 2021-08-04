@@ -55,7 +55,7 @@ static exprt create_lexicographic_less_than(
   // In fact, the last element is unnecessary, so we do not create it.
   exprt::operandst equality_conjunctions(lhs.size());
   equality_conjunctions[0] = binary_relation_exprt(lhs[0], ID_equal, rhs[0]);
-  for(unsigned int i = 1; i < equality_conjunctions.size() - 1; i++)
+  for(size_t i = 1; i < equality_conjunctions.size() - 1; i++)
   {
     binary_relation_exprt component_i_equality{lhs[i], ID_equal, rhs[i]};
     equality_conjunctions[i] =
@@ -71,7 +71,7 @@ static exprt create_lexicographic_less_than(
   exprt::operandst lexicographic_individual_comparisons(lhs.size());
   lexicographic_individual_comparisons[0] =
     binary_relation_exprt(lhs[0], ID_lt, rhs[0]);
-  for(unsigned int i = 1; i < lexicographic_individual_comparisons.size(); i++)
+  for(size_t i = 1; i < lexicographic_individual_comparisons.size(); i++)
   {
     binary_relation_exprt component_i_less_than{lhs[i], ID_lt, rhs[i]};
     lexicographic_individual_comparisons[i] =
@@ -80,10 +80,20 @@ static exprt create_lexicographic_less_than(
   return disjunction(lexicographic_individual_comparisons);
 }
 
+static void insert_before_swap_and_advance(
+  goto_programt &program,
+  goto_programt::targett &target,
+  goto_programt &payload)
+{
+  const auto offset = payload.instructions.size();
+  program.insert_before_swap(target, payload);
+  std::advance(target, offset);
+}
+
 void code_contractst::check_apply_loop_contracts(
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
-  const goto_programt::targett loop_head,
+  goto_programt::targett loop_head,
   const loopt &loop,
   const irep_idt &mode)
 {
@@ -138,8 +148,8 @@ void code_contractst::check_apply_loop_contracts(
   //   H: assert(invariant);
   //   havoc;
   //   assume(invariant);
-  //   old_decreases_value = decreases_clause(current_environment);
   //   if(guard) goto E:
+  //   old_decreases_value = decreases_clause(current_environment);
   //   loop;
   //   new_decreases_value = decreases_clause(current_environment);
   //   assert(invariant);
@@ -191,34 +201,19 @@ void code_contractst::check_apply_loop_contracts(
   // decreases clause's value before and after the loop
   for(const auto &clause : decreases_clause.operands())
   {
-    old_decreases_vars.push_back(
+    const auto old_decreases_var =
       new_tmp_symbol(clause.type(), loop_head->source_location, mode)
-        .symbol_expr());
-    new_decreases_vars.push_back(
+        .symbol_expr();
+    havoc_code.add(
+      goto_programt::make_decl(old_decreases_var, loop_head->source_location));
+    old_decreases_vars.push_back(old_decreases_var);
+
+    const auto new_decreases_var =
       new_tmp_symbol(clause.type(), loop_head->source_location, mode)
-        .symbol_expr());
-  }
-
-  if(!decreases_clause.is_nil())
-  {
-    // Generate: declarations of the temporary variables that stores the
-    // multidimensional decreases clause's value before the loop
-    for(const auto &old_temp_var : old_decreases_vars)
-    {
-      havoc_code.add(
-        goto_programt::make_decl(old_temp_var, loop_head->source_location));
-    }
-
-    // Generate: assignments to store the multidimensional decreases clause's
-    // value before the loop
-    for(size_t i = 0; i < old_decreases_vars.size(); i++)
-    {
-      code_assignt old_decreases_assignment{old_decreases_vars[i],
-                                            decreases_clause_exprs[i]};
-      old_decreases_assignment.add_source_location() =
-        loop_head->source_location;
-      converter.goto_convert(old_decreases_assignment, havoc_code, mode);
-    }
+        .symbol_expr();
+    havoc_code.add(
+      goto_programt::make_decl(new_decreases_var, loop_head->source_location));
+    new_decreases_vars.push_back(new_decreases_var);
   }
 
   // non-deterministically skip the loop if it is a do-while loop
@@ -231,7 +226,23 @@ void code_contractst::check_apply_loop_contracts(
 
   // Now havoc at the loop head.
   // Use insert_before_swap to preserve jumps to loop head.
-  goto_function.body.insert_before_swap(loop_head, havoc_code);
+  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
+
+  // Generate: assignments to store the multidimensional decreases clause's
+  // value before the loop
+  if(!decreases_clause.is_nil())
+  {
+    for(size_t i = 0; i < old_decreases_vars.size(); i++)
+    {
+      code_assignt old_decreases_assignment{old_decreases_vars[i],
+                                            decreases_clause_exprs[i]};
+      old_decreases_assignment.add_source_location() =
+        loop_head->source_location;
+      converter.goto_convert(old_decreases_assignment, havoc_code, mode);
+    }
+
+    goto_function.body.destructive_insert(std::next(loop_head), havoc_code);
+  }
 
   // Generate: assert(invariant) just after the loop exits
   // We use a block scope to create a temporary assertion,
@@ -244,19 +255,10 @@ void code_contractst::check_apply_loop_contracts(
       "Check that loop invariant is preserved");
   }
 
+  // Generate: assignments to store the multidimensional decreases clause's
+  // value after one iteration of the loop
   if(!decreases_clause.is_nil())
   {
-    // Generate: declarations of temporary variables that stores the
-    // multidimensional decreases clause's value after one arbitrary iteration
-    // of the loop
-    for(const auto &new_temp_var : new_decreases_vars)
-    {
-      havoc_code.add(
-        goto_programt::make_decl(new_temp_var, loop_head->source_location));
-    }
-
-    // Generate: assignments to store the multidimensional decreases clause's
-    // value after one iteration of the loop
     for(size_t i = 0; i < new_decreases_vars.size(); i++)
     {
       code_assignt new_decreases_assignment{new_decreases_vars[i],
@@ -269,8 +271,8 @@ void code_contractst::check_apply_loop_contracts(
     // Generate: assertion that the multidimensional decreases clause's value
     // after the loop is smaller than the value before the loop.
     // Here, we use the lexicographic order.
-    code_assertt monotonic_decreasing_assertion{create_lexicographic_less_than(
-      new_decreases_vars, old_decreases_vars)};
+    code_assertt monotonic_decreasing_assertion{
+      create_lexicographic_less_than(new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
       loop_head->source_location;
     converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
@@ -287,9 +289,7 @@ void code_contractst::check_apply_loop_contracts(
     }
   }
 
-  auto offset = havoc_code.instructions.size();
-  goto_function.body.insert_before_swap(loop_end, havoc_code);
-  std::advance(loop_end, offset);
+  insert_before_swap_and_advance(goto_function.body, loop_end, havoc_code);
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->targets.clear();

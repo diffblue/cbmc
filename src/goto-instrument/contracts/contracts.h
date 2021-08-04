@@ -123,7 +123,7 @@ public:
   void check_apply_loop_contracts(
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,
-    const goto_programt::targett loop_head,
+    goto_programt::targett loop_head,
     const loopt &loop,
     const irep_idt &mode);
 
