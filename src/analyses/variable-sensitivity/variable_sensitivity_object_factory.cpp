@@ -7,6 +7,7 @@
 \*******************************************************************/
 #include "variable_sensitivity_object_factory.h"
 #include "full_array_abstract_object.h"
+#include "region_context.h"
 #include "value_set_pointer_abstract_object.h"
 
 template <class context_classt>
@@ -37,6 +38,9 @@ abstract_object_pointert wrap_with_context_object(
   const abstract_object_pointert &abstract_object,
   const vsd_configt &configuration)
 {
+  if(configuration.context_tracking.region_context)
+    return create_context_abstract_object<region_contextt>(abstract_object);
+
   if(configuration.context_tracking.data_dependency_context)
     return create_context_abstract_object<data_dependency_contextt>(
       abstract_object);

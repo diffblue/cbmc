@@ -78,8 +78,8 @@
   "(vsd-pointers):"                                                            \
   "(vsd-unions):"                                                              \
   "(vsd-flow-insensitive)"                                                     \
-  "(vsd-data-dependencies)"
-
+  "(vsd-data-dependencies)"                                                    \
+  "(vsd-region-tracking)"
 // clang-format off
 #define HELP_VSD \
     " --vsd-values                 value tracking - constants|intervals|set-of-constants\n" /* NOLINT(whitespace/line_length) */ \
@@ -89,6 +89,7 @@
     " --vsd-unions                 union sensitive analysis - top-bottom\n" \
     " --vsd-flow-insensitive       disables flow sensitivity\n" \
     " --vsd-data-dependencies      track data dependencies\n" \
+    " --vsd-region-tracking        track SSA regions\n" \
 
 // cland-format on
 
@@ -100,6 +101,7 @@
   options.set_option("unions", cmdline.get_value("vsd-unions")); \
   options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("data-dependencies", cmdline.isset("vsd-data-dependencies")); /* NOLINT(whitespace/line_length) */ \
+  options.set_option("region-tracking", cmdline.isset("vsd-region-tracking")); /* NOLINT(whitespace/line_length) */ \
   (void)0
 
 class variable_sensitivity_domaint : public ai_domain_baset

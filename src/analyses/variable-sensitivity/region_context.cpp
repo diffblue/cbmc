@@ -1,12 +1,12 @@
 /*******************************************************************\
 
- Module: analyses variable-sensitivity write_location_context
+ Module: analyses variable-sensitivity region_contextt
 
- Author: Diffblue Ltd.
+ Author: Jez Higgins
 
 \*******************************************************************/
 
-#include "write_location_context.h"
+#include "region_context.h"
 
 #include <algorithm>
 
@@ -21,12 +21,12 @@
  * \return a clone of this abstract object with its location context
  * updated
  */
-abstract_object_pointert write_location_contextt::update_location_context(
+abstract_object_pointert region_contextt::update_location_context(
   const abstract_objectt::locationst &locations,
   const bool update_sub_elements) const
 {
   const auto &result =
-    std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+    std::dynamic_pointer_cast<region_contextt>(mutable_clone());
 
   if(update_sub_elements)
   {
@@ -41,8 +41,7 @@ abstract_object_pointert write_location_contextt::update_location_context(
   return result;
 }
 
-abstract_objectt::locationst
-write_location_contextt::get_last_written_locations() const
+abstract_objectt::locationst region_contextt::get_last_written_locations() const
 {
   return last_written_locations;
 }
@@ -63,7 +62,7 @@ write_location_contextt::get_last_written_locations() const
  * \return the abstract_objectt representing the result of writing
  * to a specific component.
  */
-abstract_object_pointert write_location_contextt::write(
+abstract_object_pointert region_contextt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -81,12 +80,11 @@ abstract_object_pointert write_location_contextt::write(
   // Need to ensure the result of the write is still wrapped in a dependency
   // context
   const auto &result =
-    std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+    std::dynamic_pointer_cast<region_contextt>(mutable_clone());
 
   // Update the child and record the updated write locations
   result->set_child(updated_child);
-  auto value_context =
-    std::dynamic_pointer_cast<const write_location_contextt>(value);
+  auto value_context = std::dynamic_pointer_cast<const region_contextt>(value);
 
   if(value_context)
   {
@@ -107,12 +105,11 @@ abstract_object_pointert write_location_contextt::write(
  * \return the result of the merge, or 'this' if the merge would not change
  * the current abstract object
  */
-abstract_object_pointert write_location_contextt::merge(
+abstract_object_pointert region_contextt::merge(
   const abstract_object_pointert &other,
   const widen_modet &widen_mode) const
 {
-  auto cast_other =
-    std::dynamic_pointer_cast<const write_location_contextt>(other);
+  auto cast_other = std::dynamic_pointer_cast<const region_contextt>(other);
 
   if(cast_other)
   {
@@ -128,7 +125,7 @@ abstract_object_pointert write_location_contextt::merge(
 }
 
 // need wrapper function here to disambiguate meet overload
-static abstract_objectt::combine_result object_meet(
+abstract_objectt::combine_result object_meet(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2)
 {
@@ -136,10 +133,9 @@ static abstract_objectt::combine_result object_meet(
 }
 
 abstract_object_pointert
-write_location_contextt::meet(const abstract_object_pointert &other) const
+region_contextt::meet(const abstract_object_pointert &other) const
 {
-  auto cast_other =
-    std::dynamic_pointer_cast<const write_location_contextt>(other);
+  auto cast_other = std::dynamic_pointer_cast<const region_contextt>(other);
 
   if(cast_other)
     return combine(cast_other, object_meet);
@@ -147,7 +143,7 @@ write_location_contextt::meet(const abstract_object_pointert &other) const
   return abstract_objectt::meet(other);
 }
 
-abstract_object_pointert write_location_contextt::combine(
+abstract_object_pointert region_contextt::combine(
   const write_location_context_ptrt &other,
   combine_fn fn) const
 {
@@ -162,7 +158,7 @@ abstract_object_pointert write_location_contextt::combine(
   if(combined_child.modified || merge_locations)
   {
     const auto &result =
-      std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+      std::dynamic_pointer_cast<region_contextt>(mutable_clone());
     if(combined_child.modified)
     {
       result->set_child(combined_child.object);
@@ -191,12 +187,10 @@ abstract_object_pointert write_location_contextt::combine(
  *
  * \return the result of the merge
  */
-abstract_object_pointert
-write_location_contextt::abstract_object_merge_internal(
+abstract_object_pointert region_contextt::abstract_object_merge_internal(
   const abstract_object_pointert &other) const
 {
-  auto other_context =
-    std::dynamic_pointer_cast<const write_location_contextt>(other);
+  auto other_context = std::dynamic_pointer_cast<const region_contextt>(other);
 
   if(other_context)
   {
@@ -218,7 +212,7 @@ write_location_contextt::abstract_object_merge_internal(
  *
  * \param locations the locations to set
  */
-void write_location_contextt::set_last_written_locations(
+void region_contextt::set_last_written_locations(
   const abstract_objectt::locationst &locations)
 {
   last_written_locations = locations;
@@ -232,7 +226,7 @@ void write_location_contextt::set_last_written_locations(
  * (that contains the object ... )
  * \param ns the current namespace
  */
-void write_location_contextt::output(
+void region_contextt::output(
   std::ostream &out,
   const ai_baset &ai,
   const namespacet &ns) const
@@ -253,7 +247,7 @@ void write_location_contextt::output(
  * \return the union of this objects location set, and 'locations'
  */
 abstract_objectt::locationst
-write_location_contextt::get_location_union(const locationst &locations) const
+region_contextt::get_location_union(const locationst &locations) const
 {
   locationst existing_locations = get_last_written_locations();
   existing_locations.insert(locations.begin(), locations.end());
@@ -271,7 +265,7 @@ write_location_contextt::get_location_union(const locationst &locations) const
  * \return true if 'this' is considered to have been modified in comparison
  * to 'before', false otherwise.
  */
-bool write_location_contextt::has_been_modified(
+bool region_contextt::has_been_modified(
   const abstract_object_pointert &before) const
 {
   if(this == before.get())
@@ -281,7 +275,7 @@ bool write_location_contextt::has_been_modified(
   }
 
   auto before_context =
-    std::dynamic_pointer_cast<const write_location_contextt>(before);
+    std::dynamic_pointer_cast<const region_contextt>(before);
 
   if(!before_context)
   {
@@ -350,7 +344,7 @@ bool write_location_contextt::has_been_modified(
  * \param out the stream on which to output the locations
  * \param locations the set of locations to output
  */
-void write_location_contextt::output_last_written_locations(
+void region_contextt::output_last_written_locations(
   std::ostream &out,
   const abstract_objectt::locationst &locations)
 {
