@@ -392,14 +392,7 @@ abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
     }
   }
 
-  if(modified)
-  {
-    return result;
-  }
-  else
-  {
-    return shared_from_this();
-  }
+  return modified ? result : shared_from_this();
 }
 
 exprt full_array_abstract_objectt::to_predicate_internal(
