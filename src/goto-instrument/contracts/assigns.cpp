@@ -18,16 +18,16 @@ Date: July 2021
 #include <util/pointer_predicates.h>
 
 assigns_clause_targett::assigns_clause_targett(
-  const exprt &object_ptr,
+  const exprt &object,
   code_contractst &contract,
   messaget &log_parameter,
   const irep_idt &function_id)
-  : pointer_object(pointer_for(object_ptr)),
+  : pointer_object(pointer_for(object)),
     contract(contract),
     init_block(),
     log(log_parameter),
-    local_target(typet()),
-    target_id(object_ptr.id())
+    target(typet()),
+    target_id(object.id())
 {
   INVARIANT(
     pointer_object.type().id() == ID_pointer,
@@ -40,13 +40,12 @@ assigns_clause_targett::assigns_clause_targett(
     function_symbol.location,
     function_symbol.mode);
 
-  local_target = standin_symbol.symbol_expr();
+  target = standin_symbol.symbol_expr();
 
   // Build standin variable initialization block
-  init_block.add(
-    goto_programt::make_decl(local_target, function_symbol.location));
+  init_block.add(goto_programt::make_decl(target, function_symbol.location));
   init_block.add(goto_programt::make_assignment(
-    code_assignt(local_target, pointer_object), function_symbol.location));
+    code_assignt(target, pointer_object), function_symbol.location));
 }
 
 assigns_clause_targett::~assigns_clause_targett()
@@ -56,7 +55,7 @@ assigns_clause_targett::~assigns_clause_targett()
 std::vector<symbol_exprt> assigns_clause_targett::temporary_declarations() const
 {
   std::vector<symbol_exprt> result;
-  result.push_back(local_target);
+  result.push_back(target);
   return result;
 }
 
@@ -93,7 +92,7 @@ exprt assigns_clause_targett::alias_expression(const exprt &lhs)
 
   const exprt region_target = plus_exprt(
     typecast_exprt::conditional_cast(
-      size_of_expr(dereference_exprt(local_target).type(), contract.ns).value(),
+      size_of_expr(dereference_exprt(target).type(), contract.ns).value(),
       target_offset.type()),
     target_offset);
 
@@ -107,13 +106,13 @@ exprt assigns_clause_targett::alias_expression(const exprt &lhs)
 exprt assigns_clause_targett::compatible_expression(
   const assigns_clause_targett &called_target)
 {
-  return same_object(called_target.get_direct_pointer(), local_target);
+  return same_object(called_target.get_direct_pointer(), target);
 }
 
-goto_programt
-assigns_clause_targett::havoc_code(source_locationt location) const
+goto_programt assigns_clause_targett::havoc_code() const
 {
   goto_programt assigns_havoc;
+  source_locationt location = pointer_object.source_location();
 
   exprt lhs = dereference_exprt(pointer_object);
   side_effect_expr_nondett rhs(lhs.type(), location);
@@ -141,12 +140,12 @@ assigns_clauset::assigns_clauset(
   code_contractst &contract,
   const irep_idt function_id,
   messaget log_parameter)
-  : assigns_expr(assigns),
+  : assigns(assigns),
     parent(contract),
     function_id(function_id),
     log(log_parameter)
 {
-  for(exprt target : assigns_expr.operands())
+  for(exprt target : assigns.operands())
   {
     add_target(target);
   }
@@ -173,13 +172,7 @@ assigns_clause_targett *assigns_clauset::add_target(exprt target)
   return new_target;
 }
 
-assigns_clause_targett *
-assigns_clauset::add_pointer_target(exprt current_operation)
-{
-  return add_target(dereference_exprt(current_operation));
-}
-
-goto_programt assigns_clauset::init_block(source_locationt location)
+goto_programt assigns_clauset::init_block()
 {
   goto_programt result;
   for(assigns_clause_targett *target : targets)
@@ -193,29 +186,7 @@ goto_programt assigns_clauset::init_block(source_locationt location)
   return result;
 }
 
-goto_programt &assigns_clauset::temporary_declarations(
-  source_locationt location,
-  irep_idt function_name,
-  irep_idt language_mode)
-{
-  if(standin_declarations.empty())
-  {
-    for(assigns_clause_targett *target : targets)
-    {
-      for(symbol_exprt symbol : target->temporary_declarations())
-      {
-        standin_declarations.add(
-          goto_programt::make_decl(symbol, symbol.source_location()));
-      }
-    }
-  }
-  return standin_declarations;
-}
-
-goto_programt assigns_clauset::dead_stmts(
-  source_locationt location,
-  irep_idt function_name,
-  irep_idt language_mode)
+goto_programt assigns_clauset::dead_stmts()
 {
   goto_programt dead_statements;
   for(assigns_clause_targett *target : targets)
@@ -229,12 +200,11 @@ goto_programt assigns_clauset::dead_stmts(
   return dead_statements;
 }
 
-goto_programt assigns_clauset::havoc_code(
-  source_locationt location,
-  irep_idt function_name,
-  irep_idt language_mode)
+goto_programt assigns_clauset::havoc_code()
 {
   goto_programt havoc_statements;
+  source_locationt location = assigns.source_location();
+
   for(assigns_clause_targett *target : targets)
   {
     // (1) If the assigned target is not a dereference,
@@ -262,7 +232,7 @@ goto_programt assigns_clauset::havoc_code(
 
     // create havoc_statements
     for(goto_programt::instructiont instruction :
-        target->havoc_code(location).instructions)
+        target->havoc_code().instructions)
     {
       havoc_statements.add(std::move(instruction));
     }

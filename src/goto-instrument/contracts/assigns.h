@@ -23,7 +23,7 @@ class assigns_clause_targett
 {
 public:
   assigns_clause_targett(
-    const exprt &object_ptr,
+    const exprt &object,
     code_contractst &contract,
     messaget &log_parameter,
     const irep_idt &function_id);
@@ -32,13 +32,13 @@ public:
   std::vector<symbol_exprt> temporary_declarations() const;
   exprt alias_expression(const exprt &lhs);
   exprt compatible_expression(const assigns_clause_targett &called_target);
-  goto_programt havoc_code(source_locationt location) const;
+  goto_programt havoc_code() const;
   const exprt &get_direct_pointer() const;
   goto_programt &get_init_block();
 
-  static exprt pointer_for(const exprt &exp)
+  static exprt pointer_for(const exprt &object)
   {
-    return address_of_exprt(exp);
+    return address_of_exprt(object);
   }
 
 protected:
@@ -46,7 +46,7 @@ protected:
   const code_contractst &contract;
   goto_programt init_block;
   messaget &log;
-  symbol_exprt local_target;
+  symbol_exprt target;
   const irep_idt &target_id;
 };
 
@@ -61,26 +61,14 @@ public:
   ~assigns_clauset();
 
   assigns_clause_targett *add_target(exprt target);
-  assigns_clause_targett *add_pointer_target(exprt current_operation);
-  goto_programt init_block(source_locationt location);
-  goto_programt &temporary_declarations(
-    source_locationt location,
-    irep_idt function_name,
-    irep_idt language_mode);
-  goto_programt dead_stmts(
-    source_locationt location,
-    irep_idt function_name,
-    irep_idt language_mode);
-  goto_programt havoc_code(
-    source_locationt location,
-    irep_idt function_name,
-    irep_idt language_mode);
+  goto_programt init_block();
+  goto_programt dead_stmts();
+  goto_programt havoc_code();
   exprt alias_expression(const exprt &lhs);
-
   exprt compatible_expression(const assigns_clauset &called_assigns);
 
 protected:
-  const exprt &assigns_expr;
+  const exprt &assigns;
 
   std::vector<assigns_clause_targett *> targets;
   goto_programt standin_declarations;

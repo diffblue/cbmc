@@ -589,8 +589,7 @@ bool code_contractst::apply_function_contract(
   if(assigns.is_not_nil())
   {
     assigns_clauset assigns_cause(assigns, *this, function, log);
-    goto_programt assigns_havoc = assigns_cause.havoc_code(
-      function_symbol.location, function, function_symbol.mode);
+    goto_programt assigns_havoc = assigns_cause.havoc_code();
 
     // Insert the non-deterministic assignment immediately before the call site.
     std::size_t lines_to_iterate = assigns_havoc.instructions.size();
@@ -739,7 +738,7 @@ void code_contractst::instrument_call_statement(
 
       // Make freshly allocated memory assignable, if we can determine its type.
       assigns_clause_targett *new_target =
-        assigns_clause.add_pointer_target(rhs);
+        assigns_clause.add_target(dereference_exprt(rhs));
       goto_programt &pointer_capture = new_target->get_init_block();
 
       size_t lines_to_iterate = pointer_capture.instructions.size();
@@ -920,10 +919,9 @@ void code_contractst::check_frame_conditions(
 
   // Create temporary variables to hold the assigns
   // clause targets before they can be modified.
-  goto_programt standin_decls = assigns.init_block(target.location);
+  goto_programt standin_decls = assigns.init_block();
   // Create dead statements for temporary variables
-  goto_programt mark_dead =
-    assigns.dead_stmts(target.location, target.name, target.mode);
+  goto_programt mark_dead = assigns.dead_stmts();
 
   // Skip lines with temporary variable declarations
   size_t lines_to_iterate = standin_decls.instructions.size();
