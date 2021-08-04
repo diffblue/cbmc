@@ -7,7 +7,6 @@
 ///  * The member functions of the `smt_term_const_downcast_visitort` class.
 ///  * The type of term checks required to implement `smt_termt::accept`.
 TERM_ID(bool_literal)
-TERM_ID(not)
 TERM_ID(identifier)
 TERM_ID(bit_vector_constant)
 TERM_ID(function_application)

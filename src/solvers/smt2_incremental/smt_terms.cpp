@@ -48,20 +48,6 @@ bool smt_bool_literal_termt::value() const
   return get_bool(ID_value);
 }
 
-smt_not_termt::smt_not_termt(smt_termt operand)
-  : smt_termt{ID_smt_not_term, smt_bool_sortt{}}
-{
-  INVARIANT(
-    operand.get_sort() == smt_bool_sortt{},
-    "smt_not_termt may only be applied to terms which have bool sort.");
-  get_sub().push_back(std::move(operand));
-}
-
-const smt_termt &smt_not_termt::operand() const
-{
-  return static_cast<const smt_termt &>(get_sub().at(0));
-}
-
 static bool is_valid_smt_identifier(irep_idt identifier)
 {
   static const std::regex valid{R"(^[^\|\\]*$)"};

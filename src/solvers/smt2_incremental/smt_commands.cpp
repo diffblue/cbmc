@@ -198,3 +198,51 @@ void smt_commandt::accept(smt_command_const_downcast_visitort &&visitor) const
 {
   ::accept(*this, id(), std::move(visitor));
 }
+
+smt_command_functiont::smt_command_functiont(
+  const smt_declare_function_commandt &function_declaration)
+  : _identifier(function_declaration.identifier())
+{
+  const auto sort_references = function_declaration.parameter_sorts();
+  parameter_sorts =
+    make_range(sort_references).collect<decltype(parameter_sorts)>();
+}
+
+smt_command_functiont::smt_command_functiont(
+  const smt_define_function_commandt &function_definition)
+  : _identifier{function_definition.identifier()}
+{
+  const auto parameters = function_definition.parameters();
+  parameter_sorts =
+    make_range(parameters)
+      .map([](const smt_termt &term) { return term.get_sort(); })
+      .collect<decltype(parameter_sorts)>();
+}
+
+irep_idt smt_command_functiont::identifier() const
+{
+  return _identifier.identifier();
+}
+
+smt_sortt smt_command_functiont::return_sort(
+  const std::vector<smt_termt> &arguments) const
+{
+  return _identifier.get_sort();
+}
+
+void smt_command_functiont::validate(
+  const std::vector<smt_termt> &arguments) const
+{
+  INVARIANT(
+    parameter_sorts.size() == arguments.size(),
+    "Number of parameters and number of arguments must be the same.");
+  const auto parameter_sort_arguments =
+    make_range(parameter_sorts).zip(make_range(arguments));
+  for(const auto &parameter_sort_argument_pair : parameter_sort_arguments)
+  {
+    INVARIANT(
+      parameter_sort_argument_pair.first ==
+        parameter_sort_argument_pair.second.get_sort(),
+      "Sort of argument must have the same sort as the parameter.");
+  }
+}

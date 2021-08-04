@@ -102,7 +102,6 @@ private:
   smt_term_to_string_convertert() = default;
 
   void visit(const smt_bool_literal_termt &bool_literal) override;
-  void visit(const smt_not_termt &not_term) override;
   void visit(const smt_identifier_termt &identifier_term) override;
   void visit(const smt_bit_vector_constant_termt &bit_vector_constant) override;
   void
@@ -169,11 +168,6 @@ void smt_term_to_string_convertert::visit(
   const smt_bool_literal_termt &bool_literal)
 {
   push_output(bool_literal.value() ? "true" : "false");
-}
-
-void smt_term_to_string_convertert::visit(const smt_not_termt &not_term)
-{
-  push_outputs("(not ", not_term.operand(), ")");
 }
 
 void smt_term_to_string_convertert::visit(

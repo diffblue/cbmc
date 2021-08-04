@@ -132,4 +132,22 @@ public:
 #undef COMMAND_ID
 };
 
+/// \brief A function generated from a command. Used for validating function
+///   application term arguments.
+class smt_command_functiont
+{
+private:
+  std::vector<smt_sortt> parameter_sorts;
+  smt_identifier_termt _identifier;
+
+public:
+  explicit smt_command_functiont(
+    const smt_declare_function_commandt &function_declaration);
+  explicit smt_command_functiont(
+    const smt_define_function_commandt &function_definition);
+  irep_idt identifier() const;
+  smt_sortt return_sort(const std::vector<smt_termt> &arguments) const;
+  void validate(const std::vector<smt_termt> &arguments) const;
+};
+
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_COMMANDS_H

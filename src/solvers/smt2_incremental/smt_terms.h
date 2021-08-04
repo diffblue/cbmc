@@ -75,13 +75,6 @@ public:
   bool value() const;
 };
 
-class smt_not_termt : public smt_termt
-{
-public:
-  explicit smt_not_termt(smt_termt operand);
-  const smt_termt &operand() const;
-};
-
 /// Stores identifiers in unescaped and unquoted form. Any escaping or quoting
 /// required should be performed during printing.
 class smt_identifier_termt : public smt_termt
@@ -120,12 +113,42 @@ public:
 
 class smt_function_application_termt : public smt_termt
 {
-public:
+private:
+  /// Unchecked construction of function application terms. The public factoryt
+  /// sub class should be used to construct instances of this term with the
+  /// appropriate checks for the function being applied.
   smt_function_application_termt(
     smt_identifier_termt function_identifier,
     std::vector<smt_termt> arguments);
+
+public:
   const smt_identifier_termt &function_identifier() const;
   std::vector<std::reference_wrapper<const smt_termt>> arguments() const;
+
+  template <typename functiont>
+  class factoryt
+  {
+  private:
+    functiont function;
+
+  public:
+    template <typename... function_type_argument_typest>
+    explicit factoryt(function_type_argument_typest &&... arguments)
+      : function{std::forward<function_type_argument_typest>(arguments)...}
+    {
+    }
+
+    template <typename... argument_typest>
+    smt_function_application_termt
+    operator()(argument_typest &&... arguments) const
+    {
+      function.validate(arguments...);
+      auto return_sort = function.return_sort(arguments...);
+      return smt_function_application_termt{
+        smt_identifier_termt{function.identifier(), std::move(return_sort)},
+        {std::forward<argument_typest>(arguments)...}};
+    }
+  };
 };
 
 class smt_term_const_downcast_visitort
