@@ -16,7 +16,6 @@ Date: July 2021
 
 #include "contracts.h"
 
-#include <ansi-c/expr2c.h>
 #include <util/pointer_offset_size.h>
 
 /// \brief A base class for assigns clause targets
@@ -48,6 +47,7 @@ protected:
   goto_programt init_block;
   messaget &log;
   symbol_exprt local_target;
+  const irep_idt &target_id;
 };
 
 class assigns_clauset

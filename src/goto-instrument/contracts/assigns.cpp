@@ -26,7 +26,8 @@ assigns_clause_targett::assigns_clause_targett(
     contract(contract),
     init_block(),
     log(log_parameter),
-    local_target(typet())
+    local_target(typet()),
+    target_id(object_ptr.id())
 {
   INVARIANT(
     pointer_object.type().id() == ID_pointer,
@@ -69,6 +70,11 @@ exprt assigns_clause_targett::alias_expression(const exprt &lhs)
   condition.push_back(same_object(lhs_ptr, target));
 
   // If assigns target was a dereference, comparing objects is enough
+  if(target_id == ID_dereference)
+  {
+    return conjunction(condition);
+  }
+
   if(target_id == ID_dereference)
   {
     return conjunction(condition);
