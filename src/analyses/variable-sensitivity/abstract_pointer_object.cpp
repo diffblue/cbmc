@@ -62,6 +62,15 @@ abstract_object_pointert abstract_pointer_objectt::expression_transform(
     expr, operands, environment, ns);
 }
 
+abstract_object_pointert abstract_pointer_objectt::read(
+  const abstract_environmentt &environment,
+  const exprt &expr,
+  const namespacet &ns) const
+{
+  PRECONDITION(is_dereference(expr));
+  return read_dereference(environment, ns);
+}
+
 abstract_object_pointert abstract_pointer_objectt::write(
   abstract_environmentt &environment,
   const namespacet &ns,

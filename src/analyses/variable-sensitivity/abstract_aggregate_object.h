@@ -61,6 +61,29 @@ public:
       expr, operands, environment, ns);
   }
 
+  abstract_object_pointert assign_expression_transform(
+    const abstract_object_pointert &lhs_abstract_object,
+    const exprt &lhs,
+    const exprt &rhs,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override
+  {
+    if(rhs.id() == aggregate_traitst::ACCESS_EXPR_ID())
+      return read_component(environment, rhs, ns);
+
+    return abstract_objectt::assign_expression_transform(
+      lhs_abstract_object, lhs, rhs, operands, environment, ns);
+  }
+
+  abstract_object_pointert read(
+    const abstract_environmentt &environment,
+    const exprt &specifier,
+    const namespacet &ns) const override
+  {
+    return read_component(environment, specifier, ns);
+  }
+
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,

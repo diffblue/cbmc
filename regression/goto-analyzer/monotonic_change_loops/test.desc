@@ -1,0 +1,22 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> TOP @ \[0, 2\]$
+^main.*x .* -> TOP @ \[2\]$
+^main.*y .* -> TOP @ \[5, 7\]$
+^main.*y .* -> TOP @ \[7\]$
+^main.*z .* -> TOP @ \[10, 13\]$
+^main.*z .* -> TOP @ \[12\]$
+^main.*z .* -> TOP @ \[13\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the monotonic-change abstract interpretation
+correctly computes an abstract value for (possibly divergent) loops. This hinges
+on a correct implementation of the widening operator (which is subsumed by the
+merge function). 
+
+All abstract values are TOP, which is rather boring. However, if we add
+non-strict increase and non-strict decrease to the abstract domain, then the
+result of this test case will be more interesting.

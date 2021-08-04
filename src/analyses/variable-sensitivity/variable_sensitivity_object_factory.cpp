@@ -6,8 +6,10 @@
 
 \*******************************************************************/
 #include "variable_sensitivity_object_factory.h"
+#include "abstract_value_object.h"
 #include "full_array_abstract_object.h"
 #include "liveness_context.h"
+#include "monotonic_change.h"
 #include "value_set_pointer_abstract_object.h"
 
 template <class context_classt>
@@ -126,6 +128,219 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(
   return abstract_object_type;
 }
 
+bool variable_sensitivity_object_factoryt::is_predicate_abstraction(
+  const typet &type,
+  const namespacet &ns) const
+{
+  const typet &followed_type = ns.follow(type);
+  ABSTRACT_OBJECT_TYPET abstract_object_type =
+    get_abstract_object_type(followed_type);
+
+  if(abstract_object_type == MONOTONIC_CHANGE)
+    return true;
+  else
+    return false;
+}
+
+abstract_object_pointert
+variable_sensitivity_object_factoryt::get_abstract_object_declaration(
+  const typet &type,
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  const typet &followed_type = ns.follow(type);
+  ABSTRACT_OBJECT_TYPET abstract_object_type =
+    get_abstract_object_type(followed_type);
+
+  bool top = true;
+  bool bottom = false;
+
+  abstract_object_pointert abstract_object;
+
+  switch(abstract_object_type)
+  {
+  case TWO_VALUE:
+    abstract_object =
+      std::make_shared<abstract_objectt>(followed_type, top, bottom);
+    break;
+  case CONSTANT:
+    abstract_object =
+      std::make_shared<constant_abstract_valuet>(followed_type, top, bottom);
+    break;
+  case INTERVAL:
+    abstract_object =
+      std::make_shared<interval_abstract_valuet>(followed_type, top, bottom);
+    break;
+  case VALUE_SET:
+    abstract_object =
+      std::make_shared<value_set_abstract_objectt>(followed_type, top, bottom);
+    break;
+  case MONOTONIC_CHANGE:
+    // For MONOTONIC_CHANGE, an initial abstract object is NOT the top. Instead,
+    // it is the abstract value "unchanged."
+    abstract_object = std::make_shared<monotonic_changet>(
+      followed_type, false, false, unchanged);
+    break;
+
+  case ARRAY_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_array_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case ARRAY_SENSITIVE:
+    abstract_object =
+      std::make_shared<full_array_abstract_objectt>(followed_type, top, bottom);
+    break;
+
+  case POINTER_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_pointer_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case POINTER_SENSITIVE:
+    abstract_object = std::make_shared<constant_pointer_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case VALUE_SET_OF_POINTERS:
+    abstract_object = std::make_shared<value_set_pointer_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+
+  case STRUCT_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_struct_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case STRUCT_SENSITIVE:
+    abstract_object = std::make_shared<full_struct_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+
+  case UNION_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_union_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+
+  case HEAP_ALLOCATION:
+  {
+    auto dynamic_object = exprt(ID_dynamic_object);
+    dynamic_object.set(
+      ID_identifier, "heap-allocation-" + std::to_string(heap_allocations++));
+    auto heap_symbol = unary_exprt(ID_address_of, dynamic_object, e.type());
+    auto heap_pointer =
+      get_abstract_object(e.type(), false, false, heap_symbol, environment, ns);
+    return heap_pointer;
+  }
+
+  default:
+    UNREACHABLE;
+    abstract_object =
+      std::make_shared<abstract_objectt>(followed_type, top, bottom);
+  }
+
+  return wrap_with_context_object(abstract_object, configuration);
+}
+
+abstract_object_pointert
+variable_sensitivity_object_factoryt::get_abstract_object_arbitrary_assignment(
+  const abstract_object_pointert &lhs_abstract_object,
+  const typet &type,
+  const exprt &rhs,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
+{
+  const typet &followed_type = ns.follow(type);
+  ABSTRACT_OBJECT_TYPET abstract_object_type =
+    get_abstract_object_type(followed_type);
+
+  bool top = false;
+  bool bottom = false;
+
+  abstract_object_pointert abstract_object;
+
+  switch(abstract_object_type)
+  {
+  case TWO_VALUE:
+    abstract_object =
+      std::make_shared<abstract_objectt>(followed_type, top, bottom);
+    break;
+  case CONSTANT:
+    abstract_object =
+      std::make_shared<constant_abstract_valuet>(followed_type, top, bottom);
+    break;
+  case INTERVAL:
+    abstract_object =
+      std::make_shared<interval_abstract_valuet>(followed_type, top, bottom);
+    break;
+  case VALUE_SET:
+    abstract_object =
+      std::make_shared<value_set_abstract_objectt>(followed_type, top, bottom);
+    break;
+  case MONOTONIC_CHANGE:
+    // For MONOTONIC_CHANGE, we check the left-hand side's current abstract
+    // value of monotonic change.
+    abstract_object = monotonic_change_expression_transform(
+      lhs_abstract_object,
+      // We don't care about the left-hand side's expression, so we just pass
+      // nil_expret().
+      nil_exprt(),
+      rhs);
+    break;
+
+  case ARRAY_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_array_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case ARRAY_SENSITIVE:
+    abstract_object =
+      std::make_shared<full_array_abstract_objectt>(followed_type, top, bottom);
+    break;
+
+  case POINTER_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_pointer_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case POINTER_SENSITIVE:
+    abstract_object = std::make_shared<constant_pointer_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case VALUE_SET_OF_POINTERS:
+    abstract_object = std::make_shared<value_set_pointer_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+
+  case STRUCT_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_struct_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+  case STRUCT_SENSITIVE:
+    abstract_object = std::make_shared<full_struct_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+
+  case UNION_INSENSITIVE:
+    abstract_object = std::make_shared<two_value_union_abstract_objectt>(
+      followed_type, top, bottom);
+    break;
+
+  case HEAP_ALLOCATION:
+  {
+    auto dynamic_object = exprt(ID_dynamic_object);
+    dynamic_object.set(
+      ID_identifier, "heap-allocation-" + std::to_string(heap_allocations++));
+    auto heap_symbol = unary_exprt(ID_address_of, dynamic_object, rhs.type());
+    auto heap_pointer = get_abstract_object(
+      rhs.type(), false, false, heap_symbol, environment, ns);
+    return heap_pointer;
+  }
+
+  default:
+    UNREACHABLE;
+    abstract_object =
+      std::make_shared<abstract_objectt>(followed_type, top, bottom);
+  }
+
+  return wrap_with_context_object(abstract_object, configuration);
+}
+
 abstract_object_pointert
 variable_sensitivity_object_factoryt::get_abstract_object(
   const typet &type,
@@ -152,6 +367,9 @@ variable_sensitivity_object_factoryt::get_abstract_object(
       followed_type, top, bottom, e, environment, ns, configuration);
   case VALUE_SET:
     return initialize_abstract_object<value_set_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns, configuration);
+  case MONOTONIC_CHANGE:
+    return initialize_abstract_object<monotonic_changet>(
       followed_type, top, bottom, e, environment, ns, configuration);
 
   case ARRAY_INSENSITIVE:

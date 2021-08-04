@@ -48,6 +48,11 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
+  abstract_object_pointert read(
+    const abstract_environmentt &environment,
+    const exprt &expr,
+    const namespacet &ns) const override;
+
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
