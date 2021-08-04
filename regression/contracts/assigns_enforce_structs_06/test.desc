@@ -1,0 +1,19 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[f1.\d+\] line \d+ Check that p\-\>buf\[\(.*\)0\] is assignable\: SUCCESS$
+^\[f1.\d+\] line \d+ Check that p\-\>buf\[\(.*\)1\] is assignable\: SUCCESS$
+^\[f1.\d+\] line \d+ Check that p\-\>buf\[\(.*\)2\] is assignable\: SUCCESS$
+^\[f1.\d+\] line \d+ Check that p\-\>size is assignable\: FAILURE$
+^\[f2.\d+\] line \d+ Check that p\-\>buf\[\(.*\)0\] is assignable\: FAILURE$
+^\[f2.\d+\] line \d+ Check that p\-\>size is assignable\: SUCCESS$
+^\[f3.\d+\] line \d+ Check that p\-\>buf is assignable\: SUCCESS$
+^\[f3.\d+\] line \d+ Check that p\-\>size is assignable\: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+Checks whether CBMC properly evaluates write set of members
+from the same object. In this case, we have a dynamic object
+as one of the struct members.

@@ -114,7 +114,7 @@ Clauses](contracts-requires-and-ensures.md) - Replacement section, and it will a
 non-deterministic assignments for each object listed in the `__CPROVER_assigns`
 clause. Since these objects might be modified by the function, CBMC uses
 non-deterministic assignments to havoc them and restrict their values only by
-assuming the postconditions (i.e., requires clauses).
+assuming the postconditions (i.e., ensures clauses).
 
 In our example, consider that a function `foo` may call `sum`.
 
