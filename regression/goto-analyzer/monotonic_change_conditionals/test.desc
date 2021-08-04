@@ -1,0 +1,20 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Staying unchanged @ \[0\]$
+^main.*x .* -> Strictly and monotonically increasing @ \[4\]$
+^main.*x .* -> Strictly and monotonically increasing @ \[4, 6\]$
+^main.*y .* -> Staying unchanged @ \[8\]$
+^main.*y .* -> Strictly and monotonically increasing @ \[12\]$
+^main.*y .* -> TOP @ \[12, 14\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether the abstract interpretation of monotonic change
+correctly handles if-else statements. 
+
+Consider the location in code immediately after we have exited the if-else
+statement (i.e. when the two branches of the if-else statement join). At this
+point, the abstract object must be the "join" (in the terminology of lattice
+theory) of the abstract values corresponding to the two branches. 

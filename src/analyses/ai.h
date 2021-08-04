@@ -175,6 +175,23 @@ public:
     finalize();
   }
 
+  // Run abstract interpretation on a whole program. function_id is the ID of
+  // the function that we want to analyze. goto_model is the whole GOTO program.
+  // It is necessary to pass the entire GOTO program because function_id may
+  // call other functions. This version of the ()-operator was added
+  // specifically for the purpose of the decreases clauses' automatic inference.
+  void operator()(const irep_idt &function_id, goto_modelt &goto_model)
+  {
+    const namespacet ns(goto_model.get_symbol_table());
+    initialize(goto_model.get_goto_functions());
+    const goto_programt &function_body =
+      goto_model.get_goto_function(function_id).body;
+    trace_ptrt p = entry_state(function_body);
+    fixedpoint(
+      p, function_id, function_body, goto_model.get_goto_functions(), ns);
+    finalize();
+  }
+
   /// Run abstract interpretation on a single function
   void operator()(
     const irep_idt &function_id,

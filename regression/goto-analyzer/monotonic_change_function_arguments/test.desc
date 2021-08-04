@@ -1,0 +1,27 @@
+CORE
+main.c
+--function foo --vsd --vsd-values monotonic-change --show
+^__CPROVER__start.*x .* -> Staying unchanged @ \[28\]$
+^__CPROVER__start.*x .* -> TOP @ \[29\]$
+^__CPROVER__start.*y .* -> Staying unchanged @ \[31\]$
+^__CPROVER__start.*y .* -> TOP @ \[32\]$
+^foo.*x .* -> TOP @ \[34\]$
+^foo.*x .* -> TOP @ \[20\]$
+^foo.*x .* -> TOP @ \[21\]$
+^foo.*y .* -> TOP @ \[34\]$
+^foo.*y .* -> TOP @ \[22\]$
+^foo.*y .* -> TOP @ \[23\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case tests whether formal arguments of a standalone function (i.e. a
+function that is not invoked by another function) are initialized correctly.
+When the abstract interpretation analyzes the function foo, its actual arguments
+(i.e. parameter) are set to __CPROVER__start::x and __CPROVER__start::y. They
+have the abstract value TOP. This is due to this GOTO instruction:
+ASSIGN __CPROVER__start::x := side_effect #source_location="" statement="nondet" is_nondet_nullable="1"
+
+Ideally, __CPROVER__start::x and __CPROVER__start::y should have the abstract
+value "unchanged" instead of TOP. However, this may require extensive
+modification of the code base.

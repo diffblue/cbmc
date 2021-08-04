@@ -92,6 +92,18 @@ public:
   abstract_object_pointert
   write_location_context(const locationt &location) const override;
 
+  // assign_expression_transform is almost identical to expression_transform,
+  // except that the former is tailored to assignments. Specifically,
+  // assign_expression_transform takes in two additional arguments: (i) the
+  // left-hand side's abstract object and (ii) the left-hand side's expression.
+  abstract_object_pointert assign_expression_transform(
+    const abstract_object_pointert &lhs_abstract_object,
+    const exprt &lhs,
+    const exprt &rhs,
+    const std::vector<abstract_object_pointert> &operands,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const override;
+
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 
@@ -119,6 +131,11 @@ protected:
   // actions when an abstract_object is set/unset to TOP
   void set_top_internal() override;
   void set_not_top_internal() override;
+
+  abstract_object_pointert read(
+    const abstract_environmentt &environment,
+    const exprt &specifier,
+    const namespacet &ns) const override;
 
   abstract_object_pointert write(
     abstract_environmentt &environment,

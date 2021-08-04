@@ -1,0 +1,21 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+^main.*x .* -> Staying unchanged @ \[0\]$
+^main.*x .* -> Strictly and monotonically increasing @ \[1\]$
+^main.*x .* -> Strictly and monotonically increasing @ \[2\]$
+^main.*y .* -> Staying unchanged @ \[3\]$
+^main.*y .* -> Strictly and monotonically decreasing @ \[4\]$
+^main.*y .* -> Strictly and monotonically decreasing @ \[5\]$
+^main.*z .* -> Staying unchanged @ \[6\]$
+^main.*z .* -> Strictly and monotonically increasing @ \[7\]$
+^main.*z .* -> TOP @ \[8\]$
+^main.*u .* -> Staying unchanged @ \[9\]$
+^main.*u .* -> Strictly and monotonically increasing @ \[10\]$
+^main.*u .* -> TOP @ \[11\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether strict and monotonic increase and decrease are
+correctly detected for integer-typed variables. 

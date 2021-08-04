@@ -39,14 +39,16 @@ void variable_sensitivity_domaint::transform(
   {
   case DECL:
   {
-    abstract_object_pointert top_object =
+    abstract_object_pointert declared_object =
       abstract_state
-        .abstract_object_factory(
-          instruction.decl_symbol().type(), ns, true, false)
+        .abstract_declared_object_factory(
+          instruction.decl_symbol().type(), instruction.decl_symbol(), ns)
         ->write_location_context(from);
-    abstract_state.assign(instruction.decl_symbol(), top_object, ns);
+    abstract_state.assign(instruction.decl_symbol(), declared_object, ns);
   }
-  // We now store top.
+  // We now store top (for most cases). The only exception is the predicate
+  // abstraction of monotonic change. In that case, an abstract value is
+  // initialized to "unchanged" instead of the top.
   break;
 
   case DEAD:
@@ -60,7 +62,7 @@ void variable_sensitivity_domaint::transform(
     // TODO : check return values
     const code_assignt &inst = instruction.get_assign();
     abstract_object_pointert rhs =
-      abstract_state.eval(inst.rhs(), ns)->write_location_context(from);
+      abstract_state.assign_eval(inst, ns)->write_location_context(from);
     abstract_state.assign(inst.lhs(), rhs, ns);
   }
   break;

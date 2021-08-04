@@ -1,0 +1,13 @@
+CORE
+main.c
+--function main --vsd --vsd-values monotonic-change --show
+main.*x .* -> Staying unchanged @ \[0\]$
+main.*x .* -> Strictly and monotonically increasing @ \[3\]$
+main.*y .* -> Staying unchanged @ \[4\]$
+main.*y .* -> TOP @ \[7\]$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test case checks whether we correctly compute the abstract value for a
+ternary expression; i.e. bool_expr() ? expr1 : expr2.

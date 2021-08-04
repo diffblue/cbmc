@@ -39,6 +39,7 @@ SRC = ai.cpp \
       variable-sensitivity/abstract_pointer_object.cpp \
       variable-sensitivity/abstract_value_object.cpp \
       variable-sensitivity/constant_abstract_value.cpp \
+      variable-sensitivity/monotonic_change.cpp \
       variable-sensitivity/constant_pointer_abstract_object.cpp \
       variable-sensitivity/context_abstract_object.cpp \
       variable-sensitivity/data_dependency_context.cpp \
