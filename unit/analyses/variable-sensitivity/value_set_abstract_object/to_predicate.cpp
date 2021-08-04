@@ -70,12 +70,7 @@ SCENARIO(
     WHEN("{ 0, 1, 2 }")
     {
       auto obj = make_value_set({val0, val1, val2}, environment, ns);
-      auto pred = obj->to_predicate(x_name);
-      THEN("predicate is x == 0 || x == 1 || x == 2")
-      {
-        auto repr = expr_to_str(pred);
-        REQUIRE(repr == "x == 0 || x == 1 || x == 2");
-      }
+      THEN_PREDICATE(obj, "x == 0 || x == 1 || x == 2");
     }
     WHEN("{ [0, 1] }")
     {
@@ -85,17 +80,17 @@ SCENARIO(
     WHEN("{ [0, 1], 2 }")
     {
       auto obj = make_value_set({interval_0_1, val2}, environment, ns);
-      THEN_PREDICATE(obj, "0 <= x && x <= 1 || x == 2");
+      THEN_PREDICATE(obj, "x == 2 || 0 <= x && x <= 1");
     }
     WHEN("{ [0, 1], 2, 3 }")
     {
       auto obj = make_value_set({interval_0_1, val2, val3}, environment, ns);
-      THEN_PREDICATE(obj, "0 <= x && x <= 1 || x == 3 || x == 2");
+      THEN_PREDICATE(obj, "x == 2 || x == 3 || 0 <= x && x <= 1");
     }
     WHEN("{ [0, 1], 1, 2 }")
     {
       auto obj = make_value_set({interval_0_1, val1, val2}, environment, ns);
-      THEN_PREDICATE(obj, "0 <= x && x <= 1 || x == 2");
+      THEN_PREDICATE(obj, "x == 2 || 0 <= x && x <= 1");
     }
     WHEN("{ [0, 1], [1, 2] }")
     {
@@ -110,7 +105,7 @@ SCENARIO(
     WHEN("{ [0, 1], [2, 3] }")
     {
       auto obj = make_value_set({interval_0_1, interval_2_3}, environment, ns);
-      THEN_PREDICATE(obj, "2 <= x && x <= 3 || 0 <= x && x <= 1");
+      THEN_PREDICATE(obj, "0 <= x && x <= 1 || 2 <= x && x <= 3");
     }
   }
 }

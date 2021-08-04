@@ -350,6 +350,7 @@ exprt value_set_abstract_objectt::to_predicate_internal(const exprt &name) const
     [&name](const abstract_object_pointert &value) {
       return value->to_predicate(name);
     });
+  std::sort(all_predicates.begin(), all_predicates.end());
 
   return or_exprt(all_predicates);
 }
