@@ -74,11 +74,6 @@ exprt assigns_clause_targett::alias_expression(const exprt &lhs)
     return conjunction(condition);
   }
 
-  if(target_id == ID_dereference)
-  {
-    return conjunction(condition);
-  }
-
   const exprt lhs_offset = pointer_offset(lhs_ptr);
   const exprt target_offset = pointer_offset(target);
 
