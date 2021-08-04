@@ -557,9 +557,7 @@ bool code_contractst::apply_function_contract(
     assertion.instructions.back().source_location.set_property_class(
       ID_precondition);
     is_fresh.update_requires(assertion);
-    auto lines_to_iterate = assertion.instructions.size();
-    goto_program.insert_before_swap(target, assertion);
-    std::advance(target, lines_to_iterate);
+    insert_before_swap_and_advance(goto_program, target, assertion);
   }
 
   // Gather all the instructions required to handle history variables
@@ -579,9 +577,7 @@ bool code_contractst::apply_function_contract(
 
     // add all the history variable initialization instructions
     // to the goto program
-    auto lines_to_iterate = ensures_pair.second.instructions.size();
-    goto_program.insert_before_swap(target, ensures_pair.second);
-    std::advance(target, lines_to_iterate);
+    insert_before_swap_and_advance(goto_program, target, ensures_pair.second);
   }
 
   // Create a series of non-deterministic assignments to havoc the variables
@@ -592,9 +588,7 @@ bool code_contractst::apply_function_contract(
     goto_programt assigns_havoc = assigns_cause.havoc_code();
 
     // Insert the non-deterministic assignment immediately before the call site.
-    std::size_t lines_to_iterate = assigns_havoc.instructions.size();
-    goto_program.insert_before_swap(target, assigns_havoc);
-    std::advance(target, lines_to_iterate);
+    insert_before_swap_and_advance(goto_program, target, assigns_havoc);
   }
 
   // To remove the function call, insert statements related to the assumption.
@@ -602,9 +596,7 @@ bool code_contractst::apply_function_contract(
   if(!ensures.is_false())
   {
     is_fresh.update_ensures(ensures_pair.first);
-    auto lines_to_iterate = ensures_pair.first.instructions.size();
-    goto_program.insert_before_swap(target, ensures_pair.first);
-    std::advance(target, lines_to_iterate);
+    insert_before_swap_and_advance(goto_program, target, ensures_pair.first);
   }
   *target = goto_programt::make_skip();
 
@@ -690,9 +682,8 @@ void code_contractst::instrument_assign_statement(
     instruction_iterator->source_location));
   alias_assertion.instructions.back().source_location.set_comment(
     "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-  size_t lines_to_iterate = alias_assertion.instructions.size();
-  program.insert_before_swap(instruction_iterator, alias_assertion);
-  std::advance(instruction_iterator, lines_to_iterate);
+  insert_before_swap_and_advance(
+    program, instruction_iterator, alias_assertion);
 }
 
 void code_contractst::instrument_call_statement(
@@ -721,15 +712,13 @@ void code_contractst::instrument_call_statement(
 
   if(called_name == "malloc")
   {
-    goto_programt::instructionst::iterator local_instruction_iterator =
-      instruction_iterator;
     // malloc statments return a void pointer, which is then cast and assigned
     // to a result variable. We iterate one line forward to grab the result of
     // the malloc once it is cast.
-    local_instruction_iterator++;
-    if(local_instruction_iterator->is_assign())
+    instruction_iterator++;
+    if(instruction_iterator->is_assign())
     {
-      const exprt &rhs = local_instruction_iterator->assign_rhs();
+      const exprt &rhs = instruction_iterator->assign_rhs();
       INVARIANT(
         rhs.id() == ID_typecast,
         "malloc is called but the result is not cast. Excluding result from "
@@ -740,10 +729,8 @@ void code_contractst::instrument_call_statement(
       assigns_clause_targett *new_target =
         assigns_clause.add_target(dereference_exprt(rhs));
       goto_programt &pointer_capture = new_target->get_init_block();
-
-      size_t lines_to_iterate = pointer_capture.instructions.size();
-      program.insert_before_swap(local_instruction_iterator, pointer_capture);
-      std::advance(instruction_iterator, lines_to_iterate + 1);
+      insert_before_swap_and_advance(
+        program, instruction_iterator, pointer_capture);
     }
     return; // assume malloc edits no pre-existing memory objects.
   }
@@ -924,12 +911,8 @@ void code_contractst::check_frame_conditions(
   goto_programt mark_dead = assigns.dead_stmts();
 
   // Skip lines with temporary variable declarations
-  size_t lines_to_iterate = standin_decls.instructions.size();
-
-  goto_programt::instructionst::iterator instruction_it =
-    program.instructions.begin();
-  program.insert_before_swap(instruction_it, standin_decls);
-  std::advance(instruction_it, lines_to_iterate);
+  auto instruction_it = program.instructions.begin();
+  insert_before_swap_and_advance(program, instruction_it, standin_decls);
 
   for(; instruction_it != program.instructions.end(); ++instruction_it)
   {
@@ -942,7 +925,6 @@ void code_contractst::check_frame_conditions(
         assigns.add_target(instruction_it->get_decl().symbol());
       goto_programt &pointer_capture = new_target->get_init_block();
 
-      lines_to_iterate = pointer_capture.instructions.size();
       for(auto in : pointer_capture.instructions)
       {
         program.insert_after(instruction_it, in);
