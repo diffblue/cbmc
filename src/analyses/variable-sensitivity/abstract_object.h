@@ -218,7 +218,7 @@ public:
     const namespacet &ns) const;
 
   typedef goto_programt::const_targett locationt;
-  typedef std::set<goto_programt::const_targett> locationst;
+  typedef std::set<locationt> locationst;
   typedef sharing_mapt<irep_idt, abstract_object_pointert, false, irep_id_hash>
     shared_mapt;
 

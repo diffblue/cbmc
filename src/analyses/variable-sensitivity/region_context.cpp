@@ -8,8 +8,6 @@
 
 #include "region_context.h"
 
-#include <algorithm>
-
 /**
  * Update the location context for an abstract object, potentially
  * propagating the update to any children of this abstract object.
@@ -37,13 +35,13 @@ abstract_object_pointert region_contextt::update_location_context(
     result->set_child(visited_child);
   }
 
-  result->set_last_written_locations(locations);
+  result->set_location(*locations.cbegin());
   return result;
 }
 
-abstract_objectt::locationst region_contextt::get_last_written_locations() const
+abstract_objectt::locationt region_contextt::get_location() const
 {
-  return last_written_locations;
+  return *assign_location;
 }
 
 /**
@@ -82,15 +80,12 @@ abstract_object_pointert region_contextt::write(
   const auto &result =
     std::dynamic_pointer_cast<region_contextt>(mutable_clone());
 
-  // Update the child and record the updated write locations
   result->set_child(updated_child);
-  auto value_context = std::dynamic_pointer_cast<const region_contextt>(value);
 
+  // Update the child and record the updated write locations
+  auto value_context = std::dynamic_pointer_cast<const region_contextt>(value);
   if(value_context)
-  {
-    result->set_last_written_locations(
-      value_context->get_last_written_locations());
-  }
+    result->set_location(value_context->get_location());
 
   return result;
 }
@@ -143,79 +138,32 @@ region_contextt::meet(const abstract_object_pointert &other) const
   return abstract_objectt::meet(other);
 }
 
-abstract_object_pointert region_contextt::combine(
-  const write_location_context_ptrt &other,
-  combine_fn fn) const
+abstract_object_pointert
+region_contextt::combine(const region_context_ptrt &other, combine_fn fn) const
 {
   auto combined_child = fn(child_abstract_object, other->child_abstract_object);
+  auto location_match = get_location() == other->get_location();
 
-  abstract_objectt::locationst location_union =
-    get_location_union(other->get_last_written_locations());
-  // If the union is larger than the initial set, then update.
-  bool merge_locations =
-    location_union.size() > get_last_written_locations().size();
-
-  if(combined_child.modified || merge_locations)
+  if(combined_child.modified || location_match)
   {
     const auto &result =
       std::dynamic_pointer_cast<region_contextt>(mutable_clone());
-    if(combined_child.modified)
-    {
-      result->set_child(combined_child.object);
-    }
-    if(merge_locations)
-    {
-      result->set_last_written_locations(location_union);
-    }
-
+    result->set_child(combined_child.object);
+    result->reset_location();
     return result;
   }
 
   return shared_from_this();
 }
 
-/**
- * Helper function for abstract_objectt::abstract_object_merge to perform any
- * additional actions after the base abstract_object_merge has completed its
- * actions but immediately prior to it returning. As such, this function gives
- * the ability to perform additional work for a merge.
- *
- * For the dependency context, this additional work is the tracking of
- * last_written_locations across the merge
- *
- * \param other the object to merge with this
- *
- * \return the result of the merge
- */
-abstract_object_pointert region_contextt::abstract_object_merge_internal(
-  const abstract_object_pointert &other) const
+void region_contextt::reset_location()
 {
-  auto other_context = std::dynamic_pointer_cast<const region_contextt>(other);
-
-  if(other_context)
-  {
-    abstract_objectt::locationst location_union =
-      get_location_union(other_context->get_last_written_locations());
-
-    // If the union is larger than the initial set, then update.
-    if(location_union.size() > get_last_written_locations().size())
-    {
-      abstract_object_pointert result = mutable_clone();
-      return result->update_location_context(location_union, false);
-    }
-  }
-  return shared_from_this();
+  assign_location.reset();
 }
 
-/**
- * Sets the last written locations for this context
- *
- * \param locations the locations to set
- */
-void region_contextt::set_last_written_locations(
-  const abstract_objectt::locationst &locations)
+void region_contextt::set_location(const locationt &location)
 {
-  last_written_locations = locations;
+  assign_location.emplace(location);
 }
 
 /**
@@ -233,26 +181,10 @@ void region_contextt::output(
 {
   context_abstract_objectt::output(out, ai, ns);
 
-  // Output last written locations immediately following the child output
-  out << " @ ";
-  output_last_written_locations(out, last_written_locations);
-}
-
-/**
- * Construct the union of the location set of the current object, and a
- * the provided location set.
- *
- * \param locations the set of locations to be unioned with this context
- *
- * \return the union of this objects location set, and 'locations'
- */
-abstract_objectt::locationst
-region_contextt::get_location_union(const locationst &locations) const
-{
-  locationst existing_locations = get_last_written_locations();
-  existing_locations.insert(locations.begin(), locations.end());
-
-  return existing_locations;
+  if(assign_location.has_value())
+    out << " @ [" << assign_location.value()->location_number << "]";
+  else
+    out << " @ [merge-point]";
 }
 
 /**
@@ -269,10 +201,7 @@ bool region_contextt::has_been_modified(
   const abstract_object_pointert &before) const
 {
   if(this == before.get())
-  {
-    // copy-on-write means pointer equality implies no modifications
     return false;
-  }
 
   auto before_context =
     std::dynamic_pointer_cast<const region_contextt>(before);
@@ -293,81 +222,5 @@ bool region_contextt::has_been_modified(
   // For two sets of last written locations to match,
   // each location in one set must be equal to precisely one location
   // in the other, since a set can assume at most one match
-  const abstract_objectt::locationst &first_write_locations =
-    before_context->get_last_written_locations();
-  const abstract_objectt::locationst &second_write_locations =
-    get_last_written_locations();
-
-  class location_ordert
-  {
-  public:
-    bool operator()(
-      goto_programt::const_targett instruction,
-      goto_programt::const_targett other_instruction) const
-    {
-      return instruction->location_number > other_instruction->location_number;
-    }
-  };
-
-  typedef std::set<goto_programt::const_targett, location_ordert>
-    sorted_locationst;
-
-  sorted_locationst lhs_location;
-  for(const auto &entry : first_write_locations)
-  {
-    lhs_location.insert(entry);
-  }
-
-  sorted_locationst rhs_location;
-  for(const auto &entry : second_write_locations)
-  {
-    rhs_location.insert(entry);
-  }
-
-  abstract_objectt::locationst intersection;
-  std::set_intersection(
-    lhs_location.cbegin(),
-    lhs_location.cend(),
-    rhs_location.cbegin(),
-    rhs_location.cend(),
-    std::inserter(intersection, intersection.end()),
-    location_ordert());
-  bool all_matched = intersection.size() == first_write_locations.size() &&
-                     intersection.size() == second_write_locations.size();
-
-  return !all_matched;
-}
-
-/**
- * Internal helper function to format and output a given set of locations
- *
- * \param out the stream on which to output the locations
- * \param locations the set of locations to output
- */
-void region_contextt::output_last_written_locations(
-  std::ostream &out,
-  const abstract_objectt::locationst &locations)
-{
-  out << "[";
-  bool comma = false;
-
-  std::set<unsigned> sorted_locations;
-  for(auto location : locations)
-  {
-    sorted_locations.insert(location->location_number);
-  }
-
-  for(auto location_number : sorted_locations)
-  {
-    if(!comma)
-    {
-      out << location_number;
-      comma = true;
-    }
-    else
-    {
-      out << ", " << location_number;
-    }
-  }
-  out << "]";
+  return before_context->get_location() != get_location();
 }
