@@ -202,3 +202,14 @@ bool region_contextt::has_been_modified(
   // in the other, since a set can assume at most one match
   return before_context->get_location() != get_location();
 }
+
+abstract_object_pointert
+region_contextt::merge_location_context(const locationt &location) const
+{
+  if(assign_location.has_value())
+    return shared_from_this();
+
+  auto update = std::dynamic_pointer_cast<region_contextt>(mutable_clone());
+  update->assign_location = location;
+  return update;
+}

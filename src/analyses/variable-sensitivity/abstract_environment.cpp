@@ -364,8 +364,9 @@ bool abstract_environmentt::merge(
   bool modified = false;
   for(const auto &entry : env.map.get_delta_view(map))
   {
-    auto merge_result =
-      abstract_objectt::merge(entry.get_other_map_value(), entry.m, widen_mode);
+    auto merge_result = abstract_objectt::merge(
+      entry.get_other_map_value(), entry.m, merge_location, widen_mode);
+
     modified |= merge_result.modified;
     map.replace(entry.k, merge_result.object);
   }

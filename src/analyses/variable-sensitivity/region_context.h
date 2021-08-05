@@ -64,6 +64,9 @@ public:
 
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
+  abstract_object_pointert
+  merge_location_context(const locationt &location) const override;
+
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 

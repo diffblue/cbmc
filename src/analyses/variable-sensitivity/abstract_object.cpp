@@ -209,11 +209,25 @@ void abstract_objectt::output(
 abstract_objectt::combine_result abstract_objectt::merge(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
+  const locationt &merge_location,
+  const widen_modet &widen_mode)
+{
+  abstract_object_pointert result = merge(op1, op2, widen_mode).object;
+  result = result->merge_location_context(merge_location);
+
+  // If no modifications, we will return the original pointer
+  return {result, result != op1};
+}
+
+abstract_objectt::combine_result abstract_objectt::merge(
+  const abstract_object_pointert &op1,
+  const abstract_object_pointert &op2,
   const widen_modet &widen_mode)
 {
   abstract_object_pointert result = op1->should_use_base_merge(op2)
                                       ? op1->abstract_object_merge(op2)
                                       : op1->merge(op2, widen_mode);
+
   // If no modifications, we will return the original pointer
   return {result, result != op1};
 }
@@ -243,6 +257,12 @@ bool abstract_objectt::should_use_base_meet(
 
 abstract_object_pointert
 abstract_objectt::write_location_context(const locationt &location) const
+{
+  return shared_from_this();
+}
+
+abstract_object_pointert
+abstract_objectt::merge_location_context(const locationt &location) const
 {
   return shared_from_this();
 }

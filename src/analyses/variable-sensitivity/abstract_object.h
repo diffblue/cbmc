@@ -267,6 +267,11 @@ public:
   static combine_result merge(
     const abstract_object_pointert &op1,
     const abstract_object_pointert &op2,
+    const locationt &merge_location,
+    const widen_modet &widen_mode);
+  static combine_result merge(
+    const abstract_object_pointert &op1,
+    const abstract_object_pointert &op2,
     const widen_modet &widen_mode);
 
   /// Interface method for the meet operation. Decides whether to use the base
@@ -289,7 +294,7 @@ public:
   meet(const abstract_object_pointert &other) const;
 
   /**
-   * Update the location context for an abstract object.
+   * Update the write location context for an abstract object.
    *
    * \param location the location to be updated
    *
@@ -298,6 +303,17 @@ public:
    */
   virtual abstract_object_pointert
   write_location_context(const locationt &location) const;
+
+  /**
+   * Update the merge location context for an abstract object.
+   *
+   * \param location the location to be updated
+   *
+   * \return a clone of this abstract object with its location context
+   * updated
+   */
+  virtual abstract_object_pointert
+  merge_location_context(const locationt &location) const;
 
   // Const versions must perform copy-on-write
   abstract_object_pointert make_top() const
