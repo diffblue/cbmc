@@ -81,9 +81,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
-  abstract_object_pointert update_location_context(
-    const abstract_objectt::locationst &locations,
-    const bool update_sub_elements) const override;
+  abstract_object_pointert
+  update_location_context(const locationst &locations) const override;
 
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;

@@ -279,12 +279,8 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
 }
 
 abstract_object_pointert full_struct_abstract_objectt::update_location_context(
-  const locationst &locations,
-  const bool update_sub_elements) const
+  const locationst &locations) const
 {
-  if(!update_sub_elements)
-    return shared_from_this();
-
   return visit_sub_elements(location_update_visitort(locations));
 }
 

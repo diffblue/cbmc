@@ -297,15 +297,12 @@ public:
    * propogating the update to any children of this abstract object.
    *
    * \param locations the set of locations to be updated
-   * \param update_sub_elements if true, propogate the update operation to any
-   * children of this abstract object
    *
    * \return a clone of this abstract object with it's location context
    * updated
    */
-  virtual abstract_object_pointert update_location_context(
-    const locationst &locations,
-    const bool update_sub_elements) const;
+  virtual abstract_object_pointert
+  update_location_context(const locationst &locations) const;
 
   // Const versions must perform copy-on-write
   abstract_object_pointert make_top() const

@@ -175,8 +175,9 @@ write_location_contextt::abstract_object_merge_internal(
     // If the union is larger than the initial set, then update.
     if(location_union.size() > get_last_written_locations().size())
     {
-      abstract_object_pointert result = mutable_clone();
-      return result->update_location_context(location_union, false);
+      auto result =
+        std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+      return result->update_location_context_internal(location_union);
     }
   }
   return shared_from_this();

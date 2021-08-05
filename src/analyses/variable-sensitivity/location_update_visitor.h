@@ -24,7 +24,7 @@ public:
   abstract_object_pointert
   visit(const abstract_object_pointert &element) const override
   {
-    return element->update_location_context(locations, true);
+    return element->update_location_context(locations);
   }
 
 private:
