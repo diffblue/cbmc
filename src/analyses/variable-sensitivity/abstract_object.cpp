@@ -241,6 +241,12 @@ bool abstract_objectt::should_use_base_meet(
   return is_bottom() || is_top() || other->is_bottom() || other->is_top();
 }
 
+abstract_object_pointert
+abstract_objectt::write_location_context(const locationt &location) const
+{
+  return update_location_context({location}, true);
+}
+
 abstract_object_pointert abstract_objectt::update_location_context(
   const locationst &locations,
   const bool update_sub_elements) const

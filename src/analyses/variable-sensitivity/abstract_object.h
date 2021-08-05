@@ -289,6 +289,9 @@ public:
   virtual abstract_object_pointert
   meet(const abstract_object_pointert &other) const;
 
+  virtual abstract_object_pointert
+  write_location_context(const locationt &location) const;
+
   /**
    * Update the location context for an abstract object, potentially
    * propogating the update to any children of this abstract object.
