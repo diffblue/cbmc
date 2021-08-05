@@ -183,6 +183,7 @@ exprt abstract_objectt::to_predicate(const exprt &name) const
 
 exprt abstract_objectt::to_predicate_internal(const exprt &name) const
 {
+  UNREACHABLE;
   return nil_exprt();
 }
 
