@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include "region_context.h"
+#include "location_update_visitor.h"
 
 /**
  * Update the location context for an abstract object, potentially

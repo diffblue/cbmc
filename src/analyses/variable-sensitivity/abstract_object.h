@@ -334,7 +334,7 @@ public:
   struct abstract_object_visitort
   {
     virtual abstract_object_pointert
-    visit(const abstract_object_pointert element) const = 0;
+    visit(const abstract_object_pointert &element) const = 0;
   };
 
   /**

@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include "write_location_context.h"
+#include "location_update_visitor.h"
 
 #include <algorithm>
 
