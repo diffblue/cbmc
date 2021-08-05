@@ -7,7 +7,6 @@
 \*******************************************************************/
 
 #include "write_location_context.h"
-#include "location_update_visitor.h"
 
 #include <algorithm>
 
@@ -32,9 +31,8 @@ abstract_object_pointert write_location_contextt::update_location_context(
   if(update_sub_elements)
   {
     abstract_object_pointert visited_child =
-      child_abstract_object
-        ->update_location_context(locations, update_sub_elements)
-        ->visit_sub_elements(location_update_visitort(locations));
+      child_abstract_object->update_location_context(
+        locations, update_sub_elements);
     result->set_child(visited_child);
   }
 

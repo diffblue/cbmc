@@ -15,6 +15,7 @@
 
 #include "abstract_value_object.h"
 #include "full_array_abstract_object.h"
+#include "location_update_visitor.h"
 #include "map_visit.h"
 
 bool eval_index(
@@ -374,6 +375,16 @@ abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   const namespacet &ns) const
 {
   return env.abstract_object_factory(type().subtype(), ns, true, false);
+}
+
+abstract_object_pointert full_array_abstract_objectt::update_location_context(
+  const locationst &locations,
+  const bool update_sub_elements) const
+{
+  if(!update_sub_elements)
+    return shared_from_this();
+
+  return visit_sub_elements(location_update_visitort(locations));
 }
 
 abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(

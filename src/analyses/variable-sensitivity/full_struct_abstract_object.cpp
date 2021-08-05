@@ -12,6 +12,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <util/std_expr.h>
 
 #include "full_struct_abstract_object.h"
+#include "location_update_visitor.h"
 #include "map_visit.h"
 
 // #define DEBUG
@@ -275,6 +276,16 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
     DATA_INVARIANT(result->verify(), "Structural invariants maintained");
     return result;
   }
+}
+
+abstract_object_pointert full_struct_abstract_objectt::update_location_context(
+  const locationst &locations,
+  const bool update_sub_elements) const
+{
+  if(!update_sub_elements)
+    return shared_from_this();
+
+  return visit_sub_elements(location_update_visitort(locations));
 }
 
 abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(

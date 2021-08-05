@@ -67,6 +67,21 @@ public:
     const class namespacet &ns) const override;
 
   /**
+   * Update the location context for an abstract object, potentially
+   * propogating the update to any children of this abstract object.
+   *
+   * \param locations the set of locations to be updated
+   * \param update_sub_elements if true, propogate the update operation to any
+   * children of this abstract object
+   *
+   * \return a clone of this abstract object with it's location context
+   * updated
+   */
+  abstract_object_pointert update_location_context(
+    const locationst &locations,
+    const bool update_sub_elements) const override;
+
+  /**
    * Apply a visitor operation to all sub elements of this abstract_object.
    * A sub element might be a member of a struct, or an element of an array,
    * for instance, but this is entirely determined by the particular
