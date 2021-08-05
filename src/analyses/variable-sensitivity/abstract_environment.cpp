@@ -345,6 +345,7 @@ abstract_object_pointert abstract_environmentt::add_object_context(
 
 bool abstract_environmentt::merge(
   const abstract_environmentt &env,
+  const goto_programt::const_targett &merge_location,
   widen_modet widen_mode)
 {
   // for each entry in the incoming environment we need to either add it

@@ -232,7 +232,8 @@ bool variable_sensitivity_domaint::merge(
   auto widen_mode =
     from->should_widen(*to) ? widen_modet::could_widen : widen_modet::no;
   // Use the abstract_environment merge
-  bool any_changes = abstract_state.merge(b.abstract_state, widen_mode);
+  bool any_changes =
+    abstract_state.merge(b.abstract_state, to->current_location(), widen_mode);
 
   DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
   return any_changes;
