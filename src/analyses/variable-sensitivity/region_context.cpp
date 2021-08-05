@@ -132,7 +132,7 @@ void region_contextt::reset_location()
 
 context_abstract_objectt::context_abstract_object_ptrt
 region_contextt::update_location_context_internal(
-  const abstract_objectt::locationst &locations) const
+  const locationst &locations) const
 {
   auto result = std::dynamic_pointer_cast<region_contextt>(mutable_clone());
   result->set_location(*locations.cbegin());

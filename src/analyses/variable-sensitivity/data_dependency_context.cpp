@@ -42,7 +42,7 @@ bool data_dependency_contextt::has_been_modified(
   }
 
   // Check whether the data dependencies have changed as well
-  abstract_objectt::locationst intersection;
+  locationst intersection;
   std::set_intersection(
     data_deps.cbegin(),
     data_deps.cend(),
@@ -129,7 +129,7 @@ abstract_object_pointert data_dependency_contextt::insert_data_deps(
 
 context_abstract_objectt::context_abstract_object_ptrt
 data_dependency_contextt::update_location_context_internal(
-  const abstract_objectt::locationst &locations) const
+  const locationst &locations) const
 {
   auto result =
     std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
@@ -158,7 +158,7 @@ void data_dependency_contextt::set_data_deps(const locationst &locations)
  */
 void data_dependency_contextt::set_data_deps(const dependenciest &dependencies)
 {
-  abstract_objectt::locationst intersection;
+  locationst intersection;
   std::set_intersection(
     data_deps.cbegin(),
     data_deps.cend(),

@@ -377,10 +377,10 @@ abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
 
-abstract_object_pointert full_array_abstract_objectt::update_location_context(
-  const locationst &locations) const
+abstract_object_pointert full_array_abstract_objectt::write_location_context(
+  const locationt &location) const
 {
-  return visit_sub_elements(location_update_visitort(locations));
+  return visit_sub_elements(location_update_visitort(location));
 }
 
 abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(

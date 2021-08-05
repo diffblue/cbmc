@@ -98,8 +98,8 @@ private:
 
   optionalt<locationt> assign_location;
 
-  context_abstract_object_ptrt update_location_context_internal(
-    const abstract_objectt::locationst &locations) const override;
+  context_abstract_object_ptrt
+  update_location_context_internal(const locationst &locations) const override;
 
   void set_location(const locationt &location);
 };

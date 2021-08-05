@@ -15,20 +15,19 @@ class location_update_visitort
   : public abstract_objectt::abstract_object_visitort
 {
 public:
-  explicit location_update_visitort(
-    const abstract_objectt::locationst &locations)
-    : locations(locations)
+  explicit location_update_visitort(const abstract_objectt::locationt &location)
+    : location(location)
   {
   }
 
   abstract_object_pointert
   visit(const abstract_object_pointert &element) const override
   {
-    return element->update_location_context(locations);
+    return element->write_location_context(location);
   }
 
 private:
-  const abstract_objectt::locationst &locations;
+  const abstract_objectt::locationt &location;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LOCATION_UPDATE_VISITOR_H

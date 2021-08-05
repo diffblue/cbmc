@@ -61,16 +61,15 @@ public:
     const override;
 
   /**
-   * Update the location context for an abstract object, potentially
-   * propogating the update to any children of this abstract object.
+   * Update the location context for an abstract object.
    *
-   * \param locations the set of locations to be updated
+   * \param location the location to be updated
    *
-   * \return a clone of this abstract object with it's location context
+   * \return a clone of this abstract object with its location context
    * updated
    */
   abstract_object_pointert
-  update_location_context(const locationst &locations) const override;
+  write_location_context(const locationt &location) const override;
 
   /**
    * Apply a visitor operation to all sub elements of this abstract_object.

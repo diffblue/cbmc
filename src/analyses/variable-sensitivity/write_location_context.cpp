@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-abstract_objectt::locationst
+context_abstract_objectt::locationst
 write_location_contextt::get_last_written_locations() const
 {
   return last_written_locations;
@@ -122,8 +122,7 @@ abstract_object_pointert write_location_contextt::combine(
 {
   auto combined_child = fn(child_abstract_object, other->child_abstract_object);
 
-  abstract_objectt::locationst location_union =
-    get_location_union(other->get_last_written_locations());
+  auto location_union = get_location_union(other->get_last_written_locations());
   // If the union is larger than the initial set, then update.
   bool merge_locations =
     location_union.size() > get_last_written_locations().size();
@@ -169,7 +168,7 @@ write_location_contextt::abstract_object_merge_internal(
 
   if(other_context)
   {
-    abstract_objectt::locationst location_union =
+    auto location_union =
       get_location_union(other_context->get_last_written_locations());
 
     // If the union is larger than the initial set, then update.
@@ -185,7 +184,7 @@ write_location_contextt::abstract_object_merge_internal(
 
 context_abstract_objectt::context_abstract_object_ptrt
 write_location_contextt::update_location_context_internal(
-  const abstract_objectt::locationst &locations) const
+  const locationst &locations) const
 {
   auto result =
     std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
@@ -199,7 +198,7 @@ write_location_contextt::update_location_context_internal(
  * \param locations the locations to set
  */
 void write_location_contextt::set_last_written_locations(
-  const abstract_objectt::locationst &locations)
+  const locationst &locations)
 {
   last_written_locations = locations;
 }
@@ -232,7 +231,7 @@ void write_location_contextt::output(
  *
  * \return the union of this objects location set, and 'locations'
  */
-abstract_objectt::locationst
+context_abstract_objectt::locationst
 write_location_contextt::get_location_union(const locationst &locations) const
 {
   locationst existing_locations = get_last_written_locations();
@@ -279,10 +278,9 @@ bool write_location_contextt::has_been_modified(
   // For two sets of last written locations to match,
   // each location in one set must be equal to precisely one location
   // in the other, since a set can assume at most one match
-  const abstract_objectt::locationst &first_write_locations =
+  const locationst &first_write_locations =
     before_context->get_last_written_locations();
-  const abstract_objectt::locationst &second_write_locations =
-    get_last_written_locations();
+  const locationst &second_write_locations = get_last_written_locations();
 
   class location_ordert
   {
@@ -310,7 +308,7 @@ bool write_location_contextt::has_been_modified(
     rhs_location.insert(entry);
   }
 
-  abstract_objectt::locationst intersection;
+  locationst intersection;
   std::set_intersection(
     lhs_location.cbegin(),
     lhs_location.cend(),
@@ -332,7 +330,7 @@ bool write_location_contextt::has_been_modified(
  */
 void write_location_contextt::output_last_written_locations(
   std::ostream &out,
-  const abstract_objectt::locationst &locations)
+  const locationst &locations)
 {
   out << "[";
   bool comma = false;

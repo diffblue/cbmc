@@ -81,8 +81,16 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
+  /**
+   * Update the location context for an abstract object.
+   *
+   * \param location the location to be updated
+   *
+   * \return a clone of this abstract object with its location context
+   * updated
+   */
   abstract_object_pointert
-  update_location_context(const locationst &locations) const override;
+  write_location_context(const locationt &location) const override;
 
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
@@ -124,8 +132,10 @@ protected:
 
   exprt to_predicate_internal(const exprt &name) const override;
 
-  virtual context_abstract_object_ptrt update_location_context_internal(
-    const abstract_objectt::locationst &locations) const = 0;
+  typedef std::set<locationt> locationst;
+
+  virtual context_abstract_object_ptrt
+  update_location_context_internal(const locationst &locations) const = 0;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONTEXT_ABSTRACT_OBJECT_H

@@ -218,7 +218,6 @@ public:
     const namespacet &ns) const;
 
   typedef goto_programt::const_targett locationt;
-  typedef std::set<locationt> locationst;
   typedef sharing_mapt<irep_idt, abstract_object_pointert, false, irep_id_hash>
     shared_mapt;
 
@@ -289,20 +288,16 @@ public:
   virtual abstract_object_pointert
   meet(const abstract_object_pointert &other) const;
 
-  virtual abstract_object_pointert
-  write_location_context(const locationt &location) const;
-
   /**
-   * Update the location context for an abstract object, potentially
-   * propogating the update to any children of this abstract object.
+   * Update the location context for an abstract object.
    *
-   * \param locations the set of locations to be updated
+   * \param location the location to be updated
    *
-   * \return a clone of this abstract object with it's location context
+   * \return a clone of this abstract object with its location context
    * updated
    */
   virtual abstract_object_pointert
-  update_location_context(const locationst &locations) const;
+  write_location_context(const locationt &location) const;
 
   // Const versions must perform copy-on-write
   abstract_object_pointert make_top() const

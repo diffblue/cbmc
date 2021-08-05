@@ -244,12 +244,6 @@ bool abstract_objectt::should_use_base_meet(
 abstract_object_pointert
 abstract_objectt::write_location_context(const locationt &location) const
 {
-  return update_location_context({location});
-}
-
-abstract_object_pointert
-abstract_objectt::update_location_context(const locationst &locations) const
-{
   return shared_from_this();
 }
 

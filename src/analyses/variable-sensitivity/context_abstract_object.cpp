@@ -105,13 +105,12 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
   return envelop(result);
 }
 
-abstract_object_pointert context_abstract_objectt::update_location_context(
-  const abstract_objectt::locationst &locations) const
+abstract_object_pointert context_abstract_objectt::write_location_context(
+  const locationt &location) const
 {
-  auto result = update_location_context_internal(locations);
+  auto result = update_location_context_internal({location});
 
-  abstract_object_pointert visited_child =
-    child_abstract_object->update_location_context(locations);
+  auto visited_child = child_abstract_object->write_location_context(location);
   result->set_child(visited_child);
 
   return result;
