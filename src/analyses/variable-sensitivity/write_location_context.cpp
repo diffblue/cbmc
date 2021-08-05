@@ -10,36 +10,6 @@
 
 #include <algorithm>
 
-/**
- * Update the location context for an abstract object, potentially
- * propagating the update to any children of this abstract object.
- *
- * \param locations the set of locations to be updated
- * \param update_sub_elements if true, propogate the update operation to any
- * children of this abstract object
- *
- * \return a clone of this abstract object with its location context
- * updated
- */
-abstract_object_pointert write_location_contextt::update_location_context(
-  const abstract_objectt::locationst &locations,
-  const bool update_sub_elements) const
-{
-  const auto &result =
-    std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
-
-  if(update_sub_elements)
-  {
-    abstract_object_pointert visited_child =
-      child_abstract_object->update_location_context(
-        locations, update_sub_elements);
-    result->set_child(visited_child);
-  }
-
-  result->set_last_written_locations(locations);
-  return result;
-}
-
 abstract_objectt::locationst
 write_location_contextt::get_last_written_locations() const
 {
@@ -210,6 +180,16 @@ write_location_contextt::abstract_object_merge_internal(
     }
   }
   return shared_from_this();
+}
+
+context_abstract_objectt::context_abstract_object_ptrt
+write_location_contextt::update_location_context_internal(
+  const abstract_objectt::locationst &locations) const
+{
+  auto result =
+    std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+  result->set_last_written_locations(locations);
+  return result;
 }
 
 /**

@@ -81,6 +81,10 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns) const override;
 
+  abstract_object_pointert update_location_context(
+    const abstract_objectt::locationst &locations,
+    const bool update_sub_elements) const override;
+
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 
@@ -96,7 +100,8 @@ public:
   abstract_object_pointert get_child() const;
 
 protected:
-  CLONE
+  using context_abstract_object_ptrt =
+    std::shared_ptr<context_abstract_objectt>;
 
   // The abstract_objectt that will be wrapped in a context
   abstract_object_pointert child_abstract_object;
@@ -119,6 +124,9 @@ protected:
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
   exprt to_predicate_internal(const exprt &name) const override;
+
+  virtual context_abstract_object_ptrt update_location_context_internal(
+    const abstract_objectt::locationst &locations) const = 0;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONTEXT_ABSTRACT_OBJECT_H

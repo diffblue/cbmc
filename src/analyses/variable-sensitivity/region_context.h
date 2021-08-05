@@ -64,10 +64,6 @@ public:
 
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
-  abstract_object_pointert update_location_context(
-    const abstract_objectt::locationst &locations,
-    const bool update_sub_elements) const override;
-
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 
@@ -101,6 +97,9 @@ private:
   combine(const region_context_ptrt &other, combine_fn fn) const;
 
   optionalt<locationt> assign_location;
+
+  context_abstract_object_ptrt update_location_context_internal(
+    const abstract_objectt::locationst &locations) const override;
 
   void set_location(const locationt &location);
 };

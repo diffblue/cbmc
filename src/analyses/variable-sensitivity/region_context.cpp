@@ -8,36 +8,6 @@
 
 #include "region_context.h"
 
-/**
- * Update the location context for an abstract object, potentially
- * propagating the update to any children of this abstract object.
- *
- * \param locations the set of locations to be updated
- * \param update_sub_elements if true, propogate the update operation to any
- * children of this abstract object
- *
- * \return a clone of this abstract object with its location context
- * updated
- */
-abstract_object_pointert region_contextt::update_location_context(
-  const abstract_objectt::locationst &locations,
-  const bool update_sub_elements) const
-{
-  const auto &result =
-    std::dynamic_pointer_cast<region_contextt>(mutable_clone());
-
-  if(update_sub_elements)
-  {
-    abstract_object_pointert visited_child =
-      child_abstract_object->update_location_context(
-        locations, update_sub_elements);
-    result->set_child(visited_child);
-  }
-
-  result->set_location(*locations.cbegin());
-  return result;
-}
-
 abstract_objectt::locationt region_contextt::get_location() const
 {
   return *assign_location;
@@ -158,6 +128,15 @@ region_contextt::combine(const region_context_ptrt &other, combine_fn fn) const
 void region_contextt::reset_location()
 {
   assign_location.reset();
+}
+
+context_abstract_objectt::context_abstract_object_ptrt
+region_contextt::update_location_context_internal(
+  const abstract_objectt::locationst &locations) const
+{
+  auto result = std::dynamic_pointer_cast<region_contextt>(mutable_clone());
+  result->set_location(*locations.cbegin());
+  return result;
 }
 
 void region_contextt::set_location(const locationt &location)

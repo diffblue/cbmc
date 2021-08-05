@@ -67,10 +67,6 @@ public:
 
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
-  abstract_object_pointert update_location_context(
-    const abstract_objectt::locationst &locations,
-    const bool update_sub_elements) const override;
-
   locationst get_location_union(const locationst &locations) const;
 
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
@@ -101,6 +97,8 @@ protected:
     const abstract_objectt::locationst &locations);
 
   virtual abstract_objectt::locationst get_last_written_locations() const;
+  void
+  set_last_written_locations(const abstract_objectt::locationst &locations);
 
 private:
   using combine_fn = std::function<abstract_objectt::combine_result(
@@ -115,8 +113,8 @@ private:
   // To enforce copy-on-write these are private and have read-only accessors
   abstract_objectt::locationst last_written_locations;
 
-  void
-  set_last_written_locations(const abstract_objectt::locationst &locations);
+  context_abstract_object_ptrt update_location_context_internal(
+    const abstract_objectt::locationst &locations) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_LOCATION_CONTEXT_H
