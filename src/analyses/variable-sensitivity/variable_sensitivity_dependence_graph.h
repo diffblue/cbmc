@@ -244,7 +244,8 @@ public:
     const goto_functionst &goto_functions,
     const namespacet &_ns,
     variable_sensitivity_object_factory_ptrt object_factory,
-    const vsd_configt &_configuration);
+    const vsd_configt &_configuration,
+    message_handlert &message_handler);
 
   void
   initialize(const irep_idt &function_id, const goto_programt &goto_program)
