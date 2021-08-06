@@ -6,9 +6,9 @@
 
 \*******************************************************************/
 
-#include "region_context.h"
+#include "liveness_context.h"
 
-abstract_objectt::locationt region_contextt::get_location() const
+abstract_objectt::locationt liveness_contextt::get_location() const
 {
   return *assign_location;
 }
@@ -29,7 +29,7 @@ abstract_objectt::locationt region_contextt::get_location() const
  * \return the abstract_objectt representing the result of writing
  * to a specific component.
  */
-abstract_object_pointert region_contextt::write(
+abstract_object_pointert liveness_contextt::write(
   abstract_environmentt &environment,
   const namespacet &ns,
   const std::stack<exprt> &stack,
@@ -47,12 +47,13 @@ abstract_object_pointert region_contextt::write(
   // Need to ensure the result of the write is still wrapped in a dependency
   // context
   const auto &result =
-    std::dynamic_pointer_cast<region_contextt>(mutable_clone());
+    std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
 
   result->set_child(updated_child);
 
   // Update the child and record the updated write locations
-  auto value_context = std::dynamic_pointer_cast<const region_contextt>(value);
+  auto value_context =
+    std::dynamic_pointer_cast<const liveness_contextt>(value);
   if(value_context)
     result->set_location(value_context->get_location());
 
@@ -69,11 +70,11 @@ abstract_object_pointert region_contextt::write(
  * \return the result of the merge, or 'this' if the merge would not change
  * the current abstract object
  */
-abstract_object_pointert region_contextt::merge(
+abstract_object_pointert liveness_contextt::merge(
   const abstract_object_pointert &other,
   const widen_modet &widen_mode) const
 {
-  auto cast_other = std::dynamic_pointer_cast<const region_contextt>(other);
+  auto cast_other = std::dynamic_pointer_cast<const liveness_contextt>(other);
 
   if(cast_other)
   {
@@ -97,9 +98,9 @@ abstract_objectt::combine_result object_meet(
 }
 
 abstract_object_pointert
-region_contextt::meet(const abstract_object_pointert &other) const
+liveness_contextt::meet(const abstract_object_pointert &other) const
 {
-  auto cast_other = std::dynamic_pointer_cast<const region_contextt>(other);
+  auto cast_other = std::dynamic_pointer_cast<const liveness_contextt>(other);
 
   if(cast_other)
     return combine(cast_other, object_meet);
@@ -107,8 +108,9 @@ region_contextt::meet(const abstract_object_pointert &other) const
   return abstract_objectt::meet(other);
 }
 
-abstract_object_pointert
-region_contextt::combine(const region_context_ptrt &other, combine_fn fn) const
+abstract_object_pointert liveness_contextt::combine(
+  const region_context_ptrt &other,
+  combine_fn fn) const
 {
   auto combined_child = fn(child_abstract_object, other->child_abstract_object);
   auto location_match = get_location() == other->get_location();
@@ -116,7 +118,7 @@ region_contextt::combine(const region_context_ptrt &other, combine_fn fn) const
   if(combined_child.modified || location_match)
   {
     const auto &result =
-      std::dynamic_pointer_cast<region_contextt>(mutable_clone());
+      std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
     result->set_child(combined_child.object);
     result->reset_location();
     return result;
@@ -125,21 +127,21 @@ region_contextt::combine(const region_context_ptrt &other, combine_fn fn) const
   return shared_from_this();
 }
 
-void region_contextt::reset_location()
+void liveness_contextt::reset_location()
 {
   assign_location.reset();
 }
 
 context_abstract_objectt::context_abstract_object_ptrt
-region_contextt::update_location_context_internal(
+liveness_contextt::update_location_context_internal(
   const locationst &locations) const
 {
-  auto result = std::dynamic_pointer_cast<region_contextt>(mutable_clone());
+  auto result = std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
   result->set_location(*locations.cbegin());
   return result;
 }
 
-void region_contextt::set_location(const locationt &location)
+void liveness_contextt::set_location(const locationt &location)
 {
   assign_location.emplace(location);
 }
@@ -152,7 +154,7 @@ void region_contextt::set_location(const locationt &location)
  * (that contains the object ... )
  * \param ns the current namespace
  */
-void region_contextt::output(
+void liveness_contextt::output(
   std::ostream &out,
   const ai_baset &ai,
   const namespacet &ns) const
@@ -175,14 +177,14 @@ void region_contextt::output(
  * \return true if 'this' is considered to have been modified in comparison
  * to 'before', false otherwise.
  */
-bool region_contextt::has_been_modified(
+bool liveness_contextt::has_been_modified(
   const abstract_object_pointert &before) const
 {
   if(this == before.get())
     return false;
 
   auto before_context =
-    std::dynamic_pointer_cast<const region_contextt>(before);
+    std::dynamic_pointer_cast<const liveness_contextt>(before);
 
   if(!before_context)
   {
@@ -204,12 +206,12 @@ bool region_contextt::has_been_modified(
 }
 
 abstract_object_pointert
-region_contextt::merge_location_context(const locationt &location) const
+liveness_contextt::merge_location_context(const locationt &location) const
 {
   if(assign_location.has_value())
     return shared_from_this();
 
-  auto update = std::dynamic_pointer_cast<region_contextt>(mutable_clone());
+  auto update = std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
   update->assign_location = location;
   return update;
 }

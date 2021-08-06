@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-values set-of-constants --vsd-region-tracking --show
+--variable-sensitivity --vsd-values set-of-constants --vsd-liveness --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::x .* value-set-begin: 2, 3 :value-set-end @ \[7\]

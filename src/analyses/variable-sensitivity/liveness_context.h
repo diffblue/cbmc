@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: analyses variable-sensitivity region_context
+ Module: analyses variable-sensitivity liveness_contextt
 
  Author: Jez Higgins
 
@@ -9,11 +9,11 @@
 /**
  * \file
  *  Maintain a context in the variable sensitvity domain that records
- *  the assignment region for a given abstract_objectt.
+ *  the liveness region for a given abstract_objectt.
  */
 
-#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_REGION_CONTEXT_H
-#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_REGION_CONTEXT_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
 
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <iostream>
@@ -30,17 +30,17 @@
  * of this, 'context_abstract_objectt<T>' which provides the same
  * constructors as the standard 'abstract_objectt' class.
  */
-class region_contextt : public context_abstract_objectt
+class liveness_contextt : public context_abstract_objectt
 {
 public:
-  explicit region_contextt(
+  explicit liveness_contextt(
     const abstract_object_pointert child,
     const typet &type)
     : context_abstract_objectt(child, type)
   {
   }
 
-  region_contextt(
+  liveness_contextt(
     const abstract_object_pointert child,
     const typet &type,
     bool top,
@@ -49,7 +49,7 @@ public:
   {
   }
 
-  explicit region_contextt(
+  explicit liveness_contextt(
     const abstract_object_pointert child,
     const exprt &expr,
     const abstract_environmentt &environment,
@@ -58,7 +58,7 @@ public:
   {
   }
 
-  virtual ~region_contextt()
+  virtual ~liveness_contextt()
   {
   }
 
@@ -94,7 +94,7 @@ private:
   using combine_fn = std::function<abstract_objectt::combine_result(
     const abstract_object_pointert &op1,
     const abstract_object_pointert &op2)>;
-  using region_context_ptrt = std::shared_ptr<const region_contextt>;
+  using region_context_ptrt = std::shared_ptr<const liveness_contextt>;
 
   abstract_object_pointert
   combine(const region_context_ptrt &other, combine_fn fn) const;
@@ -107,4 +107,4 @@ private:
   void set_location(const locationt &location);
 };
 
-#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_REGION_CONTEXT_H
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
