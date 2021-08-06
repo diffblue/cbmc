@@ -5,5 +5,6 @@ main.c
 ^SIGNAL=0$
 ^main::1::x .* TOP @ \[1\]
 ^main::1::x .* value-set-begin: 0 :value-set-end @ \[2\]
-^main::1::x .* value-set-begin: 2, 3 :value-set-end @ \[4, 6\]
+^main::1::x .* value-set-begin: 1, 2, 3, 4, 5 :value-set-end @ \[8\]
+^main::1::x .* value-set-begin: 0, 1, 2, 3, 4, 5 :value-set-end @ \[2, 8\]
 --

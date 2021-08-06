@@ -10,7 +10,7 @@
 
 abstract_objectt::locationt liveness_contextt::get_location() const
 {
-  return *assign_location;
+  return assign_location.has_value() ? assign_location.value() : locationt();
 }
 
 /**
@@ -164,7 +164,7 @@ void liveness_contextt::output(
   if(assign_location.has_value())
     out << " @ [" << assign_location.value()->location_number << "]";
   else
-    out << " @ [merge-point]";
+    out << " @ [undefined]";
 }
 
 /**

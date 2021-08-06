@@ -1,0 +1,11 @@
+CORE
+main.c
+--variable-sensitivity --vsd-values set-of-constants --vsd-pointers constants --show
+^EXIT=0$
+^SIGNAL=0$
+^main::1::x .* TOP @ \[1\]
+^main::1::x .* value-set-begin: 0 :value-set-end @ \[2\]
+^main::1::x .* value-set-begin: 2, 3 :value-set-end @ \[6, 8\]
+^main::1::p .* TOP @ \[3\]
+^main::1::p .*\(main::1::x\) @ \[4\]
+--
