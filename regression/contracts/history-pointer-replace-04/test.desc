@@ -1,0 +1,14 @@
+CORE
+main.c
+--replace-all-calls-with-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[precondition.\d+\] file main.c line \d+ Check requires clause\: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion p\-\>y \!\= 7\: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+This test checks that history variables are supported for struct members.
+By using the --replace-all-calls-with-contracts flag, the assertion in
+main should consider the ensures clause (with old value). In this case,
+this assertion should fail.
