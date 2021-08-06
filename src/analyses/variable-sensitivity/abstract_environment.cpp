@@ -408,14 +408,13 @@ void abstract_environmentt::output(
 {
   out << "{\n";
 
-  decltype(map)::viewt view;
-  map.get_view(view);
-  for(const auto &entry : view)
+  for(const auto &entry : map.get_view())
   {
     out << entry.first << " () -> ";
     entry.second->output(out, ai, ns);
     out << "\n";
   }
+
   out << "}\n";
 }
 
@@ -426,12 +425,11 @@ exprt abstract_environmentt::to_predicate() const
   if(is_top())
     return true_exprt();
 
-  auto predicates = std::vector<exprt> { };
+  auto predicates = std::vector<exprt>{};
   for(const auto &entry : map.get_view())
   {
     auto sym = entry.first;
     auto val = entry.second;
-
     auto pred = val->to_predicate(symbol_exprt(sym, val->type()));
 
     predicates.push_back(pred);
@@ -444,9 +442,7 @@ exprt abstract_environmentt::to_predicate() const
 
 bool abstract_environmentt::verify() const
 {
-  decltype(map)::viewt view;
-  map.get_view(view);
-  for(const auto &entry : view)
+  for(const auto &entry : map.get_view())
   {
     if(entry.second == nullptr)
     {
@@ -483,9 +479,7 @@ abstract_environmentt::modified_symbols(
 {
   // Find all symbols who have different write locations in each map
   std::vector<abstract_environmentt::map_keyt> symbols_diff;
-  decltype(first.map)::viewt view;
-  first.map.get_view(view);
-  for(const auto &entry : view)
+  for(const auto &entry : first.map.get_view())
   {
     const auto &second_entry = second.map.find(entry.first);
     if(second_entry.has_value())
@@ -528,10 +522,8 @@ abstract_environmentt::gather_statistics(const namespacet &ns) const
 {
   abstract_object_statisticst statistics = {};
   statistics.number_of_globals = count_globals(ns);
-  decltype(map)::viewt view;
-  map.get_view(view);
   abstract_object_visitedt visited;
-  for(auto const &object : view)
+  for(auto const &object : map.get_view())
   {
     if(visited.find(object.second) == visited.end())
     {
