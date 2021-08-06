@@ -419,6 +419,29 @@ void abstract_environmentt::output(
   out << "}\n";
 }
 
+exprt abstract_environmentt::to_predicate() const
+{
+  if(is_bottom())
+    return false_exprt();
+  if(is_top())
+    return true_exprt();
+
+  auto predicates = std::vector<exprt> { };
+  for(const auto &entry : map.get_view())
+  {
+    auto sym = entry.first;
+    auto val = entry.second;
+
+    auto pred = val->to_predicate(symbol_exprt(sym, val->type()));
+
+    predicates.push_back(pred);
+  }
+
+  if(predicates.size() == 1)
+    return predicates.front();
+  return and_exprt(predicates);
+}
+
 bool abstract_environmentt::verify() const
 {
   decltype(map)::viewt view;

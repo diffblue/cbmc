@@ -14,6 +14,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
+       analyses/variable-sensitivity/abstract_environment/to_predicate.cpp \
        analyses/variable-sensitivity/abstract_object/merge.cpp \
        analyses/variable-sensitivity/abstract_object/index_range.cpp \
        analyses/variable-sensitivity/constant_abstract_value/meet.cpp \

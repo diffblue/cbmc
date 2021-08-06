@@ -255,5 +255,6 @@ std::string exprs_to_str(const std::vector<exprt> &values);
 void THEN_PREDICATE(
   const abstract_object_pointert &obj,
   const std::string &out);
+void THEN_PREDICATE(const abstract_environmentt &env, const std::string &out);
 
 #endif

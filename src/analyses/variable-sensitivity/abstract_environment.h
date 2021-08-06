@@ -224,6 +224,12 @@ public:
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const;
 
+  /// Gives a boolean condition that is true for all values represented by the
+  /// environment.
+  ///
+  /// \return An exprt describing the environment
+  exprt to_predicate() const;
+
   /// Check the structural invariants are maintained.
   /// In this case this is checking there aren't any null pointer mapped values
   bool verify() const;

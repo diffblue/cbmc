@@ -538,3 +538,13 @@ void THEN_PREDICATE(const abstract_object_pointert &obj, const std::string &out)
     REQUIRE(repr == out);
   }
 }
+
+void THEN_PREDICATE(const abstract_environmentt &env, const std::string &out)
+{
+  auto pred = env.to_predicate();
+  THEN("predicate is " + out)
+  {
+    auto repr = expr_to_str(pred);
+    REQUIRE(repr == out);
+  }
+}
