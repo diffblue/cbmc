@@ -18,6 +18,7 @@ class constant_abstract_valuet;
 class constant_interval_exprt;
 class interval_abstract_valuet;
 class value_set_abstract_objectt;
+class variable_sensitivity_domaint;
 
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns);
@@ -256,5 +257,8 @@ void THEN_PREDICATE(
   const abstract_object_pointert &obj,
   const std::string &out);
 void THEN_PREDICATE(const abstract_environmentt &env, const std::string &out);
+void THEN_PREDICATE(
+  const variable_sensitivity_domaint &domain,
+  const std::string &out);
 
 #endif

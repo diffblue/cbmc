@@ -152,6 +152,9 @@ public:
   /// \return exprt describing the domain
   exprt to_predicate() const override;
 
+  exprt to_predicate(const exprt &expr, const namespacet &ns) const;
+  exprt to_predicate(const exprt::operandst &exprs, const namespacet &ns) const;
+
   /// Computes the join between "this" and "b".
   ///
   /// \param b: the other domain

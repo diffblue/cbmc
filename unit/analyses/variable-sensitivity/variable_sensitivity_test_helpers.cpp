@@ -12,6 +12,7 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 #include <ansi-c/ansi_c_language.h>
 
@@ -539,12 +540,23 @@ void THEN_PREDICATE(const abstract_object_pointert &obj, const std::string &out)
   }
 }
 
-void THEN_PREDICATE(const abstract_environmentt &env, const std::string &out)
+void THEN_PREDICATE(const exprt &pred, const std::string &out)
 {
-  auto pred = env.to_predicate();
   THEN("predicate is " + out)
   {
     auto repr = expr_to_str(pred);
     REQUIRE(repr == out);
   }
+}
+
+void THEN_PREDICATE(const abstract_environmentt &env, const std::string &out)
+{
+  THEN_PREDICATE(env.to_predicate(), out);
+}
+
+void THEN_PREDICATE(
+  const variable_sensitivity_domaint &domain,
+  const std::string &out)
+{
+  THEN_PREDICATE(domain.to_predicate(), out);
 }
