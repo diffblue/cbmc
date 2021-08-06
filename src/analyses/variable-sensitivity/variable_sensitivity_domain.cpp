@@ -176,6 +176,11 @@ void variable_sensitivity_domaint::output(
   abstract_state.output(out, ai, ns);
 }
 
+exprt variable_sensitivity_domaint::to_predicate() const
+{
+  return abstract_state.to_predicate();
+}
+
 void variable_sensitivity_domaint::make_bottom()
 {
   abstract_state.make_bottom();
