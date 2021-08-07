@@ -394,23 +394,22 @@ void code_contractst::replace_old_parameter(
 
     const auto &parameter = to_old_expr(expr).expression();
 
-    // TODO: generalize below
-    if(parameter.id() == ID_dereference)
+    if(
+      parameter.id() == ID_dereference || parameter.id() == ID_member ||
+      parameter.id() == ID_symbol)
     {
-      const auto &dereference_expr = to_dereference_expr(parameter);
-
-      auto it = parameter2history.find(dereference_expr);
+      auto it = parameter2history.find(parameter);
 
       if(it == parameter2history.end())
       {
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
-          new_tmp_symbol(dereference_expr.type(), location, mode).symbol_expr();
+          new_tmp_symbol(parameter.type(), location, mode).symbol_expr();
 
         // 2. Associate the above temporary variable to it's corresponding
         // expression
-        parameter2history[dereference_expr] = tmp_symbol;
+        parameter2history[parameter] = tmp_symbol;
 
         // 3. Add the required instructions to the instructions list
         // 3.1 Declare the newly created temporary variable
@@ -419,11 +418,11 @@ void code_contractst::replace_old_parameter(
         // 3.2 Add an assignment such that the value pointed to by the new
         // temporary variable is equal to the value of the corresponding
         // parameter
-        history.add(goto_programt::make_assignment(
-          tmp_symbol, dereference_expr, location));
+        history.add(
+          goto_programt::make_assignment(tmp_symbol, parameter, location));
       }
 
-      expr = parameter2history[dereference_expr];
+      expr = parameter2history[parameter];
     }
     else
     {

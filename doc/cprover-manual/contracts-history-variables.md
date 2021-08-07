@@ -13,8 +13,9 @@ _ensures_ clause.
 
 ### Parameters
 
-`__CPROVER_old` takes a single argument, which is the identifier corresponding to
-a parameter of the function. For now, only scalar or pointer types are supported.
+`__CPROVER_old` takes a single argument, which is the identifier
+corresponding to a parameter of the function. For now, only scalars,
+pointers, and struct members are supported.
 
 ### Semantics
 
