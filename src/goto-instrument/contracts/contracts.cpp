@@ -394,7 +394,6 @@ void code_contractst::replace_old_parameter(
 
     const auto &parameter = to_old_expr(expr).expression();
 
-    // TODO: generalize below
     if(
       parameter.id() == ID_dereference || parameter.id() == ID_member ||
       parameter.id() == ID_symbol)
