@@ -7,8 +7,6 @@ main.c
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause\: SUCCESS$
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause\: SUCCESS$
 ^\[bar.\d+\] line \d+ Check that p\-\>y is assignable\: SUCCESS$
-^\[baz.\d+\] line \d+ Check that pp is assignable\: SUCCESS$
-^\[baz.\d+\] line \d+ Check that empty is assignable\: SUCCESS$
 ^\[baz.\d+\] line \d+ Check that p is assignable\: SUCCESS$
 ^\[baz.\d+\] line \d+ Check that p is assignable\: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*p\-\>y is assignable\: SUCCESS$

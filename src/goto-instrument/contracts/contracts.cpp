@@ -675,14 +675,19 @@ void code_contractst::instrument_assign_statement(
 
   const exprt &lhs = instruction_iterator->assign_lhs();
 
-  goto_programt alias_assertion;
-  alias_assertion.add(goto_programt::make_assertion(
-    assigns_clause.alias_expression(lhs),
-    instruction_iterator->source_location));
-  alias_assertion.instructions.back().source_location.set_comment(
-    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-  insert_before_swap_and_advance(
-    program, instruction_iterator, alias_assertion);
+  if(
+    freely_assignable_symbols.find(lhs.get(ID_identifier)) ==
+    freely_assignable_symbols.end())
+  {
+    goto_programt alias_assertion;
+    alias_assertion.add(goto_programt::make_assertion(
+      assigns_clause.alias_expression(lhs),
+      instruction_iterator->source_location));
+    alias_assertion.instructions.back().source_location.set_comment(
+      "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
+    insert_before_swap_and_advance(
+      program, instruction_iterator, alias_assertion);
+  }
 }
 
 void code_contractst::instrument_call_statement(
@@ -894,14 +899,6 @@ void code_contractst::check_frame_conditions(
 
   // Create a list of variables that are okay to assign.
   std::set<irep_idt> freely_assignable_symbols;
-  // Add all parameters that are not pointers to the freely assignable set
-  for(code_typet::parametert param : type.parameters())
-  {
-    if(param.type().id() != ID_pointer)
-    {
-      freely_assignable_symbols.insert(param.get_identifier());
-    }
-  }
 
   // Create temporary variables to hold the assigns
   // clause targets before they can be modified.
@@ -917,6 +914,7 @@ void code_contractst::check_frame_conditions(
   {
     if(instruction_it->is_decl())
     {
+      // Local variables are always freely assignable
       freely_assignable_symbols.insert(
         instruction_it->get_decl().symbol().get_identifier());
 
