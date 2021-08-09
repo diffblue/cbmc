@@ -70,6 +70,8 @@ public:
    */
   abstract_object_pointert
   write_location_context(const locationt &location) const override;
+  abstract_object_pointert
+  merge_location_context(const locationt &location) const override;
 
   /**
    * Apply a visitor operation to all sub elements of this abstract_object.

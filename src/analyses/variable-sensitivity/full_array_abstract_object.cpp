@@ -383,6 +383,12 @@ abstract_object_pointert full_array_abstract_objectt::write_location_context(
   return visit_sub_elements(location_update_visitort(location));
 }
 
+abstract_object_pointert full_array_abstract_objectt::merge_location_context(
+  const locationt &location) const
+{
+  return visit_sub_elements(merge_location_update_visitort(location));
+}
+
 abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
