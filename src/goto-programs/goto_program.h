@@ -344,18 +344,74 @@ public:
     }
 
     /// Get the function call for FUNCTION_CALL
+#if 1
+    DEPRECATED(SINCE(
+      2021,
+      2,
+      24,
+      "Use call_function(), call_lhs(), call_arguments() instead"))
     const code_function_callt &get_function_call() const
     {
       PRECONDITION(is_function_call());
       return to_code_function_call(code);
     }
+#endif
+
+    /// Get the function that is called for FUNCTION_CALL
+    const exprt &call_function() const
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code).function();
+    }
+
+    /// Get the function that is called for FUNCTION_CALL
+    exprt &call_function()
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code).function();
+    }
+
+    /// Get the lhs of a FUNCTION_CALL (may be nil)
+    const exprt &call_lhs() const
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code).lhs();
+    }
+
+    /// Get the lhs of a FUNCTION_CALL (may be nil)
+    exprt &call_lhs()
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code).lhs();
+    }
+
+    /// Get the arguments of a FUNCTION_CALL
+    const exprt::operandst &call_arguments() const
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code).arguments();
+    }
+
+    /// Get the arguments of a FUNCTION_CALL
+    exprt::operandst &call_arguments()
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code).arguments();
+    }
 
     /// Set the function call for FUNCTION_CALL
+#if 1
+    DEPRECATED(SINCE(
+      2021,
+      2,
+      24,
+      "Use call_function(), call_lhs(), call_arguments() instead"))
     void set_function_call(code_function_callt c)
     {
       PRECONDITION(is_function_call());
       code = std::move(c);
     }
+#endif
 
     /// Get the statement for OTHER
     const codet &get_other() const

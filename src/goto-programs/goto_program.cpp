@@ -329,14 +329,11 @@ std::list<exprt> expressions_read(
     break;
 
   case FUNCTION_CALL:
-  {
-    const code_function_callt &function_call = instruction.get_function_call();
-    for(const auto &argument : function_call.arguments())
+    for(const auto &argument : instruction.call_arguments())
       dest.push_back(argument);
-    if(function_call.lhs().is_not_nil())
-      parse_lhs_read(function_call.lhs(), dest);
+    if(instruction.call_lhs().is_not_nil())
+      parse_lhs_read(instruction.call_lhs(), dest);
     break;
-  }
 
   case ASSIGN:
     dest.push_back(instruction.assign_rhs());
@@ -371,12 +368,8 @@ std::list<exprt> expressions_written(
   switch(instruction.type)
   {
   case FUNCTION_CALL:
-    {
-      const code_function_callt &function_call =
-        instruction.get_function_call();
-      if(function_call.lhs().is_not_nil())
-        dest.push_back(function_call.lhs());
-    }
+    if(instruction.call_lhs().is_not_nil())
+      dest.push_back(instruction.call_lhs());
     break;
 
   case ASSIGN:
@@ -999,35 +992,20 @@ void goto_programt::instructiont::transform(
 
   case FUNCTION_CALL:
   {
-    auto new_call = get_function_call();
-    bool change = false;
-
-    auto new_lhs = f(new_call.lhs());
+    auto new_lhs = f(call_lhs());
     if(new_lhs.has_value())
-    {
-      new_call.lhs() = *new_lhs;
-      change = true;
-    }
+      call_lhs() = *new_lhs;
 
-    auto new_function = f(new_call.function());
-    if(new_function.has_value())
-    {
-      new_call.function() = *new_function;
-      change = true;
-    }
+    auto new_call_function = f(call_function());
+    if(new_call_function.has_value())
+      call_function() = *new_call_function;
 
-    for(auto &a : new_call.arguments())
+    for(auto &a : call_arguments())
     {
       auto new_a = f(a);
       if(new_a.has_value())
-      {
         a = *new_a;
-        change = true;
-      }
     }
-
-    if(change)
-      set_function_call(new_call);
   }
   break;
 
@@ -1082,13 +1060,10 @@ void goto_programt::instructiont::apply(
     break;
 
   case FUNCTION_CALL:
-  {
-    const auto &call = get_function_call();
-    f(call.lhs());
-    for(auto &a : call.arguments())
+    f(call_lhs());
+    for(auto &a : call_arguments())
       f(a);
-  }
-  break;
+    break;
 
   case GOTO:
   case ASSUME:

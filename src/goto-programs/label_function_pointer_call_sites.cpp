@@ -21,14 +21,13 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
     for_each_instruction_if(
       goto_function.second,
       [](const goto_programt::targett it) {
-        return it->is_function_call() && can_cast_expr<dereference_exprt>(
-                                           it->get_function_call().function());
+        return it->is_function_call() &&
+               can_cast_expr<dereference_exprt>(it->call_function());
       },
       [&](goto_programt::targett &it) {
-        auto const &function_call = it->get_function_call();
         auto const &function_pointer_dereference =
-          to_dereference_expr(function_call.function());
-        auto const &source_location = function_call.source_location();
+          to_dereference_expr(it->call_function());
+        auto const &source_location = it->source_location;
         auto const &goto_function_symbol_mode =
           goto_model.symbol_table.lookup_ref(goto_function.first).mode;
 
@@ -43,7 +42,7 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
             function_call_site_symbol.pretty_name = call_site_symbol_name;
           function_call_site_symbol.type =
             function_pointer_dereference.pointer().type();
-          function_call_site_symbol.location = function_call.source_location();
+          function_call_site_symbol.location = source_location;
           function_call_site_symbol.is_lvalue = true;
           function_call_site_symbol.mode = goto_function_symbol_mode;
           return function_call_site_symbol;

@@ -270,9 +270,7 @@ void remove_function_pointerst::remove_function_pointer(
   const irep_idt &function_id,
   goto_programt::targett target)
 {
-  const code_function_callt &code = target->get_function_call();
-
-  const auto &function = to_dereference_expr(code.function());
+  const auto &function = to_dereference_expr(target->call_function());
 
   // this better have the right type
   code_typet call_type=to_code_type(function.type());
@@ -282,7 +280,7 @@ void remove_function_pointerst::remove_function_pointer(
      call_type.parameters().empty())
   {
     call_type.remove_ellipsis();
-    for(const auto &argument : code.arguments())
+    for(const auto &argument : target->call_arguments())
     {
       call_type.parameters().push_back(code_typet::parametert(argument.type()));
     }
@@ -317,9 +315,7 @@ void remove_function_pointerst::remove_function_pointer(
 
     if(functions.size()==1)
     {
-      auto call = target->get_function_call();
-      call.function() = *functions.cbegin();
-      target->set_function_call(call);
+      target->call_function() = *functions.cbegin();
       return;
     }
   }
@@ -337,7 +333,7 @@ void remove_function_pointerst::remove_function_pointer(
       return;
     }
 
-    bool return_value_used=code.lhs().is_not_nil();
+    bool return_value_used = target->call_lhs().is_not_nil();
 
     // get all type-compatible functions
     // whose address is ever taken
@@ -368,9 +364,7 @@ void remove_function_pointerst::remove_function_pointer(
   goto_programt::targett target,
   const functionst &functions)
 {
-  const code_function_callt &code = target->get_function_call();
-
-  const exprt &function = code.function();
+  const exprt &function = target->call_function();
   const exprt &pointer = to_dereference_expr(function).pointer();
 
   // the final target is a skip
@@ -386,8 +380,8 @@ void remove_function_pointerst::remove_function_pointer(
   for(const auto &fun : functions)
   {
     // call function
-    auto new_call = code;
-    new_call.function() = fun;
+    auto new_call =
+      code_function_callt(target->call_lhs(), fun, target->call_arguments());
 
     // the signature of the function might not match precisely
     fix_argument_types(new_call);
@@ -487,9 +481,7 @@ bool remove_function_pointerst::remove_function_pointers(
   Forall_goto_program_instructions(target, goto_program)
     if(target->is_function_call())
     {
-      const code_function_callt &code = target->get_function_call();
-
-      if(code.function().id()==ID_dereference)
+      if(target->call_function().id() == ID_dereference)
       {
         remove_function_pointer(goto_program, function_id, target);
         did_something=true;
