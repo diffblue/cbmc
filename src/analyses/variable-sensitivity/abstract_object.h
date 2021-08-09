@@ -44,6 +44,11 @@ enum class widen_modet;
     typedef std::remove_const<                                                 \
       std::remove_reference<decltype(*this)>::type>::type current_typet;       \
     return internal_abstract_object_pointert(new current_typet(*this));        \
+  }                                                                            \
+  template <class T>                                                           \
+  std::shared_ptr<T> clone(const T *t) const                                   \
+  {                                                                            \
+    return std::dynamic_pointer_cast<T>(mutable_clone());                      \
   }
 
 /// Merge is designed to allow different abstractions to be merged

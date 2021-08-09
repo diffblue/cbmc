@@ -107,8 +107,7 @@ abstract_object_pointert data_dependency_contextt::insert_data_deps(
   if(new_dependencies.empty())
     return shared_from_this();
 
-  const auto &result =
-    std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
+  auto result = clone(this);
 
   for(auto l : new_dependencies)
   {
@@ -153,8 +152,7 @@ data_dependency_contextt::set_data_deps(const dependencest &dependencies) const
     intersection.size() == dependencies.size())
     return shared_from_this();
 
-  const auto &result =
-    std::dynamic_pointer_cast<data_dependency_contextt>(mutable_clone());
+  auto result = clone(this);
 
   result->data_deps = dependencies;
 
@@ -280,8 +278,7 @@ abstract_object_pointert data_dependency_contextt::combine(
     std::dynamic_pointer_cast<const data_dependency_contextt>(
       parent->insert_data_deps(other->data_deps));
 
-  const auto &result = std::dynamic_pointer_cast<data_dependency_contextt>(
-    updated_parent->mutable_clone());
+  auto result = clone(this);
 
   // On a merge, data_dominators are the intersection of this object and the
   // other object. In other words, the dominators at this merge point are

@@ -124,8 +124,7 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
       member_expr.compound().type(), false, true);
   }
 
-  const auto &result =
-    std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   if(!stack.empty())
   {
@@ -257,8 +256,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   if(is_bottom())
     return std::make_shared<full_struct_abstract_objectt>(*other);
 
-  const auto &result =
-    std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   bool modified = merge_shared_maps(map, other->map, result->map, widen_mode);
 
@@ -279,8 +277,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
 abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
-  const auto &result =
-    std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   bool modified = false;
 

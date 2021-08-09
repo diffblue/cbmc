@@ -62,7 +62,7 @@ abstract_object_pointert abstract_objectt::abstract_object_merge(
   if(is_top() || other->bottom)
     return this->abstract_object_merge_internal(other);
 
-  internal_abstract_object_pointert merged = mutable_clone();
+  auto merged = mutable_clone();
   merged->set_top();
   merged->bottom = false;
   return merged->abstract_object_merge_internal(other);
@@ -90,7 +90,7 @@ abstract_object_pointert abstract_objectt::abstract_object_meet(
   if(is_bottom() || other->top)
     return this->abstract_object_meet_internal(other);
 
-  internal_abstract_object_pointert met = mutable_clone();
+  auto met = mutable_clone();
   met->bottom = true;
   met->top = false;
   return met->abstract_object_meet_internal(other);

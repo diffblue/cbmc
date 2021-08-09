@@ -113,8 +113,7 @@ context_abstract_objectt::envelop(abstract_object_pointert &object) const
     nullptr)
     return object;
 
-  const auto &envelope =
-    std::dynamic_pointer_cast<context_abstract_objectt>(mutable_clone());
+  auto envelope = clone(this);
   envelope->set_child(object);
   return envelope;
 }

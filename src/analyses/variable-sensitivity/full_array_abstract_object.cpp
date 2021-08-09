@@ -119,8 +119,7 @@ abstract_object_pointert full_array_abstract_objectt::full_array_merge(
   if(is_bottom())
     return std::make_shared<full_array_abstract_objectt>(*other);
 
-  const auto &result =
-    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   bool modified = merge_shared_maps(map, other->map, result->map, widen_mode);
   if(!modified)
@@ -261,8 +260,7 @@ abstract_object_pointert full_array_abstract_objectt::write_sub_element(
   const abstract_object_pointert &value,
   bool merging_write) const
 {
-  const auto &result =
-    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   mp_integer index_value;
   bool good_index = eval_index(expr, environment, ns, index_value);
@@ -316,8 +314,7 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
   const abstract_object_pointert &value,
   bool merging_write) const
 {
-  const auto &result =
-    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   mp_integer index_value;
   bool good_index = eval_index(expr, environment, ns, index_value);
@@ -378,8 +375,7 @@ abstract_object_pointert full_array_abstract_objectt::get_top_entry(
 abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
-  const auto &result =
-    std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
+  auto result = clone(this);
 
   bool modified = false;
   for(auto &item : result->map.get_view())

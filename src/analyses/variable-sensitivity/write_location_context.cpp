@@ -25,8 +25,7 @@ abstract_object_pointert write_location_contextt::update_location_context(
   const abstract_objectt::locationst &locations,
   const bool update_sub_elements) const
 {
-  const auto &result =
-    std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+  auto result = clone(this);
 
   if(update_sub_elements)
   {
@@ -80,8 +79,7 @@ abstract_object_pointert write_location_contextt::write(
 
   // Need to ensure the result of the write is still wrapped in a dependency
   // context
-  const auto &result =
-    std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+  auto result = clone(this);
 
   // Update the child and record the updated write locations
   result->set_child(updated_child);
@@ -161,8 +159,7 @@ abstract_object_pointert write_location_contextt::combine(
 
   if(combined_child.modified || merge_locations)
   {
-    const auto &result =
-      std::dynamic_pointer_cast<write_location_contextt>(mutable_clone());
+    auto result = clone(this);
     if(combined_child.modified)
     {
       result->set_child(combined_child.object);
@@ -206,7 +203,7 @@ write_location_contextt::abstract_object_merge_internal(
     // If the union is larger than the initial set, then update.
     if(location_union.size() > get_last_written_locations().size())
     {
-      abstract_object_pointert result = mutable_clone();
+      auto result = clone(this);
       return result->update_location_context(location_union, false);
     }
   }

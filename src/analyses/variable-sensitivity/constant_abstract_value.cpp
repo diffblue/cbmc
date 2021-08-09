@@ -141,7 +141,7 @@ abstract_value_pointert constant_abstract_valuet::constrain(
   const exprt &lower,
   const exprt &upper) const
 {
-  return as_value(mutable_clone());
+  return as_value(clone(this));
 }
 
 exprt constant_abstract_valuet::to_predicate_internal(const exprt &name) const

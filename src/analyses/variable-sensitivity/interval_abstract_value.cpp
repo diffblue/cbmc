@@ -456,7 +456,7 @@ abstract_value_pointert interval_abstract_valuet::constrain(
     constant_interval_exprt::get_min(upper, interval.get_upper());
 
   if(constant_interval_exprt::greater_than(lower_bound, upper_bound))
-    return as_value(mutable_clone());
+    return as_value(clone(this));
 
   auto constrained_interval = constant_interval_exprt(lower_bound, upper_bound);
   return as_value(

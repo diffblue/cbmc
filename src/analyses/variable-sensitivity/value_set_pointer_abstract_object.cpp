@@ -200,8 +200,7 @@ abstract_object_pointert value_set_pointer_abstract_objectt::resolve_values(
 
   auto unwrapped_values = unwrap_and_extract_values(new_values);
 
-  auto result = std::dynamic_pointer_cast<value_set_pointer_abstract_objectt>(
-    mutable_clone());
+  auto result = clone(this);
 
   if(unwrapped_values.size() > max_value_set_size)
   {
