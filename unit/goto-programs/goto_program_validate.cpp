@@ -197,7 +197,8 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       auto &function_map = goto_model.goto_functions.function_map;
       auto it = function_map.find("g");
       auto &instructions = it->second.body.instructions;
-      instructions.insert(instructions.begin(), goto_programt::make_return());
+      instructions.insert(
+        instructions.begin(), goto_programt::make_return(code_returnt()));
 
       goto_model_validation_optionst validation_options{
         goto_model_validation_optionst ::set_optionst::all_false};

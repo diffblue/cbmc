@@ -17,7 +17,7 @@ TEST_CASE("cover_intrument_end_of_function", "[core]")
     goto_programt::make_function_call(code_function_callt({}, {})));
   goto_program.add(
     goto_programt::make_function_call(code_function_callt({}, {})));
-  goto_program.add(goto_programt::make_return());
+  goto_program.add(goto_programt::make_end_function());
   // Act
   cover_instrument_end_of_function(
     "foo", goto_program, goto_programt::make_assertion);
@@ -37,7 +37,7 @@ TEST_CASE("cover_instrument_end_of_function with custom expression", "[core]")
     goto_programt::make_function_call(code_function_callt({}, {})));
   goto_program.add(
     goto_programt::make_function_call(code_function_callt({}, {})));
-  goto_program.add(goto_programt::make_return());
+  goto_program.add(goto_programt::make_end_function());
   const cover_instrumenter_baset::assertion_factoryt assertion_factory =
     [](const exprt &, const source_locationt &location) {
       return goto_programt::make_assertion(true_exprt{}, location);
