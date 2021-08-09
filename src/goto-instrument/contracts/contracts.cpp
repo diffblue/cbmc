@@ -396,7 +396,7 @@ void code_contractst::replace_old_parameter(
 
     if(
       parameter.id() == ID_dereference || parameter.id() == ID_member ||
-      parameter.id() == ID_symbol)
+      parameter.id() == ID_symbol || parameter.id() == ID_ptrmember)
     {
       auto it = parameter2history.find(parameter);
 
