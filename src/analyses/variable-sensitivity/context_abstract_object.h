@@ -117,6 +117,8 @@ protected:
     bool merging_write) const override;
 
   bool has_been_modified(const abstract_object_pointert &before) const override;
+
+  exprt to_predicate_internal(const exprt &name) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONTEXT_ABSTRACT_OBJECT_H

@@ -171,6 +171,17 @@ public:
   /// that allows an object to be built from a value.
   virtual exprt to_constant() const;
 
+  /// Converts to an invariant expression
+  ///
+  /// \param name - the variable name to substitute into the expression
+  /// \return Returns an exprt representing the object as an invariant.
+  ///
+  /// The the abstract element represents a single value the expression will
+  /// have the form _name = value_, if the value is an interval it will have the
+  /// the form _lower <= name <= upper_, etc.
+  /// If the value is bottom returns false, if top returns true.
+  exprt to_predicate(const exprt &name) const;
+
   /**
    * A helper function to evaluate writing to a component of an
    * abstract object. More precise abstractions may override this to
@@ -351,6 +362,11 @@ public:
   {
     return shared_from_this() == other;
   }
+
+  /// to_predicate implementation - derived classes will override
+  /// \param name - the variable name to substitute into the expression
+  /// \return Returns an exprt representing the object as an invariant.
+  virtual exprt to_predicate_internal(const exprt &name) const;
 
 private:
   /// To enforce copy-on-write these are private and have read-only accessors

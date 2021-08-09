@@ -172,6 +172,21 @@ exprt abstract_objectt::to_constant() const
   return nil_exprt();
 }
 
+exprt abstract_objectt::to_predicate(const exprt &name) const
+{
+  if(is_top())
+    return true_exprt();
+  if(is_bottom())
+    return false_exprt();
+  return to_predicate_internal(name);
+}
+
+exprt abstract_objectt::to_predicate_internal(const exprt &name) const
+{
+  UNREACHABLE;
+  return nil_exprt();
+}
+
 void abstract_objectt::output(
   std::ostream &out,
   const ai_baset &ai,

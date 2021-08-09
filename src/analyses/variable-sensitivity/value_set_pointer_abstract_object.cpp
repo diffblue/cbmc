@@ -229,6 +229,25 @@ abstract_object_pointert value_set_pointer_abstract_objectt::merge(
   return abstract_objectt::merge(other, widen_mode);
 }
 
+exprt value_set_pointer_abstract_objectt::to_predicate_internal(
+  const exprt &name) const
+{
+  if(values.size() == 1)
+    return values.first()->to_predicate(name);
+
+  auto all_predicates = exprt::operandst{};
+  std::transform(
+    values.begin(),
+    values.end(),
+    std::back_inserter(all_predicates),
+    [&name](const abstract_object_pointert &value) {
+      return value->to_predicate(name);
+    });
+  std::sort(all_predicates.begin(), all_predicates.end());
+
+  return or_exprt(all_predicates);
+}
+
 void value_set_pointer_abstract_objectt::set_values(
   const abstract_object_sett &other_values)
 {

@@ -69,6 +69,8 @@ protected:
   abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const override;
 
+  exprt to_predicate_internal(const exprt &name) const override;
+
 private:
   /// Setter for updating the stored values
   /// \param other_values: the new (non-empty) set of values
@@ -82,10 +84,10 @@ private:
   abstract_object_pointert
   resolve_values(const abstract_object_sett &new_values) const;
 
+  void set_top_internal() override;
+
   // data
   abstract_object_sett values;
-
-  void set_top_internal() override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VALUE_SET_ABSTRACT_OBJECT_H

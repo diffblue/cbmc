@@ -388,3 +388,9 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
     return true_exprt();
   return nil_exprt();
 }
+
+exprt constant_pointer_abstract_objectt::to_predicate_internal(
+  const exprt &name) const
+{
+  return equal_exprt(name, value_stack.to_expression());
+}

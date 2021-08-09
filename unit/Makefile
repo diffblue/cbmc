@@ -14,18 +14,26 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/does_expr_lose_const.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
+       analyses/variable-sensitivity/abstract_environment/to_predicate.cpp \
        analyses/variable-sensitivity/abstract_object/merge.cpp \
        analyses/variable-sensitivity/abstract_object/index_range.cpp \
        analyses/variable-sensitivity/constant_abstract_value/meet.cpp \
        analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
+       analyses/variable-sensitivity/constant_abstract_value/to_predicate.cpp \
+       analyses/variable-sensitivity/constant_pointer_abstract_object/to_predicate.cpp \
+       analyses/variable-sensitivity/full_array_abstract_object/array_builder.cpp \
        analyses/variable-sensitivity/full_array_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/full_array_abstract_object/to_predicate.cpp \
        analyses/variable-sensitivity/eval.cpp \
        analyses/variable-sensitivity/eval-member-access.cpp \
        analyses/variable-sensitivity/interval_abstract_value/extremes-go-top.cpp \
        analyses/variable-sensitivity/interval_abstract_value/meet.cpp \
        analyses/variable-sensitivity/interval_abstract_value/merge.cpp \
+       analyses/variable-sensitivity/interval_abstract_value/to_predicate.cpp \
        analyses/variable-sensitivity/interval_abstract_value/widening_merge.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/full_struct_abstract_object/struct_builder.cpp \
+       analyses/variable-sensitivity/full_struct_abstract_object/to_predicate.cpp \
        analyses/variable-sensitivity/last_written_location.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume.cpp \
        analyses/variable-sensitivity/value_expression_evaluation/assume_prune.cpp \
@@ -34,7 +42,10 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/compacting.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/meet.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/value_set_abstract_object/to_predicate.cpp \
        analyses/variable-sensitivity/value_set_abstract_object/widening_merge.cpp \
+       analyses/variable-sensitivity/value_set_pointer_abstract_object/to_predicate.cpp \
+       analyses/variable-sensitivity/variable_sensitivity_domain/to_predicate.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
        ansi-c/expr2c.cpp \
        ansi-c/max_malloc_size.cpp \

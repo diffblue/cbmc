@@ -12,11 +12,13 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 #include <ansi-c/ansi_c_language.h>
 
 #include <testing-utils/use_catch.h>
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 #include <util/string_utils.h>
@@ -163,6 +165,11 @@ bool set_contains(const abstract_object_sett &set, const exprt &val)
 }
 
 static std::string interval_to_str(const constant_interval_exprt &expr);
+
+exprt to_expr(int v)
+{
+  return from_integer(v, integer_typet());
+}
 
 std::string expr_to_str(const exprt &expr)
 {
@@ -520,4 +527,36 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   INFO("Result should be a value set")
   REQUIRE(vs);
   return vs;
+}
+
+void THEN_PREDICATE(const abstract_object_pointert &obj, const std::string &out)
+{
+  const auto x_name = symbol_exprt(dstringt("x"), obj->type());
+  auto pred = obj->to_predicate(x_name);
+  THEN("predicate is " + out)
+  {
+    auto repr = expr_to_str(pred);
+    REQUIRE(repr == out);
+  }
+}
+
+void THEN_PREDICATE(const exprt &pred, const std::string &out)
+{
+  THEN("predicate is " + out)
+  {
+    auto repr = expr_to_str(pred);
+    REQUIRE(repr == out);
+  }
+}
+
+void THEN_PREDICATE(const abstract_environmentt &env, const std::string &out)
+{
+  THEN_PREDICATE(env.to_predicate(), out);
+}
+
+void THEN_PREDICATE(
+  const variable_sensitivity_domaint &domain,
+  const std::string &out)
+{
+  THEN_PREDICATE(domain.to_predicate(), out);
 }

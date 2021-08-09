@@ -176,6 +176,37 @@ void variable_sensitivity_domaint::output(
   abstract_state.output(out, ai, ns);
 }
 
+exprt variable_sensitivity_domaint::to_predicate() const
+{
+  return abstract_state.to_predicate();
+}
+
+exprt variable_sensitivity_domaint::to_predicate(
+  const exprt &expr,
+  const namespacet &ns) const
+{
+  auto result = abstract_state.eval(expr, ns);
+  return result->to_predicate(expr);
+}
+
+exprt variable_sensitivity_domaint::to_predicate(
+  const exprt::operandst &exprs,
+  const namespacet &ns) const
+{
+  if(exprs.empty())
+    return false_exprt();
+  if(exprs.size() == 1)
+    return to_predicate(exprs.front(), ns);
+
+  auto predicates = std::vector<exprt>{};
+  std::transform(
+    exprs.cbegin(),
+    exprs.cend(),
+    std::back_inserter(predicates),
+    [this, &ns](const exprt &expr) { return to_predicate(expr, ns); });
+  return and_exprt(predicates);
+}
+
 void variable_sensitivity_domaint::make_bottom()
 {
   abstract_state.make_bottom();

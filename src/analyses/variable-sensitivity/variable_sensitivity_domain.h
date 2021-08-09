@@ -146,7 +146,14 @@ public:
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
-  void output(std::ostream &out) const;
+  /// Gives a Boolean condition that is true for all values represented by the
+  /// domain.  This allows domains to be converted into program invariants.
+  ///
+  /// \return exprt describing the domain
+  exprt to_predicate() const override;
+
+  exprt to_predicate(const exprt &expr, const namespacet &ns) const;
+  exprt to_predicate(const exprt::operandst &exprs, const namespacet &ns) const;
 
   /// Computes the join between "this" and "b".
   ///

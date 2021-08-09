@@ -144,6 +144,11 @@ abstract_value_pointert constant_abstract_valuet::constrain(
   return as_value(mutable_clone());
 }
 
+exprt constant_abstract_valuet::to_predicate_internal(const exprt &name) const
+{
+  return equal_exprt(name, value);
+}
+
 void constant_abstract_valuet::get_statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,

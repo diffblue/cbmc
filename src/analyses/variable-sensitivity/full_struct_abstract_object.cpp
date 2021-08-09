@@ -307,6 +307,27 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   }
 }
 
+exprt full_struct_abstract_objectt::to_predicate_internal(
+  const exprt &name) const
+{
+  auto all_predicates = exprt::operandst{};
+
+  for(auto field : map.get_sorted_view())
+  {
+    auto field_name = member_exprt(name, field.first, name.type());
+    auto field_expr = field.second->to_predicate(field_name);
+
+    if(!field_expr.is_true())
+      all_predicates.push_back(field_expr);
+  }
+
+  if(all_predicates.empty())
+    return true_exprt();
+  if(all_predicates.size() == 1)
+    return all_predicates.front();
+  return and_exprt(all_predicates);
+}
+
 void full_struct_abstract_objectt::statistics(
   abstract_object_statisticst &statistics,
   abstract_object_visitedt &visited,
