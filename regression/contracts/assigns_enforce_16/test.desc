@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts _ --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether verification fails when enforcing a contract
+for functions, without assigns clauses, that modify an input.

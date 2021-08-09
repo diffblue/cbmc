@@ -45,8 +45,7 @@ void foo5(struct buf buffer) __CPROVER_assigns(buffer)
   buffer.len = 0;
 }
 
-void foo6(struct buf *buffer)
-  __CPROVER_assigns(buffer->data, *(buffer->data), buffer->len)
+void foo6(struct buf *buffer) __CPROVER_assigns(buffer->data, buffer->len)
 {
   buffer->data = malloc(sizeof(*(buffer->data)));
   *(buffer->data) = 1;

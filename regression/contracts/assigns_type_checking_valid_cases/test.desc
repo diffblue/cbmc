@@ -1,10 +1,11 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-all-contracts _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo1.\d+\] line \d+ Check that a is assignable: SUCCESS$
 ^\[foo10.\d+\] line \d+ Check that buffer\-\>len is assignable: SUCCESS$
+^\[foo10.\d+\] line \d+ Check that buffer\-\>aux\.allocated is assignable: SUCCESS$
 ^\[foo2.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[foo3.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[foo3.\d+\] line \d+ Check that y is assignable: SUCCESS$
@@ -27,7 +28,6 @@ main.c
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)7\] is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)8\] is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)9\] is assignable: SUCCESS$
-^\[foo9.\d+\] line \d+ Check that new_array is assignable: SUCCESS$
 ^\[foo9.\d+\] line \d+ Check that array is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
