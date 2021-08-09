@@ -110,8 +110,8 @@ abstract_object_pointert context_abstract_objectt::write_location_context(
 {
   auto result = update_location_context_internal({location});
 
-  auto visited_child = child_abstract_object->write_location_context(location);
-  result->set_child(visited_child);
+  auto updated_child = child_abstract_object->write_location_context(location);
+  result->set_child(updated_child);
 
   return result;
 }

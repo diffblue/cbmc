@@ -213,5 +213,8 @@ liveness_contextt::merge_location_context(const locationt &location) const
 
   auto update = std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
   update->assign_location = location;
+  auto updated_child = child_abstract_object->merge_location_context(location);
+  update->set_child(updated_child);
+
   return update;
 }

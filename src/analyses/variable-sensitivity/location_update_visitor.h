@@ -30,4 +30,24 @@ private:
   const abstract_objectt::locationt &location;
 };
 
+class merge_location_update_visitort
+  : public abstract_objectt::abstract_object_visitort
+{
+public:
+  explicit merge_location_update_visitort(
+    const abstract_objectt::locationt &location)
+    : location(location)
+  {
+  }
+
+  abstract_object_pointert
+  visit(const abstract_object_pointert &element) const override
+  {
+    return element->merge_location_context(location);
+  }
+
+private:
+  const abstract_objectt::locationt &location;
+};
+
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LOCATION_UPDATE_VISITOR_H

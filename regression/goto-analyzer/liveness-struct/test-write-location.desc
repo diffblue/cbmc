@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable-sensitivity --vsd-structs every-field --vsd-values intervals --vsd-liveness --show
+^EXIT=0$
+^SIGNAL=0$
+^main::1::s .* \{\} @ \[1\]
+^main::1::s .* \{.x=\[1, 1\] @ \[2\], .y=\[3, 3\] @ \[2\]\} @ \[2\]
+^main::1::s .* \{.x=\[2, 3\] @ \[7\], .y=\[3, 3\] @ \[2\]\} @ \[7\]
+--
