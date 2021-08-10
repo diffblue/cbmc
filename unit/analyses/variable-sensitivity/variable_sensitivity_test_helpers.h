@@ -84,6 +84,18 @@ void EXPECT(
   const std::vector<exprt> &values,
   const std::vector<exprt> &expected_values);
 
+void EXPECT_INDEX(
+  std::shared_ptr<const abstract_objectt> &result,
+  int index,
+  int expected,
+  abstract_environmentt &environment,
+  namespacet &ns);
+void EXPECT_EMPTY_INDEX(
+  std::shared_ptr<const abstract_objectt> &result,
+  int index,
+  abstract_environmentt &environment,
+  namespacet &ns);
+
 void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result);
 
 void EXPECT_TOP(abstract_objectt::combine_result const &result);

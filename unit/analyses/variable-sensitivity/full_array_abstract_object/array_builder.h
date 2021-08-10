@@ -25,10 +25,4 @@ full_array_abstract_objectt::full_array_pointert build_top_array();
 
 full_array_abstract_objectt::full_array_pointert build_bottom_array();
 
-exprt read_index(
-  full_array_abstract_objectt::full_array_pointert array_object,
-  const index_exprt &index,
-  abstract_environmentt &environment,
-  const namespacet &ns);
-
 #endif

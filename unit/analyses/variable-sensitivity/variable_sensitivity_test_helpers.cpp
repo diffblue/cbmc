@@ -294,6 +294,40 @@ void EXPECT(
   }
 }
 
+void EXPECT_INDEX(
+  std::shared_ptr<const abstract_objectt> &result,
+  int index,
+  int expected,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto type = signedbv_typet(32);
+  auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
+  auto expr = result->expression_transform(index_expr, {}, environment, ns)
+                ->to_constant();
+
+  auto expected_expr = from_integer(expected, type);
+  INFO(
+    "Expect array[" + std::to_string(index) +
+    "] == " + std::to_string(expected));
+  REQUIRE(expr_to_str(expr) == expr_to_str(expected_expr));
+}
+
+void EXPECT_EMPTY_INDEX(
+  std::shared_ptr<const abstract_objectt> &result,
+  int index,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto type = signedbv_typet(32);
+  auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
+  auto expr = result->expression_transform(index_expr, {}, environment, ns)
+                ->to_constant();
+
+  INFO("Expect array[" + std::to_string(index) + "] to be empty");
+  REQUIRE(expr_to_str(expr) == expr_to_str(nil_exprt()));
+}
+
 void EXPECT_UNMODIFIED(
   std::shared_ptr<const abstract_objectt> &result,
   bool modified)
