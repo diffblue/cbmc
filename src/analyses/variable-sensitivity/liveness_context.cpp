@@ -8,9 +8,14 @@
 
 #include "liveness_context.h"
 
+bool liveness_contextt::has_location() const
+{
+  return assign_location.has_value();
+}
+
 abstract_objectt::locationt liveness_contextt::get_location() const
 {
-  return assign_location.has_value() ? assign_location.value() : locationt();
+  return assign_location.value();
 }
 
 /**
@@ -108,18 +113,44 @@ liveness_contextt::meet(const abstract_object_pointert &other) const
   return abstract_objectt::meet(other);
 }
 
+bool liveness_contextt::at_same_location(const liveness_context_ptrt &rhs) const
+{
+  return has_location() && rhs->has_location() &&
+         (get_location()->location_number ==
+          rhs->get_location()->location_number);
+}
+
 abstract_object_pointert liveness_contextt::combine(
-  const region_context_ptrt &other,
+  const liveness_context_ptrt &other,
   combine_fn fn) const
 {
   auto combined_child = fn(child_abstract_object, other->child_abstract_object);
-  auto location_match = get_location() == other->get_location();
+  auto location_match = at_same_location(other);
 
-  if(combined_child.modified || location_match)
+  if(combined_child.modified || !location_match)
   {
     const auto &result =
       std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
     result->set_child(combined_child.object);
+    result->reset_location();
+    return result;
+  }
+
+  return shared_from_this();
+}
+
+abstract_object_pointert liveness_contextt::abstract_object_merge_internal(
+  const abstract_object_pointert &other) const
+{
+  auto other_context =
+    std::dynamic_pointer_cast<const liveness_contextt>(other);
+
+  if(!other_context)
+    return shared_from_this();
+
+  if(other_context && !at_same_location(other_context))
+  {
+    auto result = std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
     result->reset_location();
     return result;
   }
@@ -161,8 +192,8 @@ void liveness_contextt::output(
 {
   context_abstract_objectt::output(out, ai, ns);
 
-  if(assign_location.has_value())
-    out << " @ [" << assign_location.value()->location_number << "]";
+  if(has_location())
+    out << " @ [" << get_location()->location_number << "]";
   else
     out << " @ [undefined]";
 }
@@ -202,7 +233,7 @@ bool liveness_contextt::has_been_modified(
   // For two sets of last written locations to match,
   // each location in one set must be equal to precisely one location
   // in the other, since a set can assume at most one match
-  return before_context->get_location() != get_location();
+  return !at_same_location(before_context);
 }
 
 abstract_object_pointert

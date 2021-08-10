@@ -79,6 +79,9 @@ protected:
   abstract_object_pointert
   meet(const abstract_object_pointert &other) const override;
 
+  abstract_object_pointert abstract_object_merge_internal(
+    const abstract_object_pointert &other) const override;
+
   abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
@@ -94,15 +97,18 @@ private:
   using combine_fn = std::function<abstract_objectt::combine_result(
     const abstract_object_pointert &op1,
     const abstract_object_pointert &op2)>;
-  using region_context_ptrt = std::shared_ptr<const liveness_contextt>;
+  using liveness_context_ptrt = std::shared_ptr<const liveness_contextt>;
 
   abstract_object_pointert
-  combine(const region_context_ptrt &other, combine_fn fn) const;
+  combine(const liveness_context_ptrt &other, combine_fn fn) const;
 
   optionalt<locationt> assign_location;
 
   context_abstract_object_ptrt
   update_location_context_internal(const locationst &locations) const override;
+
+  bool has_location() const;
+  bool at_same_location(const liveness_context_ptrt &rhs) const;
 
   void set_location(const locationt &location);
 };

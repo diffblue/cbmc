@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable-sensitivity --vsd-liveness --show
+^EXIT=0$
+^SIGNAL=0$
+globalX .* 0 @ \[30\]
+globalX .* 1 @ \[0\]
+globalX .* TOP @ \[33\]
+--
