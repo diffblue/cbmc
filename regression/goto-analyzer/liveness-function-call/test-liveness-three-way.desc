@@ -4,5 +4,5 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 \[main.assertion.1\] .* globalX == 1: SUCCESS
-\[main.assertion.2\] .* globalX == 2: UNKNOWN
+\[main.assertion.2\] .* globalX == 2: SUCCESS
 --

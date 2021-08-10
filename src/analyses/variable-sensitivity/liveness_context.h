@@ -15,7 +15,7 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_LIVENESS_CONTEXT_H
 
-#include <analyses/variable-sensitivity/context_abstract_object.h>
+#include <analyses/variable-sensitivity/write_location_context.h>
 #include <iostream>
 #include <stack>
 
@@ -30,13 +30,13 @@
  * of this, 'context_abstract_objectt<T>' which provides the same
  * constructors as the standard 'abstract_objectt' class.
  */
-class liveness_contextt : public context_abstract_objectt
+class liveness_contextt : public write_location_contextt
 {
 public:
   explicit liveness_contextt(
     const abstract_object_pointert child,
     const typet &type)
-    : context_abstract_objectt(child, type)
+    : write_location_contextt(child, type)
   {
   }
 
@@ -45,7 +45,7 @@ public:
     const typet &type,
     bool top,
     bool bottom)
-    : context_abstract_objectt(child, type, top, bottom)
+    : write_location_contextt(child, type, top, bottom)
   {
   }
 
@@ -54,15 +54,9 @@ public:
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns)
-    : context_abstract_objectt(child, expr, environment, ns)
+    : write_location_contextt(child, expr, environment, ns)
   {
   }
-
-  virtual ~liveness_contextt()
-  {
-  }
-
-  bool has_been_modified(const abstract_object_pointert &before) const override;
 
   abstract_object_pointert
   merge_location_context(const locationt &location) const override;
@@ -76,8 +70,6 @@ protected:
   abstract_object_pointert merge(
     const abstract_object_pointert &other,
     const widen_modet &widen_mode) const override;
-  abstract_object_pointert
-  meet(const abstract_object_pointert &other) const override;
 
   abstract_object_pointert abstract_object_merge_internal(
     const abstract_object_pointert &other) const override;
@@ -91,16 +83,12 @@ protected:
     bool merging_write) const override;
 
   locationt get_location() const;
-  void reset_location();
 
 private:
-  using combine_fn = std::function<abstract_objectt::combine_result(
-    const abstract_object_pointert &op1,
-    const abstract_object_pointert &op2)>;
   using liveness_context_ptrt = std::shared_ptr<const liveness_contextt>;
 
   abstract_object_pointert
-  combine(const liveness_context_ptrt &other, combine_fn fn) const;
+  reset_location_on_merge(const liveness_context_ptrt &merged) const;
 
   optionalt<locationt> assign_location;
 
@@ -108,7 +96,6 @@ private:
   update_location_context_internal(const locationst &locations) const override;
 
   bool has_location() const;
-  bool at_same_location(const liveness_context_ptrt &rhs) const;
 
   void set_location(const locationt &location);
 };

@@ -42,21 +42,15 @@ abstract_object_pointert liveness_contextt::write(
   const abstract_object_pointert &value,
   bool merging_write) const
 {
-  abstract_object_pointert updated_child = child_abstract_object->write(
-    environment, ns, stack, specifier, value, merging_write);
-
-  // Only perform an update if the write to the child has in fact changed it...
-  if(updated_child == child_abstract_object)
+  auto updated = std::dynamic_pointer_cast<const liveness_contextt>(
+    write_location_contextt::write(
+      environment, ns, stack, specifier, value, merging_write));
+  if(updated == shared_from_this())
     return shared_from_this();
 
-  // Need to ensure the result of the write is still wrapped in a dependency
-  // context
-  const auto &result =
-    std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
-
-  result->set_child(updated_child);
-
-  // Update the child and record the updated write locations
+  // record the updated write locations
+  auto result =
+    std::dynamic_pointer_cast<liveness_contextt>(updated->mutable_clone());
   auto value_context =
     std::dynamic_pointer_cast<const liveness_contextt>(value);
   if(value_context)
@@ -83,84 +77,32 @@ abstract_object_pointert liveness_contextt::merge(
 
   if(cast_other)
   {
-    auto merge_fn = [&widen_mode](
-                      const abstract_object_pointert &op1,
-                      const abstract_object_pointert &op2) {
-      return abstract_objectt::merge(op1, op2, widen_mode);
-    };
-    return combine(cast_other, merge_fn);
+    auto merged = std::dynamic_pointer_cast<const liveness_contextt>(
+      write_location_contextt::merge(other, widen_mode));
+    return reset_location_on_merge(merged);
   }
 
   return abstract_objectt::merge(other, widen_mode);
 }
 
-// need wrapper function here to disambiguate meet overload
-abstract_objectt::combine_result object_meet(
-  const abstract_object_pointert &op1,
-  const abstract_object_pointert &op2)
-{
-  return abstract_objectt::meet(op1, op2);
-}
-
-abstract_object_pointert
-liveness_contextt::meet(const abstract_object_pointert &other) const
-{
-  auto cast_other = std::dynamic_pointer_cast<const liveness_contextt>(other);
-
-  if(cast_other)
-    return combine(cast_other, object_meet);
-
-  return abstract_objectt::meet(other);
-}
-
-bool liveness_contextt::at_same_location(const liveness_context_ptrt &rhs) const
-{
-  return has_location() && rhs->has_location() &&
-         (get_location()->location_number ==
-          rhs->get_location()->location_number);
-}
-
-abstract_object_pointert liveness_contextt::combine(
-  const liveness_context_ptrt &other,
-  combine_fn fn) const
-{
-  auto combined_child = fn(child_abstract_object, other->child_abstract_object);
-  auto location_match = at_same_location(other);
-
-  if(combined_child.modified || !location_match)
-  {
-    const auto &result =
-      std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
-    result->set_child(combined_child.object);
-    result->reset_location();
-    return result;
-  }
-
-  return shared_from_this();
-}
-
 abstract_object_pointert liveness_contextt::abstract_object_merge_internal(
   const abstract_object_pointert &other) const
 {
-  auto other_context =
-    std::dynamic_pointer_cast<const liveness_contextt>(other);
-
-  if(!other_context)
-    return shared_from_this();
-
-  if(other_context && !at_same_location(other_context))
-  {
-    auto result = std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
-    result->reset_location();
-    return result;
-  }
-
-  return shared_from_this();
+  auto merged = std::dynamic_pointer_cast<const liveness_contextt>(
+    write_location_contextt::abstract_object_merge_internal(other));
+  return reset_location_on_merge(merged);
 }
 
-void liveness_contextt::reset_location()
+abstract_object_pointert liveness_contextt::reset_location_on_merge(
+  const liveness_context_ptrt &merged) const
 {
-  assign_location.reset();
+  if(merged == shared_from_this())
+    return shared_from_this();
+
+  auto updated =
+    std::dynamic_pointer_cast<liveness_contextt>(merged->mutable_clone());
+  updated->assign_location.reset();
+  return updated;
 }
 
 context_abstract_objectt::context_abstract_object_ptrt
@@ -168,6 +110,7 @@ liveness_contextt::update_location_context_internal(
   const locationst &locations) const
 {
   auto result = std::dynamic_pointer_cast<liveness_contextt>(mutable_clone());
+  result->set_last_written_locations(locations);
   result->set_location(*locations.cbegin());
   return result;
 }
@@ -196,44 +139,6 @@ void liveness_contextt::output(
     out << " @ [" << get_location()->location_number << "]";
   else
     out << " @ [undefined]";
-}
-
-/**
- * Determine whether 'this' abstract_object has been modified in comparison
- * to a previous 'before' state.
- *
- * \param before the abstract_object_pointert to use as a reference to
- * compare against
- *
- * \return true if 'this' is considered to have been modified in comparison
- * to 'before', false otherwise.
- */
-bool liveness_contextt::has_been_modified(
-  const abstract_object_pointert &before) const
-{
-  if(this == before.get())
-    return false;
-
-  auto before_context =
-    std::dynamic_pointer_cast<const liveness_contextt>(before);
-
-  if(!before_context)
-  {
-    // The other context is not something we understand, so must assume
-    // that the abstract_object has been modified
-    return true;
-  }
-
-  // Even if the pointers are different, it maybe that it has changed only
-  // because of a merge operation, rather than an actual write. Given that
-  // this class has knowledge of where writes have occured, use that
-  // information to determine if any writes have happened and use that as the
-  // proxy for whether the value has changed or not.
-  //
-  // For two sets of last written locations to match,
-  // each location in one set must be equal to precisely one location
-  // in the other, since a set can assume at most one match
-  return !at_same_location(before_context);
 }
 
 abstract_object_pointert

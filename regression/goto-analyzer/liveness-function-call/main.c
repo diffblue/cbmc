@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int globalX;
 
 void f00()
