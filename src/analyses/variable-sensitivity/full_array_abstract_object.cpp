@@ -15,6 +15,8 @@
 
 #include "abstract_value_object.h"
 #include "full_array_abstract_object.h"
+#include "location_update_visitor.h"
+#include "map_visit.h"
 
 bool eval_index(
   const exprt &index,
@@ -375,31 +377,27 @@ abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
 
+abstract_object_pointert full_array_abstract_objectt::write_location_context(
+  const locationt &location) const
+{
+  return visit_sub_elements(location_update_visitort(location));
+}
+
+abstract_object_pointert full_array_abstract_objectt::merge_location_context(
+  const locationt &location) const
+{
+  return visit_sub_elements(merge_location_update_visitort(location));
+}
+
 abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
   const auto &result =
     std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
-  bool modified = false;
-  for(auto &item : result->map.get_view())
-  {
-    auto newval = visitor.visit(item.second);
-    if(newval != item.second)
-    {
-      result->map.replace(item.first, std::move(newval));
-      modified = true;
-    }
-  }
+  bool is_modified = visit_map(result->map, visitor);
 
-  if(modified)
-  {
-    return result;
-  }
-  else
-  {
-    return shared_from_this();
-  }
+  return is_modified ? result : shared_from_this();
 }
 
 exprt full_array_abstract_objectt::to_predicate_internal(

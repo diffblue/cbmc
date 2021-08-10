@@ -53,6 +53,7 @@ struct vsd_configt
 
   struct
   {
+    bool liveness;
     bool data_dependency_context;
     bool last_write_context;
   } context_tracking;

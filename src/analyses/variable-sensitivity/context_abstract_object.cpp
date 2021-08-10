@@ -105,6 +105,17 @@ abstract_object_pointert context_abstract_objectt::expression_transform(
   return envelop(result);
 }
 
+abstract_object_pointert context_abstract_objectt::write_location_context(
+  const locationt &location) const
+{
+  auto result = update_location_context_internal({location});
+
+  auto updated_child = child_abstract_object->write_location_context(location);
+  result->set_child(updated_child);
+
+  return result;
+}
+
 abstract_object_pointert
 context_abstract_objectt::envelop(abstract_object_pointert &object) const
 {

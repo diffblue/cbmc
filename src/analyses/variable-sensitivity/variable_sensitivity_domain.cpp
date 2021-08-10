@@ -39,12 +39,11 @@ void variable_sensitivity_domaint::transform(
   {
   case DECL:
   {
-    const abstract_objectt::locationst write_location = {from};
     abstract_object_pointert top_object =
       abstract_state
         .abstract_object_factory(
           instruction.decl_symbol().type(), ns, true, false)
-        ->update_location_context(write_location, true);
+        ->write_location_context(from);
     abstract_state.assign(instruction.decl_symbol(), top_object, ns);
   }
   // We now store top.
@@ -60,10 +59,8 @@ void variable_sensitivity_domaint::transform(
   {
     // TODO : check return values
     const code_assignt &inst = instruction.get_assign();
-    const abstract_objectt::locationst write_location = {from};
     abstract_object_pointert rhs =
-      abstract_state.eval(inst.rhs(), ns)
-        ->update_location_context(write_location, true);
+      abstract_state.eval(inst.rhs(), ns)->write_location_context(from);
     abstract_state.assign(inst.lhs(), rhs, ns);
   }
   break;
@@ -235,7 +232,8 @@ bool variable_sensitivity_domaint::merge(
   auto widen_mode =
     from->should_widen(*to) ? widen_modet::could_widen : widen_modet::no;
   // Use the abstract_environment merge
-  bool any_changes = abstract_state.merge(b.abstract_state, widen_mode);
+  bool any_changes =
+    abstract_state.merge(b.abstract_state, to->current_location(), widen_mode);
 
   DATA_INVARIANT(abstract_state.verify(), "Structural invariant");
   return any_changes;
@@ -382,8 +380,7 @@ void variable_sensitivity_domaint::transform_function_call(
         // Evaluate the expression that is being
         // passed into the function call (called_arg)
         abstract_object_pointert param_val =
-          abstract_state.eval(called_arg, ns)
-            ->update_location_context({from}, true);
+          abstract_state.eval(called_arg, ns)->write_location_context(from);
 
         // Assign the evaluated value to the symbol associated with the
         // parameter of the function

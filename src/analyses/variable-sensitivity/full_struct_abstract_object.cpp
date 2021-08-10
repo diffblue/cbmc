@@ -12,6 +12,8 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <util/std_expr.h>
 
 #include "full_struct_abstract_object.h"
+#include "location_update_visitor.h"
+#include "map_visit.h"
 
 // #define DEBUG
 
@@ -276,35 +278,27 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   }
 }
 
+abstract_object_pointert full_struct_abstract_objectt::write_location_context(
+  const locationt &location) const
+{
+  return visit_sub_elements(location_update_visitort(location));
+}
+
+abstract_object_pointert full_struct_abstract_objectt::merge_location_context(
+  const locationt &location) const
+{
+  return visit_sub_elements(merge_location_update_visitort(location));
+}
+
 abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
   const abstract_object_visitort &visitor) const
 {
   const auto &result =
     std::dynamic_pointer_cast<full_struct_abstract_objectt>(mutable_clone());
 
-  bool modified = false;
+  bool is_modified = visit_map(result->map, visitor);
 
-  shared_struct_mapt::viewt view;
-  result->map.get_view(view);
-
-  for(auto &item : view)
-  {
-    auto newval = visitor.visit(item.second);
-    if(newval != item.second)
-    {
-      result->map.replace(item.first, newval);
-      modified = true;
-    }
-  }
-
-  if(modified)
-  {
-    return result;
-  }
-  else
-  {
-    return shared_from_this();
-  }
+  return is_modified ? result : shared_from_this();
 }
 
 exprt full_struct_abstract_objectt::to_predicate_internal(

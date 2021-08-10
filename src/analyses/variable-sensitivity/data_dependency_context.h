@@ -54,10 +54,6 @@ public:
     const abstract_object_pointert &value,
     bool merging_write) const override;
 
-  abstract_object_pointert update_location_context(
-    const abstract_objectt::locationst &locations,
-    const bool update_sub_elements) const override;
-
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
   std::set<goto_programt::const_targett> get_data_dependencies() const;
@@ -96,31 +92,18 @@ private:
       return instruction->location_number > other_instruction->location_number;
     }
   };
-  typedef std::set<goto_programt::const_targett, location_ordert> dependencest;
-  dependencest data_deps;
-  dependencest data_dominators;
+  typedef std::set<goto_programt::const_targett, location_ordert> dependenciest;
+  dependenciest data_deps;
+  dependenciest data_dominators;
 
   abstract_object_pointert
-  insert_data_deps(const dependencest &dependencies) const;
+  insert_data_deps(const dependenciest &dependencies) const;
 
-  abstract_object_pointert
-  set_data_deps(const dependencest &dependencies) const;
+  context_abstract_object_ptrt
+  update_location_context_internal(const locationst &locations) const override;
 
-  abstract_object_pointert insert_data_deps(const locationst &locations) const
-  {
-    // `locationst` is unsorted, so convert this to a sorted `dependenciest`
-    dependencest dependencies(locations.begin(), locations.end());
-
-    return insert_data_deps(dependencies);
-  }
-
-  abstract_object_pointert set_data_deps(const locationst &locations) const
-  {
-    // `locationst` is unsorted, so convert this to a sorted `dependenciest`
-    dependencest dependencies(locations.begin(), locations.end());
-
-    return set_data_deps(dependencies);
-  }
+  void set_data_deps(const locationst &locations);
+  void set_data_deps(const dependenciest &dependences);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_DATA_DEPENDENCY_CONTEXT_H

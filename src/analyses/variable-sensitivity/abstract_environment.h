@@ -190,10 +190,14 @@ public:
   /// Computes the join between "this" and "b"
   ///
   /// \param env: the other environment
+  /// \param merge_location: when the merge is happening
   /// \param widen_mode: indicates if this is a widening merge
   ///
   /// \return A Boolean, true when the merge has changed something
-  virtual bool merge(const abstract_environmentt &env, widen_modet widen_mode);
+  virtual bool merge(
+    const abstract_environmentt &env,
+    const goto_programt::const_targett &merge_location,
+    widen_modet widen_mode);
 
   /// This should be used as a default case / everything else has failed
   /// The string is so that I can easily find and diagnose cases where this
