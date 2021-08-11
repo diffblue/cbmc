@@ -1135,50 +1135,6 @@ inline euclidean_mod_exprt &to_euclidean_mod_expr(exprt &expr)
   return ret;
 }
 
-/// \brief Remainder of division
-class rem_exprt:public binary_exprt
-{
-public:
-  rem_exprt(exprt _lhs, exprt _rhs)
-    : binary_exprt(std::move(_lhs), ID_rem, std::move(_rhs))
-  {
-  }
-};
-
-template <>
-inline bool can_cast_expr<rem_exprt>(const exprt &base)
-{
-  return base.id() == ID_rem;
-}
-
-inline void validate_expr(const rem_exprt &value)
-{
-  validate_operands(value, 2, "Remainder must have two operands");
-}
-
-/// \brief Cast an exprt to a \ref rem_exprt
-///
-/// \a expr must be known to be \ref rem_exprt.
-///
-/// \param expr: Source expression
-/// \return Object of type \ref rem_exprt
-inline const rem_exprt &to_rem_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_rem);
-  const rem_exprt &ret = static_cast<const rem_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
-}
-
-/// \copydoc to_rem_expr(const exprt &)
-inline rem_exprt &to_rem_expr(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_rem);
-  rem_exprt &ret = static_cast<rem_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
-}
-
 
 /// \brief Equality
 class equal_exprt:public binary_relation_exprt
