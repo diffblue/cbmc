@@ -6,11 +6,10 @@
 #define CPROVER_UTIL_PIPED_PROCESS_H
 
 #ifdef _WIN32
-// TODO: Windows definitions go here
-#else
+#  include <windows.h>
+#endif
 
 #  include <vector>
-
 #  include "optional.h"
 
 #  define PIPED_PROCESS_INFINITE_TIMEOUT                                       \
@@ -27,7 +26,7 @@ public:
     NOT_CREATED,
     CREATED,
     STOPPED,
-    ERROR
+    ERRORED
   };
 
   /// Enumeration for send response.
@@ -35,7 +34,7 @@ public:
   {
     SUCCEEDED,
     FAILED,
-    ERROR
+    ERRORED
   };
 
   /// Send a string message (command) to the child process.
@@ -82,6 +81,15 @@ public:
   ~piped_processt();
 
 protected:
+#ifdef _WIN32
+  // Process information handle for Windows
+  PROCESS_INFORMATION proc_info;
+  // Handles for communication with child process
+  HANDLE child_std_IN_Rd;
+  HANDLE child_std_IN_Wr;
+  HANDLE child_std_OUT_Rd;
+  HANDLE child_std_OUT_Wr;
+#else
   // Child process ID.
   pid_t child_process_id;
   FILE *command_stream;
@@ -91,9 +99,8 @@ protected:
   // the results of execution from.
   int pipe_input[2];
   int pipe_output[2];
+#endif
   statet process_state;
 };
-
-#endif // endif _WIN32
 
 #endif // endifndef CPROVER_UTIL_PIPED_PROCESS_H
