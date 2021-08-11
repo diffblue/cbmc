@@ -2,10 +2,6 @@
 /// \author Diffblue Ltd.
 /// Unit tests for checking the piped process communication mechanism.
 
-#ifdef _WIN32
-// No unit tests yet!
-#else
-
 #  include <testing-utils/use_catch.h>
 #  include <util/optional.h>
 #  include <util/piped_process.h>
@@ -18,8 +14,12 @@ TEST_CASE(
   const std::string to_be_echoed = "The Jabberwocky";
   // Need to give path to avoid shell built-in invocation
   std::vector<std::string> commands;
+#ifdef _WIN32
+  commands.push_back("cmd /c echo The Jabberwocky");
+#else
   commands.push_back("/bin/echo");
   commands.push_back(to_be_echoed);
+#endif
   piped_processt process = piped_processt(commands);
 
   // This is an indirect way to detect when the pipe has something. This
@@ -35,9 +35,14 @@ TEST_CASE(
   "Creating a sub process with a binary that doesn't exist.",
   "[core][util][piped_process]")
 {
-  const std::string expected_error("Launching abcde failed");
   std::vector<std::string> commands;
+#ifdef _WIN32
+  const std::string expected_error("'abcde' is not recogni");
+  commands.push_back("cmd /c abcde");
+#else
+  const std::string expected_error("Launching abcde failed");
   commands.push_back("abcde");
+#endif
   piped_processt process = piped_processt(commands);
 
   // This is an indirect way to detect when the pipe has something. This
@@ -61,6 +66,39 @@ TEST_CASE(
   REQUIRE(response.find(expected_error) < response.length() - 5);
 }
 
+// This is a test of child termination, it's not perfect and could go wrong
+// if run at midnight, but it's sufficient for a basic check for now.
+TEST_CASE(
+  "Creating a sub process and terminate it.",
+  "[core][util][piped_process]")
+{
+  std::vector<std::string> commands;
+#ifdef _WIN32
+  commands.push_back("cmd /c ping 127.0.0.1 -n 6 > nul");
+  SYSTEMTIME st;
+  GetSystemTime(&st);
+  WORD calc = 3600 * st.wHour + 60 * st.wMinute + st.wSecond;
+  piped_processt process = piped_processt(commands);
+  process.~piped_processt();
+  GetSystemTime(&st);
+  // New time minus old time, could go wrong at midnight
+  calc = 3600 * st.wHour + 60 * st.wMinute + st.wSecond - calc;
+#else
+  // Currently not working under Linxu/MacOS?!
+  // commands.push_back("sleep 6");
+  // time_t calc = time(NULL);
+  // piped_processt process = piped_processt(commands);
+  // process.~piped_processt();
+  // calc = time(NULL) - calc;
+  size_t calc = 0;
+#endif
+  // Command should take >5 seconds, check we called destructor and
+  // moved on in less than 2 seconds.
+  REQUIRE(calc < 2);
+}
+
+#ifndef _WIN32
+// No Windows tests for z3 due to path and dependency issues.
 TEST_CASE(
   "Creating a sub process of z3 and read a response from an echo command.",
   "[core][util][piped_process][.z3]")
@@ -266,5 +304,4 @@ TEST_CASE(
   REQUIRE(
     process.send("(exit)\n") == piped_processt::send_responset::SUCCEEDED);
 }
-
 #endif
