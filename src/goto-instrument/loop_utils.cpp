@@ -11,33 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "loop_utils.h"
 
-#include <util/expr_util.h>
-#include <util/pointer_expr.h>
-#include <util/std_expr.h>
+#include <analyses/local_may_alias.h>
 
 #include <goto-programs/pointer_arithmetic.h>
 
-#include <analyses/local_may_alias.h>
-
-class loop_utils_is_constantt : public is_constantt
-{
-public:
-  explicit loop_utils_is_constantt(const modifiest &mod) : modifies(mod)
-  {
-  }
-  bool is_constant(const exprt &expr) const override
-  {
-    // Besides the "usual" constants (checked in is_constantt::is_constant),
-    // we also treat unmodified symbols as constants
-    if(expr.id() == ID_symbol && modifies.find(expr) == modifies.end())
-      return true;
-
-    return is_constantt::is_constant(expr);
-  }
-
-protected:
-  const modifiest &modifies;
-};
+#include <util/pointer_expr.h>
+#include <util/std_expr.h>
 
 goto_programt::targett get_loop_exit(const loopt &loop)
 {
@@ -57,51 +36,6 @@ goto_programt::targett get_loop_exit(const loopt &loop)
   return ++last;
 }
 
-void build_havoc_code_for_scalar(
-  const goto_programt::targett loop_head,
-  const exprt &lhs,
-  goto_programt &dest)
-{
-  side_effect_expr_nondett rhs(lhs.type(), loop_head->source_location);
-
-  goto_programt::targett t = dest.add(goto_programt::make_assignment(
-    lhs, std::move(rhs), loop_head->source_location));
-  t->code_nonconst().add_source_location() = loop_head->source_location;
-}
-
-void build_havoc_code_for_object(
-  const goto_programt::targett loop_head,
-  const exprt &lhs,
-  goto_programt &dest)
-{
-  codet havoc(ID_havoc_object);
-  havoc.add_source_location() = loop_head->source_location;
-  havoc.add_to_operands(lhs);
-
-  dest.add(goto_programt::make_other(havoc, loop_head->source_location));
-}
-
-void build_havoc_code(
-  const goto_programt::targett loop_head,
-  const modifiest &modifies,
-  goto_programt &dest)
-{
-  loop_utils_is_constantt is_constant(modifies);
-  for(const auto &lhs : modifies)
-  {
-    if(lhs.id() == ID_index || lhs.id() == ID_dereference)
-    {
-      address_of_exprt address_of_lhs(lhs);
-      if(!is_constant(address_of_lhs))
-      {
-        build_havoc_code_for_object(loop_head, address_of_lhs, dest);
-        continue;
-      }
-    }
-
-    build_havoc_code_for_scalar(loop_head, lhs, dest);
-  }
-}
 
 void get_modifies_lhs(
   const local_may_aliast &local_may_alias,

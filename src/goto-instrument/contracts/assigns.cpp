@@ -13,6 +13,8 @@ Date: July 2021
 
 #include "assigns.h"
 
+#include <goto-instrument/havoc_utils.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_predicates.h>

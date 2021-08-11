@@ -30,11 +30,6 @@ void get_modifies_lhs(
   const exprt &lhs,
   modifiest &modifies);
 
-void build_havoc_code(
-  const goto_programt::targett loop_head,
-  const modifiest &modifies,
-  goto_programt &dest);
-
 goto_programt::targett get_loop_exit(const loopt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_LOOP_UTILS_H

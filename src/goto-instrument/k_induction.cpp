@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_skip.h>
 
-#include "unwind.h"
+#include "havoc_utils.h"
 #include "loop_utils.h"
+#include "unwind.h"
 
 class k_inductiont
 {
@@ -96,7 +97,7 @@ void k_inductiont::process_loop(
 
     // build the havocking code
     goto_programt havoc_code;
-    build_havoc_code(loop_head, modifies, havoc_code);
+    append_havoc_code(loop_head->source_location, modifies, havoc_code);
 
     // unwind to get k+1 copies
     std::vector<goto_programt::targett> iteration_points;
