@@ -438,4 +438,9 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
   return ret;
 }
 
+/// \brief returns the a rounding mode expression for a given
+/// IEEE rounding mode, encoded using the recommendation in
+/// C11 5.2.4.2.2
+constant_exprt floatbv_rounding_mode(unsigned);
+
 #endif // CPROVER_UTIL_FLOATBV_EXPR_H
