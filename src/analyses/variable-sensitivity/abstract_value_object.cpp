@@ -255,19 +255,20 @@ private:
       auto lhs_value = eval_constant(op);
 
       // do not give up if a sub-expression is not a constant,
-      // because the whole expression may still be simplified in some cases
-      expr.operands().push_back(lhs_value.is_nil() ? op : lhs_value);
-    }
-
-    exprt simplified = simplify_expr(expr, ns);
-    for(const exprt &op : simplified.operands())
-    {
-      auto lhs_value = eval_constant(op);
       if(lhs_value.is_nil())
-        return top(simplified.type());
+      {
+        exprt simplified_op = simplify_expr(op, ns);
+        if(simplified_op.is_not_nil())
+          lhs_value = eval_constant(simplified_op);
+        if(lhs_value.is_nil())
+          return top(expr.type());
+      }
+
+      expr.operands().push_back(lhs_value);
     }
 
     // the expression is fully simplified
+    exprt simplified = simplify_expr(expr, ns);
     return std::make_shared<constant_abstract_valuet>(
       simplified, environment, ns);
   }
