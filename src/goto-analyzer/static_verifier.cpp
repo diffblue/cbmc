@@ -215,12 +215,8 @@ static_verifier_resultt::static_verifier_resultt(
           // The awkward case, there are traces that (may) reach it and
           // some are true, some are false.  It is not entirely fair to say
           // "FAILURE (if reachable)" because it's a bit more complex than
-          // that, "FAILURE (if reachable via a particular trace)" would be
-          // more accurate summary of what we know at this point.
-          // Given that all results of FAILURE from this analysis are
-          // caveated with some reachability questions, the following is not
-          // entirely unreasonable.
-          status = ai_verifier_statust::FALSE_IF_REACHABLE;
+          // that, and so the best we can say is UNKNOWN.
+          status = ai_verifier_statust::UNKNOWN;
         }
       }
     }
@@ -473,11 +469,9 @@ bool static_verifier(
     static_verifier_console(results, ns, m);
   }
 
-  m.status() << m.bold << "Summary: "
-             << pass << " pass, "
-             << fail << " fail if reachable, "
-             << unknown << " unknown"
-             << m.reset << messaget::eom;
+  m.status() << m.bold << "Summary: " << pass << " pass, " << fail
+             << " fail if reachable, " << unknown << " unknown" << m.reset
+             << messaget::eom;
 
   return false;
 }
