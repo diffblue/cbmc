@@ -2140,10 +2140,10 @@ long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long
 #define __CPROVER_FENV_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y);
-
-double fmod(double x, double y) { return __sort_of_CPROVER_remainder(FE_TOWARDZERO, x, y); }
-
+double fmod(double x, double y)
+{
+  return __CPROVER_fmod(x, y);
+}
 
 /* FUNCTION: fmodf */
 
@@ -2157,10 +2157,10 @@ double fmod(double x, double y) { return __sort_of_CPROVER_remainder(FE_TOWARDZE
 #define __CPROVER_FENV_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y);
-
-float fmodf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TOWARDZERO, x, y); }
-
+float fmodf(float x, float y)
+{
+  return __CPROVER_fmodf(x, y);
+}
 
 /* FUNCTION: fmodl */
 
@@ -2174,11 +2174,10 @@ float fmodf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TOWARDZER
 #define __CPROVER_FENV_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y);
-
-long double fmodl(long double x, long double y) { return __sort_of_CPROVER_remainderl(FE_TOWARDZERO, x, y); }
-
-
+long double fmodl(long double x, long double y)
+{
+  return __CPROVER_fmodl(x, y);
+}
 
 /* ISO 9899:2011
  *
