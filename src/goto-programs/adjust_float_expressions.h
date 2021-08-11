@@ -56,4 +56,8 @@ void adjust_float_expressions(
 /// \see adjust_float_expressions(goto_functionst &, const namespacet &)
 void adjust_float_expressions(goto_modelt &goto_model);
 
+/// Return the identifier of the program symbol used to
+/// store the current rounding mode.
+irep_idt rounding_mode_identifier();
+
 #endif // CPROVER_GOTO_PROGRAMS_ADJUST_FLOAT_EXPRESSIONS_H

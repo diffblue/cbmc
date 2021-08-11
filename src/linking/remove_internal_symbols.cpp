@@ -11,6 +11,8 @@ Author: Daniel Kroening
 
 #include "remove_internal_symbols.h"
 
+#include <goto-programs/adjust_float_expressions.h>
+
 #include <util/config.h>
 #include <util/find_symbols.h>
 #include <util/message.h>
@@ -119,7 +121,7 @@ void remove_internal_symbols(
   special.insert(CPROVER_PREFIX "malloc_size");
   special.insert(CPROVER_PREFIX "deallocated");
   special.insert(CPROVER_PREFIX "dead_object");
-  special.insert(CPROVER_PREFIX "rounding_mode");
+  special.insert(rounding_mode_identifier());
   special.insert("__new");
   special.insert("__new_array");
   special.insert("__placement_new");

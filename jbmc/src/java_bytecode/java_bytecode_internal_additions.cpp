@@ -18,14 +18,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+
 void java_internal_additions(symbol_table_baset &dest)
 {
   // add __CPROVER_rounding_mode
 
   {
     symbolt symbol;
-    symbol.base_name = CPROVER_PREFIX "rounding_mode";
-    symbol.name=CPROVER_PREFIX "rounding_mode";
+    symbol.name = rounding_mode_identifier();
+    symbol.base_name = symbol.name;
     symbol.type=signed_int_type();
     symbol.mode=ID_C;
     symbol.is_lvalue=true;

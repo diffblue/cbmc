@@ -16,6 +16,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/message.h>
 #include <util/range.h>
 
+#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_functions.h>
 
 #include <linking/static_lifetime_init.h>
@@ -33,8 +34,8 @@ static void create_initialize(symbol_tablet &symbol_table)
 
   namespacet ns(symbol_table);
 
-  symbol_exprt rounding_mode=
-    ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
+  symbol_exprt rounding_mode =
+    ns.lookup(rounding_mode_identifier()).symbol_expr();
 
   code_assignt a(rounding_mode, from_integer(0, rounding_mode.type()));
   init_code.add(a);

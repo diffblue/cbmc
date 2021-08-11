@@ -11,6 +11,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_internal_additions.h"
 
+#include <goto-programs/adjust_float_expressions.h>
+
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
@@ -25,8 +27,8 @@ void jsil_internal_additions(symbol_tablet &dest)
 
   {
     symbolt symbol;
-    symbol.base_name = CPROVER_PREFIX "rounding_mode";
-    symbol.name=CPROVER_PREFIX "rounding_mode";
+    symbol.name = rounding_mode_identifier();
+    symbol.base_name = symbol.name;
     symbol.type=signed_int_type();
     symbol.mode=ID_C;
     symbol.is_lvalue=true;

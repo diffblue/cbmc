@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class constant_exprt;
 class floatbv_typet;
 
-const char ID_cprover_rounding_mode_str[] = CPROVER_PREFIX "rounding_mode";
-
 class ieee_float_spect
 {
 public:

@@ -11,6 +11,8 @@ Author: Peter Schrammel
 
 #include "constant_propagator.h"
 
+#include <goto-programs/adjust_float_expressions.h>
+
 #ifdef DEBUG
 #include <iostream>
 #include <util/format_expr.h>
@@ -655,7 +657,7 @@ bool constant_propagator_domaint::partial_evaluate(
   // if the current rounding mode is top we can
   // still get a non-top result by trying all rounding
   // modes and checking if the results are all the same
-  if(!known_values.is_constant(ID_cprover_rounding_mode_str))
+  if(!known_values.is_constant(rounding_mode_identifier()))
     return partial_evaluate_with_all_rounding_modes(known_values, expr, ns);
 
   return replace_constants_and_simplify(known_values, expr, ns);
@@ -685,7 +687,7 @@ bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
   {
     valuest tmp_values = known_values;
     tmp_values.set_to(
-      symbol_exprt(ID_cprover_rounding_mode_str, integer_typet()),
+      symbol_exprt(rounding_mode_identifier(), integer_typet()),
       from_integer(rounding_modes[i], integer_typet()));
     exprt result = expr;
     if(replace_constants_and_simplify(tmp_values, result, ns))

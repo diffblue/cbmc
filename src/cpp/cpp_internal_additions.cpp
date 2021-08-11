@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+
 std::string c2cpp(const std::string &s)
 {
   std::string result;
@@ -108,7 +110,7 @@ void cpp_internal_additions(std::ostream &out)
 
   // float
   // TODO: should be thread_local
-  out << "int " CPROVER_PREFIX "rounding_mode = "
+  out << "int " << rounding_mode_identifier() << " = "
       << std::to_string(config.ansi_c.rounding_mode) << ';' << '\n';
 
   // pipes, write, read, close
