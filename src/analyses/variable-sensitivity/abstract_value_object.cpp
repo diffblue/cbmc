@@ -225,9 +225,10 @@ class constants_evaluator
 public:
   constants_evaluator(
     const exprt &e,
+    const std::vector<abstract_object_pointert> &ops,
     const abstract_environmentt &env,
     const namespacet &n)
-    : expression(e), environment(env), ns(n)
+    : expression(e), operands(ops), environment(env), ns(n)
   {
   }
 
@@ -244,31 +245,28 @@ public:
 private:
   abstract_object_pointert transform() const
   {
-    exprt expr = adjust_expression_for_rounding_mode();
-    auto operands = expr.operands();
-    expr.operands().clear();
+    auto expr = adjust_expression_for_rounding_mode();
 
-    // Two passes over the expression - one for simplification,
-    // another to check if there are any top subexpressions left
-    for(const exprt &op : operands)
+    auto operand_is_top = false;
+    for(size_t i = 0; i != operands.size(); ++i)
     {
-      auto lhs_value = eval_constant(op);
+      auto lhs_value = operands[i]->to_constant();
 
       // do not give up if a sub-expression is not a constant,
-      if(lhs_value.is_nil())
-      {
-        exprt simplified_op = simplify_expr(op, ns);
-        if(simplified_op.is_not_nil())
-          lhs_value = eval_constant(simplified_op);
-        if(lhs_value.is_nil())
-          return top(expr.type());
-      }
-
-      expr.operands().push_back(lhs_value);
+      // because the whole expression may still be simplified in some cases
+      // (eg multiplication by zero)
+      if(lhs_value.is_not_nil())
+        expr.operands()[i] = lhs_value;
+      else
+        operand_is_top = true;
     }
 
+    auto simplified = simplify_expr(expr, ns);
+
+    if(simplified.has_operands() && operand_is_top)
+      return top(simplified.type());
+
     // the expression is fully simplified
-    exprt simplified = simplify_expr(expr, ns);
     return std::make_shared<constant_abstract_valuet>(
       simplified, environment, ns);
   }
@@ -279,8 +277,11 @@ private:
     for(auto rounding_mode : all_rounding_modes)
     {
       auto child_env(environment_with_rounding_mode(rounding_mode));
+      auto child_operands =
+        reeval_operands(expression.operands(), child_env, ns);
+
       possible_results.push_back(
-        constants_evaluator(expression, child_env, ns)());
+        constants_evaluator(expression, child_operands, child_env, ns)());
     }
 
     auto first = possible_results.front()->to_constant();
@@ -312,12 +313,25 @@ private:
   {
     exprt adjusted_expr = expression;
     adjust_float_expressions(adjusted_expr, ns);
+
+    if(adjusted_expr != expression)
+      operands = reeval_operands(adjusted_expr.operands(), environment, ns);
+
     return adjusted_expr;
   }
 
-  exprt eval_constant(const exprt &op) const
+  static std::vector<abstract_object_pointert> reeval_operands(
+    const exprt::operandst &ops,
+    const abstract_environmentt &env,
+    const namespacet &ns)
   {
-    return environment.eval(op, ns)->to_constant();
+    auto reevaled_operands = std::vector<abstract_object_pointert>{};
+    std::transform(
+      ops.cbegin(),
+      ops.end(),
+      std::back_inserter(reevaled_operands),
+      [&env, &ns](const exprt &op) { return env.eval(op, ns); });
+    return reevaled_operands;
   }
 
   abstract_object_pointert top(const typet &type) const
@@ -327,11 +341,13 @@ private:
 
   bool rounding_mode_is_not_set() const
   {
-    auto rounding_mode = eval_constant(rounding_mode_symbol);
+    auto rounding_mode =
+      environment.eval(rounding_mode_symbol, ns)->to_constant();
     return rounding_mode.is_nil();
   }
 
   const exprt &expression;
+  mutable std::vector<abstract_object_pointert> operands;
   const abstract_environmentt &environment;
   const namespacet &ns;
 
@@ -356,7 +372,7 @@ abstract_object_pointert constants_expression_transform(
   const abstract_environmentt &environment,
   const namespacet &ns)
 {
-  auto evaluator = constants_evaluator(expr, environment, ns);
+  auto evaluator = constants_evaluator(expr, operands, environment, ns);
   return evaluator();
 }
 
