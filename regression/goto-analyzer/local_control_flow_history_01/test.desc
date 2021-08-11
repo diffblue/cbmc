@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* assertion x != 0: SUCCESS$
 ^\[main.assertion.2\] .* assertion x == 1: SUCCESS$
-^\[main.assertion.3\] .* assertion x == -1: FAILURE \(if reachable\)$
+^\[main.assertion.3\] .* assertion x == -1: UNKNOWN$
 ^\[main.assertion.4\] .* assertion x == 0: SUCCESS$
 --
 ^warning: ignoring

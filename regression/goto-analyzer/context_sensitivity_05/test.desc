@@ -6,7 +6,7 @@ main.c
 ^\[f00.assertion.3\] .* assertion 0: SUCCESS \(unreachable\)$
 ^\[f00.assertion.4\] .* assertion x >= 0: SUCCESS$
 ^\[f00.assertion.5\] .* assertion x < 0: FAILURE \(if reachable\)$
-^\[f00.assertion.6\] .* assertion x < 2: FAILURE \(if reachable\)$
+^\[f00.assertion.6\] .* assertion x < 2: UNKNOWN$
 ^\[f00.assertion.7\] .* assertion \(x <= 0\) \? 1 : y: UNKNOWN$
 ^\[f00.assertion.8\] .* assertion \(x <= 1\) \? 0 : y: UNKNOWN$
 ^\[f00.assertion.9\] .* assertion \(x <= 2\) \? \(\(x <= 3\) \? 1 : 0\) : y: UNKNOWN$

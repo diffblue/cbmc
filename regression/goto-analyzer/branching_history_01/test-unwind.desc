@@ -1,0 +1,7 @@
+CORE
+main.c
+--verify --recursive-interprocedural --vsd  --loop-unwind-and-branching 10
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] .* local == global: UNKNOWN
+--
