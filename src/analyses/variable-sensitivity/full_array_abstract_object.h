@@ -203,7 +203,10 @@ private:
 
   shared_array_mapt map;
 
-  void map_put(mp_integer index, const abstract_object_pointert &value);
+  void map_put(
+    mp_integer index,
+    const abstract_object_pointert &value,
+    bool overrun);
   abstract_object_pointert map_find_or_top(
     mp_integer index,
     const abstract_environmentt &env,

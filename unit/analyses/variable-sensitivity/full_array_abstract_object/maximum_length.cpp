@@ -86,8 +86,8 @@ SCENARIO(
         EXPECT_INDEX(updated, 0, 1, environment, ns);
         EXPECT_INDEX(updated, 1, 2, environment, ns);
         EXPECT_INDEX(updated, 2, 3, environment, ns);
-        EXPECT_EMPTY_INDEX(updated, 3, environment, ns);
-        EXPECT_EMPTY_INDEX(updated, 4, environment, ns);
+        EXPECT_INDEX_TOP(updated, 3, environment, ns);
+        EXPECT_INDEX_TOP(updated, 4, environment, ns);
         EXPECT_INDEX(updated, 5, 99, environment, ns);
       }
     }
@@ -106,6 +106,55 @@ SCENARIO(
         EXPECT_INDEX(updated, 1, 2, environment, ns);
         EXPECT_INDEX(updated, 2, 3, environment, ns);
         EXPECT_INDEX(updated, 10, 4, environment, ns);
+      }
+    }
+  }
+  WHEN("array = {1, 2, 3}, reads beyond maximum size mapped to max_size")
+  {
+    WHEN("a[max] = 4")
+    {
+      auto array = build_array({1, 2, 3}, environment, ns);
+
+      auto updated = write_array(array, 99, 4, environment, ns);
+
+      for(int i = 10; i <= 30; i += 5)
+        THEN("array[" + std::to_string(i) + "] = 4}")
+        {
+          EXPECT_INDEX(updated, i, 4, environment, ns);
+        }
+    }
+  }
+  WHEN("array = {1, 2, 3}, writes beyond maximum size are merged")
+  {
+    WHEN("array[98] = 3, array[99] = 4")
+    {
+      auto array = build_array({1, 2, 3}, environment, ns);
+
+      auto updated = write_array(array, 99, 4, environment, ns);
+      updated = write_array(updated, 98, 3, environment, ns);
+
+      THEN("array equals {1, 2, 3, ..., [10] = TOP}")
+      {
+        EXPECT_INDEX(updated, 0, 1, environment, ns);
+        EXPECT_INDEX(updated, 1, 2, environment, ns);
+        EXPECT_INDEX(updated, 2, 3, environment, ns);
+        EXPECT_INDEX(updated, 10, {3, 4}, environment, ns);
+      }
+    }
+    WHEN("array[99] = 3, array[99] = 4, array[100] = 5")
+    {
+      auto array = build_array({1, 2, 3}, environment, ns);
+
+      auto updated = write_array(array, 100, 5, environment, ns);
+      updated = write_array(updated, 99, 4, environment, ns);
+      updated = write_array(updated, 98, 3, environment, ns);
+
+      THEN("array equals {1, 2, 3, ..., [10] = TOP}")
+      {
+        EXPECT_INDEX(updated, 0, 1, environment, ns);
+        EXPECT_INDEX(updated, 1, 2, environment, ns);
+        EXPECT_INDEX(updated, 2, 3, environment, ns);
+        EXPECT_INDEX(updated, 10, {3, 4, 5}, environment, ns);
       }
     }
   }

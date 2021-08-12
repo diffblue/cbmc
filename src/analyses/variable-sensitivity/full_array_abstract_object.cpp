@@ -22,6 +22,7 @@ struct eval_index_resultt
 {
   bool is_good;
   mp_integer value;
+  bool overrun;
 };
 
 static mp_integer max_array_index = 10;
@@ -275,7 +276,8 @@ abstract_object_pointert full_array_abstract_objectt::write_sub_element(
     auto const existing_value = map_find_or_top(index.value, environment, ns);
     result->map_put(
       index.value,
-      environment.write(existing_value, value, stack, ns, merging_write));
+      environment.write(existing_value, value, stack, ns, merging_write),
+      index.overrun);
     result->set_not_top();
     DATA_INVARIANT(result->verify(), "Structural invariants maintained");
     return result;
@@ -337,7 +339,7 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
     }
     else
     {
-      result->map_put(index.value, value);
+      result->map_put(index.value, value, index.overrun);
       result->set_not_top();
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -353,14 +355,24 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
 
 void full_array_abstract_objectt::map_put(
   mp_integer index_value,
-  const abstract_object_pointert &value)
+  const abstract_object_pointert &value,
+  bool overrun)
 {
   auto old_value = map.find(index_value);
 
-  if(old_value.has_value())
-    map.replace(index_value, value);
-  else
+  if(!old_value.has_value())
     map.insert(index_value, value);
+  else
+  {
+    // if we're over the max_index, merge with existing value
+    auto replacement_value =
+      overrun
+        ? abstract_objectt::merge(old_value.value(), value, widen_modet::no)
+            .object
+        : value;
+
+    map.replace(index_value, replacement_value);
+  }
 }
 
 abstract_object_pointert full_array_abstract_objectt::map_find_or_top(
@@ -369,7 +381,9 @@ abstract_object_pointert full_array_abstract_objectt::map_find_or_top(
   const namespacet &ns) const
 {
   auto value = map.find(index_value);
-  return value.has_value() ? value.value() : get_top_entry(env, ns);
+  if(value.has_value())
+    return value.value();
+  return get_top_entry(env, ns);
 }
 
 abstract_object_pointert full_array_abstract_objectt::get_top_entry(
@@ -455,8 +469,7 @@ static eval_index_resultt eval_index(
   mp_integer out_index;
   bool result = to_integer(to_constant_expr(value), out_index);
 
-  if(out_index > max_array_index)
-    out_index = max_array_index;
+  bool overrun = (out_index > max_array_index);
 
-  return {!result, out_index};
+  return {!result, overrun ? max_array_index : out_index, overrun};
 }

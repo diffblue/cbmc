@@ -140,7 +140,8 @@ as_interval(const abstract_object_pointert &aop)
 std::shared_ptr<const value_set_abstract_objectt>
 as_value_set(const abstract_object_pointert &aop)
 {
-  return std::dynamic_pointer_cast<const value_set_abstract_objectt>(aop);
+  return std::dynamic_pointer_cast<const value_set_abstract_objectt>(
+    aop->unwrap_context());
 }
 
 bool set_contains(const std::vector<exprt> &set, const exprt &val)
@@ -272,10 +273,7 @@ void EXPECT(
   REQUIRE(values.size() == expected_values.size());
 
   for(auto &ev : expected_values)
-  {
-    INFO("Expect " + value_string + " to match " + expected_string);
     REQUIRE(set_contains(values, ev));
-  }
 }
 
 void EXPECT(
@@ -313,7 +311,28 @@ void EXPECT_INDEX(
   REQUIRE(expr_to_str(expr) == expr_to_str(expected_expr));
 }
 
-void EXPECT_EMPTY_INDEX(
+void EXPECT_INDEX(
+  std::shared_ptr<const abstract_objectt> &result,
+  int index,
+  std::vector<int> expected,
+  abstract_environmentt &environment,
+  namespacet &ns)
+{
+  auto type = signedbv_typet(32);
+  auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
+  auto value =
+    as_value_set(result->expression_transform(index_expr, {}, environment, ns));
+
+  auto expected_exprs = std::vector<exprt>{};
+  for(int e : expected)
+    expected_exprs.push_back(from_integer(e, type));
+  INFO(
+    "Expect array[" + std::to_string(index) +
+    "] == " + exprs_to_str(expected_exprs));
+  EXPECT(value, expected_exprs);
+}
+
+void EXPECT_INDEX_TOP(
   std::shared_ptr<const abstract_objectt> &result,
   int index,
   abstract_environmentt &environment,
@@ -321,11 +340,10 @@ void EXPECT_EMPTY_INDEX(
 {
   auto type = signedbv_typet(32);
   auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
-  auto expr = result->expression_transform(index_expr, {}, environment, ns)
-                ->to_constant();
+  auto value = result->expression_transform(index_expr, {}, environment, ns);
 
-  INFO("Expect array[" + std::to_string(index) + "] to be empty");
-  REQUIRE(expr_to_str(expr) == expr_to_str(nil_exprt()));
+  INFO("Expect array[" + std::to_string(index) + "] to be TOP");
+  REQUIRE(value->is_top());
 }
 
 void EXPECT_UNMODIFIED(

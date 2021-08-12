@@ -90,7 +90,13 @@ void EXPECT_INDEX(
   int expected,
   abstract_environmentt &environment,
   namespacet &ns);
-void EXPECT_EMPTY_INDEX(
+void EXPECT_INDEX(
+  std::shared_ptr<const abstract_objectt> &result,
+  int index,
+  std::vector<int> expected,
+  abstract_environmentt &environment,
+  namespacet &ns);
+void EXPECT_INDEX_TOP(
   std::shared_ptr<const abstract_objectt> &result,
   int index,
   abstract_environmentt &environment,

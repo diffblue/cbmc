@@ -84,8 +84,8 @@ SCENARIO(
         REQUIRE_FALSE(result.object->is_top());
         REQUIRE_FALSE(result.object->is_bottom());
         EXPECT_INDEX(result.object, 0, val1[0], environment, ns);
-        EXPECT_EMPTY_INDEX(result.object, 1, environment, ns);
-        EXPECT_EMPTY_INDEX(result.object, 1, environment, ns);
+        EXPECT_INDEX_TOP(result.object, 1, environment, ns);
+        EXPECT_INDEX_TOP(result.object, 1, environment, ns);
 
         // Since it has modified, we definitely shouldn't be reusing the pointer
         REQUIRE_FALSE(result.object == op1);
@@ -107,7 +107,7 @@ SCENARIO(
         REQUIRE(result.object->is_top());
         REQUIRE_FALSE(result.object->is_bottom());
         for(int i = 0; i != 3; ++i)
-          EXPECT_EMPTY_INDEX(result.object, i, environment, ns);
+          EXPECT_INDEX_TOP(result.object, i, environment, ns);
 
         // We can't reuse the abstract object as the value has changed
         REQUIRE(result.object != op1);
@@ -151,7 +151,7 @@ SCENARIO(
         REQUIRE(result.object->is_top());
         REQUIRE_FALSE(result.object->is_bottom());
         for(int i = 0; i != 3; ++i)
-          EXPECT_EMPTY_INDEX(result.object, i, environment, ns);
+          EXPECT_INDEX_TOP(result.object, i, environment, ns);
 
         // Is optimal
         REQUIRE(result.object == op1);
@@ -173,7 +173,7 @@ SCENARIO(
         REQUIRE(result.object->is_top());
         REQUIRE_FALSE(result.object->is_bottom());
         for(int i = 0; i != 3; ++i)
-          EXPECT_EMPTY_INDEX(result.object, i, environment, ns);
+          EXPECT_INDEX_TOP(result.object, i, environment, ns);
 
         // Is optimal
         REQUIRE(result.object == op1);
@@ -195,7 +195,7 @@ SCENARIO(
         REQUIRE(result.object->is_top());
         REQUIRE_FALSE(result.object->is_bottom());
         for(int i = 0; i != 3; ++i)
-          EXPECT_EMPTY_INDEX(result.object, i, environment, ns);
+          EXPECT_INDEX_TOP(result.object, i, environment, ns);
 
         // Is optimal
         REQUIRE(result.object == op1);
@@ -239,7 +239,7 @@ SCENARIO(
         REQUIRE(result.object->is_top());
         REQUIRE_FALSE(result.object->is_bottom());
         for(int i = 0; i != 3; ++i)
-          EXPECT_EMPTY_INDEX(result.object, i, environment, ns);
+          EXPECT_INDEX_TOP(result.object, i, environment, ns);
 
         // Is optimal
         REQUIRE(result.object != op1);
