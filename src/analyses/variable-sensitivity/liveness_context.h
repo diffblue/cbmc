@@ -64,6 +64,8 @@ public:
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;
 
+  locationt get_location() const;
+
 protected:
   CLONE
 
@@ -81,8 +83,6 @@ protected:
     const exprt &specifier,
     const abstract_object_pointert &value,
     bool merging_write) const override;
-
-  locationt get_location() const;
 
 private:
   using liveness_context_ptrt = std::shared_ptr<const liveness_contextt>;
