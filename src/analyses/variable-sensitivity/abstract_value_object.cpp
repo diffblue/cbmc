@@ -273,25 +273,31 @@ private:
 
   abstract_object_pointert try_transform_expr_with_all_rounding_modes() const
   {
-    std::vector<abstract_object_pointert> possible_results;
+    abstract_object_pointert last_result;
+
+    auto results_differ = [](
+                            const abstract_object_pointert &prev,
+                            const abstract_object_pointert &cur) {
+      if(prev == nullptr)
+        return false;
+      return prev->to_constant() != cur->to_constant();
+    };
+
     for(auto rounding_mode : all_rounding_modes)
     {
       auto child_env(environment_with_rounding_mode(rounding_mode));
       auto child_operands =
         reeval_operands(expression.operands(), child_env, ns);
 
-      possible_results.push_back(
-        constants_evaluator(expression, child_operands, child_env, ns)());
+      auto result =
+        constants_evaluator(expression, child_operands, child_env, ns)();
+
+      if(result->is_top() || results_differ(last_result, result))
+        return top(expression.type());
+      last_result = result;
     }
 
-    auto first = possible_results.front()->to_constant();
-    for(auto const &possible_result : possible_results)
-    {
-      auto current = possible_result->to_constant();
-      if(current.is_nil() || current != first)
-        return top(expression.type());
-    }
-    return possible_results.front();
+    return last_result;
   }
 
   abstract_environmentt
