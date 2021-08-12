@@ -77,6 +77,11 @@ public:
   variable_sensitivity_object_factoryt(
     const variable_sensitivity_object_factoryt &) = delete;
 
+  const vsd_configt &config() const
+  {
+    return configuration;
+  }
+
 private:
   /// Decide which abstract object type to use for the variable in question.
   ///
