@@ -9,6 +9,7 @@
 #include <ostream>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
@@ -24,8 +25,6 @@ struct eval_index_resultt
   mp_integer value;
   bool overrun;
 };
-
-static mp_integer max_array_index = 10;
 
 static eval_index_resultt eval_index(
   const exprt &expr,
@@ -469,6 +468,7 @@ static eval_index_resultt eval_index(
   mp_integer out_index;
   bool result = to_integer(to_constant_expr(value), out_index);
 
+  auto max_array_index = env.configuration().maximum_array_index;
   bool overrun = (out_index > max_array_index);
 
   return {!result, overrun ? max_array_index : out_index, overrun};

@@ -11,6 +11,7 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 
+#include <limits>
 #include <map>
 
 #include <util/exception_utils.h>
@@ -50,6 +51,8 @@ struct vsd_configt
   ABSTRACT_OBJECT_TYPET union_abstract_type;
 
   flow_sensitivityt flow_sensitivity;
+
+  size_t maximum_array_index = std::numeric_limits<size_t>::max();
 
   struct
   {
