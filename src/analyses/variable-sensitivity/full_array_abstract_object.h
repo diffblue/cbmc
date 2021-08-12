@@ -203,6 +203,12 @@ private:
 
   shared_array_mapt map;
 
+  void map_put(mp_integer index, const abstract_object_pointert &value);
+  abstract_object_pointert map_find_or_top(
+    mp_integer index,
+    const abstract_environmentt &env,
+    const namespacet &ns) const;
+
   /// Short hand method for creating a top element of the array
   ///
   /// \param env: the abstract environment

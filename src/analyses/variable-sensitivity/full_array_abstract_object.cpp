@@ -25,7 +25,7 @@ struct eval_index_resultt
 };
 
 static eval_index_resultt eval_index(
-  const exprt &index,
+  const exprt &expr,
   const abstract_environmentt &env,
   const namespacet &ns);
 
@@ -211,32 +211,25 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
 {
   PRECONDITION(!is_bottom());
   auto index = eval_index(expr, env, ns);
+
   if(index.is_good)
-  {
-    // Here we are assuming it is always in bounds
-    auto const value = map.find(index.value);
-    if(value.has_value())
-      return value.value();
-    return get_top_entry(env, ns);
-  }
-  else
-  {
-    // Although we don't know where we are reading from, and therefore
-    // we should be returning a TOP value, we may still have useful
-    // additional information in elements of the array - such as write
-    // histories so we merge all the known array elements with TOP and return
-    // that.
+    return map_find_or_top(index.value, env, ns);
 
-    // Create a new TOP value of the appropriate element type
-    abstract_object_pointert result = get_top_entry(env, ns);
+  // Although we don't know where we are reading from, and therefore
+  // we should be returning a TOP value, we may still have useful
+  // additional information in elements of the array - such as write
+  // histories so we merge all the known array elements with TOP and return
+  // that.
 
-    // Merge each known element into the TOP value
-    for(const auto &element : map.get_view())
-      result =
-        abstract_objectt::merge(result, element.second, widen_modet::no).object;
+  // Create a new TOP value of the appropriate element type
+  auto result = get_top_entry(env, ns);
 
-    return result;
-  }
+  // Merge each known element into the TOP value
+  for(const auto &element : map.get_view())
+    result =
+      abstract_objectt::merge(result, element.second, widen_modet::no).object;
+
+  return result;
 }
 
 abstract_object_pointert full_array_abstract_objectt::write_element(
@@ -277,22 +270,10 @@ abstract_object_pointert full_array_abstract_objectt::write_sub_element(
   {
     // We were able to evaluate the index to a value, which we
     // assume is in bounds...
-    auto const old_value = map.find(index.value);
-
-    if(old_value.has_value())
-    {
-      result->map.replace(
-        index.value,
-        environment.write(old_value.value(), value, stack, ns, merging_write));
-    }
-    else
-    {
-      result->map.insert(
-        index.value,
-        environment.write(
-          get_top_entry(environment, ns), value, stack, ns, merging_write));
-    }
-
+    auto const existing_value = map_find_or_top(index.value, environment, ns);
+    result->map_put(
+      index.value,
+      environment.write(existing_value, value, stack, ns, merging_write));
     result->set_not_top();
     DATA_INVARIANT(result->verify(), "Structural invariants maintained");
     return result;
@@ -354,14 +335,9 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
     }
     else
     {
-      auto old_value = result->map.find(index.value);
-
-      if(old_value.has_value())
-        result->map.replace(index.value, value);
-      else
-        result->map.insert(index.value, value);
-
+      result->map_put(index.value, value);
       result->set_not_top();
+
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
       return result;
     }
@@ -371,6 +347,27 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
   // TODO(tkiley): Merge with each entry
   return abstract_aggregate_baset::write_component(
     environment, ns, std::stack<exprt>(), expr, value, merging_write);
+}
+
+void full_array_abstract_objectt::map_put(
+  mp_integer index_value,
+  const abstract_object_pointert &value)
+{
+  auto old_value = map.find(index_value);
+
+  if(old_value.has_value())
+    map.replace(index_value, value);
+  else
+    map.insert(index_value, value);
+}
+
+abstract_object_pointert full_array_abstract_objectt::map_find_or_top(
+  mp_integer index_value,
+  const abstract_environmentt &env,
+  const namespacet &ns) const
+{
+  auto value = map.find(index_value);
+  return value.has_value() ? value.value() : get_top_entry(env, ns);
 }
 
 abstract_object_pointert full_array_abstract_objectt::get_top_entry(
