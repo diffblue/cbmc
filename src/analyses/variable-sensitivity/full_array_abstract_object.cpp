@@ -18,11 +18,16 @@
 #include "location_update_visitor.h"
 #include "map_visit.h"
 
-bool eval_index(
+struct eval_index_resultt
+{
+  bool is_good;
+  mp_integer value;
+};
+
+static eval_index_resultt eval_index(
   const exprt &index,
   const abstract_environmentt &env,
-  const namespacet &ns,
-  mp_integer &out_index);
+  const namespacet &ns);
 
 template <typename index_fn>
 abstract_object_pointert apply_to_index_range(
@@ -205,11 +210,11 @@ abstract_object_pointert full_array_abstract_objectt::read_element(
   const namespacet &ns) const
 {
   PRECONDITION(!is_bottom());
-  mp_integer index_value;
-  if(eval_index(expr, env, ns, index_value))
+  auto index = eval_index(expr, env, ns);
+  if(index.is_good)
   {
     // Here we are assuming it is always in bounds
-    auto const value = map.find(index_value);
+    auto const value = map.find(index.value);
     if(value.has_value())
       return value.value();
     return get_top_entry(env, ns);
@@ -266,25 +271,24 @@ abstract_object_pointert full_array_abstract_objectt::write_sub_element(
   const auto &result =
     std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
-  mp_integer index_value;
-  bool good_index = eval_index(expr, environment, ns, index_value);
+  auto index = eval_index(expr, environment, ns);
 
-  if(good_index)
+  if(index.is_good)
   {
     // We were able to evaluate the index to a value, which we
     // assume is in bounds...
-    auto const old_value = map.find(index_value);
+    auto const old_value = map.find(index.value);
 
     if(old_value.has_value())
     {
       result->map.replace(
-        index_value,
+        index.value,
         environment.write(old_value.value(), value, stack, ns, merging_write));
     }
     else
     {
       result->map.insert(
-        index_value,
+        index.value,
         environment.write(
           get_top_entry(environment, ns), value, stack, ns, merging_write));
     }
@@ -321,10 +325,9 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
   const auto &result =
     std::dynamic_pointer_cast<full_array_abstract_objectt>(mutable_clone());
 
-  mp_integer index_value;
-  bool good_index = eval_index(expr, environment, ns, index_value);
+  auto index = eval_index(expr, environment, ns);
 
-  if(good_index)
+  if(index.is_good)
   {
     // We were able to evaluate the index expression to a constant
     if(merging_write)
@@ -337,11 +340,11 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
 
       INVARIANT(!result->map.empty(), "If not top, map cannot be empty");
 
-      auto old_value = result->map.find(index_value);
+      auto old_value = result->map.find(index.value);
       if(old_value.has_value()) // if not found it's top, so nothing to merge
       {
         result->map.replace(
-          index_value,
+          index.value,
           abstract_objectt::merge(old_value.value(), value, widen_modet::no)
             .object);
       }
@@ -351,12 +354,12 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
     }
     else
     {
-      auto old_value = result->map.find(index_value);
+      auto old_value = result->map.find(index.value);
 
       if(old_value.has_value())
-        result->map.replace(index_value, value);
+        result->map.replace(index.value, value);
       else
-        result->map.insert(index_value, value);
+        result->map.insert(index.value, value);
 
       result->set_not_top();
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -438,20 +441,20 @@ void full_array_abstract_objectt::statistics(
   statistics.objects_memory_usage += memory_sizet::from_bytes(sizeof(*this));
 }
 
-bool eval_index(
+static eval_index_resultt eval_index(
   const exprt &expr,
   const abstract_environmentt &env,
-  const namespacet &ns,
-  mp_integer &out_index)
+  const namespacet &ns)
 {
-  const index_exprt &index = to_index_expr(expr);
-  abstract_object_pointert index_abstract_object = env.eval(index.index(), ns);
-  exprt value = index_abstract_object->to_constant();
+  const auto &index_expr = to_index_expr(expr);
+  auto index_abstract_object = env.eval(index_expr.index(), ns);
+  auto value = index_abstract_object->to_constant();
 
   if(!value.is_constant())
-    return false;
+    return {false};
 
-  constant_exprt constant_index = to_constant_expr(value);
-  bool result = to_integer(constant_index, out_index);
-  return !result;
+  mp_integer out_index;
+  bool result = to_integer(to_constant_expr(value), out_index);
+
+  return {!result, out_index};
 }
