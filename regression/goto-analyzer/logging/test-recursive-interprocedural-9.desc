@@ -1,0 +1,18 @@
+CORE
+main.c
+--verify --recursive-interprocedural --vsd --loop-unwind-and-branching 10 --one-domain-per-history --verbosity 9
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1] line \d+ assertion local == global: SUCCESS$
+^\[main\.assertion\.2] line \d+ assertion local == global: UNKNOWN$
+^\[main\.assertion\.3] line \d+ assertion local == global: SUCCESS$
+^\[main\.assertion\.4] line \d+ assertion local == global: UNKNOWN$
+^ai_baset::visit \d+ in main$
+^ai_baset::visit_edge from \d+ to \d+\.\.\. gives a new history\.\.\. applying transformer\.\.\. merging\.\.\. result queued\.$
+^ai_baset::visit_function_call at \d+$
+^ai_baset::visit_end_function main$
+^ai_recursive_interproceduralt::visit_edge_function_call from \d+ to \d+$
+--
+^warning: ignoring
+^p = local_control_flow_history : location \d+
+^global \(\) -> 0 @ \[\d+\]$
