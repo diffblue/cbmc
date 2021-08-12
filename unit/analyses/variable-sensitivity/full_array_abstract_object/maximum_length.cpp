@@ -46,7 +46,7 @@ SCENARIO(
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
-  WHEN("Under maximum size, array = {1, 2, 3}")
+  WHEN("array = {1, 2, 3}, writes under maximum size")
   {
     WHEN("array[3] = 4")
     {
@@ -89,6 +89,23 @@ SCENARIO(
         EXPECT_EMPTY_INDEX(updated, 3, environment, ns);
         EXPECT_EMPTY_INDEX(updated, 4, environment, ns);
         EXPECT_INDEX(updated, 5, 99, environment, ns);
+      }
+    }
+  }
+  WHEN("array = {1, 2, 3}, writes beyond maximum size mapped to max_size")
+  {
+    WHEN("array[99] = 4")
+    {
+      auto array = build_array({1, 2, 3}, environment, ns);
+
+      auto updated = write_array(array, 99, 4, environment, ns);
+
+      THEN("array equals {1, 2, 3, ..., [10] = 4}")
+      {
+        EXPECT_INDEX(updated, 0, 1, environment, ns);
+        EXPECT_INDEX(updated, 1, 2, environment, ns);
+        EXPECT_INDEX(updated, 2, 3, environment, ns);
+        EXPECT_INDEX(updated, 10, 4, environment, ns);
       }
     }
   }
