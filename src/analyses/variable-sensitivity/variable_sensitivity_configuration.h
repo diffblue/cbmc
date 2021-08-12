@@ -58,11 +58,6 @@ struct vsd_configt
     bool last_write_context;
   } context_tracking;
 
-  struct
-  {
-    bool new_value_set;
-  } advanced_sensitivities;
-
   static vsd_configt from_options(const optionst &options);
 
   static vsd_configt constant_domain();
@@ -76,8 +71,7 @@ struct vsd_configt
       array_abstract_type{ARRAY_INSENSITIVE},
       union_abstract_type{UNION_INSENSITIVE},
       flow_sensitivity{flow_sensitivityt::sensitive},
-      context_tracking{false, true},
-      advanced_sensitivities{false}
+      context_tracking{false, true}
   {
   }
 
