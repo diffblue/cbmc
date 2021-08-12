@@ -32,7 +32,6 @@ public:
   std::vector<symbol_exprt> temporary_declarations() const;
   exprt alias_expression(const exprt &lhs);
   exprt compatible_expression(const assigns_clause_targett &called_target);
-  goto_programt havoc_code() const;
   const exprt &get_direct_pointer() const;
   goto_programt &get_init_block();
 
