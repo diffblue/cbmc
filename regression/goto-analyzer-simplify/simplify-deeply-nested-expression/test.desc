@@ -1,0 +1,10 @@
+CORE
+main.c
+--vsd
+^SIGNAL=0$
+^EXIT=0$
+--
+--
+This expression is derived from a real system under test. Due to inadvertent reevaluation of expression operands, all expression evaluations had geometric complexity (even more so in the presence of TOP values). This particular expression took nearly two hours to evaluate. Reworking to prevent repeated reevaluation brings this down to a few tenths.
+See https://github.com/diffblue/cbmc/pull/6290
+If this test appears to hang, the constant_evaluator is probably your first port of call.
