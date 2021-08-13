@@ -13,7 +13,7 @@ Author: Daniel Poetzl
 #define CPROVER_UTIL_SHARING_MAP_H
 
 #ifdef SM_DEBUG
-#include <iostream>
+#  include <iostream>
 #endif
 
 #include <functional>
@@ -34,9 +34,9 @@ Author: Daniel Poetzl
 #include "threeval.h"
 
 #ifdef SM_INTERNAL_CHECKS
-#define SM_ASSERT(b) INVARIANT(b, "Sharing map internal invariant")
+#  define SM_ASSERT(b) INVARIANT(b, "Sharing map internal invariant")
 #else
-#define SM_ASSERT(b)
+#  define SM_ASSERT(b)
 #endif
 
 // clang-format off
@@ -344,8 +344,8 @@ public:
     map.swap(other.map);
 
     std::size_t tmp = num;
-    num=other.num;
-    other.num=tmp;
+    num = other.num;
+    other.num = tmp;
   }
 
   /// Get number of elements in map
@@ -359,14 +359,14 @@ public:
   /// Check if map is empty
   bool empty() const
   {
-    return num==0;
+    return num == 0;
   }
 
   /// Clear map
   void clear()
   {
     map.clear();
-    num=0;
+    num = 0;
   }
 
   /// Check if key is in map
@@ -376,7 +376,7 @@ public:
   /// - Best case: O(1)
   bool has_key(const key_type &k) const
   {
-    return get_leaf_node(k)!=nullptr;
+    return get_leaf_node(k) != nullptr;
   }
 
   // views
@@ -695,8 +695,7 @@ SHARING_MAPT(void)
         f(l.get_key(), l.get_value());
       }
     }
-  }
-  while(!stack.empty());
+  } while(!stack.empty());
 }
 
 SHARING_MAPT(std::size_t)
@@ -907,7 +906,10 @@ SHARING_MAPT(void)::add_item_if_not_shared(
         }
       }
 
-      delta_view.push_back({k, leaf.get_value()});
+      if(!only_common)
+      {
+        delta_view.push_back({k, leaf.get_value()});
+      }
 
       return;
     }
@@ -920,10 +922,11 @@ SHARING_MAPT(void)::add_item_if_not_shared(
       if(equalT()(leaf.get_key(), ip->get_key()))
       {
         delta_view.push_back({k, leaf.get_value(), ip->get_value()});
-        return;
       }
-
-      delta_view.push_back({k, leaf.get_value()});
+      else if(!only_common)
+      {
+        delta_view.push_back({k, leaf.get_value()});
+      }
 
       return;
     }
@@ -1113,8 +1116,7 @@ SHARING_MAPT(void)
         }
       }
     }
-  }
-  while(!stack.empty());
+  } while(!stack.empty());
 }
 
 SHARING_MAPT2(, delta_viewt)::get_delta_view(
@@ -1217,7 +1219,7 @@ SHARING_MAPT(void)::erase(const key_type &k)
     if(m.size() > 1 || del == nullptr)
     {
       del = ip;
-      del_bit=bit;
+      del_bit = bit;
     }
 
     ip = &ip->add_child(bit);
