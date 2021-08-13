@@ -13,6 +13,10 @@
 #include <limits>
 #include <util/options.h>
 
+static void check_one_of_options(
+  const optionst &options,
+  const std::vector<std::string> &names);
+
 vsd_configt vsd_configt::from_options(const optionst &options)
 {
   vsd_configt config{};
@@ -37,6 +41,7 @@ vsd_configt vsd_configt::from_options(const optionst &options)
   config.context_tracking.data_dependency_context =
     options.get_bool_option("data-dependencies");
   config.context_tracking.liveness = options.get_bool_option("liveness");
+  check_one_of_options(options, {"data-dependencies", "liveness"});
 
   config.flow_sensitivity = (options.get_bool_option("flow-insensitive"))
                               ? flow_sensitivityt::insensitive
@@ -165,4 +170,27 @@ size_t vsd_configt::option_to_size(
     throw invalid_argument(option_name, argument, mapping);
   }
   return selected->second;
+}
+
+void check_one_of_options(
+  const optionst &options,
+  const std::vector<std::string> &names)
+{
+  int how_many = 0;
+  for(auto &name : names)
+    how_many += options.get_bool_option(name);
+
+  if(how_many <= 1)
+    return;
+
+  auto choices = std::string("");
+  for(auto &name : names)
+  {
+    choices += (!choices.empty() ? "|" : "");
+    auto option = "--vsd-" + name;
+    choices += option;
+  }
+
+  throw invalid_command_line_argument_exceptiont{"Conflicting arguments",
+                                                 "Can only use of " + choices};
 }
