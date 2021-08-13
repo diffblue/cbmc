@@ -120,7 +120,8 @@ class ieee_floatt
 public:
   // ROUND_TO_EVEN is also known as "round to nearest, ties to even", and
   // is the IEEE default.
-  // The numbering below is what x86 uses in the control word.
+  // The numbering below is what x86 uses in the control word and
+  // what is recommended in C11 5.2.4.2.2
   enum rounding_modet
   {
     ROUND_TO_EVEN=0, ROUND_TO_MINUS_INF=1,

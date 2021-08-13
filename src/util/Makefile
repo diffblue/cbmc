@@ -22,6 +22,7 @@ SRC = allocate_objects.cpp \
       find_macros.cpp \
       find_symbols.cpp \
       fixedbv.cpp \
+      floatbv_expr.cpp \
       format_constant.cpp \
       format_expr.cpp \
       format_number_range.cpp \
