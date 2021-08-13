@@ -67,7 +67,7 @@ SCENARIO(
       env.assign(x_name, val2, ns);
       env.assign(y_name, val3, ns);
 
-      THEN_PREDICATE(env, "y == 3 && x == 2");
+      THEN_PREDICATE(env, "x == 2 && y == 3");
     }
   }
 }

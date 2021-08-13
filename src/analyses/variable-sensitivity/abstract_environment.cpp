@@ -9,9 +9,11 @@
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object_statistics.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
 #include <util/simplify_expr_class.h>
+#include <util/simplify_utils.h>
 
 #include <algorithm>
 #include <map>
@@ -427,7 +429,7 @@ exprt abstract_environmentt::to_predicate() const
   if(is_top())
     return true_exprt();
 
-  auto predicates = std::vector<exprt>{};
+  exprt::operandst predicates;
   for(const auto &entry : map.get_view())
   {
     auto sym = entry.first;
@@ -439,6 +441,8 @@ exprt abstract_environmentt::to_predicate() const
 
   if(predicates.size() == 1)
     return predicates.front();
+
+  sort_operands(predicates);
   return and_exprt(predicates);
 }
 
