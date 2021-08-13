@@ -1,6 +1,6 @@
 int main(void)
 {
-  int arr[] = {1, 2, 3};
+  int arr[] = {1, 2, 3, 4, 5};
   int ix;
   if(ix)
   {
@@ -10,9 +10,11 @@ int main(void)
   {
     ix = 2;
   }
-  // ix is between 0 and 2
-  // so this is between 1 and 3
+
+  // ix is between 0 and 4
+  // so this is between 1 and 5
   int arr_at_ix = arr[ix];
+
   int write_ix;
   if(write_ix)
   {
@@ -20,14 +22,13 @@ int main(void)
   }
   else
   {
-    write_ix = 1;
+    write_ix = 4;
   }
-  arr[write_ix] = 4;
+  arr[write_ix] = 99;
   int arr_0_after_write = arr[0];
   int arr_1_after_write = arr[1];
-  // We can't write to arr[2]
-  // because write_ix is between 0 and 1
-  // so this should be unchanged
   int arr_2_after_write = arr[2];
+  int arr_3_after_write = arr[3];
+  int arr_4_after_write = arr[4];
   return 0;
 }
