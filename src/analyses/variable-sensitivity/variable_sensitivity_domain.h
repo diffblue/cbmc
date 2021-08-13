@@ -75,6 +75,7 @@
   "(vsd-values):"                                                              \
   "(vsd-structs):"                                                             \
   "(vsd-arrays):"                                                              \
+  "(vsd-array-max-elements):"                                                  \
   "(vsd-pointers):"                                                            \
   "(vsd-unions):"                                                              \
   "(vsd-flow-insensitive)"                                                     \
@@ -88,7 +89,9 @@
   " --vsd-structs                struct field sensitive analysis - "           \
   "top-bottom|every-field\n" /* NOLINT(whitespace/line_length) */              \
   " --vsd-arrays                 array entry sensitive analysis - "            \
-  "top-bottom|smash|every-element\n" /* NOLINT(whitespace/line_length) */      \
+  "top-bottom|smash|up-to-n-elements|every-element\n" /* NOLINT(whitespace/line_length) */ \
+  " --vsd-array-max-elements     the n in --vsd-arrays up-to-n-elements - "    \
+  "defaults 10 if not given" /* NOLINT(whitespace/line_length) */ \
   " --vsd-pointers               pointer sensitive analysis - "                \
   "top-bottom|constants|value-set\n" /* NOLINT(whitespace/line_length) */      \
   " --vsd-unions                 union sensitive analysis - top-bottom\n"      \
@@ -102,6 +105,7 @@
   options.set_option("values", cmdline.get_value("vsd-values"));               \
   options.set_option("pointers", cmdline.get_value("vsd-pointers"));           \
   options.set_option("arrays", cmdline.get_value("vsd-arrays"));               \
+  options.set_option("array-max-elements", cmdline.get_value("vsd-array-max-elements")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("structs", cmdline.get_value("vsd-structs"));             \
   options.set_option("unions", cmdline.get_value("vsd-unions"));               \
   options.set_option("flow-insensitive", cmdline.isset("vsd-flow-insensitive")); /* NOLINT(whitespace/line_length) */ \

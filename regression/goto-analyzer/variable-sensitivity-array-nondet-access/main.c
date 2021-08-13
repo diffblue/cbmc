@@ -11,8 +11,8 @@ int main(void)
     ix = 2;
   }
 
-  // ix is between 0 and 4
-  // so this is between 1 and 5
+  // ix is between 0 and 2
+  // so this is between 1 and 3
   int arr_at_ix = arr[ix];
 
   int write_ix;

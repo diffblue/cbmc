@@ -1,0 +1,10 @@
+CORE
+main.c
+--show --variable-sensitivity --vsd-values constants --vsd-arrays smash
+^EXIT=0$
+^SIGNAL=0$
+main::1::arr_0_after_write \(\) -> TOP
+main::1::arr_1_after_write \(\) -> TOP
+main::1::arr_2_after_write \(\) -> TOP
+main::1::arr_3_after_write \(\) -> TOP
+main::1::arr_4_after_write \(\) -> TOP

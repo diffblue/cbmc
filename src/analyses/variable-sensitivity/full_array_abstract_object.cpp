@@ -484,7 +484,7 @@ static eval_index_resultt eval_index(
   const namespacet &ns)
 {
   auto max_array_index = env.configuration().maximum_array_index;
-  bool overrun = (index > max_array_index);
+  bool overrun = (index >= max_array_index);
 
   return {true, overrun ? max_array_index : index, overrun};
 }

@@ -87,6 +87,8 @@ private:
     const option_mappingt &mapping,
     ABSTRACT_OBJECT_TYPET default_type);
 
+  static size_t configure_max_array_size(const optionst &options);
+
   static size_t option_to_size(
     const optionst &options,
     const std::string &option_name,
