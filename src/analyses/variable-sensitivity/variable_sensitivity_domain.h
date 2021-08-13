@@ -88,7 +88,7 @@
   " --vsd-structs                struct field sensitive analysis - "           \
   "top-bottom|every-field\n" /* NOLINT(whitespace/line_length) */              \
   " --vsd-arrays                 array entry sensitive analysis - "            \
-  "top-bottom|every-element\n" /* NOLINT(whitespace/line_length) */            \
+  "top-bottom|smash|every-element\n" /* NOLINT(whitespace/line_length) */      \
   " --vsd-pointers               pointer sensitive analysis - "                \
   "top-bottom|constants|value-set\n" /* NOLINT(whitespace/line_length) */      \
   " --vsd-unions                 union sensitive analysis - top-bottom\n"      \

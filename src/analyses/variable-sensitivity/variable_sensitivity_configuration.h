@@ -11,7 +11,6 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 
-#include <limits>
 #include <map>
 
 #include <util/exception_utils.h>
@@ -52,7 +51,7 @@ struct vsd_configt
 
   flow_sensitivityt flow_sensitivity;
 
-  size_t maximum_array_index = std::numeric_limits<size_t>::max();
+  size_t maximum_array_index = 0;
 
   struct
   {
@@ -80,6 +79,7 @@ struct vsd_configt
 
 private:
   using option_mappingt = std::map<std::string, ABSTRACT_OBJECT_TYPET>;
+  using option_size_mappingt = std::map<std::string, size_t>;
 
   static ABSTRACT_OBJECT_TYPET option_to_abstract_type(
     const optionst &options,
@@ -87,15 +87,16 @@ private:
     const option_mappingt &mapping,
     ABSTRACT_OBJECT_TYPET default_type);
 
-  static invalid_command_line_argument_exceptiont invalid_argument(
+  static size_t option_to_size(
+    const optionst &options,
     const std::string &option_name,
-    const std::string &bad_argument,
-    const option_mappingt &mapping);
+    const option_size_mappingt &mapping);
 
   static const option_mappingt value_option_mappings;
   static const option_mappingt pointer_option_mappings;
   static const option_mappingt struct_option_mappings;
   static const option_mappingt array_option_mappings;
+  static const option_size_mappingt array_option_size_mappings;
   static const option_mappingt union_option_mappings;
 };
 

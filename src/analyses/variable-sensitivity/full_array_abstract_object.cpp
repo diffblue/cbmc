@@ -30,6 +30,10 @@ static eval_index_resultt eval_index(
   const exprt &expr,
   const abstract_environmentt &env,
   const namespacet &ns);
+static eval_index_resultt eval_index(
+  const mp_integer &index,
+  const abstract_environmentt &env,
+  const namespacet &ns);
 
 template <typename index_fn>
 abstract_object_pointert apply_to_index_range(
@@ -83,11 +87,12 @@ full_array_abstract_objectt::full_array_abstract_objectt(
 {
   if(expr.id() == ID_array)
   {
-    int index = 0;
+    mp_integer i = 0;
     for(const exprt &entry : expr.operands())
     {
-      map.insert(mp_integer(index), environment.eval(entry, ns));
-      ++index;
+      auto index = eval_index(i, environment, ns);
+      map_put(index.value, environment.eval(entry, ns), index.overrun);
+      ++i;
     }
     set_not_top();
   }
@@ -467,9 +472,19 @@ static eval_index_resultt eval_index(
 
   mp_integer out_index;
   bool result = to_integer(to_constant_expr(value), out_index);
+  if(result)
+    return {false};
 
+  return eval_index(out_index, env, ns);
+}
+
+static eval_index_resultt eval_index(
+  const mp_integer &index,
+  const abstract_environmentt &env,
+  const namespacet &ns)
+{
   auto max_array_index = env.configuration().maximum_array_index;
-  bool overrun = (out_index > max_array_index);
+  bool overrun = (index > max_array_index);
 
-  return {!result, overrun ? max_array_index : out_index, overrun};
+  return {true, overrun ? max_array_index : index, overrun};
 }

@@ -10,6 +10,7 @@
 /// domain abstractions are used, flow sensitivity, etc
 #include "variable_sensitivity_configuration.h"
 
+#include <limits>
 #include <util/options.h>
 
 vsd_configt vsd_configt::from_options(const optionst &options)
@@ -41,6 +42,9 @@ vsd_configt vsd_configt::from_options(const optionst &options)
                               ? flow_sensitivityt::insensitive
                               : flow_sensitivityt::sensitive;
 
+  config.maximum_array_index =
+    option_to_size(options, "arrays", array_option_size_mappings);
+
   return config;
 }
 
@@ -52,6 +56,7 @@ vsd_configt vsd_configt::constant_domain()
   config.pointer_abstract_type = POINTER_SENSITIVE;
   config.struct_abstract_type = STRUCT_SENSITIVE;
   config.array_abstract_type = ARRAY_SENSITIVE;
+  config.maximum_array_index = std::numeric_limits<size_t>::max();
   return config;
 }
 
@@ -62,6 +67,7 @@ vsd_configt vsd_configt::value_set()
   config.pointer_abstract_type = VALUE_SET_OF_POINTERS;
   config.struct_abstract_type = STRUCT_SENSITIVE;
   config.array_abstract_type = ARRAY_SENSITIVE;
+  config.maximum_array_index = std::numeric_limits<size_t>::max();
   return config;
 }
 
@@ -73,6 +79,7 @@ vsd_configt vsd_configt::intervals()
   config.pointer_abstract_type = POINTER_SENSITIVE;
   config.struct_abstract_type = STRUCT_SENSITIVE;
   config.array_abstract_type = ARRAY_SENSITIVE;
+  config.maximum_array_index = std::numeric_limits<size_t>::max();
   return config;
 }
 
@@ -92,15 +99,23 @@ const vsd_configt::option_mappingt vsd_configt::struct_option_mappings = {
 
 const vsd_configt::option_mappingt vsd_configt::array_option_mappings = {
   {"top-bottom", ARRAY_INSENSITIVE},
+  {"smash", ARRAY_SENSITIVE},
   {"every-element", ARRAY_SENSITIVE}};
+
+const vsd_configt::option_size_mappingt
+  vsd_configt::array_option_size_mappings = {
+    {"top-bottom", 0},
+    {"smash", 0},
+    {"every-element", std::numeric_limits<size_t>::max()}};
 
 const vsd_configt::option_mappingt vsd_configt::union_option_mappings = {
   {"top-bottom", UNION_INSENSITIVE}};
 
-invalid_command_line_argument_exceptiont vsd_configt::invalid_argument(
+template <class mappingt>
+invalid_command_line_argument_exceptiont invalid_argument(
   const std::string &option_name,
   const std::string &bad_argument,
-  const option_mappingt &mapping)
+  const mappingt &mapping)
 {
   auto option = "--vsd-" + option_name;
   auto choices = std::string("");
@@ -124,6 +139,25 @@ ABSTRACT_OBJECT_TYPET vsd_configt::option_to_abstract_type(
 
   if(argument.empty())
     return default_type;
+
+  auto selected = mapping.find(argument);
+  if(selected == mapping.end())
+  {
+    throw invalid_argument(option_name, argument, mapping);
+  }
+  return selected->second;
+}
+
+size_t vsd_configt::option_to_size(
+  const optionst &options,
+  const std::string &option_name,
+  const option_size_mappingt &mapping)
+{
+  const size_t def = std::numeric_limits<size_t>::max();
+  const auto argument = options.get_option(option_name);
+
+  if(argument.empty())
+    return def;
 
   auto selected = mapping.find(argument);
   if(selected == mapping.end())
