@@ -919,10 +919,11 @@ SHARING_MAPT(void)::add_item_if_not_shared(
       if(equalT()(leaf.get_key(), ip->get_key()))
       {
         delta_view.push_back({k, leaf.get_value(), ip->get_value()});
-        return;
       }
-
-      delta_view.push_back({k, leaf.get_value()});
+      else if(!only_common)
+      {
+        delta_view.push_back({k, leaf.get_value()});
+      }
 
       return;
     }
