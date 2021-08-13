@@ -906,7 +906,10 @@ SHARING_MAPT(void)::add_item_if_not_shared(
         }
       }
 
-      delta_view.push_back({k, leaf.get_value()});
+      if(!only_common)
+      {
+        delta_view.push_back({k, leaf.get_value()});
+      }
 
       return;
     }
