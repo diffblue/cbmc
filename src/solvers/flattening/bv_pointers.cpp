@@ -508,7 +508,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     return SUB::convert_byte_extract(to_byte_extract_expr(expr));
   }
-  else
+  else if(
+    expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian)
   {
     return SUB::convert_byte_update(to_byte_update_expr(expr));
   }
