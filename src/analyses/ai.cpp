@@ -269,6 +269,10 @@ bool ai_baset::visit(
 {
   bool new_data=false;
   locationt l = p->current_location();
+  messaget log(message_handler);
+
+  log.progress() << "ai_baset::visit " << l->location_number << " in "
+                 << function_id << messaget::eom;
 
   // Function call and end are special cases
   if(l->is_function_call())
@@ -325,11 +329,27 @@ bool ai_baset::visit_edge(
   const namespacet &ns,
   working_sett &working_set)
 {
+  messaget log(message_handler);
+  log.progress() << "ai_baset::visit_edge from "
+                 << p->current_location()->location_number << " to "
+                 << to_l->location_number << "... ";
+
   // Has history taught us not to step here...
   auto next =
     p->step(to_l, *(storage->abstract_traces_before(to_l)), caller_history);
   if(next.first == ai_history_baset::step_statust::BLOCKED)
+  {
+    log.progress() << "blocked by history" << messaget::eom;
     return false;
+  }
+  else if(next.first == ai_history_baset::step_statust::NEW)
+  {
+    log.progress() << "gives a new history... ";
+  }
+  else
+  {
+    log.progress() << "merges with existing history... ";
+  }
   trace_ptrt to_p = next.second;
 
   // Abstract domains are mutable so we must copy before we transform
@@ -339,21 +359,50 @@ bool ai_baset::visit_edge(
   statet &new_values = *tmp_state;
 
   // Apply transformer
+  log.progress() << "applying transformer... ";
   new_values.transform(function_id, p, to_function_id, to_p, *this, ns);
 
   // Expanding a domain means that it has to be analysed again
   // Likewise if the history insists that it is a new trace
   // (assuming it is actually reachable).
+  log.progress() << "merging... ";
+  bool return_value = false;
   if(
     merge(new_values, p, to_p) ||
     (next.first == ai_history_baset::step_statust::NEW &&
      !new_values.is_bottom()))
   {
     put_in_working_set(working_set, to_p);
-    return true;
+    log.progress() << "result queued." << messaget::eom;
+    return_value = true;
+  }
+  else
+  {
+    log.progress() << "domain unchanged." << messaget::eom;
   }
 
-  return false;
+  // Branch because printing some histories and domains can be expensive
+  // esp. if the output is then just discarded and this is a critical path.
+  if(message_handler.get_verbosity() >= messaget::message_levelt::M_DEBUG)
+  {
+    log.debug() << "p = ";
+    p->output(log.debug());
+    log.debug() << messaget::eom;
+
+    log.debug() << "current = ";
+    current.output(log.debug(), *this, ns);
+    log.debug() << messaget::eom;
+
+    log.debug() << "to_p = ";
+    to_p->output(log.debug());
+    log.debug() << messaget::eom;
+
+    log.debug() << "new_values = ";
+    new_values.output(log.debug(), *this, ns);
+    log.debug() << messaget::eom;
+  }
+
+  return return_value;
 }
 
 bool ai_baset::visit_edge_function_call(
@@ -366,6 +415,11 @@ bool ai_baset::visit_edge_function_call(
   const goto_functionst &,
   const namespacet &ns)
 {
+  messaget log(message_handler);
+  log.progress() << "ai_baset::visit_edge_function_call from "
+                 << p_call->current_location()->location_number << " to "
+                 << l_return->location_number << messaget::eom;
+
   // The default implementation is not interprocedural
   // so the effects of the call are approximated but nothing else
   return visit_edge(
@@ -391,6 +445,10 @@ bool ai_baset::visit_function_call(
 
   PRECONDITION(l_call->is_function_call());
 
+  messaget log(message_handler);
+  log.progress() << "ai_baset::visit_function_call at "
+                 << l_call->location_number << messaget::eom;
+
   locationt l_return = std::next(l_call);
 
   // operator() allows analysis of a single goto_program independently
@@ -404,6 +462,8 @@ bool ai_baset::visit_function_call(
     {
       const irep_idt &callee_function_id =
         to_symbol_expr(callee_expression).get_identifier();
+
+      log.progress() << "Calling " << callee_function_id << messaget::eom;
 
       goto_functionst::function_mapt::const_iterator it =
         goto_functions.function_map.find(callee_function_id);
@@ -464,6 +524,10 @@ bool ai_baset::visit_end_function(
   locationt l = p->current_location();
   PRECONDITION(l->is_end_function());
 
+  messaget log(message_handler);
+  log.progress() << "ai_baset::visit_end_function " << function_id
+                 << messaget::eom;
+
   // Do nothing
   return false;
 }
@@ -478,6 +542,11 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
+  messaget log(message_handler);
+  log.progress() << "ai_recursive_interproceduralt::visit_edge_function_call"
+                 << " from " << p_call->current_location()->location_number
+                 << " to " << l_return->location_number << messaget::eom;
+
   // This is the edge from call site to function head.
   {
     locationt l_begin = callee.instructions.begin();
@@ -495,6 +564,9 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
       ns,
       catch_working_set);
 
+    log.progress() << "Handle " << callee_function_id << " recursively"
+                   << messaget::eom;
+
     // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
       fixedpoint(
@@ -507,6 +579,8 @@ bool ai_recursive_interproceduralt::visit_edge_function_call(
 
   // This is the edge from function end to return site.
   {
+    log.progress() << "Handle return edges" << messaget::eom;
+
     // get location at end of the procedure we have called
     locationt l_end = --callee.instructions.end();
     DATA_INVARIANT(

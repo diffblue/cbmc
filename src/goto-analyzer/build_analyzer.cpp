@@ -22,6 +22,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <goto-programs/goto_model.h>
 
+#include <util/message.h>
 #include <util/options.h>
 
 /// Ideally this should be a pure function of options.
@@ -29,7 +30,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 std::unique_ptr<ai_baset> build_analyzer(
   const optionst &options,
   const goto_modelt &goto_model,
-  const namespacet &ns)
+  const namespacet &ns,
+  message_handlert &mh)
 {
   auto vsd_config = vsd_configt::from_options(options);
   auto vs_object_factory =
@@ -99,7 +101,7 @@ std::unique_ptr<ai_baset> build_analyzer(
       if(options.get_bool_option("recursive-interprocedural"))
       {
         return util_make_unique<ai_recursive_interproceduralt>(
-          std::move(hf), std::move(df), std::move(st));
+          std::move(hf), std::move(df), std::move(st), mh);
       }
       else if(options.get_bool_option("three-way-merge"))
       {
@@ -107,7 +109,7 @@ std::unique_ptr<ai_baset> build_analyzer(
         if(options.get_bool_option("vsd"))
         {
           return util_make_unique<ai_three_way_merget>(
-            std::move(hf), std::move(df), std::move(st));
+            std::move(hf), std::move(df), std::move(st), mh);
         }
       }
     }
@@ -127,7 +129,7 @@ std::unique_ptr<ai_baset> build_analyzer(
     else if(options.get_bool_option("dependence-graph-vs"))
     {
       return util_make_unique<variable_sensitivity_dependence_grapht>(
-        goto_model.goto_functions, ns, vs_object_factory, vsd_config);
+        goto_model.goto_functions, ns, vs_object_factory, vsd_config, mh);
     }
     else if(options.get_bool_option("vsd"))
     {

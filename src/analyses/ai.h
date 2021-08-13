@@ -51,6 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/deprecate.h>
 #include <util/json.h>
 #include <util/make_unique.h>
+#include <util/message.h>
 #include <util/xml.h>
 
 #include <goto-programs/goto_model.h>
@@ -127,10 +128,12 @@ public:
   ai_baset(
     std::unique_ptr<ai_history_factory_baset> &&hf,
     std::unique_ptr<ai_domain_factory_baset> &&df,
-    std::unique_ptr<ai_storage_baset> &&st)
+    std::unique_ptr<ai_storage_baset> &&st,
+    message_handlert &mh)
     : history_factory(std::move(hf)),
       domain_factory(std::move(df)),
-      storage(std::move(st))
+      storage(std::move(st)),
+      message_handler(mh)
   {
   }
 
@@ -515,6 +518,9 @@ protected:
   {
     return storage->get_state(p, *domain_factory);
   }
+
+  // Logging
+  message_handlert &message_handler;
 };
 
 // Perform interprocedural analysis by simply recursing in the interpreter
@@ -525,8 +531,9 @@ public:
   ai_recursive_interproceduralt(
     std::unique_ptr<ai_history_factory_baset> &&hf,
     std::unique_ptr<ai_domain_factory_baset> &&df,
-    std::unique_ptr<ai_storage_baset> &&st)
-    : ai_baset(std::move(hf), std::move(df), std::move(st))
+    std::unique_ptr<ai_storage_baset> &&st,
+    message_handlert &mh)
+    : ai_baset(std::move(hf), std::move(df), std::move(st), mh)
   {
   }
 
@@ -562,7 +569,8 @@ public:
         util_make_unique<
           ai_history_factory_default_constructort<ahistoricalt>>(),
         util_make_unique<ai_domain_factory_default_constructort<domainT>>(),
-        util_make_unique<location_sensitive_storaget>())
+        util_make_unique<location_sensitive_storaget>(),
+        no_logging)
   {
   }
 
@@ -571,7 +579,8 @@ public:
         util_make_unique<
           ai_history_factory_default_constructort<ahistoricalt>>(),
         std::move(df),
-        util_make_unique<location_sensitive_storaget>())
+        util_make_unique<location_sensitive_storaget>(),
+        no_logging)
   {
   }
 
@@ -613,6 +622,9 @@ private:
   /// This function exists to enforce that `domainT` is derived from
   /// \ref ai_domain_baset
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
+
+  // To keep the old constructor interface we disable logging
+  null_message_handlert no_logging;
 };
 
 /// Base class for concurrency-aware abstract interpretation. See

@@ -568,7 +568,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     try
     {
-      analyzer = build_analyzer(options, goto_model, ns);
+      analyzer = build_analyzer(options, goto_model, ns, ui_message_handler);
     }
     catch(const invalid_command_line_argument_exceptiont &e)
     {

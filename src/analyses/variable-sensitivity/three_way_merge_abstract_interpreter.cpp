@@ -43,6 +43,11 @@ bool ai_three_way_merget::visit_edge_function_call(
     l_callee_end->is_end_function(),
     "The last instruction of a goto_program must be END_FUNCTION");
 
+  messaget log(message_handler);
+  log.progress() << "ai_three_way_merget::visit_edge_function_call"
+                 << " from " << l_call_site->location_number << " to "
+                 << l_callee_start->location_number << messaget::eom;
+
   // Histories for call_site and callee_start are easy
   trace_ptrt p_call_site = p_call;
 
@@ -54,6 +59,7 @@ bool ai_three_way_merget::visit_edge_function_call(
   {
     // Unexpected...
     // We can't three-way merge without a callee start so
+    log.progress() << "Blocked by history step!" << messaget::eom;
     return false;
   }
   trace_ptrt p_callee_start = next.second;
@@ -74,6 +80,9 @@ bool ai_three_way_merget::visit_edge_function_call(
       ns,
       catch_working_set);
 
+    log.progress() << "Handle " << callee_function_id << " recursively"
+                   << messaget::eom;
+
     // do we need to do/re-do the fixedpoint of the body?
     if(new_data)
       fixedpoint(
@@ -85,6 +94,7 @@ bool ai_three_way_merget::visit_edge_function_call(
   }
 
   // Now we can give histories for the return part
+  log.progress() << "Handle return edges" << messaget::eom;
 
   // Find the histories at the end of the function
   auto traces = storage->abstract_traces_before(l_callee_end);
@@ -96,11 +106,18 @@ bool ai_three_way_merget::visit_edge_function_call(
   // p_call_site and p_callee_start
   for(auto p_callee_end : *traces)
   {
+    log.progress() << "ai_three_way_merget::visit_edge_function_call edge from "
+                   << l_callee_end->location_number << " to "
+                   << l_return_site->location_number << "... ";
+
     // First off, is it even reachable?
     const statet &s_callee_end = get_state(p_callee_end);
 
     if(s_callee_end.is_bottom())
+    {
+      log.progress() << "unreachable on this trace" << messaget::eom;
       continue; // Unreachable in callee -- no need to merge
+    }
 
     // Can it return to p_call_site?
     auto return_step = p_callee_end->step(
@@ -108,7 +125,18 @@ bool ai_three_way_merget::visit_edge_function_call(
       *(storage->abstract_traces_before(l_return_site)),
       p_call_site); // Because it is a return edge!
     if(return_step.first == ai_history_baset::step_statust::BLOCKED)
+    {
+      log.progress() << "blocked by history" << messaget::eom;
       continue; // Can't return -- no need to merge
+    }
+    else if(return_step.first == ai_history_baset::step_statust::NEW)
+    {
+      log.progress() << "gives a new history... ";
+    }
+    else
+    {
+      log.progress() << "merges with existing history... ";
+    }
 
     // The fourth history!
     trace_ptrt p_return_site = return_step.second;
@@ -123,6 +151,7 @@ bool ai_three_way_merget::visit_edge_function_call(
     // Apply transformer
     // This is for an end_function instruction which normally doesn't do much
     // but in VSD it does, so this cannot be omitted.
+    log.progress() << "applying transformer... ";
     s_working.transform(
       callee_function_id,
       p_callee_end,
@@ -137,19 +166,47 @@ bool ai_three_way_merget::visit_edge_function_call(
     const std::unique_ptr<statet> ptr_s_working_copy(
       make_temporary_state(s_working));
 
+    log.progress() << "three way merge... ";
     s_working.merge_three_way_function_return(
       get_state(p_call_site),
       get_state(p_callee_start),
       *ptr_s_working_copy,
       ns);
 
+    log.progress() << "merging... ";
     if(
       merge(s_working, p_callee_end, p_return_site) ||
       (return_step.first == ai_history_baset::step_statust::NEW &&
        !s_working.is_bottom()))
     {
       put_in_working_set(working_set, p_return_site);
+      log.progress() << "result queued." << messaget::eom;
       new_data = true;
+    }
+    else
+    {
+      log.progress() << "domain unchanged." << messaget::eom;
+    }
+
+    // Branch because printing some histories and domains can be expensive
+    // esp. if the output is then just discarded and this is a critical path.
+    if(message_handler.get_verbosity() >= messaget::message_levelt::M_DEBUG)
+    {
+      log.debug() << "p_callee_end = ";
+      p_callee_end->output(log.debug());
+      log.debug() << messaget::eom;
+
+      log.debug() << "s_callee_end = ";
+      s_callee_end.output(log.debug(), *this, ns);
+      log.debug() << messaget::eom;
+
+      log.debug() << "p_return_site = ";
+      p_return_site->output(log.debug());
+      log.debug() << messaget::eom;
+
+      log.debug() << "s_working = ";
+      s_working.output(log.debug(), *this, ns);
+      log.debug() << messaget::eom;
     }
   }
 

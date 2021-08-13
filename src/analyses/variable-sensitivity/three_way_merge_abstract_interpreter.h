@@ -30,8 +30,13 @@ public:
   ai_three_way_merget(
     std::unique_ptr<ai_history_factory_baset> &&hf,
     std::unique_ptr<ai_domain_factory_baset> &&df,
-    std::unique_ptr<ai_storage_baset> &&st)
-    : ai_recursive_interproceduralt(std::move(hf), std::move(df), std::move(st))
+    std::unique_ptr<ai_storage_baset> &&st,
+    message_handlert &mh)
+    : ai_recursive_interproceduralt(
+        std::move(hf),
+        std::move(df),
+        std::move(st),
+        mh)
   {
   }
 

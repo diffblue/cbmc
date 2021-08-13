@@ -15,6 +15,7 @@ class ai_baset;
 class goto_modelt;
 class namespacet;
 class optionst;
+class message_handlert;
 
 /// Build an abstract interpreter configured by the options.
 /// This may require options for:
@@ -29,6 +30,7 @@ class optionst;
 std::unique_ptr<ai_baset> build_analyzer(
   const optionst &options,
   const goto_modelt &goto_model,
-  const namespacet &ns);
+  const namespacet &ns,
+  message_handlert &mh);
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
