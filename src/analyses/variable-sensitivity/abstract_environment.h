@@ -35,6 +35,8 @@ enum class widen_modet
   could_widen
 };
 
+struct vsd_configt;
+
 class abstract_environmentt
 {
 public:
@@ -174,18 +176,8 @@ public:
     const exprt &e,
     const namespacet &ns) const;
 
-  /// Wraps an existing object in any configured context object
-  ///
-  /// \param abstract_object: The object to be wrapped
-  ///
-  /// \return The wrapped abstract object
-  ///
-  /// Look at the configuration context dependency, and constructs
-  /// the appropriate wrapper object around the supplied object
-  /// If no such configuration is enabled, the supplied object will be
-  /// returned unchanged
-  virtual abstract_object_pointert
-  add_object_context(const abstract_object_pointert &abstract_object) const;
+  /// Exposes the environment configuration
+  const vsd_configt &configuration() const;
 
   /// Computes the join between "this" and "b"
   ///

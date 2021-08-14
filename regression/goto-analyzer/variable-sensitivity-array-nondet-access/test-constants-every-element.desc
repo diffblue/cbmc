@@ -1,0 +1,11 @@
+CORE
+main.c
+--show --variable-sensitivity --vsd-values constants --vsd-arrays every-element
+^EXIT=0$
+^SIGNAL=0$
+main::1::arr_at_ix \(\) -> TOP @ \[9\]
+main::1::arr_0_after_write \(\) -> TOP @ \[18\]
+main::1::arr_1_after_write \(\) -> TOP @ \[20\]
+main::1::arr_2_after_write \(\) -> TOP @ \[22\]
+main::1::arr_3_after_write \(\) -> TOP @ \[24\]
+main::1::arr_4_after_write \(\) -> TOP @ \[26\]

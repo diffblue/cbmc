@@ -1,9 +1,0 @@
-CORE
-main.c
---show --variable-sensitivity --vsd-values intervals --vsd-arrays every-element
-^EXIT=0$
-^SIGNAL=0$
-main::1::arr_at_ix \(\) -> \[1, 3\] @ \[9\]
-main::1::arr_0_after_write \(\) -> \[1, 4\] @ \[18\]
-main::1::arr_1_after_write \(\) -> \[2, 4\] @ \[20\]
-main::1::arr_2_after_write \(\) -> \[3, 3\] @ \[22\]

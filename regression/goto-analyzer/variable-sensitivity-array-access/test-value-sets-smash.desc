@@ -1,0 +1,10 @@
+CORE
+main.c
+--show --variable-sensitivity --vsd-values set-of-constants --vsd-arrays smash
+^EXIT=0$
+^SIGNAL=0$
+main::1::arr_0_after_write \(\) -> value-set-begin: 1, 2, 3, 4, 5, 99 :value-set-end
+main::1::arr_1_after_write \(\) -> value-set-begin: 1, 2, 3, 4, 5, 99 :value-set-end
+main::1::arr_2_after_write \(\) -> value-set-begin: 1, 2, 3, 4, 5, 99 :value-set-end
+main::1::arr_3_after_write \(\) -> value-set-begin: 1, 2, 3, 4, 5, 99 :value-set-end
+main::1::arr_4_after_write \(\) -> value-set-begin: 1, 2, 3, 4, 5, 99 :value-set-end

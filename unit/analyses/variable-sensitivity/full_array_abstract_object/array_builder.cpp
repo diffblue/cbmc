@@ -10,6 +10,7 @@
 #include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_array_abstract_object/array_builder.h>
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 
 full_array_abstract_objectt::full_array_pointert build_array(
@@ -26,15 +27,17 @@ full_array_abstract_objectt::full_array_pointert build_array(
   abstract_environmentt &environment,
   const namespacet &ns)
 {
+  const typet type = signedbv_typet(32);
+
   const array_typet array_type(
-    integer_typet(), from_integer(array.size(), integer_typet()));
+    integer_typet(), from_integer(array.size(), type));
 
   exprt::operandst element_ops;
 
   for(auto element : array)
   {
     if(element != TOP_MEMBER)
-      element_ops.push_back(from_integer(element, integer_typet()));
+      element_ops.push_back(from_integer(element, type));
     else
       element_ops.push_back(nil_exprt());
   }
@@ -55,14 +58,4 @@ full_array_abstract_objectt::full_array_pointert build_bottom_array()
   auto array_type =
     array_typet(integer_typet(), from_integer(3, integer_typet()));
   return std::make_shared<full_array_abstract_objectt>(array_type, false, true);
-}
-
-exprt read_index(
-  full_array_abstract_objectt::full_array_pointert array_object,
-  const index_exprt &index,
-  abstract_environmentt &environment,
-  const namespacet &ns)
-{
-  return array_object->expression_transform(index, {}, environment, ns)
-    ->to_constant();
 }

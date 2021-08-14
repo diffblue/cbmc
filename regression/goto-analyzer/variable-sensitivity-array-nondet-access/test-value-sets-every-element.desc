@@ -1,0 +1,11 @@
+CORE
+main.c
+--show --variable-sensitivity --vsd-values set-of-constants --vsd-arrays every-element
+^EXIT=0$
+^SIGNAL=0$
+main::1::arr_at_ix \(\) -> value-set-begin: 1, 3 :value-set-end
+main::1::arr_0_after_write \(\) -> value-set-begin: 1, 99 :value-set-end
+main::1::arr_1_after_write \(\) -> value-set-begin: 2 :value-set-end
+main::1::arr_2_after_write \(\) -> value-set-begin: 3 :value-set-end
+main::1::arr_3_after_write \(\) -> value-set-begin: 4 :value-set-end
+main::1::arr_4_after_write \(\) -> value-set-begin: 5, 99 :value-set-end
