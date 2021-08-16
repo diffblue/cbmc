@@ -79,8 +79,10 @@ TEST_CASE(
   commands.push_back("cmd /c ping 127.0.0.1 -n 6 > nul");
   std::chrono::steady_clock::time_point start_time =
     std::chrono::steady_clock::now();
-  piped_processt process(commands);
-  process.~piped_processt();
+  {
+    // Scope restriction to cause destruction
+    piped_processt process(commands);
+  }
   std::chrono::steady_clock::time_point end_time =
     std::chrono::steady_clock::now();
   std::chrono::duration<double> time_span =
