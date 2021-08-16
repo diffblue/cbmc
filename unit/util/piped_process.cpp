@@ -20,7 +20,7 @@ TEST_CASE(
   commands.push_back("/bin/echo");
   commands.push_back(to_be_echoed);
 #endif
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   // This is an indirect way to detect when the pipe has something. This
   // could (in theory) also return when there is an error, but this unit
@@ -43,7 +43,7 @@ TEST_CASE(
   const std::string expected_error("Launching abcde failed");
   commands.push_back("abcde");
 #endif
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   // This is an indirect way to detect when the pipe has something. This
   // could (in theory) also return when there is an error, but this unit
@@ -78,7 +78,7 @@ TEST_CASE(
   SYSTEMTIME st;
   GetSystemTime(&st);
   WORD calc = 3600 * st.wHour + 60 * st.wMinute + st.wSecond;
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
   process.~piped_processt();
   GetSystemTime(&st);
   // New time minus old time, could go wrong at midnight
@@ -87,7 +87,7 @@ TEST_CASE(
   // Currently not working under Linxu/MacOS?!
   // commands.push_back("sleep 6");
   // time_t calc = time(NULL);
-  // piped_processt process = piped_processt(commands);
+  // piped_processt process(commands);
   // process.~piped_processt();
   // calc = time(NULL) - calc;
   size_t calc = 0;
@@ -106,7 +106,7 @@ TEST_CASE(
   std::vector<std::string> commands;
   commands.push_back("z3");
   commands.push_back("-in");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   REQUIRE(
     process.send("(echo \"hi\")\n") ==
@@ -128,7 +128,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   const std::string termination_statement = "(exit)\n";
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   REQUIRE(
     process.send("(echo \"hi\")\n") ==
@@ -158,7 +158,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string message =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -182,7 +182,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string statement =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -204,7 +204,7 @@ TEST_CASE(
   std::vector<std::string> commands;
   commands.push_back("z3");
   commands.push_back("-in");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   REQUIRE(
     process.send("(echo \"hi\")\n") ==
@@ -234,7 +234,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string statement =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -290,7 +290,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string statement =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
