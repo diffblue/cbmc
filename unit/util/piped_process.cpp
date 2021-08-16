@@ -6,6 +6,8 @@
 #  include <util/optional.h>
 #  include <util/piped_process.h>
 #  include <util/string_utils.h>
+// Used for testing destructor/timing
+#include <chrono>
 
 TEST_CASE(
   "Creating a sub process and reading its output.",
@@ -75,14 +77,16 @@ TEST_CASE(
   std::vector<std::string> commands;
 #ifdef _WIN32
   commands.push_back("cmd /c ping 127.0.0.1 -n 6 > nul");
-  SYSTEMTIME st;
-  GetSystemTime(&st);
-  WORD calc = 3600 * st.wHour + 60 * st.wMinute + st.wSecond;
+  std::chrono::steady_clock::time_point start_time =
+    std::chrono::steady_clock::now();
   piped_processt process(commands);
   process.~piped_processt();
-  GetSystemTime(&st);
-  // New time minus old time, could go wrong at midnight
-  calc = 3600 * st.wHour + 60 * st.wMinute + st.wSecond - calc;
+  std::chrono::steady_clock::time_point end_time =
+    std::chrono::steady_clock::now();
+  std::chrono::duration<double> time_span =
+    std::chrono::duration_cast<std::chrono::duration<double>>(
+      end_time - start_time);
+  size_t calc = time_span.count();
 #else
   // Currently not working under Linxu/MacOS?!
   // commands.push_back("sleep 6");
