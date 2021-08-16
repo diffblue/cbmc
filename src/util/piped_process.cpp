@@ -132,7 +132,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
     &sec_attr); // For inheritance by child
   if(child_std_IN_Rd == INVALID_HANDLE_VALUE)
   {
-    throw std::runtime_error("Input pipe creation failed for child_std_IN_Rd");
+    throw system_exceptiont("Input pipe creation failed for child_std_IN_Rd");
   }
   // Connect to the other side of the pipe
   child_std_IN_Wr = CreateFileA(
@@ -145,11 +145,11 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
     NULL);
   if(child_std_IN_Wr == INVALID_HANDLE_VALUE)
   {
-    throw std::runtime_error("Input pipe creation failed for child_std_IN_Wr");
+    throw system_exceptiont("Input pipe creation failed for child_std_IN_Wr");
   }
   if(!SetHandleInformation(child_std_IN_Rd, HANDLE_FLAG_INHERIT, 0))
   {
-    throw std::runtime_error(
+    throw system_exceptiont(
       "Input pipe creation failed on SetHandleInformation");
   }
   const std::string out_name = base_name + "\\OUT";
@@ -164,8 +164,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
     &sec_attr); // For inheritance by child
   if(child_std_OUT_Rd == INVALID_HANDLE_VALUE)
   {
-    throw std::runtime_error(
-      "Output pipe creation failed for child_std_OUT_Rd");
+    throw system_exceptiont("Output pipe creation failed for child_std_OUT_Rd");
   }
   child_std_OUT_Wr = CreateFileA(
     out_name.c_str(),
@@ -177,12 +176,11 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
     NULL);
   if(child_std_OUT_Wr == INVALID_HANDLE_VALUE)
   {
-    throw std::runtime_error(
-      "Output pipe creation failed for child_std_OUT_Wr");
+    throw system_exceptiont("Output pipe creation failed for child_std_OUT_Wr");
   }
   if(!SetHandleInformation(child_std_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
   {
-    throw std::runtime_error(
+    throw system_exceptiont(
       "Output pipe creation failed on SetHandleInformation");
   }
   // Create the child process
