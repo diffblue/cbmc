@@ -6,16 +6,20 @@
 #define CPROVER_UTIL_PIPED_PROCESS_H
 
 #ifdef _WIN32
-#  include <windows.h>
+#  include <memory>
+// The below are forward declarations for Windows APIs
+struct _PROCESS_INFORMATION;                             // NOLINT
+typedef struct _PROCESS_INFORMATION PROCESS_INFORMATION; // NOLINT
+typedef void *HANDLE;                                    // NOLINT
 #endif
 
-#  include <vector>
-#  include "optional.h"
+#include "optional.h"
+#include <vector>
 
-#  define PIPED_PROCESS_INFINITE_TIMEOUT                                       \
-    optionalt<std::size_t>                                                     \
-    {                                                                          \
-    }
+#define PIPED_PROCESS_INFINITE_TIMEOUT                                         \
+  optionalt<std::size_t>                                                       \
+  {                                                                            \
+  }
 
 class piped_processt
 {
@@ -87,7 +91,7 @@ public:
 protected:
 #ifdef _WIN32
   // Process information handle for Windows
-  PROCESS_INFORMATION proc_info;
+  std::unique_ptr<PROCESS_INFORMATION> proc_info;
   // Handles for communication with child process
   HANDLE child_std_IN_Rd;
   HANDLE child_std_IN_Wr;

@@ -79,6 +79,8 @@
 #  include "run.h"     // for Windows arg quoting
 #  include "unicode.h" // for widen function
 #  include <tchar.h>   // library for _tcscpy function
+#  include <util/make_unique.h>
+#  include <windows.h>
 #else
 #  include <fcntl.h>  // library for fcntl function
 #  include <poll.h>   // library for poll function
@@ -185,7 +187,8 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
   }
   // Create the child process
   STARTUPINFOW start_info;
-  ZeroMemory(&proc_info, sizeof(PROCESS_INFORMATION));
+  proc_info = util_make_unique<PROCESS_INFORMATION>();
+  ZeroMemory(proc_info.get(), sizeof(PROCESS_INFORMATION));
   ZeroMemory(&start_info, sizeof(STARTUPINFOW));
   start_info.cb = sizeof(STARTUPINFOW);
   start_info.hStdError = child_std_OUT_Wr;
@@ -211,7 +214,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
     NULL,                     // use parent's environment
     NULL,                     // use parent's current directory
     &start_info,              // STARTUPINFO pointer
-    &proc_info);              // receives PROCESS_INFORMATION
+    proc_info.get());         // receives PROCESS_INFORMATION
   // Close handles to the stdin and stdout pipes no longer needed by the
   // child process. If they are not explicitly closed, there is no way to
   // recognize that the child process has ended (but maybe we don't care).
@@ -298,7 +301,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
 piped_processt::~piped_processt()
 {
 #  ifdef _WIN32
-  TerminateProcess(proc_info.hProcess, 0);
+  TerminateProcess(proc_info->hProcess, 0);
   // Disconnecting the pipes also kicks the client off, it should be killed
   // by now, but this will also force the client off.
   // Note that pipes are cleaned up by Windows when all handles to the pipe
@@ -307,8 +310,8 @@ piped_processt::~piped_processt()
   DisconnectNamedPipe(child_std_IN_Wr);
   CloseHandle(child_std_OUT_Rd);
   CloseHandle(child_std_IN_Wr);
-  CloseHandle(proc_info.hProcess);
-  CloseHandle(proc_info.hThread);
+  CloseHandle(proc_info->hProcess);
+  CloseHandle(proc_info->hThread);
 #  else
   // Close the parent side of the remaining pipes
   fclose(command_stream);
@@ -363,6 +366,8 @@ std::string piped_processt::receive()
     success = ReadFile(child_std_OUT_Rd, buff, BUFSIZE, &nbytes, NULL);
 #else
     nbytes = read(pipe_output[0], buff, BUFSIZE);
+    // Added the status back in here to keep parity with old implementation
+    // TODO: check which statuses are really used/needed.
     if(nbytes == 0) // Update if the pipe is stopped
       process_state = statet::STOPPED;
     success = nbytes > 0;
