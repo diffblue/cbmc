@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -3051,6 +3052,11 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   else if(expr_type.id()==ID_rational)
   {
     std::string value=id2string(expr.get_value());
+    const bool negative = has_prefix(value, "-");
+
+    if(negative)
+      out << "(- ";
+
     size_t pos=value.find("/");
 
     if(pos==std::string::npos)
@@ -3060,10 +3066,19 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       out << "(/ " << value.substr(0, pos) << ".0 "
                    << value.substr(pos+1) << ".0)";
     }
+
+    if(negative)
+      out << ')';
   }
   else if(expr_type.id()==ID_integer)
   {
-    out << expr.get_value();
+    const auto value = id2string(expr.get_value());
+
+    // SMT2 has no negative integer literals
+    if(has_prefix(value, "-"))
+      out << "(- " << value.substr(1, std::string::npos) << ')';
+    else
+      out << value;
   }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
