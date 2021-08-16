@@ -21,6 +21,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
+irep_idt rounding_mode_identifier()
+{
+  return CPROVER_PREFIX "rounding_mode";
+}
+
 /// Iterate over an expression and check it or any of its subexpressions are
 /// floating point operations that haven't been adjusted with a rounding mode
 /// yet.
@@ -186,7 +191,7 @@ void adjust_float_expressions(exprt &expr, const namespacet &ns)
     return;
 
   symbol_exprt rounding_mode =
-    ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
+    ns.lookup(rounding_mode_identifier()).symbol_expr();
 
   rounding_mode.add_source_location() = expr.source_location();
 

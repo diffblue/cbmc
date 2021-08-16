@@ -11,6 +11,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_entry_point.h"
 
+#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_functions.h>
 
 #include <linking/static_lifetime_init.h>
@@ -20,9 +21,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-
-/// Name of the CPROVER-specific variable that specifies the rounding mode.
-#define ROUNDING_MODE_NAME CPROVER_PREFIX "rounding_mode"
 
 /// Postfix for the artificial data block that is created when calling a main
 /// symbol that is a function block.
@@ -146,7 +144,7 @@ static void generate_statement_list_init_function(symbol_tablet &symbol_table)
 static void generate_rounding_mode(symbol_tablet &symbol_table)
 {
   symbolt rounding_mode;
-  rounding_mode.name = ROUNDING_MODE_NAME;
+  rounding_mode.name = rounding_mode_identifier();
   rounding_mode.type = signed_int_type();
   rounding_mode.is_thread_local = true;
   rounding_mode.is_static_lifetime = true;

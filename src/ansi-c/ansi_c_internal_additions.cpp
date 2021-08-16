@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+
 const char gcc_builtin_headers_types[]=
 "# 1 \"gcc_builtin_headers_types.h\"\n"
 #include "gcc_builtin_headers_types.inc"
@@ -205,7 +207,8 @@ void ansi_c_internal_additions(std::string &code)
       CPROVER_PREFIX "constant_infinity_uint];\n"
 
     // float stuff
-    "int " CPROVER_PREFIX "thread_local " CPROVER_PREFIX "rounding_mode="+
+    "int " CPROVER_PREFIX "thread_local " +
+      id2string(rounding_mode_identifier()) + '='+
       std::to_string(config.ansi_c.rounding_mode)+";\n"
 
     // pipes, write, read, close

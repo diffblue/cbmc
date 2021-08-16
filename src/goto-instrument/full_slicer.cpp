@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/cprover_prefix.h>
 
+#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/remove_skip.h>
 
 void full_slicert::add_dependencies(
@@ -248,7 +249,7 @@ static bool implicit(goto_programt::const_targett target)
 
   const symbol_exprt &s=to_symbol_expr(a.lhs());
 
-  return s.get_identifier()==CPROVER_PREFIX "rounding_mode";
+  return s.get_identifier() == rounding_mode_identifier();
 }
 
 void full_slicert::operator()(
