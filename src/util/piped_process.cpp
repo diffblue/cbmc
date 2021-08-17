@@ -116,8 +116,6 @@ std::wstring process_windows_args(const std::vector<std::string> commandvec)
 
 piped_processt::piped_processt(const std::vector<std::string> commandvec)
 {
-  // Default state
-  process_state = statet::NOT_CREATED;
 #  ifdef _WIN32
   // Security attributes for pipe creation
   SECURITY_ATTRIBUTES sec_attr;
@@ -300,7 +298,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
     command_stream = fdopen(pipe_input[1], "w");
   }
 #  endif
-  process_state = statet::CREATED;
+  process_state = statet::RUNNING;
 }
 
 piped_processt::~piped_processt()
@@ -329,7 +327,7 @@ piped_processt::~piped_processt()
 
 piped_processt::send_responset piped_processt::send(const std::string &message)
 {
-  if(process_state != statet::CREATED)
+  if(process_state != statet::RUNNING)
   {
     return send_responset::ERRORED;
   }
@@ -355,7 +353,7 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
 std::string piped_processt::receive()
 {
   INVARIANT(
-    process_state == statet::CREATED,
+    process_state == statet::RUNNING,
     "Can only receive() from a fully initialised process");
   std::string response = std::string("");
   char buff[BUFSIZE];
@@ -374,7 +372,7 @@ std::string piped_processt::receive()
     // Added the status back in here to keep parity with old implementation
     // TODO: check which statuses are really used/needed.
     if(nbytes == 0) // Update if the pipe is stopped
-      process_state = statet::STOPPED;
+      process_state = statet::ERRORED;
     success = nbytes > 0;
 #endif
     INVARIANT(
@@ -464,7 +462,7 @@ bool piped_processt::can_receive()
 
 void piped_processt::wait_receivable(int wait_time)
 {
-  while(process_state == statet::CREATED && !can_receive(0))
+  while(process_state == statet::RUNNING && !can_receive(0))
   {
 #ifdef _WIN32
     Sleep(wait_time);

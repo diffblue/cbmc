@@ -27,9 +27,7 @@ public:
   /// Enumeration to keep track of child process state.
   enum class statet
   {
-    NOT_CREATED,
-    CREATED,
-    STOPPED,
+    RUNNING,
     ERRORED
   };
 
