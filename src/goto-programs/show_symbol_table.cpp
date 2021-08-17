@@ -29,21 +29,10 @@ Author: Daniel Kroening, kroening@kroening.com
 static std::unique_ptr<languaget>
 get_show_symbol_language(const symbolt &symbol)
 {
-  std::unique_ptr<languaget> ptr;
-
-  if(symbol.mode.empty())
-  {
-    ptr=get_default_language();
-  }
-  else
-  {
-    ptr=get_language_from_mode(symbol.mode);
-  }
-
-  if(!ptr)
-    throw "symbol "+id2string(symbol.name)+" has unknown mode";
-
-  return ptr;
+  if(!symbol.mode.empty())
+    if(auto language_from_mode = get_language_from_mode(symbol.mode))
+      return language_from_mode;
+  return get_default_language();
 }
 
 void show_symbol_table_xml_ui()
