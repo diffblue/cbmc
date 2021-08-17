@@ -24,6 +24,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
+/// \brief Gets the language which should be used for showing the type and value
+///   of the supplied \p symbol.
+static std::unique_ptr<languaget>
+get_show_symbol_language(const symbolt &symbol)
+{
+  std::unique_ptr<languaget> ptr;
+
+  if(symbol.mode.empty())
+  {
+    ptr=get_default_language();
+  }
+  else
+  {
+    ptr=get_language_from_mode(symbol.mode);
+  }
+
+  if(!ptr)
+    throw "symbol "+id2string(symbol.name)+" has unknown mode";
+
+  return ptr;
+}
+
 void show_symbol_table_xml_ui()
 {
 }
@@ -39,16 +61,7 @@ void show_symbol_table_brief_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-      ptr=get_default_language();
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
-    }
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str;
 
@@ -72,19 +85,7 @@ void show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str, value_str;
 
@@ -160,19 +161,7 @@ static void show_symbol_table_json_ui(
   {
     const symbolt &symbol = id_and_symbol.second;
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str, value_str;
 
@@ -234,19 +223,7 @@ static void show_symbol_table_brief_json_ui(
   {
     const symbolt &symbol = id_and_symbol.second;
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str, value_str;
 
