@@ -101,6 +101,19 @@
 
 #  define BUFSIZE 2048
 
+#ifdef _WIN32
+std::wstring process_windows_args(const std::vector<std::string> commandvec)
+{
+  std::wstring result = widen(commandvec[0]);
+  for(int i = 1; i < commandvec.size(); i++)
+  {
+    result.append(L" ");
+    result.append(quote_windows_arg(widen(commandvec[i])));
+  }
+  return result;
+}
+#endif
+
 piped_processt::piped_processt(const std::vector<std::string> commandvec)
 {
   // Default state
@@ -193,13 +206,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
   start_info.hStdOutput = child_std_OUT_Wr;
   start_info.hStdInput = child_std_IN_Rd;
   start_info.dwFlags |= STARTF_USESTDHANDLES;
-  // Unpack the command into a single string for Windows API
-  std::wstring cmdline = widen(commandvec[0]);
-  for(int i = 1; i < commandvec.size(); i++)
-  {
-    cmdline.append(L" ");
-    cmdline.append(quote_windows_arg(widen(commandvec[i])));
-  }
+  const std::wstring cmdline = process_windows_args(commandvec);
   // Note that we do NOT free this since it becomes part of the child
   // and causes heap corruption in Windows if we free!
   const BOOL success = CreateProcessW(
