@@ -102,7 +102,13 @@
 #  define BUFSIZE 2048
 
 #ifdef _WIN32
-std::wstring process_windows_args(const std::vector<std::string> commandvec)
+/// This function prepares a single wide string for the windows command
+/// line.
+/// \param commandvec: A vector of strings that contain the command and
+///                    arguments to the command.
+/// \returns A single wide string of the command appropriate for windows
+static std::wstring
+prepare_windows_command_line(const std::vector<std::string> &commandvec)
 {
   std::wstring result = widen(commandvec[0]);
   for(int i = 1; i < commandvec.size(); i++)
@@ -114,7 +120,7 @@ std::wstring process_windows_args(const std::vector<std::string> commandvec)
 }
 #endif
 
-piped_processt::piped_processt(const std::vector<std::string> commandvec)
+piped_processt::piped_processt(const std::vector<std::string> &commandvec)
 {
 #  ifdef _WIN32
   // Security attributes for pipe creation
@@ -204,7 +210,7 @@ piped_processt::piped_processt(const std::vector<std::string> commandvec)
   start_info.hStdOutput = child_std_OUT_Wr;
   start_info.hStdInput = child_std_IN_Rd;
   start_info.dwFlags |= STARTF_USESTDHANDLES;
-  const std::wstring cmdline = process_windows_args(commandvec);
+  const std::wstring cmdline = prepare_windows_command_line(commandvec);
   // Note that we do NOT free this since it becomes part of the child
   // and causes heap corruption in Windows if we free!
   const BOOL success = CreateProcessW(

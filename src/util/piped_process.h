@@ -78,7 +78,7 @@ public:
   /// Initiate a new subprocess with pipes supporting communication
   /// between the parent (this process) and the child.
   /// \param commandvec The command and arguments to create the process
-  explicit piped_processt(const std::vector<std::string> commandvec);
+  explicit piped_processt(const std::vector<std::string> &commandvec);
 
   // Deleted due to declaring an explicit destructor and not wanting copy
   // constructors to be implemented.
