@@ -1,0 +1,12 @@
+CORE
+rust.json
+--xml-ui --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+--
+symbol \w+ has unknown mode
+--
+Test that --show-symbol-table with --xml-ui does not crash when given an symbol
+with an unsupported language mode. Note that no symbol table is shown at the
+time of writing this test, because --show-symbol-table has not been implemented
+for the xml user interface.

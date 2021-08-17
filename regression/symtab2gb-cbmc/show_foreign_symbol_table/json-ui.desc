@@ -1,0 +1,12 @@
+CORE
+rust.json
+--json-ui --show-symbol-table
+"symbolTable":
+"mode": "rust",
+^EXIT=0$
+^SIGNAL=0$
+--
+symbol \w+ has unknown mode
+--
+Test that --show-symbol-table with --json-ui correctly shows the source language
+mode of a symbol, even if that language mode is unsupported.

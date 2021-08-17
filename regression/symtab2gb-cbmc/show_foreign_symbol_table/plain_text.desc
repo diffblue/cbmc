@@ -1,0 +1,12 @@
+CORE
+rust.json
+--show-symbol-table
+Symbols:
+Mode\.+: rust
+^EXIT=0$
+^SIGNAL=0$
+--
+symbol \w+ has unknown mode
+--
+Test that --show-symbol-table correctly shows the source language mode of a
+symbol, even if that language mode is unsupported.
