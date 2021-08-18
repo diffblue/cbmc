@@ -24,6 +24,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
+/// \brief Gets the language which should be used for showing the type and value
+///   of the supplied \p symbol.
+/// \return A unique pointer, pointing to the language corresponding to the mode
+///   of the \p symbol in the case where the symbol specifies a known/registered
+///   language mode. Returns the globally configured default language/first
+///   language registered in the case where mode is empty or does not correspond
+///   to a known registered language. The enables showing the symbol even if the
+///   language is not recognised.
+static std::unique_ptr<languaget>
+get_show_symbol_language(const symbolt &symbol)
+{
+  if(!symbol.mode.empty())
+    if(auto language_from_mode = get_language_from_mode(symbol.mode))
+      return language_from_mode;
+  return get_default_language();
+}
+
 void show_symbol_table_xml_ui()
 {
 }
@@ -39,16 +56,7 @@ void show_symbol_table_brief_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-      ptr=get_default_language();
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
-    }
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str;
 
@@ -72,19 +80,7 @@ void show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str, value_str;
 
@@ -160,19 +156,7 @@ static void show_symbol_table_json_ui(
   {
     const symbolt &symbol = id_and_symbol.second;
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str, value_str;
 
@@ -234,19 +218,7 @@ static void show_symbol_table_brief_json_ui(
   {
     const symbolt &symbol = id_and_symbol.second;
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode.empty())
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+    const std::unique_ptr<languaget> ptr = get_show_symbol_language(symbol);
 
     std::string type_str, value_str;
 
