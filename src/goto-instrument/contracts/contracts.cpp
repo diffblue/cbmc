@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Verify and use annotated invariants and pre/post-conditions
+Module: Verify and use annotated loop and function contracts
 
 Author: Michael Tautschnig
 
@@ -9,12 +9,9 @@ Date: February 2016
 \*******************************************************************/
 
 /// \file
-/// Verify and use annotated invariants and pre/post-conditions
+/// Verify and use annotated loop and function contracts
 
 #include "contracts.h"
-
-#include "assigns.h"
-#include "memory_predicates.h"
 
 #include <algorithm>
 #include <map>
@@ -22,6 +19,8 @@ Date: February 2016
 #include <analyses/local_may_alias.h>
 
 #include <ansi-c/c_expr.h>
+
+#include <goto-instrument/havoc_utils.h>
 
 #include <goto-programs/remove_skip.h>
 
@@ -33,6 +32,9 @@ Date: February 2016
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
+
+#include "assigns.h"
+#include "memory_predicates.h"
 
 // Create a lexicographic less-than relation between two tuples of variables.
 // This is used in the implementation of multidimensional decreases clauses.
@@ -185,8 +187,8 @@ void code_contractst::check_apply_loop_contracts(
       "Check loop invariant before entry");
   }
 
-  // havoc variables being written to
-  build_havoc_code(loop_head, modifies, havoc_code);
+  // havoc the variables that may be modified
+  append_havoc_code(loop_head->source_location, modifies, havoc_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,

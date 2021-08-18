@@ -1,10 +1,19 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-all-calls-with-contracts _ --pointer-primitive-check
+^\[main.assertion.1\] line \d+ assertion b\[0\] == 'a': FAILURE$
+^\[main.assertion.2\] line \d+ assertion b\[1\] == 'b': FAILURE$
+^\[main.assertion.3\] line \d+ assertion b\[2\] == 'c': FAILURE$
+^\[main.assertion.4\] line \d+ assertion b\[3\] == 'd': FAILURE$
+^\[main.assertion.5\] line \d+ assertion b\[0\] == 'a': FAILURE$
+^\[main.assertion.6\] line \d+ assertion b\[1\] == '1': SUCCESS$
+^\[main.assertion.7\] line \d+ assertion b\[2\] == 'c': FAILURE$
+^\[main.assertion.8\] line \d+ assertion b\[3\] == '3': FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
+^\[.+\.pointer_primitives\.\d+] line .*: FAILURE$
 --
-Checks whether the values outside the array range specified by the assigns
-target are not havocked when calling the associated function.
+Checks that entire arrays and fixed single elements are correctly havoced
+when functions are replaced by contracts.

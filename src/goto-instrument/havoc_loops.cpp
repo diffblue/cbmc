@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 
 #include "function_modifies.h"
+#include "havoc_utils.h"
 #include "loop_utils.h"
 
 class havoc_loopst
@@ -67,7 +68,7 @@ void havoc_loopst::havoc_loop(
 
   // build the havocking code
   goto_programt havoc_code;
-  build_havoc_code(loop_head, modifies, havoc_code);
+  append_havoc_code(loop_head->source_location, modifies, havoc_code);
 
   // Now havoc at the loop head. Use insert_swap to
   // preserve jumps to loop head.

@@ -13,6 +13,8 @@ Date: July 2021
 
 #include "assigns.h"
 
+#include <goto-instrument/havoc_utils.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_predicates.h>
@@ -104,22 +106,6 @@ exprt assigns_clause_targett::compatible_expression(
   return same_object(called_target.get_direct_pointer(), target);
 }
 
-goto_programt assigns_clause_targett::havoc_code() const
-{
-  goto_programt assigns_havoc;
-  source_locationt location = pointer_object.source_location();
-
-  exprt lhs = dereference_exprt(pointer_object);
-  side_effect_expr_nondett rhs(lhs.type(), location);
-
-  goto_programt::targett target =
-    assigns_havoc.add(goto_programt::make_assignment(
-      code_assignt(std::move(lhs), std::move(rhs)), location));
-  target->code_nonconst().add_source_location() = location;
-
-  return assigns_havoc;
-}
-
 const exprt &assigns_clause_targett::get_direct_pointer() const
 {
   return pointer_object;
@@ -197,47 +183,12 @@ goto_programt assigns_clauset::dead_stmts()
 
 goto_programt assigns_clauset::havoc_code()
 {
+  modifiest modifies;
+  for(const auto &t : targets)
+    modifies.insert(to_address_of_expr(t->get_direct_pointer()).object());
+
   goto_programt havoc_statements;
-  source_locationt location = assigns.source_location();
-
-  for(assigns_clause_targett *target : targets)
-  {
-    // (1) If the assigned target is not a dereference,
-    // only include the havoc_statement
-
-    // (2) If the assigned target is a dereference, do the following:
-
-    // if(!__CPROVER_w_ok(target, 0)) goto z;
-    //      havoc_statements
-    // z: skip
-
-    // create the z label
-    goto_programt tmp_z;
-    goto_programt::targett z = tmp_z.add(goto_programt::make_skip(location));
-
-    const auto &target_ptr = target->get_direct_pointer();
-
-    if(to_address_of_expr(target_ptr).object().id() == ID_dereference)
-    {
-      // create the condition
-      exprt condition =
-        not_exprt(w_ok_exprt(target_ptr, from_integer(0, unsigned_int_type())));
-      havoc_statements.add(goto_programt::make_goto(z, condition, location));
-    }
-
-    // create havoc_statements
-    for(goto_programt::instructiont instruction :
-        target->havoc_code().instructions)
-    {
-      havoc_statements.add(std::move(instruction));
-    }
-
-    if(to_address_of_expr(target_ptr).object().id() == ID_dereference)
-    {
-      // add the z label instruction
-      havoc_statements.destructive_append(tmp_z);
-    }
-  }
+  append_havoc_code(assigns.source_location(), modifies, havoc_statements);
   return havoc_statements;
 }
 
