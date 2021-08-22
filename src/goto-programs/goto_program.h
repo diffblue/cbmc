@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/source_location.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
 
 enum class validation_modet;
 
@@ -776,11 +775,8 @@ public:
     const irep_idt &identifier,
     std::ostream &out) const;
 
-  /// Output goto-program to given stream
-  std::ostream &output(std::ostream &out) const
-  {
-    return output(namespacet(symbol_tablet()), irep_idt(), out);
-  }
+  /// Output goto-program to given stream, using an empty symbol table
+  std::ostream &output(std::ostream &out) const;
 
   /// Output a single instruction
   std::ostream &output_instruction(

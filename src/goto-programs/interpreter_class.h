@@ -16,9 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/invariant.h>
-#include <util/std_types.h>
-#include <util/sparse_vector.h>
 #include <util/message.h>
+#include <util/sparse_vector.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include "goto_functions.h"
 #include "goto_trace.h"

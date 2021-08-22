@@ -12,6 +12,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 static std::shared_ptr<const constant_abstract_valuet>
 meet(abstract_object_pointert const &op1, abstract_object_pointert const &op2)

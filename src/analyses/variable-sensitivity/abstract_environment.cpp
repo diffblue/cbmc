@@ -14,6 +14,7 @@
 #include <util/simplify_expr.h>
 #include <util/simplify_expr_class.h>
 #include <util/simplify_utils.h>
+#include <util/symbol_table.h>
 
 #include <algorithm>
 #include <map>

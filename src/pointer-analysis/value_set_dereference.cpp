@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
+#include <util/symbol_table.h>
 
 #include <deque>
 

@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include <ansi-c/c_qualifiers.h>
 

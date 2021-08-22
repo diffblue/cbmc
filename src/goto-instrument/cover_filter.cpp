@@ -12,6 +12,7 @@ Author: Peter Schrammel
 #include "cover_filter.h"
 
 #include <util/prefix.h>
+#include <util/symbol.h>
 
 #include <linking/static_lifetime_init.h>
 

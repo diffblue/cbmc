@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 
 #include <util/byte_operators.h>
 #include <util/pointer_expr.h>
+#include <util/symbol_table.h>
 
 TEST_CASE("java trace validation", "[core][java_trace_validation]")
 {

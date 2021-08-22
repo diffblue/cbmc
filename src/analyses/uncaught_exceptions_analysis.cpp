@@ -15,6 +15,7 @@ Author: Cristina David
 #include "uncaught_exceptions_analysis.h"
 
 #include <util/namespace.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/goto_functions.h>
 

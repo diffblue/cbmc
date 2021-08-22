@@ -11,7 +11,10 @@
 
 #include <analyses/variable-sensitivity/full_array_abstract_object/array_builder.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+
 #include <testing-utils/use_catch.h>
+
+#include <util/symbol_table.h>
 
 SCENARIO(
   "array to predicate",

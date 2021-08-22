@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
 
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,

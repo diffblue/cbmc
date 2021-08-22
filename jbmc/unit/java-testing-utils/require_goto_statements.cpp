@@ -18,6 +18,7 @@ Author: Diffblue Ltd.
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/suffix.h>
+#include <util/symbol_table.h>
 
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up

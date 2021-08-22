@@ -9,10 +9,13 @@
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+
 #include <testing-utils/use_catch.h>
+
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/pointer_expr.h>
+#include <util/symbol_table.h>
 
 template <typename... Args>
 std::shared_ptr<value_set_pointer_abstract_objectt> make_vsp(Args &&... args)

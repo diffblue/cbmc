@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/pointer_expr.h>
+#include <util/symbol_table.h>
 
 static bool object_descriptor_matches(
   const exprt &descriptor_expr, const exprt &target)

@@ -11,6 +11,7 @@ Date: April 2016
 #include "variable_sensitivity_domain.h"
 
 #include <util/cprover_prefix.h>
+#include <util/symbol_table.h>
 
 #include <algorithm>
 

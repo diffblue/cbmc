@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_class.h"
 
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 void goto_convertt::convert_msc_try_finally(
   const codet &code,

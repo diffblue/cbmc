@@ -14,6 +14,7 @@ Date: February 2012
 #include "fence.h"
 
 #include <util/namespace.h>
+#include <util/symbol.h>
 
 bool is_fence(
   const goto_programt::instructiont &instruction,

@@ -19,6 +19,7 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
+#include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
 #include <langapi/mode.h>

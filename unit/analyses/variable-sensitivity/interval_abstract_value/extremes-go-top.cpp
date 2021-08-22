@@ -13,8 +13,10 @@
 #include <testing-utils/use_catch.h>
 
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 static void
 verify_extreme_interval(typet type, abstract_environmentt &env, namespacet &ns)

@@ -7,6 +7,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 static symbolt simple_symbol(const irep_idt &identifier, const typet &type)
 {
