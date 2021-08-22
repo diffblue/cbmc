@@ -1880,7 +1880,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   if(
     root_size.has_value() && *root_size >= 0 && val_size.has_value() &&
     *val_size >= 0 && offset_int.has_value() && *offset_int >= 0 &&
-    *offset_int + *val_size <= *root_size)
+    *offset_int * 8 + *val_size <= *root_size)
   {
     auto root_bits =
       expr2bits(root, expr.id() == ID_byte_update_little_endian, ns);
