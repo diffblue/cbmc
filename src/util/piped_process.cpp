@@ -144,8 +144,12 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
     PIPE_TYPE_BYTE | PIPE_NOWAIT, // Bytes and non-blocking
     PIPE_UNLIMITED_INSTANCES,     // Probably doesn't matter
     BUFSIZE,
-    BUFSIZE,    // Output and input bufffer sizes
-    0,          // Timeout in ms, 0 = use system default
+    BUFSIZE, // Output and input bufffer sizes
+    0,       // Timeout in ms, 0 = use system default
+    // This is the timeout that WaitNamedPipe functions will wait to try
+    // and connect before aborting if no instance of the pipe is available.
+    // In practice this is not used since we connect immediately and only
+    // use one instance (no waiting for a free instance).
     &sec_attr); // For inheritance by child
   if(child_std_IN_Rd == INVALID_HANDLE_VALUE)
   {
