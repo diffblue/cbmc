@@ -1405,6 +1405,19 @@ void smt2_parsert::setup_sorts()
   sorts["Int"] = [] { return integer_typet(); };
   sorts["Real"] = [] { return real_typet(); };
 
+  sorts["Float16"] = [] {
+    return ieee_float_spect::half_precision().to_type();
+  };
+  sorts["Float32"] = [] {
+    return ieee_float_spect::single_precision().to_type();
+  };
+  sorts["Float64"] = [] {
+    return ieee_float_spect::double_precision().to_type();
+  };
+  sorts["Float128"] = [] {
+    return ieee_float_spect::quadruple_precision().to_type();
+  };
+
   sorts["BitVec"] = [this] {
     if(next_token() != smt2_tokenizert::NUMERAL)
       throw error("expected numeral as bit-width");
