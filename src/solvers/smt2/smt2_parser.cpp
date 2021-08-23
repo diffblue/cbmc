@@ -471,9 +471,19 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
   const auto width_f = to_unsignedbv_type(op[2].type()).get_width();
 
   // stitch the bits together
+  const auto concat_type = unsignedbv_typet(width_f + width_e + 1);
+
+  // We need a bitvector type without numerical interpretation
+  // to do this conversion.
+  const auto bv_type = bv_typet(concat_type.get_width());
+
+  // The target type
+  const auto fp_type = ieee_float_spect(width_f, width_e).to_type();
+
   return typecast_exprt(
-    concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e + 1)),
-    ieee_float_spect(width_f, width_e).to_type());
+    typecast_exprt(
+      concatenation_exprt(exprt::operandst(op), concat_type), bv_type),
+    fp_type);
 }
 
 exprt smt2_parsert::function_application()
