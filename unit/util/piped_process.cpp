@@ -39,7 +39,7 @@ TEST_CASE(
 {
   std::vector<std::string> commands;
 #ifdef _WIN32
-  const std::string expected_error("'abcde' is not recogni");
+  const std::string expected_error("'abcde' is not recognized");
   commands.push_back("cmd /c abcde");
 #else
   const std::string expected_error("Launching abcde failed");
@@ -90,13 +90,17 @@ TEST_CASE(
       end_time - start_time);
   size_t calc = time_span.count();
 #else
-  // Currently not working under Linxu/MacOS?!
-  // commands.push_back("sleep 6");
-  // time_t calc = time(NULL);
-  // piped_processt process(commands);
-  // process.~piped_processt();
-  // calc = time(NULL) - calc;
+  // Currently not working under Linux/MacOS?!
+  // Likely due to issue in handling signals from child process
+#  if 0
+  commands.push_back("sleep 6");
+  time_t calc = time(NULL);
+  piped_processt process(commands);
+  process.~piped_processt();
+  calc = time(NULL) - calc;
+#  else
   size_t calc = 0;
+#  endif
 #endif
   // Command should take >5 seconds, check we called destructor and
   // moved on in less than 2 seconds.
