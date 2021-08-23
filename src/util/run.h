@@ -48,4 +48,11 @@ int run(
   std::ostream &std_output,
   const std::string &std_error);
 
+#ifdef _WIN32
+/// This quotes Windows argument strings correctly
+/// \p src is the string to be quoted
+/// \return correctly quoted string
+std::wstring quote_windows_arg(const std::wstring &src);
+#endif
+
 #endif // CPROVER_UTIL_RUN_H

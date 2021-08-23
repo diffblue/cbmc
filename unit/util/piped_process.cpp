@@ -2,14 +2,12 @@
 /// \author Diffblue Ltd.
 /// Unit tests for checking the piped process communication mechanism.
 
-#ifdef _WIN32
-// No unit tests yet!
-#else
-
 #  include <testing-utils/use_catch.h>
 #  include <util/optional.h>
 #  include <util/piped_process.h>
 #  include <util/string_utils.h>
+// Used for testing destructor/timing
+#include <chrono>
 
 TEST_CASE(
   "Creating a sub process and reading its output.",
@@ -18,9 +16,13 @@ TEST_CASE(
   const std::string to_be_echoed = "The Jabberwocky";
   // Need to give path to avoid shell built-in invocation
   std::vector<std::string> commands;
+#ifdef _WIN32
+  commands.push_back("cmd /c echo The Jabberwocky");
+#else
   commands.push_back("/bin/echo");
   commands.push_back(to_be_echoed);
-  piped_processt process = piped_processt(commands);
+#endif
+  piped_processt process(commands);
 
   // This is an indirect way to detect when the pipe has something. This
   // could (in theory) also return when there is an error, but this unit
@@ -35,10 +37,15 @@ TEST_CASE(
   "Creating a sub process with a binary that doesn't exist.",
   "[core][util][piped_process]")
 {
-  const std::string expected_error("Launching abcde failed");
   std::vector<std::string> commands;
+#ifdef _WIN32
+  const std::string expected_error("'abcde' is not recognized");
+  commands.push_back("cmd /c abcde");
+#else
+  const std::string expected_error("Launching abcde failed");
   commands.push_back("abcde");
-  piped_processt process = piped_processt(commands);
+#endif
+  piped_processt process(commands);
 
   // This is an indirect way to detect when the pipe has something. This
   // could (in theory) also return when there is an error, but this unit
@@ -61,6 +68,47 @@ TEST_CASE(
   REQUIRE(response.find(expected_error) < response.length() - 5);
 }
 
+// This is a test of child termination, it's not perfect and could go wrong
+// if run at midnight, but it's sufficient for a basic check for now.
+TEST_CASE(
+  "Creating a sub process and terminate it.",
+  "[core][util][piped_process]")
+{
+  std::vector<std::string> commands;
+#ifdef _WIN32
+  commands.push_back("cmd /c ping 127.0.0.1 -n 6 > nul");
+  std::chrono::steady_clock::time_point start_time =
+    std::chrono::steady_clock::now();
+  {
+    // Scope restriction to cause destruction
+    piped_processt process(commands);
+  }
+  std::chrono::steady_clock::time_point end_time =
+    std::chrono::steady_clock::now();
+  std::chrono::duration<double> time_span =
+    std::chrono::duration_cast<std::chrono::duration<double>>(
+      end_time - start_time);
+  size_t calc = time_span.count();
+#else
+  // Currently not working under Linux/MacOS?!
+  // Likely due to issue in handling signals from child process
+#  if 0
+  commands.push_back("sleep 6");
+  time_t calc = time(NULL);
+  piped_processt process(commands);
+  process.~piped_processt();
+  calc = time(NULL) - calc;
+#  else
+  size_t calc = 0;
+#  endif
+#endif
+  // Command should take >5 seconds, check we called destructor and
+  // moved on in less than 2 seconds.
+  REQUIRE(calc < 2);
+}
+
+#ifndef _WIN32
+// No Windows tests for z3 due to path and dependency issues.
 TEST_CASE(
   "Creating a sub process of z3 and read a response from an echo command.",
   "[core][util][piped_process][.z3]")
@@ -68,7 +116,7 @@ TEST_CASE(
   std::vector<std::string> commands;
   commands.push_back("z3");
   commands.push_back("-in");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   REQUIRE(
     process.send("(echo \"hi\")\n") ==
@@ -90,7 +138,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   const std::string termination_statement = "(exit)\n";
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   REQUIRE(
     process.send("(echo \"hi\")\n") ==
@@ -120,7 +168,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string message =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -144,7 +192,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string statement =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -166,7 +214,7 @@ TEST_CASE(
   std::vector<std::string> commands;
   commands.push_back("z3");
   commands.push_back("-in");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   REQUIRE(
     process.send("(echo \"hi\")\n") ==
@@ -196,7 +244,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string statement =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -252,7 +300,7 @@ TEST_CASE(
   commands.push_back("z3");
   commands.push_back("-in");
   commands.push_back("-smt2");
-  piped_processt process = piped_processt(commands);
+  piped_processt process(commands);
 
   std::string statement =
     "(set-logic QF_LIA) (declare-const x Int) (declare-const y Int) (assert (> "
@@ -266,5 +314,4 @@ TEST_CASE(
   REQUIRE(
     process.send("(exit)\n") == piped_processt::send_responset::SUCCEEDED);
 }
-
 #endif

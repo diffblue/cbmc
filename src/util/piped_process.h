@@ -6,17 +6,20 @@
 #define CPROVER_UTIL_PIPED_PROCESS_H
 
 #ifdef _WIN32
-// TODO: Windows definitions go here
-#else
+#  include <memory>
+// The below are forward declarations for Windows APIs
+struct _PROCESS_INFORMATION;                             // NOLINT
+typedef struct _PROCESS_INFORMATION PROCESS_INFORMATION; // NOLINT
+typedef void *HANDLE;                                    // NOLINT
+#endif
 
-#  include <vector>
+#include "optional.h"
+#include <vector>
 
-#  include "optional.h"
-
-#  define PIPED_PROCESS_INFINITE_TIMEOUT                                       \
-    optionalt<std::size_t>                                                     \
-    {                                                                          \
-    }
+#define PIPED_PROCESS_INFINITE_TIMEOUT                                         \
+  optionalt<std::size_t>                                                       \
+  {                                                                            \
+  }
 
 class piped_processt
 {
@@ -24,10 +27,8 @@ public:
   /// Enumeration to keep track of child process state.
   enum class statet
   {
-    NOT_CREATED,
-    CREATED,
-    STOPPED,
-    ERROR
+    RUNNING,
+    ERRORED
   };
 
   /// Enumeration for send response.
@@ -35,7 +36,7 @@ public:
   {
     SUCCEEDED,
     FAILED,
-    ERROR
+    ERRORED
   };
 
   /// Send a string message (command) to the child process.
@@ -77,11 +78,24 @@ public:
   /// Initiate a new subprocess with pipes supporting communication
   /// between the parent (this process) and the child.
   /// \param commandvec The command and arguments to create the process
-  explicit piped_processt(const std::vector<std::string> commandvec);
+  explicit piped_processt(const std::vector<std::string> &commandvec);
 
+  // Deleted due to declaring an explicit destructor and not wanting copy
+  // constructors to be implemented.
+  piped_processt(const piped_processt &) = delete;
+  piped_processt &operator=(const piped_processt &) = delete;
   ~piped_processt();
 
 protected:
+#ifdef _WIN32
+  // Process information handle for Windows
+  std::unique_ptr<PROCESS_INFORMATION> proc_info;
+  // Handles for communication with child process
+  HANDLE child_std_IN_Rd;
+  HANDLE child_std_IN_Wr;
+  HANDLE child_std_OUT_Rd;
+  HANDLE child_std_OUT_Wr;
+#else
   // Child process ID.
   pid_t child_process_id;
   FILE *command_stream;
@@ -91,9 +105,8 @@ protected:
   // the results of execution from.
   int pipe_input[2];
   int pipe_output[2];
+#endif
   statet process_state;
 };
-
-#endif // endif _WIN32
 
 #endif // endifndef CPROVER_UTIL_PIPED_PROCESS_H
