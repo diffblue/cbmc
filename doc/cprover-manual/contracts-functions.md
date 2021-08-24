@@ -2,16 +2,9 @@
 
 CBMC offers support for function contracts, which includes three basic clauses:
 _requires_, _ensures_, and _assigns_.
-These clauses formally describe the specification of a function. CBMC
-also provides a series of built-in constructs to be used with functions
+These clauses formally describe the specification of a function.
+CBMC also provides a series of built-in constructs to be used with functions
 contracts (e.g., _history variables_, _quantifiers_, and _memory predicates_).
-
-To learn more about contracts, take a look at the chapter [Design by
-Contract](http://se.inf.ethz.ch/~meyer/publications/old/dbc_chapter.pdf) from
-the book Object-Oriented Software Construction by Bertrand Meyer or read the
-notes [Contract-based
-Design](https://www.georgefairbanks.com/york-university-contract-based-design-2021)
-by George Fairbanks.
 
 ## Overview
 
@@ -157,4 +150,3 @@ program using contracts.
 - [Memory Predicates](contracts-memory-predicates.md)
 - [History Variables](contracts-history-variables.md)
 - [Quantifiers](contracts-quantifiers.md)
-- [Loop Contracts]()
