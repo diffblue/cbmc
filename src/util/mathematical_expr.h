@@ -338,6 +338,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<forall_exprt>(const exprt &base)
+{
+  return base.id() == ID_forall;
+}
+
+inline void validate_expr(const forall_exprt &value)
+{
+  validate_expr(static_cast<const quantifier_exprt &>(value));
+}
+
 inline const forall_exprt &to_forall_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_forall);
