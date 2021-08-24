@@ -75,7 +75,7 @@ example, developers can use the built-in construct `__CPROVER_return_value`,
 which represents the return value of a function. As postconditions, one may list
 possible return values (in this case, either `SUCCESS` or `FAILURE`) as well as
 describe the main property of this function: if the function returns `SUCCESS`,
-then `*out` stores the result of `*a + *b`.  We can also check that the value in
+then `*out` stores the result of `a + b`.  We can also check that the value in
 `*out` will be preserved in case of failure by using `__CPROVER_old`, which
 refers to the value of a given object in the pre-state of a function (see
 [History Variables](contracts-history-variables.md) Section for details). Thus, for the `sum` function, the
