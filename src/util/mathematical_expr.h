@@ -375,6 +375,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<exists_exprt>(const exprt &base)
+{
+  return base.id() == ID_exists;
+}
+
+inline void validate_expr(const exists_exprt &value)
+{
+  validate_expr(static_cast<const quantifier_exprt &>(value));
+}
+
 inline const exists_exprt &to_exists_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_exists);
