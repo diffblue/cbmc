@@ -59,4 +59,15 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<is_invalid_pointer_exprt>(const exprt &base)
+{
+  return base.id() == ID_is_invalid_pointer;
+}
+
+inline void validate_expr(const is_invalid_pointer_exprt &value)
+{
+  validate_operands(value, 1, "is_invalid_pointer must have one operand");
+}
+
 #endif // CPROVER_UTIL_POINTER_PREDICATES_H
