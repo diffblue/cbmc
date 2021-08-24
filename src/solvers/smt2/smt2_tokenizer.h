@@ -92,13 +92,13 @@ public:
   }
 
   /// generate an error exception, pre-filled with a message
-  smt2_errort error(const std::string &message)
+  smt2_errort error(const std::string &message) const
   {
     return smt2_errort(message, line_no);
   }
 
   /// generate an error exception
-  smt2_errort error()
+  smt2_errort error() const
   {
     return smt2_errort(line_no);
   }

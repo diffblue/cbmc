@@ -345,11 +345,9 @@ exprt smt2_parsert::cast_bv_to_unsigned(const exprt &expr)
   return typecast_exprt(expr, unsignedbv_typet(width));
 }
 
-exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
+void smt2_parsert::check_matching_operand_types(
+  const exprt::operandst &op) const
 {
-  if(op.empty())
-    throw error("expression must have at least one operand");
-
   for(std::size_t i = 1; i < op.size(); i++)
   {
     if(op[i].type() != op[0].type())
@@ -360,6 +358,14 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
                     << smt2_format(op[i].type()) << '\'';
     }
   }
+}
+
+exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
+{
+  if(op.empty())
+    throw error("expression must have at least one operand");
+
+  check_matching_operand_types(op);
 
   exprt result(id, op[0].type());
   result.operands() = op;
@@ -371,13 +377,7 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
   if(op.size()!=2)
     throw error("expression must have two operands");
 
-  if(op[0].type() != op[1].type())
-  {
-    throw error() << "expression must have operands with matching types,"
-                     " but got '"
-                  << smt2_format(op[0].type()) << "' and '"
-                  << smt2_format(op[1].type()) << '\'';
-  }
+  check_matching_operand_types(op);
 
   return binary_predicate_exprt(op[0], id, op[1]);
 }
@@ -395,8 +395,7 @@ exprt smt2_parsert::binary(irep_idt id, const exprt::operandst &op)
   if(op.size()!=2)
     throw error("expression must have two operands");
 
-  if(op[0].type() != op[1].type())
-    throw error("expression must have operands with matching types");
+  check_matching_operand_types(op);
 
   return binary_exprt(op[0], id, op[1], op[0].type());
 }
