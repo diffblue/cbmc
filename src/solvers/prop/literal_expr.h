@@ -36,6 +36,18 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<literal_exprt>(const exprt &base)
+{
+  return base.id() == ID_literal;
+}
+
+inline void validate_expr(const literal_exprt &literal)
+{
+  DATA_INVARIANT(
+    !literal.has_operands(), "literal expression should not have operands");
+}
+
 /// Cast a generic exprt to a \ref literal_exprt. This is an unchecked
 /// conversion. \a expr must be known to be \ref literal_exprt.
 /// \param expr: Source expression

@@ -27,6 +27,17 @@ public:
   bool from_array_expr(const array_exprt &);
 };
 
+template <>
+inline bool can_cast_expr<string_constantt>(const exprt &base)
+{
+  return base.id() == ID_string_constant;
+}
+
+inline void validate_expr(const string_constantt &expr)
+{
+  validate_operands(expr, 0, "String constants must not have operands");
+}
+
 inline const string_constantt &to_string_constant(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_string_constant);

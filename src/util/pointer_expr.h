@@ -306,6 +306,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<is_dynamic_object_exprt>(const exprt &base)
+{
+  return base.id() == ID_is_invalid_pointer;
+}
+
+inline void validate_expr(const is_dynamic_object_exprt &value)
+{
+  validate_operands(value, 1, "is_dynamic_object must have one operand");
+}
+
 inline const is_dynamic_object_exprt &
 to_is_dynamic_object_expr(const exprt &expr)
 {
