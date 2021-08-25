@@ -75,12 +75,12 @@ public:
 
   bool exit;
 
-  smt2_tokenizert::smt2_errort error(const std::string &message)
+  smt2_tokenizert::smt2_errort error(const std::string &message) const
   {
     return smt2_tokenizer.error(message);
   }
 
-  smt2_tokenizert::smt2_errort error()
+  smt2_tokenizert::smt2_errort error() const
   {
     return smt2_tokenizer.error();
   }
@@ -158,6 +158,7 @@ protected:
   exprt::operandst operands();
   typet function_signature_declaration();
   signature_with_parameter_idst function_signature_definition();
+  void check_matching_operand_types(const exprt::operandst &) const;
   exprt multi_ary(irep_idt, const exprt::operandst &);
   exprt binary_predicate(irep_idt, const exprt::operandst &);
   exprt binary(irep_idt, const exprt::operandst &);
