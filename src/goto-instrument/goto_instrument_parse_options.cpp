@@ -1149,12 +1149,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   }
 
   if(
-    cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
+    cmdline.isset(FLAG_LOOP_CONTRACTS) || 
+    cmdline.isset(FLAG_DECREASES_CLAUSES_INFERENCE) ||
+    cmdline.isset(FLAG_REPLACE_CALL) ||
     cmdline.isset(FLAG_REPLACE_ALL_CALLS) ||
     cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
     cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
   {
-    code_contractst cont(goto_model, log);
+    code_contractst cont(goto_model, log, ui_message_handler);
 
     if(cmdline.isset(FLAG_REPLACE_CALL))
     {
@@ -1184,6 +1186,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     if(cmdline.isset(FLAG_LOOP_CONTRACTS))
       cont.apply_loop_contracts();
+
+    if(cmdline.isset(FLAG_DECREASES_CLAUSES_INFERENCE))
+      cont.infer_decreases_clauses_in_program();
   }
 
   if(cmdline.isset("value-set-fi-fp-removal"))
@@ -1874,6 +1879,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
+    HELP_DECREASES_CLAUSES_INFERENCE
     HELP_REPLACE_CALL
     HELP_REPLACE_ALL_CALLS
     HELP_ENFORCE_CONTRACT

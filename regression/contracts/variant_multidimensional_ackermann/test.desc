@@ -5,7 +5,7 @@ main.c
 ^\[precondition.2\] .* Check requires clause: SUCCESS$
 ^\[ackermann.1\] .* Check loop invariant before entry: SUCCESS$
 ^\[ackermann.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[ackermann.3\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[ackermann.3\] .* Check decreases clause \(m, n\) on loop iteration: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

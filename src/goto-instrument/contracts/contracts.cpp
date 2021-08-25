@@ -17,12 +17,24 @@ Date: February 2016
 #include <map>
 
 #include <analyses/local_may_alias.h>
+#include <analyses/ai.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/monotonic_change.h>
 
 #include <ansi-c/c_expr.h>
+#include <ansi-c/cprover_library.h>
+#include <cpp/cprover_library.h>
 
 #include <goto-instrument/havoc_utils.h>
 
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/add_malloc_may_fail_variable_initializations.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/process_goto_program.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include <util/c_types.h>
 #include <util/expr_util.h>
@@ -32,9 +44,16 @@ Date: February 2016
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
+#include <util/options.h>
+#include <util/config.h>
+#include <util/rename.h>
+#include <util/std_types.h>
+#include <util/ui_message.h>
 
 #include "assigns.h"
 #include "memory_predicates.h"
+
+#include <assembler/remove_asm.h>
 
 // Create a lexicographic less-than relation between two tuples of variables.
 // This is used in the implementation of multidimensional decreases clauses.
@@ -90,6 +109,467 @@ static void insert_before_swap_and_advance(
   const auto offset = payload.instructions.size();
   program.insert_before_swap(target, payload);
   std::advance(target, offset);
+}
+
+// Collect top-level inequalities from a given expression "expr." "Top-level"
+// inequalities refer to those inequalities that are conjuncts at the top level.
+// For example, if "expr" is a < b && c >= d && ..., then the two inequalities a
+// < b and c >= d will be collected. However, if "expr" is a < b || (c >= d && e
+// > f), then neither c >= d nor e > f will be extracted. Even though c >=d and
+// > e > f are conjuncts, they are NOT top-level conjuncts.
+static void extract_inequalities(exprt &expr, exprt::operandst &accumulator)
+{
+  if(
+    expr.id() == ID_lt || expr.id() == ID_le || expr.id() == ID_gt ||
+    expr.id() == ID_ge)
+  {
+    accumulator.push_back(expr);
+  }
+  else if(expr.id() == ID_and)
+  {
+    extract_inequalities(expr.operands()[0], accumulator);
+    extract_inequalities(expr.operands()[1], accumulator);
+  }
+}
+
+std::string code_contractst::decreases_clause_to_string(
+  const exprt::operandst &decreases_clause_exprs)
+{
+  if(decreases_clause_exprs.empty())
+    return "Empty";
+  else if(decreases_clause_exprs.size() == 1)
+    return from_expr(
+      ns, decreases_clause_exprs[0].id(), decreases_clause_exprs[0]);
+  else
+  {
+    std::string result =
+      "(" +
+      from_expr(ns, decreases_clause_exprs[0].id(), decreases_clause_exprs[0]);
+    for(size_t i = 1; i < decreases_clause_exprs.size(); i++)
+    {
+      result = result + ", " +
+               from_expr(
+                 ns, decreases_clause_exprs[i].id(), decreases_clause_exprs[i]);
+    }
+    return result + ")";
+  }
+}
+
+// This is identical to the function
+// goto_analyzer_parse_optionst::process_goto_program.
+bool code_contractst::preprocess_goto_program(const optionst &options)
+{
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(goto_model);
+
+  // add the library
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
+  link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+
+  add_malloc_may_fail_variable_initializations(goto_model);
+
+  // Common removal of types and complex constructs.
+  //
+  // For some reason, process_goto_program seems to remove all ASSUME from
+  // goto_model. This is bad because we want goto_model to be left intact
+  // (except that we will add a successfully inferred decreases clause to
+  // goto_model later). We can fix this by simply commenting out the following
+  // four lines. However, I am afraid that it may give rise to another bug. It
+  // requires further investigation.
+  if(process_goto_program(goto_model, options, log))
+    return true;
+  else
+    return false;
+}
+
+std::unique_ptr<ai_baset>
+code_contractst::build_monotonic_change_analyzer()
+{
+  // Build a suitable option for a monotonic-change analyzer
+  optionst options;
+
+  // Options for showing the result of abstract interpretation. This is for
+  // debugging.
+  options.set_option("show", true);
+  options.set_option("general-analysis", true);
+
+  // legacy-ait is the default choice of an abstract interpreter according to
+  // goto_analyzer_parse_options.cpp.
+  options.set_option("legacy-ait", true);
+
+  // Options for history and storage
+  options.set_option("ahistorical", true);
+  options.set_option("history set", true);
+  options.set_option("one-domain-per-location", true);
+  options.set_option("storage set", true);
+
+  // Options for an absract domain
+  options.set_option("vsd", true);
+  options.set_option("domain set", true);
+  options.set_option("values", std::list<std::string>{"monotonic-change"});
+  options.set_option("pointers", std::list<std::string>{"constants"});
+  options.set_option("structs", std::list<std::string>{"every-field"});
+  options.set_option("arrays", std::list<std::string>{"every-element"});
+
+  if(preprocess_goto_program(options))
+  {
+    log.error() << "The GOTO program cannot be processed properly during the "
+                   "monotonic-change analysis"
+                << messaget::eom;
+  }
+
+  // Build an analyzer
+  log.status() << "Building a monotonic-change analyzer" << messaget::eom;
+
+  auto vsd_config = vsd_configt::from_options(options);
+  auto vs_object_factory =
+    variable_sensitivity_object_factoryt::configured_with(vsd_config);
+  auto df = util_make_unique<variable_sensitivity_domain_factoryt>(
+    vs_object_factory, vsd_config);
+  return util_make_unique<ait<variable_sensitivity_domaint>>(std::move(df));
+}
+
+void code_contractst::infer_decreases_clause(
+  goto_functionst::goto_functiont &goto_function,
+  goto_programt::targett loop_head,
+  const loopt &loop)
+{
+  PRECONDITION(!loop.empty());
+
+  // find the last back edge
+  goto_programt::targett loop_end = loop_head;
+  for(const auto &t : loop)
+  {
+    if(
+      t->is_goto() && t->get_target() == loop_head &&
+      t->location_number > loop_end->location_number)
+      loop_end = t;
+  }
+
+  // see whether we have an invariant and a decreases clause
+  auto invariant = static_cast<const exprt &>(
+    loop_end->get_condition().find(ID_C_spec_loop_invariant));
+  auto decreases_clause = static_cast<const exprt &>(
+    loop_end->get_condition().find(ID_C_spec_decreases));
+
+  if(!decreases_clause.is_nil())
+  {
+    log.warning() << "A decreases clause has already been inserted. So there "
+                     "is no need to infer a decreases clause."
+                  << messaget::eom;
+    return;
+  }
+  else if(invariant.is_nil())
+  {
+    invariant = true_exprt();
+    log.warning() << "The loop at " << loop_head->source_location.as_string()
+                  << " does not have a loop invariant. "
+                  << "Hence, a default loop invariant ('true') is being used."
+                  << messaget::eom;
+  }
+  else
+  {
+    // form the conjunction
+    invariant = conjunction(invariant.operands());
+  }
+
+  // Collect inequalities from a loop invariant. These inequalities are
+  // candidates for decreses clauses.
+  exprt::operandst inequalities;
+  extract_inequalities(invariant, inequalities);
+  if(inequalities.empty())
+  {
+    log.error()
+      << "We have failed in extracting any inequalities from a loop invariant."
+      << messaget::eom;
+    return;
+  }
+
+  // Build a temporary function that encapsulates/wraps a loop body. Later, we
+  // will pass this function to an analyzer for abstract interpretation. This
+  // function takes in no arguments and returns void. So we must ensure that the
+  // function's body does not contain any RETURN instruction. In fact, the
+  // function process process_goto_program in process_goto_program.cpp seems to
+  // already remove RETURN instructions (but I am not sure). Just to be sure, I
+  // will explicitly filter out RETURN instructions inside the loop body
+  // (again).
+  goto_functiont encapsulating_function;
+
+  /*
+  Here is my strategy for wrapping a loop body inside a function. Consider this
+  GOTO code:
+
+  1: IF A THEN GOTO 2
+     inst_1
+     inst_2
+     ...
+     IF B THEN GOTO 3
+     ...
+     IF C THEN GOTO 4
+     ...
+     inst_n
+     GOTO 1
+  2: ...
+     ...
+  3: ...
+     ...
+  4: ...
+
+  Here, "IF A THEN GOTO 2" is a loop head, and "GOTO 1" is a back edge of the
+  loop. The loop body has several instructions that jumps out of the loop body;
+  e.g. "IF B THEN GOTO 3." The above will be transformed into the following
+  function body.
+
+     inst_1
+     inst_2
+     ...
+     IF B THEN GOTO 1
+     ...
+     IF C THEN GOTO 1
+     ...
+     inst_n
+     SKIP
+  1: END_FUNCTION
+
+  Note that it is important to add an extra SKIP after inst_n. Let's consider
+  what would happen if we did not have this extra SKIP instruction. The code
+  would be
+
+     inst_1
+     inst_2
+     ...
+     IF B THEN GOTO 1
+     ...
+     IF C THEN GOTO 1
+     ...
+     inst_n
+  1: END_FUNCTION
+
+  Now how can we access the abstract state at the end of the loop body? If we
+  use abstract_state_before(END_FUNCTION), it is wrong. We do not care about the
+  abstract state after jumping out of the loop body; e.g. after we jump from "IF
+  B THEN GOTO 1" to END_FUNCTION. We only focus on the abstract state
+  immediately after inst_n in the loop body is reached. Sadly,
+  abstract_state_before(END_FUNCTION) is the join of the following:
+  (i) the abstract state after inst_n is reached;
+  (ii) the abstract state after we jump from "IF B THEN GOTO 1" (or "IF C THEN
+  GOTO 1") to END_FUNCTION.
+  What we want is just (i), not (ii).
+
+  How about abstract_state_after(inst_n)? Well, this turns out to be the same as
+  abstract_state_before(END_FUNCTION). In my opinion,
+  abstract_state_after(inst_n) should contain the abstract state (i) rather than
+  the join of both (i) and (ii).
+
+  This is why we need to insert an extra SKIP instruction before END_FUNCTION.
+  */
+
+  // A mapping between the instructions in "loop" and the instructions in
+  // "encapsulating_function." This mapping will later be used to correctly copy
+  // the targets of instructions. This mapping was inspired by the function
+  // goto_programt::copy_from.
+  typedef std::map<goto_programt::const_targett, goto_programt::targett>
+    targets_mappingt;
+  targets_mappingt targets_mapping;
+
+  for(const auto &ins_loop : loop)
+  {
+    // Replace a RETURN instruction with ASSUME false. However, it seems that if
+    // a loop body contains a RETURN instruction, it is not recognized as a
+    // natural loop. This is true for at least those toy examples I experimented
+    // with. If a loop is not recognized as a natural loop, then this function
+    // (i.e. code_contractst::infer_decreases_clause) will not be invoked.
+    if(ins_loop->is_set_return_value())
+    {
+      encapsulating_function.body.add(
+        goto_programt::make_assumption(false_exprt()));
+    }
+    else if(ins_loop != loop_end && ins_loop != loop_head)
+    {
+      goto_programt::targett new_instruction =
+        encapsulating_function.body.insert_before(
+          encapsulating_function.body.instructions.end(), *ins_loop);
+      targets_mapping[ins_loop] = new_instruction;
+    }
+  }
+
+  // Insert an extra SKIP instruction to the end of the function that
+  // encapsulates the loop body. The reason why we need it is explained above.
+  goto_programt::targett extra_skip =
+    encapsulating_function.body.add(goto_programt::make_skip());
+
+  // Insert the END_FUNCTION instruction. For any instruction in the loop body
+  // that points/jumps to another instruction outside the loop, we will redirect
+  // them to this extra SKIP instruction.
+  goto_programt::targett encapsulating_function_last_instruction =
+    encapsulating_function.body.add(goto_programt::make_end_function());
+
+  // Correctly modify/adapt the targets of those instructions in
+  // "encapsulating_function." It is necessary to modify/adapt these targets for
+  // two reasons. 
+  //
+  // Firstly, a goto/jump instruction inside "encapsulating_function"
+  // points/jumps to a target in "loop," not "encapsulating_function." This is
+  // because, so far, we have copied instructions, but their targets still point
+  // to "loop." Hence, we need to redirect these goto/jump instructions to
+  // appropriate targets in "encapsulating_function." 
+  //
+  // Secondly, an instruction inside "encapsulating_function" may point/jump to
+  // another instruction outside "encapsulating_function." In this case, we will
+  // redirect the instruction to the newly created END_FUNCTION instruction at the
+  // end of "encapsulating_function."
+  //
+  // This loop was inspired by the function goto_programt::copy_from.
+  Forall_goto_program_instructions(ins_fun, encapsulating_function.body)
+  {
+    if(ins_fun->is_goto())
+    {
+      if(loop.contains(ins_fun->get_target()))
+      {
+        targets_mappingt::iterator m_target_it =
+          targets_mapping.find(ins_fun->get_target());
+        ins_fun->set_target(m_target_it->second);
+      }
+      else
+      {
+        ins_fun->set_target(encapsulating_function_last_instruction);
+      }
+    }
+  }
+
+  // Create a fresh name for the temporary function that encapsulates the loop
+  // body.
+  irep_idt encapsulating_fun_name{get_new_name(irep_idt{"temporary"}, ns, '$')};
+  symbolt encapsulating_fun_symbol = symbolt();
+  encapsulating_fun_symbol.type = code_typet{{}, empty_typet()};
+  encapsulating_fun_symbol.value = exprt{ID_compiled};
+  encapsulating_fun_symbol.name = encapsulating_fun_name;
+  encapsulating_fun_symbol.base_name = encapsulating_fun_name;
+  encapsulating_fun_symbol.mode = irep_idt{"C"};
+  encapsulating_fun_symbol.pretty_name = encapsulating_fun_name;
+
+  // We (i) insert the newly created name to the symbol table and (ii)
+  // insert the newly created function to the function map.
+  goto_model.symbol_table.insert(encapsulating_fun_symbol);
+  goto_model.goto_functions.function_map.insert(
+    std::pair<irep_idt, goto_functiont>(
+      encapsulating_fun_name, std::move(encapsulating_function)));
+
+#ifdef DEBUG
+  log.status() << "The function encapsulating the loop body at "
+               << loop_head->source_location
+               << " before preprocessing is displayed below" << messaget::eom;
+  show_goto_functions(goto_model, ui_message_handler, false);
+#endif
+
+  // Build an analyzer
+  std::unique_ptr<ai_baset> analyzer = build_monotonic_change_analyzer();
+
+#ifdef DEBUG
+  log.status() << "The function encapsulating the loop body at "
+               << loop_head->source_location
+               << " after preprocessing is displayed below" << messaget::eom;
+  show_goto_functions(goto_model, ui_message_handler, false);
+#endif
+
+  // Run the analyzer
+  log.status() << "Computing monotonic-change abstract values" << messaget::eom;
+  (*analyzer)(encapsulating_fun_name, goto_model);
+
+#ifdef DEBUG
+  // Print out the result of abstract interpretation
+  log.status() << "Printing the result of monotonic-change analysis"
+               << messaget::eom;
+  (*analyzer).output(goto_model, log.status());
+#endif
+
+  // Obtain the final abstract state of the loop body. Note that this is the
+  // state before "the extra SKIP instruction," not the last "END_FUNCTION
+  // instruction."
+  const variable_sensitivity_domaint &abstract_state_last_instruction =
+    static_cast<const variable_sensitivity_domaint &>(
+      *(analyzer->abstract_state_before(extra_skip)));
+
+  // For each inequality extracted from a loop invariant, check whether the
+  // distance between two operands strictly decreases after one iteration of the
+  // loop.
+  exprt::operandst valid_decreases_clauses;
+  for(const exprt &inequality : inequalities)
+  {
+    const exprt first_expr = inequality.operands()[0];
+    const exprt second_expr = inequality.operands()[1];
+
+    // I wonder if abstract_state_last_instruction.eval is really the correct
+    // way to calculate the monotonic-change status. The function
+    // abstract_environment::eval was designed for existing abstract
+    // interpretations, not monotonic-change abstract interpretation. I am
+    // afraid that "eval" may return the monotonic-change status "unchanged"
+    // when it should have returned "top."
+    std::shared_ptr<const monotonic_changet> first_abstract_object =
+      std::dynamic_pointer_cast<const monotonic_changet>(
+        abstract_state_last_instruction.eval(first_expr, ns)->unwrap_context());
+    std::shared_ptr<const monotonic_changet> second_abstract_object =
+      std::dynamic_pointer_cast<const monotonic_changet>(
+        abstract_state_last_instruction.eval(second_expr, ns)
+          ->unwrap_context());
+
+    if(first_abstract_object != nullptr && second_abstract_object != nullptr)
+    {
+      monotonicity_flags first_mvalue =
+        first_abstract_object->monotonicity_value;
+      monotonicity_flags second_mvalue =
+        second_abstract_object->monotonicity_value;
+      if(
+        (inequality.id() == ID_lt || inequality.id() == ID_le) &&
+        ((first_mvalue == unchanged && second_mvalue == strict_decrease) ||
+         (first_mvalue == strict_increase && second_mvalue == unchanged)))
+      {
+        valid_decreases_clauses.push_back(
+          binary_exprt(second_expr, ID_minus, first_expr));
+      }
+      else if(
+        (inequality.id() == ID_gt || inequality.id() == ID_ge) &&
+        ((first_mvalue == unchanged && second_mvalue == strict_increase) ||
+         (first_mvalue == strict_decrease && second_mvalue == unchanged)))
+      {
+        valid_decreases_clauses.push_back(
+          binary_exprt(first_expr, ID_minus, second_expr));
+      }
+    }
+  }
+
+  if(valid_decreases_clauses.empty())
+  {
+    log.error()
+      << "We have failed in inferring a decreases clause for the loop at "
+      << loop_head->source_location << messaget::eom;
+  }
+  else{
+    for(const exprt decreases_clause : valid_decreases_clauses)
+    {
+      log.status() << "Decreases clasue for the loop at "
+                   << loop_head->source_location << " is "
+                   << from_expr(ns, decreases_clause.id(), decreases_clause)
+                   << messaget::eom;
+    }
+
+    // Create an expression whose operand is the decreases clause we have just
+    // successfully inferred. We then attach the new expression to loop_end
+    // because that is where decreases clauses (and also loop invariants) are
+    // stored. This is step is necessary because, in general, a decreases clause
+    // may be multidimensional and hence may contain multiple components.
+    exprt decreases_clasue_vector = exprt();
+    decreases_clasue_vector.copy_to_operands(valid_decreases_clauses[0]);
+    loop_end->guard.add(ID_C_spec_decreases).swap(decreases_clasue_vector);
+  }
+
+  // Remove the temproary function that encapsulates the loop body from the GOTO
+  // program
+  goto_model.symbol_table.remove(encapsulating_fun_name);
+  goto_model.goto_functions.function_map.erase(encapsulating_fun_name);
 }
 
 void code_contractst::check_apply_loop_contracts(
@@ -279,7 +759,9 @@ void code_contractst::check_apply_loop_contracts(
       loop_head->source_location;
     converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
     havoc_code.instructions.back().source_location.set_comment(
-      "Check decreases clause on loop iteration");
+      "Check decreases clause " +
+      decreases_clause_to_string(decreases_clause_exprs) +
+      " on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
@@ -623,6 +1105,32 @@ void code_contractst::apply_loop_contract(
       loop.first,
       loop.second,
       symbol_table.lookup_ref(function).mode);
+  }
+}
+
+void code_contractst::infer_decreases_clauses_in_function(
+  const irep_idt &function,
+  goto_functionst::goto_functiont &goto_function)
+{
+  natural_loops_mutablet natural_loops(goto_function.body);
+
+#ifdef DEBUG
+  if (natural_loops.loop_map.empty())
+  {
+    log.status() << "Function " << function << " has no natural loops"
+                 << messaget::eom;
+    return;
+  }
+#endif
+
+  // Iterate over the (natural) loops in the function,
+  // and attempt to infer decreases clauses.
+  for(const auto &loop : natural_loops.loop_map)
+  {
+    infer_decreases_clause(
+      goto_function,
+      loop.first,
+      loop.second);
   }
 }
 
@@ -1226,6 +1734,12 @@ void code_contractst::apply_loop_contracts()
 {
   for(auto &goto_function : goto_functions.function_map)
     apply_loop_contract(goto_function.first, goto_function.second);
+}
+
+void code_contractst::infer_decreases_clauses_in_program()
+{
+  for(auto &goto_function : goto_functions.function_map)
+    infer_decreases_clauses_in_function(goto_function.first, goto_function.second);
 }
 
 bool code_contractst::replace_calls()
