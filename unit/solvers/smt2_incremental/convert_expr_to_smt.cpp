@@ -3,6 +3,7 @@
 #include <testing-utils/use_catch.h>
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 
@@ -169,4 +170,65 @@ TEST_CASE(
   REQUIRE(
     convert_expr_to_smt(not_exprt{true_exprt{}}) ==
     smt_core_theoryt::make_not(smt_bool_literal_termt{true}));
+}
+
+TEST_CASE(
+  "expr to smt conversion for relational operators",
+  "[core][smt2_incremental]")
+{
+  const smt_termt one_term = smt_bit_vector_constant_termt{1, 8};
+  const smt_termt two_term = smt_bit_vector_constant_termt{2, 8};
+  SECTION("Greater than")
+  {
+    CHECK(
+      convert_expr_to_smt(
+        greater_than_exprt{from_integer({1}, signedbv_typet{8}),
+                           from_integer({2}, signedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::signed_greater_than(one_term, two_term));
+    CHECK(
+      convert_expr_to_smt(
+        greater_than_exprt{from_integer({1}, unsignedbv_typet{8}),
+                           from_integer({2}, unsignedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::unsigned_greater_than(one_term, two_term));
+  }
+  SECTION("Greater than or equal")
+  {
+    CHECK(
+      convert_expr_to_smt(
+        greater_than_or_equal_exprt{from_integer({1}, signedbv_typet{8}),
+                                    from_integer({2}, signedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::signed_greater_than_or_equal(one_term, two_term));
+    CHECK(
+      convert_expr_to_smt(
+        greater_than_or_equal_exprt{from_integer({1}, unsignedbv_typet{8}),
+                                    from_integer({2}, unsignedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::unsigned_greater_than_or_equal(
+        one_term, two_term));
+  }
+  SECTION("Less than")
+  {
+    CHECK(
+      convert_expr_to_smt(
+        less_than_exprt{from_integer({1}, signedbv_typet{8}),
+                        from_integer({2}, signedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::signed_less_than(one_term, two_term));
+    CHECK(
+      convert_expr_to_smt(
+        less_than_exprt{from_integer({1}, unsignedbv_typet{8}),
+                        from_integer({2}, unsignedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::unsigned_less_than(one_term, two_term));
+  }
+  SECTION("Less than or equal")
+  {
+    CHECK(
+      convert_expr_to_smt(
+        less_than_or_equal_exprt{from_integer({1}, signedbv_typet{8}),
+                                 from_integer({2}, signedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::signed_less_than_or_equal(one_term, two_term));
+    CHECK(
+      convert_expr_to_smt(
+        less_than_or_equal_exprt{from_integer({1}, unsignedbv_typet{8}),
+                                 from_integer({2}, unsignedbv_typet{8})}) ==
+      smt_bit_vector_theoryt::unsigned_less_than_or_equal(one_term, two_term));
+  }
 }
