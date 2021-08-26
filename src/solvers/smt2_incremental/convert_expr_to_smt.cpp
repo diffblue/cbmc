@@ -56,9 +56,15 @@ static smt_termt convert_expr_to_smt(const union_exprt &union_construction)
 
 static smt_termt convert_expr_to_smt(const constant_exprt &constant_literal)
 {
+  if(
+    const auto bool_type =
+      type_try_dynamic_cast<bool_typet>(constant_literal.type()))
+  {
+    return smt_bool_literal_termt{constant_literal.is_true()};
+  }
   UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for constant literal expression: " +
-    constant_literal.pretty());
+    "Generation of SMT formula for constant literal expression of type: " +
+    constant_literal.type().pretty());
 }
 
 static smt_termt convert_expr_to_smt(const concatenation_exprt &concatenation)
