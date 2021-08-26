@@ -12,7 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_PROPERTIES_H
 #define CPROVER_GOTO_CHECKER_PROPERTIES_H
 
-#include <unordered_map>
+#include <map>
 
 #include <goto-programs/goto_program.h>
 
@@ -73,7 +73,7 @@ struct property_infot
 };
 
 /// A map of property IDs to property infos
-typedef std::unordered_map<irep_idt, property_infot> propertiest;
+typedef std::map<irep_idt, property_infot> propertiest;
 
 /// Returns the properties in the goto model
 propertiest initialize_properties(const abstract_goto_modelt &);

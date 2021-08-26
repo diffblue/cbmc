@@ -41,6 +41,7 @@ class optionst;
 
 enum class coverage_criteriont
 {
+  ASSUME,
   LOCATION,
   BRANCH,
   DECISION,

@@ -24,6 +24,7 @@ SRC = accelerate/accelerate.cpp \
       cover.cpp \
       cover_basic_blocks.cpp \
       cover_filter.cpp \
+      cover_instrument_assume.cpp \
       cover_instrument_branch.cpp \
       cover_instrument_condition.cpp \
       cover_instrument_decision.cpp \

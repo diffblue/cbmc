@@ -18,6 +18,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/cover$(OBJEXT) \
       ../goto-instrument/cover_basic_blocks$(OBJEXT) \
       ../goto-instrument/cover_filter$(OBJEXT) \
+      ../goto-instrument/cover_instrument_assume$(OBJEXT) \
       ../goto-instrument/cover_instrument_branch$(OBJEXT) \
       ../goto-instrument/cover_instrument_condition$(OBJEXT) \
       ../goto-instrument/cover_instrument_decision$(OBJEXT) \

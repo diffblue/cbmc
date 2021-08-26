@@ -99,6 +99,10 @@ void cover_instrumenterst::add_from_criterion(
   case coverage_criteriont::COVER:
     instrumenters.push_back(
       util_make_unique<cover_cover_instrumentert>(symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::ASSUME:
+    instrumenters.push_back(
+      util_make_unique<cover_assume_instrumentert>(symbol_table, goal_filters));
   }
 }
 
@@ -126,6 +130,8 @@ parse_coverage_criterion(const std::string &criterion_string)
     c = coverage_criteriont::MCDC;
   else if(criterion_string == "cover")
     c = coverage_criteriont::COVER;
+  else if(criterion_string == "assume")
+    c = coverage_criteriont::ASSUME;
   else
   {
     std::stringstream s;
@@ -200,6 +206,9 @@ cover_configt get_cover_config(
     coverage_criteriont c = parse_coverage_criterion(criterion_string);
 
     if(c == coverage_criteriont::ASSERTION)
+      cover_config.keep_assertions = true;
+    // Make sure that existing assertions don't get replaced by assumes
+    else if(c == coverage_criteriont::ASSUME)
       cover_config.keep_assertions = true;
 
     instrumenters.add_from_criterion(c, symbol_table, *goal_filters);

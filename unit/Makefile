@@ -221,6 +221,7 @@ BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/goto-instrument/cover$(OBJEXT) \
           ../src/goto-instrument/cover_basic_blocks$(OBJEXT) \
           ../src/goto-instrument/cover_filter$(OBJEXT) \
+          ../src/goto-instrument/cover_instrument_assume$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_branch$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_condition$(OBJEXT) \
           ../src/goto-instrument/cover_instrument_decision$(OBJEXT) \
