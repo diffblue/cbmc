@@ -6,7 +6,30 @@
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 
+#include <util/bitvector_types.h>
 #include <util/std_expr.h>
+
+TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
+{
+  SECTION("Boolean type")
+  {
+    CHECK(convert_type_to_smt_sort(bool_typet{}) == smt_bool_sortt{});
+  }
+  SECTION("Bit vector types")
+  {
+    CHECK(convert_type_to_smt_sort(bv_typet{8}) == smt_bit_vector_sortt{8});
+    CHECK(
+      convert_type_to_smt_sort(signedbv_typet{16}) == smt_bit_vector_sortt{16});
+    CHECK(
+      convert_type_to_smt_sort(unsignedbv_typet{32}) ==
+      smt_bit_vector_sortt{32});
+  }
+  SECTION("Error handling")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    CHECK_THROWS(convert_type_to_smt_sort(empty_typet{}));
+  }
+}
 
 TEST_CASE("expr to smt conversion for bool literal", "[core][smt2_incremental]")
 {

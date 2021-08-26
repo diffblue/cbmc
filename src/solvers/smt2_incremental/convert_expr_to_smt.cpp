@@ -19,6 +19,29 @@
 #include <functional>
 #include <numeric>
 
+static smt_sortt convert_type_to_smt_sort(const bool_typet &type)
+{
+  return smt_bool_sortt{};
+}
+
+static smt_sortt convert_type_to_smt_sort(const bitvector_typet &type)
+{
+  return smt_bit_vector_sortt{type.get_width()};
+}
+
+smt_sortt convert_type_to_smt_sort(const typet &type)
+{
+  if(const auto bool_type = type_try_dynamic_cast<bool_typet>(type))
+  {
+    return convert_type_to_smt_sort(*bool_type);
+  }
+  if(const auto bitvector_type = type_try_dynamic_cast<bitvector_typet>(type))
+  {
+    return convert_type_to_smt_sort(*bitvector_type);
+  }
+  UNIMPLEMENTED_FEATURE("Generation of SMT formula for type: " + type.pretty());
+}
+
 static smt_termt convert_expr_to_smt(const symbol_exprt &symbol_expr)
 {
   UNIMPLEMENTED_FEATURE(
