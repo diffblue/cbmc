@@ -2,7 +2,6 @@
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 
-#include <ansi-c/c_expr.h>
 #include <solvers/prop/literal_expr.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
@@ -396,14 +395,6 @@ static smt_termt convert_expr_to_smt(const isnormal_exprt &is_normal_expr)
     is_normal_expr.pretty());
 }
 
-static smt_termt
-convert_expr_to_smt(const side_effect_expr_overflowt &overflow_expr)
-{
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for overflow checked arithmetic expression: " +
-    overflow_expr.pretty());
-}
-
 static smt_termt convert_expr_to_smt(const array_exprt &array_construction)
 {
   UNIMPLEMENTED_FEATURE(
@@ -716,12 +707,6 @@ smt_termt convert_expr_to_smt(const exprt &expr)
   if(const auto is_normal_expr = expr_try_dynamic_cast<isnormal_exprt>(expr))
   {
     return convert_expr_to_smt(*is_normal_expr);
-  }
-  if(
-    const auto overflow_expr =
-      expr_try_dynamic_cast<side_effect_expr_overflowt>(expr))
-  {
-    return convert_expr_to_smt(*overflow_expr);
   }
   if(const auto array_construction = expr_try_dynamic_cast<array_exprt>(expr))
   {
