@@ -130,8 +130,10 @@ static smt_termt convert_expr_to_smt(const sign_exprt &is_negative)
 
 static smt_termt convert_expr_to_smt(const if_exprt &if_expression)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for if expression: " + if_expression.pretty());
+  return smt_core_theoryt::if_then_else(
+    convert_expr_to_smt(if_expression.cond()),
+    convert_expr_to_smt(if_expression.true_case()),
+    convert_expr_to_smt(if_expression.false_case()));
 }
 
 /// \brief Converts operator expressions with 2 or more operands to terms

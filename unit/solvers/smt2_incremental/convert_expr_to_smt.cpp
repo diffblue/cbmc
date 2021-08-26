@@ -15,6 +15,26 @@ TEST_CASE("expr to smt conversion for bool literal", "[core][smt2_incremental]")
 }
 
 TEST_CASE(
+  "expr to smt conversion for \"if then else\"",
+  "[core][smt2_incremental]")
+{
+  const auto true_term = smt_bool_literal_termt{true};
+  const auto false_term = smt_bool_literal_termt{false};
+  CHECK(
+    convert_expr_to_smt(if_exprt{true_exprt{}, false_exprt{}, true_exprt{}}) ==
+    smt_core_theoryt::if_then_else(true_term, false_term, true_term));
+  CHECK(
+    convert_expr_to_smt(if_exprt{true_exprt{}, true_exprt{}, false_exprt{}}) ==
+    smt_core_theoryt::if_then_else(true_term, true_term, false_term));
+  CHECK(
+    convert_expr_to_smt(if_exprt{false_exprt{}, false_exprt{}, true_exprt{}}) ==
+    smt_core_theoryt::if_then_else(false_term, false_term, true_term));
+  CHECK(
+    convert_expr_to_smt(if_exprt{false_exprt{}, true_exprt{}, false_exprt{}}) ==
+    smt_core_theoryt::if_then_else(false_term, true_term, false_term));
+}
+
+TEST_CASE(
   "expr to smt conversion for \"and\" operator",
   "[core][smt2_incremental]")
 {
