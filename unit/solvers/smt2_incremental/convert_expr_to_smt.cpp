@@ -81,6 +81,26 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "expr to smt conversion for \"equals\" operator",
+  "[core][smt2_incremental]")
+{
+  REQUIRE(
+    convert_expr_to_smt(equal_exprt{false_exprt{}, true_exprt{}}) ==
+    smt_core_theoryt::equal(
+      smt_bool_literal_termt{false}, smt_bool_literal_termt{true}));
+}
+
+TEST_CASE(
+  "expr to smt conversion for \"not equals\" operator",
+  "[core][smt2_incremental]")
+{
+  REQUIRE(
+    convert_expr_to_smt(notequal_exprt{false_exprt{}, true_exprt{}}) ==
+    smt_core_theoryt::distinct(
+      smt_bool_literal_termt{false}, smt_bool_literal_termt{true}));
+}
+
+TEST_CASE(
   "expr to smt conversion for \"not\" operator",
   "[core][smt2_incremental]")
 {

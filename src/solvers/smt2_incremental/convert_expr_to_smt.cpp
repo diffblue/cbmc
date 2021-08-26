@@ -193,15 +193,14 @@ static smt_termt convert_expr_to_smt(const not_exprt &logical_not)
 
 static smt_termt convert_expr_to_smt(const equal_exprt &equal)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for equality expression: " + equal.pretty());
+  return smt_core_theoryt::equal(
+    convert_expr_to_smt(equal.op0()), convert_expr_to_smt(equal.op1()));
 }
 
 static smt_termt convert_expr_to_smt(const notequal_exprt &not_equal)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for not equal expression: " +
-    not_equal.pretty());
+  return smt_core_theoryt::distinct(
+    convert_expr_to_smt(not_equal.op0()), convert_expr_to_smt(not_equal.op1()));
 }
 
 static smt_termt convert_expr_to_smt(const ieee_float_equal_exprt &float_equal)
