@@ -4,6 +4,7 @@
 
 #include <solvers/prop/literal_expr.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
+#include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/expr.h>
@@ -82,17 +83,37 @@ static smt_termt convert_expr_to_smt(const union_exprt &union_construction)
     union_construction.pretty());
 }
 
+struct sort_based_literal_convertert : public smt_sort_const_downcast_visitort
+{
+  const constant_exprt &member_input;
+  optionalt<smt_termt> result;
+
+  explicit sort_based_literal_convertert(const constant_exprt &input)
+    : member_input{input}
+  {
+  }
+
+  void visit(const smt_bool_sortt &) override
+  {
+    result = smt_bool_literal_termt{member_input.is_true()};
+  }
+
+  void visit(const smt_bit_vector_sortt &bit_vector_sort) override
+  {
+    const auto &width = bit_vector_sort.bit_width();
+    // We get the value using a non-signed interpretation, as smt bit vector
+    // terms do not carry signedness.
+    const auto value = bvrep2integer(member_input.get_value(), width, false);
+    result = smt_bit_vector_constant_termt{value, bit_vector_sort};
+  }
+};
+
 static smt_termt convert_expr_to_smt(const constant_exprt &constant_literal)
 {
-  if(
-    const auto bool_type =
-      type_try_dynamic_cast<bool_typet>(constant_literal.type()))
-  {
-    return smt_bool_literal_termt{constant_literal.is_true()};
-  }
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for constant literal expression of type: " +
-    constant_literal.type().pretty());
+  const auto sort = convert_type_to_smt_sort(constant_literal.type());
+  sort_based_literal_convertert converter(constant_literal);
+  sort.accept(converter);
+  return *converter.result;
 }
 
 static smt_termt convert_expr_to_smt(const concatenation_exprt &concatenation)

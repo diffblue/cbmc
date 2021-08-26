@@ -6,7 +6,9 @@
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/format.h>
 #include <util/std_expr.h>
 
 TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
@@ -31,10 +33,27 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
   }
 }
 
-TEST_CASE("expr to smt conversion for bool literal", "[core][smt2_incremental]")
+TEST_CASE(
+  "\"exprt\" to smt term conversion for constants/literals",
+  "[core][smt2_incremental]")
 {
-  CHECK(convert_expr_to_smt(true_exprt{}) == smt_bool_literal_termt{true});
-  CHECK(convert_expr_to_smt(false_exprt{}) == smt_bool_literal_termt{false});
+  SECTION("Boolean constants")
+  {
+    CHECK(convert_expr_to_smt(true_exprt{}) == smt_bool_literal_termt{true});
+    CHECK(convert_expr_to_smt(false_exprt{}) == smt_bool_literal_termt{false});
+  }
+  SECTION("Bit vector literals")
+  {
+    CHECK(
+      convert_expr_to_smt(from_integer({12}, signedbv_typet{8})) ==
+      smt_bit_vector_constant_termt{12, 8});
+    CHECK(
+      convert_expr_to_smt(from_integer({24}, unsignedbv_typet{8})) ==
+      smt_bit_vector_constant_termt{24, 8});
+    CHECK(
+      convert_expr_to_smt(from_integer({-1}, signedbv_typet{16})) ==
+      smt_bit_vector_constant_termt{65535, 16});
+  }
 }
 
 TEST_CASE(
