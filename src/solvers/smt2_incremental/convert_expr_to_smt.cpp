@@ -3,6 +3,7 @@
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 
 #include <solvers/prop/literal_expr.h>
+#include <solvers/smt2_incremental/smt_core_theory.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/expr.h>
@@ -11,8 +12,12 @@
 #include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
+#include <util/range.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
+
+#include <functional>
+#include <numeric>
 
 static smt_termt convert_expr_to_smt(const symbol_exprt &symbol_expr)
 {
@@ -129,38 +134,61 @@ static smt_termt convert_expr_to_smt(const if_exprt &if_expression)
     "Generation of SMT formula for if expression: " + if_expression.pretty());
 }
 
+/// \brief Converts operator expressions with 2 or more operands to terms
+///   expressed as binary operator application.
+/// \param expr: The expression to convert.
+/// \param factory: The factory function which makes applications of the
+///   relevant smt term, when applied to the term operands.
+/// \details The conversion used is left associative for instances with 3 or
+///   more operands. The SMT standard / core theory version 2.6 actually
+///   supports applying the `and`, `or` and `xor` to 3 or more operands.
+///   However our internal `smt_core_theoryt` does not support this currently
+///   and converting to binary application has the advantage of making the order
+///   of evaluation explicit.
+template <typename factoryt>
+static smt_termt convert_multiary_operator_to_terms(
+  const multi_ary_exprt &expr,
+  const factoryt &factory)
+{
+  PRECONDITION(expr.operands().size() >= 2);
+  const auto operand_terms =
+    make_range(expr.operands()).map([](const exprt &expr) {
+      return convert_expr_to_smt(expr);
+    });
+  return std::accumulate(
+    ++operand_terms.begin(),
+    operand_terms.end(),
+    *operand_terms.begin(),
+    factory);
+}
+
 static smt_termt convert_expr_to_smt(const and_exprt &and_expression)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for logical and expression: " +
-    and_expression.pretty());
+  return convert_multiary_operator_to_terms(
+    and_expression, smt_core_theoryt::make_and);
 }
 
 static smt_termt convert_expr_to_smt(const or_exprt &or_expression)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for logical or expression: " +
-    or_expression.pretty());
+  return convert_multiary_operator_to_terms(
+    or_expression, smt_core_theoryt::make_or);
 }
 
 static smt_termt convert_expr_to_smt(const xor_exprt &xor_expression)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for logical xor expression: " +
-    xor_expression.pretty());
+  return convert_multiary_operator_to_terms(
+    xor_expression, smt_core_theoryt::make_xor);
 }
 
 static smt_termt convert_expr_to_smt(const implies_exprt &implies)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for implies expression: " + implies.pretty());
+  return smt_core_theoryt::implies(
+    convert_expr_to_smt(implies.op0()), convert_expr_to_smt(implies.op1()));
 }
 
 static smt_termt convert_expr_to_smt(const not_exprt &logical_not)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for logical not expression: " +
-    logical_not.pretty());
+  return smt_core_theoryt::make_not(convert_expr_to_smt(logical_not.op()));
 }
 
 static smt_termt convert_expr_to_smt(const equal_exprt &equal)
