@@ -31,10 +31,22 @@ Date: February 2016
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 
+#include <util/options.h>
+
+#include <util/ui_message.h>
+
+#include <analyses/ai.h>
+
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
   " --apply-loop-contracts\n"                                                  \
   "                              check and use loop contracts when provided\n"
+
+#define FLAG_DECREASES_CLAUSES_INFERENCE "infer-decreases-clauses"
+#define HELP_DECREASES_CLAUSES_INFERENCE                                       \
+  " --infer-decreases-clauses\n"                                               \
+  "                              infer decreases clauses for loops without "   \
+  "explicit decreases clauses\n"
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
@@ -61,13 +73,17 @@ class replace_symbolt;
 class code_contractst
 {
 public:
-  code_contractst(goto_modelt &goto_model, messaget &log)
+  code_contractst(
+    goto_modelt &goto_model,
+    messaget &log,
+    ui_message_handlert &ui_message_handler)
     : ns(goto_model.symbol_table),
+      goto_model(goto_model),
       symbol_table(goto_model.symbol_table),
       goto_functions(goto_model.goto_functions),
       log(log),
+      ui_message_handler(ui_message_handler),
       converter(symbol_table, log.get_message_handler())
-
   {
   }
 
@@ -115,6 +131,8 @@ public:
 
   void apply_loop_contracts();
 
+  void infer_decreases_clauses_in_program();
+
   const symbolt &new_tmp_symbol(
     const typet &type,
     const source_locationt &source_location,
@@ -127,17 +145,24 @@ public:
     const loopt &loop,
     const irep_idt &mode);
 
+  void infer_decreases_clause(
+    goto_functionst::goto_functiont &goto_function,
+    goto_programt::targett loop_head,
+    const loopt &loop);
+
   // for "helper" classes to update symbol table.
   symbol_tablet &get_symbol_table();
   goto_functionst &get_goto_functions();
 
   namespacet ns;
+  goto_modelt &goto_model;
 
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 
   messaget &log;
+  ui_message_handlert &ui_message_handler;
   goto_convertt converter;
 
   std::unordered_set<irep_idt> summarized;
@@ -191,6 +216,11 @@ protected:
     const irep_idt &function,
     goto_functionst::goto_functiont &goto_function);
 
+  // Attempt to infer decreases clauses for all loops in "function."
+  void infer_decreases_clauses_in_function(
+    const irep_idt &function,
+    goto_functionst::goto_functiont &goto_function);
+
   /// \brief Does the named function have a contract?
   bool has_contract(const irep_idt);
 
@@ -233,6 +263,20 @@ protected:
     codet &expression,
     source_locationt location,
     const irep_idt &mode);
+
+  // Convert a (possibly multidimensional) decreases clause to a string
+  std::string
+  decreases_clause_to_string(const exprt::operandst &decreases_clause_exprs);
+
+  // Construct an analyzer for monotonic-change abstract interpretation.
+  // loop_body_funtion_id is the name of the function that encapsulates a loop
+  // body to be analyzed.
+  std::unique_ptr<ai_baset> build_monotonic_change_analyzer();
+
+  // Preprocess a GOTO program before it is passed to an analyzer for abstract
+  // interpretation. This is identical to the function
+  // goto_analyzer_parse_optionst::process_goto_program.
+  bool preprocess_goto_program(const optionst &options);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H

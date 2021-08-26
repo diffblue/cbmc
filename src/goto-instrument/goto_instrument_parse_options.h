@@ -100,6 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(model-argc-argv):" \
   "(" FLAG_LOOP_CONTRACTS ")" \
+  "(" FLAG_DECREASES_CLAUSES_INFERENCE ")" \
   "(" FLAG_REPLACE_CALL "):" \
   "(" FLAG_REPLACE_ALL_CALLS ")" \
   "(" FLAG_ENFORCE_CONTRACT "):" \

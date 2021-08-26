@@ -3,7 +3,7 @@ main.c
 --apply-loop-contracts
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$
 ^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.3\] .* Check decreases clause on loop iteration: FAILURE$
+^\[main.3\] .* Check decreases clause N - i on loop iteration: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
