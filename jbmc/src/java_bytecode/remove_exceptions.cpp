@@ -446,7 +446,7 @@ remove_exceptionst::instrument_function_call(
   const auto &function = instr_it->call_function();
 
   DATA_INVARIANT(
-    function.id() == ID_symbol, "identified expected to be a symbol");
+    function.id() == ID_symbol, "function call expected to be a symbol");
   const irep_idt &callee_id = to_symbol_expr(function).get_identifier();
 
   if(function_may_throw(callee_id))
