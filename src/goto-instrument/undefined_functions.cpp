@@ -41,16 +41,16 @@ void undefined_function_abort_path(goto_modelt &goto_model)
       if(!ins.is_function_call())
         continue;
 
-      const code_function_callt &call = ins.get_function_call();
+      const auto &function = ins.call_function();
 
-      if(call.function().id()!=ID_symbol)
+      if(function.id() != ID_symbol)
         continue;
 
-      const irep_idt &function=
-        to_symbol_expr(call.function()).get_identifier();
+      const irep_idt &function_identifier =
+        to_symbol_expr(function).get_identifier();
 
-      goto_functionst::function_mapt::const_iterator entry=
-        goto_model.goto_functions.function_map.find(function);
+      goto_functionst::function_mapt::const_iterator entry =
+        goto_model.goto_functions.function_map.find(function_identifier);
       DATA_INVARIANT(
         entry!=goto_model.goto_functions.function_map.end(),
         "called function must be in function_map");
@@ -60,7 +60,7 @@ void undefined_function_abort_path(goto_modelt &goto_model)
 
       ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
       ins.source_location.set_comment(
-        "'" + id2string(function) + "' is undefined");
+        "'" + id2string(function_identifier) + "' is undefined");
     }
   }
 }

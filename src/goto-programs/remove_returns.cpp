@@ -152,18 +152,16 @@ bool remove_returnst::do_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt function_call = i_it->get_function_call();
-
       INVARIANT(
-        function_call.function().id() == ID_symbol,
+        i_it->call_function().id() == ID_symbol,
         "indirect function calls should have been removed prior to running "
         "remove-returns");
 
       const irep_idt function_id =
-        to_symbol_expr(function_call.function()).get_identifier();
+        to_symbol_expr(i_it->call_function()).get_identifier();
 
       // Do we return anything?
-      if(does_function_call_return(function_call))
+      if(does_function_call_return(*i_it))
       {
         // replace "lhs=f(...)" by
         // "f(...); lhs=f#return_value; DEAD f#return_value;"
@@ -182,21 +180,21 @@ bool remove_returnst::do_function_calls(
           // from the return type in the declaration.  We therefore do a
           // cast.
           rhs = typecast_exprt::conditional_cast(
-            *return_value, function_call.lhs().type());
+            *return_value, i_it->call_lhs().type());
         }
         else
         {
           rhs = side_effect_expr_nondett(
-            function_call.lhs().type(), i_it->source_location);
+            i_it->call_lhs().type(), i_it->source_location);
         }
 
         goto_programt::targett t_a = goto_program.insert_after(
           i_it,
           goto_programt::make_assignment(
-            code_assignt(function_call.lhs(), rhs), i_it->source_location));
+            code_assignt(i_it->call_lhs(), rhs), i_it->source_location));
 
         // fry the previous assignment
-        function_call.lhs().make_nil();
+        i_it->call_lhs().make_nil();
 
         if(!is_stub)
         {
@@ -204,9 +202,6 @@ bool remove_returnst::do_function_calls(
             t_a,
             goto_programt::make_dead(*return_value, i_it->source_location));
         }
-
-        // update the call
-        i_it->set_function_call(function_call);
 
         requires_update = true;
       }
@@ -341,14 +336,12 @@ void remove_returnst::undo_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt function_call = i_it->get_function_call();
-
       // ignore function pointers
-      if(function_call.function().id()!=ID_symbol)
+      if(i_it->call_function().id() != ID_symbol)
         continue;
 
-      const irep_idt function_id=
-        to_symbol_expr(function_call.function()).get_identifier();
+      const irep_idt function_id =
+        to_symbol_expr(i_it->call_function()).get_identifier();
 
       // find "f(...); lhs=f#return_value; DEAD f#return_value;"
       // and revert to "lhs=f(...);"
@@ -366,9 +359,7 @@ void remove_returnst::undo_function_calls(
         continue;
 
       // restore the previous assignment
-      function_call.lhs() = next->assign_lhs();
-
-      i_it->set_function_call(function_call);
+      i_it->call_lhs() = next->assign_lhs();
 
       // remove the assignment and subsequent dead
       // i_it remains valid
@@ -429,9 +420,9 @@ bool is_return_value_symbol(const symbol_exprt &symbol_expr)
   return is_return_value_identifier(symbol_expr.get_identifier());
 }
 
-bool does_function_call_return(const code_function_callt &function_call)
+bool does_function_call_return(const goto_programt::instructiont &function_call)
 {
-  return to_code_type(function_call.function().type()).return_type() !=
+  return to_code_type(function_call.call_function().type()).return_type() !=
            empty_typet() &&
-         function_call.lhs().is_not_nil();
+         function_call.call_lhs().is_not_nil();
 }

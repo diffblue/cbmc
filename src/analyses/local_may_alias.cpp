@@ -393,11 +393,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
 
     case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call =
-        instruction.get_function_call();
-      if(code_function_call.lhs().is_not_nil())
-        assign_lhs(
-          code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
+      const auto &lhs = instruction.call_lhs();
+      if(lhs.is_not_nil())
+        assign_lhs(lhs, nil_exprt(), loc_info_src, loc_info_dest);
 
       // this might invalidate all pointers that are
       // a) local and dirty

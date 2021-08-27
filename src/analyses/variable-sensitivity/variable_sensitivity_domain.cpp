@@ -291,8 +291,7 @@ void variable_sensitivity_domaint::transform_function_call(
 {
   PRECONDITION(from->type == FUNCTION_CALL);
 
-  const code_function_callt &function_call = from->get_function_call();
-  const exprt &function = function_call.function();
+  const exprt &function = from->call_function();
 
   const locationt next = std::next(from);
 
@@ -303,7 +302,7 @@ void variable_sensitivity_domaint::transform_function_call(
     const irep_idt function_id = symbol_expr.get_identifier();
 
     const code_function_callt::argumentst &called_arguments =
-      function_call.arguments();
+      from->call_arguments();
 
     if(to->location_number == next->location_number)
     {

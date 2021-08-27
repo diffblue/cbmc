@@ -57,7 +57,7 @@ static void forall_callsites(
   {
     if(i_it->is_function_call())
     {
-      const exprt &function_expr = i_it->get_function_call().function();
+      const exprt &function_expr = i_it->call_function();
       if(function_expr.id()==ID_symbol)
       {
         const irep_idt &callee=to_symbol_expr(function_expr).get_identifier();

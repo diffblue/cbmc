@@ -400,7 +400,7 @@ function_pointer_restrictionst::get_by_name_restriction(
 {
   PRECONDITION(location->is_function_call());
 
-  const exprt &function = location->get_function_call().function();
+  const exprt &function = location->call_function();
 
   if(!can_cast_expr<dereference_exprt>(function))
     return {};

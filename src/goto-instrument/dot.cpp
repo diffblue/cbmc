@@ -153,7 +153,7 @@ void dott::write_dot_subgraph(
         std::stringstream ss;
         ss << "Node_" << subgraphscount << "_" << it->location_number;
         function_calls.push_back(
-          std::pair<std::string, exprt>(ss.str(), function_call.function()));
+          std::pair<std::string, exprt>(ss.str(), it->call_function()));
       }
       else if(
         it->is_assign() || it->is_decl() || it->is_set_return_value() ||

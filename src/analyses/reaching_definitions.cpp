@@ -212,8 +212,6 @@ void rd_range_domaint::transform_function_call(
   const irep_idt &function_to,
   reaching_definitions_analysist &rd)
 {
-  const code_function_callt &code = from->get_function_call();
-
   // only if there is an actual call, i.e., we have a body
   if(function_from != function_to)
   {
@@ -240,7 +238,7 @@ void rd_range_domaint::transform_function_call(
         ++it;
     }
 
-    const symbol_exprt &fn_symbol_expr=to_symbol_expr(code.function());
+    const symbol_exprt &fn_symbol_expr = to_symbol_expr(from->call_function());
     const code_typet &code_type=
       to_code_type(ns.lookup(fn_symbol_expr.get_identifier()).type);
 
@@ -261,7 +259,7 @@ void rd_range_domaint::transform_function_call(
   else
   {
     // handle return values of undefined functions
-    if(from->get_function_call().lhs().is_not_nil())
+    if(from->call_lhs().is_not_nil())
       transform_assign(ns, from, function_from, from, rd);
   }
 }
@@ -276,7 +274,6 @@ void rd_range_domaint::transform_end_function(
 {
   locationt call = to;
   --call;
-  const code_function_callt &code = call->get_function_call();
 
   valuest new_values;
   new_values.swap(values);
@@ -323,7 +320,7 @@ void rd_range_domaint::transform_end_function(
   }
 
   // handle return values
-  if(code.lhs().is_not_nil())
+  if(call->call_lhs().is_not_nil())
   {
 #if 0
     rd_range_domaint *rd_state=

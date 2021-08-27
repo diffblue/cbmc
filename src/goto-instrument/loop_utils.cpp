@@ -82,7 +82,7 @@ void get_modifies(
     }
     else if(instruction.is_function_call())
     {
-      const exprt &lhs = instruction.get_function_call().lhs();
+      const exprt &lhs = instruction.call_lhs();
       get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
     }
   }

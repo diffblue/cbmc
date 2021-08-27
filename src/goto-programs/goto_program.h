@@ -123,8 +123,9 @@ public:
   ///     Ends the life of the symbol denoted by the field `code`.
   ///     After a DEAD instruction the symbol must be DECL'd again before use.
   /// - FUNCTION_CALL:
-  ///     Invoke the function denoted by field `code` (an instance of
-  ///     code_function_callt).
+  ///     Invoke the function returned by `call_function` with the arguments
+  ///     returned by `call_arguments`, then assign the return value (if any)
+  ///     to `call_lhs`
   /// - ASSIGN:
   ///     Update the left-hand side of `code` (an instance of code_assignt) to
   ///     the value of the right-hand side.
@@ -1116,12 +1117,13 @@ public:
 
   /// Create a function call instruction
   static instructiont make_function_call(
+    exprt lhs,
     exprt function,
     code_function_callt::argumentst arguments,
     const source_locationt &l = source_locationt::nil())
   {
     return instructiont(
-      code_function_callt(std::move(function), std::move(arguments)),
+      code_function_callt(lhs, std::move(function), std::move(arguments)),
       l,
       FUNCTION_CALL,
       nil_exprt(),

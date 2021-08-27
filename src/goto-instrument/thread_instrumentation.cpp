@@ -66,7 +66,7 @@ void thread_exit_instrumentation(goto_modelt &goto_model)
       for(const auto &instruction : gf_entry.second.body.instructions)
         if(instruction.is_function_call())
         {
-          const exprt &function = instruction.get_function_call().function();
+          const exprt &function = instruction.call_function();
           if(function.id()==ID_symbol)
             thread_fkts.insert(to_symbol_expr(function).get_identifier());
         }

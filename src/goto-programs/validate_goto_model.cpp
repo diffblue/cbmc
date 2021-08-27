@@ -107,10 +107,9 @@ void validate_goto_modelt::function_pointer_calls_removed()
     {
       if(instr.is_function_call())
       {
-        const code_function_callt &function_call = instr.get_function_call();
         DATA_CHECK(
           vm,
-          function_call.function().id() == ID_symbol,
+          instr.call_function().id() == ID_symbol,
           "no calls via function pointer should be present");
       }
     }
@@ -132,10 +131,9 @@ void validate_goto_modelt::check_returns_removed()
 
       if(instr.is_function_call())
       {
-        const auto &function_call = instr.get_function_call();
         DATA_CHECK(
           vm,
-          !does_function_call_return(function_call),
+          !does_function_call_return(instr),
           "function call lhs return should be nil");
       }
     }

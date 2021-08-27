@@ -96,12 +96,8 @@ void value_set_domain_templatet<VST>::transform(
     break;
 
   case FUNCTION_CALL:
-  {
-    const code_function_callt &code = from_l->get_function_call();
-
-    value_set.do_function_call(function_to, code.arguments(), ns);
-  }
-  break;
+    value_set.do_function_call(function_to, from_l->call_arguments(), ns);
+    break;
 
   case ASSERT:
   case SKIP:

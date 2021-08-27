@@ -45,11 +45,11 @@ void functions_in_scope_visitort::operator()(const goto_programt &prog)
   {
     if(ins->is_function_call())
     {
-      const code_function_callt &call = ins->get_function_call();
+      const auto &function = ins->call_function();
 
-      if(call.function().id() != ID_symbol)
+      if(function.id() != ID_symbol)
       {
-        log.error().source_location = call.find_source_location();
+        log.error().source_location = ins->source_location;
         log.error() << "Function pointer used in function invoked by "
                        "function contract: "
                     << messaget::eom;
@@ -57,8 +57,7 @@ void functions_in_scope_visitort::operator()(const goto_programt &prog)
       }
       else
       {
-        const irep_idt &fun_name =
-          to_symbol_expr(call.function()).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
         if(function_set.find(fun_name) == function_set.end())
         {
           function_set.insert(fun_name);
@@ -101,12 +100,11 @@ void find_is_fresh_calls_visitort::operator()(goto_programt &prog)
   {
     if(ins->is_function_call())
     {
-      const code_function_callt &call = ins->get_function_call();
+      const auto &function = ins->call_function();
 
-      if(call.function().id() == ID_symbol)
+      if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name =
-          to_symbol_expr(call.function()).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
 
         if(fun_name == (CPROVER_PREFIX + std::string("is_fresh")))
         {
@@ -212,23 +210,17 @@ void is_fresh_baset::update_fn_call(
   const std::string &fn_name,
   bool add_address_of)
 {
-  const code_function_callt &const_call = ins->get_function_call();
-  code_function_callt call(
-    exprt(const_call.lhs()),
-    exprt(const_call.function()),
-    code_function_callt::argumentst(const_call.arguments()));
-
   // adjusting the expression for the first argument, if required
   if(add_address_of)
   {
-    INVARIANT(call.arguments().size() > 0, "Function must have arguments");
-    call.arguments()[0] = address_of_exprt(call.arguments()[0]);
+    INVARIANT(
+      as_const(*ins).call_arguments().size() > 0,
+      "Function must have arguments");
+    ins->call_arguments()[0] = address_of_exprt(ins->call_arguments()[0]);
   }
 
   // fixing the function name.
-  to_symbol_expr(call.function()).set_identifier(fn_name);
-
-  ins->set_function_call(call);
+  to_symbol_expr(ins->call_function()).set_identifier(fn_name);
 }
 
 /* Declarations for contract enforcement */

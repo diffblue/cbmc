@@ -455,8 +455,7 @@ bool ai_baset::visit_function_call(
   // it generates a synthetic goto_functions object for this
   if(!goto_functions.function_map.empty())
   {
-    const code_function_callt &code = l_call->get_function_call();
-    const exprt &callee_expression = code.function();
+    const exprt &callee_expression = l_call->call_function();
 
     if(callee_expression.id() == ID_symbol)
     {

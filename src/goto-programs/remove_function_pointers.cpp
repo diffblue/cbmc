@@ -270,7 +270,7 @@ void remove_function_pointerst::remove_function_pointer(
   const irep_idt &function_id,
   goto_programt::targett target)
 {
-  const auto &function = to_dereference_expr(target->call_function());
+  const auto &function = to_dereference_expr(as_const(*target).call_function());
 
   // this better have the right type
   code_typet call_type=to_code_type(function.type());
@@ -280,7 +280,7 @@ void remove_function_pointerst::remove_function_pointer(
      call_type.parameters().empty())
   {
     call_type.remove_ellipsis();
-    for(const auto &argument : target->call_arguments())
+    for(const auto &argument : as_const(*target).call_arguments())
     {
       call_type.parameters().push_back(code_typet::parametert(argument.type()));
     }
@@ -333,7 +333,7 @@ void remove_function_pointerst::remove_function_pointer(
       return;
     }
 
-    bool return_value_used = target->call_lhs().is_not_nil();
+    bool return_value_used = as_const(*target).call_lhs().is_not_nil();
 
     // get all type-compatible functions
     // whose address is ever taken

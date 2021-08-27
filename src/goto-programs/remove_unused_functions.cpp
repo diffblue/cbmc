@@ -75,10 +75,10 @@ void find_used_functions(
       {
         if(instruction.type == FUNCTION_CALL)
         {
-          const code_function_callt &call = instruction.get_function_call();
+          const auto &function = instruction.call_function();
 
           const irep_idt &identifier =
-            to_symbol_expr(call.function()).get_identifier();
+            to_symbol_expr(function).get_identifier();
 
           find_used_functions(identifier, functions, seen);
         }

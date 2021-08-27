@@ -31,16 +31,13 @@ void function_modifiest::get_modifies(
   }
   else if(instruction.is_function_call())
   {
-    const code_function_callt &code_function_call =
-      instruction.get_function_call();
-    const exprt &lhs=code_function_call.lhs();
+    const exprt &lhs = instruction.call_lhs();
 
     // return value assignment
     if(lhs.is_not_nil())
       get_modifies_lhs(local_may_alias, i_it, lhs, modifies);
 
-    get_modifies_function(
-      code_function_call.function(), modifies);
+    get_modifies_function(instruction.call_function(), modifies);
   }
 }
 

@@ -151,8 +151,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
       {
         if(from->is_function_call())
         {
-          const code_function_callt &cfc = from->get_function_call();
-          const exprt &call = cfc.function();
+          const exprt &call = from->call_function();
 
           if(call.id() == ID_symbol)
           {
@@ -189,8 +188,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   }
   else if(to->is_function_call())
   {
-    const code_function_callt &call = to->get_function_call();
-    const code_function_callt::argumentst &args = call.arguments();
+    const code_function_callt::argumentst &args = to->call_arguments();
     for(const auto &arg : args)
     {
       eval_data_deps(arg, ns, domain_data_deps);
