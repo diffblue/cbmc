@@ -714,6 +714,90 @@ inline void validate_expr(const binary_relation_exprt &value)
   binary_relation_exprt::check(value);
 }
 
+/// \brief Binary greater than operator expression.
+class greater_than_exprt : public binary_relation_exprt
+{
+public:
+  greater_than_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_gt, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<greater_than_exprt>(const exprt &base)
+{
+  return base.id() == ID_gt;
+}
+
+inline void validate_expr(const greater_than_exprt &value)
+{
+  binary_relation_exprt::check(value);
+}
+
+/// \brief Binary greater than or equal operator expression.
+class greater_than_or_equal_exprt : public binary_relation_exprt
+{
+public:
+  greater_than_or_equal_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_ge, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<greater_than_or_equal_exprt>(const exprt &base)
+{
+  return base.id() == ID_ge;
+}
+
+inline void validate_expr(const greater_than_or_equal_exprt &value)
+{
+  binary_relation_exprt::check(value);
+}
+
+/// \brief Binary less than operator expression.
+class less_than_exprt : public binary_relation_exprt
+{
+public:
+  less_than_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_lt, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<less_than_exprt>(const exprt &base)
+{
+  return base.id() == ID_lt;
+}
+
+inline void validate_expr(const less_than_exprt &value)
+{
+  binary_relation_exprt::check(value);
+}
+
+/// \brief Binary less than or equal operator expression.
+class less_than_or_equal_exprt : public binary_relation_exprt
+{
+public:
+  less_than_or_equal_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_le, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<less_than_or_equal_exprt>(const exprt &base)
+{
+  return base.id() == ID_le;
+}
+
+inline void validate_expr(const less_than_or_equal_exprt &value)
+{
+  binary_relation_exprt::check(value);
+}
+
 /// \brief Cast an exprt to a \ref binary_relation_exprt
 ///
 /// \a expr must be known to be \ref binary_relation_exprt.

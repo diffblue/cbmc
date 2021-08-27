@@ -40,6 +40,12 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_type<bool_typet>(const typet &base)
+{
+  return base.id() == ID_bool;
+}
+
 /// The empty type
 class empty_typet:public typet
 {
