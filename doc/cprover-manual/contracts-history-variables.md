@@ -1,5 +1,7 @@
 # History Variables
 
+## In Function Contracts
+
 ### Syntax
 
 ```c
@@ -33,3 +35,7 @@ __CPROVER_assigns(*out)
   /* ... */
 }
 ```
+
+## In Loop Contracts
+
+TODO: Document `__CPROVER_loop_entry` and `__CPROVER_loop_old`.

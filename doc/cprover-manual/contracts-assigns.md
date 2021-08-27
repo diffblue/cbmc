@@ -1,5 +1,7 @@
 # Assigns Clause
 
+## In Function Contracts
+
 ### Syntax
 
 ```c
@@ -174,3 +176,7 @@ int foo()
   return rval;
 }
 ```
+
+## In Loop Contracts
+
+TODO: Document `__CPROVER_assigns` for loops.
