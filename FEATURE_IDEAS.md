@@ -74,6 +74,24 @@ https://github.com/diffblue/cbmc/issues/218
 possible entry of fixed size arrays. For more details see
 https://github.com/diffblue/cbmc/issues/265
 
+
+## Connecting Producers and Consumers of Knowledge about Termination
+
+There is very limited knowledge about loop termination conditions
+and this could be improved. For example, the slicing could be
+improved with knoweldge regarding loop termination so that
+irrelevant loops can be more effectively sliced. Similarly, in
+goto-analyze assertions can only be false if reachable, adding
+termination can give crude reachability analysis.
+
+The overall approach could be to have for each loop and/or
+function information: `TERMINATE`, `NON_TERMINATE`, or
+`UNKNOWN_TERMINATION`.
+
+Further details on possible implementations and discussion
+can be found here
+https://github.com/diffblue/cbmc/issues/618
+
 # CBMC Mini Project Ideas
 
 The following projects are short, focussed features that give new CBMC
