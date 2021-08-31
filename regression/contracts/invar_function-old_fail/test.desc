@@ -1,0 +1,10 @@
+CORE
+main.c
+--apply-loop-contracts
+^main.c.* error: __CPROVER_old is not allowed in loop invariants.$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test ensures that __CPROVER_old cannot be used within loop contracts. 

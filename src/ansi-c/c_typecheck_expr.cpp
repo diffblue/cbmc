@@ -2695,7 +2695,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ok_expr);
   }
-  else if(identifier == CPROVER_PREFIX "old")
+  else if(
+    (identifier == CPROVER_PREFIX "old") ||
+    (identifier == CPROVER_PREFIX "loop_entry"))
   {
     if(expr.arguments().size() != 1)
     {
@@ -2704,7 +2706,9 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    old_exprt old_expr(expr.arguments()[0]);
+    irep_idt id = identifier == CPROVER_PREFIX "old" ? ID_old : ID_loop_entry;
+
+    history_exprt old_expr(expr.arguments()[0], id);
     old_expr.add_source_location() = source_location;
 
     return std::move(old_expr);
@@ -3957,19 +3961,15 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   }
 }
 
-void c_typecheck_baset::disallow_history_variables(const exprt &expr) const
+void c_typecheck_baset::disallow_subexpr_by_id(
+  const exprt &expr,
+  const irep_idt &id,
+  const std::string &message) const
 {
-  for(auto &op : expr.operands())
-  {
-    disallow_history_variables(op);
-  }
+  if(!has_subexpr(expr, id))
+    return;
 
-  if(expr.id() == ID_old)
-  {
-    error().source_location = expr.source_location();
-    error() << CPROVER_PREFIX
-      "old expressions are not allowed in " CPROVER_PREFIX "requires clauses"
-            << eom;
-    throw 0;
-  }
+  error().source_location = expr.source_location();
+  error() << message << eom;
+  throw 0;
 }

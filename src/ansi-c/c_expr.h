@@ -200,12 +200,12 @@ inline side_effect_expr_overflowt &to_side_effect_expr_overflow(exprt &expr)
   return static_cast<side_effect_expr_overflowt &>(side_effect_expr);
 }
 
-/// \brief A class for an expression that indicates the pre-function-call
-/// value of an expression passed as a parameter to a function
-class old_exprt : public unary_exprt
+/// \brief A class for an expression that indicates a history variable
+class history_exprt : public unary_exprt
 {
 public:
-  explicit old_exprt(exprt variable) : unary_exprt(ID_old, std::move(variable))
+  explicit history_exprt(exprt variable, const irep_idt &id)
+    : unary_exprt(id, std::move(variable))
   {
   }
 
@@ -215,10 +215,12 @@ public:
   }
 };
 
-inline const old_exprt &to_old_expr(const exprt &expr)
+inline const history_exprt &
+to_history_expr(const exprt &expr, const irep_idt &id)
 {
-  PRECONDITION(expr.id() == ID_old);
-  auto &ret = static_cast<const old_exprt &>(expr);
+  PRECONDITION(id == ID_old || id == ID_loop_entry);
+  PRECONDITION(expr.id() == id);
+  auto &ret = static_cast<const history_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }

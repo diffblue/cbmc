@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts
+^main.c.* error: __CPROVER_loop_entry is not allowed in preconditions.$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test ensures that __CPROVER_loop_entry cannot be used within requires clause.

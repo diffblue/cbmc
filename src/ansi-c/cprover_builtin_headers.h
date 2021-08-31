@@ -37,6 +37,7 @@ void __CPROVER_fence(const char *kind, ...);
 // contract-related functions
 __CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size);
 void __CPROVER_old(const void *);
+void __CPROVER_loop_entry(const void *);
 
 // pointers
 __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);

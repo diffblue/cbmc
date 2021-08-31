@@ -219,12 +219,13 @@ protected:
 
   /// This function recursively identifies the "old" expressions within expr
   /// and replaces them with correspoding history variables.
-  void replace_old_parameter(
+  void replace_history_parameter(
     exprt &expr,
     std::map<exprt, exprt> &parameter2history,
     source_locationt location,
     const irep_idt &mode,
-    goto_programt &history);
+    goto_programt &history,
+    const irep_idt &id);
 
   /// This function creates and returns an instruction that corresponds to the
   /// ensures clause. It also returns a list of instructions related to
