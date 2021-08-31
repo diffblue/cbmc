@@ -1,5 +1,5 @@
 CORE
-main.c
+leftshift_overflow.c
 --signed-overflow-check --c89
 ^EXIT=10$
 ^SIGNAL=0$

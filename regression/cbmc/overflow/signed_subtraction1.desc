@@ -1,5 +1,5 @@
 CORE
-falsealarm.c
+signed_subtraction1.c
 --signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
