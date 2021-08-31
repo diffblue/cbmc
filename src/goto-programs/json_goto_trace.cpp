@@ -15,6 +15,7 @@ Author: Daniel Kroening
 
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
+#include <util/symbol.h>
 
 #include <langapi/language_util.h>
 

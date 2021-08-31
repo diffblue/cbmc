@@ -16,8 +16,10 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <goto-programs/goto_functions.h>
 #include <langapi/language.h>
+
 #include <util/json.h>
 #include <util/make_unique.h>
+#include <util/symbol_table.h>
 
 class json_symtab_languaget : public languaget
 {

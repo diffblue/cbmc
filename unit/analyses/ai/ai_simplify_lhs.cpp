@@ -20,8 +20,9 @@ Author: Diffblue Ltd.
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/namespace.h>
-#include <util/ui_message.h>
 #include <util/simplify_expr.h>
+#include <util/symbol_table.h>
+#include <util/ui_message.h>
 
 class constant_simplification_mockt:public ai_domain_baset
 {

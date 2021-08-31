@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <goto-programs/goto_program.h>
-#include <util/namespace.h>
 #include <util/cprover_prefix.h>
+#include <util/namespace.h>
 #include <util/prefix.h>
+#include <util/symbol_table.h>
 
 #include "wmm.h"
 

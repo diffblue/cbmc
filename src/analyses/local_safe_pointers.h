@@ -16,6 +16,8 @@ Author: Diffblue Ltd
 
 #include <util/pointer_expr.h>
 
+#include <map>
+
 /// A very simple, cheap analysis to determine when dereference operations are
 /// trivially guarded by a check against a null pointer access.
 /// In the interests of a very cheap analysis we only search for very local

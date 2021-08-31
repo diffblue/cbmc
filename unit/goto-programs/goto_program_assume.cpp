@@ -10,6 +10,7 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/goto_function.h>
 

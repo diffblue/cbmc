@@ -19,6 +19,7 @@ Date: March 2016
 #include <iostream>
 
 #include <util/string2int.h>
+#include <util/symbol.h>
 #include <util/xml.h>
 
 #include <langapi/language_util.h>

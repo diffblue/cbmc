@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
+#include <util/symbol_table.h>
 
 #include "class_hierarchy.h"
 #include "class_identifier.h"

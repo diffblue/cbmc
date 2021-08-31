@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
+#include <map>
+
 class goto_functionst;
 class local_may_aliast;
 

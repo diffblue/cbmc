@@ -13,6 +13,8 @@ Date: June 2003
 
 #include "goto_functions.h"
 
+#include <util/symbol.h>
+
 #include <algorithm>
 
 void goto_functionst::compute_location_numbers()

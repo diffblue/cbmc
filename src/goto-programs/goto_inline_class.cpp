@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/invariant.h>
 #include <util/std_code.h>
+#include <util/symbol.h>
 
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,

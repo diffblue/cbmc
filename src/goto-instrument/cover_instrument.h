@@ -14,6 +14,8 @@ Author: Peter Schrammel
 
 #include <memory>
 
+#include <util/symbol_table.h>
+
 #include <goto-programs/goto_program.h>
 
 enum class coverage_criteriont;

@@ -7,12 +7,16 @@
 \*******************************************************************/
 
 #include "array_builder.h"
+
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+
 #include <testing-utils/use_catch.h>
+
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
+#include <util/symbol_table.h>
 
 using abstract_object_ptrt = std::shared_ptr<const abstract_objectt>;
 

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
+#include <util/symbol_table.h>
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {

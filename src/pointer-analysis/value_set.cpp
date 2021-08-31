@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
+#include <util/symbol_table.h>
 
 #ifdef DEBUG
 #include <iostream>

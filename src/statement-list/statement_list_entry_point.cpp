@@ -21,6 +21,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
+#include <util/symbol_table.h>
 
 /// Postfix for the artificial data block that is created when calling a main
 /// symbol that is a function block.

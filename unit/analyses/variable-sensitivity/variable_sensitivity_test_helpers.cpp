@@ -22,6 +22,7 @@
 #include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
 #include <util/string_utils.h>
+#include <util/symbol_table.h>
 
 std::shared_ptr<const constant_abstract_valuet>
 make_constant(exprt val, abstract_environmentt &env, namespacet &ns)

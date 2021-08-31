@@ -13,6 +13,8 @@ Date: May 2018
 
 #include "goto_function.h"
 
+#include <util/symbol.h>
+
 /// Return in \p dest the identifiers of the local variables declared in the \p
 /// goto_function and the identifiers of the paramters of the \p goto_function.
 void get_local_identifiers(

@@ -12,6 +12,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 static void ASSUME_TRUE(
   symbol_exprt const &x,

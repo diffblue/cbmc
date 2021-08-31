@@ -18,6 +18,8 @@ Date: June 2003
 
 #include <util/cprover_prefix.h>
 
+#include <map>
+
 /// A collection of goto functions
 class goto_functionst
 {

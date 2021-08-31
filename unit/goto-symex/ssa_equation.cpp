@@ -10,6 +10,7 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 #include <goto-symex/symex_target_equation.h>
 

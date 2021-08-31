@@ -16,6 +16,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/string2int.h>
+#include <util/symbol_table.h>
 
 #include <iostream>
 

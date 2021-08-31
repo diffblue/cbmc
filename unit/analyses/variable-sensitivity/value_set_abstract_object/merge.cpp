@@ -14,6 +14,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 static merge_result<const value_set_abstract_objectt>
 merge(abstract_object_pointert op1, abstract_object_pointert op2)

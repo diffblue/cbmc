@@ -12,6 +12,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 static merge_result<const interval_abstract_valuet> widening_merge(
   const abstract_object_pointert &op1,

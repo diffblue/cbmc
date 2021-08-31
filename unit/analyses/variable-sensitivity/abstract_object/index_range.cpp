@@ -15,6 +15,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/symbol_table.h>
 
 SCENARIO(
   "index_range for constant_abstract_values"

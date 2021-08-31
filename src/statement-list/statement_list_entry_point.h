@@ -12,8 +12,8 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #ifndef CPROVER_STATEMENT_LIST_STATEMENT_LIST_ENTRY_POINT_H
 #define CPROVER_STATEMENT_LIST_STATEMENT_LIST_ENTRY_POINT_H
 
-class symbol_tablet;
 class message_handlert;
+class symbol_tablet;
 
 /// Creates a new entry point for the Statement List language.
 /// \param [out] symbol_table: Symbol table of the current TIA program. Gets

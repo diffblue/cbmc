@@ -19,6 +19,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/json_stream.h>
 #include <util/options.h>
 #include <util/string_utils.h>
+#include <util/symbol.h>
 #include <util/ui_message.h>
 #include <util/xml.h>
 

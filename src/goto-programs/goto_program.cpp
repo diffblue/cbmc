@@ -21,9 +21,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 #include <util/validate.h>
 
 #include <langapi/language_util.h>
+
+std::ostream &goto_programt::output(std::ostream &out) const
+{
+  return output(namespacet(symbol_tablet()), irep_idt(), out);
+}
 
 /// Writes to \p out a two/three line string representation of a given
 /// \p instruction. The output is of the format:
