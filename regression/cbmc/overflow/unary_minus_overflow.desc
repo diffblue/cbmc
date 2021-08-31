@@ -1,0 +1,10 @@
+CORE
+unary_minus_overflow.c
+--signed-overflow-check --unsigned-overflow-check
+^EXIT=10$
+^SIGNAL=0$
+^\[.*\] line .* arithmetic overflow on signed unary minus in -x: FAILURE$
+^\[.*\] line .* arithmetic overflow on signed unary minus in -\(x \+ 1\): SUCCESS$
+^\[.*\] line .* arithmetic overflow on unsigned unary minus in -a: SUCCESS$
+^\[.*\] line .* arithmetic overflow on unsigned unary minus in -b: FAILURE$
+--

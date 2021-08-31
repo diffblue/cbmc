@@ -1,5 +1,5 @@
 CORE
-main.c
+signed_addition_overflow4.c
 --signed-overflow-check --conversion-check
 ^EXIT=10$
 ^SIGNAL=0$
@@ -11,5 +11,3 @@ main.c
 --
 The addition is done in signed int; hence, the overflow is only detected
 on conversion.
-
-See #4208.

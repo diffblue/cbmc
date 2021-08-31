@@ -734,8 +734,8 @@ void goto_checkt::integer_overflow_check(
   {
     if(type.id()==ID_signedbv)
     {
-      // overflow on unary- can only happen with the smallest
-      // representable number 100....0
+      // overflow on unary- on signed integers can only happen with the
+      // smallest representable number 100....0
 
       equal_exprt int_min_eq(
         to_unary_minus_expr(expr).op(), to_signedbv_type(type).smallest_expr());
@@ -743,6 +743,22 @@ void goto_checkt::integer_overflow_check(
       add_guarded_property(
         not_exprt(int_min_eq),
         "arithmetic overflow on signed unary minus",
+        "overflow",
+        expr.find_source_location(),
+        expr,
+        guard);
+    }
+    else if(type.id() == ID_unsignedbv)
+    {
+      // Overflow on unary- on unsigned integers happens for all operands
+      // that are not zero.
+
+      notequal_exprt not_eq_zero(
+        to_unary_minus_expr(expr).op(), to_unsignedbv_type(type).zero_expr());
+
+      add_guarded_property(
+        not_eq_zero,
+        "arithmetic overflow on unsigned unary minus",
         "overflow",
         expr.find_source_location(),
         expr,
