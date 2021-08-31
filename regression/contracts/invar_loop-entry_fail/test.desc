@@ -1,0 +1,11 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=(10|6)$
+^SIGNAL=0$
+^\[main.1\] .* Check loop invariant before entry: SUCCESS$
+^\[main.2\] .* Check that loop invariant is preserved: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+This test ensures that __CPROVER_loop_entry violations are checked.

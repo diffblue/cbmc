@@ -147,6 +147,7 @@ void code_contractst::check_apply_loop_contracts(
   //   H: loop;
   //   E: ...
   // to
+  //   initialize loop_entry variables;
   //   H: assert(invariant);
   //   havoc;
   //   assume(invariant);
@@ -175,6 +176,20 @@ void code_contractst::check_apply_loop_contracts(
     replace(invariant_copy);
     return invariant_copy;
   };
+
+  // Process "loop_entry" history variables
+  // Find and replace "loop_entry" expression in the "invariant" expression.
+  std::map<exprt, exprt> parameter2history;
+  replace_history_parameter(
+    invariant,
+    parameter2history,
+    loop_head->source_location,
+    mode,
+    havoc_code,
+    ID_loop_entry);
+
+  // Create 'loop_entry' history variables
+  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
 
   // Generate: assert(invariant) just before the loop
   // We use a block scope to create a temporary assertion,
@@ -377,24 +392,23 @@ void code_contractst::add_quantified_variable(
   }
 }
 
-void code_contractst::replace_old_parameter(
+void code_contractst::replace_history_parameter(
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
   source_locationt location,
   const irep_idt &mode,
-  goto_programt &history)
+  goto_programt &history,
+  const irep_idt &id)
 {
   for(auto &op : expr.operands())
   {
-    replace_old_parameter(op, parameter2history, location, mode, history);
+    replace_history_parameter(
+      op, parameter2history, location, mode, history, id);
   }
 
-  if(expr.id() == ID_old)
+  if(expr.id() == ID_old || expr.id() == ID_loop_entry)
   {
-    DATA_INVARIANT(
-      expr.operands().size() == 1, CPROVER_PREFIX "old must have one operand");
-
-    const auto &parameter = to_old_expr(expr).expression();
+    const auto &parameter = to_history_expr(expr, id).expression();
 
     if(
       parameter.id() == ID_dereference || parameter.id() == ID_member ||
@@ -428,8 +442,8 @@ void code_contractst::replace_old_parameter(
     }
     else
     {
-      log.error() << CPROVER_PREFIX "old does not currently support "
-                  << parameter.id() << " expressions." << messaget::eom;
+      log.error() << "Tracking history of " << parameter.id()
+                  << " expressions is not supported yet." << messaget::eom;
       throw 0;
     }
   }
@@ -445,7 +459,8 @@ code_contractst::create_ensures_instruction(
   goto_programt history;
 
   // Find and replace "old" expression in the "expression" variable
-  replace_old_parameter(expression, parameter2history, location, mode, history);
+  replace_history_parameter(
+    expression, parameter2history, location, mode, history, ID_old);
 
   // Create instructions corresponding to the ensures clause
   goto_programt ensures_program;

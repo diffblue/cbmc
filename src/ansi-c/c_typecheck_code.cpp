@@ -820,6 +820,10 @@ void c_typecheck_baset::typecheck_spec_loop_invariant(codet &code)
     {
       typecheck_expr(invariant);
       implicit_typecast_bool(invariant);
+      disallow_subexpr_by_id(
+        invariant,
+        ID_old,
+        CPROVER_PREFIX "old is not allowed in loop invariants.");
     }
   }
 }

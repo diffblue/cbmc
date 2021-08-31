@@ -730,7 +730,14 @@ void c_typecheck_baset::typecheck_declaration(
           {
             typecheck_expr(requires);
             implicit_typecast_bool(requires);
-            disallow_history_variables(requires);
+            disallow_subexpr_by_id(
+              requires,
+              ID_old,
+              CPROVER_PREFIX "old is not allowed in preconditions.");
+            disallow_subexpr_by_id(
+              requires,
+              ID_loop_entry,
+              CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
           }
         }
 
@@ -751,6 +758,10 @@ void c_typecheck_baset::typecheck_declaration(
           {
             typecheck_expr(ensures);
             implicit_typecast_bool(ensures);
+            disallow_subexpr_by_id(
+              ensures,
+              ID_loop_entry,
+              CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
           }
 
           if(return_type.id() != ID_empty)
