@@ -1,7 +1,7 @@
 CORE
 double_deref_with_pointer_arithmetic_single_alias.c
 --show-vcc
-\{1\} \(derefd_pointer::derefd_pointer!0#1 = address_of\(symex_dynamic::dynamic_object2\) \? main::argc!0@1#1 = 1 : symex::invalid_object!0#0 = main::argc!0@1#1\)
+\{1\} main::argc!0@1#1 = 1
 ^EXIT=0$
 ^SIGNAL=0$
 --
