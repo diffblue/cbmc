@@ -1,4 +1,4 @@
-void *malloc(unsigned);
+void *malloc(__CPROVER_size_t);
 
 typedef struct str_struct
 {

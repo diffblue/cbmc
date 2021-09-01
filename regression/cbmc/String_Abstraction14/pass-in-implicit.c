@@ -1,4 +1,4 @@
-void *malloc(unsigned);
+void *malloc(__CPROVER_size_t);
 
 void use_str(char *s)
 {
