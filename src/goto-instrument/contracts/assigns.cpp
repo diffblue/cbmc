@@ -24,41 +24,19 @@ assigns_clause_targett::assigns_clause_targett(
   code_contractst &contract,
   messaget &log_parameter,
   const irep_idt &function_id)
-  : pointer_object(pointer_for(object)),
-    contract(contract),
+  : contract(contract),
     init_block(),
     log(log_parameter),
-    target(typet()),
+    target(pointer_for(object)),
     target_id(object.id())
 {
   INVARIANT(
-    pointer_object.type().id() == ID_pointer,
+    target.type().id() == ID_pointer,
     "Assigns clause targets should be stored as pointer expressions.");
-  const symbolt &function_symbol = contract.ns.lookup(function_id);
-
-  // Declare a new symbol to stand in for the reference
-  symbolt standin_symbol = contract.new_tmp_symbol(
-    pointer_object.type(),
-    function_symbol.location,
-    function_symbol.mode);
-
-  target = standin_symbol.symbol_expr();
-
-  // Build standin variable initialization block
-  init_block.add(goto_programt::make_decl(target, function_symbol.location));
-  init_block.add(goto_programt::make_assignment(
-    code_assignt(target, pointer_object), function_symbol.location));
 }
 
 assigns_clause_targett::~assigns_clause_targett()
 {
-}
-
-std::vector<symbol_exprt> assigns_clause_targett::temporary_declarations() const
-{
-  std::vector<symbol_exprt> result;
-  result.push_back(target);
-  return result;
 }
 
 exprt assigns_clause_targett::alias_expression(const exprt &lhs)
@@ -66,6 +44,11 @@ exprt assigns_clause_targett::alias_expression(const exprt &lhs)
   exprt::operandst condition;
   exprt lhs_ptr = (lhs.id() == ID_address_of) ? to_address_of_expr(lhs).object()
                                               : pointer_for(lhs);
+
+  // __CPROVER_w_ok(target, sizeof(target))
+  condition.push_back(w_ok_exprt(
+    target,
+    size_of_expr(dereference_exprt(target).type(), contract.ns).value()));
 
   // __CPROVER_same_object(lhs, target)
   condition.push_back(same_object(lhs_ptr, target));
@@ -103,17 +86,12 @@ exprt assigns_clause_targett::alias_expression(const exprt &lhs)
 exprt assigns_clause_targett::compatible_expression(
   const assigns_clause_targett &called_target)
 {
-  return same_object(called_target.get_direct_pointer(), target);
+  return same_object(called_target.get_target(), target);
 }
 
-const exprt &assigns_clause_targett::get_direct_pointer() const
+const exprt &assigns_clause_targett::get_target() const
 {
-  return pointer_object;
-}
-
-goto_programt &assigns_clause_targett::get_init_block()
-{
-  return init_block;
+  return target;
 }
 
 assigns_clauset::assigns_clauset(
@@ -140,7 +118,7 @@ assigns_clauset::~assigns_clauset()
   }
 }
 
-assigns_clause_targett *assigns_clauset::add_target(exprt target)
+void assigns_clauset::add_target(exprt target)
 {
   assigns_clause_targett *new_target = new assigns_clause_targett(
     (target.id() == ID_address_of)
@@ -150,42 +128,13 @@ assigns_clause_targett *assigns_clauset::add_target(exprt target)
     log,
     function_id);
   targets.push_back(new_target);
-  return new_target;
-}
-
-goto_programt assigns_clauset::init_block()
-{
-  goto_programt result;
-  for(assigns_clause_targett *target : targets)
-  {
-    for(goto_programt::instructiont inst :
-        target->get_init_block().instructions)
-    {
-      result.add(goto_programt::instructiont(inst));
-    }
-  }
-  return result;
-}
-
-goto_programt assigns_clauset::dead_stmts()
-{
-  goto_programt dead_statements;
-  for(assigns_clause_targett *target : targets)
-  {
-    for(symbol_exprt symbol : target->temporary_declarations())
-    {
-      dead_statements.add(
-        goto_programt::make_dead(symbol, symbol.source_location()));
-    }
-  }
-  return dead_statements;
 }
 
 goto_programt assigns_clauset::havoc_code()
 {
   modifiest modifies;
   for(const auto &t : targets)
-    modifies.insert(to_address_of_expr(t->get_direct_pointer()).object());
+    modifies.insert(to_address_of_expr(t->get_target()).object());
 
   goto_programt havoc_statements;
   append_havoc_code(assigns.source_location(), modifies, havoc_statements);
@@ -231,7 +180,7 @@ exprt assigns_clauset::compatible_expression(
 
         // Validating the called target through __CPROVER_w_ok() is
         // only useful when the called target is a dereference
-        const auto &called_target_ptr = called_target->get_direct_pointer();
+        const auto &called_target_ptr = called_target->get_target();
         if(
           to_address_of_expr(called_target_ptr).object().id() == ID_dereference)
         {
