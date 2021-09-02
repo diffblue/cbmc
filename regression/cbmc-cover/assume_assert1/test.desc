@@ -1,0 +1,11 @@
+CORE
+assume_assert.c
+--cover assume
+^EXIT=0$
+^SIGNAL=0$
+^\[main.coverage.1\] file assume_assert.c line \d function main assert\(false\) before assume\(x > 0\): SATISFIED$
+^\[main.coverage.2\] file assume_assert.c line \d function main assert\(false\) after assume\(x > 0\): SATISFIED$
+^\[main.coverage.3\] file assume_assert.c line \d function main assert\(false\) before assume\(x < 0\): SATISFIED$
+^\[main.coverage.4\] file assume_assert.c line \d function main assert\(false\) after assume\(x < 0\): FAILED$
+--
+^warning: ignoring
