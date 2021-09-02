@@ -97,6 +97,7 @@ smt2_convt::smt2_convt(
     break;
 
   case solvert::CVC4:
+    logic = "ALL";
     use_array_of_bool = true;
     use_as_const = true;
     break;
