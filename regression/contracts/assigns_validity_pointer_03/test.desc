@@ -7,7 +7,7 @@ main.c
 // bar
 ASSERT \*x > 0
 IF !\(\*x == 3\) THEN GOTO \d
-tmp_if_expr = \*y == 5 \? true \: false;
+tmp_if_expr = \*y == 5 \? true : false;
 ASSUME tmp_if_expr
 // baz
 ASSUME \*z == 7

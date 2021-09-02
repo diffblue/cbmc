@@ -4,8 +4,8 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo1.\d+\] line \d+ Check that a is assignable: SUCCESS$
-^\[foo10.\d+\] line \d+ Check that buffer\-\>len is assignable: SUCCESS$
-^\[foo10.\d+\] line \d+ Check that buffer\-\>aux\.allocated is assignable: SUCCESS$
+^\[foo10.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
+^\[foo10.\d+\] line \d+ Check that buffer->aux\.allocated is assignable: SUCCESS$
 ^\[foo2.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[foo3.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[foo3.\d+\] line \d+ Check that y is assignable: SUCCESS$
@@ -14,10 +14,10 @@ main.c
 ^\[foo4.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^\[foo5.\d+\] line \d+ Check that buffer.data is assignable: SUCCESS$
 ^\[foo5.\d+\] line \d+ Check that buffer.len is assignable: SUCCESS$
-^\[foo6.\d+\] line \d+ Check that \*buffer\-\>data is assignable: SUCCESS$
-^\[foo6.\d+\] line \d+ Check that buffer\-\>len is assignable: SUCCESS$
-^\[foo7.\d+\] line \d+ Check that \*buffer\-\>data is assignable: SUCCESS$
-^\[foo7.\d+\] line \d+ Check that buffer\-\>len is assignable: SUCCESS$
+^\[foo6.\d+\] line \d+ Check that \*buffer->data is assignable: SUCCESS$
+^\[foo6.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
+^\[foo7.\d+\] line \d+ Check that \*buffer->data is assignable: SUCCESS$
+^\[foo7.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)0\] is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)1\] is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)2\] is assignable: SUCCESS$
