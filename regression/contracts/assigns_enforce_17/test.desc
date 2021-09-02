@@ -3,7 +3,7 @@ main.c
 --enforce-all-contracts
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.\d+\] line \d+ assertion x \=\= 0\: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion x \=\= 0: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

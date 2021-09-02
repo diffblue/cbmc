@@ -16,9 +16,6 @@ ASSUME .*::tmp_if_expr\$\d
 IF ¬\(z ≠ NULL\) THEN GOTO \d
 ASSIGN .*::tmp_if_expr\$\d := \(\*z = 7 \? true : false\)
 ASSUME .*::tmp_if_expr\$\d
-// foo
-ASSUME \*.*::tmp_cc\$\d > 0
-ASSERT \*.*::tmp_cc\$\d = 3
 --
 \[3\] file main\.c line 6 assertion: FAILURE
 --

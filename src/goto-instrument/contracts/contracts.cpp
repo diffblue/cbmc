@@ -750,11 +750,7 @@ void code_contractst::instrument_call_statement(
       typet cast_type = rhs.type();
 
       // Make freshly allocated memory assignable, if we can determine its type.
-      assigns_clause_targett *new_target =
-        assigns_clause.add_target(dereference_exprt(rhs));
-      goto_programt &pointer_capture = new_target->get_init_block();
-      insert_before_swap_and_advance(
-        program, instruction_iterator, pointer_capture);
+      assigns_clause.add_target(dereference_exprt(rhs));
     }
     return; // assume malloc edits no pre-existing memory objects.
   }
@@ -895,10 +891,6 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     return true;
   }
   goto_programt &program = old_function->second.body;
-  if(program.instructions.empty()) // empty function body
-  {
-    return false;
-  }
 
   if(check_for_looped_mallocs(program))
   {
@@ -923,17 +915,9 @@ void code_contractst::check_frame_conditions(
   // Create a list of variables that are okay to assign.
   std::set<irep_idt> freely_assignable_symbols;
 
-  // Create temporary variables to hold the assigns
-  // clause targets before they can be modified.
-  goto_programt standin_decls = assigns.init_block();
-  // Create dead statements for temporary variables
-  goto_programt mark_dead = assigns.dead_stmts();
-
-  // Skip lines with temporary variable declarations
-  auto instruction_it = program.instructions.begin();
-  insert_before_swap_and_advance(program, instruction_it, standin_decls);
-
-  for(; instruction_it != program.instructions.end(); ++instruction_it)
+  for(auto instruction_it = program.instructions.begin();
+      instruction_it != program.instructions.end();
+      ++instruction_it)
   {
     if(instruction_it->is_decl())
     {
@@ -941,15 +925,7 @@ void code_contractst::check_frame_conditions(
       freely_assignable_symbols.insert(
         instruction_it->get_decl().symbol().get_identifier());
 
-      assigns_clause_targett *new_target =
-        assigns.add_target(instruction_it->get_decl().symbol());
-      goto_programt &pointer_capture = new_target->get_init_block();
-
-      for(auto in : pointer_capture.instructions)
-      {
-        program.insert_after(instruction_it, in);
-        ++instruction_it;
-      }
+      assigns.add_target(instruction_it->get_decl().symbol());
     }
     else if(instruction_it->is_assign())
     {
@@ -970,15 +946,6 @@ void code_contractst::check_frame_conditions(
         assigns);
     }
   }
-
-  // Walk the iterator back to the last statement
-  while(!instruction_it->is_end_function())
-  {
-    --instruction_it;
-  }
-
-  // Make sure the temporary symbols are marked dead
-  program.insert_before_swap(instruction_it, mark_dead);
 }
 
 bool code_contractst::enforce_contract(const irep_idt &function)

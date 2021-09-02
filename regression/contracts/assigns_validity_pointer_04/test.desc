@@ -11,9 +11,6 @@ ASSIGN goto_convertt::tmp_if_expr := \(\*foo::1::y = 5 \? true : false\)
 ASSUME .*::tmp_if_expr
 // baz
 ASSUME \*z = 7
-// foo
-ASSUME \*.*::tmp_cc\$\d > 0
-ASSERT \*.*::tmp_cc\$\d = 3
 --
 --
 Verification:

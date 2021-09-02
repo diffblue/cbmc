@@ -5,9 +5,6 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 //^([foo\.1] line 15 assertion: FAILURE)
-// foo
-ASSUME \*.*::tmp_cc\$\d > 0
-ASSERT \*.*::tmp_cc\$\d = 3
 --
 \[foo\.1\] line 24 assertion: FAILURE
 \[foo\.3\] line 27 assertion: FAILURE

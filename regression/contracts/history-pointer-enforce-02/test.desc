@@ -4,7 +4,6 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-ASSERT \*.*::tmp_cc\$\d < .*::tmp_cc\$\d \+ 5
 --
 --
 Verification:

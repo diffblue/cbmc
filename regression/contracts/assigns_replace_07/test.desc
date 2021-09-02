@@ -1,0 +1,12 @@
+CORE
+main.c
+--replace-all-calls-with-contracts _ --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[pointer\_dereference.\d+\] file main.c line \d+ dereference failure: pointer NULL in p->buf: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion p \!\= NULL \=\=> p->buf\[0\] \=\= 0: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks whether CBMC properly evaluates write set of members
+from invalid objects. In this case, they are not writable.

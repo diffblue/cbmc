@@ -29,11 +29,9 @@ public:
     const irep_idt &function_id);
   ~assigns_clause_targett();
 
-  std::vector<symbol_exprt> temporary_declarations() const;
   exprt alias_expression(const exprt &lhs);
   exprt compatible_expression(const assigns_clause_targett &called_target);
-  const exprt &get_direct_pointer() const;
-  goto_programt &get_init_block();
+  const exprt &get_target() const;
 
   static exprt pointer_for(const exprt &object)
   {
@@ -41,11 +39,10 @@ public:
   }
 
 protected:
-  const exprt pointer_object;
   const code_contractst &contract;
   goto_programt init_block;
   messaget &log;
-  symbol_exprt target;
+  exprt target;
   const irep_idt &target_id;
 };
 
@@ -59,9 +56,7 @@ public:
     messaget log_parameter);
   ~assigns_clauset();
 
-  assigns_clause_targett *add_target(exprt target);
-  goto_programt init_block();
-  goto_programt dead_stmts();
+  void add_target(exprt target);
   goto_programt havoc_code();
   exprt alias_expression(const exprt &lhs);
   exprt compatible_expression(const assigns_clauset &called_assigns);

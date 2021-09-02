@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-all-contracts _ --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: FAILURE$
+^\[f1.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in p->buf: FAILURE$
+^\[f2.\d+\] line \d+ Check that pp->p->buf\[\(.*\)0\] is assignable: FAILURE$
+^\[f2.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in pp->p->buf: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks whether CBMC properly evaluates write set of members
+from invalid objects. In this case, they are not writable.
