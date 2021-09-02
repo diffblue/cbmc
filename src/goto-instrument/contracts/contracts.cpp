@@ -892,15 +892,6 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   }
   goto_programt &program = old_function->second.body;
 
-  if(
-    program.empty() ||
-    (program.instructions.size() <= 2 &&
-     program.instructions.front().is_skip() &&
-     program.instructions.back().is_end_function())) // empty function body
-  {
-    return false;
-  }
-
   if(check_for_looped_mallocs(program))
   {
     return true;
