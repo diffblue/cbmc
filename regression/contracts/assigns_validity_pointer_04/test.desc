@@ -1,9 +1,11 @@
-KNOWNBUG
+CORE
 main.c
 --enforce-contract foo --replace-call-with-contract bar --replace-call-with-contract baz _ --pointer-primitive-check
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^\[foo.\d+\] line \d+ Check that z is assignable: FAILURE$
+^.* 1 of \d+ failed \(\d+ iteration.*\)$
+^VERIFICATION FAILED$
 // bar
 ASSERT \*foo::x > 0
 IF ¬\(\*foo::x = 3\) THEN GOTO \d
@@ -17,9 +19,3 @@ This test checks support for a malloced pointer that is assigned to by
 a function (bar and baz). Both functions bar and baz are being replaced by
 their function contracts, while the calling function foo is being checked
 (by enforcing it's function contracts).
-
-BUG: `z` is being assigned to in `foo`, but is not in `foo`s assigns clause!
-This test is expected to pass but it should not.
-It somehow used to (and still does on *nix), but that seems buggy.
-Most likely the bug is related to `freely_assignable_symbols`,
-which would be properly fixed in a subsequent PR.

@@ -23,7 +23,6 @@ assigns_clauset::targett::targett(
   const assigns_clauset &parent,
   const exprt &expr)
   : address(address_of_exprt(normalize(expr))),
-    expr(expr),
     id(expr.id()),
     parent(parent)
 {
@@ -99,7 +98,7 @@ assigns_clauset::assigns_clauset(
 
 void assigns_clauset::add_target(const exprt &target_expr)
 {
-  auto insertion_succeeded = targets.emplace(*this, target_expr).second;
+  auto insertion_succeeded = write_set.emplace(*this, target_expr).second;
 
   if(!insertion_succeeded)
   {
@@ -112,13 +111,30 @@ void assigns_clauset::add_target(const exprt &target_expr)
 
 void assigns_clauset::remove_target(const exprt &target_expr)
 {
-  targets.erase(targett(*this, targett::normalize(target_expr)));
+  write_set.erase(targett(*this, target_expr));
+}
+
+void assigns_clauset::add_freely_assignable_expr(const exprt &expr)
+{
+  auto insertion_succeeded = freely_assignable_set.emplace(*this, expr).second;
+
+  if(!insertion_succeeded)
+  {
+    log.warning() << "Ignored duplicate expression '"
+                  << from_expr(ns, expr.id(), expr) << "' in assigns clause at "
+                  << expr.source_location().as_string() << messaget::eom;
+  }
+}
+
+void assigns_clauset::remove_freely_assignable_expr(const exprt &expr)
+{
+  freely_assignable_set.erase(targett(*this, targett::normalize(expr)));
 }
 
 goto_programt assigns_clauset::generate_havoc_code() const
 {
   modifiest modifies;
-  for(const auto &target : targets)
+  for(const auto &target : write_set)
     modifies.insert(target.address.object());
 
   goto_programt havoc_statements;
@@ -129,13 +145,18 @@ goto_programt assigns_clauset::generate_havoc_code() const
 exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
 {
   // If write set is empty, no assignment is allowed.
-  if(targets.empty())
+  if(write_set.empty() && freely_assignable_set.empty())
     return false_exprt();
 
   const auto lhs_address = address_of_exprt(targett::normalize(lhs));
 
   exprt::operandst condition;
-  for(const auto &target : targets)
+  for(const auto &target : freely_assignable_set)
+  {
+    condition.push_back(target.generate_containment_check(lhs_address));
+  }
+
+  for(const auto &target : write_set)
   {
     condition.push_back(target.generate_containment_check(lhs_address));
   }
@@ -145,11 +166,11 @@ exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
 exprt assigns_clauset::generate_subset_check(
   const assigns_clauset &subassigns) const
 {
-  if(subassigns.targets.empty())
+  if(subassigns.write_set.empty())
     return true_exprt();
 
   exprt result = true_exprt();
-  for(const auto &subtarget : subassigns.targets)
+  for(const auto &subtarget : subassigns.write_set)
   {
     // TODO: Optimize the implication generated due to the validity check.
     // In some cases, e.g. when `subtarget` is known to be `NULL`,
@@ -158,7 +179,7 @@ exprt assigns_clauset::generate_subset_check(
       w_ok_exprt(subtarget.address, from_integer(0, unsigned_int_type()));
 
     exprt::operandst current_subtarget_found_conditions;
-    for(const auto &target : targets)
+    for(const auto &target : write_set)
     {
       current_subtarget_found_conditions.push_back(
         target.generate_containment_check(subtarget.address));

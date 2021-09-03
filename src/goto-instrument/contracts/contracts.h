@@ -150,7 +150,7 @@ protected:
 
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
-  void check_frame_conditions(goto_programt &program, const symbolt &target);
+  void check_frame_conditions(goto_programt &, assigns_clauset &);
 
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.
@@ -159,24 +159,20 @@ protected:
   /// Inserts an assertion statement into program before the assignment
   /// instruction_it, to ensure that the left-hand-side of the assignment
   /// aliases some expression in original_references, unless it is contained
-  /// in freely_assignable_exprs.
+  /// in freely assignable set.
   void instrument_assign_statement(
-    goto_programt::instructionst::iterator &instruction_it,
-    goto_programt &program,
-    exprt &assigns,
-    std::set<irep_idt> &freely_assignable_symbols,
-    assigns_clauset &assigns_clause);
+    goto_programt::instructionst::iterator &,
+    goto_programt &,
+    assigns_clauset &);
 
   /// Inserts an assertion statement into program before the function call at
   /// ins_it, to ensure that any memory which may be written by the call is
-  /// aliased by some expression in assigns_references,unless it is contained
-  /// in freely_assignable_exprs.
+  /// aliased by some expression in assigns_references, unless it is contained
+  /// in freely assignable set.
   void instrument_call_statement(
-    goto_programt::instructionst::iterator &ins_it,
-    goto_programt &program,
-    exprt &assigns,
-    std::set<irep_idt> &freely_assignable_symbols,
-    assigns_clauset &assigns_clause);
+    goto_programt::instructionst::iterator &,
+    goto_programt &,
+    assigns_clauset &);
 
   /// Creates a boolean expression which is true when there exists an expression
   /// in aliasable_references with the same pointer object and pointer offset as
