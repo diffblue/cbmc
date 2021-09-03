@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-all-contracts
+^main.c.* error: __CPROVER_loop_old is not allowed in postconditions.$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test ensures that __CPROVER_loop_old cannot be used within ensures clause.

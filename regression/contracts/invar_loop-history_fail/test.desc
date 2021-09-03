@@ -5,7 +5,9 @@ main.c
 ^SIGNAL=0$
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$
 ^\[main.2\] .* Check that loop invariant is preserved: FAILURE$
+^\[main.3\] .* Check loop invariant before entry: FAILURE$
+^\[main.4\] .* Check that loop invariant is preserved: FAILURE$
 ^VERIFICATION FAILED$
 --
 --
-This test ensures that __CPROVER_loop_entry violations are checked.
+This test ensures that loop history variable violations are checked.

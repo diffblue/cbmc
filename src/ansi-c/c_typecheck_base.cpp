@@ -738,6 +738,10 @@ void c_typecheck_baset::typecheck_declaration(
               requires,
               ID_loop_entry,
               CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
+            disallow_subexpr_by_id(
+              requires,
+              ID_loop_old,
+              CPROVER_PREFIX "loop_old is not allowed in preconditions.");
           }
         }
 
@@ -762,6 +766,10 @@ void c_typecheck_baset::typecheck_declaration(
               ensures,
               ID_loop_entry,
               CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
+            disallow_subexpr_by_id(
+              ensures,
+              ID_loop_old,
+              CPROVER_PREFIX "loop_old is not allowed in postconditions.");
           }
 
           if(return_type.id() != ID_empty)

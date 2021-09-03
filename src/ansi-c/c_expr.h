@@ -218,7 +218,7 @@ public:
 inline const history_exprt &
 to_history_expr(const exprt &expr, const irep_idt &id)
 {
-  PRECONDITION(id == ID_old || id == ID_loop_entry);
+  PRECONDITION(id == ID_old || id == ID_loop_entry || id == ID_loop_old);
   PRECONDITION(expr.id() == id);
   auto &ret = static_cast<const history_exprt &>(expr);
   validate_expr(ret);

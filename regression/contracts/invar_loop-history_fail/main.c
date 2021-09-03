@@ -12,4 +12,12 @@ void main()
       x = x + 1;
       x = x - 2;
     }
+
+  while(y > 0)
+    __CPROVER_loop_invariant(x != __CPROVER_loop_old(x))
+    {
+      --y;
+      x = x + 2;
+      x = x - 2;
+    }
 }

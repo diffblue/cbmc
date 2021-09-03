@@ -2697,7 +2697,8 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(
     (identifier == CPROVER_PREFIX "old") ||
-    (identifier == CPROVER_PREFIX "loop_entry"))
+    (identifier == CPROVER_PREFIX "loop_entry") ||
+    (identifier == CPROVER_PREFIX "loop_old"))
   {
     if(expr.arguments().size() != 1)
     {
@@ -2706,7 +2707,15 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    irep_idt id = identifier == CPROVER_PREFIX "old" ? ID_old : ID_loop_entry;
+    irep_idt id;
+    if(identifier == CPROVER_PREFIX "old")
+      id = ID_old;
+    else if(identifier == CPROVER_PREFIX "loop_entry")
+      id = ID_loop_entry;
+    else if(identifier == CPROVER_PREFIX "loop_old")
+      id = ID_loop_old;
+    else
+      UNREACHABLE;
 
     history_exprt old_expr(expr.arguments()[0], id);
     old_expr.add_source_location() = source_location;

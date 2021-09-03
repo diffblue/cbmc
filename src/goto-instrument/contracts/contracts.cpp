@@ -147,9 +147,10 @@ void code_contractst::check_apply_loop_contracts(
   //   H: loop;
   //   E: ...
   // to
-  //   initialize loop_entry variables;
+  //   initialize loop_entry and loop_old variables;
   //   H: assert(invariant);
   //   havoc;
+  //   update loop_old variables;
   //   assume(invariant);
   //   if(guard) goto E:
   //   old_decreases_value = decreases_clause(current_environment);
@@ -177,8 +178,7 @@ void code_contractst::check_apply_loop_contracts(
     return invariant_copy;
   };
 
-  // Process "loop_entry" history variables
-  // Find and replace "loop_entry" expression in the "invariant" expression.
+  // Replace 'loop_entry' expressions with new temporary variables
   std::map<exprt, exprt> parameter2history;
   replace_history_parameter(
     invariant,
@@ -187,8 +187,18 @@ void code_contractst::check_apply_loop_contracts(
     mode,
     havoc_code,
     ID_loop_entry);
+  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
 
-  // Create 'loop_entry' history variables
+  // Replace 'loop_old' expressions with new temporary variables
+  parameter2history.clear();
+  auto invariant_copy = invariant;
+  replace_history_parameter(
+    invariant,
+    parameter2history,
+    loop_head->source_location,
+    mode,
+    havoc_code,
+    ID_loop_old);
   insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
 
   // Generate: assert(invariant) just before the loop
@@ -260,6 +270,17 @@ void code_contractst::check_apply_loop_contracts(
 
     goto_function.body.destructive_insert(std::next(loop_head), havoc_code);
   }
+
+  // Reassign 'loop_old' history variables before the loop body
+  parameter2history.clear();
+  replace_history_parameter(
+    invariant_copy,
+    parameter2history,
+    loop_head->source_location,
+    mode,
+    havoc_code,
+    ID_loop_old);
+  goto_function.body.destructive_insert(std::next(loop_head), havoc_code);
 
   // Generate: assert(invariant) just after the loop exits
   // We use a block scope to create a temporary assertion,
@@ -406,7 +427,7 @@ void code_contractst::replace_history_parameter(
       op, parameter2history, location, mode, history, id);
   }
 
-  if(expr.id() == ID_old || expr.id() == ID_loop_entry)
+  if(expr.id() == id)
   {
     const auto &parameter = to_history_expr(expr, id).expression();
 
