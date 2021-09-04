@@ -1,4 +1,4 @@
-# Invariant Clause
+# Invariant Clauses
 
 An _invariant_ clause specifies a property that must be preserved
 by every iteration of a loop.
@@ -46,11 +46,14 @@ __CPROVER_loop_invariant(i <= n);
 
 **Important.** Invariant clauses must be free of _side effects_,
 for example, mutation of local or global variables.
-
+Otherwise, CBMC raises an error message during compilation:
+```
+Loop invariant is not side-effect free. (at: file main.c line 4 function main) 
+```
 
 ### Semantics
 
-The loop invariant clause expands to several assumptions and assertions:
+A loop invariant clause expands to several assumptions and assertions:
 1. The invariant is _asserted_ just before the first iteration.
 2. The invariant is _assumed_ on a non-deterministic state to model a non-deterministic iteration.
 3. The invariant is finally _asserted_ again to establish its inductiveness.
@@ -71,20 +74,19 @@ int binary_search(int val, int *buf, int size)
 {
   if(size <= 0 || buf == NULL) return NOT_FOUND;
 
-  long lb = 0, ub = size - 1;
-  long mid = (lb + ub) / 2;
+  long long lb = 0, ub = size - 1;
+  long long mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
 
   while(lb <= ub)
   __CPROVER_loop_invariant(0L <= lb && lb - 1L <= ub && ub < size)
-  __CPROVER_loop_invariant(mid == (lb + ub) / 2L)
-  __CPROVER_decreases(ub - lb)
+  __CPROVER_loop_invariant(mid == ((unsigned int)lb + (unsigned int)ub) >> 1)
   {
      if(buf[mid] == val) break;
      if(buf[mid] < val)
        lb = mid + 1;
      else
        ub = mid - 1;
-     mid = (lb + ub) / 2;
+     mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
   }
   return lb > ub ? NOT_FOUND : mid;
 }
@@ -97,19 +99,19 @@ int binary_search(int val, int *buf, int size)
 {
   if(size <= 0 || buf == NULL) return NOT_FOUND;
 
-  long lb = 0, ub = size - 1;
-  long mid = (lb + ub) / 2;
+  long long lb = 0, ub = size - 1;
+  long long mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
 
   /* 1. assert invariant at loop entry */
   assert(0L <= lb && lb - 1L <= ub && ub < size);
-  assert(mid == (lb + ub) / 2L);
+  assert(mid == ((unsigned int)lb + (unsigned int)ub) >> 1);
 
   /* 2. create a non-deterministic state for modified variables */
   havoc(lb, ub, mid);
 
   /* 3. establish invariant to model state at an arbitrary iteration */
-  __CPROVER_assume(0L <= lb && lb - 1L <= ub && ub < size)
-  __CPROVER_assume(mid == (lb + ub) / 2L)
+  __CPROVER_assume(0L <= lb && lb - 1L <= ub && ub < size);
+  __CPROVER_assume(mid == ((unsigned int)lb + (unsigned int)ub) >> 1);
 
   /* 4. perform a single arbitrary iteration (or exit the loop) */
   if(lb <= ub)
@@ -119,11 +121,11 @@ int binary_search(int val, int *buf, int size)
       lb = mid + 1;
     else
       ub = mid - 1;
-    mid = (lb + ub) / 2;
+    mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
 
     /* 5. assert the invariant to establish inductiveness */
     assert(0L <= lb && lb - 1L <= ub && ub < size);
-    assert(mid == (lb + ub) / 2L);
+    assert(mid == ((unsigned int)lb + (unsigned int)ub) >> 1);
 
     /* 6. terminate this symbolic execution path; similar to "exit" */
     __CPROVER_assume(false);
