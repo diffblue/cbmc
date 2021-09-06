@@ -71,3 +71,37 @@ int main() {
 This code fails, as there is a choice of x and y which results in a counterexample
 (any choice in which x and y are different).
 
+## Coverage
+
+You can ask CBMC to give coverage information regarding `__CPROVER_assume` statements.
+This is useful when you need, for example, to check which assume statements may have
+led to an emptying of the search state space, resulting in `assert` statements being
+vaccuously passed.
+
+To use that invoke CBMC with the `--cover assume` option. For example, for a file:
+
+```c
+#include <assert.h>
+
+int main()
+{
+  int x;
+  __CPROVER_assume(x > 0);
+  __CPROVER_assume(x < 0);
+  assert(0 == 1);
+}
+```
+
+CBMC invoked with `cbmc --cover assume test.c` will report:
+
+```sh
+[main.1] file assume_assert.c line 6 function main assert(false) before assume(x > 0): SATISFIED
+[main.2] file assume_assert.c line 6 function main assert(false) after assume(x > 0): SATISFIED
+[main.3] file assume_assert.c line 7 function main assert(false) before assume(x < 0): SATISFIED
+[main.4] file assume_assert.c line 7 function main assert(false) after assume(x < 0): FAILED
+```
+
+When an `assert(false)` statement before the assume has the property status `SATISFIED`,
+but is followed by an `assert(false)` statement *after* the assume statement that has status
+`FAILED`, this is an indication that this specific assume statement (on the line reported)
+is one that is emptying the search space for model checking.

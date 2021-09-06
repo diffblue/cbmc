@@ -213,6 +213,7 @@ The table below summarizes the coverage criteria that CBMC supports.
 Criterion |Definition
 ----------|----------
 assertion |For every assertion, generate a test that reaches it
+assume    |For every assume, generate tests before and after the assume statement to indicate coverage before and after it
 location  |For every location, generate a test that reaches it
 branch    |Generate a test for every branch outcome
 decision  |Generate a test for both outcomes of every Boolean expression that is not an operand of a propositional connective
