@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Specify write set in function contracts.
+Module: Specify write set in code contracts.
 
 Author: Felipe R. Monteiro
 
@@ -19,129 +19,112 @@ Date: July 2021
 #include <util/c_types.h>
 #include <util/pointer_predicates.h>
 
-assigns_clause_targett::assigns_clause_targett(
-  const exprt &object,
-  code_contractst &contract,
-  messaget &log_parameter,
-  const irep_idt &function_id)
-  : contract(contract),
-    init_block(),
-    log(log_parameter),
-    target(pointer_for(object)),
-    target_id(object.id())
-{
-  INVARIANT(
-    target.type().id() == ID_pointer,
-    "Assigns clause targets should be stored as pointer expressions.");
-}
-
-assigns_clause_targett::~assigns_clause_targett()
+assigns_clauset::targett::targett(
+  const assigns_clauset &parent,
+  const exprt &expr)
+  : expr(address_of_exprt(expr)), id(expr.id()), parent(parent)
 {
 }
 
-exprt assigns_clause_targett::alias_expression(const exprt &lhs)
+exprt assigns_clauset::targett::normalize(const exprt &expr)
+{
+  if(expr.id() != ID_address_of)
+    return expr;
+
+  const auto &object = to_address_of_expr(expr).object();
+  if(object.id() != ID_index)
+    return object;
+
+  return to_index_expr(object).array();
+}
+
+exprt assigns_clauset::targett::generate_alias_check(const exprt &lhs) const
 {
   exprt::operandst condition;
-  exprt lhs_ptr = (lhs.id() == ID_address_of) ? to_address_of_expr(lhs).object()
-                                              : pointer_for(lhs);
+  const auto lhs_ptr =
+    (lhs.id() == ID_address_of) ? lhs : address_of_exprt(lhs);
 
   // __CPROVER_w_ok(target, sizeof(target))
   condition.push_back(w_ok_exprt(
-    target,
-    size_of_expr(dereference_exprt(target).type(), contract.ns).value()));
+    expr, size_of_expr(dereference_exprt(expr).type(), parent.ns).value()));
 
   // __CPROVER_same_object(lhs, target)
-  condition.push_back(same_object(lhs_ptr, target));
+  condition.push_back(same_object(lhs_ptr, expr));
 
   // If assigns target was a dereference, comparing objects is enough
-  if(target_id == ID_dereference)
+  if(id == ID_dereference)
   {
     return conjunction(condition);
   }
 
-  const exprt lhs_offset = pointer_offset(lhs_ptr);
-  const exprt target_offset = pointer_offset(target);
+  const auto lhs_offset = pointer_offset(lhs_ptr);
+  const auto own_offset = pointer_offset(expr);
 
   // __CPROVER_offset(lhs) >= __CPROVER_offset(target)
-  condition.push_back(binary_relation_exprt(lhs_offset, ID_ge, target_offset));
+  condition.push_back(binary_relation_exprt(lhs_offset, ID_ge, own_offset));
 
-  const exprt region_lhs = plus_exprt(
+  const auto lhs_region = plus_exprt(
     typecast_exprt::conditional_cast(
-      size_of_expr(lhs.type(), contract.ns).value(), lhs_offset.type()),
+      size_of_expr(lhs.type(), parent.ns).value(), lhs_offset.type()),
     lhs_offset);
 
-  const exprt region_target = plus_exprt(
+  const exprt own_region = plus_exprt(
     typecast_exprt::conditional_cast(
-      size_of_expr(dereference_exprt(target).type(), contract.ns).value(),
-      target_offset.type()),
-    target_offset);
+      size_of_expr(dereference_exprt(expr).type(), parent.ns).value(),
+      own_offset.type()),
+    own_offset);
 
   // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
   // (sizeof(target) + __CPROVER_offset(target))
-  condition.push_back(binary_relation_exprt(region_lhs, ID_le, region_target));
+  condition.push_back(binary_relation_exprt(lhs_region, ID_le, own_region));
 
   return conjunction(condition);
 }
 
-exprt assigns_clause_targett::compatible_expression(
-  const assigns_clause_targett &called_target)
+exprt assigns_clauset::targett::generate_compatibility_check(
+  const assigns_clauset::targett &other_target) const
 {
-  return same_object(called_target.get_target(), target);
-}
-
-const exprt &assigns_clause_targett::get_target() const
-{
-  return target;
+  return same_object(other_target.expr, expr);
 }
 
 assigns_clauset::assigns_clauset(
-  const exprt &assigns,
-  code_contractst &contract,
-  const irep_idt function_id,
-  messaget log_parameter)
-  : assigns(assigns),
-    parent(contract),
-    function_id(function_id),
-    log(log_parameter)
+  const exprt &expr,
+  const messaget &log,
+  const namespacet &ns)
+  : expr(expr), log(log), ns(ns)
 {
-  for(exprt target : assigns.operands())
+  for(const auto &target_expr : expr.operands())
   {
-    add_target(target);
+    add_target(target_expr);
   }
 }
 
-assigns_clauset::~assigns_clauset()
+void assigns_clauset::add_target(const exprt &target_expr)
 {
-  for(assigns_clause_targett *target : targets)
+  auto insertion_succeeded =
+    targets.emplace(*this, targett::normalize(target_expr)).second;
+
+  if(!insertion_succeeded)
   {
-    delete target;
+    log.warning() << "Ignored duplicate expression '"
+                  << from_expr(ns, target_expr.id(), target_expr)
+                  << "' in assigns clause at "
+                  << target_expr.source_location().as_string() << messaget::eom;
   }
 }
 
-void assigns_clauset::add_target(exprt target)
-{
-  assigns_clause_targett *new_target = new assigns_clause_targett(
-    (target.id() == ID_address_of)
-      ? to_index_expr(to_address_of_expr(target).object()).array()
-      : target,
-    parent,
-    log,
-    function_id);
-  targets.push_back(new_target);
-}
-
-goto_programt assigns_clauset::havoc_code()
+goto_programt assigns_clauset::generate_havoc_code() const
 {
   modifiest modifies;
-  for(const auto &t : targets)
-    modifies.insert(to_address_of_expr(t->get_target()).object());
+  for(const auto &target : targets)
+    modifies.insert(to_address_of_expr(target.expr).object());
 
   goto_programt havoc_statements;
-  append_havoc_code(assigns.source_location(), modifies, havoc_statements);
+  append_havoc_code(expr.source_location(), modifies, havoc_statements);
   return havoc_statements;
 }
 
-exprt assigns_clauset::alias_expression(const exprt &lhs)
+exprt assigns_clauset::generate_alias_check(const exprt &lhs) const
 {
   // If write set is empty, no assignment is allowed.
   if(targets.empty())
@@ -150,15 +133,15 @@ exprt assigns_clauset::alias_expression(const exprt &lhs)
   }
 
   exprt::operandst condition;
-  for(assigns_clause_targett *target : targets)
+  for(const auto &target : targets)
   {
-    condition.push_back(target->alias_expression(lhs));
+    condition.push_back(target.generate_alias_check(lhs));
   }
   return disjunction(condition);
 }
 
-exprt assigns_clauset::compatible_expression(
-  const assigns_clauset &called_assigns)
+exprt assigns_clauset::generate_compatibility_check(
+  const assigns_clauset &called_assigns) const
 {
   if(called_assigns.targets.empty())
   {
@@ -167,11 +150,11 @@ exprt assigns_clauset::compatible_expression(
 
   bool first_clause = true;
   exprt result = true_exprt();
-  for(assigns_clause_targett *called_target : called_assigns.targets)
+  for(const auto &called_target : called_assigns.targets)
   {
     bool first_iter = true;
     exprt current_target_compatible = false_exprt();
-    for(assigns_clause_targett *target : targets)
+    for(const auto &target : targets)
     {
       if(first_iter)
       {
@@ -180,22 +163,22 @@ exprt assigns_clauset::compatible_expression(
 
         // Validating the called target through __CPROVER_w_ok() is
         // only useful when the called target is a dereference
-        const auto &called_target_ptr = called_target->get_target();
+        const auto &called_target_ptr = called_target.expr;
         if(
           to_address_of_expr(called_target_ptr).object().id() == ID_dereference)
         {
           // or_exprt is short-circuited, therefore
-          // target->compatible_expression(*called_target) would not be
+          // target.generate_compatibility_check(*called_target) would not be
           // checked on invalid called_targets.
           current_target_compatible = or_exprt(
             not_exprt(w_ok_exprt(
               called_target_ptr, from_integer(0, unsigned_int_type()))),
-            target->compatible_expression(*called_target));
+            target.generate_compatibility_check(called_target));
         }
         else
         {
           current_target_compatible =
-            target->compatible_expression(*called_target);
+            target.generate_compatibility_check(called_target);
         }
         first_iter = false;
       }
@@ -203,7 +186,7 @@ exprt assigns_clauset::compatible_expression(
       {
         current_target_compatible = or_exprt(
           current_target_compatible,
-          target->compatible_expression(*called_target));
+          target.generate_compatibility_check(called_target));
       }
     }
     if(first_clause)
@@ -213,10 +196,7 @@ exprt assigns_clauset::compatible_expression(
     }
     else
     {
-      exprt::operandst conjuncts;
-      conjuncts.push_back(result);
-      conjuncts.push_back(current_target_compatible);
-      result = conjunction(conjuncts);
+      result = and_exprt(result, current_target_compatible);
     }
   }
 

@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-all-contracts
+^Ignored duplicate expression '\*x' in assigns clause at file main\.c line \d+$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that repeated expressions in assigns clauses are
+correctly detected and ignored.

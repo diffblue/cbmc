@@ -601,8 +601,8 @@ bool code_contractst::apply_function_contract(
   // in the assigns clause.
   if(assigns.is_not_nil())
   {
-    assigns_clauset assigns_cause(assigns, *this, function, log);
-    goto_programt assigns_havoc = assigns_cause.havoc_code();
+    assigns_clauset assigns_cause(assigns, log, ns);
+    auto assigns_havoc = assigns_cause.generate_havoc_code();
 
     // Insert the non-deterministic assignment immediately before the call site.
     insert_before_swap_and_advance(goto_program, target, assigns_havoc);
@@ -699,7 +699,7 @@ void code_contractst::instrument_assign_statement(
   {
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
-      assigns_clause.alias_expression(lhs),
+      assigns_clause.generate_alias_check(lhs),
       instruction_iterator->source_location));
     alias_assertion.instructions.back().source_location.set_comment(
       "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
@@ -762,8 +762,8 @@ void code_contractst::instrument_call_statement(
       to_symbol_expr(instruction_iterator->call_lhs()).get_identifier()) ==
       freely_assignable_symbols.end())
   {
-    exprt alias_expr =
-      assigns_clause.alias_expression(instruction_iterator->call_lhs());
+    const auto alias_expr =
+      assigns_clause.generate_alias_check(instruction_iterator->call_lhs());
 
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
@@ -802,13 +802,12 @@ void code_contractst::instrument_call_statement(
     replace_formal_params(called_assigns);
 
     // check compatibility of assigns clause with the called function
-    assigns_clauset called_assigns_clause(
-      called_assigns, *this, called_name, log);
-    exprt compatible =
-      assigns_clause.compatible_expression(called_assigns_clause);
+    assigns_clauset called_assigns_clause(called_assigns, log, ns);
+    const auto compatibility_check =
+      assigns_clause.generate_compatibility_check(called_assigns_clause);
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
-      compatible, instruction_iterator->source_location));
+      compatibility_check, instruction_iterator->source_location));
     alias_assertion.instructions.back().source_location.set_comment(
       "Check compatibility of assigns clause with the called function");
     program.insert_before_swap(instruction_iterator, alias_assertion);
@@ -910,7 +909,7 @@ void code_contractst::check_frame_conditions(
   const auto &type = to_code_with_contract_type(target.type);
   exprt assigns_expr = type.assigns();
 
-  assigns_clauset assigns(assigns_expr, *this, target.name, log);
+  assigns_clauset assigns(assigns_expr, log, ns);
 
   // Create a list of variables that are okay to assign.
   std::set<irep_idt> freely_assignable_symbols;
