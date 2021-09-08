@@ -21,11 +21,11 @@ void cover_assume_instrumentert::instrument(
   const cover_blocks_baset &,
   const assertion_factoryt &make_assertion) const
 {
-  namespacet ns{symbol_tablet()};
   if(i_it->is_assume())
   {
     const auto location = i_it->source_location;
-    const auto assume_condition = expr2c(i_it->get_condition(), ns);
+    const auto assume_condition =
+      expr2c(i_it->get_condition(), namespacet{symbol_tablet()});
     const auto comment_before =
       "assert(false) before assume(" + assume_condition + ")";
     const auto comment_after =
