@@ -110,6 +110,11 @@ void assigns_clauset::add_target(const exprt &target_expr)
   }
 }
 
+void assigns_clauset::remove_target(const exprt &target_expr)
+{
+  targets.erase(targett(*this, targett::normalize(target_expr)));
+}
+
 goto_programt assigns_clauset::generate_havoc_code() const
 {
   modifiest modifies;

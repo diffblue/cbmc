@@ -54,6 +54,7 @@ public:
   assigns_clauset(const exprt &, const messaget &, const namespacet &);
 
   void add_target(const exprt &);
+  void remove_target(const exprt &);
 
   goto_programt generate_havoc_code() const;
   exprt generate_containment_check(const exprt &) const;

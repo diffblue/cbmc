@@ -944,6 +944,13 @@ void code_contractst::check_frame_conditions(
         freely_assignable_symbols,
         assigns);
     }
+    else if(instruction_it->is_dead())
+    {
+      freely_assignable_symbols.erase(
+        instruction_it->get_dead().symbol().get_identifier());
+
+      assigns.remove_target(instruction_it->get_dead().symbol());
+    }
   }
 }
 
