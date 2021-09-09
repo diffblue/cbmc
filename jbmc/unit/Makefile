@@ -105,6 +105,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_basic_blocks$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_filter$(OBJEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/cover_instrument_assume$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_instrument_branch$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_instrument_condition$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_instrument_decision$(OBJEXT) \

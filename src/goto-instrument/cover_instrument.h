@@ -292,4 +292,24 @@ void cover_instrument_end_of_function(
   goto_programt &goto_program,
   const cover_instrumenter_baset::assertion_factoryt &);
 
+// assume-instructions instrumenter.
+class cover_assume_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_assume_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "location")
+  {
+  }
+
+protected:
+  void instrument(
+    const irep_idt &,
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_blocks_baset &,
+    const assertion_factoryt &) const override;
+};
+
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
