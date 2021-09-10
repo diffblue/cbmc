@@ -47,6 +47,7 @@ const char *non_ms_cl_options[]=
   "--validate-goto-model",
   "--export-file-local-symbols",
   "--mangle-suffix",
+  "--export-file-local-symbol",
   nullptr
 };
 // clang-format on
@@ -62,7 +63,8 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &arguments)
 
       if(
         arguments[i] == "--verbosity" || arguments[i] == "--function" ||
-        arguments[i] == "--mangle-suffix")
+        arguments[i] == "--mangle-suffix" ||
+        arguments[i] == "--export-file-local-symbol")
       {
         if(i < arguments.size() - 1)
         {

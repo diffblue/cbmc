@@ -50,6 +50,9 @@ fi
 export_flag=""
 if is_in old-flag "$ALL_ARGS"; then
   export_flag="--export-function-local-symbols"
+elif is_in "export-[a-zA-Z0-9_,]*-only" "$ALL_ARGS"; then
+  names=${ALL_ARGS#*export-}
+  export_flag="--export-file-local-symbol ${names%-only*}"
 else
   export_flag="--export-file-local-symbols"
 fi

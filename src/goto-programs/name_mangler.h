@@ -31,13 +31,20 @@ class function_name_manglert
 {
 public:
   /// \param mh: handler to construct a log from
-  /// \param gm: mangle all names in gm's symbol table and goto program
+  /// \param gm: mangle names in gm's symbol table and goto program
   /// \param extra_info: a string to be included in each mangled name
+  /// \param needs_mangling: a regular expression describing names that need to
+  ///   be mangled.
   function_name_manglert(
     message_handlert &mh,
     goto_modelt &gm,
-    const std::string &extra_info)
-    : log(mh), model(gm), mangle_fun(), extra_info(extra_info)
+    const std::string &extra_info,
+    const std::string &needs_mangling)
+    : log(mh),
+      model(gm),
+      mangle_fun(),
+      extra_info(extra_info),
+      needs_mangling(needs_mangling)
   {
   }
 
@@ -64,6 +71,8 @@ public:
       if(sym.value.is_nil()) // has no body
         continue;
       if(!sym.is_file_local)
+        continue;
+      if(!std::regex_match(id2string(sym.name), needs_mangling))
         continue;
 
       const irep_idt mangled = mangle_fun(sym, extra_info);
@@ -136,6 +145,7 @@ protected:
   goto_modelt &model;
   MangleFun mangle_fun;
   const std::string &extra_info;
+  const std::regex needs_mangling;
 };
 
 /// \brief Mangle identifiers by including their filename

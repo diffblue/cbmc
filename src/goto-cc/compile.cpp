@@ -23,6 +23,7 @@ Date: June 2006
 #include <util/get_base_name.h>
 #include <util/prefix.h>
 #include <util/run.h>
+#include <util/string_utils.h>
 #include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
 #include <util/tempfile.h>
@@ -353,10 +354,13 @@ bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
     convert_symbols(goto_model);
   }
 
-  if(keep_file_local)
+  if(!keep_file_local.empty())
   {
     function_name_manglert<file_name_manglert> mangler(
-      log.get_message_handler(), goto_model, file_local_mangle_suffix);
+      log.get_message_handler(),
+      goto_model,
+      file_local_mangle_suffix,
+      keep_file_local);
     mangler.mangle();
   }
 
@@ -424,10 +428,13 @@ optionalt<symbol_tablet> compilet::compile()
       else
         cfn = output_file_object;
 
-      if(keep_file_local)
+      if(!keep_file_local.empty())
       {
         function_name_manglert<file_name_manglert> mangler(
-          log.get_message_handler(), file_goto_model, file_local_mangle_suffix);
+          log.get_message_handler(),
+          file_goto_model,
+          file_local_mangle_suffix,
+          keep_file_local);
         mangler.mangle();
       }
 
@@ -645,6 +652,27 @@ optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
   return std::move(file_symbol_table);
 }
 
+/// Combine the elements of \p values to a regular expression denoting
+/// alternatives. Each element of \p values may in turn be a sequence of
+/// comma-separated values, which are also expanded to contribute to the overall
+/// collection of alternatives.
+static std::string csv_to_pattern(const std::list<std::string> &values)
+{
+  std::string result;
+
+  for(const auto &csv : values)
+  {
+    for(const auto &name : split_string(csv, ','))
+    {
+      if(!result.empty())
+        result += '|';
+      result += name;
+    }
+  }
+
+  return result;
+}
+
 /// constructor
 compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
   : log(mh),
@@ -652,8 +680,12 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
     warning_is_fatal(Werror),
     keep_file_local(
       // function-local is the old name and is still in use, but is misleading
-      cmdline.isset("export-function-local-symbols") ||
-      cmdline.isset("export-file-local-symbols")),
+      (cmdline.isset("export-function-local-symbols") ||
+       cmdline.isset("export-file-local-symbols"))
+        ? ".*"
+        : (cmdline.isset("export-file-local-symbol")
+             ? csv_to_pattern(cmdline.get_values("export-file-local-symbol"))
+             : "")),
     file_local_mangle_suffix(
       cmdline.isset("mangle-suffix") ? cmdline.get_value("mangle-suffix") : "")
 {

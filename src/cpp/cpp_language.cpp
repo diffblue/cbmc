@@ -131,7 +131,7 @@ bool cpp_languaget::typecheck(
       cpp_parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
 
-  remove_internal_symbols(new_symbol_table, get_message_handler(), false);
+  remove_internal_symbols(new_symbol_table, get_message_handler(), "");
 
   return linking(symbol_table, new_symbol_table, get_message_handler());
 }

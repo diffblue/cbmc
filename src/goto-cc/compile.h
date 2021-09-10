@@ -111,7 +111,7 @@ protected:
   bool warning_is_fatal;
 
   /// \brief Whether to keep implementations of file-local symbols
-  const bool keep_file_local;
+  const std::string keep_file_local;
 
   /// \brief String to include in all mangled names
   const std::string file_local_mangle_suffix;
