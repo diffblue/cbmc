@@ -179,10 +179,8 @@ void unreachable_instructions(
 
     const symbolt &decl = ns.lookup(gf_entry.first);
 
-    // gf_entry.first may be a link-time renamed version, use the
-    // base_name instead; do not list inlined functions
     if(
-      called.find(decl.base_name) != called.end() ||
+      called.find(decl.name) != called.end() ||
       to_code_type(decl.type).get_inlined())
     {
       unreachable_instructions(goto_program, dead_map);
@@ -314,10 +312,8 @@ static void list_functions(
   {
     const symbolt &decl = ns.lookup(gf_entry.first);
 
-    // gf_entry.first may be a link-time renamed version, use the
-    // base_name instead; do not list inlined functions
     if(
-      unreachable == (called.find(decl.base_name) != called.end() ||
+      unreachable == (called.find(decl.name) != called.end() ||
                       to_code_type(decl.type).get_inlined()))
     {
       continue;
