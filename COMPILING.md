@@ -1,4 +1,4 @@
-#WHAT ARCHITECTURE ?
+#WHAT ARCHITECTURE?
 
 CPROVER now needs a C++11 compliant compiler and is known to work in the
 following environments:
