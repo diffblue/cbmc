@@ -24,8 +24,8 @@ int binary_search(int val, int *buf, int size)
 {
   if(size <= 0 || buf == NULL) return NOT_FOUND;
 
-  long lb = 0, ub = size - 1;
-  long mid = (lb + ub) / 2;
+  int lb = 0, ub = size - 1;
+  int mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
 
   while(lb <= ub)
   {
@@ -34,7 +34,7 @@ int binary_search(int val, int *buf, int size)
        lb = mid + 1;
      else
        ub = mid - 1;
-     mid = (lb + ub) / 2;
+     mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
   }
   return lb > ub ? NOT_FOUND : mid;
 }
@@ -96,12 +96,12 @@ int binary_search(int val, int *buf, int size)
 {
   if(size <= 0 || buf == NULL) return NOT_FOUND;
 
-  long lb = 0, ub = size - 1;
-  long mid = (lb + ub) / 2;
+  int lb = 0, ub = size - 1;
+  int mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
 
   while(lb <= ub)
   __CPROVER_loop_invariant(0L <= lb && lb - 1L <= ub && ub < size)
-  __CPROVER_loop_invariant(mid == (lb + ub) / 2L)
+  __CPROVER_loop_invariant(mid == ((unsigned int)lb + (unsigned int)ub) >> 1)
   __CPROVER_decreases(ub - lb)
   {
      if(buf[mid] == val) break;
@@ -109,7 +109,7 @@ int binary_search(int val, int *buf, int size)
        lb = mid + 1;
      else
        ub = mid - 1;
-     mid = (lb + ub) / 2;
+     mid = ((unsigned int)lb + (unsigned int)ub) >> 1;
   }
   return lb > ub ? NOT_FOUND : mid;
 }
