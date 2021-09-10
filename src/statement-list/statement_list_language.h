@@ -43,13 +43,14 @@ public:
   ///   If the symbol table is not empty when calling this function, its
   ///   contents are merged with the new entries.
   /// \param module: Name of the file that has been parsed.
-  /// \param keep_file_local: Set to true if local variables of this module
-  ///   should be included in the table.
+  /// \param keep_file_local: Set to non-empty string that is used as regular
+  ///   expression over local variable names that must not be cleaned from the
+  ///   symbol table.
   /// \return False if no errors occurred, true otherwise.
   bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module,
-    const bool keep_file_local) override;
+    const std::string &keep_file_local) override;
 
   bool
   typecheck(symbol_tablet &symbol_table, const std::string &module) override;

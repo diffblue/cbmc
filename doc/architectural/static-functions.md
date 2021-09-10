@@ -92,7 +92,8 @@ We should now also write a harness for `private_function`. However,
 since that function is marked `static`, it is not possible for functions
 in external files to call it. We can write and link a harness by
 stripping the `static` attribute from `private_function` using goto-cc's
-`--export-file-local-symbols` flag.
+`--export-file-local-symbols` or `--export-file-local-symbol private_function`
+flag.
 
 \code{.sh}
 > goto-cc -c -o --export-file-local-symbols library_with_static.o library.c

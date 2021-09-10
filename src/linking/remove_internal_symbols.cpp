@@ -22,6 +22,8 @@ Author: Daniel Kroening
 
 #include "static_lifetime_init.h"
 
+#include <regex>
+
 static void get_symbols(
   const namespacet &ns,
   const symbolt &in_symbol,
@@ -99,12 +101,12 @@ static void get_symbols(
 ///          on "extern inline"
 /// \param symbol_table: symbol table to clean up
 /// \param mh: log handler
-/// \param keep_file_local: keep file-local functions with bodies even if we
+/// \param keep_file_local: regular expression over symbols to keep even if we
 ///                         would otherwise remove them
 void remove_internal_symbols(
   symbol_tablet &symbol_table,
   message_handlert &mh,
-  const bool keep_file_local)
+  const std::string &keep_file_local)
 {
   namespacet ns(symbol_table);
   find_symbols_sett exported;
@@ -176,7 +178,9 @@ void remove_internal_symbols(
       {
         get_symbols(ns, symbol, exported);
       }
-      else if(has_body && is_file_local && keep_file_local)
+      else if(
+        has_body && is_file_local && !keep_file_local.empty() &&
+        std::regex_match(id2string(symbol.name), std::regex(keep_file_local)))
       {
         get_symbols(ns, symbol, exported);
       }

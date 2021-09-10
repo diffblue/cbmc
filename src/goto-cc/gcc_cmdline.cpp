@@ -28,6 +28,7 @@ const char *goto_cc_options_with_separated_argument[]=
   "--print-rejected-preprocessed-source",
   "--mangle-suffix",
   "--object-bits",
+  "--export-file-local-symbol",
   nullptr
 };
 

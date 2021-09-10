@@ -103,7 +103,7 @@ bool ansi_c_languaget::parse(
 bool ansi_c_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module,
-  const bool keep_file_local)
+  const std::string &keep_file_local)
 {
   symbol_tablet new_symbol_table;
 

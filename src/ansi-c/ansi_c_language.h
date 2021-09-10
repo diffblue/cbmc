@@ -54,7 +54,7 @@ public:
   bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module,
-    const bool keep_file_local) override;
+    const std::string &keep_file_local) override;
 
   bool can_keep_file_local() override
   {
@@ -64,7 +64,7 @@ public:
   bool
   typecheck(symbol_tablet &symbol_table, const std::string &module) override
   {
-    return typecheck(symbol_table, module, true);
+    return typecheck(symbol_table, module, ".*");
   }
 
   void show_parse(std::ostream &out) override;

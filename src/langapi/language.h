@@ -140,7 +140,7 @@ public:
   virtual bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module,
-    const bool keep_file_local)
+    const std::string &keep_file_local)
   {
     INVARIANT(
       false,

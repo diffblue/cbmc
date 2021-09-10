@@ -82,7 +82,7 @@ bool language_filest::parse()
 
 bool language_filest::typecheck(
   symbol_tablet &symbol_table,
-  const bool keep_file_local)
+  const std::string &keep_file_local)
 {
   // typecheck interfaces
 
@@ -204,7 +204,7 @@ bool language_filest::interfaces(
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,
   const std::string &module,
-  const bool keep_file_local)
+  const std::string &keep_file_local)
 {
   // check module map
 
@@ -222,7 +222,7 @@ bool language_filest::typecheck_module(
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,
   language_modulet &module,
-  const bool keep_file_local)
+  const std::string &keep_file_local)
 {
   // already typechecked?
 
