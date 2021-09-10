@@ -30,8 +30,7 @@ public:
 
     static exprt normalize(const exprt &);
 
-    exprt generate_alias_check(const exprt &) const;
-    exprt generate_compatibility_check(const targett &) const;
+    exprt generate_containment_check(const address_of_exprt &) const;
 
     bool operator==(const targett &other) const
     {
@@ -46,7 +45,8 @@ public:
       }
     };
 
-    const exprt expr;
+    const address_of_exprt address;
+    const exprt &expr;
     const irep_idt &id;
     const assigns_clauset &parent;
   };
@@ -56,8 +56,8 @@ public:
   void add_target(const exprt &);
 
   goto_programt generate_havoc_code() const;
-  exprt generate_alias_check(const exprt &) const;
-  exprt generate_compatibility_check(const assigns_clauset &) const;
+  exprt generate_containment_check(const exprt &) const;
+  exprt generate_subset_check(const assigns_clauset &) const;
 
   const exprt &expr;
   const messaget &log;

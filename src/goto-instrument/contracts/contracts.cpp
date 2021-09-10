@@ -699,7 +699,7 @@ void code_contractst::instrument_assign_statement(
   {
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
-      assigns_clause.generate_alias_check(lhs),
+      assigns_clause.generate_containment_check(lhs),
       instruction_iterator->source_location));
     alias_assertion.instructions.back().source_location.set_comment(
       "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
@@ -762,8 +762,8 @@ void code_contractst::instrument_call_statement(
       to_symbol_expr(instruction_iterator->call_lhs()).get_identifier()) ==
       freely_assignable_symbols.end())
   {
-    const auto alias_expr =
-      assigns_clause.generate_alias_check(instruction_iterator->call_lhs());
+    const auto alias_expr = assigns_clause.generate_containment_check(
+      instruction_iterator->call_lhs());
 
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
@@ -801,15 +801,15 @@ void code_contractst::instrument_call_statement(
     }
     replace_formal_params(called_assigns);
 
-    // check compatibility of assigns clause with the called function
+    // check subset relationship of assigns clause for called function
     assigns_clauset called_assigns_clause(called_assigns, log, ns);
-    const auto compatibility_check =
-      assigns_clause.generate_compatibility_check(called_assigns_clause);
+    const auto subset_check =
+      assigns_clause.generate_subset_check(called_assigns_clause);
     goto_programt alias_assertion;
     alias_assertion.add(goto_programt::make_assertion(
-      compatibility_check, instruction_iterator->source_location));
+      subset_check, instruction_iterator->source_location));
     alias_assertion.instructions.back().source_location.set_comment(
-      "Check compatibility of assigns clause with the called function");
+      "Check that callee's assigns clause is a subset of caller's");
     program.insert_before_swap(instruction_iterator, alias_assertion);
     ++instruction_iterator;
   }
