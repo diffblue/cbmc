@@ -8,12 +8,12 @@ int main()
   float fone = 1.0f;
   float fcomplex = 0x1p+37f;
   float finf = INFINITY;
-  float fnan = NAN;
+  float fnan = +NAN;
 
   double dzero = 0.0;
   double done = 1.0;
   double dinf = INFINITY;
-  double dnan = NAN;
+  double dnan = +NAN;
   double dcomplex = -5.56268e-309;
 
   assert(false);
