@@ -1,0 +1,13 @@
+CORE
+file1.c
+final-link show-symbol-table assertion-check
+^Base name\.\.\.: __CPROVER_file_local_.*_foo$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Base name\.\.\.: foo$
+--
+The linking order must not affect the base name of the mangled symbol. See
+base-name-1 for a test that will yield a different linking order (while still
+producing the same base name).
