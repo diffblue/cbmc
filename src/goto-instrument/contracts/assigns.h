@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Specify write set in function contracts.
+Module: Specify write set in code contracts.
 
 Author: Felipe R. Monteiro
 
@@ -18,58 +18,54 @@ Date: July 2021
 
 #include <util/pointer_offset_size.h>
 
-/// \brief A base class for assigns clause targets
-class assigns_clause_targett
-{
-public:
-  assigns_clause_targett(
-    const exprt &object,
-    code_contractst &contract,
-    messaget &log_parameter,
-    const irep_idt &function_id);
-  ~assigns_clause_targett();
-
-  exprt alias_expression(const exprt &lhs);
-  exprt compatible_expression(const assigns_clause_targett &called_target);
-  const exprt &get_target() const;
-
-  static exprt pointer_for(const exprt &object)
-  {
-    return address_of_exprt(object);
-  }
-
-protected:
-  const code_contractst &contract;
-  goto_programt init_block;
-  messaget &log;
-  exprt target;
-  const irep_idt &target_id;
-};
-
+/// \brief A class for representing assigns clauses in code contracts
 class assigns_clauset
 {
 public:
-  assigns_clauset(
-    const exprt &assigns,
-    code_contractst &contract,
-    const irep_idt function_id,
-    messaget log_parameter);
-  ~assigns_clauset();
+  /// \brief A class for representing targets for assigns clauses
+  class targett
+  {
+  public:
+    targett(const assigns_clauset &, const exprt &);
 
-  void add_target(exprt target);
-  goto_programt havoc_code();
-  exprt alias_expression(const exprt &lhs);
-  exprt compatible_expression(const assigns_clauset &called_assigns);
+    static exprt normalize(const exprt &);
+
+    exprt generate_containment_check(const address_of_exprt &) const;
+
+    bool operator==(const targett &other) const
+    {
+      return expr == other.expr;
+    }
+
+    struct hasht
+    {
+      std::size_t operator()(const targett &target) const
+      {
+        return irep_hash{}(target.expr);
+      }
+    };
+
+    const address_of_exprt address;
+    const exprt &expr;
+    const irep_idt &id;
+    const assigns_clauset &parent;
+  };
+
+  assigns_clauset(const exprt &, const messaget &, const namespacet &);
+
+  void add_target(const exprt &);
+  void remove_target(const exprt &);
+
+  goto_programt generate_havoc_code() const;
+  exprt generate_containment_check(const exprt &) const;
+  exprt generate_subset_check(const assigns_clauset &) const;
+
+  const exprt &expr;
+  const messaget &log;
+  const namespacet &ns;
 
 protected:
-  const exprt &assigns;
-
-  std::vector<assigns_clause_targett *> targets;
-  goto_programt standin_declarations;
-
-  code_contractst &parent;
-  const irep_idt function_id;
-  messaget log;
+  std::unordered_set<targett, targett::hasht> targets;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_ASSIGNS_H
