@@ -12,8 +12,9 @@ main.c
 ^.* 1 of \d+ failed \(\d+ iteration.*\)$
 ^VERIFICATION FAILED$
 --
+^\[foo.\d+\] line \d+ Check that a is assignable: FAILURE$
 ^\[foo.pointer\_primitives.\d+\] line \d+ deallocated dynamic object in POINTER_OBJECT\(tmp\_cc\$\d+\): FAILURE$
-^.* 8 of \d+ failed (\d+ iterations)$
+^.* 3 of \d+ failed (\d+ iterations)$
 --
 Checks whether contract enforcement works with functions that deallocate memory.
 We had problems before when freeing a variable, but still keeping it on

@@ -723,13 +723,13 @@ void code_contractst::instrument_call_statement(
       instrument_assign_statement(
         instruction_iterator, program, assigns_clause);
       const exprt &lhs = instruction_iterator->assign_lhs();
-      assigns_clause.add_freely_assignable_expr(dereference_exprt(lhs));
+      assigns_clause.add_local_write_set(dereference_exprt(lhs));
     }
     return; // assume malloc edits no pre-existing memory objects.
   }
   else if(called_name == "free")
   {
-    assigns_clause.remove_freely_assignable_expr(dereference_exprt(
+    assigns_clause.remove_local_write_set(dereference_exprt(
       to_typecast_expr(instruction_iterator->call_arguments().front()).op()));
     return;
   }
@@ -880,7 +880,7 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   // Adds formal parameters to freely assignable set
   for(auto &parameter : to_code_type(target.type).parameters())
   {
-    assigns.add_freely_assignable_expr(
+    assigns.add_local_write_set(
       ns.lookup(parameter.get_identifier()).symbol_expr());
   }
 
@@ -901,7 +901,7 @@ void code_contractst::check_frame_conditions(
     if(instruction_it->is_decl())
     {
       // Local variables are always freely assignable
-      assigns.add_freely_assignable_expr(instruction_it->get_decl().symbol());
+      assigns.add_local_write_set(instruction_it->get_decl().symbol());
     }
     else if(instruction_it->is_assign())
     {
@@ -919,8 +919,7 @@ void code_contractst::check_frame_conditions(
     }
     else if(instruction_it->is_dead())
     {
-      assigns.remove_freely_assignable_expr(
-        instruction_it->get_dead().symbol());
+      assigns.remove_local_write_set(instruction_it->get_dead().symbol());
     }
   }
 }
