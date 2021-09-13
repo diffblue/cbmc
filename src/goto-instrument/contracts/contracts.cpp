@@ -689,7 +689,7 @@ void code_contractst::instrument_assign_statement(
       lhs_sym.is_static_lifetime &&
       lhs_sym.location.get_function() ==
         instruction_iterator->source_location.get_function())
-      assigns_clause.add_local_write_set(lhs);
+      assigns_clause.add_to_local_write_set(lhs);
   }
 
   goto_programt alias_assertion;
@@ -737,13 +737,13 @@ void code_contractst::instrument_call_statement(
       instrument_assign_statement(
         instruction_iterator, program, assigns_clause);
       const exprt &lhs = instruction_iterator->assign_lhs();
-      assigns_clause.add_local_write_set(dereference_exprt(lhs));
+      assigns_clause.add_to_local_write_set(dereference_exprt(lhs));
     }
     return; // assume malloc edits no pre-existing memory objects.
   }
   else if(called_name == "free")
   {
-    assigns_clause.remove_local_write_set(dereference_exprt(
+    assigns_clause.remove_from_local_write_set(dereference_exprt(
       to_typecast_expr(instruction_iterator->call_arguments().front()).op()));
     return;
   }
@@ -894,7 +894,7 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   // Adds formal parameters to freely assignable set
   for(auto &parameter : to_code_type(target.type).parameters())
   {
-    assigns.add_local_write_set(
+    assigns.add_to_local_write_set(
       ns.lookup(parameter.get_identifier()).symbol_expr());
   }
 
@@ -915,7 +915,7 @@ void code_contractst::check_frame_conditions(
     if(instruction_it->is_decl())
     {
       // Local variables are always freely assignable
-      assigns.add_local_write_set(instruction_it->get_decl().symbol());
+      assigns.add_to_local_write_set(instruction_it->get_decl().symbol());
     }
     else if(instruction_it->is_assign())
     {
@@ -933,7 +933,7 @@ void code_contractst::check_frame_conditions(
     }
     else if(instruction_it->is_dead())
     {
-      assigns.remove_local_write_set(instruction_it->get_dead().symbol());
+      assigns.remove_from_local_write_set(instruction_it->get_dead().symbol());
     }
   }
 }

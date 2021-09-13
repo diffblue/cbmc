@@ -52,10 +52,10 @@ public:
 
   assigns_clauset(const exprt &, const messaget &, const namespacet &);
 
-  void add_global_write_set(const exprt &);
-  void remove_global_write_set(const exprt &);
-  void add_local_write_set(const exprt &);
-  void remove_local_write_set(const exprt &);
+  void add_to_global_write_set(const exprt &);
+  void remove_from_global_write_set(const exprt &);
+  void add_to_local_write_set(const exprt &);
+  void remove_from_local_write_set(const exprt &);
 
   goto_programt generate_havoc_code() const;
   exprt generate_containment_check(const exprt &) const;
