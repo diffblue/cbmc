@@ -666,19 +666,6 @@ goto_functionst &code_contractst::get_goto_functions()
   return goto_functions;
 }
 
-exprt code_contractst::create_alias_expression(
-  const exprt &lhs,
-  std::vector<exprt> &aliasable_references)
-{
-  exprt::operandst operands;
-  operands.reserve(aliasable_references.size());
-  for(auto aliasable : aliasable_references)
-  {
-    operands.push_back(equal_exprt(lhs, typecast_exprt(aliasable, lhs.type())));
-  }
-  return disjunction(operands);
-}
-
 void code_contractst::instrument_assign_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,

@@ -174,13 +174,6 @@ protected:
     goto_programt &,
     assigns_clauset &);
 
-  /// Creates a boolean expression which is true when there exists an expression
-  /// in aliasable_references with the same pointer object and pointer offset as
-  /// the address of lhs.
-  exprt create_alias_expression(
-    const exprt &lhs,
-    std::vector<exprt> &aliasable_references);
-
   /// Apply loop contracts, whenever available, to all loops in `function`.
   /// Loop invariants, loop variants, and loop assigns clauses.
   void apply_loop_contract(
