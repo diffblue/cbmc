@@ -138,6 +138,9 @@ goto_programt assigns_clauset::generate_havoc_code() const
   for(const auto &target : global_write_set)
     modifies.insert(target.address.object());
 
+  for(const auto &target : local_write_set)
+    modifies.insert(target.address.object());
+
   goto_programt havoc_statements;
   append_havoc_code(location, modifies, havoc_statements);
   return havoc_statements;
