@@ -678,6 +678,20 @@ void code_contractst::instrument_assign_statement(
 
   const exprt &lhs = instruction_iterator->assign_lhs();
 
+  // Local static variables are not declared locally, therefore, they are not
+  // included in the local write set during declaration. We check here whether
+  // lhs of the assignment is a local static variable and, if it is indeed
+  // true, we add lhs to our local write set before checking the assignment.
+  if(lhs.id() == ID_symbol)
+  {
+    auto lhs_sym = ns.lookup(lhs.get(ID_identifier));
+    if(
+      lhs_sym.is_static_lifetime &&
+      lhs_sym.location.get_function() ==
+        instruction_iterator->source_location.get_function())
+      assigns_clause.add_local_write_set(lhs);
+  }
+
   goto_programt alias_assertion;
   alias_assertion.add(goto_programt::make_assertion(
     assigns_clause.generate_containment_check(lhs),

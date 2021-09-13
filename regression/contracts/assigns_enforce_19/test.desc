@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-all-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[f.\d+\] line \d+ Check that a is assignable: SUCCESS$
+^\[g.\d+\] line \d+ Check that b is assignable: SUCCESS$
+^\[g.\d+\] line \d+ Check that c is assignable: FAILURE$
+^\[g.\d+\] line \d+ Check that \*points\_to\_b is assignable: SUCCESS$
+^\[g.\d+\] line \d+ Check that \*points\_to\_c is assignable: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks whether contract enforcement works with (local and global) static variables.
+Local static variables should be part of the local write set.
+Global static variables should be included in the global write set,
+otherwise any assignment to it is invalid.
