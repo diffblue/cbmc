@@ -666,24 +666,9 @@ goto_functionst &code_contractst::get_goto_functions()
   return goto_functions;
 }
 
-exprt code_contractst::create_alias_expression(
-  const exprt &lhs,
-  std::vector<exprt> &aliasable_references)
-{
-  exprt::operandst operands;
-  operands.reserve(aliasable_references.size());
-  for(auto aliasable : aliasable_references)
-  {
-    operands.push_back(equal_exprt(lhs, typecast_exprt(aliasable, lhs.type())));
-  }
-  return disjunction(operands);
-}
-
 void code_contractst::instrument_assign_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,
-  exprt &assigns,
-  std::set<irep_idt> &freely_assignable_symbols,
   assigns_clauset &assigns_clause)
 {
   INVARIANT(
@@ -693,26 +678,33 @@ void code_contractst::instrument_assign_statement(
 
   const exprt &lhs = instruction_iterator->assign_lhs();
 
-  if(
-    freely_assignable_symbols.find(lhs.get(ID_identifier)) ==
-    freely_assignable_symbols.end())
+  // Local static variables are not declared locally, therefore, they are not
+  // included in the local write set during declaration. We check here whether
+  // lhs of the assignment is a local static variable and, if it is indeed
+  // true, we add lhs to our local write set before checking the assignment.
+  if(lhs.id() == ID_symbol)
   {
-    goto_programt alias_assertion;
-    alias_assertion.add(goto_programt::make_assertion(
-      assigns_clause.generate_containment_check(lhs),
-      instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-    insert_before_swap_and_advance(
-      program, instruction_iterator, alias_assertion);
+    auto lhs_sym = ns.lookup(lhs.get(ID_identifier));
+    if(
+      lhs_sym.is_static_lifetime &&
+      lhs_sym.location.get_function() ==
+        instruction_iterator->source_location.get_function())
+      assigns_clause.add_to_local_write_set(lhs);
   }
+
+  goto_programt alias_assertion;
+  alias_assertion.add(goto_programt::make_assertion(
+    assigns_clause.generate_containment_check(lhs),
+    instruction_iterator->source_location));
+  alias_assertion.instructions.back().source_location.set_comment(
+    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
+  insert_before_swap_and_advance(
+    program, instruction_iterator, alias_assertion);
 }
 
 void code_contractst::instrument_call_statement(
   goto_programt::instructionst::iterator &instruction_iterator,
   goto_programt &program,
-  exprt &assigns,
-  std::set<irep_idt> &freely_assignable_symbols,
   assigns_clauset &assigns_clause)
 {
   INVARIANT(
@@ -742,25 +734,34 @@ void code_contractst::instrument_call_statement(
     instruction_iterator++;
     if(instruction_iterator->is_assign())
     {
-      const exprt &rhs = instruction_iterator->assign_rhs();
-      INVARIANT(
-        rhs.id() == ID_typecast,
-        "malloc is called but the result is not cast. Excluding result from "
-        "the assignable memory frame.");
-      typet cast_type = rhs.type();
-
-      // Make freshly allocated memory assignable, if we can determine its type.
-      assigns_clause.add_target(dereference_exprt(rhs));
+      instrument_assign_statement(
+        instruction_iterator, program, assigns_clause);
+      const exprt &lhs = instruction_iterator->assign_lhs();
+      assigns_clause.add_to_local_write_set(dereference_exprt(lhs));
     }
     return; // assume malloc edits no pre-existing memory objects.
+  }
+  else if(called_name == "free")
+  {
+    goto_programt alias_assertion;
+    const exprt &lhs_dereference = dereference_exprt(
+      to_typecast_expr(instruction_iterator->call_arguments().front()).op());
+    alias_assertion.add(goto_programt::make_assertion(
+      assigns_clause.generate_containment_check(lhs_dereference),
+      instruction_iterator->source_location));
+    alias_assertion.instructions.back().source_location.set_comment(
+      "Check that " + from_expr(ns, lhs_dereference.id(), lhs_dereference) +
+      " is assignable");
+    assigns_clause.remove_from_local_write_set(lhs_dereference);
+    assigns_clause.remove_from_global_write_set(lhs_dereference);
+    insert_before_swap_and_advance(
+      program, instruction_iterator, alias_assertion);
+    return;
   }
 
   if(
     instruction_iterator->call_lhs().is_not_nil() &&
-    instruction_iterator->call_lhs().id() == ID_symbol &&
-    freely_assignable_symbols.find(
-      to_symbol_expr(instruction_iterator->call_lhs()).get_identifier()) ==
-      freely_assignable_symbols.end())
+    instruction_iterator->call_lhs().id() == ID_symbol)
   {
     const auto alias_expr = assigns_clause.generate_containment_check(
       instruction_iterator->call_lhs());
@@ -896,24 +897,28 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     return true;
   }
 
+  // Get assigns clause for function
+  const symbolt &target = ns.lookup(function);
+  assigns_clauset assigns(
+    to_code_with_contract_type(target.type).assigns(), log, ns);
+
+  // Adds formal parameters to freely assignable set
+  for(auto &parameter : to_code_type(target.type).parameters())
+  {
+    assigns.add_to_local_write_set(
+      ns.lookup(parameter.get_identifier()).symbol_expr());
+  }
+
   // Insert aliasing assertions
-  check_frame_conditions(program, ns.lookup(function));
+  check_frame_conditions(program, assigns);
 
   return false;
 }
 
 void code_contractst::check_frame_conditions(
   goto_programt &program,
-  const symbolt &target)
+  assigns_clauset &assigns)
 {
-  const auto &type = to_code_with_contract_type(target.type);
-  exprt assigns_expr = type.assigns();
-
-  assigns_clauset assigns(assigns_expr, log, ns);
-
-  // Create a list of variables that are okay to assign.
-  std::set<irep_idt> freely_assignable_symbols;
-
   for(auto instruction_it = program.instructions.begin();
       instruction_it != program.instructions.end();
       ++instruction_it)
@@ -921,18 +926,13 @@ void code_contractst::check_frame_conditions(
     if(instruction_it->is_decl())
     {
       // Local variables are always freely assignable
-      freely_assignable_symbols.insert(
-        instruction_it->get_decl().symbol().get_identifier());
-
-      assigns.add_target(instruction_it->get_decl().symbol());
+      assigns.add_to_local_write_set(instruction_it->get_decl().symbol());
     }
     else if(instruction_it->is_assign())
     {
       instrument_assign_statement(
         instruction_it,
         program,
-        assigns_expr,
-        freely_assignable_symbols,
         assigns);
     }
     else if(instruction_it->is_function_call())
@@ -940,16 +940,11 @@ void code_contractst::check_frame_conditions(
       instrument_call_statement(
         instruction_it,
         program,
-        assigns_expr,
-        freely_assignable_symbols,
         assigns);
     }
     else if(instruction_it->is_dead())
     {
-      freely_assignable_symbols.erase(
-        instruction_it->get_dead().symbol().get_identifier());
-
-      assigns.remove_target(instruction_it->get_dead().symbol());
+      assigns.remove_from_local_write_set(instruction_it->get_dead().symbol());
     }
   }
 }

@@ -23,7 +23,6 @@ assigns_clauset::targett::targett(
   const assigns_clauset &parent,
   const exprt &expr)
   : address(address_of_exprt(normalize(expr))),
-    expr(expr),
     id(expr.id()),
     parent(parent)
 {
@@ -89,17 +88,18 @@ assigns_clauset::assigns_clauset(
   const exprt &expr,
   const messaget &log,
   const namespacet &ns)
-  : expr(expr), log(log), ns(ns)
+  : location(expr.source_location()), log(log), ns(ns)
 {
   for(const auto &target_expr : expr.operands())
   {
-    add_target(target_expr);
+    add_to_global_write_set(target_expr);
   }
 }
 
-void assigns_clauset::add_target(const exprt &target_expr)
+void assigns_clauset::add_to_global_write_set(const exprt &target_expr)
 {
-  auto insertion_succeeded = targets.emplace(*this, target_expr).second;
+  auto insertion_succeeded =
+    global_write_set.emplace(*this, target_expr).second;
 
   if(!insertion_succeeded)
   {
@@ -110,32 +110,50 @@ void assigns_clauset::add_target(const exprt &target_expr)
   }
 }
 
-void assigns_clauset::remove_target(const exprt &target_expr)
+void assigns_clauset::remove_from_global_write_set(const exprt &target_expr)
 {
-  targets.erase(targett(*this, targett::normalize(target_expr)));
+  global_write_set.erase(targett(*this, target_expr));
+}
+
+void assigns_clauset::add_to_local_write_set(const exprt &expr)
+{
+  local_write_set.emplace(*this, expr);
+}
+
+void assigns_clauset::remove_from_local_write_set(const exprt &expr)
+{
+  local_write_set.erase(targett(*this, expr));
 }
 
 goto_programt assigns_clauset::generate_havoc_code() const
 {
   modifiest modifies;
-  for(const auto &target : targets)
+  for(const auto &target : global_write_set)
+    modifies.insert(target.address.object());
+
+  for(const auto &target : local_write_set)
     modifies.insert(target.address.object());
 
   goto_programt havoc_statements;
-  append_havoc_code(expr.source_location(), modifies, havoc_statements);
+  append_havoc_code(location, modifies, havoc_statements);
   return havoc_statements;
 }
 
 exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
 {
   // If write set is empty, no assignment is allowed.
-  if(targets.empty())
+  if(global_write_set.empty() && local_write_set.empty())
     return false_exprt();
 
   const auto lhs_address = address_of_exprt(targett::normalize(lhs));
 
   exprt::operandst condition;
-  for(const auto &target : targets)
+  for(const auto &target : local_write_set)
+  {
+    condition.push_back(target.generate_containment_check(lhs_address));
+  }
+
+  for(const auto &target : global_write_set)
   {
     condition.push_back(target.generate_containment_check(lhs_address));
   }
@@ -145,11 +163,16 @@ exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
 exprt assigns_clauset::generate_subset_check(
   const assigns_clauset &subassigns) const
 {
-  if(subassigns.targets.empty())
+  if(subassigns.global_write_set.empty())
     return true_exprt();
 
+  INVARIANT(
+    subassigns.local_write_set.empty(),
+    "Local write set for function calls should be empty at this point.\n" +
+      subassigns.location.as_string());
+
   exprt result = true_exprt();
-  for(const auto &subtarget : subassigns.targets)
+  for(const auto &subtarget : subassigns.global_write_set)
   {
     // TODO: Optimize the implication generated due to the validity check.
     // In some cases, e.g. when `subtarget` is known to be `NULL`,
@@ -158,7 +181,12 @@ exprt assigns_clauset::generate_subset_check(
       w_ok_exprt(subtarget.address, from_integer(0, unsigned_int_type()));
 
     exprt::operandst current_subtarget_found_conditions;
-    for(const auto &target : targets)
+    for(const auto &target : global_write_set)
+    {
+      current_subtarget_found_conditions.push_back(
+        target.generate_containment_check(subtarget.address));
+    }
+    for(const auto &target : local_write_set)
     {
       current_subtarget_found_conditions.push_back(
         target.generate_containment_check(subtarget.address));

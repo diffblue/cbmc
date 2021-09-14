@@ -34,38 +34,40 @@ public:
 
     bool operator==(const targett &other) const
     {
-      return expr == other.expr;
+      return address == other.address;
     }
 
     struct hasht
     {
       std::size_t operator()(const targett &target) const
       {
-        return irep_hash{}(target.expr);
+        return irep_hash{}(target.address);
       }
     };
 
     const address_of_exprt address;
-    const exprt &expr;
     const irep_idt &id;
     const assigns_clauset &parent;
   };
 
   assigns_clauset(const exprt &, const messaget &, const namespacet &);
 
-  void add_target(const exprt &);
-  void remove_target(const exprt &);
+  void add_to_global_write_set(const exprt &);
+  void remove_from_global_write_set(const exprt &);
+  void add_to_local_write_set(const exprt &);
+  void remove_from_local_write_set(const exprt &);
 
   goto_programt generate_havoc_code() const;
   exprt generate_containment_check(const exprt &) const;
   exprt generate_subset_check(const assigns_clauset &) const;
 
-  const exprt &expr;
+  const source_locationt &location;
   const messaget &log;
   const namespacet &ns;
 
 protected:
-  std::unordered_set<targett, targett::hasht> targets;
+  std::unordered_set<targett, targett::hasht> global_write_set;
+  std::unordered_set<targett, targett::hasht> local_write_set;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_ASSIGNS_H
