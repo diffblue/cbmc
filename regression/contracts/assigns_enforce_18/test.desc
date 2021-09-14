@@ -3,13 +3,16 @@ main.c
 --enforce-all-contracts _ --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
+^\[bar.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
 ^\[bar.\d+\] line \d+ Check that \*b is assignable: SUCCESS$
+^\[baz.\d+\] line \d+ Check that \*c is assignable: FAILURE$
+^\[baz.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that a is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that yp is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that z is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*xp is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that y is assignable: FAILURE$
-^.* 1 of \d+ failed \(\d+ iteration.*\)$
+^.* 2 of \d+ failed \(\d+ iteration.*\)$
 ^VERIFICATION FAILED$
 --
 ^\[foo.\d+\] line \d+ Check that a is assignable: FAILURE$

@@ -743,8 +743,19 @@ void code_contractst::instrument_call_statement(
   }
   else if(called_name == "free")
   {
-    assigns_clause.remove_from_local_write_set(dereference_exprt(
-      to_typecast_expr(instruction_iterator->call_arguments().front()).op()));
+    goto_programt alias_assertion;
+    const exprt &lhs_dereference = dereference_exprt(
+      to_typecast_expr(instruction_iterator->call_arguments().front()).op());
+    alias_assertion.add(goto_programt::make_assertion(
+      assigns_clause.generate_containment_check(lhs_dereference),
+      instruction_iterator->source_location));
+    alias_assertion.instructions.back().source_location.set_comment(
+      "Check that " + from_expr(ns, lhs_dereference.id(), lhs_dereference) +
+      " is assignable");
+    assigns_clause.remove_from_local_write_set(lhs_dereference);
+    assigns_clause.remove_from_global_write_set(lhs_dereference);
+    insert_before_swap_and_advance(
+      program, instruction_iterator, alias_assertion);
     return;
   }
 
