@@ -272,6 +272,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       for(auto &assignment : to_unary_expr(as_expr).op().operands())
         assigns.add_to_operands(std::move(assignment));
     }
+    assigns.add_source_location() = as_expr.source_location();
   }
   else if(type.id() == ID_C_spec_ensures)
   {
