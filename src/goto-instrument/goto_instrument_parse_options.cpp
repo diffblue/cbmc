@@ -1154,6 +1154,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
     cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
   {
+    do_indirect_call_and_rtti_removal();
     code_contractst cont(goto_model, log);
 
     if(cmdline.isset(FLAG_REPLACE_CALL))
