@@ -7,7 +7,7 @@ main.c
 \[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS
 \[bar.\d+\] line \d+ Check that z is assignable: SUCCESS
 \[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS
-\[foo.\d+\] line \d+ Check that callee's assigns clause is a subset of caller's: SUCCESS
+\[foo.\d+\] line \d+ Check that bar\'s assigns clause is a subset of foo\'s assigns clause: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion \!\(n \< 4\): SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --

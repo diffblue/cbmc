@@ -601,8 +601,31 @@ bool code_contractst::apply_function_contract(
   // in the assigns clause.
   if(assigns.is_not_nil())
   {
-    assigns_clauset assigns_cause(assigns, log, ns);
-    auto assigns_havoc = assigns_cause.generate_havoc_code();
+    assigns_clauset assigns_clause(assigns, log, ns);
+
+    // Retrieve assigns clause of the caller function if exists.
+    const irep_idt &caller_function = target->source_location.get_function();
+    auto caller_assigns =
+      to_code_with_contract_type(ns.lookup(caller_function).type).assigns();
+
+    if(caller_assigns.is_not_nil())
+    {
+      // check subset relationship of assigns clause for called function
+      assigns_clauset caller_assigns_clause(caller_assigns, log, ns);
+      goto_programt subset_check_assertion;
+      subset_check_assertion.add(goto_programt::make_assertion(
+        caller_assigns_clause.generate_subset_check(assigns_clause),
+        assigns_clause.location));
+      subset_check_assertion.instructions.back().source_location.set_comment(
+        "Check that " + id2string(function) +
+        "'s assigns clause is a subset of " + id2string(caller_function) +
+        "'s assigns clause");
+      insert_before_swap_and_advance(
+        goto_program, target, subset_check_assertion);
+    }
+
+    // Havoc all targets in global write set
+    auto assigns_havoc = assigns_clause.generate_havoc_code();
 
     // Insert the non-deterministic assignment immediately before the call site.
     insert_before_swap_and_advance(goto_program, target, assigns_havoc);
@@ -772,8 +795,8 @@ void code_contractst::instrument_call_statement(
     alias_assertion.instructions.back().source_location.set_comment(
       "Check that " + from_expr(ns, alias_expr.id(), alias_expr) +
       " is assignable");
-    program.insert_before_swap(instruction_iterator, alias_assertion);
-    ++instruction_iterator;
+    insert_before_swap_and_advance(
+      program, instruction_iterator, alias_assertion);
   }
 
   const symbolt &called_symbol = ns.lookup(called_name);
@@ -810,9 +833,12 @@ void code_contractst::instrument_call_statement(
     alias_assertion.add(goto_programt::make_assertion(
       subset_check, instruction_iterator->source_location));
     alias_assertion.instructions.back().source_location.set_comment(
-      "Check that callee's assigns clause is a subset of caller's");
-    program.insert_before_swap(instruction_iterator, alias_assertion);
-    ++instruction_iterator;
+      "Check that " + id2string(called_name) +
+      "'s assigns clause is a subset of " +
+      id2string(instruction_iterator->source_location.get_function()) +
+      "'s assigns clause");
+    insert_before_swap_and_advance(
+      program, instruction_iterator, alias_assertion);
   }
 }
 
