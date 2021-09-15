@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.2)
 
+# Compile with /usr/bin/clang on MacOS
+# See https://github.com/diffblue/cbmc/issues/4956
+#
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+    if(NOT DEFINED CMAKE_C_COMPILER)
+        message(STATUS "Setting CMAKE_C_COMPILER to /usr/bin/clang for MacOS")
+        set(CMAKE_C_COMPILER "/usr/bin/clang")
+    endif()
+endif()
+
 # If cmake generates files inside of the cbmc source directory this can lead to important files being overwritten, so we prevent that here
 if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
   message(FATAL_ERROR
@@ -230,7 +240,55 @@ cprover_default_properties(
     util
     xml)
 
+# Get the major version of the java installation used by maven.
+#
+# The java in your PATH may not be the java used by maven.
+# Installing java and maven with `brew install openjdk maven` will install
+#   /opt/homebrew/opt/openjdk/bin/java
+#   /opt/homebrew/bin/mvn
+# and the cask-only installation directory /opt/homebrew/opt/openjdk/bin
+# will not be in your PATH by default.  See `brew info java`.
+#
+function(MAVEN_JAVA_MAJOR_VERSION VERSION)
+    # Output of mvn --version includes a string like "Java version: 16.1.4"
+    # Return the major version number found in that string (like 16 in 16.1.4).
+    # Return UNKNOWN if the major version number can't be found.
+    execute_process(COMMAND mvn --version
+                    OUTPUT_VARIABLE STDOUT
+                    ERROR_VARIABLE STDERR
+                    RESULT_VARIABLE ERRNO
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_STRIP_TRAILING_WHITESPACE)
+    string(REGEX REPLACE "[ \t\r\n]+" " " OUTPUT "${STDOUT}")
+    string(REGEX REPLACE "[ \t\r\n]+" " " ERROR "${STDERR}")
+    if(ERRNO)
+        message(STATUS "Warning: Failed to run mvn --version: ${ERROR}")
+        set(OUTPUT "Java version: ") # ensure VERSION=="UNKNOWN" below
+    endif()
+
+    string(REGEX REPLACE ".*Java version: ([0-9]*).*" "\\1" FOUND ${OUTPUT})
+    if(FOUND STREQUAL OUTPUT)
+        message(STATUS
+                "Warning: Failed to find java version in mvn --version output: ${OUTPUT}")
+        set(FOUND "") # guarantee VERSION=="UNKNOWN" below
+    endif()
+
+    if(NOT FOUND)
+        set(FOUND "UNKNOWN")
+    endif()
+    set(${VERSION} ${FOUND} PARENT_SCOPE)
+endfunction()
+
+MAVEN_JAVA_MAJOR_VERSION(JAVA_VERSION)
+message(STATUS "Found Maven uses Java version ${JAVA_VERSION} by default")
+
 option(WITH_JBMC "Build the JBMC Java front-end" ON)
+if(JAVA_VERSION GREATER 16)
+  # JBMC won't build with OpenJDK version 17.
+  # See https://github.com/diffblue/cbmc/issues/6343
+  message(STATUS "Setting WITH_JBMC to OFF: Java version ${JAVA_VERSION} > 16")
+  set(WITH_JBMC OFF)
+endif()
 if(WITH_JBMC)
     add_subdirectory(jbmc)
 endif()
