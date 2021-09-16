@@ -56,6 +56,8 @@ exprt assigns_clauset::targett::generate_containment_check(
   // If assigns target was a dereference, comparing objects is enough
   if(id == ID_dereference)
   {
+    // __CPROVER_w_ok(target, sizeof(target)) &&
+    // __CPROVER_same_object(lhs, target)
     return conjunction(condition);
   }
 
@@ -81,6 +83,11 @@ exprt assigns_clauset::targett::generate_containment_check(
   // (sizeof(target) + __CPROVER_offset(target))
   condition.push_back(binary_relation_exprt(lhs_region, ID_le, own_region));
 
+  // __CPROVER_w_ok(target, sizeof(target)) &&
+  // __CPROVER_same_object(lhs, target) &&
+  // __CPROVER_offset(lhs) >= __CPROVER_offset(target) &&
+  // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
+  // (sizeof(target) + __CPROVER_offset(target))
   return conjunction(condition);
 }
 
