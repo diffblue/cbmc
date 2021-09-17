@@ -43,52 +43,62 @@ exprt assigns_clauset::targett::normalize(const exprt &expr)
 exprt assigns_clauset::targett::generate_containment_check(
   const address_of_exprt &lhs_address) const
 {
-  exprt::operandst condition;
+  exprt::operandst address_validity;
+  exprt::operandst containment_check;
 
   // __CPROVER_w_ok(target, sizeof(target))
-  condition.push_back(w_ok_exprt(
+  address_validity.push_back(w_ok_exprt(
     address,
     size_of_expr(dereference_exprt(address).type(), parent.ns).value()));
 
+  // __CPROVER_w_ok(lhs, sizeof(lhs))
+  address_validity.push_back(w_ok_exprt(
+    lhs_address,
+    size_of_expr(dereference_exprt(lhs_address).type(), parent.ns).value()));
+
   // __CPROVER_same_object(lhs, target)
-  condition.push_back(same_object(lhs_address, address));
+  containment_check.push_back(same_object(lhs_address, address));
 
   // If assigns target was a dereference, comparing objects is enough
-  if(id == ID_dereference)
+  // and the resulting condition will be
+  // __CPROVER_w_ok(target, sizeof(target))
+  // && __CPROVER_w_ok(lhs, sizeof(lhs))
+  // ==> __CPROVER_same_object(lhs, target)
+  if(id != ID_dereference)
   {
-    // __CPROVER_w_ok(target, sizeof(target)) &&
-    // __CPROVER_same_object(lhs, target)
-    return conjunction(condition);
+    const auto lhs_offset = pointer_offset(lhs_address);
+    const auto own_offset = pointer_offset(address);
+
+    // __CPROVER_offset(lhs) >= __CPROVER_offset(target)
+    containment_check.push_back(
+      binary_relation_exprt(lhs_offset, ID_ge, own_offset));
+
+    const auto lhs_region = plus_exprt(
+      typecast_exprt::conditional_cast(
+        size_of_expr(lhs_address.object().type(), parent.ns).value(),
+        lhs_offset.type()),
+      lhs_offset);
+
+    const exprt own_region = plus_exprt(
+      typecast_exprt::conditional_cast(
+        size_of_expr(address.object().type(), parent.ns).value(),
+        own_offset.type()),
+      own_offset);
+
+    // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
+    // (sizeof(target) + __CPROVER_offset(target))
+    containment_check.push_back(
+      binary_relation_exprt(lhs_region, ID_le, own_region));
   }
 
-  const auto lhs_offset = pointer_offset(lhs_address);
-  const auto own_offset = pointer_offset(address);
-
-  // __CPROVER_offset(lhs) >= __CPROVER_offset(target)
-  condition.push_back(binary_relation_exprt(lhs_offset, ID_ge, own_offset));
-
-  const auto lhs_region = plus_exprt(
-    typecast_exprt::conditional_cast(
-      size_of_expr(lhs_address.object().type(), parent.ns).value(),
-      lhs_offset.type()),
-    lhs_offset);
-
-  const exprt own_region = plus_exprt(
-    typecast_exprt::conditional_cast(
-      size_of_expr(address.object().type(), parent.ns).value(),
-      own_offset.type()),
-    own_offset);
-
-  // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
-  // (sizeof(target) + __CPROVER_offset(target))
-  condition.push_back(binary_relation_exprt(lhs_region, ID_le, own_region));
-
-  // __CPROVER_w_ok(target, sizeof(target)) &&
-  // __CPROVER_same_object(lhs, target) &&
-  // __CPROVER_offset(lhs) >= __CPROVER_offset(target) &&
-  // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
-  // (sizeof(target) + __CPROVER_offset(target))
-  return conjunction(condition);
+  // __CPROVER_w_ok(target, sizeof(target))
+  // && __CPROVER_w_ok(lhs, sizeof(lhs))
+  // ==> __CPROVER_same_object(lhs, target)
+  //     && __CPROVER_offset(lhs) >= __CPROVER_offset(target)
+  //     && (sizeof(lhs) + __CPROVER_offset(lhs)) <=
+  //        (sizeof(target) + __CPROVER_offset(target))
+  return binary_relation_exprt(
+    conjunction(address_validity), ID_implies, conjunction(containment_check));
 }
 
 assigns_clauset::assigns_clauset(
@@ -159,7 +169,6 @@ exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
   {
     condition.push_back(target.generate_containment_check(lhs_address));
   }
-
   for(const auto &target : global_write_set)
   {
     condition.push_back(target.generate_containment_check(lhs_address));
@@ -181,12 +190,6 @@ exprt assigns_clauset::generate_subset_check(
   exprt result = true_exprt();
   for(const auto &subtarget : subassigns.global_write_set)
   {
-    // TODO: Optimize the implication generated due to the validity check.
-    // In some cases, e.g. when `subtarget` is known to be `NULL`,
-    // the implication can be skipped entirely. See #6105 for more details.
-    auto validity_check =
-      w_ok_exprt(subtarget.address, from_integer(0, unsigned_int_type()));
-
     exprt::operandst current_subtarget_found_conditions;
     for(const auto &target : global_write_set)
     {
@@ -198,12 +201,7 @@ exprt assigns_clauset::generate_subset_check(
       current_subtarget_found_conditions.push_back(
         target.generate_containment_check(subtarget.address));
     }
-
-    auto current_subtarget_found = or_exprt(
-      not_exprt(validity_check),
-      disjunction(current_subtarget_found_conditions));
-
-    result = and_exprt(result, current_subtarget_found);
+    result = and_exprt(result, disjunction(current_subtarget_found_conditions));
   }
 
   return result;
