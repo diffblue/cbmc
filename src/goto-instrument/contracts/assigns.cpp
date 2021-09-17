@@ -15,8 +15,11 @@ Date: July 2021
 
 #include <goto-instrument/havoc_utils.h>
 
+#include <langapi/language_util.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
 assigns_clauset::targett::targett(

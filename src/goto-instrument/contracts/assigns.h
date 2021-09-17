@@ -14,9 +14,12 @@ Date: July 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_ASSIGNS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_ASSIGNS_H
 
-#include "contracts.h"
+#include <unordered_set>
 
-#include <util/pointer_offset_size.h>
+#include <goto-programs/goto_model.h>
+
+#include <util/message.h>
+#include <util/pointer_expr.h>
 
 /// \brief A class for representing assigns clauses in code contracts
 class assigns_clauset

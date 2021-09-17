@@ -24,6 +24,8 @@ Date: February 2016
 
 #include <goto-programs/remove_skip.h>
 
+#include <langapi/language_util.h>
+
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
@@ -35,62 +37,7 @@ Date: February 2016
 
 #include "assigns.h"
 #include "memory_predicates.h"
-
-// Create a lexicographic less-than relation between two tuples of variables.
-// This is used in the implementation of multidimensional decreases clauses.
-static exprt create_lexicographic_less_than(
-  const std::vector<symbol_exprt> &lhs,
-  const std::vector<symbol_exprt> &rhs)
-{
-  PRECONDITION(lhs.size() == rhs.size());
-
-  if(lhs.empty())
-  {
-    return false_exprt();
-  }
-
-  // Store conjunctions of equalities.
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 == l1, s1 == l1 && s2 == l2,
-  // s1 == l1 && s2 == l2 && s3 == l3>.
-  // In fact, the last element is unnecessary, so we do not create it.
-  exprt::operandst equality_conjunctions(lhs.size());
-  equality_conjunctions[0] = binary_relation_exprt(lhs[0], ID_equal, rhs[0]);
-  for(size_t i = 1; i < equality_conjunctions.size() - 1; i++)
-  {
-    binary_relation_exprt component_i_equality{lhs[i], ID_equal, rhs[i]};
-    equality_conjunctions[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_equality);
-  }
-
-  // Store inequalities between the i-th components of the input vectors
-  // (i.e. lhs and rhs).
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 < l1, s1 == l1 && s2 < l2, s1 == l1 &&
-  // s2 == l2 && s3 < l3>.
-  exprt::operandst lexicographic_individual_comparisons(lhs.size());
-  lexicographic_individual_comparisons[0] =
-    binary_relation_exprt(lhs[0], ID_lt, rhs[0]);
-  for(size_t i = 1; i < lexicographic_individual_comparisons.size(); i++)
-  {
-    binary_relation_exprt component_i_less_than{lhs[i], ID_lt, rhs[i]};
-    lexicographic_individual_comparisons[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_less_than);
-  }
-  return disjunction(lexicographic_individual_comparisons);
-}
-
-static void insert_before_swap_and_advance(
-  goto_programt &program,
-  goto_programt::targett &target,
-  goto_programt &payload)
-{
-  const auto offset = payload.instructions.size();
-  program.insert_before_swap(target, payload);
-  std::advance(target, offset);
-}
+#include "utils.h"
 
 void code_contractst::check_apply_loop_contracts(
   goto_functionst::goto_functiont &goto_function,
@@ -289,7 +236,8 @@ void code_contractst::check_apply_loop_contracts(
     // after the loop is smaller than the value before the loop.
     // Here, we use the lexicographic order.
     code_assertt monotonic_decreasing_assertion{
-      create_lexicographic_less_than(new_decreases_vars, old_decreases_vars)};
+      generate_lexicographic_less_than_check(
+        new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
       loop_head->source_location;
     converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
