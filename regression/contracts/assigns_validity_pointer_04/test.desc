@@ -3,8 +3,10 @@ main.c
 --enforce-contract foo --replace-call-with-contract bar --replace-call-with-contract baz _ --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
+^\[\d+\] file main.c line \d+ Check that bar\'s assigns clause is a subset of foo\'s assigns clause: FAILURE$
+^\[\d+\] file main.c line \d+ Check that baz\'s assigns clause is a subset of foo\'s assigns clause: FAILURE$
 ^\[foo.\d+\] line \d+ Check that z is assignable: FAILURE$
-^.* 1 of \d+ failed \(\d+ iteration.*\)$
+^.* 3 of \d+ failed \(\d+ iteration.*\)$
 ^VERIFICATION FAILED$
 // bar
 ASSERT \*foo::x > 0

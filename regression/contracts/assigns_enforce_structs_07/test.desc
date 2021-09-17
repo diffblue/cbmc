@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --enforce-all-contracts _ --pointer-check
 ^EXIT=10$
@@ -12,3 +12,6 @@ main.c
 --
 Checks whether CBMC properly evaluates write set of members
 from invalid objects. In this case, they are not writable.
+
+Bug: We need to check the validity of each dereference
+when accessing struct members.
