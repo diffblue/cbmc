@@ -207,7 +207,7 @@ jobs:
           $servers = @('http://ts.ssl.com', 'http://timestamp.digicert.com', 'http://timestamp.sectigo.com')
           foreach($ts_server in $servers)
           {
-            & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr $ts_server ${{ steps.create_packages.outputs.msi_installer }}
+            & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr $ts_server ${{ steps.create_packages.outputs.msi_installer } /td SHA256 /fd SHA256}
             if ($LastExitCode -eq "0")
             {
               # Stop if code-signing the binary using this server was successful.
