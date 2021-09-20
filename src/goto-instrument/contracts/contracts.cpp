@@ -715,14 +715,7 @@ void code_contractst::instrument_assign_statement(
       assigns_clause.add_to_local_write_set(lhs);
   }
 
-  goto_programt alias_assertion;
-  alias_assertion.add(goto_programt::make_assertion(
-    assigns_clause.generate_containment_check(lhs),
-    instruction_iterator->source_location));
-  alias_assertion.instructions.back().source_location.set_comment(
-    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-  insert_before_swap_and_advance(
-    program, instruction_iterator, alias_assertion);
+  add_containment_check(program, assigns_clause, instruction_iterator, lhs);
 }
 
 void code_contractst::instrument_call_statement(
@@ -748,8 +741,7 @@ void code_contractst::instrument_call_statement(
     called_name =
       to_symbol_expr(instruction_iterator->call_function()).get_identifier();
   }
-  log.warning() << "called function: " << id2string(called_name)
-                << messaget::eom;
+
   if(called_name == "malloc")
   {
     // malloc statments return a void pointer, which is then cast and assigned
@@ -767,19 +759,12 @@ void code_contractst::instrument_call_statement(
   }
   else if(called_name == "free")
   {
-    goto_programt alias_assertion;
     const exprt &lhs_dereference = dereference_exprt(
       to_typecast_expr(instruction_iterator->call_arguments().front()).op());
-    alias_assertion.add(goto_programt::make_assertion(
-      assigns_clause.generate_containment_check(lhs_dereference),
-      instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that " + from_expr(ns, lhs_dereference.id(), lhs_dereference) +
-      " is assignable");
+    add_containment_check(
+      program, assigns_clause, instruction_iterator, lhs_dereference);
     assigns_clause.remove_from_local_write_set(lhs_dereference);
     assigns_clause.remove_from_global_write_set(lhs_dereference);
-    insert_before_swap_and_advance(
-      program, instruction_iterator, alias_assertion);
     return;
   }
 
@@ -787,17 +772,11 @@ void code_contractst::instrument_call_statement(
     instruction_iterator->call_lhs().is_not_nil() &&
     instruction_iterator->call_lhs().id() == ID_symbol)
   {
-    const auto alias_expr = assigns_clause.generate_containment_check(
+    add_containment_check(
+      program,
+      assigns_clause,
+      instruction_iterator,
       instruction_iterator->call_lhs());
-
-    goto_programt alias_assertion;
-    alias_assertion.add(goto_programt::make_assertion(
-      alias_expr, instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that " + from_expr(ns, alias_expr.id(), alias_expr) +
-      " is assignable");
-    insert_before_swap_and_advance(
-      program, instruction_iterator, alias_assertion);
   }
 
   const symbolt &called_symbol = ns.lookup(called_name);
@@ -977,20 +956,27 @@ void code_contractst::check_frame_conditions(
       instruction_it->is_other() &&
       instruction_it->get_other().get_statement() == ID_havoc_object)
     {
-      goto_programt alias_assertion;
       const exprt &havoc_argument = dereference_exprt(
         to_typecast_expr(instruction_it->get_other().operands().front()).op());
-      alias_assertion.add(goto_programt::make_assertion(
-        assigns.generate_containment_check(havoc_argument),
-        instruction_it->source_location));
-      alias_assertion.instructions.back().source_location.set_comment(
-        "Check that " + from_expr(ns, havoc_argument.id(), havoc_argument) +
-        " is assignable");
+      add_containment_check(program, assigns, instruction_it, havoc_argument);
       assigns.remove_from_local_write_set(havoc_argument);
       assigns.remove_from_global_write_set(havoc_argument);
-      insert_before_swap_and_advance(program, instruction_it, alias_assertion);
     }
   }
+}
+
+void code_contractst::add_containment_check(
+  goto_programt &program,
+  const assigns_clauset &assigns,
+  goto_programt::instructionst::iterator &instruction_it,
+  const exprt &expr)
+{
+  goto_programt assertion;
+  assertion.add(goto_programt::make_assertion(
+    assigns.generate_containment_check(expr), instruction_it->source_location));
+  assertion.instructions.back().source_location.set_comment(
+    "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
+  insert_before_swap_and_advance(program, instruction_it, assertion);
 }
 
 bool code_contractst::enforce_contract(const irep_idt &function)
