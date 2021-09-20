@@ -152,6 +152,14 @@ protected:
   /// assigned memory is within the assignable memory frame.
   void check_frame_conditions(goto_programt &, assigns_clauset &);
 
+  /// Inserts an assertion into the goto program to ensure that
+  /// an expression is within the assignable memory frame.
+  void add_containment_check(
+    goto_programt &,
+    const assigns_clauset &,
+    goto_programt::instructionst::iterator &,
+    const exprt &);
+
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.
   bool check_for_looped_mallocs(const goto_programt &program);
