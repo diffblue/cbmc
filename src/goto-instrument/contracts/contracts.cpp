@@ -748,7 +748,8 @@ void code_contractst::instrument_call_statement(
     called_name =
       to_symbol_expr(instruction_iterator->call_function()).get_identifier();
   }
-
+  log.warning() << "called function: " << id2string(called_name)
+                << messaget::eom;
   if(called_name == "malloc")
   {
     // malloc statments return a void pointer, which is then cast and assigned
@@ -971,6 +972,23 @@ void code_contractst::check_frame_conditions(
     else if(instruction_it->is_dead())
     {
       assigns.remove_from_local_write_set(instruction_it->get_dead().symbol());
+    }
+    else if(
+      instruction_it->is_other() &&
+      instruction_it->get_other().get_statement() == ID_havoc_object)
+    {
+      goto_programt alias_assertion;
+      const exprt &havoc_argument = dereference_exprt(
+        to_typecast_expr(instruction_it->get_other().operands().front()).op());
+      alias_assertion.add(goto_programt::make_assertion(
+        assigns.generate_containment_check(havoc_argument),
+        instruction_it->source_location));
+      alias_assertion.instructions.back().source_location.set_comment(
+        "Check that " + from_expr(ns, havoc_argument.id(), havoc_argument) +
+        " is assignable");
+      assigns.remove_from_local_write_set(havoc_argument);
+      assigns.remove_from_global_write_set(havoc_argument);
+      insert_before_swap_and_advance(program, instruction_it, alias_assertion);
     }
   }
 }
