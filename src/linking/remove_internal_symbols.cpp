@@ -189,8 +189,12 @@ void remove_internal_symbols(
     {
       // 'extern' symbols are only exported if there
       // is an initializer.
-      if((has_initializer || !symbol.is_extern) &&
-         !is_file_local)
+      if(
+        (has_initializer || !symbol.is_extern) &&
+        (!is_file_local ||
+         (symbol.is_static_lifetime && !keep_file_local.empty() &&
+          std::regex_match(
+            id2string(symbol.name), std::regex(keep_file_local)))))
       {
         get_symbols(ns, symbol, exported);
       }

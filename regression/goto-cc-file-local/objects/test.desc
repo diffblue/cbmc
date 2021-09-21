@@ -1,0 +1,11 @@
+CORE
+main.c
+show-symbol-table
+^Symbol\.\.\.\.\.\.: __CPROVER_file_local_main_c_foo$
+^Symbol\.\.\.\.\.\.: __CPROVER_file_local_main_c_bar$
+^Symbol\.\.\.\.\.\.: baz$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Symbol\.\.\.\.\.\.: __CPROVER_file_local_main_c_baz::x$

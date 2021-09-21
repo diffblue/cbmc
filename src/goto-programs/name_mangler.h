@@ -27,7 +27,7 @@
 /// mangled name of its \ref symbolt argument, incorporating the second
 /// argument into the mangled name if possible.
 template <class MangleFun>
-class function_name_manglert
+class file_local_name_manglert
 {
 public:
   /// \param mh: handler to construct a log from
@@ -35,7 +35,7 @@ public:
   /// \param extra_info: a string to be included in each mangled name
   /// \param needs_mangling: a regular expression describing names that need to
   ///   be mangled.
-  function_name_manglert(
+  file_local_name_manglert(
     message_handlert &mh,
     goto_modelt &gm,
     const std::string &extra_info,
@@ -48,7 +48,7 @@ public:
   {
   }
 
-  /// \brief Mangle all file-local function symbols in the program
+  /// \brief Mangle all file-local non-type global-scoped symbols in the program
   ///
   /// The way in which the symbols will be mangled is decided by which mangler
   /// type this object is instantiated with, e.g. DJB_manglert mangles the path
@@ -66,11 +66,14 @@ public:
     {
       const symbolt &sym = sym_it->second;
 
-      if(sym.type.id() != ID_code) // is not a function
-        continue;
-      if(sym.value.is_nil()) // has no body
-        continue;
       if(!sym.is_file_local)
+        continue;
+      if(sym.is_type)
+        continue;
+      // no name mangling for functions without body
+      if(sym.type.id() == ID_code && sym.value.is_nil())
+        continue;
+      if(sym.type.id() != ID_code && !sym.is_static_lifetime)
         continue;
       if(!std::regex_match(id2string(sym.name), needs_mangling))
         continue;
@@ -85,7 +88,8 @@ public:
       old_syms.push_back(sym_it);
 
       rename.insert(sym.symbol_expr(), new_sym.symbol_expr());
-      renamed_funs.insert(std::make_pair(sym.name, mangled));
+      if(sym.type.id() == ID_code)
+        renamed_funs.insert(std::make_pair(sym.name, mangled));
 
       log.debug() << "Mangling: " << sym.name << " -> " << mangled << log.eom;
     }

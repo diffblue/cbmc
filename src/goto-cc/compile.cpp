@@ -356,7 +356,7 @@ bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
 
   if(!keep_file_local.empty())
   {
-    function_name_manglert<file_name_manglert> mangler(
+    file_local_name_manglert<file_name_manglert> mangler(
       log.get_message_handler(),
       goto_model,
       file_local_mangle_suffix,
@@ -430,7 +430,7 @@ optionalt<symbol_tablet> compilet::compile()
 
       if(!keep_file_local.empty())
       {
-        function_name_manglert<file_name_manglert> mangler(
+        file_local_name_manglert<file_name_manglert> mangler(
           log.get_message_handler(),
           file_goto_model,
           file_local_mangle_suffix,
