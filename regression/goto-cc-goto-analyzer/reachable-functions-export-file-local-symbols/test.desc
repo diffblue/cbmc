@@ -1,0 +1,13 @@
+CORE
+test.c
+--reachable-functions
+^.* foo 1 4$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.* [a-zA-Z0-9_]+foo \d+ \d+$
+--
+This test checks that after building the goto binary (see test.sh) with
+--export-file-local-symbols function "foo" is still reported as reachable. Note,
+that the symbol representing "foo" has a mangled name in the goto binary, which
+makes the symbol name different from its base name.
