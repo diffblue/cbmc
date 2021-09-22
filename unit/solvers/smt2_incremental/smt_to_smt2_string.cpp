@@ -33,6 +33,18 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "Test smt_identifier_termt to string conversion",
+  "[core][smt2_incremental]")
+{
+  CHECK(
+    smt_to_smt2_string(smt_identifier_termt{"abc", smt_bool_sortt{}}) ==
+    "|abc|");
+  CHECK(
+    smt_to_smt2_string(smt_identifier_termt{"\\", smt_bool_sortt{}}) ==
+    "|&92;|");
+}
+
+TEST_CASE(
   "Test smt_function_application_termt to string conversion",
   "[core][smt2_incremental]")
 {

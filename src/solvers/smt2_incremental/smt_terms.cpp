@@ -50,7 +50,7 @@ bool smt_bool_literal_termt::value() const
 
 static bool is_valid_smt_identifier(irep_idt identifier)
 {
-  static const std::regex valid{R"(^[^\|\\]*$)"};
+  static const std::regex valid{R"(^[^\|]*$)"};
   return std::regex_match(id2string(identifier), valid);
 }
 
@@ -59,7 +59,7 @@ smt_identifier_termt::smt_identifier_termt(irep_idt identifier, smt_sortt sort)
 {
   INVARIANT(
     is_valid_smt_identifier(identifier),
-    R"(Identifiers may not contain | or \ characters.)");
+    R"(Identifiers may not contain | characters.)");
   set(ID_identifier, identifier);
 }
 
