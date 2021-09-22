@@ -6,9 +6,14 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 
+#include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/stack_decision_procedure.h>
 #include <util/message.h>
 #include <util/piped_process.h>
+#include <util/std_expr.h>
+
+#include <unordered_map>
+#include <unordered_set>
 
 class smt_commandt;
 class message_handlert;
@@ -48,6 +53,10 @@ protected:
   /// \brief Converts given SMT2 command to SMT2 string and sends it to the
   ///    solver process.
   void send_to_solver(const smt_commandt &command);
+  /// \brief Defines any functions which \p expr depends on, which have not yet
+  ///   been defined, along with their dependencies in turn.
+  void define_dependent_functions(const exprt &expr);
+  void ensure_handle_for_expr_defined(const exprt &expr);
 
   const namespacet &ns;
 
@@ -57,6 +66,22 @@ protected:
 
   piped_processt solver_process;
   messaget log;
+
+  class sequencet
+  {
+    size_t next_id = 0;
+
+  public:
+    size_t operator()()
+    {
+      return next_id++;
+    }
+  } handle_sequence;
+
+  std::unordered_map<exprt, smt_identifier_termt, irep_hash>
+    expression_handle_identifiers;
+  std::unordered_map<exprt, smt_identifier_termt, irep_hash>
+    expression_identifiers;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H

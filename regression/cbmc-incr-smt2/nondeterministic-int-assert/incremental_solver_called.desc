@@ -4,6 +4,12 @@ test.c
 Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
 Sending command to SMT2 solver - \(set-option :produce-models true\)
 Sending command to SMT2 solver - \(set-logic QF_UFBV\)
+Sending command to SMT2 solver - \(define-fun |B0| \(\) Bool true\)
+Sending command to SMT2 solver - \(declare-fun |main::1::x!0@1#1| \(\) \(_ BitVec 32\)\)
+Sending command to SMT2 solver - \(define-fun |B1| \(\) Bool \(|=| |main::1::x!0@1#1| |main::1::x!0@1#1|\)\)
+Sending command to SMT2 solver - \(assert \(|not| \(|not| \(|=| |main::1::x!0@1#1| \(_ bv0 32\)\)\)\)\)
+Sending command to SMT2 solver - \(define-fun |B2| \(\) Bool \(|not| false\)\)
+Sending command to SMT2 solver - \(assert |B2|\)
 ^EXIT=(0|127|134|137)$
 ^SIGNAL=0$
 identifier: main::1::x
