@@ -8,10 +8,12 @@
 #include <util/string_utils.h>
 
 smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
-  std::string _solver_command)
-  : solver_command{std::move(_solver_command)},
+  std::string _solver_command,
+  message_handlert &message_handler)
+  : solver_command(std::move(_solver_command)),
     number_of_solver_calls{0},
-    solver_process{split_string(solver_command, ' ', false, true)}
+    solver_process{split_string(solver_command, ' ', false, true)},
+    log{message_handler}
 {
   send_to_solver(smt_set_option_commandt{smt_option_produce_modelst{true}});
   send_to_solver(smt_set_logic_commandt{
@@ -83,5 +85,8 @@ decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 void smt2_incremental_decision_proceduret::send_to_solver(
   const smt_commandt &command)
 {
-  solver_process.send(smt_to_smt2_string(command) + "\n");
+  const std::string command_string = smt_to_smt2_string(command);
+  log.debug() << "Sending command to SMT2 solver - " << command_string
+              << messaget::eom;
+  solver_process.send(command_string + "\n");
 }

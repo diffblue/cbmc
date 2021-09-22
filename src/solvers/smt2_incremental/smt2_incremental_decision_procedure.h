@@ -7,17 +7,23 @@
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 
 #include <solvers/stack_decision_procedure.h>
+#include <util/message.h>
 #include <util/piped_process.h>
 
 class smt_commandt;
+class message_handlert;
 
 class smt2_incremental_decision_proceduret final
   : public stack_decision_proceduret
 {
 public:
-  /// \param solver_command: The command and arguments for invoking the smt2
-  ///                        solver.
-  explicit smt2_incremental_decision_proceduret(std::string solver_command);
+  /// \param solver_command:
+  ///   The command and arguments for invoking the smt2 solver.
+  /// \param message_handler:
+  ///   The messaging system to be used for logging purposes.
+  explicit smt2_incremental_decision_proceduret(
+    std::string solver_command,
+    message_handlert &message_handler);
 
   // Implementation of public decision_proceduret member functions.
   exprt handle(const exprt &expr) override;
@@ -44,6 +50,7 @@ protected:
   size_t number_of_solver_calls;
 
   piped_processt solver_process;
+  messaget log;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
