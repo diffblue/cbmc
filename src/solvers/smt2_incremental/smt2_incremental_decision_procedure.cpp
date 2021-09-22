@@ -2,11 +2,15 @@
 
 #include "smt2_incremental_decision_procedure.h"
 
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <util/expr.h>
+#include <util/string_utils.h>
 
 smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
-  std::string solver_command)
-  : solver_command{std::move(solver_command)}, number_of_solver_calls{0}
+  std::string _solver_command)
+  : solver_command{std::move(_solver_command)},
+    number_of_solver_calls{0},
+    solver_process{split_string(solver_command, ' ', false, true)}
 {
 }
 
@@ -70,4 +74,10 @@ decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
   UNIMPLEMENTED_FEATURE("solving.");
+}
+
+void smt2_incremental_decision_proceduret::send_to_solver(
+  const smt_commandt &command)
+{
+  solver_process.send(smt_to_smt2_string(command) + "\n");
 }
