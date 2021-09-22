@@ -5,12 +5,15 @@
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <util/expr.h>
+#include <util/namespace.h>
 #include <util/string_utils.h>
 
 smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
+  const namespacet &_ns,
   std::string _solver_command,
   message_handlert &message_handler)
-  : solver_command(std::move(_solver_command)),
+  : ns{_ns},
+    solver_command(std::move(_solver_command)),
     number_of_solver_calls{0},
     solver_process{split_string(solver_command, ' ', false, true)},
     log{message_handler}

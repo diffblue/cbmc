@@ -12,16 +12,20 @@
 
 class smt_commandt;
 class message_handlert;
+class namespacet;
 
 class smt2_incremental_decision_proceduret final
   : public stack_decision_proceduret
 {
 public:
+  /// \param _ns: Namespace for looking up the expressions which symbol_exprts
+  ///   relate to.
   /// \param solver_command:
   ///   The command and arguments for invoking the smt2 solver.
   /// \param message_handler:
   ///   The messaging system to be used for logging purposes.
   explicit smt2_incremental_decision_proceduret(
+    const namespacet &_ns,
     std::string solver_command,
     message_handlert &message_handler);
 
@@ -44,6 +48,8 @@ protected:
   /// \brief Converts given SMT2 command to SMT2 string and sends it to the
   ///    solver process.
   void send_to_solver(const smt_commandt &command);
+
+  const namespacet &ns;
 
   /// This is where we store the solver command for reporting the solver used.
   std::string solver_command;

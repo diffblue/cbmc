@@ -333,7 +333,7 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
 
   return util_make_unique<solvert>(
     util_make_unique<smt2_incremental_decision_proceduret>(
-      std::move(solver_command), message_handler));
+      ns, std::move(solver_command), message_handler));
 }
 
 std::unique_ptr<solver_factoryt::solvert>
