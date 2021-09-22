@@ -1,7 +1,9 @@
 CORE
 test.c
---incremental-smt2-solver "z3 --smt2 -in"
+--incremental-smt2-solver "z3 --smt2 -in" --verbosity 10
 Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+Sending command to SMT2 solver - \(set-option :produce-models true\)
+Sending command to SMT2 solver - \(set-logic QF_UFBV\)
 ^EXIT=(0|127|134|137)$
 ^SIGNAL=0$
 identifier: main::1::x
