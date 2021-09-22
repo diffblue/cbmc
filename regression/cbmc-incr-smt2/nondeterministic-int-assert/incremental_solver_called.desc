@@ -1,7 +1,7 @@
 CORE
 test.c
---incremental-smt2-solver z3
-Passing problem to incremental SMT2 solving via "z3"
+--incremental-smt2-solver "z3 --smt2 -in"
+Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
 ^EXIT=(0|127|134|137)$
 ^SIGNAL=0$
 identifier: main::1::x
