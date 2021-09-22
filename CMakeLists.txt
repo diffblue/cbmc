@@ -240,7 +240,7 @@ cprover_default_properties(
     util
     xml)
 
-# Get the major version of the java installation used by maven.
+# Get the version of the java installation used by maven.
 #
 # The java in your PATH may not be the java used by maven.
 # Installing java and maven with `brew install openjdk maven` will install
@@ -249,9 +249,9 @@ cprover_default_properties(
 # and the cask-only installation directory /opt/homebrew/opt/openjdk/bin
 # will not be in your PATH by default.  See `brew info java`.
 #
-function(MAVEN_JAVA_MAJOR_VERSION VERSION)
+function(MAVEN_JAVA_VERSION VERSION)
     # Output of mvn --version includes a string like "Java version: 16.1.4"
-    # Return the major version number found in that string (like 16 in 16.1.4).
+    # Return the version number found in that string (like 16.1.4).
     # Return UNKNOWN if the major version number can't be found.
     execute_process(COMMAND mvn --version
                     OUTPUT_VARIABLE STDOUT
@@ -266,10 +266,11 @@ function(MAVEN_JAVA_MAJOR_VERSION VERSION)
         set(OUTPUT "Java version: ") # ensure VERSION=="UNKNOWN" below
     endif()
 
-    string(REGEX REPLACE ".*Java version: ([0-9]*).*" "\\1" FOUND ${OUTPUT})
+    string(REGEX REPLACE ".*Java version: ([0-9.]*).*" "\\1" FOUND ${OUTPUT})
     if(FOUND STREQUAL OUTPUT)
         message(STATUS
-                "Warning: Failed to find java version in mvn --version output: ${OUTPUT}")
+                "Warning: Failed to find java version in mvn --version output: "
+                "${OUTPUT}")
         set(FOUND "") # guarantee VERSION=="UNKNOWN" below
     endif()
 
@@ -279,15 +280,18 @@ function(MAVEN_JAVA_MAJOR_VERSION VERSION)
     set(${VERSION} ${FOUND} PARENT_SCOPE)
 endfunction()
 
-MAVEN_JAVA_MAJOR_VERSION(JAVA_VERSION)
+MAVEN_JAVA_VERSION(JAVA_VERSION)
 message(STATUS "Found Maven uses Java version ${JAVA_VERSION} by default")
 
 option(WITH_JBMC "Build the JBMC Java front-end" ON)
-if(JAVA_VERSION GREATER 16)
+if(NOT JAVA_VERSION VERSION_LESS 17)
   # JBMC won't build with OpenJDK version 17.
   # See https://github.com/diffblue/cbmc/issues/6343
-  message(STATUS "Setting WITH_JBMC to OFF: Java version ${JAVA_VERSION} > 16")
+  message(STATUS "Setting WITH_JBMC to OFF: Java version ${JAVA_VERSION} >= 17")
   set(WITH_JBMC OFF)
+endif()
+if(JAVA_VERSION STREQUAL "UNKNOWN")
+  message(STATUS "Use cmake option -DWITH_JBMC=OFF if jbmc fails to build.")
 endif()
 if(WITH_JBMC)
     add_subdirectory(jbmc)
