@@ -10,16 +10,17 @@ Sending command to SMT2 solver - \(define-fun |B1| \(\) Bool \(|=| |main::1::x!0
 Sending command to SMT2 solver - \(assert \(|not| \(|not| \(|=| |main::1::x!0@1#1| \(_ bv0 32\)\)\)\)\)
 Sending command to SMT2 solver - \(define-fun |B2| \(\) Bool \(|not| false\)\)
 Sending command to SMT2 solver - \(assert |B2|\)
+Sending command to SMT2 solver - \(check-sat\)
+Solver response - sat
 ^EXIT=(0|127|134|137)$
 ^SIGNAL=0$
-identifier: main::1::x
 --
 type: pointer
 --
 Test that running cbmc with the `--incremental-smt2-solver` argument causes the
 incremental smt2 solving to be used. Note that at the time of adding this test,
-an invariant violation is expected due to the unimplemented solving.
-Regexes matching the printing in the expected failed invariant are included in
-order to test that `--slice-formula` is causing the first unimplemented
-expression passed to `smt2_incremental_decision_proceduret` to relate to the
-variable `x` in function `main` and not to `cprover_initialise`.
+an invariant violation is expected due to the unimplemented response parsing.
+
+The sliced formula is expected to use only the implemented subset of exprts.
+This is implementation is sufficient to send this example to the solver and
+receive a "sat" response.

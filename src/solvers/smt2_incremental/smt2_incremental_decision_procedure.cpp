@@ -196,7 +196,10 @@ void smt2_incremental_decision_proceduret::pop()
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  UNIMPLEMENTED_FEATURE("solving.");
+  send_to_solver(smt_check_sat_commandt{});
+  const auto result = solver_process.wait_receive();
+  log.debug() << "Solver response - " << result << messaget::eom;
+  UNIMPLEMENTED_FEATURE("parsing of solver response.");
 }
 
 void smt2_incremental_decision_proceduret::send_to_solver(
