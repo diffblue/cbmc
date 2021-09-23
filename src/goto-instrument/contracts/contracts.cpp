@@ -473,18 +473,21 @@ code_contractst::create_ensures_instruction(
 }
 
 bool code_contractst::apply_function_contract(
-  goto_programt &goto_program,
-  goto_programt::targett target)
+  const irep_idt &function,
+  goto_programt &function_body,
+  goto_programt::targett &target)
 {
+  const auto &const_target =
+    static_cast<const goto_programt::targett &>(target);
   // Return if the function is not named in the call; currently we don't handle
   // function pointers.
-  PRECONDITION(as_const(*target).call_function().id() == ID_symbol);
+  PRECONDITION(const_target->call_function().id() == ID_symbol);
 
   // Retrieve the function type, which is needed to extract the contract
   // components.
-  const irep_idt &function =
-    to_symbol_expr(as_const(*target).call_function()).get_identifier();
-  const symbolt &function_symbol = ns.lookup(function);
+  const irep_idt &target_function =
+    to_symbol_expr(const_target->call_function()).get_identifier();
+  const symbolt &function_symbol = ns.lookup(target_function);
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
   // Isolate each component of the contract.
@@ -499,15 +502,15 @@ bool code_contractst::apply_function_contract(
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
-    if(as_const(*target).call_lhs().is_not_nil())
+    if(target->call_lhs().is_not_nil())
     {
       // If so, have it replaced appropriately.
       // For example, if foo() ensures that its return value is > 5, then
       // rewrite calls to foo as follows:
       // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
       symbol_exprt ret_val(
-        CPROVER_PREFIX "return_value", as_const(*target).call_lhs().type());
-      common_replace.insert(ret_val, as_const(*target).call_lhs());
+        CPROVER_PREFIX "return_value", const_target->call_lhs().type());
+      common_replace.insert(ret_val, const_target->call_lhs());
     }
     else
     {
@@ -521,10 +524,10 @@ bool code_contractst::apply_function_contract(
         // fresh variable to replace __CPROVER_return_value with.
         const symbolt &fresh = get_fresh_aux_symbol(
           type.return_type(),
-          id2string(function),
+          id2string(target_function),
           "ignored_return_value",
-          target->source_location,
-          symbol_table.lookup_ref(function).mode,
+          const_target->source_location,
+          symbol_table.lookup_ref(target_function).mode,
           ns,
           symbol_table);
         symbol_exprt ret_val(CPROVER_PREFIX "return_value", type.return_type());
@@ -534,7 +537,7 @@ bool code_contractst::apply_function_contract(
   }
 
   // Replace formal parameters
-  const auto &arguments = target->call_arguments();
+  const auto &arguments = const_target->call_arguments();
   auto a_it = arguments.begin();
   for(auto p_it = type.parameters().begin();
       p_it != type.parameters().end() && a_it != arguments.end();
@@ -551,9 +554,9 @@ bool code_contractst::apply_function_contract(
   // and only refer to the common symbols to be replaced.
   common_replace(assigns);
 
-  const auto &mode = symbol_table.lookup_ref(function).mode;
+  const auto &mode = symbol_table.lookup_ref(target_function).mode;
 
-  is_fresh_replacet is_fresh(*this, log, function);
+  is_fresh_replacet is_fresh(*this, log, target_function);
   is_fresh.create_declarations();
 
   // Insert assertion of the precondition immediately before the call site.
@@ -567,14 +570,14 @@ bool code_contractst::apply_function_contract(
     converter.goto_convert(
       code_assertt(requires),
       assertion,
-      symbol_table.lookup_ref(function).mode);
+      symbol_table.lookup_ref(target_function).mode);
     assertion.instructions.back().source_location = requires.source_location();
     assertion.instructions.back().source_location.set_comment(
       "Check requires clause");
     assertion.instructions.back().source_location.set_property_class(
       ID_precondition);
     is_fresh.update_requires(assertion);
-    insert_before_swap_and_advance(goto_program, target, assertion);
+    insert_before_swap_and_advance(function_body, target, assertion);
   }
 
   // Gather all the instructions required to handle history variables
@@ -590,11 +593,11 @@ bool code_contractst::apply_function_contract(
     ensures_pair = create_ensures_instruction(
       assumption,
       ensures.source_location(),
-      symbol_table.lookup_ref(function).mode);
+      symbol_table.lookup_ref(target_function).mode);
 
     // add all the history variable initialization instructions
     // to the goto program
-    insert_before_swap_and_advance(goto_program, target, ensures_pair.second);
+    insert_before_swap_and_advance(function_body, target, ensures_pair.second);
   }
 
   // Create a series of non-deterministic assignments to havoc the variables
@@ -604,9 +607,8 @@ bool code_contractst::apply_function_contract(
     assigns_clauset assigns_clause(assigns, log, ns);
 
     // Retrieve assigns clause of the caller function if exists.
-    const irep_idt &caller_function = target->source_location.get_function();
     auto caller_assigns =
-      to_code_with_contract_type(ns.lookup(caller_function).type).assigns();
+      to_code_with_contract_type(ns.lookup(function).type).assigns();
 
     if(caller_assigns.is_not_nil())
     {
@@ -617,18 +619,19 @@ bool code_contractst::apply_function_contract(
         caller_assigns_clause.generate_subset_check(assigns_clause),
         assigns_clause.location));
       subset_check_assertion.instructions.back().source_location.set_comment(
-        "Check that " + id2string(function) +
-        "'s assigns clause is a subset of " + id2string(caller_function) +
+        "Check that " + id2string(target_function) +
+        "'s assigns clause is a subset of " +
+        id2string(const_target->source_location.get_function()) +
         "'s assigns clause");
       insert_before_swap_and_advance(
-        goto_program, target, subset_check_assertion);
+        function_body, target, subset_check_assertion);
     }
 
     // Havoc all targets in global write set
     auto assigns_havoc = assigns_clause.generate_havoc_code();
 
     // Insert the non-deterministic assignment immediately before the call site.
-    insert_before_swap_and_advance(goto_program, target, assigns_havoc);
+    insert_before_swap_and_advance(function_body, target, assigns_havoc);
   }
 
   // To remove the function call, insert statements related to the assumption.
@@ -636,12 +639,12 @@ bool code_contractst::apply_function_contract(
   if(!ensures.is_false())
   {
     is_fresh.update_ensures(ensures_pair.first);
-    insert_before_swap_and_advance(goto_program, target, ensures_pair.first);
+    insert_before_swap_and_advance(function_body, target, ensures_pair.first);
   }
   *target = goto_programt::make_skip();
 
   // Add this function to the set of replaced functions.
-  summarized.insert(function);
+  summarized.insert(target_function);
   return false;
 }
 
@@ -1223,7 +1226,8 @@ bool code_contractst::replace_calls(const std::set<std::string> &functions)
         if(found == functions.end())
           continue;
 
-        fail |= apply_function_contract(goto_function.second.body, ins);
+        fail |= apply_function_contract(
+          goto_function.first, goto_function.second.body, ins);
       }
     }
   }

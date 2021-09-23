@@ -195,8 +195,9 @@ protected:
   /// non-deterministic assignments for the write set, and assumptions
   /// based on ensures clauses.
   bool apply_function_contract(
-    goto_programt &goto_program,
-    goto_programt::targett target);
+    const irep_idt &,
+    goto_programt &,
+    goto_programt::targett &);
 
   /// Instruments `wrapper_function` adding assumptions based on requires
   /// clauses and assertions based on ensures clauses.
