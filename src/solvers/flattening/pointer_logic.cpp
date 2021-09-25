@@ -160,9 +160,6 @@ pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
   // add NULL
   null_object=objects.number(exprt(ID_NULL));
   CHECK_RETURN(null_object == 0);
-
-  // add INVALID
-  invalid_object=objects.number(exprt("INVALID"));
 }
 
 pointer_logict::~pointer_logict()

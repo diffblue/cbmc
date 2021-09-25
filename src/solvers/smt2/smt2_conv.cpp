@@ -270,6 +270,7 @@ void smt2_convt::define_object_size(
 
 decision_proceduret::resultt smt2_convt::dec_solve()
 {
+  post_process();
   write_footer();
   out.flush();
   return decision_proceduret::resultt::D_ERROR;
@@ -1615,14 +1616,14 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id() == ID_is_invalid_pointer)
   {
+    // we don't know the number of objects until conversion
+    // is finished
     const auto &op = to_unary_expr(expr).op();
     std::size_t pointer_width = boolbv_width(op.type());
-    out << "(= ((_ extract "
-        << pointer_width-1 << " "
-        << pointer_width-config.bv_encoding.object_bits << ") ";
+    out << "(bvuge ((_ extract " << pointer_width - 1 << " "
+        << pointer_width - config.bv_encoding.object_bits << ") ";
     convert_expr(op);
-    out << ") (_ bv" << pointer_logic.get_invalid_object()
-        << " " << config.bv_encoding.object_bits << "))";
+    out << ") number-of-objects)";
   }
   else if(expr.id()==ID_string_constant)
   {
@@ -2131,6 +2132,17 @@ void smt2_convt::convert_expr(const exprt &expr)
       false,
       "smt2_convt::convert_expr should not be applied to unsupported type",
       expr.id_string());
+}
+
+void smt2_convt::post_process()
+{
+  // we now know how many objects there are
+  if(number_of_objects_declared)
+  {
+    out << "; fix number of objects\n";
+    out << "(assert (= number-of-objects (_ bv" << pointer_logic.objects.size()
+        << ' ' << config.bv_encoding.object_bits << ")))\n";
+  }
 }
 
 void smt2_convt::convert_typecast(const typecast_exprt &expr)
@@ -4721,6 +4733,17 @@ void smt2_convt::find_symbols(const exprt &expr)
       }
 
       defined_expressions[expr]=id;
+    }
+  }
+  else if(expr.id() == ID_is_invalid_pointer)
+  {
+    if(!number_of_objects_declared)
+    {
+      out << "; the following is for is_invalid_pointer\n";
+      out << "(declare-fun number-of-objects () ";
+      out << "(_ BitVec " << config.bv_encoding.object_bits << ')';
+      out << ")\n";
+      number_of_objects_declared = true;
     }
   }
   else if(expr.id() == ID_object_size)

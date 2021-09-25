@@ -93,6 +93,10 @@ protected:
   std::vector<exprt> assumptions;
   boolbv_widtht boolbv_width;
 
+  // post-processing for number-of-objects
+  bool number_of_objects_declared = false;
+  void post_process();
+
   std::size_t number_of_solver_calls = 0;
 
   resultt dec_solve() override;

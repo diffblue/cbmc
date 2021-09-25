@@ -60,12 +60,6 @@ public:
     return null_object;
   }
 
-  /// \return number of INVALID object
-  std::size_t get_invalid_object() const
-  {
-    return invalid_object;
-  }
-
   bool is_dynamic_object(const exprt &expr) const;
 
   void get_dynamic_objects(std::vector<std::size_t> &objects) const;
