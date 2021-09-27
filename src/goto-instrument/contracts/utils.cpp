@@ -10,6 +10,64 @@ Date: September 2021
 
 #include "utils.h"
 
+#include <util/pointer_expr.h>
+#include <util/pointer_predicates.h>
+
+static void append_safe_havoc_code_for_expr(
+  const source_locationt location,
+  const namespacet &ns,
+  const exprt &expr,
+  goto_programt &dest,
+  const std::function<void()> &havoc_code_impl)
+{
+  goto_programt skip_program;
+  const auto skip_target = skip_program.add(goto_programt::make_skip(location));
+
+  // skip havocing only if all pointer derefs in the expression are valid
+  // (to avoid spurious pointer deref errors)
+  dest.add(goto_programt::make_goto(
+    skip_target, not_exprt{all_dereferences_are_valid(expr, ns)}, location));
+
+  havoc_code_impl();
+
+  // add the final skip target
+  dest.destructive_append(skip_program);
+}
+
+void havoc_if_validt::append_object_havoc_code_for_expr(
+  const source_locationt location,
+  const exprt &expr,
+  goto_programt &dest) const
+{
+  append_safe_havoc_code_for_expr(location, ns, expr, dest, [&]() {
+    havoc_utilst::append_object_havoc_code_for_expr(location, expr, dest);
+  });
+}
+
+void havoc_if_validt::append_scalar_havoc_code_for_expr(
+  const source_locationt location,
+  const exprt &expr,
+  goto_programt &dest) const
+{
+  append_safe_havoc_code_for_expr(location, ns, expr, dest, [&]() {
+    havoc_utilst::append_scalar_havoc_code_for_expr(location, expr, dest);
+  });
+}
+
+exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
+{
+  exprt::operandst validity_checks;
+
+  if(expr.id() == ID_dereference)
+    validity_checks.push_back(
+      good_pointer_def(to_dereference_expr(expr).pointer(), ns));
+
+  for(const auto &op : expr.operands())
+    validity_checks.push_back(all_dereferences_are_valid(op, ns));
+
+  return conjunction(validity_checks);
+}
+
 exprt generate_lexicographic_less_than_check(
   const std::vector<symbol_exprt> &lhs,
   const std::vector<symbol_exprt> &rhs)

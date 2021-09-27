@@ -97,7 +97,8 @@ void k_inductiont::process_loop(
 
     // build the havocking code
     goto_programt havoc_code;
-    append_havoc_code(loop_head->source_location, modifies, havoc_code);
+    havoc_utilst havoc_gen(modifies);
+    havoc_gen.append_full_havoc_code(loop_head->source_location, havoc_code);
 
     // unwind to get k+1 copies
     std::vector<goto_programt::targett> iteration_points;

@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts
+--apply-loop-contracts _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$
@@ -11,7 +11,7 @@ main.c
 ^\[main.assertion.2\] .* assertion x2 == z2: SUCCESS$
 ^\[main.5\] .* Check loop invariant before entry: SUCCESS$
 ^\[main.6\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.3\] .* assertion \*\(s1->n\) == \*\(s2->n\): SUCCESS$
+^\[main.assertion.3\] .* assertion \*\(s1\.n\) == \*\(s2->n\): SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

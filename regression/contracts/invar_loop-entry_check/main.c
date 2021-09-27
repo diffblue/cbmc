@@ -33,17 +33,17 @@ void main()
   assert(x2 == z2);
 
   int y3;
-  s *s1, *s2;
+  s s0, s1, *s2 = &s0;
   s2->n = malloc(sizeof(int));
-  s1->n = s2->n;
+  s1.n = s2->n;
 
   while(y3 > 0)
-    __CPROVER_loop_invariant(s1->n == __CPROVER_loop_entry(s1->n))
+    __CPROVER_loop_invariant(s2->n == __CPROVER_loop_entry(s2->n))
     {
       --y3;
-      s1->n = s1->n + 1;
-      s1->n = s1->n - 1;
+      s0.n = s0.n + 1;
+      s2->n = s2->n - 1;
     }
 
-  assert(*(s1->n) == *(s2->n));
+  assert(*(s1.n) == *(s2->n));
 }

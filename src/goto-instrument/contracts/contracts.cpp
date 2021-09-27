@@ -33,6 +33,7 @@ Date: February 2016
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
 
 #include "assigns.h"
@@ -150,7 +151,8 @@ void code_contractst::check_apply_loop_contracts(
   }
 
   // havoc the variables that may be modified
-  append_havoc_code(loop_head->source_location, modifies, havoc_code);
+  havoc_if_validt havoc_gen(modifies, ns);
+  havoc_gen.append_full_havoc_code(loop_head->source_location, havoc_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
@@ -366,6 +368,11 @@ void code_contractst::replace_history_parameter(
 
       if(it == parameter2history.end())
       {
+        // 0. Create a skip target to jump to, if the parameter is invalid
+        goto_programt skip_program;
+        const auto skip_target =
+          skip_program.add(goto_programt::make_skip(location));
+
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
@@ -376,14 +383,23 @@ void code_contractst::replace_history_parameter(
         parameter2history[parameter] = tmp_symbol;
 
         // 3. Add the required instructions to the instructions list
-        // 3.1 Declare the newly created temporary variable
+        // 3.1. Declare the newly created temporary variable
         history.add(goto_programt::make_decl(tmp_symbol, location));
 
-        // 3.2 Add an assignment such that the value pointed to by the new
+        // 3.2. Skip storing the history if the expression is invalid
+        history.add(goto_programt::make_goto(
+          skip_target,
+          not_exprt{all_dereferences_are_valid(parameter, ns)},
+          location));
+
+        // 3.3. Add an assignment such that the value pointed to by the new
         // temporary variable is equal to the value of the corresponding
         // parameter
         history.add(
           goto_programt::make_assignment(tmp_symbol, parameter, location));
+
+        // 3.4. Add a skip target
+        history.destructive_append(skip_program);
       }
 
       expr = parameter2history[parameter];

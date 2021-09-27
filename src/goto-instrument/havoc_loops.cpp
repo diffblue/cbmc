@@ -68,7 +68,8 @@ void havoc_loopst::havoc_loop(
 
   // build the havocking code
   goto_programt havoc_code;
-  append_havoc_code(loop_head->source_location, modifies, havoc_code);
+  havoc_utilst havoc_gen(modifies);
+  havoc_gen.append_full_havoc_code(loop_head->source_location, havoc_code);
 
   // Now havoc at the loop head. Use insert_swap to
   // preserve jumps to loop head.
