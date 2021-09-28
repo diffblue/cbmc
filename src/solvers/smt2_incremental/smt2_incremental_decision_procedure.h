@@ -9,15 +9,16 @@
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/stack_decision_procedure.h>
 #include <util/message.h>
-#include <util/piped_process.h>
 #include <util/std_expr.h>
 
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
 class smt_commandt;
 class message_handlert;
 class namespacet;
+class smt_base_solver_processt;
 
 class smt2_incremental_decision_proceduret final
   : public stack_decision_proceduret
@@ -25,13 +26,13 @@ class smt2_incremental_decision_proceduret final
 public:
   /// \param _ns: Namespace for looking up the expressions which symbol_exprts
   ///   relate to.
-  /// \param solver_command:
-  ///   The command and arguments for invoking the smt2 solver.
+  /// \param solver_process:
+  ///   The smt2 solver process communication interface.
   /// \param message_handler:
   ///   The messaging system to be used for logging purposes.
   explicit smt2_incremental_decision_proceduret(
     const namespacet &_ns,
-    std::string solver_command,
+    std::unique_ptr<smt_base_solver_processt> solver_process,
     message_handlert &message_handler);
 
   // Implementation of public decision_proceduret member functions.
@@ -50,9 +51,6 @@ public:
 protected:
   // Implementation of protected decision_proceduret member function.
   resultt dec_solve() override;
-  /// \brief Converts given SMT2 command to SMT2 string and sends it to the
-  ///    solver process.
-  void send_to_solver(const smt_commandt &command);
   /// \brief Defines any functions which \p expr depends on, which have not yet
   ///   been defined, along with their dependencies in turn.
   void define_dependent_functions(const exprt &expr);
@@ -60,11 +58,9 @@ protected:
 
   const namespacet &ns;
 
-  /// This is where we store the solver command for reporting the solver used.
-  std::string solver_command;
   size_t number_of_solver_calls;
 
-  piped_processt solver_process;
+  std::unique_ptr<smt_base_solver_processt> solver_process;
   messaget log;
 
   class sequencet

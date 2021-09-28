@@ -5,8 +5,8 @@
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/smt_terms.h>
-#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <util/expr.h>
 #include <util/namespace.h>
 #include <util/range.h>
@@ -74,7 +74,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         const smt_define_function_commandt function{
           symbol->name, {}, convert_expr_to_smt(symbol->value)};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
-        send_to_solver(function);
+        solver_process->send(function);
       }
       else
       {
@@ -83,7 +83,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
             identifier, convert_type_to_smt_sort(symbol_expr->type())),
           {}};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
-        send_to_solver(function);
+        solver_process->send(function);
       }
     }
     to_be_defined.pop();
@@ -92,16 +92,16 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
 
 smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
   const namespacet &_ns,
-  std::string _solver_command,
+  std::unique_ptr<smt_base_solver_processt> _solver_process,
   message_handlert &message_handler)
   : ns{_ns},
-    solver_command(std::move(_solver_command)),
     number_of_solver_calls{0},
-    solver_process{split_string(solver_command, ' ', false, true)},
+    solver_process(std::move(_solver_process)),
     log{message_handler}
 {
-  send_to_solver(smt_set_option_commandt{smt_option_produce_modelst{true}});
-  send_to_solver(smt_set_logic_commandt{
+  solver_process->send(
+    smt_set_option_commandt{smt_option_produce_modelst{true}});
+  solver_process->send(smt_set_logic_commandt{
     smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}});
 }
 
@@ -119,7 +119,7 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
   expression_handle_identifiers.emplace(expr, function.identifier());
-  send_to_solver(function);
+  solver_process->send(function);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -143,7 +143,7 @@ void smt2_incremental_decision_proceduret::print_assignment(
 std::string
 smt2_incremental_decision_proceduret::decision_procedure_text() const
 {
-  return "incremental SMT2 solving via \"" + solver_command + "\"";
+  return "incremental SMT2 solving via " + solver_process->description();
 }
 
 std::size_t
@@ -169,7 +169,7 @@ void smt2_incremental_decision_proceduret::set_to(const exprt &expr, bool value)
   }();
   if(!value)
     converted_term = smt_core_theoryt::make_not(converted_term);
-  send_to_solver(smt_assert_commandt{converted_term});
+  solver_process->send(smt_assert_commandt{converted_term});
 }
 
 void smt2_incremental_decision_proceduret::push(
@@ -196,17 +196,7 @@ void smt2_incremental_decision_proceduret::pop()
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  send_to_solver(smt_check_sat_commandt{});
-  const auto result = solver_process.wait_receive();
-  log.debug() << "Solver response - " << result << messaget::eom;
-  UNIMPLEMENTED_FEATURE("parsing of solver response.");
-}
-
-void smt2_incremental_decision_proceduret::send_to_solver(
-  const smt_commandt &command)
-{
-  const std::string command_string = smt_to_smt2_string(command);
-  log.debug() << "Sending command to SMT2 solver - " << command_string
-              << messaget::eom;
-  solver_process.send(command_string + "\n");
+  solver_process->send(smt_check_sat_commandt{});
+  const smt_responset result = solver_process->receive_response();
+  UNIMPLEMENTED_FEATURE("handling solver response.");
 }
