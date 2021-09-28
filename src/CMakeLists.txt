@@ -106,6 +106,7 @@ add_subdirectory(statement-list)
 add_subdirectory(util)
 
 add_subdirectory(cbmc)
+add_subdirectory(crangler)
 add_subdirectory(goto-cc)
 add_subdirectory(goto-instrument)
 add_subdirectory(goto-analyzer)
