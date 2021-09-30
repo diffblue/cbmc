@@ -67,21 +67,21 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
     {
       const irep_idt &identifier = symbol_expr->get_identifier();
       const symbolt *symbol = nullptr;
-      if(!ns.lookup(identifier, symbol) && !symbol->value.is_nil())
-      {
-        if(dependencies_needed(symbol->value))
-          continue;
-        const smt_define_function_commandt function{
-          symbol->name, {}, convert_expr_to_smt(symbol->value)};
-        expression_identifiers.emplace(*symbol_expr, function.identifier());
-        solver_process->send(function);
-      }
-      else
+      if(ns.lookup(identifier, symbol) || symbol->value.is_nil())
       {
         const smt_declare_function_commandt function{
           smt_identifier_termt(
             identifier, convert_type_to_smt_sort(symbol_expr->type())),
           {}};
+        expression_identifiers.emplace(*symbol_expr, function.identifier());
+        solver_process->send(function);
+      }
+      else
+      {
+        if(dependencies_needed(symbol->value))
+          continue;
+        const smt_define_function_commandt function{
+          symbol->name, {}, convert_expr_to_smt(symbol->value)};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
         solver_process->send(function);
       }
