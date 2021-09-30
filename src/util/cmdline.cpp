@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/edit_distance.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
+#include <util/string_utils.h>
 
 cmdlinet::cmdlinet()
 {
@@ -120,16 +121,14 @@ std::list<std::string>
 cmdlinet::get_comma_separated_values(const char *option) const
 {
   std::list<std::string> separated_values;
-  auto i = getoptnr(option);
-  if(i.has_value() && !options[*i].values.empty())
+
+  for(const auto &csv : get_values(option))
   {
-    std::istringstream values_stream(options[*i].values.front());
-    std::string single_value;
-    while(std::getline(values_stream, single_value, ','))
-    {
-      separated_values.push_back(single_value);
-    }
+    const auto values = split_string(csv, ',');
+    separated_values.insert(
+      separated_values.end(), values.begin(), values.end());
   }
+
   return separated_values;
 }
 
