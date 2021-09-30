@@ -11,6 +11,7 @@ Date: September 2021
 #include "utils.h"
 
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
 static void append_safe_havoc_code_for_expr(
@@ -59,8 +60,16 @@ exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
   exprt::operandst validity_checks;
 
   if(expr.id() == ID_dereference)
-    validity_checks.push_back(
-      good_pointer_def(to_dereference_expr(expr).pointer(), ns));
+  {
+    const auto &pointer = to_dereference_expr(expr).pointer();
+    const auto opt_size_of_deref =
+      size_of_expr(to_pointer_type(pointer.type()).subtype(), ns);
+
+    if(opt_size_of_deref.has_value())
+      validity_checks.push_back(good_pointer_def(pointer, ns));
+    else
+      validity_checks.push_back(false_exprt());
+  }
 
   for(const auto &op : expr.operands())
     validity_checks.push_back(all_dereferences_are_valid(op, ns));

@@ -89,7 +89,10 @@ exprt good_pointer_def(
   const typet &dereference_type=pointer_type.subtype();
 
   const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
-  CHECK_RETURN(size_of_expr_opt.has_value());
+  PRECONDITION_WITH_DIAGNOSTICS(
+    size_of_expr_opt.has_value(),
+    "Could not compute sizeof on pointer's dereference type. "
+    "It may be a void pointer.");
 
   const exprt good_dynamic = not_exprt{deallocated(pointer, ns)};
 
