@@ -67,7 +67,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
     {
       const irep_idt &identifier = symbol_expr->get_identifier();
       const symbolt *symbol = nullptr;
-      if(!ns.lookup(identifier, symbol))
+      if(!ns.lookup(identifier, symbol) && !symbol->value.is_nil())
       {
         if(dependencies_needed(symbol->value))
           continue;
