@@ -156,6 +156,7 @@ protected:
 /// Note: This requires label_function_pointer_call_sites to be run
 ///       before
 void restrict_function_pointers(
+  message_handlert &message_handler,
   goto_modelt &goto_model,
   const function_pointer_restrictionst &restrictions);
 

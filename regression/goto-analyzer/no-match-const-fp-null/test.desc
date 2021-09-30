@@ -2,7 +2,7 @@ CORE
 main.c
 --show-goto-functions --pointer-check
 ^Removal of function pointers and virtual functions$
-^\s*ASSERT false // invalid function pointer$
+^\s*ASSERT false // no candidates for dereferenced function pointer
 function func: replacing function pointer by 0 possible targets
 ^EXIT=0$
 ^SIGNAL=0$

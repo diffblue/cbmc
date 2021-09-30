@@ -5,7 +5,7 @@ main.c
 ^\s*IF .*::fp = address_of\(f2\) THEN GOTO [0-9]$
 ^\s*IF .*::fp = address_of\(f3\) THEN GOTO [0-9]$
 ^\s*IF .*::fp = address_of\(f4\) THEN GOTO [0-9]$
-^\s*ASSERT false // invalid function pointer$
+^\s*ASSERT false // dereferenced function pointer must be one of \[f[2-4], f[2-4], f[2-4]\]$
 ^EXIT=0$
 ^SIGNAL=0$
 --

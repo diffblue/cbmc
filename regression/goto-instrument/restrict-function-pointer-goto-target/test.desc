@@ -3,7 +3,7 @@ test.c
 --restrict-function-pointer main.function_pointer_call.1/f
 ^EXIT=0$
 ^SIGNAL=0$
-\[main.assertion.1\] line \d+ dereferenced function pointer at main.function_pointer_call.1 must be f: SUCCESS
+\[main.pointer_dereference.1\] line \d+ dereferenced function pointer must be f: SUCCESS
 --
 --
 This test checks that a function pointer call that is the target of a goto (in

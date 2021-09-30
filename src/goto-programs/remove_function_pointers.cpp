@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string_utils.h>
 
 #include <analyses/does_remove_const.h>
 
@@ -44,24 +45,8 @@ public:
     goto_programt &goto_program,
     const irep_idt &function_id);
 
-  // a set of function symbols
-  using functionst = remove_const_function_pointerst::functionst;
-
-  /// Replace a call to a dynamic function at location
-  /// target in the given goto-program by a case-split
-  /// over a given set of functions
-  /// \param goto_program: The goto program that contains target
-  /// \param function_id: Name of function containing the target
-  /// \param target: location with function call with function pointer
-  /// \param functions: The set of functions to consider
-  void remove_function_pointer(
-    goto_programt &goto_program,
-    const irep_idt &function_id,
-    goto_programt::targett target,
-    const functionst &functions);
-
 protected:
-  messaget log;
+  message_handlert &message_handler;
   const namespacet ns;
   symbol_tablet &symbol_table;
   bool add_safety_assertion;
@@ -89,21 +74,6 @@ protected:
 
   typedef std::map<irep_idt, code_typet> type_mapt;
   type_mapt type_map;
-
-  bool is_type_compatible(
-    bool return_value_used,
-    const code_typet &call_type,
-    const code_typet &function_type);
-
-  bool arg_is_type_compatible(
-    const typet &call_type,
-    const typet &function_type);
-
-  void fix_argument_types(code_function_callt &function_call);
-  void fix_return_type(
-    const irep_idt &in_function_id,
-    code_function_callt &function_call,
-    goto_programt &dest);
 };
 
 remove_function_pointerst::remove_function_pointerst(
@@ -112,7 +82,7 @@ remove_function_pointerst::remove_function_pointerst(
   bool _add_safety_assertion,
   bool only_resolve_const_fps,
   const goto_functionst &goto_functions)
-  : log(_message_handler),
+  : message_handler(_message_handler),
     ns(_symbol_table),
     symbol_table(_symbol_table),
     add_safety_assertion(_add_safety_assertion),
@@ -131,9 +101,10 @@ remove_function_pointerst::remove_function_pointerst(
   }
 }
 
-bool remove_function_pointerst::arg_is_type_compatible(
+static bool arg_is_type_compatible(
   const typet &call_type,
-  const typet &function_type)
+  const typet &function_type,
+  const namespacet &ns)
 {
   if(call_type == function_type)
     return true;
@@ -157,10 +128,11 @@ bool remove_function_pointerst::arg_is_type_compatible(
          pointer_offset_bits(function_type, ns);
 }
 
-bool remove_function_pointerst::is_type_compatible(
+bool function_is_type_compatible(
   bool return_value_used,
   const code_typet &call_type,
-  const code_typet &function_type)
+  const code_typet &function_type,
+  const namespacet &ns)
 {
   // we are willing to ignore anything that's returned
   // if we call with 'void'
@@ -173,8 +145,8 @@ bool remove_function_pointerst::is_type_compatible(
   }
   else
   {
-    if(!arg_is_type_compatible(call_type.return_type(),
-                               function_type.return_type()))
+    if(!arg_is_type_compatible(
+         call_type.return_type(), function_type.return_type(), ns))
       return false;
   }
 
@@ -199,16 +171,15 @@ bool remove_function_pointerst::is_type_compatible(
       return false;
 
     for(std::size_t i=0; i<call_parameters.size(); i++)
-      if(!arg_is_type_compatible(call_parameters[i].type(),
-                                 function_parameters[i].type()))
+      if(!arg_is_type_compatible(
+           call_parameters[i].type(), function_parameters[i].type(), ns))
         return false;
   }
 
   return true;
 }
 
-void remove_function_pointerst::fix_argument_types(
-  code_function_callt &function_call)
+static void fix_argument_types(code_function_callt &function_call)
 {
   const code_typet &code_type = to_code_type(function_call.function().type());
 
@@ -231,9 +202,10 @@ void remove_function_pointerst::fix_argument_types(
   }
 }
 
-void remove_function_pointerst::fix_return_type(
+static void fix_return_type(
   const irep_idt &in_function_id,
   code_function_callt &function_call,
+  symbol_tablet &symbol_table,
   goto_programt &dest)
 {
   // are we returning anything at all?
@@ -246,6 +218,7 @@ void remove_function_pointerst::fix_return_type(
   if(function_call.lhs().type() == code_type.return_type())
     return;
 
+  const namespacet ns(symbol_table);
   const symbolt &function_symbol =
     ns.lookup(to_symbol_expr(function_call.function()).get_identifier());
 
@@ -293,6 +266,7 @@ void remove_function_pointerst::remove_function_pointer(
   remove_const_function_pointerst::functionst functions;
   does_remove_constt const_removal_check(goto_program, ns);
   const auto does_remove_const = const_removal_check();
+  messaget log{message_handler};
   if(does_remove_const.first)
   {
     log.warning().source_location = does_remove_const.second;
@@ -345,7 +319,8 @@ void remove_function_pointerst::remove_function_pointer(
         continue;
 
       // type-compatible?
-      if(!is_type_compatible(return_value_used, call_type, t.second))
+      if(!function_is_type_compatible(
+           return_value_used, call_type, t.second, ns))
         continue;
 
       if(t.first=="pthread_mutex_cleanup")
@@ -356,14 +331,56 @@ void remove_function_pointerst::remove_function_pointer(
     }
   }
 
-  remove_function_pointer(goto_program, function_id, target, functions);
+  ::remove_function_pointer(
+    message_handler,
+    symbol_table,
+    goto_program,
+    function_id,
+    target,
+    functions,
+    add_safety_assertion);
 }
 
-void remove_function_pointerst::remove_function_pointer(
+static std::string function_pointer_assertion_comment(
+  const std::unordered_set<symbol_exprt, irep_hash> &candidates)
+{
+  std::stringstream comment;
+
+  comment << "dereferenced function pointer must be ";
+
+  if(candidates.size() == 1)
+  {
+    comment << candidates.begin()->get_identifier();
+  }
+  else if(candidates.empty())
+  {
+    comment.str("no candidates for dereferenced function pointer");
+  }
+  else
+  {
+    comment << "one of [";
+
+    join_strings(
+      comment,
+      candidates.begin(),
+      candidates.end(),
+      ", ",
+      [](const symbol_exprt &s) { return s.get_identifier(); });
+
+    comment << ']';
+  }
+
+  return comment.str();
+}
+
+void remove_function_pointer(
+  message_handlert &message_handler,
+  symbol_tablet &symbol_table,
   goto_programt &goto_program,
   const irep_idt &function_id,
   goto_programt::targett target,
-  const functionst &functions)
+  const std::unordered_set<symbol_exprt, irep_hash> &functions,
+  const bool add_safety_assertion)
 {
   const exprt &function = target->call_function();
   const exprt &pointer = to_dereference_expr(function).pointer();
@@ -388,7 +405,7 @@ void remove_function_pointerst::remove_function_pointer(
     fix_argument_types(new_call);
 
     goto_programt tmp;
-    fix_return_type(function_id, new_call, tmp);
+    fix_return_type(function_id, new_call, symbol_table, tmp);
 
     auto call = new_code_calls.add(goto_programt::make_function_call(new_call));
     new_code_calls.destructive_append(tmp);
@@ -412,7 +429,8 @@ void remove_function_pointerst::remove_function_pointer(
     goto_programt::targett t =
       new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
     t->source_location_nonconst().set_property_class("pointer dereference");
-    t->source_location_nonconst().set_comment("invalid function pointer");
+    t->source_location_nonconst().set_comment(
+      function_pointer_assertion_comment(functions));
   }
   new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
 
@@ -450,6 +468,7 @@ void remove_function_pointerst::remove_function_pointer(
     goto_programt::make_other(code_expression, target->source_location());
 
   // report statistics
+  messaget log{message_handler};
   log.statistics().source_location = target->source_location();
   log.statistics() << "replacing function pointer by " << functions.size()
                    << " possible targets" << messaget::eom;
