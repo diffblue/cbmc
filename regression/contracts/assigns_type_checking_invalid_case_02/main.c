@@ -18,7 +18,16 @@ int main()
   b[8] = 'i';
   b[9] = 'j';
   bar(b);
+  assert(b[0] == 'a');
+  assert(b[1] == 'b');
+  assert(b[2] == 'c');
+  assert(b[3] == 'd');
+  assert(b[4] == 'e');
+  assert(b[5] == 'f');
+  assert(b[6] == 'g');
   assert(b[7] == 'h');
+  assert(b[8] == 'i');
+  assert(b[9] == 'j');
 
   return 0;
 }

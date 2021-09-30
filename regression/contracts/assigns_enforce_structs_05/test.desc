@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract f1
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f1.\d+\] line \d+ Check that p->y is assignable: FAILURE$

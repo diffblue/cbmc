@@ -1135,56 +1135,30 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  const std::list<std::pair<std::string, std::string>> contract_flags(
-    {{FLAG_REPLACE_CALL, FLAG_REPLACE_ALL_CALLS},
-     {FLAG_ENFORCE_CONTRACT, FLAG_ENFORCE_ALL_CONTRACTS}});
-  for(const auto &pair : contract_flags)
-  {
-    if(cmdline.isset(pair.first.c_str()) && cmdline.isset(pair.second.c_str()))
-    {
-      log.error() << "Pass at most one of --" << pair.first << " and --"
-                  << pair.second << "." << messaget::eom;
-      exit(CPROVER_EXIT_USAGE_ERROR);
-    }
-  }
-
   if(
     cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
-    cmdline.isset(FLAG_REPLACE_ALL_CALLS) ||
-    cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
-    cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
+    cmdline.isset(FLAG_ENFORCE_CONTRACT))
   {
     do_indirect_call_and_rtti_removal();
-    code_contractst cont(goto_model, log);
+    code_contractst contracts(goto_model, log);
 
-    if(cmdline.isset(FLAG_REPLACE_CALL))
-    {
-      std::set<std::string> to_replace(
-        cmdline.get_values(FLAG_REPLACE_CALL).begin(),
-        cmdline.get_values(FLAG_REPLACE_CALL).end());
-      if(cont.replace_calls(to_replace))
-        exit(CPROVER_EXIT_USAGE_ERROR);
-    }
+    std::set<std::string> to_replace(
+      cmdline.get_values(FLAG_REPLACE_CALL).begin(),
+      cmdline.get_values(FLAG_REPLACE_CALL).end());
 
-    if(cmdline.isset(FLAG_REPLACE_ALL_CALLS))
-      if(cont.replace_calls())
-        exit(CPROVER_EXIT_USAGE_ERROR);
+    std::set<std::string> to_enforce(
+      cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
+      cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
 
-    if(cmdline.isset(FLAG_ENFORCE_CONTRACT))
-    {
-      std::set<std::string> to_enforce(
-        cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
-        cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
-      if(cont.enforce_contracts(to_enforce))
-        exit(CPROVER_EXIT_USAGE_ERROR);
-    }
-
-    if(cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
-      if(cont.enforce_contracts())
-        exit(CPROVER_EXIT_USAGE_ERROR);
+    // It’s important to keep the order of contracts instrumentation, i.e.,
+    // first replacement then enforcement. We rely on contract replacement
+    // and inlining of sub-function calls to properly annotate all
+    // assignments.
+    contracts.replace_calls(to_replace);
+    contracts.enforce_contracts(to_enforce);
 
     if(cmdline.isset(FLAG_LOOP_CONTRACTS))
-      cont.apply_loop_contracts();
+      contracts.apply_loop_contracts();
   }
 
   if(cmdline.isset("value-set-fi-fp-removal"))
@@ -1876,9 +1850,7 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
     HELP_REPLACE_CALL
-    HELP_REPLACE_ALL_CALLS
     HELP_ENFORCE_CONTRACT
-    HELP_ENFORCE_ALL_CONTRACTS
     "\n"
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)

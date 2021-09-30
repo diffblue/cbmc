@@ -267,13 +267,6 @@ void code_contractst::check_apply_loop_contracts(
     loop_end->set_condition(boolean_negate(loop_end->get_condition()));
 }
 
-bool code_contractst::has_contract(const irep_idt fun_name)
-{
-  const symbolt &function_symbol = ns.lookup(fun_name);
-  const auto &type = to_code_with_contract_type(function_symbol.type);
-  return type.has_contract();
-}
-
 void code_contractst::add_quantified_variable(
   const exprt &expression,
   replace_symbolt &replace,
@@ -439,7 +432,8 @@ code_contractst::create_ensures_instruction(
 bool code_contractst::apply_function_contract(
   const irep_idt &function,
   goto_programt &function_body,
-  goto_programt::targett &target)
+  goto_programt::targett &target,
+  std::set<std::string> enforced_functions)
 {
   const auto &const_target =
     static_cast<const goto_programt::targett &>(target);
@@ -514,10 +508,6 @@ bool code_contractst::apply_function_contract(
     }
   }
 
-  // ASSIGNS clause should not refer to any quantified variables,
-  // and only refer to the common symbols to be replaced.
-  common_replace(assigns);
-
   const auto &mode = symbol_table.lookup_ref(target_function).mode;
 
   is_fresh_replacet is_fresh(*this, log, target_function);
@@ -564,24 +554,31 @@ bool code_contractst::apply_function_contract(
     insert_before_swap_and_advance(function_body, target, ensures_pair.second);
   }
 
+  // ASSIGNS clause should not refer to any quantified variables,
+  // and only refer to the common symbols to be replaced.
+  exprt targets;
+  for(auto &target : assigns)
+    targets.add_to_operands(std::move(target));
+  common_replace(targets);
+
   // Create a series of non-deterministic assignments to havoc the variables
   // in the assigns clause.
-  if(assigns.is_not_nil())
+  if(!assigns.empty())
   {
-    assigns_clauset assigns_clause(assigns, log, ns);
+    assigns_clauset assigns_clause(targets.operands(), log, ns);
 
     // Retrieve assigns clause of the caller function if exists.
     auto caller_assigns =
       to_code_with_contract_type(ns.lookup(function).type).assigns();
 
-    if(caller_assigns.is_not_nil())
+    if(enforced_functions.find(function.c_str()) != enforced_functions.end())
     {
       // check subset relationship of assigns clause for called function
       assigns_clauset caller_assigns_clause(caller_assigns, log, ns);
       goto_programt subset_check_assertion;
       subset_check_assertion.add(goto_programt::make_assertion(
         caller_assigns_clause.generate_subset_check(assigns_clause),
-        assigns_clause.location));
+        const_target->source_location));
       subset_check_assertion.instructions.back().source_location.set_comment(
         "Check that " + id2string(target_function) +
         "'s assigns clause is a subset of " +
@@ -592,7 +589,8 @@ bool code_contractst::apply_function_contract(
     }
 
     // Havoc all targets in global write set
-    auto assigns_havoc = assigns_clause.generate_havoc_code();
+    auto assigns_havoc =
+      assigns_clause.generate_havoc_code(const_target->source_location);
 
     // Insert the non-deterministic assignment immediately before the call site.
     insert_before_swap_and_advance(function_body, target, assigns_havoc);
@@ -751,29 +749,23 @@ void code_contractst::instrument_call_statement(
   const typet &called_symbol_type = (called_symbol.type.id() == ID_pointer)
                                       ? called_symbol.type.subtype()
                                       : called_symbol.type;
-  exprt called_assigns =
+  const auto called_assigns =
     to_code_with_contract_type(called_symbol_type).assigns();
-  const code_typet &called_type = to_code_type(called_symbol_type);
 
-  if(called_assigns.is_not_nil())
+  if(!called_assigns.empty())
   {
-    replace_symbolt replace_formal_params;
-    const auto &arguments = instruction_iterator->call_arguments();
-    auto a_it = arguments.begin();
-    for(auto p_it = called_type.parameters().begin();
-        p_it != called_type.parameters().end() && a_it != arguments.end();
-        ++p_it, ++a_it)
-    {
-      if(!p_it->get_identifier().empty())
-      {
-        symbol_exprt p(p_it->get_identifier(), p_it->type());
-        replace_formal_params.insert(p, *a_it);
-      }
-    }
-    replace_formal_params(called_assigns);
+    replace_symbolt replace_formal_parameters = actuals_replace_map(
+      instruction_iterator->call_lhs(),
+      instruction_iterator->call_function(),
+      instruction_iterator->call_arguments(),
+      ns);
+    exprt targets;
+    for(auto &target : called_assigns)
+      targets.add_to_operands(std::move(target));
+    replace_formal_parameters(targets);
 
-    // check subset relationship of assigns clause for called function
-    assigns_clauset called_assigns_clause(called_assigns, log, ns);
+    // Check subset relationship of assigns clause for called function
+    assigns_clauset called_assigns_clause(targets.operands(), log, ns);
     const auto subset_check =
       assigns_clause.generate_subset_check(called_assigns_clause);
     goto_programt alias_assertion;
@@ -1019,9 +1011,9 @@ void code_contractst::add_contract_check(
   const symbolt &function_symbol = ns.lookup(mangled_function);
   const auto &code_type = to_code_with_contract_type(function_symbol.type);
 
-  exprt assigns = code_type.assigns();
-  exprt requires = conjunction(code_type.requires());
-  exprt ensures = conjunction(code_type.ensures());
+  auto assigns = code_type.assigns();
+  auto requires = conjunction(code_type.requires());
+  auto ensures = conjunction(code_type.ensures());
 
   // build:
   // if(nondet)
@@ -1157,22 +1149,14 @@ void code_contractst::add_contract_check(
   dest.destructive_insert(dest.instructions.begin(), check);
 }
 
-bool code_contractst::replace_calls(const std::set<std::string> &functions)
+bool code_contractst::replace_calls(
+  const std::set<std::string> &to_replace,
+  const std::set<std::string> &to_enforce)
 {
+  if(to_replace.empty())
+    return false;
+
   bool fail = false;
-  for(const auto &function : functions)
-  {
-    if(!has_contract(function))
-    {
-      log.error() << "Function '" << function
-                  << "' does not have a contract; "
-                     "not replacing calls with contract."
-                  << messaget::eom;
-      fail = true;
-    }
-  }
-  if(fail)
-    return true;
 
   for(auto &goto_function : goto_functions.function_map)
   {
@@ -1186,12 +1170,12 @@ bool code_contractst::replace_calls(const std::set<std::string> &functions)
         const irep_idt &called_function =
           to_symbol_expr(ins->call_function()).get_identifier();
         auto found = std::find(
-          functions.begin(), functions.end(), id2string(called_function));
-        if(found == functions.end())
+          to_replace.begin(), to_replace.end(), id2string(called_function));
+        if(found == to_replace.end())
           continue;
 
         fail |= apply_function_contract(
-          goto_function.first, goto_function.second.body, ins);
+          goto_function.first, goto_function.second.body, ins, to_enforce);
       }
     }
   }
@@ -1213,32 +1197,14 @@ void code_contractst::apply_loop_contracts()
     apply_loop_contract(goto_function.first, goto_function.second);
 }
 
-bool code_contractst::replace_calls()
+bool code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
 {
-  std::set<std::string> functions;
-  for(auto &goto_function : goto_functions.function_map)
-  {
-    if(has_contract(goto_function.first))
-      functions.insert(id2string(goto_function.first));
-  }
-  return replace_calls(functions);
-}
+  if(to_enforce.empty())
+    return false;
 
-bool code_contractst::enforce_contracts()
-{
-  std::set<std::string> functions;
-  for(auto &goto_function : goto_functions.function_map)
-  {
-    if(has_contract(goto_function.first))
-      functions.insert(id2string(goto_function.first));
-  }
-  return enforce_contracts(functions);
-}
-
-bool code_contractst::enforce_contracts(const std::set<std::string> &functions)
-{
   bool fail = false;
-  for(const auto &function : functions)
+
+  for(const auto &function : to_enforce)
   {
     auto goto_function = goto_functions.function_map.find(function);
     if(goto_function == goto_functions.function_map.end())
@@ -1247,14 +1213,6 @@ bool code_contractst::enforce_contracts(const std::set<std::string> &functions)
       log.error() << "Could not find function '" << function
                   << "' in goto-program; not enforcing contracts."
                   << messaget::eom;
-      continue;
-    }
-
-    if(!has_contract(function))
-    {
-      fail = true;
-      log.error() << "Could not find any contracts within function '"
-                  << function << "'; nothing to enforce." << messaget::eom;
       continue;
     }
 

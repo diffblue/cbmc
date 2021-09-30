@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$

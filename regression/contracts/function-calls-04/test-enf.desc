@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts _ --unwind 20 --unwinding-assertions
+--enforce-contract f1 --enforce-contract f2_out --enforce-contract f2_in _ --unwind 20 --unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

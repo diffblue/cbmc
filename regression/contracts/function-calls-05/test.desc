@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 \[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS

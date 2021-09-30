@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^Ignored duplicate expression '\*x' in assigns clause at file main\.c line \d+$
 ^EXIT=0$
 ^SIGNAL=0$

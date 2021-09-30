@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo --enforce-contract bar --enforce-contract baz --enforce-contract qux
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[bar\.1\] line \d+ .*: FAILURE$

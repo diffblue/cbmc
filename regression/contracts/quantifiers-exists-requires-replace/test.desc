@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract f1 --replace-call-with-contract f2
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[precondition.\d+\] file main.c line \d+ Check requires clause: SUCCESS$

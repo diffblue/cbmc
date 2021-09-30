@@ -1,9 +1,10 @@
 CORE
 main.c
---replace-call-with-contract bar
+--replace-call-with-contract bar --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
-\[\d+\] file main.c line \d+ Check that bar\'s assigns clause is a subset of foo\'s assigns clause: SUCCESS$
+\[foo.\d+\] line \d+ Check that bar\'s assigns clause is a subset of foo\'s assigns clause: SUCCESS$
+\[foo.\d+\] line \d+ Check that \*z is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^Condition: \!not\_found$

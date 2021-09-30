@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[postcondition.\d+\] Check ensures clause: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts _ --malloc-may-fail --malloc-fail-null --pointer-check
+--enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$

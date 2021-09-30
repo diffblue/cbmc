@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract f1
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line .* assertion len > 0 ==> found_zero: SUCCESS$
