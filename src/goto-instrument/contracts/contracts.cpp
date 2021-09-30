@@ -22,6 +22,7 @@ Date: February 2016
 
 #include <goto-instrument/havoc_utils.h>
 
+#include <goto-programs/goto_inline.h>
 #include <goto-programs/remove_skip.h>
 
 #include <langapi/language_util.h>
@@ -433,7 +434,7 @@ bool code_contractst::apply_function_contract(
   const irep_idt &function,
   goto_programt &function_body,
   goto_programt::targett &target,
-  std::set<std::string> enforced_functions)
+  const std::set<std::string> &enforced_functions)
 {
   const auto &const_target =
     static_cast<const goto_programt::targett &>(target);
@@ -684,100 +685,52 @@ void code_contractst::instrument_assign_statement(
 }
 
 void code_contractst::instrument_call_statement(
-  goto_programt::instructionst::iterator &instruction_iterator,
-  goto_programt &program,
-  assigns_clauset &assigns_clause)
+  goto_programt::instructionst::iterator &instruction_it,
+  const irep_idt &function,
+  goto_programt &body,
+  assigns_clauset &assigns)
 {
   INVARIANT(
-    instruction_iterator->is_function_call(),
+    instruction_it->is_function_call(),
     "The first argument of instrument_call_statement should always be "
     "a function call");
 
-  irep_idt called_name;
-  if(instruction_iterator->call_function().id() == ID_dereference)
+  irep_idt called_function;
+  if(instruction_it->call_function().id() == ID_dereference)
   {
-    called_name =
+    called_function =
       to_symbol_expr(
-        to_dereference_expr(instruction_iterator->call_function()).pointer())
+        to_dereference_expr(instruction_it->call_function()).pointer())
         .get_identifier();
   }
   else
   {
-    called_name =
-      to_symbol_expr(instruction_iterator->call_function()).get_identifier();
+    called_function =
+      to_symbol_expr(instruction_it->call_function()).get_identifier();
   }
 
-  if(called_name == "malloc")
+  if(called_function == "malloc")
   {
     // malloc statments return a void pointer, which is then cast and assigned
     // to a result variable. We iterate one line forward to grab the result of
     // the malloc once it is cast.
-    instruction_iterator++;
-    if(instruction_iterator->is_assign())
+    instruction_it++;
+    if(instruction_it->is_assign())
     {
-      instrument_assign_statement(
-        instruction_iterator, program, assigns_clause);
-      const exprt &lhs = instruction_iterator->assign_lhs();
-      assigns_clause.add_to_local_write_set(dereference_exprt(lhs));
+      instrument_assign_statement(instruction_it, body, assigns);
+      const exprt &lhs = instruction_it->assign_lhs();
+      assigns.add_to_local_write_set(dereference_exprt(lhs));
     }
     return; // assume malloc edits no pre-existing memory objects.
   }
-  else if(called_name == "free")
+  else if(called_function == "free")
   {
     const exprt &lhs_dereference = dereference_exprt(
-      to_typecast_expr(instruction_iterator->call_arguments().front()).op());
-    add_containment_check(
-      program, assigns_clause, instruction_iterator, lhs_dereference);
-    assigns_clause.remove_from_local_write_set(lhs_dereference);
-    assigns_clause.remove_from_global_write_set(lhs_dereference);
+      to_typecast_expr(instruction_it->call_arguments().front()).op());
+    add_containment_check(body, assigns, instruction_it, lhs_dereference);
+    assigns.remove_from_local_write_set(lhs_dereference);
+    assigns.remove_from_global_write_set(lhs_dereference);
     return;
-  }
-
-  if(
-    instruction_iterator->call_lhs().is_not_nil() &&
-    instruction_iterator->call_lhs().id() == ID_symbol)
-  {
-    add_containment_check(
-      program,
-      assigns_clause,
-      instruction_iterator,
-      instruction_iterator->call_lhs());
-  }
-
-  const symbolt &called_symbol = ns.lookup(called_name);
-  // Called symbol might be a function pointer.
-  const typet &called_symbol_type = (called_symbol.type.id() == ID_pointer)
-                                      ? called_symbol.type.subtype()
-                                      : called_symbol.type;
-  const auto called_assigns =
-    to_code_with_contract_type(called_symbol_type).assigns();
-
-  if(!called_assigns.empty())
-  {
-    replace_symbolt replace_formal_parameters = actuals_replace_map(
-      instruction_iterator->call_lhs(),
-      instruction_iterator->call_function(),
-      instruction_iterator->call_arguments(),
-      ns);
-    exprt targets;
-    for(auto &target : called_assigns)
-      targets.add_to_operands(std::move(target));
-    replace_formal_parameters(targets);
-
-    // Check subset relationship of assigns clause for called function
-    assigns_clauset called_assigns_clause(targets.operands(), log, ns);
-    const auto subset_check =
-      assigns_clause.generate_subset_check(called_assigns_clause);
-    goto_programt alias_assertion;
-    alias_assertion.add(goto_programt::make_assertion(
-      subset_check, instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that " + id2string(called_name) +
-      "'s assigns clause is a subset of " +
-      id2string(instruction_iterator->source_location.get_function()) +
-      "'s assigns clause");
-    insert_before_swap_and_advance(
-      program, instruction_iterator, alias_assertion);
   }
 }
 
@@ -847,17 +800,16 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
 bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
-  auto old_function = goto_functions.function_map.find(function);
-  if(old_function == goto_functions.function_map.end())
+  auto function_obj = goto_functions.function_map.find(function);
+  if(function_obj == goto_functions.function_map.end())
   {
     log.error() << "Could not find function '" << function
                 << "' in goto-program; not enforcing contracts."
                 << messaget::eom;
     return true;
   }
-  goto_programt &program = old_function->second.body;
 
-  if(check_for_looped_mallocs(program))
+  if(check_for_looped_mallocs(function_obj->second.body))
   {
     return true;
   }
@@ -875,17 +827,21 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   }
 
   // Insert aliasing assertions
-  check_frame_conditions(program, assigns);
+  check_frame_conditions(
+    function_obj->first, function_obj->second.body, assigns);
 
   return false;
 }
 
 void code_contractst::check_frame_conditions(
-  goto_programt &program,
+  const irep_idt &function,
+  goto_programt &body,
   assigns_clauset &assigns)
 {
-  for(auto instruction_it = program.instructions.begin();
-      instruction_it != program.instructions.end();
+  goto_function_inline(goto_functions, function, ns, log.get_message_handler());
+
+  for(auto instruction_it = body.instructions.begin();
+      instruction_it != body.instructions.end();
       ++instruction_it)
   {
     if(instruction_it->is_decl())
@@ -895,17 +851,11 @@ void code_contractst::check_frame_conditions(
     }
     else if(instruction_it->is_assign())
     {
-      instrument_assign_statement(
-        instruction_it,
-        program,
-        assigns);
+      instrument_assign_statement(instruction_it, body, assigns);
     }
     else if(instruction_it->is_function_call())
     {
-      instrument_call_statement(
-        instruction_it,
-        program,
-        assigns);
+      instrument_call_statement(instruction_it, function, body, assigns);
     }
     else if(instruction_it->is_dead())
     {
@@ -917,7 +867,7 @@ void code_contractst::check_frame_conditions(
     {
       const exprt &havoc_argument = dereference_exprt(
         to_typecast_expr(instruction_it->get_other().operands().front()).op());
-      add_containment_check(program, assigns, instruction_it, havoc_argument);
+      add_containment_check(body, assigns, instruction_it, havoc_argument);
       assigns.remove_from_local_write_set(havoc_argument);
       assigns.remove_from_global_write_set(havoc_argument);
     }

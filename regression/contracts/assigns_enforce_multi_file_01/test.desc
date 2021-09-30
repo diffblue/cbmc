@@ -1,9 +1,9 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract f2 --enforce-contract f3
-^EXIT=10$
+--enforce-contract f1
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^VERIFICATION SUCCESSFUL$
 --
 --
 This test replicates the behavior of assigns_enforce_04, but separates

@@ -1,8 +1,10 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract f2 _ --unwind 20 --unwinding-assertions
+--enforce-contract f1 _ --unwind 20 --unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
+^file main.c line \d+ function f2: recursion is ignored on call to \'f2\'$
+^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$
 ^VERIFICATION FAILED$
 --
 --
@@ -10,7 +12,6 @@ Verification:
   function | pre-cond | post-cond
   ---------|----------|----------
   f1       | assumed  | asserted
-  f2       | assumed  | asserted
 
 Test should fail:
 The postcondition of f2 is incorrect, considering the recursion particularity. 
