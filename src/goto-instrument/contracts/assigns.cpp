@@ -15,9 +15,12 @@ Date: July 2021
 
 #include <goto-instrument/havoc_utils.h>
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
+#include <langapi/language_util.h>
+
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+
+#include "utils.h"
 
 assigns_clauset::targett::targett(
   const assigns_clauset &parent,
@@ -43,27 +46,16 @@ exprt assigns_clauset::targett::normalize(const exprt &expr)
 exprt assigns_clauset::targett::generate_containment_check(
   const address_of_exprt &lhs_address) const
 {
-  exprt::operandst address_validity;
+  const auto address_validity = and_exprt{
+    all_dereferences_are_valid(dereference_exprt{address}, parent.ns),
+    all_dereferences_are_valid(dereference_exprt{lhs_address}, parent.ns)};
+
   exprt::operandst containment_check;
-
-  // __CPROVER_w_ok(target, sizeof(target))
-  address_validity.push_back(w_ok_exprt(
-    address,
-    size_of_expr(dereference_exprt(address).type(), parent.ns).value()));
-
-  // __CPROVER_w_ok(lhs, sizeof(lhs))
-  address_validity.push_back(w_ok_exprt(
-    lhs_address,
-    size_of_expr(dereference_exprt(lhs_address).type(), parent.ns).value()));
-
-  // __CPROVER_same_object(lhs, target)
   containment_check.push_back(same_object(lhs_address, address));
 
   // If assigns target was a dereference, comparing objects is enough
-  // and the resulting condition will be
-  // __CPROVER_w_ok(target, sizeof(target))
-  // && __CPROVER_w_ok(lhs, sizeof(lhs))
-  // ==> __CPROVER_same_object(lhs, target)
+  // and the resulting condition will be:
+  // VALID(self) && VALID(lhs) ==> __CPROVER_same_object(lhs, self)
   if(id != ID_dereference)
   {
     const auto lhs_offset = pointer_offset(lhs_address);
@@ -86,19 +78,17 @@ exprt assigns_clauset::targett::generate_containment_check(
       own_offset);
 
     // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
-    // (sizeof(target) + __CPROVER_offset(target))
+    // (sizeof(self) + __CPROVER_offset(self))
     containment_check.push_back(
       binary_relation_exprt(lhs_region, ID_le, own_region));
   }
 
-  // __CPROVER_w_ok(target, sizeof(target))
-  // && __CPROVER_w_ok(lhs, sizeof(lhs))
-  // ==> __CPROVER_same_object(lhs, target)
-  //     && __CPROVER_offset(lhs) >= __CPROVER_offset(target)
-  //     && (sizeof(lhs) + __CPROVER_offset(lhs)) <=
-  //        (sizeof(target) + __CPROVER_offset(target))
-  return binary_relation_exprt(
-    conjunction(address_validity), ID_implies, conjunction(containment_check));
+  // VALID(self) && VALID(lhs)
+  // ==> __CPROVER_same_object(lhs, self)
+  //  && __CPROVER_offset(lhs) >= __CPROVER_offset(self)
+  //  && (sizeof(lhs) + __CPROVER_offset(lhs)) <=
+  //        (sizeof(self) + __CPROVER_offset(self))
+  return or_exprt{not_exprt{address_validity}, conjunction(containment_check)};
 }
 
 assigns_clauset::assigns_clauset(
@@ -147,12 +137,13 @@ goto_programt assigns_clauset::generate_havoc_code() const
   modifiest modifies;
   for(const auto &target : global_write_set)
     modifies.insert(target.address.object());
-
   for(const auto &target : local_write_set)
     modifies.insert(target.address.object());
 
   goto_programt havoc_statements;
-  append_havoc_code(location, modifies, havoc_statements);
+  havoc_if_validt havoc_gen(modifies, ns);
+  havoc_gen.append_full_havoc_code(location, havoc_statements);
+
   return havoc_statements;
 }
 

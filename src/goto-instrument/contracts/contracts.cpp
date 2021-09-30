@@ -24,6 +24,8 @@ Date: February 2016
 
 #include <goto-programs/remove_skip.h>
 
+#include <langapi/language_util.h>
+
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
@@ -31,66 +33,12 @@ Date: February 2016
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
 
 #include "assigns.h"
 #include "memory_predicates.h"
-
-// Create a lexicographic less-than relation between two tuples of variables.
-// This is used in the implementation of multidimensional decreases clauses.
-static exprt create_lexicographic_less_than(
-  const std::vector<symbol_exprt> &lhs,
-  const std::vector<symbol_exprt> &rhs)
-{
-  PRECONDITION(lhs.size() == rhs.size());
-
-  if(lhs.empty())
-  {
-    return false_exprt();
-  }
-
-  // Store conjunctions of equalities.
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 == l1, s1 == l1 && s2 == l2,
-  // s1 == l1 && s2 == l2 && s3 == l3>.
-  // In fact, the last element is unnecessary, so we do not create it.
-  exprt::operandst equality_conjunctions(lhs.size());
-  equality_conjunctions[0] = binary_relation_exprt(lhs[0], ID_equal, rhs[0]);
-  for(size_t i = 1; i < equality_conjunctions.size() - 1; i++)
-  {
-    binary_relation_exprt component_i_equality{lhs[i], ID_equal, rhs[i]};
-    equality_conjunctions[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_equality);
-  }
-
-  // Store inequalities between the i-th components of the input vectors
-  // (i.e. lhs and rhs).
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 < l1, s1 == l1 && s2 < l2, s1 == l1 &&
-  // s2 == l2 && s3 < l3>.
-  exprt::operandst lexicographic_individual_comparisons(lhs.size());
-  lexicographic_individual_comparisons[0] =
-    binary_relation_exprt(lhs[0], ID_lt, rhs[0]);
-  for(size_t i = 1; i < lexicographic_individual_comparisons.size(); i++)
-  {
-    binary_relation_exprt component_i_less_than{lhs[i], ID_lt, rhs[i]};
-    lexicographic_individual_comparisons[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_less_than);
-  }
-  return disjunction(lexicographic_individual_comparisons);
-}
-
-static void insert_before_swap_and_advance(
-  goto_programt &program,
-  goto_programt::targett &target,
-  goto_programt &payload)
-{
-  const auto offset = payload.instructions.size();
-  program.insert_before_swap(target, payload);
-  std::advance(target, offset);
-}
+#include "utils.h"
 
 void code_contractst::check_apply_loop_contracts(
   goto_functionst::goto_functiont &goto_function,
@@ -203,7 +151,8 @@ void code_contractst::check_apply_loop_contracts(
   }
 
   // havoc the variables that may be modified
-  append_havoc_code(loop_head->source_location, modifies, havoc_code);
+  havoc_if_validt havoc_gen(modifies, ns);
+  havoc_gen.append_full_havoc_code(loop_head->source_location, havoc_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
@@ -289,7 +238,8 @@ void code_contractst::check_apply_loop_contracts(
     // after the loop is smaller than the value before the loop.
     // Here, we use the lexicographic order.
     code_assertt monotonic_decreasing_assertion{
-      create_lexicographic_less_than(new_decreases_vars, old_decreases_vars)};
+      generate_lexicographic_less_than_check(
+        new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
       loop_head->source_location;
     converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
@@ -418,6 +368,11 @@ void code_contractst::replace_history_parameter(
 
       if(it == parameter2history.end())
       {
+        // 0. Create a skip target to jump to, if the parameter is invalid
+        goto_programt skip_program;
+        const auto skip_target =
+          skip_program.add(goto_programt::make_skip(location));
+
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
@@ -428,14 +383,23 @@ void code_contractst::replace_history_parameter(
         parameter2history[parameter] = tmp_symbol;
 
         // 3. Add the required instructions to the instructions list
-        // 3.1 Declare the newly created temporary variable
+        // 3.1. Declare the newly created temporary variable
         history.add(goto_programt::make_decl(tmp_symbol, location));
 
-        // 3.2 Add an assignment such that the value pointed to by the new
+        // 3.2. Skip storing the history if the expression is invalid
+        history.add(goto_programt::make_goto(
+          skip_target,
+          not_exprt{all_dereferences_are_valid(parameter, ns)},
+          location));
+
+        // 3.3. Add an assignment such that the value pointed to by the new
         // temporary variable is equal to the value of the corresponding
         // parameter
         history.add(
           goto_programt::make_assignment(tmp_symbol, parameter, location));
+
+        // 3.4. Add a skip target
+        history.destructive_append(skip_program);
       }
 
       expr = parameter2history[parameter];

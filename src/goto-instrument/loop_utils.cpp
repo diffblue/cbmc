@@ -50,10 +50,11 @@ void get_modifies_lhs(
     const pointer_arithmetict ptr(to_dereference_expr(lhs).pointer());
     for(const auto &mod : local_may_alias.get(t, ptr.pointer))
     {
+      const typecast_exprt typed_mod{mod, ptr.pointer.type()};
       if(ptr.offset.is_nil())
-        modifies.insert(dereference_exprt{mod});
+        modifies.insert(dereference_exprt{typed_mod});
       else
-        modifies.insert(dereference_exprt{plus_exprt{mod, ptr.offset}});
+        modifies.insert(dereference_exprt{plus_exprt{typed_mod, ptr.offset}});
     }
   }
   else if(lhs.id()==ID_if)
