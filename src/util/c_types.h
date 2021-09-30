@@ -339,22 +339,14 @@ public:
   {
   }
 
-  bool has_contract() const
+  const exprt::operandst &assigns() const
   {
-    return assigns().is_not_nil() || !requires().empty() || !ensures().empty();
+    return static_cast<const exprt &>(find(ID_C_spec_assigns)).operands();
   }
 
-  const exprt &assigns() const
+  exprt::operandst &assigns()
   {
-    return static_cast<const exprt &>(find(ID_C_spec_assigns));
-  }
-
-  exprt &assigns()
-  {
-    auto &result = static_cast<exprt &>(add(ID_C_spec_assigns));
-    if(result.id().empty()) // not initialized?
-      result.make_nil();
-    return result;
+    return static_cast<exprt &>(add(ID_C_spec_assigns)).operands();
   }
 
   const exprt::operandst &requires() const

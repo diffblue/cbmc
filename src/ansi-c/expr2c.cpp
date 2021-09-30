@@ -583,10 +583,9 @@ std::string expr2ct::convert_rec(
       dest += " [[requires " + convert(requires) + "]]";
     }
 
-    if(!to_code_with_contract_type(src).assigns().operands().empty())
+    for(auto &assigns : to_code_with_contract_type(src).assigns())
     {
-      dest += " [[assigns " +
-              convert(to_code_with_contract_type(src).assigns()) + "]]";
+      dest += " [[assigns " + convert(assigns) + "]]";
     }
 
     for(auto &ensures : to_code_with_contract_type(src).ensures())

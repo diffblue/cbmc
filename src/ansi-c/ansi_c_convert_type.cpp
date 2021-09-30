@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
@@ -253,26 +254,22 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
 
-    for(const exprt &operand : to_unary_expr(as_expr).op().operands())
+    for(const exprt &target : to_unary_expr(as_expr).op().operands())
     {
-      if(
-        operand.id() != ID_symbol && operand.id() != ID_ptrmember &&
-        operand.id() != ID_member && operand.id() != ID_dereference)
+      if(!is_lvalue(target))
       {
-        error().source_location = source_location;
+        error().source_location = target.source_location();
         error() << "illegal target in assigns clause" << eom;
         throw 0;
       }
+      else if(has_subexpr(target, ID_side_effect))
+      {
+        error().source_location = target.source_location();
+        error() << "Assigns clause is not side-effect free." << eom;
+        throw 0;
+      }
+      assigns.push_back(target);
     }
-
-    if(assigns.is_nil())
-      assigns = to_unary_expr(as_expr).op();
-    else
-    {
-      for(auto &assignment : to_unary_expr(as_expr).op().operands())
-        assigns.add_to_operands(std::move(assignment));
-    }
-    assigns.add_source_location() = as_expr.source_location();
   }
   else if(type.id() == ID_C_spec_ensures)
   {
@@ -329,7 +326,7 @@ void ansi_c_convert_typet::write(typet &type)
     if(!requires.empty())
       to_code_with_contract_type(type).requires() = std::move(requires);
 
-    if(assigns.is_not_nil())
+    if(!assigns.empty())
       to_code_with_contract_type(type).assigns() = std::move(assigns);
 
     if(!ensures.empty())

@@ -741,10 +741,10 @@ void c_typecheck_baset::typecheck_declaration(
           }
         }
 
-        if(as_const(code_type).assigns().is_not_nil())
+        if(!as_const(code_type).assigns().empty())
         {
-          for(auto &op : code_type.assigns().operands())
-            typecheck_expr(op);
+          for(auto &target : code_type.assigns())
+            typecheck_expr(target);
         }
 
         if(!as_const(code_type).ensures().empty())
