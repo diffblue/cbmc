@@ -53,18 +53,20 @@ public:
     const assigns_clauset &parent;
   };
 
-  assigns_clauset(const exprt &, const messaget &, const namespacet &);
+  assigns_clauset(
+    const exprt::operandst &,
+    const messaget &,
+    const namespacet &);
 
   void add_to_global_write_set(const exprt &);
   void remove_from_global_write_set(const exprt &);
   void add_to_local_write_set(const exprt &);
   void remove_from_local_write_set(const exprt &);
 
-  goto_programt generate_havoc_code() const;
+  goto_programt generate_havoc_code(const source_locationt &) const;
   exprt generate_containment_check(const exprt &) const;
   exprt generate_subset_check(const assigns_clauset &) const;
 
-  const source_locationt &location;
   const messaget &log;
   const namespacet &ns;
 

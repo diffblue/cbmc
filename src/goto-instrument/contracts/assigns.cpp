@@ -92,12 +92,12 @@ exprt assigns_clauset::targett::generate_containment_check(
 }
 
 assigns_clauset::assigns_clauset(
-  const exprt &expr,
+  const exprt::operandst &assigns,
   const messaget &log,
   const namespacet &ns)
-  : location(expr.source_location()), log(log), ns(ns)
+  : log(log), ns(ns)
 {
-  for(const auto &target_expr : expr.operands())
+  for(const auto &target_expr : assigns)
   {
     add_to_global_write_set(target_expr);
   }
@@ -132,7 +132,8 @@ void assigns_clauset::remove_from_local_write_set(const exprt &expr)
   local_write_set.erase(targett(*this, expr));
 }
 
-goto_programt assigns_clauset::generate_havoc_code() const
+goto_programt
+assigns_clauset::generate_havoc_code(const source_locationt &location) const
 {
   modifiest modifies;
   for(const auto &target : global_write_set)
@@ -176,7 +177,9 @@ exprt assigns_clauset::generate_subset_check(
   INVARIANT(
     subassigns.local_write_set.empty(),
     "Local write set for function calls should be empty at this point.\n" +
-      subassigns.location.as_string());
+      subassigns.local_write_set.begin()
+        ->address.source_location()
+        .as_string());
 
   exprt result = true_exprt();
   for(const auto &subtarget : subassigns.global_write_set)
