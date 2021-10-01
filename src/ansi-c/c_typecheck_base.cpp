@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/std_types.h>
 
 #include "ansi_c_declaration.h"
@@ -741,16 +742,27 @@ void c_typecheck_baset::typecheck_declaration(
         for(auto &target : code_type.assigns())
         {
           typecheck_expr(target);
+
           if(target.type().id() == ID_empty)
           {
             error().source_location = target.source_location();
             error() << "void-typed targets not permitted" << eom;
             throw 0;
           }
-          if(!target.get_bool(ID_C_lvalue))
+          else if(target.id() == ID_pointer_object)
+          {
+            // skip
+          }
+          else if(!target.get_bool(ID_C_lvalue))
           {
             error().source_location = target.source_location();
             error() << "illegal target in assigns clause" << eom;
+            throw 0;
+          }
+          else if(has_subexpr(target, ID_side_effect))
+          {
+            error().source_location = target.source_location();
+            error() << "assigns clause is not side-effect free" << eom;
             throw 0;
           }
         }

@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/expr_util.h>
+#include <util/std_code.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
@@ -255,15 +255,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       static_cast<const exprt &>(static_cast<const irept &>(type));
 
     for(const exprt &target : to_unary_expr(as_expr).op().operands())
-    {
-      if(has_subexpr(target, ID_side_effect))
-      {
-        error().source_location = target.source_location();
-        error() << "Assigns clause is not side-effect free." << eom;
-        throw 0;
-      }
       assigns.push_back(target);
-    }
   }
   else if(type.id() == ID_C_spec_ensures)
   {

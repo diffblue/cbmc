@@ -16,59 +16,100 @@ Date: July 2021
 
 #include <unordered_set>
 
-#include <goto-programs/goto_model.h>
-
 #include <util/message.h>
-#include <util/pointer_expr.h>
+
+#include "utils.h"
+
+typedef std::pair<const exprt, const exprt> slicet;
 
 /// \brief A class for representing assigns clauses in code contracts
 class assigns_clauset
 {
 public:
-  /// \brief A class for representing targets for assigns clauses
-  class targett
+  /// \brief A class for representing Conditional Address Ranges
+  class conditional_address_ranget
   {
   public:
-    targett(const assigns_clauset &, const exprt &);
+    conditional_address_ranget(const assigns_clauset &, const exprt &);
 
-    static exprt normalize(const exprt &);
+    goto_programt generate_snapshot_instructions() const;
 
-    exprt generate_containment_check(const address_of_exprt &) const;
-
-    bool operator==(const targett &other) const
+    bool operator==(const conditional_address_ranget &other) const
     {
-      return address == other.address;
+      return source_expr == other.source_expr;
     }
 
     struct hasht
     {
-      std::size_t operator()(const targett &target) const
+      std::size_t operator()(const conditional_address_ranget &target) const
       {
-        return irep_hash{}(target.address);
+        return irep_hash{}(target.source_expr);
       }
     };
 
-    const address_of_exprt address;
-    const irep_idt &id;
+    const exprt source_expr;
+    const source_locationt &location;
     const assigns_clauset &parent;
+
+    const slicet slice;
+    const symbol_exprt validity_condition_var;
+    const symbol_exprt lower_bound_address_var;
+    const symbol_exprt upper_bound_address_var;
+
+  protected:
+    const exprt
+    generate_unsafe_inclusion_check(const conditional_address_ranget &) const;
+
+    const symbolt
+    generate_new_symbol(const typet &, const source_locationt &) const;
+
+    friend class assigns_clauset;
   };
+
+  typedef std::
+    unordered_set<conditional_address_ranget, conditional_address_ranget::hasht>
+      write_sett;
 
   assigns_clauset(
     const exprt::operandst &,
     const messaget &,
-    const namespacet &);
+    const namespacet &,
+    const irep_idt &,
+    symbol_tablet &);
 
-  void add_to_write_set(const exprt &);
+  write_sett::const_iterator add_to_write_set(const exprt &);
   void remove_from_write_set(const exprt &);
 
-  goto_programt generate_havoc_code(const source_locationt &) const;
-  exprt generate_containment_check(const exprt &) const;
+  exprt generate_inclusion_check(const conditional_address_ranget &) const;
+
+  const write_sett &get_write_set() const
+  {
+    return write_set;
+  }
 
   const messaget &log;
   const namespacet &ns;
+  const irep_idt &function_name;
 
 protected:
-  std::unordered_set<targett, targett::hasht> write_set;
+  symbol_tablet &symbol_table;
+  write_sett write_set;
+};
+
+/// \brief A class that further overrides the "safe" havoc utilities,
+///        and adds support for havocing pointer_object expressions.
+class havoc_assigns_targetst : public havoc_if_validt
+{
+public:
+  havoc_assigns_targetst(const modifiest &mod, const namespacet &ns)
+    : havoc_if_validt(mod, ns)
+  {
+  }
+
+  void append_havoc_code_for_expr(
+    const source_locationt location,
+    const exprt &expr,
+    goto_programt &dest) const override;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_ASSIGNS_H

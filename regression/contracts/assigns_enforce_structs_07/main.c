@@ -26,11 +26,17 @@ void f2(struct pair_of_pairs *pp) __CPROVER_assigns(*(pp->p->buf))
 int main()
 {
   struct pair *p = malloc(sizeof(*p));
+  if(p)
+    p->buf = malloc(100 * sizeof(uint8_t));
   f1(p);
 
   struct pair_of_pairs *pp = malloc(sizeof(*pp));
   if(pp)
+  {
     pp->p = malloc(sizeof(*(pp->p)));
+    if(pp->p)
+      pp->p->buf = malloc(100 * sizeof(uint8_t));
+  }
   f2(pp);
 
   return 0;

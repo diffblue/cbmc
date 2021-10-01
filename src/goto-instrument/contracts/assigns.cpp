@@ -9,144 +9,177 @@ Date: July 2021
 \*******************************************************************/
 
 /// \file
-/// Specify write set in function contracts
+/// Specify write set in code contracts
 
 #include "assigns.h"
 
-#include <goto-instrument/havoc_utils.h>
-
 #include <langapi/language_util.h>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
-#include "utils.h"
+static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
+{
+  // FIXME: Refactor these checks out to a common function that can be
+  // used both in compilation and instrumentation stages
+  if(expr.id() == ID_pointer_object)
+  {
+    const auto &arg = expr.operands().front();
+    return {
+      minus_exprt{
+        typecast_exprt::conditional_cast(arg, pointer_type(char_type())),
+        pointer_offset(arg)},
+      typecast_exprt::conditional_cast(object_size(arg), signed_size_type())};
+  }
+  else if(is_lvalue(expr))
+  {
+    const auto &size = size_of_expr(expr.type(), ns);
 
-assigns_clauset::targett::targett(
+    INVARIANT(
+      size.has_value(),
+      "`sizeof` must always be computable on l-value assigns clause targets.");
+
+    return {typecast_exprt::conditional_cast(
+              address_of_exprt{expr}, pointer_type(char_type())),
+            typecast_exprt::conditional_cast(size.value(), signed_size_type())};
+  }
+
+  UNREACHABLE;
+}
+
+const symbolt assigns_clauset::conditional_address_ranget::generate_new_symbol(
+  const typet &type,
+  const source_locationt &location) const
+{
+  return new_tmp_symbol(
+    type,
+    location,
+    parent.symbol_table.lookup_ref(parent.function_name).mode,
+    parent.symbol_table);
+}
+
+assigns_clauset::conditional_address_ranget::conditional_address_ranget(
   const assigns_clauset &parent,
   const exprt &expr)
-  : address(address_of_exprt(normalize(expr))),
-    id(expr.id()),
-    parent(parent)
+  : source_expr(expr),
+    location(expr.source_location()),
+    parent(parent),
+    slice(normalize_to_slice(expr, parent.ns)),
+    validity_condition_var(
+      generate_new_symbol(bool_typet(), location).symbol_expr()),
+    lower_bound_address_var(
+      generate_new_symbol(slice.first.type(), location).symbol_expr()),
+    upper_bound_address_var(
+      generate_new_symbol(slice.first.type(), location).symbol_expr())
 {
 }
 
-exprt assigns_clauset::targett::normalize(const exprt &expr)
+goto_programt
+assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
+  const
 {
-  if(expr.id() != ID_address_of)
-    return expr;
+  goto_programt instructions;
 
-  const auto &object = to_address_of_expr(expr).object();
-  if(object.id() != ID_index)
-    return object;
+  instructions.add(goto_programt::make_decl(validity_condition_var, location));
+  instructions.add(goto_programt::make_decl(lower_bound_address_var, location));
+  instructions.add(goto_programt::make_decl(upper_bound_address_var, location));
 
-  return to_index_expr(object).array();
+  goto_programt skip_program;
+  const auto skip_target = skip_program.add(goto_programt::make_skip(location));
+
+  const auto validity_check_expr =
+    and_exprt{all_dereferences_are_valid(source_expr, parent.ns),
+              w_ok_exprt{slice.first, slice.second}};
+  instructions.add(goto_programt::make_assignment(
+    validity_condition_var, validity_check_expr, location));
+
+  instructions.add(goto_programt::make_goto(
+    skip_target, not_exprt{validity_condition_var}, location));
+
+  instructions.add(goto_programt::make_assignment(
+    lower_bound_address_var, slice.first, location));
+
+  instructions.add(goto_programt::make_assignment(
+    upper_bound_address_var,
+    minus_exprt{plus_exprt{slice.first, slice.second},
+                from_integer(1, slice.second.type())},
+    location));
+
+  instructions.destructive_append(skip_program);
+  return instructions;
+}
+
+const exprt
+assigns_clauset::conditional_address_ranget::generate_unsafe_inclusion_check(
+  const conditional_address_ranget &lhs) const
+{
+  return conjunction(
+    {validity_condition_var,
+     same_object(lower_bound_address_var, lhs.lower_bound_address_var),
+     same_object(lhs.upper_bound_address_var, upper_bound_address_var),
+     less_than_or_equal_exprt{lower_bound_address_var,
+                              lhs.lower_bound_address_var},
+     less_than_or_equal_exprt{lhs.upper_bound_address_var,
+                              upper_bound_address_var}});
 }
 
 assigns_clauset::assigns_clauset(
   const exprt::operandst &assigns,
   const messaget &log,
-  const namespacet &ns)
-  : log(log), ns(ns)
+  const namespacet &ns,
+  const irep_idt &function_name,
+  symbol_tablet &symbol_table)
+  : log(log), ns(ns), function_name(function_name), symbol_table(symbol_table)
 {
   for(const auto &target_expr : assigns)
-  {
     add_to_write_set(target_expr);
-  }
 }
 
-void assigns_clauset::add_to_write_set(const exprt &target_expr)
+assigns_clauset::write_sett::const_iterator
+assigns_clauset::add_to_write_set(const exprt &target_expr)
 {
-  auto insertion_succeeded = write_set.emplace(*this, target_expr).second;
+  auto result = write_set.emplace(*this, target_expr);
 
-  if(!insertion_succeeded)
+  if(!result.second)
   {
     log.warning() << "Ignored duplicate expression '"
                   << from_expr(ns, target_expr.id(), target_expr)
                   << "' in assigns clause at "
                   << target_expr.source_location().as_string() << messaget::eom;
   }
+  return result.first;
 }
 
 void assigns_clauset::remove_from_write_set(const exprt &target_expr)
 {
-  write_set.erase(targett(*this, target_expr));
+  write_set.erase(conditional_address_ranget(*this, target_expr));
 }
 
-exprt assigns_clauset::targett::generate_containment_check(
-  const address_of_exprt &lhs_address) const
+exprt assigns_clauset::generate_inclusion_check(
+  const conditional_address_ranget &lhs) const
 {
-  const auto address_validity = and_exprt{
-    all_dereferences_are_valid(dereference_exprt{address}, parent.ns),
-    all_dereferences_are_valid(dereference_exprt{lhs_address}, parent.ns)};
-
-  exprt::operandst containment_check;
-  containment_check.push_back(same_object(lhs_address, address));
-
-  // If assigns target was a dereference, comparing objects is enough
-  // and the resulting condition will be:
-  // VALID(self) && VALID(lhs) ==> __CPROVER_same_object(lhs, self)
-  if(id != ID_dereference)
-  {
-    const auto lhs_offset = pointer_offset(lhs_address);
-    const auto own_offset = pointer_offset(address);
-
-    // __CPROVER_offset(lhs) >= __CPROVER_offset(target)
-    containment_check.push_back(
-      binary_relation_exprt(lhs_offset, ID_ge, own_offset));
-
-    const auto lhs_region = plus_exprt(
-      typecast_exprt::conditional_cast(
-        size_of_expr(lhs_address.object().type(), parent.ns).value(),
-        lhs_offset.type()),
-      lhs_offset);
-
-    const exprt own_region = plus_exprt(
-      typecast_exprt::conditional_cast(
-        size_of_expr(address.object().type(), parent.ns).value(),
-        own_offset.type()),
-      own_offset);
-
-    // (sizeof(lhs) + __CPROVER_offset(lhs)) <=
-    // (sizeof(self) + __CPROVER_offset(self))
-    containment_check.push_back(
-      binary_relation_exprt(lhs_region, ID_le, own_region));
-  }
-
-  // VALID(self) && VALID(lhs)
-  // ==> __CPROVER_same_object(lhs, self)
-  //  && __CPROVER_offset(lhs) >= __CPROVER_offset(self)
-  //  && (sizeof(lhs) + __CPROVER_offset(lhs)) <=
-  //        (sizeof(self) + __CPROVER_offset(self))
-  return or_exprt{not_exprt{address_validity}, conjunction(containment_check)};
-}
-
-goto_programt
-assigns_clauset::generate_havoc_code(const source_locationt &location) const
-{
-  modifiest modifies;
-  for(const auto &target : write_set)
-    modifies.insert(target.address.object());
-
-  goto_programt havoc_statements;
-  havoc_if_validt havoc_gen(modifies, ns);
-  havoc_gen.append_full_havoc_code(location, havoc_statements);
-
-  return havoc_statements;
-}
-
-exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
-{
-  // If write set is empty, no assignment is allowed.
   if(write_set.empty())
-    return false_exprt();
+    return not_exprt{lhs.validity_condition_var};
 
-  const auto lhs_address = address_of_exprt(targett::normalize(lhs));
-
-  exprt::operandst condition;
+  exprt::operandst conditions{not_exprt{lhs.validity_condition_var}};
   for(const auto &target : write_set)
+    conditions.push_back(target.generate_unsafe_inclusion_check(lhs));
+
+  return disjunction(conditions);
+}
+
+void havoc_assigns_targetst::append_havoc_code_for_expr(
+  const source_locationt location,
+  const exprt &expr,
+  goto_programt &dest) const
+{
+  if(expr.id() == ID_pointer_object)
   {
-    condition.push_back(target.generate_containment_check(lhs_address));
+    append_object_havoc_code_for_expr(location, expr.operands().front(), dest);
+    return;
   }
-  return disjunction(condition);
+
+  havoc_utilst::append_havoc_code_for_expr(location, expr, dest);
 }

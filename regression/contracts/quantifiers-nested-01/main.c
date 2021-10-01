@@ -1,6 +1,6 @@
 // clang-format off
 int f1(int *arr)
-  __CPROVER_assigns(*arr)
+  __CPROVER_assigns(__CPROVER_POINTER_OBJECT(arr))
   __CPROVER_ensures(__CPROVER_forall {
     int i;
     __CPROVER_forall

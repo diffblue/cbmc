@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that POINTER_OBJECT can be used both on arrays and scalars.
