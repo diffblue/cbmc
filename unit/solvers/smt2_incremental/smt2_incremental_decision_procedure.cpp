@@ -143,23 +143,23 @@ TEST_CASE(
       REQUIRE(
         sent_commands ==
         std::vector<smt_commandt>{
-          smt_declare_function_commandt{nondet_int_b_term, {}},
           smt_declare_function_commandt{nondet_int_a_term, {}},
           smt_define_function_commandt{
-            "third_comparison",
-            {},
-            smt_core_theoryt::equal(nondet_int_a_term, nondet_int_b_term)},
-          smt_define_function_commandt{
             "forty_two", {}, smt_bit_vector_constant_termt{42, 16}},
+          smt_define_function_commandt{
+            "first_comparison",
+            {},
+            smt_core_theoryt::equal(nondet_int_a_term, forty_two_term)},
+          smt_declare_function_commandt{nondet_int_b_term, {}},
           smt_define_function_commandt{
             "second_comparison",
             {},
             smt_core_theoryt::make_not(
               smt_core_theoryt::equal(nondet_int_b_term, forty_two_term))},
           smt_define_function_commandt{
-            "first_comparison",
+            "third_comparison",
             {},
-            smt_core_theoryt::equal(nondet_int_a_term, forty_two_term)},
+            smt_core_theoryt::equal(nondet_int_a_term, nondet_int_b_term)},
           smt_define_function_commandt{
             "comparison_conjunction",
             {},

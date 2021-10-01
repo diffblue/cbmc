@@ -18,18 +18,21 @@
 
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
+/// \return A collection of sub expressions, which need to be expressed as
+///   separate smt commands. This collection is in traversal order. It will
+///   include duplicate subexpressions, which need to be removed by the caller
+///   in order to avoid duplicate definitions.
 /// \note This pass over \p expr is tightly coupled to the implementation of
 ///   `convert_expr_to_smt`. This is because any sub expressions which
 ///   `convert_expr_to_smt` translates into function applications, must also be
 ///   returned by this`gather_dependent_expressions` function.
-static std::unordered_set<exprt, irep_hash>
-gather_dependent_expressions(const exprt &expr)
+static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
 {
-  std::unordered_set<exprt, irep_hash> dependent_expressions;
+  std::vector<exprt> dependent_expressions;
   expr.visit_pre([&](const exprt &expr_node) {
     if(can_cast_expr<symbol_exprt>(expr_node))
     {
-      dependent_expressions.insert(expr_node);
+      dependent_expressions.push_back(expr_node);
     }
   });
   return dependent_expressions;
