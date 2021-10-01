@@ -673,19 +673,8 @@ void code_contractst::instrument_call_statement(
     "The first argument of instrument_call_statement should always be "
     "a function call");
 
-  irep_idt called_function;
-  if(instruction_it->call_function().id() == ID_dereference)
-  {
-    called_function =
-      to_symbol_expr(
-        to_dereference_expr(instruction_it->call_function()).pointer())
-        .get_identifier();
-  }
-  else
-  {
-    called_function =
-      to_symbol_expr(instruction_it->call_function()).get_identifier();
-  }
+  irep_idt called_function =
+    to_symbol_expr(instruction_it->call_function()).get_identifier();
 
   if(called_function == "malloc")
   {
