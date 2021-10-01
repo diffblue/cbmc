@@ -74,8 +74,7 @@ public:
   /// it using `cbmc --function F`.
   ///
   /// \return `true` on failure, `false` otherwise
-  bool
-  replace_calls(const std::set<std::string> &, const std::set<std::string> &);
+  bool replace_calls(const std::set<std::string> &);
 
   /// \brief Turn requires & ensures into assumptions and assertions for each of
   ///        the named functions
@@ -178,8 +177,7 @@ protected:
   bool apply_function_contract(
     const irep_idt &,
     goto_programt &,
-    goto_programt::targett &,
-    const std::set<std::string> &);
+    goto_programt::targett &);
 
   /// Instruments `wrapper_function` adding assumptions based on requires
   /// clauses and assertions based on ensures clauses.

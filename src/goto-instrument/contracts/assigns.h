@@ -63,7 +63,6 @@ public:
 
   goto_programt generate_havoc_code(const source_locationt &) const;
   exprt generate_containment_check(const exprt &) const;
-  exprt generate_subset_check(const assigns_clauset &) const;
 
   const messaget &log;
   const namespacet &ns;

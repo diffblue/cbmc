@@ -3,7 +3,6 @@ main.c
 --replace-call-with-contract bar --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
-\[foo.\d+\] line \d+ Check that bar\'s assigns clause is a subset of foo\'s assigns clause: SUCCESS$
 \[foo.\d+\] line \d+ Check that \*z is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --

@@ -3,7 +3,7 @@
 
 int x = 0;
 
-void quz() __CPROVER_assigns(x)
+void quz() __CPROVER_assigns(x) __CPROVER_ensures(x == -1)
 {
   x = -1;
 }
@@ -17,6 +17,7 @@ void bar(int *y, int w) __CPROVER_assigns(*y)
 {
   *y = 3;
   w = baz();
+  assert(w == 5);
   quz();
 }
 

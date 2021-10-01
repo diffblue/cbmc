@@ -1,14 +1,14 @@
 CORE
 main.c
---enforce-contract foo
+--enforce-contract foo --replace-call-with-contract quz
 ^EXIT=10$
 ^SIGNAL=0$
 main.c function bar
 ^\[bar.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
+^\[bar.\d+\] line \d+ Check that x is assignable: FAILURE$
 ^\[baz.\d+\] line \d+ Check that w is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that w is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that z is assignable: SUCCESS$
-^\[quz.\d+\] line \d+ Check that x is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

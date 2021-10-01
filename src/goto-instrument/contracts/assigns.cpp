@@ -150,24 +150,3 @@ exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
   }
   return disjunction(condition);
 }
-
-exprt assigns_clauset::generate_subset_check(
-  const assigns_clauset &subassigns) const
-{
-  if(subassigns.write_set.empty())
-    return true_exprt();
-
-  exprt result = true_exprt();
-  for(const auto &subtarget : subassigns.write_set)
-  {
-    exprt::operandst current_subtarget_found_conditions;
-    for(const auto &target : write_set)
-    {
-      current_subtarget_found_conditions.push_back(
-        target.generate_containment_check(subtarget.address));
-    }
-    result = and_exprt(result, disjunction(current_subtarget_found_conditions));
-  }
-
-  return result;
-}

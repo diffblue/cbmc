@@ -433,8 +433,7 @@ code_contractst::create_ensures_instruction(
 bool code_contractst::apply_function_contract(
   const irep_idt &function,
   goto_programt &function_body,
-  goto_programt::targett &target,
-  const std::set<std::string> &enforced_functions)
+  goto_programt::targett &target)
 {
   const auto &const_target =
     static_cast<const goto_programt::targett &>(target);
@@ -568,30 +567,9 @@ bool code_contractst::apply_function_contract(
   {
     assigns_clauset assigns_clause(targets.operands(), log, ns);
 
-    // Retrieve assigns clause of the caller function if exists.
-    auto caller_assigns =
-      to_code_with_contract_type(ns.lookup(function).type).assigns();
-
-    if(enforced_functions.find(function.c_str()) != enforced_functions.end())
-    {
-      // check subset relationship of assigns clause for called function
-      assigns_clauset caller_assigns_clause(caller_assigns, log, ns);
-      goto_programt subset_check_assertion;
-      subset_check_assertion.add(goto_programt::make_assertion(
-        caller_assigns_clause.generate_subset_check(assigns_clause),
-        const_target->source_location));
-      subset_check_assertion.instructions.back().source_location.set_comment(
-        "Check that " + id2string(target_function) +
-        "'s assigns clause is a subset of " +
-        id2string(const_target->source_location.get_function()) +
-        "'s assigns clause");
-      insert_before_swap_and_advance(
-        function_body, target, subset_check_assertion);
-    }
-
     // Havoc all targets in global write set
     auto assigns_havoc =
-      assigns_clause.generate_havoc_code(const_target->source_location);
+      assigns_clause.generate_havoc_code(target->source_location);
 
     // Insert the non-deterministic assignment immediately before the call site.
     insert_before_swap_and_advance(function_body, target, assigns_havoc);
@@ -1097,9 +1075,7 @@ void code_contractst::add_contract_check(
   dest.destructive_insert(dest.instructions.begin(), check);
 }
 
-bool code_contractst::replace_calls(
-  const std::set<std::string> &to_replace,
-  const std::set<std::string> &to_enforce)
+bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
 {
   if(to_replace.empty())
     return false;
@@ -1123,7 +1099,7 @@ bool code_contractst::replace_calls(
           continue;
 
         fail |= apply_function_contract(
-          goto_function.first, goto_function.second.body, ins, to_enforce);
+          goto_function.first, goto_function.second.body, ins);
       }
     }
   }

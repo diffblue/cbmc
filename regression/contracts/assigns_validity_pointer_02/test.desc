@@ -13,9 +13,7 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$
-^\[foo.\d+\] line \d+ Check that bar\'s assigns clause is a subset of foo\'s assigns clause: FAILURE$
 ^\[foo.\d+\] line \d+ Check that \*x is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that baz\'s assigns clause is a subset of foo\'s assigns clause: FAILURE$
 --
 Verification:
 This test checks support for a NULL pointer that is assigned to by
