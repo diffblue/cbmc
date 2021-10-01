@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=(1|64)$
+^SIGNAL=0$
+^.*error: Assigns clause is not side-effect free.$
+^CONVERSION ERROR$
+--
+--
+Check that function call expressions are rejected in assigns clauses.
