@@ -53,10 +53,10 @@ protected:
 /// over all dereferenced pointer expressions *(pexpr_1), *(pexpr_2), ...
 /// found in the AST of `expr`.
 ///
-/// \param expr The expression that contains dereferences to be validated
-/// \param ns The namespace that defines all symbols appearing in `expr`
+/// \param expr: The expression that contains dereferences to be validated.
+/// \param ns: The namespace that defines all symbols appearing in `expr`.
 /// \return A conjunctive expression that checks validity of all pointers
-///         that are dereferenced within `expr`
+///         that are dereferenced within `expr`.
 exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns);
 
 /// \brief Generate a lexicographic less-than comparison over ordered tuples
@@ -65,9 +65,9 @@ exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns);
 /// comparison, lhs < rhs, between two ordered tuples of variables.
 /// This is used in instrumentation of decreases clauses.
 ///
-/// \param lhs A vector of variables representing the LHS of the comparison
-/// \param rhs A vector of variables representing the RHS of the comparison
-/// \return A lexicographic less-than comparison expression: LHS < RHS
+/// \param lhs: A vector of variables representing the LHS of the comparison.
+/// \param rhs: A vector of variables representing the RHS of the comparison.
+/// \return A lexicographic less-than comparison expression: LHS < RHS.
 exprt generate_lexicographic_less_than_check(
   const std::vector<symbol_exprt> &lhs,
   const std::vector<symbol_exprt> &rhs);
@@ -81,12 +81,25 @@ exprt generate_lexicographic_less_than_check(
 /// After insertion, `target` is advanced by the size of the `payload`,
 /// and `payload` is destroyed.
 ///
-/// \param destination The destination program for inserting the `payload`
-/// \param target The instruction iterator at which to insert the `payload`
-/// \param payload The goto program to be inserted into the `destination`
+/// \param destination: The destination program for inserting the `payload`.
+/// \param target: The instruction iterator at which to insert the `payload`.
+/// \param payload: The goto program to be inserted into the `destination`.
 void insert_before_swap_and_advance(
   goto_programt &destination,
   goto_programt::targett &target,
   goto_programt &payload);
+
+/// \brief Adds a new temporary symbol to the symbol table.
+///
+/// \param type: The type of the new symbol.
+/// \param location: The source location for the new symbol.
+/// \param mode: The mode for the new symbol, e.g. ID_C, ID_java.
+/// \param symtab: The symbol table to which the new symbol is to be added.
+/// \return The new symbolt object.
+const symbolt &new_tmp_symbol(
+  const typet &type,
+  const source_locationt &location,
+  const irep_idt &mode,
+  symbol_table_baset &symtab);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

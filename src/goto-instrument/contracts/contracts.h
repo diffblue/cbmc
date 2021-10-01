@@ -96,11 +96,6 @@ public:
 
   void apply_loop_contracts();
 
-  const symbolt &new_tmp_symbol(
-    const typet &type,
-    const source_locationt &source_location,
-    const irep_idt &mode);
-
   void check_apply_loop_contracts(
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,

@@ -169,14 +169,16 @@ void code_contractst::check_apply_loop_contracts(
   for(const auto &clause : decreases_clause.operands())
   {
     const auto old_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
+      new_tmp_symbol(
+        clause.type(), loop_head->source_location, mode, symbol_table)
         .symbol_expr();
     havoc_code.add(
       goto_programt::make_decl(old_decreases_var, loop_head->source_location));
     old_decreases_vars.push_back(old_decreases_var);
 
     const auto new_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
+      new_tmp_symbol(
+        clause.type(), loop_head->source_location, mode, symbol_table)
         .symbol_expr();
     havoc_code.add(
       goto_programt::make_decl(new_decreases_var, loop_head->source_location));
@@ -317,10 +319,8 @@ void code_contractst::add_quantified_variable(
       const auto &quantified_symbol = to_symbol_expr(quantified_variable);
 
       // 1. create fresh symbol
-      symbolt new_symbol = get_fresh_aux_symbol(
+      symbolt new_symbol = new_tmp_symbol(
         quantified_symbol.type(),
-        id2string(quantified_symbol.get_identifier()),
-        "tmp",
         quantified_symbol.source_location(),
         mode,
         symbol_table);
@@ -370,7 +370,8 @@ void code_contractst::replace_history_parameter(
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
-          new_tmp_symbol(parameter.type(), location, mode).symbol_expr();
+          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
+            .symbol_expr();
 
         // 2. Associate the above temporary variable to it's corresponding
         // expression
@@ -607,20 +608,6 @@ void code_contractst::apply_loop_contract(
       loop.second,
       symbol_table.lookup_ref(function).mode);
   }
-}
-
-const symbolt &code_contractst::new_tmp_symbol(
-  const typet &type,
-  const source_locationt &source_location,
-  const irep_idt &mode)
-{
-  return get_fresh_aux_symbol(
-    type,
-    id2string(source_location.get_function()) + "::tmp_cc",
-    "tmp_cc",
-    source_location,
-    mode,
-    symbol_table);
 }
 
 symbol_tablet &code_contractst::get_symbol_table()
@@ -962,7 +949,8 @@ void code_contractst::add_contract_check(
     symbol_exprt r = new_tmp_symbol(
                        code_type.return_type(),
                        skip->source_location,
-                       function_symbol.mode)
+                       function_symbol.mode,
+                       symbol_table)
                        .symbol_expr();
     check.add(goto_programt::make_decl(r, skip->source_location));
 
@@ -986,7 +974,8 @@ void code_contractst::add_contract_check(
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
                        skip->source_location,
-                       parameter_symbol.mode)
+                       parameter_symbol.mode,
+                       symbol_table)
                        .symbol_expr();
     check.add(goto_programt::make_decl(p, skip->source_location));
     check.add(goto_programt::make_assignment(
