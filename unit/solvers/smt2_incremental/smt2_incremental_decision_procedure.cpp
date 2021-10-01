@@ -14,6 +14,12 @@
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
+// Used by catch framework for printing in the case of test failures. This
+// means that we get error messages showing the smt formula expressed as SMT2
+// strings instead of `{?}` being printed. It works because catch uses the
+// appropriate overload of `operator<<` where it exists.
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
+
 class smt_mock_solver_processt : public smt_base_solver_processt
 {
 public:
