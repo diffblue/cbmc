@@ -678,7 +678,7 @@ void code_contractst::instrument_assign_statement(
       lhs_sym.is_static_lifetime &&
       lhs_sym.location.get_function() ==
         instruction_iterator->source_location.get_function())
-      assigns_clause.add_to_local_write_set(lhs);
+      assigns_clause.add_to_write_set(lhs);
   }
 
   add_containment_check(program, assigns_clause, instruction_iterator, lhs);
@@ -719,7 +719,7 @@ void code_contractst::instrument_call_statement(
     {
       instrument_assign_statement(instruction_it, body, assigns);
       const exprt &lhs = instruction_it->assign_lhs();
-      assigns.add_to_local_write_set(dereference_exprt(lhs));
+      assigns.add_to_write_set(dereference_exprt(lhs));
     }
     return; // assume malloc edits no pre-existing memory objects.
   }
@@ -728,8 +728,7 @@ void code_contractst::instrument_call_statement(
     const exprt &lhs_dereference = dereference_exprt(
       to_typecast_expr(instruction_it->call_arguments().front()).op());
     add_containment_check(body, assigns, instruction_it, lhs_dereference);
-    assigns.remove_from_local_write_set(lhs_dereference);
-    assigns.remove_from_global_write_set(lhs_dereference);
+    assigns.remove_from_write_set(lhs_dereference);
     return;
   }
 }
@@ -822,7 +821,7 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   // Adds formal parameters to freely assignable set
   for(auto &parameter : to_code_type(target.type).parameters())
   {
-    assigns.add_to_local_write_set(
+    assigns.add_to_write_set(
       ns.lookup(parameter.get_identifier()).symbol_expr());
   }
 
@@ -847,7 +846,7 @@ void code_contractst::check_frame_conditions(
     if(instruction_it->is_decl())
     {
       // Local variables are always freely assignable
-      assigns.add_to_local_write_set(instruction_it->get_decl().symbol());
+      assigns.add_to_write_set(instruction_it->get_decl().symbol());
     }
     else if(instruction_it->is_assign())
     {
@@ -859,7 +858,7 @@ void code_contractst::check_frame_conditions(
     }
     else if(instruction_it->is_dead())
     {
-      assigns.remove_from_local_write_set(instruction_it->get_dead().symbol());
+      assigns.remove_from_write_set(instruction_it->get_dead().symbol());
     }
     else if(
       instruction_it->is_other() &&
@@ -868,8 +867,7 @@ void code_contractst::check_frame_conditions(
       const exprt &havoc_argument = dereference_exprt(
         to_typecast_expr(instruction_it->get_other().operands().front()).op());
       add_containment_check(body, assigns, instruction_it, havoc_argument);
-      assigns.remove_from_local_write_set(havoc_argument);
-      assigns.remove_from_global_write_set(havoc_argument);
+      assigns.remove_from_write_set(havoc_argument);
     }
   }
 }
