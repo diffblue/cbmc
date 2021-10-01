@@ -14,7 +14,8 @@ Verification:
   f1       | assumed  | asserted
 
 Test should fail:
-The postcondition of f2 is incorrect, considering the recursion particularity. 
+The postcondition of f2_out is incorrect, considering the recursion particularity. 
 
 Recursion:
-The base case for the recursive call to f2 provides different behavior than the general case (given the pre-conditions).
+The base case for the recursive call to f2_out provides different behavior
+than the general case (given the pre-conditions).

@@ -1,0 +1,22 @@
+CORE
+main.c
+--enforce-contract f2_out _ --unwind 20 --unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^file main.c line \d+ function f2\_in: recursion is ignored on call to \'f2\_out\'$
+^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$
+^\[f2\_out.\d+\] line \d+ Check that loc2 is assignable: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+Verification:
+  function | pre-cond | post-cond
+  ---------|----------|----------
+  f2_out   | assumed  | asserted
+
+Test should fail:
+The postcondition of f2 is incorrect, considering the recursion particularity. 
+
+Recursion:
+The base case for the recursive call to f2_out provides different behavior
+than the general case (given the pre-conditions).
