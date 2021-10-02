@@ -256,13 +256,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
 
     for(const exprt &target : to_unary_expr(as_expr).op().operands())
     {
-      if(!is_lvalue(target))
-      {
-        error().source_location = target.source_location();
-        error() << "illegal target in assigns clause" << eom;
-        throw 0;
-      }
-      else if(has_subexpr(target, ID_side_effect))
+      if(has_subexpr(target, ID_side_effect))
       {
         error().source_location = target.source_location();
         error() << "Assigns clause is not side-effect free." << eom;

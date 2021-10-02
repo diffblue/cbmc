@@ -739,7 +739,21 @@ void c_typecheck_baset::typecheck_declaration(
         }
 
         for(auto &target : code_type.assigns())
+        {
           typecheck_expr(target);
+          if(target.type().id() == ID_empty)
+          {
+            error().source_location = target.source_location();
+            error() << "void-typed targets not permitted" << eom;
+            throw 0;
+          }
+          if(!target.get_bool(ID_C_lvalue))
+          {
+            error().source_location = target.source_location();
+            error() << "illegal target in assigns clause" << eom;
+            throw 0;
+          }
+        }
 
         if(!as_const(code_type).ensures().empty())
         {
