@@ -597,7 +597,7 @@ exprt make_va_list(const exprt &expr)
   if(result.id() == ID_address_of)
   {
     const auto &address_of_expr = to_address_of_expr(result);
-    if(is_lvalue(address_of_expr.object()))
+    if(is_assignable(address_of_expr.object()))
       result = address_of_expr.object();
   }
 
@@ -1156,7 +1156,7 @@ void goto_convertt::do_function_call_symbol(
     exprt dest_expr=make_va_list(arguments[0]);
     const typecast_exprt src_expr(arguments[1], dest_expr.type());
 
-    if(!is_lvalue(dest_expr))
+    if(!is_assignable(dest_expr))
     {
       error().source_location=dest_expr.find_source_location();
       error() << "va_copy argument expected to be lvalue" << eom;
@@ -1179,7 +1179,7 @@ void goto_convertt::do_function_call_symbol(
 
     exprt dest_expr=make_va_list(arguments[0]);
 
-    if(!is_lvalue(dest_expr))
+    if(!is_assignable(dest_expr))
     {
       error().source_location=dest_expr.find_source_location();
       error() << "va_start argument expected to be lvalue" << eom;
@@ -1214,7 +1214,7 @@ void goto_convertt::do_function_call_symbol(
 
     exprt dest_expr=make_va_list(arguments[0]);
 
-    if(!is_lvalue(dest_expr))
+    if(!is_assignable(dest_expr))
     {
       error().source_location=dest_expr.find_source_location();
       error() << "va_end argument expected to be lvalue" << eom;

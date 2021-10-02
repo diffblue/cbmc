@@ -335,7 +335,7 @@ bool address_of_aware_replace_symbolt::replace_symbol_expr(
   if(unchecked_replace_symbolt::replace_symbol_expr(s_copy))
     return true;
 
-  if(require_lvalue && !is_lvalue(s_copy))
+  if(require_lvalue && !is_assignable(s_copy))
     return true;
 
   // Note s_copy is no longer a symbol_exprt due to the replace operation,
