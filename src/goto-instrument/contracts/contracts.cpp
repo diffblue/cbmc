@@ -628,39 +628,17 @@ goto_functionst &code_contractst::get_goto_functions()
 }
 
 void code_contractst::instrument_assign_statement(
-  goto_programt::instructionst::iterator &instruction_iterator,
+  goto_programt::instructionst::iterator &instruction_it,
   goto_programt &program,
   assigns_clauset &assigns_clause)
 {
   INVARIANT(
-    instruction_iterator->is_assign(),
+    instruction_it->is_assign(),
     "The first instruction of instrument_assign_statement should always be"
     " an assignment");
 
-  const exprt &lhs = instruction_iterator->assign_lhs();
-
-  // Local static variables are not declared locally, therefore, they are not
-  // included in the local write set during declaration. We check here whether
-  // lhs of the assignment is a local static variable and, if it is indeed
-  // true, we add lhs to our local write set before checking the assignment.
-  if(lhs.id() == ID_symbol)
-  {
-    auto lhs_sym = ns.lookup(lhs.get(ID_identifier));
-    if(
-      lhs_sym.is_static_lifetime &&
-      lhs_sym.location.get_function() ==
-        instruction_iterator->source_location.get_function())
-    {
-      // TODO: Fix this.
-      // The CAR snapshot should be made only once at the beginning.
-      const auto car = assigns_clause.add_to_write_set(lhs);
-      auto snapshot_instructions = car->generate_snapshot_instructions();
-      insert_before_swap_and_advance(
-        program, instruction_iterator, snapshot_instructions);
-    }
-  }
-
-  add_containment_check(program, assigns_clause, instruction_iterator, lhs);
+  add_containment_check(
+    program, assigns_clause, instruction_it, instruction_it->assign_lhs());
 }
 
 void code_contractst::instrument_call_statement(
@@ -798,11 +776,16 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function,
     symbol_table);
 
-  // Adds formal parameters to freely assignable set
-  for(auto &parameter : to_code_type(target.type).parameters())
+  // Adds formal parameters to write set
+  for(const auto &param : to_code_type(target.type).parameters())
+    assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
+
+  // Adds local static declarations to write set
+  for(const auto &sym_pair : symbol_table)
   {
-    assigns.add_to_write_set(
-      ns.lookup(parameter.get_identifier()).symbol_expr());
+    const auto &sym = sym_pair.second;
+    if(sym.is_static_lifetime && sym.location.get_function() == function)
+      assigns.add_to_write_set(sym.symbol_expr());
   }
 
   auto instruction_it = function_obj->second.body.instructions.begin();
