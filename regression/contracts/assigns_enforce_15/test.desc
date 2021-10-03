@@ -1,11 +1,10 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo --enforce-contract baz --enforce-contract qux
 ^EXIT=10$
 ^SIGNAL=0$
-^\[bar\.1\] line \d+ .*: FAILURE$
-^\[baz\.1\] line \d+ .*: FAILURE$
-^\[qux\.1\] line \d+ .*: FAILURE$
+^\[baz.\d+\] line \d+ Check that global is assignable: FAILURE$
+^\[qux.\d+\] line \d+ Check that global is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

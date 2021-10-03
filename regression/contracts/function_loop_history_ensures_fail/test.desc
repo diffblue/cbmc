@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^main.c.* error: __CPROVER_loop_entry is not allowed in postconditions.$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

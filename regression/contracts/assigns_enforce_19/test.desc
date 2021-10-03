@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract f --enforce-contract g
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f.\d+\] line \d+ Check that a is assignable: SUCCESS$

@@ -724,27 +724,35 @@ void c_typecheck_baset::typecheck_declaration(
         // available
         auto &code_type = to_code_with_contract_type(new_symbol.type);
 
-        if(!as_const(code_type).requires().empty())
+        for(auto &requires : code_type.requires())
         {
-          for(auto &requires : code_type.requires())
-          {
-            typecheck_expr(requires);
-            implicit_typecast_bool(requires);
-            disallow_subexpr_by_id(
-              requires,
-              ID_old,
-              CPROVER_PREFIX "old is not allowed in preconditions.");
-            disallow_subexpr_by_id(
-              requires,
-              ID_loop_entry,
-              CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
-          }
+          typecheck_expr(requires);
+          implicit_typecast_bool(requires);
+          disallow_subexpr_by_id(
+            requires,
+            ID_old,
+            CPROVER_PREFIX "old is not allowed in preconditions.");
+          disallow_subexpr_by_id(
+            requires,
+            ID_loop_entry,
+            CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
         }
 
-        if(as_const(code_type).assigns().is_not_nil())
+        for(auto &target : code_type.assigns())
         {
-          for(auto &op : code_type.assigns().operands())
-            typecheck_expr(op);
+          typecheck_expr(target);
+          if(target.type().id() == ID_empty)
+          {
+            error().source_location = target.source_location();
+            error() << "void-typed targets not permitted" << eom;
+            throw 0;
+          }
+          if(!target.get_bool(ID_C_lvalue))
+          {
+            error().source_location = target.source_location();
+            error() << "illegal target in assigns clause" << eom;
+            throw 0;
+          }
         }
 
         if(!as_const(code_type).ensures().empty())

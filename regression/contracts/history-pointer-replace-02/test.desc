@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -10,6 +10,6 @@ ASSUME \*\(address_of.*n.*\) ≥ .*::tmp_cc[\$\d]? \+ 2
 --
 Verification:
 This test checks that history variables are supported with the use of the
---replace-all-calls-with-contracts flag. In this case, the pre-condition
+--replace-call-with-contract flag. In this case, the pre-condition
 becomes an assertion and the post-condition (which contains the history
 variable) becomes an assumption.

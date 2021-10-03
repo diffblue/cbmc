@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract get_at_idx
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

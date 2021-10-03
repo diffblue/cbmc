@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts _ --malloc-may-fail --malloc-fail-null --pointer-check
+--replace-call-with-contract f1 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.\d+\] line \d+ assertion p == NULL \|\| p->buf\[0\] == 0: SUCCESS$

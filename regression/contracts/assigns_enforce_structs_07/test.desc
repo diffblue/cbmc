@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts _ --malloc-may-fail --malloc-fail-null --pointer-check
+--enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
@@ -8,7 +8,6 @@ main.c
 ^\[f1.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in p->buf: FAILURE$
 ^\[f2.\d+\] line \d+ Check that pp->p->buf\[\(.*\)0\] is assignable: SUCCESS$
 ^\[f2.pointer\_dereference.\d+\] line \d+ dereference failure: pointer invalid in pp->p->buf\[\(.*\)0\]: FAILURE$
-^\[f2.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in pp->p->buf: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

@@ -1,9 +1,10 @@
 KNOWNBUG
 main.c
---check-code-contracts
+--enforce-contract quicksort --enforce-contract partition --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 --
 Loop invariants are overzealous in deciding what counts as side effects.
+Recursion is not supported for function contracts.

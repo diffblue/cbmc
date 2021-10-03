@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts _ --pointer-primitive-check
+--enforce-contract foo --enforce-contract bar --enforce-contract baz _ --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[bar.\d+\] line \d+ Check that \*a is assignable: SUCCESS$

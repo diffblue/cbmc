@@ -47,8 +47,7 @@ public:
   bool constructor, destructor;
 
   // contracts
-  exprt assigns;
-  exprt::operandst requires, ensures;
+  exprt::operandst assigns, ensures, requires;
 
   // storage spec
   c_storage_spect c_storage_spec;
@@ -87,7 +86,7 @@ public:
     msc_based.make_nil();
     gcc_attribute_mode.make_nil();
 
-    assigns.make_nil();
+    assigns.clear();
     requires.clear();
     ensures.clear();
 

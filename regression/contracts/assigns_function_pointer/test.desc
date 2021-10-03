@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract bar
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[bar.1\] line \d+ Check that fun\_ptr is assignable: SUCCESS$

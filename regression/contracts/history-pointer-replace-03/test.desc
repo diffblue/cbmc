@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract foo
 ^main.c.* error: __CPROVER_old is not allowed in preconditions.$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[foo.\d+\] line \d+ Check that \*y is assignable: FAILURE$

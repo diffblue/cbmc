@@ -43,6 +43,36 @@ exprt assigns_clauset::targett::normalize(const exprt &expr)
   return to_index_expr(object).array();
 }
 
+assigns_clauset::assigns_clauset(
+  const exprt::operandst &assigns,
+  const messaget &log,
+  const namespacet &ns)
+  : log(log), ns(ns)
+{
+  for(const auto &target_expr : assigns)
+  {
+    add_to_write_set(target_expr);
+  }
+}
+
+void assigns_clauset::add_to_write_set(const exprt &target_expr)
+{
+  auto insertion_succeeded = write_set.emplace(*this, target_expr).second;
+
+  if(!insertion_succeeded)
+  {
+    log.warning() << "Ignored duplicate expression '"
+                  << from_expr(ns, target_expr.id(), target_expr)
+                  << "' in assigns clause at "
+                  << target_expr.source_location().as_string() << messaget::eom;
+  }
+}
+
+void assigns_clauset::remove_from_write_set(const exprt &target_expr)
+{
+  write_set.erase(targett(*this, target_expr));
+}
+
 exprt assigns_clauset::targett::generate_containment_check(
   const address_of_exprt &lhs_address) const
 {
@@ -91,53 +121,11 @@ exprt assigns_clauset::targett::generate_containment_check(
   return or_exprt{not_exprt{address_validity}, conjunction(containment_check)};
 }
 
-assigns_clauset::assigns_clauset(
-  const exprt &expr,
-  const messaget &log,
-  const namespacet &ns)
-  : location(expr.source_location()), log(log), ns(ns)
-{
-  for(const auto &target_expr : expr.operands())
-  {
-    add_to_global_write_set(target_expr);
-  }
-}
-
-void assigns_clauset::add_to_global_write_set(const exprt &target_expr)
-{
-  auto insertion_succeeded =
-    global_write_set.emplace(*this, target_expr).second;
-
-  if(!insertion_succeeded)
-  {
-    log.warning() << "Ignored duplicate expression '"
-                  << from_expr(ns, target_expr.id(), target_expr)
-                  << "' in assigns clause at "
-                  << target_expr.source_location().as_string() << messaget::eom;
-  }
-}
-
-void assigns_clauset::remove_from_global_write_set(const exprt &target_expr)
-{
-  global_write_set.erase(targett(*this, target_expr));
-}
-
-void assigns_clauset::add_to_local_write_set(const exprt &expr)
-{
-  local_write_set.emplace(*this, expr);
-}
-
-void assigns_clauset::remove_from_local_write_set(const exprt &expr)
-{
-  local_write_set.erase(targett(*this, expr));
-}
-
-goto_programt assigns_clauset::generate_havoc_code() const
+goto_programt
+assigns_clauset::generate_havoc_code(const source_locationt &location) const
 {
   modifiest modifies;
-  for(const auto &target : global_write_set)
-    modifies.insert(target.address.object());
-  for(const auto &target : local_write_set)
+  for(const auto &target : write_set)
     modifies.insert(target.address.object());
 
   goto_programt havoc_statements;
@@ -150,50 +138,15 @@ goto_programt assigns_clauset::generate_havoc_code() const
 exprt assigns_clauset::generate_containment_check(const exprt &lhs) const
 {
   // If write set is empty, no assignment is allowed.
-  if(global_write_set.empty() && local_write_set.empty())
+  if(write_set.empty())
     return false_exprt();
 
   const auto lhs_address = address_of_exprt(targett::normalize(lhs));
 
   exprt::operandst condition;
-  for(const auto &target : local_write_set)
-  {
-    condition.push_back(target.generate_containment_check(lhs_address));
-  }
-  for(const auto &target : global_write_set)
+  for(const auto &target : write_set)
   {
     condition.push_back(target.generate_containment_check(lhs_address));
   }
   return disjunction(condition);
-}
-
-exprt assigns_clauset::generate_subset_check(
-  const assigns_clauset &subassigns) const
-{
-  if(subassigns.global_write_set.empty())
-    return true_exprt();
-
-  INVARIANT(
-    subassigns.local_write_set.empty(),
-    "Local write set for function calls should be empty at this point.\n" +
-      subassigns.location.as_string());
-
-  exprt result = true_exprt();
-  for(const auto &subtarget : subassigns.global_write_set)
-  {
-    exprt::operandst current_subtarget_found_conditions;
-    for(const auto &target : global_write_set)
-    {
-      current_subtarget_found_conditions.push_back(
-        target.generate_containment_check(subtarget.address));
-    }
-    for(const auto &target : local_write_set)
-    {
-      current_subtarget_found_conditions.push_back(
-        target.generate_containment_check(subtarget.address));
-    }
-    result = and_exprt(result, disjunction(current_subtarget_found_conditions));
-  }
-
-  return result;
 }

@@ -24,6 +24,7 @@ Date: February 2016
 #include <goto-programs/goto_convert_class.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
+#include <goto-programs/instrument_preconditions.h>
 
 #include <util/message.h>
 #include <util/namespace.h>
@@ -39,18 +40,9 @@ Date: February 2016
   " --replace-call-with-contract <fun>\n"                                      \
   "                              replace calls to fun with fun's contract\n"
 
-#define FLAG_REPLACE_ALL_CALLS "replace-all-calls-with-contracts"
-#define HELP_REPLACE_ALL_CALLS                                                 \
-  " --replace-all-calls-with-contracts\n"                                      \
-  "                              as above for all functions with a contract\n"
-
 #define FLAG_ENFORCE_CONTRACT "enforce-contract"
 #define HELP_ENFORCE_CONTRACT                                                  \
   " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
-
-#define FLAG_ENFORCE_ALL_CONTRACTS "enforce-all-contracts"
-#define HELP_ENFORCE_ALL_CONTRACTS                                             \
-  " --enforce-all-contracts      as above for all functions with a contract\n"
 
 class assigns_clauset;
 class local_may_aliast;
@@ -82,7 +74,7 @@ public:
   /// it using `cbmc --function F`.
   ///
   /// \return `true` on failure, `false` otherwise
-  bool replace_calls(const std::set<std::string> &functions);
+  bool replace_calls(const std::set<std::string> &);
 
   /// \brief Turn requires & ensures into assumptions and assertions for each of
   ///        the named functions
@@ -101,15 +93,6 @@ public:
   ///
   /// \return `true` on failure, `false` otherwise
   bool enforce_contracts(const std::set<std::string> &functions);
-
-  /// \brief Call enforce_contracts() on all functions that have a contract
-  /// \return `true` on failure, `false` otherwise
-  bool enforce_contracts();
-
-  /// \brief Call replace_calls() on all calls to any function that has a
-  ///        contract
-  /// \return `true` on failure, `false` otherwise
-  bool replace_calls();
 
   void apply_loop_contracts();
 
@@ -148,7 +131,8 @@ protected:
 
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
-  void check_frame_conditions(goto_programt &, assigns_clauset &);
+  void
+  check_frame_conditions(const irep_idt &, goto_programt &, assigns_clauset &);
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
@@ -177,6 +161,7 @@ protected:
   /// in freely assignable set.
   void instrument_call_statement(
     goto_programt::instructionst::iterator &,
+    const irep_idt &,
     goto_programt &,
     assigns_clauset &);
 
@@ -185,9 +170,6 @@ protected:
   void apply_loop_contract(
     const irep_idt &function,
     goto_functionst::goto_functiont &goto_function);
-
-  /// \brief Does the named function have a contract?
-  bool has_contract(const irep_idt);
 
   /// Replaces function calls with assertions based on requires clauses,
   /// non-deterministic assignments for the write set, and assumptions

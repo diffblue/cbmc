@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -8,6 +8,6 @@ main.c
 --
 Verification:
 This test checks that history variables are supported for parameters of the
-the function under test. By using the --enforce-all-contracts flag,
+the function under test. By using the --enforce-contract flag,
 the post-condition (which contains the history variable) is asserted.
 In this case, this assertion should pass.

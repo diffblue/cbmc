@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract f2 --replace-call-with-contract f3
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

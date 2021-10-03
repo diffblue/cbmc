@@ -101,9 +101,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(horn)(skip-loops):(model-argc-argv):" \
   "(" FLAG_LOOP_CONTRACTS ")" \
   "(" FLAG_REPLACE_CALL "):" \
-  "(" FLAG_REPLACE_ALL_CALLS ")" \
   "(" FLAG_ENFORCE_CONTRACT "):" \
-  "(" FLAG_ENFORCE_ALL_CONTRACTS ")" \
   "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\

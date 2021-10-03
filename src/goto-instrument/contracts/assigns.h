@@ -53,24 +53,22 @@ public:
     const assigns_clauset &parent;
   };
 
-  assigns_clauset(const exprt &, const messaget &, const namespacet &);
+  assigns_clauset(
+    const exprt::operandst &,
+    const messaget &,
+    const namespacet &);
 
-  void add_to_global_write_set(const exprt &);
-  void remove_from_global_write_set(const exprt &);
-  void add_to_local_write_set(const exprt &);
-  void remove_from_local_write_set(const exprt &);
+  void add_to_write_set(const exprt &);
+  void remove_from_write_set(const exprt &);
 
-  goto_programt generate_havoc_code() const;
+  goto_programt generate_havoc_code(const source_locationt &) const;
   exprt generate_containment_check(const exprt &) const;
-  exprt generate_subset_check(const assigns_clauset &) const;
 
-  const source_locationt &location;
   const messaget &log;
   const namespacet &ns;
 
 protected:
-  std::unordered_set<targett, targett::hasht> global_write_set;
-  std::unordered_set<targett, targett::hasht> local_write_set;
+  std::unordered_set<targett, targett::hasht> write_set;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_ASSIGNS_H

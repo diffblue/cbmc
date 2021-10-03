@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts _ --pointer-primitive-check
+--enforce-contract foo1 --enforce-contract foo2 --enforce-contract foo3 --enforce-contract foo4 --enforce-contract foo5 --enforce-contract foo6 --enforce-contract foo7 --enforce-contract foo8 --enforce-contract foo9 --enforce-contract foo10 _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo1.\d+\] line \d+ Check that a is assignable: SUCCESS$

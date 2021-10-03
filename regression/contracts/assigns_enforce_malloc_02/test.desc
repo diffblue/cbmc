@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract f1
 ^EXIT=6$
 ^SIGNAL=0$
 Unable to complete instrumentation, as this malloc may be in a loop.$
