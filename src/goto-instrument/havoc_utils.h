@@ -73,7 +73,7 @@ public:
   /// \param location The source location to annotate on the havoc instruction
   /// \param expr The expression to havoc
   /// \param dest The destination goto program to append the instructions to
-  void append_havoc_code_for_expr(
+  virtual void append_havoc_code_for_expr(
     const source_locationt location,
     const exprt &expr,
     goto_programt &dest) const;

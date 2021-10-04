@@ -3,21 +3,18 @@ main.c
 --enforce-contract foo --enforce-contract bar --enforce-contract baz _ --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[bar.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
+^\[bar.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a\) is assignable: SUCCESS$
 ^\[bar.\d+\] line \d+ Check that \*b is assignable: SUCCESS$
-^\[baz.\d+\] line \d+ Check that \*c is assignable: FAILURE$
+^\[baz.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)c\) is assignable: FAILURE$
 ^\[baz.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that a is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that yp is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that z is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*xp is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that y is assignable: FAILURE$
-^.* 2 of \d+ failed \(\d+ iteration.*\)$
+^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)yp\) is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
-^\[foo.\d+\] line \d+ Check that a is assignable: FAILURE$
-^\[foo.pointer\_primitives.\d+\] line \d+ deallocated dynamic object in POINTER_OBJECT\(tmp\_cc\$\d+\): FAILURE$
-^.* 3 of \d+ failed (\d+ iterations)$
 --
 Checks whether contract enforcement works with functions that deallocate memory.
 We had problems before when freeing a variable, but still keeping it on

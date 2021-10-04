@@ -8,7 +8,7 @@ struct string
 
 // clang-format off
 int foo(struct string *x)
-  __CPROVER_assigns(*(x->str))
+  __CPROVER_assigns(x->str[x->len-1])
   __CPROVER_requires(
     x->len == 128 &&
     __CPROVER_is_fresh(x->str, x->len * sizeof(char)))

@@ -10,6 +10,7 @@ Date: September 2021
 
 #include "utils.h"
 
+#include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 
@@ -120,4 +121,19 @@ void insert_before_swap_and_advance(
   const auto offset = payload.instructions.size();
   destination.insert_before_swap(target, payload);
   std::advance(target, offset);
+}
+
+const symbolt &new_tmp_symbol(
+  const typet &type,
+  const source_locationt &location,
+  const irep_idt &mode,
+  symbol_table_baset &symtab)
+{
+  return get_fresh_aux_symbol(
+    type,
+    id2string(location.get_function()) + "::tmp_cc",
+    "tmp_cc",
+    location,
+    mode,
+    symtab);
 }

@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-int foo(bool a, int *x, long *y) __CPROVER_assigns(*(a ? x : y++))
+int foo(bool a, int *x, long long *y) __CPROVER_assigns(*(a ? x : y++))
 {
   if(a)
   {

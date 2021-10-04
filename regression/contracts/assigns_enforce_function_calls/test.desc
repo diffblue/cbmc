@@ -3,7 +3,7 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: Assigns clause is not side-effect free.$
+^.*error: illegal target in assigns clause$
 ^CONVERSION ERROR$
 --
 --

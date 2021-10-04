@@ -96,11 +96,6 @@ public:
 
   void apply_loop_contracts();
 
-  const symbolt &new_tmp_symbol(
-    const typet &type,
-    const source_locationt &source_location,
-    const irep_idt &mode);
-
   void check_apply_loop_contracts(
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,
@@ -131,8 +126,11 @@ protected:
 
   /// Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
-  void
-  check_frame_conditions(const irep_idt &, goto_programt &, assigns_clauset &);
+  void check_frame_conditions(
+    const irep_idt &,
+    goto_programt &,
+    goto_programt::targett &,
+    assigns_clauset &);
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
@@ -176,6 +174,7 @@ protected:
   /// based on ensures clauses.
   bool apply_function_contract(
     const irep_idt &,
+    const source_locationt &,
     goto_programt &,
     goto_programt::targett &);
 

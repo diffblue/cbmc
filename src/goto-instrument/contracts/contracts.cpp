@@ -169,14 +169,16 @@ void code_contractst::check_apply_loop_contracts(
   for(const auto &clause : decreases_clause.operands())
   {
     const auto old_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
+      new_tmp_symbol(
+        clause.type(), loop_head->source_location, mode, symbol_table)
         .symbol_expr();
     havoc_code.add(
       goto_programt::make_decl(old_decreases_var, loop_head->source_location));
     old_decreases_vars.push_back(old_decreases_var);
 
     const auto new_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
+      new_tmp_symbol(
+        clause.type(), loop_head->source_location, mode, symbol_table)
         .symbol_expr();
     havoc_code.add(
       goto_programt::make_decl(new_decreases_var, loop_head->source_location));
@@ -317,10 +319,8 @@ void code_contractst::add_quantified_variable(
       const auto &quantified_symbol = to_symbol_expr(quantified_variable);
 
       // 1. create fresh symbol
-      symbolt new_symbol = get_fresh_aux_symbol(
+      symbolt new_symbol = new_tmp_symbol(
         quantified_symbol.type(),
-        id2string(quantified_symbol.get_identifier()),
-        "tmp",
         quantified_symbol.source_location(),
         mode,
         symbol_table);
@@ -370,7 +370,8 @@ void code_contractst::replace_history_parameter(
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
-          new_tmp_symbol(parameter.type(), location, mode).symbol_expr();
+          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
+            .symbol_expr();
 
         // 2. Associate the above temporary variable to it's corresponding
         // expression
@@ -432,6 +433,7 @@ code_contractst::create_ensures_instruction(
 
 bool code_contractst::apply_function_contract(
   const irep_idt &function,
+  const source_locationt &location,
   goto_programt &function_body,
   goto_programt::targett &target)
 {
@@ -565,11 +567,17 @@ bool code_contractst::apply_function_contract(
   // in the assigns clause.
   if(!assigns.empty())
   {
-    assigns_clauset assigns_clause(targets.operands(), log, ns);
+    assigns_clauset assigns_clause(
+      targets.operands(), log, ns, target_function, symbol_table);
 
-    // Havoc all targets in global write set
-    auto assigns_havoc =
-      assigns_clause.generate_havoc_code(target->source_location);
+    // Havoc all targets in the write set
+    modifiest modifies;
+    for(const auto &target : targets.operands())
+      modifies.insert(target);
+
+    goto_programt assigns_havoc;
+    havoc_assigns_targetst havoc_gen(modifies, ns);
+    havoc_gen.append_full_havoc_code(location, assigns_havoc);
 
     // Insert the non-deterministic assignment immediately before the call site.
     insert_before_swap_and_advance(function_body, target, assigns_havoc);
@@ -609,20 +617,6 @@ void code_contractst::apply_loop_contract(
   }
 }
 
-const symbolt &code_contractst::new_tmp_symbol(
-  const typet &type,
-  const source_locationt &source_location,
-  const irep_idt &mode)
-{
-  return get_fresh_aux_symbol(
-    type,
-    id2string(source_location.get_function()) + "::tmp_cc",
-    "tmp_cc",
-    source_location,
-    mode,
-    symbol_table);
-}
-
 symbol_tablet &code_contractst::get_symbol_table()
 {
   return symbol_table;
@@ -634,32 +628,17 @@ goto_functionst &code_contractst::get_goto_functions()
 }
 
 void code_contractst::instrument_assign_statement(
-  goto_programt::instructionst::iterator &instruction_iterator,
+  goto_programt::instructionst::iterator &instruction_it,
   goto_programt &program,
   assigns_clauset &assigns_clause)
 {
   INVARIANT(
-    instruction_iterator->is_assign(),
+    instruction_it->is_assign(),
     "The first instruction of instrument_assign_statement should always be"
     " an assignment");
 
-  const exprt &lhs = instruction_iterator->assign_lhs();
-
-  // Local static variables are not declared locally, therefore, they are not
-  // included in the local write set during declaration. We check here whether
-  // lhs of the assignment is a local static variable and, if it is indeed
-  // true, we add lhs to our local write set before checking the assignment.
-  if(lhs.id() == ID_symbol)
-  {
-    auto lhs_sym = ns.lookup(lhs.get(ID_identifier));
-    if(
-      lhs_sym.is_static_lifetime &&
-      lhs_sym.location.get_function() ==
-        instruction_iterator->source_location.get_function())
-      assigns_clause.add_to_write_set(lhs);
-  }
-
-  add_containment_check(program, assigns_clause, instruction_iterator, lhs);
+  add_containment_check(
+    program, assigns_clause, instruction_it, instruction_it->assign_lhs());
 }
 
 void code_contractst::instrument_call_statement(
@@ -673,29 +652,37 @@ void code_contractst::instrument_call_statement(
     "The first argument of instrument_call_statement should always be "
     "a function call");
 
-  irep_idt called_function =
+  const auto &callee_name =
     to_symbol_expr(instruction_it->call_function()).get_identifier();
 
-  if(called_function == "malloc")
+  if(callee_name == "malloc")
   {
-    // malloc statments return a void pointer, which is then cast and assigned
-    // to a result variable. We iterate one line forward to grab the result of
-    // the malloc once it is cast.
-    instruction_it++;
-    if(instruction_it->is_assign())
+    const auto &function_call =
+      to_code_function_call(instruction_it->get_code());
+    if(function_call.lhs().is_not_nil())
     {
-      instrument_assign_statement(instruction_it, body, assigns);
-      const exprt &lhs = instruction_it->assign_lhs();
-      assigns.add_to_write_set(dereference_exprt(lhs));
+      // grab the returned pointer from malloc
+      const auto &object = function_call.lhs();
+      // move past the call and then insert the CAR
+      instruction_it++;
+      const auto car = assigns.add_to_write_set(pointer_object(object));
+      auto snapshot_instructions = car->generate_snapshot_instructions();
+      insert_before_swap_and_advance(
+        body, instruction_it, snapshot_instructions);
+      // since CAR was inserted *after* the malloc,
+      // move the instruction pointer backward,
+      // because the caller increments it in a `for` loop
+      instruction_it--;
     }
-    return; // assume malloc edits no pre-existing memory objects.
+    return;
   }
-  else if(called_function == "free")
+  else if(callee_name == "free")
   {
-    const exprt &lhs_dereference = dereference_exprt(
-      to_typecast_expr(instruction_it->call_arguments().front()).op());
-    add_containment_check(body, assigns, instruction_it, lhs_dereference);
-    assigns.remove_from_write_set(lhs_dereference);
+    add_containment_check(
+      body,
+      assigns,
+      instruction_it,
+      pointer_object(instruction_it->call_arguments().front()));
     return;
   }
 }
@@ -783,18 +770,35 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   // Get assigns clause for function
   const symbolt &target = ns.lookup(function);
   assigns_clauset assigns(
-    to_code_with_contract_type(target.type).assigns(), log, ns);
+    to_code_with_contract_type(target.type).assigns(),
+    log,
+    ns,
+    function,
+    symbol_table);
 
-  // Adds formal parameters to freely assignable set
-  for(auto &parameter : to_code_type(target.type).parameters())
+  // Adds formal parameters to write set
+  for(const auto &param : to_code_type(target.type).parameters())
+    assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
+
+  // Adds local static declarations to write set
+  for(const auto &sym_pair : symbol_table)
   {
-    assigns.add_to_write_set(
-      ns.lookup(parameter.get_identifier()).symbol_expr());
+    const auto &sym = sym_pair.second;
+    if(sym.is_static_lifetime && sym.location.get_function() == function)
+      assigns.add_to_write_set(sym.symbol_expr());
   }
+
+  auto instruction_it = function_obj->second.body.instructions.begin();
+  for(const auto &car : assigns.get_write_set())
+  {
+    auto snapshot_instructions = car.generate_snapshot_instructions();
+    insert_before_swap_and_advance(
+      function_obj->second.body, instruction_it, snapshot_instructions);
+  };
 
   // Insert aliasing assertions
   check_frame_conditions(
-    function_obj->first, function_obj->second.body, assigns);
+    function_obj->first, function_obj->second.body, instruction_it, assigns);
 
   return false;
 }
@@ -802,18 +806,27 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 void code_contractst::check_frame_conditions(
   const irep_idt &function,
   goto_programt &body,
+  goto_programt::targett &instruction_it,
   assigns_clauset &assigns)
 {
   goto_function_inline(goto_functions, function, ns, log.get_message_handler());
 
-  for(auto instruction_it = body.instructions.begin();
-      instruction_it != body.instructions.end();
-      ++instruction_it)
+  for(; instruction_it != body.instructions.end(); ++instruction_it)
   {
     if(instruction_it->is_decl())
     {
-      // Local variables are always freely assignable
-      assigns.add_to_write_set(instruction_it->get_decl().symbol());
+      // grab the declared symbol
+      const auto &decl_symbol = instruction_it->get_decl().symbol();
+      // move past the call and then insert the CAR
+      instruction_it++;
+      const auto car = assigns.add_to_write_set(decl_symbol);
+      auto snapshot_instructions = car->generate_snapshot_instructions();
+      insert_before_swap_and_advance(
+        body, instruction_it, snapshot_instructions);
+      // since CAR was inserted *after* the DECL,
+      // move the instruction pointer backward,
+      // because the caller increments it in a `for` loop
+      instruction_it--;
     }
     else if(instruction_it->is_assign())
     {
@@ -834,7 +847,6 @@ void code_contractst::check_frame_conditions(
       const exprt &havoc_argument = dereference_exprt(
         to_typecast_expr(instruction_it->get_other().operands().front()).op());
       add_containment_check(body, assigns, instruction_it, havoc_argument);
-      assigns.remove_from_write_set(havoc_argument);
     }
   }
 }
@@ -845,9 +857,14 @@ void code_contractst::add_containment_check(
   goto_programt::instructionst::iterator &instruction_it,
   const exprt &expr)
 {
+  const assigns_clauset::conditional_address_ranget car{assigns, expr};
+  auto snapshot_instructions = car.generate_snapshot_instructions();
+  insert_before_swap_and_advance(
+    program, instruction_it, snapshot_instructions);
+
   goto_programt assertion;
   assertion.add(goto_programt::make_assertion(
-    assigns.generate_containment_check(expr), instruction_it->source_location));
+    assigns.generate_inclusion_check(car), instruction_it->source_location));
   assertion.instructions.back().source_location.set_comment(
     "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
   insert_before_swap_and_advance(program, instruction_it, assertion);
@@ -962,7 +979,8 @@ void code_contractst::add_contract_check(
     symbol_exprt r = new_tmp_symbol(
                        code_type.return_type(),
                        skip->source_location,
-                       function_symbol.mode)
+                       function_symbol.mode,
+                       symbol_table)
                        .symbol_expr();
     check.add(goto_programt::make_decl(r, skip->source_location));
 
@@ -986,7 +1004,8 @@ void code_contractst::add_contract_check(
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
                        skip->source_location,
-                       parameter_symbol.mode)
+                       parameter_symbol.mode,
+                       symbol_table)
                        .symbol_expr();
     check.add(goto_programt::make_decl(p, skip->source_location));
     check.add(goto_programt::make_assignment(
@@ -1088,7 +1107,10 @@ bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
           continue;
 
         fail |= apply_function_contract(
-          goto_function.first, goto_function.second.body, ins);
+          goto_function.first,
+          ins->source_location,
+          goto_function.second.body,
+          ins);
       }
     }
   }

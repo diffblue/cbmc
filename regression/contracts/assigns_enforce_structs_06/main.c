@@ -8,7 +8,7 @@ struct pair
   size_t size;
 };
 
-void f1(struct pair *p) __CPROVER_assigns(*(p->buf))
+void f1(struct pair *p) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(p->buf))
 {
   p->buf[0] = 0;
   p->buf[1] = 1;

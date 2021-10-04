@@ -8,3 +8,5 @@ main.c
 --
 Check that Elvis operator expressions of form '(cond ? *if_true : *if_false)'
 are supported in assigns clauses.
+
+BUG: `is_lvalue` in goto is not consistent with `target.get_bool(ID_C_lvalue)`.

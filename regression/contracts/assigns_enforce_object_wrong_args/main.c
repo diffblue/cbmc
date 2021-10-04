@@ -2,12 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-int *bar(int *x)
-{
-  return *x;
-}
-
-int foo(int *x) __CPROVER_assigns(bar(x))
+int baz(int *x) __CPROVER_assigns(__CPROVER_POINTER_OBJECT())
 {
   *x = 0;
   return 0;
@@ -16,6 +11,5 @@ int foo(int *x) __CPROVER_assigns(bar(x))
 int main()
 {
   int x;
-  foo(&x);
   baz(&x);
 }

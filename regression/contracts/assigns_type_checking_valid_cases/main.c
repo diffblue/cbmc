@@ -59,7 +59,7 @@ void foo7(int a, struct buf *buffer) __CPROVER_assigns(*buffer)
   buffer->len = 1;
 }
 
-void foo8(int array[]) __CPROVER_assigns(*array)
+void foo8(int array[]) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(array))
 {
   array[0] = 1;
   array[1] = 1;

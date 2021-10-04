@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract baz
+^EXIT=(1|64)$
+^SIGNAL=0$
+^.*error: pointer_object expects one argument$
+^CONVERSION ERROR$
+--
+--
+Check that `__CPROVER_POINTER_OBJECT` in assigns clauses are invoked correctly.
