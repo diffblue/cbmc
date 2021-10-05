@@ -291,7 +291,8 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
     {
       auto c = target->get_function_call();
       create_static_function_call(c, *functions.front().symbol_expr, ns);
-      target->set_function_call(c);
+      target->call_function() = c.function();
+      target->call_arguments() = c.arguments();
     }
     return next_target;
   }
