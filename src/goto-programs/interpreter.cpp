@@ -653,15 +653,16 @@ exprt interpretert::get_value(
 /// executes the assign statement at the current pc value
 void interpretert::execute_assign()
 {
-  const code_assignt &code_assign = pc->get_assign();
+  const exprt &assign_lhs = pc->assign_lhs();
+  const exprt &assign_rhs = pc->assign_rhs();
 
   mp_vectort rhs;
-  evaluate(code_assign.rhs(), rhs);
+  evaluate(assign_rhs, rhs);
 
   if(!rhs.empty())
   {
-    mp_integer address=evaluate_address(code_assign.lhs());
-    mp_integer size=get_size(code_assign.lhs().type());
+    mp_integer address = evaluate_address(assign_lhs);
+    mp_integer size = get_size(assign_lhs.type());
 
     if(size!=rhs.size())
       output.error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -671,20 +672,19 @@ void interpretert::execute_assign()
     {
       goto_trace_stept &trace_step=steps.get_last_step();
       assign(address, rhs);
-      trace_step.full_lhs=code_assign.lhs();
+      trace_step.full_lhs = assign_lhs;
       trace_step.full_lhs_value=get_value(trace_step.full_lhs.type(), rhs);
     }
   }
-  else if(code_assign.rhs().id()==ID_side_effect)
+  else if(assign_rhs.id() == ID_side_effect)
   {
-    side_effect_exprt side_effect=to_side_effect_expr(code_assign.rhs());
+    side_effect_exprt side_effect = to_side_effect_expr(assign_rhs);
     if(side_effect.get_statement()==ID_nondet)
     {
       mp_integer address =
-        numeric_cast_v<std::size_t>(evaluate_address(code_assign.lhs()));
+        numeric_cast_v<std::size_t>(evaluate_address(assign_lhs));
 
-      mp_integer size=
-        get_size(code_assign.lhs().type());
+      mp_integer size = get_size(assign_lhs.type());
 
       for(mp_integer i=0; i<size; ++i)
       {

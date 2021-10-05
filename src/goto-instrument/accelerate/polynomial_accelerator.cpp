@@ -621,10 +621,11 @@ void polynomial_acceleratort::cone_of_influence(
       // A[i]=0;
       // or
       // *p=x;
-      code_assignt assignment = r_it->get_assign();
+      exprt assignment_lhs = r_it->assign_lhs();
+      exprt assignment_rhs = r_it->assign_rhs();
       expr_sett lhs_syms;
 
-      utils.gather_rvalues(assignment.lhs(), lhs_syms);
+      utils.gather_rvalues(assignment_lhs, lhs_syms);
 
       for(expr_sett::iterator s_it=lhs_syms.begin();
           s_it!=lhs_syms.end();
@@ -635,8 +636,8 @@ void polynomial_acceleratort::cone_of_influence(
           // We're assigning to something in the cone of influence -- expand the
           // cone.
           body.push_front(*r_it);
-          cone.erase(assignment.lhs());
-          utils.gather_rvalues(assignment.rhs(), cone);
+          cone.erase(assignment_lhs);
+          utils.gather_rvalues(assignment_rhs, cone);
           break;
         }
       }
@@ -779,9 +780,8 @@ exprt polynomial_acceleratort::precondition(patht &path)
     if(t->is_assign())
     {
       // XXX Need to check for aliasing...
-      const code_assignt &assignment = t->get_assign();
-      const exprt &lhs=assignment.lhs();
-      const exprt &rhs=assignment.rhs();
+      const exprt &lhs = t->assign_lhs();
+      const exprt &rhs = t->assign_rhs();
 
       if(lhs.id()==ID_symbol)
       {

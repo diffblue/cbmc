@@ -243,11 +243,11 @@ static bool implicit(goto_programt::const_targett target)
   if(!target->is_assign())
     return false;
 
-  const code_assignt &a = target->get_assign();
-  if(a.lhs().id()!=ID_symbol)
+  const exprt &a_lhs = target->assign_lhs();
+  if(a_lhs.id() != ID_symbol)
     return false;
 
-  const symbol_exprt &s=to_symbol_expr(a.lhs());
+  const symbol_exprt &s = to_symbol_expr(a_lhs);
 
   return s.get_identifier() == rounding_mode_identifier();
 }

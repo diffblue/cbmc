@@ -816,7 +816,7 @@ void code_contractst::check_frame_conditions(
     if(instruction_it->is_decl())
     {
       // grab the declared symbol
-      const auto &decl_symbol = instruction_it->get_decl().symbol();
+      const auto &decl_symbol = instruction_it->decl_symbol();
       // move past the call and then insert the CAR
       instruction_it++;
       const auto car = assigns.add_to_write_set(decl_symbol);
@@ -838,7 +838,7 @@ void code_contractst::check_frame_conditions(
     }
     else if(instruction_it->is_dead())
     {
-      assigns.remove_from_write_set(instruction_it->get_dead().symbol());
+      assigns.remove_from_write_set(instruction_it->dead_symbol());
     }
     else if(
       instruction_it->is_other() &&

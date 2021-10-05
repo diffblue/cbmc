@@ -94,11 +94,9 @@ public:
   {
     if(!i.is_assign())
       return false;
-    const code_assignt &assign = i.get_assign();
-    return
-      assign.lhs().id() == ID_symbol &&
-      id2string(to_symbol_expr(assign.lhs()).get_identifier()).find('y') !=
-      std::string::npos;
+    return i.assign_lhs().id() == ID_symbol &&
+           id2string(to_symbol_expr(i.assign_lhs()).get_identifier())
+               .find('y') != std::string::npos;
   }
 
   static bool is_y_assignment_location(locationt l)

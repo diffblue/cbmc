@@ -717,16 +717,16 @@ void rw_guarded_range_set_value_sett::add(
     {range_start, {range_end, guard.as_expr()}});
 }
 
-static void goto_rw(
+static void goto_rw_assign(
   const irep_idt &function,
   goto_programt::const_targett target,
-  const code_assignt &assign,
+  const exprt &lhs,
+  const exprt &rhs,
   rw_range_sett &rw_set)
 {
   rw_set.get_objects_rec(
-    function, target, rw_range_sett::get_modet::LHS_W, assign.lhs());
-  rw_set.get_objects_rec(
-    function, target, rw_range_sett::get_modet::READ, assign.rhs());
+    function, target, rw_range_sett::get_modet::LHS_W, lhs);
+  rw_set.get_objects_rec(function, target, rw_range_sett::get_modet::READ, rhs);
 }
 
 static void goto_rw(
@@ -801,7 +801,8 @@ void goto_rw(
     break;
 
   case ASSIGN:
-    goto_rw(function, target, target->get_assign(), rw_set);
+    goto_rw_assign(
+      function, target, target->assign_lhs(), target->assign_rhs(), rw_set);
     break;
 
   case DEAD:

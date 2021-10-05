@@ -26,8 +26,7 @@ void function_modifiest::get_modifies(
 
   if(instruction.is_assign())
   {
-    const exprt &lhs = instruction.get_assign().lhs();
-    get_modifies_lhs(local_may_alias, i_it, lhs, modifies);
+    get_modifies_lhs(local_may_alias, i_it, instruction.assign_lhs(), modifies);
   }
   else if(instruction.is_function_call())
   {

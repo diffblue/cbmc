@@ -39,20 +39,19 @@ std::pair<bool, source_locationt> does_remove_constt::operator()() const
       continue;
     }
 
-    const code_assignt &assign = instruction.get_assign();
-    const typet &rhs_type=assign.rhs().type();
-    const typet &lhs_type=assign.lhs().type();
+    const typet &rhs_type = instruction.assign_rhs().type();
+    const typet &lhs_type = instruction.assign_lhs().type();
 
     // Compare the types recursively for a point where the rhs is more
     // const that the lhs
     if(!does_type_preserve_const_correctness(&lhs_type, &rhs_type))
     {
-      return {true, assign.find_source_location()};
+      return {true, instruction.source_location};
     }
 
-    if(does_expr_lose_const(assign.rhs()))
+    if(does_expr_lose_const(instruction.assign_rhs()))
     {
-      return {true, assign.rhs().find_source_location()};
+      return {true, instruction.assign_rhs().find_source_location()};
     }
   }
 

@@ -269,12 +269,12 @@ void local_bitvector_analysist::build()
     switch(instruction.type)
     {
     case ASSIGN:
-    {
-      const code_assignt &code_assign = instruction.get_assign();
       assign_lhs(
-        code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
+        instruction.assign_lhs(),
+        instruction.assign_rhs(),
+        loc_info_src,
+        loc_info_dest);
       break;
-    }
 
     case DECL:
       assign_lhs(

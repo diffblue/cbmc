@@ -193,14 +193,6 @@ public:
       return code;
     }
 
-    /// Get the assignment for ASSIGN
-    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
-    const code_assignt &get_assign() const
-    {
-      PRECONDITION(is_assign());
-      return to_code_assign(code);
-    }
-
     /// Get the lhs of the assignment for ASSIGN
     const exprt &assign_lhs() const
     {
@@ -229,26 +221,6 @@ public:
       return to_code_assign(code).rhs();
     }
 
-    /// Set the assignment for ASSIGN
-    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
-    void set_assign(code_assignt c)
-    {
-      PRECONDITION(is_assign());
-      code = std::move(c);
-    }
-
-    /// Get the declaration for DECL
-    DEPRECATED(SINCE(2021, 2, 24, "Use decl_symbol instead"))
-    const code_declt &get_decl() const
-    {
-      PRECONDITION(is_decl());
-      const auto &decl = expr_checked_cast<code_declt>(code);
-      INVARIANT(
-        !decl.initial_value(),
-        "code_declt in goto program may not contain initialization.");
-      return decl;
-    }
-
     /// Get the declared symbol for DECL
     const symbol_exprt &decl_symbol() const
     {
@@ -271,26 +243,6 @@ public:
       return decl.symbol();
     }
 
-    /// Set the declaration for DECL
-    DEPRECATED(SINCE(2021, 2, 24, "Use decl_symbol instead"))
-    void set_decl(code_declt c)
-    {
-      PRECONDITION(is_decl());
-      INVARIANT(
-        !c.initial_value(),
-        "Initialization must be separated from code_declt before adding to "
-        "goto_instructiont.");
-      code = std::move(c);
-    }
-
-    /// Get the dead statement for DEAD
-    DEPRECATED(SINCE(2021, 2, 24, "Use dead_symbol instead"))
-    const code_deadt &get_dead() const
-    {
-      PRECONDITION(is_dead());
-      return to_code_dead(code);
-    }
-
     /// Get the symbol for DEAD
     const symbol_exprt &dead_symbol() const
     {
@@ -305,22 +257,6 @@ public:
       return to_code_dead(code).symbol();
     }
 
-    /// Set the dead statement for DEAD
-    DEPRECATED(SINCE(2021, 2, 24, "Use dead_symbol instead"))
-    void set_dead(code_deadt c)
-    {
-      PRECONDITION(is_dead());
-      code = std::move(c);
-    }
-
-    /// Get the return statement for READ
-    DEPRECATED(SINCE(2021, 2, 24, "Use return_value instead"))
-    const code_returnt &get_return() const
-    {
-      PRECONDITION(is_set_return_value());
-      return to_code_return(code);
-    }
-
     /// Get the return value of a SET_RETURN_VALUE instruction
     const exprt &return_value() const
     {
@@ -333,14 +269,6 @@ public:
     {
       PRECONDITION(is_set_return_value());
       return to_code_return(code).return_value();
-    }
-
-    /// Set the return statement for SET_RETURN_VALUE
-    DEPRECATED(SINCE(2021, 2, 24, "Use return_value instead"))
-    void set_return(code_returnt c)
-    {
-      PRECONDITION(is_set_return_value());
-      code = std::move(c);
     }
 
     /// Get the function call for FUNCTION_CALL

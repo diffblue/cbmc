@@ -111,11 +111,9 @@ void global_may_alias_domaint::transform(
   {
   case ASSIGN:
   {
-    const code_assignt &code_assign = instruction.get_assign();
-
     std::set<irep_idt> rhs_aliases;
-    get_rhs_aliases(code_assign.rhs(), rhs_aliases);
-    assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
+    get_rhs_aliases(instruction.assign_rhs(), rhs_aliases);
+    assign_lhs_aliases(instruction.assign_lhs(), rhs_aliases);
     break;
   }
 

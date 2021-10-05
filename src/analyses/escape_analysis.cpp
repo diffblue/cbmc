@@ -188,15 +188,16 @@ void escape_domaint::transform(
   {
   case ASSIGN:
     {
-      const code_assignt &code_assign = instruction.get_assign();
+      const exprt &assign_lhs = instruction.assign_lhs();
+      const exprt &assign_rhs = instruction.assign_rhs();
 
       std::set<irep_idt> cleanup_functions;
-      get_rhs_cleanup(code_assign.rhs(), cleanup_functions);
-      assign_lhs_cleanup(code_assign.lhs(), cleanup_functions);
+      get_rhs_cleanup(assign_rhs, cleanup_functions);
+      assign_lhs_cleanup(assign_lhs, cleanup_functions);
 
       std::set<irep_idt> rhs_aliases;
-      get_rhs_aliases(code_assign.rhs(), rhs_aliases);
-      assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
+      get_rhs_aliases(assign_rhs, rhs_aliases);
+      assign_lhs_aliases(assign_lhs, rhs_aliases);
     }
     break;
 
@@ -461,17 +462,12 @@ void escape_analysist::instrument(
 
       if(instruction.type == ASSIGN)
       {
-        const code_assignt &code_assign = instruction.get_assign();
+        const exprt &assign_lhs = instruction.assign_lhs();
 
         std::set<irep_idt> cleanup_functions;
-        operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
+        operator[](i_it).check_lhs(assign_lhs, cleanup_functions);
         insert_cleanup(
-          gf_entry.second,
-          i_it,
-          code_assign.lhs(),
-          cleanup_functions,
-          false,
-          ns);
+          gf_entry.second, i_it, assign_lhs, cleanup_functions, false, ns);
       }
       else if(instruction.type == DEAD)
       {

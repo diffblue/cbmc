@@ -59,10 +59,10 @@ void variable_sensitivity_domaint::transform(
   case ASSIGN:
   {
     // TODO : check return values
-    const code_assignt &inst = instruction.get_assign();
     abstract_object_pointert rhs =
-      abstract_state.eval(inst.rhs(), ns)->write_location_context(from);
-    abstract_state.assign(inst.lhs(), rhs, ns);
+      abstract_state.eval(instruction.assign_rhs(), ns)
+        ->write_location_context(from);
+    abstract_state.assign(instruction.assign_lhs(), rhs, ns);
   }
   break;
 

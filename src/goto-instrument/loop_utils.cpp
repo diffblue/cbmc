@@ -78,7 +78,7 @@ void get_modifies(
 
     if(instruction.is_assign())
     {
-      const exprt &lhs = instruction.get_assign().lhs();
+      const exprt &lhs = instruction.assign_lhs();
       get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
     }
     else if(instruction.is_function_call())

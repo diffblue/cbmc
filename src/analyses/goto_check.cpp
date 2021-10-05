@@ -1982,33 +1982,30 @@ void goto_checkt::goto_check(
     }
     else if(i.is_assign())
     {
-      const code_assignt &code_assign = i.get_assign();
+      const exprt &assign_lhs = i.assign_lhs();
+      const exprt &assign_rhs = i.assign_rhs();
 
       // Reset the no_enum_check with the flag reset for exception
       // safety
       {
         flag_resett no_enum_check_flag_resetter;
         no_enum_check_flag_resetter.set_flag(no_enum_check, true);
-        check(code_assign.lhs());
+        check(assign_lhs);
       }
-      check(code_assign.rhs());
+
+      check(assign_rhs);
 
       // the LHS might invalidate any assertion
-      invalidate(code_assign.lhs());
+      invalidate(assign_lhs);
 
-      if(has_subexpr(code_assign.rhs(), [](const exprt &expr) {
+      if(has_subexpr(assign_rhs, [](const exprt &expr) {
            return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
                   expr.id() == ID_rw_ok;
          }))
       {
-        const exprt &rhs = i.get_assign().rhs();
-        auto rw_ok_cond = rw_ok_check(rhs);
+        auto rw_ok_cond = rw_ok_check(assign_rhs);
         if(rw_ok_cond.has_value())
-        {
-          auto new_assign = i.get_assign(); // copy
-          new_assign.rhs() = *rw_ok_cond;
-          i.set_assign(new_assign);
-        }
+          i.assign_rhs_nonconst() = *rw_ok_cond;
       }
     }
     else if(i.is_function_call())

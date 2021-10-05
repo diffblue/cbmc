@@ -140,8 +140,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   domain_data_deps.clear();
   if(to->is_assign())
   {
-    const code_assignt &inst = to->get_assign();
-    const exprt &rhs = inst.rhs();
+    const exprt &rhs = to->assign_rhs();
 
     // Handle return value of a 'no body' function
     if(rhs.id() == ID_side_effect)

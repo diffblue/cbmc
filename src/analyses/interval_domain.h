@@ -120,7 +120,7 @@ protected:
   void havoc_rec(const exprt &);
   void assume_rec(const exprt &, bool negation=false);
   void assume_rec(const exprt &lhs, irep_idt id, const exprt &rhs);
-  void assign(const class code_assignt &assignment);
+  void assign(const exprt &lhs, const exprt &rhs);
   integer_intervalt get_int_rec(const exprt &);
   ieee_float_intervalt get_float_rec(const exprt &);
 };
