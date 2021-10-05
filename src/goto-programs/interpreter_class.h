@@ -275,8 +275,7 @@ protected:
 
   bool evaluate_boolean(const exprt &expr)
   {
-    mp_vectort v;
-    evaluate(expr, v);
+    mp_vectort v = evaluate(expr);
     if(v.size()!=1)
       throw "invalid boolean value";
     return v.front()!=0;
@@ -296,9 +295,7 @@ protected:
     const mp_integer &cell_offset,
     mp_integer &result);
 
-  void evaluate(
-    const exprt &expr,
-    mp_vectort &dest);
+  mp_vectort evaluate(const exprt &);
 
   mp_integer evaluate_address(const exprt &expr, bool fail_quietly=false);
 

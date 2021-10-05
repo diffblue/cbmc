@@ -298,8 +298,7 @@ void interpretert::step()
 
     if(call_stack.top().return_value_address != 0)
     {
-      mp_vectort rhs;
-      evaluate(pc->return_value(), rhs);
+      mp_vectort rhs = evaluate(pc->return_value());
       assign(call_stack.top().return_value_address, rhs);
     }
 
@@ -390,15 +389,14 @@ void interpretert::execute_other()
     DATA_INVARIANT(
       pc->get_code().operands().size() == 1,
       "expression statement expected to have one operand");
-    mp_vectort rhs;
-    evaluate(pc->get_code().op0(), rhs);
+    mp_vectort rhs = evaluate(pc->get_code().op0());
   }
   else if(statement==ID_array_set)
   {
-    mp_vectort tmp, rhs;
-    evaluate(pc->get_code().op1(), tmp);
+    mp_vectort tmp = evaluate(pc->get_code().op1());
     mp_integer address = evaluate_address(pc->get_code().op0());
     mp_integer size = get_size(pc->get_code().op0().type());
+    mp_vectort rhs;
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
       output.error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -656,8 +654,7 @@ void interpretert::execute_assign()
   const exprt &assign_lhs = pc->assign_lhs();
   const exprt &assign_rhs = pc->assign_rhs();
 
-  mp_vectort rhs;
-  evaluate(assign_rhs, rhs);
+  mp_vectort rhs = evaluate(assign_rhs);
 
   if(!rhs.empty())
   {
@@ -780,7 +777,7 @@ void interpretert::execute_function_call()
   argument_values.resize(call_arguments.size());
 
   for(std::size_t i = 0; i < call_arguments.size(); i++)
-    evaluate(call_arguments[i], argument_values[i]);
+    argument_values[i] = evaluate(call_arguments[i]);
 
   // do the call
 
@@ -827,10 +824,10 @@ void interpretert::execute_function_call()
 
     if(it!=function_input_vars.end())
     {
-      mp_vectort value;
       PRECONDITION(!it->second.empty());
       PRECONDITION(!it->second.front().return_assignments.empty());
-      evaluate(it->second.front().return_assignments.back().value, value);
+      mp_vectort value =
+        evaluate(it->second.front().return_assignments.back().value);
       if(return_value_address>0)
       {
         assign(return_value_address, value);
@@ -891,8 +888,7 @@ typet interpretert::concretize_type(const typet &type)
   if(type.id()==ID_array)
   {
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    mp_vectort computed_size;
-    evaluate(size_expr, computed_size);
+    mp_vectort computed_size = evaluate(size_expr);
     if(computed_size.size()==1 &&
        computed_size[0]>=0)
     {
@@ -1013,8 +1009,7 @@ mp_integer interpretert::get_size(const typet &type)
 
     mp_integer subtype_size=get_size(type.subtype());
 
-    mp_vectort i;
-    evaluate(size_expr, i);
+    mp_vectort i = evaluate(size_expr);
     if(i.size()==1)
     {
       // Go via the binary representation to reproduce any
