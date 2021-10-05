@@ -72,7 +72,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
       main_function.body.instructions.begin();
     while(test_instruction != main_function.body.instructions.end() &&
           (!test_instruction->is_assign() ||
-           test_instruction->get_assign().lhs() != local_y.symbol_expr()))
+           test_instruction->assign_lhs() != local_y.symbol_expr()))
     {
       ++test_instruction;
     }
@@ -310,10 +310,9 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     // have been propagated once we reach it.
     goto_programt::const_targett test_instruction =
       main_function.body.instructions.begin();
-    while(
-      test_instruction != main_function.body.instructions.end() &&
-      !(test_instruction->is_assign() &&
-        test_instruction->get_assign().lhs() == marker_symbol.symbol_expr()))
+    while(test_instruction != main_function.body.instructions.end() &&
+          !(test_instruction->is_assign() &&
+            test_instruction->assign_lhs() == marker_symbol.symbol_expr()))
     {
       ++test_instruction;
     }

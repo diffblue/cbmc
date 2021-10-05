@@ -92,7 +92,7 @@ void nondet_static(
     if(instruction.is_assign())
     {
       const symbol_exprt sym =
-        to_symbol_expr(as_const(instruction).get_assign().lhs());
+        to_symbol_expr(as_const(instruction).assign_lhs());
 
       if(is_nondet_initializable_static(sym, ns))
       {

@@ -34,10 +34,10 @@ void validate_nondet_method_removed(
     // Check that our NONDET(<type>) exists on a rhs somewhere.
     if(inst.is_assign())
     {
-      const code_assignt &assignment = inst.get_assign();
-      if(assignment.rhs().id() == ID_side_effect)
+      const exprt &assignment_rhs = inst.assign_rhs();
+      if(assignment_rhs.id() == ID_side_effect)
       {
-        const side_effect_exprt &see = to_side_effect_expr(assignment.rhs());
+        const side_effect_exprt &see = to_side_effect_expr(assignment_rhs);
         if(see.get_statement() == ID_nondet)
         {
           replacement_nondet_exists = true;
@@ -92,7 +92,7 @@ void validate_nondets_converted(
     // Check that our NONDET(<type>) exists on a rhs somewhere.
     exprt target_expression =
       (inst.is_assign()
-         ? inst.get_assign().rhs()
+         ? inst.assign_rhs()
          : inst.is_set_return_value() ? inst.return_value() : inst.get_code());
 
     if(

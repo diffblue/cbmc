@@ -193,14 +193,6 @@ public:
       return code;
     }
 
-    /// Get the assignment for ASSIGN
-    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
-    const code_assignt &get_assign() const
-    {
-      PRECONDITION(is_assign());
-      return to_code_assign(code);
-    }
-
     /// Get the lhs of the assignment for ASSIGN
     const exprt &assign_lhs() const
     {

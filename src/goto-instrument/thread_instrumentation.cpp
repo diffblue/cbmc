@@ -94,13 +94,11 @@ void mutex_init_instrumentation(
   {
     if(it->is_assign())
     {
-      const code_assignt &code_assign = it->get_assign();
-
-      if(code_assign.lhs().type()==lock_type)
+      if(it->assign_lhs().type() == lock_type)
       {
         const code_function_callt call(
           f_it->second.symbol_expr(),
-          {address_of_exprt(code_assign.lhs()),
+          {address_of_exprt(it->assign_lhs()),
            address_of_exprt(string_constantt("mutex-init"))});
 
         goto_program.insert_after(
