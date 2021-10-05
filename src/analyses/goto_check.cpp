@@ -2001,14 +2001,10 @@ void goto_checkt::goto_check(
                   expr.id() == ID_rw_ok;
          }))
       {
-        const exprt &rhs = i.get_assign().rhs();
+        const exprt &rhs = i.assign_rhs();
         auto rw_ok_cond = rw_ok_check(rhs);
         if(rw_ok_cond.has_value())
-        {
-          auto new_assign = i.get_assign(); // copy
-          new_assign.rhs() = *rw_ok_cond;
-          i.set_assign(new_assign);
-        }
+          i.assign_rhs_nonconst() = *rw_ok_cond;
       }
     }
     else if(i.is_function_call())
