@@ -37,7 +37,6 @@ Date: February 2016
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
 
-#include "assigns.h"
 #include "memory_predicates.h"
 #include "utils.h"
 
@@ -669,21 +668,98 @@ void code_contractst::instrument_call_statement(
       auto snapshot_instructions = car->generate_snapshot_instructions();
       insert_before_swap_and_advance(
         body, instruction_it, snapshot_instructions);
-      // since CAR was inserted *after* the malloc,
+      // since CAR was inserted *after* the malloc call,
       // move the instruction pointer backward,
       // because the caller increments it in a `for` loop
       instruction_it--;
     }
-    return;
   }
   else if(callee_name == "free")
   {
-    add_inclusion_check(
+    const auto free_car = add_inclusion_check(
       body,
       assigns,
       instruction_it,
       pointer_object(instruction_it->call_arguments().front()));
-    return;
+
+    // skip all invalidation business if we're freeing invalid memory
+    goto_programt alias_checking_instructions, skip_program;
+    alias_checking_instructions.add(goto_programt::make_goto(
+      skip_program.add(
+        goto_programt::make_skip(instruction_it->source_location)),
+      not_exprt{free_car.validity_condition_var},
+      instruction_it->source_location));
+
+    // Since the argument to free may be an "alias" (but not identical)
+    // to existing CARs' source_expr, structural equality wouldn't work.
+    // Moreover, multiple CARs in the writeset might be aliased to the
+    // same underlying object.
+    // So, we first find the corresponding CAR using `same_object` checks.
+    std::unordered_set<exprt, irep_hash> write_set_validity_addrs;
+    for(const auto &w_car : assigns.get_write_set())
+    {
+      const auto object_validity_var_addr =
+        new_tmp_symbol(
+          pointer_type(bool_typet{}),
+          instruction_it->source_location,
+          symbol_table.lookup_ref(function).mode,
+          symbol_table)
+          .symbol_expr();
+      write_set_validity_addrs.insert(object_validity_var_addr);
+
+      alias_checking_instructions.add(goto_programt::make_decl(
+        object_validity_var_addr, instruction_it->source_location));
+      // if the CAR was defined on the same_object as the one being `free`d,
+      // record its validity variable's address, otherwise record NULL
+      alias_checking_instructions.add(goto_programt::make_assignment(
+        object_validity_var_addr,
+        if_exprt{
+          and_exprt{
+            w_car.validity_condition_var,
+            same_object(
+              free_car.lower_bound_address_var, w_car.lower_bound_address_var)},
+          address_of_exprt{w_car.validity_condition_var},
+          null_pointer_exprt{to_pointer_type(object_validity_var_addr.type())}},
+        instruction_it->source_location));
+    }
+
+    alias_checking_instructions.destructive_append(skip_program);
+    insert_before_swap_and_advance(
+      body, instruction_it, alias_checking_instructions);
+
+    // move past the call and then insert the invalidation instructions
+    instruction_it++;
+
+    // skip all invalidation business if we're freeing invalid memory
+    goto_programt invalidation_instructions;
+    skip_program.clear();
+    invalidation_instructions.add(goto_programt::make_goto(
+      skip_program.add(
+        goto_programt::make_skip(instruction_it->source_location)),
+      not_exprt{free_car.validity_condition_var},
+      instruction_it->source_location));
+
+    // invalidate all recorded CAR validity variables
+    for(const auto &w_car_validity_addr : write_set_validity_addrs)
+    {
+      goto_programt w_car_skip_program;
+      invalidation_instructions.add(goto_programt::make_goto(
+        w_car_skip_program.add(
+          goto_programt::make_skip(instruction_it->source_location)),
+        null_pointer(w_car_validity_addr),
+        instruction_it->source_location));
+      invalidation_instructions.add(goto_programt::make_assignment(
+        dereference_exprt{w_car_validity_addr},
+        false_exprt{},
+        instruction_it->source_location));
+      invalidation_instructions.destructive_append(w_car_skip_program);
+    }
+
+    invalidation_instructions.destructive_append(skip_program);
+    insert_before_swap_and_advance(
+      body, instruction_it, invalidation_instructions);
+
+    instruction_it--;
   }
 }
 
@@ -823,9 +899,9 @@ void code_contractst::check_frame_conditions(
       auto snapshot_instructions = car->generate_snapshot_instructions();
       insert_before_swap_and_advance(
         body, instruction_it, snapshot_instructions);
-      // since CAR was inserted *after* the DECL,
+      // since CAR was inserted *after* the DECL instruction,
       // move the instruction pointer backward,
-      // because the caller increments it in a `for` loop
+      // because the `for` loop takes care of the increment
       instruction_it--;
     }
     else if(instruction_it->is_assign())
@@ -838,7 +914,28 @@ void code_contractst::check_frame_conditions(
     }
     else if(instruction_it->is_dead())
     {
-      assigns.remove_from_write_set(instruction_it->dead_symbol());
+      const auto &symbol = instruction_it->dead_symbol();
+      // CAR equality and hash are defined on source_expr alone,
+      // therefore this temporary CAR should be "found"
+      const auto &symbol_car = assigns.get_write_set().find(
+        assigns_clauset::conditional_address_ranget{assigns, symbol});
+      if(symbol_car != assigns.get_write_set().end())
+      {
+        instruction_it++;
+        auto invalidation_assignment = goto_programt::make_assignment(
+          symbol_car->validity_condition_var,
+          false_exprt{},
+          instruction_it->source_location);
+        // note that instruction_it is not advanced by this call,
+        // so no need to move it backwards
+        body.insert_before_swap(instruction_it, invalidation_assignment);
+      }
+      else
+      {
+        throw incorrect_goto_program_exceptiont(
+          "Found a `DEAD` variable without corresponding `DECL`!",
+          instruction_it->source_location);
+      }
     }
     else if(
       instruction_it->is_other() &&
@@ -851,7 +948,8 @@ void code_contractst::check_frame_conditions(
   }
 }
 
-void code_contractst::add_inclusion_check(
+const assigns_clauset::conditional_address_ranget
+code_contractst::add_inclusion_check(
   goto_programt &program,
   const assigns_clauset &assigns,
   goto_programt::instructionst::iterator &instruction_it,
@@ -868,6 +966,8 @@ void code_contractst::add_inclusion_check(
   assertion.instructions.back().source_location.set_comment(
     "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
   insert_before_swap_and_advance(program, instruction_it, assertion);
+
+  return car;
 }
 
 bool code_contractst::enforce_contract(const irep_idt &function)

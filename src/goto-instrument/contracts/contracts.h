@@ -30,6 +30,8 @@ Date: February 2016
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 
+#include "assigns.h"
+
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
   " --apply-loop-contracts\n"                                                  \
@@ -44,7 +46,6 @@ Date: February 2016
 #define HELP_ENFORCE_CONTRACT                                                  \
   " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
 
-class assigns_clauset;
 class local_may_aliast;
 class replace_symbolt;
 
@@ -134,7 +135,7 @@ protected:
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
-  void add_inclusion_check(
+  const assigns_clauset::conditional_address_ranget add_inclusion_check(
     goto_programt &,
     const assigns_clauset &,
     goto_programt::instructionst::iterator &,
