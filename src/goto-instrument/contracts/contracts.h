@@ -134,7 +134,7 @@ protected:
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
-  void add_containment_check(
+  void add_inclusion_check(
     goto_programt &,
     const assigns_clauset &,
     goto_programt::instructionst::iterator &,
@@ -144,19 +144,17 @@ protected:
   /// a goto statement that jumps back.
   bool check_for_looped_mallocs(const goto_programt &program);
 
-  /// Inserts an assertion statement into program before the assignment
+  /// Inserts an assertion into program immediately before the assignment
   /// instruction_it, to ensure that the left-hand-side of the assignment
-  /// aliases some expression in original_references, unless it is contained
-  /// in freely assignable set.
+  /// is "included" in the (conditional address ranges in the) write set.
   void instrument_assign_statement(
     goto_programt::instructionst::iterator &,
     goto_programt &,
     assigns_clauset &);
 
-  /// Inserts an assertion statement into program before the function call at
-  /// ins_it, to ensure that any memory which may be written by the call is
-  /// aliased by some expression in assigns_references, unless it is contained
-  /// in freely assignable set.
+  /// Inserts an assertion into program immediately before the function call at
+  /// instruction_it, to ensure that all memory locations written to by the
+  // callee are "included" in the (conditional address ranges in the) write set.
   void instrument_call_statement(
     goto_programt::instructionst::iterator &,
     const irep_idt &,

@@ -637,7 +637,7 @@ void code_contractst::instrument_assign_statement(
     "The first instruction of instrument_assign_statement should always be"
     " an assignment");
 
-  add_containment_check(
+  add_inclusion_check(
     program, assigns_clause, instruction_it, instruction_it->assign_lhs());
 }
 
@@ -678,7 +678,7 @@ void code_contractst::instrument_call_statement(
   }
   else if(callee_name == "free")
   {
-    add_containment_check(
+    add_inclusion_check(
       body,
       assigns,
       instruction_it,
@@ -846,12 +846,12 @@ void code_contractst::check_frame_conditions(
     {
       const exprt &havoc_argument = dereference_exprt(
         to_typecast_expr(instruction_it->get_other().operands().front()).op());
-      add_containment_check(body, assigns, instruction_it, havoc_argument);
+      add_inclusion_check(body, assigns, instruction_it, havoc_argument);
     }
   }
 }
 
-void code_contractst::add_containment_check(
+void code_contractst::add_inclusion_check(
   goto_programt &program,
   const assigns_clauset &assigns,
   goto_programt::instructionst::iterator &instruction_it,
