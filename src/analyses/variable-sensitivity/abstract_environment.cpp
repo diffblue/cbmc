@@ -711,14 +711,14 @@ exprt assume_eq_unbounded(
   const left_and_right_valuest &operands,
   const namespacet &ns)
 {
-  if(operands.left->is_top() && is_lvalue(operands.lhs))
+  if(operands.left->is_top() && is_assignable(operands.lhs))
   {
     // TOP == x
     auto constrained = std::make_shared<interval_abstract_valuet>(
       operands.right_interval(), env, ns);
     prune_assign(env, operands.left, operands.lhs, constrained, ns);
   }
-  if(operands.right->is_top() && is_lvalue(operands.rhs))
+  if(operands.right->is_top() && is_assignable(operands.rhs))
   {
     // x == TOP
     auto constrained = std::make_shared<interval_abstract_valuet>(
@@ -746,9 +746,9 @@ exprt assume_eq(
   if(meet->is_bottom())
     return false_exprt();
 
-  if(is_lvalue(operands.lhs))
+  if(is_assignable(operands.lhs))
     prune_assign(env, operands.left, operands.lhs, meet, ns);
-  if(is_lvalue(operands.rhs))
+  if(is_assignable(operands.rhs))
     prune_assign(env, operands.right, operands.rhs, meet, ns);
   return true_exprt();
 }
@@ -781,7 +781,7 @@ exprt assume_less_than_unbounded(
   const left_and_right_valuest &operands,
   const namespacet &ns)
 {
-  if(operands.left->is_top() && is_lvalue(operands.lhs))
+  if(operands.left->is_top() && is_assignable(operands.lhs))
   {
     // TOP < x, so prune range is min->right.upper
     auto pruned_expr = constant_interval_exprt(
@@ -792,7 +792,7 @@ exprt assume_less_than_unbounded(
       std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);
     prune_assign(env, operands.left, operands.lhs, constrained, ns);
   }
-  if(operands.right->is_top() && is_lvalue(operands.rhs))
+  if(operands.right->is_top() && is_assignable(operands.rhs))
   {
     // x < TOP, so prune range is left.lower->max
     auto pruned_expr = constant_interval_exprt(
@@ -830,7 +830,7 @@ exprt assume_less_than(
   auto result = env.eval(reduced_le_expr, ns)->to_constant();
   if(result.is_true())
   {
-    if(is_lvalue(operands.lhs))
+    if(is_assignable(operands.lhs))
     {
       auto pruned_upper = constant_interval_exprt::get_min(
         left_interval.get_upper(), right_upper);
@@ -838,7 +838,7 @@ exprt assume_less_than(
         as_value(operands.left)->constrain(left_lower, pruned_upper);
       prune_assign(env, operands.left, operands.lhs, constrained, ns);
     }
-    if(is_lvalue(operands.rhs))
+    if(is_assignable(operands.rhs))
     {
       auto pruned_lower = constant_interval_exprt::get_max(
         left_lower, right_interval.get_lower());

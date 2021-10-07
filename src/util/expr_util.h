@@ -29,8 +29,12 @@ class if_exprt;
 class typet;
 class namespacet;
 
-/// Returns true iff the argument is (syntactically) an lvalue.
-bool is_lvalue(const exprt &expr);
+/// Returns true iff the argument is one of the following:
+/// * a symbol
+/// * a dereference
+/// * an array element
+/// * a struct member
+bool is_assignable(const exprt &);
 
 /// splits an expression with >=3 operands into nested binary expressions
 exprt make_binary(const exprt &);
