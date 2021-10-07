@@ -12,6 +12,7 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
+#include "goto_instruction_code.h"
 #include "std_code.h"
 #include "validate_helpers.h"
 

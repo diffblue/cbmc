@@ -12,6 +12,7 @@ Date:   June 2017
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/goto_instruction_code.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 

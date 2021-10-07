@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_ALLOCATE_OBJECTS_H
 #define CPROVER_UTIL_ALLOCATE_OBJECTS_H
 
+#include "goto_instruction_code.h"
 #include "namespace.h"
 #include "source_location.h"
-#include "std_code.h"
 
 /// Selects the kind of objects allocated
 enum class lifetimet

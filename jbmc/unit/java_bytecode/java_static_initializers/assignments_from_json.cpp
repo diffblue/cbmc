@@ -7,14 +7,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include <java_bytecode/assignments_from_json.h>
-
 #include <java_bytecode/ci_lazy_methods_needed.h>
 #include <java_bytecode/java_bytecode_convert_class.h>
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
+
 #include <testing-utils/expr_query.h>
 #include <testing-utils/use_catch.h>
+
 #include <util/arith_tools.h>
+#include <util/goto_instruction_code.h>
 #include <util/json.h>
 #include <util/symbol_table.h>
 

@@ -13,6 +13,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "converters/statement_list_types.h"
 
 #include <util/cprover_prefix.h>
+#include <util/goto_instruction_code.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>

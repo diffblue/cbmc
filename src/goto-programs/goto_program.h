@@ -18,10 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 #include <util/deprecate.h>
+#include <util/goto_instruction_code.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
-#include <util/std_code.h>
 
 enum class validation_modet;
 
