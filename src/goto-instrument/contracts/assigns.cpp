@@ -86,6 +86,15 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
   instructions.add(goto_programt::make_decl(lower_bound_address_var, location));
   instructions.add(goto_programt::make_decl(upper_bound_address_var, location));
 
+  instructions.add(goto_programt::make_assignment(
+    lower_bound_address_var,
+    null_pointer_exprt{to_pointer_type(slice.first.type())},
+    location));
+  instructions.add(goto_programt::make_assignment(
+    upper_bound_address_var,
+    null_pointer_exprt{to_pointer_type(slice.first.type())},
+    location));
+
   goto_programt skip_program;
   const auto skip_target = skip_program.add(goto_programt::make_skip(location));
 

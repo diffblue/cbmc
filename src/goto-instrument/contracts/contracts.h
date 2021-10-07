@@ -30,6 +30,8 @@ Date: February 2016
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 
+#include "assigns.h"
+
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
   " --apply-loop-contracts\n"                                                  \
@@ -44,7 +46,6 @@ Date: February 2016
 #define HELP_ENFORCE_CONTRACT                                                  \
   " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
 
-class assigns_clauset;
 class local_may_aliast;
 class replace_symbolt;
 
@@ -134,7 +135,7 @@ protected:
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
-  void add_containment_check(
+  const assigns_clauset::conditional_address_ranget add_inclusion_check(
     goto_programt &,
     const assigns_clauset &,
     goto_programt::instructionst::iterator &,
@@ -144,19 +145,17 @@ protected:
   /// a goto statement that jumps back.
   bool check_for_looped_mallocs(const goto_programt &program);
 
-  /// Inserts an assertion statement into program before the assignment
+  /// Inserts an assertion into program immediately before the assignment
   /// instruction_it, to ensure that the left-hand-side of the assignment
-  /// aliases some expression in original_references, unless it is contained
-  /// in freely assignable set.
+  /// is "included" in the (conditional address ranges in the) write set.
   void instrument_assign_statement(
     goto_programt::instructionst::iterator &,
     goto_programt &,
     assigns_clauset &);
 
-  /// Inserts an assertion statement into program before the function call at
-  /// ins_it, to ensure that any memory which may be written by the call is
-  /// aliased by some expression in assigns_references, unless it is contained
-  /// in freely assignable set.
+  /// Inserts an assertion into program immediately before the function call at
+  /// instruction_it, to ensure that all memory locations written to by the
+  // callee are "included" in the (conditional address ranges in the) write set.
   void instrument_call_statement(
     goto_programt::instructionst::iterator &,
     const irep_idt &,
