@@ -33,7 +33,7 @@ static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
         pointer_offset(arg)},
       typecast_exprt::conditional_cast(object_size(arg), signed_size_type())};
   }
-  else if(is_lvalue(expr))
+  else if(is_assignable(expr))
   {
     const auto &size = size_of_expr(expr.type(), ns);
 

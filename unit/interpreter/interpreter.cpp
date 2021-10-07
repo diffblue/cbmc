@@ -32,9 +32,7 @@ public:
 
   mp_vectort evaluate(const exprt &expression)
   {
-    mp_vectort result;
-    interpreter.evaluate(expression, result);
-    return result;
+    return interpreter.evaluate(expression);
   }
 };
 
