@@ -120,7 +120,7 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
       {
         // turn references into non-references
         {
-          code_declt &decl = to_code_decl(statements.front());
+          code_frontend_declt &decl = to_code_frontend_decl(statements.front());
           cpp_declarationt &cpp_declaration = to_cpp_declaration(decl.symbol());
 
           assert(cpp_declaration.declarators().size()==1);
@@ -139,8 +139,8 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
           catch_block.statements().front().get_statement() == ID_decl_block);
 
         // get the declaration
-        const code_declt &code_decl =
-          to_code_decl(to_code(catch_block.statements().front().op0()));
+        const code_frontend_declt &code_decl = to_code_frontend_decl(
+          to_code(catch_block.statements().front().op0()));
 
         // get the type
         const typet &type = code_decl.symbol().type();
@@ -199,7 +199,7 @@ void cpp_typecheckt::typecheck_switch(codet &code)
     assert(decl.operands().size()==1);
 
     // replace declaration by its symbol
-    value = to_code_decl(to_code(to_unary_expr(decl).op())).symbol();
+    value = to_code_frontend_decl(to_code(to_unary_expr(decl).op())).symbol();
 
     c_typecheck_baset::typecheck_switch(code);
 
@@ -456,7 +456,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       throw 0;
     }
 
-    code_declt decl_statement(cpp_symbol_expr(symbol));
+    code_frontend_declt decl_statement(cpp_symbol_expr(symbol));
     decl_statement.add_source_location()=symbol.location;
 
     // Do we have an initializer that's not code?

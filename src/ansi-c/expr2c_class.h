@@ -214,7 +214,7 @@ protected:
   std::string convert_code_break(unsigned indent);
   std::string convert_code_switch(const codet &src, unsigned indent);
   std::string convert_code_continue(unsigned indent);
-  std::string convert_code_decl(const codet &src, unsigned indent);
+  std::string convert_code_frontend_decl(const codet &, unsigned indent);
   std::string convert_code_decl_block(const codet &src, unsigned indent);
   std::string convert_code_dead(const codet &src, unsigned indent);
   // NOLINTNEXTLINE(whitespace/line_length)

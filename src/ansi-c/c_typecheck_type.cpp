@@ -634,7 +634,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       // produce the code that declares and initializes the symbol
       symbol_exprt symbol_expr = new_symbol.symbol_expr();
 
-      code_declt declaration(symbol_expr);
+      code_frontend_declt declaration(symbol_expr);
       declaration.add_source_location() = size_source_location;
 
       code_assignt assignment;

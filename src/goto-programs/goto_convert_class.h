@@ -222,9 +222,9 @@ protected:
     const code_blockt &code,
     goto_programt &dest,
     const irep_idt &mode);
-  void convert_decl(
-    const code_declt &code,
-    goto_programt &dest,
+  void convert_frontend_decl(
+    const code_frontend_declt &,
+    goto_programt &,
     const irep_idt &mode);
   void convert_decl_type(const codet &code, goto_programt &dest);
   void convert_expression(

@@ -436,7 +436,7 @@ void goto_convertt::convert(
   if(statement==ID_block)
     convert_block(to_code_block(code), dest, mode);
   else if(statement==ID_decl)
-    convert_decl(to_code_decl(code), dest, mode);
+    convert_frontend_decl(to_code_frontend_decl(code), dest, mode);
   else if(statement==ID_decl_type)
     convert_decl_type(code, dest);
   else if(statement==ID_expression)
@@ -606,8 +606,8 @@ void goto_convertt::convert_expression(
   }
 }
 
-void goto_convertt::convert_decl(
-  const code_declt &code,
+void goto_convertt::convert_frontend_decl(
+  const code_frontend_declt &code,
   goto_programt &dest,
   const irep_idt &mode)
 {
@@ -1845,9 +1845,9 @@ symbolt &goto_convertt::new_tmp_symbol(
     mode,
     symbol_table);
 
-  code_declt decl(new_symbol.symbol_expr());
+  code_frontend_declt decl(new_symbol.symbol_expr());
   decl.add_source_location()=source_location;
-  convert_decl(decl, dest, mode);
+  convert_frontend_decl(decl, dest, mode);
 
   return new_symbol;
 }
