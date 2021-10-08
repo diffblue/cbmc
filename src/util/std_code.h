@@ -360,7 +360,8 @@ public:
   }
 };
 
-template<> inline bool can_cast_expr<code_declt>(const exprt &base)
+template <>
+inline bool can_cast_expr<code_declt>(const exprt &base)
 {
   return detail::can_cast_code_impl(base, ID_decl);
 }
@@ -382,6 +383,107 @@ inline code_declt &to_code_decl(codet &code)
   PRECONDITION(code.get_statement() == ID_decl);
   code_declt::check(code);
   return static_cast<code_declt &>(code);
+}
+
+/// A `codet` representing the declaration of a local variable.
+/// For example, if a variable (symbol) `x` is represented as a
+/// \ref symbol_exprt `sym`, then the declaration of this variable can be
+/// represented as `code_frontend_declt(sym)`.
+class code_frontend_declt : public codet
+{
+public:
+  explicit code_frontend_declt(symbol_exprt symbol)
+    : codet(ID_decl, {std::move(symbol)})
+  {
+  }
+
+  symbol_exprt &symbol()
+  {
+    return static_cast<symbol_exprt &>(op0());
+  }
+
+  const symbol_exprt &symbol() const
+  {
+    return static_cast<const symbol_exprt &>(op0());
+  }
+
+  const irep_idt &get_identifier() const
+  {
+    return symbol().get_identifier();
+  }
+
+  /// Returns the initial value to which the declared variable is initialized,
+  /// or empty in the case where no initialisation is included.
+  /// \note: Initial values may be present in the front end but they must be
+  ///   separated into a separate assignment when used in a `goto_instructiont`.
+  optionalt<exprt> initial_value() const
+  {
+    if(operands().size() < 2)
+      return {};
+    return {op1()};
+  }
+
+  /// Sets the value to which this declaration initializes the declared
+  /// variable. Empty optional maybe passed to remove existing initialisation.
+  /// \note: Initial values may be present in the front end but they must be
+  ///   separated into a separate assignment when used in a `goto_instructiont`.
+  void set_initial_value(optionalt<exprt> initial_value)
+  {
+    if(!initial_value)
+    {
+      operands().resize(1);
+    }
+    else if(operands().size() < 2)
+    {
+      PRECONDITION(operands().size() == 1);
+      add_to_operands(std::move(*initial_value));
+    }
+    else
+    {
+      op1() = std::move(*initial_value);
+    }
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    // will be size()==1 in the future
+    DATA_CHECK(
+      vm,
+      code.operands().size() >= 1,
+      "declaration must have one or more operands");
+    DATA_CHECK(
+      vm,
+      code.op0().id() == ID_symbol,
+      "declaring a non-symbol: " +
+        id2string(to_symbol_expr(code.op0()).get_identifier()));
+  }
+};
+
+template <>
+inline bool can_cast_expr<code_frontend_declt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_decl);
+}
+
+inline void validate_expr(const code_frontend_declt &x)
+{
+  code_frontend_declt::check(x);
+}
+
+inline const code_frontend_declt &to_code_frontend_decl(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_decl);
+  code_frontend_declt::check(code);
+  return static_cast<const code_frontend_declt &>(code);
+}
+
+inline code_frontend_declt &to_code_frontend_decl(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_decl);
+  code_frontend_declt::check(code);
+  return static_cast<code_frontend_declt &>(code);
 }
 
 /// Create a fatal assertion, which checks a condition and then halts if it does
@@ -1944,16 +2046,16 @@ public:
     return static_cast<const codet &>(op0());
   }
 
-  code_declt &get_catch_decl(unsigned i)
+  code_frontend_declt &get_catch_decl(unsigned i)
   {
     PRECONDITION((2 * i + 2) < operands().size());
-    return to_code_decl(to_code(operands()[2*i+1]));
+    return to_code_frontend_decl(to_code(operands()[2 * i + 1]));
   }
 
-  const code_declt &get_catch_decl(unsigned i) const
+  const code_frontend_declt &get_catch_decl(unsigned i) const
   {
     PRECONDITION((2 * i + 2) < operands().size());
-    return to_code_decl(to_code(operands()[2*i+1]));
+    return to_code_frontend_decl(to_code(operands()[2 * i + 1]));
   }
 
   codet &get_catch_code(unsigned i)
@@ -1968,7 +2070,7 @@ public:
     return to_code(operands()[2*i+2]);
   }
 
-  void add_catch(const code_declt &to_catch, const codet &code_catch)
+  void add_catch(const code_frontend_declt &to_catch, const codet &code_catch)
   {
     add_to_operands(to_catch, code_catch);
   }

@@ -443,7 +443,7 @@ void format_expr_configt::setup()
     {
       return os << "dead " << format(to_code_dead(code).symbol()) << ";";
     }
-    else if(const auto decl = expr_try_dynamic_cast<code_declt>(code))
+    else if(const auto decl = expr_try_dynamic_cast<code_frontend_declt>(code))
     {
       const auto &declaration_symb = decl->symbol();
       os << "decl " << format(declaration_symb.type()) << " "

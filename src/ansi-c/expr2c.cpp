@@ -2761,9 +2761,8 @@ std::string expr2ct::convert_code_continue(unsigned indent)
   return dest;
 }
 
-std::string expr2ct::convert_code_decl(
-  const codet &src,
-  unsigned indent)
+std::string
+expr2ct::convert_code_frontend_decl(const codet &src, unsigned indent)
 {
   // initializer to go away
   if(src.operands().size()!=1 &&
@@ -3013,7 +3012,7 @@ std::string expr2ct::convert_code(
     return convert_code_continue(indent);
 
   if(statement==ID_decl)
-    return convert_code_decl(src, indent);
+    return convert_code_frontend_decl(src, indent);
 
   if(statement==ID_decl_block)
     return convert_code_decl_block(src, indent);

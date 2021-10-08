@@ -316,7 +316,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     }
     else
     {
-      code_declt decl(symbol.symbol_expr());
+      code_frontend_declt decl(symbol.symbol_expr());
       decl.add_source_location() = symbol.location;
       decl.symbol().add_source_location() = symbol.location;
 

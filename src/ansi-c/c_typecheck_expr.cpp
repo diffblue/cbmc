@@ -323,7 +323,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
 
     // replace declarations by symbol expressions
     for(auto &binding : bindings)
-      binding = to_code_decl(to_code(binding)).symbol();
+      binding = to_code_frontend_decl(to_code(binding)).symbol();
 
     if(expr.id() == ID_lambda)
     {
@@ -788,7 +788,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
         throw 0;
       }
 
-      code_declt decl(symbol.symbol_expr());
+      code_frontend_declt decl(symbol.symbol_expr());
       decl.add_source_location() = declaration.source_location();
 
       binding = decl;

@@ -679,7 +679,7 @@ optionalt<codet> Parser::rTypedefStatement()
   if(!rTypedef(declaration))
     return {};
 
-  return code_declt(
+  return code_frontend_declt(
     static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
 }
 
@@ -7501,7 +7501,7 @@ optionalt<codet> Parser::rStatement()
         cpp_declarationt declaration;
         if(!rTypedefUsing(declaration))
           return {};
-        code_declt statement(
+        code_frontend_declt statement(
           static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
         statement.add_source_location() = declaration.source_location();
         return std::move(statement);
@@ -7790,7 +7790,7 @@ optionalt<codet> Parser::rTryStatement()
       if(declaration.declarators().front().name().is_nil())
         declaration.declarators().front().name() = cpp_namet("#anon");
 
-      code_declt code_decl(
+      code_frontend_declt code_decl(
         static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
       set_location(code_decl, catch_token);
 
@@ -8237,7 +8237,7 @@ optionalt<codet> Parser::rDeclarationStatement()
       cpp_declarationt declaration;
       if(!rConstDeclaration(declaration))
         return {};
-      return code_declt(
+      return code_frontend_declt(
         static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
     }
     else
@@ -8268,7 +8268,7 @@ optionalt<codet> Parser::rIntegralDeclStatement(
   if(lex.LookAhead(0)==';')
   {
     lex.get_token(tk);
-    code_declt statement(
+    code_frontend_declt statement(
       static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
     set_location(statement, tk);
     return std::move(statement);
@@ -8281,7 +8281,7 @@ optionalt<codet> Parser::rIntegralDeclStatement(
     if(lex.get_token(tk)!=';')
       return {};
 
-    code_declt statement(
+    code_frontend_declt statement(
       static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
     set_location(statement, tk);
     return std::move(statement);
@@ -8333,7 +8333,7 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
   if(lex.get_token(tk)!=';')
     return {};
 
-  code_declt statement(
+  code_frontend_declt statement(
     static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
   set_location(statement, tk);
   return std::move(statement);
