@@ -14,12 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "format_type.h"
+#include "goto_instruction_code.h"
 #include "ieee_float.h"
 #include "mathematical_expr.h"
 #include "mp_arith.h"
 #include "pointer_expr.h"
 #include "prefix.h"
-#include "std_code.h"
 #include "string_utils.h"
 
 #include <map>

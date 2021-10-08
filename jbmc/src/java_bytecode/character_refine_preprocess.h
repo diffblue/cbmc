@@ -20,8 +20,9 @@ Date:   March 2017
 #ifndef CPROVER_JAVA_BYTECODE_CHARACTER_REFINE_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_CHARACTER_REFINE_PREPROCESS_H
 
-#include <util/std_code.h>
+#include <util/goto_instruction_code.h>
 #include <util/mp_arith.h>
+#include <util/std_code.h>
 
 #include <unordered_map>
 

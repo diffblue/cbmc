@@ -13,8 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // #include <langapi/language_util.h>
 
+#include <util/goto_instruction_code.h>
 #include <util/pointer_expr.h>
-#include <util/std_code.h>
 
 #include <util/invariant.h>
 

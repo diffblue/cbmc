@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
+#include <util/goto_instruction_code.h>
 #include <util/json.h>
 #include <util/symbol_table.h>
 

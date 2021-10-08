@@ -14,6 +14,7 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_types.h>
 
 #include <util/fresh_symbol.h>
+#include <util/goto_instruction_code.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/symbol_table_base.h>
