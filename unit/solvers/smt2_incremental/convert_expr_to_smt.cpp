@@ -34,6 +34,13 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
   }
 }
 
+TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
+{
+  CHECK(
+    convert_expr_to_smt(symbol_exprt{"foo", bool_typet{}}) ==
+    smt_identifier_termt("foo", smt_bool_sortt{}));
+}
+
 TEST_CASE(
   "\"exprt\" to smt term conversion for constants/literals",
   "[core][smt2_incremental]")

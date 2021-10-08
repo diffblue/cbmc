@@ -1,0 +1,32 @@
+CORE winbug
+control_flow.c
+--incremental-smt2-solver "z3 --smt2 -in" --verbosity 10
+Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+Sending command to SMT2 solver - \(set-option :produce-models true\)
+Sending command to SMT2 solver - \(set-logic QF_UFBV\)
+Sending command to SMT2 solver - \(declare-fun |goto_symex::&92;guard#1| \(\) Bool\)
+Sending command to SMT2 solver - \(define-fun |B1| \(\) Bool |goto_symex::&92;guard#1|\)
+Sending command to SMT2 solver - \(declare-fun |main::1::x!0@1#1| \(\) \(_ BitVec 32\)\)
+Sending command to SMT2 solver - \(assert \(|=| |goto_symex::&92;guard#1| \(|not| \(|=| |main::1::x!0@1#1| \(_ bv0 32\)\)\)\)\)
+Sending command to SMT2 solver - \(declare-fun |main::1::y!0@1#4| \(\) \(_ BitVec 32\)\)
+Sending command to SMT2 solver - \(assert \(|=| |main::1::y!0@1#4| \(|ite| |goto_symex::&92;guard#1| \(_ bv9 32\) \(_ bv4 32\)\)\)\)
+Sending command to SMT2 solver - \(declare-fun |main::1::x!0@1#3| \(\) \(_ BitVec 32\)\)
+Sending command to SMT2 solver - \(assert \(|=| |main::1::x!0@1#3| \(|ite| |goto_symex::&92;guard#1| |main::1::x!0@1#1| \(_ bv0 32\)\)\)\)
+Sending command to SMT2 solver - \(declare-fun |main::1::z!0@1#2| \(\) \(_ BitVec 32\)\)
+Sending command to SMT2 solver - \(assert \(|=| |main::1::z!0@1#2| |main::1::y!0@1#4|\)\)
+Sending command to SMT2 solver - \(define-fun |B3| \(\) Bool \(|=| |main::1::x!0@1#1| \(_ bv0 32\)\)\)
+Sending command to SMT2 solver - \(assert \(|not| \(|not| \(|=| |main::1::x!0@1#3| |main::1::z!0@1#2|\)\)\)\)
+Sending command to SMT2 solver - \(define-fun |B4| \(\) Bool \(|not| false\)\)
+Sending command to SMT2 solver - \(assert |B4|\)
+Sending command to SMT2 solver - \(check-sat\)
+Solver response - sat
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--
+type: pointer
+--
+Test that running cbmc with the `--incremental-smt2-solver` argument can be used
+to send a valid SMT2 formula to a sub-process solver for an example input file
+which include control flow constructs. Note that at the time of adding this
+test, an invariant violation is expected due to the unimplemented response
+parsing.

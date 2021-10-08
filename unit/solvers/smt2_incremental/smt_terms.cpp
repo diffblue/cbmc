@@ -39,7 +39,7 @@ TEST_CASE("smt_identifier_termt construction", "[core][smt2_incremental]")
   cbmc_invariants_should_throwt invariants_throw;
   CHECK_NOTHROW(smt_identifier_termt{"foo bar", smt_bool_sortt{}});
   CHECK_THROWS(smt_identifier_termt{"|foo bar|", smt_bool_sortt{}});
-  CHECK_THROWS(smt_identifier_termt{"foo\\ bar", smt_bool_sortt{}});
+  CHECK_NOTHROW(smt_identifier_termt{"foo\\ bar", smt_bool_sortt{}});
 }
 
 TEST_CASE("smt_identifier_termt getters.", "[core][smt2_incremental]")

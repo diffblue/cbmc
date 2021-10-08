@@ -33,6 +33,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/external_sat.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
+#include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/strings/string_refinement.h>
 
 solver_factoryt::solver_factoryt(
@@ -330,10 +331,12 @@ std::unique_ptr<solver_factoryt::solvert>
 solver_factoryt::get_incremental_smt2(std::string solver_command)
 {
   no_beautification();
+  auto solver_process = util_make_unique<smt_piped_solver_processt>(
+    std::move(solver_command), message_handler);
 
   return util_make_unique<solvert>(
     util_make_unique<smt2_incremental_decision_proceduret>(
-      std::move(solver_command)));
+      ns, std::move(solver_process), message_handler));
 }
 
 std::unique_ptr<solver_factoryt::solvert>
