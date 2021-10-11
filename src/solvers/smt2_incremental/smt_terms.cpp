@@ -52,7 +52,7 @@ static bool is_valid_smt_identifier(irep_idt identifier)
 {
   // The below regex matches a complete string which does not contain the `|`
   // character. So it would match the string `foo bar`, but not `|foo bar|`.
-  static const std::regex valid{R"(^[^\|]*$)"};
+  static const std::regex valid{"[^\\|]*"};
   return std::regex_match(id2string(identifier), valid);
 }
 
