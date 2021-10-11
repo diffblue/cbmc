@@ -59,6 +59,10 @@ static bool is_valid_smt_identifier(irep_idt identifier)
 smt_identifier_termt::smt_identifier_termt(irep_idt identifier, smt_sortt sort)
   : smt_termt(ID_smt_identifier_term, std::move(sort))
 {
+  // The below invariant exists as a sanity check that the string being used for
+  // the identifier is in unescaped form. This is because the escaping and
+  // unescaping are implementation details of the printing to string and
+  // response parsing respectively, not part of the underlying data.
   INVARIANT(
     is_valid_smt_identifier(identifier),
     R"(Identifiers may not contain | characters.)");
