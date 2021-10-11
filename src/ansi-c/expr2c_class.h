@@ -199,7 +199,8 @@ protected:
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_switch_case(const code_switch_caset &src, unsigned indent);
   std::string convert_code_asm(const code_asmt &src, unsigned indent);
-  std::string convert_code_assign(const code_assignt &src, unsigned indent);
+  std::string
+  convert_code_frontend_assign(const code_frontend_assignt &, unsigned indent);
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_ifthenelse(const code_ifthenelset &src, unsigned indent);
   std::string convert_code_for(const code_fort &src, unsigned indent);

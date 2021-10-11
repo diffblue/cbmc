@@ -179,20 +179,20 @@ static irep_idt clinit_local_init_complete_var_name(const irep_idt &class_name)
   return id2string(class_name) + CPROVER_PREFIX "clinit_wrapper::init_complete";
 }
 
-/// Generates a code_assignt for clinit_statest
+/// Generates a code_frontend_assignt for clinit_statest
 /// /param expr:
 ///   expression to be used as the LHS of generated assignment.
 /// /param state:
 ///   execution state of the clint_wrapper, used as the RHS of the generated
 ///   assignment.
-/// /return returns a code_assignt, assigning \p expr to the integer
+/// /return returns a code_frontend_assignt, assigning \p expr to the integer
 ///   representation of \p state
-static code_assignt
+static code_frontend_assignt
 gen_clinit_assign(const exprt &expr, const clinit_statest state)
 {
   mp_integer initv(static_cast<int>(state));
   constant_exprt init_s = from_integer(initv, clinit_states_type());
-  return code_assignt(expr, init_s);
+  return code_frontend_assignt(expr, init_s);
 }
 
 /// Generates an equal_exprt for clinit_statest
@@ -596,7 +596,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 
   // C::__CPROVER_PREFIX_clinit_thread_local_state = INIT_COMPLETE;
   {
-    code_assignt assign = gen_clinit_assign(
+    code_frontend_assignt assign = gen_clinit_assign(
       clinit_thread_local_state_sym.symbol_expr(),
       clinit_statest::INIT_COMPLETE);
     function_body.add(assign);
@@ -629,7 +629,8 @@ code_blockt get_thread_safe_clinit_wrapper_body(
     code_ifthenelset init_conditional(
       gen_clinit_eqexpr(
         clinit_state_sym.symbol_expr(), clinit_statest::INIT_COMPLETE),
-      code_blockt({code_assignt(init_complete.symbol_expr(), true_exprt())}));
+      code_blockt(
+        {code_frontend_assignt(init_complete.symbol_expr(), true_exprt())}));
 
     code_ifthenelset not_init_conditional(
       gen_clinit_eqexpr(
@@ -637,7 +638,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
       code_blockt(
         {gen_clinit_assign(
            clinit_state_sym.symbol_expr(), clinit_statest::IN_PROGRESS),
-         code_assignt(init_complete.symbol_expr(), false_exprt())}),
+         code_frontend_assignt(init_complete.symbol_expr(), false_exprt())}),
       std::move(init_conditional));
 
     function_body.add(std::move(not_init_conditional));
@@ -757,7 +758,8 @@ code_ifthenelset get_clinit_wrapper_body(
     false_exprt());
 
   // add the "already-run = false" statement
-  code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
+  code_frontend_assignt set_already_run(
+    already_run_symbol.symbol_expr(), true_exprt());
   code_blockt init_body({set_already_run});
 
   clinit_wrapper_do_recursive_calls(

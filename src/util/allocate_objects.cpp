@@ -129,9 +129,10 @@ exprt allocate_objectst::allocate_dynamic_object_symbol(
   if(allocate_type.id() == ID_empty)
   {
     // make null
-    code_assignt code{target_expr,
-                      null_pointer_exprt{to_pointer_type(target_expr.type())},
-                      source_location};
+    code_frontend_assignt code{
+      target_expr,
+      null_pointer_exprt{to_pointer_type(target_expr.type())},
+      source_location};
     output_code.add(std::move(code));
 
     return exprt();
@@ -154,14 +155,14 @@ exprt allocate_objectst::allocate_dynamic_object_symbol(
 
   symbols_created.push_back(&malloc_sym);
 
-  code_assignt assign =
+  code_frontend_assignt assign =
     make_allocate_code(malloc_sym.symbol_expr(), object_size.value());
   output_code.add(assign);
 
   exprt malloc_symbol_expr = typecast_exprt::conditional_cast(
     malloc_sym.symbol_expr(), target_expr.type());
 
-  code_assignt code(target_expr, malloc_symbol_expr);
+  code_frontend_assignt code(target_expr, malloc_symbol_expr);
   code.add_source_location() = source_location;
   output_code.add(code);
 
@@ -198,7 +199,7 @@ exprt allocate_objectst::allocate_non_dynamic_object(
   exprt aoe = typecast_exprt::conditional_cast(
     address_of_exprt(aux_symbol.symbol_expr()), target_expr.type());
 
-  code_assignt code(target_expr, aoe);
+  code_frontend_assignt code(target_expr, aoe);
   code.add_source_location() = source_location;
   assignments.add(code);
 
@@ -252,9 +253,10 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
   }
 }
 
-code_assignt make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+code_frontend_assignt
+make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
   side_effect_exprt alloc{
     ID_allocate, {size, false_exprt()}, lhs.type(), lhs.source_location()};
-  return code_assignt(lhs, alloc);
+  return code_frontend_assignt(lhs, alloc);
 }

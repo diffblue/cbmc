@@ -647,7 +647,7 @@ static void instantiate_atomic_fetch_op(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{result, deref_ptr});
+  block.add(code_frontend_assignt{result, deref_ptr});
 
   // build *ptr = result OP arguments[1];
   irep_idt op_id = identifier == ID___atomic_fetch_add
@@ -664,7 +664,7 @@ static void instantiate_atomic_fetch_op(
                                          ? ID_bitnand
                                          : ID_nil;
   binary_exprt op_expr{result, op_id, parameter_exprs[1], type};
-  block.add(code_assignt{deref_ptr, std::move(op_expr)});
+  block.add(code_frontend_assignt{deref_ptr, std::move(op_expr)});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -724,9 +724,9 @@ static void instantiate_atomic_op_fetch(
                                          ? ID_bitnand
                                          : ID_nil;
   binary_exprt op_expr{deref_ptr, op_id, parameter_exprs[1], type};
-  block.add(code_assignt{result, std::move(op_expr)});
+  block.add(code_frontend_assignt{result, std::move(op_expr)});
 
-  block.add(code_assignt{deref_ptr, result});
+  block.add(code_frontend_assignt{deref_ptr, result});
 
   // this instruction implies an mfence, i.e., WRfence
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -822,9 +822,9 @@ static void instantiate_sync_val_compare_and_swap(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{result, deref_ptr});
+  block.add(code_frontend_assignt{result, deref_ptr});
 
-  code_assignt assign{deref_ptr, parameter_exprs[2]};
+  code_frontend_assignt assign{deref_ptr, parameter_exprs[2]};
   assign.add_source_location() = source_location;
   block.add(code_ifthenelset{equal_exprt{result, parameter_exprs[1]},
                              std::move(assign)});
@@ -880,9 +880,9 @@ static void instantiate_sync_lock_test_and_set(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{result, deref_ptr});
+  block.add(code_frontend_assignt{result, deref_ptr});
 
-  block.add(code_assignt{deref_ptr, parameter_exprs[1]});
+  block.add(code_frontend_assignt{deref_ptr, parameter_exprs[1]});
 
   // This built-in function is not a full barrier, but rather an acquire
   // barrier.
@@ -922,9 +922,9 @@ static void instantiate_sync_lock_release(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
-                         typecast_exprt::conditional_cast(
-                           from_integer(0, signed_int_type()), type)});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
+                                  typecast_exprt::conditional_cast(
+                                    from_integer(0, signed_int_type()), type)});
 
   // This built-in function is not a full barrier, but rather a release
   // barrier.
@@ -958,8 +958,8 @@ static void instantiate_atomic_load(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[1]},
-                         dereference_exprt{parameter_exprs[0]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[1]},
+                                  dereference_exprt{parameter_exprs[0]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1018,8 +1018,8 @@ static void instantiate_atomic_store(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
-                         dereference_exprt{parameter_exprs[1]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
+                                  dereference_exprt{parameter_exprs[1]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1071,10 +1071,10 @@ static void instantiate_atomic_exchange(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[2]},
-                         dereference_exprt{parameter_exprs[0]}});
-  block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
-                         dereference_exprt{parameter_exprs[1]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[2]},
+                                  dereference_exprt{parameter_exprs[0]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
+                                  dereference_exprt{parameter_exprs[1]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1154,14 +1154,15 @@ static void instantiate_atomic_compare_exchange(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{
+  block.add(code_frontend_assignt{
     result,
     typecast_exprt::conditional_cast(
       equal_exprt{deref_ptr, dereference_exprt{parameter_exprs[1]}},
       result.type())});
 
   // we never fail spuriously, and ignore parameter_exprs[3]
-  code_assignt assign{deref_ptr, dereference_exprt{parameter_exprs[2]}};
+  code_frontend_assignt assign{deref_ptr,
+                               dereference_exprt{parameter_exprs[2]}};
   assign.add_source_location() = source_location;
   code_expressiont success_fence{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1170,8 +1171,8 @@ static void instantiate_atomic_compare_exchange(
     source_location}};
   success_fence.add_source_location() = source_location;
 
-  code_assignt assign_not_equal{dereference_exprt{parameter_exprs[1]},
-                                deref_ptr};
+  code_frontend_assignt assign_not_equal{dereference_exprt{parameter_exprs[1]},
+                                         deref_ptr};
   assign_not_equal.add_source_location() = source_location;
   code_expressiont failure_fence{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),

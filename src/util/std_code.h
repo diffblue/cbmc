@@ -34,7 +34,7 @@ class codet:public exprt
 public:
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
-  ///   \ref code_assignt.
+  ///   \ref code_frontend_assignt.
   explicit codet(const irep_idt &statement) : exprt(ID_code, empty_typet())
   {
     set_statement(statement);
@@ -48,7 +48,7 @@ public:
 
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
-  ///   \ref code_assignt.
+  ///   \ref code_frontend_assignt.
   /// \param _op: any operands to be added
   explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
   {
@@ -160,6 +160,115 @@ inline codet &to_code(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_code);
   return static_cast<codet &>(expr);
+}
+
+/// A \ref codet representing an assignment in the program.
+/// For example, if an expression `e1` is represented as an \ref exprt `expr1`
+/// and an expression `e2` is represented as an \ref exprt `expr2`, the
+/// (nonstandard) assignment statement `e1 = e2;` can be represented
+/// as `code_frontend_assignt(expr1, expr2)`.
+class code_frontend_assignt : public codet
+{
+public:
+  code_frontend_assignt() : codet(ID_assign)
+  {
+    operands().resize(2);
+  }
+
+  code_frontend_assignt(exprt lhs, exprt rhs)
+    : codet(ID_assign, {std::move(lhs), std::move(rhs)})
+  {
+  }
+
+  code_frontend_assignt(exprt lhs, exprt rhs, source_locationt loc)
+    : codet(ID_assign, {std::move(lhs), std::move(rhs)}, std::move(loc))
+  {
+  }
+
+  exprt &lhs()
+  {
+    return op0();
+  }
+
+  exprt &rhs()
+  {
+    return op1();
+  }
+
+  const exprt &lhs() const
+  {
+    return op0();
+  }
+
+  const exprt &rhs() const
+  {
+    return op1();
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, code.operands().size() == 2, "assignment must have two operands");
+  }
+
+  static void validate(
+    const codet &code,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(code, vm);
+
+    DATA_CHECK(
+      vm,
+      code.op0().type() == code.op1().type(),
+      "lhs and rhs of assignment must have same type");
+  }
+
+  static void validate_full(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    for(const exprt &op : code.operands())
+    {
+      validate_full_expr(op, ns, vm);
+    }
+
+    validate(code, ns, vm);
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_frontend_assignt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_assign);
+}
+
+inline void validate_expr(const code_frontend_assignt &x)
+{
+  code_frontend_assignt::check(x);
+}
+
+inline const code_frontend_assignt &to_code_frontend_assign(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_assign);
+  code_frontend_assignt::check(code);
+  return static_cast<const code_frontend_assignt &>(code);
+}
+
+inline code_frontend_assignt &to_code_frontend_assign(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_assign);
+  code_frontend_assignt::check(code);
+  return static_cast<code_frontend_assignt &>(code);
 }
 
 /// A \ref codet representing sequential composition of program statements.

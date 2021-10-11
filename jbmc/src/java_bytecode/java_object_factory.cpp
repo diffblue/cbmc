@@ -399,7 +399,7 @@ void initialize_nondet_string_fields(
     allocate_objects.allocate_automatic_local_object(
       java_int_type(), "tmp_object_factory");
   const side_effect_expr_nondett nondet_length(length_expr.type(), loc);
-  code.add(code_assignt(length_expr, nondet_length));
+  code.add(code_frontend_assignt(length_expr, nondet_length));
 
   // assume (length_expr >= min_nondet_string_length);
   const exprt min_length =
@@ -508,8 +508,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     // Having created a pointer to object of type replacement_pointer_type
     // we now assign it back to the original pointer with a cast
     // from pointer_type to replacement_pointer_type
-    assignments.add(
-      code_assignt(expr, typecast_exprt(real_pointer_symbol, pointer_type)));
+    assignments.add(code_frontend_assignt(
+      expr, typecast_exprt(real_pointer_symbol, pointer_type)));
     return;
   }
 
@@ -539,8 +539,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
   {
     if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
     {
-      assignments.add(
-        code_assignt{expr, null_pointer_exprt{pointer_type}, location});
+      assignments.add(code_frontend_assignt{
+        expr, null_pointer_exprt{pointer_type}, location});
     }
     // Otherwise leave it as it is.
     return;
@@ -615,7 +615,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
 
-  const code_assignt set_null_inst{
+  const code_frontend_assignt set_null_inst{
     expr, null_pointer_exprt{pointer_type}, location};
 
   const bool allow_null = depth > object_factory_parameters.min_null_tree_depth;
@@ -734,7 +734,7 @@ alternate_casest get_string_input_values_code(
   {
     const symbol_exprt s =
       get_or_create_string_literal_symbol(val, symbol_table, true);
-    cases.push_back(code_assignt(expr, s));
+    cases.push_back(code_frontend_assignt(expr, s));
   }
   return cases;
 }
@@ -843,7 +843,7 @@ void java_object_factoryt::gen_nondet_struct_init(
         allocate_objects);
     }
 
-    assignments.add(code_assignt(expr, *initial_object));
+    assignments.add(code_frontend_assignt(expr, *initial_object));
   }
 
   for(const auto &component : components)
@@ -865,7 +865,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       // which is necessary to support concurrency.
       if(update_in_place == update_in_placet::MUST_UPDATE_IN_PLACE)
         continue;
-      code_assignt code(me, from_integer(0, me.type()));
+      code_frontend_assignt code(me, from_integer(0, me.type()));
       code.add_source_location() = location;
       assignments.add(code);
     }
@@ -950,7 +950,7 @@ static code_blockt assume_expr_integral(
     allocate_local_symbol(java_int_type(), "assume_integral_tmp");
   assignments.add(code_declt(aux_int), location);
   exprt nondet_rhs = side_effect_expr_nondett(java_int_type(), location);
-  code_assignt aux_assign(aux_int, nondet_rhs);
+  code_frontend_assignt aux_assign(aux_int, nondet_rhs);
   aux_assign.add_source_location() = location;
   assignments.add(aux_assign);
   assignments.add(
@@ -1068,7 +1068,7 @@ void java_object_factoryt::gen_nondet_init(
     exprt rhs = type.id() == ID_c_bool
                   ? get_nondet_bool(type, location)
                   : side_effect_expr_nondett(type, location);
-    code_assignt assign(expr, rhs);
+    code_frontend_assignt assign(expr, rhs);
     assign.add_source_location() = location;
 
     assignments.add(assign);
@@ -1084,7 +1084,7 @@ void java_object_factoryt::gen_nondet_init(
       if(auto singleton = interval.as_singleton())
       {
         assignments.add(
-          code_assignt{expr, from_integer(*singleton, expr.type())});
+          code_frontend_assignt{expr, from_integer(*singleton, expr.type())});
       }
       else
       {
@@ -1158,7 +1158,7 @@ static void allocate_nondet_length_array(
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_element_type, element_type);
-  code_assignt assign(lhs, java_new_array);
+  code_frontend_assignt assign(lhs, java_new_array);
   assign.add_source_location() = location;
   assignments.add(assign);
 }
@@ -1204,13 +1204,15 @@ static void array_primitive_init_code(
   // *array_data_init = NONDET(TYPE [max_length_expr]);
   side_effect_expr_nondett nondet_data(array_type, location);
   const dereference_exprt data_pointer_deref{tmp_finite_array_pointer};
-  assignments.add(code_assignt(data_pointer_deref, std::move(nondet_data)));
+  assignments.add(
+    code_frontend_assignt(data_pointer_deref, std::move(nondet_data)));
   assignments.statements().back().add_source_location() = location;
 
   // init_array_expr = *array_data_init;
   address_of_exprt tmp_nondet_pointer(
     index_exprt(data_pointer_deref, from_integer(0, java_int_type())));
-  assignments.add(code_assignt(init_array_expr, std::move(tmp_nondet_pointer)));
+  assignments.add(
+    code_frontend_assignt(init_array_expr, std::move(tmp_nondet_pointer)));
   assignments.statements().back().add_source_location() = location;
 }
 
@@ -1251,7 +1253,7 @@ code_blockt java_object_factoryt::assign_element(
     // If we're updating an existing array item, read the existing object that
     // we (may) alter:
     if(update_in_place != update_in_placet::NO_UPDATE_IN_PLACE)
-      assignments.add(code_assignt(init_expr, element));
+      assignments.add(code_frontend_assignt(init_expr, element));
   }
 
   // MUST_UPDATE_IN_PLACE only applies to this object.
@@ -1277,7 +1279,7 @@ code_blockt java_object_factoryt::assign_element(
   {
     // We used a temporary variable to update or initialise an array item;
     // now write it into the array:
-    assignments.add(code_assignt(element, init_expr));
+    assignments.add(code_frontend_assignt(element, init_expr));
   }
   return assignments;
 }
@@ -1337,7 +1339,7 @@ static void array_loop_init_code(
   const symbol_exprt &array_init_symexpr =
     allocate_local_symbol(init_array_expr.type(), "array_data_init");
 
-  code_assignt data_assign(array_init_symexpr, init_array_expr);
+  code_frontend_assignt data_assign(array_init_symexpr, init_array_expr);
   data_assign.add_source_location() = location;
   assignments.add(data_assign);
 
@@ -1505,7 +1507,8 @@ bool java_object_factoryt::gen_nondet_enum_init(
 
   const dereference_exprt element_at_index =
     array_element_from_pointer(enum_array_expr, index_expr);
-  code_assignt enum_assign(expr, typecast_exprt(element_at_index, expr.type()));
+  code_frontend_assignt enum_assign(
+    expr, typecast_exprt(element_at_index, expr.type()));
   assignments.add(enum_assign);
 
   return true;
@@ -1520,7 +1523,7 @@ static void assert_type_consistency(const code_blockt &assignments)
   {
     if(code.get_statement() != ID_assign)
       continue;
-    const auto &assignment = to_code_assign(code);
+    const auto &assignment = to_code_frontend_assign(code);
     INVARIANT(
       assignment.lhs().type() == assignment.rhs().type(),
       "object factory should produce type-consistent assignments");

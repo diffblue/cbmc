@@ -42,7 +42,7 @@ static void copy_parent(
   op1.get_sub().push_back(cpp_namet(arg_name, source_location));
   op1.add_source_location()=source_location;
 
-  code_assignt code(dereference_exprt(op0), op1);
+  code_frontend_assignt code(dereference_exprt(op0), op1);
   code.add_source_location() = source_location;
 
   block.operands().push_back(code);
@@ -239,7 +239,7 @@ void cpp_typecheckt::default_cpctor(
       ptrmember.set(ID_component_name, mem_c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
-      code_assignt assign(ptrmember, address);
+      code_frontend_assignt assign(ptrmember, address);
       initializers.move_to_sub(assign);
       continue;
     }
@@ -691,7 +691,7 @@ void cpp_typecheckt::full_member_initialization(
       ptrmember.set(ID_component_name, c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
-      code_assignt assign(ptrmember, address);
+      code_frontend_assignt assign(ptrmember, address);
       final_initializers.move_to_sub(assign);
       continue;
     }

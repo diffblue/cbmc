@@ -227,7 +227,7 @@ code_fort code_fort::from_index_bounds(
     location);
 
   return code_fort{
-    code_assignt{loop_index, std::move(start_index)},
+    code_frontend_assignt{loop_index, std::move(start_index)},
     binary_relation_exprt{loop_index, ID_lt, std::move(end_index)},
     std::move(inc),
     std::move(body)};

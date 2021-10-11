@@ -3022,7 +3022,7 @@ std::string expr2ct::convert_code(
     return convert_code_dead(src, indent);
 
   if(statement==ID_assign)
-    return convert_code_assign(to_code_assign(src), indent);
+    return convert_code_frontend_assign(to_code_frontend_assign(src), indent);
 
   if(statement=="lock")
     return convert_code_lock(src, indent);
@@ -3062,8 +3062,8 @@ std::string expr2ct::convert_code(
   return convert_norep(src, precedence);
 }
 
-std::string expr2ct::convert_code_assign(
-  const code_assignt &src,
+std::string expr2ct::convert_code_frontend_assign(
+  const code_frontend_assignt &src,
   unsigned indent)
 {
   return indent_str(indent) +
