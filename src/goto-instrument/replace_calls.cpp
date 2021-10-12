@@ -70,12 +70,11 @@ void replace_callst::operator()(
     if(!ins.is_function_call())
       continue;
 
-    auto cfc = ins.get_function_call();
-    exprt &function = cfc.function();
+    const exprt &function = ins.call_function();
 
     PRECONDITION(function.id() == ID_symbol);
 
-    symbol_exprt &se = to_symbol_expr(function);
+    const symbol_exprt &se = to_symbol_expr(function);
     const irep_idt &id = se.get_identifier();
 
     auto f_it1 = goto_functions.function_map.find(id);
@@ -109,10 +108,8 @@ void replace_callst::operator()(
     }
 
     // Finally modify the call
-    function.type() = ns.lookup(f_it2->first).type;
-    se.set_identifier(new_id);
-
-    ins.set_function_call(cfc);
+    ins.call_function().type() = ns.lookup(f_it2->first).type;
+    to_symbol_expr(ins.call_function()).set_identifier(new_id);
   }
 }
 

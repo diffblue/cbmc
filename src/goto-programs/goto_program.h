@@ -327,20 +327,6 @@ public:
       return to_code_function_call(code).arguments();
     }
 
-    /// Set the function call for FUNCTION_CALL
-#if 1
-    DEPRECATED(SINCE(
-      2021,
-      2,
-      24,
-      "Use call_function(), call_lhs(), call_arguments() instead"))
-    void set_function_call(code_function_callt c)
-    {
-      PRECONDITION(is_function_call());
-      code = std::move(c);
-    }
-#endif
-
     /// Get the statement for OTHER
     const codet &get_other() const
     {
