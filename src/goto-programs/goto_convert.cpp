@@ -269,7 +269,7 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
     if(it->get_target()->target_number == it_z->target_number)
     {
       it->set_target(it_goto_y->get_target());
-      it->set_condition(boolean_negate(it->get_condition()));
+      it->condition_nonconst() = boolean_negate(it->condition());
       it_goto_y->turn_into_skip();
     }
   }

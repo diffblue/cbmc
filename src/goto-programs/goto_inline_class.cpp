@@ -282,9 +282,8 @@ void goto_inlinet::insert_function_body(
 
       if(instruction.has_condition())
       {
-        exprt c = instruction.get_condition();
-        replace_location(c, target->source_location);
-        instruction.set_condition(c);
+        replace_location(
+          instruction.condition_nonconst(), target->source_location);
       }
     }
   }
