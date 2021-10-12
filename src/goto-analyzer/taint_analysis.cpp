@@ -75,9 +75,7 @@ void taint_analysist::instrument(
 
     if(instruction.is_function_call())
     {
-      const code_function_callt &function_call =
-        instruction.get_function_call();
-      const exprt &function = function_call.function();
+      const exprt &function = instruction.call_function();
 
       if(function.id() == ID_symbol)
       {
@@ -144,8 +142,8 @@ void taint_analysist::instrument(
             {
               unsigned nr =
                 have_this ? rule.parameter_number : rule.parameter_number - 1;
-              if(function_call.arguments().size() > nr)
-                where = function_call.arguments()[nr];
+              if(instruction.call_arguments().size() > nr)
+                where = instruction.call_arguments()[nr];
               break;
             }
 
@@ -153,9 +151,9 @@ void taint_analysist::instrument(
               if(have_this)
               {
                 DATA_INVARIANT(
-                  !function_call.arguments().empty(),
+                  !instruction.call_arguments().empty(),
                   "`this` implies at least one argument in function call");
-                where = function_call.arguments()[0];
+                where = instruction.call_arguments()[0];
               }
               break;
             }
