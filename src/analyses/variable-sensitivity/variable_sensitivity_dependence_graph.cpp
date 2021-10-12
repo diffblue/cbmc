@@ -195,7 +195,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   }
   else if(to->is_goto())
   {
-    eval_data_deps(to->guard, ns, domain_data_deps);
+    eval_data_deps(to->condition(), ns, domain_data_deps);
   }
 }
 

@@ -25,7 +25,8 @@ void cover_branch_instrumentert::instrument(
 
   const bool is_function_entry_point =
     i_it == goto_program.instructions.begin();
-  const bool is_conditional_goto = i_it->is_goto() && !i_it->guard.is_true();
+  const bool is_conditional_goto =
+    i_it->is_goto() && !i_it->condition().is_true();
   if(!is_function_entry_point && !is_conditional_goto)
     return;
 
@@ -52,7 +53,7 @@ void cover_branch_instrumentert::instrument(
     std::string true_comment = "block " + b + " branch true";
     std::string false_comment = "block " + b + " branch false";
 
-    exprt guard = i_it->guard;
+    exprt guard = i_it->condition();
     source_locationt source_location = i_it->source_location;
 
     goto_program.insert_before_swap(i_it);

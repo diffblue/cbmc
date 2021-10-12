@@ -98,7 +98,11 @@ bool write_goto_binary(
         irepconverter.reference_convert(instruction.get_code(), out);
         irepconverter.reference_convert(instruction.source_location, out);
         write_gb_word(out, (long)instruction.type);
-        irepconverter.reference_convert(instruction.guard, out);
+
+        const auto condition =
+          instruction.has_condition() ? instruction.condition() : true_exprt();
+        irepconverter.reference_convert(condition, out);
+
         write_gb_word(out, instruction.target_number);
 
         write_gb_word(out, instruction.targets.size());

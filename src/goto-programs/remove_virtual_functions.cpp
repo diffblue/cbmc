@@ -421,8 +421,8 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
           !new_code_gotos.empty(),
           "a dispatch table entry has been processed already, "
           "which should have created a GOTO");
-        new_code_gotos.instructions.back().guard =
-          or_exprt(new_code_gotos.instructions.back().guard, class_id_test);
+        new_code_gotos.instructions.back().condition_nonconst() = or_exprt(
+          new_code_gotos.instructions.back().condition(), class_id_test);
       }
       else
       {

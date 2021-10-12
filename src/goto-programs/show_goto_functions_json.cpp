@@ -95,11 +95,11 @@ json_objectt show_goto_functions_jsont::convert(
           instruction_entry["operands"] = std::move(operand_array);
         }
 
-        if(!instruction.guard.is_true())
+        if(instruction.has_condition())
         {
-          json_objectt guard_object=
+          json_objectt guard_object =
             no_comments_irep_converter.convert_from_irep(
-              instruction.guard);
+              instruction.condition());
 
           instruction_entry["guard"] = std::move(guard_object);
         }
