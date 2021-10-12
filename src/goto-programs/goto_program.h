@@ -334,7 +334,8 @@ public:
     goto_program_instruction_typet type;
 
     /// Guard for gotos, assume, assert
-    /// Use get_condition() to read, and set_condition(c) to write.
+    /// Use condition() method to access.
+    /// This member will eventually be protected.
     exprt guard;
 
     /// Does this instruction have a condition?
@@ -355,6 +356,20 @@ public:
     {
       PRECONDITION(has_condition());
       guard = std::move(c);
+    }
+
+    /// Get the condition of gotos, assume, assert
+    const exprt &condition() const
+    {
+      PRECONDITION(has_condition());
+      return guard;
+    }
+
+    /// Get the condition of gotos, assume, assert
+    exprt &condition_nonconst()
+    {
+      PRECONDITION(has_condition());
+      return guard;
     }
 
     // The below will eventually become a single target only.
