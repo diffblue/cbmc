@@ -345,6 +345,7 @@ public:
     }
 
     /// Get the condition of gotos, assume, assert
+    DEPRECATED(SINCE(2021, 10, 12, "Use condition() instead"))
     const exprt &get_condition() const
     {
       PRECONDITION(has_condition());
@@ -352,6 +353,7 @@ public:
     }
 
     /// Set the condition of gotos, assume, assert
+    DEPRECATED(SINCE(2021, 10, 12, "Use condition_nonconst() instead"))
     void set_condition(exprt c)
     {
       PRECONDITION(has_condition());
