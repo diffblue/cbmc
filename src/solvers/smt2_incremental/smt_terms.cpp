@@ -50,13 +50,19 @@ bool smt_bool_literal_termt::value() const
 
 static bool is_valid_smt_identifier(irep_idt identifier)
 {
-  static const std::regex valid{R"(^[^\|]*$)"};
+  // The below regex matches a complete string which does not contain the `|`
+  // character. So it would match the string `foo bar`, but not `|foo bar|`.
+  static const std::regex valid{"[^\\|]*"};
   return std::regex_match(id2string(identifier), valid);
 }
 
 smt_identifier_termt::smt_identifier_termt(irep_idt identifier, smt_sortt sort)
   : smt_termt(ID_smt_identifier_term, std::move(sort))
 {
+  // The below invariant exists as a sanity check that the string being used for
+  // the identifier is in unescaped form. This is because the escaping and
+  // unescaping are implementation details of the printing to string and
+  // response parsing respectively, not part of the underlying data.
   INVARIANT(
     is_valid_smt_identifier(identifier),
     R"(Identifiers may not contain | characters.)");

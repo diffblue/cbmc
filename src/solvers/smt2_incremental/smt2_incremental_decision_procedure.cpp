@@ -49,7 +49,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         return expr_identifier.first;
       });
   std::stack<exprt> to_be_defined;
-  const auto dependencies_needed = [&](const exprt &expr) {
+  const auto push_dependencies_needed = [&](const exprt &expr) {
     bool result = false;
     for(const auto &dependency : gather_dependent_expressions(expr))
     {
@@ -60,11 +60,11 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
     }
     return result;
   };
-  dependencies_needed(expr);
+  push_dependencies_needed(expr);
   while(!to_be_defined.empty())
   {
     const exprt current = to_be_defined.top();
-    if(dependencies_needed(current))
+    if(push_dependencies_needed(current))
       continue;
     if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(current))
     {
@@ -81,7 +81,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
       }
       else
       {
-        if(dependencies_needed(symbol->value))
+        if(push_dependencies_needed(symbol->value))
           continue;
         const smt_define_function_commandt function{
           symbol->name, {}, convert_expr_to_smt(symbol->value)};
