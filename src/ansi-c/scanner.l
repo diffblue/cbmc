@@ -234,9 +234,10 @@ CPROVER_PREFIX  "__CPROVER_"
 
 arith_check     ("conversion"|"undefined-shift"|"nan"|"div-by-zero")
 enum_check      "enum-range"
+pointer_primitive "pointer-primitive"
 memory_check    ("bounds"|"pointer"|"memory_leak")
 overflow_check  ("signed"|"unsigned"|"pointer"|"float")"-overflow"
-named_check     ["]({arith_check}|{enum_check}|{memory_check}|{overflow_check})["]
+named_check     ["]({arith_check}|{enum_check}|{memory_check}|{overflow_check}|{pointer_primitive})["]
 
 %x GRAMMAR
 %x COMMENT1

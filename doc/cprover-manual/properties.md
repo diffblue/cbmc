@@ -122,6 +122,7 @@ The goto-instrument program supports these checks:
 | `--bounds-check`             |  add array bounds checks                             |
 | `--div-by-zero-check`        |  add division by zero checks                         |
 | `--pointer-check`            |  add pointer checks                                  |
+| `--pointer-primitive-check`  |  add pointer primitive checks                        |
 | `--signed-overflow-check`    |  add arithmetic over- and underflow checks           |
 | `--unsigned-overflow-check`  |  add arithmetic over- and underflow checks           |
 | `--undefined-shift-check`    |  add range checks for shift distances                |
