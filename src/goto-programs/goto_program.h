@@ -271,20 +271,6 @@ public:
       return to_code_return(code).return_value();
     }
 
-    /// Get the function call for FUNCTION_CALL
-#if 1
-    DEPRECATED(SINCE(
-      2021,
-      2,
-      24,
-      "Use call_function(), call_lhs(), call_arguments() instead"))
-    const code_function_callt &get_function_call() const
-    {
-      PRECONDITION(is_function_call());
-      return to_code_function_call(code);
-    }
-#endif
-
     /// Get the function that is called for FUNCTION_CALL
     const exprt &call_function() const
     {

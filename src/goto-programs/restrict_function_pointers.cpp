@@ -77,15 +77,15 @@ void restrict_function_pointer(
 
   // Check if this is calling a function pointer, and if so if it is one
   // we have a restriction for
-  const auto &original_function_call = location->get_function_call();
+  const auto &original_function = location->call_function();
 
-  if(!can_cast_expr<dereference_exprt>(original_function_call.function()))
+  if(!can_cast_expr<dereference_exprt>(original_function))
     return;
 
   // because we run the label function pointer calls transformation pass before
   // this stage a dereference can only dereference a symbol expression
   auto const &called_function_pointer =
-    to_dereference_expr(original_function_call.function()).pointer();
+    to_dereference_expr(original_function).pointer();
   PRECONDITION(can_cast_expr<symbol_exprt>(called_function_pointer));
   auto const &pointer_symbol = to_symbol_expr(called_function_pointer);
   auto const restriction_iterator =

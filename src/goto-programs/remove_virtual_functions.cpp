@@ -289,7 +289,8 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
     }
     else
     {
-      auto c = target->get_function_call();
+      auto c = code_function_callt(
+        target->call_lhs(), target->call_function(), target->call_arguments());
       create_static_function_call(c, *functions.front().symbol_expr, ns);
       target->call_function() = c.function();
       target->call_arguments() = c.arguments();
@@ -299,7 +300,8 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
 
   const auto &vcall_source_loc=target->source_location;
 
-  code_function_callt code(target->get_function_call());
+  code_function_callt code(
+    target->call_lhs(), target->call_function(), target->call_arguments());
   goto_programt new_code_for_this_argument;
 
   process_this_argument(

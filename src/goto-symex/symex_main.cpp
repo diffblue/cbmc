@@ -582,8 +582,8 @@ void goto_symext::print_symex_step(statet &state)
       print_callstack_entry(state.source) << messaget::eom;
 
       // Add the method we're about to enter with no location number.
-      log.status() << format(state.source.pc->get_function_call().function())
-                   << messaget::eom << messaget::eom;
+      log.status() << format(state.source.pc->call_function()) << messaget::eom
+                   << messaget::eom;
     }
   }
 }
@@ -675,8 +675,11 @@ void goto_symext::execute_next_instruction(
   case FUNCTION_CALL:
     if(state.reachable)
     {
-      symex_function_call(
-        get_goto_function, state, instruction.get_function_call());
+      code_function_callt call(
+        instruction.call_lhs(),
+        instruction.call_function(),
+        instruction.call_arguments());
+      symex_function_call(get_goto_function, state, call);
     }
     else
       symex_transition(state);

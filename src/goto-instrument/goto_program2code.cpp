@@ -170,7 +170,11 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return target;
 
     case FUNCTION_CALL:
-      dest.add(target->get_function_call());
+    {
+      code_function_callt call(
+        target->call_lhs(), target->call_function(), target->call_arguments());
+      dest.add(call);
+    }
       return target;
 
     case OTHER:
@@ -465,8 +469,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
      !next->is_target() &&
      (next->is_assign() || next->is_function_call()))
   {
-    exprt lhs =
-      next->is_assign() ? next->assign_lhs() : next->get_function_call().lhs();
+    exprt lhs = next->is_assign() ? next->assign_lhs() : next->call_lhs();
     if(lhs==symbol &&
        va_list_expr.find(lhs)==va_list_expr.end())
     {
@@ -477,9 +480,11 @@ goto_programt::const_targett goto_program2codet::convert_decl(
       else
       {
         // could hack this by just erasing the first operand
-        const code_function_callt &f = next->get_function_call();
         side_effect_expr_function_callt call(
-          f.function(), f.arguments(), typet{}, source_locationt{});
+          next->call_function(),
+          next->call_arguments(),
+          typet{},
+          source_locationt{});
         d.copy_to_operands(call);
       }
 
@@ -1299,15 +1304,16 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     thread_start->call_arguments().size() == 1 &&
     after_thread_start == thread_end)
   {
-    const code_function_callt &cf = thread_start->get_function_call();
-
     system_headers.insert("pthread.h");
 
     const null_pointer_exprt n(pointer_type(empty_typet()));
     dest.add(code_function_callt(
-      cf.lhs(),
+      thread_start->call_lhs(),
       symbol_exprt("pthread_create", code_typet({}, empty_typet())),
-      {n, n, cf.function(), cf.arguments().front()}));
+      {n,
+       n,
+       thread_start->call_function(),
+       thread_start->call_arguments().front()}));
 
     return thread_end;
   }
