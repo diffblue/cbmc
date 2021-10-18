@@ -1,0 +1,11 @@
+CORE
+test.c
+--div-by-zero-check
+^EXIT=10$
+^SIGNAL=0$
+\[main\.division-by-zero\.1] line \d+ division by zero in n / 0: FAILURE
+^VERIFICATION FAILED$
+--
+--
+--div-by-zero-check should catch the failure in the antecedent.
+--pointer-check doesn't but gives an pointer outside object bounds issue.

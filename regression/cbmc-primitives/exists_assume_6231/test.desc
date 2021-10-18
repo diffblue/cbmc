@@ -1,0 +1,10 @@
+CORE
+test.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+\[main\.assertion\.1\] line \d+ this assertion should be satified: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring forall
+--
