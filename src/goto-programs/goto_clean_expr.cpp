@@ -106,7 +106,8 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
 /// re-write boolean operators into ?:
 void goto_convertt::rewrite_boolean(exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_and || expr.id() == ID_or);
+  PRECONDITION(
+    expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies);
   PRECONDITION_WITH_DIAGNOSTICS(
     expr.is_boolean(),
     expr.find_source_location(),
@@ -114,6 +115,16 @@ void goto_convertt::rewrite_boolean(exprt &expr)
     expr.id(),
     "' must be Boolean, but got ",
     irep_pretty_diagnosticst{expr});
+
+  // re-write "a ==> b" into a?b:1
+  if(auto implies = expr_try_dynamic_cast<implies_exprt>(expr))
+  {
+    expr = if_exprt{std::move(implies->lhs()),
+                    std::move(implies->rhs()),
+                    true_exprt{},
+                    bool_typet{}};
+    return;
+  }
 
   // re-write "a && b" into nested a?b:0
   // re-write "a || b" into nested a?1:b
@@ -165,7 +176,7 @@ void goto_convertt::clean_expr(
   bool result_is_used)
 {
   // this cleans:
-  //   && || ?: comma (control-dependency)
+  //   && || ==> ?: comma (control-dependency)
   //   function calls
   //   object constructors like arrays, string constants, structs
   //   ++ -- (pre and post)
@@ -175,7 +186,7 @@ void goto_convertt::clean_expr(
   if(!needs_cleaning(expr))
     return;
 
-  if(expr.id()==ID_and || expr.id()==ID_or)
+  if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies)
   {
     // rewrite into ?:
     rewrite_boolean(expr);
