@@ -55,7 +55,7 @@ void introduce_temporaries(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    message.debug() <<instruction.source_location<< messaget::eom;
+    message.debug() << instruction.source_location() << messaget::eom;
 
     if(instruction.is_goto() ||
        instruction.is_assert() ||
@@ -78,7 +78,7 @@ void introduce_temporaries(
         bool_typet(),
         id2string(function_id),
         "$tmp_guard",
-        instruction.source_location,
+        instruction.source_location(),
         ns.lookup(function_id).mode,
         symbol_table);
       new_symbol.is_static_lifetime=true;
@@ -89,7 +89,7 @@ void introduce_temporaries(
 
       goto_programt::instructiont new_i = goto_programt::make_assignment(
         code_assignt(symbol_expr, instruction.get_condition()),
-        instruction.source_location);
+        instruction.source_location());
 
       // replace guard
       instruction.set_condition(symbol_expr);

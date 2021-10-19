@@ -417,13 +417,14 @@ bool instrumentert::cfg_visitort::contains_shared_array(
 #endif
   ) const // NOLINT(whitespace/parens)
 {
-  instrumenter.message.debug() << "contains_shared_array called for "
-    << targ->source_location.get_line() << " and "
-    << i_it->source_location.get_line() << messaget::eom;
+  instrumenter.message.debug()
+    << "contains_shared_array called for " << targ->source_location().get_line()
+    << " and " << i_it->source_location().get_line() << messaget::eom;
   for(goto_programt::const_targett cur=targ; cur!=i_it; ++cur)
   {
-    instrumenter.message.debug() << "Do we have an array at line "
-      <<cur->source_location.get_line()<<"?" << messaget::eom;
+    instrumenter.message.debug()
+      << "Do we have an array at line " << cur->source_location().get_line()
+      << "?" << messaget::eom;
     rw_set_loct rw_set(
       ns,
       value_sets,
@@ -540,11 +541,12 @@ void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
     // The code below uses heuristics to limit false positives: no cycles across
     // inlined functions, which we would detect when file names or
     // (user-provided) function names change _within a single goto_program_.
-    if(!found_pos
-      || new_targ->source_location.get_function()
-        !=targ->source_location.get_function()
-      || new_targ->source_location.get_file()
-        !=targ->source_location.get_file())
+    if(
+      !found_pos ||
+      new_targ->source_location().get_function() !=
+        targ->source_location().get_function() ||
+      new_targ->source_location().get_file() !=
+        targ->source_location().get_file())
       return;
   }
 
@@ -756,7 +758,7 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
     thread,
     "f",
     instrumenter.unique_id++,
-    instruction.source_location,
+    instruction.source_location(),
     function_id,
     false);
   const event_idt new_fence_node=egraph.add_node();
@@ -802,7 +804,7 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
     thread,
     "asm",
     instrumenter.unique_id++,
-    instruction.source_location,
+    instruction.source_location(),
     function_id,
     false,
     WRfence,
@@ -897,16 +899,16 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       thread,
       id2string(read),
       instrumenter.unique_id++,
-      instruction.source_location,
+      instruction.source_location(),
       function_id,
       local(read));
 
     const event_idt new_read_node=egraph.add_node();
     egraph[new_read_node]=new_read_event;
-    instrumenter.message.debug() << "new Read"<<read<<" @thread"
-      <<(thread)<<"("<<instruction.source_location<<","
-      <<(local(read)?"local":"shared")<<") #"<<new_read_node
-      << messaget::eom;
+    instrumenter.message.debug() << "new Read" << read << " @thread" << (thread)
+                                 << "(" << instruction.source_location() << ","
+                                 << (local(read) ? "local" : "shared") << ") #"
+                                 << new_read_node << messaget::eom;
 
     if(read==ID_unknown)
       unknown_read_nodes.insert(new_read_node);
@@ -1000,15 +1002,16 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       thread,
       id2string(write),
       instrumenter.unique_id++,
-      instruction.source_location,
+      instruction.source_location(),
       function_id,
       local(write));
 
     const event_idt new_write_node=egraph.add_node();
     egraph[new_write_node](new_write_event);
-    instrumenter.message.debug() << "new Write "<<write<<" @thread"<<(thread)
-      <<"("<<instruction.source_location<<","
-      << (local(write)?"local":"shared")<<") #"<<new_write_node
+    instrumenter.message.debug()
+      << "new Write " << write << " @thread" << (thread) << "("
+      << instruction.source_location() << ","
+      << (local(write) ? "local" : "shared") << ") #" << new_write_node
       << messaget::eom;
 
     if(write==ID_unknown)
@@ -1151,9 +1154,9 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
         const irep_idt &read = r_entry.second.object;
         instrumenter.message.debug() << "dp: Write:"<<write<<"; Read:"<<read
           << messaget::eom;
-        const datat read_p(read, instruction.source_location);
-        const datat write_p(write, instruction.source_location);
-          data_dp.dp_analysis(read_p, local(read), write_p, local(write));
+        const datat read_p(read, instruction.source_location());
+        const datat write_p(write, instruction.source_location());
+        data_dp.dp_analysis(read_p, local(read), write_p, local(write));
         }
     }
     data_dp.dp_merge();
@@ -1166,8 +1169,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
         const irep_idt &read = r_entry.second.object;
         if(read2==read)
           continue;
-        const datat read_p(read, instruction.source_location);
-        const datat read2_p(read2, instruction.source_location);
+        const datat read_p(read, instruction.source_location());
+        const datat read2_p(read2, instruction.source_location());
         data_dp.dp_analysis(read_p, local(read), read2_p, local(read2));
       }
     }
@@ -1185,7 +1188,7 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
     thread,
     "F",
     instrumenter.unique_id++,
-    instruction.source_location,
+    instruction.source_location(),
     function_id,
     false);
   const event_idt new_fence_node=egraph.add_node();
@@ -1271,7 +1274,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
     {
       for(const auto &instruction : gf_entry.second.body.instructions)
       {
-        if(instruction.source_location == current_location)
+        if(instruction.source_location() == current_location)
         {
           current_po = &gf_entry.second.body;
           thread_found=true;
@@ -1307,13 +1310,13 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
 
       /* add this instruction to the interleaving */
       Forall_goto_program_instructions(i_it, *current_po)
-        if(i_it->source_location==current_location)
+        if(i_it->source_location() == current_location)
         {
           /* add all the instructions of this line */
-          for(goto_programt::instructionst::iterator same_loc=i_it;
-            same_loc!=current_po->instructions.end()
-            && same_loc->source_location==i_it->source_location;
-            same_loc++)
+          for(goto_programt::instructionst::iterator same_loc = i_it;
+              same_loc != current_po->instructions.end() &&
+              same_loc->source_location() == i_it->source_location();
+              same_loc++)
             add_instr_to_interleaving(same_loc, interleaving);
           break;
         }
@@ -1329,12 +1332,12 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
       bool in_cycle=false;
       Forall_goto_program_instructions(it, *current_po)
       {
-        if(it->source_location==current_location)
+        if(it->source_location() == current_location)
           in_cycle=true;
 
         /* do not add the last instruction now -- will be done at
            the next iteration */
-        if(it->source_location==next_location)
+        if(it->source_location() == next_location)
           break;
 
         if(in_cycle)
@@ -1365,7 +1368,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
         if(!target_in_cycle)
         {
           instruction = goto_programt::make_assertion(
-            false_exprt(), instruction.source_location);
+            false_exprt(), instruction.source_location());
           break;
         }
       }

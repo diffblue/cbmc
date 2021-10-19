@@ -38,7 +38,7 @@ static void collect_eloc(
   {
     for(const auto &instruction : gf_entry.second.body.instructions)
     {
-      const auto &source_location = instruction.source_location;
+      const auto &source_location = instruction.source_location();
 
       filest &files = dest[source_location.get_working_directory()];
       const irep_idt &file = source_location.get_file();

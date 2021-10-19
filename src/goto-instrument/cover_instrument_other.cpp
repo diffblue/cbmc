@@ -42,7 +42,7 @@ void cover_assertion_instrumentert::instrument(
   {
     i_it->guard = false_exprt();
     initialize_source_location(
-      i_it, id2string(i_it->source_location.get_comment()), function_id);
+      i_it, id2string(i_it->source_location().get_comment()), function_id);
   }
 }
 
@@ -63,7 +63,7 @@ void cover_cover_instrumentert::instrument(
       i_it->call_arguments().size() == 1)
     {
       const exprt c = i_it->call_arguments()[0];
-      *i_it = make_assertion(not_exprt(c), i_it->source_location);
+      *i_it = make_assertion(not_exprt(c), i_it->source_location());
       std::string comment = "condition '" + from_expr(ns, function_id, c) + "'";
       initialize_source_location(i_it, comment, function_id);
     }
@@ -90,12 +90,13 @@ void cover_instrument_end_of_function(
     last_function_call != goto_program.instructions.rbegin(),
     "Goto program shouldn't end with a function call");
   const auto if_it = last_function_call.base();
-  const auto location = if_it->source_location;
+  const auto location = if_it->source_location();
   const std::string &comment =
     "additional goal to ensure reachability of end of function";
   goto_program.insert_before_swap(if_it);
   *if_it = make_assertion(false_exprt(), location);
-  if_it->source_location.set_comment(comment);
-  if_it->source_location.set_property_class("reachability_constraint");
-  if_it->source_location.set_function(function_id);
+  if_it->source_location_nonconst().set_comment(comment);
+  if_it->source_location_nonconst().set_property_class(
+    "reachability_constraint");
+  if_it->source_location_nonconst().set_function(function_id);
 }

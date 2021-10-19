@@ -121,11 +121,11 @@ void uninitializedt::add_assertions(
 
         symbol_exprt symbol_expr(new_identifier, bool_typet());
         i1->type=DECL;
-        i1->source_location=instruction.source_location;
+        i1->source_location_nonconst() = instruction.source_location();
         i1->code_nonconst() = code_declt(symbol_expr);
 
         i2->type=ASSIGN;
-        i2->source_location=instruction.source_location;
+        i2->source_location_nonconst() = instruction.source_location();
         i2->code_nonconst() = code_assignt(symbol_expr, false_exprt());
       }
     }
@@ -157,10 +157,11 @@ void uninitializedt::add_assertions(
             goto_programt::instructiont assertion =
               goto_programt::make_assertion(
                 symbol_exprt(new_identifier, bool_typet()),
-                instruction.source_location);
-            assertion.source_location.set_comment(
+                instruction.source_location());
+            assertion.source_location_nonconst().set_comment(
               "use of uninitialized local variable");
-            assertion.source_location.set_property_class("uninitialized local");
+            assertion.source_location_nonconst().set_property_class(
+              "uninitialized local");
 
             goto_program.insert_before_swap(i_it, assertion);
             i_it++;
@@ -183,7 +184,8 @@ void uninitializedt::add_assertions(
             assignment.type=ASSIGN;
             assignment.code_nonconst() = code_assignt(
               symbol_exprt(new_identifier, bool_typet()), true_exprt());
-            assignment.source_location=instruction.source_location;
+            assignment.source_location_nonconst() =
+              instruction.source_location();
 
             goto_program.insert_before_swap(i_it, assignment);
             i_it++;

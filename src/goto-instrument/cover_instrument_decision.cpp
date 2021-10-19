@@ -26,11 +26,11 @@ void cover_decision_instrumentert::instrument(
     i_it->turn_into_skip();
 
   // Decisions are maximal Boolean combinations of conditions.
-  if(!i_it->source_location.is_built_in())
+  if(!i_it->source_location().is_built_in())
   {
     const std::set<exprt> decisions = collect_decisions(i_it);
 
-    const source_locationt source_location = i_it->source_location;
+    const source_locationt source_location = i_it->source_location();
 
     for(const auto &d : decisions)
     {

@@ -40,7 +40,7 @@ optionalt<default_trace_stept> default_step(
   const goto_trace_stept &step,
   const source_locationt &previous_source_location)
 {
-  const source_locationt &source_location = step.pc->source_location;
+  const source_locationt &source_location = step.pc->source_location();
   if(source_location.is_nil() || source_location.get_file().empty())
     return {};
 

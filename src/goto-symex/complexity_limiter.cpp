@@ -158,8 +158,8 @@ complexity_limitert::check_complexity(goto_symex_statet &state)
       {
         log.warning()
           << "[symex-complexity] Loop operations considered too complex"
-          << (state.source.pc->source_location.is_not_nil()
-                ? " at: " + state.source.pc->source_location.as_string()
+          << (state.source.pc->source_location().is_not_nil()
+                ? " at: " + state.source.pc->source_location().as_string()
                 : ", location number: " +
                     std::to_string(state.source.pc->location_number) + ".")
           << messaget::eom;
@@ -169,8 +169,9 @@ complexity_limitert::check_complexity(goto_symex_statet &state)
     }
 
     log.warning() << "[symex-complexity] Branch considered too complex"
-                  << (state.source.pc->source_location.is_not_nil()
-                        ? " at: " + state.source.pc->source_location.as_string()
+                  << (state.source.pc->source_location().is_not_nil()
+                        ? " at: " +
+                            state.source.pc->source_location().as_string()
                         : ", location number: " +
                             std::to_string(state.source.pc->location_number) +
                             ".")
@@ -189,8 +190,9 @@ complexity_limitert::check_complexity(goto_symex_statet &state)
   if(in_blacklisted_loop(current_call_stack, state.source.pc))
   {
     log.warning() << "[symex-complexity] Trying to enter blacklisted loop"
-                  << (state.source.pc->source_location.is_not_nil()
-                        ? " at: " + state.source.pc->source_location.as_string()
+                  << (state.source.pc->source_location().is_not_nil()
+                        ? " at: " +
+                            state.source.pc->source_location().as_string()
                         : ", location number: " +
                             std::to_string(state.source.pc->location_number) +
                             ".")

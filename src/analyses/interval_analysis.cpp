@@ -79,7 +79,7 @@ void instrument_intervals(
       goto_function.body.insert_before_swap(i_it);
       *t = goto_programt::make_assumption(conjunction(assertion));
       i_it++; // goes to original instruction
-      t->source_location=i_it->source_location;
+      t->source_location_nonconst() = i_it->source_location();
     }
   }
 }

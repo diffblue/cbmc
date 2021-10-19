@@ -140,7 +140,7 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   DATA_INVARIANT(
     end_function->is_end_function(),
     "last instruction in a function body is end function");
-  file_name = end_function->source_location.get_file();
+  file_name = end_function->source_location().get_file();
   DATA_INVARIANT(!file_name.empty(), "should have a valid source location");
 
   // compute the maximum coverage of individual source-code lines
@@ -209,15 +209,15 @@ void goto_program_coverage_recordt::compute_coverage_lines(
   forall_goto_program_instructions(it, goto_program)
   {
     if(
-      it->source_location.is_nil() ||
-      it->source_location.get_file() != file_name || it->is_dead() ||
+      it->source_location().is_nil() ||
+      it->source_location().get_file() != file_name || it->is_dead() ||
       it->is_end_function())
       continue;
 
     const bool is_branch = it->is_goto() && !it->guard.is_constant();
 
     unsigned l =
-      safe_string2unsigned(id2string(it->source_location.get_line()));
+      safe_string2unsigned(id2string(it->source_location().get_line()));
     std::pair<coverage_lines_mapt::iterator, bool> entry =
       dest.insert(std::make_pair(l, coverage_linet()));
 

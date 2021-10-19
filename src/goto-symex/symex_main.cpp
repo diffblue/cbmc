@@ -175,7 +175,7 @@ void goto_symext::symex_assert(
   // now try simplifier on it
   do_simplify(l2_condition);
 
-  std::string msg = id2string(instruction.source_location.get_comment());
+  std::string msg = id2string(instruction.source_location().get_comment());
   if(msg.empty())
     msg = "assertion";
 
@@ -538,12 +538,12 @@ void goto_symext::print_symex_step(statet &state)
                  << format(state.source.pc->get_code());
 
     if(
-      state.source.pc->source_location.is_not_nil() &&
-      !state.source.pc->source_location.get_java_bytecode_index().empty())
+      state.source.pc->source_location().is_not_nil() &&
+      !state.source.pc->source_location().get_java_bytecode_index().empty())
     {
       log.status()
         << " bytecode index: "
-        << state.source.pc->source_location.get_java_bytecode_index();
+        << state.source.pc->source_location().get_java_bytecode_index();
     }
 
     log.status() << messaget::eom;

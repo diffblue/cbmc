@@ -30,7 +30,7 @@ void set_properties(
     if(!it->is_assert())
       continue;
 
-    irep_idt property_id=it->source_location.get_property_id();
+    irep_idt property_id = it->source_location().get_property_id();
 
     std::unordered_set<irep_idt>::iterator c_it =
       property_set.find(property_id);
@@ -59,16 +59,16 @@ void label_properties(
     if(!it->is_assert())
       continue;
 
-    irep_idt function=it->source_location.get_function();
+    irep_idt function = it->source_location().get_function();
 
     std::string prefix=id2string(function);
-    if(!it->source_location.get_property_class().empty())
+    if(!it->source_location().get_property_class().empty())
     {
       if(!prefix.empty())
         prefix+=".";
 
-      std::string class_infix=
-        id2string(it->source_location.get_property_class());
+      std::string class_infix =
+        id2string(it->source_location().get_property_class());
 
       // replace the spaces by underscores
       std::replace(class_infix.begin(), class_infix.end(), ' ', '_');
@@ -85,7 +85,7 @@ void label_properties(
 
     std::string property_id=prefix+std::to_string(count);
 
-    it->source_location.set_property_id(property_id);
+    it->source_location_nonconst().set_property_id(property_id);
   }
 }
 

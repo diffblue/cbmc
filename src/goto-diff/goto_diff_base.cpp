@@ -104,7 +104,7 @@ void goto_difft::output_function(
       if(!ins.is_assert())
         continue;
 
-      const source_locationt &source_location = ins.source_location;
+      const source_locationt &source_location = ins.source_location();
       irep_idt property_id = source_location.get_property_id();
       msg.result() << "\n    " << property_id;
     }

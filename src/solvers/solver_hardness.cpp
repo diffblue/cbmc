@@ -31,8 +31,8 @@ operator==(const solver_hardnesst::hardness_ssa_keyt &other) const
 {
   if(ssa_expression != other.ssa_expression)
     return false;
-  return pc->source_location.as_string() ==
-         other.pc->source_location.as_string();
+  return pc->source_location().as_string() ==
+         other.pc->source_location().as_string();
 }
 
 bool solver_hardnesst::assertion_statst::empty() const
@@ -154,7 +154,7 @@ void solver_hardnesst::produce_report()
       // identifier for each one.
       hardness_stats_json["GOTO_ID"] =
         json_numbert{std::to_string((i << ssa_set_bit_offset) + j)};
-      hardness_stats_json["Source"] = json(ssa.pc->source_location);
+      hardness_stats_json["Source"] = json(ssa.pc->source_location());
 
       auto sat_hardness_json = json_objectt{};
       sat_hardness_json["Clauses"] =
@@ -191,7 +191,7 @@ void solver_hardnesst::produce_report()
       auto assertion_stats_pc_json = json_objectt{};
       assertion_stats_pc_json["GOTO"] =
         json_stringt{goto_instruction2string(pc)};
-      assertion_stats_pc_json["Source"] = json(pc->source_location);
+      assertion_stats_pc_json["Source"] = json(pc->source_location());
       assertion_stats_pcs_json.push_back(assertion_stats_pc_json);
     }
     assertion_stats_json["Sources"] = assertion_stats_pcs_json;

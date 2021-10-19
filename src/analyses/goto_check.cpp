@@ -1573,8 +1573,9 @@ void goto_checkt::add_guarded_property(
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
 
-    t->source_location.set_comment(comment + " in " + source_expr_string);
-    t->source_location.set_property_class(property_class);
+    t->source_location_nonconst().set_comment(
+      comment + " in " + source_expr_string);
+    t->source_location_nonconst().set_property_class(property_class);
   }
 }
 
@@ -1894,7 +1895,7 @@ void goto_checkt::goto_check(
     goto_programt::instructiont &i=*it;
 
     flag_resett flag_resetter;
-    const auto &pragmas = i.source_location.get_pragmas();
+    const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
       if(d.first == "disable:bounds-check")
@@ -1956,12 +1957,13 @@ void goto_checkt::goto_check(
       {
         auto t = new_code.add(
           enable_assert_to_assume
-            ? goto_programt::make_assumption(false_exprt{}, i.source_location)
-            : goto_programt::make_assertion(false_exprt{}, i.source_location));
+            ? goto_programt::make_assumption(false_exprt{}, i.source_location())
+            : goto_programt::make_assertion(
+                false_exprt{}, i.source_location()));
 
-        t->source_location.set_property_class("error label");
-        t->source_location.set_comment("error label "+label);
-        t->source_location.set("user-provided", true);
+        t->source_location_nonconst().set_property_class("error label");
+        t->source_location_nonconst().set_comment("error label " + label);
+        t->source_location_nonconst().set("user-provided", true);
       }
     }
 
@@ -2034,7 +2036,7 @@ void goto_checkt::goto_check(
             not_eq_null,
             "this is null on method invocation",
             "pointer dereference",
-            i.source_location,
+            i.source_location(),
             pointer,
             guardt(true_exprt(), guard_manager));
         }
@@ -2084,7 +2086,7 @@ void goto_checkt::goto_check(
           not_eq_null,
           "throwing null",
           "pointer dereference",
-          i.source_location,
+          i.source_location(),
           pointer,
           guardt(true_exprt(), guard_manager));
       }
@@ -2094,11 +2096,12 @@ void goto_checkt::goto_check(
     }
     else if(i.is_assert())
     {
-      bool is_user_provided=i.source_location.get_bool("user-provided");
+      bool is_user_provided = i.source_location().get_bool("user-provided");
 
-      if((is_user_provided && !enable_assertions &&
-          i.source_location.get_property_class()!="error label") ||
-         (!is_user_provided && !enable_built_in_assertions))
+      if(
+        (is_user_provided && !enable_assertions &&
+         i.source_location().get_property_class() != "error label") ||
+        (!is_user_provided && !enable_built_in_assertions))
       {
         i.turn_into_skip();
         did_something = true;
@@ -2126,13 +2129,13 @@ void goto_checkt::goto_check(
           exprt address_of_expr = typecast_exprt::conditional_cast(
             address_of_exprt(variable), lhs.type());
           if_exprt rhs(
-            side_effect_expr_nondett(bool_typet(), i.source_location),
+            side_effect_expr_nondett(bool_typet(), i.source_location()),
             std::move(address_of_expr),
             lhs);
           goto_programt::targett t =
             new_code.add(goto_programt::make_assignment(
-              std::move(lhs), std::move(rhs), i.source_location));
-          t->code_nonconst().add_source_location() = i.source_location;
+              std::move(lhs), std::move(rhs), i.source_location()));
+          t->code_nonconst().add_source_location() = i.source_location();
         }
 
         if(
@@ -2148,13 +2151,13 @@ void goto_checkt::goto_check(
           exprt alloca_result =
             typecast_exprt::conditional_cast(variable, lhs.type());
           if_exprt rhs(
-            side_effect_expr_nondett(bool_typet(), i.source_location),
+            side_effect_expr_nondett(bool_typet(), i.source_location()),
             std::move(alloca_result),
             lhs);
           goto_programt::targett t =
             new_code.add(goto_programt::make_assignment(
-              std::move(lhs), std::move(rhs), i.source_location));
-          t->code_nonconst().add_source_location() = i.source_location;
+              std::move(lhs), std::move(rhs), i.source_location()));
+          t->code_nonconst().add_source_location() = i.source_location();
         }
       }
     }
@@ -2188,30 +2191,32 @@ void goto_checkt::goto_check(
 
     for(auto &instruction : new_code.instructions)
     {
-      if(instruction.source_location.is_nil())
+      if(instruction.source_location().is_nil())
       {
-        instruction.source_location.id(irep_idt());
+        instruction.source_location_nonconst().id(irep_idt());
 
-        if(!it->source_location.get_file().empty())
-          instruction.source_location.set_file(it->source_location.get_file());
+        if(!it->source_location().get_file().empty())
+          instruction.source_location_nonconst().set_file(
+            it->source_location().get_file());
 
-        if(!it->source_location.get_line().empty())
-          instruction.source_location.set_line(it->source_location.get_line());
+        if(!it->source_location().get_line().empty())
+          instruction.source_location_nonconst().set_line(
+            it->source_location().get_line());
 
-        if(!it->source_location.get_function().empty())
-          instruction.source_location.set_function(
-            it->source_location.get_function());
+        if(!it->source_location().get_function().empty())
+          instruction.source_location_nonconst().set_function(
+            it->source_location().get_function());
 
-        if(!it->source_location.get_column().empty())
+        if(!it->source_location().get_column().empty())
         {
-          instruction.source_location.set_column(
-            it->source_location.get_column());
+          instruction.source_location_nonconst().set_column(
+            it->source_location().get_column());
         }
 
-        if(!it->source_location.get_java_bytecode_index().empty())
+        if(!it->source_location().get_java_bytecode_index().empty())
         {
-          instruction.source_location.set_java_bytecode_index(
-            it->source_location.get_java_bytecode_index());
+          instruction.source_location_nonconst().set_java_bytecode_index(
+            it->source_location().get_java_bytecode_index());
         }
       }
     }

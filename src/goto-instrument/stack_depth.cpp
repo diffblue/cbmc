@@ -53,24 +53,24 @@ void stack_depth(
 
   binary_relation_exprt guard(symbol, ID_le, max_depth);
   goto_programt::targett assert_ins = goto_program.insert_before(
-    first, goto_programt::make_assertion(guard, first->source_location));
+    first, goto_programt::make_assertion(guard, first->source_location()));
 
-  assert_ins->source_location.set_comment(
-    "Stack depth exceeds "+std::to_string(i_depth));
-  assert_ins->source_location.set_property_class("stack-depth");
+  assert_ins->source_location_nonconst().set_comment(
+    "Stack depth exceeds " + std::to_string(i_depth));
+  assert_ins->source_location_nonconst().set_property_class("stack-depth");
 
   goto_program.insert_before(
     first,
     goto_programt::make_assignment(
       code_assignt(symbol, plus_exprt(symbol, from_integer(1, symbol.type()))),
-      first->source_location));
+      first->source_location()));
 
   goto_programt::targett last=--goto_program.instructions.end();
   assert(last->is_end_function());
 
   goto_programt::instructiont minus_ins = goto_programt::make_assignment(
     code_assignt(symbol, minus_exprt(symbol, from_integer(1, symbol.type()))),
-    last->source_location);
+    last->source_location());
 
   goto_program.insert_before_swap(last, minus_ins);
 }

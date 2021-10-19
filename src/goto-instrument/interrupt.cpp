@@ -101,8 +101,8 @@ static void interrupt(
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
 
-      const source_locationt &source_location=
-        original_instruction.source_location;
+      const source_locationt &source_location =
+        original_instruction.source_location();
 
       code_function_callt isr_call(interrupt_handler);
       isr_call.add_source_location()=source_location;
@@ -129,7 +129,7 @@ static void interrupt(
       goto_programt::targett t_orig=i_it;
       t_orig++;
 
-      const source_locationt &source_location=i_it->source_location;
+      const source_locationt &source_location = i_it->source_location();
 
       code_function_callt isr_call(interrupt_handler);
       isr_call.add_source_location()=source_location;

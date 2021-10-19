@@ -471,7 +471,7 @@ void local_may_aliast::output(
 
   for(const auto &instruction : goto_function.body.instructions)
   {
-    out << "**** " << instruction.source_location << "\n";
+    out << "**** " << instruction.source_location() << "\n";
 
     const loc_infot &loc_info=loc_infos[l];
 

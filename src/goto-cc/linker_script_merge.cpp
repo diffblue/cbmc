@@ -280,7 +280,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
           log.error() << " Could not pointerize '" << sym.get_identifier()
                       << "' in function " << gf.first << ". Pretty:\n"
                       << sym.pretty() << "\n";
-          log.error().source_location = instruction.source_location;
+          log.error().source_location = instruction.source_location();
         }
         log.error() << messaget::eom;
       }

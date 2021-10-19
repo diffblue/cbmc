@@ -222,7 +222,7 @@ static_verifier_resultt::static_verifier_resultt(
     }
   }
 
-  source_location = assert_location->source_location;
+  source_location = assert_location->source_location();
   function_id = func_id;
 }
 

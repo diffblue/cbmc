@@ -155,7 +155,7 @@ struct hash<solver_hardnesst::hardness_ssa_keyt>
   {
     return std::hash<std::string>{}(
       hashed_stats.ssa_expression +
-      hashed_stats.pc->source_location.as_string());
+      hashed_stats.pc->source_location().as_string());
   }
 };
 } // namespace std

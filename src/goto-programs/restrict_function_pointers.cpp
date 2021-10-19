@@ -105,12 +105,12 @@ void restrict_function_pointer(
   *location = goto_programt::make_assertion(
     false_exprt{},
     make_function_pointer_restriction_assertion_source_location(
-      original_function_call_instruction.source_location, restriction));
+      original_function_call_instruction.source_location(), restriction));
 
   auto const assume_false_location = goto_function.body.insert_after(
     location,
     goto_programt::make_assumption(
-      false_exprt{}, original_function_call_instruction.source_location));
+      false_exprt{}, original_function_call_instruction.source_location()));
 
   // this is mutable because we'll update this at the end of each
   // loop iteration to always point at the start of the branch
@@ -131,7 +131,7 @@ void restrict_function_pointer(
     auto const goto_end_if_location = goto_function.body.insert_before(
       else_location,
       goto_programt::make_goto(
-        end_if_location, original_function_call_instruction.source_location));
+        end_if_location, original_function_call_instruction.source_location()));
     auto const replaced_instruction_location =
       goto_function.body.insert_before(goto_end_if_location, new_instruction);
     else_location = goto_function.body.insert_before(

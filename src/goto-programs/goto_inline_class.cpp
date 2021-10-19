@@ -30,7 +30,7 @@ void goto_inlinet::parameter_assignments(
   PRECONDITION(target->is_function_call());
   PRECONDITION(dest.empty());
 
-  const source_locationt &source_location=target->source_location;
+  const source_locationt &source_location = target->source_location();
 
   // iterates over the operands
   exprt::operandst::const_iterator it1=arguments.begin();
@@ -129,7 +129,7 @@ void goto_inlinet::parameter_destruction(
   PRECONDITION(target->is_function_call());
   PRECONDITION(dest.empty());
 
-  const source_locationt &source_location=target->source_location;
+  const source_locationt &source_location = target->source_location();
 
   for(const auto &identifier : parameter_identifiers)
   {
@@ -277,13 +277,14 @@ void goto_inlinet::insert_function_body(
   {
     for(auto &instruction : tmp.instructions)
     {
-      replace_location(instruction.source_location, target->source_location);
-      replace_location(instruction.code_nonconst(), target->source_location);
+      replace_location(
+        instruction.source_location_nonconst(), target->source_location());
+      replace_location(instruction.code_nonconst(), target->source_location());
 
       if(instruction.has_condition())
       {
         replace_location(
-          instruction.condition_nonconst(), target->source_location);
+          instruction.condition_nonconst(), target->source_location());
       }
     }
   }

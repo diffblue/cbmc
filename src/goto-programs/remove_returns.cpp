@@ -128,7 +128,7 @@ void remove_returnst::replace_returns(
 
         // now turn the `return' into `assignment'
         instruction = goto_programt::make_assignment(
-          assignment, instruction.source_location);
+          assignment, instruction.source_location());
       }
       else
         instruction.turn_into_skip();
@@ -185,13 +185,13 @@ bool remove_returnst::do_function_calls(
         else
         {
           rhs = side_effect_expr_nondett(
-            i_it->call_lhs().type(), i_it->source_location);
+            i_it->call_lhs().type(), i_it->source_location());
         }
 
         goto_programt::targett t_a = goto_program.insert_after(
           i_it,
           goto_programt::make_assignment(
-            code_assignt(i_it->call_lhs(), rhs), i_it->source_location));
+            code_assignt(i_it->call_lhs(), rhs), i_it->source_location()));
 
         // fry the previous assignment
         i_it->call_lhs().make_nil();
@@ -200,7 +200,7 @@ bool remove_returnst::do_function_calls(
         {
           goto_program.insert_after(
             t_a,
-            goto_programt::make_dead(*return_value, i_it->source_location));
+            goto_programt::make_dead(*return_value, i_it->source_location()));
         }
 
         requires_update = true;
@@ -315,7 +315,7 @@ bool remove_returnst::restore_returns(
       // replace "fkt#return_value=x;" by "return x;"
       const exprt rhs = instruction.assign_rhs();
       instruction = goto_programt::make_return(
-        code_returnt(rhs), instruction.source_location);
+        code_returnt(rhs), instruction.source_location());
       did_something = true;
     }
   }

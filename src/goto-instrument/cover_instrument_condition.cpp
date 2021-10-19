@@ -26,11 +26,11 @@ void cover_condition_instrumentert::instrument(
     i_it->turn_into_skip();
 
   // Conditions are all atomic predicates in the programs.
-  if(!i_it->source_location.is_built_in())
+  if(!i_it->source_location().is_built_in())
   {
     const std::set<exprt> conditions = collect_conditions(i_it);
 
-    const source_locationt source_location = i_it->source_location;
+    const source_locationt source_location = i_it->source_location();
 
     for(const auto &c : conditions)
     {

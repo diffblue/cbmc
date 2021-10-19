@@ -162,7 +162,7 @@ void shared_bufferst::assignment(
     t->type=ASSIGN;
     t->code_nonconst() = code_assignt(symbol, value);
     t->code_nonconst().add_source_location() = source_location;
-    t->source_location=source_location;
+    t->source_location_nonconst() = source_location;
 
     // instrumentations.insert((const irep_idt) (t->code.id()));
 
@@ -1112,8 +1112,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
 
         goto_programt::instructiont original_instruction;
         original_instruction.swap(instruction);
-        const source_locationt &source_location=
-          original_instruction.source_location;
+        const source_locationt &source_location =
+          original_instruction.source_location();
 
         // ATOMIC_BEGIN: we make the whole thing atomic
         instruction = goto_programt::make_atomic_begin(source_location);
@@ -1296,8 +1296,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
     {
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
-      const source_locationt &source_location=
-        original_instruction.source_location;
+      const source_locationt &source_location =
+        original_instruction.source_location();
 
       // ATOMIC_BEGIN
       instruction = goto_programt::make_atomic_begin(source_location);
@@ -1322,7 +1322,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     else if(is_lwfence(instruction, ns))
     {
       // po -- remove the lwfence
-      *i_it = goto_programt::make_skip(i_it->source_location);
+      *i_it = goto_programt::make_skip(i_it->source_location());
     }
     else if(instruction.is_function_call())
     {

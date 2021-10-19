@@ -164,21 +164,21 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         // is illegal for C++ non-pod types and impossible in Java in any case.
         if(not_prefix)
         {
-          debug().source_location = i.source_location;
+          debug().source_location = i.source_location();
           debug() << "encountered goto '" << goto_label
                   << "' that enters one or more lexical blocks; "
                   << "omitting constructors and destructors" << eom;
         }
         else
         {
-          debug().source_location = i.source_location;
+          debug().source_location = i.source_location();
           debug() << "adding goto-destructor code on jump to '" << goto_label
                   << "'" << eom;
 
           node_indext end_destruct = intersection_result.common_ancestor;
           goto_programt destructor_code;
           unwind_destructor_stack(
-            i.source_location,
+            i.source_location(),
             destructor_code,
             mode,
             end_destruct,
@@ -221,7 +221,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 
       goto_program.insert_after(
         g_it,
-        goto_programt::make_goto(label.second.first, guard, i.source_location));
+        goto_programt::make_goto(
+          label.second.first, guard, i.source_location()));
     }
   }
 
@@ -833,8 +834,8 @@ void goto_convertt::convert_assert(
 
   goto_programt::targett t =
     dest.add(goto_programt::make_assertion(cond, code.source_location()));
-  t->source_location.set(ID_property, ID_assertion);
-  t->source_location.set("user-provided", true);
+  t->source_location_nonconst().set(ID_property, ID_assertion);
+  t->source_location_nonconst().set("user-provided", true);
 }
 
 void goto_convertt::convert_skip(
@@ -1228,7 +1229,7 @@ void goto_convertt::convert_switch(
   }
 
   tmp_cases.add(goto_programt::make_goto(
-    targets.default_target, targets.default_target->source_location));
+    targets.default_target, targets.default_target->source_location()));
 
   dest.destructive_append(sideeffects);
   dest.destructive_append(tmp_cases);
@@ -1607,7 +1608,7 @@ void goto_convertt::generate_ifthenelse(
   // x: goto z;
   CHECK_RETURN(!tmp_w.instructions.empty());
   x->complete_goto(z);
-  x->source_location = tmp_w.instructions.back().source_location;
+  x->source_location_nonconst() = tmp_w.instructions.back().source_location();
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -1934,7 +1935,7 @@ void goto_convertt::generate_thread_block(
     END_THREAD,
     nil_exprt(),
     {}));
-  e->source_location=thread_body.source_location();
+  e->source_location_nonconst() = thread_body.source_location();
   goto_programt::targett z = postamble.add(goto_programt::make_skip());
 
   preamble.add(goto_programt::instructiont(

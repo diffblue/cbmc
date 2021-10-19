@@ -208,7 +208,8 @@ void goto_convert_functionst::convert_function(
   {
     goto_programt::instructiont a_begin;
     a_begin = goto_programt::make_atomic_begin();
-    a_begin.source_location = f.body.instructions.front().source_location;
+    a_begin.source_location_nonconst() =
+      f.body.instructions.front().source_location();
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
     goto_programt::targett a_end =

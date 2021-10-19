@@ -550,7 +550,7 @@ jsont variable_sensitivity_dependence_domaint::output_json(
 
     link["locationNumber"] =
       json_numbert(std::to_string(target->location_number));
-    link["sourceLocation"] = json(target->source_location);
+    link["sourceLocation"] = json(target->source_location());
     link["type"] = json_stringt("control");
     link["branch"] = json_stringt(branch.to_string());
   }
@@ -560,7 +560,7 @@ jsont variable_sensitivity_dependence_domaint::output_json(
     json_objectt &link = graph.push_back().make_object();
     link["locationNumber"] =
       json_numbert(std::to_string(target->location_number));
-    link["sourceLocation"] = json(target->source_location);
+    link["sourceLocation"] = json(target->source_location());
     link["type"] = json_stringt("control");
     link["branch"] = json_stringt("UNCONDITIONAL");
   }
@@ -570,8 +570,8 @@ jsont variable_sensitivity_dependence_domaint::output_json(
     json_objectt &link = graph.push_back().make_object();
     link["locationNumber"] =
       json_numbert(std::to_string(dep.first->location_number));
-    link["sourceLocation"] = json(dep.first->source_location);
-    json_stringt(dep.first->source_location.as_string());
+    link["sourceLocation"] = json(dep.first->source_location());
+    json_stringt(dep.first->source_location().as_string());
     link["type"] = json_stringt("data");
 
     const std::set<exprt> &expr_set = dep.second;

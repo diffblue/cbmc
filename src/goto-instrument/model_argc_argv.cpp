@@ -152,7 +152,7 @@ bool model_argc_argv(
     main_symbol.mode);
 
   for(auto &instruction : init_instructions.instructions)
-    instruction.source_location.set_file("<built-in-library>");
+    instruction.source_location_nonconst().set_file("<built-in-library>");
 
   goto_functionst::function_mapt::iterator start_entry=
     goto_model.goto_functions.function_map.find(

@@ -634,7 +634,7 @@ void cover_mcdc_instrumentert::instrument(
   // 3. Each condition in a decision takes every possible outcome
   // 4. Each condition in a decision is shown to independently
   //    affect the outcome of the decision.
-  if(!i_it->source_location.is_built_in())
+  if(!i_it->source_location().is_built_in())
   {
     const std::set<exprt> conditions = collect_conditions(i_it);
     const std::set<exprt> decisions = collect_decisions(i_it);
@@ -647,7 +647,7 @@ void cover_mcdc_instrumentert::instrument(
       decisions.end(),
       inserter(both, both.end()));
 
-    const source_locationt source_location = i_it->source_location;
+    const source_locationt source_location = i_it->source_location();
 
     for(const auto &p : both)
     {
@@ -663,18 +663,20 @@ void cover_mcdc_instrumentert::instrument(
       std::string comment_t = description + " '" + p_string + "' true";
       goto_program.insert_before_swap(i_it);
       *i_it = make_assertion(not_exprt(p), source_location);
-      i_it->source_location.set_comment(comment_t);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(function_id);
+      i_it->source_location_nonconst().set_comment(comment_t);
+      i_it->source_location_nonconst().set(
+        ID_coverage_criterion, coverage_criterion);
+      i_it->source_location_nonconst().set_property_class(property_class);
+      i_it->source_location_nonconst().set_function(function_id);
 
       std::string comment_f = description + " '" + p_string + "' false";
       goto_program.insert_before_swap(i_it);
       *i_it = make_assertion(p, source_location);
-      i_it->source_location.set_comment(comment_f);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(function_id);
+      i_it->source_location_nonconst().set_comment(comment_f);
+      i_it->source_location_nonconst().set(
+        ID_coverage_criterion, coverage_criterion);
+      i_it->source_location_nonconst().set_property_class(property_class);
+      i_it->source_location_nonconst().set_function(function_id);
     }
 
     std::set<exprt> controlling;
@@ -696,10 +698,11 @@ void cover_mcdc_instrumentert::instrument(
 
       goto_program.insert_before_swap(i_it);
       *i_it = make_assertion(not_exprt(p), source_location);
-      i_it->source_location.set_comment(description);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(function_id);
+      i_it->source_location_nonconst().set_comment(description);
+      i_it->source_location_nonconst().set(
+        ID_coverage_criterion, coverage_criterion);
+      i_it->source_location_nonconst().set_property_class(property_class);
+      i_it->source_location_nonconst().set_function(function_id);
     }
 
     for(std::size_t i = 0; i < both.size() * 2 + controlling.size(); i++)

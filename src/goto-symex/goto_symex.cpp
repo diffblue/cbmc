@@ -97,7 +97,7 @@ void goto_symext::symex_assign(
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are executing a hidden instruction.
-    if(state.source.pc->source_location.get_hide())
+    if(state.source.pc->source_location().get_hide())
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     symex_assignt symex_assign{

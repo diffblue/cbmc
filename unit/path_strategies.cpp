@@ -335,8 +335,8 @@ void symex_eventt::validate_resume(
   REQUIRE(!events.empty());
 
   int dst = 0;
-  if(!state.saved_target->source_location.get_line().empty())
-    dst = std::stoi(state.saved_target->source_location.get_line().c_str());
+  if(!state.saved_target->source_location().get_line().empty())
+    dst = std::stoi(state.saved_target->source_location().get_line().c_str());
 
   if(state.has_saved_next_instruction)
   {

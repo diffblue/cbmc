@@ -30,7 +30,7 @@ goto_programt::targett add_instruction(
 {
   goto_programt::instructiont instruction;
   instruction.location_number = instructions.size();
-  instruction.source_location = location;
+  instruction.source_location_nonconst() = location;
   instructions.push_back(instruction);
   return std::next(instructions.begin(), instruction.location_number);
 }

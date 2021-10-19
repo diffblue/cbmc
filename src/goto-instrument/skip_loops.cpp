@@ -47,7 +47,8 @@ static bool skip_loops(
 
     goto_program.insert_before(
       loop_head,
-      goto_programt::make_goto(next, true_exprt(), loop_head->source_location));
+      goto_programt::make_goto(
+        next, true_exprt(), loop_head->source_location()));
 
     ++l_it;
   }

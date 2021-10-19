@@ -49,7 +49,7 @@ void functions_in_scope_visitort::operator()(const goto_programt &prog)
 
       if(function.id() != ID_symbol)
       {
-        log.error().source_location = ins->source_location;
+        log.error().source_location = ins->source_location();
         log.error() << "Function pointer used in function invoked by "
                        "function contract: "
                     << messaget::eom;
