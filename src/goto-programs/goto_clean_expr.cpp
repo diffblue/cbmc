@@ -144,12 +144,15 @@ void goto_convertt::rewrite_boolean(exprt &expr)
     {
       if_exprt if_e(op, tmp, false_exprt());
       tmp.swap(if_e);
+      continue;
     }
-    else // ID_or
+    if(expr.id() == ID_or)
     {
       if_exprt if_e(op, true_exprt(), tmp);
       tmp.swap(if_e);
+      continue;
     }
+    UNREACHABLE;
   }
 
   expr.swap(tmp);
