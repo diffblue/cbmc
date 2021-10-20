@@ -17,6 +17,7 @@ Author: Diffblue Ltd.
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/suffix.h>
 #include <util/symbol_table.h>
 

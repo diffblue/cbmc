@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
+#include <util/std_code.h>
 #include <util/string_constant.h>
 
 #include "goto_model.h"

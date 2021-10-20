@@ -13,6 +13,7 @@ Date:   September 2009
 
 #include "remove_returns.h"
 
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/suffix.h>
 

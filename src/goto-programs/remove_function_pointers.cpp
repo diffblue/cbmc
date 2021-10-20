@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/source_location.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 
 #include <analyses/does_remove_const.h>

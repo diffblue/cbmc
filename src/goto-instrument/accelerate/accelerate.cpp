@@ -15,9 +15,10 @@ Author: Matt Lewis
 
 #include <goto-programs/goto_functions.h>
 
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/find_symbols.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <iostream>
 #include <list>

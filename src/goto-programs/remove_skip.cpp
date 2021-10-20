@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "goto_model.h"
 
+#include <util/std_code.h>
+
 /// Determine whether the instruction is semantically equivalent to a skip
 /// (no-op).  This includes a skip, but also if(false) goto ..., goto next;
 ///  next: ..., and (void)0.

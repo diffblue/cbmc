@@ -20,6 +20,7 @@ Date: November 2011
 #include "nondet_static.h"
 
 #include <util/prefix.h>
+#include <util/std_code.h>
 
 #include <goto-programs/goto_model.h>
 

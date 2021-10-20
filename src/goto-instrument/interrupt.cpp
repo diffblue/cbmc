@@ -14,6 +14,7 @@ Date: September 2011
 #include "interrupt.h"
 
 #include <util/range.h>
+#include <util/std_code.h>
 
 #include <linking/static_lifetime_init.h>
 

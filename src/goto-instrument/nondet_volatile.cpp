@@ -17,6 +17,7 @@ Date: September 2011
 #include <util/fresh_symbol.h>
 #include <util/options.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 #include <util/symbol_table.h>

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/goto_instruction_code.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
+#include <util/std_code.h>
 
 /// Selects the kind of objects allocated
 enum class lifetimet

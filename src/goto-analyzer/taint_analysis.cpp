@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/string_constant.h>
 
 #include <goto-programs/class_hierarchy.h>

@@ -25,6 +25,7 @@ Author: Peter Schrammel
 #include <util/ieee_float.h>
 #include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 
 #include <langapi/language_util.h>
 

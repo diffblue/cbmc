@@ -22,6 +22,7 @@ Author: Peter Schrammel
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/pointer_offset_size.h>
+#include <util/std_code.h>
 
 class remove_java_newt
 {

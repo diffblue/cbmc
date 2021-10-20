@@ -10,9 +10,11 @@
 #include "data_dependency_context.h"
 
 #include <langapi/language_util.h>
+
 #include <util/container_utils.h>
 #include <util/json.h>
 #include <util/json_irep.h>
+#include <util/std_code.h>
 
 /**
  * Evaluate an expression and accumulate all the data dependencies
