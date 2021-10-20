@@ -31,6 +31,13 @@ std::ostream &goto_programt::output(std::ostream &out) const
   return output(namespacet(symbol_tablet()), irep_idt(), out);
 }
 
+goto_programt::instructiont goto_programt::make_incomplete_goto(
+  const code_gotot &_code,
+  const source_locationt &l)
+{
+  return instructiont(_code, l, INCOMPLETE_GOTO, true_exprt(), {});
+}
+
 /// Writes to \p out a two/three line string representation of a given
 /// \p instruction. The output is of the format:
 /// ```
