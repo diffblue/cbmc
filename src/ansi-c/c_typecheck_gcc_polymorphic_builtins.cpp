@@ -635,7 +635,7 @@ static void instantiate_atomic_fetch_op(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -697,7 +697,7 @@ static void instantiate_atomic_op_fetch(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -810,7 +810,7 @@ static void instantiate_sync_val_compare_and_swap(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -868,7 +868,7 @@ static void instantiate_sync_lock_test_and_set(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -990,7 +990,7 @@ static void instantiate_atomic_load_n(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(ID___atomic_load),
@@ -1105,7 +1105,7 @@ static void instantiate_atomic_exchange_n(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(ID___atomic_exchange),
@@ -1142,7 +1142,7 @@ static void instantiate_atomic_compare_exchange(
     result_symbol(
       identifier_with_type, c_bool_type(), source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{

@@ -226,9 +226,6 @@ public:
     {
       PRECONDITION(is_decl());
       auto &decl = expr_checked_cast<code_declt>(code);
-      INVARIANT(
-        !decl.initial_value(),
-        "code_declt in goto program may not contain initialization.");
       return decl.symbol();
     }
 
@@ -237,9 +234,6 @@ public:
     {
       PRECONDITION(is_decl());
       auto &decl = expr_checked_cast<code_declt>(code);
-      INVARIANT(
-        !decl.initial_value(),
-        "code_declt in goto program may not contain initialization.");
       return decl.symbol();
     }
 

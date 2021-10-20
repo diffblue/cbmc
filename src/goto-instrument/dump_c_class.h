@@ -198,7 +198,7 @@ protected:
       const typet &type)
   {
     symbol_exprt sym(identifier, type);
-    code_declt d(sym);
+    code_frontend_declt d(sym);
 
     std::string d_str=expr_to_string(d);
     assert(!d_str.empty());
@@ -232,7 +232,7 @@ protected:
     const typet &type,
     std::ostream &os);
 
-  typedef std::unordered_map<irep_idt, code_declt> local_static_declst;
+  typedef std::unordered_map<irep_idt, code_frontend_declt> local_static_declst;
 
   void convert_global_variable(
       const symbolt &symbol,
@@ -259,7 +259,7 @@ protected:
   void cleanup_expr(exprt &expr);
   void cleanup_type(typet &type);
   void cleanup_decl(
-    code_declt &decl,
+    code_frontend_declt &decl,
     std::list<irep_idt> &local_static,
     std::list<irep_idt> &local_type_decls);
   void cleanup_harness(code_blockt &b);

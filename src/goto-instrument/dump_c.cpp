@@ -649,7 +649,7 @@ void dump_ct::convert_compound_enum(
 }
 
 void dump_ct::cleanup_decl(
-  code_declt &decl,
+  code_frontend_declt &decl,
   std::list<irep_idt> &local_static,
   std::list<irep_idt> &local_type_decls)
 {
@@ -908,7 +908,7 @@ void dump_ct::convert_global_variable(
       !converted_global.insert(symbol.name).second)
     return;
 
-  code_declt d(symbol.symbol_expr());
+  code_frontend_declt d(symbol.symbol_expr());
 
   find_symbols_sett syms;
   if(symbol.value.is_not_nil())
@@ -1214,7 +1214,7 @@ void dump_ct::insert_local_static_decls(
       local_static_decls.find(*it);
     PRECONDITION(d_it!=local_static_decls.end());
 
-    code_declt d=d_it->second;
+    code_frontend_declt d = d_it->second;
     std::list<irep_idt> redundant;
     cleanup_decl(d, redundant, type_decls);
 
