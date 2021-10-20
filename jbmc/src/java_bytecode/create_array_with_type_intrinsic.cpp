@@ -75,7 +75,7 @@ codet create_array_with_type_body(
   code_blockt code_block;
 
   // Declare new_array temporary:
-  code_block.add(code_declt(new_array_symbol_expr));
+  code_block.add(code_frontend_declt(new_array_symbol_expr));
 
   // new_array = new Object[length];
   side_effect_exprt new_array_expr{
