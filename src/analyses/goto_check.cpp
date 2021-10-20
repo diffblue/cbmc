@@ -834,7 +834,8 @@ void goto_checkt::integer_overflow_check(
       {
         if(
           config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14)
+          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
+          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
         {
           allow_shift_into_sign_bit = false;
         }

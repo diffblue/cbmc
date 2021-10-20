@@ -593,6 +593,9 @@ int gcc_modet::doit()
 
     if(std_string=="gnu++14" || std_string=="c++14")
       config.cpp.set_cpp14();
+
+    if(std_string == "gnu++17" || std_string == "c++17")
+      config.cpp.set_cpp17();
   }
   else
   {

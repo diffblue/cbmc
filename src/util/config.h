@@ -224,13 +224,14 @@ public:
 
   struct cppt
   {
-    enum class cpp_standardt { CPP98, CPP03, CPP11, CPP14 } cpp_standard;
+    enum class cpp_standardt { CPP98, CPP03, CPP11, CPP14, CPP17 } cpp_standard;
     static cpp_standardt default_cpp_standard();
 
     void set_cpp98() { cpp_standard=cpp_standardt::CPP98; }
     void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
     void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
     void set_cpp14() { cpp_standard=cpp_standardt::CPP14; }
+    void set_cpp17() { cpp_standard=cpp_standardt::CPP17; }
 
     static const std::size_t default_object_bits=8;
   } cpp;
