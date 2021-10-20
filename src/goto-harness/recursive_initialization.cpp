@@ -239,7 +239,7 @@ code_blockt build_null_pointer(const symbol_exprt &result_symbol)
   const null_pointer_exprt nullptr_expr{to_pointer_type(type_to_construct)};
   const code_assignt assign_null{dereference_exprt{result_symbol},
                                  nullptr_expr};
-  return code_blockt{{assign_null, code_returnt{}}};
+  return code_blockt{{assign_null, code_frontend_returnt{}}};
 }
 
 code_blockt recursive_initializationt::build_constructor_body(
@@ -688,7 +688,7 @@ code_blockt recursive_initializationt::build_pointer_constructor(
 
   null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
   const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
-  code_blockt null_and_return{{assign_null, code_returnt{}}};
+  code_blockt null_and_return{{assign_null, code_frontend_returnt{}}};
   body.add(code_ifthenelset{conjunction(should_not_recurse), null_and_return});
 
   const auto should_recurse_nondet =
@@ -1034,7 +1034,7 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
       auto const condition = equal_exprt{
         function_pointer_selector,
         from_integer(function_pointer_index, function_pointer_selector.type())};
-      auto const then = code_blockt{{assign, code_returnt{}}};
+      auto const then = code_blockt{{assign, code_frontend_returnt{}}};
       body.add(code_ifthenelset{condition, then});
     }
     else

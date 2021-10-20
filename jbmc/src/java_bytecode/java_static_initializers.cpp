@@ -590,7 +590,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
       gen_clinit_eqexpr(
         clinit_thread_local_state_sym.symbol_expr(),
         clinit_statest::INIT_COMPLETE),
-      code_returnt());
+      code_frontend_returnt());
     function_body.add(std::move(conditional));
   }
 
@@ -651,7 +651,8 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 
   // if(init_complete) return;
   {
-    code_ifthenelset conditional(init_complete.symbol_expr(), code_returnt());
+    code_ifthenelset conditional(
+      init_complete.symbol_expr(), code_frontend_returnt());
     function_body.add(std::move(conditional));
   }
 
@@ -696,7 +697,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
       gen_clinit_assign(
         clinit_state_sym.symbol_expr(), clinit_statest::INIT_COMPLETE));
     function_body.add(atomic_end);
-    function_body.add(code_returnt());
+    function_body.add(code_frontend_returnt());
   }
 
   return function_body;

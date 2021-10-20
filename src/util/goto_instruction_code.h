@@ -479,4 +479,61 @@ inline void validate_expr(const code_outputt &output)
   code_outputt::check(output);
 }
 
+/// \ref codet representation of a "return from a function" statement.
+class code_returnt : public codet
+{
+public:
+  explicit code_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
+  {
+  }
+
+  const exprt &return_value() const
+  {
+    return op0();
+  }
+
+  exprt &return_value()
+  {
+    return op0();
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(vm, code.operands().size() == 1, "return must have one operand");
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_returnt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_return);
+}
+
+inline void validate_expr(const code_returnt &x)
+{
+  code_returnt::check(x);
+}
+
+inline const code_returnt &to_code_return(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_return);
+  code_returnt::check(code);
+  return static_cast<const code_returnt &>(code);
+}
+
+inline code_returnt &to_code_return(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_return);
+  code_returnt::check(code);
+  return static_cast<code_returnt &>(code);
+}
+
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_INSTRUCTION_CODE_H

@@ -902,14 +902,14 @@ inline code_gotot &to_code_goto(codet &code)
 }
 
 /// \ref codet representation of a "return from a function" statement.
-class code_returnt:public codet
+class code_frontend_returnt : public codet
 {
 public:
-  code_returnt() : codet(ID_return, {nil_exprt()})
+  code_frontend_returnt() : codet(ID_return, {nil_exprt()})
   {
   }
 
-  explicit code_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
+  explicit code_frontend_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
   {
   }
 
@@ -942,28 +942,29 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
+template <>
+inline bool can_cast_expr<code_frontend_returnt>(const exprt &base)
 {
   return detail::can_cast_code_impl(base, ID_return);
 }
 
-inline void validate_expr(const code_returnt &x)
+inline void validate_expr(const code_frontend_returnt &x)
 {
-  code_returnt::check(x);
+  code_frontend_returnt::check(x);
 }
 
-inline const code_returnt &to_code_return(const codet &code)
+inline const code_frontend_returnt &to_code_frontend_return(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
-  code_returnt::check(code);
-  return static_cast<const code_returnt &>(code);
+  code_frontend_returnt::check(code);
+  return static_cast<const code_frontend_returnt &>(code);
 }
 
-inline code_returnt &to_code_return(codet &code)
+inline code_frontend_returnt &to_code_frontend_return(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
-  code_returnt::check(code);
-  return static_cast<code_returnt &>(code);
+  code_frontend_returnt::check(code);
+  return static_cast<code_frontend_returnt &>(code);
 }
 
 /// \ref codet representation of a label for branch targets.

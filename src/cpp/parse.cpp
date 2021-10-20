@@ -7350,7 +7350,7 @@ optionalt<codet> Parser::rStatement()
 
     lex.get_token(tk1);
 
-    code_returnt statement;
+    code_frontend_returnt statement;
     set_location(statement, tk1);
 
     if(lex.LookAhead(0)==';')

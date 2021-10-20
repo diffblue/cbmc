@@ -185,35 +185,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
     }
   }
 
-  /// check_returns_removed()
-  WHEN(
-    "not all returns have been removed - an instruction is of type "
-    "'return'")
-  {
-    THEN("fail!")
-    {
-      goto_convert(goto_model, null_message_handler);
-
-      auto &function_map = goto_model.goto_functions.function_map;
-      auto it = function_map.find("g");
-      auto &instructions = it->second.body.instructions;
-      instructions.insert(
-        instructions.begin(), goto_programt::make_return(code_returnt()));
-
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
-      validation_options.check_returns_removed = true;
-
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
-    }
-  }
-
   WHEN("not all returns have been removed - a function call lhs is not nil")
   {
     // int h();

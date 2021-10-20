@@ -267,7 +267,7 @@ protected:
     goto_programt &dest,
     const irep_idt &mode);
   void convert_return(
-    const code_returnt &code,
+    const code_frontend_returnt &,
     goto_programt &dest,
     const irep_idt &mode);
   void convert_continue(

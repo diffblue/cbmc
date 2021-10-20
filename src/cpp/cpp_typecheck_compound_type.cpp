@@ -688,8 +688,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           expr_call.type()=to_code_type(component.type()).return_type();
 
-          func_symb.value = code_blockt{
-            {code_returnt(already_typechecked_exprt{std::move(expr_call)})}};
+          func_symb.value = code_blockt{{code_frontend_returnt(
+            already_typechecked_exprt{std::move(expr_call)})}};
         }
         else
         {

@@ -105,7 +105,7 @@ codet create_array_with_type_body(
     new_array_element_classid, old_array_element_classid));
 
   // return new_array
-  code_block.add(code_returnt(new_array_symbol_expr));
+  code_block.add(code_frontend_returnt(new_array_symbol_expr));
 
   return std::move(code_block);
 }

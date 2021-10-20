@@ -1361,7 +1361,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     else if(bytecode == BC_return)
     {
       PRECONDITION(op.empty() && results.empty());
-      c=code_returnt();
+      c = code_frontend_returnt();
     }
     else if(bytecode == patternt("?return"))
     {
@@ -1370,7 +1370,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       PRECONDITION(op.size() == 1 && results.empty());
       const exprt r =
         typecast_exprt::conditional_cast(op[0], method_return_type);
-      c=code_returnt(r);
+      c = code_frontend_returnt(r);
     }
     else if(bytecode == patternt("?astore"))
     {

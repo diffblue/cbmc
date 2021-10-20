@@ -139,7 +139,7 @@ protected:
   virtual void typecheck_gcc_computed_goto(codet &code);
   virtual void typecheck_gcc_switch_case_range(code_gcc_switch_case_ranget &);
   virtual void typecheck_gcc_local_label(codet &code);
-  virtual void typecheck_return(code_returnt &code);
+  virtual void typecheck_return(code_frontend_returnt &);
   virtual void typecheck_switch(codet &code);
   virtual void typecheck_while(code_whilet &code);
   virtual void typecheck_dowhile(code_dowhilet &code);
