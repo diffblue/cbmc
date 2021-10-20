@@ -57,7 +57,7 @@ void symex_bmct::symex_step(
 
   if(
     !state.guard.is_false() && state.source.pc->is_assume() &&
-    simplify_expr(state.source.pc->guard, ns).is_false())
+    simplify_expr(state.source.pc->condition(), ns).is_false())
   {
     log.statistics() << "aborting path on assume(false) at "
                      << state.source.pc->source_location << " thread "
@@ -86,7 +86,7 @@ void symex_bmct::symex_step(
     // sure the goto is considered covered
     if(
       cur_pc->is_goto() && cur_pc->get_target() != state.source.pc &&
-      cur_pc->guard.is_true())
+      cur_pc->condition().is_true())
       symex_coverage.covered(cur_pc, cur_pc->get_target());
     else if(!state.guard.is_false())
       symex_coverage.covered(cur_pc, state.source.pc);
@@ -109,7 +109,7 @@ void symex_bmct::merge_goto(
     // could the branch possibly be taken?
     !prev_guard.is_false() && !state.guard.is_false() &&
     // branches only, no single-successor goto
-    !prev_pc->guard.is_true())
+    !prev_pc->condition().is_true())
     symex_coverage.covered(prev_pc, state.source.pc);
 }
 
