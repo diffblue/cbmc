@@ -1,0 +1,14 @@
+CORE
+short-circuit-memory-checks.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+line 11 dereference failure: pointer NULL in \*c: SUCCESS
+line 12 dereference failure: pointer NULL in \*c: FAILURE
+VERIFICATION FAILED
+--
+^warning: ignoring
+--
+Test that side effects on the right hand side of the ==> operator are correctly
+short-circuited or not where the side effect is a pointer check. Note that this
+test is based upon the originally reported github issue 6319.

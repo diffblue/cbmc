@@ -1,0 +1,14 @@
+CORE
+false_implies_failure_side_effect.c
+
+^EXIT=0$
+^SIGNAL=0$
+line 5 fail function: SUCCESS
+VERIFICATION SUCCESSFUL
+--
+^warning: ignoring
+--
+Test that side effects on the right hand side of the ==> operator that would
+otherwise result in verification failure do not do so when the left hand side
+is false. This confirms that the ==> operator employs short circuiting
+evaluation in the same way as the && and || operators.
