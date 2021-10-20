@@ -52,7 +52,7 @@ symbol_exprt generate_nondet_int(
 
   // Assign the symbol any non deterministic integer value.
   //   int_type name_prefix::nondet_int = NONDET(int_type)
-  instructions.add(code_assignt(
+  instructions.add(code_frontend_assignt(
     nondet_symbol, side_effect_expr_nondett(int_type, source_location)));
 
   // Constrain the non deterministic integer with a lower bound of `min_value`.

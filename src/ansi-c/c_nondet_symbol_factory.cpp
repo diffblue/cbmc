@@ -57,8 +57,8 @@ void symbol_factoryt::gen_nondet_init(
       // Handle the pointer-to-code case separately:
       // leave as nondet_ptr to allow `remove_function_pointers`
       // to replace the pointer.
-      assignments.add(
-        code_assignt{expr, side_effect_expr_nondett{pointer_type, loc}});
+      assignments.add(code_frontend_assignt{
+        expr, side_effect_expr_nondett{pointer_type, loc}});
       return;
     }
 
@@ -71,7 +71,7 @@ void symbol_factoryt::gen_nondet_init(
         depth >= object_factory_params.max_nondet_tree_depth)
       {
         assignments.add(
-          code_assignt{expr, null_pointer_exprt{pointer_type}, loc});
+          code_frontend_assignt{expr, null_pointer_exprt{pointer_type}, loc});
 
         return;
       }
@@ -104,7 +104,7 @@ void symbol_factoryt::gen_nondet_init(
       //           <code from recursive call to gen_nondet_init() with
       //             tmp$<temporary_counter>>
       // And the next line is labelled label2
-      const code_assignt set_null_inst{
+      const code_frontend_assignt set_null_inst{
         expr, null_pointer_exprt{pointer_type}, loc};
 
       code_ifthenelset null_check(
@@ -154,7 +154,7 @@ void symbol_factoryt::gen_nondet_init(
     //   <expr> = NONDET(type);
     exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
                                        : side_effect_expr_nondett(type, loc);
-    code_assignt assign(expr, rhs);
+    code_frontend_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
     assignments.add(std::move(assign));

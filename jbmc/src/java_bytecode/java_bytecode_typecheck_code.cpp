@@ -19,7 +19,7 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
 
   if(statement==ID_assign)
   {
-    code_assignt &code_assign=to_code_assign(code);
+    code_frontend_assignt &code_assign = to_code_frontend_assign(code);
     typecheck_expr(code_assign.lhs());
     typecheck_expr(code_assign.rhs());
 

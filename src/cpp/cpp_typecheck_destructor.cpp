@@ -88,7 +88,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
       ptrmember.set(ID_component_name, c.get_name());
       ptrmember.operands().push_back(this_expr);
 
-      code_assignt assign(ptrmember, address);
+      code_frontend_assignt assign(ptrmember, address);
       block.add(assign);
       continue;
     }

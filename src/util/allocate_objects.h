@@ -119,6 +119,7 @@ private:
 /// \param lhs: pointer which will be allocated
 /// \param size: size of the object
 /// \return code allocating the object and assigning it to `lhs`
-code_assignt make_allocate_code(const symbol_exprt &lhs, const exprt &size);
+code_frontend_assignt
+make_allocate_code(const symbol_exprt &lhs, const exprt &size);
 
 #endif // CPROVER_UTIL_ALLOCATE_OBJECTS_H

@@ -122,8 +122,8 @@ void java_static_lifetime_init(
 
   const symbol_exprt rounding_mode =
     symbol_table.lookup_ref(rounding_mode_identifier()).symbol_expr();
-  code_block.add(
-    code_assignt{rounding_mode, from_integer(0, rounding_mode.type())});
+  code_block.add(code_frontend_assignt{rounding_mode,
+                                       from_integer(0, rounding_mode.type())});
 
   object_factory_parameters.function_id = initialize_symbol.name;
 
@@ -226,7 +226,7 @@ void java_static_lifetime_init(
           to_struct_expr(*zero_object), ns, to_struct_tag_type(sym.type));
 
         code_block.add(
-          std::move(code_assignt(sym.symbol_expr(), *zero_object)));
+          std::move(code_frontend_assignt(sym.symbol_expr(), *zero_object)));
 
         // Then call the init function:
         code_block.add(std::move(initializer_call));
@@ -257,7 +257,7 @@ void java_static_lifetime_init(
       }
       else if(sym.value.is_not_nil())
       {
-        code_assignt assignment(sym.symbol_expr(), sym.value);
+        code_frontend_assignt assignment(sym.symbol_expr(), sym.value);
         assignment.add_source_location()=source_location;
         code_block.add(assignment);
       }
@@ -333,7 +333,7 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
                                     .symbol_expr();
       main_arguments[param_number] = result;
       init_code.add(code_declt{result});
-      init_code.add(code_assignt{
+      init_code.add(code_frontend_assignt{
         result,
         side_effect_exprt{ID_java_new, {}, p.type(), function.location}});
       continue;
@@ -417,10 +417,9 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
           function.location,
           pointer_type_selector,
           message_handler);
-        init_code_for_type.add(
-          code_assignt(
-            result_symbol.symbol_expr(),
-            typecast_exprt(init_expr_for_parameter, p.type())));
+        init_code_for_type.add(code_frontend_assignt(
+          result_symbol.symbol_expr(),
+          typecast_exprt(init_expr_for_parameter, p.type())));
         cases.push_back(init_code_for_type);
       }
 
@@ -672,7 +671,7 @@ bool generate_java_start_function(
   symbol_table.add(exc_symbol);
 
   // Zero-initialise the top-level exception catch variable:
-  init_code.add(code_assignt(
+  init_code.add(code_frontend_assignt(
     exc_symbol.symbol_expr(),
     null_pointer_exprt(to_pointer_type(exc_symbol.type))));
 

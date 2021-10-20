@@ -637,7 +637,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       code_frontend_declt declaration(symbol_expr);
       declaration.add_source_location() = size_source_location;
 
-      code_assignt assignment;
+      code_frontend_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs() = new_symbol.value;
       assignment.add_source_location() = size_source_location;

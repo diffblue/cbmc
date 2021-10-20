@@ -411,7 +411,7 @@ bool generate_ansi_c_start_function(
         // disable bounds check on that one
         index_expr.set(ID_C_bounds_check, false);
 
-        init_code.add(code_assignt(index_expr, null));
+        init_code.add(code_frontend_assignt(index_expr, null));
       }
 
       if(parameters.size()==3)

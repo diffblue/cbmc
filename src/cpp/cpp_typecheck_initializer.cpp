@@ -303,7 +303,7 @@ void cpp_typecheckt::zero_initializer(
       typecast_exprt::conditional_cast(from_integer(0, enum_type), type);
     already_typechecked_exprt::make_already_typechecked(zero);
 
-    code_assignt assign;
+    code_frontend_assignt assign;
     assign.lhs()=object;
     assign.rhs()=zero;
     assign.add_source_location()=source_location;
@@ -326,7 +326,7 @@ void cpp_typecheckt::zero_initializer(
       throw 0;
     }
 
-    code_assignt assign(object, *value);
+    code_frontend_assignt assign(object, *value);
     assign.add_source_location()=source_location;
 
     typecheck_expr(assign.lhs());
