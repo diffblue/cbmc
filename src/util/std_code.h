@@ -372,6 +372,111 @@ inline code_blockt &to_code_block(codet &code)
   return static_cast<code_blockt &>(code);
 }
 
+/// An assumption, which must hold in subsequent code.
+class code_assumet : public codet
+{
+public:
+  explicit code_assumet(exprt expr) : codet(ID_assume, {std::move(expr)})
+  {
+  }
+
+  const exprt &assumption() const
+  {
+    return op0();
+  }
+
+  exprt &assumption()
+  {
+    return op0();
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_assumet>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_assume);
+}
+
+inline void validate_expr(const code_assumet &x)
+{
+  validate_operands(x, 1, "assume must have one operand");
+}
+
+inline const code_assumet &to_code_assume(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_assume);
+  const code_assumet &ret = static_cast<const code_assumet &>(code);
+  validate_expr(ret);
+  return ret;
+}
+
+inline code_assumet &to_code_assume(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_assume);
+  code_assumet &ret = static_cast<code_assumet &>(code);
+  validate_expr(ret);
+  return ret;
+}
+
+/// A non-fatal assertion, which checks a condition then permits execution to
+/// continue.
+class code_assertt : public codet
+{
+public:
+  explicit code_assertt(exprt expr) : codet(ID_assert, {std::move(expr)})
+  {
+  }
+
+  const exprt &assertion() const
+  {
+    return op0();
+  }
+
+  exprt &assertion()
+  {
+    return op0();
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_assertt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_assert);
+}
+
+inline void validate_expr(const code_assertt &x)
+{
+  validate_operands(x, 1, "assert must have one operand");
+}
+
+inline const code_assertt &to_code_assert(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_assert);
+  const code_assertt &ret = static_cast<const code_assertt &>(code);
+  validate_expr(ret);
+  return ret;
+}
+
+inline code_assertt &to_code_assert(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_assert);
+  code_assertt &ret = static_cast<code_assertt &>(code);
+  validate_expr(ret);
+  return ret;
+}
+
 /// A \ref codet representing a `skip` statement.
 class code_skipt:public codet
 {
