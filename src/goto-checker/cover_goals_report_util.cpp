@@ -46,8 +46,8 @@ static void output_goals_plain(const propertiest &properties, messaget &log)
   {
     log.result() << "[" << property_pair.first << "]";
 
-    if(property_pair.second.pc->source_location.is_not_nil())
-      log.result() << ' ' << property_pair.second.pc->source_location;
+    if(property_pair.second.pc->source_location().is_not_nil())
+      log.result() << ' ' << property_pair.second.pc->source_location();
 
     if(!property_pair.second.description.empty())
       log.result() << ' ' << property_pair.second.description;
@@ -75,8 +75,9 @@ static void output_goals_xml(const propertiest &properties, messaget &log)
                                                               : "FAILED"}},
       {});
 
-    if(property_pair.second.pc->source_location.is_not_nil())
-      xml_result.new_element() = xml(property_pair.second.pc->source_location);
+    if(property_pair.second.pc->source_location().is_not_nil())
+      xml_result.new_element() =
+        xml(property_pair.second.pc->source_location());
 
     log.result() << xml_result;
   }
@@ -102,8 +103,8 @@ static void output_goals_json(
     json_goal["goal"] = json_stringt(property_pair.first);
     json_goal["description"] = json_stringt(property_info.description);
 
-    if(property_info.pc->source_location.is_not_nil())
-      json_goal["sourceLocation"] = json(property_info.pc->source_location);
+    if(property_info.pc->source_location().is_not_nil())
+      json_goal["sourceLocation"] = json(property_info.pc->source_location());
 
     goals_array.push_back(std::move(json_goal));
   }

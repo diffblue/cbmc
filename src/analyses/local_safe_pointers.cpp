@@ -195,7 +195,7 @@ void local_safe_pointerst::output(
   for(const auto &instruction : goto_program.instructions)
   {
     out << "**** " << instruction.location_number << " "
-        << instruction.source_location << "\n";
+        << instruction.source_location() << "\n";
 
     out << "Non-null expressions: ";
 
@@ -239,7 +239,7 @@ void local_safe_pointerst::output_safe_dereferences(
   for(const auto &instruction : goto_program.instructions)
   {
     out << "**** " << instruction.location_number << " "
-        << instruction.source_location << "\n";
+        << instruction.source_location() << "\n";
 
     out << "Safe (known-not-null) dereferences: ";
 

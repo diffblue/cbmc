@@ -96,7 +96,7 @@ void nondet_static(
 
       if(is_nondet_initializable_static(sym, ns))
       {
-        const auto source_location = instruction.source_location;
+        const auto source_location = instruction.source_location();
         instruction = goto_programt::make_assignment(
           code_assignt(
             sym, side_effect_expr_nondett(sym.type(), source_location)),

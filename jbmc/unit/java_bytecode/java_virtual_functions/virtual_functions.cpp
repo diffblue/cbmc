@@ -148,7 +148,7 @@ SCENARIO(
 
           while(it->type != goto_program_instruction_typet::END_FUNCTION)
           {
-            const source_locationt &loc = it->source_location;
+            const source_locationt &loc = it->source_location();
             REQUIRE(loc != source_locationt::nil());
             REQUIRE_FALSE(loc.get_java_bytecode_index().empty());
             const auto new_index = loc.get_java_bytecode_index();

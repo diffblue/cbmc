@@ -298,7 +298,7 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
     return next_target;
   }
 
-  const auto &vcall_source_loc=target->source_location;
+  const auto &vcall_source_loc = target->source_location();
 
   code_function_callt code(
     target->call_lhs(), target->call_function(), target->call_arguments());
@@ -380,7 +380,7 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
           goto_programt::make_assertion(false_exprt(), vcall_source_loc));
 
         // No definition for this type; shouldn't be possible...
-        t1->source_location.set_comment(
+        t1->source_location_nonconst().set_comment(
           "cannot find calls for " +
           id2string(code.function().get(ID_identifier)) + " dispatching " +
           id2string(fun.class_id));
@@ -443,11 +443,11 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
   // set locations
   for(auto &instruction : new_code.instructions)
   {
-    source_locationt &source_location = instruction.source_location;
+    source_locationt &source_location = instruction.source_location_nonconst();
 
     const irep_idt property_class = source_location.get_property_class();
     const irep_idt comment = source_location.get_comment();
-    source_location = target->source_location;
+    source_location = target->source_location();
     if(!property_class.empty())
       source_location.set_property_class(property_class);
     if(!comment.empty())

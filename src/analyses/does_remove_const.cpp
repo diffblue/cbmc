@@ -46,7 +46,7 @@ std::pair<bool, source_locationt> does_remove_constt::operator()() const
     // const that the lhs
     if(!does_type_preserve_const_correctness(&lhs_type, &rhs_type))
     {
-      return {true, instruction.source_location};
+      return {true, instruction.source_location()};
     }
 
     if(does_expr_lose_const(instruction.assign_rhs()))

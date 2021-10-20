@@ -71,7 +71,7 @@ void code_contractst::check_apply_loop_contracts(
     {
       invariant = true_exprt();
       log.warning()
-        << "The loop at " << loop_head->source_location.as_string()
+        << "The loop at " << loop_head->source_location().as_string()
         << " does not have a loop invariant, but has a decreases clause. "
         << "Hence, a default loop invariant ('true') is being used."
         << messaget::eom;
@@ -131,7 +131,7 @@ void code_contractst::check_apply_loop_contracts(
   replace_history_parameter(
     invariant,
     parameter2history,
-    loop_head->source_location,
+    loop_head->source_location(),
     mode,
     havoc_code,
     ID_loop_entry);
@@ -144,22 +144,22 @@ void code_contractst::check_apply_loop_contracts(
   // and immediately convert it to goto instructions.
   {
     code_assertt assertion{invariant_expr()};
-    assertion.add_source_location() = loop_head->source_location;
+    assertion.add_source_location() = loop_head->source_location();
     converter.goto_convert(assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location.set_comment(
+    havoc_code.instructions.back().source_location_nonconst().set_comment(
       "Check loop invariant before entry");
   }
 
   // havoc the variables that may be modified
   havoc_if_validt havoc_gen(modifies, ns);
-  havoc_gen.append_full_havoc_code(loop_head->source_location, havoc_code);
+  havoc_gen.append_full_havoc_code(loop_head->source_location(), havoc_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
   // and immediately convert it to goto instructions.
   {
     code_assumet assumption{invariant_expr()};
-    assumption.add_source_location() = loop_head->source_location;
+    assumption.add_source_location() = loop_head->source_location();
     converter.goto_convert(assumption, havoc_code, mode);
   }
 
@@ -169,18 +169,18 @@ void code_contractst::check_apply_loop_contracts(
   {
     const auto old_decreases_var =
       new_tmp_symbol(
-        clause.type(), loop_head->source_location, mode, symbol_table)
+        clause.type(), loop_head->source_location(), mode, symbol_table)
         .symbol_expr();
-    havoc_code.add(
-      goto_programt::make_decl(old_decreases_var, loop_head->source_location));
+    havoc_code.add(goto_programt::make_decl(
+      old_decreases_var, loop_head->source_location()));
     old_decreases_vars.push_back(old_decreases_var);
 
     const auto new_decreases_var =
       new_tmp_symbol(
-        clause.type(), loop_head->source_location, mode, symbol_table)
+        clause.type(), loop_head->source_location(), mode, symbol_table)
         .symbol_expr();
-    havoc_code.add(
-      goto_programt::make_decl(new_decreases_var, loop_head->source_location));
+    havoc_code.add(goto_programt::make_decl(
+      new_decreases_var, loop_head->source_location()));
     new_decreases_vars.push_back(new_decreases_var);
   }
 
@@ -189,7 +189,7 @@ void code_contractst::check_apply_loop_contracts(
   {
     havoc_code.add(goto_programt::make_goto(
       loop_end,
-      side_effect_expr_nondett(bool_typet(), loop_head->source_location)));
+      side_effect_expr_nondett(bool_typet(), loop_head->source_location())));
   }
 
   // Now havoc at the loop head.
@@ -205,7 +205,7 @@ void code_contractst::check_apply_loop_contracts(
       code_assignt old_decreases_assignment{old_decreases_vars[i],
                                             decreases_clause_exprs[i]};
       old_decreases_assignment.add_source_location() =
-        loop_head->source_location;
+        loop_head->source_location();
       converter.goto_convert(old_decreases_assignment, havoc_code, mode);
     }
 
@@ -217,9 +217,9 @@ void code_contractst::check_apply_loop_contracts(
   // and immediately convert it to goto instructions.
   {
     code_assertt assertion{invariant_expr()};
-    assertion.add_source_location() = loop_end->source_location;
+    assertion.add_source_location() = loop_end->source_location();
     converter.goto_convert(assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location.set_comment(
+    havoc_code.instructions.back().source_location_nonconst().set_comment(
       "Check that loop invariant is preserved");
   }
 
@@ -232,7 +232,7 @@ void code_contractst::check_apply_loop_contracts(
       code_assignt new_decreases_assignment{new_decreases_vars[i],
                                             decreases_clause_exprs[i]};
       new_decreases_assignment.add_source_location() =
-        loop_head->source_location;
+        loop_head->source_location();
       converter.goto_convert(new_decreases_assignment, havoc_code, mode);
     }
 
@@ -243,18 +243,18 @@ void code_contractst::check_apply_loop_contracts(
       generate_lexicographic_less_than_check(
         new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
-      loop_head->source_location;
+      loop_head->source_location();
     converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location.set_comment(
+    havoc_code.instructions.back().source_location_nonconst().set_comment(
       "Check decreases clause on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
     {
       havoc_code.add(goto_programt::make_dead(
-        old_decreases_vars[i], loop_head->source_location));
+        old_decreases_vars[i], loop_head->source_location()));
       havoc_code.add(goto_programt::make_dead(
-        new_decreases_vars[i], loop_head->source_location));
+        new_decreases_vars[i], loop_head->source_location()));
     }
   }
 
@@ -485,7 +485,7 @@ bool code_contractst::apply_function_contract(
           type.return_type(),
           id2string(target_function),
           "ignored_return_value",
-          const_target->source_location,
+          const_target->source_location(),
           symbol_table.lookup_ref(target_function).mode,
           ns,
           symbol_table);
@@ -526,10 +526,11 @@ bool code_contractst::apply_function_contract(
       code_assertt(requires),
       assertion,
       symbol_table.lookup_ref(target_function).mode);
-    assertion.instructions.back().source_location = requires.source_location();
-    assertion.instructions.back().source_location.set_comment(
+    assertion.instructions.back().source_location_nonconst() =
+      requires.source_location();
+    assertion.instructions.back().source_location_nonconst().set_comment(
       "Check requires clause");
-    assertion.instructions.back().source_location.set_property_class(
+    assertion.instructions.back().source_location_nonconst().set_property_class(
       ID_precondition);
     is_fresh.update_requires(assertion);
     insert_before_swap_and_advance(function_body, target, assertion);
@@ -686,9 +687,9 @@ void code_contractst::instrument_call_statement(
     goto_programt alias_checking_instructions, skip_program;
     alias_checking_instructions.add(goto_programt::make_goto(
       skip_program.add(
-        goto_programt::make_skip(instruction_it->source_location)),
+        goto_programt::make_skip(instruction_it->source_location())),
       not_exprt{free_car.validity_condition_var},
-      instruction_it->source_location));
+      instruction_it->source_location()));
 
     // Since the argument to free may be an "alias" (but not identical)
     // to existing CARs' source_expr, structural equality wouldn't work.
@@ -701,14 +702,14 @@ void code_contractst::instrument_call_statement(
       const auto object_validity_var_addr =
         new_tmp_symbol(
           pointer_type(bool_typet{}),
-          instruction_it->source_location,
+          instruction_it->source_location(),
           symbol_table.lookup_ref(function).mode,
           symbol_table)
           .symbol_expr();
       write_set_validity_addrs.insert(object_validity_var_addr);
 
       alias_checking_instructions.add(goto_programt::make_decl(
-        object_validity_var_addr, instruction_it->source_location));
+        object_validity_var_addr, instruction_it->source_location()));
       // if the CAR was defined on the same_object as the one being `free`d,
       // record its validity variable's address, otherwise record NULL
       alias_checking_instructions.add(goto_programt::make_assignment(
@@ -720,7 +721,7 @@ void code_contractst::instrument_call_statement(
               free_car.lower_bound_address_var, w_car.lower_bound_address_var)},
           address_of_exprt{w_car.validity_condition_var},
           null_pointer_exprt{to_pointer_type(object_validity_var_addr.type())}},
-        instruction_it->source_location));
+        instruction_it->source_location()));
     }
 
     alias_checking_instructions.destructive_append(skip_program);
@@ -735,9 +736,9 @@ void code_contractst::instrument_call_statement(
     skip_program.clear();
     invalidation_instructions.add(goto_programt::make_goto(
       skip_program.add(
-        goto_programt::make_skip(instruction_it->source_location)),
+        goto_programt::make_skip(instruction_it->source_location())),
       not_exprt{free_car.validity_condition_var},
-      instruction_it->source_location));
+      instruction_it->source_location()));
 
     // invalidate all recorded CAR validity variables
     for(const auto &w_car_validity_addr : write_set_validity_addrs)
@@ -745,13 +746,13 @@ void code_contractst::instrument_call_statement(
       goto_programt w_car_skip_program;
       invalidation_instructions.add(goto_programt::make_goto(
         w_car_skip_program.add(
-          goto_programt::make_skip(instruction_it->source_location)),
+          goto_programt::make_skip(instruction_it->source_location())),
         null_pointer(w_car_validity_addr),
-        instruction_it->source_location));
+        instruction_it->source_location()));
       invalidation_instructions.add(goto_programt::make_assignment(
         dereference_exprt{w_car_validity_addr},
         false_exprt{},
-        instruction_it->source_location));
+        instruction_it->source_location()));
       invalidation_instructions.destructive_append(w_car_skip_program);
     }
 
@@ -925,7 +926,7 @@ void code_contractst::check_frame_conditions(
         auto invalidation_assignment = goto_programt::make_assignment(
           symbol_car->validity_condition_var,
           false_exprt{},
-          instruction_it->source_location);
+          instruction_it->source_location());
         // note that instruction_it is not advanced by this call,
         // so no need to move it backwards
         body.insert_before_swap(instruction_it, invalidation_assignment);
@@ -934,7 +935,7 @@ void code_contractst::check_frame_conditions(
       {
         throw incorrect_goto_program_exceptiont(
           "Found a `DEAD` variable without corresponding `DECL`!",
-          instruction_it->source_location);
+          instruction_it->source_location());
       }
     }
     else if(
@@ -962,8 +963,8 @@ code_contractst::add_inclusion_check(
 
   goto_programt assertion;
   assertion.add(goto_programt::make_assertion(
-    assigns.generate_inclusion_check(car), instruction_it->source_location));
-  assertion.instructions.back().source_location.set_comment(
+    assigns.generate_inclusion_check(car), instruction_it->source_location()));
+  assertion.instructions.back().source_location_nonconst().set_comment(
     "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
   insert_before_swap_and_advance(program, instruction_it, assertion);
 
@@ -1078,11 +1079,11 @@ void code_contractst::add_contract_check(
   {
     symbol_exprt r = new_tmp_symbol(
                        code_type.return_type(),
-                       skip->source_location,
+                       skip->source_location(),
                        function_symbol.mode,
                        symbol_table)
                        .symbol_expr();
-    check.add(goto_programt::make_decl(r, skip->source_location));
+    check.add(goto_programt::make_decl(r, skip->source_location()));
 
     call.lhs() = r;
     return_stmt = code_returnt(r);
@@ -1103,13 +1104,13 @@ void code_contractst::add_contract_check(
     const symbolt &parameter_symbol = ns.lookup(parameter);
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
-                       skip->source_location,
+                       skip->source_location(),
                        parameter_symbol.mode,
                        symbol_table)
                        .symbol_expr();
-    check.add(goto_programt::make_decl(p, skip->source_location));
+    check.add(goto_programt::make_decl(p, skip->source_location()));
     check.add(goto_programt::make_assignment(
-      p, parameter_symbol.symbol_expr(), skip->source_location));
+      p, parameter_symbol.symbol_expr(), skip->source_location()));
 
     call.arguments().push_back(p);
 
@@ -1154,10 +1155,12 @@ void code_contractst::add_contract_check(
     assertion.add_source_location() = ensures.source_location();
     ensures_pair = create_ensures_instruction(
       assertion, ensures.source_location(), function_symbol.mode);
-    ensures_pair.first.instructions.back().source_location.set_comment(
-      "Check ensures clause");
-    ensures_pair.first.instructions.back().source_location.set_property_class(
-      ID_postcondition);
+    ensures_pair.first.instructions.back()
+      .source_location_nonconst()
+      .set_comment("Check ensures clause");
+    ensures_pair.first.instructions.back()
+      .source_location_nonconst()
+      .set_property_class(ID_postcondition);
 
     // add all the history variable initializations
     visitor.update_ensures(ensures_pair.first);
@@ -1165,7 +1168,7 @@ void code_contractst::add_contract_check(
   }
 
   // ret=mangled_function(parameter1, ...)
-  check.add(goto_programt::make_function_call(call, skip->source_location));
+  check.add(goto_programt::make_function_call(call, skip->source_location()));
 
   // Generate: assert(ensures)
   if(ensures.is_not_nil())
@@ -1175,7 +1178,7 @@ void code_contractst::add_contract_check(
 
   if(code_type.return_type() != empty_typet())
   {
-    check.add(goto_programt::make_return(return_stmt, skip->source_location));
+    check.add(goto_programt::make_return(return_stmt, skip->source_location()));
   }
 
   // prepend the new code to dest
@@ -1208,7 +1211,7 @@ bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
 
         fail |= apply_function_contract(
           goto_function.first,
-          ins->source_location,
+          ins->source_location(),
           goto_function.second.body,
           ins);
       }

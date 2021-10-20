@@ -345,7 +345,7 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
           !i_it->is_end_function())
         {
           *i_it = goto_programt::make_assumption(
-            false_exprt(), i_it->source_location);
+            false_exprt(), i_it->source_location());
         }
       }
 

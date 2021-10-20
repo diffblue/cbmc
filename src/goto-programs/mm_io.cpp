@@ -57,7 +57,7 @@ void mm_io(
         if(deref_expr_r.size()==1)
         {
           const dereference_exprt &d=*deref_expr_r.begin();
-          source_locationt source_location=it->source_location;
+          source_locationt source_location = it->source_location();
           const code_typet &ct=to_code_type(mm_io_r.type());
 
           irep_idt identifier=to_symbol_expr(mm_io_r).get_identifier();
@@ -84,7 +84,7 @@ void mm_io(
         if(a_lhs.id() == ID_dereference)
         {
           const dereference_exprt &d = to_dereference_expr(a_lhs);
-          source_locationt source_location=it->source_location;
+          source_locationt source_location = it->source_location();
           const code_typet &ct=to_code_type(mm_io_w.type());
           const typet &pt=ct.parameters()[0].type();
           const typet &st=ct.parameters()[1].type();

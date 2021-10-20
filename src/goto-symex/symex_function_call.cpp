@@ -63,7 +63,7 @@ void goto_symext::parameter_assignments(
     // if you run out of actual arguments there was a mismatch
     if(it1==arguments.end())
     {
-      log.warning() << state.source.pc->source_location.as_string()
+      log.warning() << state.source.pc->source_location().as_string()
                     << ": "
                        "call to '"
                     << id2string(function_identifier)
@@ -72,7 +72,7 @@ void goto_symext::parameter_assignments(
                     << log.eom;
 
       rhs = side_effect_expr_nondett(
-        parameter_type, state.source.pc->source_location);
+        parameter_type, state.source.pc->source_location());
     }
     else
       rhs=*it1;
@@ -115,7 +115,7 @@ void goto_symext::parameter_assignments(
         else
         {
           std::ostringstream error;
-          error << state.source.pc->source_location.as_string() << ": "
+          error << state.source.pc->source_location().as_string() << ": "
                 << "function call: parameter \"" << identifier
                 << "\" type mismatch:\ngot " << rhs.type().pretty()
                 << "\nexpected " << parameter_type.pretty();
@@ -154,7 +154,7 @@ void goto_symext::parameter_assignments(
         it1->type(),
         id2string(function_identifier),
         "va_arg",
-        state.source.pc->source_location,
+        state.source.pc->source_location(),
         ns.lookup(function_identifier).mode,
         state.symbol_table);
       va_arg.is_parameter = true;

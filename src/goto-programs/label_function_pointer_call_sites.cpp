@@ -27,7 +27,7 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
       [&](goto_programt::targett &it) {
         auto const &function_pointer_dereference =
           to_dereference_expr(it->call_function());
-        auto const &source_location = it->source_location;
+        auto const &source_location = it->source_location();
         auto const &goto_function_symbol_mode =
           goto_model.symbol_table.lookup_ref(goto_function.first).mode;
 
@@ -42,7 +42,7 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
             function_call_site_symbol.pretty_name = call_site_symbol_name;
           function_call_site_symbol.type =
             function_pointer_dereference.pointer().type();
-          function_call_site_symbol.location = it->source_location;
+          function_call_site_symbol.location = it->source_location();
           function_call_site_symbol.is_lvalue = true;
           function_call_site_symbol.mode = goto_function_symbol_mode;
           return function_call_site_symbol;

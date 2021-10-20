@@ -285,7 +285,7 @@ void goto_symext::symex_va_start(
     array.type(),
     id2string(state.source.function_id),
     "va_args",
-    state.source.pc->source_location,
+    state.source.pc->source_location(),
     ns.lookup(state.source.function_id).mode,
     state.symbol_table);
   va_array.value = array;

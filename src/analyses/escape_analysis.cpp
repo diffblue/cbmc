@@ -420,7 +420,7 @@ void escape_analysist::insert_cleanup(
   bool is_object,
   const namespacet &ns)
 {
-  source_locationt source_location=location->source_location;
+  source_locationt source_location = location->source_location();
 
   for(const auto &cleanup : cleanup_functions)
   {

@@ -410,8 +410,8 @@ void remove_function_pointerst::remove_function_pointer(
   {
     goto_programt::targett t =
       new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
-    t->source_location.set_property_class("pointer dereference");
-    t->source_location.set_comment("invalid function pointer");
+    t->source_location_nonconst().set_property_class("pointer dereference");
+    t->source_location_nonconst().set_comment("invalid function pointer");
   }
   new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
 
@@ -425,11 +425,11 @@ void remove_function_pointerst::remove_function_pointer(
   // set locations
   for(auto &instruction : new_code.instructions)
   {
-    source_locationt &source_location = instruction.source_location;
+    source_locationt &source_location = instruction.source_location_nonconst();
 
     irep_idt property_class = source_location.get_property_class();
     irep_idt comment = source_location.get_comment();
-    source_location = target->source_location;
+    source_location = target->source_location();
     if(!property_class.empty())
       source_location.set_property_class(property_class);
     if(!comment.empty())
@@ -449,7 +449,7 @@ void remove_function_pointerst::remove_function_pointer(
   target->type=OTHER;
 
   // report statistics
-  log.statistics().source_location = target->source_location;
+  log.statistics().source_location = target->source_location();
   log.statistics() << "replacing function pointer by " << functions.size()
                    << " possible targets" << messaget::eom;
 

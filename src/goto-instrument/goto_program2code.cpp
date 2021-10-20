@@ -138,12 +138,11 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 {
   assert(target!=goto_program.instructions.end());
 
-  if(target->type!=ASSERT &&
-     !target->source_location.get_comment().empty())
+  if(target->type != ASSERT && !target->source_location().get_comment().empty())
   {
     dest.add(code_skipt());
     dest.statements().back().add_source_location().set_comment(
-      target->source_location.get_comment());
+      target->source_location().get_comment());
   }
 
   // try do-while first
@@ -194,7 +193,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       system_headers.insert("assert.h");
       dest.add(code_assertt(target->get_condition()));
       dest.statements().back().add_source_location().set_comment(
-        target->source_location.get_comment());
+        target->source_location().get_comment());
       return target;
 
     case ASSUME:
@@ -252,7 +251,7 @@ void goto_program2codet::convert_labels(
     std::stringstream label;
     label << CPROVER_PREFIX "DUMP_L" << target->target_number;
     code_labelt l(label.str(), code_blockt());
-    l.add_source_location()=target->source_location;
+    l.add_source_location() = target->source_location();
     target_label=l.get_label();
     latest_block->add(std::move(l));
     latest_block =
@@ -275,7 +274,7 @@ void goto_program2codet::convert_labels(
     labels_in_use.insert(*it);
 
     code_labelt l(*it, code_blockt());
-    l.add_source_location()=target->source_location;
+    l.add_source_location() = target->source_location();
     latest_block->add(std::move(l));
     latest_block =
       &to_code_block(to_code_label(latest_block->statements().back()).code());
@@ -1266,7 +1265,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
         labels_in_use.insert(*it);
 
         code_labelt l(*it, std::move(b));
-        l.add_source_location()=target->source_location;
+        l.add_source_location() = target->source_location();
         b = std::move(l);
       }
 
@@ -1332,7 +1331,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       labels_in_use.insert(*it);
 
       code_labelt l(*it, std::move(b));
-      l.add_source_location()=target->source_location;
+      l.add_source_location() = target->source_location();
       b = std::move(l);
     }
 
@@ -1950,6 +1949,6 @@ void goto_program2codet::copy_source_location(
 {
   if(src->get_code().source_location().is_not_nil())
     dst.add_source_location() = src->get_code().source_location();
-  else if(src->source_location.is_not_nil())
-    dst.add_source_location() = src->source_location;
+  else if(src->source_location().is_not_nil())
+    dst.add_source_location() = src->source_location();
 }

@@ -79,7 +79,7 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
+      instruction->source_location_nonconst() = function_symbol.location;
       return instruction;
     };
     add_instruction(goto_programt::make_assumption(false_exprt()));
@@ -99,8 +99,8 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
-      instruction->source_location.set_function(function_name);
+      instruction->source_location_nonconst() = function_symbol.location;
+      instruction->source_location_nonconst().set_function(function_name);
       return instruction;
     };
     auto assert_instruction =
@@ -109,8 +109,10 @@ protected:
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
                    << format(assert_instruction->get_condition());
-    assert_instruction->source_location.set_comment(comment_stream.str());
-    assert_instruction->source_location.set_property_class(ID_assertion);
+    assert_instruction->source_location_nonconst().set_comment(
+      comment_stream.str());
+    assert_instruction->source_location_nonconst().set_property_class(
+      ID_assertion);
     add_instruction(goto_programt::make_end_function());
   }
 };
@@ -128,8 +130,8 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
-      instruction->source_location.set_function(function_name);
+      instruction->source_location_nonconst() = function_symbol.location;
+      instruction->source_location_nonconst().set_function(function_name);
       return instruction;
     };
     auto assert_instruction =
@@ -138,8 +140,10 @@ protected:
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
                    << format(assert_instruction->get_condition());
-    assert_instruction->source_location.set_comment(comment_stream.str());
-    assert_instruction->source_location.set_property_class(ID_assertion);
+    assert_instruction->source_location_nonconst().set_comment(
+      comment_stream.str());
+    assert_instruction->source_location_nonconst().set_property_class(
+      ID_assertion);
     add_instruction(goto_programt::make_assumption(false_exprt()));
     add_instruction(goto_programt::make_end_function());
   }
@@ -266,7 +270,7 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
+      instruction->source_location_nonconst() = function_symbol.location;
       return instruction;
     };
 

@@ -385,13 +385,13 @@ void goto_symext::symex_goto(statet &state)
     new_state_pc = state_pc;
     state_pc = tmp;
 
-    log.debug() << "Resuming from jump target '" << state_pc->source_location
+    log.debug() << "Resuming from jump target '" << state_pc->source_location()
                 << "'" << log.eom;
   }
   else if(state.has_saved_next_instruction)
   {
     log.debug() << "Resuming from next instruction '"
-                << state_pc->source_location << "'" << log.eom;
+                << state_pc->source_location() << "'" << log.eom;
   }
   else if(symex_config.doing_path_exploration)
   {
@@ -410,10 +410,10 @@ void goto_symext::symex_goto(statet &state)
     // so let its truth value for `backwards` be the same as ours for `forward`.
 
     log.debug() << "Saving next instruction '"
-                << next_instruction.state.saved_target->source_location << "'"
+                << next_instruction.state.saved_target->source_location() << "'"
                 << log.eom;
     log.debug() << "Saving jump target '"
-                << jump_target.state.saved_target->source_location << "'"
+                << jump_target.state.saved_target->source_location() << "'"
                 << log.eom;
     path_storage.push(next_instruction);
     path_storage.push(jump_target);
@@ -675,7 +675,7 @@ void goto_symext::merge_goto(
   if(state.atomic_section_id != goto_state.atomic_section_id)
     throw incorrect_goto_program_exceptiont(
       "atomic sections differ across branches",
-      state.source.pc->source_location);
+      state.source.pc->source_location());
 
   // Merge guards. Don't write this to `state` yet because we might move
   // goto_state over it below.

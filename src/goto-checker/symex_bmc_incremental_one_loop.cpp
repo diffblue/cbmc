@@ -98,7 +98,7 @@ bool symex_bmc_incremental_one_loopt::should_stop_unwind(
   if(this_loop_limit != std::numeric_limits<unsigned>::max())
     log.statistics() << " (" << this_loop_limit << " max)";
 
-  log.statistics() << " " << source.pc->source_location << " thread "
+  log.statistics() << " " << source.pc->source_location() << " thread "
                    << source.thread_nr << log.eom;
 
   return abort;

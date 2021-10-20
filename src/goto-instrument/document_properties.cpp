@@ -280,7 +280,7 @@ void document_propertiest::doit()
     {
       if(instruction.is_assert())
       {
-        const auto &source_location = instruction.source_location;
+        const auto &source_location = instruction.source_location();
         source_locationt new_source_location;
 
         new_source_location.set_file(source_location.get_file());

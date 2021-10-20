@@ -274,13 +274,13 @@ static goto_programt::targett check_and_replace_target(
     const auto &nondet_var = target_instruction->return_value();
 
     side_effect_expr_nondett inserted_expr(
-      nondet_var.type(), target_instruction->source_location);
+      nondet_var.type(), target_instruction->source_location());
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
     target_instruction->code_nonconst() = code_returnt(inserted_expr);
     target_instruction->code_nonconst().add_source_location() =
-      target_instruction->source_location;
+      target_instruction->source_location();
   }
   else if(target_instruction->is_assign())
   {
@@ -288,14 +288,14 @@ static goto_programt::targett check_and_replace_target(
     const auto &nondet_var = target_instruction->assign_lhs();
 
     side_effect_expr_nondett inserted_expr(
-      nondet_var.type(), target_instruction->source_location);
+      nondet_var.type(), target_instruction->source_location());
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
     target_instruction->code_nonconst() =
       code_assignt(nondet_var, inserted_expr);
     target_instruction->code_nonconst().add_source_location() =
-      target_instruction->source_location;
+      target_instruction->source_location();
   }
 
   goto_program.update();

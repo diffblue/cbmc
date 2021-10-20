@@ -27,10 +27,10 @@ show_location(const ai_baset &ai, ai_baset::locationt loc)
   if(abstract_state->is_top())
     return {};
 
-  if(loc->source_location.get_line().empty())
+  if(loc->source_location().get_line().empty())
     return {};
 
-  return loc->source_location.full_path();
+  return loc->source_location().full_path();
 }
 
 /// get the source files with non-top abstract states
@@ -101,7 +101,7 @@ void show_on_source(
       if(file.has_value() && file.value() == source_file)
       {
         const std::size_t line_no =
-          stoull(id2string(i_it->source_location.get_line()));
+          stoull(id2string(i_it->source_location().get_line()));
         if(line_map.find(line_no) == line_map.end())
           line_map[line_no] = i_it;
       }

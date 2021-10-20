@@ -36,18 +36,18 @@ void remove_calls_no_bodyt::remove_call_no_body(
   for(const exprt &argument : arguments)
   {
     tmp.add(goto_programt::make_other(
-      code_expressiont(argument), target->source_location));
+      code_expressiont(argument), target->source_location()));
   }
 
   // return value
   if(lhs.is_not_nil())
   {
-    side_effect_expr_nondett rhs(lhs.type(), target->source_location);
+    side_effect_expr_nondett rhs(lhs.type(), target->source_location());
 
     code_assignt code(lhs, rhs);
-    code.add_source_location() = target->source_location;
+    code.add_source_location() = target->source_location();
 
-    tmp.add(goto_programt::make_assignment(code, target->source_location));
+    tmp.add(goto_programt::make_assignment(code, target->source_location()));
   }
 
   // kill call

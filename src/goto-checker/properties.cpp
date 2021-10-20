@@ -87,11 +87,12 @@ void update_properties_from_goto_model(
       if(!i_it->is_assert())
         continue;
 
-      std::string description = id2string(i_it->source_location.get_comment());
+      std::string description =
+        id2string(i_it->source_location().get_comment());
       if(description.empty())
         description = "assertion";
       properties.emplace(
-        i_it->source_location.get_property_id(),
+        i_it->source_location().get_property_id(),
         property_infot{i_it, description, property_statust::NOT_CHECKED});
     }
   }

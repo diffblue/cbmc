@@ -32,7 +32,7 @@ void goto_symext::havoc_rec(
         guard.as_expr(), dest, exprt(ID_null_object, dest.type()));
 
     auto rhs =
-      side_effect_expr_nondett(dest.type(), state.source.pc->source_location);
+      side_effect_expr_nondett(dest.type(), state.source.pc->source_location());
 
     symex_assign(state, lhs, rhs);
   }

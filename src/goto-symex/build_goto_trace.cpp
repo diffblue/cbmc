@@ -155,7 +155,7 @@ static void update_internal_field(
   // set internal field to CPROVER functions (e.g., __CPROVER_initialize)
   if(SSA_step.is_function_call())
   {
-    if(SSA_step.source.pc->source_location.as_string().empty())
+    if(SSA_step.source.pc->source_location().as_string().empty())
       goto_trace_step.internal=true;
   }
 

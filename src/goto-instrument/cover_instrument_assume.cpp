@@ -23,7 +23,7 @@ void cover_assume_instrumentert::instrument(
 {
   if(i_it->is_assume())
   {
-    const auto location = i_it->source_location;
+    const auto location = i_it->source_location();
     const auto assume_condition =
       expr2c(i_it->get_condition(), namespacet{symbol_tablet()});
     const auto comment_before =
@@ -42,7 +42,7 @@ void cover_assume_instrumentert::instrument(
   // Otherwise, skip existing assertions.
   else if(i_it->is_assert())
   {
-    const auto location = i_it->source_location;
+    const auto location = i_it->source_location();
     // Filter based on if assertion was added by us as part of instrumentation.
     if(location.get_property_class() != "coverage")
     {

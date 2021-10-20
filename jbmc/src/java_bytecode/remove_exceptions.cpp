@@ -246,7 +246,7 @@ void remove_exceptionst::instrument_exception_handler(
       instr_it,
       goto_programt::make_assignment(
         code_assignt(thrown_global_symbol, null_voidptr),
-        instr_it->source_location));
+        instr_it->source_location()));
 
     // add the assignment exc = @inflight_exception (before the null assignment)
     goto_program.insert_after(
@@ -255,7 +255,7 @@ void remove_exceptionst::instrument_exception_handler(
         code_assignt(
           thrown_exception_local,
           typecast_exprt(thrown_global_symbol, thrown_exception_local.type())),
-        instr_it->source_location));
+        instr_it->source_location()));
   }
 
   instr_it->turn_into_skip();
@@ -362,7 +362,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
         goto_programt::targett t_exc = goto_program.insert_after(
           instr_it,
           goto_programt::make_goto(
-            new_state_pc, true_exprt(), instr_it->source_location));
+            new_state_pc, true_exprt(), instr_it->source_location()));
 
         // use instanceof to check that this is the correct handler
         struct_tag_typet type(stack_catch[i][j].first);
@@ -385,13 +385,13 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   }
 
   *default_dispatch = goto_programt::make_goto(
-    default_target, true_exprt(), instr_it->source_location);
+    default_target, true_exprt(), instr_it->source_location());
 
   // add dead instructions
   for(const auto &local : locals)
   {
     goto_program.insert_after(
-      instr_it, goto_programt::make_dead(local, instr_it->source_location));
+      instr_it, goto_programt::make_dead(local, instr_it->source_location()));
   }
 }
 
@@ -476,7 +476,7 @@ remove_exceptionst::instrument_function_call(
         goto_programt::make_goto(
           next_it,
           no_exception_currently_in_flight,
-          instr_it->source_location));
+          instr_it->source_location()));
 
       return instrumentation_resultt::ADDED_CODE_WITH_MAY_THROW;
     }

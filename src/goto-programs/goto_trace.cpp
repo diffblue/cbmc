@@ -112,8 +112,8 @@ void goto_trace_stept::output(
         << '\n';
   }
 
-  if(!pc->source_location.is_nil())
-    out << pc->source_location << '\n';
+  if(!pc->source_location().is_nil())
+    out << pc->source_location() << '\n';
 
   out << pc->type << '\n';
 
@@ -122,8 +122,8 @@ void goto_trace_stept::output(
     if(!cond_value)
     {
       out << "Violated property:" << '\n';
-      if(pc->source_location.is_nil())
-        out << "  " << pc->source_location << '\n';
+      if(pc->source_location().is_nil())
+        out << "  " << pc->source_location() << '\n';
 
       if(!comment.empty())
         out << "  " << comment << '\n';
@@ -312,7 +312,7 @@ state_location(const goto_trace_stept &state, const namespacet &ns)
 {
   std::string result;
 
-  const auto &source_location = state.pc->source_location;
+  const auto &source_location = state.pc->source_location();
 
   if(!source_location.get_file().empty())
     result += "file " + id2string(source_location.get_file());
@@ -406,7 +406,7 @@ void show_compact_goto_trace(
       {
         out << '\n';
         out << messaget::red << "Violated property:" << messaget::reset << '\n';
-        if(!step.pc->source_location.is_nil())
+        if(!step.pc->source_location().is_nil())
           out << "  " << state_location(step, ns) << '\n';
 
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
@@ -432,9 +432,9 @@ void show_compact_goto_trace(
 
       out << "  ";
 
-      if(!step.pc->source_location.get_line().empty())
+      if(!step.pc->source_location().get_line().empty())
       {
-        out << messaget::faint << step.pc->source_location.get_line() << ':'
+        out << messaget::faint << step.pc->source_location().get_line() << ':'
             << messaget::reset << ' ';
       }
 
@@ -450,13 +450,14 @@ void show_compact_goto_trace(
     case goto_trace_stept::typet::FUNCTION_CALL:
       // downwards arrow
       out << '\n' << messaget::faint << u8"\u21b3" << messaget::reset << ' ';
-      if(!step.pc->source_location.get_file().empty())
+      if(!step.pc->source_location().get_file().empty())
       {
-        out << messaget::faint << step.pc->source_location.get_file();
+        out << messaget::faint << step.pc->source_location().get_file();
 
-        if(!step.pc->source_location.get_line().empty())
+        if(!step.pc->source_location().get_line().empty())
         {
-          out << messaget::faint << ':' << step.pc->source_location.get_line();
+          out << messaget::faint << ':'
+              << step.pc->source_location().get_line();
         }
 
         out << messaget::reset << ' ';
@@ -531,7 +532,7 @@ void show_full_goto_trace(
       {
         out << '\n';
         out << messaget::red << "Violated property:" << messaget::reset << '\n';
-        if(!step.pc->source_location.is_nil())
+        if(!step.pc->source_location().is_nil())
         {
           out << "  " << state_location(step, ns) << '\n';
         }
@@ -555,8 +556,8 @@ void show_full_goto_trace(
         out << "\n";
         out << "Assumption:\n";
 
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << '\n';
+        if(!step.pc->source_location().is_nil())
+          out << "  " << step.pc->source_location() << '\n';
 
         out << "  " << from_expr(ns, step.function_id, step.pc->get_condition())
             << '\n';
@@ -751,8 +752,8 @@ static void show_goto_stack_trace(
     if(step.is_assert())
     {
       out << "  assertion failure";
-      if(!step.pc->source_location.is_nil())
-        out << ' ' << step.pc->source_location;
+      if(!step.pc->source_location().is_nil())
+        out << ' ' << step.pc->source_location();
       out << '\n';
     }
     else if(step.is_function_call())
@@ -773,8 +774,8 @@ static void show_goto_stack_trace(
 
       out << ')';
 
-      if(!step.pc->source_location.is_nil())
-        out << ' ' << step.pc->source_location;
+      if(!step.pc->source_location().is_nil())
+        out << ' ' << step.pc->source_location();
 
       out << '\n';
     }

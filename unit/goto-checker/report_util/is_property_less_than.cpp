@@ -13,7 +13,7 @@ static goto_programt::instructiont instruction_for_location(
   location.set_function(function);
   location.set_line(line_no);
   goto_programt::instructiont instruction;
-  instruction.source_location = location;
+  instruction.source_location_nonconst() = location;
   return instruction;
 }
 
@@ -32,9 +32,10 @@ std::ostream &operator<<(std::ostream &os, const propertyt &value)
 {
   os << "{ property_id=" << value.first << ", "
      << " property_location={ "
-     << " file=" << value.second.pc->source_location.get_file() << ", "
-     << " function=" << value.second.pc->source_location.get_function() << ", "
-     << " line=" << value.second.pc->source_location.get_line() << "}}";
+     << " file=" << value.second.pc->source_location().get_file() << ", "
+     << " function=" << value.second.pc->source_location().get_function()
+     << ", "
+     << " line=" << value.second.pc->source_location().get_line() << "}}";
   return os;
 }
 

@@ -40,7 +40,7 @@ bool internal_functions_filtert::operator()(
   // ignore if built-in library
   if(
     !goto_function.body.instructions.empty() &&
-    goto_function.body.instructions.front().source_location.is_built_in())
+    goto_function.body.instructions.front().source_location().is_built_in())
     return false;
 
   return true;

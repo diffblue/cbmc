@@ -42,7 +42,7 @@ void symex_bmct::symex_step(
   const get_goto_functiont &get_goto_function,
   statet &state)
 {
-  const source_locationt &source_location = state.source.pc->source_location;
+  const source_locationt &source_location = state.source.pc->source_location();
 
   if(!source_location.is_nil() && last_source_location != source_location)
   {
@@ -60,10 +60,10 @@ void symex_bmct::symex_step(
     simplify_expr(state.source.pc->condition(), ns).is_false())
   {
     log.statistics() << "aborting path on assume(false) at "
-                     << state.source.pc->source_location << " thread "
+                     << state.source.pc->source_location() << " thread "
                      << state.source.thread_nr;
 
-    const irep_idt &c = state.source.pc->source_location.get_comment();
+    const irep_idt &c = state.source.pc->source_location().get_comment();
     if(!c.empty())
       log.statistics() << ": " << c;
 
@@ -153,7 +153,7 @@ bool symex_bmct::should_stop_unwind(
   if(this_loop_limit != std::numeric_limits<unsigned>::max())
     log.statistics() << " (" << this_loop_limit << " max)";
 
-  log.statistics() << " " << source.pc->source_location << " thread "
+  log.statistics() << " " << source.pc->source_location() << " thread "
                    << source.thread_nr << log.eom;
 
   return abort;

@@ -41,7 +41,7 @@ operator()(goto_modelt &goto_model, const std::string &function_to_instrument)
   DATA_INVARIANT(
     last_instruction->is_end_function(),
     "last instruction in function should be END_FUNCTION");
-  source_locationt assert_location = last_instruction->source_location;
+  source_locationt assert_location = last_instruction->source_location();
   assert_location.set_property_class(ID_assertion);
   assert_location.set_comment("insert-final-assert-false (should fail) ");
   goto_programt::instructiont false_assert =

@@ -739,8 +739,8 @@ void change_impactt::output_instruction(
   {
     if(prefix == ' ')
       return;
-    const irep_idt &file=target->source_location.get_file();
-    const irep_idt &line=target->source_location.get_line();
+    const irep_idt &file = target->source_location().get_file();
+    const irep_idt &line = target->source_location().get_line();
     if(!file.empty() && !line.empty())
       std::cout << prefix << " " << id2string(file)
                 << " " << id2string(line) << '\n';

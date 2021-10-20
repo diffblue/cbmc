@@ -98,7 +98,7 @@ void convert(
 
   for(const auto &step : goto_trace.steps)
   {
-    const source_locationt &source_location=step.pc->source_location;
+    const source_locationt &source_location = step.pc->source_location();
 
     xmlt xml_location;
     if(source_location.is_not_nil() && !source_location.get_file().empty())

@@ -147,7 +147,7 @@ static void output_single_property_plain(
   messaget &log,
   irep_idt current_file = irep_idt())
 {
-  const auto &l = property_info.pc->source_location;
+  const auto &l = property_info.pc->source_location();
   log.result() << messaget::faint << '[' << property_id << "] "
                << messaget::reset;
   if(l.get_file() != current_file)
@@ -193,8 +193,8 @@ using propertyt = std::pair<irep_idt, property_infot>;
 static bool
 is_property_less_than(const propertyt &property1, const propertyt &property2)
 {
-  const auto &p1 = property1.second.pc->source_location;
-  const auto &p2 = property2.second.pc->source_location;
+  const auto &p1 = property1.second.pc->source_location();
+  const auto &p2 = property2.second.pc->source_location();
   if(p1.get_file() != p2.get_file())
     return id2string(p1.get_file()) < id2string(p2.get_file());
   if(p1.get_function() != p2.get_function())
@@ -271,7 +271,7 @@ static void output_properties_plain(
   irep_idt current_file;
   for(const auto &p : sorted_properties)
   {
-    const auto &l = p->second.pc->source_location;
+    const auto &l = p->second.pc->source_location();
     if(l.get_function() != previous_function)
     {
       if(!previous_function.empty())
@@ -427,7 +427,7 @@ void output_fault_localization_scores(
       out << "Fault localization scores:" << messaget::eom;
       for(auto &score_pair : fault_location.scores)
       {
-        out << score_pair.first->source_location
+        out << score_pair.first->source_location()
             << "\n  score: " << score_pair.second << messaget::eom;
       }
     });
@@ -462,9 +462,10 @@ static void output_fault_localization_plain(
   }
 
   output_fault_localization_scores(fault_location, log);
-  log.result() << "[" + id2string(property_id) + "]: \n  "
-               << max_fault_localization_score(fault_location)->source_location
-               << messaget::eom;
+  log.result()
+    << "[" + id2string(property_id) + "]: \n  "
+    << max_fault_localization_score(fault_location)->source_location()
+    << messaget::eom;
 }
 
 static void output_fault_localization_plain(
@@ -497,7 +498,7 @@ static xmlt xml(
   output_fault_localization_scores(fault_location, log);
 
   xmlt xml_location =
-    xml(max_fault_localization_score(fault_location)->source_location);
+    xml(max_fault_localization_score(fault_location)->source_location());
   xml_diagnosis.new_element("result").new_element().swap(xml_location);
 
   return xml_diagnosis;
@@ -527,7 +528,7 @@ static json_objectt json(const fault_location_infot &fault_location)
   else
   {
     json_result["result"] =
-      json(max_fault_localization_score(fault_location)->source_location);
+      json(max_fault_localization_score(fault_location)->source_location());
   }
   return json_result;
 }

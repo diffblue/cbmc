@@ -150,8 +150,8 @@ public:
     if(!target->is_assert())
       return false;
 
-    const std::string &p_id=
-      id2string(target->source_location.get_property_id());
+    const std::string &p_id =
+      id2string(target->source_location().get_property_id());
 
     for(std::list<std::string>::const_iterator
         it=property_ids.begin();

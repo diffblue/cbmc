@@ -800,7 +800,7 @@ void custom_bitvector_analysist::check(
         const namespacet ns(goto_model.symbol_table);
         result = simplify_expr(std::move(tmp), ns);
 
-        description=i_it->source_location.get_comment();
+        description = i_it->source_location().get_comment();
       }
       else
         continue;
@@ -815,7 +815,7 @@ void custom_bitvector_analysist::check(
         else
           out << "UNKNOWN";
         out << "\">\n";
-        out << xml(i_it->source_location);
+        out << xml(i_it->source_location());
         out << "<description>"
             << description
             << "</description>\n";
@@ -823,7 +823,7 @@ void custom_bitvector_analysist::check(
       }
       else
       {
-        out << i_it->source_location;
+        out << i_it->source_location();
         if(!description.empty())
           out << ", " << description;
         out << ": ";

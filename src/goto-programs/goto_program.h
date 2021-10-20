@@ -321,8 +321,21 @@ public:
       code = std::move(c);
     }
 
-    /// The location of the instruction in the source file
-    source_locationt source_location;
+    /// The location of the instruction in the source file.
+    /// Use source_location() to access.
+  protected:
+    source_locationt _source_location;
+
+  public:
+    const source_locationt &source_location() const
+    {
+      return _source_location;
+    }
+
+    source_locationt &source_location_nonconst()
+    {
+      return _source_location;
+    }
 
     /// What kind of instruction?
     goto_program_instruction_typet type;
@@ -463,7 +476,7 @@ public:
 
     explicit instructiont(goto_program_instruction_typet _type)
       : code(static_cast<const codet &>(get_nil_irep())),
-        source_location(static_cast<const source_locationt &>(get_nil_irep())),
+        _source_location(static_cast<const source_locationt &>(get_nil_irep())),
         type(_type),
         guard(true_exprt())
     {
@@ -472,12 +485,12 @@ public:
     /// Constructor that can set all members, passed by value
     instructiont(
       codet _code,
-      source_locationt _source_location,
+      source_locationt __source_location,
       goto_program_instruction_typet _type,
       exprt _guard,
       targetst _targets)
       : code(std::move(_code)),
-        source_location(std::move(_source_location)),
+        _source_location(std::move(__source_location)),
         type(_type),
         guard(std::move(_guard)),
         targets(std::move(_targets))
@@ -489,7 +502,7 @@ public:
     {
       using std::swap;
       swap(instruction.code, code);
-      swap(instruction.source_location, source_location);
+      swap(instruction._source_location, _source_location);
       swap(instruction.type, type);
       swap(instruction.guard, guard);
       swap(instruction.targets, targets);

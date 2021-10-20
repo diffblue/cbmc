@@ -27,7 +27,7 @@ void goto_symext::symex_start_thread(statet &state)
     throw incorrect_goto_program_exceptiont(
       "spawning threads out of atomic sections is not allowed; "
       "this would require amendments to ordering constraints",
-      state.source.pc->source_location);
+      state.source.pc->source_location());
 
   // record this
   target.spawn(state.guard.as_expr(), state.source);

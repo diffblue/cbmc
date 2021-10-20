@@ -243,14 +243,15 @@ static bool filter_out(
   // we filter out steps with the same source location
   // TODO: if these are assignments we should accumulate them into
   //       a single edge
-  if(prev_it!=goto_trace.steps.end() &&
-     prev_it->pc->source_location==it->pc->source_location)
+  if(
+    prev_it != goto_trace.steps.end() &&
+    prev_it->pc->source_location() == it->pc->source_location())
     return true;
 
   if(it->is_goto() && it->pc->get_condition().is_true())
     return true;
 
-  const source_locationt &source_location=it->pc->source_location;
+  const source_locationt &source_location = it->pc->source_location();
 
   if(source_location.is_nil() ||
      source_location.get_file().empty() ||
@@ -362,10 +363,11 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     // skip declarations followed by an immediate assignment
     goto_tracet::stepst::const_iterator next=it;
     ++next;
-    if(next!=goto_trace.steps.end() &&
-       next->type==goto_trace_stept::typet::ASSIGNMENT &&
-       it->full_lhs==next->full_lhs &&
-       it->pc->source_location==next->pc->source_location)
+    if(
+      next != goto_trace.steps.end() &&
+      next->type == goto_trace_stept::typet::ASSIGNMENT &&
+      it->full_lhs == next->full_lhs &&
+      it->pc->source_location() == next->pc->source_location())
     {
       step_to_node[it->step_nr]=sink;
 
@@ -374,7 +376,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
     prev_it=it;
 
-    const source_locationt &source_location=it->pc->source_location;
+    const source_locationt &source_location = it->pc->source_location();
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
@@ -546,7 +548,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       it!=equation.SSA_steps.end();
       it++, step_nr++) // we cannot replace this by a ranged for
   {
-    const source_locationt &source_location=it->source.pc->source_location;
+    const source_locationt &source_location = it->source.pc->source_location();
 
     if(
       it->hidden ||
@@ -563,10 +565,10 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     // skip declarations followed by an immediate assignment
     symex_target_equationt::SSA_stepst::const_iterator next=it;
     ++next;
-    if(next!=equation.SSA_steps.end() &&
-       next->is_assignment() &&
-       it->ssa_full_lhs==next->ssa_full_lhs &&
-       it->source.pc->source_location==next->source.pc->source_location)
+    if(
+      next != equation.SSA_steps.end() && next->is_assignment() &&
+      it->ssa_full_lhs == next->ssa_full_lhs &&
+      it->source.pc->source_location() == next->source.pc->source_location())
     {
       step_to_node[step_nr]=sink;
 
