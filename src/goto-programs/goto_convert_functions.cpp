@@ -138,7 +138,7 @@ void goto_convert_functionst::add_return(
   side_effect_expr_nondett rhs(return_type, source_location);
 
   f.body.add(
-    goto_programt::make_return(code_returnt(std::move(rhs)), source_location));
+    goto_programt::make_set_return_value(std::move(rhs), source_location));
 }
 
 void goto_convert_functionst::convert_function(

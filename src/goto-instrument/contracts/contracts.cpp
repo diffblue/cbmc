@@ -1178,8 +1178,8 @@ void code_contractst::add_contract_check(
 
   if(code_type.return_type() != empty_typet())
   {
-    check.add(
-      goto_programt::make_return(return_stmt.value(), skip->source_location()));
+    check.add(goto_programt::make_set_return_value(
+      return_stmt.value().return_value(), skip->source_location()));
   }
 
   // prepend the new code to dest

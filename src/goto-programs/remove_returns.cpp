@@ -314,8 +314,8 @@ bool remove_returnst::restore_returns(
 
       // replace "fkt#return_value=x;" by "return x;"
       const exprt rhs = instruction.assign_rhs();
-      instruction = goto_programt::make_return(
-        code_returnt(rhs), instruction.source_location());
+      instruction = goto_programt::make_set_return_value(
+        rhs, instruction.source_location());
       did_something = true;
     }
   }

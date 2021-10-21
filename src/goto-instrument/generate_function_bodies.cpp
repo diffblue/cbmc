@@ -357,7 +357,8 @@ protected:
       exprt return_expr =
         typecast_exprt::conditional_cast(aux_symbol.symbol_expr(), return_type);
 
-      add_instruction(goto_programt::make_return(code_returnt(return_expr)));
+      add_instruction(
+        goto_programt::make_set_return_value(std::move(return_expr)));
 
       add_instruction(goto_programt::make_dead(aux_symbol.symbol_expr()));
     }
