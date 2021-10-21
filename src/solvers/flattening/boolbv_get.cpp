@@ -139,7 +139,8 @@ exprt boolbvt::bv_get_rec(
       const union_typet &union_type=to_union_type(type);
       const union_typet::componentst &components=union_type.components();
 
-      assert(!components.empty());
+      if(components.empty())
+        return empty_union_exprt(type);
 
       // Any idea that's better than just returning the first component?
       std::size_t component_nr=0;

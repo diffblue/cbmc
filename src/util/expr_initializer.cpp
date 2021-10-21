@@ -208,51 +208,29 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   }
   else if(type_id==ID_union)
   {
-    const union_typet::componentst &components=
-      to_union_type(type).components();
+    const union_typet &union_type = to_union_type(type);
 
-    union_typet::componentt component;
-    bool found=false;
-    mp_integer component_size=0;
-
-    // we need to find the largest member
-
-    for(const auto &c : components)
+    if(union_type.components().empty())
     {
-      // skip methods
-      if(c.type().id() == ID_code)
-        continue;
-
-      auto bits = pointer_offset_bits(c.type(), ns);
-
-      if(bits.has_value() && *bits > component_size)
-      {
-        component = c;
-        found=true;
-        component_size = *bits;
-      }
-    }
-
-    if(!found)
-    {
-      // stupid empty union
-      union_exprt value(irep_idt(), nil_exprt(), type);
+      empty_union_exprt value{type};
       value.add_source_location() = source_location;
       return std::move(value);
     }
-    else
-    {
-      auto component_value =
-        expr_initializer_rec(component.type(), source_location);
 
-      if(!component_value.has_value())
-        return {};
+    const auto &widest_member = union_type.find_widest_union_component(ns);
+    if(!widest_member.has_value())
+      return {};
 
-      union_exprt value(component.get_name(), *component_value, type);
-      value.add_source_location() = source_location;
+    auto component_value =
+      expr_initializer_rec(widest_member->first.type(), source_location);
 
-      return std::move(value);
-    }
+    if(!component_value.has_value())
+      return {};
+
+    union_exprt value{widest_member->first.get_name(), *component_value, type};
+    value.add_source_location() = source_location;
+
+    return std::move(value);
   }
   else if(type_id==ID_c_enum_tag)
   {
