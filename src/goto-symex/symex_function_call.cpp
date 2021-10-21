@@ -203,15 +203,7 @@ void goto_symext::symex_function_call_symbol(
 
   PRECONDITION(code.function().id() == ID_symbol);
 
-  const irep_idt &identifier=
-    to_symbol_expr(code.function()).get_identifier();
-
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
-  {
-    symex_fkt(state, code);
-  }
-  else
-    symex_function_call_code(get_goto_function, state, code);
+  symex_function_call_code(get_goto_function, state, code);
 }
 
 void goto_symext::symex_function_call_code(

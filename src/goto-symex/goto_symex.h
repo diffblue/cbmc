@@ -442,10 +442,6 @@ protected:
   virtual void symex_end_of_function(statet &);
 
   /// Symbolic execution of a call to a function call.
-  /// For functions starting with \c __CPROVER_fkt
-  /// \ref goto_symext::symex_fkt
-  /// For non-special functions see
-  /// \ref goto_symext::symex_function_call_code
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
@@ -754,16 +750,7 @@ protected:
   /// \param code: right-hand side containing side effect
   virtual void
   symex_cpp_new(statet &state, const exprt &lhs, const side_effect_exprt &code);
-  /// Symbolically execute a FUNCTION_CALL instruction for a function whose
-  /// name starts with CPROVER_FKT_PREFIX
-  /// \remarks
-  /// While the name seems to imply that this would be called when symbolic
-  /// execution doesn't know what to do, it may actually be derived from a
-  /// German abbreviation for function.
-  /// This should not be called as these functions should already be removed
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
-  virtual void symex_fkt(statet &state, const code_function_callt &code);
+
   /// Symbolically execute an OTHER instruction that does a CPP `printf`
   /// \param state: Symbolic execution state for current instruction
   /// \param rhs: The cleaned up CPP `printf` instruction
