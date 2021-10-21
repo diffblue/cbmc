@@ -834,29 +834,15 @@ static exprt unpack_rec(
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
     const union_typet &union_type = to_union_type(ns.follow(src.type()));
-    const union_typet::componentst &components = union_type.components();
 
-    mp_integer max_width = 0;
-    typet max_comp_type;
-    irep_idt max_comp_name;
+    const auto widest_member = union_type.find_widest_union_component(ns);
 
-    for(const auto &comp : components)
+    if(widest_member.has_value())
     {
-      auto element_width = pointer_offset_bits(comp.type(), ns);
-
-      if(!element_width.has_value() || *element_width <= max_width)
-        continue;
-
-      max_width = *element_width;
-      max_comp_type = comp.type();
-      max_comp_name = comp.get_name();
-    }
-
-    if(max_width > 0)
-    {
-      member_exprt member(src, max_comp_name, max_comp_type);
+      member_exprt member{
+        src, widest_member->first.get_name(), widest_member->first.type()};
       return unpack_rec(
-        member, little_endian, offset_bytes, max_bytes, ns, true);
+        member, little_endian, offset_bytes, widest_member->second, ns, true);
     }
   }
   else if(src.type().id() == ID_pointer)
