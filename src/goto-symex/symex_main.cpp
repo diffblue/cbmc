@@ -674,13 +674,7 @@ void goto_symext::execute_next_instruction(
 
   case FUNCTION_CALL:
     if(state.reachable)
-    {
-      code_function_callt call(
-        instruction.call_lhs(),
-        instruction.call_function(),
-        instruction.call_arguments());
-      symex_function_call(get_goto_function, state, call);
-    }
+      symex_function_call(get_goto_function, state, instruction);
     else
       symex_transition(state);
     break;

@@ -173,54 +173,58 @@ void goto_symext::parameter_assignments(
 void goto_symext::symex_function_call(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &code)
+  const goto_programt::instructiont &instruction)
 {
-  const exprt &function=code.function();
+  const exprt &function = instruction.call_function();
 
   // If at some point symex_function_call can support more
   // expression ids(), like ID_Dereference, please expand the
   // precondition appropriately.
   PRECONDITION(function.id() == ID_symbol);
-  symex_function_call_symbol(get_goto_function, state, code);
+
+  symex_function_call_symbol(
+    get_goto_function,
+    state,
+    instruction.call_lhs(),
+    to_symbol_expr(instruction.call_function()),
+    instruction.call_arguments());
 }
 
 void goto_symext::symex_function_call_symbol(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &original_code)
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments)
 {
-  code_function_callt code = original_code;
+  exprt cleaned_lhs;
 
-  if(code.lhs().is_not_nil())
-    code.lhs() = clean_expr(std::move(code.lhs()), state, true);
+  if(lhs.is_nil())
+    cleaned_lhs = lhs;
+  else
+    cleaned_lhs = clean_expr(lhs, state, true);
 
-  code.function() = clean_expr(std::move(code.function()), state, false);
+  // no need to clean the function, which is a symbol only
 
-  for(auto &argument : code.arguments())
-    argument = clean_expr(std::move(argument), state, false);
+  exprt::operandst cleaned_arguments;
+
+  for(auto &argument : arguments)
+    cleaned_arguments.push_back(clean_expr(argument, state, false));
 
   target.location(state.guard.as_expr(), state.source);
 
-  PRECONDITION(code.function().id() == ID_symbol);
-
-  const irep_idt &identifier=
-    to_symbol_expr(code.function()).get_identifier();
-
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
-  {
-    symex_fkt(state, code);
-  }
-  else
-    symex_function_call_code(get_goto_function, state, code);
+  symex_function_call_post_clean(
+    get_goto_function, state, cleaned_lhs, function, cleaned_arguments);
 }
 
-void goto_symext::symex_function_call_code(
+void goto_symext::symex_function_call_post_clean(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &call)
+  const exprt &cleaned_lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &cleaned_arguments)
 {
-  const irep_idt &identifier=
-    to_symbol_expr(call.function()).get_identifier();
+  const irep_idt &identifier = function.get_identifier();
 
   const goto_functionst::goto_functiont &goto_function =
     get_goto_function(identifier);
@@ -258,10 +262,10 @@ void goto_symext::symex_function_call_code(
   }
 
   // read the arguments -- before the locality renaming
-  const exprt::operandst &arguments = call.arguments();
   const std::vector<renamedt<exprt, L2>> renamed_arguments =
-    make_range(arguments).map(
-      [&](const exprt &a) { return state.rename(a, ns); });
+    make_range(cleaned_arguments).map([&](const exprt &a) {
+      return state.rename(a, ns);
+    });
 
   // we hide the call if the caller and callee are both hidden
   const bool hidden =
@@ -279,18 +283,18 @@ void goto_symext::symex_function_call_code(
     target.function_return(
       state.guard.as_expr(), identifier, state.source, hidden);
 
-    if(call.lhs().is_not_nil())
+    if(cleaned_lhs.is_not_nil())
     {
-      const auto rhs =
-        side_effect_expr_nondett(call.lhs().type(), call.source_location());
-      symex_assign(state, call.lhs(), rhs);
+      const auto rhs = side_effect_expr_nondett(
+        cleaned_lhs.type(), state.source.pc->source_location());
+      symex_assign(state, cleaned_lhs, rhs);
     }
 
     if(symex_config.havoc_undefined_functions)
     {
       // assign non det to function arguments if pointers
       // are not const
-      for(const auto &arg : call.arguments())
+      for(const auto &arg : cleaned_arguments)
       {
         if(
           arg.type().id() == ID_pointer &&
@@ -325,10 +329,10 @@ void goto_symext::symex_function_call_code(
   locality(identifier, state, path_storage, goto_function, ns);
 
   // assign actuals to formal parameters
-  parameter_assignments(identifier, goto_function, state, arguments);
+  parameter_assignments(identifier, goto_function, state, cleaned_arguments);
 
   frame.end_of_function=--goto_function.body.instructions.end();
-  frame.return_value=call.lhs();
+  frame.return_value = cleaned_lhs;
   frame.function_identifier=identifier;
   frame.hidden_function = goto_function.is_hidden();
 

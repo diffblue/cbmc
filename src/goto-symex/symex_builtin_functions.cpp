@@ -534,28 +534,3 @@ void goto_symext::symex_cpp_delete(
   bool do_array=code.get(ID_statement)==ID_cpp_delete_array;
   #endif
 }
-
-void goto_symext::symex_fkt(
-  statet &,
-  const code_function_callt &)
-{
-  // TODO: uncomment this line when TG-4667 is done
-  // UNREACHABLE;
-  #if 0
-  exprt new_fc(ID_function, fc.type());
-
-  new_fc.reserve_operands(fc.operands().size()-1);
-
-  bool first=true;
-
-  Forall_operands(it, fc)
-    if(first)
-      first=false;
-    else
-      new_fc.add_to_operands(std::move(*it));
-
-  new_fc.set(ID_identifier, fc.op0().get(ID_identifier));
-
-  fc.swap(new_fc);
-  #endif
-}
