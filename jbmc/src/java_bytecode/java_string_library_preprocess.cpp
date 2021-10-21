@@ -16,9 +16,9 @@ Date:   April 2017
 ///   java standard library. In particular methods from java.lang.String,
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
+#include <goto-programs/allocate_objects.h>
 #include <goto-programs/class_identifier.h>
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>

@@ -8,8 +8,9 @@ Author: Diffblue Ltd.
 
 #include "nondet.h"
 
-#include "allocate_objects.h"
-#include "arith_tools.h"
+#include <goto-programs/allocate_objects.h>
+
+#include <util/arith_tools.h>
 
 symbol_exprt generate_nondet_int(
   const exprt &min_value_expr,

@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
 #include <util/message.h>
-#include <util/nondet.h>
 #include <util/nondet_bool.h>
 #include <util/prefix.h>
 

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/journalling_symbol_table.h>
-#include <util/nondet.h>
 #include <util/suffix.h>
 
 #include <goto-programs/adjust_float_expressions.h>
@@ -26,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_literals.h"
 #include "java_types.h"
 #include "java_utils.h"
+#include "nondet.h"
 
 #include <cstring>
 
