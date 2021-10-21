@@ -822,12 +822,21 @@ public:
     }
   }
 
-  static instructiont make_return(
-    code_returnt c,
+  static instructiont make_set_return_value(
+    exprt return_value,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(std::move(c), l, SET_RETURN_VALUE, nil_exprt(), {});
+    return instructiont(
+      code_returnt(std::move(return_value)),
+      l,
+      SET_RETURN_VALUE,
+      nil_exprt(),
+      {});
   }
+
+  static instructiont make_set_return_value(
+    const code_returnt &code,
+    const source_locationt &l = source_locationt::nil()) = delete;
 
   static instructiont
   make_skip(const source_locationt &l = source_locationt::nil())

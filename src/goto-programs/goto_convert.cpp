@@ -1296,9 +1296,9 @@ void goto_convertt::convert_return(
       "function must return value",
       new_code.find_source_location());
 
-    // Now add a return node to set the return value.
-    dest.add(goto_programt::make_return(
-      to_code_return(new_code), new_code.source_location()));
+    // Now add a 'set return value' instruction to set the return value.
+    dest.add(goto_programt::make_set_return_value(
+      new_code.return_value(), new_code.source_location()));
   }
   else
   {
