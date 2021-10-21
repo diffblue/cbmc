@@ -178,44 +178,59 @@ void goto_symext::symex_function_call(
 {
   const exprt &function = instruction.call_function();
 
-  // If at some point symex_function_call can support more
-  // expression ids(), like ID_Dereference, please expand the
-  // precondition appropriately.
-  PRECONDITION(function.id() == ID_symbol);
+  PRECONDITION(function.id() == ID_symbol || function.id() == ID_dereference);
 
-  symex_function_call_symbol(
-    get_goto_function,
-    state,
-    instruction.call_lhs(),
-    to_symbol_expr(instruction.call_function()),
-    instruction.call_arguments());
-}
-
-void goto_symext::symex_function_call_symbol(
-  const get_goto_functiont &get_goto_function,
-  statet &state,
-  const exprt &lhs,
-  const symbol_exprt &function,
-  const exprt::operandst &arguments)
-{
+  // clean lhs
   exprt cleaned_lhs;
 
-  if(lhs.is_nil())
-    cleaned_lhs = lhs;
+  if(instruction.call_lhs().is_nil())
+    cleaned_lhs = nil_exprt();
   else
-    cleaned_lhs = clean_expr(lhs, state, true);
+    cleaned_lhs = clean_expr(instruction.call_lhs(), state, true);
 
-  // no need to clean the function, which is a symbol only
+  // need to clean the function expression in case it's a dereference
+  auto cleaned_function = clean_expr(function, state, false);
 
+  // clean the arguments
   exprt::operandst cleaned_arguments;
 
-  for(auto &argument : arguments)
+  for(auto &argument : instruction.call_arguments())
     cleaned_arguments.push_back(clean_expr(argument, state, false));
 
   target.location(state.guard.as_expr(), state.source);
 
-  symex_function_call_post_clean(
-    get_goto_function, state, cleaned_lhs, function, cleaned_arguments);
+  // We get an if-then-else nest that contains symbols
+  // in the case of function pointers, and we traverse that recursively.
+  symex_function_call_post_clean_rec(
+    get_goto_function, state, cleaned_lhs, cleaned_function, cleaned_arguments);
+}
+
+void goto_symext::symex_function_call_post_clean_rec(
+  const get_goto_functiont &get_goto_function,
+  statet &state,
+  const exprt &cleaned_lhs,
+  const exprt &cleaned_function,
+  const exprt::operandst &cleaned_arguments)
+{
+  if(cleaned_function.id() == ID_symbol)
+  {
+    symex_function_call_post_clean(
+      get_goto_function,
+      state,
+      cleaned_lhs,
+      to_symbol_expr(cleaned_function),
+      cleaned_arguments);
+  }
+  else if(cleaned_function.id() == ID_if)
+  {
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      false, "todo", irep_pretty_diagnosticst(cleaned_function));
+  }
+  else
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "cleaned function is expected to consist of if and symbol",
+      irep_pretty_diagnosticst(cleaned_function));
 }
 
 void goto_symext::symex_function_call_post_clean(

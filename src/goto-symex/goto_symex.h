@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class address_of_exprt;
 class code_function_callt;
+class dereference_exprt;
 class function_application_exprt;
 class goto_symex_statet;
 class path_storaget;
@@ -445,19 +446,19 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_end_of_function(statet &);
 
-  /// Symbolic execution of a call to a function call.
+  /// Symbolic execution of a call to a function given via a pointer.
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param lhs: nil or the lhs of the function call instruction
-  /// \param function: the symbol of the function to call
-  /// \param arguments: the arguments of the function call
-  virtual void symex_function_call_symbol(
+  /// \param lhs: nil or the lhs of the function call instruction, cleaned
+  /// \param function: the dereference expression for the function to call, cleaned
+  /// \param arguments: the arguments of the function call, cleaned
+  void symex_function_call_post_clean_rec(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const exprt &lhs,
-    const symbol_exprt &function,
-    const exprt::operandst &arguments);
+    const exprt &cleaned_lhs,
+    const exprt &cleaned_function,
+    const exprt::operandst &cleaned_arguments);
 
   /// Symbolic execution of a function call by inlining.
   /// Records the call in \p target by appending a function call step and:
