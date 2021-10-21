@@ -464,11 +464,15 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param call: The function call instruction
-  virtual void symex_function_call_code(
+  /// \param cleaned_lhs: nil or the lhs of the function call, cleaned
+  /// \param function: the symbol of the function to call
+  /// \param cleaned_arguments: the arguments of the function call, cleaned
+  virtual void symex_function_call_post_clean(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const code_function_callt &call);
+    const exprt &cleaned_lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &cleaned_arguments);
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
