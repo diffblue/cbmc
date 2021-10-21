@@ -16,14 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <unordered_set>
 
-#include <util/allocate_objects.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/replace_expr.h>
 #include <util/std_code.h>
 
-#include "goto_program.h"
+#include "allocate_objects.h"
 #include "destructor_tree.h"
+#include "goto_program.h"
 
 class side_effect_expr_overflowt;
 

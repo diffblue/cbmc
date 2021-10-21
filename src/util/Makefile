@@ -1,5 +1,4 @@
-SRC = allocate_objects.cpp \
-      arith_tools.cpp \
+SRC = arith_tools.cpp \
       array_element_from_pointer.cpp \
       array_name.cpp \
       base_type.cpp \
@@ -54,7 +53,6 @@ SRC = allocate_objects.cpp \
       message.cpp \
       mp_arith.cpp \
       namespace.cpp \
-      nondet.cpp \
       object_factory_parameters.cpp \
       options.cpp \
       parse_options.cpp \

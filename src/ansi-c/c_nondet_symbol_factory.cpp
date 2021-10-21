@@ -13,7 +13,6 @@ Author: Diffblue Ltd.
 
 #include <ansi-c/c_object_factory_parameters.h>
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
@@ -21,6 +20,7 @@ Author: Diffblue Ltd.
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
+#include <goto-programs/allocate_objects.h>
 #include <goto-programs/goto_functions.h>
 
 /// Creates a nondet for expr, including calling itself recursively to make

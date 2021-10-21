@@ -20,11 +20,12 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <ansi-c/expr2c_class.h>
 
-#include <util/allocate_objects.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/allocate_objects.h>
 
 class gdb_apit;
 class exprt;

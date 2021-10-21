@@ -6,16 +6,16 @@ Author: Diffblue Ltd
 
 \*******************************************************************/
 
-#include <util/allocate_objects.h>
+#include <goto-programs/allocate_objects.h>
+
 #include <util/c_types.h>
-#include <util/source_location.h>
 #include <util/symbol_table.h>
 
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(
   "Tests the absence of a bug that crashed allocate_objects",
-  "[core][util][allocate_objects]")
+  "[core][goto-programs][allocate_objects]")
 {
   symbol_tablet symtab{};
   // Because __a_temp will return a const reference to temporary

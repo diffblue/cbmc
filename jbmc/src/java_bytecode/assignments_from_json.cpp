@@ -15,9 +15,9 @@ Author: Diffblue Ltd.
 #include "java_types.h"
 #include "java_utils.h"
 
+#include <goto-programs/allocate_objects.h>
 #include <goto-programs/class_identifier.h>
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>

@@ -1,4 +1,5 @@
-SRC = add_malloc_may_fail_variable_initializations.cpp \
+SRC = allocate_objects.cpp \
+      add_malloc_may_fail_variable_initializations.cpp \
       adjust_float_expressions.cpp \
       builtin_functions.cpp \
       class_hierarchy.cpp \
