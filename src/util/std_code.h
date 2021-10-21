@@ -12,155 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include "expr_cast.h"
-#include "invariant.h"
+#include "std_code_base.h"
 #include "std_expr.h"
-#include "validate.h"
-#include "validate_code.h"
-
-/// Data structure for representing an arbitrary statement in a program. Every
-/// specific type of statement (e.g. block of statements, assignment,
-/// if-then-else statement...) is represented by a subtype of `codet`.
-/// `codet`s are represented to be subtypes of \ref exprt since statements can
-/// occur in an expression context in C: for example, the assignment `x = y;`
-/// is an expression with return value `y`. For other types of statements in an
-/// expression context, see e.g.
-/// https://gcc.gnu.org/onlinedocs/gcc/Statement-Exprs.html.
-/// To distinguish a `codet` from other [exprts](\ref exprt), we set its
-/// [id()](\ref irept::id) to `ID_code`. To distinguish different types of
-/// `codet`, we use a named sub `ID_statement`.
-class codet:public exprt
-{
-public:
-  /// \param statement: Specifies the type of the `codet` to be constructed,
-  ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
-  ///   \ref code_frontend_assignt.
-  explicit codet(const irep_idt &statement) : exprt(ID_code, empty_typet())
-  {
-    set_statement(statement);
-  }
-
-  codet(const irep_idt &statement, source_locationt loc)
-    : exprt(ID_code, empty_typet(), std::move(loc))
-  {
-    set_statement(statement);
-  }
-
-  /// \param statement: Specifies the type of the `codet` to be constructed,
-  ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
-  ///   \ref code_frontend_assignt.
-  /// \param _op: any operands to be added
-  explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
-  {
-    operands() = std::move(_op);
-  }
-
-  codet(const irep_idt &statement, operandst op, source_locationt loc)
-    : codet(statement, std::move(loc))
-  {
-    operands() = std::move(op);
-  }
-
-  void set_statement(const irep_idt &statement)
-  {
-    set(ID_statement, statement);
-  }
-
-  const irep_idt &get_statement() const
-  {
-    return get(ID_statement);
-  }
-
-  codet &first_statement();
-  const codet &first_statement() const;
-  codet &last_statement();
-  const codet &last_statement() const;
-
-  /// Check that the code statement is well-formed (shallow checks only, i.e.,
-  /// enclosed statements, subexpressions, etc. are not checked)
-  ///
-  /// Subclasses may override this function to provide specific well-formedness
-  /// checks for the corresponding types.
-  ///
-  /// The validation mode indicates whether well-formedness check failures are
-  /// reported via DATA_INVARIANT violations or exceptions.
-  static void check(const codet &, const validation_modet)
-  {
-  }
-
-  /// Check that the code statement is well-formed, assuming that all its
-  /// enclosed statements, subexpressions, etc. have all ready been checked for
-  /// well-formedness.
-  ///
-  /// Subclasses may override this function to provide specific well-formedness
-  /// checks for the corresponding types.
-  ///
-  /// The validation mode indicates whether well-formedness check failures are
-  /// reported via DATA_INVARIANT violations or exceptions.
-  static void validate(
-    const codet &code,
-    const namespacet &,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    check_code(code, vm);
-  }
-
-  /// Check that the code statement is well-formed (full check, including checks
-  /// of all subexpressions)
-  ///
-  /// Subclasses may override this function to provide specific well-formedness
-  /// checks for the corresponding types.
-  ///
-  /// The validation mode indicates whether well-formedness check failures are
-  /// reported via DATA_INVARIANT violations or exceptions.
-  static void validate_full(
-    const codet &code,
-    const namespacet &,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    check_code(code, vm);
-  }
-
-  using exprt::op0;
-  using exprt::op1;
-  using exprt::op2;
-  using exprt::op3;
-};
-
-namespace detail // NOLINT
-{
-
-template<typename Tag>
-inline bool can_cast_code_impl(const exprt &expr, const Tag &tag)
-{
-  if(const auto ptr = expr_try_dynamic_cast<codet>(expr))
-  {
-    return ptr->get_statement() == tag;
-  }
-  return false;
-}
-
-} // namespace detail
-
-template<> inline bool can_cast_expr<codet>(const exprt &base)
-{
-  return base.id()==ID_code;
-}
-
-// to_code has no validation other than checking the id(), so no validate_expr
-// is provided for codet
-
-inline const codet &to_code(const exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_code);
-  return static_cast<const codet &>(expr);
-}
-
-inline codet &to_code(exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_code);
-  return static_cast<codet &>(expr);
-}
 
 /// A \ref codet representing an assignment in the program.
 /// For example, if an expression `e1` is represented as an \ref exprt `expr1`
@@ -498,71 +351,6 @@ template<> inline bool can_cast_expr<code_skipt>(const exprt &base)
 }
 
 // there is no to_code_skip, so no validate_expr is provided for code_skipt
-
-/// A `codet` representing the declaration of a local variable.
-/// For example, if a variable (symbol) `x` is represented as a
-/// \ref symbol_exprt `sym`, then the declaration of this variable can be
-/// represented as `code_declt(sym)`.
-class code_declt:public codet
-{
-public:
-  explicit code_declt(symbol_exprt symbol) : codet(ID_decl, {std::move(symbol)})
-  {
-  }
-
-  symbol_exprt &symbol()
-  {
-    return static_cast<symbol_exprt &>(op0());
-  }
-
-  const symbol_exprt &symbol() const
-  {
-    return static_cast<const symbol_exprt &>(op0());
-  }
-
-  const irep_idt &get_identifier() const
-  {
-    return symbol().get_identifier();
-  }
-
-  static void check(
-    const codet &code,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    DATA_CHECK(
-      vm, code.operands().size() == 1, "declaration must have one operand");
-    DATA_CHECK(
-      vm,
-      code.op0().id() == ID_symbol,
-      "declaring a non-symbol: " +
-        id2string(to_symbol_expr(code.op0()).get_identifier()));
-  }
-};
-
-template <>
-inline bool can_cast_expr<code_declt>(const exprt &base)
-{
-  return detail::can_cast_code_impl(base, ID_decl);
-}
-
-inline void validate_expr(const code_declt &x)
-{
-  code_declt::check(x);
-}
-
-inline const code_declt &to_code_decl(const codet &code)
-{
-  PRECONDITION(code.get_statement() == ID_decl);
-  code_declt::check(code);
-  return static_cast<const code_declt &>(code);
-}
-
-inline code_declt &to_code_decl(codet &code)
-{
-  PRECONDITION(code.get_statement() == ID_decl);
-  code_declt::check(code);
-  return static_cast<code_declt &>(code);
-}
 
 /// A `codet` representing the declaration of a local variable.
 /// For example, if a variable (symbol) `x` is represented as a
@@ -1114,14 +902,14 @@ inline code_gotot &to_code_goto(codet &code)
 }
 
 /// \ref codet representation of a "return from a function" statement.
-class code_returnt:public codet
+class code_frontend_returnt : public codet
 {
 public:
-  code_returnt() : codet(ID_return, {nil_exprt()})
+  code_frontend_returnt() : codet(ID_return, {nil_exprt()})
   {
   }
 
-  explicit code_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
+  explicit code_frontend_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
   {
   }
 
@@ -1154,28 +942,29 @@ protected:
   using codet::op3;
 };
 
-template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
+template <>
+inline bool can_cast_expr<code_frontend_returnt>(const exprt &base)
 {
   return detail::can_cast_code_impl(base, ID_return);
 }
 
-inline void validate_expr(const code_returnt &x)
+inline void validate_expr(const code_frontend_returnt &x)
 {
-  code_returnt::check(x);
+  code_frontend_returnt::check(x);
 }
 
-inline const code_returnt &to_code_return(const codet &code)
+inline const code_frontend_returnt &to_code_frontend_return(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
-  code_returnt::check(code);
-  return static_cast<const code_returnt &>(code);
+  code_frontend_returnt::check(code);
+  return static_cast<const code_frontend_returnt &>(code);
 }
 
-inline code_returnt &to_code_return(codet &code)
+inline code_frontend_returnt &to_code_frontend_return(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
-  code_returnt::check(code);
-  return static_cast<code_returnt &>(code);
+  code_frontend_returnt::check(code);
+  return static_cast<code_frontend_returnt &>(code);
 }
 
 /// \ref codet representation of a label for branch targets.

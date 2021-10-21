@@ -189,6 +189,71 @@ inline code_deadt &to_code_dead(codet &code)
   return static_cast<code_deadt &>(code);
 }
 
+/// A `codet` representing the declaration of a local variable.
+/// For example, if a variable (symbol) `x` is represented as a
+/// \ref symbol_exprt `sym`, then the declaration of this variable can be
+/// represented as `code_declt(sym)`.
+class code_declt : public codet
+{
+public:
+  explicit code_declt(symbol_exprt symbol) : codet(ID_decl, {std::move(symbol)})
+  {
+  }
+
+  symbol_exprt &symbol()
+  {
+    return static_cast<symbol_exprt &>(op0());
+  }
+
+  const symbol_exprt &symbol() const
+  {
+    return static_cast<const symbol_exprt &>(op0());
+  }
+
+  const irep_idt &get_identifier() const
+  {
+    return symbol().get_identifier();
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, code.operands().size() == 1, "declaration must have one operand");
+    DATA_CHECK(
+      vm,
+      code.op0().id() == ID_symbol,
+      "declaring a non-symbol: " +
+        id2string(to_symbol_expr(code.op0()).get_identifier()));
+  }
+};
+
+template <>
+inline bool can_cast_expr<code_declt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_decl);
+}
+
+inline void validate_expr(const code_declt &x)
+{
+  code_declt::check(x);
+}
+
+inline const code_declt &to_code_decl(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_decl);
+  code_declt::check(code);
+  return static_cast<const code_declt &>(code);
+}
+
+inline code_declt &to_code_decl(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_decl);
+  code_declt::check(code);
+  return static_cast<code_declt &>(code);
+}
+
 /// \ref codet representation of a function call statement.
 /// The function call statement has three operands.
 /// The first is the expression that is used to store the return value.
@@ -412,6 +477,63 @@ inline bool can_cast_expr<code_outputt>(const exprt &base)
 inline void validate_expr(const code_outputt &output)
 {
   code_outputt::check(output);
+}
+
+/// \ref codet representation of a "return from a function" statement.
+class code_returnt : public codet
+{
+public:
+  explicit code_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
+  {
+  }
+
+  const exprt &return_value() const
+  {
+    return op0();
+  }
+
+  exprt &return_value()
+  {
+    return op0();
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(vm, code.operands().size() == 1, "return must have one operand");
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_returnt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_return);
+}
+
+inline void validate_expr(const code_returnt &x)
+{
+  code_returnt::check(x);
+}
+
+inline const code_returnt &to_code_return(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_return);
+  code_returnt::check(code);
+  return static_cast<const code_returnt &>(code);
+}
+
+inline code_returnt &to_code_return(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_return);
+  code_returnt::check(code);
+  return static_cast<code_returnt &>(code);
 }
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_INSTRUCTION_CODE_H

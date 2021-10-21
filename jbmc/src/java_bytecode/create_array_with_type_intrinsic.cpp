@@ -75,7 +75,7 @@ codet create_array_with_type_body(
   code_blockt code_block;
 
   // Declare new_array temporary:
-  code_block.add(code_declt(new_array_symbol_expr));
+  code_block.add(code_frontend_declt(new_array_symbol_expr));
 
   // new_array = new Object[length];
   side_effect_exprt new_array_expr{
@@ -105,7 +105,7 @@ codet create_array_with_type_body(
     new_array_element_classid, old_array_element_classid));
 
   // return new_array
-  code_block.add(code_returnt(new_array_symbol_expr));
+  code_block.add(code_frontend_returnt(new_array_symbol_expr));
 
   return std::move(code_block);
 }

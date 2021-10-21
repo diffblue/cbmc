@@ -20,7 +20,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 class code_assignt;
 class code_function_callt;
 class code_ifthenelset;
-class code_returnt;
+class code_frontend_returnt;
 class code_try_catcht;
 class codet;
 class message_handlert;
@@ -89,7 +89,7 @@ protected:
   void typecheck_expr_main(exprt &expr);
   void typecheck_code(codet &code);
   void typecheck_function_call(code_function_callt &function_call);
-  void typecheck_return(code_returnt &code);
+  void typecheck_return(code_frontend_returnt &);
   void typecheck_block(codet &code);
   void typecheck_ifthenelse(code_ifthenelset &code);
   void typecheck_assign(code_assignt &code);

@@ -470,7 +470,7 @@ void goto_convertt::convert(
   else if(statement==ID_break)
     convert_break(to_code_break(code), dest, mode);
   else if(statement==ID_return)
-    convert_return(to_code_return(code), dest, mode);
+    convert_return(to_code_frontend_return(code), dest, mode);
   else if(statement==ID_continue)
     convert_continue(to_code_continue(code), dest, mode);
   else if(statement==ID_goto)
@@ -1258,7 +1258,7 @@ void goto_convertt::convert_break(
 }
 
 void goto_convertt::convert_return(
-  const code_returnt &code,
+  const code_frontend_returnt &code,
   goto_programt &dest,
   const irep_idt &mode)
 {
@@ -1273,7 +1273,7 @@ void goto_convertt::convert_return(
     "return takes none or one operand",
     code.find_source_location());
 
-  code_returnt new_code(code);
+  code_frontend_returnt new_code(code);
 
   if(new_code.has_return_value())
   {
@@ -1297,7 +1297,8 @@ void goto_convertt::convert_return(
       new_code.find_source_location());
 
     // Now add a return node to set the return value.
-    dest.add(goto_programt::make_return(new_code, new_code.source_location()));
+    dest.add(goto_programt::make_return(
+      to_code_return(new_code), new_code.source_location()));
   }
   else
   {

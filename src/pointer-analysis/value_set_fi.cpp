@@ -1378,12 +1378,9 @@ void value_set_fit::apply_code(const codet &code, const namespacet &ns)
   {
     const code_returnt &code_return = to_code_return(code);
     // this is turned into an assignment
-    if(code_return.has_return_value())
-    {
-      std::string rvs="value_set::return_value"+std::to_string(from_function);
-      symbol_exprt lhs(rvs, code_return.return_value().type());
-      assign(lhs, code_return.return_value(), ns);
-    }
+    std::string rvs = "value_set::return_value" + std::to_string(from_function);
+    symbol_exprt lhs(rvs, code_return.return_value().type());
+    assign(lhs, code_return.return_value(), ns);
   }
   else if(statement==ID_fence)
   {

@@ -68,7 +68,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_continue)
     typecheck_continue(code);
   else if(statement==ID_return)
-    typecheck_return(to_code_return(code));
+    typecheck_return(to_code_frontend_return(code));
   else if(statement==ID_decl)
     typecheck_decl(code);
   else if(statement==ID_assign)
@@ -643,7 +643,7 @@ void c_typecheck_baset::typecheck_start_thread(codet &code)
   typecheck_code(to_code(code.op0()));
 }
 
-void c_typecheck_baset::typecheck_return(code_returnt &code)
+void c_typecheck_baset::typecheck_return(code_frontend_returnt &code)
 {
   if(code.has_return_value())
   {

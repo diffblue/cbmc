@@ -637,7 +637,7 @@ void jsil_typecheckt::typecheck_code(codet &code)
   if(statement==ID_function_call)
     typecheck_function_call(to_code_function_call(code));
   else if(statement==ID_return)
-    typecheck_return(to_code_return(code));
+    typecheck_return(to_code_frontend_return(code));
   else if(statement==ID_expression)
   {
     if(code.operands().size()!=1)
@@ -678,7 +678,7 @@ void jsil_typecheckt::typecheck_code(codet &code)
   }
 }
 
-void jsil_typecheckt::typecheck_return(code_returnt &code)
+void jsil_typecheckt::typecheck_return(code_frontend_returnt &code)
 {
   if(code.has_return_value())
     typecheck_expr(code.return_value());
