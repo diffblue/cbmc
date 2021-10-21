@@ -431,11 +431,11 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
+  /// \param instruction: The function call instruction
   virtual void symex_function_call(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const code_function_callt &code);
+    const goto_programt::instructiont &instruction);
 
   /// Symbolically execute a END_FUNCTION instruction.
   /// \param state: Symbolic execution state for current instruction
@@ -445,11 +445,15 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
+  /// \param lhs: nil or the lhs of the function call instruction
+  /// \param function: the symbol of the function to call
+  /// \param arguments: the arguments of the function call
   virtual void symex_function_call_symbol(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const code_function_callt &code);
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments);
 
   /// Symbolic execution of a function call by inlining.
   /// Records the call in \p target by appending a function call step and:

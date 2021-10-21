@@ -173,23 +173,31 @@ void goto_symext::parameter_assignments(
 void goto_symext::symex_function_call(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &code)
+  const goto_programt::instructiont &instruction)
 {
-  const exprt &function=code.function();
+  const exprt &function = instruction.call_function();
 
   // If at some point symex_function_call can support more
   // expression ids(), like ID_Dereference, please expand the
   // precondition appropriately.
   PRECONDITION(function.id() == ID_symbol);
-  symex_function_call_symbol(get_goto_function, state, code);
+
+  symex_function_call_symbol(
+    get_goto_function,
+    state,
+    instruction.call_lhs(),
+    to_symbol_expr(instruction.call_function()),
+    instruction.call_arguments());
 }
 
 void goto_symext::symex_function_call_symbol(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &original_code)
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments)
 {
-  code_function_callt code = original_code;
+  code_function_callt code(lhs, function, arguments);
 
   if(code.lhs().is_not_nil())
     code.lhs() = clean_expr(std::move(code.lhs()), state, true);
