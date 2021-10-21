@@ -2126,6 +2126,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_expr(simplify_expr(to_count_trailing_zeros_expr(expr).lower(), ns));
   }
+  else if(expr.id() == ID_empty_union)
+  {
+    out << "()";
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
@@ -4403,7 +4407,9 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   if(expr.id() == ID_equal && value)
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
-    if(equal_expr.lhs().type().id() == ID_empty)
+    if(
+      equal_expr.lhs().type().id() == ID_empty ||
+      equal_expr.rhs().id() == ID_empty_union)
     {
       // ignore equality checking over expressions with empty (void) type
       return;
@@ -4891,7 +4897,9 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id() == ID_union || type.id() == ID_union_tag)
   {
     std::size_t width=boolbv_width(type);
-    CHECK_RETURN_WITH_DIAGNOSTICS(width != 0, "failed to get width of union");
+    CHECK_RETURN_WITH_DIAGNOSTICS(
+      to_union_type(ns.follow(type)).components().empty() || width != 0,
+      "failed to get width of union");
 
     out << "(_ BitVec " << width << ")";
   }

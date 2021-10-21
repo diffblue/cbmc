@@ -183,6 +183,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_struct(to_struct_expr(expr));
   else if(expr.id()==ID_union)
     return convert_union(to_union_expr(expr));
+  else if(expr.id() == ID_empty_union)
+    return convert_empty_union(to_empty_union_expr(expr));
   else if(expr.id()==ID_string_constant)
     return convert_bitvector(
       to_string_constant(expr).to_array_expr());

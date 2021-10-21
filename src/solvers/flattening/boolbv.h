@@ -162,6 +162,7 @@ protected:
   virtual bvt convert_let(const let_exprt &);
   virtual bvt convert_array_of(const array_of_exprt &expr);
   virtual bvt convert_union(const union_exprt &expr);
+  virtual bvt convert_empty_union(const empty_union_exprt &expr);
   virtual bvt convert_bv_typecast(const typecast_exprt &expr);
   virtual bvt convert_add_sub(const exprt &expr);
   virtual bvt convert_mult(const mult_exprt &expr);
