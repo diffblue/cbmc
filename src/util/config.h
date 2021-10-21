@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_CONFIG_H
 #define CPROVER_UTIL_CONFIG_H
 
@@ -125,12 +124,29 @@ public:
     bool ts_18661_3_Floatn_types; // ISO/IEC TS 18661-3:2015
     bool gcc__float128_type;      // __float128, a gcc extension since 4.3/4.5
     bool single_precision_constant;
-    enum class c_standardt { C89, C99, C11 } c_standard;
+    enum class c_standardt
+    {
+      C89,
+      C99,
+      C11
+    } c_standard;
     static c_standardt default_c_standard();
 
-    void set_c89() { c_standard=c_standardt::C89; for_has_scope=false; }
-    void set_c99() { c_standard=c_standardt::C99; for_has_scope=true; }
-    void set_c11() { c_standard=c_standardt::C11; for_has_scope=true; }
+    void set_c89()
+    {
+      c_standard = c_standardt::C89;
+      for_has_scope = false;
+    }
+    void set_c99()
+    {
+      c_standard = c_standardt::C99;
+      for_has_scope = true;
+    }
+    void set_c11()
+    {
+      c_standard = c_standardt::C11;
+      for_has_scope = true;
+    }
 
     ieee_floatt::rounding_modet rounding_mode;
 
@@ -152,10 +168,21 @@ public:
     // instruction (in bytes)
     std::size_t memory_operand_size;
 
-    enum class endiannesst { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN };
+    enum class endiannesst
+    {
+      NO_ENDIANNESS,
+      IS_LITTLE_ENDIAN,
+      IS_BIG_ENDIAN
+    };
     endiannesst endianness;
 
-    enum class ost { NO_OS, OS_LINUX, OS_MACOS, OS_WIN };
+    enum class ost
+    {
+      NO_OS,
+      OS_LINUX,
+      OS_MACOS,
+      OS_WIN
+    };
     ost os;
 
     static std::string os_to_string(ost);
@@ -194,8 +221,15 @@ public:
     };
     flavourt mode; // the syntax of source files
 
-    enum class preprocessort { NONE, GCC, CLANG, VISUAL_STUDIO,
-                               CODEWARRIOR, ARM };
+    enum class preprocessort
+    {
+      NONE,
+      GCC,
+      CLANG,
+      VISUAL_STUDIO,
+      CODEWARRIOR,
+      ARM
+    };
     preprocessort preprocessor; // the preprocessor to use
 
     std::list<std::string> defines;
@@ -204,7 +238,11 @@ public:
     std::list<std::string> include_paths;
     std::list<std::string> include_files;
 
-    enum class libt { LIB_NONE, LIB_FULL };
+    enum class libt
+    {
+      LIB_NONE,
+      LIB_FULL
+    };
     libt lib;
 
     bool string_abstraction;
@@ -219,21 +257,43 @@ public:
 
     malloc_failure_modet malloc_failure_mode = malloc_failure_mode_none;
 
-    static const std::size_t default_object_bits=8;
+    static const std::size_t default_object_bits = 8;
   } ansi_c;
 
   struct cppt
   {
-    enum class cpp_standardt { CPP98, CPP03, CPP11, CPP14, CPP17 } cpp_standard;
+    enum class cpp_standardt
+    {
+      CPP98,
+      CPP03,
+      CPP11,
+      CPP14,
+      CPP17
+    } cpp_standard;
     static cpp_standardt default_cpp_standard();
 
-    void set_cpp98() { cpp_standard=cpp_standardt::CPP98; }
-    void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
-    void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
-    void set_cpp14() { cpp_standard=cpp_standardt::CPP14; }
-    void set_cpp17() { cpp_standard=cpp_standardt::CPP17; }
+    void set_cpp98()
+    {
+      cpp_standard = cpp_standardt::CPP98;
+    }
+    void set_cpp03()
+    {
+      cpp_standard = cpp_standardt::CPP03;
+    }
+    void set_cpp11()
+    {
+      cpp_standard = cpp_standardt::CPP11;
+    }
+    void set_cpp14()
+    {
+      cpp_standard = cpp_standardt::CPP14;
+    }
+    void set_cpp17()
+    {
+      cpp_standard = cpp_standardt::CPP17;
+    }
 
-    static const std::size_t default_object_bits=8;
+    static const std::size_t default_object_bits = 8;
   } cpp;
 
   struct verilogt
@@ -247,7 +307,7 @@ public:
     classpatht classpath;
     irep_idt main_class;
 
-    static const std::size_t default_object_bits=16;
+    static const std::size_t default_object_bits = 16;
   } java;
 
   struct bv_encodingt
