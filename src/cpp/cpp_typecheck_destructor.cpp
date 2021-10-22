@@ -11,7 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <util/goto_instruction_code.h>
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/pointer_expr.h>
 
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const

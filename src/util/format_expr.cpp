@@ -14,13 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "format_type.h"
-#include "goto_instruction_code.h"
 #include "ieee_float.h"
 #include "mathematical_expr.h"
 #include "mp_arith.h"
 #include "pointer_expr.h"
 #include "prefix.h"
-#include "std_code.h"
 #include "string_utils.h"
 
 #include <map>
@@ -423,53 +421,6 @@ void format_expr_configt::setup()
     return os << '(' << format(if_expr.cond()) << " ? "
               << format(if_expr.true_case()) << " : "
               << format(if_expr.false_case()) << ')';
-  };
-
-  expr_map[ID_code] =
-    [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    const auto &code = to_code(expr);
-    const irep_idt &statement = code.get_statement();
-
-    if(statement == ID_assign)
-      return os << format(to_code_assign(code).lhs()) << " = "
-                << format(to_code_assign(code).rhs()) << ';';
-    else if(statement == ID_block)
-    {
-      os << '{';
-      for(const auto &s : to_code_block(code).statements())
-        os << ' ' << format(s);
-      return os << " }";
-    }
-    else if(statement == ID_dead)
-    {
-      return os << "dead " << format(to_code_dead(code).symbol()) << ";";
-    }
-    else if(const auto decl = expr_try_dynamic_cast<code_frontend_declt>(code))
-    {
-      const auto &declaration_symb = decl->symbol();
-      os << "decl " << format(declaration_symb.type()) << " "
-         << format(declaration_symb);
-      if(const optionalt<exprt> initial_value = decl->initial_value())
-        os << " = " << format(*initial_value);
-      return os << ";";
-    }
-    else if(statement == ID_function_call)
-    {
-      const auto &func_call = to_code_function_call(code);
-      os << to_symbol_expr(func_call.function()).get_identifier() << "(";
-
-      // Join all our arguments together.
-      join_strings(
-        os,
-        func_call.arguments().begin(),
-        func_call.arguments().end(),
-        ", ",
-        [](const exprt &expr) { return format(expr); });
-
-      return os << ");";
-    }
-    else
-      return fallback_format_rec(os, expr);
   };
 
   expr_map[ID_string_constant] =

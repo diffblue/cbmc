@@ -13,11 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/fresh_symbol.h>
-#include <util/goto_instruction_code.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>

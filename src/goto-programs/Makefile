@@ -21,6 +21,7 @@ SRC = allocate_objects.cpp \
       goto_functions.cpp \
       goto_inline_class.cpp \
       goto_inline.cpp \
+      goto_instruction_code.cpp \
       goto_program.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \
@@ -69,6 +70,7 @@ SRC = allocate_objects.cpp \
       string_instrumentation.cpp \
       structured_trace_util.cpp \
       system_library_symbols.cpp \
+      validate_code.cpp \
       validate_goto_model.cpp \
       vcd_goto_trace.cpp \
       wp.cpp \

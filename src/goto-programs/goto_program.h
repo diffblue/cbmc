@@ -12,13 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 
+#include "goto_instruction_code.h"
+
 #include <iosfwd>
 #include <set>
 #include <limits>
 #include <string>
 
 #include <util/deprecate.h>
-#include <util/goto_instruction_code.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>

@@ -14,10 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
-#include <util/goto_instruction_code.h>
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
+
+#include <goto-programs/goto_instruction_code.h>
 
 #include <atomic>
 

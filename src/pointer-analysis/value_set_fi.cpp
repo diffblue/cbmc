@@ -13,10 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/goto_instruction_code.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>

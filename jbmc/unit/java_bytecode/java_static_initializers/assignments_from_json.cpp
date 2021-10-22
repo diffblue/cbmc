@@ -15,8 +15,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <testing-utils/expr_query.h>
 #include <testing-utils/use_catch.h>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
-#include <util/goto_instruction_code.h>
 #include <util/json.h>
 #include <util/symbol_table.h>
 

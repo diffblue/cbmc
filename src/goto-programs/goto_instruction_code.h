@@ -9,8 +9,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_UTIL_GOTO_INSTRUCTION_CODE_H
 #define CPROVER_UTIL_GOTO_INSTRUCTION_CODE_H
 
-#include "std_code_base.h"
-#include "std_expr.h"
+#include <util/std_code_base.h>
+#include <util/std_expr.h>
 
 /// A \ref codet representing an assignment in the program.
 /// For example, if an expression `e1` is represented as an \ref exprt `expr1`

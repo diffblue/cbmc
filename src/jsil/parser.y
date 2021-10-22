@@ -11,7 +11,8 @@ extern char *yyjsiltext;
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1
 
-#include <util/goto_instruction_code.h>
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/string_constant.h>
 
 #include "jsil_y.tab.h"
