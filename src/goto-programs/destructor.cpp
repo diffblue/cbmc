@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Destructor Calls
 
 #include "destructor.h"
+#include "goto_instruction_code.h"
 
-#include <util/goto_instruction_code.h>
 #include <util/namespace.h>
 
 code_function_callt get_destructor(

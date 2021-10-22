@@ -10,9 +10,10 @@ Date:   June 2017
 
 #include "java_bytecode_instrument.h"
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/goto_instruction_code.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 

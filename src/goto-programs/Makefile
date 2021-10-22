@@ -21,6 +21,7 @@ SRC = allocate_objects.cpp \
       goto_functions.cpp \
       goto_inline_class.cpp \
       goto_inline.cpp \
+      goto_instruction_code.cpp \
       goto_program.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \

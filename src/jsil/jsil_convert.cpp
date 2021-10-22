@@ -11,7 +11,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_convert.h"
 
-#include <util/goto_instruction_code.h>
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/message.h>
 #include <util/symbol_table.h>
 

@@ -8,10 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_lifetime_init.h"
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
-#include <util/goto_instruction_code.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
 #include <util/std_code.h>

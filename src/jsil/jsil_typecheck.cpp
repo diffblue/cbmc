@@ -11,8 +11,9 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_typecheck.h"
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/bitvector_types.h>
-#include <util/goto_instruction_code.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>

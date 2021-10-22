@@ -9,7 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_ALLOCATE_OBJECTS_H
 #define CPROVER_UTIL_ALLOCATE_OBJECTS_H
 
-#include <util/goto_instruction_code.h>
+#include "goto_instruction_code.h"
+
 #include <util/namespace.h>
 #include <util/source_location.h>
 #include <util/std_code.h>

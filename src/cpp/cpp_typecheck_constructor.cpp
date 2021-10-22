@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/goto_instruction_code.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
