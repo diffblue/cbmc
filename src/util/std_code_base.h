@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "std_types.h"
 #include "validate.h"
-#include "validate_code.h"
 
 /// Data structure for representing an arbitrary statement in a program. Every
 /// specific type of statement (e.g. block of statements, assignment,
@@ -72,51 +71,6 @@ public:
   const codet &first_statement() const;
   codet &last_statement();
   const codet &last_statement() const;
-
-  /// Check that the code statement is well-formed (shallow checks only, i.e.,
-  /// enclosed statements, subexpressions, etc. are not checked)
-  ///
-  /// Subclasses may override this function to provide specific well-formedness
-  /// checks for the corresponding types.
-  ///
-  /// The validation mode indicates whether well-formedness check failures are
-  /// reported via DATA_INVARIANT violations or exceptions.
-  static void check(const codet &, const validation_modet)
-  {
-  }
-
-  /// Check that the code statement is well-formed, assuming that all its
-  /// enclosed statements, subexpressions, etc. have all ready been checked for
-  /// well-formedness.
-  ///
-  /// Subclasses may override this function to provide specific well-formedness
-  /// checks for the corresponding types.
-  ///
-  /// The validation mode indicates whether well-formedness check failures are
-  /// reported via DATA_INVARIANT violations or exceptions.
-  static void validate(
-    const codet &code,
-    const namespacet &,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    check_code(code, vm);
-  }
-
-  /// Check that the code statement is well-formed (full check, including checks
-  /// of all subexpressions)
-  ///
-  /// Subclasses may override this function to provide specific well-formedness
-  /// checks for the corresponding types.
-  ///
-  /// The validation mode indicates whether well-formedness check failures are
-  /// reported via DATA_INVARIANT violations or exceptions.
-  static void validate_full(
-    const codet &code,
-    const namespacet &,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    check_code(code, vm);
-  }
 
   using exprt::op0;
   using exprt::op1;
