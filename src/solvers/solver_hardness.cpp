@@ -14,6 +14,7 @@ Author: Diffblue Ltd.
 #include <util/format_type.h>
 #include <util/json_irep.h>
 #include <util/json_stream.h>
+#include <util/std_code.h>
 
 solver_hardnesst::sat_hardnesst &solver_hardnesst::sat_hardnesst::
 operator+=(const solver_hardnesst::sat_hardnesst &other)

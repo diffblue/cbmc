@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/std_code.h>
 
 void goto_symext::havoc_rec(
   statet &state,

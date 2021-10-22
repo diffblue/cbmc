@@ -14,6 +14,8 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
+#include <util/std_code.h>
+
 #include <algorithm>
 #include <regex>
 

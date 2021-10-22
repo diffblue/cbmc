@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/std_code.h>
 
 #include "expr_skeleton.h"
 #include "path_storage.h"

@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
+#include <util/std_code.h>
 #include <util/string_expr.h>
 #include <util/string_utils.h>
 

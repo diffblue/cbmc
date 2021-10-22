@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/source_location.h>
 
+class code_gotot;
 enum class validation_modet;
 
 /// The type of an instruction in a GOTO program.
@@ -980,11 +981,8 @@ public:
   }
 
   static instructiont make_incomplete_goto(
-    const code_gotot &_code,
-    const source_locationt &l = source_locationt::nil())
-  {
-    return instructiont(_code, l, INCOMPLETE_GOTO, true_exprt(), {});
-  }
+    const code_gotot &,
+    const source_locationt & = source_locationt::nil());
 
   static instructiont make_goto(
     targett _target,

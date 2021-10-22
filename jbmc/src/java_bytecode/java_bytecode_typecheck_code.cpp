@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_typecheck.h"
 
 #include <util/goto_instruction_code.h>
+#include <util/std_code.h>
 
 void java_bytecode_typecheckt::typecheck_code(codet &code)
 {

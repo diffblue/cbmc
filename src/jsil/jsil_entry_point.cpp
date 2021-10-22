@@ -15,6 +15,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/config.h>
 #include <util/message.h>
 #include <util/range.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/adjust_float_expressions.h>

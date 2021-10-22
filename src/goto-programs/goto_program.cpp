@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_type.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/validate.h>
@@ -29,6 +30,13 @@ Author: Daniel Kroening, kroening@kroening.com
 std::ostream &goto_programt::output(std::ostream &out) const
 {
   return output(namespacet(symbol_tablet()), irep_idt(), out);
+}
+
+goto_programt::instructiont goto_programt::make_incomplete_goto(
+  const code_gotot &_code,
+  const source_locationt &l)
+{
+  return instructiont(_code, l, INCOMPLETE_GOTO, true_exprt(), {});
 }
 
 /// Writes to \p out a two/three line string representation of a given

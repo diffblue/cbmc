@@ -12,6 +12,7 @@ Author: Daniel Poetzl
 #include "remove_calls_no_body.h"
 
 #include <util/invariant.h>
+#include <util/std_code.h>
 
 #include "goto_functions.h"
 
