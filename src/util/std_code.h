@@ -190,19 +190,6 @@ public:
   }
 
   codet &find_last_statement();
-
-  static void validate_full(
-    const codet &code,
-    const namespacet &ns,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    for(const auto &statement : code.operands())
-    {
-      DATA_CHECK(
-        vm, code.id() == ID_code, "code block must be made up of codet");
-      validate_full_code(to_code(statement), ns, vm);
-    }
-  }
 };
 
 template<> inline bool can_cast_expr<code_blockt>(const exprt &base)

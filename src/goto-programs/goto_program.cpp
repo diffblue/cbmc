@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program.h"
 
+#include "validate_code.h"
+
 #include <iomanip>
 
 #include <util/base_type.h>

@@ -69,6 +69,7 @@ SRC = allocate_objects.cpp \
       string_instrumentation.cpp \
       structured_trace_util.cpp \
       system_library_symbols.cpp \
+      validate_code.cpp \
       validate_goto_model.cpp \
       vcd_goto_trace.cpp \
       wp.cpp \

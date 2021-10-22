@@ -9,12 +9,12 @@ Author: Daniel Poetzl
 #include "validate_code.h"
 
 #ifdef REPORT_UNIMPLEMENTED_CODE_CHECKS
-#include <iostream>
+#  include <iostream>
 #endif
 
-#include "goto_instruction_code.h"
-#include "std_code.h"
-#include "validate_helpers.h"
+#include <util/goto_instruction_code.h>
+#include <util/std_code.h>
+#include <util/validate_helpers.h>
 
 #define CALL_ON_CODE(code_type)                                                \
   C<codet, code_type>()(code, std::forward<Args>(args)...)

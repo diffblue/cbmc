@@ -106,7 +106,6 @@ SRC = arith_tools.cpp \
       unicode.cpp \
       union_find.cpp \
       union_find_replace.cpp \
-      validate_code.cpp \
       validate_expressions.cpp \
       validate_types.cpp \
       version.cpp \
