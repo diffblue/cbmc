@@ -70,7 +70,7 @@ void value_set_domain_templatet<VST>::transform(
   const irep_idt &function_to,
   locationt to_l)
 {
-  switch(from_l->type)
+  switch(from_l->type())
   {
   case GOTO:
     // ignore for now

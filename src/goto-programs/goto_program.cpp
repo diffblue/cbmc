@@ -83,7 +83,7 @@ std::ostream &goto_programt::output_instruction(
   else
     out << "        ";
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case NO_INSTRUCTION_TYPE:
     out << "NO INSTRUCTION TYPE SET" << '\n';
@@ -331,7 +331,7 @@ std::list<exprt> expressions_read(
 {
   std::list<exprt> dest;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case ASSUME:
   case ASSERT:
@@ -380,7 +380,7 @@ std::list<exprt> expressions_written(
 {
   std::list<exprt> dest;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case FUNCTION_CALL:
     if(instruction.call_lhs().is_not_nil())
@@ -486,7 +486,7 @@ std::string as_string(
 {
   std::string result;
 
-  switch(i.type)
+  switch(i.type())
   {
   case NO_INSTRUCTION_TYPE:
     return "(NO INSTRUCTION TYPE)";
@@ -743,7 +743,7 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
 {
   // clang-format off
   return
-    type == other.type &&
+    _type == other._type &&
     code == other.code &&
     guard == other.guard &&
     targets.size() == other.targets.size() &&
@@ -842,7 +842,7 @@ void goto_programt::instructiont::validate(
     };
 
   const symbolt *table_symbol;
-  switch(type)
+  switch(_type)
   {
   case NO_INSTRUCTION_TYPE:
     break;
@@ -955,7 +955,7 @@ void goto_programt::instructiont::validate(
 void goto_programt::instructiont::transform(
   std::function<optionalt<exprt>(exprt)> f)
 {
-  switch(type)
+  switch(_type)
   {
   case OTHER:
     if(get_other().get_statement() == ID_expression)
@@ -1059,7 +1059,7 @@ void goto_programt::instructiont::transform(
 void goto_programt::instructiont::apply(
   std::function<void(const exprt &)> f) const
 {
-  switch(type)
+  switch(_type)
   {
   case OTHER:
     if(get_other().get_statement() == ID_expression)

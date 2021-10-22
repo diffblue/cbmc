@@ -36,7 +36,7 @@ void variable_sensitivity_domaint::transform(
 #endif
 
   const goto_programt::instructiont &instruction = *from;
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case DECL:
   {
@@ -290,7 +290,7 @@ void variable_sensitivity_domaint::transform_function_call(
   ai_baset &ai,
   const namespacet &ns)
 {
-  PRECONDITION(from->type == FUNCTION_CALL);
+  PRECONDITION(from->type() == FUNCTION_CALL);
 
   const exprt &function = from->call_function();
 

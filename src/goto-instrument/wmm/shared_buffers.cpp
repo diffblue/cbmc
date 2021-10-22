@@ -159,11 +159,8 @@ void shared_bufferst::assignment(
   {
     const exprt symbol=ns.lookup(identifier).symbol_expr();
 
-    t=goto_program.insert_before(t);
-    t->type=ASSIGN;
-    t->code_nonconst() = code_assignt(symbol, value);
-    t->code_nonconst().add_source_location() = source_location;
-    t->source_location_nonconst() = source_location;
+    t = goto_program.insert_before(
+      t, goto_programt::make_assignment(symbol, value, source_location));
 
     // instrumentations.insert((const irep_idt) (t->code.id()));
 
@@ -1072,8 +1069,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    shared_buffers.message.debug() << "instruction "<<instruction.type
-                                   << messaget::eom;
+    shared_buffers.message.debug()
+      << "instruction " << instruction.type() << messaget::eom;
 
     /* thread marking */
     if(instruction.is_start_thread())

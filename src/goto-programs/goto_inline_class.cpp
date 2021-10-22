@@ -162,15 +162,15 @@ void goto_inlinet::replace_return(
       {
         // a typecast may be necessary if the declared return type at the call
         // site differs from the defined return type
-        it->code_nonconst() = code_assignt(
+        *it = goto_programt::make_assignment(
           lhs,
-          typecast_exprt::conditional_cast(it->return_value(), lhs.type()));
-        it->type=ASSIGN;
+          typecast_exprt::conditional_cast(it->return_value(), lhs.type()),
+          it->source_location());
       }
       else
       {
-        it->code_nonconst() = code_expressiont(it->return_value());
-        it->type=OTHER;
+        *it = goto_programt::make_other(
+          code_expressiont(it->return_value()), it->source_location());
       }
     }
   }
@@ -232,7 +232,7 @@ void goto_inlinet::insert_function_body(
   DATA_INVARIANT(
     end.is_end_function(),
     "final instruction of a function must be an END_FUNCTION");
-  end.type=LOCATION;
+  end = goto_programt::make_location(end.source_location());
 
   // make sure the inlined function does not introduce hiding
   if(goto_function.is_hidden())
@@ -290,8 +290,7 @@ void goto_inlinet::insert_function_body(
   }
 
   // kill call
-  target->type=LOCATION;
-  target->code_nonconst().clear();
+  *target = goto_programt::make_location(target->source_location());
   target++;
 
   dest.destructive_insert(target, tmp);

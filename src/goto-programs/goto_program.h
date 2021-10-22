@@ -340,8 +340,24 @@ public:
     }
 
     /// What kind of instruction?
-    goto_program_instruction_typet type;
+    goto_program_instruction_typet type() const
+    {
+      return _type;
+    }
 
+    /// Set the kind of the instruction.
+    /// This method is best avoided to prevent mal-formed instructions.
+    /// Consider using the goto_programt::make_X methods instead.
+    goto_program_instruction_typet &type_nonconst()
+    {
+      return _type;
+    }
+
+  protected:
+    // Use type() and type_nonconst() to access.
+    goto_program_instruction_typet _type;
+
+  public:
     /// Guard for gotos, assume, assert
     /// Use condition() method to access.
     /// This member will eventually be protected.
@@ -426,9 +442,9 @@ public:
     { return target_number!=nil_target; }
 
     /// Clear the node
-    void clear(goto_program_instruction_typet _type)
+    void clear(goto_program_instruction_typet __type)
     {
-      type=_type;
+      _type = __type;
       targets.clear();
       guard=true_exprt();
       code.make_nil();
@@ -453,32 +469,32 @@ public:
 
     void complete_goto(targett _target)
     {
-      PRECONDITION(type == INCOMPLETE_GOTO);
+      PRECONDITION(_type == INCOMPLETE_GOTO);
       code.make_nil();
       targets.push_back(_target);
-      type = GOTO;
+      _type = GOTO;
     }
 
     // clang-format off
-    bool is_goto            () const { return type == GOTO;             }
-    bool is_set_return_value() const { return type == SET_RETURN_VALUE; }
-    bool is_assign          () const { return type == ASSIGN;           }
-    bool is_function_call   () const { return type == FUNCTION_CALL;    }
-    bool is_throw           () const { return type == THROW;            }
-    bool is_catch           () const { return type == CATCH;            }
-    bool is_skip            () const { return type == SKIP;             }
-    bool is_location        () const { return type == LOCATION;         }
-    bool is_other           () const { return type == OTHER;            }
-    bool is_decl            () const { return type == DECL;             }
-    bool is_dead            () const { return type == DEAD;             }
-    bool is_assume          () const { return type == ASSUME;           }
-    bool is_assert          () const { return type == ASSERT;           }
-    bool is_atomic_begin    () const { return type == ATOMIC_BEGIN;     }
-    bool is_atomic_end      () const { return type == ATOMIC_END;       }
-    bool is_start_thread    () const { return type == START_THREAD;     }
-    bool is_end_thread      () const { return type == END_THREAD;       }
-    bool is_end_function    () const { return type == END_FUNCTION;     }
-    bool is_incomplete_goto () const { return type == INCOMPLETE_GOTO;  }
+    bool is_goto            () const { return _type == GOTO;             }
+    bool is_set_return_value() const { return _type == SET_RETURN_VALUE; }
+    bool is_assign          () const { return _type == ASSIGN;           }
+    bool is_function_call   () const { return _type == FUNCTION_CALL;    }
+    bool is_throw           () const { return _type == THROW;            }
+    bool is_catch           () const { return _type == CATCH;            }
+    bool is_skip            () const { return _type == SKIP;             }
+    bool is_location        () const { return _type == LOCATION;         }
+    bool is_other           () const { return _type == OTHER;            }
+    bool is_decl            () const { return _type == DECL;             }
+    bool is_dead            () const { return _type == DEAD;             }
+    bool is_assume          () const { return _type == ASSUME;           }
+    bool is_assert          () const { return _type == ASSERT;           }
+    bool is_atomic_begin    () const { return _type == ATOMIC_BEGIN;     }
+    bool is_atomic_end      () const { return _type == ATOMIC_END;       }
+    bool is_start_thread    () const { return _type == START_THREAD;     }
+    bool is_end_thread      () const { return _type == END_THREAD;       }
+    bool is_end_function    () const { return _type == END_FUNCTION;     }
+    bool is_incomplete_goto () const { return _type == INCOMPLETE_GOTO;  }
     // clang-format on
 
     instructiont():
@@ -486,10 +502,10 @@ public:
     {
     }
 
-    explicit instructiont(goto_program_instruction_typet _type)
+    explicit instructiont(goto_program_instruction_typet __type)
       : code(static_cast<const codet &>(get_nil_irep())),
         _source_location(static_cast<const source_locationt &>(get_nil_irep())),
-        type(_type),
+        _type(__type),
         guard(true_exprt())
     {
     }
@@ -498,12 +514,12 @@ public:
     instructiont(
       codet _code,
       source_locationt __source_location,
-      goto_program_instruction_typet _type,
+      goto_program_instruction_typet __type,
       exprt _guard,
       targetst _targets)
       : code(std::move(_code)),
         _source_location(std::move(__source_location)),
-        type(_type),
+        _type(__type),
         guard(std::move(_guard)),
         targets(std::move(_targets))
     {
@@ -515,7 +531,7 @@ public:
       using std::swap;
       swap(instruction.code, code);
       swap(instruction._source_location, _source_location);
-      swap(instruction.type, type);
+      swap(instruction._type, _type);
       swap(instruction.guard, guard);
       swap(instruction.targets, targets);
     }
@@ -552,7 +568,7 @@ public:
     std::string to_string() const
     {
       std::ostringstream instruction_id_builder;
-      instruction_id_builder << type;
+      instruction_id_builder << _type;
       return instruction_id_builder.str();
     }
 

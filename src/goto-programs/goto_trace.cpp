@@ -115,7 +115,7 @@ void goto_trace_stept::output(
   if(!pc->source_location().is_nil())
     out << pc->source_location() << '\n';
 
-  out << pc->type << '\n';
+  out << pc->type() << '\n';
 
   if(pc->is_assert())
   {

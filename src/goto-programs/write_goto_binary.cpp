@@ -97,7 +97,7 @@ bool write_goto_binary(
       {
         irepconverter.reference_convert(instruction.get_code(), out);
         irepconverter.reference_convert(instruction.source_location(), out);
-        write_gb_word(out, (long)instruction.type);
+        write_gb_word(out, (long)instruction.type());
 
         const auto condition =
           instruction.has_condition() ? instruction.condition() : true_exprt();

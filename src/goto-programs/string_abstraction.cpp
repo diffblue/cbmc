@@ -465,7 +465,7 @@ goto_programt::targett string_abstractiont::abstract(
   goto_programt &dest,
   goto_programt::targett it)
 {
-  switch(it->type)
+  switch(it->type())
   {
   case ASSIGN:
     it=abstract_assign(dest, it);

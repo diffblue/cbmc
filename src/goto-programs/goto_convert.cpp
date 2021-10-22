@@ -208,8 +208,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
     const exprt pointer = destination.pointer();
 
     // remember the expression for later checks
-    i.type=OTHER;
-    i.code_nonconst() = code_expressiont(pointer);
+    i =
+      goto_programt::make_other(code_expressiont(pointer), i.source_location());
 
     // insert huge case-split
     for(const auto &label : targets.labels)

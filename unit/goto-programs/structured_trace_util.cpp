@@ -56,7 +56,7 @@ TEST_CASE("structured_trace_util", "[core][util][trace]")
   add_instruction(loop_head_location, instructions);
   // 2: goto 1 # back_edge
   const auto back_edge = add_instruction(back_edge_location, instructions);
-  back_edge->type = GOTO;
+  back_edge->type_nonconst() = GOTO;
   // 3: no_location
   goto_programt::instructiont no_location;
   no_location.location_number = 3;

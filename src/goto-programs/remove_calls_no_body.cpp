@@ -52,8 +52,7 @@ void remove_calls_no_bodyt::remove_call_no_body(
   }
 
   // kill call
-  target->type = LOCATION;
-  target->code_nonconst().clear();
+  *target = goto_programt::make_location(target->source_location());
   target++;
 
   goto_program.destructive_insert(target, tmp);

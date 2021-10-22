@@ -19,7 +19,7 @@ Author: Diffblue Limited.
 static bool is_expected_virtualmethod_call(
   const goto_programt::instructiont &instruction)
 {
-  if(instruction.type != FUNCTION_CALL)
+  if(instruction.type() != FUNCTION_CALL)
     return false;
   const auto &called_function = instruction.call_function();
   if(!can_cast_expr<class_method_descriptor_exprt>(called_function))

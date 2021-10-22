@@ -463,7 +463,7 @@ void cfg_baset<T, P, I>::compute_edges(
   next_PC++;
 
   // compute forward edges first
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case GOTO:
     compute_edges_goto(goto_program, instruction, next_PC, entry);

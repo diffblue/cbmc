@@ -56,7 +56,7 @@ bool points_tot::transform(const cfgt::nodet &e)
   bool result=false;
   const goto_programt::instructiont &instruction=*(e.PC);
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case SET_RETURN_VALUE:
     // TODO

@@ -153,12 +153,12 @@ static goto_programt analyse_checks_directly_preceding_function_call(
   {
     instr_it = std::prev(instr_it);
 
-    if(instr_it->type == ASSERT)
+    if(instr_it->is_assert())
     {
       continue;
     }
 
-    if(instr_it->type != ASSUME)
+    if(!instr_it->is_assume())
     {
       break;
     }

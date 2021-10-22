@@ -236,7 +236,7 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
   if(instruction.is_target())
     out << std::setw(6) << instruction.target_number << ": ";
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case NO_INSTRUCTION_TYPE:
     out << "NO INSTRUCTION TYPE SET";

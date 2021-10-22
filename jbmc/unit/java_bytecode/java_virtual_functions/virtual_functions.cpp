@@ -30,7 +30,7 @@ void check_function_call(
 
   for(const auto &target : targets)
   {
-    REQUIRE(target->type == goto_program_instruction_typet::FUNCTION_CALL);
+    REQUIRE(target->type() == goto_program_instruction_typet::FUNCTION_CALL);
     REQUIRE(target->call_function().id() == ID_symbol);
     REQUIRE(
       to_symbol_expr(target->call_function()).get_identifier() ==
@@ -69,7 +69,7 @@ SCENARIO(
           {
             // There should be two guarded GOTOs with non-constant guards. One
             // branching for class C and one for class D or O.
-            if(instruction.type == goto_program_instruction_typet::GOTO)
+            if(instruction.type() == goto_program_instruction_typet::GOTO)
             {
               if(instruction.guard.id() == ID_equal)
               {
@@ -146,7 +146,7 @@ SCENARIO(
         {
           irep_idt current_index;
 
-          while(it->type != goto_program_instruction_typet::END_FUNCTION)
+          while(it->type() != goto_program_instruction_typet::END_FUNCTION)
           {
             const source_locationt &loc = it->source_location();
             REQUIRE(loc != source_locationt::nil());
@@ -157,7 +157,7 @@ SCENARIO(
             {
               current_index = new_index;
               // instruction with a new bytecode index begins with ASSERT
-              REQUIRE(it->type == goto_program_instruction_typet::ASSERT);
+              REQUIRE(it->type() == goto_program_instruction_typet::ASSERT);
               // the assertion corresponds to a line coverage goal
               REQUIRE_FALSE(loc.get_basic_block_covered_lines().empty());
             }

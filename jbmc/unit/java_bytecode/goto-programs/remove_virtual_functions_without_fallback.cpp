@@ -88,7 +88,7 @@ static goto_programt::const_targett interpret_classid_comparison(
 
   while(pc != program.instructions.end())
   {
-    if(pc->type == GOTO)
+    if(pc->type() == GOTO)
     {
       exprt guard = pc->guard;
       guard = resolve_classid_test(guard, actual_class_id, ns);
@@ -105,7 +105,7 @@ static goto_programt::const_targett interpret_classid_comparison(
         return pc;
       }
     }
-    else if(pc->type == SKIP)
+    else if(pc->type() == SKIP)
     {
       ++pc;
     }

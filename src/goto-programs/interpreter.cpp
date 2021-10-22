@@ -258,7 +258,7 @@ void interpretert::step()
   goto_trace_stept &trace_step=steps.get_last_step();
   trace_step.thread_nr=thread_id;
   trace_step.pc=pc;
-  switch(pc->type)
+  switch(pc->type())
   {
   case GOTO:
     trace_step.type=goto_trace_stept::typet::GOTO;
@@ -337,7 +337,7 @@ void interpretert::step()
     break;
   case THROW:
     trace_step.type=goto_trace_stept::typet::GOTO;
-    while(!done && (pc->type!=CATCH))
+    while(!done && (pc->type() != CATCH))
     {
       if(pc==function->second.body.instructions.end())
       {
