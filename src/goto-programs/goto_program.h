@@ -441,6 +441,16 @@ public:
       clear(SKIP);
     }
 
+    /// Transforms either an assertion or a GOTO instruction
+    /// into an assumption, with the same condition.
+    void turn_into_assume()
+    {
+      PRECONDITION(_type == GOTO || _type == ASSERT);
+      _type = ASSUME;
+      targets.clear();
+      code.make_nil();
+    }
+
     void complete_goto(targett _target)
     {
       PRECONDITION(type == INCOMPLETE_GOTO);
