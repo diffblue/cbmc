@@ -14,7 +14,6 @@ Date: Oct 2018
 #include <util/pointer_expr.h>
 
 #include "goto_functions.h"
-#include "remove_returns.h"
 
 namespace
 {
@@ -37,18 +36,6 @@ private:
 
   /// Check that no function calls via function pointer are present
   void function_pointer_calls_removed();
-
-  /// Check returns have been removed
-  ///
-  /// Calls via function pointer must have been removed already when
-  /// removing returns, thus enabling this check also enables the check
-  /// that all calls via function pointer have been removed
-  ///
-  /// Sub-checks are:
-  /// - no return statements in any of the functions
-  /// - lhs of every \ref code_function_callt instruction is nil
-  /// - all return types are void (of both calls and functions themselves)
-  void check_returns_removed();
 
   /// Check that for all:
   /// -# functions that are called or
@@ -74,18 +61,10 @@ validate_goto_modelt::validate_goto_modelt(
   if(validation_options.entry_point_exists)
     entry_point_exists();
 
-  /// NB function pointer calls must have been removed before removing
-  /// returns - so 'check_returns_removed' also enables
-  // 'function_pointer_calls_removed'
-  if(
-    validation_options.function_pointer_calls_removed ||
-    validation_options.check_returns_removed)
+  if(validation_options.function_pointer_calls_removed)
   {
     function_pointer_calls_removed();
   }
-
-  if(validation_options.check_returns_removed)
-    check_returns_removed();
 
   if(validation_options.check_called_functions)
     check_called_functions();
@@ -111,30 +90,6 @@ void validate_goto_modelt::function_pointer_calls_removed()
           vm,
           instr.call_function().id() == ID_symbol,
           "no calls via function pointer should be present");
-      }
-    }
-  }
-}
-
-void validate_goto_modelt::check_returns_removed()
-{
-  for(const auto &fun : function_map)
-  {
-    const goto_functiont &goto_function = fun.second;
-
-    for(const auto &instr : goto_function.body.instructions)
-    {
-      DATA_CHECK(
-        vm,
-        !instr.is_set_return_value(),
-        "no SET_RETURN_VALUE instructions should be present");
-
-      if(instr.is_function_call())
-      {
-        DATA_CHECK(
-          vm,
-          !does_function_call_return(instr),
-          "function call lhs return should be nil");
       }
     }
   }

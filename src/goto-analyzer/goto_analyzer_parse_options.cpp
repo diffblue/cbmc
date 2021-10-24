@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
@@ -388,6 +389,7 @@ int goto_analyzer_parse_optionst::doit()
   // Preserve backwards compatibility in processing
   options.set_option("partial-inline", true);
   options.set_option("rewrite-union", false);
+  options.set_option("remove-returns", true);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;

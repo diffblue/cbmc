@@ -185,48 +185,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
     }
   }
 
-  WHEN("not all returns have been removed - a function call lhs is not nil")
-  {
-    // int h();
-    symbolt h;
-    h.name = "h";
-    h.mode = ID_C;
-    h.type = code_typet({}, signed_int_type());
-    h.value = code_blockt{};
-    goto_model.symbol_table.add(h);
-
-    // the lhs is non-nil
-    code_function_callt function_call{from_integer(1, signed_int_type()),
-                                      h.symbol_expr(),
-                                      code_function_callt::argumentst{}};
-    symbolt k;
-    k.name = "k";
-    k.mode = ID_C;
-    k.type = code_typet({}, empty_typet{});
-
-    code_blockt k_body{{function_call}};
-    k.value = k_body;
-
-    goto_model.symbol_table.add(k);
-
-    THEN("fail!")
-    {
-      goto_convert(goto_model, null_message_handler);
-
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
-      validation_options.check_returns_removed = true;
-
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
-    }
-  }
-
   WHEN("all returns have been removed")
   {
     THEN("true!")

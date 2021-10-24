@@ -14,6 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "goto_state.h"
 #include "symex_target.h"
+
 #include <analyses/lexical_loops.h>
 
 /// Stack frames -- these are used for function calls and for exceptions
@@ -30,7 +31,8 @@ struct framet
   std::vector<irep_idt> parameter_names;
   guardt guard_at_function_start;
   goto_programt::const_targett end_of_function;
-  exprt return_value = nil_exprt();
+  exprt call_lhs = nil_exprt();                // cleaned, but not renamed
+  optionalt<symbol_exprt> return_value_symbol; // not renamed
   bool hidden_function = false;
 
   symex_level1t old_level1;
