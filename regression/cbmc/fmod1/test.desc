@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE broken-z3-smt-backend broken-smt-backend
 main.c
 
 ^EXIT=0$
@@ -7,5 +7,3 @@ main.c
 --
 ^warning: ignoring
 --
-Currently, the case where the second argument is +-inf is wrongly
-implemented by float_utils.rem.
