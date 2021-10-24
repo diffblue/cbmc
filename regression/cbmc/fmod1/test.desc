@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Currently, the case where the second argument is +-inf is wrongly
+implemented by float_utils.rem.
