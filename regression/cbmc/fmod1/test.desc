@@ -1,0 +1,9 @@
+CORE broken-z3-smt-backend broken-smt-backend
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
