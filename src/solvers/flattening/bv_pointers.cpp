@@ -172,8 +172,30 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
-      return bv_utils.rel(
-        bv0, expr.id(), bv1, bv_utilst::representationt::UNSIGNED);
+      const pointer_typet &type0 = to_pointer_type(operands[0].type());
+      bvt offset_bv0 = offset_literals(bv0, type0);
+
+      const pointer_typet &type1 = to_pointer_type(operands[1].type());
+      bvt offset_bv1 = offset_literals(bv1, type1);
+
+      // Comparison over pointers to distinct objects is undefined behavior in
+      // C; we choose to always produce "false" in such a case.  Alternatively,
+      // we could do a comparison over the integer representation of a pointer
+
+      // do the same-object-test via an expression as this may permit re-using
+      // already cached encodings of the equality test
+      const exprt same_object = ::same_object(operands[0], operands[1]);
+      const literalt same_object_lit = convert(same_object);
+      if(same_object_lit.is_false())
+        return same_object_lit;
+
+      return prop.land(
+        same_object_lit,
+        bv_utils.rel(
+          offset_bv0,
+          expr.id(),
+          offset_bv1,
+          bv_utilst::representationt::SIGNED));
     }
   }
 

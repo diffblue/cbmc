@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
@@ -3165,7 +3166,6 @@ void smt2_convt::convert_relation(const binary_relation_exprt &expr)
   const typet &op_type=expr.op0().type();
 
   if(op_type.id()==ID_unsignedbv ||
-     op_type.id()==ID_pointer ||
      op_type.id()==ID_bv)
   {
     out << "(";
@@ -3237,6 +3237,31 @@ void smt2_convt::convert_relation(const binary_relation_exprt &expr)
     out << " ";
     convert_expr(expr.op1());
     out << ")";
+  }
+  else if(op_type.id() == ID_pointer)
+  {
+    const exprt same_object = ::same_object(expr.op0(), expr.op1());
+
+    out << "(and ";
+    convert_expr(same_object);
+
+    out << " (";
+    if(expr.id() == ID_le)
+      out << "bvsle";
+    else if(expr.id() == ID_lt)
+      out << "bvslt";
+    else if(expr.id() == ID_ge)
+      out << "bvsge";
+    else if(expr.id() == ID_gt)
+      out << "bvsgt";
+
+    out << ' ';
+    convert_expr(pointer_offset(expr.op0()));
+    out << ' ';
+    convert_expr(pointer_offset(expr.op1()));
+    out << ')';
+
+    out << ')';
   }
   else
     UNEXPECTEDCASE(
