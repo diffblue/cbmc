@@ -59,8 +59,20 @@ void havoc_utilst::append_scalar_havoc_code_for_expr(
   const exprt &expr,
   goto_programt &dest) const
 {
-  side_effect_expr_nondett rhs(expr.type(), location);
-  goto_programt::targett t =
-    dest.add(goto_programt::make_assignment(expr, std::move(rhs), location));
-  t->code_nonconst().add_source_location() = location;
+  if (expr.type().id() == ID_pointer)
+  {
+    nondet_symbol_exprt rhs{"havoc::nondet", expr.type(), location};
+    goto_programt::targett t =
+      dest.add(goto_programt::make_assignment(expr, std::move(rhs), location));
+    t->code_nonconst().add_source_location() = location;
+    
+  }
+  else
+  { 
+    side_effect_expr_nondett rhs(expr.type(), location);
+    goto_programt::targett t =
+      dest.add(goto_programt::make_assignment(expr, std::move(rhs), location));
+    t->code_nonconst().add_source_location() = location;
+  }
+
 }
