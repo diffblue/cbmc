@@ -201,12 +201,12 @@ protected:
   /// \param guard: the condition under which the operation happens
   void pointer_primitive_check(const exprt &expr, const guardt &guard);
 
-  /// Returns true if the given expression is a pointer primitive such as
-  /// __CPROVER_r_ok()
+  /// Returns true if the given expression is a pointer primitive
+  /// that requires a pointer primitive check
   ///
   /// \param expr expression
   /// \return true if the given expression is a pointer primitive
-  bool is_pointer_primitive(const exprt &expr);
+  bool requires_pointer_primitive_check(const exprt &);
 
   optionalt<goto_checkt::conditiont>
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
@@ -1282,10 +1282,7 @@ void goto_checkt::pointer_primitive_check(
   if(expr.source_location().is_built_in())
     return;
 
-  const exprt pointer =
-    (expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok)
-      ? to_r_or_w_ok_expr(expr).pointer()
-      : to_unary_expr(expr).op();
+  const exprt pointer = to_unary_expr(expr).op();
 
   CHECK_RETURN(pointer.type().id() == ID_pointer);
 
@@ -1317,15 +1314,13 @@ void goto_checkt::pointer_primitive_check(
   }
 }
 
-bool goto_checkt::is_pointer_primitive(const exprt &expr)
+bool goto_checkt::requires_pointer_primitive_check(const exprt &expr)
 {
   // we don't need to include the __CPROVER_same_object primitive here as it
   // is replaced by lower level primitives in the special function handling
   // during typechecking (see c_typecheck_expr.cpp)
   return expr.id() == ID_pointer_object || expr.id() == ID_pointer_offset ||
-         expr.id() == ID_object_size || expr.id() == ID_r_ok ||
-         expr.id() == ID_w_ok || expr.id() == ID_rw_ok ||
-         expr.id() == ID_is_dynamic_object;
+         expr.id() == ID_object_size || expr.id() == ID_is_dynamic_object;
 }
 
 goto_checkt::conditionst goto_checkt::get_pointer_dereferenceable_conditions(
@@ -1795,7 +1790,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
   }
-  else if(is_pointer_primitive(expr))
+  else if(requires_pointer_primitive_check(expr))
   {
     pointer_primitive_check(expr, guard);
   }

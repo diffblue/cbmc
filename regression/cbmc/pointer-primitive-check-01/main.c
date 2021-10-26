@@ -18,11 +18,5 @@ void main()
   __CPROVER_OBJECT_SIZE(p4);
 
   char *p5;
-  __CPROVER_r_ok(p5, 1);
-
-  char *p6;
-  __CPROVER_w_ok(p6, 1);
-
-  char *p7;
-  __CPROVER_DYNAMIC_OBJECT(p7);
+  __CPROVER_DYNAMIC_OBJECT(p5);
 }
