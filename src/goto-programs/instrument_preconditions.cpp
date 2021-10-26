@@ -62,7 +62,7 @@ void remove_preconditions(goto_programt &goto_program)
       instruction.is_assert() &&
       instruction.source_location().get_property_class() == ID_precondition)
     {
-      instruction.type=LOCATION;
+      instruction = goto_programt::make_location(instruction.source_location());
     }
     else
       break; // preconditions must be at the front

@@ -175,10 +175,8 @@ void remove_function_pointer(
 
   // We preserve the original dereferencing to possibly catch
   // further pointer-related errors.
-  code_expressiont code_expression(function);
-  code_expression.add_source_location() = function.source_location();
-  target->code_nonconst().swap(code_expression);
-  target->type = OTHER;
+  *target = goto_programt::make_other(
+    code_expressiont(function), function.source_location());
 }
 
 void value_set_fi_fp_removal(

@@ -186,8 +186,8 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       current_thread=coming_from;
     thread=current_thread;
 
-    instrumenter.message.debug() << "visit instruction "<<instruction.type
-      << messaget::eom;
+    instrumenter.message.debug()
+      << "visit instruction " << instruction.type() << messaget::eom;
 
     if(instruction.is_start_thread() || instruction.is_end_thread())
     {

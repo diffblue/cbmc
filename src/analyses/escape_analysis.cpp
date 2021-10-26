@@ -184,7 +184,7 @@ void escape_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case ASSIGN:
     {
@@ -460,7 +460,7 @@ void escape_analysist::instrument(
 
       const goto_programt::instructiont &instruction=*i_it;
 
-      if(instruction.type == ASSIGN)
+      if(instruction.type() == ASSIGN)
       {
         const exprt &assign_lhs = instruction.assign_lhs();
 
@@ -469,7 +469,7 @@ void escape_analysist::instrument(
         insert_cleanup(
           gf_entry.second, i_it, assign_lhs, cleanup_functions, false, ns);
       }
-      else if(instruction.type == DEAD)
+      else if(instruction.type() == DEAD)
       {
         const auto &dead_symbol = instruction.dead_symbol();
 

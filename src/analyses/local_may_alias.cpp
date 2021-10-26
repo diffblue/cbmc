@@ -371,7 +371,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     const loc_infot &loc_info_src=loc_infos[loc_nr];
     loc_infot loc_info_dest=loc_infos[loc_nr];
 
-    switch(instruction.type)
+    switch(instruction.type())
     {
     case ASSIGN:
     {

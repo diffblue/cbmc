@@ -32,7 +32,7 @@ void local_cfgt::build(const goto_programt &goto_program)
     nodet &node=nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
 
-    switch(instruction.type)
+    switch(instruction.type())
     {
     case GOTO:
       if(!instruction.get_condition().is_true())

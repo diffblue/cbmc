@@ -311,7 +311,8 @@ static void instrument_cover_goals(
           {
             successor->turn_into_skip();
           }
-          i_it->type = goto_program_instruction_typet::ASSUME;
+
+          i_it->turn_into_assume();
         }
         else
         {

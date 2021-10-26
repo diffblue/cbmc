@@ -138,7 +138,9 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 {
   assert(target!=goto_program.instructions.end());
 
-  if(target->type != ASSERT && !target->source_location().get_comment().empty())
+  if(
+    target->type() != ASSERT &&
+    !target->source_location().get_comment().empty())
   {
     dest.add(code_skipt());
     dest.statements().back().add_source_location().set_comment(
@@ -158,7 +160,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 
   convert_labels(target, dest);
 
-  switch(target->type)
+  switch(target->type())
   {
     case SKIP:
     case LOCATION:
@@ -764,10 +766,9 @@ bool goto_program2codet::set_block_end_points(
       continue;
 
     // compute the block that belongs to this case
-    for(goto_programt::const_targett case_end=it->case_start;
-        case_end!=goto_program.instructions.end() &&
-        case_end->type!=END_FUNCTION &&
-        case_end!=upper_bound;
+    for(goto_programt::const_targett case_end = it->case_start;
+        case_end != goto_program.instructions.end() &&
+        case_end->type() != END_FUNCTION && case_end != upper_bound;
         ++case_end)
     {
       const auto &case_end_node = dominators.get_node(case_end);

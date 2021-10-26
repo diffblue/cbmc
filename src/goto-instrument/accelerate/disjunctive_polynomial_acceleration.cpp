@@ -845,9 +845,7 @@ void disjunctive_polynomial_accelerationt::build_fixed()
   for(auto &instruction : fixed.instructions)
   {
     if(instruction.is_assert())
-    {
-      instruction.type = ASSUME;
-    }
+      instruction.turn_into_assume();
   }
 
   // We're only interested in paths that loop back to the loop header.

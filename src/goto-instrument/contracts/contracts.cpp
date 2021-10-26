@@ -261,8 +261,8 @@ void code_contractst::check_apply_loop_contracts(
   insert_before_swap_and_advance(goto_function.body, loop_end, havoc_code);
 
   // change the back edge into assume(false) or assume(guard)
-  loop_end->targets.clear();
-  loop_end->type = ASSUME;
+  loop_end->turn_into_assume();
+
   if(loop_head->is_goto())
     loop_end->set_condition(false_exprt());
   else

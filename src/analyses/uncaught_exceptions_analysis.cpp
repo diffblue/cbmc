@@ -67,7 +67,7 @@ void uncaught_exceptions_domaint::transform(
 {
   const goto_programt::instructiont &instruction=*from;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case THROW:
   {

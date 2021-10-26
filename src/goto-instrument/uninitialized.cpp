@@ -112,21 +112,20 @@ void uninitializedt::add_assertions(
 
       if(tracking.find(identifier)!=tracking.end())
       {
-        goto_programt::targett i1=goto_program.insert_after(i_it);
-        goto_programt::targett i2=goto_program.insert_after(i1);
-        i_it++, i_it++;
-
         const irep_idt new_identifier=
           id2string(identifier)+"#initialized";
 
         symbol_exprt symbol_expr(new_identifier, bool_typet());
-        i1->type=DECL;
-        i1->source_location_nonconst() = instruction.source_location();
-        i1->code_nonconst() = code_declt(symbol_expr);
+        goto_programt::instructiont i1 =
+          goto_programt::make_decl(symbol_expr, instruction.source_location());
 
-        i2->type=ASSIGN;
-        i2->source_location_nonconst() = instruction.source_location();
-        i2->code_nonconst() = code_assignt(symbol_expr, false_exprt());
+        goto_programt::instructiont i2 = goto_programt::make_assignment(
+          symbol_expr, false_exprt(), instruction.source_location());
+
+        goto_programt::targett i1_it =
+          goto_program.insert_after(i_it, std::move(i1));
+        goto_program.insert_after(i1_it, std::move(i2));
+        i_it++, i_it++;
       }
     }
     else
@@ -180,12 +179,11 @@ void uninitializedt::add_assertions(
           {
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
 
-            goto_programt::instructiont assignment;
-            assignment.type=ASSIGN;
-            assignment.code_nonconst() = code_assignt(
-              symbol_exprt(new_identifier, bool_typet()), true_exprt());
-            assignment.source_location_nonconst() =
-              instruction.source_location();
+            goto_programt::instructiont assignment =
+              goto_programt::make_assignment(
+                symbol_exprt(new_identifier, bool_typet()),
+                true_exprt(),
+                instruction.source_location());
 
             goto_program.insert_before_swap(i_it, assignment);
             i_it++;

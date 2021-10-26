@@ -131,7 +131,7 @@ void k_inductiont::process_loop(
     {
       assert(t!=goto_function.body.instructions.end());
       if(t->is_assert())
-        t->type=ASSUME;
+        t->turn_into_assume();
     }
 
     // assume the loop condition has become false

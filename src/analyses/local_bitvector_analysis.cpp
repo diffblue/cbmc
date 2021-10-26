@@ -266,7 +266,7 @@ void local_bitvector_analysist::build()
     auto &loc_info_src=loc_infos[loc_nr];
     auto loc_info_dest=loc_infos[loc_nr];
 
-    switch(instruction.type)
+    switch(instruction.type())
     {
     case ASSIGN:
       assign_lhs(

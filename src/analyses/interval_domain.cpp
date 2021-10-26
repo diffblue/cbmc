@@ -68,7 +68,7 @@ void interval_domaint::transform(
   locationt to{trace_to->current_location()};
 
   const goto_programt::instructiont &instruction=*from;
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case DECL:
     havoc_rec(instruction.decl_symbol());

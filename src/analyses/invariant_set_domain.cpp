@@ -25,7 +25,7 @@ void invariant_set_domaint::transform(
   locationt from_l(trace_from->current_location());
   locationt to_l(trace_to->current_location());
 
-  switch(from_l->type)
+  switch(from_l->type())
   {
   case GOTO:
     {

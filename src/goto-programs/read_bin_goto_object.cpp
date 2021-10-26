@@ -104,8 +104,8 @@ static bool read_bin_goto_object(
       instruction.source_location_nonconst() =
         static_cast<const source_locationt &>(
           irepconverter.reference_convert(in));
-      instruction.type = (goto_program_instruction_typet)
-                              irepconverter.read_gb_word(in);
+      instruction.type_nonconst() =
+        (goto_program_instruction_typet)irepconverter.read_gb_word(in);
       instruction.guard =
         static_cast<const exprt &>(irepconverter.reference_convert(in));
       instruction.target_number = irepconverter.read_gb_word(in);

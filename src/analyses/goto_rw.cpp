@@ -756,7 +756,7 @@ void goto_rw(
   goto_programt::const_targett target,
   rw_range_sett &rw_set)
 {
-  switch(target->type)
+  switch(target->type())
   {
   case NO_INSTRUCTION_TYPE:
   case INCOMPLETE_GOTO:

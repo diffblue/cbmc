@@ -516,9 +516,9 @@ void goto_symext::print_symex_step(statet &state)
   // debugging and if there's no code block at this point.
   if(
     !symex_config.show_symex_steps || !state.reachable ||
-    state.source.pc->type == DEAD ||
+    state.source.pc->type() == DEAD ||
     (state.source.pc->get_code().is_nil() &&
-     state.source.pc->type != END_FUNCTION))
+     state.source.pc->type() != END_FUNCTION))
   {
     return;
   }
@@ -551,7 +551,7 @@ void goto_symext::print_symex_step(statet &state)
 
   // Print the method we're returning too.
   const auto &call_stack = state.threads[state.source.thread_nr].call_stack;
-  if(state.source.pc->type == END_FUNCTION)
+  if(state.source.pc->type() == END_FUNCTION)
   {
     log.status() << messaget::eom;
 
@@ -566,7 +566,7 @@ void goto_symext::print_symex_step(statet &state)
   }
 
   // On a function call print the entire call stack.
-  if(state.source.pc->type == FUNCTION_CALL)
+  if(state.source.pc->type() == FUNCTION_CALL)
   {
     log.status() << messaget::eom;
 
@@ -620,7 +620,7 @@ void goto_symext::execute_next_instruction(
   state.depth++;
 
   // actually do instruction
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case SKIP:
     if(state.reachable)

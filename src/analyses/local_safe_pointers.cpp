@@ -108,7 +108,7 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
         instruction.location_number, checked_expressions);
     }
 
-    switch(instruction.type)
+    switch(instruction.type())
     {
     // Instruction types that definitely don't write anything, and therefore
     // can't store a null pointer:

@@ -30,7 +30,7 @@ bool value_set_domain_fit::transform(
   //      from_l->function << " " << from_l->location_number << " to " <<
   //      to_l->function << " " << to_l->location_number << '\n';
 
-  switch(from_l->type)
+  switch(from_l->type())
   {
   case GOTO:
     // ignore for now

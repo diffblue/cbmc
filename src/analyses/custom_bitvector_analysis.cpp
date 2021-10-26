@@ -283,7 +283,7 @@ void custom_bitvector_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case ASSIGN:
     assign_struct_rec(

@@ -73,7 +73,7 @@ void find_used_functions(
     {
       for(const auto &instruction : f_it->second.body.instructions)
       {
-        if(instruction.type == FUNCTION_CALL)
+        if(instruction.is_function_call())
         {
           const auto &function = instruction.call_function();
 
