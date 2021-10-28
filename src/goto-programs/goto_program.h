@@ -345,16 +345,9 @@ public:
       return _type;
     }
 
-    /// Set the kind of the instruction.
-    /// This method is best avoided to prevent mal-formed instructions.
-    /// Consider using the goto_programt::make_X methods instead.
-    goto_program_instruction_typet &type_nonconst()
-    {
-      return _type;
-    }
-
   protected:
-    // Use type() and type_nonconst() to access.
+    // Use type() to access. To prevent malformed instructions, no non-const
+    // access method is provided.
     goto_program_instruction_typet _type;
 
   public:
