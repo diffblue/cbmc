@@ -169,12 +169,13 @@ to pointers that point to within a memory object.
 
 ## Checking if a memory segment has at least a given size
 
-The following two primitives can be used to check whether there is a memory
-segment starting at the given pointer and extending for at least the given
-number of bytes:
+The following three primitives can be used to check whether there is a
+memory segment starting at the given pointer and extending for at least the
+given number of bytes:
 
 - `_Bool __CPROVER_r_ok(const void *p, size_t size)`
 - `_Bool __CPROVER_w_ok(const void *p, size_t size)`
+- `_Bool __CPROVER_rw_ok(const void *p, size_t size)`
 
 At present, both primitives are equivalent as all memory in CBMC is considered
 both readable and writeable. If `p` is the null pointer, the primitives return
