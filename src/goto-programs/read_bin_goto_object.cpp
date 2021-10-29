@@ -97,17 +97,20 @@ static bool read_bin_goto_object(
     for(std::size_t ins_index = 0; ins_index < ins_count; ++ins_index)
     {
       goto_programt::targett itarget = f.body.add_instruction();
-      goto_programt::instructiont &instruction=*itarget;
 
-      instruction.code_nonconst() =
+      // take copies as references into irepconverter are not stable
+      codet code =
         static_cast<const codet &>(irepconverter.reference_convert(in));
-      instruction.source_location_nonconst() =
-        static_cast<const source_locationt &>(
-          irepconverter.reference_convert(in));
-      instruction.type_nonconst() =
+      source_locationt source_location = static_cast<const source_locationt &>(
+        irepconverter.reference_convert(in));
+      goto_program_instruction_typet instruction_type =
         (goto_program_instruction_typet)irepconverter.read_gb_word(in);
-      instruction.guard =
+      exprt guard =
         static_cast<const exprt &>(irepconverter.reference_convert(in));
+
+      goto_programt::instructiont instruction{
+        code, source_location, instruction_type, guard, {}};
+
       instruction.target_number = irepconverter.read_gb_word(in);
       if(instruction.is_target() &&
          rev_target_map.insert(
@@ -131,6 +134,8 @@ static bool read_bin_goto_object(
         // The above info is also held in the goto_functiont object, and could
         // be stored in the binary.
       }
+
+      itarget->swap(instruction);
     }
 
     // Resolve targets

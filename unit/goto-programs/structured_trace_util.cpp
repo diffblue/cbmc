@@ -10,12 +10,6 @@ Author: Diffblue
 #include <goto-programs/goto_trace.h>
 #include <goto-programs/structured_trace_util.h>
 
-void link_edges(goto_programt::targett source, goto_programt::targett target)
-{
-  source->targets.push_back(target);
-  target->incoming_edges.insert(source);
-}
-
 source_locationt simple_location(const std::string &file, unsigned line)
 {
   source_locationt location;
@@ -53,19 +47,19 @@ TEST_CASE("structured_trace_util", "[core][util][trace]")
   // 0 # normal_location
   add_instruction(basic_location, instructions);
   // 1 # loop_head
-  add_instruction(loop_head_location, instructions);
+  auto loop_head = add_instruction(loop_head_location, instructions);
   // 2: goto 1 # back_edge
-  const auto back_edge = add_instruction(back_edge_location, instructions);
-  back_edge->type_nonconst() = GOTO;
+  instructions.emplace_back(
+    goto_programt::make_goto(loop_head, back_edge_location));
+  auto back_edge = std::prev(instructions.end());
+  back_edge->location_number = 2;
+  loop_head->incoming_edges.insert(back_edge);
   // 3: no_location
   goto_programt::instructiont no_location;
   no_location.location_number = 3;
   instructions.push_back(no_location);
   // 4: no_file
   add_instruction(no_file_location, instructions);
-
-  link_edges(
-    std::next(instructions.begin(), 2), std::next(instructions.begin(), 1));
 
   SECTION("location-only steps")
   {
