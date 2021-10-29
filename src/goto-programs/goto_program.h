@@ -930,10 +930,24 @@ public:
   }
 
   static instructiont make_decl(
+    const code_declt &_code,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(_code, l, DECL, nil_exprt(), {});
+  }
+
+  static instructiont make_decl(
     const symbol_exprt &symbol,
     const source_locationt &l = source_locationt::nil())
   {
     return instructiont(code_declt(symbol), l, DECL, nil_exprt(), {});
+  }
+
+  static instructiont make_dead(
+    const code_deadt &_code,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(_code, l, DEAD, nil_exprt(), {});
   }
 
   static instructiont make_dead(
@@ -1045,13 +1059,6 @@ public:
   {
     return instructiont(
       code_assignt(std::move(lhs), std::move(rhs)), l, ASSIGN, nil_exprt(), {});
-  }
-
-  static instructiont make_decl(
-    const code_declt &_code,
-    const source_locationt &l = source_locationt::nil())
-  {
-    return instructiont(_code, l, DECL, nil_exprt(), {});
   }
 
   /// Create a function call instruction

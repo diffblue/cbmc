@@ -129,6 +129,11 @@ public:
   {
   }
 
+  code_deadt(symbol_exprt symbol, source_locationt loc)
+    : codet(ID_dead, {std::move(symbol)}, std::move(loc))
+  {
+  }
+
   symbol_exprt &symbol()
   {
     return static_cast<symbol_exprt &>(op0());
@@ -198,6 +203,11 @@ class code_declt : public codet
 {
 public:
   explicit code_declt(symbol_exprt symbol) : codet(ID_decl, {std::move(symbol)})
+  {
+  }
+
+  code_declt(symbol_exprt symbol, source_locationt loc)
+    : codet(ID_decl, {std::move(symbol)}, std::move(loc))
   {
   }
 
