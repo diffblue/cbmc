@@ -213,10 +213,8 @@ void goto_convert_functionst::convert_function(
     !f.body.instructions.empty() &&
     has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
   {
-    goto_programt::instructiont a_begin;
-    a_begin = goto_programt::make_atomic_begin();
-    a_begin.source_location_nonconst() =
-      f.body.instructions.front().source_location();
+    goto_programt::instructiont a_begin = goto_programt::make_atomic_begin(
+      f.body.instructions.front().source_location());
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
     goto_programt::targett a_end =

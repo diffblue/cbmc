@@ -30,7 +30,7 @@ void cover_condition_instrumentert::instrument(
   {
     const std::set<exprt> conditions = collect_conditions(i_it);
 
-    const source_locationt source_location = i_it->source_location();
+    source_locationt source_location = i_it->source_location();
 
     for(const auto &c : conditions)
     {
@@ -38,13 +38,13 @@ void cover_condition_instrumentert::instrument(
 
       const std::string comment_t = "condition '" + c_string + "' true";
       goto_program.insert_before_swap(i_it);
+      initialize_source_location(source_location, comment_t, function_id);
       *i_it = make_assertion(c, source_location);
-      initialize_source_location(i_it, comment_t, function_id);
 
       const std::string comment_f = "condition '" + c_string + "' false";
       goto_program.insert_before_swap(i_it);
+      initialize_source_location(source_location, comment_f, function_id);
       *i_it = make_assertion(not_exprt(c), source_location);
-      initialize_source_location(i_it, comment_f, function_id);
     }
 
     for(std::size_t i = 0; i < conditions.size() * 2; i++)

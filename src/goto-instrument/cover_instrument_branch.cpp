@@ -40,10 +40,9 @@ void cover_branch_instrumentert::instrument(
     std::string comment = "entry point";
 
     source_locationt source_location = i_it->source_location();
-
-    goto_programt::targett t = goto_program.insert_before(
+    initialize_source_location(source_location, comment, function_id);
+    goto_program.insert_before(
       i_it, make_assertion(false_exprt(), source_location));
-    initialize_source_location(t, comment, function_id);
   }
 
   if(is_conditional_goto)
@@ -57,12 +56,12 @@ void cover_branch_instrumentert::instrument(
     source_locationt source_location = i_it->source_location();
 
     goto_program.insert_before_swap(i_it);
+    initialize_source_location(source_location, true_comment, function_id);
     *i_it = make_assertion(not_exprt(guard), source_location);
-    initialize_source_location(i_it, true_comment, function_id);
 
     goto_program.insert_before_swap(i_it);
+    initialize_source_location(source_location, false_comment, function_id);
     *i_it = make_assertion(guard, source_location);
-    initialize_source_location(i_it, false_comment, function_id);
 
     std::advance(i_it, 2);
   }

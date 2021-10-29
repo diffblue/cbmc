@@ -278,10 +278,9 @@ void code_contractst::check_apply_loop_contracts(
   {
     code_assertt assertion{initial_invariant_val};
     assertion.add_source_location() = loop_head_location;
+    assertion.add_source_location().set_comment(
+      "Check loop invariant before entry");
     converter.goto_convert(assertion, pre_loop_head_instrs, mode);
-    pre_loop_head_instrs.instructions.back()
-      .source_location_nonconst()
-      .set_comment("Check loop invariant before entry");
   }
 
   // Insert the first block of pre_loop_head_instrs,
@@ -396,10 +395,9 @@ void code_contractst::check_apply_loop_contracts(
   {
     code_assertt assertion{invariant};
     assertion.add_source_location() = loop_head_location;
+    assertion.add_source_location().set_comment(
+      "Check that loop invariant is preserved");
     converter.goto_convert(assertion, pre_loop_end_instrs, mode);
-    pre_loop_end_instrs.instructions.back()
-      .source_location_nonconst()
-      .set_comment("Check that loop invariant is preserved");
   }
 
   // Generate: assignments to store the multidimensional decreases clause's
@@ -421,11 +419,10 @@ void code_contractst::check_apply_loop_contracts(
       generate_lexicographic_less_than_check(
         new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() = loop_head_location;
+    monotonic_decreasing_assertion.add_source_location().set_comment(
+      "Check decreases clause on loop iteration");
     converter.goto_convert(
       monotonic_decreasing_assertion, pre_loop_end_instrs, mode);
-    pre_loop_end_instrs.instructions.back()
-      .source_location_nonconst()
-      .set_comment("Check decreases clause on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
@@ -464,12 +461,12 @@ void code_contractst::check_apply_loop_contracts(
 
     goto_programt pre_loop_exit_instrs;
     // Assertion to check that step case was checked if we entered the loop.
+    source_locationt annotated_location = loop_head_location;
+    annotated_location.set_comment(
+      "Check that loop instrumentation was not truncated");
     pre_loop_exit_instrs.add(goto_programt::make_assertion(
       or_exprt{not_exprt{entered_loop}, not_exprt{in_base_case}},
-      loop_head_location));
-    pre_loop_exit_instrs.instructions.back()
-      .source_location_nonconst()
-      .set_comment("Check that loop instrumentation was not truncated");
+      annotated_location));
     // Instructions to make all the temporaries go dead.
     pre_loop_exit_instrs.add(
       goto_programt::make_dead(in_base_case, loop_head_location));
@@ -873,9 +870,8 @@ void code_contractst::apply_function_contract(
         goto_programt::make_decl(to_symbol_expr(call_ret), loc));
 
     side_effect_expr_nondett expr(type, location);
-    auto target = havoc_instructions.add(
-      goto_programt::make_assignment(call_ret, expr, loc));
-    target->code_nonconst().add_source_location() = loc;
+    havoc_instructions.add(goto_programt::make_assignment(
+      code_assignt{call_ret, std::move(expr), loc}, loc));
   }
 
   // Insert havoc instructions immediately before the call site.

@@ -52,15 +52,13 @@ void overflow_instrumentert::add_overflow_checks(
 
   if(t->is_assign())
   {
-    code_assignt &assignment = to_code_assign(t->code_nonconst());
-
-    if(assignment.lhs()==overflow_var)
+    if(t->assign_lhs() == overflow_var)
     {
       return;
     }
 
-    add_overflow_checks(t, assignment.lhs(), added);
-    add_overflow_checks(t, assignment.rhs(), added);
+    add_overflow_checks(t, t->assign_lhs_nonconst(), added);
+    add_overflow_checks(t, t->assign_rhs_nonconst(), added);
   }
 
   if(t->has_condition())

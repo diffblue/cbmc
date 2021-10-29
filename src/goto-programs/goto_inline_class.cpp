@@ -47,9 +47,9 @@ void goto_inlinet::parameter_assignments(
     // this is the type the n-th argument should have
     const typet &parameter_type = symbol.type;
 
-    goto_programt::targett decl =
-      dest.add(goto_programt::make_decl(symbol.symbol_expr(), source_location));
-    decl->code_nonconst().add_source_location() = source_location;
+    code_declt decl{symbol.symbol_expr()};
+    decl.add_source_location() = source_location;
+    dest.add(goto_programt::make_decl(std::move(decl), source_location));
 
     // this is the actual parameter
     exprt actual;

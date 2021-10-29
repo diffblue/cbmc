@@ -1724,20 +1724,25 @@ void goto_check_ct::add_guarded_property(
 
   if(assertions.insert(std::make_pair(src_expr, guarded_expr)).second)
   {
-    auto t = new_code.add(
-      enable_assert_to_assume ? goto_programt::make_assumption(
-                                  std::move(guarded_expr), source_location)
-                              : goto_programt::make_assertion(
-                                  std::move(guarded_expr), source_location));
-
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
 
-    t->source_location_nonconst().set_comment(
-      comment + " in " + source_expr_string);
-    t->source_location_nonconst().set_property_class(property_class);
+    source_locationt annotated_location = source_location;
+    annotated_location.set_comment(comment + " in " + source_expr_string);
+    annotated_location.set_property_class(property_class);
 
-    add_all_disable_named_check_pragmas(t->source_location_nonconst());
+    add_all_disable_named_check_pragmas(annotated_location);
+
+    if(enable_assert_to_assume)
+    {
+      new_code.add(goto_programt::make_assumption(
+        std::move(guarded_expr), annotated_location));
+    }
+    else
+    {
+      new_code.add(goto_programt::make_assertion(
+        std::move(guarded_expr), annotated_location));
+    }
   }
 }
 
@@ -2120,15 +2125,21 @@ void goto_check_ct::goto_check(
     {
       if(std::find(i.labels.begin(), i.labels.end(), label) != i.labels.end())
       {
-        auto t = new_code.add(
-          enable_assert_to_assume
-            ? goto_programt::make_assumption(false_exprt{}, i.source_location())
-            : goto_programt::make_assertion(
-                false_exprt{}, i.source_location()));
+        source_locationt annotated_location = i.source_location();
+        annotated_location.set_property_class("error label");
+        annotated_location.set_comment("error label " + label);
+        annotated_location.set("user-provided", true);
 
-        t->source_location_nonconst().set_property_class("error label");
-        t->source_location_nonconst().set_comment("error label " + label);
-        t->source_location_nonconst().set("user-provided", true);
+        if(enable_assert_to_assume)
+        {
+          new_code.add(
+            goto_programt::make_assumption(false_exprt{}, annotated_location));
+        }
+        else
+        {
+          new_code.add(
+            goto_programt::make_assertion(false_exprt{}, annotated_location));
+        }
       }
     }
 
@@ -2210,10 +2221,9 @@ void goto_check_ct::goto_check(
             side_effect_expr_nondett(bool_typet(), i.source_location()),
             std::move(address_of_expr),
             lhs);
-          goto_programt::targett t =
-            new_code.add(goto_programt::make_assignment(
-              std::move(lhs), std::move(rhs), i.source_location()));
-          t->code_nonconst().add_source_location() = i.source_location();
+          new_code.add(goto_programt::make_assignment(
+            code_assignt{std::move(lhs), std::move(rhs), i.source_location()},
+            i.source_location()));
         }
       }
     }

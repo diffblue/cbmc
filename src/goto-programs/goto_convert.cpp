@@ -833,9 +833,9 @@ void goto_convertt::convert_assert(
 
   clean_expr(cond, dest, mode);
 
-  goto_programt::targett t =
-    dest.add(goto_programt::make_assertion(cond, code.source_location()));
-  t->source_location_nonconst().set("user-provided", true);
+  source_locationt annotated_location = code.source_location();
+  annotated_location.set("user-provided", true);
+  dest.add(goto_programt::make_assertion(cond, annotated_location));
 }
 
 void goto_convertt::convert_skip(
@@ -1606,8 +1606,8 @@ void goto_convertt::generate_ifthenelse(
 
   // do the x label
   goto_programt tmp_x;
-  goto_programt::targett x =
-    tmp_x.add(goto_programt::make_incomplete_goto(true_exprt()));
+  goto_programt::targett x = tmp_x.add(goto_programt::make_incomplete_goto(
+    true_exprt(), true_case.instructions.back().source_location()));
 
   // do the z label
   goto_programt tmp_z;
@@ -1636,7 +1636,6 @@ void goto_convertt::generate_ifthenelse(
   // x: goto z;
   CHECK_RETURN(!tmp_w.instructions.empty());
   x->complete_goto(z);
-  x->source_location_nonconst() = tmp_w.instructions.back().source_location();
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -1957,13 +1956,12 @@ void goto_convertt::generate_thread_block(
   goto_programt::targett c = body.add(goto_programt::make_skip());
   convert(thread_body, body, mode);
 
-  goto_programt::targett e = postamble.add(goto_programt::instructiont(
+  postamble.add(goto_programt::instructiont(
     static_cast<const codet &>(get_nil_irep()),
     thread_body.source_location(),
     END_THREAD,
     nil_exprt(),
     {}));
-  e->source_location_nonconst() = thread_body.source_location();
   goto_programt::targett z = postamble.add(goto_programt::make_skip());
 
   preamble.add(goto_programt::instructiont(

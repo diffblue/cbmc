@@ -164,8 +164,8 @@ void memory_snapshot_harness_generatort::add_init_section(
 
   auto ins_it1 = goto_program.insert_before(
     start_it,
-    goto_programt::make_goto(goto_program.const_cast_target(start_it)));
-  ins_it1->condition_nonconst() = func_init_done_var;
+    goto_programt::make_goto(
+      goto_program.const_cast_target(start_it), func_init_done_var));
 
   auto ins_it2 = goto_program.insert_after(
     ins_it1,

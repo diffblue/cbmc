@@ -153,14 +153,13 @@ void uninitializedt::add_assertions(
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
 
             // insert assertion
+            source_locationt annotated_location = instruction.source_location();
+            annotated_location.set_comment(
+              "use of uninitialized local variable " + id2string(identifier));
+            annotated_location.set_property_class("uninitialized local");
             goto_programt::instructiont assertion =
               goto_programt::make_assertion(
-                symbol_exprt(new_identifier, bool_typet()),
-                instruction.source_location());
-            assertion.source_location_nonconst().set_comment(
-              "use of uninitialized local variable " + id2string(identifier));
-            assertion.source_location_nonconst().set_property_class(
-              "uninitialized local");
+                symbol_exprt(new_identifier, bool_typet()), annotated_location);
 
             goto_program.insert_before_swap(i_it, assertion);
             i_it++;

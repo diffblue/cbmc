@@ -31,7 +31,8 @@ void cover_location_instrumentert::instrument(
   {
     const std::string b = std::to_string(block_nr + 1); // start with 1
     const std::string id = id2string(function_id) + "#" + b;
-    auto source_location = basic_blocks.source_location_of(block_nr);
+    source_locationt source_location =
+      basic_blocks.source_location_of(block_nr);
 
     // filter goals
     if(goal_filters(source_location))
@@ -41,8 +42,8 @@ void cover_location_instrumentert::instrument(
         "block " + b + " (lines " + source_lines.to_string() + ")";
       source_location.set_basic_block_source_lines(source_lines.to_irep());
       goto_program.insert_before_swap(i_it);
+      initialize_source_location(source_location, comment, function_id);
       *i_it = make_assertion(false_exprt(), source_location);
-      initialize_source_location(i_it, comment, function_id);
       i_it++;
     }
   }

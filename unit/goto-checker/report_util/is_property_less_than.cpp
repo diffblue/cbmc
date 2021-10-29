@@ -12,9 +12,13 @@ static goto_programt::instructiont instruction_for_location(
   location.set_file(file);
   location.set_function(function);
   location.set_line(line_no);
-  goto_programt::instructiont instruction;
-  instruction.source_location_nonconst() = location;
-  return instruction;
+
+  return goto_programt::instructiont{
+    codet{ID_nil},
+    location,
+    goto_program_instruction_typet::NO_INSTRUCTION_TYPE,
+    {},
+    {}};
 }
 
 static property_infot test_info(const goto_programt::const_targett &target)

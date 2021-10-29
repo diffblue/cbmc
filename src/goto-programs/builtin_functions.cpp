@@ -698,12 +698,12 @@ void goto_convertt::do_havoc_slice(
 
   r_or_w_ok_exprt ok_expr(ID_w_ok, arguments[0], arguments[1]);
   ok_expr.add_source_location() = source_location;
-  goto_programt::targett t =
-    dest.add(goto_programt::make_assertion(ok_expr, source_location));
-  t->source_location_nonconst().set("user-provided", false);
-  t->source_location_nonconst().set_property_class(ID_assertion);
-  t->source_location_nonconst().set_comment(
+  source_locationt annotated_location = source_location;
+  annotated_location.set("user-provided", false);
+  annotated_location.set_property_class(ID_assertion);
+  annotated_location.set_comment(
     "assertion havoc_slice " + from_expr(ns, identifier, ok_expr));
+  dest.add(goto_programt::make_assertion(ok_expr, annotated_location));
 
   const array_typet array_type(char_type(), simplify_expr(arguments[1], ns));
 
@@ -782,11 +782,11 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // let's double-check the type of the argument
-    goto_programt::targett t = dest.add(goto_programt::make_assumption(
+    source_locationt annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    dest.add(goto_programt::make_assumption(
       typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
-      function.source_location()));
-
-    t->source_location_nonconst().set("user-provided", true);
+      annotated_location));
 
     if(lhs.is_not_nil())
     {
@@ -804,11 +804,10 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    goto_programt::targett t = dest.add(
-      goto_programt::make_assertion(false_exprt(), function.source_location()));
-
-    t->source_location_nonconst().set("user-provided", true);
-    t->source_location_nonconst().set_property_class(ID_assertion);
+    source_locationt annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    annotated_location.set_property_class(ID_assertion);
+    dest.add(goto_programt::make_assertion(false_exprt(), annotated_location));
 
     if(lhs.is_not_nil())
     {
@@ -819,9 +818,9 @@ void goto_convertt::do_function_call_symbol(
 
     // __VERIFIER_error has abort() semantics, even if no assertions
     // are being checked
-    goto_programt::targett a = dest.add(goto_programt::make_assumption(
-      false_exprt(), function.source_location()));
-    a->source_location_nonconst().set("user-provided", true);
+    annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    dest.add(goto_programt::make_assumption(false_exprt(), annotated_location));
   }
   else if(
     identifier == "assert" &&
@@ -835,13 +834,14 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // let's double-check the type of the argument
-    goto_programt::targett t = dest.add(goto_programt::make_assertion(
-      typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
-      function.source_location()));
-    t->source_location_nonconst().set("user-provided", true);
-    t->source_location_nonconst().set_property_class(ID_assertion);
-    t->source_location_nonconst().set_comment(
+    source_locationt annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    annotated_location.set_property_class(ID_assertion);
+    annotated_location.set_comment(
       "assertion " + from_expr(ns, identifier, arguments.front()));
+    dest.add(goto_programt::make_assertion(
+      typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
+      annotated_location));
 
     if(lhs.is_not_nil())
     {
@@ -874,26 +874,27 @@ void goto_convertt::do_function_call_symbol(
       get_string_constant(arguments[1]);
 
     // let's double-check the type of the argument
-    goto_programt::targett t = dest.add(goto_programt::make_assertion(
-      typecast_exprt::conditional_cast(arguments[0], bool_typet()),
-      function.source_location()));
-
+    source_locationt annotated_location = function.source_location();
     if(is_precondition)
     {
-      t->source_location_nonconst().set_property_class(ID_precondition);
+      annotated_location.set_property_class(ID_precondition);
     }
     else if(is_postcondition)
     {
-      t->source_location_nonconst().set_property_class(ID_postcondition);
+      annotated_location.set_property_class(ID_postcondition);
     }
     else
     {
-      t->source_location_nonconst().set(
+      annotated_location.set(
         "user-provided", !function.source_location().is_built_in());
-      t->source_location_nonconst().set_property_class(ID_assertion);
+      annotated_location.set_property_class(ID_assertion);
     }
 
-    t->source_location_nonconst().set_comment(description);
+    annotated_location.set_comment(description);
+
+    dest.add(goto_programt::make_assertion(
+      typecast_exprt::conditional_cast(arguments[0], bool_typet()),
+      annotated_location));
 
     if(lhs.is_not_nil())
     {
@@ -1085,12 +1086,11 @@ void goto_convertt::do_function_call_symbol(
     const irep_idt description=
       "assertion "+id2string(get_string_constant(arguments[0]));
 
-    goto_programt::targett t = dest.add(
-      goto_programt::make_assertion(false_exprt(), function.source_location()));
-
-    t->source_location_nonconst().set("user-provided", true);
-    t->source_location_nonconst().set_property_class(ID_assertion);
-    t->source_location_nonconst().set_comment(description);
+    source_locationt annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    annotated_location.set_property_class(ID_assertion);
+    annotated_location.set_comment(description);
+    dest.add(goto_programt::make_assertion(false_exprt(), annotated_location));
     // we ignore any LHS
   }
   else if(identifier=="__assert_rtn" ||
@@ -1123,12 +1123,11 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    goto_programt::targett t = dest.add(
-      goto_programt::make_assertion(false_exprt(), function.source_location()));
-
-    t->source_location_nonconst().set("user-provided", true);
-    t->source_location_nonconst().set_property_class(ID_assertion);
-    t->source_location_nonconst().set_comment(description);
+    source_locationt annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    annotated_location.set_property_class(ID_assertion);
+    annotated_location.set_comment(description);
+    dest.add(goto_programt::make_assertion(false_exprt(), annotated_location));
     // we ignore any LHS
   }
   else if(identifier=="__assert_func")
@@ -1157,12 +1156,11 @@ void goto_convertt::do_function_call_symbol(
       description="assertion";
     }
 
-    goto_programt::targett t = dest.add(
-      goto_programt::make_assertion(false_exprt(), function.source_location()));
-
-    t->source_location_nonconst().set("user-provided", true);
-    t->source_location_nonconst().set_property_class(ID_assertion);
-    t->source_location_nonconst().set_comment(description);
+    source_locationt annotated_location = function.source_location();
+    annotated_location.set("user-provided", true);
+    annotated_location.set_property_class(ID_assertion);
+    annotated_location.set_comment(description);
+    dest.add(goto_programt::make_assertion(false_exprt(), annotated_location));
     // we ignore any LHS
   }
   else if(identifier==CPROVER_PREFIX "fence")

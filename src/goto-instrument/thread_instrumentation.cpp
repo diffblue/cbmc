@@ -35,8 +35,6 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   assert(end->is_end_function());
 
-  source_locationt source_location = end->source_location();
-
   goto_program.insert_before_swap(end);
 
   const string_constantt mutex_locked_string("mutex-locked");
@@ -47,10 +45,9 @@ void thread_exit_instrumentation(goto_programt &goto_program)
     ID_get_may,
     address_of_exprt(mutex_locked_string)};
 
+  source_locationt source_location = end->source_location();
+  source_location.set_comment("mutexes must not be locked on thread exit");
   *end = goto_programt::make_assertion(not_exprt(get_may), source_location);
-
-  end->source_location_nonconst().set_comment(
-    "mutexes must not be locked on thread exit");
 }
 
 void thread_exit_instrumentation(goto_modelt &goto_model)
