@@ -1736,7 +1736,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
     check_rec_address(to_address_of_expr(expr).object(), guard);
     return;
   }
-  else if(expr.id() == ID_and || expr.id() == ID_or)
+  else if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies)
   {
     check_rec_logical_op(expr, guard);
     return;
