@@ -10,6 +10,8 @@
 [Loop Unwinding](cbmc/unwinding/),
 [Assertion Checking](cbmc/assertions/)
 
+## 4. [Goto-Analyzer &ndash; Abstract Interpretation](goto-analyzer/)
+
 ## 4. [Test Suite Generation](test-suite/)
 
 ## 5. [Program Properties](properties/)
