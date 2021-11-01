@@ -75,7 +75,7 @@ TEST_CASE(
 {
   CHECK(
     smt_to_smt2_string(smt_get_value_commandt{
-      smt_identifier_termt{"foo", smt_bool_sortt{}}}) == "(get-value |foo|)");
+      smt_identifier_termt{"foo", smt_bool_sortt{}}}) == "(get-value (|foo|))");
 }
 
 TEST_CASE(
