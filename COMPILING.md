@@ -1,4 +1,4 @@
-#WHAT ARCHITECTURE ?
+# What architecture?
 
 CPROVER now needs a C++11 compliant compiler and is known to work in the
 following environments:
@@ -18,7 +18,7 @@ past, but are not actively tested:
 - Solaris 11
 - FreeBSD 11
 
-#Building using CMake
+# Building using CMake
 
 Building with CMake is supported across Linux, MacOS X and Windows with Visual
 Studio 2019. There are also hand-written make files which can be used to build
