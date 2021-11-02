@@ -52,7 +52,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
     LINKFLAGS += -force_cpusubtype_ALL -arch arm64 -arch x86_64
   endif
   LINKLIB = /usr/bin/libtool -static -o $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ -pthread $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
@@ -63,7 +63,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
 else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS +=
   LINKLIB = ar rcT $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -lpthread $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
@@ -73,7 +73,7 @@ else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   endif
 else
   LINKLIB = ar rcT $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group -pthread $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = gcc

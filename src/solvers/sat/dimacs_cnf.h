@@ -11,11 +11,29 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_SAT_DIMACS_CNF_H
 
 #include <iosfwd>
+#include <atomic>
+#include <condition_variable>
 
 #include "cnf_clause_list.h"
+#include <util/blocking_queue.h>
 
 class dimacs_cnft:public cnf_clause_listt
 {
+protected:
+  // Optimal block size, in clauses
+  const size_t target_block_size = 1<<16;
+
+  struct clause_range {
+    size_t ordinal;
+    clausest::const_iterator first, limit;
+    explicit clause_range(const size_t ordinal,
+                          const clausest::const_iterator first,
+                          const clausest::const_iterator limit)
+      : ordinal(ordinal), first(first), limit(limit)
+    { }
+    clause_range() : ordinal(0), first(nullptr), limit(nullptr) { }
+  };
+
 public:
   explicit dimacs_cnft(message_handlert &);
   virtual ~dimacs_cnft() { }
@@ -38,8 +56,14 @@ public:
 protected:
   void write_problem_line(std::ostream &out);
   void write_clauses(std::ostream &out);
+  void wait_file_block(const size_t ordinal);
+  void printer_entry(std::ostream *out);
 
   bool break_lines;
+  size_t next_file_block;
+  std::mutex writing_sync;
+  std::condition_variable block_written;
+  blocking_queue<clause_range> print_queue;
 };
 
 class dimacs_cnf_dumpt:public cnft

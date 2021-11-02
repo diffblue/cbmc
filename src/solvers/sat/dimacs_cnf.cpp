@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/magic.h>
 
 #include <iostream>
+#include <thread>
 
 dimacs_cnft::dimacs_cnft(message_handlert &message_handler)
   : cnf_clause_listt(message_handler), break_lines(false)
@@ -76,25 +77,62 @@ void dimacs_cnft::write_dimacs_clause(
   out << "0" << "\n";
 }
 
+void dimacs_cnft::wait_file_block(const size_t ordinal) {
+  std::unique_lock<std::mutex> lock(writing_sync);
+  for(;;) {
+    assert(next_file_block <= ordinal);
+    if(next_file_block == ordinal) {
+      return;
+    }
+    block_written.wait(lock);
+  }
+}
+
+void dimacs_cnft::printer_entry(std::ostream *out) {
+  clause_range item;
+  std::stringstream output_block;
+  while(print_queue.pop(item)) {
+    output_block.str("");
+    output_block.clear();
+
+    for(clausest::const_iterator it=item.first; it!=item.limit; it++) {
+      write_dimacs_clause(*it, output_block, break_lines);
+    }
+
+    wait_file_block(item.ordinal);
+    *out << output_block.str();
+    std::unique_lock<std::mutex> lock(writing_sync);
+    next_file_block++;
+    block_written.notify_all();
+  }
+}
+
 void dimacs_cnft::write_clauses(std::ostream &out)
 {
-  std::size_t count = 0;
-  std::stringstream output_block;
-  for(clausest::const_iterator it=clauses.begin();
-      it!=clauses.end(); it++)
-  {
-    write_dimacs_clause(*it, output_block, break_lines);
-
-    // print the block once in a while
-    if(++count % CNF_DUMP_BLOCK_SIZE == 0)
-    {
-      out << output_block.str();
-      output_block.str("");
-    }
+  std::vector<std::thread> pool;
+  const size_t thread_count = std::max(2u, std::thread::hardware_concurrency()) - 1;
+  for(size_t i=0; i<thread_count; i++) {
+    pool.emplace_back(&dimacs_cnft::printer_entry, this, &out);
   }
-
-  // make sure the final block is printed as well
-  out << output_block.str();
+  next_file_block = 0;
+  size_t total_blocks = 0;
+  for(clausest::const_iterator it=clauses.begin();
+      it!=clauses.end(); )
+  {
+    clausest::const_iterator first = it;
+    size_t total_size = 0;
+    while(total_size < target_block_size && it != clauses.end()) {
+      total_size += it->size();
+      it++;
+    }
+    print_queue.push(clause_range(total_blocks, first, it));
+    total_blocks++;
+  }
+  print_queue.request_shutdown();
+  wait_file_block(total_blocks);
+  for(size_t i=0; i<pool.size(); i++) {
+    pool[i].join();
+  }
 }
 
 void dimacs_cnf_dumpt::lcnf(const bvt &bv)
