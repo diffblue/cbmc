@@ -29,6 +29,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <regex>
 #include <sstream>
 #include <unordered_map>
 
@@ -86,7 +87,7 @@ struct c_wranglert
     bool remove_static = false;
   };
 
-  using functionst = std::map<std::string, functiont>;
+  using functionst = std::list<std::pair<std::regex, functiont>>;
   functionst functions;
 
   // output
@@ -171,6 +172,9 @@ void c_wranglert::configure_functions(const jsont &config)
       if(!items.is_array())
         throw deserialization_exceptiont("function entry must be sequence");
 
+      this->functions.emplace_back(function_name, functiont{});
+      functiont &function_config = this->functions.back().second;
+
       for(const auto &function_item : to_json_array(items))
       {
         // These need to start with "ensures", "requires", "assigns",
@@ -190,16 +194,14 @@ void c_wranglert::configure_functions(const jsont &config)
           std::ostringstream rest;
           join_strings(rest, split.begin() + 1, split.end(), ' ');
 
-          this->functions[function_name].contract.emplace_back(
-            split[0], rest.str());
+          function_config.contract.emplace_back(split[0], rest.str());
         }
         else if(split[0] == "assert" && split.size() >= 3)
         {
           std::ostringstream rest;
           join_strings(rest, split.begin() + 2, split.end(), ' ');
 
-          this->functions[function_name].assertions.emplace_back(
-            split[1], rest.str());
+          function_config.assertions.emplace_back(split[1], rest.str());
         }
         else if(
           (split[0] == "for" && split.size() >= 3 && split[2] == "invariant") ||
@@ -208,7 +210,7 @@ void c_wranglert::configure_functions(const jsont &config)
           std::ostringstream rest;
           join_strings(rest, split.begin() + 3, split.end(), ' ');
 
-          this->functions[function_name].loop_invariants.emplace_back(
+          function_config.loop_invariants.emplace_back(
             split[0], split[1], rest.str());
         }
         else if(split[0] == "stub")
@@ -216,7 +218,7 @@ void c_wranglert::configure_functions(const jsont &config)
           std::ostringstream rest;
           join_strings(rest, split.begin() + 1, split.end(), ' ');
 
-          this->functions[function_name].stub = rest.str();
+          function_config.stub = rest.str();
         }
         else if(split[0] == "remove")
         {
@@ -224,7 +226,7 @@ void c_wranglert::configure_functions(const jsont &config)
             throw deserialization_exceptiont("unexpected remove entry");
 
           if(split[1] == "static")
-            this->functions[function_name].remove_static = true;
+            function_config.remove_static = true;
           else
             throw deserialization_exceptiont(
               "unexpected remove entry " + split[1]);
@@ -401,13 +403,15 @@ static void mangle(
   if(
     declaration.is_function() && name_opt.has_value() && declaration.has_body())
   {
-    auto f_it = config.functions.find(name_opt->text);
-    if(f_it != config.functions.end())
+    for(const auto &entry : config.functions)
     {
-      // we are to modify this function
-      mangle_function(declaration, defines, f_it->second, out);
+      if(std::regex_match(name_opt->text, entry.first))
+      {
+        // we are to modify this function
+        mangle_function(declaration, defines, entry.second, out);
 
-      return;
+        return;
+      }
     }
   }
 
