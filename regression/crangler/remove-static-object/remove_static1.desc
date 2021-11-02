@@ -1,0 +1,8 @@
+CORE
+remove_static1.json
+
+^\s+void foobar1\(\)$
+^\s+short x;$
+^EXIT=0$
+^SIGNAL=0$
+--

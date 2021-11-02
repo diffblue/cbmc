@@ -90,11 +90,20 @@ struct c_wranglert
   using functionst = std::list<std::pair<std::regex, functiont>>;
   functionst functions;
 
+  struct objectt
+  {
+    bool remove_static = false;
+  };
+
+  using objectst = std::list<std::pair<std::regex, objectt>>;
+  objectst objects;
+
   // output
   std::string output;
 
   void configure_sources(const jsont &);
   void configure_functions(const jsont &);
+  void configure_objects(const jsont &);
   void configure_output(const jsont &);
 };
 
@@ -234,6 +243,62 @@ void c_wranglert::configure_functions(const jsont &config)
         else
           throw deserialization_exceptiont(
             "unexpected function entry " + split[0]);
+      }
+    }
+  }
+}
+
+void c_wranglert::configure_objects(const jsont &config)
+{
+  auto objects = config["objects"];
+
+  if(objects.is_null())
+    return;
+
+  if(!objects.is_array())
+    throw deserialization_exceptiont("objects entry must be sequence");
+
+  for(const auto &object : to_json_array(objects))
+  {
+    if(!object.is_object())
+      throw deserialization_exceptiont("object entry must be object");
+
+    for(const auto &object_entry : to_json_object(object))
+    {
+      const auto &object_name = object_entry.first;
+      const auto &items = object_entry.second;
+
+      if(!items.is_array())
+        throw deserialization_exceptiont("object entry must be sequence");
+
+      this->objects.emplace_back(object_name, objectt{});
+      objectt &object_config = this->objects.back().second;
+
+      for(const auto &object_item : to_json_array(items))
+      {
+        // Needs to start with "remove"
+        if(!object_item.is_string())
+          throw deserialization_exceptiont("object entry must be string");
+
+        auto item_string = object_item.value;
+        auto split = split_string(item_string, ' ');
+        if(split.empty())
+          continue;
+
+        if(split[0] == "remove")
+        {
+          if(split.size() == 1)
+            throw deserialization_exceptiont("unexpected remove entry");
+
+          if(split[1] == "static")
+            object_config.remove_static = true;
+          else
+            throw deserialization_exceptiont(
+              "unexpected remove entry " + split[1]);
+        }
+        else
+          throw deserialization_exceptiont(
+            "unexpected object entry " + split[0]);
       }
     }
   }
@@ -393,6 +458,39 @@ static void mangle_function(
   }
 }
 
+static void mangle_object(
+  const c_declarationt &declaration,
+  const c_definest &defines,
+  const c_wranglert::objectt &object_config,
+  std::ostream &out)
+{
+  if(object_config.remove_static)
+  {
+    for(auto &t : declaration.pre_declarator)
+    {
+      if(t.text == "static")
+      {
+        // we replace by white space
+        out << std::string(6, ' ');
+      }
+      else
+        out << t.text;
+    }
+  }
+  else
+  {
+    for(auto &t : declaration.pre_declarator)
+      out << t.text;
+  }
+
+  for(auto &t : declaration.declarator)
+    out << t.text;
+  for(auto &t : declaration.post_declarator)
+    out << t.text;
+  for(auto &t : declaration.initializer)
+    out << t.text;
+}
+
 static void mangle(
   const c_declarationt &declaration,
   const c_definest &defines,
@@ -409,6 +507,19 @@ static void mangle(
       {
         // we are to modify this function
         mangle_function(declaration, defines, entry.second, out);
+
+        return;
+      }
+    }
+  }
+  else if(!declaration.is_function() && name_opt.has_value())
+  {
+    for(const auto &entry : config.objects)
+    {
+      if(std::regex_match(name_opt->text, entry.first))
+      {
+        // we are to modify this function
+        mangle_object(declaration, defines, entry.second, out);
 
         return;
       }
@@ -441,6 +552,7 @@ void c_wrangler(const jsont &config)
 
   c_wrangler.configure_sources(config);
   c_wrangler.configure_functions(config);
+  c_wrangler.configure_objects(config);
   c_wrangler.configure_output(config);
 
   for(auto &source_file : c_wrangler.source_files)
