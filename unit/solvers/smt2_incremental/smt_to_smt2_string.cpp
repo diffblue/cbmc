@@ -70,6 +70,15 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "Test smt_get_value_commandt to string conversion",
+  "[core][smt2_incremental]")
+{
+  CHECK(
+    smt_to_smt2_string(smt_get_value_commandt{
+      smt_identifier_termt{"foo", smt_bool_sortt{}}}) == "(get-value (|foo|))");
+}
+
+TEST_CASE(
   "Test smt_push_commandt to string conversion",
   "[core][smt2_incremental]")
 {

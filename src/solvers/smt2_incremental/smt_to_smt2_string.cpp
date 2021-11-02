@@ -334,7 +334,7 @@ public:
 
   void visit(const smt_get_value_commandt &get_value) override
   {
-    os << "(get-value " << get_value.descriptor() << ")";
+    os << "(get-value (" << get_value.descriptor() << "))";
   }
 
   void visit(const smt_pop_commandt &pop) override

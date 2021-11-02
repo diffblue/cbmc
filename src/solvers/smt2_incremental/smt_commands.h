@@ -87,6 +87,14 @@ class smt_get_value_commandt : public smt_commandt,
                                protected smt_termt::storert<smt_assert_commandt>
 {
 public:
+  /// \brief This constructor constructs the `get-value` command, such that it
+  ///   stores a single descriptor for which the solver will be commanded to
+  ///   respond with a value.
+  /// \note This class currently supports storing a single descriptor only,
+  ///   whereas the SMT-LIB standard version 2.6 supports one or more
+  ///   descriptors. Getting one value at a time is currently sufficient for our
+  ///   requirements. This class could be expanded should there be a need to get
+  ///   multiple values at once.
   explicit smt_get_value_commandt(smt_termt descriptor);
   const smt_termt &descriptor() const;
 };
