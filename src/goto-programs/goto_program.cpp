@@ -133,7 +133,7 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case SET_RETURN_VALUE:
-    out << "RETURN " << format(instruction.return_value()) << '\n';
+    out << "SET RETURN VALUE " << format(instruction.return_value()) << '\n';
     break;
 
   case DECL:
