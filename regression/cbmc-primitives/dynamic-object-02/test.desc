@@ -1,4 +1,4 @@
-FUTURE
+CORE
 main.c
 
 ^EXIT=10$
@@ -9,4 +9,3 @@ main.c
 ^warning: ignoring
 --
 Check that the dynamic object property is nondet for uninitialized pointers.
-Recorded as ADA-526.

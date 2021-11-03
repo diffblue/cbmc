@@ -1,4 +1,4 @@
-FUTURE
+CORE
 main.c
 --no-simplify --no-propagation
 ^EXIT=10$
@@ -10,5 +10,6 @@ main.c
 --
 Check that the dynamic object property is nondet for uninitialized pointers. We
 use --no-simplify and --no-propagation to ensure that the case is not solved by
-the constant propagation and thus tests the constraint encoding. Recorded as
-ADA-526.
+the constant propagation and thus tests the constraint encoding. We expect
+that `__CPROVER_DYNAMIC_OBJECT` should be nondet for pointers that are neither
+null nor valid.
