@@ -31,8 +31,8 @@
 # These files change frequently and changes are high-risk
 
 /src/cbmc/ @kroening @tautschnig @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
-/src/goto-programs/ @kroening @tautschnig @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
-/src/util/ @kroening @tautschnig @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
+/src/goto-programs/ @kroening @tautschnig @peterschrammel
+/src/util/ @kroening @tautschnig @peterschrammel
 /src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
 /src/solvers/strings @martin-cs @romainbrenguier @peterschrammel
 /jbmc/src/java_bytecode/ @romainbrenguier @peterschrammel
