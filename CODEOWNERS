@@ -7,8 +7,8 @@
 # These files should rarely change
 
 /src/big-int/ @kroening
-/src/ansi-c/ @kroening @tautschnig @chrisr-diffblue @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
-/src/assembler/ @kroening @tautschnig @chrisr-diffblue @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
+/src/ansi-c/ @kroening @tautschnig @chrisr-diffblue @peterschrammel @thomasspriggs @TGWDB
+/src/assembler/ @kroening @tautschnig @chrisr-diffblue @peterschrammel
 /src/goto-cc/ @kroening @tautschnig @chrisr-diffblue
 /src/linking/ @kroening @tautschnig @chrisr-diffblue
 /src/memory-models/ @kroening @tautschnig
