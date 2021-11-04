@@ -1,7 +1,7 @@
 void boolean()
 {
   __CPROVER_bool a, b;
-  __CPROVER_assert((a ≡ b) == (a == b), "≥");
+  __CPROVER_assert((a ≡ b) == (a == b), "≡");
   __CPROVER_assert((a ≢ b) == (a != b), "≢");
   __CPROVER_assert((a ⇒ b) == (!a || b), "⇒");
   __CPROVER_assert((a ⇔ b) == (a == b), "⇔");
@@ -16,7 +16,7 @@ void relations()
   int a, b;
   __CPROVER_assert((a ≥ b) == (a >= b), "≥");
   __CPROVER_assert((a ≤ b) == (a <= b), "≤");
-  __CPROVER_assert((a ≡ b) == (a == b), "≥");
+  __CPROVER_assert((a ≡ b) == (a == b), "≡");
   __CPROVER_assert((a ≢ b) == (a != b), "≢");
   __CPROVER_assert((− a) == (-a), "−");
 }
