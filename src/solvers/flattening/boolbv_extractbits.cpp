@@ -31,18 +31,6 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
   auto upper_as_int = maybe_upper_as_int.value();
   auto lower_as_int = maybe_lower_as_int.value();
 
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    upper_as_int >= 0 && upper_as_int < src_bv.size(),
-    "upper end of extracted bits must be within the bitvector",
-    expr.find_source_location(),
-    irep_pretty_diagnosticst{expr});
-
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    lower_as_int >= 0 && lower_as_int < src_bv.size(),
-    "lower end of extracted bits must be within the bitvector",
-    expr.find_source_location(),
-    irep_pretty_diagnosticst{expr});
-
   DATA_INVARIANT(
     lower_as_int <= upper_as_int,
     "upper bound must be greater or equal to lower bound");
@@ -56,9 +44,40 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
     expr.find_source_location(),
     irep_pretty_diagnosticst{expr});
 
-  const std::size_t offset = numeric_cast_v<std::size_t>(lower_as_int);
+  bvt result_bv;
 
-  bvt result_bv(src_bv.begin() + offset, src_bv.begin() + offset + bv_width);
+  // add out-of-bounds bits (if any) at the lower end
+  if(lower_as_int < 0)
+  {
+    if(upper_as_int < 0)
+    {
+      lower_as_int -= upper_as_int + 1;
+      upper_as_int = 0;
+    }
+
+    const std::size_t lower_out_of_bounds =
+      numeric_cast_v<std::size_t>(-lower_as_int);
+    result_bv = prop.new_variables(lower_out_of_bounds);
+    lower_as_int = 0;
+  }
+
+  const std::size_t offset = numeric_cast_v<std::size_t>(lower_as_int);
+  const std::size_t upper_size_t = numeric_cast_v<std::size_t>(upper_as_int);
+
+  result_bv.reserve(bv_width);
+  result_bv.insert(
+    result_bv.end(),
+    src_bv.begin() + std::min(offset, src_bv.size()),
+    src_bv.begin() + std::min(src_bv.size(), upper_size_t + 1));
+
+  // add out-of-bounds bits (if any) at the upper end
+  if(upper_size_t >= src_bv.size())
+  {
+    bvt upper_oob_bits =
+      prop.new_variables(upper_size_t - std::max(offset, src_bv.size()) + 1);
+    result_bv.insert(
+      result_bv.end(), upper_oob_bits.begin(), upper_oob_bits.end());
+  }
 
   return result_bv;
 }
