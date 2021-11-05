@@ -210,6 +210,30 @@ protected:
     codet &expression,
     source_locationt location,
     const irep_idt &mode);
+
+  
+  /// Finds static local symbols that occur in the body of the given function and adds them to the the write set of `assigns`.
+  ///
+  /// @param function the function to search local static symbols in
+  /// @param assigns assigns clause where search results are added
+  /// @return true if failure, false if success
+  ///
+  /// A symbol is considered a static local symbol iff:
+  /// - it has a static lifetime annotation
+  /// - its source location has a non-empty function attribute
+  ///
+  /// Symbol occurrences are searched in:
+  /// - ASSERT/ASSUME conditions
+  /// - ASSIGN lhs and rhs
+  /// - FUNCTION_CALL function, lhs and operands
+  /// - SET_RETURN_VALUE instructions
+  /// - OTHER code.
+  ///
+  /// The search does *not*:
+  /// - recurse into FUNCTION_CALL 
+  /// - test DECL or DEAD symbols (because local statics are never DECL'd or DEAD'd for being static).
+  /// - test attributes of GOTO, SET_RETURN_VALUE, THREAD*, ATOMIC*, THROW, CATCH  instructions
+  void find_static_locals(const goto_functiont &function, assigns_clauset &assigns);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H

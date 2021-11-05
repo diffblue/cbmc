@@ -41,15 +41,17 @@ static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
       size.has_value(),
       "`sizeof` must always be computable on l-value assigns clause targets.");
 
-    return {typecast_exprt::conditional_cast(
-              address_of_exprt{expr}, pointer_type(char_type())),
-            typecast_exprt::conditional_cast(size.value(), signed_size_type())};
+    return {
+      typecast_exprt::conditional_cast(
+        address_of_exprt{expr}, pointer_type(char_type())),
+      typecast_exprt::conditional_cast(size.value(), signed_size_type())};
   }
 
   UNREACHABLE;
 }
 
 const symbolt assigns_clauset::conditional_address_ranget::generate_new_symbol(
+  const std::string &prefix,
   const typet &type,
   const source_locationt &location) const
 {
@@ -57,7 +59,8 @@ const symbolt assigns_clauset::conditional_address_ranget::generate_new_symbol(
     type,
     location,
     parent.symbol_table.lookup_ref(parent.function_name).mode,
-    parent.symbol_table);
+    parent.symbol_table,
+    prefix);
 }
 
 assigns_clauset::conditional_address_ranget::conditional_address_ranget(
@@ -68,11 +71,13 @@ assigns_clauset::conditional_address_ranget::conditional_address_ranget(
     parent(parent),
     slice(normalize_to_slice(expr, parent.ns)),
     validity_condition_var(
-      generate_new_symbol(bool_typet(), location).symbol_expr()),
+      generate_new_symbol("__car_valid", bool_typet(), location).symbol_expr()),
     lower_bound_address_var(
-      generate_new_symbol(slice.first.type(), location).symbol_expr()),
+      generate_new_symbol("__car_lb", slice.first.type(), location)
+        .symbol_expr()),
     upper_bound_address_var(
-      generate_new_symbol(slice.first.type(), location).symbol_expr())
+      generate_new_symbol("__car_ub", slice.first.type(), location)
+        .symbol_expr())
 {
 }
 
@@ -81,41 +86,55 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
   const
 {
   goto_programt instructions;
+  // adding pragmas to the location to selectively disable checks
+  // where it is sound to do so
+  source_locationt location_no_checks = location;
+  location_no_checks.add_pragma("disable:pointer-check");
+  location_no_checks.add_pragma("disable:pointer-primitive-check");
+  location_no_checks.add_pragma("disable:pointer-overflow-check");
 
-  instructions.add(goto_programt::make_decl(validity_condition_var, location));
-  instructions.add(goto_programt::make_decl(lower_bound_address_var, location));
-  instructions.add(goto_programt::make_decl(upper_bound_address_var, location));
+  instructions.add(
+    goto_programt::make_decl(validity_condition_var, location_no_checks));
+  instructions.add(
+    goto_programt::make_decl(lower_bound_address_var, location_no_checks));
+  instructions.add(
+    goto_programt::make_decl(upper_bound_address_var, location_no_checks));
 
   instructions.add(goto_programt::make_assignment(
     lower_bound_address_var,
     null_pointer_exprt{to_pointer_type(slice.first.type())},
-    location));
+    location_no_checks));
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
     null_pointer_exprt{to_pointer_type(slice.first.type())},
-    location));
+    location_no_checks));
 
   goto_programt skip_program;
-  const auto skip_target = skip_program.add(goto_programt::make_skip(location));
+  const auto skip_target =
+    skip_program.add(goto_programt::make_skip(location_no_checks));
 
-  const auto validity_check_expr =
-    and_exprt{all_dereferences_are_valid(source_expr, parent.ns),
-              w_ok_exprt{slice.first, slice.second}};
+  const auto validity_check_expr = and_exprt{
+    all_dereferences_are_valid(source_expr, parent.ns),
+    w_ok_exprt{slice.first, slice.second}};
   instructions.add(goto_programt::make_assignment(
-    validity_condition_var, validity_check_expr, location));
+    validity_condition_var, validity_check_expr, location_no_checks));
 
   instructions.add(goto_programt::make_goto(
-    skip_target, not_exprt{validity_condition_var}, location));
+    skip_target, not_exprt{validity_condition_var}, location_no_checks));
 
   instructions.add(goto_programt::make_assignment(
-    lower_bound_address_var, slice.first, location));
+    lower_bound_address_var, slice.first, location_no_checks));
+
+  source_locationt location_overflow_check = location;
+  location_overflow_check.add_pragma("enable:pointer-overflow-check");
 
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
-    minus_exprt{plus_exprt{slice.first, slice.second},
-                from_integer(1, slice.second.type())},
-    location));
-
+    minus_exprt{
+      plus_exprt{slice.first, slice.second},
+      from_integer(1, slice.second.type())},
+    // activate pointer-overflow checks to guard against overflow on this addition
+    location_overflow_check));
   instructions.destructive_append(skip_program);
   return instructions;
 }
@@ -127,11 +146,14 @@ assigns_clauset::conditional_address_ranget::generate_unsafe_inclusion_check(
   return conjunction(
     {validity_condition_var,
      same_object(lower_bound_address_var, lhs.lower_bound_address_var),
-     same_object(lhs.upper_bound_address_var, upper_bound_address_var),
-     less_than_or_equal_exprt{lower_bound_address_var,
-                              lhs.lower_bound_address_var},
-     less_than_or_equal_exprt{lhs.upper_bound_address_var,
-                              upper_bound_address_var}});
+     // redudant now that we guard against pointer overflow
+     // same_object(lhs.upper_bound_address_var, upper_bound_address_var),
+     less_than_or_equal_exprt{
+       pointer_offset(lower_bound_address_var),
+       pointer_offset(lhs.lower_bound_address_var)},
+     less_than_or_equal_exprt{
+       pointer_offset(lhs.upper_bound_address_var),
+       pointer_offset(upper_bound_address_var)}});
 }
 
 assigns_clauset::assigns_clauset(

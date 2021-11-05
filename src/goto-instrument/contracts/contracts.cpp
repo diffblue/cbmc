@@ -15,6 +15,8 @@ Date: February 2016
 
 #include <algorithm>
 #include <map>
+#include <util/std_code.h>
+#include <util/find_symbols.h>
 
 #include <analyses/local_may_alias.h>
 
@@ -677,6 +679,11 @@ void code_contractst::instrument_call_statement(
   }
   else if(callee_name == "free")
   {
+    source_locationt &source_location_no_checks = instruction_it->source_location_nonconst();
+    source_location_no_checks.add_pragma("disable:pointer-check");
+    source_location_no_checks.add_pragma("disable:pointer-primitive-check");
+    source_location_no_checks.add_pragma("disable:pointer-overflow-check");
+
     const auto free_car = add_inclusion_check(
       body,
       assigns,
@@ -687,9 +694,9 @@ void code_contractst::instrument_call_statement(
     goto_programt alias_checking_instructions, skip_program;
     alias_checking_instructions.add(goto_programt::make_goto(
       skip_program.add(
-        goto_programt::make_skip(instruction_it->source_location())),
+        goto_programt::make_skip(source_location_no_checks)),
       not_exprt{free_car.validity_condition_var},
-      instruction_it->source_location()));
+      source_location_no_checks));
 
     // Since the argument to free may be an "alias" (but not identical)
     // to existing CARs' source_expr, structural equality wouldn't work.
@@ -702,14 +709,15 @@ void code_contractst::instrument_call_statement(
       const auto object_validity_var_addr =
         new_tmp_symbol(
           pointer_type(bool_typet{}),
-          instruction_it->source_location(),
+          source_location_no_checks,
           symbol_table.lookup_ref(function).mode,
-          symbol_table)
+          symbol_table,
+          "__car_valid")
           .symbol_expr();
       write_set_validity_addrs.insert(object_validity_var_addr);
 
       alias_checking_instructions.add(goto_programt::make_decl(
-        object_validity_var_addr, instruction_it->source_location()));
+        object_validity_var_addr, source_location_no_checks));
       // if the CAR was defined on the same_object as the one being `free`d,
       // record its validity variable's address, otherwise record NULL
       alias_checking_instructions.add(goto_programt::make_assignment(
@@ -721,7 +729,7 @@ void code_contractst::instrument_call_statement(
               free_car.lower_bound_address_var, w_car.lower_bound_address_var)},
           address_of_exprt{w_car.validity_condition_var},
           null_pointer_exprt{to_pointer_type(object_validity_var_addr.type())}},
-        instruction_it->source_location()));
+        source_location_no_checks));
     }
 
     alias_checking_instructions.destructive_append(skip_program);
@@ -736,9 +744,9 @@ void code_contractst::instrument_call_statement(
     skip_program.clear();
     invalidation_instructions.add(goto_programt::make_goto(
       skip_program.add(
-        goto_programt::make_skip(instruction_it->source_location())),
+        goto_programt::make_skip(source_location_no_checks)),
       not_exprt{free_car.validity_condition_var},
-      instruction_it->source_location()));
+      source_location_no_checks));
 
     // invalidate all recorded CAR validity variables
     for(const auto &w_car_validity_addr : write_set_validity_addrs)
@@ -746,13 +754,13 @@ void code_contractst::instrument_call_statement(
       goto_programt w_car_skip_program;
       invalidation_instructions.add(goto_programt::make_goto(
         w_car_skip_program.add(
-          goto_programt::make_skip(instruction_it->source_location())),
+          goto_programt::make_skip(source_location_no_checks)),
         null_pointer(w_car_validity_addr),
-        instruction_it->source_location()));
+        source_location_no_checks));
       invalidation_instructions.add(goto_programt::make_assignment(
         dereference_exprt{w_car_validity_addr},
         false_exprt{},
-        instruction_it->source_location()));
+        source_location_no_checks));
       invalidation_instructions.destructive_append(w_car_skip_program);
     }
 
@@ -844,6 +852,9 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     return true;
   }
 
+  // Full inlining of the function body
+  goto_function_inline(goto_functions, function, ns, log.get_message_handler());
+
   // Get assigns clause for function
   const symbolt &target = ns.lookup(function);
   assigns_clauset assigns(
@@ -853,17 +864,12 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function,
     symbol_table);
 
-  // Adds formal parameters to write set
+  // Add formal parameters to write set
   for(const auto &param : to_code_type(target.type).parameters())
     assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
 
-  // Adds local static declarations to write set
-  for(const auto &sym_pair : symbol_table)
-  {
-    const auto &sym = sym_pair.second;
-    if(sym.is_static_lifetime && sym.location.get_function() == function)
-      assigns.add_to_write_set(sym.symbol_expr());
-  }
+  // Detect local static variables and add them to the write set
+  find_static_locals(function_obj->second, assigns);
 
   auto instruction_it = function_obj->second.body.instructions.begin();
   for(const auto &car : assigns.get_write_set())
@@ -886,8 +892,6 @@ void code_contractst::check_frame_conditions(
   goto_programt::targett &instruction_it,
   assigns_clauset &assigns)
 {
-  goto_function_inline(goto_functions, function, ns, log.get_message_handler());
-
   for(; instruction_it != body.instructions.end(); ++instruction_it)
   {
     if(instruction_it->is_decl())
@@ -916,6 +920,10 @@ void code_contractst::check_frame_conditions(
     else if(instruction_it->is_dead())
     {
       const auto &symbol = instruction_it->dead_symbol();
+      source_locationt &source_location_no_checks = instruction_it->source_location_nonconst();
+      source_location_no_checks.add_pragma("disable:pointer-check");
+      source_location_no_checks.add_pragma("disable:pointer-primitive-check");
+      source_location_no_checks.add_pragma("disable:pointer-overflow-check");
       // CAR equality and hash are defined on source_expr alone,
       // therefore this temporary CAR should be "found"
       const auto &symbol_car = assigns.get_write_set().find(
@@ -962,10 +970,14 @@ code_contractst::add_inclusion_check(
     program, instruction_it, snapshot_instructions);
 
   goto_programt assertion;
-  assertion.add(goto_programt::make_assertion(
-    assigns.generate_inclusion_check(car), instruction_it->source_location()));
-  assertion.instructions.back().source_location_nonconst().set_comment(
+  source_locationt source_location = instruction_it->source_location_nonconst();
+  source_location.add_pragma("disable:pointer-check");
+  source_location.add_pragma("disable:pointer-primitive-check");
+  source_location.add_pragma("disable:pointer-overflow-check");
+  source_location.set_comment(
     "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
+  assertion.add(goto_programt::make_assertion(
+    assigns.generate_inclusion_check(car), source_location));
   insert_before_swap_and_advance(program, instruction_it, assertion);
 
   return car;
@@ -1259,4 +1271,64 @@ bool code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
       fail = enforce_contract(function);
   }
   return fail;
+}
+
+void code_contractst::find_static_locals(
+  const goto_functiont &function,
+  assigns_clauset &assigns)
+{
+  find_symbols_sett tmp_set;
+
+  // find symbols in all possible places
+  forall_goto_program_instructions(inst, function.body)
+  {
+    // this covers ASSERT/ASSUME and guarded instructions
+    if(inst->has_condition())
+      find_symbols(inst->condition(), tmp_set, true, false);
+
+    if(inst->is_assign())
+    {
+      if(inst->assign_lhs().is_not_nil())
+        find_symbols(inst->assign_lhs(), tmp_set, true, false);
+
+      if(inst->assign_rhs().is_not_nil())
+        find_symbols(inst->assign_rhs(), tmp_set, true, false);
+    }
+
+    if(inst->is_set_return_value())
+      find_symbols(inst->return_value(), tmp_set, true, false);
+
+    if(inst->is_function_call())
+    {
+      if(inst->call_lhs().is_not_nil())
+        find_symbols(inst->call_lhs(), tmp_set, true, false);
+
+      // we DO NOT recurse into function calls
+      find_symbols(inst->call_function(), tmp_set, true, false);
+
+      forall_expr(e_it, inst->call_arguments())
+      {
+        find_symbols(*e_it, tmp_set, true, false);
+      }
+    }
+
+    if(inst->is_other())
+      find_symbols(inst->get_other(), tmp_set, true, false);
+  }
+
+  // filter symbols with static lifetime and non-empty function attribute
+  // and add them to the assigns clause
+  for(auto it = tmp_set.begin(); it != tmp_set.end(); it++)
+  {
+    symbolt sym = ns.lookup(*it);
+    bool is_local_static =
+      sym.is_static_lifetime && !sym.location.get_function().empty();
+    if(is_local_static)
+      assigns.add_to_write_set(sym.symbol_expr());
+  }
+
+  // clear set
+  tmp_set.clear();
+
+  return;
 }

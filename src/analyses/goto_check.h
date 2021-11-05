@@ -17,21 +17,25 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_modelt;
 class namespacet;
 class optionst;
+class message_handlert;
 
 void goto_check(
   const namespacet &ns,
   const optionst &options,
-  goto_functionst &goto_functions);
+  goto_functionst &goto_functions,
+  message_handlert &message_handler);
 
 void goto_check(
   const irep_idt &function_identifier,
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
-  const optionst &options);
+  const optionst &options,
+  message_handlert &message_handler);
 
 void goto_check(
   const optionst &options,
-  goto_modelt &goto_model);
+  goto_modelt &goto_model,
+  message_handlert &message_handler);
 
 #define OPT_GOTO_CHECK                                                         \
   "(bounds-check)(pointer-check)(memory-leak-check)"                           \

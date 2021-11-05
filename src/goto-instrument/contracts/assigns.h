@@ -61,7 +61,9 @@ public:
     generate_unsafe_inclusion_check(const conditional_address_ranget &) const;
 
     const symbolt
-    generate_new_symbol(const typet &, const source_locationt &) const;
+    generate_new_symbol(
+      const std::string &prefix,
+      const typet &, const source_locationt &) const;
 
     friend class assigns_clauset;
   };

@@ -6,21 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_ANSI_C_ANSI_C_PARSER_H
 #define CPROVER_ANSI_C_ANSI_C_PARSER_H
 
+#include <map>
 #include <set>
 
-#include <util/parser.h>
 #include <util/config.h>
+#include <util/parser.h>
 
 #include "ansi_c_parse_tree.h"
 #include "ansi_c_scope.h"
 
 int yyansi_cparse();
 
-class ansi_c_parsert:public parsert
+class ansi_c_parsert : public parsert
 {
 public:
   ansi_c_parse_treet parse_tree;
@@ -39,7 +39,7 @@ public:
 
   virtual bool parse() override
   {
-    return yyansi_cparse()!=0;
+    return yyansi_cparse() != 0;
   }
 
   virtual void clear() override
@@ -48,12 +48,12 @@ public:
     parse_tree.clear();
 
     // scanner state
-    tag_following=false;
-    asm_block_following=false;
-    parenthesis_counter=0;
+    tag_following = false;
+    asm_block_following = false;
+    parenthesis_counter = 0;
     string_literal.clear();
     pragma_pack.clear();
-    pragma_cprover.clear();
+    pragma_cprover_stack.clear();
 
     // set up global scope
     scopes.clear();
@@ -66,7 +66,7 @@ public:
   unsigned parenthesis_counter;
   std::string string_literal;
   std::list<exprt> pragma_pack;
-  std::list<std::set<irep_idt>> pragma_cprover;
+  std::list<std::map<irep_idt, bool>> pragma_cprover_stack;
 
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
@@ -107,7 +107,13 @@ public:
     return scopes.back();
   }
 
-  enum class decl_typet { TAG, MEMBER, PARAMETER, OTHER };
+  enum class decl_typet
+  {
+    TAG,
+    MEMBER,
+    PARAMETER,
+    OTHER
+  };
 
   // convert a declarator and then add it to existing an declaration
   void add_declarator(exprt &declaration, irept &declarator);
@@ -117,20 +123,20 @@ public:
 
   void copy_item(const ansi_c_declarationt &declaration)
   {
-    assert(declaration.id()==ID_declaration);
+    assert(declaration.id() == ID_declaration);
     parse_tree.items.push_back(declaration);
   }
 
   void new_scope(const std::string &prefix)
   {
-    const scopet &current=current_scope();
+    const scopet &current = current_scope();
     scopes.push_back(scopet());
-    scopes.back().prefix=current.prefix+prefix;
+    scopes.back().prefix = current.prefix + prefix;
   }
 
   ansi_c_id_classt lookup(
     const irep_idt &base_name, // in
-    irep_idt &identifier, // out
+    irep_idt &identifier,      // out
     bool tag,
     bool label);
 
@@ -143,15 +149,25 @@ public:
     return identifier;
   }
 
-  void set_pragma_cprover()
-  {
-    source_location.remove(ID_pragma);
-    for(const auto &pragma_set : pragma_cprover)
-    {
-      for(const auto &pragma : pragma_set)
-        source_location.add_pragma(pragma);
-    }
-  }
+  /// \brief True iff the CPROVER pragma stack is empty
+  bool pragma_cprover_empty();
+
+  /// \brief Pushes an empty level in the CPROVER pragma stack
+  void pragma_cprover_push();
+
+  /// \brief Pops a level in the CPROVER pragma stack
+  void pragma_cprover_pop();
+
+  /// \brief Adds a check to the CPROVER pragma stack
+  void pragma_cprover_add_check(irep_idt name, bool enabled);
+
+  /// Returns true the same check with different polarity
+  /// is already present at top of the stack
+  bool pragma_cprover_clash(irep_idt name, bool enabled);
+
+  /// \brief Tags \ref source_location with
+  /// the current CPROVER pragma stack
+  void set_pragma_cprover();
 };
 
 extern ansi_c_parsert ansi_c_parser;

@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^\[bar\.\d+\] line \d+ Check that \*a\->u\.b\->c is assignable: SUCCESS$
+^\[foo\.\d+\] line \d+ Check that a\->u\.i is assignable: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks wether contract enforcement works with arguments to __CPROVER_havoc_object.

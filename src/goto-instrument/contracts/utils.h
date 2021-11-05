@@ -100,6 +100,7 @@ const symbolt &new_tmp_symbol(
   const typet &type,
   const source_locationt &location,
   const irep_idt &mode,
-  symbol_table_baset &symtab);
+  symbol_table_baset &symtab,
+  std::string suffix = "tmp_cc");
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
