@@ -1606,6 +1606,8 @@ void goto_checkt::check_rec_address(const exprt &expr, guardt &guard)
 
 void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
 {
+  PRECONDITION(
+    expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies);
   INVARIANT(
     expr.is_boolean(),
     "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
@@ -1736,7 +1738,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
     check_rec_address(to_address_of_expr(expr).object(), guard);
     return;
   }
-  else if(expr.id() == ID_and || expr.id() == ID_or)
+  else if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies)
   {
     check_rec_logical_op(expr, guard);
     return;

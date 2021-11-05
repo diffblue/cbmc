@@ -1,0 +1,16 @@
+CORE
+--div-by-zero-check
+test.c
+^EXIT=0$
+^SIGNAL=0$
+\[main\.assertion\.1\] line \d 10 / y is expected to succeed: SUCCESS
+\[main\.division-by-zero\.1\] line \d division by zero in 10 / y: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+\[main\.division-by-zero\.1\] line \d division by zero in 10 / y: FAILURE
+--
+Without the change that drives the refinement of the guard for a `ID_implies`
+statement in `goto-check`, this will fail with a counterexample of `y = 0`.
+With the bug fix, the `--div-by-zero-check` will succeed because the
+antecedent of the conditional is becoming the guard for the consequent,
+guarding any checks performed there.
