@@ -129,7 +129,7 @@ std::ostream &goto_programt::output_instruction(
       // fallthrough
     }
 
-    out << "OTHER " << format(instruction.get_other());
+    out << "OTHER " << format(instruction.get_other()) << '\n';
     break;
 
   case SET_RETURN_VALUE:
