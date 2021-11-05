@@ -1606,6 +1606,8 @@ void goto_checkt::check_rec_address(const exprt &expr, guardt &guard)
 
 void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
 {
+  PRECONDITION(
+    expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies);
   INVARIANT(
     expr.is_boolean(),
     "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
