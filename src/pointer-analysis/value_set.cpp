@@ -371,6 +371,30 @@ value_sett::object_mapt value_sett::get_value_set(
   return dest;
 }
 
+std::vector<exprt>
+value_sett::get_any_object(exprt expr, const namespacet &ns) const
+{
+  if(expr.type().id() != ID_pointer)
+    return {};
+
+  object_mapt object_map;
+
+  // we'll take the union of all objects we see, with unspecified offsets
+  values.iterate([this, &object_map](const irep_idt &key, const entryt &value) {
+    for(const auto &object : value.object_map.read())
+      insert(object_map, object.first, offsett());
+  });
+
+  // we'll add null, in case it's not there yet
+  insert(
+    object_map,
+    exprt(ID_null_object, to_pointer_type(expr.type()).subtype()),
+    offsett());
+
+  return make_range(object_map.read())
+    .map([&](const object_map_dt::value_type &pair) { return to_expr(pair); });
+}
+
 /// Check if 'suffix' starts with 'field'.
 /// Suffix is delimited by periods and '[]' (array access) tokens, so we're
 /// looking for ".field($|[]|.)"
@@ -507,20 +531,7 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id() == ID_nondet_symbol)
   {
-    if(expr.type().id() == ID_pointer)
-    {
-      // we'll take the union of all objects we see, with unspecified offsets
-      values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
-        for(const auto &object : value.object_map.read())
-          insert(dest, object.first, offsett());
-      });
-
-      // we'll add null, in case it's not there yet
-      insert(
-        dest,
-        exprt(ID_null_object, to_pointer_type(expr_type).subtype()),
-        offsett());
-    }
+    insert(dest, exprt(ID_unknown, original_type));
   }
   else if(expr.id()==ID_if)
   {

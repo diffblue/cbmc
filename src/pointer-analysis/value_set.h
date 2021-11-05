@@ -251,6 +251,13 @@ public:
   ///   are object_descriptor_exprt or have id ID_invalid or ID_unknown.
   std::vector<exprt> get_value_set(exprt expr, const namespacet &ns) const;
 
+  /// Collects all objects known to the value set.
+  /// \param expr: query expression
+  /// \param ns: global namespace
+  /// \return list of objects that any pointer could point to. These expressions
+  ///   are object_descriptor_exprt or have id ID_invalid or ID_unknown.
+  std::vector<exprt> get_any_object(exprt expr, const namespacet &ns) const;
+
   void clear()
   {
     values.clear();
