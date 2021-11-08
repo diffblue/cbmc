@@ -1,7 +1,7 @@
 CORE
 main.c
---enforce-contract f1 _ --unwind 20 --unwinding-assertions
-^file main\.c line 19 function f2_in: recursion is ignored on call to 'f2_out'$
+--enforce-contract sum _ --trace
+^file main\.c line 6 function sum_rec: recursion is ignored on call to 'sum_rec'$
 ^Invariant check failed$
 ^Condition: decorated\.get_recursive_function_warnings_count\(\) == 0$
 ^Reason: Recursive functions found during inlining$

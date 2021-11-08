@@ -87,6 +87,21 @@ public:
     return write_set;
   }
 
+  /// \brief Finds symbols declared with a static lifetime in the given
+  /// `root_function` or one of the functions it calls,
+  /// and adds them to the write set of this assigns clause.
+  ///
+  /// @param functions all functions of the goto_model
+  /// @param root_function the root function under which to search statics
+  ///
+  /// A symbol is considered a static local symbol iff:
+  /// - it has a static lifetime annotation
+  /// - its source location has a non-empty function attribute
+  /// - this function attribute is found in the call graph of the root_function
+  void add_static_locals_to_write_set(
+    const goto_functionst &functions,
+    const irep_idt &root_function);
+
   const messaget &log;
   const namespacet &ns;
   const irep_idt &function_name;
