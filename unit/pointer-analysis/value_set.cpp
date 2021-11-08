@@ -103,8 +103,8 @@ SCENARIO(
     code_assignt assign_x(a1_x, address_of_exprt(a2_symbol.symbol_expr()));
     code_assignt assign_y(a1_y, address_of_exprt(a3_symbol.symbol_expr()));
 
-    value_set.apply_code(assign_x, ns);
-    value_set.apply_code(assign_y, ns);
+    value_set.assign(assign_x.lhs(), assign_x.rhs(), ns, false, false);
+    value_set.assign(assign_y.lhs(), assign_y.rhs(), ns, false, false);
 
     null_pointer_exprt null_A_ptr(to_pointer_type(a1_x.type()));
 

@@ -72,23 +72,33 @@ void value_set_domain_templatet<VST>::transform(
 {
   switch(from_l->type())
   {
+  case ASSIGN:
+    value_set.assign(
+      from_l->assign_lhs(), from_l->assign_rhs(), ns, false, false);
+    break;
+
+  case DEAD:
+    // ignore for now (could prune value set)
+    break;
+
+  case DECL:
+    value_set.apply_decl(from_l->decl_symbol(), ns);
+    break;
+
+  case END_FUNCTION:
+    value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
+    break;
+
   case GOTO:
     // ignore for now
     break;
 
-  case END_FUNCTION:
-  {
-    value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
-    break;
-  }
-
-  // Note intentional fall-through here:
   case SET_RETURN_VALUE:
+    value_set.apply_set_return_value(from_l->return_value(), ns);
+    break;
+
   case OTHER:
-  case ASSIGN:
-  case DECL:
-  case DEAD:
-    value_set.apply_code(from_l->get_code(), ns);
+    // ignore
     break;
 
   case ASSUME:

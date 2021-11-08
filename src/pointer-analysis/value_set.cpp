@@ -1505,123 +1505,33 @@ void value_sett::do_end_function(
   assign(lhs, rhs, ns, false, false);
 }
 
-void value_sett::apply_code_rec(
-  const codet &code,
+void value_sett::apply_decl(const symbol_exprt &symbol, const namespacet &ns)
+{
+  const exprt &lhs = symbol;
+  const typet &lhs_type = lhs.type();
+
+  if(
+    lhs_type.id() == ID_pointer ||
+    (lhs_type.id() == ID_array && lhs_type.subtype().id() == ID_pointer))
+  {
+    // assign the address of the failed object
+    if(auto failed = get_failed_symbol(to_symbol_expr(lhs), ns))
+    {
+      address_of_exprt address_of_expr(*failed, to_pointer_type(lhs.type()));
+      assign(lhs, address_of_expr, ns, false, false);
+    }
+    else
+      assign(lhs, exprt(ID_invalid), ns, false, false);
+  }
+}
+
+void value_sett::apply_set_return_value(
+  const exprt &value,
   const namespacet &ns)
 {
-  const irep_idt &statement=code.get_statement();
-
-  if(statement==ID_block)
-  {
-    forall_operands(it, code)
-      apply_code_rec(to_code(*it), ns);
-  }
-  else if(statement==ID_function_call)
-  {
-    // shouldn't be here
-    UNREACHABLE;
-  }
-  else if(statement==ID_assign)
-  {
-    if(code.operands().size()!=2)
-      throw "assignment expected to have two operands";
-
-    assign(code.op0(), code.op1(), ns, false, false);
-  }
-  else if(statement==ID_decl)
-  {
-    if(code.operands().size()!=1)
-      throw "decl expected to have one operand";
-
-    const exprt &lhs=code.op0();
-
-    if(lhs.id()!=ID_symbol)
-      throw "decl expected to have symbol on lhs";
-
-    const typet &lhs_type = lhs.type();
-
-    if(
-      lhs_type.id() == ID_pointer ||
-      (lhs_type.id() == ID_array && lhs_type.subtype().id() == ID_pointer))
-    {
-      // assign the address of the failed object
-      if(auto failed = get_failed_symbol(to_symbol_expr(lhs), ns))
-      {
-        address_of_exprt address_of_expr(*failed, to_pointer_type(lhs.type()));
-        assign(lhs, address_of_expr, ns, false, false);
-      }
-      else
-        assign(lhs, exprt(ID_invalid), ns, false, false);
-    }
-  }
-  else if(statement==ID_expression)
-  {
-    // can be ignored, we don't expect side effects here
-  }
-  else if(statement=="cpp_delete" ||
-          statement=="cpp_delete[]")
-  {
-    // does nothing
-  }
-  else if(statement=="lock" || statement=="unlock")
-  {
-    // ignore for now
-  }
-  else if(statement==ID_asm)
-  {
-    // ignore for now, probably not safe
-  }
-  else if(statement==ID_nondet)
-  {
-    // doesn't do anything
-  }
-  else if(statement==ID_printf)
-  {
-    // doesn't do anything
-  }
-  else if(statement==ID_return)
-  {
-    const code_returnt &code_return = to_code_return(code);
-    // this is turned into an assignment
-    symbol_exprt lhs(
-      "value_set::return_value", code_return.return_value().type());
-    assign(lhs, code_return.return_value(), ns, false, false);
-  }
-  else if(statement==ID_array_set)
-  {
-  }
-  else if(statement==ID_array_copy)
-  {
-  }
-  else if(statement==ID_array_replace)
-  {
-  }
-  else if(statement==ID_assume)
-  {
-    guard(to_code_assume(code).assumption(), ns);
-  }
-  else if(statement==ID_user_specified_predicate ||
-          statement==ID_user_specified_parameter_predicates ||
-          statement==ID_user_specified_return_predicates)
-  {
-    // doesn't do anything
-  }
-  else if(statement==ID_fence)
-  {
-  }
-  else if(can_cast_expr<code_inputt>(code) || can_cast_expr<code_outputt>(code))
-  {
-    // doesn't do anything
-  }
-  else if(statement==ID_dead)
-  {
-    // Ignore by default; could prune the value set.
-  }
-  else
-  {
-    // std::cerr << code.pretty() << '\n';
-    throw "value_sett: unexpected statement: "+id2string(statement);
-  }
+  // this is turned into an assignment
+  symbol_exprt lhs("value_set::return_value", value.type());
+  assign(lhs, value, ns, false, false);
 }
 
 void value_sett::guard(
