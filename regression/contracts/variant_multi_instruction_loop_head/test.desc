@@ -1,0 +1,19 @@
+CORE
+main.c
+--apply-loop-contracts
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test fails even without the fix proposed in the commit, so it should be improved.
+It is expected to fail because the proposed invariant isn't strong enough to help prove
+termination using the specified variant.
+
+The test highlights a case where a C loop guard is compiled to multiple GOTO instructions.
+Therefore the loop_head pointer needs to be advanced multiple times to get to the loop body,
+where the initial value of the loop variant (/ ranking function) must be recorded.
+
+The proposed fix advances the pointer until the source_location differs from the original
+loop_head's source_location. However, this might still not work if the loop guard in the
+original C code was split across multiple lines in the first place.

@@ -209,7 +209,21 @@ void code_contractst::check_apply_loop_contracts(
       converter.goto_convert(old_decreases_assignment, havoc_code, mode);
     }
 
-    goto_function.body.destructive_insert(std::next(loop_head), havoc_code);
+    // Forward the loop_head iterator until the start of the body.
+    // This is necessary because complex C loop_head conditions could be
+    // converted to multiple GOTO instructions (e.g. temporaries are introduced).
+    // FIXME: This simple approach wouldn't work when
+    // the loop guard in the source file is split across multiple lines.
+    const auto head_loc = loop_head->source_location();
+    while(loop_head->source_location() == head_loc)
+      loop_head = std::next(loop_head);
+
+    // At this point, we are just past the loop head,
+    // so at the beginning of the loop body.
+    auto loop_body = loop_head;
+    loop_head--;
+
+    goto_function.body.destructive_insert(loop_body, havoc_code);
   }
 
   // Generate: assert(invariant) just after the loop exits
