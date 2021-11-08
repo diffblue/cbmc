@@ -45,7 +45,9 @@ exprt deallocated(const exprt &pointer, const namespacet &ns)
   // we check __CPROVER_deallocated!
   const symbolt &deallocated_symbol=ns.lookup(CPROVER_PREFIX "deallocated");
 
-  return same_object(pointer, deallocated_symbol.symbol_expr());
+  return index_exprt{
+    deallocated_symbol.symbol_expr(),
+    typecast_exprt::conditional_cast(pointer_object(pointer), index_type())};
 }
 
 exprt dead_object(const exprt &pointer, const namespacet &ns)
@@ -53,7 +55,9 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   // we check __CPROVER_dead_object!
   const symbolt &deallocated_symbol=ns.lookup(CPROVER_PREFIX "dead_object");
 
-  return same_object(pointer, deallocated_symbol.symbol_expr());
+  return index_exprt{
+    deallocated_symbol.symbol_expr(),
+    typecast_exprt::conditional_cast(pointer_object(pointer), index_type())};
 }
 
 exprt good_pointer(const exprt &pointer)

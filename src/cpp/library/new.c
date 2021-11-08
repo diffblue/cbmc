@@ -71,7 +71,9 @@ inline void __delete(void *ptr)
                          "delete argument must have offset zero");
 
   // catch double delete
-  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr, "double delete");
+  __CPROVER_precondition(
+    ptr == 0 || !__CPROVER_deallocated[__CPROVER_POINTER_OBJECT(ptr)],
+    "double delete");
 
   // catch people who call delete for objects allocated with new[]
   __CPROVER_precondition(
@@ -107,8 +109,9 @@ inline void __delete_array(void *ptr)
                          "delete argument must have offset zero");
 
   // catch double delete
-  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr,
-                         "double delete");
+  __CPROVER_precondition(
+    ptr == 0 || !__CPROVER_deallocated[__CPROVER_POINTER_OBJECT(ptr)],
+    "double delete");
 
   // catch people who call delete[] for objects allocated with new
   __CPROVER_precondition(

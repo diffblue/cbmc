@@ -264,8 +264,9 @@ void free(void *ptr)
                          "free argument has offset zero");
 
   // catch double free
-  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr,
-                         "double free");
+  __CPROVER_precondition(
+    ptr == 0 || !__CPROVER_deallocated[__CPROVER_POINTER_OBJECT(ptr)],
+    "double free");
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
@@ -602,10 +603,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __CPROVER_deallocate */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-
 void __CPROVER_deallocate(void *ptr)
 {
-  if(__VERIFIER_nondet___CPROVER_bool())
-    __CPROVER_deallocated = ptr;
+  __CPROVER_deallocated[__CPROVER_POINTER_OBJECT(ptr)] = 1;
 }

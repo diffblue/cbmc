@@ -1,7 +1,7 @@
 CORE
 test.c
 --malloc-may-fail --malloc-fail-null
-^\[main.precondition_instance.\d+] line \d+ double free: SUCCESS$
+^\[(free.precondition|main.precondition_instance).\d+] line \d+ double free: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

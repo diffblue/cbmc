@@ -2214,15 +2214,9 @@ void goto_check_ct::goto_check(
         if(local_bitvector_analysis->dirty(variable))
         {
           // need to mark the dead variable as dead
-          exprt lhs = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-          exprt address_of_expr = typecast_exprt::conditional_cast(
-            address_of_exprt(variable), lhs.type());
-          if_exprt rhs(
-            side_effect_expr_nondett(bool_typet(), i.source_location()),
-            std::move(address_of_expr),
-            lhs);
+          exprt lhs = dead_object(address_of_exprt{variable}, ns);
           new_code.add(goto_programt::make_assignment(
-            code_assignt{std::move(lhs), std::move(rhs), i.source_location()},
+            code_assignt{std::move(lhs), true_exprt{}, i.source_location()},
             i.source_location()));
         }
       }

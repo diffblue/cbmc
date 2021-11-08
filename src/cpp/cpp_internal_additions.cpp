@@ -88,8 +88,12 @@ void cpp_internal_additions(std::ostream &out)
       << CPROVER_PREFIX "memory[__CPROVER::constant_infinity_uint];" << '\n';
 
   // malloc
-  out << "const void *" CPROVER_PREFIX "deallocated = 0;" << '\n';
-  out << "const void *" CPROVER_PREFIX "dead_object = 0;" << '\n';
+  out << CPROVER_PREFIX "bool "
+      << CPROVER_PREFIX "deallocated[__CPROVER::constant_infinity_uint];"
+      << '\n';
+  out << CPROVER_PREFIX "bool "
+      << CPROVER_PREFIX "dead_object[__CPROVER::constant_infinity_uint];"
+      << '\n';
   out << "const void *" CPROVER_PREFIX "new_object = 0;" << '\n';
   out << "" CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_is_new_array = 0;"
       << '\n';
