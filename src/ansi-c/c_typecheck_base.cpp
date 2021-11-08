@@ -739,33 +739,7 @@ void c_typecheck_baset::typecheck_declaration(
             CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
         }
 
-        for(auto &target : code_type.assigns())
-        {
-          typecheck_expr(target);
-
-          if(target.type().id() == ID_empty)
-          {
-            error().source_location = target.source_location();
-            error() << "void-typed targets not permitted" << eom;
-            throw 0;
-          }
-          else if(target.id() == ID_pointer_object)
-          {
-            // skip
-          }
-          else if(!target.get_bool(ID_C_lvalue))
-          {
-            error().source_location = target.source_location();
-            error() << "illegal target in assigns clause" << eom;
-            throw 0;
-          }
-          else if(has_subexpr(target, ID_side_effect))
-          {
-            error().source_location = target.source_location();
-            error() << "assigns clause is not side-effect free" << eom;
-            throw 0;
-          }
-        }
+        typecheck_spec_assigns(code_type.assigns());
 
         if(!as_const(code_type).ensures().empty())
         {

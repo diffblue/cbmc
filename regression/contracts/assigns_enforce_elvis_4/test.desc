@@ -3,7 +3,7 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: void-typed targets not permitted$
+^.*error: void-typed targets not permitted in assigns clause$
 --
 --
 Check that Elvis operator expressions '*(cond ? if_true : if_false)' with different types in true and false branches are rejected.

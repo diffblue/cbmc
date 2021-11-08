@@ -3,7 +3,7 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: illegal target in assigns clause$
+^.*error: non-lvalue target in assigns clause$
 ^CONVERSION ERROR$
 --
 --

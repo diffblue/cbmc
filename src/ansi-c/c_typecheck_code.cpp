@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/range.h>
 #include <util/string_constant.h>
 
@@ -493,6 +494,12 @@ void c_typecheck_baset::typecheck_for(codet &code)
 
   typecheck_spec_loop_invariant(code);
   typecheck_spec_decreases(code);
+
+  if(code.find(ID_C_spec_assigns).is_not_nil())
+  {
+    typecheck_spec_assigns(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_label(code_labelt &code)
@@ -782,6 +789,12 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
 
   typecheck_spec_loop_invariant(code);
   typecheck_spec_decreases(code);
+
+  if(code.find(ID_C_spec_assigns).is_not_nil())
+  {
+    typecheck_spec_assigns(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
@@ -816,6 +829,43 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
 
   typecheck_spec_loop_invariant(code);
   typecheck_spec_decreases(code);
+
+  if(code.find(ID_C_spec_assigns).is_not_nil())
+  {
+    typecheck_spec_assigns(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
+}
+
+void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
+{
+  for(auto &target : targets)
+  {
+    typecheck_expr(target);
+
+    if(target.type().id() == ID_empty)
+    {
+      error().source_location = target.source_location();
+      error() << "void-typed targets not permitted in assigns clause" << eom;
+      throw 0;
+    }
+    else if(target.id() == ID_pointer_object)
+    {
+      // skip
+    }
+    else if(!target.get_bool(ID_C_lvalue))
+    {
+      error().source_location = target.source_location();
+      error() << "non-lvalue target in assigns clause" << eom;
+      throw 0;
+    }
+    else if(has_subexpr(target, ID_side_effect))
+    {
+      error().source_location = target.source_location();
+      error() << "assigns clause is not side-effect free" << eom;
+      throw 0;
+    }
+  }
 }
 
 void c_typecheck_baset::typecheck_spec_loop_invariant(codet &code)

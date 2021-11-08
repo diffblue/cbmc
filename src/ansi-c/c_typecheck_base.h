@@ -144,6 +144,9 @@ protected:
   virtual void typecheck_while(code_whilet &code);
   virtual void typecheck_dowhile(code_dowhilet &code);
   virtual void typecheck_start_thread(codet &code);
+
+  // contracts
+  virtual void typecheck_spec_assigns(exprt::operandst &targets);
   virtual void typecheck_spec_loop_invariant(codet &code);
   virtual void typecheck_spec_decreases(codet &code);
 

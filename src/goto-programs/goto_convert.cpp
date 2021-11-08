@@ -863,11 +863,15 @@ void goto_convertt::convert_loop_contracts(
   goto_programt::targett loop,
   const irep_idt &mode)
 {
-  exprt invariant =
-    static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
-  exprt decreases_clause =
-    static_cast<const exprt &>(code.find(ID_C_spec_decreases));
+  auto assigns = static_cast<const unary_exprt &>(code.find(ID_C_spec_assigns));
+  if(assigns.is_not_nil())
+  {
+    PRECONDITION(loop->is_goto());
+    loop->guard.add(ID_C_spec_assigns).swap(assigns.op());
+  }
 
+  auto invariant =
+    static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
   if(!invariant.is_nil())
   {
     if(has_subexpr(invariant, ID_side_effect))
@@ -880,6 +884,8 @@ void goto_convertt::convert_loop_contracts(
     loop->condition_nonconst().add(ID_C_spec_loop_invariant).swap(invariant);
   }
 
+  auto decreases_clause =
+    static_cast<const exprt &>(code.find(ID_C_spec_decreases));
   if(!decreases_clause.is_nil())
   {
     if(has_subexpr(decreases_clause, ID_side_effect))
@@ -972,7 +978,7 @@ void goto_convertt::convert_for(
   goto_programt::targett y = tmp_y.add(
     goto_programt::make_goto(u, true_exprt(), code.source_location()));
 
-  // loop invariant and decreases clause
+  // assigns clause, loop invariant and decreases clause
   convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(sideeffects);
@@ -1030,7 +1036,7 @@ void goto_convertt::convert_while(
   goto_programt tmp_x;
   convert(code.body(), tmp_x, mode);
 
-  // loop invariant and decreases clause
+  // assigns clause, loop invariant and decreases clause
   convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(tmp_branch);
@@ -1099,7 +1105,7 @@ void goto_convertt::convert_dowhile(
   // y: if(c) goto w;
   y->complete_goto(w);
 
-  // loop invariant and decreases clause
+  // assigns_clause, loop invariant and decreases clause
   convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(tmp_w);

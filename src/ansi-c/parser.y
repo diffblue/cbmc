@@ -2453,6 +2453,9 @@ iteration_statement:
           statement($$, ID_while);
           parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($8)));
 
+          if(!parser_stack($5).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($5).operands());
+
           if(!parser_stack($6).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($6).operands());
 
@@ -2467,6 +2470,9 @@ iteration_statement:
           $$=$1;
           statement($$, ID_dowhile);
           parser_stack($$).add_to_operands(std::move(parser_stack($5)), std::move(parser_stack($2)));
+
+          if(!parser_stack($7).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($7).operands());
 
           if(!parser_stack($8).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($8).operands());
@@ -2498,6 +2504,9 @@ iteration_statement:
           mto($$, $5);
           mto($$, $7);
           mto($$, $12);
+
+          if(!parser_stack($9).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($9).operands());
 
           if(!parser_stack($10).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($10).operands());
