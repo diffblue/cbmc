@@ -820,6 +820,21 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
   rename(ssa.type(), l1_identifier, ns);
   ssa.update_type();
 
+  // in case of pointers, put something into the value set
+  if(ssa.type().id() == ID_pointer)
+  {
+    exprt rhs;
+    if(
+      auto failed =
+        get_failed_symbol(to_symbol_expr(ssa.get_original_expr()), ns))
+      rhs = address_of_exprt(*failed, to_pointer_type(ssa.type()));
+    else
+      rhs = exprt(ID_invalid);
+
+    exprt l1_rhs = rename<L1>(std::move(rhs), ns).get();
+    value_set.assign(ssa, l1_rhs, ns, true, false);
+  }
+
   // L2 renaming
   const exprt fields = field_sensitivity.get_fields(ns, *this, ssa);
   for(const auto &l1_symbol : find_symbols(fields))
