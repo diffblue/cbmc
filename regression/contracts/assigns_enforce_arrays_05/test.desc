@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract assigns_ptr --enforce-contract assigns_range
+--enforce-contract assigns_range
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

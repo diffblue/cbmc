@@ -1,7 +1,8 @@
 CORE
 main.c
 --apply-loop-contracts
-^The loop at file main.c line 4 function main does not have a loop invariant, but has a decreases clause. Hence, a default loop invariant \('true'\) is being used.$
+activate-multi-line-match
+^The loop at file main.c line 4 function main does not have an invariant.*.\nHence, a default invariant \('true'\) is being used to prove those.$
 ^\[main.1\].*Check loop invariant before entry: SUCCESS$
 ^\[main.2\].*Check that loop invariant is preserved: SUCCESS$
 ^\[main.3\].*Check decreases clause on loop iteration: SUCCESS$

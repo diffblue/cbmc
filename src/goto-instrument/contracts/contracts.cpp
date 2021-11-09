@@ -30,6 +30,7 @@ Date: February 2016
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/graph.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
@@ -41,6 +42,7 @@ Date: February 2016
 #include "utils.h"
 
 void code_contractst::check_apply_loop_contracts(
+  const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
   goto_programt::targett loop_head,
@@ -57,23 +59,29 @@ void code_contractst::check_apply_loop_contracts(
       t->location_number > loop_end->location_number)
       loop_end = t;
 
-  // see whether we have an invariant and a decreases clause
+  // check for assigns, invariant, and decreases clauses
+  auto assigns = static_cast<const exprt &>(
+    loop_end->get_condition().find(ID_C_spec_assigns));
   auto invariant = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_loop_invariant));
   auto decreases_clause = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_decreases));
 
+  assigns_clauset loop_assigns(
+    assigns.operands(), log, ns, function_name, symbol_table);
+
   if(invariant.is_nil())
   {
-    if(decreases_clause.is_nil())
+    if(decreases_clause.is_nil() && assigns.is_nil())
       return;
     else
     {
       invariant = true_exprt();
       log.warning()
         << "The loop at " << loop_head->source_location().as_string()
-        << " does not have a loop invariant, but has a decreases clause. "
-        << "Hence, a default loop invariant ('true') is being used."
+        << " does not have an invariant, but has other clauses"
+        << " specified in its contract.\n"
+        << "Hence, a default invariant ('true') is being used to prove those."
         << messaget::eom;
     }
   }
@@ -97,23 +105,20 @@ void code_contractst::check_apply_loop_contracts(
   // to
   //   initialize loop_entry variables;
   //   H: assert(invariant);
+  //   snapshot(write_set);
   //   havoc;
   //   assume(invariant);
   //   if(guard) goto E:
-  //   old_decreases_value = decreases_clause(current_environment);
-  //   loop;
-  //   new_decreases_value = decreases_clause(current_environment);
+  //   old_decreases_value = decreases_clause_expr;
+  //   loop with optional write_set inclusion checks;
+  //   new_decreases_value = decreases_clause_expr;
   //   assert(invariant);
   //   assert(new_decreases_value < old_decreases_value);
   //   assume(false);
   //   E: ...
 
-  // find out what can get changed in the loop
-  modifiest modifies;
-  get_modifies(local_may_alias, loop, modifies);
-
-  // build the havocking code
-  goto_programt havoc_code;
+  // an intermediate goto_program to store generated instructions
+  goto_programt generated_code;
 
   // process quantified variables correctly (introduce a fresh temporary)
   // and return a copy of the invariant
@@ -133,11 +138,11 @@ void code_contractst::check_apply_loop_contracts(
     parameter2history,
     loop_head->source_location(),
     mode,
-    havoc_code,
+    generated_code,
     ID_loop_entry);
 
   // Create 'loop_entry' history variables
-  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
+  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
 
   // Generate: assert(invariant) just before the loop
   // We use a block scope to create a temporary assertion,
@@ -145,14 +150,46 @@ void code_contractst::check_apply_loop_contracts(
   {
     code_assertt assertion{invariant_expr()};
     assertion.add_source_location() = loop_head->source_location();
-    converter.goto_convert(assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location_nonconst().set_comment(
+    converter.goto_convert(assertion, generated_code, mode);
+    generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check loop invariant before entry");
   }
 
   // havoc the variables that may be modified
-  havoc_if_validt havoc_gen(modifies, ns);
-  havoc_gen.append_full_havoc_code(loop_head->source_location(), havoc_code);
+  modifiest modifies;
+  if(assigns.is_nil())
+  {
+    try
+    {
+      get_modifies(local_may_alias, loop, modifies);
+    }
+    catch(const analysis_exceptiont &exc)
+    {
+      log.error() << "Failed to infer variables being modified by the loop at "
+                  << loop_head->source_location()
+                  << ".\nPlease specify an assigns clause.\nReason:"
+                  << messaget::eom;
+      throw exc;
+    }
+  }
+  else
+  {
+    for(const auto &target : assigns.operands())
+      modifies.insert(target);
+
+    // create snapshots of the CARs -- must be done before havocing
+    for(const auto &car : loop_assigns.get_write_set())
+    {
+      auto snapshot_instructions = car.generate_snapshot_instructions();
+      insert_before_swap_and_advance(
+        goto_function.body, loop_head, snapshot_instructions);
+    };
+  }
+
+  havoc_assigns_targetst havoc_gen(modifies, ns);
+  havoc_gen.append_full_havoc_code(
+    loop_head->source_location(), generated_code);
+  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
@@ -160,7 +197,7 @@ void code_contractst::check_apply_loop_contracts(
   {
     code_assumet assumption{invariant_expr()};
     assumption.add_source_location() = loop_head->source_location();
-    converter.goto_convert(assumption, havoc_code, mode);
+    converter.goto_convert(assumption, generated_code, mode);
   }
 
   // Create fresh temporary variables that store the multidimensional
@@ -171,7 +208,7 @@ void code_contractst::check_apply_loop_contracts(
       new_tmp_symbol(
         clause.type(), loop_head->source_location(), mode, symbol_table)
         .symbol_expr();
-    havoc_code.add(goto_programt::make_decl(
+    generated_code.add(goto_programt::make_decl(
       old_decreases_var, loop_head->source_location()));
     old_decreases_vars.push_back(old_decreases_var);
 
@@ -179,7 +216,7 @@ void code_contractst::check_apply_loop_contracts(
       new_tmp_symbol(
         clause.type(), loop_head->source_location(), mode, symbol_table)
         .symbol_expr();
-    havoc_code.add(goto_programt::make_decl(
+    generated_code.add(goto_programt::make_decl(
       new_decreases_var, loop_head->source_location()));
     new_decreases_vars.push_back(new_decreases_var);
   }
@@ -192,17 +229,44 @@ void code_contractst::check_apply_loop_contracts(
     throw 0;
 
     // non-deterministically skip the loop if it is a do-while loop.
-    havoc_code.add(goto_programt::make_goto(
+    generated_code.add(goto_programt::make_goto(
       loop_end,
       side_effect_expr_nondett(bool_typet(), loop_head->source_location())));
   }
 
-  // Now havoc at the loop head.
+  // Assume invariant & decl the variant temporaries (just before loop guard).
   // Use insert_before_swap to preserve jumps to loop head.
-  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
+  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
+
+  // Forward the loop_head iterator until the start of the body.
+  // This is necessary because complex C loop_head conditions could be
+  // converted to multiple GOTO instructions (e.g. temporaries are introduced).
+  // FIXME: This simple approach wouldn't work when
+  // the loop guard in the source file is split across multiple lines.
+  const auto head_loc = loop_head->source_location();
+  while(loop_head->source_location() == head_loc)
+    loop_head++;
+
+  // At this point, we are just past the loop head,
+  // so at the beginning of the loop body.
+  auto loop_body = loop_head;
+  loop_head--;
+
+  // Perform write set instrumentation before adding anything else to loop body.
+  // Copy the loop_body as we would increment the iterator while instrumenting.
+  if(assigns.is_not_nil())
+  {
+    auto copy_loop_body = loop_body;
+    check_frame_conditions(
+      function_name,
+      goto_function.body,
+      copy_loop_body,
+      loop_end,
+      loop_assigns);
+  }
 
   // Generate: assignments to store the multidimensional decreases clause's
-  // value before the loop
+  // value just before the loop body (but just after the loop guard)
   if(!decreases_clause.is_nil())
   {
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
@@ -211,24 +275,10 @@ void code_contractst::check_apply_loop_contracts(
                                             decreases_clause_exprs[i]};
       old_decreases_assignment.add_source_location() =
         loop_head->source_location();
-      converter.goto_convert(old_decreases_assignment, havoc_code, mode);
+      converter.goto_convert(old_decreases_assignment, generated_code, mode);
     }
 
-    // Forward the loop_head iterator until the start of the body.
-    // This is necessary because complex C loop_head conditions could be
-    // converted to multiple GOTO instructions (e.g. temporaries are introduced).
-    // FIXME: This simple approach wouldn't work when
-    // the loop guard in the source file is split across multiple lines.
-    const auto head_loc = loop_head->source_location();
-    while(loop_head->source_location() == head_loc)
-      loop_head = std::next(loop_head);
-
-    // At this point, we are just past the loop head,
-    // so at the beginning of the loop body.
-    auto loop_body = loop_head;
-    loop_head--;
-
-    goto_function.body.destructive_insert(loop_body, havoc_code);
+    goto_function.body.destructive_insert(loop_body, generated_code);
   }
 
   // Generate: assert(invariant) just after the loop exits
@@ -237,8 +287,8 @@ void code_contractst::check_apply_loop_contracts(
   {
     code_assertt assertion{invariant_expr()};
     assertion.add_source_location() = loop_end->source_location();
-    converter.goto_convert(assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location_nonconst().set_comment(
+    converter.goto_convert(assertion, generated_code, mode);
+    generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check that loop invariant is preserved");
   }
 
@@ -252,7 +302,7 @@ void code_contractst::check_apply_loop_contracts(
                                             decreases_clause_exprs[i]};
       new_decreases_assignment.add_source_location() =
         loop_head->source_location();
-      converter.goto_convert(new_decreases_assignment, havoc_code, mode);
+      converter.goto_convert(new_decreases_assignment, generated_code, mode);
     }
 
     // Generate: assertion that the multidimensional decreases clause's value
@@ -263,21 +313,22 @@ void code_contractst::check_apply_loop_contracts(
         new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
       loop_head->source_location();
-    converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location_nonconst().set_comment(
+    converter.goto_convert(
+      monotonic_decreasing_assertion, generated_code, mode);
+    generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check decreases clause on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
     {
-      havoc_code.add(goto_programt::make_dead(
+      generated_code.add(goto_programt::make_dead(
         old_decreases_vars[i], loop_head->source_location()));
-      havoc_code.add(goto_programt::make_dead(
+      generated_code.add(goto_programt::make_dead(
         new_decreases_vars[i], loop_head->source_location()));
     }
   }
 
-  insert_before_swap_and_advance(goto_function.body, loop_end, havoc_code);
+  insert_before_swap_and_advance(goto_function.body, loop_end, generated_code);
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->turn_into_assume();
@@ -613,22 +664,64 @@ bool code_contractst::apply_function_contract(
 }
 
 void code_contractst::apply_loop_contract(
-  const irep_idt &function,
+  const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function)
 {
   local_may_aliast local_may_alias(goto_function);
   natural_loops_mutablet natural_loops(goto_function.body);
 
-  // Iterate over the (natural) loops in the function,
-  // and apply any invariant annotations that we find.
-  for(const auto &loop : natural_loops.loop_map)
+  // A graph node type that stores information about a loop.
+  // We create a DAG representing nesting of various loops in goto_function,
+  // sort them topologically, and instrument them in the top-sorted order.
+  //
+  // The goal here is not avoid explicit "subset checks" on nested write sets.
+  // When instrumenting in a top-sorted order,
+  // the outer loop would no longer observe the inner loop's write set,
+  // but only corresponding `havoc` statements,
+  // which can be instrumented in the usual way to achieve a "subset check".
+
+  struct loop_graph_nodet : public graph_nodet<empty_edget>
   {
+    typedef const goto_programt::targett &targett;
+    typedef const typename natural_loops_mutablet::loopt &loopt;
+
+    targett target;
+    loopt loop;
+
+    loop_graph_nodet(targett t, loopt l) : target(t), loop(l)
+    {
+    }
+  };
+  grapht<loop_graph_nodet> loop_nesting_graph;
+
+  for(const auto &loop : natural_loops.loop_map)
+    loop_nesting_graph.add_node(loop.first, loop.second);
+
+  for(size_t outer = 0; outer < loop_nesting_graph.size(); ++outer)
+  {
+    for(size_t inner = 0; inner < loop_nesting_graph.size(); ++inner)
+    {
+      if(inner == outer)
+        continue;
+
+      if(loop_nesting_graph[outer].loop.contains(
+           loop_nesting_graph[inner].target))
+        loop_nesting_graph.add_edge(outer, inner);
+    }
+  }
+
+  // Iterate over the (natural) loops in the function, in topo-sorted order,
+  // and apply any loop contracts that we find.
+  for(const auto &idx : loop_nesting_graph.topsort())
+  {
+    const auto &loop_node = loop_nesting_graph[idx];
     check_apply_loop_contracts(
+      function_name,
       goto_function,
       local_may_alias,
-      loop.first,
-      loop.second,
-      symbol_table.lookup_ref(function).mode);
+      loop_node.target,
+      loop_node.loop,
+      symbol_table.lookup_ref(function_name).mode);
   }
 }
 
@@ -890,7 +983,11 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 
   // Insert aliasing assertions
   check_frame_conditions(
-    function_obj->first, function_obj->second.body, instruction_it, assigns);
+    function_obj->first,
+    function_obj->second.body,
+    instruction_it,
+    function_obj->second.body.instructions.end(),
+    assigns);
 
   return false;
 }
@@ -899,11 +996,12 @@ void code_contractst::check_frame_conditions(
   const irep_idt &function,
   goto_programt &body,
   goto_programt::targett &instruction_it,
+  const goto_programt::targett &instruction_end,
   assigns_clauset &assigns)
 {
   goto_function_inline(goto_functions, function, ns, log.get_message_handler());
 
-  for(; instruction_it != body.instructions.end(); ++instruction_it)
+  for(; instruction_it != instruction_end; ++instruction_it)
   {
     if(instruction_it->is_decl())
     {

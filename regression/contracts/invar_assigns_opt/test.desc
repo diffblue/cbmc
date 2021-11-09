@@ -3,14 +3,16 @@ main.c
 --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.3\] .* Check decreases clause on loop iteration: SUCCESS$
-^\[main.assertion.1\] .* assertion r1 == 0: SUCCESS$
-^\[main.4\] .* Check loop invariant before entry: SUCCESS$
-^\[main.5\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.6\] .* Check decreases clause on loop iteration: SUCCESS$
-^\[main.assertion.2\] .* assertion r2 == 0: SUCCESS$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[main.assertion.\d+\] .* assertion r1 == 0: SUCCESS$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that s2 is assignable: SUCCESS$
+^\[main.\d+\] .* Check that r2 is assignable: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[main.assertion.\d+\] .* assertion r2 == 0: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --
