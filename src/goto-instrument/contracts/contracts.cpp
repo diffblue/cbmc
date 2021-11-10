@@ -942,8 +942,8 @@ void code_contractst::check_frame_conditions(
       instruction_it->is_other() &&
       instruction_it->get_other().get_statement() == ID_havoc_object)
     {
-      const exprt &havoc_argument = dereference_exprt(
-        to_typecast_expr(instruction_it->get_other().operands().front()).op());
+      const auto havoc_argument =
+        pointer_object(instruction_it->get_other().operands().front());
       add_inclusion_check(body, assigns, instruction_it, havoc_argument);
     }
   }
