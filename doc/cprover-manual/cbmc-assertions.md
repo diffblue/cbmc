@@ -87,7 +87,7 @@ postconditions to create a function contract, which can be used for
 modular verification.
 
 
-Future CPROVER releases will support explicit quantifiers with a syntax
+CPROVER also supports explicit quantifiers with a syntax
 that resembles Spec\#:
 
 ```C
@@ -95,3 +95,11 @@ __CPROVER_forall { *type identifier* ; *expression* }
 __CPROVER_exists { *type identifier* ; *expression* }
 ```
 
+For example, the following can be used to check equality of
+two arrays `array` and `array2` to a bound `n`.
+```C
+assert(__CPROVER_forall { int i ;
+            (0 <= i && i < n) ==> arrary1[i] == array2[i]
+                     } );
+```
+Usage of `__CPROVER_exists` is similar.
