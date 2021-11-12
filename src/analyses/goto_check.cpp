@@ -25,8 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
-#include <util/options.h>
 #include <util/message.h>
+#include <util/options.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -50,10 +50,8 @@ public:
   goto_checkt(
     const namespacet &_ns,
     const optionst &_options,
-    message_handlert &_message_handler):
-    ns(_ns),
-    local_bitvector_analysis(nullptr),
-    log(_message_handler)
+    message_handlert &_message_handler)
+    : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
   {
     no_enum_check = false;
     enable_bounds_check=_options.get_bool_option("bounds-check");
@@ -1856,7 +1854,7 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
 class flag_resett
 {
 public:
-  /// \brief Store the current value of \p flag and 
+  /// \brief Store the current value of \p flag and
   /// then set its value to \p new_value.
   /// \returns true if the flag was already seen before
   bool set_flag(bool &flag, bool new_value)
@@ -1877,7 +1875,7 @@ public:
     return seen_flags.find(&flag) != seen_flags.end();
   }
 
-  /// \brief Restore the values of all flags that have been 
+  /// \brief Restore the values of all flags that have been
   /// modified via `set_flag`.
   ~flag_resett()
   {

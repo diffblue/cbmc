@@ -81,6 +81,22 @@ assigns_clauset::conditional_address_ranget::conditional_address_ranget(
 {
 }
 
+// clang-format off
+/// \brief Generates and returns snapshot instructions for source_expr.
+///
+/// ```
+/// DECL bool __car_valid
+/// DECL char *__car_lb
+/// DECL char *__car_ub
+/// ASSIGN __car_lb := NULL
+/// ASSIGN __car_ub := NULL
+/// ASSIGN __car_valid := all_dereferences_are_valid(source_expr) & rw_ok(&(source_expr), size)
+/// IF !__car_valid GOTO END_SNAPSHOT
+/// ASSIGN __car_lb := &(source_expr)
+/// ASSIGN __car_ub := &(source_expr) + size-1
+/// END_SNAPSHOT: SKIP
+/// ```
+// clang-format on
 goto_programt
 assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
   const
@@ -109,15 +125,16 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
     null_pointer_exprt{to_pointer_type(slice.first.type())},
     location_no_checks));
 
-  goto_programt skip_program;
-  const auto skip_target =
-    skip_program.add(goto_programt::make_skip(location_no_checks));
-
+  // check validity
   const auto validity_check_expr = and_exprt{
     all_dereferences_are_valid(source_expr, parent.ns),
     w_ok_exprt{slice.first, slice.second}};
   instructions.add(goto_programt::make_assignment(
     validity_condition_var, validity_check_expr, location_no_checks));
+
+  // jump here if validity_check_expr is false
+  goto_programt skip_program;
+  const auto skip_target = skip_program.add(goto_programt::make_skip(location));
 
   instructions.add(goto_programt::make_goto(
     skip_target, not_exprt{validity_condition_var}, location_no_checks));

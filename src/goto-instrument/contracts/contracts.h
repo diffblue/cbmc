@@ -216,7 +216,6 @@ protected:
   ///
   /// @param function the function to search local static symbols in
   /// @param assigns assigns clause where search results are added
-  /// @return true if failure, false if success
   ///
   /// A symbol is considered a static local symbol iff:
   /// - it has a static lifetime annotation

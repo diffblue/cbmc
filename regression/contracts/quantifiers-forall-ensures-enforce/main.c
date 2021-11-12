@@ -23,7 +23,7 @@ int f1(int *arr, int len)
 int main()
 {
   int len;
-  __CPROVER_assume(0 <= len && len <= MAX_LEN);
+  __CPROVER_assume(0 < len && len <= MAX_LEN);
 
   int *arr = malloc(len * sizeof(int));
   f1(arr, len);

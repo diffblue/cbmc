@@ -91,10 +91,16 @@ void insert_before_swap_and_advance(
 
 /// \brief Adds a new temporary symbol to the symbol table.
 ///
+/// The unique name is generated as:
+/// ```
+/// "location.function() + "::" + suffix + "$" + uid
+/// ```
+///
 /// \param type: The type of the new symbol.
 /// \param location: The source location for the new symbol.
 /// \param mode: The mode for the new symbol, e.g. ID_C, ID_java.
 /// \param symtab: The symbol table to which the new symbol is to be added.
+/// \param suffix: base suffix used to generate the unique name.
 /// \return The new symbolt object.
 const symbolt &new_tmp_symbol(
   const typet &type,
