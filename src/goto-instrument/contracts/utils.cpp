@@ -14,6 +14,21 @@ Date: September 2021
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 
+goto_programt::instructiont &
+add_pragma_disable_assigns_check(goto_programt::instructiont &instr)
+{
+  instr.source_location_nonconst().add_pragma(
+    CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK);
+  return instr;
+}
+
+goto_programt &add_pragma_disable_assigns_check(goto_programt &prog)
+{
+  Forall_goto_program_instructions(it, prog)
+    add_pragma_disable_assigns_check(*it);
+  return prog;
+}
+
 static void append_safe_havoc_code_for_expr(
   const source_locationt location,
   const namespacet &ns,

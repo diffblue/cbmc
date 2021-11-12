@@ -141,9 +141,6 @@ void code_contractst::check_apply_loop_contracts(
     generated_code,
     ID_loop_entry);
 
-  // Create 'loop_entry' history variables
-  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
-
   // Generate: assert(invariant) just before the loop
   // We use a block scope to create a temporary assertion,
   // and immediately convert it to goto instructions.
@@ -154,6 +151,14 @@ void code_contractst::check_apply_loop_contracts(
     generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check loop invariant before entry");
   }
+
+  // Add 'loop_entry' history variables and base case assertion.
+  // These variables are local and thus
+  // need not be checked against the enclosing scope's write set.
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_head,
+    add_pragma_disable_assigns_check(generated_code));
 
   // havoc the variables that may be modified
   modifiest modifies;
@@ -177,7 +182,8 @@ void code_contractst::check_apply_loop_contracts(
     for(const auto &target : assigns.operands())
       modifies.insert(target);
 
-    // create snapshots of the CARs -- must be done before havocing
+    // Create snapshots of write set CARs.
+    // This must be done before havocing the write set.
     for(const auto &car : loop_assigns.get_write_set())
     {
       auto snapshot_instructions = car.generate_snapshot_instructions();
@@ -189,7 +195,17 @@ void code_contractst::check_apply_loop_contracts(
   havoc_assigns_targetst havoc_gen(modifies, ns);
   havoc_gen.append_full_havoc_code(
     loop_head->source_location(), generated_code);
-  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
+
+  // Add the havocing code, but only check against the enclosing scope's
+  // write set if it was manually specified.
+  if(assigns.is_nil())
+    insert_before_swap_and_advance(
+      goto_function.body,
+      loop_head,
+      add_pragma_disable_assigns_check(generated_code));
+  else
+    insert_before_swap_and_advance(
+      goto_function.body, loop_head, generated_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
@@ -744,7 +760,6 @@ void code_contractst::instrument_assign_statement(
     instruction_it->is_assign(),
     "The first instruction of instrument_assign_statement should always be"
     " an assignment");
-
   add_inclusion_check(
     program, assigns_clause, instruction_it, instruction_it->assign_lhs());
 }
@@ -834,7 +849,9 @@ void code_contractst::instrument_call_statement(
 
     alias_checking_instructions.destructive_append(skip_program);
     insert_before_swap_and_advance(
-      body, instruction_it, alias_checking_instructions);
+      body,
+      instruction_it,
+      add_pragma_disable_assigns_check(alias_checking_instructions));
 
     // move past the call and then insert the invalidation instructions
     instruction_it++;
@@ -866,7 +883,9 @@ void code_contractst::instrument_call_statement(
 
     invalidation_instructions.destructive_append(skip_program);
     insert_before_swap_and_advance(
-      body, instruction_it, invalidation_instructions);
+      body,
+      instruction_it,
+      add_pragma_disable_assigns_check(invalidation_instructions));
 
     instruction_it--;
   }
@@ -1003,6 +1022,14 @@ void code_contractst::check_frame_conditions(
 
   for(; instruction_it != instruction_end; ++instruction_it)
   {
+    const auto &pragmas = instruction_it->source_location().get_pragmas();
+    if(pragmas.find(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK) != pragmas.end())
+      continue;
+
+    // Do not instrument this instruction again in the future,
+    // since we are going to instrument it now below.
+    add_pragma_disable_assigns_check(*instruction_it);
+
     if(instruction_it->is_decl())
     {
       // grab the declared symbol
