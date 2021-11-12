@@ -184,9 +184,14 @@ void code_contractst::check_apply_loop_contracts(
     new_decreases_vars.push_back(new_decreases_var);
   }
 
-  // non-deterministically skip the loop if it is a do-while loop
-  if(!loop_head->is_goto())
+  // TODO: Fix loop contract handling for do/while loops.
+  if(loop_end->is_goto() && !loop_end->get_condition().is_true())
   {
+    log.error() << "Loop contracts are unsupported on do/while loops: "
+                << loop_head->source_location() << messaget::eom;
+    throw 0;
+
+    // non-deterministically skip the loop if it is a do-while loop.
     havoc_code.add(goto_programt::make_goto(
       loop_end,
       side_effect_expr_nondett(bool_typet(), loop_head->source_location())));
@@ -276,11 +281,7 @@ void code_contractst::check_apply_loop_contracts(
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->turn_into_assume();
-
-  if(loop_head->is_goto())
-    loop_end->set_condition(false_exprt());
-  else
-    loop_end->set_condition(boolean_negate(loop_end->get_condition()));
+  loop_end->set_condition(boolean_negate(loop_end->get_condition()));
 }
 
 void code_contractst::add_quantified_variable(
