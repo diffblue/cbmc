@@ -103,6 +103,7 @@ public:
   public:
     valuation_pairt() = delete;
     valuation_pairt(smt_termt descriptor, smt_termt value);
+    valuation_pairt(irep_idt descriptor, const smt_termt &value);
 
     using irept::pretty;
 

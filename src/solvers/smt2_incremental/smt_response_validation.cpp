@@ -176,6 +176,88 @@ valid_smt_error_response(const irept &parse_tree)
     validate_string_literal(parse_tree.get_sub()[1]));
 }
 
+static bool all_subs_are_pairs(const irept &parse_tree)
+{
+  return std::all_of(
+    parse_tree.get_sub().cbegin(),
+    parse_tree.get_sub().cend(),
+    [](const irept &sub) { return sub.get_sub().size() == 2; });
+}
+
+static response_or_errort<irep_idt>
+validate_smt_identifier(const irept &parse_tree)
+{
+  if(!parse_tree.get_sub().empty() || parse_tree.id().empty())
+  {
+    return response_or_errort<irep_idt>(
+      "Expected identifier, found - \"" + print_parse_tree(parse_tree) + "\".");
+  }
+  return response_or_errort<irep_idt>(parse_tree.id());
+}
+
+static optionalt<smt_termt> valid_smt_bool(const irept &parse_tree)
+{
+  if(!parse_tree.get_sub().empty())
+    return {};
+  if(parse_tree.id() == ID_true)
+    return {smt_bool_literal_termt{true}};
+  if(parse_tree.id() == ID_false)
+    return {smt_bool_literal_termt{false}};
+  return {};
+}
+
+static response_or_errort<smt_termt> validate_term(const irept &parse_tree)
+{
+  if(const auto smt_bool = valid_smt_bool(parse_tree))
+    return response_or_errort<smt_termt>{*smt_bool};
+  return response_or_errort<smt_termt>{"Unrecognised SMT term - \"" +
+                                       print_parse_tree(parse_tree) + "\"."};
+}
+
+static response_or_errort<smt_get_value_responset::valuation_pairt>
+validate_valuation_pair(const irept &pair_parse_tree)
+{
+  PRECONDITION(pair_parse_tree.get_sub().size() == 2);
+  const auto &descriptor = pair_parse_tree.get_sub()[0];
+  const auto &value = pair_parse_tree.get_sub()[1];
+  return validation_propagating<smt_get_value_responset::valuation_pairt>(
+    validate_smt_identifier(descriptor), validate_term(value));
+}
+
+/// \returns: A response or error in the case where the parse tree appears to be
+///   a get-value command. Returns empty otherwise.
+/// \note: Because this kind of response does not start with an identifying
+///   keyword, it will be considered that the response is intended to be a
+///   get-value response if it is composed of a collection of one or more pairs.
+static optionalt<response_or_errort<smt_responset>>
+valid_smt_get_value_response(const irept &parse_tree)
+{
+  // Shape matching for does this look like a get value response?
+  if(!parse_tree.id().empty())
+    return {};
+  if(parse_tree.get_sub().empty())
+    return {};
+  if(!all_subs_are_pairs(parse_tree))
+    return {};
+  std::vector<std::string> error_messages;
+  std::vector<smt_get_value_responset::valuation_pairt> valuation_pairs;
+  for(const auto &pair : parse_tree.get_sub())
+  {
+    const auto pair_validation_result = validate_valuation_pair(pair);
+    if(const auto error = pair_validation_result.get_if_error())
+      error_messages.insert(error_messages.end(), error->begin(), error->end());
+    if(const auto valid_pair = pair_validation_result.get_if_valid())
+      valuation_pairs.push_back(*valid_pair);
+  }
+  if(!error_messages.empty())
+    return {response_or_errort<smt_responset>{std::move(error_messages)}};
+  else
+  {
+    return {response_or_errort<smt_responset>{
+      smt_get_value_responset{valuation_pairs}}};
+  }
+}
+
 response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
 {
   if(parse_tree.id() == "sat")
@@ -193,6 +275,8 @@ response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
     return response_or_errort<smt_responset>{smt_success_responset{}};
   if(parse_tree.id() == "unsupported")
     return response_or_errort<smt_responset>{smt_unsupported_responset{}};
+  if(const auto get_value_response = valid_smt_get_value_response(parse_tree))
+    return *get_value_response;
   return response_or_errort<smt_responset>{"Invalid SMT response \"" +
                                            id2string(parse_tree.id()) + "\""};
 }

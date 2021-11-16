@@ -91,3 +91,24 @@ TEST_CASE("Validation of SMT error response", "[core][smt2_incremental]")
        .get_if_error() ==
     std::vector<std::string>{"Error response has multiple error messages."});
 }
+
+TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
+{
+  SECTION("Boolean sorted values.")
+  {
+    const response_or_errort<smt_responset> true_response =
+      validate_smt_response(*smt2irep("((a true))").parsed_output);
+    CHECK(
+      *true_response.get_if_valid() ==
+      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+        smt_identifier_termt{"a", smt_bool_sortt{}},
+        smt_bool_literal_termt{true}}}});
+    const response_or_errort<smt_responset> false_response =
+      validate_smt_response(*smt2irep("((a false))").parsed_output);
+    CHECK(
+      *false_response.get_if_valid() ==
+      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+        smt_identifier_termt{"a", smt_bool_sortt{}},
+        smt_bool_literal_termt{false}}}});
+  }
+}

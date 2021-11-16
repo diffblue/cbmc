@@ -109,8 +109,18 @@ smt_get_value_responset::valuation_pairt::valuation_pairt(
   smt_termt descriptor,
   smt_termt value)
 {
+  INVARIANT(
+    descriptor.get_sort() == value.get_sort(),
+    "SMT valuation pair must have matching sort for the descriptor and value.");
   get_sub().push_back(upcast(std::move(descriptor)));
   get_sub().push_back(upcast(std::move(value)));
+}
+
+smt_get_value_responset::valuation_pairt::valuation_pairt(
+  irep_idt descriptor,
+  const smt_termt &value)
+  : valuation_pairt(smt_identifier_termt{descriptor, value.get_sort()}, value)
+{
 }
 
 const smt_termt &smt_get_value_responset::valuation_pairt::descriptor() const
