@@ -43,3 +43,10 @@ TEST_CASE("Validation of check-sat repsonses", "[core][smt2_incremental]")
     *validate_smt_response(*smt2irep("unknown").parsed_output).get_if_valid() ==
     smt_check_sat_responset{smt_unknown_responset{}});
 }
+
+TEST_CASE("Validation of SMT success response", "[core][smt2_incremental]")
+{
+  CHECK(
+    *validate_smt_response(*smt2irep("success").parsed_output).get_if_valid() ==
+    smt_success_responset{});
+}
