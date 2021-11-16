@@ -107,13 +107,25 @@ response_or_errort<smt_baset> validation_propagating(argumentst &&... arguments)
   }
 }
 
+/// Produces a human-readable representation of the given \p parse_tree, for use
+/// in error messaging.
+/// \note This is currently implemented using `pretty`, but this function is
+///   used instead of calling `pretty` directly so that will be more straight
+///   forward to replace with an implementation specific to our use case which
+///   is more easily readable by users of CBMC.
+static std::string print_parse_tree(const irept &parse_tree)
+{
+  return parse_tree.pretty(0, 0);
+}
+
 static response_or_errort<irep_idt>
 validate_string_literal(const irept &parse_tree)
 {
   if(!parse_tree.get_sub().empty())
   {
     return response_or_errort<irep_idt>(
-      "Expected string literal, found \"" + parse_tree.pretty(0, 0) + "\".");
+      "Expected string literal, found \"" + print_parse_tree(parse_tree) +
+      "\".");
   }
   return response_or_errort<irep_idt>{parse_tree.id()};
 }
