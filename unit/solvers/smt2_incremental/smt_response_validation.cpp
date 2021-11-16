@@ -4,6 +4,7 @@
 #include <testing-utils/use_catch.h>
 
 #include <solvers/smt2_incremental/smt_response_validation.h>
+#include <util/mp_arith.h>
 
 // Debug printer for `smt_responset`. This will be used by the catch framework
 // for printing in the case of failed checks / requirements.
@@ -110,5 +111,22 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
       smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
         smt_identifier_termt{"a", smt_bool_sortt{}},
         smt_bool_literal_termt{false}}}});
+  }
+  SECTION("Bit vector sorted values.")
+  {
+    const response_or_errort<smt_responset> response_255 =
+      validate_smt_response(*smt2irep("((a #xff))").parsed_output);
+    CHECK(
+      *response_255.get_if_valid() ==
+      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+        smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
+        smt_bit_vector_constant_termt{255, 8}}}});
+    const response_or_errort<smt_responset> response_42 =
+      validate_smt_response(*smt2irep("((a #b00101010))").parsed_output);
+    CHECK(
+      *response_42.get_if_valid() ==
+      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+        smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
+        smt_bit_vector_constant_termt{42, 8}}}});
   }
 }

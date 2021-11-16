@@ -17,6 +17,11 @@
 
 #include <solvers/smt2_incremental/smt_response_validation.h>
 
+#include <util/mp_arith.h>
+#include <util/range.h>
+
+#include <regex>
+
 template <class smtt>
 response_or_errort<smtt>::response_or_errort(smtt smt) : smt{std::move(smt)}
 {
@@ -206,10 +211,50 @@ static optionalt<smt_termt> valid_smt_bool(const irept &parse_tree)
   return {};
 }
 
+static optionalt<smt_termt> valid_smt_binary(const std::string &text)
+{
+  static const std::regex binary_format{"#b[01]+"};
+  if(!std::regex_match(text, binary_format))
+    return {};
+  const mp_integer value = string2integer({text.begin() + 2, text.end()}, 2);
+  // Width is number of bit values minus the "#b" prefix.
+  const std::size_t width = text.size() - 2;
+  return {smt_bit_vector_constant_termt{value, width}};
+}
+
+static optionalt<smt_termt> valid_smt_hex(const std::string &text)
+{
+  static const std::regex hex_format{"#x[0-9A-Za-z]+"};
+  if(!std::regex_match(text, hex_format))
+    return {};
+  const std::string hex{text.begin() + 2, text.end()};
+  // SMT-LIB 2 allows hex characters to be upper of lower case, but they should
+  // be upper case for mp_integer.
+  const mp_integer value =
+    string2integer(make_range(hex).map<std::function<int(int)>>(toupper), 16);
+  const std::size_t width = (text.size() - 2) * 4;
+  return {smt_bit_vector_constant_termt{value, width}};
+}
+
+static optionalt<smt_termt>
+valid_smt_bit_vector_constant(const irept &parse_tree)
+{
+  if(!parse_tree.get_sub().empty() || parse_tree.id().empty())
+    return {};
+  const auto value_string = id2string(parse_tree.id());
+  if(const auto smt_binary = valid_smt_binary(value_string))
+    return *smt_binary;
+  if(const auto smt_hex = valid_smt_hex(value_string))
+    return *smt_hex;
+  return {};
+}
+
 static response_or_errort<smt_termt> validate_term(const irept &parse_tree)
 {
   if(const auto smt_bool = valid_smt_bool(parse_tree))
     return response_or_errort<smt_termt>{*smt_bool};
+  if(const auto bit_vector_constant = valid_smt_bit_vector_constant(parse_tree))
+    return response_or_errort<smt_termt>{*bit_vector_constant};
   return response_or_errort<smt_termt>{"Unrecognised SMT term - \"" +
                                        print_parse_tree(parse_tree) + "\"."};
 }
