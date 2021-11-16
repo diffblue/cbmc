@@ -50,3 +50,20 @@ TEST_CASE("Validation of SMT success response", "[core][smt2_incremental]")
     *validate_smt_response(*smt2irep("success").parsed_output).get_if_valid() ==
     smt_success_responset{});
 }
+
+TEST_CASE(
+  "Error handling of SMT response validation",
+  "[core][smt2_incremental]")
+{
+  SECTION("Parse tree produced is not a valid SMT-LIB version 2.6 response")
+  {
+    const response_or_errort<smt_responset> validation_response =
+      validate_smt_response(*smt2irep("foobar").parsed_output);
+    CHECK(
+      *validation_response.get_if_error() ==
+      std::vector<std::string>{"Invalid SMT response \"foobar\""});
+    CHECK(
+      *validate_smt_response(*smt2irep("()").parsed_output).get_if_error() ==
+      std::vector<std::string>{"Invalid SMT response \"\""});
+  }
+}

@@ -48,5 +48,6 @@ response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
       smt_check_sat_responset{smt_unknown_responset{}}};
   if(parse_tree.id() == "success")
     return response_or_errort<smt_responset>{smt_success_responset{}};
-  UNIMPLEMENTED;
+  return response_or_errort<smt_responset>{"Invalid SMT response \"" +
+                                           id2string(parse_tree.id()) + "\""};
 }
