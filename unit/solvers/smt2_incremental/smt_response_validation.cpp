@@ -51,6 +51,13 @@ TEST_CASE("Validation of SMT success response", "[core][smt2_incremental]")
     smt_success_responset{});
 }
 
+TEST_CASE("Validation of SMT unsupported response", "[core][smt2_incremental]")
+{
+  CHECK(
+    *validate_smt_response(*smt2irep("unsupported").parsed_output)
+       .get_if_valid() == smt_unsupported_responset{});
+}
+
 TEST_CASE(
   "Error handling of SMT response validation",
   "[core][smt2_incremental]")
