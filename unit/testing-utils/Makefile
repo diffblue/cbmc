@@ -7,6 +7,7 @@ SRC = \
   require_expr.cpp \
   require_symbol.cpp \
   run_test_with_compilers.cpp \
+  smt2irep.cpp \
   # Empty last line (please keep above list sorted!)
 
 INCLUDES = -I .. -I . -I ../../src
