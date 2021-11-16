@@ -1,0 +1,10 @@
+CORE broken-smt-backend
+test_struct_raw_bytes.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^.*expecting FAILURE: SUCCESS$
+^.*expecting SUCCESS: FAILURE$
+^.*dereference .*: FAILURE$

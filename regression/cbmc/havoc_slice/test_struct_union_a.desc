@@ -1,0 +1,10 @@
+CORE
+test_struct_union_a.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^.*expecting FAILURE: SUCCESS$
+^.*expecting SUCCESS: FAILURE$
+^.*dereference .*: FAILURE$

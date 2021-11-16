@@ -636,12 +636,92 @@ void goto_convertt::do_enum_is_in_range(
   copy(assignment, ASSIGN, dest);
 }
 
+void goto_convertt::do_havoc_slice(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  irep_idt identifier = CPROVER_PREFIX "havoc_slice";
+
+  // We disable checks on the generated instructions
+  // because we add our own rw_ok assertion that takes size into account
+  auto source_location = function.find_source_location();
+  source_location.add_pragma("disable:pointer-check");
+  source_location.add_pragma("disable:pointer-overflow-check");
+  source_location.add_pragma("disable:pointer-primitive-check");
+
+  // check # arguments
+  if(arguments.size() != 2)
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier << "' expected to have two arguments" << eom;
+    throw 0;
+  }
+
+  // check argument types
+  if(arguments[0].type().id() != ID_pointer)
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier
+            << "' first argument expected to have `void *` type" << eom;
+    throw 0;
+  }
+
+  if(arguments[1].type().id() != ID_unsignedbv)
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier
+            << "' second argument expected to have `size_t` type" << eom;
+    throw 0;
+  }
+
+  // check nil lhs
+  if(lhs.is_not_nil())
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier << "' not expected to have a LHS" << eom;
+    throw 0;
+  }
+
+  // insert instructions
+  // assert(rw_ok(argument[0], argument[1]));
+  // char nondet_contents[argument[1]];
+  // __CPROVER_array_replace(p, nondet_contents);
+
+  r_or_w_ok_exprt ok_expr(ID_w_ok, arguments[0], arguments[1]);
+  ok_expr.add_source_location() = source_location;
+  goto_programt::targett t =
+    dest.add(goto_programt::make_assertion(ok_expr, source_location));
+  t->source_location_nonconst().set("user-provided", false);
+  t->source_location_nonconst().set_property_class(ID_assertion);
+  t->source_location_nonconst().set_comment(
+    "assertion havoc_slice " + from_expr(ns, identifier, ok_expr));
+
+  const array_typet array_type(char_type(), arguments[1]);
+
+  const symbolt &nondet_contents =
+    new_tmp_symbol(array_type, "nondet_contents", dest, source_location, mode);
+  const exprt &nondet_contents_expr = address_of_exprt{
+    index_exprt{nondet_contents.symbol_expr(), from_integer(0, index_type())}};
+
+  const exprt &arg0 =
+    typecast_exprt::conditional_cast(arguments[0], pointer_type(empty_typet{}));
+  const exprt &arg1 = typecast_exprt::conditional_cast(
+    nondet_contents_expr, pointer_type(empty_typet{}));
+
+  codet array_replace(ID_array_replace, {arg0, arg1}, source_location);
+  dest.add(goto_programt::make_other(array_replace, source_location));
+}
+
 /// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
   const symbol_exprt &function,
   const exprt::operandst &arguments,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(function.get_bool(ID_C_invalid_object))
     return; // ignore
@@ -681,8 +761,12 @@ void goto_convertt::do_function_call_symbol(
     return;
   }
 
-  if(identifier==CPROVER_PREFIX "assume" ||
-     identifier=="__VERIFIER_assume")
+  if(identifier == CPROVER_PREFIX "havoc_slice")
+  {
+    do_havoc_slice(lhs, function, arguments, dest, mode);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "assume" || identifier == "__VERIFIER_assume")
   {
     if(arguments.size()!=1)
     {

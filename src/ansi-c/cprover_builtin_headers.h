@@ -4,6 +4,7 @@ void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
 void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);
 void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 void __CPROVER_havoc_object(void *);
+void __CPROVER_havoc_slice(void *, __CPROVER_size_t);
 __CPROVER_bool __CPROVER_equal();
 __CPROVER_bool __CPROVER_same_object(const void *, const void *);
 __CPROVER_bool __CPROVER_is_invalid_pointer(const void *);

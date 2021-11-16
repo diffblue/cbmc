@@ -9,6 +9,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_UTIL_GOTO_INSTRUCTION_CODE_H
 #define CPROVER_UTIL_GOTO_INSTRUCTION_CODE_H
 
+#include <util/cprover_prefix.h>
 #include <util/std_code_base.h>
 #include <util/std_expr.h>
 
@@ -536,5 +537,19 @@ inline code_returnt &to_code_return(codet &code)
   code_returnt::check(code);
   return static_cast<code_returnt &>(code);
 }
+
+/// \brief Builds a \ref code_function_callt
+/// to `__CPROVER_havoc_slice(p, size)`.
+///
+/// \param p The pointer argument.
+/// \param size The size argument.
+/// \param ns Namespace where the `__CPROVER_havoc_slice symbol` can be found.
+/// \remarks: It is a PRECONDITION that `__CPROVER_havoc_slice` exists
+///   in the namespace
+///
+/// \return A \ref code_function_callt expression
+///         `nil_exprt() := __CPROVER_havoc_slice(p, size)`.
+inline code_function_callt
+havoc_slice_call(const exprt &p, const exprt &size, const namespacet &ns);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_INSTRUCTION_CODE_H
