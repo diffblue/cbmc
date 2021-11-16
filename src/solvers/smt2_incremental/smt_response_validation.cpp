@@ -37,5 +37,14 @@ template class response_or_errort<smt_responset>;
 
 response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
 {
+  if(parse_tree.id() == "sat")
+    return response_or_errort<smt_responset>{
+      smt_check_sat_responset{smt_sat_responset{}}};
+  if(parse_tree.id() == "unsat")
+    return response_or_errort<smt_responset>{
+      smt_check_sat_responset{smt_unsat_responset{}}};
+  if(parse_tree.id() == "unknown")
+    return response_or_errort<smt_responset>{
+      smt_check_sat_responset{smt_unknown_responset{}}};
   UNIMPLEMENTED;
 }

@@ -1,5 +1,6 @@
 // Author: Diffblue Ltd.
 
+#include <testing-utils/smt2irep.h>
 #include <testing-utils/use_catch.h>
 
 #include <solvers/smt2_incremental/smt_response_validation.h>
@@ -28,4 +29,17 @@ TEST_CASE("response_or_errort storage", "[core][smt2_incremental]")
     CHECK_FALSE(valid.get_if_error());
     CHECK(*valid.get_if_valid() == smt_unsupported_responset{});
   }
+}
+
+TEST_CASE("Validation of check-sat repsonses", "[core][smt2_incremental]")
+{
+  CHECK(
+    *validate_smt_response(*smt2irep("sat").parsed_output).get_if_valid() ==
+    smt_check_sat_responset{smt_sat_responset{}});
+  CHECK(
+    *validate_smt_response(*smt2irep("unsat").parsed_output).get_if_valid() ==
+    smt_check_sat_responset{smt_unsat_responset{}});
+  CHECK(
+    *validate_smt_response(*smt2irep("unknown").parsed_output).get_if_valid() ==
+    smt_check_sat_responset{smt_unknown_responset{}});
 }
