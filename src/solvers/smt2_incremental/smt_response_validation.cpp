@@ -1,5 +1,20 @@
 // Author: Diffblue Ltd.
 
+/// \file
+///
+/// Validation of smt response parse trees to produce either a strongly typed
+/// `smt_responset` representation, or a set of error messages.
+///
+/// \note
+///
+/// Functions named with the prefix `validate_` require the given parse tree to
+/// be a particular kind of sub tree. Functions named with the prefix `valid_`
+/// are called in places where the exact kind of sub-tree expected is unknown
+/// and so the function must determine if the sub-tree is of that type at all,
+/// before performing validation of it. These functions will return a
+/// `response_or_errort` in the case where the parse tree is of that type or
+/// an empty optional otherwise.
+
 #include <solvers/smt2_incremental/smt_response_validation.h>
 
 template <class smtt>
