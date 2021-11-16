@@ -19,6 +19,7 @@ class response_or_errort final
 public:
   explicit response_or_errort(smtt smt);
   explicit response_or_errort(std::string message);
+  explicit response_or_errort(std::vector<std::string> messages);
 
   /// \brief Gets the smt response if the response is valid, or returns nullptr
   ///   otherwise.

@@ -74,3 +74,20 @@ TEST_CASE(
       std::vector<std::string>{"Invalid SMT response \"\""});
   }
 }
+
+TEST_CASE("Validation of SMT error response", "[core][smt2_incremental]")
+{
+  CHECK(
+    *validate_smt_response(
+       *smt2irep("(error \"Test error message.\")").parsed_output)
+       .get_if_valid() == smt_error_responset{"Test error message."});
+  CHECK(
+    *validate_smt_response(*smt2irep("(error)").parsed_output).get_if_error() ==
+    std::vector<std::string>{"Error response is missing the error message."});
+  CHECK(
+    *validate_smt_response(
+       *smt2irep("(error \"Test error message1.\" \"Test error message2.\")")
+          .parsed_output)
+       .get_if_error() ==
+    std::vector<std::string>{"Error response has multiple error messages."});
+}
