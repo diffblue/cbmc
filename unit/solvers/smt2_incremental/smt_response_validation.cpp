@@ -4,6 +4,15 @@
 
 #include <solvers/smt2_incremental/smt_response_validation.h>
 
+// Debug printer for `smt_responset`. This will be used by the catch framework
+// for printing in the case of failed checks / requirements.
+std::ostream &
+operator<<(std::ostream &output_stream, const smt_responset &response)
+{
+  output_stream << response.pretty();
+  return output_stream;
+}
+
 TEST_CASE("response_or_errort storage", "[core][smt2_incremental]")
 {
   SECTION("Error response")
