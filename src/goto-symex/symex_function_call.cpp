@@ -332,10 +332,32 @@ void goto_symext::symex_function_call_post_clean(
   // assign actuals to formal parameters
   parameter_assignments(identifier, goto_function, state, cleaned_arguments);
 
-  frame.end_of_function=--goto_function.body.instructions.end();
-  frame.return_value = cleaned_lhs;
+  frame.call_lhs = cleaned_lhs;
+  frame.end_of_function = --goto_function.body.instructions.end();
   frame.function_identifier=identifier;
   frame.hidden_function = goto_function.is_hidden();
+
+  // set up the 'return value symbol' when needed
+  if(frame.call_lhs.is_not_nil())
+  {
+    irep_idt return_value_symbol_identifier =
+      "goto_symex::return_value::" + id2string(identifier);
+
+    if(!state.symbol_table.has_symbol(return_value_symbol_identifier))
+    {
+      const symbolt &function_symbol = ns.lookup(identifier);
+      auxiliary_symbolt
+        new_symbol; // these are thread-local and have dynamic lifetime
+      new_symbol.base_name = "return_value";
+      new_symbol.name = return_value_symbol_identifier;
+      new_symbol.type = to_code_type(function_symbol.type).return_type();
+      new_symbol.mode = function_symbol.mode;
+      state.symbol_table.add(new_symbol);
+    }
+
+    frame.return_value_symbol =
+      ns.lookup(return_value_symbol_identifier).symbol_expr();
+  }
 
   const framet &p_frame = state.call_stack().previous_frame();
   for(const auto &pair : p_frame.loop_iterations)
@@ -405,14 +427,33 @@ static void pop_frame(
 /// do function call by inlining
 void goto_symext::symex_end_of_function(statet &state)
 {
+  PRECONDITION(!state.call_stack().empty());
+
   const bool hidden = state.call_stack().top().hidden_function;
 
   // first record the return
   target.function_return(
     state.guard.as_expr(), state.source.function_id, state.source, hidden);
 
-  // then get rid of the frame
+  // before we drop the frame, remember the call LHS
+  // and the return value symbol, if any
+  auto call_lhs = state.call_stack().top().call_lhs;
+  auto return_value_symbol = state.call_stack().top().return_value_symbol;
+
+  // now get rid of the frame
   pop_frame(state, path_storage, symex_config.doing_path_exploration);
+
+  // after dropping the frame, assign the return value, if any
+  if(state.reachable && call_lhs.is_not_nil())
+  {
+    DATA_INVARIANT(
+      return_value_symbol.has_value(),
+      "must have return value symbol when assigning call lhs");
+    // the type of the call lhs and the return type might not match
+    auto casted_return_value = typecast_exprt::conditional_cast(
+      return_value_symbol.value(), call_lhs.type());
+    symex_assign(state, call_lhs, casted_return_value);
+  }
 }
 
 /// Preserves locality of parameters of a given function by applying L1

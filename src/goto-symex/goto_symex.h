@@ -303,6 +303,10 @@ protected:
   /// Symbolically execute a GOTO instruction in the context of unreachable code
   /// \param state: Symbolic execution state for current instruction
   void symex_unreachable_goto(statet &state);
+  /// Symbolically execute a SET_RETURN_VALUE instruction
+  /// \param state: Symbolic execution state for current instruction
+  /// \param return_value: The value to be returned
+  void symex_set_return_value(statet &state, const exprt &return_value);
   /// Symbolically execute a START_THREAD instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_start_thread(statet &state);

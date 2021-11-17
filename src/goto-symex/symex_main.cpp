@@ -661,8 +661,9 @@ void goto_symext::execute_next_instruction(
     break;
 
   case SET_RETURN_VALUE:
-    // This case should have been removed by return-value removal
-    UNREACHABLE;
+    if(state.reachable)
+      symex_set_return_value(state, instruction.return_value());
+    symex_transition(state);
     break;
 
   case ASSIGN:

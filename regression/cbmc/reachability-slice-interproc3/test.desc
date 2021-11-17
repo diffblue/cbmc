@@ -3,6 +3,6 @@ main.c
 --reachability-slice-fb --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-ASSIGN main#return_value := 1
+SET RETURN VALUE 1$
 --
 ^warning: ignoring

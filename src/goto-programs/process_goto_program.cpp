@@ -58,9 +58,16 @@ bool process_goto_program(
   }
 
   // remove returns, gcc vectors, complex
-  remove_returns(goto_model);
+  if(
+    options.get_bool_option("remove-returns") ||
+    options.get_bool_option("string-abstraction"))
+  {
+    remove_returns(goto_model);
+  }
+
   remove_vector(goto_model);
   remove_complex(goto_model);
+
   if(options.get_bool_option("rewrite-union"))
     rewrite_union(goto_model);
 
