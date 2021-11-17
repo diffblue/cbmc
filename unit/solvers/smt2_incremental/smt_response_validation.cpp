@@ -129,4 +129,54 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
         smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
         smt_bit_vector_constant_termt{42, 8}}}});
   }
+  SECTION("Multiple valuation pairs.")
+  {
+    const response_or_errort<smt_responset> two_pair_response =
+      validate_smt_response(*smt2irep("((a true) (b false))").parsed_output);
+    CHECK(
+      *two_pair_response.get_if_valid() ==
+      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+                                 smt_identifier_termt{"a", smt_bool_sortt{}},
+                                 smt_bool_literal_termt{true}},
+                               smt_get_value_responset::valuation_pairt{
+                                 smt_identifier_termt{"b", smt_bool_sortt{}},
+                                 smt_bool_literal_termt{false}}}});
+  }
+  SECTION("Invalid terms.")
+  {
+    const response_or_errort<smt_responset> empty_value_response =
+      validate_smt_response(*smt2irep("((a ())))").parsed_output);
+    CHECK(
+      *empty_value_response.get_if_error() ==
+      std::vector<std::string>{"Unrecognised SMT term - \"\"."});
+    const response_or_errort<smt_responset> pair_value_response =
+      validate_smt_response(*smt2irep("((a (#xF00D #xBAD))))").parsed_output);
+    CHECK(
+      *pair_value_response.get_if_error() ==
+      std::vector<std::string>{"Unrecognised SMT term - \"\n"
+                               "0: #xF00D\n"
+                               "1: #xBAD\"."});
+    const response_or_errort<smt_responset> two_pair_value_response =
+      validate_smt_response(
+        *smt2irep("((a (#xF00D #xBAD)) (b (#xDEAD #xFA11)))").parsed_output);
+    CHECK(
+      *two_pair_value_response.get_if_error() ==
+      std::vector<std::string>{"Unrecognised SMT term - \"\n"
+                               "0: #xF00D\n"
+                               "1: #xBAD\".",
+                               "Unrecognised SMT term - \"\n"
+                               "0: #xDEAD\n"
+                               "1: #xFA11\"."});
+    const response_or_errort<smt_responset> empty_descriptor_response =
+      validate_smt_response(*smt2irep("((() true))").parsed_output);
+    CHECK(
+      *empty_descriptor_response.get_if_error() ==
+      std::vector<std::string>{"Expected identifier, found - \"\"."});
+    const response_or_errort<smt_responset> empty_pair =
+      validate_smt_response(*smt2irep("((() ())))").parsed_output);
+    CHECK(
+      *empty_pair.get_if_error() ==
+      std::vector<std::string>{"Expected identifier, found - \"\".",
+                               "Unrecognised SMT term - \"\"."});
+  }
 }
