@@ -113,7 +113,6 @@ __CPROVER_HIDE:;
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object =
     record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? alloc_size : __CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -178,7 +177,6 @@ __CPROVER_HIDE:;
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object =
     record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? malloc_size : __CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -210,7 +208,6 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
-  __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // record alloca to detect invalid free

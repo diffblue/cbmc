@@ -3,8 +3,8 @@ main.c
 --variable-sensitivity --vsd-liveness --show
 ^EXIT=0$
 ^SIGNAL=0$
-globalX .* 0 @ \[28\]
+globalX .* 0 @ \[27\]
 globalX .* 1 @ \[0\]
 globalX .* 2 @ \[3\]
-globalX .* TOP @ \[31\]
+globalX .* TOP @ \[30\]
 --

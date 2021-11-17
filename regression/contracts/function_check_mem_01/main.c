@@ -7,21 +7,16 @@
 
 #include <stddef.h>
 
-#define __CPROVER_VALID_MEM(ptr, size) \
-  __CPROVER_POINTER_OBJECT((ptr)) != __CPROVER_POINTER_OBJECT(NULL) && \
-  !__CPROVER_invalid_pointer((ptr)) && \
-  __CPROVER_POINTER_OBJECT((ptr)) != \
-  __CPROVER_POINTER_OBJECT(__CPROVER_deallocated) && \
-  __CPROVER_POINTER_OBJECT((ptr)) != \
-  __CPROVER_POINTER_OBJECT(__CPROVER_dead_object) && \
-  (__builtin_object_size((ptr), 1) >= (size) && \
-  __CPROVER_POINTER_OFFSET((ptr)) >= 0l || \
-   __CPROVER_DYNAMIC_OBJECT((ptr))) && \
-  (__CPROVER_POINTER_OFFSET((ptr)) >= 0 && \
-   __CPROVER_malloc_size >= (size) + __CPROVER_POINTER_OFFSET((ptr)) || \
-   __CPROVER_POINTER_OBJECT((ptr)) != \
-   __CPROVER_POINTER_OBJECT(__CPROVER_malloc_object))
-    
+#define __CPROVER_VALID_MEM(ptr, size)                                         \
+  __CPROVER_POINTER_OBJECT((ptr)) != __CPROVER_POINTER_OBJECT(NULL) &&         \
+    !__CPROVER_invalid_pointer((ptr)) &&                                       \
+    __CPROVER_POINTER_OBJECT((ptr)) !=                                         \
+      __CPROVER_POINTER_OBJECT(__CPROVER_deallocated) &&                       \
+    __CPROVER_POINTER_OBJECT((ptr)) !=                                         \
+      __CPROVER_POINTER_OBJECT(__CPROVER_dead_object) &&                       \
+    (__builtin_object_size((ptr), 1) >= (size) &&                              \
+     __CPROVER_POINTER_OFFSET((ptr)) >= 0l)
+
 typedef struct bar
 {
   int x;

@@ -16,7 +16,6 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // non-derministically record the object size for bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
-  __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
@@ -44,7 +43,6 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // non-deterministically record the object size for bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
-  __CPROVER_malloc_size=record_malloc?size*count:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?1:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
