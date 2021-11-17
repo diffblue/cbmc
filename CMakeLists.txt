@@ -150,6 +150,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
               "$<TARGET_FILE:unit>"
               "$<TARGET_FILE:goto-harness>"
               "$<TARGET_FILE:cbmc>"
+              "$<TARGET_FILE:crangler>"
               "$<TARGET_FILE:driver>"
               "$<TARGET_FILE:goto-analyzer>"
               "$<TARGET_FILE:goto-cc>"
@@ -213,6 +214,8 @@ cprover_default_properties(
     cbmc
     cbmc-lib
     cpp
+    crangler
+    crangler-lib
     driver
     goto-analyzer
     goto-analyzer-lib

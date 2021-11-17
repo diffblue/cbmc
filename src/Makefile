@@ -4,6 +4,7 @@ DIRS = analyses \
        big-int \
        cbmc \
        cpp \
+       crangler \
        goto-analyzer \
        goto-cc \
        goto-checker \
@@ -27,6 +28,7 @@ DIRS = analyses \
        # Empty last line
 
 all: cbmc.dir \
+     crangler.dir \
      goto-analyzer.dir \
      goto-cc.dir \
      goto-diff.dir \
@@ -58,6 +60,8 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 .PHONY: clean
 
 cpp.dir: ansi-c.dir linking.dir
+
+crangler.dir: util.dir json.dir
 
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \

@@ -1,0 +1,8 @@
+CORE
+remove_static1.json
+
+^\s+void foobar1\(\)$
+^void\s+foobar2\(\)$
+^EXIT=0$
+^SIGNAL=0$
+--
