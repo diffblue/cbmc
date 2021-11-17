@@ -3925,6 +3925,38 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   throw 0;
 }
 
+class is_compile_time_constantt : public is_constantt
+{
+public:
+  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
+  {
+  }
+
+protected:
+  const namespacet &ns;
+
+  bool is_constant(const exprt &e) const override
+  {
+    if(e.id() == ID_infinity)
+      return true;
+    else
+      return is_constantt::is_constant(e);
+  }
+
+  bool is_constant_address_of(const exprt &e) const override
+  {
+    if(e.id() == ID_symbol)
+    {
+      return e.type().id() == ID_code ||
+             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
+    }
+    else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
+      return true;
+    else
+      return is_constantt::is_constant_address_of(e);
+  }
+};
+
 void c_typecheck_baset::make_constant(exprt &expr)
 {
   // Floating-point expressions may require a rounding mode.
@@ -3936,8 +3968,7 @@ void c_typecheck_baset::make_constant(exprt &expr)
 
   simplify(expr, *this);
 
-  if(!expr.is_constant() &&
-     expr.id()!=ID_infinity)
+  if(!is_compile_time_constantt(*this)(expr))
   {
     error().source_location=expr.find_source_location();
     error() << "expected constant expression, but got '" << to_string(expr)
@@ -3952,8 +3983,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   make_index_type(expr);
   simplify(expr, *this);
 
-  if(!expr.is_constant() &&
-     expr.id()!=ID_infinity)
+  if(!is_compile_time_constantt(*this)(expr))
   {
     error().source_location=expr.find_source_location();
     error() << "conversion to integer constant failed" << eom;

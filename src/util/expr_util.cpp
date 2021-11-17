@@ -236,6 +236,7 @@ bool is_constantt::is_constant(const exprt &expr) const
     expr.id() == ID_typecast || expr.id() == ID_array_of ||
     expr.id() == ID_plus || expr.id() == ID_mult || expr.id() == ID_array ||
     expr.id() == ID_with || expr.id() == ID_struct || expr.id() == ID_union ||
+    expr.id() == ID_empty_union ||
     // byte_update works, byte_extract may be out-of-bounds
     expr.id() == ID_byte_update_big_endian ||
     expr.id() == ID_byte_update_little_endian)
