@@ -308,11 +308,18 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     // see if it's a typedef
     // or a function
     // or static
-    if(symbol.is_type ||
-       symbol.type.id()==ID_code ||
-       symbol.is_static_lifetime)
+    if(symbol.is_type || symbol.type.id() == ID_code)
     {
       // we ignore
+    }
+    else if(symbol.is_static_lifetime)
+    {
+      // make sure the initialization value is a compile-time constant
+      if(symbol.value.is_not_nil())
+      {
+        exprt init_value = symbol.value;
+        make_constant(init_value);
+      }
     }
     else
     {
