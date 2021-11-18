@@ -22,8 +22,6 @@ exprt deallocated(const exprt &pointer, const namespacet &);
 exprt dead_object(const exprt &pointer, const namespacet &);
 exprt pointer_offset(const exprt &pointer);
 exprt pointer_object(const exprt &pointer);
-DEPRECATED(SINCE(2021, 5, 6, "Unnecessary, remove any use"))
-exprt malloc_object(const exprt &pointer, const namespacet &);
 exprt object_size(const exprt &pointer);
 DEPRECATED(SINCE(2021, 5, 6, "Use is_dynamic_object_exprt instead"))
 exprt dynamic_object(const exprt &pointer);
