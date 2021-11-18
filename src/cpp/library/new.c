@@ -13,9 +13,9 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
-  // non-derministically record the object size for bounds checking
+  // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
+  __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
@@ -40,9 +40,9 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
-  // non-deterministically record the object size for bounds checking
+  // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
+  __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
   __CPROVER_malloc_is_new_array=record_malloc?1:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
@@ -80,10 +80,9 @@ inline void __delete(void *ptr)
   __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr, "double delete");
 
   // catch people who call delete for objects allocated with new[]
-  __CPROVER_precondition(ptr==0 ||
-                         __CPROVER_malloc_object!=ptr ||
-                         !__CPROVER_malloc_is_new_array,
-                         "delete of array object");
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_new_object != ptr || !__CPROVER_malloc_is_new_array,
+    "delete of array object");
 
   // If ptr is NULL, no operation is performed.
   // This is a requirement by the standard, not generosity!
@@ -120,10 +119,9 @@ inline void __delete_array(void *ptr)
                          "double delete");
 
   // catch people who call delete[] for objects allocated with new
-  __CPROVER_precondition(ptr==0 ||
-                         __CPROVER_malloc_object!=ptr ||
-                         __CPROVER_malloc_is_new_array,
-                         "delete[] of non-array object");
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_new_object != ptr || __CPROVER_malloc_is_new_array,
+    "delete[] of non-array object");
 
   if(ptr!=0)
   {
