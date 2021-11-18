@@ -1,6 +1,7 @@
 /* FUNCTION: __new */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __CPROVER_uninterpreted_is_new_array(const void *);
 
 inline void *__new(__typeof__(sizeof(int)) malloc_size)
 {
@@ -16,7 +17,7 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
-  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+  __CPROVER_assume(!__CPROVER_uninterpreted_is_new_array(res));
 
   // detect memory leaks
   __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
@@ -28,6 +29,7 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
 /* FUNCTION: __new_array */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __CPROVER_uninterpreted_is_new_array(const void *);
 
 inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
 {
@@ -43,7 +45,7 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
-  __CPROVER_malloc_is_new_array=record_malloc?1:__CPROVER_malloc_is_new_array;
+  __CPROVER_assume(__CPROVER_uninterpreted_is_new_array(res));
 
   // detect memory leaks
   __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
@@ -66,6 +68,7 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
 /* FUNCTION: __delete */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __CPROVER_uninterpreted_is_new_array(const void *);
 
 inline void __delete(void *ptr)
 {
@@ -81,7 +84,8 @@ inline void __delete(void *ptr)
 
   // catch people who call delete for objects allocated with new[]
   __CPROVER_precondition(
-    ptr == 0 || __CPROVER_new_object != ptr || !__CPROVER_malloc_is_new_array,
+    ptr == 0 || __CPROVER_new_object != ptr ||
+      !__CPROVER_uninterpreted_is_new_array(ptr),
     "delete of array object");
 
   // If ptr is NULL, no operation is performed.
@@ -101,6 +105,7 @@ inline void __delete(void *ptr)
 /* FUNCTION: __delete_array */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __CPROVER_uninterpreted_is_new_array(const void *);
 
 inline void __delete_array(void *ptr)
 {
@@ -120,7 +125,8 @@ inline void __delete_array(void *ptr)
 
   // catch people who call delete[] for objects allocated with new
   __CPROVER_precondition(
-    ptr == 0 || __CPROVER_new_object != ptr || __CPROVER_malloc_is_new_array,
+    ptr == 0 || __CPROVER_new_object != ptr ||
+      __CPROVER_uninterpreted_is_new_array(ptr),
     "delete[] of non-array object");
 
   if(ptr!=0)

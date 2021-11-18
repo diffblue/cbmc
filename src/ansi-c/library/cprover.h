@@ -13,7 +13,6 @@ typedef __typeof__(sizeof(int)) __CPROVER_size_t;
 void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);
 extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_new_object;
-extern _Bool __CPROVER_malloc_is_new_array;
 extern const void *__CPROVER_memory_leak;
 
 extern int __CPROVER_malloc_failure_mode;
