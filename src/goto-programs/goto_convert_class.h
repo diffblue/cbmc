@@ -203,7 +203,8 @@ protected:
     const exprt &lhs,
     const symbol_exprt &function,
     const exprt::operandst &arguments,
-    goto_programt &dest);
+    goto_programt &dest,
+    const irep_idt &mode);
 
   virtual void do_function_call_symbol(const symbolt &)
   {
@@ -672,6 +673,12 @@ protected:
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
+  void do_havoc_slice(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode);
 
   exprt get_array_argument(const exprt &src);
 };

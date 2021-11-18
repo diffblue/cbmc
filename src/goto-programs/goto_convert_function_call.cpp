@@ -60,7 +60,7 @@ void goto_convertt::do_function_call(
   else if(new_function.id()==ID_symbol)
   {
     do_function_call_symbol(
-      new_lhs, to_symbol_expr(new_function), new_arguments, dest);
+      new_lhs, to_symbol_expr(new_function), new_arguments, dest, mode);
   }
   else if(new_function.id() == ID_null_object)
   {

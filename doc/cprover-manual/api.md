@@ -211,6 +211,57 @@ returns true when it is safe to do both.  These predicates can be given an
 optional size; when the size argument is not given, the size of the subtype
 (which must not be **void**) of the pointer type is used.
 
+#### \_\_CPROVER\_havoc\_object
+
+
+This function requires a valid pointer and updates **all bytes** of the
+underlying object with nondeterministic values.
+
+```C
+void __CPROVER_havoc_object(void *p);
+```
+
+**Warning**
+
+This primitive havocs object bytes before
+the given `p` and after `p + sizeof(*p)`:
+
+```C
+struct foo {
+  int x;
+  int y;
+  int z;
+};
+
+struct foo thefoo = {.x = 1; .y = 2, .z = 3};
+
+int* p = &thefoo.y; // pointing to thefoo.y
+
+__CPROVER_havoc_object(p); // makes the whole struct nondet
+__CPROVER_assert(thefoo.x == 1, "fails because `thefoo.x` is now nondet");
+__CPROVER_assert(thefoo.y == 2, "fails because `thefoo.y` is now nondet");
+__CPROVER_assert(thefoo.z == 3, "fails because `thefoo.z` is now nondet");
+```
+
+#### \_\_CPROVER\_havoc\_slice
+
+This function requires requires that `__CPROVER_w_ok(p, size)` holds,
+and updates `size` consecutive bytes of the underlying object, starting at `p`,
+with nondeterministic values.
+
+```C
+void __CPROVER_havoc_slice(void *p, __CPROVER_size_t size);
+```
+
+**Caveat**
+
+- If the slice contains bytes that can be interpreted as pointers by the
+  program, this will cause these pointers to become invalid
+  (i.e. they will not point to anything meaningful).
+- If this slice only contains bytes that are not interpreted as pointers
+  by the program, then havocing the slice is equivalent to making the
+  interpretation of these bytes nondeterministic.
+
 ### Predefined Types and Symbols
 
 #### \_\_CPROVER\_bitvector

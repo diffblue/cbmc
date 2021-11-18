@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^\[main\.assertion\.\d+\] line 9 assertion havoc_slice W_OK.*: FAILURE$
+^\[main\.assertion\.\d+\] line 13 assertion havoc_slice W_OK.*: FAILURE$
+^\[main\.assertion\.\d+\] line 18 assertion havoc_slice W_OK.*: FAILURE$
+^\[main\.assertion\.\d+\] line 21 assertion havoc_slice W_OK.*: FAILURE$
+^\[main\.assertion\.\d+\] line 24 assertion havoc_slice W_OK.*: FAILURE$
+^\[main\.assertion\.\d+\] line 27 assertion havoc_slice W_OK.*: FAILURE$
+^\[main\.assertion\.\d+\] line 30 assertion havoc_slice W_OK.*: FAILURE$
+\*\* 7 of [0-9]+ failed \(.*\)
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
