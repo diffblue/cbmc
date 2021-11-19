@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_dereference_state.h"
 
-#include <util/pointer_expr.h>
 #include <util/symbol_table.h>
 
 /// Get or create a failed symbol for the given pointer-typed expression. These
@@ -81,39 +80,5 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
 std::vector<exprt>
 symex_dereference_statet::get_value_set(const exprt &expr) const
 {
-  auto result = state.value_set.get_value_set(expr, ns);
-
-  bool has_unknown = result.empty();
-  for(const auto &v : result)
-  {
-    if(v.id() == ID_unknown)
-    {
-      has_unknown = true;
-      break;
-    }
-  }
-
-  if(has_unknown)
-  {
-#if 0
-    // The value set only knows about objects the address of which has been
-    // taken, and may therefore still present an underapproximation for
-    // non-deterministic pointers.
-    result = state.value_set.get_any_object(expr, ns);
-#else
-    state.get_level2().current_names.iterate(
-      [this, &result](
-        const irep_idt &key, const std::pair<ssa_exprt, std::size_t> &entry) {
-        const irep_idt &obj_identifier = entry.first.get_object_name();
-        if(obj_identifier != state.guard_identifier())
-          result.emplace_back(
-            object_descriptor_exprt{ns.lookup(obj_identifier).symbol_expr()});
-      });
-
-    result.emplace_back(object_descriptor_exprt{
-      exprt(ID_null_object, to_pointer_type(expr.type()).subtype())});
-#endif
-  }
-
-  return result;
+  return state.value_set.get_value_set(expr, ns);
 }
