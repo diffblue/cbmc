@@ -90,7 +90,10 @@ TEST_CASE("Validation of SMT error response", "[core][smt2_incremental]")
        *smt2irep("(error \"Test error message1.\" \"Test error message2.\")")
           .parsed_output)
        .get_if_error() ==
-    std::vector<std::string>{"Error response has multiple error messages."});
+    std::vector<std::string>{"Error response has multiple error messages - \"\n"
+                             "0: error\n"
+                             "1: Test error message1.\n"
+                             "2: Test error message2.\"."});
 }
 
 TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")

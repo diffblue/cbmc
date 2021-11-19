@@ -175,7 +175,8 @@ valid_smt_error_response(const irept &parse_tree)
   if(parse_tree.get_sub().size() > 2)
   {
     return {response_or_errort<smt_responset>{
-      "Error response has multiple error messages."}};
+      "Error response has multiple error messages - \"" +
+      print_parse_tree(parse_tree) + "\"."}};
   }
   return validation_propagating<smt_error_responset, smt_responset>(
     validate_string_literal(parse_tree.get_sub()[1]));
