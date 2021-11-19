@@ -179,8 +179,7 @@ void code_contractst::check_apply_loop_contracts(
   }
   else
   {
-    for(const auto &target : assigns.operands())
-      modifies.insert(target);
+    modifies.insert(assigns.operands().cbegin(), assigns.operands().cend());
 
     // Create snapshots of write set CARs.
     // This must be done before havocing the write set.
@@ -269,16 +268,10 @@ void code_contractst::check_apply_loop_contracts(
   loop_head--;
 
   // Perform write set instrumentation before adding anything else to loop body.
-  // Copy the loop_body as we would increment the iterator while instrumenting.
   if(assigns.is_not_nil())
   {
-    auto copy_loop_body = loop_body;
     check_frame_conditions(
-      function_name,
-      goto_function.body,
-      copy_loop_body,
-      loop_end,
-      loop_assigns);
+      function_name, goto_function.body, loop_body, loop_end, loop_assigns);
   }
 
   // Generate: assignments to store the multidimensional decreases clause's
@@ -654,8 +647,7 @@ bool code_contractst::apply_function_contract(
 
     // Havoc all targets in the write set
     modifiest modifies;
-    for(const auto &target : targets.operands())
-      modifies.insert(target);
+    modifies.insert(targets.operands().cbegin(), targets.operands().cend());
 
     goto_programt assigns_havoc;
     havoc_assigns_targetst havoc_gen(modifies, ns);
@@ -1014,7 +1006,7 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 void code_contractst::check_frame_conditions(
   const irep_idt &function,
   goto_programt &body,
-  goto_programt::targett &instruction_it,
+  goto_programt::targett instruction_it,
   const goto_programt::targett &instruction_end,
   assigns_clauset &assigns)
 {

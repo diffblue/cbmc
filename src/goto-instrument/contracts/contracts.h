@@ -131,7 +131,7 @@ protected:
   void check_frame_conditions(
     const irep_idt &,
     goto_programt &,
-    goto_programt::targett &,
+    goto_programt::targett,
     const goto_programt::targett &,
     assigns_clauset &);
 
