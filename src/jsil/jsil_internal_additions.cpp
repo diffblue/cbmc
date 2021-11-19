@@ -39,22 +39,6 @@ void jsil_internal_additions(symbol_tablet &dest)
     dest.add(symbol);
   }
 
-  // add __CPROVER_malloc_object
-
-  {
-    symbolt symbol;
-    symbol.base_name = CPROVER_PREFIX "malloc_object";
-    symbol.name=CPROVER_PREFIX "malloc_object";
-    symbol.type=pointer_type(empty_typet());
-    symbol.mode=ID_C;
-    symbol.is_lvalue=true;
-    symbol.is_state_var=true;
-    symbol.is_thread_local=true;
-    // mark as already typechecked
-    symbol.is_extern=true;
-    dest.add(symbol);
-  }
-
   // add eval
 
   {

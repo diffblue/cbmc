@@ -111,8 +111,6 @@ __CPROVER_HIDE:;
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object =
-    record_malloc ? malloc_res : __CPROVER_malloc_object;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -175,8 +173,6 @@ __CPROVER_HIDE:;
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object =
-    record_malloc ? malloc_res : __CPROVER_malloc_object;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -207,7 +203,6 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // record alloca to detect invalid free
@@ -258,10 +253,9 @@ inline void free(void *ptr)
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
-  __CPROVER_precondition(ptr==0 ||
-                         __CPROVER_malloc_object!=ptr ||
-                         !__CPROVER_malloc_is_new_array,
-                         "free called for new[] object");
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_new_object != ptr || !__CPROVER_malloc_is_new_array,
+    "free called for new[] object");
 
   // catch people who try to use free(...) with alloca
   __CPROVER_precondition(
