@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "aggressive_slicer.h"
 #include "contracts/contracts.h"
+#include "document_properties.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"
@@ -39,8 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
-  "(document-claims-latex)(document-claims-html)" \
-  "(document-properties-latex)(document-properties-html)" \
+  OPT_DOCUMENT_PROPERTIES \
   "(dump-c-type-header):" \
   "(dump-c)(dump-cpp)(no-system-headers)(use-all-headers)(dot)(xml)" \
   "(harness)" \

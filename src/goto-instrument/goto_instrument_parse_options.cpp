@@ -85,7 +85,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "branch.h"
 #include "call_sequences.h"
 #include "concurrency.h"
-#include "document_properties.h"
 #include "dot.h"
 #include "dump_c.h"
 #include "full_slicer.h"
@@ -1722,8 +1721,7 @@ void goto_instrument_parse_optionst::help()
     " goto-instrument in out              perform instrumentation\n"
     "\n"
     "Main options:\n"
-    " --document-properties-html   generate HTML property documentation\n"
-    " --document-properties-latex  generate Latex property documentation\n"
+    HELP_DOCUMENT_PROPERTIES
     " --dump-c                     generate C source\n"
     " --dump-c-type-header m       generate a C header for types local in m\n"
     " --dump-cpp                   generate C++ source\n"
