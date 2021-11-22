@@ -86,7 +86,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "call_sequences.h"
 #include "concurrency.h"
 #include "dot.h"
-#include "dump_c.h"
 #include "full_slicer.h"
 #include "function.h"
 #include "havoc_loops.h"
@@ -1722,11 +1721,11 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Main options:\n"
     HELP_DOCUMENT_PROPERTIES
-    " --dump-c                     generate C source\n"
-    " --dump-c-type-header m       generate a C header for types local in m\n"
-    " --dump-cpp                   generate C++ source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
+    "\n"
+    "Dump Source:\n"
+    HELP_DUMP_C
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
@@ -1851,9 +1850,6 @@ void goto_instrument_parse_optionst::help()
     HELP_ENFORCE_CONTRACT
     "\n"
     "Other options:\n"
-    " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
-    " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
-    " --harness                    with --dump-c/--dump-cpp: include input generator in output\n" // NOLINT(*)
     " --version                    show version and exit\n"
     HELP_FLUSH
     " --xml-ui                     use XML-formatted output\n"

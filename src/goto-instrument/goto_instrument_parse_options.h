@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "aggressive_slicer.h"
 #include "contracts/contracts.h"
 #include "document_properties.h"
+#include "dump_c.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"
@@ -41,9 +42,8 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
   OPT_DOCUMENT_PROPERTIES \
-  "(dump-c-type-header):" \
-  "(dump-c)(dump-cpp)(no-system-headers)(use-all-headers)(dot)(xml)" \
-  "(harness)" \
+  OPT_DUMP_C \
+  "(dot)(xml)" \
   OPT_GOTO_CHECK \
   /* no-X-check are deprecated and ignored */ \
   "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \
