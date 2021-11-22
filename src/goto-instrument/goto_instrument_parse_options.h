@@ -39,7 +39,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
-  "(all)" \
   "(document-claims-latex)(document-claims-html)" \
   "(document-properties-latex)(document-properties-html)" \
   "(dump-c-type-header):" \
