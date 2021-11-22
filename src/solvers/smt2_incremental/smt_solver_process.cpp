@@ -2,7 +2,10 @@
 
 #include <solvers/smt2_incremental/smt_solver_process.h>
 
+#include <solvers/smt2/smt2irep.h>
+#include <solvers/smt2_incremental/smt_response_validation.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
+#include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/string_utils.h>
 
@@ -28,9 +31,28 @@ void smt_piped_solver_processt::send(const smt_commandt &smt_command)
   process.send(command_string + "\n");
 }
 
+/// Log messages and throw exception.
+static void handle_invalid_smt(
+  const std::vector<std::string> &validation_errors,
+  messaget &log)
+{
+  for(const std::string &message : validation_errors)
+  {
+    log.error() << message << messaget::eom;
+  }
+  throw analysis_exceptiont{"Invalid SMT response received from solver."};
+}
+
 smt_responset smt_piped_solver_processt::receive_response()
 {
   const auto response_text = process.wait_receive();
   log.debug() << "Solver response - " << response_text << messaget::eom;
-  UNIMPLEMENTED_FEATURE("parsing of solver response.");
+  response_stream << response_text;
+  const auto parse_tree = smt2irep(response_stream, log.get_message_handler());
+  if(!parse_tree)
+    throw deserialization_exceptiont{"Incomplete SMT response."};
+  const auto validation_result = validate_smt_response(*parse_tree);
+  if(const auto validation_errors = validation_result.get_if_error())
+    handle_invalid_smt(*validation_errors, log);
+  return *validation_result.get_if_valid();
 }

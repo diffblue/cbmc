@@ -5,10 +5,12 @@
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/smt_responses.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <util/expr.h>
 #include <util/namespace.h>
+#include <util/nodiscard.h>
 #include <util/range.h>
 #include <util/std_expr.h>
 #include <util/string_utils.h>
@@ -196,10 +198,29 @@ void smt2_incremental_decision_proceduret::pop()
   UNIMPLEMENTED_FEATURE("`pop`.");
 }
 
+NODISCARD
+static decision_proceduret::resultt lookup_decision_procedure_result(
+  const smt_check_sat_response_kindt &response_kind)
+{
+  if(response_kind.cast<smt_sat_responset>())
+    return decision_proceduret::resultt::D_SATISFIABLE;
+  if(response_kind.cast<smt_unsat_responset>())
+    return decision_proceduret::resultt::D_UNSATISFIABLE;
+  if(response_kind.cast<smt_unknown_responset>())
+    return decision_proceduret::resultt::D_ERROR;
+  UNREACHABLE;
+}
+
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
   solver_process->send(smt_check_sat_commandt{});
   const smt_responset result = solver_process->receive_response();
+  if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
+  {
+    if(check_sat_response->kind().cast<smt_unknown_responset>())
+      log.error() << "SMT2 solver returned \"unknown\"" << messaget::eom;
+    return lookup_decision_procedure_result(check_sat_response->kind());
+  }
   UNIMPLEMENTED_FEATURE("handling solver response.");
 }
