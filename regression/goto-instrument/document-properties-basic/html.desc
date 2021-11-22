@@ -1,0 +1,10 @@
+CORE
+main.c
+--document-properties-html
+^EXIT=0$
+^SIGNAL=0$
+^<em>  assert\(1 == 1\);<\/em>$
+--
+^warning: ignoring
+--
+Tests whether this option works at all.
