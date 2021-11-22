@@ -5,6 +5,7 @@
 
 #include <solvers/smt2_incremental/smt_responses.h>
 #include <util/invariant.h>
+#include <util/nodiscard.h>
 #include <util/optional.h>
 
 #include <string>
@@ -37,7 +38,7 @@ private:
   std::vector<std::string> messages;
 };
 
-response_or_errort<smt_responset>
+NODISCARD response_or_errort<smt_responset>
 validate_smt_response(const irept &parse_tree);
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_RESPONSE_VALIDATION_H
