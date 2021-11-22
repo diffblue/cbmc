@@ -210,3 +210,16 @@ TEST_CASE(
     }
   }
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret number of solver calls.",
+  "[core][smt2_incremental]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  auto mock_process = util_make_unique<smt_mock_solver_processt>();
+  null_message_handlert message_handler;
+  smt2_incremental_decision_proceduret procedure{
+    ns, std::move(mock_process), message_handler};
+  REQUIRE(procedure.get_number_of_solver_calls() == 0);
+}
