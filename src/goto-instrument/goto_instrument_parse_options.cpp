@@ -1851,6 +1851,7 @@ void goto_instrument_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     HELP_FLUSH
+    " --xml                        output files in XML where supported\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_TIMESTAMP
