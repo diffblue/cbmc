@@ -5,6 +5,7 @@
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/smt_responses.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
@@ -20,6 +21,8 @@
 // appropriate overload of `operator<<` where it exists.
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
+#include <deque>
+
 class smt_mock_solver_processt : public smt_base_solver_processt
 {
 public:
@@ -33,9 +36,15 @@ public:
     sent_commands.push_back(smt_command);
   }
 
+  std::deque<smt_responset> responses;
+
   smt_responset receive_response() override
   {
-    UNREACHABLE;
+    INVARIANT(
+      !responses.empty(), "There must be responses remaining for test.");
+    smt_responset response = responses.front();
+    responses.pop_front();
+    return response;
   }
 
   std::vector<smt_commandt> sent_commands;
@@ -218,8 +227,15 @@ TEST_CASE(
   symbol_tablet symbol_table;
   namespacet ns{symbol_table};
   auto mock_process = util_make_unique<smt_mock_solver_processt>();
+  auto &responses = mock_process->responses;
   null_message_handlert message_handler;
   smt2_incremental_decision_proceduret procedure{
     ns, std::move(mock_process), message_handler};
   REQUIRE(procedure.get_number_of_solver_calls() == 0);
+  responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
+  procedure();
+  REQUIRE(procedure.get_number_of_solver_calls() == 1);
+  responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
+  procedure();
+  REQUIRE(procedure.get_number_of_solver_calls() == 2);
 }
