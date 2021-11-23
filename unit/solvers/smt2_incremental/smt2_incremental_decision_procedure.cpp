@@ -286,3 +286,14 @@ TEST_CASE(
     CHECK(test.procedure() == decision_proceduret::resultt::D_ERROR);
   }
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret receives success and check-sat "
+  "response.",
+  "[core][smt2_incremental]")
+{
+  decision_procedure_test_environmentt test{};
+  test.mock_responses = {smt_success_responset{},
+                         smt_check_sat_responset{smt_sat_responset{}}};
+  REQUIRE_NOTHROW(test.procedure());
+}

@@ -18,6 +18,20 @@
 
 #include <stack>
 
+/// Issues a command to the solving process which is expected to optionally
+/// return a success status followed by the actual response of interest.
+static smt_responset get_response_to_command(
+  smt_base_solver_processt &solver_process,
+  const smt_commandt &command)
+{
+  solver_process.send(command);
+  auto response = solver_process.receive_response();
+  if(response.cast<smt_success_responset>())
+    return solver_process.receive_response();
+  else
+    return response;
+}
+
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
 /// \return A collection of sub expressions, which need to be expressed as
@@ -214,8 +228,8 @@ static decision_proceduret::resultt lookup_decision_procedure_result(
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  solver_process->send(smt_check_sat_commandt{});
-  const smt_responset result = solver_process->receive_response();
+  const smt_responset result =
+    get_response_to_command(*solver_process, smt_check_sat_commandt{});
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
   {
     if(check_sat_response->kind().cast<smt_unknown_responset>())
