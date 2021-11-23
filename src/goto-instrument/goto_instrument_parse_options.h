@@ -45,9 +45,6 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_DUMP_C \
   "(dot)(xml)" \
   OPT_GOTO_CHECK \
-  /* no-X-check are deprecated and ignored */ \
-  "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \
-  "(no-nan-check)" \
   "(remove-pointers)" \
   "(no-simplify)" \
   "(uninitialized-check)" \
