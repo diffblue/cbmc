@@ -1,6 +1,6 @@
 KNOWNBUG
 main.cpp
---unwind 1 --no-pointer-check
+--unwind 1
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
