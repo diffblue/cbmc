@@ -25,7 +25,17 @@
 
 class smt_mock_solver_processt : public smt_base_solver_processt
 {
+  std::function<void(const smt_commandt &)> _send;
+  std::function<smt_responset()> _receive;
+
 public:
+  smt_mock_solver_processt(
+    std::function<void(const smt_commandt &)> send,
+    std::function<smt_responset()> receive)
+    : _send{std::move(send)}, _receive{std::move(receive)}
+  {
+  }
+
   const std::string &description() override
   {
     UNREACHABLE;
@@ -33,24 +43,48 @@ public:
 
   void send(const smt_commandt &smt_command) override
   {
-    sent_commands.push_back(smt_command);
+    _send(smt_command);
   }
-
-  std::deque<smt_responset> responses;
 
   smt_responset receive_response() override
   {
-    INVARIANT(
-      !responses.empty(), "There must be responses remaining for test.");
-    smt_responset response = responses.front();
-    responses.pop_front();
-    return response;
+    return _receive();
   }
-
-  std::vector<smt_commandt> sent_commands;
 
   ~smt_mock_solver_processt() override = default;
 };
+
+struct decision_procedure_test_environmentt final
+{
+  void send(const smt_commandt &smt_command);
+  smt_responset receive_response();
+
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::deque<smt_responset> mock_responses;
+  std::vector<smt_commandt> sent_commands;
+  null_message_handlert message_handler;
+  smt2_incremental_decision_proceduret procedure{
+    ns,
+    util_make_unique<smt_mock_solver_processt>(
+      [&](const smt_commandt &smt_command) { this->send(smt_command); },
+      [&]() { return this->receive_response(); }),
+    message_handler};
+};
+
+void decision_procedure_test_environmentt::send(const smt_commandt &smt_command)
+{
+  sent_commands.push_back(smt_command);
+}
+
+smt_responset decision_procedure_test_environmentt::receive_response()
+{
+  INVARIANT(
+    !mock_responses.empty(), "There must be responses remaining for test.");
+  smt_responset response = mock_responses.front();
+  mock_responses.pop_front();
+  return response;
+}
 
 static symbolt make_test_symbol(irep_idt id, typet type)
 {
@@ -73,29 +107,23 @@ TEST_CASE(
   "smt2_incremental_decision_proceduret commands sent",
   "[core][smt2_incremental]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
-  auto mock_process = util_make_unique<smt_mock_solver_processt>();
-  auto &sent_commands = mock_process->sent_commands;
-  null_message_handlert message_handler;
+  decision_procedure_test_environmentt test{};
   SECTION("Construction / solver initialisation.")
   {
-    smt2_incremental_decision_proceduret procedure{
-      ns, std::move(mock_process), message_handler};
     REQUIRE(
-      sent_commands ==
+      test.sent_commands ==
       std::vector<smt_commandt>{
         smt_set_option_commandt{smt_option_produce_modelst{true}},
         smt_set_logic_commandt{
           smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}}});
-    sent_commands.clear();
+    test.sent_commands.clear();
     SECTION("Set symbol to true.")
     {
       const symbolt foo = make_test_symbol("foo", bool_typet{});
       const smt_identifier_termt foo_term{"foo", smt_bool_sortt{}};
-      procedure.set_to(foo.symbol_expr(), true);
+      test.procedure.set_to(foo.symbol_expr(), true);
       REQUIRE(
-        sent_commands ==
+        test.sent_commands ==
         std::vector<smt_commandt>{smt_declare_function_commandt{foo_term, {}},
                                   smt_assert_commandt{foo_term}});
     }
@@ -103,9 +131,9 @@ TEST_CASE(
     {
       const symbolt foo = make_test_symbol("foo", bool_typet{});
       const smt_identifier_termt foo_term{"foo", smt_bool_sortt{}};
-      procedure.set_to(foo.symbol_expr(), false);
+      test.procedure.set_to(foo.symbol_expr(), false);
       REQUIRE(
-        sent_commands ==
+        test.sent_commands ==
         std::vector<smt_commandt>{
           smt_declare_function_commandt{foo_term, {}},
           smt_assert_commandt{smt_core_theoryt::make_not(foo_term)}});
@@ -114,43 +142,43 @@ TEST_CASE(
     {
       const symbolt forty_two =
         make_test_symbol("forty_two", from_integer({42}, signedbv_typet{16}));
-      symbol_table.insert(forty_two);
+      test.symbol_table.insert(forty_two);
       const smt_identifier_termt forty_two_term{"forty_two",
                                                 smt_bit_vector_sortt{16}};
       const symbolt nondet_int_a =
         make_test_symbol("nondet_int_a", signedbv_typet{16});
-      symbol_table.insert(nondet_int_a);
+      test.symbol_table.insert(nondet_int_a);
       const smt_identifier_termt nondet_int_a_term{"nondet_int_a",
                                                    smt_bit_vector_sortt{16}};
       const symbolt nondet_int_b =
         make_test_symbol("nondet_int_b", signedbv_typet{16});
-      symbol_table.insert(nondet_int_b);
+      test.symbol_table.insert(nondet_int_b);
       const smt_identifier_termt nondet_int_b_term{"nondet_int_b",
                                                    smt_bit_vector_sortt{16}};
       const symbolt first_comparison = make_test_symbol(
         "first_comparison",
         equal_exprt{nondet_int_a.symbol_expr(), forty_two.symbol_expr()});
-      symbol_table.insert(first_comparison);
+      test.symbol_table.insert(first_comparison);
       const symbolt second_comparison = make_test_symbol(
         "second_comparison",
         not_exprt{
           equal_exprt{nondet_int_b.symbol_expr(), forty_two.symbol_expr()}});
-      symbol_table.insert(second_comparison);
+      test.symbol_table.insert(second_comparison);
       const symbolt third_comparison = make_test_symbol(
         "third_comparison",
         equal_exprt{nondet_int_a.symbol_expr(), nondet_int_b.symbol_expr()});
-      symbol_table.insert(third_comparison);
+      test.symbol_table.insert(third_comparison);
       const symbolt comparison_conjunction = make_test_symbol(
         "comparison_conjunction",
         and_exprt{{first_comparison.symbol_expr(),
                    second_comparison.symbol_expr(),
                    third_comparison.symbol_expr()}});
-      symbol_table.insert(comparison_conjunction);
+      test.symbol_table.insert(comparison_conjunction);
       smt_identifier_termt comparison_conjunction_term{"comparison_conjunction",
                                                        smt_bool_sortt{}};
-      procedure.set_to(comparison_conjunction.symbol_expr(), true);
+      test.procedure.set_to(comparison_conjunction.symbol_expr(), true);
       REQUIRE(
-        sent_commands ==
+        test.sent_commands ==
         std::vector<smt_commandt>{
           smt_declare_function_commandt{nondet_int_a_term, {}},
           smt_define_function_commandt{
@@ -183,22 +211,24 @@ TEST_CASE(
     {
       const symbolt foo = make_test_symbol("foo", bool_typet{});
       const smt_identifier_termt foo_term{"foo", smt_bool_sortt{}};
-      procedure.handle(foo.symbol_expr());
+      test.procedure.handle(foo.symbol_expr());
       REQUIRE(
-        sent_commands == std::vector<smt_commandt>{
-                           smt_declare_function_commandt{foo_term, {}},
-                           smt_define_function_commandt{"B0", {}, foo_term}});
-      sent_commands.clear();
+        test.sent_commands ==
+        std::vector<smt_commandt>{
+          smt_declare_function_commandt{foo_term, {}},
+          smt_define_function_commandt{"B0", {}, foo_term}});
+      test.sent_commands.clear();
       SECTION("Handle of previously handled expression.")
       {
-        procedure.handle(foo.symbol_expr());
-        REQUIRE(sent_commands.empty());
+        test.procedure.handle(foo.symbol_expr());
+        REQUIRE(test.sent_commands.empty());
       }
       SECTION("Handle of new expression containing previously defined symbol.")
       {
-        procedure.handle(equal_exprt{foo.symbol_expr(), foo.symbol_expr()});
+        test.procedure.handle(
+          equal_exprt{foo.symbol_expr(), foo.symbol_expr()});
         REQUIRE(
-          sent_commands ==
+          test.sent_commands ==
           std::vector<smt_commandt>{smt_define_function_commandt{
             "B1", {}, smt_core_theoryt::equal(foo_term, foo_term)}});
       }
@@ -207,10 +237,10 @@ TEST_CASE(
     {
       const symbolt bar =
         make_test_symbol("bar", from_integer({42}, signedbv_typet{8}));
-      symbol_table.insert(bar);
-      procedure.handle(bar.symbol_expr());
+      test.symbol_table.insert(bar);
+      test.procedure.handle(bar.symbol_expr());
       REQUIRE(
-        sent_commands ==
+        test.sent_commands ==
         std::vector<smt_commandt>{
           smt_define_function_commandt{
             "bar", {}, smt_bit_vector_constant_termt{42, 8}},
@@ -224,18 +254,12 @@ TEST_CASE(
   "smt2_incremental_decision_proceduret number of solver calls.",
   "[core][smt2_incremental]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
-  auto mock_process = util_make_unique<smt_mock_solver_processt>();
-  auto &responses = mock_process->responses;
-  null_message_handlert message_handler;
-  smt2_incremental_decision_proceduret procedure{
-    ns, std::move(mock_process), message_handler};
-  REQUIRE(procedure.get_number_of_solver_calls() == 0);
-  responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
-  procedure();
-  REQUIRE(procedure.get_number_of_solver_calls() == 1);
-  responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
-  procedure();
-  REQUIRE(procedure.get_number_of_solver_calls() == 2);
+  decision_procedure_test_environmentt test{};
+  REQUIRE(test.procedure.get_number_of_solver_calls() == 0);
+  test.mock_responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
+  test.procedure();
+  REQUIRE(test.procedure.get_number_of_solver_calls() == 1);
+  test.mock_responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
+  test.procedure();
+  REQUIRE(test.procedure.get_number_of_solver_calls() == 2);
 }
