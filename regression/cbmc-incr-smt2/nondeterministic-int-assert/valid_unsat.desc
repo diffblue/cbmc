@@ -1,0 +1,14 @@
+CORE winbug
+valid_unsat.c
+--incremental-smt2-solver "z3 --smt2 -in" --verbosity 10
+Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+Sending command to SMT2 solver - \(check-sat\)
+Solver response - unsat
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+type: pointer
+--
+Test that given a `.c` program where all assertions hold, the solver responds
+with unsat and CBMC reports that verification is successful.
