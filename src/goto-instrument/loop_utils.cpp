@@ -51,6 +51,10 @@ void get_modifies_lhs(
     for(const auto &mod : local_may_alias.get(t, ptr.pointer))
     {
       const typecast_exprt typed_mod{mod, ptr.pointer.type()};
+      if(mod.id() == ID_unknown)
+      {
+        throw analysis_exceptiont("Alias analysis returned UNKNOWN!");
+      }
       if(ptr.offset.is_nil())
         modifies.insert(dereference_exprt{typed_mod});
       else

@@ -17,7 +17,10 @@ void main()
   data[4][5][6] = 0;
 
   for(unsigned i = 0; i < SIZE; i++)
+    // clang-format off
+    __CPROVER_assigns(i, data[4][5][6])
     __CPROVER_loop_invariant(i <= SIZE)
+    // clang-format on
     {
       data[4][5][6] = 1;
     }

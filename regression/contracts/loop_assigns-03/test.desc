@@ -1,0 +1,17 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that i is assignable: FAILURE$
+^\[main.\d+\] .* Check that b->data\[(.*)i\] is assignable: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+This test (taken from #6021) shows the need for assigns clauses on loops.
+The alias analysis in this case returns `unknown`,
+and so we must manually annotate an assigns clause on the loop.
+
+Note that the annotated assigns clause in this case is an underapproximation,
+because `i` is also assigned in the loop and should be marked as assignable.

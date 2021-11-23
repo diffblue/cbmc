@@ -18,4 +18,9 @@ to pass -- we should not mistakenly havoc the allocations, just their values.
 However, the `data[1][2][3] == 0` assertion is expected to fail since `data`
 is havoced.
 
-Blocked on issue #6021 -- alias analysis is imprecise and returns `unknown`.
+Blocked on #6326:
+The assigns clause in this case would have an entire 3D space,
+and some of it must be re-established, to the original objects
+but with different values at certain locations, by the loop invariant.
+However, currently we cannot restrict same_object for pointers
+within loop invariants.

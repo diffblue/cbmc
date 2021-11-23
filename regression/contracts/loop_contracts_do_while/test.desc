@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that loop contracts work correctly on do/while loops.

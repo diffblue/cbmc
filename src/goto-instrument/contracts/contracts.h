@@ -98,6 +98,7 @@ public:
   void apply_loop_contracts();
 
   void check_apply_loop_contracts(
+    const irep_idt &function_name,
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,
     goto_programt::targett loop_head,
@@ -130,7 +131,8 @@ protected:
   void check_frame_conditions(
     const irep_idt &,
     goto_programt &,
-    goto_programt::targett &,
+    goto_programt::targett,
+    const goto_programt::targett &,
     assigns_clauset &);
 
   /// Inserts an assertion into the goto program to ensure that

@@ -17,6 +17,8 @@ Date: September 2021
 
 #include <goto-programs/goto_model.h>
 
+#define CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK "contracts:disable:assigns-check"
+
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
 ///        i.e. if all dereferences within an expression are valid
@@ -41,6 +43,20 @@ public:
 protected:
   const namespacet &ns;
 };
+
+/// \brief Adds a pragma on a GOTO instruction to disable inclusion checking.
+///
+/// \param instr: A mutable reference to the GOTO instruction.
+/// \return The same reference after mutation (i.e., adding the pragma).
+goto_programt::instructiont &
+add_pragma_disable_assigns_check(goto_programt::instructiont &instr);
+
+/// \brief Adds pragmas on all instructions in a GOTO program
+///        to disable inclusion checking on them.
+///
+/// \param prog: A mutable reference to the GOTO program.
+/// \return The same reference after mutation (i.e., adding the pragmas).
+goto_programt &add_pragma_disable_assigns_check(goto_programt &prog);
 
 /// \brief Generate a validity check over all dereferences in an expression
 ///

@@ -1,12 +1,14 @@
-KNOWNBUG
+CORE
 main.c
 --apply-loop-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.1\] .* assertion data\[4\]\[5\]\[6\] == 0: FAILURE$
-^\[main.assertion.2\] .* assertion data\[1\]\[2\]\[3\] == 0: SUCCESS$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.\d+\] .* Check that data\[(.*)4\]\[(.*)5\]\[(.*)6\] is assignable: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.\d+\] .* assertion data\[4\]\[5\]\[6\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion data\[1\]\[2\]\[3\] == 0: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --
@@ -17,5 +19,3 @@ The `data[4][5][6] == 0` assertion is expected to fail since `data[4][5][6]`
 is havoced and the invariant does not reestablish its value.
 However, the `data[1][2][3] == 0` assertion is expected to pass -- we should
 not havoc the entire `data` array, if only a constant index if being modified.
-
-Blocked on issue #6021 -- alias analysis is imprecise and returns `unknown`.

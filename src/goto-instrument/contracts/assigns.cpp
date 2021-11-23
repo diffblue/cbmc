@@ -117,6 +117,10 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
     location));
 
   instructions.destructive_append(skip_program);
+
+  // The assignments above are only performed on locally defined temporaries
+  // and need not be checked for inclusion in the enclosing scope's write set.
+  add_pragma_disable_assigns_check(instructions);
   return instructions;
 }
 
