@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"
 #include "replace_calls.h"
+#include "uninitialized.h"
 
 #include "count_eloc.h"
 
@@ -49,7 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_GOTO_CHECK \
   OPT_REMOVE_POINTERS \
   "(no-simplify)" \
-  "(uninitialized-check)" \
+  OPT_UNINITIALIZED_CHECK \
   "(race-check)(scc)(one-event-per-cycle)" \
   "(minimum-interference)" \
   "(mm):(my-events)" \

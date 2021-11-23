@@ -107,7 +107,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "stack_depth.h"
 #include "thread_instrumentation.h"
 #include "undefined_functions.h"
-#include "uninitialized.h"
 #include "unwind.h"
 #include "unwindset.h"
 #include "value_set_fi_fp_removal.h"
@@ -1758,7 +1757,7 @@ void goto_instrument_parse_optionst::help()
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
     HELP_GOTO_CHECK
-    " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
+    HELP_UNINITIALIZED_CHECK
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
     " --race-check                 add floating-point data race checks\n"
     "\n"
