@@ -263,3 +263,26 @@ TEST_CASE(
   test.procedure();
   REQUIRE(test.procedure.get_number_of_solver_calls() == 2);
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret mapping solver check-sat responses to "
+  "internal decision_proceduret::resultt",
+  "[core][smt2_incremental]")
+{
+  decision_procedure_test_environmentt test{};
+  SECTION("sat")
+  {
+    test.mock_responses = {smt_check_sat_responset{smt_sat_responset{}}};
+    CHECK(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
+  }
+  SECTION("unsat")
+  {
+    test.mock_responses = {smt_check_sat_responset{smt_unsat_responset{}}};
+    CHECK(test.procedure() == decision_proceduret::resultt::D_UNSATISFIABLE);
+  }
+  SECTION("unknown")
+  {
+    test.mock_responses = {smt_check_sat_responset{smt_unknown_responset{}}};
+    CHECK(test.procedure() == decision_proceduret::resultt::D_ERROR);
+  }
+}
