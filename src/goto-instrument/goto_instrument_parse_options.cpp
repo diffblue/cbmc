@@ -52,7 +52,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/write_goto_binary.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
-#include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
 #include <pointer-analysis/value_set_analysis.h>
 
@@ -1777,7 +1776,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
-    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    HELP_REMOVE_POINTERS
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)

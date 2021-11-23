@@ -28,6 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <pointer-analysis/goto_program_dereference.h>
+
 #include "aggressive_slicer.h"
 #include "contracts/contracts.h"
 #include "document_properties.h"
@@ -45,7 +47,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_DUMP_C \
   "(dot)(xml)" \
   OPT_GOTO_CHECK \
-  "(remove-pointers)" \
+  OPT_REMOVE_POINTERS \
   "(no-simplify)" \
   "(uninitialized-check)" \
   "(race-check)(scc)(one-event-per-cycle)" \
