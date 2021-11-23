@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "aggressive_slicer.h"
 #include "contracts/contracts.h"
+#include "count_eloc.h"
 #include "document_properties.h"
 #include "dump_c.h"
 #include "generate_function_bodies.h"
@@ -39,8 +40,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_volatile.h"
 #include "replace_calls.h"
 #include "uninitialized.h"
-
-#include "count_eloc.h"
 
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
