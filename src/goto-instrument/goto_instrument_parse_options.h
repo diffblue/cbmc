@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_volatile.h"
 #include "replace_calls.h"
 #include "uninitialized.h"
+#include "wmm/weak_memory.h"
 
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
@@ -50,18 +51,14 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REMOVE_POINTERS \
   "(no-simplify)" \
   OPT_UNINITIALIZED_CHECK \
-  "(race-check)(scc)(one-event-per-cycle)" \
-  "(minimum-interference)" \
-  "(mm):(my-events)" \
+  OPT_WMM \
+  "(race-check)" \
   "(unwind):(unwindset):(unwindset-file):" \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
   "(log):" \
-  "(max-var):(max-po-trans):(ignore-arrays)" \
-  "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)(reachable-call-graph)" \
   OPT_INSERT_FINAL_ASSERT_FALSE \
   OPT_SHOW_CLASS_HIERARCHY \
-  "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(isr):" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
@@ -85,7 +82,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(remove-function-pointers)" \
   "(show-claims)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
-  "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
   "(string-abstraction)" \

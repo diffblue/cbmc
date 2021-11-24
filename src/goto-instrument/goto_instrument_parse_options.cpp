@@ -110,7 +110,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwind.h"
 #include "unwindset.h"
 #include "value_set_fi_fp_removal.h"
-#include "wmm/weak_memory.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -1793,17 +1792,7 @@ void goto_instrument_parse_optionst::help()
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
     "\n"
     "Memory model instrumentations:\n"
-    " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"
-    " --scc                        detects critical cycles per SCC (one thread per SCC)\n" // NOLINT(*)
-    " --one-event-per-cycle        only instruments one event per cycle\n"
-    " --minimum-interference       instruments an optimal number of events\n"
-    " --my-events                  only instruments events whose ids appear in inst.evt\n" // NOLINT(*)
-    " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" // NOLINT(*)
-    " --no-dependencies            no dependency analysis\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --no-po-rendering            no representation of the threads in the dot\n"
-    " --render-cluster-file        clusterises the dot by files\n"
-    " --render-cluster-function    clusterises the dot by functions\n"
+    HELP_WMM_FULL
     "\n"
     "Slicing:\n"
     HELP_REACHABILITY_SLICER
