@@ -1054,20 +1054,28 @@ void code_contractst::check_frame_conditions(
         assigns_clauset::conditional_address_ranget{assigns, symbol});
       if(symbol_car != assigns.get_write_set().end())
       {
-        instruction_it++;
         auto invalidation_assignment = goto_programt::make_assignment(
           symbol_car->validity_condition_var,
           false_exprt{},
           instruction_it->source_location());
-        // note that instruction_it is not advanced by this call,
-        // so no need to move it backwards
-        body.insert_before_swap(instruction_it, invalidation_assignment);
+        // note that the CAR must be invalidated _after_ the DEAD instruction
+        body.insert_after(
+          instruction_it,
+          add_pragma_disable_assigns_check(invalidation_assignment));
       }
       else
       {
-        throw incorrect_goto_program_exceptiont(
-          "Found a `DEAD` variable without corresponding `DECL`!",
-          instruction_it->source_location());
+        // For loops, the loop_head appears after the DECL of counters,
+        // and any other temporaries introduced during "initialization".
+        // However, they go `DEAD` (possible conditionally) inside the loop,
+        // in presence of return statements.
+        // Notice that for them those variables be writable,
+        // they must appear as assigns targets anyway,
+        // but their DECL statements are outside of the loop.
+        log.warning() << "Found a `DEAD` variable "
+                      << name2string(symbol.get_identifier())
+                      << " without corresponding `DECL`, at: "
+                      << instruction_it->source_location() << messaget::eom;
       }
     }
     else if(
