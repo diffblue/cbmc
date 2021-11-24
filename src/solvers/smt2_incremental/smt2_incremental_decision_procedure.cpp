@@ -32,6 +32,21 @@ static smt_responset get_response_to_command(
     return response;
 }
 
+static optionalt<std::string>
+get_problem_messages(const smt_responset &response)
+{
+  if(const auto error = response.cast<smt_error_responset>())
+  {
+    return "SMT solver returned an error message - " +
+           id2string(error->message());
+  }
+  if(response.cast<smt_unsupported_responset>())
+  {
+    return {"SMT solver does not support given command."};
+  }
+  return {};
+}
+
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
 /// \return A collection of sub expressions, which need to be expressed as
@@ -236,5 +251,7 @@ decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
       log.error() << "SMT2 solver returned \"unknown\"" << messaget::eom;
     return lookup_decision_procedure_result(check_sat_response->kind());
   }
-  UNIMPLEMENTED_FEATURE("handling solver response.");
+  if(const auto problem = get_problem_messages(result))
+    throw analysis_exceptiont{*problem};
+  throw analysis_exceptiont{"Unexpected kind of response from SMT solver."};
 }

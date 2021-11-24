@@ -11,6 +11,7 @@
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/exception_utils.h>
 #include <util/make_unique.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
@@ -22,6 +23,36 @@
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <deque>
+
+class analysis_execption_with_messaget
+  : public Catch::MatcherBase<analysis_exceptiont>
+{
+public:
+  explicit analysis_execption_with_messaget(std::string message);
+  bool match(const analysis_exceptiont &exception) const override;
+  std::string describe() const override;
+
+private:
+  std::string expected;
+};
+
+analysis_execption_with_messaget::analysis_execption_with_messaget(
+  std::string message)
+  : expected{std::move(message)}
+{
+}
+
+bool analysis_execption_with_messaget::match(
+  const analysis_exceptiont &exception) const
+{
+  return expected == exception.what();
+}
+
+std::string analysis_execption_with_messaget::describe() const
+{
+  return std::string{"analysis_exceptiont with `.what' containing - \""} +
+         expected + "\"";
+}
 
 class smt_mock_solver_processt : public smt_base_solver_processt
 {
@@ -293,7 +324,57 @@ TEST_CASE(
   "[core][smt2_incremental]")
 {
   decision_procedure_test_environmentt test{};
-  test.mock_responses = {smt_success_responset{},
-                         smt_check_sat_responset{smt_sat_responset{}}};
-  REQUIRE_NOTHROW(test.procedure());
+  SECTION("Expected success response.")
+  {
+    test.mock_responses = {smt_success_responset{},
+                           smt_check_sat_responset{smt_sat_responset{}}};
+    REQUIRE_NOTHROW(test.procedure());
+  }
+  SECTION("Duplicated success messages.")
+  {
+    test.mock_responses = {smt_success_responset{},
+                           smt_success_responset{},
+                           smt_check_sat_responset{smt_sat_responset{}}};
+    REQUIRE_THROWS_MATCHES(
+      test.procedure(),
+      analysis_exceptiont,
+      analysis_execption_with_messaget{
+        "Unexpected kind of response from SMT solver."});
+  }
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret receives unexpected responses to "
+  "check-sat.",
+  "[core][smt2_incremental]")
+{
+  decision_procedure_test_environmentt test{};
+  SECTION("get-value response")
+  {
+    test.mock_responses = {
+      smt_get_value_responset{{{"x", smt_bool_literal_termt{false}}}}};
+    REQUIRE_THROWS_MATCHES(
+      test.procedure(),
+      analysis_exceptiont,
+      analysis_execption_with_messaget{
+        "Unexpected kind of response from SMT solver."});
+  }
+  SECTION("error message response")
+  {
+    test.mock_responses = {smt_error_responset{"foobar"}};
+    REQUIRE_THROWS_MATCHES(
+      test.procedure(),
+      analysis_exceptiont,
+      analysis_execption_with_messaget{
+        "SMT solver returned an error message - foobar"});
+  }
+  SECTION("unsupported response")
+  {
+    test.mock_responses = {smt_unsupported_responset{}};
+    REQUIRE_THROWS_MATCHES(
+      test.procedure(),
+      analysis_exceptiont,
+      analysis_execption_with_messaget{
+        "SMT solver does not support given command."});
+  }
 }
