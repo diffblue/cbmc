@@ -189,6 +189,10 @@ void code_contractst::check_apply_loop_contracts(
       insert_before_swap_and_advance(
         goto_function.body, loop_head, snapshot_instructions);
     };
+
+    // Perform write set instrumentation on the entire loop.
+    check_frame_conditions(
+      function_name, goto_function.body, loop_head, loop_end, loop_assigns);
   }
 
   havoc_assigns_targetst havoc_gen(modifies, ns);
@@ -251,7 +255,10 @@ void code_contractst::check_apply_loop_contracts(
 
   // Assume invariant & decl the variant temporaries (just before loop guard).
   // Use insert_before_swap to preserve jumps to loop head.
-  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_head,
+    add_pragma_disable_assigns_check(generated_code));
 
   // Forward the loop_head iterator until the start of the body.
   // This is necessary because complex C loop_head conditions could be
@@ -270,13 +277,6 @@ void code_contractst::check_apply_loop_contracts(
   auto loop_body = loop_head;
   loop_head--;
 
-  // Perform write set instrumentation before adding anything else to loop body.
-  if(assigns.is_not_nil())
-  {
-    check_frame_conditions(
-      function_name, goto_function.body, loop_body, loop_end, loop_assigns);
-  }
-
   // Generate: assignments to store the multidimensional decreases clause's
   // value just before the loop body (but just after the loop guard)
   if(!decreases_clause.is_nil())
@@ -290,7 +290,8 @@ void code_contractst::check_apply_loop_contracts(
       converter.goto_convert(old_decreases_assignment, generated_code, mode);
     }
 
-    goto_function.body.destructive_insert(loop_body, generated_code);
+    goto_function.body.destructive_insert(
+      loop_body, add_pragma_disable_assigns_check(generated_code));
   }
 
   // Generate: assert(invariant) just after the loop exits
@@ -340,7 +341,10 @@ void code_contractst::check_apply_loop_contracts(
     }
   }
 
-  insert_before_swap_and_advance(goto_function.body, loop_end, generated_code);
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_end,
+    add_pragma_disable_assigns_check(generated_code));
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->turn_into_assume();
