@@ -256,10 +256,13 @@ void code_contractst::check_apply_loop_contracts(
   // Forward the loop_head iterator until the start of the body.
   // This is necessary because complex C loop_head conditions could be
   // converted to multiple GOTO instructions (e.g. temporaries are introduced).
+  // If the loop_head location shifts to a different function,
+  // assume that it's an inlined function and keep skipping.
   // FIXME: This simple approach wouldn't work when
   // the loop guard in the source file is split across multiple lines.
   const auto head_loc = loop_head->source_location();
-  while(loop_head->source_location() == head_loc)
+  while(loop_head->source_location() == head_loc ||
+        loop_head->source_location().get_function() != head_loc.get_function())
     loop_head++;
 
   // At this point, we are just past the loop head,
@@ -678,6 +681,12 @@ void code_contractst::apply_loop_contract(
   local_may_aliast local_may_alias(goto_function);
   natural_loops_mutablet natural_loops(goto_function.body);
 
+  if(!natural_loops.loop_map.size())
+    return;
+
+  goto_function_inline(
+    goto_functions, function_name, ns, log.get_message_handler());
+
   // A graph node type that stores information about a loop.
   // We create a DAG representing nesting of various loops in goto_function,
   // sort them topologically, and instrument them in the top-sorted order.
@@ -992,7 +1001,11 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
       function_obj->second.body, instruction_it, snapshot_instructions);
   };
 
-  // Insert aliasing assertions
+  // Inline all function calls.
+  goto_function_inline(
+    goto_functions, function_obj->first, ns, log.get_message_handler());
+
+  // Insert write set inclusion checks.
   check_frame_conditions(
     function_obj->first,
     function_obj->second.body,
@@ -1010,8 +1023,6 @@ void code_contractst::check_frame_conditions(
   const goto_programt::targett &instruction_end,
   assigns_clauset &assigns)
 {
-  goto_function_inline(goto_functions, function, ns, log.get_message_handler());
-
   for(; instruction_it != instruction_end; ++instruction_it)
   {
     const auto &pragmas = instruction_it->source_location().get_pragmas();
