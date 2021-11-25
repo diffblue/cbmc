@@ -187,6 +187,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option(
       "symex-complexity-limit", cmdline.get_value("symex-complexity-limit"));
+    log.warning() << "**** WARNING: Complexity-limited analysis may yield "
+                     "unsound verification results"
+                  << messaget::eom;
   }
 
   if(cmdline.isset("symex-complexity-failed-child-loops-limit"))
@@ -194,18 +197,44 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(
       "symex-complexity-failed-child-loops-limit",
       cmdline.get_value("symex-complexity-failed-child-loops-limit"));
+    if(!cmdline.isset("symex-complexity-limit"))
+    {
+      log.warning() << "**** WARNING: Complexity-limited analysis may yield "
+                       "unsound verification results"
+                    << messaget::eom;
+    }
   }
 
   if(cmdline.isset("unwind"))
+  {
     options.set_option("unwind", cmdline.get_value("unwind"));
+    if(!cmdline.isset("unwinding-assertions"))
+    {
+      log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
+                       "sound verification results"
+                    << messaget::eom;
+    }
+  }
 
   if(cmdline.isset("depth"))
+  {
     options.set_option("depth", cmdline.get_value("depth"));
+    log.warning()
+      << "**** WARNING: Depth-bounded analysis may yield unsound verification "
+         "results"
+      << messaget::eom;
+  }
 
   if(cmdline.isset("unwindset"))
   {
     options.set_option(
       "unwindset", cmdline.get_comma_separated_values("unwindset"));
+    if(!cmdline.isset("unwinding-assertions"))
+    {
+      log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
+                       "sound verification results"
+                    << messaget::eom;
+    }
   }
 
   // constant propagation
@@ -234,9 +263,13 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("unwinding-assertions", true);
 
   // generate unwinding assumptions otherwise
-  options.set_option(
-    "partial-loops",
-    cmdline.isset("partial-loops"));
+  if(cmdline.isset("partial-loops"))
+  {
+    options.set_option("partial-loops", true);
+    log.warning()
+      << "**** WARNING: --partial-loops may yield unsound verification results"
+      << messaget::eom;
+  }
 
   // remove unused equations
   options.set_option(
@@ -858,6 +891,10 @@ bool jbmc_parse_optionst::process_goto_functions(
   // full slice?
   if(cmdline.isset("full-slice"))
   {
+    log.warning() << "**** WARNING: Experimental option --full-slice, "
+                  << "analysis results may be unsound. See "
+                  << "https://github.com/diffblue/cbmc/issues/260"
+                  << messaget::eom;
     log.status() << "Performing a full slice" << messaget::eom;
     if(cmdline.isset("property"))
       property_slicer(goto_model, cmdline.get_values("property"));

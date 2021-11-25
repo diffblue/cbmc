@@ -1742,6 +1742,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
 
+    log.warning() << "**** WARNING: Experimental option --full-slice, "
+                  << "analysis results may be unsound. See "
+                  << "https://github.com/diffblue/cbmc/issues/260"
+                  << messaget::eom;
     log.status() << "Performing a full slice" << messaget::eom;
     if(cmdline.isset("property"))
       property_slicer(goto_model, cmdline.get_values("property"));
