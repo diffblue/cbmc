@@ -2278,12 +2278,51 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
   // place.
   // 4) Construct a new object.
   optionalt<exprt> non_const_update_bound;
-  auto update_size_expr_opt = size_of_expr(src.value().type(), ns);
+  // update value, may require extension to full bytes
+  exprt update_value = src.value();
+  auto update_size_expr_opt = size_of_expr(update_value.type(), ns);
   CHECK_RETURN(update_size_expr_opt.has_value());
   simplify(update_size_expr_opt.value(), ns);
 
   if(!update_size_expr_opt.value().is_constant())
     non_const_update_bound = *update_size_expr_opt;
+  else
+  {
+    auto update_bits = pointer_offset_bits(update_value.type(), ns);
+    // If the following invariant fails, then the type was only found to be
+    // constant via simplification. Such instances should be fixed at the place
+    // introducing these constant-but-not-constant_exprt type sizes.
+    DATA_INVARIANT(
+      update_bits.has_value(), "constant size-of should imply fixed bit width");
+    const size_t update_bits_int = numeric_cast_v<size_t>(*update_bits);
+
+    if(update_bits_int % 8 != 0)
+    {
+      DATA_INVARIANT(
+        can_cast_type<bitvector_typet>(update_value.type()),
+        "non-byte aligned type expected to be a bitvector type");
+      size_t n_extra_bits = 8 - update_bits_int % 8;
+
+      endianness_mapt endianness_map(
+        src.op().type(), src.id() == ID_byte_update_little_endian, ns);
+      const auto bounds = map_bounds(
+        endianness_map, update_bits_int, update_bits_int + n_extra_bits - 1);
+      extractbits_exprt extra_bits{
+        src.op(), bounds.ub, bounds.lb, bv_typet{n_extra_bits}};
+
+      update_value =
+        concatenation_exprt{typecast_exprt::conditional_cast(
+                              update_value, bv_typet{update_bits_int}),
+                            extra_bits,
+                            bitvector_typet{update_value.type().id(),
+                                            update_bits_int + n_extra_bits}};
+    }
+    else
+    {
+      update_size_expr_opt =
+        from_integer(update_bits_int / 8, update_size_expr_opt->type());
+    }
+  }
 
   const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
                                     ? ID_byte_extract_little_endian
@@ -2291,7 +2330,7 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
 
   const byte_extract_exprt byte_extract_expr{
     extract_opcode,
-    src.value(),
+    update_value,
     from_integer(0, src.offset().type()),
     array_typet{bv_typet{8}, *update_size_expr_opt}};
 
