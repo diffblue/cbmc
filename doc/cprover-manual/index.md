@@ -30,8 +30,9 @@
    * [Integration into Build Systems with goto-cc](goto-cc/)
    * [Integration with Visual Studio builds](visual-studio/)
 
-9. Solvers
+9. [The CPROVER API Reference](api/)
 
-    * [Incremental SMT solver](smt2-incr/)
+10. Background Information on selected Command-line Options
 
-10. [The CPROVER API Reference](api/)
+   * [Incremental SMT solver](smt2-incr/)
+   * [Unsound options](unsound_options/)
