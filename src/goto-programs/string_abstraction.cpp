@@ -100,7 +100,17 @@ string_abstractiont::string_abstractiont(
   s.components()[1].set_pretty_name("length");
   s.components()[2].set_pretty_name("size");
 
-  string_struct = std::move(s);
+  symbolt &struct_symbol = get_fresh_aux_symbol(
+    s, "tag-", "string_struct", source_locationt{}, ID_C, ns, symbol_table);
+  struct_symbol.is_type = true;
+  struct_symbol.is_lvalue = false;
+  struct_symbol.is_state_var = false;
+  struct_symbol.is_thread_local = true;
+  struct_symbol.is_file_local = true;
+  struct_symbol.is_auxiliary = false;
+  struct_symbol.is_macro = true;
+
+  string_struct = struct_tag_typet{struct_symbol.name};
 }
 
 typet string_abstractiont::build_type(whatt what)
@@ -310,7 +320,7 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
   if(val.is_nil())
   {
     const symbolt &orig=ns.lookup(source_sym);
-    val=make_val_or_dummy_rec(dest, ref_instr, symbol, ns.follow(orig.type));
+    val = make_val_or_dummy_rec(dest, ref_instr, symbol, orig.type);
   }
 
   // may still be nil (structs, then assignments have been done already)
@@ -328,29 +338,28 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
     goto_programt::targett ref_instr,
     const symbolt &symbol, const typet &source_type)
 {
-  const typet &eff_type=ns.follow(symbol.type);
-
-  if(eff_type.id()==ID_array || eff_type.id()==ID_pointer)
+  if(symbol.type.id() == ID_array || symbol.type.id() == ID_pointer)
   {
-    const typet &source_subt=is_ptr_string_struct(eff_type)?
-      source_type:ns.follow(source_type.subtype());
-    symbol_exprt sym_expr=add_dummy_symbol_and_value(
-        dest, ref_instr, symbol, irep_idt(),
-        eff_type.subtype(), source_subt);
+    const typet &source_subt =
+      is_ptr_string_struct(symbol.type) ? source_type : source_type.subtype();
+    symbol_exprt sym_expr = add_dummy_symbol_and_value(
+      dest, ref_instr, symbol, irep_idt(), symbol.type.subtype(), source_subt);
 
-    if(eff_type.id()==ID_array)
-      return array_of_exprt(sym_expr, to_array_type(eff_type));
+    if(symbol.type.id() == ID_array)
+      return array_of_exprt(sym_expr, to_array_type(symbol.type));
     else
       return address_of_exprt(sym_expr);
   }
   else if(
-    eff_type.id() == ID_union ||
-    (eff_type.id() == ID_struct && eff_type != string_struct))
+    symbol.type.id() == ID_union_tag ||
+    (symbol.type.id() == ID_struct_tag && symbol.type != string_struct))
   {
-    const struct_union_typet &su_source=to_struct_union_type(source_type);
+    const struct_union_typet &su_source =
+      to_struct_union_type(ns.follow(source_type));
     const struct_union_typet::componentst &s_components=
       su_source.components();
-    const struct_union_typet &struct_union_type=to_struct_union_type(eff_type);
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(ns.follow(symbol.type));
     const struct_union_typet::componentst &components=
       struct_union_type.components();
     unsigned seen=0;
@@ -364,15 +373,12 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
       if(it->get_name()!=it2->get_name())
         continue;
 
-      const typet &eff_sub_type=ns.follow(it2->type());
-      if(eff_sub_type.id()==ID_pointer ||
-          eff_sub_type.id()==ID_array ||
-          eff_sub_type.id()==ID_struct ||
-          eff_sub_type.id()==ID_union)
+      if(
+        it2->type().id() == ID_pointer || it2->type().id() == ID_array ||
+        it2->type().id() == ID_struct_tag || it2->type().id() == ID_union_tag)
       {
-        symbol_exprt sym_expr=add_dummy_symbol_and_value(
-            dest, ref_instr, symbol, it2->get_name(),
-            it2->type(), ns.follow(it->type()));
+        symbol_exprt sym_expr = add_dummy_symbol_and_value(
+          dest, ref_instr, symbol, it2->get_name(), it2->type(), it->type());
 
         member_exprt member(symbol.symbol_expr(), it2->get_name(), it2->type());
 
@@ -675,58 +681,56 @@ exprt string_abstractiont::build(
 
 const typet &string_abstractiont::build_abstraction_type(const typet &type)
 {
-  const typet &eff_type=ns.follow(type);
-  abstraction_types_mapt::const_iterator map_entry=
-    abstraction_types_map.find(eff_type);
+  abstraction_types_mapt::const_iterator map_entry =
+    abstraction_types_map.find(type);
   if(map_entry!=abstraction_types_map.end())
     return map_entry->second;
 
   abstraction_types_mapt tmp;
   tmp.swap(abstraction_types_map);
-  build_abstraction_type_rec(eff_type, tmp);
+  build_abstraction_type_rec(type, tmp);
 
   abstraction_types_map.swap(tmp);
-  map_entry=tmp.find(eff_type);
-  CHECK_RETURN(map_entry != tmp.end());
-  return abstraction_types_map.insert(
-      std::make_pair(eff_type, map_entry->second)).first->second;
+  abstraction_types_map.insert(tmp.begin(), tmp.end());
+  map_entry = abstraction_types_map.find(type);
+  CHECK_RETURN(map_entry != abstraction_types_map.end());
+  return map_entry->second;
 }
 
 const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     const abstraction_types_mapt &known)
 {
-  const typet &eff_type=ns.follow(type);
-  abstraction_types_mapt::const_iterator known_entry=known.find(eff_type);
+  abstraction_types_mapt::const_iterator known_entry = known.find(type);
   if(known_entry!=known.end())
     return known_entry->second;
 
   ::std::pair<abstraction_types_mapt::iterator, bool> map_entry(
-    abstraction_types_map.insert(::std::make_pair(eff_type, typet{ID_nil})));
+    abstraction_types_map.insert(::std::make_pair(type, typet{ID_nil})));
   if(!map_entry.second)
     return map_entry.first->second;
 
-  if(eff_type.id()==ID_array || eff_type.id()==ID_pointer)
+  if(type.id() == ID_array || type.id() == ID_pointer)
   {
     // char* or void* or char[]
-    if(is_char_type(eff_type.subtype()) ||
-        eff_type.subtype().id()==ID_empty)
+    if(is_char_type(type.subtype()) || type.subtype().id() == ID_empty)
       map_entry.first->second=pointer_type(string_struct);
     else
     {
-      const typet &subt=build_abstraction_type_rec(eff_type.subtype(), known);
+      const typet &subt = build_abstraction_type_rec(type.subtype(), known);
       if(!subt.is_nil())
       {
-        if(eff_type.id()==ID_array)
-          map_entry.first->second=
-            array_typet(subt, to_array_type(eff_type).size());
+        if(type.id() == ID_array)
+          map_entry.first->second =
+            array_typet(subt, to_array_type(type).size());
         else
           map_entry.first->second=pointer_type(subt);
       }
     }
   }
-  else if(eff_type.id()==ID_struct || eff_type.id()==ID_union)
+  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    const struct_union_typet &struct_union_type=to_struct_union_type(eff_type);
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(ns.follow(type));
 
     struct_union_typet::componentst new_comp;
     for(const auto &comp : struct_union_type.components())
@@ -745,9 +749,31 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     }
     if(!new_comp.empty())
     {
-      struct_union_typet t(eff_type.id());
-      t.components().swap(new_comp);
-      map_entry.first->second=t;
+      struct_union_typet abstracted_type = struct_union_type;
+      abstracted_type.components().swap(new_comp);
+
+      const symbolt &existing_tag_symbol =
+        ns.lookup(to_tag_type(type).get_identifier());
+      symbolt &abstracted_type_symbol = get_fresh_aux_symbol(
+        abstracted_type,
+        "",
+        id2string(existing_tag_symbol.name),
+        existing_tag_symbol.location,
+        existing_tag_symbol.mode,
+        ns,
+        symbol_table);
+      abstracted_type_symbol.is_type = true;
+      abstracted_type_symbol.is_lvalue = false;
+      abstracted_type_symbol.is_state_var = false;
+      abstracted_type_symbol.is_thread_local = true;
+      abstracted_type_symbol.is_file_local = true;
+      abstracted_type_symbol.is_auxiliary = false;
+      abstracted_type_symbol.is_macro = true;
+
+      if(type.id() == ID_struct_tag)
+        map_entry.first->second = struct_tag_typet{abstracted_type_symbol.name};
+      else
+        map_entry.first->second = union_tag_typet{abstracted_type_symbol.name};
     }
   }
 
