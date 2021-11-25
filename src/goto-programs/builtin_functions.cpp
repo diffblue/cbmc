@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
+#include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
@@ -699,7 +700,7 @@ void goto_convertt::do_havoc_slice(
   t->source_location_nonconst().set_comment(
     "assertion havoc_slice " + from_expr(ns, identifier, ok_expr));
 
-  const array_typet array_type(char_type(), arguments[1]);
+  const array_typet array_type(char_type(), simplify_expr(arguments[1], ns));
 
   const symbolt &nondet_contents =
     new_tmp_symbol(array_type, "nondet_contents", dest, source_location, mode);
