@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol.h>
+#include <util/xml.h>
 
 #include <ostream>
 
@@ -215,6 +216,39 @@ void value_sett::output(std::ostream &out, const std::string &indent) const
 
     out << " } \n";
   });
+}
+
+xmlt value_sett::output_xml(void) const
+{
+  xmlt output;
+
+  value_sett::valuest::viewt view;
+  this->values.get_view(view);
+
+  for(const auto &values_entry : view)
+  {
+    xmlt &var = output.new_element("variable");
+    var.new_element("identifier").data = id2string(values_entry.first);
+
+#if 0
+    const value_sett::expr_sett &expr_set=
+      value_entries.expr_set();
+
+    for(value_sett::expr_sett::const_iterator
+          e_it=expr_set.begin();
+          e_it!=expr_set.end();
+          e_it++)
+      {
+        std::string value_str=
+          from_expr(ns, identifier, *e_it);
+
+        var.new_element("value").data=
+          xmlt::escape(value_str);
+      }
+#endif
+  }
+
+  return output;
 }
 
 exprt value_sett::to_expr(const object_map_dt::value_type &it) const

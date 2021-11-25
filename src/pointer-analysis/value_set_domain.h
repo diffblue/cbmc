@@ -12,51 +12,105 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
 
-#define USE_DEPRECATED_STATIC_ANALYSIS_H
-#include <analyses/static_analysis.h>
+#include <util/invariant.h>
+
+#include <analyses/ai.h>
 
 #include "value_set.h"
 
 /// This is the domain for a value set analysis. It is intended to be the
 /// template parameter for `value_set_analysis_templatet`, so `VST` would be
 /// `value_sett`.
-template<class VST>
-class value_set_domain_templatet:public domain_baset
+template <class VST>
+class value_set_domain_templatet : public ai_domain_baset
 {
+protected:
+  /// ait checks whether domains are bottom to increase speed and accuracy.
+  /// Older frameworks don't so it is necessary to track this.
+  bool reachable;
+
 public:
   VST value_set;
 
+  explicit value_set_domain_templatet(locationt l) : reachable(false)
+  {
+    value_set.clear();
+    value_set.location_number = l->location_number;
+  }
+
+  void make_bottom() override
+  {
+    reachable = false;
+    value_set.clear(); //???
+  }
+
+  void make_top() override
+  {
+    UNREACHABLE;
+  }
+
+  void make_entry() override
+  {
+    reachable = true;
+  }
+
+  bool is_bottom() const override
+  {
+    return reachable == false && value_set.values.size() == 0;
+  }
+
+  bool is_top() const override
+  {
+    return false;
+  }
+
   // overloading
 
-  bool merge(const value_set_domain_templatet<VST> &other, locationt)
+  bool
+  merge(const value_set_domain_templatet<VST> &other, trace_ptrt, trace_ptrt)
   {
+    reachable |= other.reachable;
     return value_set.make_union(other.value_set);
   }
 
-  void output(const namespacet &, std::ostream &out) const override
+  void
+  output(std::ostream &out, const ai_baset &, const namespacet &) const override
   {
     value_set.output(out);
   }
 
-  void initialize(const namespacet &, locationt l) override
-  {
-    value_set.clear();
-    value_set.location_number=l->location_number;
-  }
-
   void transform(
-    const namespacet &ns,
     const irep_idt &function_from,
-    locationt from_l,
+    trace_ptrt from,
     const irep_idt &function_to,
-    locationt to_l) override;
+    trace_ptrt to,
+    ai_baset &ai,
+    const namespacet &ns) override;
 
   void get_reference_set(
     const namespacet &ns,
     const exprt &expr,
-    value_setst::valuest &dest) override
+    value_setst::valuest &dest)
   {
     value_set.get_reference_set(expr, dest, ns);
+  }
+
+  exprt get_return_lhs(locationt to) const
+  {
+    // get predecessor of "to"
+    to--;
+
+    if(to->is_end_function())
+      return static_cast<const exprt &>(get_nil_irep());
+
+    INVARIANT(to->is_function_call(), "must be the function call");
+
+    return to->call_lhs();
+  }
+
+  xmlt output_xml(const ai_baset &ai, const namespacet &ns) const override
+  {
+    return value_set.output_xml();
   }
 };
 
@@ -64,12 +118,19 @@ typedef value_set_domain_templatet<value_sett> value_set_domaint;
 
 template <class VST>
 void value_set_domain_templatet<VST>::transform(
-  const namespacet &ns,
   const irep_idt &,
-  locationt from_l,
+  trace_ptrt from,
   const irep_idt &function_to,
-  locationt to_l)
+  trace_ptrt to,
+  ai_baset &,
+  const namespacet &ns)
 {
+  if(!reachable)
+    return;
+
+  locationt from_l{from->current_location()};
+  locationt to_l{to->current_location()};
+
   switch(from_l->type())
   {
   case GOTO:
@@ -78,7 +139,7 @@ void value_set_domain_templatet<VST>::transform(
 
   case END_FUNCTION:
   {
-    value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
+    value_set.do_end_function(get_return_lhs(to_l), ns);
     break;
   }
 
@@ -115,5 +176,9 @@ void value_set_domain_templatet<VST>::transform(
   }
   }
 }
+
+// To pass the correct location to the constructor we need a factory
+typedef ai_domain_factory_location_constructort<value_set_domaint>
+  value_set_domain_factoryt;
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
