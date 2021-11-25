@@ -113,12 +113,16 @@ public:
   /// no states
   virtual void make_bottom() = 0;
 
-  /// all states -- the analysis doesn't use this,
+  /// all states -- the analysis doesn't use this directly (see make_entry)
   /// and domains may refuse to implement it.
   virtual void make_top() = 0;
 
   /// Make this domain a reasonable entry-point state
-  virtual void make_entry() = 0;
+  /// For most domains top is sufficient
+  virtual void make_entry()
+  {
+    make_top();
+  }
 
   virtual bool is_bottom() const = 0;
 

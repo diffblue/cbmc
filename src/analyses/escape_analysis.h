@@ -71,11 +71,6 @@ public:
     return has_values.is_true();
   }
 
-  void make_entry() override final
-  {
-    make_top();
-  }
-
   typedef union_find<irep_idt> aliasest;
   aliasest aliases;
 

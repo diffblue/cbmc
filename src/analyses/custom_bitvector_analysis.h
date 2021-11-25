@@ -50,11 +50,6 @@ public:
     has_values=tvt(true);
   }
 
-  void make_entry() final override
-  {
-    make_top();
-  }
-
   bool is_bottom() const final override
   {
     DATA_INVARIANT(!has_values.is_false() ||

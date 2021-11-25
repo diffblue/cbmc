@@ -62,11 +62,6 @@ public:
     has_values=tvt(true);
   }
 
-  void make_entry() final override
-  {
-    make_top();
-  }
-
   /// Returns true if domain is bottom.
   bool is_bottom() const final override
   {

@@ -218,11 +218,6 @@ void variable_sensitivity_domaint::make_top()
   abstract_state.make_top();
 }
 
-void variable_sensitivity_domaint::make_entry()
-{
-  abstract_state.make_top();
-}
-
 bool variable_sensitivity_domaint::merge(
   const variable_sensitivity_domaint &b,
   trace_ptrt from,

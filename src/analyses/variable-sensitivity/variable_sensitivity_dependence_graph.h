@@ -116,11 +116,6 @@ public:
     control_dep_call_candidates.clear();
   }
 
-  void make_entry() override
-  {
-    make_top();
-  }
-
   bool is_bottom() const override
   {
     return variable_sensitivity_domaint::is_bottom() && has_values.is_false();

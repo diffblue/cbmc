@@ -145,9 +145,6 @@ public:
   /// Sets the domain to top (all states).
   void make_top() override;
 
-  /// Set up a reasonable entry-point state
-  void make_entry() override;
-
   /// Basic text output of the abstract domain
   ///
   /// \param out: the output stream
