@@ -418,6 +418,59 @@ static exprt::operandst instantiate_byte_array(
   return bytes;
 }
 
+/// Rewrite an array or vector into its individual bytes when no maximum number
+/// of bytes is known.
+/// \param src: array/vector to unpack
+/// \param el_bytes: byte width of array/vector elements
+/// \param little_endian: true, iff assumed endianness is little-endian
+/// \param ns: namespace for type lookups
+/// \return Array expression holding unpacked elements or array comprehension
+static exprt unpack_array_vector_no_known_bounds(
+  const exprt &src,
+  std::size_t el_bytes,
+  bool little_endian,
+  const namespacet &ns)
+{
+  // TODO we either need a symbol table here or make array comprehensions
+  // introduce a scope
+  static std::size_t array_comprehension_index_counter = 0;
+  ++array_comprehension_index_counter;
+  symbol_exprt array_comprehension_index{
+    "$array_comprehension_index_a_v" +
+      std::to_string(array_comprehension_index_counter),
+    index_type()};
+
+  index_exprt element{
+    src,
+    div_exprt{array_comprehension_index, from_integer(el_bytes, index_type())}};
+
+  exprt sub = unpack_rec(element, little_endian, {}, {}, ns, false);
+  exprt::operandst sub_operands = instantiate_byte_array(sub, 0, el_bytes, ns);
+
+  exprt body = sub_operands.front();
+  const mod_exprt offset{
+    array_comprehension_index,
+    from_integer(el_bytes, array_comprehension_index.type())};
+  for(std::size_t i = 1; i < el_bytes; ++i)
+  {
+    body = if_exprt{
+      equal_exprt{offset, from_integer(i, array_comprehension_index.type())},
+      sub_operands[i],
+      body};
+  }
+
+  const exprt array_vector_size = src.type().id() == ID_vector
+                                    ? to_vector_type(src.type()).size()
+                                    : to_array_type(src.type()).size();
+
+  return array_comprehension_exprt{
+    std::move(array_comprehension_index),
+    std::move(body),
+    array_typet{bv_typet{8},
+                mult_exprt{array_vector_size,
+                           from_integer(el_bytes, array_vector_size.type())}}};
+}
+
 /// Rewrite an array or vector into its individual bytes.
 /// \param src: array/vector to unpack
 /// \param src_size: array/vector size; if not a constant and thus not set,
@@ -445,47 +498,11 @@ static exprt unpack_array_vector(
 
   if(!src_size.has_value() && !max_bytes.has_value())
   {
-    // TODO we either need a symbol table here or make array comprehensions
-    // introduce a scope
-    static std::size_t array_comprehension_index_counter = 0;
-    ++array_comprehension_index_counter;
-    symbol_exprt array_comprehension_index{
-      "$array_comprehension_index_a_v" +
-        std::to_string(array_comprehension_index_counter),
-      index_type()};
-
-    CHECK_RETURN(el_bytes > 0);
-    index_exprt element{src,
-                        div_exprt{array_comprehension_index,
-                                  from_integer(el_bytes, index_type())}};
-
-    exprt sub = unpack_rec(element, little_endian, {}, {}, ns, false);
-    exprt::operandst sub_operands =
-      instantiate_byte_array(sub, 0, el_bytes, ns);
-
-    exprt body = sub_operands.front();
-    const mod_exprt offset{
-      array_comprehension_index,
-      from_integer(el_bytes, array_comprehension_index.type())};
-    for(std::size_t i = 1; i < el_bytes; ++i)
-    {
-      body = if_exprt{
-        equal_exprt{offset, from_integer(i, array_comprehension_index.type())},
-        sub_operands[i],
-        body};
-    }
-
-    const exprt array_vector_size = src.type().id() == ID_vector
-                                      ? to_vector_type(src.type()).size()
-                                      : to_array_type(src.type()).size();
-
-    return array_comprehension_exprt{
-      std::move(array_comprehension_index),
-      std::move(body),
-      array_typet{
-        bv_typet{8},
-        mult_exprt{array_vector_size,
-                   from_integer(el_bytes, array_vector_size.type())}}};
+    PRECONDITION_WITH_DIAGNOSTICS(
+      el_bytes > 0 && element_bits % 8 == 0,
+      "unpacking of arrays with non-byte-aligned elements is not supported");
+    return unpack_array_vector_no_known_bounds(
+      src, el_bytes, little_endian, ns);
   }
 
   exprt::operandst byte_operands;
