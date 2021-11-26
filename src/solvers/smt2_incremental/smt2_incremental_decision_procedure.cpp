@@ -5,16 +5,47 @@
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/smt_responses.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <util/expr.h>
 #include <util/namespace.h>
+#include <util/nodiscard.h>
 #include <util/range.h>
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>
 
 #include <stack>
+
+/// Issues a command to the solving process which is expected to optionally
+/// return a success status followed by the actual response of interest.
+static smt_responset get_response_to_command(
+  smt_base_solver_processt &solver_process,
+  const smt_commandt &command)
+{
+  solver_process.send(command);
+  auto response = solver_process.receive_response();
+  if(response.cast<smt_success_responset>())
+    return solver_process.receive_response();
+  else
+    return response;
+}
+
+static optionalt<std::string>
+get_problem_messages(const smt_responset &response)
+{
+  if(const auto error = response.cast<smt_error_responset>())
+  {
+    return "SMT solver returned an error message - " +
+           id2string(error->message());
+  }
+  if(response.cast<smt_unsupported_responset>())
+  {
+    return {"SMT solver does not support given command."};
+  }
+  return {};
+}
 
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
@@ -196,10 +227,31 @@ void smt2_incremental_decision_proceduret::pop()
   UNIMPLEMENTED_FEATURE("`pop`.");
 }
 
+NODISCARD
+static decision_proceduret::resultt lookup_decision_procedure_result(
+  const smt_check_sat_response_kindt &response_kind)
+{
+  if(response_kind.cast<smt_sat_responset>())
+    return decision_proceduret::resultt::D_SATISFIABLE;
+  if(response_kind.cast<smt_unsat_responset>())
+    return decision_proceduret::resultt::D_UNSATISFIABLE;
+  if(response_kind.cast<smt_unknown_responset>())
+    return decision_proceduret::resultt::D_ERROR;
+  UNREACHABLE;
+}
+
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  solver_process->send(smt_check_sat_commandt{});
-  const smt_responset result = solver_process->receive_response();
-  UNIMPLEMENTED_FEATURE("handling solver response.");
+  const smt_responset result =
+    get_response_to_command(*solver_process, smt_check_sat_commandt{});
+  if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
+  {
+    if(check_sat_response->kind().cast<smt_unknown_responset>())
+      log.error() << "SMT2 solver returned \"unknown\"" << messaget::eom;
+    return lookup_decision_procedure_result(check_sat_response->kind());
+  }
+  if(const auto problem = get_problem_messages(result))
+    throw analysis_exceptiont{*problem};
+  throw analysis_exceptiont{"Unexpected kind of response from SMT solver."};
 }

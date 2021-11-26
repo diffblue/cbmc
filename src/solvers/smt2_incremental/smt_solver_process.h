@@ -9,6 +9,7 @@ class smt_commandt;
 #include <util/message.h>
 #include <util/piped_process.h>
 
+#include <sstream>
 #include <string>
 
 class smt_base_solver_processt
@@ -49,6 +50,8 @@ protected:
   std::string command_line_description;
   /// The raw solver sub process.
   piped_processt process;
+  /// For buffering / combining communications from the solver to cbmc.
+  std::stringstream response_stream;
   /// For debug printing.
   messaget log;
 };
