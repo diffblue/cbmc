@@ -2865,7 +2865,14 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
 
         // may need to flatten array-theory arrays in there
         if(op.type().id() == ID_array)
-          flatten_array(op);
+        {
+          const array_typet &array_type = to_array_type(op.type());
+          const auto &size_expr = array_type.size();
+          CHECK_RETURN(size_expr.id() == ID_constant);
+
+          if(numeric_cast_v<mp_integer>(to_constant_expr(size_expr)) != 0)
+            flatten_array(op);
+        }
         else
           convert_expr(op);
 
@@ -4886,7 +4893,11 @@ void smt2_convt::convert_type(const typet &type)
   {
     if(use_datatypes)
     {
-      out << datatype_map.at(type);
+      const typet &struct_type = type.id() == ID_struct_tag
+                                   ? ns.follow_tag(to_struct_tag_type(type))
+                                   : type;
+      CHECK_RETURN(datatype_map.count(struct_type) > 0);
+      out << datatype_map.at(struct_type);
     }
     else
     {
