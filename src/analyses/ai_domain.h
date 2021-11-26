@@ -235,4 +235,21 @@ public:
   }
 };
 
+template <typename domainT>
+class ai_domain_factory_location_constructort
+  : public ai_domain_factoryt<domainT>
+{
+public:
+  typedef ai_domain_factory_baset::statet statet;
+  typedef ai_domain_factory_baset::locationt locationt;
+  typedef ai_domain_factory_baset::trace_ptrt trace_ptrt;
+
+  std::unique_ptr<statet> make(locationt l) const override
+  {
+    auto d = util_make_unique<domainT>(l);
+    CHECK_RETURN(d->is_bottom());
+    return std::unique_ptr<statet>(d.release());
+  }
+};
+
 #endif
