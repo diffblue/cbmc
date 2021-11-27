@@ -1,0 +1,27 @@
+CORE
+main.c
+--show-value-sets
+^EXIT=0$
+^SIGNAL=0$
+main::1::u = \{ <main::1::u\$object, 0, signedbv\[32\]> \}
+main::1::u = \{ <NULL-object, 0, signedbv\[32\]> \}
+main::1::u = \{ <main::1::a, 0, signedbv\[32\]> \}
+main::1::p = \{ <main::1::b, 0, signedbv\[32\]> \}
+main::1::p = \{ <main::1::c, 0, signedbv\[32\]> \}
+main::1::q = \{ <main::1::b, 0, signedbv\[32\]>, <main::1::c, 0, signedbv\[32\]> \}
+main::1::p = \{ <main::1::b, 0, signedbv\[32\]>, <main::1::c, 0, signedbv\[32\]> \}
+main::1::s = \{ <main::1::array\[0\], \*, signedbv\[32\]> \}
+--
+--
+A few basic tests to check if value sets are being handled correctly.
+
+It would be reasonable to ask about the checks for:
+
+main::1::q = \{ <main::1::b, 0, signedbv\[32\]> \}
+main::1::q = \{ <main::1::c, 0, signedbv\[32\]> \}
+
+but as domains are stored at the start of instructions the following merge will
+over-write it on one branch or the other.  To keep the test portable it is best
+avoided.
+
+
