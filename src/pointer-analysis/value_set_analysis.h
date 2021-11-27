@@ -38,17 +38,13 @@ public:
   {
   }
 
-  const value_sett &get_value_set(goto_programt::const_targett t)
-  {
-    return (*this)[t].value_set;
-  }
-
-public:
   // interface value_sets
   std::vector<exprt>
   get_values(const irep_idt &, locationt l, const exprt &expr) override
   {
-    return (*this)[l].value_set.get_value_set(expr, ns);
+    auto s = this->abstract_state_before(l);
+    auto d = std::dynamic_pointer_cast<const domaint>(s);
+    return d->value_set.get_value_set(expr, ns);
   }
 };
 
