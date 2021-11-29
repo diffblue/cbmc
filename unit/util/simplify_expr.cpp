@@ -108,6 +108,30 @@ TEST_CASE("expr2bits and bits2expr respect bit order", "[core][util]")
   const auto should_be_deadbeef2 =
     bits2expr(*be, unsignedbv_typet(32), false, ns);
   REQUIRE(deadbeef == *should_be_deadbeef2);
+
+  c_bit_field_typet four_bits{unsignedbv_typet{8}, 4};
+  struct_typet st{{{"s", unsignedbv_typet{16}},
+                   {"bf1", four_bits},
+                   {"bf2", four_bits},
+                   {"b", unsignedbv_typet{8}}}};
+
+  const auto fill_struct_le = bits2expr(*le, st, true, ns);
+  REQUIRE(fill_struct_le.has_value());
+  REQUIRE(
+    to_struct_expr(*fill_struct_le).operands()[1] ==
+    from_integer(0xd, four_bits));
+  REQUIRE(
+    to_struct_expr(*fill_struct_le).operands()[2] ==
+    from_integer(0xa, four_bits));
+
+  const auto fill_struct_be = bits2expr(*be, st, false, ns);
+  REQUIRE(fill_struct_be.has_value());
+  REQUIRE(
+    to_struct_expr(*fill_struct_be).operands()[1] ==
+    from_integer(0xb, four_bits));
+  REQUIRE(
+    to_struct_expr(*fill_struct_be).operands()[2] ==
+    from_integer(0xe, four_bits));
 }
 
 TEST_CASE("Simplify extractbit", "[core][util]")
