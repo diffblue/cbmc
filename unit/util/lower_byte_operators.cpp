@@ -62,6 +62,16 @@ TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
       bit_array_type};
     const exprt lower_be1 = lower_byte_extract(be1, ns);
     REQUIRE(lower_be1 == *array_of_bits);
+
+    const byte_extract_exprt be2{
+      little_endian ? ID_byte_extract_little_endian
+                    : ID_byte_extract_big_endian,
+      *array_of_bits,
+      from_integer(0, index_type()),
+      config.ansi_c.char_width,
+      u16};
+    const exprt lower_be2 = lower_byte_extract(be2, ns);
+    REQUIRE(lower_be2 == sixteen_bits);
   }
 
   GIVEN("Big endian")
@@ -89,6 +99,16 @@ TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
       bit_array_type};
     const exprt lower_be1 = lower_byte_extract(be1, ns);
     REQUIRE(lower_be1 == *array_of_bits);
+
+    const byte_extract_exprt be2{
+      little_endian ? ID_byte_extract_little_endian
+                    : ID_byte_extract_big_endian,
+      *array_of_bits,
+      from_integer(0, index_type()),
+      config.ansi_c.char_width,
+      u16};
+    const exprt lower_be2 = lower_byte_extract(be2, ns);
+    REQUIRE(lower_be2 == sixteen_bits);
   }
 }
 
@@ -270,6 +290,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
       union_typet({{"compA", u32}, {"compB", u64}}),
       c_enum_typet(u16),
       c_enum_typet(unsignedbv_typet(128)),
+      array_typet{bv_typet{1}, from_integer(128, size_type())},
       array_typet(u8, size),
       array_typet(s32, size),
       array_typet(u64, size),
@@ -426,6 +447,7 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
       union_typet({{"compA", u32}, {"compB", u64}}),
       c_enum_typet(u16),
       c_enum_typet(unsignedbv_typet(128)),
+      array_typet{bv_typet{1}, from_integer(128, size_type())},
       array_typet(u8, size),
       array_typet(s32, size),
       array_typet(u64, size),

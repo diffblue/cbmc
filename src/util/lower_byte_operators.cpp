@@ -563,29 +563,32 @@ static exprt unpack_array_vector(
   // refine the number of elements to extract in case the element width is known
   // and a multiple of bytes; otherwise we will expand the entire array/vector
   optionalt<mp_integer> num_elements = src_size;
-  if(element_bits > 0 && element_bits % bits_per_byte == 0)
+  if(element_bits > 0)
   {
     if(!num_elements.has_value())
     {
       // turn bytes into elements, rounding up
-      num_elements = (*max_bytes + el_bytes - 1) / el_bytes;
+      num_elements =
+        (*max_bytes * bits_per_byte + element_bits - 1) / element_bits;
     }
 
     if(offset_bytes.has_value())
     {
       // compute offset as number of elements
-      first_element = *offset_bytes / el_bytes;
-      // insert offset_bytes-many nil bytes into the output array
+      first_element = *offset_bytes * bits_per_byte / element_bits;
+      // insert offset_bytes-many zero bytes into the output array
       byte_operands.resize(
         numeric_cast_v<std::size_t>(std::min(
-          *offset_bytes - (*offset_bytes % el_bytes),
-          *num_elements * el_bytes)),
+          (*offset_bytes * bits_per_byte -
+           ((*offset_bytes * bits_per_byte) % element_bits)) /
+            bits_per_byte,
+          *num_elements * element_bits / bits_per_byte)),
         from_integer(0, bv_typet{bits_per_byte}));
     }
   }
 
   // the maximum number of bytes is an upper bound in case the size of the
-  // array/vector is unknown; if element_bits was usable above this will
+  // array/vector is unknown; if element_bits was non-zero above this will
   // have been turned into a number of elements already
   if(!num_elements)
     num_elements = *max_bytes;
@@ -595,42 +598,90 @@ static exprt unpack_array_vector(
                              ? to_array_type(src_simp.type()).index_type()
                              : to_vector_type(src_simp.type()).index_type();
 
-  for(mp_integer i = first_element; i < *num_elements; ++i)
+  if(element_bits % bits_per_byte == 0)
   {
-    exprt element;
-
-    if(
-      (src_simp.id() == ID_array || src_simp.id() == ID_vector) &&
-      i < src_simp.operands().size())
+    for(mp_integer i = first_element; i < *num_elements; ++i)
     {
-      const std::size_t index_int = numeric_cast_v<std::size_t>(i);
-      element = src_simp.operands()[index_int];
+      exprt element;
+
+      if(
+        (src_simp.id() == ID_array || src_simp.id() == ID_vector) &&
+        i < src_simp.operands().size())
+      {
+        const std::size_t index_int = numeric_cast_v<std::size_t>(i);
+        element = src_simp.operands()[index_int];
+      }
+      else
+      {
+        element = index_exprt(src_simp, from_integer(i, index_type));
+      }
+
+      // recursively unpack each element so that we eventually just have an
+      // array of bytes left
+
+      const optionalt<mp_integer> element_max_bytes =
+        max_bytes
+          ? std::min(mp_integer{el_bytes}, *max_bytes - byte_operands.size())
+          : optionalt<mp_integer>{};
+      const std::size_t element_max_bytes_int =
+        element_max_bytes ? numeric_cast_v<std::size_t>(*element_max_bytes)
+                          : el_bytes;
+
+      exprt sub = unpack_rec(
+        element, little_endian, {}, element_max_bytes, bits_per_byte, ns, true);
+      exprt::operandst sub_operands = instantiate_byte_array(
+        sub, 0, element_max_bytes_int, bits_per_byte, ns);
+      byte_operands.insert(
+        byte_operands.end(), sub_operands.begin(), sub_operands.end());
+
+      if(max_bytes && byte_operands.size() >= *max_bytes)
+        break;
     }
-    else
+  }
+  else
+  {
+    const std::size_t element_bits_int =
+      numeric_cast_v<std::size_t>(element_bits);
+
+    exprt::operandst elements;
+    for(mp_integer i = *num_elements - 1; i >= first_element; --i)
     {
-      element = index_exprt(src_simp, from_integer(i, index_type));
+      if(
+        (src_simp.id() == ID_array || src_simp.id() == ID_vector) &&
+        i < src_simp.operands().size())
+      {
+        const std::size_t index_int = numeric_cast_v<std::size_t>(i);
+        elements.push_back(typecast_exprt::conditional_cast(
+          src_simp.operands()[index_int], bv_typet{element_bits_int}));
+      }
+      else
+      {
+        elements.push_back(typecast_exprt::conditional_cast(
+          index_exprt(src_simp, from_integer(i, index_type)),
+          bv_typet{element_bits_int}));
+      }
     }
 
-    // recursively unpack each element so that we eventually just have an array
-    // of bytes left
+    const std::size_t merged_bit_width = numeric_cast_v<std::size_t>(
+      (*num_elements - first_element) * element_bits);
+    if(!little_endian)
+      std::reverse(elements.begin(), elements.end());
+    concatenation_exprt merged{std::move(elements), bv_typet{merged_bit_width}};
 
-    const optionalt<mp_integer> element_max_bytes =
-      max_bytes
-        ? std::min(mp_integer{el_bytes}, *max_bytes - byte_operands.size())
-        : optionalt<mp_integer>{};
-    const std::size_t element_max_bytes_int =
-      element_max_bytes ? numeric_cast_v<std::size_t>(*element_max_bytes)
-                        : el_bytes;
+    exprt merged_as_bytes =
+      unpack_rec(merged, little_endian, {}, max_bytes, bits_per_byte, ns, true);
 
-    exprt sub = unpack_rec(
-      element, little_endian, {}, element_max_bytes, bits_per_byte, ns, true);
-    exprt::operandst sub_operands =
-      instantiate_byte_array(sub, 0, element_max_bytes_int, bits_per_byte, ns);
+    const std::size_t merged_byte_width =
+      (merged_bit_width + bits_per_byte - 1) / bits_per_byte;
+    const std::size_t max_bytes_int =
+      max_bytes.has_value()
+        ? std::min(numeric_cast_v<std::size_t>(*max_bytes), merged_byte_width)
+        : merged_byte_width;
+
+    exprt::operandst sub_operands = instantiate_byte_array(
+      merged_as_bytes, 0, max_bytes_int, bits_per_byte, ns);
     byte_operands.insert(
       byte_operands.end(), sub_operands.begin(), sub_operands.end());
-
-    if(max_bytes && byte_operands.size() >= *max_bytes)
-      break;
   }
 
   const std::size_t size = byte_operands.size();
@@ -1120,17 +1171,55 @@ static exprt lower_byte_extract_array_vector(
     for(std::size_t i = 0; i < *num_elements; ++i)
 #pragma GCC diagnostic pop
     {
-      plus_exprt new_offset(
-        unpacked.offset(),
-        from_integer(
-          i * element_bits / src.get_bits_per_byte(),
-          unpacked.offset().type()));
+      if(element_bits % src.get_bits_per_byte() == 0)
+      {
+        plus_exprt new_offset(
+          unpacked.offset(),
+          from_integer(
+            i * element_bits / src.get_bits_per_byte(),
+            unpacked.offset().type()));
 
-      byte_extract_exprt tmp(unpacked);
-      tmp.type() = subtype;
-      tmp.offset() = new_offset;
+        byte_extract_exprt tmp(unpacked);
+        tmp.type() = subtype;
+        tmp.offset() = new_offset;
 
-      operands.push_back(lower_byte_extract(tmp, ns));
+        operands.push_back(lower_byte_extract(tmp, ns));
+      }
+      else
+      {
+        const mp_integer first_index =
+          i * element_bits / src.get_bits_per_byte();
+        const mp_integer last_index =
+          ((i + 1) * element_bits + src.get_bits_per_byte() - 1) /
+          src.get_bits_per_byte();
+
+        exprt::operandst to_concat;
+        to_concat.reserve(
+          numeric_cast_v<std::size_t>(last_index - first_index));
+        for(mp_integer j = first_index; j < last_index; ++j)
+        {
+          to_concat.push_back(index_exprt{
+            unpacked.op(),
+            plus_exprt{
+              unpacked.offset(), from_integer(j, unpacked.offset().type())}});
+        }
+
+        const std::size_t base = numeric_cast_v<std::size_t>(
+          (i * element_bits) % src.get_bits_per_byte());
+        const std::size_t last =
+          numeric_cast_v<std::size_t>(base + element_bits - 1);
+        bv_typet concat_type{src.get_bits_per_byte() * to_concat.size()};
+        endianness_mapt endianness_map(
+          concat_type, src.id() == ID_byte_extract_little_endian, ns);
+        const auto bounds = map_bounds(endianness_map, base, last);
+        extractbits_exprt element{
+          concatenation_exprt{to_concat, std::move(concat_type)},
+          from_integer(bounds.ub, size_type()),
+          from_integer(bounds.lb, size_type()),
+          subtype};
+
+        operands.push_back(element);
+      }
     }
 
     exprt result;
@@ -1153,6 +1242,10 @@ static exprt lower_byte_extract_array_vector(
     "$array_comprehension_index_a" +
       std::to_string(array_comprehension_index_counter),
     array_type.index_type()};
+
+  PRECONDITION_WITH_DIAGNOSTICS(
+    element_bits % src.get_bits_per_byte() == 0,
+    "byte extracting non-byte-aligned arrays requires constant size");
 
   plus_exprt new_offset{
     unpacked.offset(),
@@ -1300,17 +1393,13 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   {
     const typet &subtype = to_type_with_subtype(src.type()).subtype();
 
-    // consider ways of dealing with arrays of unknown subtype size or with a
-    // subtype size that does not fit byte boundaries; currently we fall back to
-    // stitching together consecutive elements down below
     auto element_bits = pointer_offset_bits(subtype, ns);
-    if(
-      element_bits.has_value() && *element_bits >= 1 &&
-      *element_bits % src.get_bits_per_byte() == 0)
-    {
-      return lower_byte_extract_array_vector(
-        src, unpacked, subtype, *element_bits, ns);
-    }
+    PRECONDITION_WITH_DIAGNOSTICS(
+      element_bits.has_value() && *element_bits >= 1,
+      "byte extracting arrays of unknown/zero subtype is not yet implemented");
+
+    return lower_byte_extract_array_vector(
+      src, unpacked, subtype, *element_bits, ns);
   }
   else if(src.type().id() == ID_complex)
   {
