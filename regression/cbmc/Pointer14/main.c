@@ -1,6 +1,4 @@
-typedef unsigned int size_t;
-
-void *malloc(size_t size);
+void *malloc(__CPROVER_size_t);
 
 enum blockstate
 {
