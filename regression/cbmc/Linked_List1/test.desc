@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--unwind 11 --unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
