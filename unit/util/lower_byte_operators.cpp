@@ -426,6 +426,7 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
       union_typet({{"compA", u32}, {"compB", u64}}),
       c_enum_typet(u16),
       c_enum_typet(unsignedbv_typet(128)),
+      array_typet{bv_typet{1}, from_integer(128, size_type())},
       array_typet(u8, size),
       array_typet(s32, size),
       array_typet(u64, size),
