@@ -944,6 +944,84 @@ static exprt unpack_rec(
     {}, array_typet{bv_typet{8}, from_integer(0, size_type())});
 }
 
+/// Rewrite a byte extraction of an array/vector-typed result to byte extraction
+/// of the individual components that make up an \ref array_exprt or
+/// \ref vector_exprt.
+/// \param src: Original byte extract expression
+/// \param unpacked: Byte extraction with root operand expanded into array (via
+///   \ref unpack_rec)
+/// \param subtype: Array/vector element type
+/// \param element_bits: bit width of array/vector elements
+/// \param ns: Namespace
+/// \return An array or vector expression.
+static exprt lower_byte_extract_array_vector(
+  const byte_extract_exprt &src,
+  const byte_extract_exprt &unpacked,
+  const typet &subtype,
+  const mp_integer &element_bits,
+  const namespacet &ns)
+{
+  optionalt<std::size_t> num_elements;
+  if(src.type().id() == ID_array)
+    num_elements = numeric_cast<std::size_t>(to_array_type(src.type()).size());
+  else
+    num_elements = numeric_cast<std::size_t>(to_vector_type(src.type()).size());
+
+  if(num_elements.has_value())
+  {
+    exprt::operandst operands;
+    operands.reserve(*num_elements);
+    for(std::size_t i = 0; i < *num_elements; ++i)
+    {
+      plus_exprt new_offset(
+        unpacked.offset(),
+        from_integer(i * element_bits / 8, unpacked.offset().type()));
+
+      byte_extract_exprt tmp(unpacked);
+      tmp.type() = subtype;
+      tmp.offset() = new_offset;
+
+      operands.push_back(lower_byte_extract(tmp, ns));
+    }
+
+    exprt result;
+    if(src.type().id() == ID_array)
+      result = array_exprt{std::move(operands), to_array_type(src.type())};
+    else
+      result = vector_exprt{std::move(operands), to_vector_type(src.type())};
+
+    return simplify_expr(result, ns);
+  }
+
+  DATA_INVARIANT(src.type().id() == ID_array, "vectors have constant size");
+  const array_typet &array_type = to_array_type(src.type());
+
+  // TODO we either need a symbol table here or make array comprehensions
+  // introduce a scope
+  static std::size_t array_comprehension_index_counter = 0;
+  ++array_comprehension_index_counter;
+  symbol_exprt array_comprehension_index{
+    "$array_comprehension_index_a" +
+      std::to_string(array_comprehension_index_counter),
+    index_type()};
+
+  plus_exprt new_offset{
+    unpacked.offset(),
+    typecast_exprt::conditional_cast(
+      mult_exprt{
+        array_comprehension_index,
+        from_integer(element_bits / 8, array_comprehension_index.type())},
+      unpacked.offset().type())};
+
+  byte_extract_exprt body(unpacked);
+  body.type() = subtype;
+  body.offset() = std::move(new_offset);
+
+  return array_comprehension_exprt{std::move(array_comprehension_index),
+                                   lower_byte_extract(body, ns),
+                                   array_type};
+}
+
 /// Rewrite a byte extraction of a complex-typed result to byte extraction of
 /// the individual components that make up a \ref complex_exprt.
 /// \param src: Original byte extract expression
@@ -1060,10 +1138,9 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     to_bitvector_type(to_type_with_subtype(unpacked.op().type()).subtype())
       .get_width() == 8);
 
-  if(src.type().id()==ID_array)
+  if(src.type().id() == ID_array || src.type().id() == ID_vector)
   {
-    const array_typet &array_type=to_array_type(src.type());
-    const typet &subtype=array_type.subtype();
+    const typet &subtype = to_type_with_subtype(src.type()).subtype();
 
     // consider ways of dealing with arrays of unknown subtype size or with a
     // subtype size that does not fit byte boundaries; currently we fall back to
@@ -1071,86 +1148,8 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     auto element_bits = pointer_offset_bits(subtype, ns);
     if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
-      auto num_elements = numeric_cast<std::size_t>(array_type.size());
-
-      if(num_elements.has_value())
-      {
-        exprt::operandst operands;
-        operands.reserve(*num_elements);
-        for(std::size_t i = 0; i < *num_elements; ++i)
-        {
-          plus_exprt new_offset(
-            unpacked.offset(),
-            from_integer(i * (*element_bits) / 8, unpacked.offset().type()));
-
-          byte_extract_exprt tmp(unpacked);
-          tmp.type() = subtype;
-          tmp.offset() = new_offset;
-
-          operands.push_back(lower_byte_extract(tmp, ns));
-        }
-
-        return simplify_expr(array_exprt(std::move(operands), array_type), ns);
-      }
-      else
-      {
-        // TODO we either need a symbol table here or make array comprehensions
-        // introduce a scope
-        static std::size_t array_comprehension_index_counter = 0;
-        ++array_comprehension_index_counter;
-        symbol_exprt array_comprehension_index{
-          "$array_comprehension_index_a" +
-            std::to_string(array_comprehension_index_counter),
-          index_type()};
-
-        plus_exprt new_offset{
-          unpacked.offset(),
-          typecast_exprt::conditional_cast(
-            mult_exprt{array_comprehension_index,
-                       from_integer(
-                         *element_bits / 8, array_comprehension_index.type())},
-            unpacked.offset().type())};
-
-        byte_extract_exprt body(unpacked);
-        body.type() = subtype;
-        body.offset() = std::move(new_offset);
-
-        return array_comprehension_exprt{std::move(array_comprehension_index),
-                                         lower_byte_extract(body, ns),
-                                         array_type};
-      }
-    }
-  }
-  else if(src.type().id() == ID_vector)
-  {
-    const vector_typet &vector_type = to_vector_type(src.type());
-    const typet &subtype = vector_type.subtype();
-
-    // consider ways of dealing with vectors of unknown subtype size or with a
-    // subtype size that does not fit byte boundaries; currently we fall back to
-    // stitching together consecutive elements down below
-    auto element_bits = pointer_offset_bits(subtype, ns);
-    if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
-    {
-      const std::size_t num_elements =
-        numeric_cast_v<std::size_t>(vector_type.size());
-
-      exprt::operandst operands;
-      operands.reserve(num_elements);
-      for(std::size_t i = 0; i < num_elements; ++i)
-      {
-        plus_exprt new_offset(
-          unpacked.offset(),
-          from_integer(i * (*element_bits) / 8, unpacked.offset().type()));
-
-        byte_extract_exprt tmp(unpacked);
-        tmp.type() = subtype;
-        tmp.offset() = simplify_expr(new_offset, ns);
-
-        operands.push_back(lower_byte_extract(tmp, ns));
-      }
-
-      return simplify_expr(vector_exprt(std::move(operands), vector_type), ns);
+      return lower_byte_extract_array_vector(
+        src, unpacked, subtype, *element_bits, ns);
     }
   }
   else if(src.type().id() == ID_complex)
