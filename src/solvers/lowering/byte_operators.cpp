@@ -50,10 +50,7 @@ static boundst map_bounds(
 
     // big-endian bounds need swapping
     if(result.ub < result.lb)
-    {
-      result.lb = endianness_map.number_of_bits() - result.lb - 1;
-      result.ub = endianness_map.number_of_bits() - result.ub - 1;
-    }
+      std::swap(result.lb, result.ub);
   }
 
   return result;
@@ -1295,7 +1292,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     concatenation_exprt concatenation(
       std::move(op), bitvector_typet(subtype->id(), width_bytes * 8));
 
-    endianness_mapt map(src.type(), little_endian, ns);
+    endianness_mapt map(concatenation.type(), little_endian, ns);
     return bv_to_expr(concatenation, src.type(), map, ns);
   }
 }
@@ -2226,22 +2223,16 @@ static exprt lower_byte_update(
     // original_bits |= newvalue
     bitor_exprt bitor_expr{bitand_expr, value_shifted};
 
-    if(!is_little_endian && bit_width > type_bits)
+    if(bit_width > type_bits)
     {
+      endianness_mapt endianness_map(
+        bitor_expr.type(), src.id() == ID_byte_update_little_endian, ns);
+      const auto bounds = map_bounds(endianness_map, 0, type_bits - 1);
+
       return simplify_expr(
         typecast_exprt::conditional_cast(
-          extractbits_exprt{bitor_expr,
-                            bit_width - 1,
-                            bit_width - type_bits,
-                            bv_typet{type_bits}},
-          src.type()),
-        ns);
-    }
-    else if(bit_width > type_bits)
-    {
-      return simplify_expr(
-        typecast_exprt::conditional_cast(
-          extractbits_exprt{bitor_expr, type_bits - 1, 0, bv_typet{type_bits}},
+          extractbits_exprt{
+            bitor_expr, bounds.ub, bounds.lb, bv_typet{type_bits}},
           src.type()),
         ns);
     }
