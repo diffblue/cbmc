@@ -53,12 +53,10 @@ void endianness_mapt::build_big_endian(const typet &src)
 {
   if(src.id() == ID_c_enum_tag)
     build_big_endian(ns.follow_tag(to_c_enum_tag_type(src)));
-  else if(src.id()==ID_unsignedbv ||
-          src.id()==ID_signedbv ||
-          src.id()==ID_fixedbv ||
-          src.id()==ID_floatbv ||
-          src.id()==ID_c_enum ||
-          src.id()==ID_c_bit_field)
+  else if(
+    src.id() == ID_unsignedbv || src.id() == ID_signedbv ||
+    src.id() == ID_fixedbv || src.id() == ID_floatbv || src.id() == ID_c_enum ||
+    src.id() == ID_c_bit_field || src.id() == ID_bv)
   {
     // these do get re-ordered!
     auto bits = pointer_offset_bits(src, ns); // error is -1
