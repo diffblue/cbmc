@@ -758,7 +758,7 @@ float sqrtf(float f)
     case FE_TOWARDZERO :
       return (f - lowerSquare == 0.0f) ? lower : upper; break;
     default:;
-      //assert(0);
+      return __VERIFIER_nondet_float();
     }
 
   }
@@ -835,7 +835,7 @@ double sqrt(double d)
     case FE_TOWARDZERO:
       return (d - lowerSquare == 0.0) ? lower : upper; break;
     default:;
-      //assert(0);
+      return __VERIFIER_nondet_double();
     }
 
   }
@@ -906,7 +906,7 @@ long double sqrtl(long double d)
     case FE_TOWARDZERO:
       return (d - lowerSquare == 0.0l) ? lower : upper; break;
     default:;
-      //assert(0);
+      return __VERIFIER_nondet_long_double();
     }
 
   }
