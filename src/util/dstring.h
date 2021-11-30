@@ -27,8 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// copies of the same string you only have to store the whole string once,
 /// which saves space.
 ///
-/// `irep_idt` and `irep_namet` are typedef-ed to \ref dstringt in irep.h unless
-/// `USE_STD_STRING` is set.
+/// `irep_idt` is typedef-ed to \ref dstringt in irep.h unless `USE_STD_STRING`
+/// is set.
 ///
 ///
 /// Note: Marked final to disable inheritance. No virtual destructor, so

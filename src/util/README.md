@@ -72,14 +72,12 @@ standard data structures as in irept.
 
 \subsection irep_idt_section Strings: dstringt, the string_container and the ID_*
 
-Within cbmc, strings are represented using \ref irep_idt or \ref irep_namet
-for keys to [named_sub](\ref irept::dt::named_sub). By default these are both
-typedefed to \ref dstringt. For debugging purposes you can set `USE_STD_STRING`,
-in which case they are both typedefed to `std::string`. You can also easily
-convert an [irep_idt](\ref irep_idt) or [irep_namet](\ref irep_namet) to a
-`std::string` using the [id2string](\ref id2string) or
-[name2string](\ref name2string) function, respectively, or either of them to a
-`char*` using the [c_str()](\ref dstringt::c_str) member function.
+Within cbmc, strings are represented using \ref irep_idt. By default this is
+typedefed to \ref dstringt. For debugging purposes you can set `USE_STD_STRING`
+to change this typedef to `std::string`. You can also easily convert an
+[irep_idt](\ref irep_idt) to a `std::string` using the
+[id2string](\ref id2string) function, or to a `char*` using the
+[c_str()](\ref dstringt::c_str) member function.
 
 \ref dstringt stores a string as an index into a large
 static table of strings. This makes it easy to compare if two

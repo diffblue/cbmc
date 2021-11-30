@@ -78,7 +78,7 @@ void irep2lisp(const irept &src, lispexprt &dest)
   {
     lispexprt name;
     name.type=lispexprt::String;
-    name.value = name2string(irep_entry.first);
+    name.value = id2string(irep_entry.first);
     dest.push_back(name);
 
     lispexprt sub;

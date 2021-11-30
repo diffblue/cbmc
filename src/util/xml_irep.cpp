@@ -34,7 +34,7 @@ void convert(
     if(!irept::is_comment(irep_entry.first))
     {
       xmlt &x_nsub = xml.new_element("named_sub");
-      x_nsub.set_attribute("name", name2string(irep_entry.first));
+      x_nsub.set_attribute("name", id2string(irep_entry.first));
       convert(irep_entry.second, x_nsub);
     }
   }
@@ -44,7 +44,7 @@ void convert(
     if(!irept::is_comment(irep_entry.first))
     {
       xmlt &x_com = xml.new_element("comment");
-      x_com.set_attribute("name", name2string(irep_entry.first));
+      x_com.set_attribute("name", id2string(irep_entry.first));
       convert(irep_entry.second, x_com);
     }
   }
