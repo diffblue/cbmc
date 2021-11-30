@@ -4,8 +4,8 @@ char *p1;
 
 void main()
 {
-  __CPROVER_POINTER_OBJECT(p1);
+  __CPROVER_r_ok(p1, 1);
 
   char *p2 = NULL;
-  __CPROVER_POINTER_OBJECT(p2);
+  __CPROVER_r_ok(p2, 1);
 }

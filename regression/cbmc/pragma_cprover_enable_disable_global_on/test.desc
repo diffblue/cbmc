@@ -2,42 +2,18 @@ CORE
 main.c
 --pointer-primitive-check
 ^main.c function main$
-^\[main.pointer_primitives.\d+\] line 11 pointer invalid in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 11 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 11 dead object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 11 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 11 pointer invalid in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 11 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 11 dead object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 11 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 23 pointer invalid in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 23 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 23 dead object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 23 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 23 pointer invalid in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 23 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 23 dead object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 23 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 33 pointer invalid in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 33 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 33 dead object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 33 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 33 pointer invalid in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 33 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 33 dead object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 33 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 38 pointer invalid in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 38 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 38 dead object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 38 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 38 pointer invalid in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 38 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 38 dead object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
-^\[main.pointer_primitives.\d+\] line 38 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 8 pointer invalid in R_OK\(p, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 8 pointer outside object bounds in R_OK\(p, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 20 pointer invalid in R_OK\(r, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 20 pointer outside object bounds in R_OK\(r, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 30 pointer invalid in R_OK\(t, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 30 pointer outside object bounds in R_OK\(t, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 35 pointer invalid in R_OK\(v, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 35 pointer outside object bounds in R_OK\(v, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
-^\[main.pointer_primitives.\d+\] line 17
-^\[main.pointer_primitives.\d+\] line 28
+^\[main.pointer_primitives.\d+\] line 14
+^\[main.pointer_primitives.\d+\] line 25
 --

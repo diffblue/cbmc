@@ -34,10 +34,10 @@ int main()
     float x;
     float y;
     ABC e;
-    bool same;
+    bool readable;
     char i;
     signed int j;
-    same = __CPROVER_same_object(p, q);
+    readable = __CPROVER_r_ok(q, 1);
     q = p + 2000000000000;
     q = r;
     if(nondet_bool())
@@ -71,10 +71,10 @@ int main()
     float x;
     float y;
     ABC e;
-    bool same;
+    bool readable;
     char i;
     signed int j;
-    same = __CPROVER_same_object(p, q);
+    readable = __CPROVER_r_ok(q, 1);
     q = p + 2000000000000;
     q = r;
     if(nondet_bool())
