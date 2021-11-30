@@ -1,0 +1,19 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[body_1.\d+\] .* Check that j is assignable: SUCCESS$
+^\[body_2.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[body_3.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[incr.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[main.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.\d+\] .* assertion j == 9: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks write set inclusion checks in presence of function calls,
+which are inlined, and also checks that DEAD instructions introduced during
+inlining is correctly handled.

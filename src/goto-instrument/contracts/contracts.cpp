@@ -189,6 +189,10 @@ void code_contractst::check_apply_loop_contracts(
       insert_before_swap_and_advance(
         goto_function.body, loop_head, snapshot_instructions);
     };
+
+    // Perform write set instrumentation on the entire loop.
+    check_frame_conditions(
+      function_name, goto_function.body, loop_head, loop_end, loop_assigns);
   }
 
   havoc_assigns_targetst havoc_gen(modifies, ns);
@@ -251,28 +255,27 @@ void code_contractst::check_apply_loop_contracts(
 
   // Assume invariant & decl the variant temporaries (just before loop guard).
   // Use insert_before_swap to preserve jumps to loop head.
-  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_head,
+    add_pragma_disable_assigns_check(generated_code));
 
   // Forward the loop_head iterator until the start of the body.
   // This is necessary because complex C loop_head conditions could be
   // converted to multiple GOTO instructions (e.g. temporaries are introduced).
+  // If the loop_head location shifts to a different function,
+  // assume that it's an inlined function and keep skipping.
   // FIXME: This simple approach wouldn't work when
   // the loop guard in the source file is split across multiple lines.
   const auto head_loc = loop_head->source_location();
-  while(loop_head->source_location() == head_loc)
+  while(loop_head->source_location() == head_loc ||
+        loop_head->source_location().get_function() != head_loc.get_function())
     loop_head++;
 
   // At this point, we are just past the loop head,
   // so at the beginning of the loop body.
   auto loop_body = loop_head;
   loop_head--;
-
-  // Perform write set instrumentation before adding anything else to loop body.
-  if(assigns.is_not_nil())
-  {
-    check_frame_conditions(
-      function_name, goto_function.body, loop_body, loop_end, loop_assigns);
-  }
 
   // Generate: assignments to store the multidimensional decreases clause's
   // value just before the loop body (but just after the loop guard)
@@ -287,7 +290,8 @@ void code_contractst::check_apply_loop_contracts(
       converter.goto_convert(old_decreases_assignment, generated_code, mode);
     }
 
-    goto_function.body.destructive_insert(loop_body, generated_code);
+    goto_function.body.destructive_insert(
+      loop_body, add_pragma_disable_assigns_check(generated_code));
   }
 
   // Generate: assert(invariant) just after the loop exits
@@ -337,7 +341,10 @@ void code_contractst::check_apply_loop_contracts(
     }
   }
 
-  insert_before_swap_and_advance(goto_function.body, loop_end, generated_code);
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_end,
+    add_pragma_disable_assigns_check(generated_code));
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->turn_into_assume();
@@ -678,6 +685,12 @@ void code_contractst::apply_loop_contract(
   local_may_aliast local_may_alias(goto_function);
   natural_loops_mutablet natural_loops(goto_function.body);
 
+  if(!natural_loops.loop_map.size())
+    return;
+
+  goto_function_inline(
+    goto_functions, function_name, ns, log.get_message_handler());
+
   // A graph node type that stores information about a loop.
   // We create a DAG representing nesting of various loops in goto_function,
   // sort them topologically, and instrument them in the top-sorted order.
@@ -992,7 +1005,11 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
       function_obj->second.body, instruction_it, snapshot_instructions);
   };
 
-  // Insert aliasing assertions
+  // Inline all function calls.
+  goto_function_inline(
+    goto_functions, function_obj->first, ns, log.get_message_handler());
+
+  // Insert write set inclusion checks.
   check_frame_conditions(
     function_obj->first,
     function_obj->second.body,
@@ -1010,8 +1027,6 @@ void code_contractst::check_frame_conditions(
   const goto_programt::targett &instruction_end,
   assigns_clauset &assigns)
 {
-  goto_function_inline(goto_functions, function, ns, log.get_message_handler());
-
   for(; instruction_it != instruction_end; ++instruction_it)
   {
     const auto &pragmas = instruction_it->source_location().get_pragmas();
@@ -1054,20 +1069,28 @@ void code_contractst::check_frame_conditions(
         assigns_clauset::conditional_address_ranget{assigns, symbol});
       if(symbol_car != assigns.get_write_set().end())
       {
-        instruction_it++;
         auto invalidation_assignment = goto_programt::make_assignment(
           symbol_car->validity_condition_var,
           false_exprt{},
           instruction_it->source_location());
-        // note that instruction_it is not advanced by this call,
-        // so no need to move it backwards
-        body.insert_before_swap(instruction_it, invalidation_assignment);
+        // note that the CAR must be invalidated _after_ the DEAD instruction
+        body.insert_after(
+          instruction_it,
+          add_pragma_disable_assigns_check(invalidation_assignment));
       }
       else
       {
-        throw incorrect_goto_program_exceptiont(
-          "Found a `DEAD` variable without corresponding `DECL`!",
-          instruction_it->source_location());
+        // For loops, the loop_head appears after the DECL of counters,
+        // and any other temporaries introduced during "initialization".
+        // However, they go `DEAD` (possible conditionally) inside the loop,
+        // in presence of return statements.
+        // Notice that for them those variables be writable,
+        // they must appear as assigns targets anyway,
+        // but their DECL statements are outside of the loop.
+        log.warning() << "Found a `DEAD` variable "
+                      << name2string(symbol.get_identifier())
+                      << " without corresponding `DECL`, at: "
+                      << instruction_it->source_location() << messaget::eom;
       }
     }
     else if(
