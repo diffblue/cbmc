@@ -1,4 +1,4 @@
-void *malloc(unsigned int s);
+void *malloc(__CPROVER_size_t s);
 
 struct nodet
 {
