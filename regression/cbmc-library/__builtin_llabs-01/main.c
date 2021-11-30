@@ -1,9 +1,13 @@
 #include <assert.h>
-#include <stdlib.h>
+
+#include <limits.h>
+
+#ifndef __GNUC__
+long long __builtin_llabs(long long);
+#endif
 
 int main()
 {
-  __builtin_llabs();
-  assert(0);
+  assert(__builtin_llabs(LLONG_MIN + 1) == LLONG_MAX);
   return 0;
 }

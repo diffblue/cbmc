@@ -84,7 +84,7 @@ int __CPROVER_isunorderedd(double f, double g);
 // absolute value
 int __CPROVER_abs(int x);
 long int __CPROVER_labs(long int x);
-long int __CPROVER_llabs(long long int x);
+long long int __CPROVER_llabs(long long int x);
 double __CPROVER_fabs(double x);
 long double __CPROVER_fabsl(long double x);
 float __CPROVER_fabsf(float x);
