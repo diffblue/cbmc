@@ -812,7 +812,11 @@ void jbmc_parse_optionst::process_goto_function(
 
   // add generic checks
   goto_check(
-    function.get_function_id(), function.get_goto_function(), ns, options);
+    function.get_function_id(),
+    function.get_goto_function(),
+    ns,
+    options,
+    ui_message_handler);
 
   // Replace Java new side effects
   remove_java_new(

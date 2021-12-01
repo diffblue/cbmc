@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
+#include <util/message.h>
 #include <util/options.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -48,9 +49,9 @@ class goto_checkt
 public:
   goto_checkt(
     const namespacet &_ns,
-    const optionst &_options):
-    ns(_ns),
-    local_bitvector_analysis(nullptr)
+    const optionst &_options,
+    message_handlert &_message_handler)
+    : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
   {
     no_enum_check = false;
     enable_bounds_check=_options.get_bool_option("bounds-check");
@@ -99,6 +100,8 @@ protected:
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
   guard_managert guard_manager;
+  messaget log;
+
   bool no_enum_check;
 
   /// Check an address-of expression:
@@ -2378,18 +2381,20 @@ void goto_check(
   const irep_idt &function_identifier,
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
-  const optionst &options)
+  const optionst &options,
+  message_handlert &message_handler)
 {
-  goto_checkt goto_check(ns, options);
+  goto_checkt goto_check(ns, options, message_handler);
   goto_check.goto_check(function_identifier, goto_function);
 }
 
 void goto_check(
   const namespacet &ns,
   const optionst &options,
-  goto_functionst &goto_functions)
+  goto_functionst &goto_functions,
+  message_handlert &message_handler)
 {
-  goto_checkt goto_check(ns, options);
+  goto_checkt goto_check(ns, options, message_handler);
 
   goto_check.collect_allocations(goto_functions);
 
@@ -2401,8 +2406,9 @@ void goto_check(
 
 void goto_check(
   const optionst &options,
-  goto_modelt &goto_model)
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
   const namespacet ns(goto_model.symbol_table);
-  goto_check(ns, options, goto_model.goto_functions);
+  goto_check(ns, options, goto_model.goto_functions, message_handler);
 }
