@@ -505,6 +505,23 @@ void value_sett::get_value_set_rec(
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
+  else if(expr.id() == ID_nondet_symbol)
+  {
+    if(expr.type().id() == ID_pointer)
+    {
+      // we'll take the union of all objects we see, with unspecified offsets
+      values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
+        for(const auto &object : value.object_map.read())
+          insert(dest, object.first, offsett());
+      });
+
+      // we'll add null, in case it's not there yet
+      insert(
+        dest,
+        exprt(ID_null_object, to_pointer_type(expr_type).subtype()),
+        offsett());
+    }
+  }
   else if(expr.id()==ID_if)
   {
     get_value_set_rec(
@@ -984,7 +1001,6 @@ void value_sett::get_value_set_rec(
   }
   else
   {
-    // for example: expr.id() == ID_nondet_symbol
     insert(dest, exprt(ID_unknown, original_type));
   }
 
