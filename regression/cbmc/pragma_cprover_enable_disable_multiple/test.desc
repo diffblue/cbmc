@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^file main.c line \d+ function main: Found enable and disable pragmas for pointer-primitive-check
+^file main.c line \d+ function main: syntax error before ' check enable "pointer-primitive"'
+^PARSING ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^file main.c line \d+ function main: Found enable and disable pragmas for pointer-overflow-check
+--
