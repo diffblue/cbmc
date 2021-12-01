@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_PARSER_H
 #define CPROVER_ANSI_C_ANSI_C_PARSER_H
 
-#include <set>
+#include <map>
 
 #include <util/parser.h>
 #include <util/config.h>
@@ -53,7 +53,7 @@ public:
     parenthesis_counter=0;
     string_literal.clear();
     pragma_pack.clear();
-    pragma_cprover.clear();
+    pragma_cprover_stack.clear();
 
     // set up global scope
     scopes.clear();
@@ -66,7 +66,6 @@ public:
   unsigned parenthesis_counter;
   std::string string_literal;
   std::list<exprt> pragma_pack;
-  std::list<std::set<irep_idt>> pragma_cprover;
 
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
@@ -143,15 +142,28 @@ public:
     return identifier;
   }
 
-  void set_pragma_cprover()
-  {
-    source_location.remove(ID_pragma);
-    for(const auto &pragma_set : pragma_cprover)
-    {
-      for(const auto &pragma : pragma_set)
-        source_location.add_pragma(pragma);
-    }
-  }
+  /// \brief True iff the CPROVER pragma stack is empty
+  bool pragma_cprover_empty();
+
+  /// \brief Pushes an empty level in the CPROVER pragma stack
+  void pragma_cprover_push();
+
+  /// \brief Pops a level in the CPROVER pragma stack
+  void pragma_cprover_pop();
+
+  /// \brief Adds a check to the CPROVER pragma stack
+  void pragma_cprover_add_check(const irep_idt &name, bool enabled);
+
+  /// Returns true iff the same check with  polarity
+  /// is already present at top of the stack
+  bool pragma_cprover_clash(const irep_idt &name, bool enabled);
+
+  /// \brief Tags \ref source_location with
+  /// the current CPROVER pragma stack
+  void set_pragma_cprover();
+
+private:
+  std::list<std::map<const irep_idt, bool>> pragma_cprover_stack;
 };
 
 extern ansi_c_parsert ansi_c_parser;
