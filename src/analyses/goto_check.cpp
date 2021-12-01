@@ -1916,36 +1916,62 @@ void goto_checkt::goto_check(
     current_target = it;
     goto_programt::instructiont &i=*it;
 
-    flag_resett flag_resetter;
+    flag_resett resetter(i);
     const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
       if(d.first == "disable:bounds-check")
-        flag_resetter.set_flag(enable_bounds_check, false);
+        resetter.set_flag(enable_bounds_check, false, d.first);
       else if(d.first == "disable:pointer-check")
-        flag_resetter.set_flag(enable_pointer_check, false);
+        resetter.set_flag(enable_pointer_check, false, d.first);
       else if(d.first == "disable:memory-leak-check")
-        flag_resetter.set_flag(enable_memory_leak_check, false);
+        resetter.set_flag(enable_memory_leak_check, false, d.first);
       else if(d.first == "disable:div-by-zero-check")
-        flag_resetter.set_flag(enable_div_by_zero_check, false);
+        resetter.set_flag(enable_div_by_zero_check, false, d.first);
       else if(d.first == "disable:enum-range-check")
-        flag_resetter.set_flag(enable_enum_range_check, false);
+        resetter.set_flag(enable_enum_range_check, false, d.first);
       else if(d.first == "disable:signed-overflow-check")
-        flag_resetter.set_flag(enable_signed_overflow_check, false);
+        resetter.set_flag(enable_signed_overflow_check, false, d.first);
       else if(d.first == "disable:unsigned-overflow-check")
-        flag_resetter.set_flag(enable_unsigned_overflow_check, false);
+        resetter.set_flag(enable_unsigned_overflow_check, false, d.first);
       else if(d.first == "disable:pointer-overflow-check")
-        flag_resetter.set_flag(enable_pointer_overflow_check, false);
+        resetter.set_flag(enable_pointer_overflow_check, false, d.first);
       else if(d.first == "disable:float-overflow-check")
-        flag_resetter.set_flag(enable_float_overflow_check, false);
+        resetter.set_flag(enable_float_overflow_check, false, d.first);
       else if(d.first == "disable:conversion-check")
-        flag_resetter.set_flag(enable_conversion_check, false);
+        resetter.set_flag(enable_conversion_check, false, d.first);
       else if(d.first == "disable:undefined-shift-check")
-        flag_resetter.set_flag(enable_undefined_shift_check, false);
+        resetter.set_flag(enable_undefined_shift_check, false, d.first);
       else if(d.first == "disable:nan-check")
-        flag_resetter.set_flag(enable_nan_check, false);
+        resetter.set_flag(enable_nan_check, false, d.first);
       else if(d.first == "disable:pointer-primitive-check")
-        flag_resetter.set_flag(enable_pointer_primitive_check, false);
+        resetter.set_flag(enable_pointer_primitive_check, false, d.first);
+      else if(d.first == "enable:bounds-check")
+        resetter.set_flag(enable_bounds_check, true, d.first);
+      else if(d.first == "enable:pointer-check")
+        resetter.set_flag(enable_pointer_check, true, d.first);
+      else if(d.first == "enable:memory_leak-check")
+        resetter.set_flag(enable_memory_leak_check, true, d.first);
+      else if(d.first == "enable:div-by-zero-check")
+        resetter.set_flag(enable_div_by_zero_check, true, d.first);
+      else if(d.first == "enable:enum-range-check")
+        resetter.set_flag(enable_enum_range_check, true, d.first);
+      else if(d.first == "enable:signed-overflow-check")
+        resetter.set_flag(enable_signed_overflow_check, true, d.first);
+      else if(d.first == "enable:unsigned-overflow-check")
+        resetter.set_flag(enable_unsigned_overflow_check, true, d.first);
+      else if(d.first == "enable:pointer-overflow-check")
+        resetter.set_flag(enable_pointer_overflow_check, true, d.first);
+      else if(d.first == "enable:float-overflow-check")
+        resetter.set_flag(enable_float_overflow_check, true, d.first);
+      else if(d.first == "enable:conversion-check")
+        resetter.set_flag(enable_conversion_check, true, d.first);
+      else if(d.first == "enable:undefined-shift-check")
+        resetter.set_flag(enable_undefined_shift_check, true, d.first);
+      else if(d.first == "enable:nan-check")
+        resetter.set_flag(enable_nan_check, true, d.first);
+      else if(d.first == "enable:pointer-primitive-check")
+        resetter.set_flag(enable_pointer_primitive_check, true, d.first);
     }
 
     new_code.clear();
@@ -2012,8 +2038,8 @@ void goto_checkt::goto_check(
       // Reset the no_enum_check with the flag reset for exception
       // safety
       {
-        flag_resett no_enum_check_flag_resetter;
-        no_enum_check_flag_resetter.set_flag(no_enum_check, true);
+        flag_resett resetter(i);
+        resetter.set_flag(no_enum_check, true, "no_enum_check");
         check(assign_lhs);
       }
 
