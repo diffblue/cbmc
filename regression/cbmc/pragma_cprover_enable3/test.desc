@@ -1,0 +1,18 @@
+CORE
+main.c
+
+^main.c function main$
+^\[main.pointer_primitives.\d+\] line 11 pointer invalid in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
+^\[main.pointer_primitives.\d+\] line 11 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
+^\[main.pointer_primitives.\d+\] line 11 dead object in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
+^\[main.pointer_primitives.\d+\] line 11 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p\): SUCCESS$
+^\[main.pointer_primitives.\d+\] line 11 pointer invalid in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 11 deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
+^\[main.pointer_primitives.\d+\] line 11 dead object in POINTER_OBJECT\(\(const void \*\)q\): SUCCESS$
+^\[main.pointer_primitives.\d+\] line 11 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)q\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^\[main.pointer_primitives.\d+\] line 17
+--

@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
+#include <util/message.h>
 #include <util/options.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -48,9 +49,9 @@ class goto_checkt
 public:
   goto_checkt(
     const namespacet &_ns,
-    const optionst &_options):
-    ns(_ns),
-    local_bitvector_analysis(nullptr)
+    const optionst &_options,
+    message_handlert &_message_handler)
+    : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
   {
     no_enum_check = false;
     enable_bounds_check=_options.get_bool_option("bounds-check");
@@ -99,6 +100,8 @@ protected:
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
   guard_managert guard_manager;
+  messaget log;
+
   bool no_enum_check;
 
   /// Check an address-of expression:
@@ -289,12 +292,6 @@ protected:
 void goto_checkt::collect_allocations(
   const goto_functionst &goto_functions)
 {
-  if(
-    !enable_pointer_check && !enable_bounds_check &&
-    !enable_pointer_overflow_check)
-  {
-    return;
-  }
 
   for(const auto &gf_entry : goto_functions.function_map)
   {
@@ -1851,22 +1848,42 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
     return {};
 }
 
-/// Set a Boolean flag to a new value (via `set_flag`) and restore the previous
-/// value when the entire object goes out of scope.
+/// \brief Set a Boolean flag to a new value (via `set_flag`) and restore
+/// the previous value when the entire object goes out of scope.
+///
+/// \remarks Calls to set_value are tracked to allow detecting doubles sets
+/// with different values and trigger an INVARIANT.
 class flag_resett
 {
 public:
-  /// Store the current value of \p flag and then set its value to \p new_value.
-  void set_flag(bool &flag, bool new_value)
+  explicit flag_resett(const goto_programt::instructiont &_instruction)
+    : instruction(_instruction)
   {
+  }
+
+  /// \brief Store the current value of \p flag and
+  /// then set its value to \p new_value.
+  ///
+  /// \remarks an INVARIANT triggers iff the flag is set
+  /// more than once with different values.
+  void set_flag(bool &flag, bool new_value, const irep_idt &flag_name)
+  {
+    bool seen = flags_to_reset.find(&flag) != flags_to_reset.end();
+    INVARIANT(
+      !(seen && flag != new_value),
+      "Flag " + id2string(flag_name) +
+        " set twice with incompatible values "
+        " at \n" +
+        instruction.source_location().pretty());
     if(flag != new_value)
     {
-      flags_to_reset.emplace_back(&flag, flag);
+      flags_to_reset.emplace(&flag, flag);
       flag = new_value;
     }
   }
 
-  /// Restore the values of all flags that have been modified via `set_flag`.
+  /// \brief Restore the values of all flags that have been
+  /// modified via `set_flag`.
   ~flag_resett()
   {
     for(const auto &flag_pair : flags_to_reset)
@@ -1874,7 +1891,8 @@ public:
   }
 
 private:
-  std::list<std::pair<bool *, bool>> flags_to_reset;
+  const goto_programt::instructiont &instruction;
+  std::map<bool *, bool> flags_to_reset;
 };
 
 void goto_checkt::goto_check(
@@ -1898,36 +1916,62 @@ void goto_checkt::goto_check(
     current_target = it;
     goto_programt::instructiont &i=*it;
 
-    flag_resett flag_resetter;
+    flag_resett resetter(i);
     const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
       if(d.first == "disable:bounds-check")
-        flag_resetter.set_flag(enable_bounds_check, false);
+        resetter.set_flag(enable_bounds_check, false, d.first);
       else if(d.first == "disable:pointer-check")
-        flag_resetter.set_flag(enable_pointer_check, false);
+        resetter.set_flag(enable_pointer_check, false, d.first);
       else if(d.first == "disable:memory-leak-check")
-        flag_resetter.set_flag(enable_memory_leak_check, false);
+        resetter.set_flag(enable_memory_leak_check, false, d.first);
       else if(d.first == "disable:div-by-zero-check")
-        flag_resetter.set_flag(enable_div_by_zero_check, false);
+        resetter.set_flag(enable_div_by_zero_check, false, d.first);
       else if(d.first == "disable:enum-range-check")
-        flag_resetter.set_flag(enable_enum_range_check, false);
+        resetter.set_flag(enable_enum_range_check, false, d.first);
       else if(d.first == "disable:signed-overflow-check")
-        flag_resetter.set_flag(enable_signed_overflow_check, false);
+        resetter.set_flag(enable_signed_overflow_check, false, d.first);
       else if(d.first == "disable:unsigned-overflow-check")
-        flag_resetter.set_flag(enable_unsigned_overflow_check, false);
+        resetter.set_flag(enable_unsigned_overflow_check, false, d.first);
       else if(d.first == "disable:pointer-overflow-check")
-        flag_resetter.set_flag(enable_pointer_overflow_check, false);
+        resetter.set_flag(enable_pointer_overflow_check, false, d.first);
       else if(d.first == "disable:float-overflow-check")
-        flag_resetter.set_flag(enable_float_overflow_check, false);
+        resetter.set_flag(enable_float_overflow_check, false, d.first);
       else if(d.first == "disable:conversion-check")
-        flag_resetter.set_flag(enable_conversion_check, false);
+        resetter.set_flag(enable_conversion_check, false, d.first);
       else if(d.first == "disable:undefined-shift-check")
-        flag_resetter.set_flag(enable_undefined_shift_check, false);
+        resetter.set_flag(enable_undefined_shift_check, false, d.first);
       else if(d.first == "disable:nan-check")
-        flag_resetter.set_flag(enable_nan_check, false);
+        resetter.set_flag(enable_nan_check, false, d.first);
       else if(d.first == "disable:pointer-primitive-check")
-        flag_resetter.set_flag(enable_pointer_primitive_check, false);
+        resetter.set_flag(enable_pointer_primitive_check, false, d.first);
+      else if(d.first == "enable:bounds-check")
+        resetter.set_flag(enable_bounds_check, true, d.first);
+      else if(d.first == "enable:pointer-check")
+        resetter.set_flag(enable_pointer_check, true, d.first);
+      else if(d.first == "enable:memory_leak-check")
+        resetter.set_flag(enable_memory_leak_check, true, d.first);
+      else if(d.first == "enable:div-by-zero-check")
+        resetter.set_flag(enable_div_by_zero_check, true, d.first);
+      else if(d.first == "enable:enum-range-check")
+        resetter.set_flag(enable_enum_range_check, true, d.first);
+      else if(d.first == "enable:signed-overflow-check")
+        resetter.set_flag(enable_signed_overflow_check, true, d.first);
+      else if(d.first == "enable:unsigned-overflow-check")
+        resetter.set_flag(enable_unsigned_overflow_check, true, d.first);
+      else if(d.first == "enable:pointer-overflow-check")
+        resetter.set_flag(enable_pointer_overflow_check, true, d.first);
+      else if(d.first == "enable:float-overflow-check")
+        resetter.set_flag(enable_float_overflow_check, true, d.first);
+      else if(d.first == "enable:conversion-check")
+        resetter.set_flag(enable_conversion_check, true, d.first);
+      else if(d.first == "enable:undefined-shift-check")
+        resetter.set_flag(enable_undefined_shift_check, true, d.first);
+      else if(d.first == "enable:nan-check")
+        resetter.set_flag(enable_nan_check, true, d.first);
+      else if(d.first == "enable:pointer-primitive-check")
+        resetter.set_flag(enable_pointer_primitive_check, true, d.first);
     }
 
     new_code.clear();
@@ -1994,8 +2038,8 @@ void goto_checkt::goto_check(
       // Reset the no_enum_check with the flag reset for exception
       // safety
       {
-        flag_resett no_enum_check_flag_resetter;
-        no_enum_check_flag_resetter.set_flag(no_enum_check, true);
+        flag_resett resetter(i);
+        resetter.set_flag(no_enum_check, true, "no_enum_check");
         check(assign_lhs);
       }
 
@@ -2378,18 +2422,20 @@ void goto_check(
   const irep_idt &function_identifier,
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
-  const optionst &options)
+  const optionst &options,
+  message_handlert &message_handler)
 {
-  goto_checkt goto_check(ns, options);
+  goto_checkt goto_check(ns, options, message_handler);
   goto_check.goto_check(function_identifier, goto_function);
 }
 
 void goto_check(
   const namespacet &ns,
   const optionst &options,
-  goto_functionst &goto_functions)
+  goto_functionst &goto_functions,
+  message_handlert &message_handler)
 {
-  goto_checkt goto_check(ns, options);
+  goto_checkt goto_check(ns, options, message_handler);
 
   goto_check.collect_allocations(goto_functions);
 
@@ -2401,8 +2447,9 @@ void goto_check(
 
 void goto_check(
   const optionst &options,
-  goto_modelt &goto_model)
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
   const namespacet ns(goto_model.symbol_table);
-  goto_check(ns, options, goto_model.goto_functions);
+  goto_check(ns, options, goto_model.goto_functions, message_handler);
 }

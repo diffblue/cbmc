@@ -1,0 +1,27 @@
+CORE broken-smt-backend
+main.c
+--object-bits 8 --bounds-check --pointer-check --pointer-primitive-check --div-by-zero-check --enum-range-check --unsigned-overflow-check --signed-overflow-check --pointer-overflow-check --float-overflow-check --conversion-check --undefined-shift-check --nan-check --pointer-primitive-check
+^\[main\.pointer_primitives\.\d+\] line 77 pointer invalid in POINTER_OBJECT\(\(const void \*\)q\): FAILURE
+^\[main\.pointer_primitives\.\d+\] line 77 pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)q\): FAILURE
+^\[main\.pointer_arithmetic\.\d+\] line 78 pointer arithmetic: pointer outside object bounds in p \+ 2000000000000(l|ll): FAILURE
+^\[main\.NaN\.\d+\] line 84 NaN on / in x / den: FAILURE
+^\[main\.division-by-zero\.\d+\] line 84 division by zero in x / den: FAILURE
+^\[main\.overflow\.\d+\] line 84 arithmetic overflow on floating-point division in x / den: FAILURE
+^\[main\.enum-range-check\.\d+\] line 85 enum range check in \(ABC\)10: FAILURE
+^\[main\.overflow\.\d+\] line 86 arithmetic overflow on signed type conversion in \(char\)\(\(signed int\)i \+ 1\): FAILURE
+^\[main\.overflow\.\d+\] line 87 arithmetic overflow on signed \+ in j \+ 1: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^\[main\.pointer_primitives\.\d+\] line 40 pointer invalid in POINTER_OBJECT\(const void \*\)q\): FAILURE
+^\[main\.pointer_primitives\.\d+\] line 40 pointer outside object bounds in POINTER_OBJECT\(const void \*\)q\): FAILURE
+^\[main\.pointer_arithmetic\.\d+\] line 41 pointer arithmetic: pointer outside object bounds in p \+ 2000000000000(l|ll): FAILURE
+^\[main\.NaN\.\d+\] line 47 NaN on / in x / den: FAILURE
+^\[main\.division-by-zero\.\d+\] line 47 division by zero in x / den: FAILURE
+^\[main\.overflow\.\d+\] line 47 arithmetic overflow on floating-point division in x / den: FAILURE
+^\[main\.enum-range-check\.\d+\] line 48 enum range check in \(ABC\)10: FAILURE
+^\[main\.overflow\.\d+\] line 49 arithmetic overflow on signed type conversion in \(char\)\(signed int\)i \+ 1\): FAILURE
+^\[main\.overflow\.\d+\] line 50 arithmetic overflow on signed \+ in j \+ 1: FAILURE
+--
+This test uses all possible named-checks to maximize coverage.

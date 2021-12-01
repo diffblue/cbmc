@@ -278,7 +278,7 @@ bool jdiff_parse_optionst::process_goto_program(
 
     // add generic checks
     log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
+    goto_check(options, goto_model, ui_message_handler);
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_model);
