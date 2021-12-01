@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_check.h"
 
 #include <algorithm>
+#include <functional>
 
 #include <util/arith_tools.h>
 #include <util/array_name.h>
