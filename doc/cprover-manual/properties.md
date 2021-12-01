@@ -131,22 +131,77 @@ The goto-instrument program supports these checks:
 | `--error-label label`        |  check that given label is unreachable               |
 
 As all of these checks apply across the entire input program, we may wish to
-disable them for selected statements in the program. For example, unsigned
-overflows can be expected and acceptable in certain instructions even when
-elsewhere we do not expect them. As of version 5.12, CBMC supports selectively
-disabling automatically generated properties.  To disable property generation,
-use `#pragma CPROVER check disable "<name_of_check>"`, which remains in effect
-until a `#pragma CPROVER check pop` (to re-enable all properties
-disabled before or since the last `#pragma CPROVER check push`) is provided.
+disable or enable them for selected statements in the program. 
+For example, unsigned overflows can be expected and acceptable in certain 
+instructions even when elsewhere we do not expect them. 
+As of version 5.12, CBMC supports selectively disabling or enabling
+automatically generated properties using pragmas.
+
+
+CPROVER pragmas are handled using a stack:
+- `#pragma CPROVER check push` pushes a new level on the pragma stack
+- `#pragma CPROVER check disable "<name_of_check>"` adds a disable pragma
+  at the top of the stack
+- `#pragma CPROVER check enable "<name_of_check>"` adds a enable pragma
+  at the top of the stack
+- an `enable` or `disable` pragma for a given check present at the top level
+  of the stack shadows other pragmas for the same in lower levels of the stack
+- adding both `enable` and `disable` pragmas for a same check in a same level
+  of the stack creates a PARSING_ERROR.
+- `#pragma CPROVER check pop` pops a level in the stack and restores the state
+  of pragmas at the sub level
+
 For example, for unsigned overflow checks, use
+
 ```
 unsigned foo(unsigned x)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "unsigned-overflow"
-  x = x + 1; // immediately follows the pragma, no unsigned overflow check here
+#pragma CPROVER check enable "unsigned-overflow"
+  // unsigned overflow check apply here
+  x = x + 1;
 #pragma CPROVER check pop
-  x = x + 2; // unsigned overflow checks are generated here
+  // unsigned overflow checks do not apply here
+  x = x + 2;
+```
+
+```
+unsigned foo(unsigned x)
+{
+#pragma CPROVER check push
+#pragma CPROVER check enable "unsigned-overflow"
+#pragma CPROVER check enable "signed-overflow"
+  // unsigned and signed overflow check apply here
+  x = x + 1;
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+  // only signed overflow check apply here
+  x = x + 2;
+#pragma CPROVER check pop
+  // unsigned and signed overflow check apply here
+  x = x + 3;
+#pragma CPROVER check pop
+  // unsigned overflow checks do not apply here
+  x = x + 2;
+```
+
+```
+unsigned foo(unsigned x)
+{
+#pragma CPROVER check push
+#pragma CPROVER check enable "unsigned-overflow"
+#pragma CPROVER check enable "signed-overflow"
+  // unsigned and signed overflow check apply here
+  x = x + 1;
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check enable "unsigned-overflow"
+  // PARSING_ERROR Found enable and disable pragmas for unsigned-overflow-check
+  x = x + 2;
+#pragma CPROVER check pop
+  x = x + 3;
+#pragma CPROVER check pop
+  x = x + 2;
 ```
 
 #### Flag --nan-check limitations
