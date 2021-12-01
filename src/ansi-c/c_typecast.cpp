@@ -382,6 +382,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
 
     return get_c_type(new_type);
   }
+  else if(type.id() == ID_integer)
+    return INTEGER;
 
   return OTHER;
 }
