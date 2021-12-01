@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_check_c.h"
 
 #include <algorithm>
+#include <optional>
 
 #include <util/arith_tools.h>
 #include <util/array_name.h>
@@ -278,6 +279,22 @@ protected:
   bool enable_assumptions;
   bool enable_pointer_primitive_check;
 
+  /// Maps a named-check name to the corresponding boolean flag.
+  std::map<irep_idt, bool *> name_to_flag{
+    {"bounds-check", &enable_bounds_check},
+    {"pointer-check", &enable_pointer_check},
+    {"memory-leak-check", &enable_memory_leak_check},
+    {"div-by-zero-check", &enable_div_by_zero_check},
+    {"enum-range-check", &enable_enum_range_check},
+    {"signed-overflow-check", &enable_signed_overflow_check},
+    {"unsigned-overflow-check", &enable_unsigned_overflow_check},
+    {"pointer-overflow-check", &enable_pointer_overflow_check},
+    {"conversion-check", &enable_conversion_check},
+    {"undefined-shift-check", &enable_undefined_shift_check},
+    {"float-overflow-check", &enable_float_overflow_check},
+    {"nan-check", &enable_nan_check},
+    {"pointer-primitive-check", &enable_pointer_primitive_check}};
+
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
 
@@ -288,6 +305,36 @@ protected:
   allocationst allocations;
 
   irep_idt mode;
+
+  /// \brief Adds "checked" pragmas for all currently active named checks
+  /// on the given source location.
+  void add_active_named_check_pragmas(source_locationt &source_location) const;
+
+  /// \brief Adds "disable" pragmas for all named checks
+  /// on the given source location.
+  void
+  add_all_disable_named_check_pragmas(source_locationt &source_location) const;
+
+  /// activation statuses for named checks
+  typedef enum
+  {
+    ENABLE,
+    DISABLE,
+    CHECKED
+  } check_statust;
+
+  /// optional (named-check, status) pair
+  using named_check_statust = optionalt<std::pair<irep_idt, check_statust>>;
+
+  /// Matches a named-check string of the form
+  ///
+  /// ```
+  /// ("enable"|"disable"|"checked") ":" <named-check>
+  /// ```
+  ///
+  /// \returns a pair (name, status) if the match succeeds
+  /// and the name is known, nothing otherwise.
+  named_check_statust match_named_check(const irep_idt &named_check) const;
 };
 
 void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
@@ -1566,6 +1613,8 @@ void goto_check_ct::add_guarded_property(
     t->source_location_nonconst().set_comment(
       comment + " in " + source_expr_string);
     t->source_location_nonconst().set_property_class(property_class);
+
+    add_all_disable_named_check_pragmas(t->source_location_nonconst());
   }
 }
 
@@ -1840,11 +1889,13 @@ optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
     return {};
 }
 
-/// \brief Set a Boolean flag to a new value (via `set_flag`) and restore
-/// the previous value when the entire object goes out of scope.
+/// Allows to:
+/// - override a Boolean flag with a new value via `set_flag`
+/// - set a Boolean flag to false via `disable_flag`, such that
+///   previous `set_flag` are overridden and future `set_flag` are ignored.
 ///
-/// \remarks Calls to set_value are tracked to allow detecting doubles sets
-/// with different values and trigger an INVARIANT.
+/// A flag's initial value (before any `set_flag` or `disable_flag`) is restored
+/// when the entire object goes out of scope.
 class flag_resett
 {
 public:
@@ -1856,22 +1907,48 @@ public:
   /// \brief Store the current value of \p flag and
   /// then set its value to \p new_value.
   ///
-  /// \remarks an INVARIANT triggers iff the flag is set
-  /// more than once with different values.
+  /// - calling `set_flag` after `disable_flag` is a no-op
+  /// - calling `set_flag` twice triggers an INVARIANT
   void set_flag(bool &flag, bool new_value, const irep_idt &flag_name)
   {
-    bool seen = flags_to_reset.find(&flag) != flags_to_reset.end();
+    // make this a no-op if the flag is disabled
+    if(disabled_flags.find(&flag) != disabled_flags.end())
+      return;
+
+    // detect double sets
     INVARIANT(
-      !(seen && flag != new_value),
-      "Flag " + id2string(flag_name) +
-        " set twice with incompatible values "
-        " at \n" +
+      flags_to_reset.find(&flag) == flags_to_reset.end(),
+      "Flag " + id2string(flag_name) + " set twice at \n" +
         instruction.source_location().pretty());
     if(flag != new_value)
     {
-      flags_to_reset.emplace(&flag, flag);
+      flags_to_reset[&flag] = flag;
       flag = new_value;
     }
+  }
+
+  /// Sets the given flag to false, overriding any previous value.
+  ///
+  /// - calling `disable_flag` after `set_flag` overrides the set value
+  /// - calling `disable_flag` twice triggers an INVARIANT
+  void disable_flag(bool &flag, const irep_idt &flag_name)
+  {
+    INVARIANT(
+      disabled_flags.find(&flag) == disabled_flags.end(),
+      "Flag " + id2string(flag_name) + " disabled twice at \n" +
+        instruction.source_location().pretty());
+
+    disabled_flags.insert(&flag);
+
+    // If the flag has not already been set,
+    // we store its current value in the reset map.
+    // Otherwise, the reset map already holds
+    // the initial value we want to reset it to, keep it as is.
+    if(flags_to_reset.find(&flag) == flags_to_reset.end())
+      flags_to_reset[&flag] = flag;
+
+    // set the flag to false in all cases.
+    flag = false;
   }
 
   /// \brief Restore the values of all flags that have been
@@ -1885,6 +1962,7 @@ public:
 private:
   const goto_programt::instructiont &instruction;
   std::map<bool *, bool> flags_to_reset;
+  std::set<bool *> disabled_flags;
 };
 
 void goto_check_ct::goto_check(
@@ -1915,59 +1993,31 @@ void goto_check_ct::goto_check(
     const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
-      if(d.first == "disable:bounds-check")
-        resetter.set_flag(enable_bounds_check, false, d.first);
-      else if(d.first == "disable:pointer-check")
-        resetter.set_flag(enable_pointer_check, false, d.first);
-      else if(d.first == "disable:memory-leak-check")
-        resetter.set_flag(enable_memory_leak_check, false, d.first);
-      else if(d.first == "disable:div-by-zero-check")
-        resetter.set_flag(enable_div_by_zero_check, false, d.first);
-      else if(d.first == "disable:enum-range-check")
-        resetter.set_flag(enable_enum_range_check, false, d.first);
-      else if(d.first == "disable:signed-overflow-check")
-        resetter.set_flag(enable_signed_overflow_check, false, d.first);
-      else if(d.first == "disable:unsigned-overflow-check")
-        resetter.set_flag(enable_unsigned_overflow_check, false, d.first);
-      else if(d.first == "disable:pointer-overflow-check")
-        resetter.set_flag(enable_pointer_overflow_check, false, d.first);
-      else if(d.first == "disable:float-overflow-check")
-        resetter.set_flag(enable_float_overflow_check, false, d.first);
-      else if(d.first == "disable:conversion-check")
-        resetter.set_flag(enable_conversion_check, false, d.first);
-      else if(d.first == "disable:undefined-shift-check")
-        resetter.set_flag(enable_undefined_shift_check, false, d.first);
-      else if(d.first == "disable:nan-check")
-        resetter.set_flag(enable_nan_check, false, d.first);
-      else if(d.first == "disable:pointer-primitive-check")
-        resetter.set_flag(enable_pointer_primitive_check, false, d.first);
-      else if(d.first == "enable:bounds-check")
-        resetter.set_flag(enable_bounds_check, true, d.first);
-      else if(d.first == "enable:pointer-check")
-        resetter.set_flag(enable_pointer_check, true, d.first);
-      else if(d.first == "enable:memory_leak-check")
-        resetter.set_flag(enable_memory_leak_check, true, d.first);
-      else if(d.first == "enable:div-by-zero-check")
-        resetter.set_flag(enable_div_by_zero_check, true, d.first);
-      else if(d.first == "enable:enum-range-check")
-        resetter.set_flag(enable_enum_range_check, true, d.first);
-      else if(d.first == "enable:signed-overflow-check")
-        resetter.set_flag(enable_signed_overflow_check, true, d.first);
-      else if(d.first == "enable:unsigned-overflow-check")
-        resetter.set_flag(enable_unsigned_overflow_check, true, d.first);
-      else if(d.first == "enable:pointer-overflow-check")
-        resetter.set_flag(enable_pointer_overflow_check, true, d.first);
-      else if(d.first == "enable:float-overflow-check")
-        resetter.set_flag(enable_float_overflow_check, true, d.first);
-      else if(d.first == "enable:conversion-check")
-        resetter.set_flag(enable_conversion_check, true, d.first);
-      else if(d.first == "enable:undefined-shift-check")
-        resetter.set_flag(enable_undefined_shift_check, true, d.first);
-      else if(d.first == "enable:nan-check")
-        resetter.set_flag(enable_nan_check, true, d.first);
-      else if(d.first == "enable:pointer-primitive-check")
-        resetter.set_flag(enable_pointer_primitive_check, true, d.first);
+      // match named-check related pragmas
+      auto matched = match_named_check(d.first);
+      if(matched.has_value())
+      {
+        auto named_check = matched.value();
+        auto name = named_check.first;
+        auto status = named_check.second;
+        bool *flag = name_to_flag.find(name)->second;
+        switch(status)
+        {
+        case check_statust::ENABLE:
+          resetter.set_flag(*flag, true, name);
+          break;
+        case check_statust::DISABLE:
+          resetter.set_flag(*flag, false, name);
+          break;
+        case check_statust::CHECKED:
+          resetter.disable_flag(*flag, name);
+          break;
+        }
+      }
     }
+
+    // add checked pragmas for all active checks
+    add_active_named_check_pragmas(i.source_location_nonconst());
 
     new_code.clear();
 
@@ -2397,4 +2447,47 @@ void goto_check_c(
 {
   const namespacet ns(goto_model.symbol_table);
   goto_check_c(ns, options, goto_model.goto_functions, message_handler);
+}
+
+void goto_check_ct::add_active_named_check_pragmas(
+  source_locationt &source_location) const
+{
+  for(const auto &entry : name_to_flag)
+    if(*(entry.second))
+      source_location.add_pragma("checked:" + id2string(entry.first));
+}
+
+void goto_check_ct::add_all_disable_named_check_pragmas(
+  source_locationt &source_location) const
+{
+  for(const auto &entry : name_to_flag)
+    source_location.add_pragma("disable:" + id2string(entry.first));
+}
+
+goto_check_ct::named_check_statust
+goto_check_ct::match_named_check(const irep_idt &named_check) const
+{
+  auto s = id2string(named_check);
+  auto col = s.find(":");
+
+  if(col == std::string::npos)
+    return {}; // separator not found
+
+  auto name = s.substr(col + 1);
+
+  if(name_to_flag.find(name) == name_to_flag.end())
+    return {}; // name unknown
+
+  check_statust status;
+  if(!s.compare(0, 6, "enable"))
+    status = check_statust::ENABLE;
+  else if(!s.compare(0, 7, "disable"))
+    status = check_statust::DISABLE;
+  else if(!s.compare(0, 7, "checked"))
+    status = check_statust::CHECKED;
+  else
+    return {}; // prefix unknow
+
+  // success
+  return std::pair<irep_idt, check_statust>{name, status};
 }
