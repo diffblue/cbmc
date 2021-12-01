@@ -405,6 +405,10 @@ static exprt::operandst instantiate_byte_array(
       src.operands().begin() + narrow_cast<std::ptrdiff_t>(upper_bound)};
   }
 
+  PRECONDITION(src.type().id() == ID_array || src.type().id() == ID_vector);
+  PRECONDITION(
+    can_cast_type<bitvector_typet>(src.type().subtype()) &&
+    to_bitvector_type(src.type().subtype()).get_width() == 8);
   exprt::operandst bytes;
   bytes.reserve(upper_bound - lower_bound);
   for(std::size_t i = lower_bound; i < upper_bound; ++i)
