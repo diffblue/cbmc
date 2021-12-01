@@ -54,4 +54,55 @@ void introduce_temporaries(
 #endif
   messaget &message);
 
+// clang-format off
+#define OPT_WMM_MEMORY_MODEL  "(mm):"
+
+#define OPT_WMM_INSTRUMENTATION_STRATEGIES                                     \
+  "(one-event-per-cycle)"                                                      \
+  "(minimum-interference)"                                                     \
+  "(read-first)"                                                               \
+  "(write-first)"                                                              \
+  "(my-events)"                                                                \
+
+#define OPT_WMM_LIMITS                                                         \
+  "(max-var):"                                                                 \
+  "(max-po-trans):"                                                            \
+
+#define OPT_WMM_LOOPS                                                          \
+  "(force-loop-duplication)"                                                   \
+  "(no-loop-duplication)"                                                      \
+
+#define OPT_WMM_MISC                                                           \
+  "(scc)"                                                                      \
+  "(cfg-kill)"                                                                 \
+  "(no-dependencies)"                                                          \
+  "(no-po-rendering)"                                                          \
+  "(render-cluster-file)"                                                      \
+  "(render-cluster-function)"                                                  \
+  "(cav11)"                                                                    \
+  "(hide-internals)"                                                           \
+  "(ignore-arrays)"                                                            \
+
+#define OPT_WMM                                                                \
+  OPT_WMM_MEMORY_MODEL                                                         \
+  OPT_WMM_INSTRUMENTATION_STRATEGIES                                           \
+  OPT_WMM_LIMITS                                                               \
+  OPT_WMM_LOOPS                                                                \
+  OPT_WMM_MISC                                                                 \
+
+
+#define HELP_WMM_FULL                                                          \
+  " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"            \
+  " --scc                        detects critical cycles per SCC (one thread per SCC)\n" /* NOLINT(whitespace/line_length) */ \
+  " --one-event-per-cycle        only instruments one event per cycle\n"       \
+  " --minimum-interference       instruments an optimal number of events\n"    \
+  " --my-events                  only instruments events whose ids appear in inst.evt\n" /* NOLINT(whitespace/line_length) */ \
+  " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" /* NOLINT(whitespace/line_length) */ \
+  " --no-dependencies            no dependency analysis\n"                     \
+  " --no-po-rendering            no representation of the threads in the dot\n"\
+  " --render-cluster-file        clusterises the dot by files\n"               \
+  " --render-cluster-function    clusterises the dot by functions\n"
+
+// clang-format on
+
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H

@@ -28,42 +28,37 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <pointer-analysis/goto_program_dereference.h>
+
 #include "aggressive_slicer.h"
 #include "contracts/contracts.h"
+#include "count_eloc.h"
+#include "document_properties.h"
+#include "dump_c.h"
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"
 #include "replace_calls.h"
-
-#include "count_eloc.h"
+#include "uninitialized.h"
+#include "wmm/weak_memory.h"
 
 // clang-format off
 #define GOTO_INSTRUMENT_OPTIONS \
-  "(all)" \
-  "(document-claims-latex)(document-claims-html)" \
-  "(document-properties-latex)(document-properties-html)" \
-  "(dump-c-type-header):" \
-  "(dump-c)(dump-cpp)(no-system-headers)(use-all-headers)(dot)(xml)" \
-  "(harness)" \
+  OPT_DOCUMENT_PROPERTIES \
+  OPT_DUMP_C \
+  "(dot)(xml)" \
   OPT_GOTO_CHECK \
-  /* no-X-check are deprecated and ignored */ \
-  "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \
-  "(no-nan-check)" \
-  "(remove-pointers)" \
+  OPT_REMOVE_POINTERS \
   "(no-simplify)" \
-  "(uninitialized-check)" \
-  "(race-check)(scc)(one-event-per-cycle)" \
-  "(minimum-interference)" \
-  "(mm):(my-events)" \
+  OPT_UNINITIALIZED_CHECK \
+  OPT_WMM \
+  "(race-check)" \
   "(unwind):(unwindset):(unwindset-file):" \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
   "(log):" \
-  "(max-var):(max-po-trans):(ignore-arrays)" \
-  "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)(reachable-call-graph)" \
   OPT_INSERT_FINAL_ASSERT_FALSE \
   OPT_SHOW_CLASS_HIERARCHY \
-  "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(isr):" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
@@ -87,7 +82,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(remove-function-pointers)" \
   "(show-claims)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
-  "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
   "(string-abstraction)" \

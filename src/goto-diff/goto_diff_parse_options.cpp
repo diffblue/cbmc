@@ -70,9 +70,6 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 
-  if(cmdline.isset("mm"))
-    options.set_option("mm", cmdline.get_value("mm"));
-
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 

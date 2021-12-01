@@ -1,0 +1,10 @@
+CORE
+main.c
+--document-properties-latex
+^EXIT=0$
+^SIGNAL=0$
+^\\claim\{assertion 1 == 1\}$
+--
+^warning: ignoring
+--
+Tests whether this option works at all.

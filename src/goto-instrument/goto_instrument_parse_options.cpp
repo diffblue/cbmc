@@ -52,7 +52,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/write_goto_binary.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
-#include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
 #include <pointer-analysis/value_set_analysis.h>
 
@@ -85,9 +84,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "branch.h"
 #include "call_sequences.h"
 #include "concurrency.h"
-#include "document_properties.h"
 #include "dot.h"
-#include "dump_c.h"
 #include "full_slicer.h"
 #include "function.h"
 #include "havoc_loops.h"
@@ -110,11 +107,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "stack_depth.h"
 #include "thread_instrumentation.h"
 #include "undefined_functions.h"
-#include "uninitialized.h"
 #include "unwind.h"
 #include "unwindset.h"
 #include "value_set_fi_fp_removal.h"
-#include "wmm/weak_memory.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -1723,13 +1718,12 @@ void goto_instrument_parse_optionst::help()
     " goto-instrument in out              perform instrumentation\n"
     "\n"
     "Main options:\n"
-    " --document-properties-html   generate HTML property documentation\n"
-    " --document-properties-latex  generate Latex property documentation\n"
-    " --dump-c                     generate C source\n"
-    " --dump-c-type-header m       generate a C header for types local in m\n"
-    " --dump-cpp                   generate C++ source\n"
+    HELP_DOCUMENT_PROPERTIES
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
+    "\n"
+    "Dump Source:\n"
+    HELP_DUMP_C
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
@@ -1763,7 +1757,7 @@ void goto_instrument_parse_optionst::help()
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
     HELP_GOTO_CHECK
-    " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
+    HELP_UNINITIALIZED_CHECK
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
     " --race-check                 add floating-point data race checks\n"
     "\n"
@@ -1781,7 +1775,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
-    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    HELP_REMOVE_POINTERS
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -1799,17 +1793,7 @@ void goto_instrument_parse_optionst::help()
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
     "\n"
     "Memory model instrumentations:\n"
-    " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"
-    " --scc                        detects critical cycles per SCC (one thread per SCC)\n" // NOLINT(*)
-    " --one-event-per-cycle        only instruments one event per cycle\n"
-    " --minimum-interference       instruments an optimal number of events\n"
-    " --my-events                  only instruments events whose ids appear in inst.evt\n" // NOLINT(*)
-    " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" // NOLINT(*)
-    " --no-dependencies            no dependency analysis\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --no-po-rendering            no representation of the threads in the dot\n"
-    " --render-cluster-file        clusterises the dot by files\n"
-    " --render-cluster-function    clusterises the dot by functions\n"
+    HELP_WMM_FULL
     "\n"
     "Slicing:\n"
     HELP_REACHABILITY_SLICER
@@ -1854,11 +1838,9 @@ void goto_instrument_parse_optionst::help()
     HELP_ENFORCE_CONTRACT
     "\n"
     "Other options:\n"
-    " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
-    " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
-    " --harness                    with --dump-c/--dump-cpp: include input generator in output\n" // NOLINT(*)
     " --version                    show version and exit\n"
     HELP_FLUSH
+    " --xml                        output files in XML where supported\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_TIMESTAMP

@@ -158,7 +158,7 @@ void uninitializedt::add_assertions(
                 symbol_exprt(new_identifier, bool_typet()),
                 instruction.source_location());
             assertion.source_location_nonconst().set_comment(
-              "use of uninitialized local variable");
+              "use of uninitialized local variable " + id2string(identifier));
             assertion.source_location_nonconst().set_property_class(
               "uninitialized local");
 
