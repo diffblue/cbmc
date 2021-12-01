@@ -292,12 +292,6 @@ protected:
 void goto_checkt::collect_allocations(
   const goto_functionst &goto_functions)
 {
-  if(
-    !enable_pointer_check && !enable_bounds_check &&
-    !enable_pointer_overflow_check)
-  {
-    return;
-  }
 
   for(const auto &gf_entry : goto_functions.function_map)
   {
