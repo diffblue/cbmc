@@ -1,7 +1,7 @@
 CORE
 test.c
 --function-pointer-restrictions-file restrictions.json
-\[use_f\.assertion\.1\] line \d+ dereferenced function pointer at use_f.function_pointer_call.1 must be one of \[(f|g), (f|g)\]: FAILURE
+\[use_f\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be one of \[(f|g), (f|g)\]: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
 --

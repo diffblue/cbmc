@@ -1,10 +1,10 @@
 CORE
 test.c
 --restrict-function-pointer-by-name fp/f,g
-\[main\.assertion\.1\] line \d+ dereferenced function pointer at main\.function_pointer_call\.1 must be one of \[(f, g)|(g, f)\]: SUCCESS
+\[main\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be one of \[(f, g)|(g, f)\]: SUCCESS
+\[main.assertion.1\] line \d+ assertion: FAILURE
 \[main.assertion.2\] line \d+ assertion: FAILURE
-\[main.assertion.3\] line \d+ assertion: FAILURE
-\[main.assertion.4\] line \d+ assertion: SUCCESS
+\[main.assertion.3\] line \d+ assertion: SUCCESS
 f\(\)
 g\(\)
 ^EXIT=10$

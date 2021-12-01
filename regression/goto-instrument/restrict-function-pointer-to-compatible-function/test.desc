@@ -1,0 +1,10 @@
+CORE
+test.c
+--restrict-function-pointer use_f.function_pointer_call.1/f
+\[use_f\.assertion\.1\] line \d+ assertion fptr\(10\) == 11: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that the function f is permitted for the first function pointer
+call in function use_f, despite parameters having different integer types.

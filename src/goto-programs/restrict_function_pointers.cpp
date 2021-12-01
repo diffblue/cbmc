@@ -18,41 +18,13 @@ Author: Diffblue Ltd.
 #include <util/string_utils.h>
 
 #include "goto_model.h"
+#include "remove_function_pointers.h"
 
 #include <algorithm>
 #include <fstream>
 
 namespace
 {
-source_locationt make_function_pointer_restriction_assertion_source_location(
-  source_locationt source_location,
-  const function_pointer_restrictionst::restrictiont restriction)
-{
-  std::stringstream comment;
-
-  comment << "dereferenced function pointer at " << restriction.first
-          << " must be ";
-
-  if(restriction.second.size() == 1)
-  {
-    comment << *restriction.second.begin();
-  }
-  else
-  {
-    comment << "one of [";
-
-    join_strings(
-      comment, restriction.second.begin(), restriction.second.end(), ", ");
-
-    comment << ']';
-  }
-
-  source_location.set_comment(comment.str());
-  source_location.set_property_class(ID_assertion);
-
-  return source_location;
-}
-
 template <typename Handler, typename GotoFunctionT>
 void for_each_function_call(GotoFunctionT &&goto_function, Handler handler)
 {
@@ -63,9 +35,11 @@ void for_each_function_call(GotoFunctionT &&goto_function, Handler handler)
     handler);
 }
 
-void restrict_function_pointer(
-  goto_functiont &goto_function,
-  goto_modelt &goto_model,
+static void restrict_function_pointer(
+  message_handlert &message_handler,
+  symbol_tablet &symbol_table,
+  goto_programt &goto_program,
+  const irep_idt &function_id,
   const function_pointer_restrictionst &restrictions,
   const goto_programt::targett &location)
 {
@@ -94,53 +68,19 @@ void restrict_function_pointer(
   if(restriction_iterator == restrictions.restrictions.end())
     return;
 
-  auto const &restriction = *restriction_iterator;
+  const namespacet ns(symbol_table);
+  std::unordered_set<symbol_exprt, irep_hash> candidates;
+  for(const auto &candidate : restriction_iterator->second)
+    candidates.insert(ns.lookup(candidate).symbol_expr());
 
-  // this is intentionally a copy because we're about to change the
-  // instruction this iterator points to
-  // if we can, we will replace uses of it by a case distinction over
-  // given functions the function pointer can point to
-  auto const original_function_call_instruction = *location;
-
-  *location = goto_programt::make_assertion(
-    false_exprt{},
-    make_function_pointer_restriction_assertion_source_location(
-      original_function_call_instruction.source_location(), restriction));
-
-  auto const assume_false_location = goto_function.body.insert_after(
+  remove_function_pointer(
+    message_handler,
+    symbol_table,
+    goto_program,
+    function_id,
     location,
-    goto_programt::make_assumption(
-      false_exprt{}, original_function_call_instruction.source_location()));
-
-  // this is mutable because we'll update this at the end of each
-  // loop iteration to always point at the start of the branch
-  // we created
-  auto else_location = location;
-
-  auto const end_if_location = goto_function.body.insert_after(
-    assume_false_location, goto_programt::make_skip());
-
-  for(auto const &restriction_target : restriction.second)
-  {
-    auto new_instruction = original_function_call_instruction;
-    // can't use get_function_call because that'll return a const ref
-    const symbol_exprt &function_pointer_target_symbol_expr =
-      goto_model.symbol_table.lookup_ref(restriction_target).symbol_expr();
-    to_code_function_call(new_instruction.code_nonconst()).function() =
-      function_pointer_target_symbol_expr;
-    auto const goto_end_if_location = goto_function.body.insert_before(
-      else_location,
-      goto_programt::make_goto(
-        end_if_location, original_function_call_instruction.source_location()));
-    auto const replaced_instruction_location =
-      goto_function.body.insert_before(goto_end_if_location, new_instruction);
-    else_location = goto_function.body.insert_before(
-      replaced_instruction_location,
-      goto_programt::make_goto(
-        else_location,
-        notequal_exprt{pointer_symbol,
-                       address_of_exprt{function_pointer_target_symbol_expr}}));
-  }
+    candidates,
+    true);
 }
 } // namespace
 
@@ -204,7 +144,17 @@ void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
       }
       auto const &function_pointer_target_type =
         function_pointer_target_sym->type;
-      if(function_type != function_pointer_target_type)
+      if(function_pointer_target_type.id() != ID_code)
+      {
+        throw invalid_restriction_exceptiont{
+          "not a function: " + id2string(function_pointer_target)};
+      }
+
+      if(!function_is_type_compatible(
+           true,
+           to_code_type(function_type),
+           to_code_type(function_pointer_target_type),
+           ns))
       {
         throw invalid_restriction_exceptiont{
           "type mismatch: `" + id2string(restriction.first) + "' points to `" +
@@ -217,6 +167,7 @@ void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
 }
 
 void restrict_function_pointers(
+  message_handlert &message_handler,
   goto_modelt &goto_model,
   const function_pointer_restrictionst &restrictions)
 {
@@ -225,7 +176,13 @@ void restrict_function_pointers(
     goto_functiont &goto_function = function_item.second;
 
     for_each_function_call(goto_function, [&](const goto_programt::targett it) {
-      restrict_function_pointer(goto_function, goto_model, restrictions, it);
+      restrict_function_pointer(
+        message_handler,
+        goto_model.symbol_table,
+        goto_function.body,
+        function_item.first,
+        restrictions,
+        it);
     });
   }
 }

@@ -2,7 +2,7 @@ CORE
 main.c
 --function foo --pointer-check
 ^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) > 5: SUCCESS$
-^\[foo.pointer_dereference.\d+\] line \d+ invalid function pointer: FAILURE$
+^\[foo.pointer_dereference.\d+\] line \d+ no candidates for dereferenced function pointer: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED

@@ -2,7 +2,7 @@ CORE
 main.c
 --show-goto-functions --pointer-check
 ^Removal of function pointers and virtual functions$
-^\s*ASSERT false // invalid function pointer$
+^\s*ASSERT false // dereferenced function pointer must be one of \[(f[1-9], ){8}f[1-9]\]$
 replacing function pointer by 9 possible targets
 ^EXIT=0$
 ^SIGNAL=0$
