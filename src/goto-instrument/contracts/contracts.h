@@ -58,7 +58,6 @@ public:
       goto_functions(goto_model.goto_functions),
       log(log),
       converter(symbol_table, log.get_message_handler())
-
   {
   }
 

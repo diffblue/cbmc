@@ -1,21 +1,12 @@
 CORE
 main.c
 --enforce-contract f2 _ --unwind 20 --unwinding-assertions
-^EXIT=10$
+^file main\.c line 13 function f2: recursion is ignored on call to 'f2'$
+^Invariant check failed$
+^Condition: decorated\.get_recursive_function_warnings_count\(\) == 0$
+^Reason: Recursive functions found during inlining$
+^EXIT=(127|134|137)$
 ^SIGNAL=0$
-^file main.c line \d+ function f2: recursion is ignored on call to \'f2\'$
-^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$
-^\[f2.\d+\] line \d+ Check that loc is assignable: SUCCESS$
-^VERIFICATION FAILED$
 --
 --
-Verification:
-  function | pre-cond | post-cond
-  ---------|----------|----------
-  f2       | assumed  | asserted
-
-Test should fail:
-The postcondition of f2 is incorrect, considering the recursion particularity. 
-
-Recursion:
-The base case for the recursive call to f2 provides different behavior than the common case (given the pre-conditions).
+Test should fail because a recursive function is found during inlining.

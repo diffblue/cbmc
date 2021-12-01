@@ -13,6 +13,8 @@ Date: July 2021
 
 #include "assigns.h"
 
+#include <analyses/call_graph.h>
+
 #include <langapi/language_util.h>
 
 #include <util/arith_tools.h>
@@ -195,4 +197,32 @@ void havoc_assigns_targetst::append_havoc_code_for_expr(
   }
 
   havoc_utilst::append_havoc_code_for_expr(location, expr, dest);
+}
+
+void assigns_clauset::add_static_locals_to_write_set(
+  const goto_functionst &functions,
+  const irep_idt &root_function)
+{
+  auto call_graph =
+    call_grapht::create_from_root_function(functions, root_function, true)
+      .get_directed_graph();
+
+  for(const auto &sym_pair : symbol_table)
+  {
+    const auto &sym = sym_pair.second;
+    if(sym.is_static_lifetime)
+    {
+      auto fname = sym.location.get_function();
+      if(
+        !fname.empty() && (fname == root_function ||
+                           call_graph.get_node_index(fname).has_value()))
+      {
+        // We found a symbol with
+        // - a static lifetime
+        // - non empty location function
+        // - this function appears in the call graph of the function
+        add_to_write_set(sym.symbol_expr());
+      }
+    }
+  }
 }

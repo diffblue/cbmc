@@ -29,6 +29,7 @@ Date: February 2016
 
 #include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
 #include <util/mathematical_expr.h>
@@ -37,9 +38,97 @@ Date: February 2016
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
+#include <util/std_code.h>
 
 #include "memory_predicates.h"
 #include "utils.h"
+
+/// Decorator for \ref message_handlert that keeps track of warnings
+/// occuring when inlining a function.
+///
+/// It counts the number of :
+/// - recursive functions warnings
+/// - missing functions warnings
+/// - missing function body warnings
+/// - missing function arguments warnings
+class inlining_decoratort : public message_handlert
+{
+private:
+  message_handlert &wrapped;
+  unsigned int recursive_function_warnings_count = 0;
+
+  void parse_message(const std::string &message)
+  {
+    if(message.find("recursion is ignored on call") != std::string::npos)
+      recursive_function_warnings_count++;
+  }
+
+public:
+  explicit inlining_decoratort(message_handlert &_wrapped) : wrapped(_wrapped)
+  {
+  }
+
+  unsigned int get_recursive_function_warnings_count()
+  {
+    return recursive_function_warnings_count;
+  }
+
+  void print(unsigned level, const std::string &message) override
+  {
+    parse_message(message);
+    wrapped.print(level, message);
+  }
+
+  void print(unsigned level, const xmlt &xml) override
+  {
+    wrapped.print(level, xml);
+  }
+
+  void print(unsigned level, const jsont &json) override
+  {
+    wrapped.print(level, json);
+  }
+
+  void print(unsigned level, const structured_datat &data) override
+  {
+    wrapped.print(level, data);
+  }
+
+  void print(
+    unsigned level,
+    const std::string &message,
+    const source_locationt &location) override
+  {
+    parse_message(message);
+    wrapped.print(level, message, location);
+    return;
+  }
+
+  void flush(unsigned i) override
+  {
+    return wrapped.flush(i);
+  }
+
+  void set_verbosity(unsigned _verbosity)
+  {
+    wrapped.set_verbosity(_verbosity);
+  }
+
+  unsigned get_verbosity() const
+  {
+    return wrapped.get_verbosity();
+  }
+
+  std::size_t get_message_count(unsigned level) const
+  {
+    return wrapped.get_message_count(level);
+  }
+
+  std::string command(unsigned i) const override
+  {
+    return wrapped.command(i);
+  }
+};
 
 void code_contractst::check_apply_loop_contracts(
   const irep_idt &function_name,
@@ -69,6 +158,8 @@ void code_contractst::check_apply_loop_contracts(
 
   assigns_clauset loop_assigns(
     assigns.operands(), log, ns, function_name, symbol_table);
+
+  loop_assigns.add_static_locals_to_write_set(goto_functions, function_name);
 
   if(invariant.is_nil())
   {
@@ -688,8 +779,13 @@ void code_contractst::apply_loop_contract(
   if(!natural_loops.loop_map.size())
     return;
 
+  inlining_decoratort decorated(log.get_message_handler());
   goto_function_inline(
     goto_functions, function_name, ns, log.get_message_handler());
+
+  INVARIANT(
+    decorated.get_recursive_function_warnings_count() == 0,
+    "Recursive functions found during inlining");
 
   // A graph node type that stores information about a loop.
   // We create a DAG representing nesting of various loops in goto_function,
@@ -985,17 +1081,12 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function,
     symbol_table);
 
-  // Adds formal parameters to write set
+  // detect and add static local variables
+  assigns.add_static_locals_to_write_set(goto_functions, function);
+
+  // Add formal parameters to write set
   for(const auto &param : to_code_type(target.type).parameters())
     assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
-
-  // Adds local static declarations to write set
-  for(const auto &sym_pair : symbol_table)
-  {
-    const auto &sym = sym_pair.second;
-    if(sym.is_static_lifetime && sym.location.get_function() == function)
-      assigns.add_to_write_set(sym.symbol_expr());
-  }
 
   auto instruction_it = function_obj->second.body.instructions.begin();
   for(const auto &car : assigns.get_write_set())
@@ -1005,9 +1096,19 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
       function_obj->second.body, instruction_it, snapshot_instructions);
   };
 
-  // Inline all function calls.
-  goto_function_inline(
-    goto_functions, function_obj->first, ns, log.get_message_handler());
+  // Full inlining of the function body
+  // Inlining is performed so that function calls to a same function
+  // occurring under different write sets get instrumented specifically
+  // for each write set
+  inlining_decoratort decorated(log.get_message_handler());
+  goto_function_inline(goto_functions, function, ns, decorated);
+
+  INVARIANT(
+    decorated.get_recursive_function_warnings_count() == 0,
+    "Recursive functions found during inlining");
+
+  // restore internal invariants
+  goto_functions.update();
 
   // Insert write set inclusion checks.
   check_frame_conditions(
