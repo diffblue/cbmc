@@ -1087,8 +1087,7 @@ void code_contractst::check_frame_conditions(
         // Notice that for them those variables be writable,
         // they must appear as assigns targets anyway,
         // but their DECL statements are outside of the loop.
-        log.warning() << "Found a `DEAD` variable "
-                      << name2string(symbol.get_identifier())
+        log.warning() << "Found a `DEAD` variable " << symbol.get_identifier()
                       << " without corresponding `DECL`, at: "
                       << instruction_it->source_location() << messaget::eom;
       }

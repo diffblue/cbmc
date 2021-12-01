@@ -35,13 +35,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef USE_DSTRING
 typedef dstringt irep_idt;
-typedef dstringt irep_namet;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef dstring_hash irep_id_hash;
 #else
 #include "string_hash.h"
 typedef std::string irep_idt;
-typedef std::string irep_namet;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef string_hash irep_id_hash;
 #endif
@@ -52,15 +50,6 @@ inline const std::string &id2string(const irep_idt &d)
   return as_string(d);
   #else
   return d;
-  #endif
-}
-
-inline const std::string &name2string(const irep_namet &n)
-{
-  #ifdef USE_DSTRING
-  return as_string(n);
-  #else
-  return n;
   #endif
 }
 
@@ -91,7 +80,7 @@ struct ref_count_ift<true>
 ///   actually a \ref dstringt and thus an integer which is a reference into a
 ///   string table.)
 ///
-/// * \ref irept::dt::named_sub : A map from `irep_namet` (a string) to \ref
+/// * \ref irept::dt::named_sub : A map from `irep_idt` (a string) to \ref
 ///   irept. This is used for named children, i.e.  subexpressions, parameters,
 ///   etc. Children whose name begins with '#' are ignored by the
 ///   default \ref operator==.
@@ -376,9 +365,9 @@ class irept
       irept,
 #endif
 #if NAMED_SUB_IS_FORWARD_LIST
-      forward_list_as_mapt<irep_namet, irept>>
+      forward_list_as_mapt<irep_idt, irept>>
 #else
-      std::map<irep_namet, irept>>
+      std::map<irep_idt, irept>>
 #endif
 {
 public:
@@ -413,35 +402,35 @@ public:
   void id(const irep_idt &_data)
   { write().data=_data; }
 
-  const irept &find(const irep_namet &name) const;
-  irept &add(const irep_namet &name);
-  irept &add(const irep_namet &name, irept irep);
+  const irept &find(const irep_idt &name) const;
+  irept &add(const irep_idt &name);
+  irept &add(const irep_idt &name, irept irep);
 
-  const std::string &get_string(const irep_namet &name) const
+  const std::string &get_string(const irep_idt &name) const
   {
     return id2string(get(name));
   }
 
-  const irep_idt &get(const irep_namet &name) const;
-  bool get_bool(const irep_namet &name) const;
-  signed int get_int(const irep_namet &name) const;
-  std::size_t get_size_t(const irep_namet &name) const;
-  long long get_long_long(const irep_namet &name) const;
+  const irep_idt &get(const irep_idt &name) const;
+  bool get_bool(const irep_idt &name) const;
+  signed int get_int(const irep_idt &name) const;
+  std::size_t get_size_t(const irep_idt &name) const;
+  long long get_long_long(const irep_idt &name) const;
 
-  void set(const irep_namet &name, const irep_idt &value)
+  void set(const irep_idt &name, const irep_idt &value)
   {
     add(name, irept(value));
   }
-  void set(const irep_namet &name, irept irep)
+  void set(const irep_idt &name, irept irep)
   {
     add(name, std::move(irep));
   }
-  void set(const irep_namet &name, const long long value);
-  void set_size_t(const irep_namet &name, const std::size_t value);
+  void set(const irep_idt &name, const long long value);
+  void set_size_t(const irep_idt &name, const std::size_t value);
 
-  void remove(const irep_namet &name);
+  void remove(const irep_idt &name);
   void move_to_sub(irept &irep);
-  void move_to_named_sub(const irep_namet &name, irept &irep);
+  void move_to_named_sub(const irep_idt &name, irept &irep);
 
   bool operator==(const irept &other) const;
 
@@ -476,7 +465,7 @@ public:
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
-  static bool is_comment(const irep_namet &name)
+  static bool is_comment(const irep_idt &name)
   { return !name.empty() && name[0]=='#'; }
 
   /// count the number of named_sub elements that are not comments

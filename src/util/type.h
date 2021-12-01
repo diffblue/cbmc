@@ -78,12 +78,12 @@ public:
     return static_cast<source_locationt &>(add(ID_C_source_location));
   }
 
-  typet &add_type(const irep_namet &name)
+  typet &add_type(const irep_idt &name)
   {
     return static_cast<typet &>(add(name));
   }
 
-  const typet &find_type(const irep_namet &name) const
+  const typet &find_type(const irep_idt &name) const
   {
     return static_cast<const typet &>(find(name));
   }

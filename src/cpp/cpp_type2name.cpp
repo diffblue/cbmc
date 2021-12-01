@@ -61,7 +61,7 @@ static std::string irep2name(const irept &irep)
       else
         result += ',';
 
-      result += do_prefix(name2string(named_sub.first));
+      result += do_prefix(id2string(named_sub.first));
 
       result += '=';
       result += irep2name(named_sub.second);
@@ -78,7 +78,7 @@ static std::string irep2name(const irept &irep)
         first=false;
       else
         result+=',';
-      result += do_prefix(name2string(named_sub.first));
+      result += do_prefix(id2string(named_sub.first));
       result+='=';
       result += irep2name(named_sub.second);
     }
