@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main.assertion.1\] .* assertion 0 <= r && r < 5: SUCCESS$
 ^\[main.assertion.2\] .* assertion \*\(arr\[r\]\) == pivot: SUCCESS$
 ^\[main.assertion.3\] .* assertion 0 < r ==> arr0 <= pivot: SUCCESS$

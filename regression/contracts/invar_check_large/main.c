@@ -23,6 +23,7 @@ int main()
   int r = 1;
   while(h > l)
     // clang-format off
+    __CPROVER_assigns(arr0, arr1, arr2, arr3, arr4, h, l, r)
     __CPROVER_loop_invariant(
       // Turn off `clang-format` because it breaks the `==>` operator.
       h >= l &&
@@ -59,6 +60,11 @@ int main()
         else if(r == l)
         {
           r = h;
+          l++;
+        }
+        else
+        {
+          h--;
           l++;
         }
       }

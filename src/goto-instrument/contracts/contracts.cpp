@@ -773,10 +773,14 @@ void code_contractst::apply_loop_contract(
   const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function)
 {
-  local_may_aliast local_may_alias(goto_function);
-  natural_loops_mutablet natural_loops(goto_function.body);
+  const bool may_have_loops = std::any_of(
+    goto_function.body.instructions.begin(),
+    goto_function.body.instructions.end(),
+    [](const goto_programt::instructiont &instruction) {
+      return instruction.is_backwards_goto();
+    });
 
-  if(!natural_loops.loop_map.size())
+  if(!may_have_loops)
     return;
 
   inlining_decoratort decorated(log.get_message_handler());
@@ -786,6 +790,12 @@ void code_contractst::apply_loop_contract(
   INVARIANT(
     decorated.get_recursive_function_warnings_count() == 0,
     "Recursive functions found during inlining");
+
+  // restore internal invariants
+  goto_functions.update();
+
+  local_may_aliast local_may_alias(goto_function);
+  natural_loops_mutablet natural_loops(goto_function.body);
 
   // A graph node type that stores information about a loop.
   // We create a DAG representing nesting of various loops in goto_function,
