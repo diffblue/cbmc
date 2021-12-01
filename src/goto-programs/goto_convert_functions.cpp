@@ -166,10 +166,19 @@ void goto_convert_functionst::convert_function(
   // we have a body, make sure all parameter names are valid
   for(const auto &p : f.parameter_identifiers)
   {
-    DATA_INVARIANT(!p.empty(), "parameter identifier should not be empty");
-    DATA_INVARIANT(
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      !p.empty(),
+      "parameter identifier should not be empty",
+      "function:",
+      identifier);
+
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
       symbol_table.has_symbol(p),
-      "parameter identifier must be a known symbol");
+      "parameter identifier must be a known symbol",
+      "function:",
+      identifier,
+      "parameter:",
+      p);
   }
 
   lifetimet parent_lifetime = lifetime;
