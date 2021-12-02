@@ -75,7 +75,7 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("mm", cmdline.get_value("mm"));
 
   // all checks supported by goto_check
-  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
+  PARSE_OPTIONS_GOTO_CHECK_JAVA(cmdline, options);
 
   if(cmdline.isset("debug-level"))
     options.set_option("debug-level", cmdline.get_value("debug-level"));
@@ -278,7 +278,7 @@ bool jdiff_parse_optionst::process_goto_program(
 
     // add generic checks
     log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model, ui_message_handler);
+    goto_check_java(options, goto_model, ui_message_handler);
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_model);
@@ -344,7 +344,7 @@ void jdiff_parse_optionst::help()
     " --compact-output             output dependencies in compact mode\n"
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
+    HELP_GOTO_CHECK_JAVA
     HELP_COVER
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
