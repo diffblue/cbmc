@@ -39,8 +39,11 @@ void *reader() { //reader
 
 int main() {
 __CPROVER_ASYNC_1: writer();
-__CPROVER_ASYNC_2: reader();
-__CPROVER_ASYNC_3: writer();
-__CPROVER_ASYNC_4: reader();
+__CPROVER_ASYNC_2:
+  reader();
+__CPROVER_ASYNC_3:
+  writer();
+__CPROVER_ASYNC_4:
+  reader();
   return 0;
 }

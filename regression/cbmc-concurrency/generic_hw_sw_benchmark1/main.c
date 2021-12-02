@@ -8,9 +8,9 @@
 
 #ifdef _ENABLE_CBMC_
 
-#define ASYNC(n, c) __CPROVER_ASYNC_ ## n: (c)
-#define ATOMIC_BEGIN  __CPROVER_atomic_begin()
-#define ATOMIC_END  __CPROVER_atomic_end()
+#  define ASYNC(n, c) __CPROVER_ASYNC_##n : (c)
+#  define ATOMIC_BEGIN __CPROVER_atomic_begin()
+#  define ATOMIC_END __CPROVER_atomic_end()
 
 char symbolic_char(char);
 
@@ -233,7 +233,7 @@ void* write_data_register(struct Hardware *hw, RegisterId reg_id, Register value
     pthread_create(&interrupt_thread, NULL, hw->interrupt_handler, (void *) hw->fw);
   }
 #else
-    ASYNC(1, hw->interrupt_handler((void *) hw->fw));
+    ASYNC(1, hw->interrupt_handler((void *)hw->fw));
 #endif
 
 SKIP:
@@ -346,7 +346,7 @@ int main(void)
   pthread_t firmware_thread;
   pthread_create(&firmware_thread, NULL, poll, (void *) fw);
 #else
-  ASYNC(1, poll((void *) fw));
+  ASYNC(1, poll((void *)fw));
 #endif
 
 #ifdef _EXPOSE_BUG_
@@ -358,7 +358,7 @@ int main(void)
   pthread_t stimulus_thread;
   pthread_create(&stimulus_thread, NULL, stimulus, (void *) hw);
 #else
-  ASYNC(2, stimulus((void *) hw));
+  ASYNC(2, stimulus((void *)hw));
 #endif
 
 #ifdef _EXPOSE_BUG_
