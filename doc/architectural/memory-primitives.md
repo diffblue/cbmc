@@ -169,26 +169,33 @@ to pointers that point to within a memory object.
 
 ## Checking if a memory segment has at least a given size
 
-The following two primitives can be used to check whether there is a memory
-segment starting at the given pointer and extending for at least the given
-number of bytes:
+The following three primitives can be used to check whether there is a
+memory segment starting at the given pointer and extending for at least the
+given number of bytes:
 
 - `_Bool __CPROVER_r_ok(const void *p, size_t size)`
 - `_Bool __CPROVER_w_ok(const void *p, size_t size)`
+- `_Bool __CPROVER_rw_ok(const void *p, size_t size)`
 
-At present, both primitives are equivalent as all memory in CBMC is considered
-both readable and writeable. If `p` is the null pointer, the primitives return
-false. If `p` is valid, the primitives return true if the memory segment
-starting at the pointer has at least the given size, and false otherwise. If `p`
-is neither null nor valid, the semantics is unspecified. It is valid to apply
-the primitive to pointers that point to within a memory object. For example:
+At present, all three primitives are equivalent as all memory in CBMC is
+considered both readable and writeable.  If `p` points to a valid object the
+primitives return true if the memory segment starting at the pointer has at
+least the given size, and false otherwise.  Specificially, when `size` is
+zero, and `p` points to the byte one beyond the end of the object, the
+predicate returns true.
+
+If `p` is either null or does not point to a valid object, the predicate
+returns false.
+
+It is valid to apply the primitive to pointers that have a nonzero offset.
+For example:
 
 ```C
 char *p = malloc(10);
-assert(__CPROVER_r_ok(p, 10)); // valid
-p += 5;
-assert(__CPROVER_r_ok(p, 3));  // valid
-assert(__CPROVER_r_ok(p, 10)); // fails
+assert(__CPROVER_r_ok(p, 10)); // passes
+assert(__CPROVER_r_ok(p + 5, 3));  // passes
+assert(__CPROVER_r_ok(p + 5, 10)); // fails
+assert(__CPROVER_r_ok(p + 10, 0)); // passes
 ```
 
 # Detecting potential misuses of memory primitives
@@ -204,8 +211,6 @@ primitives are either null or valid:
 - `__CPROVER_same_object`
 - `__CPROVER_OBJECT_SIZE`
 - `__CPROVER_DYNAMIC_OBJECT`
-- `__CPROVER_r_ok`
-- `__CPROVER_w_ok`
 
 While the first three primitives have well-defined semantics even on invalid
 pointers, using them on invalid pointers is usually unintended in user programs.
