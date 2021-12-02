@@ -53,18 +53,13 @@ public:
     message_handlert &_message_handler)
     : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
   {
-    no_enum_check = false;
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
-    enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
     enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
-    enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check =
       _options.get_bool_option("signed-overflow-check");
     enable_unsigned_overflow_check =
       _options.get_bool_option("unsigned-overflow-check");
-    enable_pointer_overflow_check =
-      _options.get_bool_option("pointer-overflow-check");
     enable_conversion_check = _options.get_bool_option("conversion-check");
     enable_undefined_shift_check =
       _options.get_bool_option("undefined-shift-check");
@@ -79,8 +74,6 @@ public:
       _options.get_bool_option("built-in-assertions");
     enable_assumptions = _options.get_bool_option("assumptions");
     error_labels = _options.get_list_option("error-label");
-    enable_pointer_primitive_check =
-      _options.get_bool_option("pointer-primitive-check");
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -89,21 +82,12 @@ public:
     const irep_idt &function_identifier,
     goto_functiont &goto_function);
 
-  /// Fill the list of allocations \ref allocationst with <address, size> for
-  ///   every allocation instruction. Also check that each allocation is
-  ///   well-formed.
-  /// \param goto_functions: goto functions from which the allocations are to be
-  ///   collected
-  void collect_allocations(const goto_functionst &goto_functions);
-
 protected:
   const namespacet &ns;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
   guard_managert guard_manager;
   messaget log;
-
-  bool no_enum_check;
 
   /// Check an address-of expression:
   ///  if it is a dereference then check the pointer
@@ -181,12 +165,8 @@ protected:
   void bounds_check_index(const index_exprt &, const guardt &);
   void bounds_check_bit_count(const unary_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
-  void mod_by_zero_check(const mod_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
-  void enum_range_check(const exprt &, const guardt &);
   void undefined_shift_check(const shift_exprt &, const guardt &);
-  void pointer_rel_check(const binary_exprt &, const guardt &);
-  void pointer_overflow_check(const exprt &, const guardt &);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
   /// \param expr the expression to be checked
@@ -198,28 +178,8 @@ protected:
     const exprt &src_expr,
     const guardt &guard);
 
-  /// Generates VCCs to check that pointers passed to pointer primitives are
-  /// either null or valid
-  ///
-  /// \param expr: the pointer primitive expression
-  /// \param guard: the condition under which the operation happens
-  void pointer_primitive_check(const exprt &expr, const guardt &guard);
-
-  /// Returns true if the given expression is a pointer primitive such as
-  /// __CPROVER_r_ok()
-  ///
-  /// \param expr expression
-  /// \return true if the given expression is a pointer primitive
-  bool is_pointer_primitive(const exprt &expr);
-
   optionalt<goto_check_javat::conditiont>
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
-  conditionst get_pointer_points_to_valid_memory_conditions(
-    const exprt &address,
-    const exprt &size);
-  exprt is_in_bounds_of_some_explicit_allocation(
-    const exprt &pointer,
-    const exprt &size);
 
   conditionst get_pointer_dereferenceable_conditions(
     const exprt &address,
@@ -260,9 +220,7 @@ protected:
 
   bool enable_bounds_check;
   bool enable_pointer_check;
-  bool enable_memory_leak_check;
   bool enable_div_by_zero_check;
-  bool enable_enum_range_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
   bool enable_pointer_overflow_check;
@@ -276,50 +234,10 @@ protected:
   bool enable_assertions;
   bool enable_built_in_assertions;
   bool enable_assumptions;
-  bool enable_pointer_primitive_check;
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
-
-  // the first element of the pair is the base address,
-  // and the second is the size of the region
-  typedef std::pair<exprt, exprt> allocationt;
-  typedef std::list<allocationt> allocationst;
-  allocationst allocations;
-
-  irep_idt mode;
 };
-
-void goto_check_javat::collect_allocations(
-  const goto_functionst &goto_functions)
-{
-  for(const auto &gf_entry : goto_functions.function_map)
-  {
-    for(const auto &instruction : gf_entry.second.body.instructions)
-    {
-      if(!instruction.is_function_call())
-        continue;
-
-      const auto &function = instruction.call_function();
-      if(
-        function.id() != ID_symbol ||
-        to_symbol_expr(function).get_identifier() != CPROVER_PREFIX
-          "allocated_memory")
-        continue;
-
-      const code_function_callt::argumentst &args =
-        instruction.call_arguments();
-      if(
-        args.size() != 2 || args[0].type().id() != ID_unsignedbv ||
-        args[1].type().id() != ID_unsignedbv)
-        throw "expected two unsigned arguments to " CPROVER_PREFIX
-              "allocated_memory";
-
-      assert(args[0].type() == args[1].type());
-      allocations.push_back({args[0], args[1]});
-    }
-  }
-}
 
 void goto_check_javat::invalidate(const exprt &lhs)
 {
@@ -367,35 +285,6 @@ void goto_check_javat::div_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
-    expr.find_source_location(),
-    expr,
-    guard);
-}
-
-void goto_check_javat::enum_range_check(const exprt &expr, const guardt &guard)
-{
-  if(!enable_enum_range_check || no_enum_check)
-    return;
-
-  const c_enum_tag_typet &c_enum_tag_type = to_c_enum_tag_type(expr.type());
-  symbolt enum_type = ns.lookup(c_enum_tag_type.get_identifier());
-  const c_enum_typet &c_enum_type = to_c_enum_type(enum_type.type);
-
-  const c_enum_typet::memberst enum_values = c_enum_type.members();
-
-  std::vector<exprt> disjuncts;
-  for(const auto &enum_value : enum_values)
-  {
-    const constant_exprt val{enum_value.get_value(), c_enum_tag_type};
-    disjuncts.push_back(equal_exprt(expr, val));
-  }
-
-  const exprt check = disjunction(disjuncts);
-
-  add_guarded_property(
-    check,
-    "enum range check",
-    "enum-range-check",
     expr.find_source_location(),
     expr,
     guard);
@@ -466,27 +355,6 @@ void goto_check_javat::undefined_shift_check(
       expr,
       guard);
   }
-}
-
-void goto_check_javat::mod_by_zero_check(
-  const mod_exprt &expr,
-  const guardt &guard)
-{
-  if(!enable_div_by_zero_check || mode == ID_java)
-    return;
-
-  // add divison by zero subgoal
-
-  exprt zero = from_integer(0, expr.op1().type());
-  const notequal_exprt inequality(expr.op1(), std::move(zero));
-
-  add_guarded_property(
-    inequality,
-    "division by zero",
-    "division-by-zero",
-    expr.find_source_location(),
-    expr,
-    guard);
 }
 
 /// check a mod expression for the case INT_MIN % -1
@@ -817,26 +685,6 @@ void goto_check_javat::integer_overflow_check(
       // C11 and C++11.
       bool allow_shift_into_sign_bit = true;
 
-      if(mode == ID_C)
-      {
-        if(
-          config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C99 ||
-          config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C11)
-        {
-          allow_shift_into_sign_bit = false;
-        }
-      }
-      else if(mode == ID_cpp)
-      {
-        if(
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
-        {
-          allow_shift_into_sign_bit = false;
-        }
-      }
-
       const unsigned number_of_top_bits =
         allow_shift_into_sign_bit ? op_width : op_width + 1;
 
@@ -1148,80 +996,6 @@ void goto_check_javat::nan_check(const exprt &expr, const guardt &guard)
     guard);
 }
 
-void goto_check_javat::pointer_rel_check(
-  const binary_exprt &expr,
-  const guardt &guard)
-{
-  if(!enable_pointer_check)
-    return;
-
-  if(
-    expr.op0().type().id() == ID_pointer &&
-    expr.op1().type().id() == ID_pointer)
-  {
-    // add same-object subgoal
-
-    exprt same_object = ::same_object(expr.op0(), expr.op1());
-
-    add_guarded_property(
-      same_object,
-      "same object violation",
-      "pointer",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-    for(const auto &pointer : expr.operands())
-    {
-      // just this particular byte must be within object bounds or one past the
-      // end
-      const auto size = from_integer(0, size_type());
-      auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
-
-      for(const auto &c : conditions)
-      {
-        add_guarded_property(
-          c.assertion,
-          "pointer relation: " + c.description,
-          "pointer arithmetic",
-          expr.find_source_location(),
-          pointer,
-          guard);
-      }
-    }
-  }
-}
-
-void goto_check_javat::pointer_overflow_check(
-  const exprt &expr,
-  const guardt &guard)
-{
-  if(!enable_pointer_overflow_check)
-    return;
-
-  if(expr.id() != ID_plus && expr.id() != ID_minus)
-    return;
-
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "pointer arithmetic expected to have exactly 2 operands");
-
-  // the result must be within object bounds or one past the end
-  const auto size = from_integer(0, size_type());
-  auto conditions = get_pointer_dereferenceable_conditions(expr, size);
-
-  for(const auto &c : conditions)
-  {
-    add_guarded_property(
-      c.assertion,
-      "pointer arithmetic: " + c.description,
-      "pointer arithmetic",
-      expr.find_source_location(),
-      expr,
-      guard);
-  }
-}
-
 void goto_check_javat::pointer_validity_check(
   const dereference_exprt &expr,
   const exprt &src_expr,
@@ -1263,74 +1037,17 @@ void goto_check_javat::pointer_validity_check(
   }
 }
 
-void goto_check_javat::pointer_primitive_check(
-  const exprt &expr,
-  const guardt &guard)
-{
-  if(!enable_pointer_primitive_check)
-    return;
-
-  if(expr.source_location().is_built_in())
-    return;
-
-  const exprt pointer =
-    (expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok)
-      ? to_r_or_w_ok_expr(expr).pointer()
-      : to_unary_expr(expr).op();
-
-  CHECK_RETURN(pointer.type().id() == ID_pointer);
-
-  if(pointer.id() == ID_symbol)
-  {
-    const auto &symbol_expr = to_symbol_expr(pointer);
-
-    if(has_prefix(id2string(symbol_expr.get_identifier()), CPROVER_PREFIX))
-      return;
-  }
-
-  const auto size_of_expr_opt = size_of_expr(pointer.type().subtype(), ns);
-
-  const exprt size = !size_of_expr_opt.has_value()
-                       ? from_integer(1, size_type())
-                       : size_of_expr_opt.value();
-
-  const conditionst &conditions =
-    get_pointer_points_to_valid_memory_conditions(pointer, size);
-  for(const auto &c : conditions)
-  {
-    add_guarded_property(
-      or_exprt{null_object(pointer), c.assertion},
-      c.description,
-      "pointer primitives",
-      expr.source_location(),
-      expr,
-      guard);
-  }
-}
-
-bool goto_check_javat::is_pointer_primitive(const exprt &expr)
-{
-  // we don't need to include the __CPROVER_same_object primitive here as it
-  // is replaced by lower level primitives in the special function handling
-  // during typechecking (see c_typecheck_expr.cpp)
-  return expr.id() == ID_pointer_object || expr.id() == ID_pointer_offset ||
-         expr.id() == ID_object_size || expr.id() == ID_r_ok ||
-         expr.id() == ID_w_ok || expr.id() == ID_rw_ok ||
-         expr.id() == ID_is_dynamic_object;
-}
-
 goto_check_javat::conditionst
 goto_check_javat::get_pointer_dereferenceable_conditions(
   const exprt &address,
   const exprt &size)
 {
-  auto conditions =
-    get_pointer_points_to_valid_memory_conditions(address, size);
-  if(auto maybe_null_condition = get_pointer_is_null_condition(address, size))
-  {
-    conditions.push_front(*maybe_null_condition);
-  }
-  return conditions;
+  auto maybe_null_condition = get_pointer_is_null_condition(address, size);
+
+  if(maybe_null_condition.has_value())
+    return {*maybe_null_condition};
+  else
+    return {};
 }
 
 std::string goto_check_javat::array_name(const exprt &expr)
@@ -1436,16 +1153,8 @@ void goto_check_javat::bounds_check_index(
       typecast_exprt::conditional_cast(
         object_size(pointer), effective_offset.type())};
 
-    exprt in_bounds_of_some_explicit_allocation =
-      is_in_bounds_of_some_explicit_allocation(
-        pointer,
-        plus_exprt{ode.offset(), from_integer(1, ode.offset().type())});
-
-    or_exprt precond(
-      std::move(in_bounds_of_some_explicit_allocation), inequality);
-
     add_guarded_property(
-      precond,
+      inequality,
       name + " dynamic object upper bound",
       "array bounds",
       expr.find_source_location(),
@@ -1562,7 +1271,8 @@ void goto_check_javat::add_guarded_property(
                                   std::move(guarded_expr), source_location));
 
     std::string source_expr_string;
-    get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
+    get_language_from_mode(ID_java)->from_expr(
+      src_expr, source_expr_string, ns);
 
     t->source_location_nonconst().set_comment(
       comment + " in " + source_expr_string);
@@ -1698,23 +1408,11 @@ void goto_check_javat::check_rec_arithmetic_op(const exprt &expr, guardt &guard)
   if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
   {
     integer_overflow_check(expr, guard);
-
-    if(
-      expr.operands().size() == 2 && expr.id() == ID_minus &&
-      expr.operands()[0].type().id() == ID_pointer &&
-      expr.operands()[1].type().id() == ID_pointer)
-    {
-      pointer_rel_check(to_binary_expr(expr), guard);
-    }
   }
   else if(expr.type().id() == ID_floatbv)
   {
     nan_check(expr, guard);
     float_overflow_check(expr, guard);
-  }
-  else if(expr.type().id() == ID_pointer)
-  {
-    pointer_overflow_check(expr, guard);
   }
 }
 
@@ -1750,9 +1448,6 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
   forall_operands(it, expr)
     check_rec(*it, guard);
 
-  if(expr.type().id() == ID_c_enum_tag)
-    enum_range_check(expr, guard);
-
   if(expr.id() == ID_index)
   {
     bounds_check(expr, guard);
@@ -1770,7 +1465,6 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
   }
   else if(expr.id() == ID_mod)
   {
-    mod_by_zero_check(to_mod_expr(expr), guard);
     mod_overflow_check(to_mod_expr(expr), guard);
   }
   else if(
@@ -1781,17 +1475,9 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
   }
   else if(expr.id() == ID_typecast)
     conversion_check(expr, guard);
-  else if(
-    expr.id() == ID_le || expr.id() == ID_lt || expr.id() == ID_ge ||
-    expr.id() == ID_gt)
-    pointer_rel_check(to_binary_relation_expr(expr), guard);
   else if(expr.id() == ID_dereference)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
-  }
-  else if(is_pointer_primitive(expr))
-  {
-    pointer_primitive_check(expr, guard);
   }
   else if(
     expr.id() == ID_count_leading_zeros || expr.id() == ID_count_trailing_zeros)
@@ -1843,53 +1529,6 @@ optionalt<exprt> goto_check_javat::rw_ok_check(exprt expr)
     return {};
 }
 
-/// \brief Set a Boolean flag to a new value (via `set_flag`) and restore
-/// the previous value when the entire object goes out of scope.
-///
-/// \remarks Calls to set_value are tracked to allow detecting doubles sets
-/// with different values and trigger an INVARIANT.
-class flag_resett
-{
-public:
-  explicit flag_resett(const goto_programt::instructiont &_instruction)
-    : instruction(_instruction)
-  {
-  }
-
-  /// \brief Store the current value of \p flag and
-  /// then set its value to \p new_value.
-  ///
-  /// \remarks an INVARIANT triggers iff the flag is set
-  /// more than once with different values.
-  void set_flag(bool &flag, bool new_value, const irep_idt &flag_name)
-  {
-    bool seen = flags_to_reset.find(&flag) != flags_to_reset.end();
-    INVARIANT(
-      !(seen && flag != new_value),
-      "Flag " + id2string(flag_name) +
-        " set twice with incompatible values "
-        " at \n" +
-        instruction.source_location().pretty());
-    if(flag != new_value)
-    {
-      flags_to_reset.emplace(&flag, flag);
-      flag = new_value;
-    }
-  }
-
-  /// \brief Restore the values of all flags that have been
-  /// modified via `set_flag`.
-  ~flag_resett()
-  {
-    for(const auto &flag_pair : flags_to_reset)
-      *flag_pair.first = flag_pair.second;
-  }
-
-private:
-  const goto_programt::instructiont &instruction;
-  std::map<bool *, bool> flags_to_reset;
-};
-
 void goto_check_javat::goto_check(
   const irep_idt &function_identifier,
   goto_functiont &goto_function)
@@ -1900,9 +1539,6 @@ void goto_check_javat::goto_check(
     return;
 
   assertions.clear();
-
-  const auto &function_symbol = ns.lookup(function_identifier);
-  mode = function_symbol.mode;
 
   bool did_something = false;
 
@@ -1915,64 +1551,6 @@ void goto_check_javat::goto_check(
   {
     current_target = it;
     goto_programt::instructiont &i = *it;
-
-    flag_resett resetter(i);
-    const auto &pragmas = i.source_location().get_pragmas();
-    for(const auto &d : pragmas)
-    {
-      if(d.first == "disable:bounds-check")
-        resetter.set_flag(enable_bounds_check, false, d.first);
-      else if(d.first == "disable:pointer-check")
-        resetter.set_flag(enable_pointer_check, false, d.first);
-      else if(d.first == "disable:memory-leak-check")
-        resetter.set_flag(enable_memory_leak_check, false, d.first);
-      else if(d.first == "disable:div-by-zero-check")
-        resetter.set_flag(enable_div_by_zero_check, false, d.first);
-      else if(d.first == "disable:enum-range-check")
-        resetter.set_flag(enable_enum_range_check, false, d.first);
-      else if(d.first == "disable:signed-overflow-check")
-        resetter.set_flag(enable_signed_overflow_check, false, d.first);
-      else if(d.first == "disable:unsigned-overflow-check")
-        resetter.set_flag(enable_unsigned_overflow_check, false, d.first);
-      else if(d.first == "disable:pointer-overflow-check")
-        resetter.set_flag(enable_pointer_overflow_check, false, d.first);
-      else if(d.first == "disable:float-overflow-check")
-        resetter.set_flag(enable_float_overflow_check, false, d.first);
-      else if(d.first == "disable:conversion-check")
-        resetter.set_flag(enable_conversion_check, false, d.first);
-      else if(d.first == "disable:undefined-shift-check")
-        resetter.set_flag(enable_undefined_shift_check, false, d.first);
-      else if(d.first == "disable:nan-check")
-        resetter.set_flag(enable_nan_check, false, d.first);
-      else if(d.first == "disable:pointer-primitive-check")
-        resetter.set_flag(enable_pointer_primitive_check, false, d.first);
-      else if(d.first == "enable:bounds-check")
-        resetter.set_flag(enable_bounds_check, true, d.first);
-      else if(d.first == "enable:pointer-check")
-        resetter.set_flag(enable_pointer_check, true, d.first);
-      else if(d.first == "enable:memory_leak-check")
-        resetter.set_flag(enable_memory_leak_check, true, d.first);
-      else if(d.first == "enable:div-by-zero-check")
-        resetter.set_flag(enable_div_by_zero_check, true, d.first);
-      else if(d.first == "enable:enum-range-check")
-        resetter.set_flag(enable_enum_range_check, true, d.first);
-      else if(d.first == "enable:signed-overflow-check")
-        resetter.set_flag(enable_signed_overflow_check, true, d.first);
-      else if(d.first == "enable:unsigned-overflow-check")
-        resetter.set_flag(enable_unsigned_overflow_check, true, d.first);
-      else if(d.first == "enable:pointer-overflow-check")
-        resetter.set_flag(enable_pointer_overflow_check, true, d.first);
-      else if(d.first == "enable:float-overflow-check")
-        resetter.set_flag(enable_float_overflow_check, true, d.first);
-      else if(d.first == "enable:conversion-check")
-        resetter.set_flag(enable_conversion_check, true, d.first);
-      else if(d.first == "enable:undefined-shift-check")
-        resetter.set_flag(enable_undefined_shift_check, true, d.first);
-      else if(d.first == "enable:nan-check")
-        resetter.set_flag(enable_nan_check, true, d.first);
-      else if(d.first == "enable:pointer-primitive-check")
-        resetter.set_flag(enable_pointer_primitive_check, true, d.first);
-    }
 
     new_code.clear();
 
@@ -2034,14 +1612,7 @@ void goto_check_javat::goto_check(
       const exprt &assign_lhs = i.assign_lhs();
       const exprt &assign_rhs = i.assign_rhs();
 
-      // Reset the no_enum_check with the flag reset for exception
-      // safety
-      {
-        flag_resett resetter(i);
-        resetter.set_flag(no_enum_check, true, "no_enum_check");
-        check(assign_lhs);
-      }
-
+      check(assign_lhs);
       check(assign_rhs);
 
       // the LHS might invalidate any assertion
@@ -2064,8 +1635,8 @@ void goto_check_javat::goto_check(
       // for Java, need to check whether 'this' is null
       // on non-static method invocations
       if(
-        mode == ID_java && enable_pointer_check &&
-        !i.call_arguments().empty() && function.type().id() == ID_code &&
+        enable_pointer_check && !i.call_arguments().empty() &&
+        function.type().id() == ID_code &&
         to_code_type(function.type()).has_this())
       {
         exprt pointer = i.call_arguments()[0];
@@ -2163,7 +1734,7 @@ void goto_check_javat::goto_check(
     }
     else if(i.is_dead())
     {
-      if(enable_pointer_check || enable_pointer_primitive_check)
+      if(enable_pointer_check)
       {
         const symbol_exprt &variable = i.dead_symbol();
 
@@ -2205,32 +1776,6 @@ void goto_check_javat::goto_check(
               std::move(lhs), std::move(rhs), i.source_location()));
           t->code_nonconst().add_source_location() = i.source_location();
         }
-      }
-    }
-    else if(i.is_end_function())
-    {
-      if(
-        function_identifier == goto_functionst::entry_point() &&
-        enable_memory_leak_check)
-      {
-        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
-        const symbol_exprt leak_expr = leak.symbol_expr();
-
-        // add self-assignment to get helpful counterexample output
-        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
-
-        source_locationt source_location;
-        source_location.set_function(function_identifier);
-
-        equal_exprt eq(
-          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
-        add_guarded_property(
-          eq,
-          "dynamically allocated memory never freed",
-          "memory-leak",
-          source_location,
-          eq,
-          guardt(true_exprt(), guard_manager));
       }
     }
 
@@ -2281,90 +1826,6 @@ void goto_check_javat::goto_check(
     remove_skip(goto_program);
 }
 
-goto_check_javat::conditionst
-goto_check_javat::get_pointer_points_to_valid_memory_conditions(
-  const exprt &address,
-  const exprt &size)
-{
-  PRECONDITION(local_bitvector_analysis);
-  PRECONDITION(address.type().id() == ID_pointer);
-  local_bitvector_analysist::flagst flags =
-    local_bitvector_analysis->get(current_target, address);
-
-  conditionst conditions;
-
-  if(mode == ID_java)
-  {
-    // The following conditions don’t apply to Java
-    return conditions;
-  }
-
-  const exprt in_bounds_of_some_explicit_allocation =
-    is_in_bounds_of_some_explicit_allocation(address, size);
-
-  const bool unknown = flags.is_unknown() || flags.is_uninitialized();
-
-  if(unknown)
-  {
-    conditions.push_back(conditiont{
-      not_exprt{is_invalid_pointer_exprt{address}}, "pointer invalid"});
-  }
-
-  if(unknown || flags.is_dynamic_heap())
-  {
-    conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(deallocated(address, ns))),
-      "deallocated dynamic object"));
-  }
-
-  if(unknown || flags.is_dynamic_local())
-  {
-    conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(dead_object(address, ns))),
-      "dead object"));
-  }
-
-  if(flags.is_dynamic_heap())
-  {
-    const or_exprt object_bounds_violation(
-      object_lower_bound(address, nil_exprt()),
-      object_upper_bound(address, size));
-
-    conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(object_bounds_violation)),
-      "pointer outside dynamic object bounds"));
-  }
-
-  if(unknown || flags.is_dynamic_local() || flags.is_static_lifetime())
-  {
-    const or_exprt object_bounds_violation(
-      object_lower_bound(address, nil_exprt()),
-      object_upper_bound(address, size));
-
-    conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(object_bounds_violation)),
-      "pointer outside object bounds"));
-  }
-
-  if(unknown || flags.is_integer_address())
-  {
-    conditions.push_back(conditiont(
-      implies_exprt(
-        integer_address(address), in_bounds_of_some_explicit_allocation),
-      "invalid integer address"));
-  }
-
-  return conditions;
-}
-
 optionalt<goto_check_javat::conditiont>
 goto_check_javat::get_pointer_is_null_condition(
   const exprt &address,
@@ -2375,45 +1836,14 @@ goto_check_javat::get_pointer_is_null_condition(
   const auto &pointer_type = to_pointer_type(address.type());
   local_bitvector_analysist::flagst flags =
     local_bitvector_analysis->get(current_target, address);
-  if(mode == ID_java)
+
+  if(flags.is_unknown() || flags.is_null())
   {
-    if(flags.is_unknown() || flags.is_null())
-    {
-      notequal_exprt not_eq_null(address, null_pointer_exprt{pointer_type});
-      return {conditiont{not_eq_null, "reference is null"}};
-    }
+    notequal_exprt not_eq_null(address, null_pointer_exprt{pointer_type});
+    return {conditiont{not_eq_null, "reference is null"}};
   }
-  else if(flags.is_unknown() || flags.is_uninitialized() || flags.is_null())
-  {
-    return {conditiont{
-      or_exprt{is_in_bounds_of_some_explicit_allocation(address, size),
-               not_exprt(null_pointer(address))},
-      "pointer NULL"}};
-  }
+
   return {};
-}
-
-exprt goto_check_javat::is_in_bounds_of_some_explicit_allocation(
-  const exprt &pointer,
-  const exprt &size)
-{
-  exprt::operandst alloc_disjuncts;
-  for(const auto &a : allocations)
-  {
-    typecast_exprt int_ptr(pointer, a.first.type());
-
-    binary_relation_exprt lb_check(a.first, ID_le, int_ptr);
-
-    plus_exprt upper_bound{
-      int_ptr, typecast_exprt::conditional_cast(size, int_ptr.type())};
-
-    binary_relation_exprt ub_check{
-      std::move(upper_bound), ID_le, plus_exprt{a.first, a.second}};
-
-    alloc_disjuncts.push_back(
-      and_exprt{std::move(lb_check), std::move(ub_check)});
-  }
-  return disjunction(alloc_disjuncts);
 }
 
 void goto_check_java(
@@ -2434,8 +1864,6 @@ void goto_check_java(
   message_handlert &message_handler)
 {
   goto_check_javat goto_check(ns, options, message_handler);
-
-  goto_check.collect_allocations(goto_functions);
 
   for(auto &gf_entry : goto_functions.function_map)
   {
