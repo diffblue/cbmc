@@ -85,8 +85,8 @@ unsigned dec() {
 
 int main(){
 __CPROVER_ASYNC_1: inc();
-__CPROVER_ASYNC_1: dec();
-__CPROVER_ASYNC_1: dec();
+__CPROVER_ASYNC_2: dec();
+__CPROVER_ASYNC_3: dec();
 
   return 0;
 }

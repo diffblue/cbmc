@@ -283,7 +283,7 @@ static signed int ethoc_reset(struct ethoc *dev)
 __CPROVER_ASYNC_1:
   open_eth_reg_write(dev->open_eth, (unsigned int)0, mode);
 
-__CPROVER_ASYNC_1:
+__CPROVER_ASYNC_2:
   open_eth_reg_write(dev->open_eth, (unsigned int)0, mode);
   return 0;
 }
