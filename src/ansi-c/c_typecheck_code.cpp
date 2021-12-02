@@ -505,7 +505,12 @@ void c_typecheck_baset::typecheck_for(codet &code)
 void c_typecheck_baset::typecheck_label(code_labelt &code)
 {
   // record the label
-  labels_defined[code.get_label()]=code.source_location();
+  if(!labels_defined.emplace(code.get_label(), code.source_location()).second)
+  {
+    error().source_location = code.source_location();
+    error() << "duplicate label '" << code.get_label() << "'" << eom;
+    throw 0;
+  }
 
   typecheck_code(code.code());
 }

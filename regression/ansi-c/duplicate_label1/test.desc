@@ -1,0 +1,9 @@
+CORE test-c++-front-end
+main.c
+
+^EXIT=(1|64)$
+^SIGNAL=0$
+error: duplicate label 'label'
+^CONVERSION ERROR$
+--
+^warning: ignoring

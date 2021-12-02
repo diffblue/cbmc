@@ -118,7 +118,9 @@ void* qrcu_updater() {
 
 int main() {
 __CPROVER_ASYNC_1: qrcu_reader1();
-__CPROVER_ASYNC_1: qrcu_reader2();
-__CPROVER_ASYNC_1: qrcu_updater();
+__CPROVER_ASYNC_2:
+  qrcu_reader2();
+__CPROVER_ASYNC_3:
+  qrcu_updater();
   return 0;
 }
