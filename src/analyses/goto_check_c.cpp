@@ -473,7 +473,7 @@ void goto_check_ct::mod_by_zero_check(
   const mod_exprt &expr,
   const guardt &guard)
 {
-  if(!enable_div_by_zero_check || mode == ID_java)
+  if(!enable_div_by_zero_check)
     return;
 
   // add divison by zero subgoal
@@ -2054,35 +2054,6 @@ void goto_check_ct::goto_check(
     }
     else if(i.is_function_call())
     {
-      const auto &function = i.call_function();
-
-      // for Java, need to check whether 'this' is null
-      // on non-static method invocations
-      if(
-        mode == ID_java && enable_pointer_check &&
-        !i.call_arguments().empty() && function.type().id() == ID_code &&
-        to_code_type(function.type()).has_this())
-      {
-        exprt pointer = i.call_arguments()[0];
-
-        local_bitvector_analysist::flagst flags =
-          local_bitvector_analysis->get(current_target, pointer);
-
-        if(flags.is_unknown() || flags.is_null())
-        {
-          notequal_exprt not_eq_null(
-            pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
-
-          add_guarded_property(
-            not_eq_null,
-            "this is null on method invocation",
-            "pointer dereference",
-            i.source_location(),
-            pointer,
-            guardt(true_exprt(), guard_manager));
-        }
-      }
-
       check(i.call_lhs());
       check(i.call_function());
 
@@ -2252,12 +2223,6 @@ void goto_check_ct::goto_check(
           instruction.source_location_nonconst().set_column(
             it->source_location().get_column());
         }
-
-        if(!it->source_location().get_java_bytecode_index().empty())
-        {
-          instruction.source_location_nonconst().set_java_bytecode_index(
-            it->source_location().get_java_bytecode_index());
-        }
       }
     }
 
@@ -2287,12 +2252,6 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
     local_bitvector_analysis->get(current_target, address);
 
   conditionst conditions;
-
-  if(mode == ID_java)
-  {
-    // The following conditions don’t apply to Java
-    return conditions;
-  }
 
   const exprt in_bounds_of_some_explicit_allocation =
     is_in_bounds_of_some_explicit_allocation(address, size);
@@ -2367,24 +2326,17 @@ goto_check_ct::get_pointer_is_null_condition(
 {
   PRECONDITION(local_bitvector_analysis);
   PRECONDITION(address.type().id() == ID_pointer);
-  const auto &pointer_type = to_pointer_type(address.type());
   local_bitvector_analysist::flagst flags =
     local_bitvector_analysis->get(current_target, address);
-  if(mode == ID_java)
-  {
-    if(flags.is_unknown() || flags.is_null())
-    {
-      notequal_exprt not_eq_null(address, null_pointer_exprt{pointer_type});
-      return {conditiont{not_eq_null, "reference is null"}};
-    }
-  }
-  else if(flags.is_unknown() || flags.is_uninitialized() || flags.is_null())
+
+  if(flags.is_unknown() || flags.is_uninitialized() || flags.is_null())
   {
     return {conditiont{
       or_exprt{is_in_bounds_of_some_explicit_allocation(address, size),
                not_exprt(null_pointer(address))},
       "pointer NULL"}};
   }
+
   return {};
 }
 
