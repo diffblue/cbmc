@@ -32,9 +32,6 @@ void goto_check(
   const optionst &,
   message_handlert &);
 
-void goto_check(
-  const optionst &,
-  goto_modelt &,
-  message_handlert &);
+void goto_check(const optionst &, goto_modelt &, message_handlert &);
 
 #endif // CPROVER_ANALYSES_GOTO_CHECK_H

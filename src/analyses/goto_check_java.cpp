@@ -54,30 +54,31 @@ public:
     : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
   {
     no_enum_check = false;
-    enable_bounds_check=_options.get_bool_option("bounds-check");
-    enable_pointer_check=_options.get_bool_option("pointer-check");
-    enable_memory_leak_check=_options.get_bool_option("memory-leak-check");
-    enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
+    enable_bounds_check = _options.get_bool_option("bounds-check");
+    enable_pointer_check = _options.get_bool_option("pointer-check");
+    enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
+    enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
     enable_enum_range_check = _options.get_bool_option("enum-range-check");
-    enable_signed_overflow_check=
+    enable_signed_overflow_check =
       _options.get_bool_option("signed-overflow-check");
-    enable_unsigned_overflow_check=
+    enable_unsigned_overflow_check =
       _options.get_bool_option("unsigned-overflow-check");
-    enable_pointer_overflow_check=
+    enable_pointer_overflow_check =
       _options.get_bool_option("pointer-overflow-check");
-    enable_conversion_check=_options.get_bool_option("conversion-check");
-    enable_undefined_shift_check=
+    enable_conversion_check = _options.get_bool_option("conversion-check");
+    enable_undefined_shift_check =
       _options.get_bool_option("undefined-shift-check");
-    enable_float_overflow_check=
+    enable_float_overflow_check =
       _options.get_bool_option("float-overflow-check");
-    enable_simplify=_options.get_bool_option("simplify");
-    enable_nan_check=_options.get_bool_option("nan-check");
+    enable_simplify = _options.get_bool_option("simplify");
+    enable_nan_check = _options.get_bool_option("nan-check");
     retain_trivial = _options.get_bool_option("retain-trivial-checks");
-    enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
-    enable_assertions=_options.get_bool_option("assertions");
-    enable_built_in_assertions=_options.get_bool_option("built-in-assertions");
-    enable_assumptions=_options.get_bool_option("assumptions");
-    error_labels=_options.get_list_option("error-label");
+    enable_assert_to_assume = _options.get_bool_option("assert-to-assume");
+    enable_assertions = _options.get_bool_option("assertions");
+    enable_built_in_assertions =
+      _options.get_bool_option("built-in-assertions");
+    enable_assumptions = _options.get_bool_option("assumptions");
+    error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
   }
@@ -292,7 +293,6 @@ protected:
 void goto_check_javat::collect_allocations(
   const goto_functionst &goto_functions)
 {
-
   for(const auto &gf_entry : goto_functions.function_map)
   {
     for(const auto &instruction : gf_entry.second.body.instructions)
@@ -309,13 +309,13 @@ void goto_check_javat::collect_allocations(
 
       const code_function_callt::argumentst &args =
         instruction.call_arguments();
-      if(args.size()!=2 ||
-         args[0].type().id()!=ID_unsignedbv ||
-         args[1].type().id()!=ID_unsignedbv)
-        throw "expected two unsigned arguments to "
-              CPROVER_PREFIX "allocated_memory";
+      if(
+        args.size() != 2 || args[0].type().id() != ID_unsignedbv ||
+        args[1].type().id() != ID_unsignedbv)
+        throw "expected two unsigned arguments to " CPROVER_PREFIX
+              "allocated_memory";
 
-      assert(args[0].type()==args[1].type());
+      assert(args[0].type() == args[1].type());
       allocations.push_back({args[0], args[1]});
     }
   }
@@ -323,11 +323,11 @@ void goto_check_javat::collect_allocations(
 
 void goto_check_javat::invalidate(const exprt &lhs)
 {
-  if(lhs.id()==ID_index)
+  if(lhs.id() == ID_index)
     invalidate(to_index_expr(lhs).array());
-  else if(lhs.id()==ID_member)
+  else if(lhs.id() == ID_member)
     invalidate(to_member_expr(lhs).struct_op());
-  else if(lhs.id()==ID_symbol)
+  else if(lhs.id() == ID_symbol)
   {
     // clear all assertions about 'symbol'
     find_symbols_sett find_symbols_set{to_symbol_expr(lhs).get_identifier()};
@@ -360,7 +360,7 @@ void goto_check_javat::div_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=from_integer(0, expr.op1().type());
+  exprt zero = from_integer(0, expr.op1().type());
   const notequal_exprt inequality(expr.op1(), std::move(zero));
 
   add_guarded_property(
@@ -413,7 +413,7 @@ void goto_check_javat::undefined_shift_check(
 
   const typet &distance_type = expr.distance().type();
 
-  if(distance_type.id()==ID_signedbv)
+  if(distance_type.id() == ID_signedbv)
   {
     binary_relation_exprt inequality(
       expr.distance(), ID_ge, from_integer(0, distance_type));
@@ -429,9 +429,9 @@ void goto_check_javat::undefined_shift_check(
 
   const typet &op_type = expr.op().type();
 
-  if(op_type.id()==ID_unsignedbv || op_type.id()==ID_signedbv)
+  if(op_type.id() == ID_unsignedbv || op_type.id() == ID_signedbv)
   {
-    exprt width_expr=
+    exprt width_expr =
       from_integer(to_bitvector_type(op_type).get_width(), distance_type);
 
     add_guarded_property(
@@ -442,7 +442,7 @@ void goto_check_javat::undefined_shift_check(
       expr,
       guard);
 
-    if(op_type.id()==ID_signedbv && expr.id()==ID_shl)
+    if(op_type.id() == ID_signedbv && expr.id() == ID_shl)
     {
       binary_relation_exprt inequality(
         expr.op(), ID_ge, from_integer(0, op_type));
@@ -477,7 +477,7 @@ void goto_check_javat::mod_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=from_integer(0, expr.op1().type());
+  exprt zero = from_integer(0, expr.op1().type());
   const notequal_exprt inequality(expr.op1(), std::move(zero));
 
   add_guarded_property(
@@ -490,7 +490,9 @@ void goto_check_javat::mod_by_zero_check(
 }
 
 /// check a mod expression for the case INT_MIN % -1
-void goto_check_javat::mod_overflow_check(const mod_exprt &expr, const guardt &guard)
+void goto_check_javat::mod_overflow_check(
+  const mod_exprt &expr,
+  const guardt &guard)
 {
   if(!enable_signed_overflow_check)
     return;
@@ -520,9 +522,7 @@ void goto_check_javat::mod_overflow_check(const mod_exprt &expr, const guardt &g
   }
 }
 
-void goto_check_javat::conversion_check(
-  const exprt &expr,
-  const guardt &guard)
+void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
 {
   if(!enable_conversion_check)
     return;
@@ -530,25 +530,24 @@ void goto_check_javat::conversion_check(
   // First, check type.
   const typet &type = expr.type();
 
-  if(type.id()!=ID_signedbv &&
-     type.id()!=ID_unsignedbv)
+  if(type.id() != ID_signedbv && type.id() != ID_unsignedbv)
     return;
 
-  if(expr.id()==ID_typecast)
+  if(expr.id() == ID_typecast)
   {
     const auto &op = to_typecast_expr(expr).op();
 
     // conversion to signed int may overflow
     const typet &old_type = op.type();
 
-    if(type.id()==ID_signedbv)
+    if(type.id() == ID_signedbv)
     {
-      std::size_t new_width=to_signedbv_type(type).get_width();
+      std::size_t new_width = to_signedbv_type(type).get_width();
 
-      if(old_type.id()==ID_signedbv) // signed -> signed
+      if(old_type.id() == ID_signedbv) // signed -> signed
       {
-        std::size_t old_width=to_signedbv_type(old_type).get_width();
-        if(new_width>=old_width)
+        std::size_t old_width = to_signedbv_type(old_type).get_width();
+        if(new_width >= old_width)
           return; // always ok
 
         const binary_relation_exprt no_overflow_upper(
@@ -565,10 +564,10 @@ void goto_check_javat::conversion_check(
           expr,
           guard);
       }
-      else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
+      else if(old_type.id() == ID_unsignedbv) // unsigned -> signed
       {
-        std::size_t old_width=to_unsignedbv_type(old_type).get_width();
-        if(new_width>=old_width+1)
+        std::size_t old_width = to_unsignedbv_type(old_type).get_width();
+        if(new_width >= old_width + 1)
           return; // always ok
 
         const binary_relation_exprt no_overflow_upper(
@@ -582,16 +581,16 @@ void goto_check_javat::conversion_check(
           expr,
           guard);
       }
-      else if(old_type.id()==ID_floatbv) // float -> signed
+      else if(old_type.id() == ID_floatbv) // float -> signed
       {
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
-        upper.from_integer(power(2, new_width-1));
+        upper.from_integer(power(2, new_width - 1));
         const binary_relation_exprt no_overflow_upper(
           op, ID_lt, upper.to_expr());
 
         ieee_floatt lower(to_floatbv_type(old_type));
-        lower.from_integer(-power(2, new_width-1)-1);
+        lower.from_integer(-power(2, new_width - 1) - 1);
         const binary_relation_exprt no_overflow_lower(
           op, ID_gt, lower.to_expr());
 
@@ -604,15 +603,15 @@ void goto_check_javat::conversion_check(
           guard);
       }
     }
-    else if(type.id()==ID_unsignedbv)
+    else if(type.id() == ID_unsignedbv)
     {
-      std::size_t new_width=to_unsignedbv_type(type).get_width();
+      std::size_t new_width = to_unsignedbv_type(type).get_width();
 
-      if(old_type.id()==ID_signedbv) // signed -> unsigned
+      if(old_type.id() == ID_signedbv) // signed -> unsigned
       {
-        std::size_t old_width=to_signedbv_type(old_type).get_width();
+        std::size_t old_width = to_signedbv_type(old_type).get_width();
 
-        if(new_width>=old_width-1)
+        if(new_width >= old_width - 1)
         {
           // only need lower bound check
           const binary_relation_exprt no_overflow_lower(
@@ -644,10 +643,10 @@ void goto_check_javat::conversion_check(
             guard);
         }
       }
-      else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
+      else if(old_type.id() == ID_unsignedbv) // unsigned -> unsigned
       {
-        std::size_t old_width=to_unsignedbv_type(old_type).get_width();
-        if(new_width>=old_width)
+        std::size_t old_width = to_unsignedbv_type(old_type).get_width();
+        if(new_width >= old_width)
           return; // always ok
 
         const binary_relation_exprt no_overflow_upper(
@@ -661,11 +660,11 @@ void goto_check_javat::conversion_check(
           expr,
           guard);
       }
-      else if(old_type.id()==ID_floatbv) // float -> unsigned
+      else if(old_type.id() == ID_floatbv) // float -> unsigned
       {
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
-        upper.from_integer(power(2, new_width)-1);
+        upper.from_integer(power(2, new_width) - 1);
         const binary_relation_exprt no_overflow_upper(
           op, ID_lt, upper.to_expr());
 
@@ -690,25 +689,24 @@ void goto_check_javat::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!enable_signed_overflow_check &&
-     !enable_unsigned_overflow_check)
+  if(!enable_signed_overflow_check && !enable_unsigned_overflow_check)
     return;
 
   // First, check type.
   const typet &type = expr.type();
 
-  if(type.id()==ID_signedbv && !enable_signed_overflow_check)
+  if(type.id() == ID_signedbv && !enable_signed_overflow_check)
     return;
 
-  if(type.id()==ID_unsignedbv && !enable_unsigned_overflow_check)
+  if(type.id() == ID_unsignedbv && !enable_unsigned_overflow_check)
     return;
 
   // add overflow subgoal
 
-  if(expr.id()==ID_div)
+  if(expr.id() == ID_div)
   {
     // undefined for signed division INT_MIN/-1
-    if(type.id()==ID_signedbv)
+    if(type.id() == ID_signedbv)
     {
       const auto &div_expr = to_div_expr(expr);
 
@@ -728,9 +726,9 @@ void goto_check_javat::integer_overflow_check(
 
     return;
   }
-  else if(expr.id()==ID_unary_minus)
+  else if(expr.id() == ID_unary_minus)
   {
-    if(type.id()==ID_signedbv)
+    if(type.id() == ID_signedbv)
     {
       // overflow on unary- on signed integers can only happen with the
       // smallest representable number 100....0
@@ -875,25 +873,24 @@ void goto_check_javat::integer_overflow_check(
   multi_ary_exprt overflow(
     "overflow-" + expr.id_string(), expr.operands(), bool_typet());
 
-  if(expr.operands().size()>=3)
+  if(expr.operands().size() >= 3)
   {
     // The overflow checks are binary!
     // We break these up.
 
-    for(std::size_t i=1; i<expr.operands().size(); i++)
+    for(std::size_t i = 1; i < expr.operands().size(); i++)
     {
       exprt tmp;
 
-      if(i==1)
+      if(i == 1)
         tmp = to_multi_ary_expr(expr).op0();
       else
       {
-        tmp=expr;
+        tmp = expr;
         tmp.operands().resize(i);
       }
 
-      std::string kind=
-        type.id()==ID_unsignedbv?"unsigned":"signed";
+      std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
 
       add_guarded_property(
         not_exprt{binary_overflow_exprt{tmp, expr.id(), expr.operands()[i]}},
@@ -921,8 +918,7 @@ void goto_check_javat::integer_overflow_check(
   {
     PRECONDITION(expr.id() == ID_unary_minus);
 
-    std::string kind=
-      type.id()==ID_unsignedbv?"unsigned":"signed";
+    std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
 
     add_guarded_property(
       not_exprt{unary_overflow_exprt{expr.id(), to_unary_expr(expr).op()}},
@@ -944,12 +940,12 @@ void goto_check_javat::float_overflow_check(
   // First, check type.
   const typet &type = expr.type();
 
-  if(type.id()!=ID_floatbv)
+  if(type.id() != ID_floatbv)
     return;
 
   // add overflow subgoal
 
-  if(expr.id()==ID_typecast)
+  if(expr.id() == ID_typecast)
   {
     // Can overflow if casting from larger
     // to smaller type.
@@ -981,7 +977,7 @@ void goto_check_javat::float_overflow_check(
 
     return;
   }
-  else if(expr.id()==ID_div)
+  else if(expr.id() == ID_div)
   {
     // Can overflow if dividing by something small
     or_exprt overflow_check(
@@ -997,20 +993,19 @@ void goto_check_javat::float_overflow_check(
 
     return;
   }
-  else if(expr.id()==ID_mod)
+  else if(expr.id() == ID_mod)
   {
     // Can't overflow
     return;
   }
-  else if(expr.id()==ID_unary_minus)
+  else if(expr.id() == ID_unary_minus)
   {
     // Can't overflow
     return;
   }
-  else if(expr.id()==ID_plus || expr.id()==ID_mult ||
-          expr.id()==ID_minus)
+  else if(expr.id() == ID_plus || expr.id() == ID_mult || expr.id() == ID_minus)
   {
-    if(expr.operands().size()==2)
+    if(expr.operands().size() == 2)
     {
       // Can overflow
       or_exprt overflow_check(
@@ -1018,10 +1013,11 @@ void goto_check_javat::float_overflow_check(
         isinf_exprt(to_binary_expr(expr).op1()),
         not_exprt(isinf_exprt(expr)));
 
-      std::string kind=
-        expr.id()==ID_plus?"addition":
-        expr.id()==ID_minus?"subtraction":
-        expr.id()==ID_mult?"multiplication":"";
+      std::string kind = expr.id() == ID_plus
+                           ? "addition"
+                           : expr.id() == ID_minus
+                               ? "subtraction"
+                               : expr.id() == ID_mult ? "multiplication" : "";
 
       add_guarded_property(
         std::move(overflow_check),
@@ -1033,9 +1029,9 @@ void goto_check_javat::float_overflow_check(
 
       return;
     }
-    else if(expr.operands().size()>=3)
+    else if(expr.operands().size() >= 3)
     {
-      assert(expr.id()!=ID_minus);
+      assert(expr.id() != ID_minus);
 
       // break up
       float_overflow_check(make_binary(expr), guard);
@@ -1044,28 +1040,25 @@ void goto_check_javat::float_overflow_check(
   }
 }
 
-void goto_check_javat::nan_check(
-  const exprt &expr,
-  const guardt &guard)
+void goto_check_javat::nan_check(const exprt &expr, const guardt &guard)
 {
   if(!enable_nan_check)
     return;
 
   // first, check type
-  if(expr.type().id()!=ID_floatbv)
+  if(expr.type().id() != ID_floatbv)
     return;
 
-  if(expr.id()!=ID_plus &&
-     expr.id()!=ID_mult &&
-     expr.id()!=ID_div &&
-     expr.id()!=ID_minus)
+  if(
+    expr.id() != ID_plus && expr.id() != ID_mult && expr.id() != ID_div &&
+    expr.id() != ID_minus)
     return;
 
   // add NaN subgoal
 
   exprt isnan;
 
-  if(expr.id()==ID_div)
+  if(expr.id() == ID_div)
   {
     const auto &div_expr = to_div_expr(expr);
 
@@ -1080,11 +1073,11 @@ void goto_check_javat::nan_check(
 
     const isinf_exprt div_inf(div_expr.op1());
 
-    isnan=or_exprt(zero_div_zero, div_inf);
+    isnan = or_exprt(zero_div_zero, div_inf);
   }
-  else if(expr.id()==ID_mult)
+  else if(expr.id() == ID_mult)
   {
-    if(expr.operands().size()>=3)
+    if(expr.operands().size() >= 3)
       return nan_check(make_binary(expr), guard);
 
     const auto &mult_expr = to_mult_expr(expr);
@@ -1100,11 +1093,11 @@ void goto_check_javat::nan_check(
         mult_expr.op1(), from_integer(0, mult_expr.op1().type())),
       isinf_exprt(mult_expr.op0()));
 
-    isnan=or_exprt(inf_times_zero, zero_times_inf);
+    isnan = or_exprt(inf_times_zero, zero_times_inf);
   }
-  else if(expr.id()==ID_plus)
+  else if(expr.id() == ID_plus)
   {
-    if(expr.operands().size()>=3)
+    if(expr.operands().size() >= 3)
       return nan_check(make_binary(expr), guard);
 
     const auto &plus_expr = to_plus_expr(expr);
@@ -1112,8 +1105,8 @@ void goto_check_javat::nan_check(
     // -inf + +inf = NaN and +inf + -inf = NaN,
     // i.e., signs differ
     ieee_float_spect spec = ieee_float_spect(to_floatbv_type(plus_expr.type()));
-    exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
-    exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
+    exprt plus_inf = ieee_floatt::plus_infinity(spec).to_expr();
+    exprt minus_inf = ieee_floatt::minus_infinity(spec).to_expr();
 
     isnan = or_exprt(
       and_exprt(
@@ -1123,7 +1116,7 @@ void goto_check_javat::nan_check(
         equal_exprt(plus_expr.op0(), plus_inf),
         equal_exprt(plus_expr.op1(), minus_inf)));
   }
-  else if(expr.id()==ID_minus)
+  else if(expr.id() == ID_minus)
   {
     // +inf - +inf = NaN and -inf - -inf = NaN,
     // i.e., signs match
@@ -1132,8 +1125,8 @@ void goto_check_javat::nan_check(
 
     ieee_float_spect spec =
       ieee_float_spect(to_floatbv_type(minus_expr.type()));
-    exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
-    exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
+    exprt plus_inf = ieee_floatt::plus_infinity(spec).to_expr();
+    exprt minus_inf = ieee_floatt::minus_infinity(spec).to_expr();
 
     isnan = or_exprt(
       and_exprt(
@@ -1162,8 +1155,9 @@ void goto_check_javat::pointer_rel_check(
   if(!enable_pointer_check)
     return;
 
-  if(expr.op0().type().id()==ID_pointer &&
-     expr.op1().type().id()==ID_pointer)
+  if(
+    expr.op0().type().id() == ID_pointer &&
+    expr.op1().type().id() == ID_pointer)
   {
     // add same-object subgoal
 
@@ -1236,7 +1230,7 @@ void goto_check_javat::pointer_validity_check(
   if(!enable_pointer_check)
     return;
 
-  const exprt &pointer=expr.pointer();
+  const exprt &pointer = expr.pointer();
 
   exprt size;
 
@@ -1325,7 +1319,8 @@ bool goto_check_javat::is_pointer_primitive(const exprt &expr)
          expr.id() == ID_is_dynamic_object;
 }
 
-goto_check_javat::conditionst goto_check_javat::get_pointer_dereferenceable_conditions(
+goto_check_javat::conditionst
+goto_check_javat::get_pointer_dereferenceable_conditions(
   const exprt &address,
   const exprt &size)
 {
@@ -1370,19 +1365,19 @@ void goto_check_javat::bounds_check_index(
 {
   const typet &array_type = expr.array().type();
 
-  if(array_type.id()==ID_pointer)
+  if(array_type.id() == ID_pointer)
     throw "index got pointer as array type";
-  else if(array_type.id()!=ID_array && array_type.id()!=ID_vector)
-    throw "bounds check expected array or vector type, got "
-      +array_type.id_string();
+  else if(array_type.id() != ID_array && array_type.id() != ID_vector)
+    throw "bounds check expected array or vector type, got " +
+      array_type.id_string();
 
-  std::string name=array_name(expr.array());
+  std::string name = array_name(expr.array());
 
-  const exprt &index=expr.index();
+  const exprt &index = expr.index();
   object_descriptor_exprt ode;
   ode.build(expr, ns);
 
-  if(index.type().id()!=ID_unsignedbv)
+  if(index.type().id() != ID_unsignedbv)
   {
     // we undo typecasts to signedbv
     if(
@@ -1397,19 +1392,19 @@ void goto_check_javat::bounds_check_index(
 
       if(!i.has_value() || *i < 0)
       {
-        exprt effective_offset=ode.offset();
+        exprt effective_offset = ode.offset();
 
-        if(ode.root_object().id()==ID_dereference)
+        if(ode.root_object().id() == ID_dereference)
         {
-          exprt p_offset=pointer_offset(
-            to_dereference_expr(ode.root_object()).pointer());
+          exprt p_offset =
+            pointer_offset(to_dereference_expr(ode.root_object()).pointer());
 
           effective_offset = plus_exprt{p_offset,
                                         typecast_exprt::conditional_cast(
                                           effective_offset, p_offset.type())};
         }
 
-        exprt zero=from_integer(0, ode.offset().type());
+        exprt zero = from_integer(0, ode.offset().type());
 
         // the final offset must not be negative
         binary_relation_exprt inequality(
@@ -1426,10 +1421,9 @@ void goto_check_javat::bounds_check_index(
     }
   }
 
-  if(ode.root_object().id()==ID_dereference)
+  if(ode.root_object().id() == ID_dereference)
   {
-    const exprt &pointer=
-      to_dereference_expr(ode.root_object()).pointer();
+    const exprt &pointer = to_dereference_expr(ode.root_object()).pointer();
 
     const plus_exprt effective_offset{
       ode.offset(),
@@ -1448,8 +1442,7 @@ void goto_check_javat::bounds_check_index(
         plus_exprt{ode.offset(), from_integer(1, ode.offset().type())});
 
     or_exprt precond(
-      std::move(in_bounds_of_some_explicit_allocation),
-      inequality);
+      std::move(in_bounds_of_some_explicit_allocation), inequality);
 
     add_guarded_property(
       precond,
@@ -1462,20 +1455,19 @@ void goto_check_javat::bounds_check_index(
     return;
   }
 
-  const exprt &size=array_type.id()==ID_array ?
-                    to_array_type(array_type).size() :
-                    to_vector_type(array_type).size();
+  const exprt &size = array_type.id() == ID_array
+                        ? to_array_type(array_type).size()
+                        : to_vector_type(array_type).size();
 
   if(size.is_nil())
   {
     // Linking didn't complete, we don't have a size.
     // Not clear what to do.
   }
-  else if(size.id()==ID_infinity)
+  else if(size.id() == ID_infinity)
   {
   }
-  else if(size.is_zero() &&
-          expr.array().id()==ID_member)
+  else if(size.is_zero() && expr.array().id() == ID_member)
   {
     // a variable sized struct member
     //
@@ -1648,7 +1640,9 @@ void goto_check_javat::check_rec_if(const if_exprt &if_expr, guardt &guard)
   }
 }
 
-bool goto_check_javat::check_rec_member(const member_exprt &member, guardt &guard)
+bool goto_check_javat::check_rec_member(
+  const member_exprt &member,
+  guardt &guard)
 {
   const dereference_exprt &deref = to_dereference_expr(member.struct_op());
 
@@ -1759,38 +1753,39 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
   if(expr.type().id() == ID_c_enum_tag)
     enum_range_check(expr, guard);
 
-  if(expr.id()==ID_index)
+  if(expr.id() == ID_index)
   {
     bounds_check(expr, guard);
   }
-  else if(expr.id()==ID_div)
+  else if(expr.id() == ID_div)
   {
     check_rec_div(to_div_expr(expr), guard);
   }
-  else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
+  else if(expr.id() == ID_shl || expr.id() == ID_ashr || expr.id() == ID_lshr)
   {
     undefined_shift_check(to_shift_expr(expr), guard);
 
-    if(expr.id()==ID_shl && expr.type().id()==ID_signedbv)
+    if(expr.id() == ID_shl && expr.type().id() == ID_signedbv)
       integer_overflow_check(expr, guard);
   }
-  else if(expr.id()==ID_mod)
+  else if(expr.id() == ID_mod)
   {
     mod_by_zero_check(to_mod_expr(expr), guard);
     mod_overflow_check(to_mod_expr(expr), guard);
   }
-  else if(expr.id()==ID_plus || expr.id()==ID_minus ||
-          expr.id()==ID_mult ||
-          expr.id()==ID_unary_minus)
+  else if(
+    expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
+    expr.id() == ID_unary_minus)
   {
     check_rec_arithmetic_op(expr, guard);
   }
-  else if(expr.id()==ID_typecast)
+  else if(expr.id() == ID_typecast)
     conversion_check(expr, guard);
-  else if(expr.id()==ID_le || expr.id()==ID_lt ||
-          expr.id()==ID_ge || expr.id()==ID_gt)
+  else if(
+    expr.id() == ID_le || expr.id() == ID_lt || expr.id() == ID_ge ||
+    expr.id() == ID_gt)
     pointer_rel_check(to_binary_relation_expr(expr), guard);
-  else if(expr.id()==ID_dereference)
+  else if(expr.id() == ID_dereference)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
   }
@@ -1914,12 +1909,12 @@ void goto_check_javat::goto_check(
   local_bitvector_analysis =
     util_make_unique<local_bitvector_analysist>(goto_function, ns);
 
-  goto_programt &goto_program=goto_function.body;
+  goto_programt &goto_program = goto_function.body;
 
   Forall_goto_program_instructions(it, goto_program)
   {
     current_target = it;
-    goto_programt::instructiont &i=*it;
+    goto_programt::instructiont &i = *it;
 
     flag_resett resetter(i);
     const auto &pragmas = i.source_location().get_pragmas();
@@ -1984,8 +1979,7 @@ void goto_check_javat::goto_check(
     // we clear all recorded assertions if
     // 1) we want to generate all assertions or
     // 2) the instruction is a branch target
-    if(retain_trivial ||
-       i.is_target())
+    if(retain_trivial || i.is_target())
       assertions.clear();
 
     if(i.has_condition())
@@ -2006,7 +2000,7 @@ void goto_check_javat::goto_check(
     // magic ERROR label?
     for(const auto &label : error_labels)
     {
-      if(std::find(i.labels.begin(), i.labels.end(), label)!=i.labels.end())
+      if(std::find(i.labels.begin(), i.labels.end(), label) != i.labels.end())
       {
         auto t = new_code.add(
           enable_assert_to_assume
@@ -2025,11 +2019,11 @@ void goto_check_javat::goto_check(
       const auto &code = i.get_other();
       const irep_idt &statement = code.get_statement();
 
-      if(statement==ID_expression)
+      if(statement == ID_expression)
       {
         check(code);
       }
-      else if(statement==ID_printf)
+      else if(statement == ID_printf)
       {
         for(const auto &op : code.operands())
           check(op);
@@ -2082,8 +2076,7 @@ void goto_check_javat::goto_check(
         if(flags.is_unknown() || flags.is_null())
         {
           notequal_exprt not_eq_null(
-            pointer,
-            null_pointer_exprt(to_pointer_type(pointer.type())));
+            pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
 
           add_guarded_property(
             not_eq_null,
@@ -2178,7 +2171,7 @@ void goto_check_javat::goto_check(
         if(local_bitvector_analysis->dirty(variable))
         {
           // need to mark the dead variable as dead
-          exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+          exprt lhs = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           exprt address_of_expr = typecast_exprt::conditional_cast(
             address_of_exprt(variable), lhs.type());
           if_exprt rhs(
@@ -2220,8 +2213,8 @@ void goto_check_javat::goto_check(
         function_identifier == goto_functionst::entry_point() &&
         enable_memory_leak_check)
       {
-        const symbolt &leak=ns.lookup(CPROVER_PREFIX "memory_leak");
-        const symbol_exprt leak_expr=leak.symbol_expr();
+        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
+        const symbol_exprt leak_expr = leak.symbol_expr();
 
         // add self-assignment to get helpful counterexample output
         new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
@@ -2230,8 +2223,7 @@ void goto_check_javat::goto_check(
         source_location.set_function(function_identifier);
 
         equal_exprt eq(
-          leak_expr,
-          null_pointer_exprt(to_pointer_type(leak.type)));
+          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
         add_guarded_property(
           eq,
           "dynamically allocated memory never freed",
@@ -2373,7 +2365,8 @@ goto_check_javat::get_pointer_points_to_valid_memory_conditions(
   return conditions;
 }
 
-optionalt<goto_check_javat::conditiont> goto_check_javat::get_pointer_is_null_condition(
+optionalt<goto_check_javat::conditiont>
+goto_check_javat::get_pointer_is_null_condition(
   const exprt &address,
   const exprt &size)
 {
