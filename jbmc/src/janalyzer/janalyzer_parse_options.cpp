@@ -797,7 +797,7 @@ void janalyzer_parse_optionst::help()
     HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
+    HELP_GOTO_CHECK_JAVA
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 
 #include <analyses/goto_check.h>
+#include <analyses/goto_check_c.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
 

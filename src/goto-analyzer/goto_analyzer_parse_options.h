@@ -100,7 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/goto_check.h>
+#include <analyses/goto_check_c.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 class optionst;

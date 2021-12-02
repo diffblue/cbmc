@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language.h>
 
-#include <analyses/goto_check.h>
+#include <analyses/goto_check_c.h>
 
 #include <goto-checker/bmc_util.h>
 

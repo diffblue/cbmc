@@ -12,7 +12,7 @@ Author: Peter Schrammel
 #ifndef CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
 #define CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
 
-#include <analyses/goto_check.h>
+#include <analyses/goto_check_java.h>
 
 #include <util/parse_options.h>
 #include <util/timestamper.h>
@@ -29,7 +29,7 @@ class goto_modelt;
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
-  OPT_GOTO_CHECK \
+  OPT_GOTO_CHECK_JAVA \
   OPT_COVER \
   "(verbosity):(version)" \
   "(no-lazy-methods)" /* should go away */ \
