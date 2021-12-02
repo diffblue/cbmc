@@ -314,7 +314,9 @@ void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
         throw "expected two unsigned arguments to " CPROVER_PREFIX
               "allocated_memory";
 
-      assert(args[0].type() == args[1].type());
+      DATA_INVARIANT(
+        args[0].type() == args[1].type(),
+        "arguments of allocated_memory must have same type");
       allocations.push_back({args[0], args[1]});
     }
   }
@@ -1028,7 +1030,7 @@ void goto_check_ct::float_overflow_check(const exprt &expr, const guardt &guard)
     }
     else if(expr.operands().size() >= 3)
     {
-      assert(expr.id() != ID_minus);
+      DATA_INVARIANT(expr.id() != ID_minus, "minus expression must be binary");
 
       // break up
       float_overflow_check(make_binary(expr), guard);

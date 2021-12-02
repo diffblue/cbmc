@@ -1031,7 +1031,7 @@ void goto_check_javat::float_overflow_check(
     }
     else if(expr.operands().size() >= 3)
     {
-      assert(expr.id() != ID_minus);
+      DATA_INVARIANT(expr.id() != ID_minus, "minus expression must be binary");
 
       // break up
       float_overflow_check(make_binary(expr), guard);
