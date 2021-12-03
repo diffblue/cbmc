@@ -52,6 +52,7 @@ static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
 }
 
 const symbolt assigns_clauset::conditional_address_ranget::generate_new_symbol(
+  const std::string &prefix,
   const typet &type,
   const source_locationt &location) const
 {
@@ -59,7 +60,8 @@ const symbolt assigns_clauset::conditional_address_ranget::generate_new_symbol(
     type,
     location,
     parent.symbol_table.lookup_ref(parent.function_name).mode,
-    parent.symbol_table);
+    parent.symbol_table,
+    prefix);
 }
 
 assigns_clauset::conditional_address_ranget::conditional_address_ranget(
@@ -70,11 +72,13 @@ assigns_clauset::conditional_address_ranget::conditional_address_ranget(
     parent(parent),
     slice(normalize_to_slice(expr, parent.ns)),
     validity_condition_var(
-      generate_new_symbol(bool_typet(), location).symbol_expr()),
+      generate_new_symbol("__car_valid", bool_typet(), location).symbol_expr()),
     lower_bound_address_var(
-      generate_new_symbol(slice.first.type(), location).symbol_expr()),
+      generate_new_symbol("__car_lb", slice.first.type(), location)
+        .symbol_expr()),
     upper_bound_address_var(
-      generate_new_symbol(slice.first.type(), location).symbol_expr())
+      generate_new_symbol("__car_ub", slice.first.type(), location)
+        .symbol_expr())
 {
 }
 

@@ -142,13 +142,18 @@ const symbolt &new_tmp_symbol(
   const typet &type,
   const source_locationt &location,
   const irep_idt &mode,
-  symbol_table_baset &symtab)
+  symbol_table_baset &symtab,
+  std::string suffix,
+  bool is_auxiliary)
 {
-  return get_fresh_aux_symbol(
+  symbolt &new_symbol = get_fresh_aux_symbol(
     type,
-    id2string(location.get_function()) + "::tmp_cc",
-    "tmp_cc",
+    id2string(location.get_function()) + "::",
+    suffix,
     location,
     mode,
     symtab);
+    new_symbol.is_auxiliary = is_auxiliary;
+    return new_symbol;
+}
 }

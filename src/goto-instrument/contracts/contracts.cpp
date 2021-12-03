@@ -936,9 +936,10 @@ void code_contractst::instrument_call_statement(
       const auto object_validity_var_addr =
         new_tmp_symbol(
           pointer_type(bool_typet{}),
-          instruction_it->source_location(),
+          location_no_checks,
           symbol_table.lookup_ref(function).mode,
-          symbol_table)
+          symbol_table,
+          "__car_valid")
           .symbol_expr();
       write_set_validity_addrs.insert(object_validity_var_addr);
 
