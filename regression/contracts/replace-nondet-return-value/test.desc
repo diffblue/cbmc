@@ -1,0 +1,20 @@
+CORE
+main.c
+--replace-call-with-contract cmp
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ expecting SUCCESS: SUCCESS$
+^\[main\.assertion\.2\] line \d+ expecting FAILURE: FAILURE$
+^\[main\.assertion\.3\] line \d+ expecting SUCCESS: SUCCESS$
+^\[main\.assertion\.4\] line \d+ expecting FAILURE: FAILURE$
+^\*\* 2 of 4 failed
+^VERIFICATION FAILED$
+--
+--
+This test checks that the return value of a replaced function call is made 
+nondet at each replacement site.
+The replaced function is called twice. Each call is expected to have a different
+return value. If the return value of the call is not made nondet at each
+replacement, it would be subject to contradictory constraints
+(from the post conditions) and the assertions expected to fail would 
+be vacuously satisfied.
