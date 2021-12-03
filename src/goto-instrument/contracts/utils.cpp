@@ -153,7 +153,13 @@ const symbolt &new_tmp_symbol(
     location,
     mode,
     symtab);
-    new_symbol.is_auxiliary = is_auxiliary;
-    return new_symbol;
+  new_symbol.is_auxiliary = is_auxiliary;
+  return new_symbol;
 }
+
+void disable_pointer_checks(source_locationt &source_location)
+{
+  source_location.add_pragma("disable:pointer-check");
+  source_location.add_pragma("disable:pointer-primitive-check");
+  source_location.add_pragma("disable:pointer-overflow-check");
 }
