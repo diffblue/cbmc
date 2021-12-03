@@ -911,6 +911,8 @@ void code_contractst::instrument_call_statement(
   }
   else if(callee_name == "free")
   {
+    source_locationt location_no_checks = instruction_it->source_location();
+    disable_pointer_checks(location_no_checks);
     const auto free_car = add_inclusion_check(
       body,
       assigns,
@@ -920,10 +922,9 @@ void code_contractst::instrument_call_statement(
     // skip all invalidation business if we're freeing invalid memory
     goto_programt alias_checking_instructions, skip_program;
     alias_checking_instructions.add(goto_programt::make_goto(
-      skip_program.add(
-        goto_programt::make_skip(instruction_it->source_location())),
+      skip_program.add(goto_programt::make_skip(location_no_checks)),
       not_exprt{free_car.validity_condition_var},
-      instruction_it->source_location()));
+      location_no_checks));
 
     // Since the argument to free may be an "alias" (but not identical)
     // to existing CARs' source_expr, structural equality wouldn't work.
@@ -936,14 +937,15 @@ void code_contractst::instrument_call_statement(
       const auto object_validity_var_addr =
         new_tmp_symbol(
           pointer_type(bool_typet{}),
-          instruction_it->source_location(),
+          location_no_checks,
           symbol_table.lookup_ref(function).mode,
-          symbol_table)
+          symbol_table,
+          "__car_valid")
           .symbol_expr();
       write_set_validity_addrs.insert(object_validity_var_addr);
 
-      alias_checking_instructions.add(goto_programt::make_decl(
-        object_validity_var_addr, instruction_it->source_location()));
+      alias_checking_instructions.add(
+        goto_programt::make_decl(object_validity_var_addr, location_no_checks));
       // if the CAR was defined on the same_object as the one being `free`d,
       // record its validity variable's address, otherwise record NULL
       alias_checking_instructions.add(goto_programt::make_assignment(
@@ -955,7 +957,7 @@ void code_contractst::instrument_call_statement(
               free_car.lower_bound_address_var, w_car.lower_bound_address_var)},
           address_of_exprt{w_car.validity_condition_var},
           null_pointer_exprt{to_pointer_type(object_validity_var_addr.type())}},
-        instruction_it->source_location()));
+        location_no_checks));
     }
 
     alias_checking_instructions.destructive_append(skip_program);
@@ -971,24 +973,22 @@ void code_contractst::instrument_call_statement(
     goto_programt invalidation_instructions;
     skip_program.clear();
     invalidation_instructions.add(goto_programt::make_goto(
-      skip_program.add(
-        goto_programt::make_skip(instruction_it->source_location())),
+      skip_program.add(goto_programt::make_skip(location_no_checks)),
       not_exprt{free_car.validity_condition_var},
-      instruction_it->source_location()));
+      location_no_checks));
 
     // invalidate all recorded CAR validity variables
     for(const auto &w_car_validity_addr : write_set_validity_addrs)
     {
       goto_programt w_car_skip_program;
       invalidation_instructions.add(goto_programt::make_goto(
-        w_car_skip_program.add(
-          goto_programt::make_skip(instruction_it->source_location())),
+        w_car_skip_program.add(goto_programt::make_skip(location_no_checks)),
         null_pointer(w_car_validity_addr),
-        instruction_it->source_location()));
+        location_no_checks));
       invalidation_instructions.add(goto_programt::make_assignment(
         dereference_exprt{w_car_validity_addr},
         false_exprt{},
-        instruction_it->source_location()));
+        location_no_checks));
       invalidation_instructions.destructive_append(w_car_skip_program);
     }
 
@@ -1174,6 +1174,9 @@ void code_contractst::check_frame_conditions(
     else if(instruction_it->is_dead())
     {
       const auto &symbol = instruction_it->dead_symbol();
+      source_locationt location_no_checks = instruction_it->source_location();
+      disable_pointer_checks(location_no_checks);
+
       // CAR equality and hash are defined on source_expr alone,
       // therefore this temporary CAR should be "found"
       const auto &symbol_car = assigns.get_write_set().find(
@@ -1227,10 +1230,13 @@ code_contractst::add_inclusion_check(
     program, instruction_it, snapshot_instructions);
 
   goto_programt assertion;
-  assertion.add(goto_programt::make_assertion(
-    assigns.generate_inclusion_check(car), instruction_it->source_location()));
-  assertion.instructions.back().source_location_nonconst().set_comment(
+  source_locationt location_no_checks =
+    instruction_it->source_location_nonconst();
+  disable_pointer_checks(location_no_checks);
+  location_no_checks.set_comment(
     "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
+  assertion.add(goto_programt::make_assertion(
+    assigns.generate_inclusion_check(car), location_no_checks));
   insert_before_swap_and_advance(program, instruction_it, assertion);
 
   return car;

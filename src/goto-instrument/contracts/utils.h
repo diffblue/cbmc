@@ -105,17 +105,24 @@ void insert_before_swap_and_advance(
   goto_programt::targett &target,
   goto_programt &payload);
 
-/// \brief Adds a new temporary symbol to the symbol table.
+/// \brief Adds a fresh and uniquely named symbol to the symbol table.
 ///
 /// \param type: The type of the new symbol.
 /// \param location: The source location for the new symbol.
 /// \param mode: The mode for the new symbol, e.g. ID_C, ID_java.
 /// \param symtab: The symbol table to which the new symbol is to be added.
+/// \param suffix: Suffix to use to generate the unique name
+/// \param is_auxiliary: Do not print symbol in traces if true (default = false)
 /// \return The new symbolt object.
 const symbolt &new_tmp_symbol(
   const typet &type,
   const source_locationt &location,
   const irep_idt &mode,
-  symbol_table_baset &symtab);
+  symbol_table_baset &symtab,
+  std::string suffix = "tmp_cc",
+  bool is_auxiliary = false);
+
+/// Add disable pragmas for all pointer checks on the given location
+void disable_pointer_checks(source_locationt &source_location);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
