@@ -193,6 +193,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2/smt2_parser.cpp \
       smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
+      smt2_incremental/construct_value_expr_from_smt.cpp \
       smt2_incremental/convert_expr_to_smt.cpp \
       smt2_incremental/smt_bit_vector_theory.cpp \
       smt2_incremental/smt_commands.cpp \
