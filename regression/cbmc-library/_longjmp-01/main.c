@@ -1,9 +1,10 @@
-#include <assert.h>
 #include <setjmp.h>
+
+static jmp_buf env;
 
 int main()
 {
-  _longjmp();
-  assert(0);
+  _longjmp(env, 1);
+  __CPROVER_assert(0, "unreachable");
   return 0;
 }
