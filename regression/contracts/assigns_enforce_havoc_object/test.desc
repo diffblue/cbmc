@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^\[bar.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: SUCCESS$
+^\[bar.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks that __CPROVER_havoc_object(x) is detected as a write to POINTER_OBJECT(x).
