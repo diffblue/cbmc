@@ -7,7 +7,7 @@ add_test_pl_tests(
     "$<TARGET_FILE:cbmc>"
     "cbmc-library"
     "$<TARGET_FILE:cbmc>"
-    "-C;-X;pthread"
+    "-C;-X;unix"
     "CORE"
 )
 endif()

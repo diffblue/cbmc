@@ -4,14 +4,14 @@ include ../../src/config.inc
 include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
-	no_pthread = -X pthread
+	unix_only = -X unix
 endif
 
 test:
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(no_pthread)
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(unix_only)
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(no_pthread)
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(unix_only)
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;

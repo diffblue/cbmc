@@ -1,4 +1,4 @@
-CORE pthread
+CORE unix
 main.c
 --bounds-check
 ^EXIT=10$

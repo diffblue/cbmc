@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE
 main.c
 --pointer-check --bounds-check
-^EXIT=0$
+^\[main.assertion.1\] line 8 reached via longjmp: SUCCESS$
+^\[main.assertion.2\] line 10 setjmp called directly: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
