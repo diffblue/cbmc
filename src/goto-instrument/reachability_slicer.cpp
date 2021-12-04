@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// from the criterion).
 
 #include "full_slicer_class.h"
-#include "reachability_slicer.h"
 #include "reachability_slicer_class.h"
 
 #include <util/exception_utils.h>
@@ -26,11 +25,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/is_threaded.h>
 
+#include "reachability_slicer.h"
+
 void reachability_slicert::operator()(
   goto_functionst &goto_functions,
   const slicing_criteriont &criterion,
   bool include_forward_reachability)
 {
+  // Replace function calls without body by non-deterministic return values to
+  // ensure the CFG does not consider instructions after such a call to be
+  // unreachable.
+  remove_calls_no_bodyt remove_calls_no_body;
+  remove_calls_no_body(goto_functions);
+  goto_functions.update();
+
   cfg(goto_functions);
   for(const auto &gf_entry : goto_functions.function_map)
   {

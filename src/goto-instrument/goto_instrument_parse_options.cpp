@@ -1066,8 +1066,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // we add the library in some cases, as some analyses benefit
 
-  if(cmdline.isset("add-library") ||
-     cmdline.isset("mm"))
+  if(
+    cmdline.isset("add-library") || cmdline.isset("mm") ||
+    cmdline.isset("reachability-slice") ||
+    cmdline.isset("reachability-slice-fb") ||
+    cmdline.isset("fp-reachability-slice"))
   {
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))

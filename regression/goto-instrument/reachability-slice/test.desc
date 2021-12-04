@@ -1,0 +1,8 @@
+CORE
+main.c
+--reachability-slice
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+should_be_sliced_away
