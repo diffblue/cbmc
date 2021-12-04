@@ -61,8 +61,6 @@ public:
     enable_unsigned_overflow_check =
       _options.get_bool_option("unsigned-overflow-check");
     enable_conversion_check = _options.get_bool_option("conversion-check");
-    enable_undefined_shift_check =
-      _options.get_bool_option("undefined-shift-check");
     enable_float_overflow_check =
       _options.get_bool_option("float-overflow-check");
     enable_simplify = _options.get_bool_option("simplify");
@@ -165,7 +163,6 @@ protected:
   void bounds_check_index(const index_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
-  void undefined_shift_check(const shift_exprt &, const guardt &);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
   /// \param expr the expression to be checked
@@ -224,7 +221,6 @@ protected:
   bool enable_unsigned_overflow_check;
   bool enable_pointer_overflow_check;
   bool enable_conversion_check;
-  bool enable_undefined_shift_check;
   bool enable_float_overflow_check;
   bool enable_simplify;
   bool enable_nan_check;
@@ -287,73 +283,6 @@ void goto_check_javat::div_by_zero_check(
     expr.find_source_location(),
     expr,
     guard);
-}
-
-void goto_check_javat::undefined_shift_check(
-  const shift_exprt &expr,
-  const guardt &guard)
-{
-  if(!enable_undefined_shift_check)
-    return;
-
-  // Undefined for all types and shifts if distance exceeds width,
-  // and also undefined for negative distances.
-
-  const typet &distance_type = expr.distance().type();
-
-  if(distance_type.id() == ID_signedbv)
-  {
-    binary_relation_exprt inequality(
-      expr.distance(), ID_ge, from_integer(0, distance_type));
-
-    add_guarded_property(
-      inequality,
-      "shift distance is negative",
-      "undefined-shift",
-      expr.find_source_location(),
-      expr,
-      guard);
-  }
-
-  const typet &op_type = expr.op().type();
-
-  if(op_type.id() == ID_unsignedbv || op_type.id() == ID_signedbv)
-  {
-    exprt width_expr =
-      from_integer(to_bitvector_type(op_type).get_width(), distance_type);
-
-    add_guarded_property(
-      binary_relation_exprt(expr.distance(), ID_lt, std::move(width_expr)),
-      "shift distance too large",
-      "undefined-shift",
-      expr.find_source_location(),
-      expr,
-      guard);
-
-    if(op_type.id() == ID_signedbv && expr.id() == ID_shl)
-    {
-      binary_relation_exprt inequality(
-        expr.op(), ID_ge, from_integer(0, op_type));
-
-      add_guarded_property(
-        inequality,
-        "shift operand is negative",
-        "undefined-shift",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
-  }
-  else
-  {
-    add_guarded_property(
-      false_exprt(),
-      "shift of non-integer type",
-      "undefined-shift",
-      expr.find_source_location(),
-      expr,
-      guard);
-  }
 }
 
 /// check a mod expression for the case INT_MIN % -1
@@ -1428,11 +1357,9 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
   {
     check_rec_div(to_div_expr(expr), guard);
   }
-  else if(expr.id() == ID_shl || expr.id() == ID_ashr || expr.id() == ID_lshr)
+  else if(expr.id() == ID_shl)
   {
-    undefined_shift_check(to_shift_expr(expr), guard);
-
-    if(expr.id() == ID_shl && expr.type().id() == ID_signedbv)
+    if(expr.type().id() == ID_signedbv)
       integer_overflow_check(expr, guard);
   }
   else if(expr.id() == ID_mod)
