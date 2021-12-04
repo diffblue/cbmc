@@ -13,17 +13,37 @@ Author: Daniel Kroening, kroening@kroening.com
 /// (and possibly, depending on the parameters, keep those that can be reached
 /// from the criterion).
 
+#include "full_slicer_class.h"
 #include "reachability_slicer.h"
+#include "reachability_slicer_class.h"
+
+#include <util/exception_utils.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 
-#include <util/exception_utils.h>
+#include <analyses/is_threaded.h>
 
-#include "full_slicer_class.h"
-#include "reachability_slicer_class.h"
+void reachability_slicert::operator()(
+  goto_functionst &goto_functions,
+  const slicing_criteriont &criterion,
+  bool include_forward_reachability)
+{
+  cfg(goto_functions);
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    forall_goto_program_instructions(i_it, gf_entry.second.body)
+      cfg[cfg.entry_map[i_it]].function_id = gf_entry.first;
+  }
+
+  is_threadedt is_threaded(goto_functions);
+  fixedpoint_to_assertions(is_threaded, criterion);
+  if(include_forward_reachability)
+    fixedpoint_from_assertions(is_threaded, criterion);
+  slice(goto_functions);
+}
 
 /// Get the set of nodes that correspond to the given criterion, or that can
 /// appear in concurrent execution. None of these should be sliced away so

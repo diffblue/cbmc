@@ -12,11 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
 #define CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
 
-#include <goto-programs/goto_functions.h>
-#include <goto-programs/cfg.h>
+#include <goto-programs/goto_program.h>
 
-#include <analyses/is_threaded.h>
-
+class goto_functionst;
 class slicing_criteriont;
 
 class reachability_slicert
@@ -25,21 +23,7 @@ public:
   void operator()(
     goto_functionst &goto_functions,
     const slicing_criteriont &criterion,
-    bool include_forward_reachability)
-  {
-    cfg(goto_functions);
-    for(const auto &gf_entry : goto_functions.function_map)
-    {
-      forall_goto_program_instructions(i_it, gf_entry.second.body)
-        cfg[cfg.entry_map[i_it]].function_id = gf_entry.first;
-    }
-
-    is_threadedt is_threaded(goto_functions);
-    fixedpoint_to_assertions(is_threaded, criterion);
-    if(include_forward_reachability)
-      fixedpoint_from_assertions(is_threaded, criterion);
-    slice(goto_functions);
-  }
+    bool include_forward_reachability);
 
 protected:
   struct slicer_entryt
