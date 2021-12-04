@@ -163,7 +163,6 @@ protected:
 
   void bounds_check(const exprt &, const guardt &);
   void bounds_check_index(const index_exprt &, const guardt &);
-  void bounds_check_bit_count(const unary_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
   void undefined_shift_check(const shift_exprt &, const guardt &);
@@ -1069,11 +1068,6 @@ void goto_check_javat::bounds_check(const exprt &expr, const guardt &guard)
 
   if(expr.id() == ID_index)
     bounds_check_index(to_index_expr(expr), guard);
-  else if(
-    expr.id() == ID_count_leading_zeros || expr.id() == ID_count_trailing_zeros)
-  {
-    bounds_check_bit_count(to_unary_expr(expr), guard);
-  }
 }
 
 void goto_check_javat::bounds_check_index(
@@ -1216,28 +1210,6 @@ void goto_check_javat::bounds_check_index(
       expr,
       guard);
   }
-}
-
-void goto_check_javat::bounds_check_bit_count(
-  const unary_exprt &expr,
-  const guardt &guard)
-{
-  std::string name;
-
-  if(expr.id() == ID_count_leading_zeros)
-    name = "leading";
-  else if(expr.id() == ID_count_trailing_zeros)
-    name = "trailing";
-  else
-    PRECONDITION(false);
-
-  add_guarded_property(
-    notequal_exprt{expr.op(), from_integer(0, expr.op().type())},
-    "count " + name + " zeros is undefined for value zero",
-    "bit count",
-    expr.find_source_location(),
-    expr,
-    guard);
 }
 
 void goto_check_javat::add_guarded_property(
@@ -1478,11 +1450,6 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
   else if(expr.id() == ID_dereference)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
-  }
-  else if(
-    expr.id() == ID_count_leading_zeros || expr.id() == ID_count_trailing_zeros)
-  {
-    bounds_check(expr, guard);
   }
 }
 
