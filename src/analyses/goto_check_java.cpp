@@ -91,25 +91,7 @@ protected:
   ///  if it is a dereference then check the pointer
   ///  if it is an index then address-check the array and then check the index
   /// \param expr: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
-  void check_rec_address(const exprt &expr, guardt &guard);
-
-  /// Check a logical operation: check each operand in separation while
-  /// extending the guarding condition as follows.
-  ///  a /\ b /\ c ==> check(a, TRUE), check(b, a), check (c, a /\ b)
-  ///  a \/ b \/ c ==> check(a, TRUE), check(b, ~a), check (c, ~a /\ ~b)
-  /// \param expr: the expression to be checked
-  /// \param guard: the condition for the check (extended with the previous
-  ///   operands (or their negations) for recursively calls)
-  void check_rec_logical_op(const exprt &expr, guardt &guard);
-
-  /// Check an if expression: check the if-condition alone, and then check the
-  ///   true/false-cases with the guard extended with if-condition and it's
-  ///   negation, respectively.
-  /// \param if_expr: the expression to be checked
-  /// \param guard: the condition for the check (extended with the (negation of
-  ///   the) if-condition for recursively calls)
-  void check_rec_if(const if_exprt &if_expr, guardt &guard);
+  void check_rec_address(const exprt &expr);
 
   /// Check that a member expression is valid:
   /// - check the structure this expression is a member of (via pointer of its
@@ -118,29 +100,25 @@ protected:
   ///   `s->member' to avoid checking safety of `s'
   /// - check all operands of the expression
   /// \param member: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
   /// \return true if no more checks are required for \p member or its
   ///   sub-expressions
-  bool check_rec_member(const member_exprt &member, guardt &guard);
+  bool check_rec_member(const member_exprt &member);
 
   /// Check that a division is valid: check for division by zero, overflow and
   ///   NaN (for floating point numbers).
   /// \param div_expr: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
-  void check_rec_div(const div_exprt &div_expr, guardt &guard);
+  void check_rec_div(const div_exprt &div_expr);
 
   /// Check that an arithmetic operation is valid: overflow check, NaN-check
   ///   (for floating point numbers), and pointer overflow check.
   /// \param expr: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
-  void check_rec_arithmetic_op(const exprt &expr, guardt &guard);
+  void check_rec_arithmetic_op(const exprt &expr);
 
   /// Recursively descend into \p expr and run the appropriate check for each
   ///   sub-expression, while collecting the condition for the check in \p
   ///   guard.
   /// \param expr: the expression to be checked
-  /// \param guard: the condition for when the check should be made
-  void check_rec(const exprt &expr, guardt &guard);
+  void check_rec(const exprt &expr);
 
   /// Initiate the recursively analysis of \p expr with its `guard' set to TRUE.
   /// \param expr: the expression to be checked
@@ -159,20 +137,17 @@ protected:
 
   using conditionst = std::list<conditiont>;
 
-  void bounds_check(const exprt &, const guardt &);
-  void bounds_check_index(const index_exprt &, const guardt &);
-  void div_by_zero_check(const div_exprt &, const guardt &);
-  void mod_overflow_check(const mod_exprt &, const guardt &);
+  void bounds_check(const exprt &);
+  void bounds_check_index(const index_exprt &);
+  void div_by_zero_check(const div_exprt &);
+  void mod_overflow_check(const mod_exprt &);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
   /// \param expr the expression to be checked
   /// \param src_expr The expression as found in the program,
   ///  prior to any rewriting
-  /// \param guard the condition under which the operation happens
-  void pointer_validity_check(
-    const dereference_exprt &expr,
-    const exprt &src_expr,
-    const guardt &guard);
+  void
+  pointer_validity_check(const dereference_exprt &expr, const exprt &src_expr);
 
   optionalt<goto_check_javat::conditiont>
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
@@ -180,10 +155,10 @@ protected:
   conditionst get_pointer_dereferenceable_conditions(
     const exprt &address,
     const exprt &size);
-  void integer_overflow_check(const exprt &, const guardt &);
-  void conversion_check(const exprt &, const guardt &);
-  void float_overflow_check(const exprt &, const guardt &);
-  void nan_check(const exprt &, const guardt &);
+  void integer_overflow_check(const exprt &);
+  void conversion_check(const exprt &);
+  void float_overflow_check(const exprt &);
+  void nan_check(const exprt &);
   optionalt<exprt> rw_ok_check(exprt);
 
   std::string array_name(const exprt &);
@@ -194,15 +169,12 @@ protected:
   /// \param property_class: classification of the property
   /// \param source_location: the source location of the original expression
   /// \param src_expr: the original expression to be included in the comment
-  /// \param guard: the condition under which the asserted expression should be
-  ///   taken into account
-  void add_guarded_property(
+  void add_property(
     const exprt &asserted_expr,
     const std::string &comment,
     const std::string &property_class,
     const source_locationt &source_location,
-    const exprt &src_expr,
-    const guardt &guard);
+    const exprt &src_expr);
 
   goto_programt new_code;
   typedef std::set<std::pair<exprt, exprt>> assertionst;
@@ -264,9 +236,7 @@ void goto_check_javat::invalidate(const exprt &lhs)
   }
 }
 
-void goto_check_javat::div_by_zero_check(
-  const div_exprt &expr,
-  const guardt &guard)
+void goto_check_javat::div_by_zero_check(const div_exprt &expr)
 {
   if(!enable_div_by_zero_check)
     return;
@@ -276,19 +246,16 @@ void goto_check_javat::div_by_zero_check(
   exprt zero = from_integer(0, expr.op1().type());
   const notequal_exprt inequality(expr.op1(), std::move(zero));
 
-  add_guarded_property(
+  add_property(
     inequality,
     "division by zero",
     "division-by-zero",
     expr.find_source_location(),
-    expr,
-    guard);
+    expr);
 }
 
 /// check a mod expression for the case INT_MIN % -1
-void goto_check_javat::mod_overflow_check(
-  const mod_exprt &expr,
-  const guardt &guard)
+void goto_check_javat::mod_overflow_check(const mod_exprt &expr)
 {
   if(!enable_signed_overflow_check)
     return;
@@ -308,17 +275,16 @@ void goto_check_javat::mod_overflow_check(
     notequal_exprt minus_one_neq(
       expr.op1(), from_integer(-1, expr.op1().type()));
 
-    add_guarded_property(
+    add_property(
       or_exprt(int_min_neq, minus_one_neq),
       "result of signed mod is not representable",
       "overflow",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
   }
 }
 
-void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
+void goto_check_javat::conversion_check(const exprt &expr)
 {
   if(!enable_conversion_check)
     return;
@@ -352,13 +318,12 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
         const binary_relation_exprt no_overflow_lower(
           op, ID_ge, from_integer(-power(2, new_width - 1), old_type));
 
-        add_guarded_property(
+        add_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on signed type conversion",
           "overflow",
           expr.find_source_location(),
-          expr,
-          guard);
+          expr);
       }
       else if(old_type.id() == ID_unsignedbv) // unsigned -> signed
       {
@@ -369,13 +334,12 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
         const binary_relation_exprt no_overflow_upper(
           op, ID_le, from_integer(power(2, new_width - 1) - 1, old_type));
 
-        add_guarded_property(
+        add_property(
           no_overflow_upper,
           "arithmetic overflow on unsigned to signed type conversion",
           "overflow",
           expr.find_source_location(),
-          expr,
-          guard);
+          expr);
       }
       else if(old_type.id() == ID_floatbv) // float -> signed
       {
@@ -390,13 +354,12 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
         const binary_relation_exprt no_overflow_lower(
           op, ID_gt, lower.to_expr());
 
-        add_guarded_property(
+        add_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to signed integer type conversion",
           "overflow",
           expr.find_source_location(),
-          expr,
-          guard);
+          expr);
       }
     }
     else if(type.id() == ID_unsignedbv)
@@ -413,13 +376,12 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
           const binary_relation_exprt no_overflow_lower(
             op, ID_ge, from_integer(0, old_type));
 
-          add_guarded_property(
+          add_property(
             no_overflow_lower,
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
             expr.find_source_location(),
-            expr,
-            guard);
+            expr);
         }
         else
         {
@@ -430,13 +392,12 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
           const binary_relation_exprt no_overflow_lower(
             op, ID_ge, from_integer(0, old_type));
 
-          add_guarded_property(
+          add_property(
             and_exprt(no_overflow_lower, no_overflow_upper),
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
             expr.find_source_location(),
-            expr,
-            guard);
+            expr);
         }
       }
       else if(old_type.id() == ID_unsignedbv) // unsigned -> unsigned
@@ -448,13 +409,12 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
         const binary_relation_exprt no_overflow_upper(
           op, ID_le, from_integer(power(2, new_width) - 1, old_type));
 
-        add_guarded_property(
+        add_property(
           no_overflow_upper,
           "arithmetic overflow on unsigned to unsigned type conversion",
           "overflow",
           expr.find_source_location(),
-          expr,
-          guard);
+          expr);
       }
       else if(old_type.id() == ID_floatbv) // float -> unsigned
       {
@@ -469,21 +429,18 @@ void goto_check_javat::conversion_check(const exprt &expr, const guardt &guard)
         const binary_relation_exprt no_overflow_lower(
           op, ID_gt, lower.to_expr());
 
-        add_guarded_property(
+        add_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to unsigned integer type conversion",
           "overflow",
           expr.find_source_location(),
-          expr,
-          guard);
+          expr);
       }
     }
   }
 }
 
-void goto_check_javat::integer_overflow_check(
-  const exprt &expr,
-  const guardt &guard)
+void goto_check_javat::integer_overflow_check(const exprt &expr)
 {
   if(!enable_signed_overflow_check && !enable_unsigned_overflow_check)
     return;
@@ -511,13 +468,12 @@ void goto_check_javat::integer_overflow_check(
 
       equal_exprt minus_one_eq(div_expr.divisor(), from_integer(-1, type));
 
-      add_guarded_property(
+      add_property(
         not_exprt(and_exprt(int_min_eq, minus_one_eq)),
         "arithmetic overflow on signed division",
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
 
     return;
@@ -532,13 +488,12 @@ void goto_check_javat::integer_overflow_check(
       equal_exprt int_min_eq(
         to_unary_minus_expr(expr).op(), to_signedbv_type(type).smallest_expr());
 
-      add_guarded_property(
+      add_property(
         not_exprt(int_min_eq),
         "arithmetic overflow on signed unary minus",
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
     else if(type.id() == ID_unsignedbv)
     {
@@ -548,13 +503,12 @@ void goto_check_javat::integer_overflow_check(
       notequal_exprt not_eq_zero(
         to_unary_minus_expr(expr).op(), to_unsignedbv_type(type).zero_expr());
 
-      add_guarded_property(
+      add_property(
         not_eq_zero,
         "arithmetic overflow on unsigned unary minus",
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
 
     return;
@@ -630,7 +584,7 @@ void goto_check_javat::integer_overflow_check(
       // a shift that's too far isn't an overflow;
       // a shift of zero isn't overflow;
       // else check the top bits
-      add_guarded_property(
+      add_property(
         disjunction({neg_value_shift,
                      neg_dist_shift,
                      dist_too_large,
@@ -639,8 +593,7 @@ void goto_check_javat::integer_overflow_check(
         "arithmetic overflow on signed shl",
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
 
     return;
@@ -668,13 +621,12 @@ void goto_check_javat::integer_overflow_check(
 
       std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
 
-      add_guarded_property(
+      add_property(
         not_exprt{binary_overflow_exprt{tmp, expr.id(), expr.operands()[i]}},
         "arithmetic overflow on " + kind + " " + expr.id_string(),
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
   }
   else if(expr.operands().size() == 2)
@@ -682,13 +634,12 @@ void goto_check_javat::integer_overflow_check(
     std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
 
     const binary_exprt &bexpr = to_binary_expr(expr);
-    add_guarded_property(
+    add_property(
       not_exprt{binary_overflow_exprt{bexpr.lhs(), expr.id(), bexpr.rhs()}},
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
   }
   else
   {
@@ -696,19 +647,16 @@ void goto_check_javat::integer_overflow_check(
 
     std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
 
-    add_guarded_property(
+    add_property(
       not_exprt{unary_overflow_exprt{expr.id(), to_unary_expr(expr).op()}},
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
   }
 }
 
-void goto_check_javat::float_overflow_check(
-  const exprt &expr,
-  const guardt &guard)
+void goto_check_javat::float_overflow_check(const exprt &expr)
 {
   if(!enable_float_overflow_check)
     return;
@@ -731,24 +679,22 @@ void goto_check_javat::float_overflow_check(
       // float-to-float
       or_exprt overflow_check{isinf_exprt(op), not_exprt(isinf_exprt(expr))};
 
-      add_guarded_property(
+      add_property(
         std::move(overflow_check),
         "arithmetic overflow on floating-point typecast",
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
     else
     {
       // non-float-to-float
-      add_guarded_property(
+      add_property(
         not_exprt(isinf_exprt(expr)),
         "arithmetic overflow on floating-point typecast",
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
     }
 
     return;
@@ -759,13 +705,12 @@ void goto_check_javat::float_overflow_check(
     or_exprt overflow_check(
       isinf_exprt(to_div_expr(expr).dividend()), not_exprt(isinf_exprt(expr)));
 
-    add_guarded_property(
+    add_property(
       std::move(overflow_check),
       "arithmetic overflow on floating-point division",
       "overflow",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
 
     return;
   }
@@ -795,13 +740,12 @@ void goto_check_javat::float_overflow_check(
                                ? "subtraction"
                                : expr.id() == ID_mult ? "multiplication" : "";
 
-      add_guarded_property(
+      add_property(
         std::move(overflow_check),
         "arithmetic overflow on floating-point " + kind,
         "overflow",
         expr.find_source_location(),
-        expr,
-        guard);
+        expr);
 
       return;
     }
@@ -810,13 +754,13 @@ void goto_check_javat::float_overflow_check(
       DATA_INVARIANT(expr.id() != ID_minus, "minus expression must be binary");
 
       // break up
-      float_overflow_check(make_binary(expr), guard);
+      float_overflow_check(make_binary(expr));
       return;
     }
   }
 }
 
-void goto_check_javat::nan_check(const exprt &expr, const guardt &guard)
+void goto_check_javat::nan_check(const exprt &expr)
 {
   if(!enable_nan_check)
     return;
@@ -854,7 +798,7 @@ void goto_check_javat::nan_check(const exprt &expr, const guardt &guard)
   else if(expr.id() == ID_mult)
   {
     if(expr.operands().size() >= 3)
-      return nan_check(make_binary(expr), guard);
+      return nan_check(make_binary(expr));
 
     const auto &mult_expr = to_mult_expr(expr);
 
@@ -874,7 +818,7 @@ void goto_check_javat::nan_check(const exprt &expr, const guardt &guard)
   else if(expr.id() == ID_plus)
   {
     if(expr.operands().size() >= 3)
-      return nan_check(make_binary(expr), guard);
+      return nan_check(make_binary(expr));
 
     const auto &plus_expr = to_plus_expr(expr);
 
@@ -915,19 +859,17 @@ void goto_check_javat::nan_check(const exprt &expr, const guardt &guard)
   else
     UNREACHABLE;
 
-  add_guarded_property(
+  add_property(
     boolean_negate(isnan),
     "NaN on " + expr.id_string(),
     "NaN",
     expr.find_source_location(),
-    expr,
-    guard);
+    expr);
 }
 
 void goto_check_javat::pointer_validity_check(
   const dereference_exprt &expr,
-  const exprt &src_expr,
-  const guardt &guard)
+  const exprt &src_expr)
 {
   if(!enable_pointer_check)
     return;
@@ -955,13 +897,12 @@ void goto_check_javat::pointer_validity_check(
 
   for(const auto &c : conditions)
   {
-    add_guarded_property(
+    add_property(
       c.assertion,
       "dereference failure: " + c.description,
       "pointer dereference",
       src_expr.find_source_location(),
-      src_expr,
-      guard);
+      src_expr);
   }
 }
 
@@ -983,7 +924,7 @@ std::string goto_check_javat::array_name(const exprt &expr)
   return ::array_name(ns, expr);
 }
 
-void goto_check_javat::bounds_check(const exprt &expr, const guardt &guard)
+void goto_check_javat::bounds_check(const exprt &expr)
 {
   if(!enable_bounds_check)
     return;
@@ -996,12 +937,10 @@ void goto_check_javat::bounds_check(const exprt &expr, const guardt &guard)
   }
 
   if(expr.id() == ID_index)
-    bounds_check_index(to_index_expr(expr), guard);
+    bounds_check_index(to_index_expr(expr));
 }
 
-void goto_check_javat::bounds_check_index(
-  const index_exprt &expr,
-  const guardt &guard)
+void goto_check_javat::bounds_check_index(const index_exprt &expr)
 {
   const typet &array_type = expr.array().type();
 
@@ -1050,13 +989,12 @@ void goto_check_javat::bounds_check_index(
         binary_relation_exprt inequality(
           effective_offset, ID_ge, std::move(zero));
 
-        add_guarded_property(
+        add_property(
           inequality,
           name + " lower bound",
           "array bounds",
           expr.find_source_location(),
-          expr,
-          guard);
+          expr);
       }
     }
   }
@@ -1076,13 +1014,12 @@ void goto_check_javat::bounds_check_index(
       typecast_exprt::conditional_cast(
         object_size(pointer), effective_offset.type())};
 
-    add_guarded_property(
+    add_property(
       inequality,
       name + " dynamic object upper bound",
       "array bounds",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
 
     return;
   }
@@ -1118,36 +1055,33 @@ void goto_check_javat::bounds_check_index(
       ID_lt,
       type_size_opt.value());
 
-    add_guarded_property(
+    add_property(
       inequality,
       name + " upper bound",
       "array bounds",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
   }
   else
   {
     binary_relation_exprt inequality{
       typecast_exprt::conditional_cast(index, size.type()), ID_lt, size};
 
-    add_guarded_property(
+    add_property(
       inequality,
       name + " upper bound",
       "array bounds",
       expr.find_source_location(),
-      expr,
-      guard);
+      expr);
   }
 }
 
-void goto_check_javat::add_guarded_property(
+void goto_check_javat::add_property(
   const exprt &asserted_expr,
   const std::string &comment,
   const std::string &property_class,
   const source_locationt &source_location,
-  const exprt &src_expr,
-  const guardt &guard)
+  const exprt &src_expr)
 {
   // first try simplifier on it
   exprt simplified_expr =
@@ -1157,19 +1091,13 @@ void goto_check_javat::add_guarded_property(
   if(!retain_trivial && simplified_expr.is_true())
     return;
 
-  // add the guard
-  exprt guarded_expr =
-    guard.is_true()
-      ? std::move(simplified_expr)
-      : implies_exprt{guard.as_expr(), std::move(simplified_expr)};
-
-  if(assertions.insert(std::make_pair(src_expr, guarded_expr)).second)
+  if(assertions.insert(std::make_pair(src_expr, simplified_expr)).second)
   {
     auto t = new_code.add(
       enable_assert_to_assume ? goto_programt::make_assumption(
-                                  std::move(guarded_expr), source_location)
+                                  std::move(simplified_expr), source_location)
                               : goto_programt::make_assertion(
-                                  std::move(guarded_expr), source_location));
+                                  std::move(simplified_expr), source_location));
 
     std::string source_expr_string;
     get_language_from_mode(ID_java)->from_expr(
@@ -1181,7 +1109,7 @@ void goto_check_javat::add_guarded_property(
   }
 }
 
-void goto_check_javat::check_rec_address(const exprt &expr, guardt &guard)
+void goto_check_javat::check_rec_address(const exprt &expr)
 {
   // we don't look into quantifiers
   if(expr.id() == ID_exists || expr.id() == ID_forall)
@@ -1189,75 +1117,26 @@ void goto_check_javat::check_rec_address(const exprt &expr, guardt &guard)
 
   if(expr.id() == ID_dereference)
   {
-    check_rec(to_dereference_expr(expr).pointer(), guard);
+    check_rec(to_dereference_expr(expr).pointer());
   }
   else if(expr.id() == ID_index)
   {
     const index_exprt &index_expr = to_index_expr(expr);
-    check_rec_address(index_expr.array(), guard);
-    check_rec(index_expr.index(), guard);
+    check_rec_address(index_expr.array());
+    check_rec(index_expr.index());
   }
   else
   {
     for(const auto &operand : expr.operands())
-      check_rec_address(operand, guard);
+      check_rec_address(operand);
   }
 }
 
-void goto_check_javat::check_rec_logical_op(const exprt &expr, guardt &guard)
-{
-  PRECONDITION(
-    expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies);
-  INVARIANT(
-    expr.is_boolean(),
-    "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
-
-  guardt old_guard = guard;
-
-  for(const auto &op : expr.operands())
-  {
-    INVARIANT(
-      op.is_boolean(),
-      "'" + expr.id_string() + "' takes Boolean operands only, but got " +
-        op.pretty());
-
-    check_rec(op, guard);
-    guard.add(expr.id() == ID_or ? boolean_negate(op) : op);
-  }
-
-  guard = std::move(old_guard);
-}
-
-void goto_check_javat::check_rec_if(const if_exprt &if_expr, guardt &guard)
-{
-  INVARIANT(
-    if_expr.cond().is_boolean(),
-    "first argument of if must be boolean, but got " + if_expr.cond().pretty());
-
-  check_rec(if_expr.cond(), guard);
-
-  {
-    guardt old_guard = guard;
-    guard.add(if_expr.cond());
-    check_rec(if_expr.true_case(), guard);
-    guard = std::move(old_guard);
-  }
-
-  {
-    guardt old_guard = guard;
-    guard.add(not_exprt{if_expr.cond()});
-    check_rec(if_expr.false_case(), guard);
-    guard = std::move(old_guard);
-  }
-}
-
-bool goto_check_javat::check_rec_member(
-  const member_exprt &member,
-  guardt &guard)
+bool goto_check_javat::check_rec_member(const member_exprt &member)
 {
   const dereference_exprt &deref = to_dereference_expr(member.struct_op());
 
-  check_rec(deref.pointer(), guard);
+  check_rec(deref.pointer());
 
   // avoid building the following expressions when pointer_validity_check
   // would return immediately anyway
@@ -1284,40 +1163,40 @@ bool goto_check_javat::check_rec_member(
 
     dereference_exprt new_deref{new_address_casted};
     new_deref.add_source_location() = deref.source_location();
-    pointer_validity_check(new_deref, member, guard);
+    pointer_validity_check(new_deref, member);
 
     return true;
   }
   return false;
 }
 
-void goto_check_javat::check_rec_div(const div_exprt &div_expr, guardt &guard)
+void goto_check_javat::check_rec_div(const div_exprt &div_expr)
 {
-  div_by_zero_check(to_div_expr(div_expr), guard);
+  div_by_zero_check(to_div_expr(div_expr));
 
   if(div_expr.type().id() == ID_signedbv)
-    integer_overflow_check(div_expr, guard);
+    integer_overflow_check(div_expr);
   else if(div_expr.type().id() == ID_floatbv)
   {
-    nan_check(div_expr, guard);
-    float_overflow_check(div_expr, guard);
+    nan_check(div_expr);
+    float_overflow_check(div_expr);
   }
 }
 
-void goto_check_javat::check_rec_arithmetic_op(const exprt &expr, guardt &guard)
+void goto_check_javat::check_rec_arithmetic_op(const exprt &expr)
 {
   if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
   {
-    integer_overflow_check(expr, guard);
+    integer_overflow_check(expr);
   }
   else if(expr.type().id() == ID_floatbv)
   {
-    nan_check(expr, guard);
-    float_overflow_check(expr, guard);
+    nan_check(expr);
+    float_overflow_check(expr);
   }
 }
 
-void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
+void goto_check_javat::check_rec(const exprt &expr)
 {
   // we don't look into quantifiers
   if(expr.id() == ID_exists || expr.id() == ID_forall)
@@ -1325,65 +1204,54 @@ void goto_check_javat::check_rec(const exprt &expr, guardt &guard)
 
   if(expr.id() == ID_address_of)
   {
-    check_rec_address(to_address_of_expr(expr).object(), guard);
-    return;
-  }
-  else if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies)
-  {
-    check_rec_logical_op(expr, guard);
-    return;
-  }
-  else if(expr.id() == ID_if)
-  {
-    check_rec_if(to_if_expr(expr), guard);
+    check_rec_address(to_address_of_expr(expr).object());
     return;
   }
   else if(
     expr.id() == ID_member &&
     to_member_expr(expr).struct_op().id() == ID_dereference)
   {
-    if(check_rec_member(to_member_expr(expr), guard))
+    if(check_rec_member(to_member_expr(expr)))
       return;
   }
 
   forall_operands(it, expr)
-    check_rec(*it, guard);
+    check_rec(*it);
 
   if(expr.id() == ID_index)
   {
-    bounds_check(expr, guard);
+    bounds_check(expr);
   }
   else if(expr.id() == ID_div)
   {
-    check_rec_div(to_div_expr(expr), guard);
+    check_rec_div(to_div_expr(expr));
   }
   else if(expr.id() == ID_shl)
   {
     if(expr.type().id() == ID_signedbv)
-      integer_overflow_check(expr, guard);
+      integer_overflow_check(expr);
   }
   else if(expr.id() == ID_mod)
   {
-    mod_overflow_check(to_mod_expr(expr), guard);
+    mod_overflow_check(to_mod_expr(expr));
   }
   else if(
     expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
     expr.id() == ID_unary_minus)
   {
-    check_rec_arithmetic_op(expr, guard);
+    check_rec_arithmetic_op(expr);
   }
   else if(expr.id() == ID_typecast)
-    conversion_check(expr, guard);
+    conversion_check(expr);
   else if(expr.id() == ID_dereference)
   {
-    pointer_validity_check(to_dereference_expr(expr), expr, guard);
+    pointer_validity_check(to_dereference_expr(expr), expr);
   }
 }
 
 void goto_check_javat::check(const exprt &expr)
 {
-  guardt guard{true_exprt{}, guard_manager};
-  check_rec(expr, guard);
+  check_rec(expr);
 }
 
 /// expand the r_ok, w_ok and rw_ok predicates
@@ -1543,13 +1411,12 @@ void goto_check_javat::goto_check(
           notequal_exprt not_eq_null(
             pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
 
-          add_guarded_property(
+          add_property(
             not_eq_null,
             "this is null on method invocation",
             "pointer dereference",
             i.source_location(),
-            pointer,
-            guardt(true_exprt(), guard_manager));
+            pointer);
         }
       }
 
@@ -1593,13 +1460,12 @@ void goto_check_javat::goto_check(
         const notequal_exprt not_eq_null(
           pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
 
-        add_guarded_property(
+        add_property(
           not_eq_null,
           "throwing null",
           "pointer dereference",
           i.source_location(),
-          pointer,
-          guardt(true_exprt(), guard_manager));
+          pointer);
       }
 
       // this has no successor
