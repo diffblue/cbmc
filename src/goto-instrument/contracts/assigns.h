@@ -118,7 +118,7 @@ protected:
 class havoc_assigns_targetst : public havoc_if_validt
 {
 public:
-  havoc_assigns_targetst(const modifiest &mod, const namespacet &ns)
+  havoc_assigns_targetst(const assignst &mod, const namespacet &ns)
     : havoc_if_validt(mod, ns)
   {
   }

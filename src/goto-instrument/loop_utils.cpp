@@ -36,15 +36,14 @@ goto_programt::targett get_loop_exit(const loopt &loop)
   return ++last;
 }
 
-
-void get_modifies_lhs(
+void get_assigns_lhs(
   const local_may_aliast &local_may_alias,
   goto_programt::const_targett t,
   const exprt &lhs,
-  modifiest &modifies)
+  assignst &assigns)
 {
   if(lhs.id() == ID_symbol || lhs.id() == ID_member || lhs.id() == ID_index)
-    modifies.insert(lhs);
+    assigns.insert(lhs);
   else if(lhs.id()==ID_dereference)
   {
     const pointer_arithmetict ptr(to_dereference_expr(lhs).pointer());
@@ -56,24 +55,24 @@ void get_modifies_lhs(
         throw analysis_exceptiont("Alias analysis returned UNKNOWN!");
       }
       if(ptr.offset.is_nil())
-        modifies.insert(dereference_exprt{typed_mod});
+        assigns.insert(dereference_exprt{typed_mod});
       else
-        modifies.insert(dereference_exprt{plus_exprt{typed_mod, ptr.offset}});
+        assigns.insert(dereference_exprt{plus_exprt{typed_mod, ptr.offset}});
     }
   }
   else if(lhs.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(lhs);
 
-    get_modifies_lhs(local_may_alias, t, if_expr.true_case(), modifies);
-    get_modifies_lhs(local_may_alias, t, if_expr.false_case(), modifies);
+    get_assigns_lhs(local_may_alias, t, if_expr.true_case(), assigns);
+    get_assigns_lhs(local_may_alias, t, if_expr.false_case(), assigns);
   }
 }
 
-void get_modifies(
+void get_assigns(
   const local_may_aliast &local_may_alias,
   const loopt &loop,
-  modifiest &modifies)
+  assignst &assigns)
 {
   for(loopt::const_iterator
       i_it=loop.begin(); i_it!=loop.end(); i_it++)
@@ -83,12 +82,12 @@ void get_modifies(
     if(instruction.is_assign())
     {
       const exprt &lhs = instruction.assign_lhs();
-      get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
+      get_assigns_lhs(local_may_alias, *i_it, lhs, assigns);
     }
     else if(instruction.is_function_call())
     {
       const exprt &lhs = instruction.call_lhs();
-      get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
+      get_assigns_lhs(local_may_alias, *i_it, lhs, assigns);
     }
   }
 }

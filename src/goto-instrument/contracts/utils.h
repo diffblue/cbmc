@@ -25,7 +25,7 @@ Date: September 2021
 class havoc_if_validt : public havoc_utilst
 {
 public:
-  havoc_if_validt(const modifiest &mod, const namespacet &ns)
+  havoc_if_validt(const assignst &mod, const namespacet &ns)
     : havoc_utilst(mod), ns(ns)
   {
   }

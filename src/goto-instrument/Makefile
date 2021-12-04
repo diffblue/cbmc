@@ -38,7 +38,7 @@ SRC = accelerate/accelerate.cpp \
       dump_c.cpp \
       full_slicer.cpp \
       function.cpp \
-      function_modifies.cpp \
+      function_assigns.cpp \
       generate_function_bodies.cpp \
       goto_instrument_languages.cpp \
       goto_instrument_main.cpp \

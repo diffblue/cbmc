@@ -1,15 +1,15 @@
 /*******************************************************************\
 
-Module: Modifies
+Module: Compute objects assigned to in a function
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Modifies
+/// Compute objects assigned to in a function.
 
-#include "function_modifies.h"
+#include "function_assigns.h"
 
 #include <util/std_expr.h>
 
@@ -17,16 +17,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "loop_utils.h"
 
-void function_modifiest::get_modifies(
+void function_assignst::get_assigns(
   const local_may_aliast &local_may_alias,
   const goto_programt::const_targett i_it,
-  modifiest &modifies)
+  assignst &assigns)
 {
   const goto_programt::instructiont &instruction=*i_it;
 
   if(instruction.is_assign())
   {
-    get_modifies_lhs(local_may_alias, i_it, instruction.assign_lhs(), modifies);
+    get_assigns_lhs(local_may_alias, i_it, instruction.assign_lhs(), assigns);
   }
   else if(instruction.is_function_call())
   {
@@ -34,15 +34,15 @@ void function_modifiest::get_modifies(
 
     // return value assignment
     if(lhs.is_not_nil())
-      get_modifies_lhs(local_may_alias, i_it, lhs, modifies);
+      get_assigns_lhs(local_may_alias, i_it, lhs, assigns);
 
-    get_modifies_function(instruction.call_function(), modifies);
+    get_assigns_function(instruction.call_function(), assigns);
   }
 }
 
-void function_modifiest::get_modifies_function(
+void function_assignst::get_assigns_function(
   const exprt &function,
-  modifiest &modifies)
+  assignst &assigns)
 {
   if(function.id()==ID_symbol)
   {
@@ -54,7 +54,7 @@ void function_modifiest::get_modifies_function(
     if(fm_it!=function_map.end())
     {
       // already done
-      modifies.insert(fm_it->second.begin(), fm_it->second.end());
+      assigns.insert(fm_it->second.begin(), fm_it->second.end());
       return;
     }
 
@@ -69,11 +69,11 @@ void function_modifiest::get_modifies_function(
     const goto_programt &goto_program=f_it->second.body;
 
     forall_goto_program_instructions(i_it, goto_program)
-      get_modifies(local_may_alias, i_it, modifies);
+      get_assigns(local_may_alias, i_it, assigns);
   }
   else if(function.id()==ID_if)
   {
-    get_modifies_function(to_if_expr(function).true_case(), modifies);
-    get_modifies_function(to_if_expr(function).false_case(), modifies);
+    get_assigns_function(to_if_expr(function).true_case(), assigns);
+    get_assigns_function(to_if_expr(function).false_case(), assigns);
   }
 }

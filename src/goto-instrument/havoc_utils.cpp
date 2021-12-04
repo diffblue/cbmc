@@ -22,7 +22,7 @@ void havoc_utilst::append_full_havoc_code(
   const source_locationt location,
   goto_programt &dest) const
 {
-  for(const auto &expr : modifies)
+  for(const auto &expr : assigns)
     append_havoc_code_for_expr(location, expr, dest);
 }
 
