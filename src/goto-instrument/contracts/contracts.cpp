@@ -23,6 +23,7 @@ Date: February 2016
 #include <goto-instrument/havoc_utils.h>
 
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
 
 #include <langapi/language_util.h>
@@ -631,6 +632,10 @@ bool code_contractst::apply_function_contract(
   // with expressions from the call site (e.g. the return value).
   // This object tracks replacements that are common to ENSURES and REQUIRES.
   replace_symbolt common_replace;
+
+  // keep track of the call's return expression to make it nondet later
+  optionalt<exprt> call_ret_opt = {};
+
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
@@ -640,9 +645,10 @@ bool code_contractst::apply_function_contract(
       // For example, if foo() ensures that its return value is > 5, then
       // rewrite calls to foo as follows:
       // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
-      symbol_exprt ret_val(
-        CPROVER_PREFIX "return_value", const_target->call_lhs().type());
-      common_replace.insert(ret_val, const_target->call_lhs());
+      auto &lhs_expr = const_target->call_lhs();
+      call_ret_opt = lhs_expr;
+      symbol_exprt ret_val(CPROVER_PREFIX "return_value", lhs_expr.type());
+      common_replace.insert(ret_val, lhs_expr);
     }
     else
     {
@@ -663,7 +669,9 @@ bool code_contractst::apply_function_contract(
           ns,
           symbol_table);
         symbol_exprt ret_val(CPROVER_PREFIX "return_value", type.return_type());
-        common_replace.insert(ret_val, fresh.symbol_expr());
+        auto fresh_sym_expr = fresh.symbol_expr();
+        common_replace.insert(ret_val, fresh_sym_expr);
+        call_ret_opt = fresh_sym_expr;
       }
     }
   }
@@ -736,8 +744,10 @@ bool code_contractst::apply_function_contract(
     targets.add_to_operands(std::move(target));
   common_replace(targets);
 
-  // Create a series of non-deterministic assignments to havoc the variables
-  // in the assigns clause.
+  // Create a sequence of non-deterministic assignments...
+  goto_programt havoc_instructions;
+
+  // ...for assigns clause targets
   if(!assigns.empty())
   {
     assigns_clauset assigns_clause(
@@ -747,13 +757,24 @@ bool code_contractst::apply_function_contract(
     modifiest modifies;
     modifies.insert(targets.operands().cbegin(), targets.operands().cend());
 
-    goto_programt assigns_havoc;
     havoc_assigns_targetst havoc_gen(modifies, ns);
-    havoc_gen.append_full_havoc_code(location, assigns_havoc);
-
-    // Insert the non-deterministic assignment immediately before the call site.
-    insert_before_swap_and_advance(function_body, target, assigns_havoc);
+    havoc_gen.append_full_havoc_code(location, havoc_instructions);
   }
+
+  // ...for the return value
+  if(call_ret_opt.has_value())
+  {
+    auto &call_ret = call_ret_opt.value();
+    auto &loc = call_ret.source_location();
+    auto &type = call_ret.type();
+    side_effect_expr_nondett expr(type, location);
+    auto target = havoc_instructions.add(
+      goto_programt::make_assignment(call_ret, expr, loc));
+    target->code_nonconst().add_source_location() = loc;
+  }
+
+  // Insert havoc instructions immediately before the call site.
+  insert_before_swap_and_advance(function_body, target, havoc_instructions);
 
   // To remove the function call, insert statements related to the assumption.
   // Then, replace the function call with a SKIP statement.
