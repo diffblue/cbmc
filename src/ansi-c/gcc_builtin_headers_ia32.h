@@ -24,14 +24,10 @@ __gcc_v4hi __builtin_ia32_psubusw(__gcc_v4hi, __gcc_v4hi);
 __gcc_v4hi __builtin_ia32_pmullw(__gcc_v4hi, __gcc_v4hi);
 __gcc_v4hi __builtin_ia32_pmulhw(__gcc_v4hi, __gcc_v4hi);
 
-__gcc_v2si __builtin_ia32_pand(__gcc_v2si, __gcc_v2si); // maybe di
-__gcc_v2si __builtin_ia32_pandn(__gcc_v2si, __gcc_v2si); // maybe di
-__gcc_v2si __builtin_ia32_por(__gcc_v2si, __gcc_v2si); // maybe di
-__gcc_v2si __builtin_ia32_pxor(__gcc_v2si, __gcc_v2si); // maybe di
-//__gcc_di __builtin_ia32_pand(__gcc_di, __gcc_di);
-//__gcc_di __builtin_ia32_pandn(__gcc_di, __gcc_di);
-//__gcc_di __builtin_ia32_por(__gcc_di, __gcc_di);
-//__gcc_di __builtin_ia32_pxor(__gcc_di, __gcc_di);
+__gcc_v1di __builtin_ia32_pand(__gcc_v1di, __gcc_v1di);
+__gcc_v1di __builtin_ia32_pandn(__gcc_v1di, __gcc_v1di);
+__gcc_v1di __builtin_ia32_por(__gcc_v1di, __gcc_v1di);
+__gcc_v1di __builtin_ia32_pxor(__gcc_v1di, __gcc_v1di);
 
 __gcc_v8qi __builtin_ia32_pcmpeqb(__gcc_v8qi, __gcc_v8qi);
 __gcc_v4hi __builtin_ia32_pcmpeqw(__gcc_v4hi, __gcc_v4hi);
