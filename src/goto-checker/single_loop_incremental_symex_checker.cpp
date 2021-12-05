@@ -30,6 +30,7 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
     equation(ui_message_handler),
+    unwindset(goto_model),
     symex(
       ui_message_handler,
       goto_model.get_symbol_table(),
@@ -37,6 +38,7 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
       options,
       path_storage,
       guard_manager,
+      unwindset,
       ui_message_handler.get_ui()),
     property_decider(options, ui_message_handler, equation, ns)
 {

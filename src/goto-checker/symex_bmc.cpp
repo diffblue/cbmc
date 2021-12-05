@@ -16,13 +16,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
 
+#include <goto-instrument/unwindset.h>
+
 symex_bmct::symex_bmct(
   message_handlert &mh,
   const symbol_tablet &outer_symbol_table,
   symex_target_equationt &_target,
   const optionst &options,
   path_storaget &path_storage,
-  guard_managert &guard_manager)
+  guard_managert &guard_manager,
+  unwindsett &unwindset)
   : goto_symext(
       mh,
       outer_symbol_table,
@@ -33,6 +36,7 @@ symex_bmct::symex_bmct(
     record_coverage(!options.get_option("symex-coverage-report").empty()),
     havoc_bodyless_functions(
       options.get_bool_option("havoc-undefined-functions")),
+    unwindset(unwindset),
     symex_coverage(ns)
 {
 }

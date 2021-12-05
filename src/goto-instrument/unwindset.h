@@ -12,12 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_UNWINDSET_H
 #define CPROVER_GOTO_INSTRUMENT_UNWINDSET_H
 
+#include <goto-programs/goto_model.h>
+
 #include <list>
 #include <map>
 #include <string>
-
-#include <util/irep.h>
-#include <util/optional.h>
 
 class unwindsett
 {
@@ -27,6 +26,9 @@ public:
   // 2) a limit per loop, all threads
   // 3) a limit for a particular thread.
   // We use the most specific of the above.
+  explicit unwindsett(abstract_goto_modelt &goto_model) : goto_model(goto_model)
+  {
+  }
 
   // global limit for all loops
   void parse_unwind(const std::string &unwind);
@@ -41,6 +43,8 @@ public:
   void parse_unwindset_file(const std::string &file_name);
 
 protected:
+  abstract_goto_modelt &goto_model;
+
   optionalt<unsigned> global_limit;
 
   // Limit for all instances of a loop.

@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unwindset.h"
 
+#include <util/exception_utils.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 
@@ -44,6 +45,65 @@ void unwindsett::parse_unwindset_one_loop(std::string val)
   if(last_c_pos != std::string::npos)
   {
     std::string id = val.substr(0, last_c_pos);
+
+    // The loop id can take three forms:
+    // 1) Just a function name to limit recursion.
+    // 2) F.N where F is a function name and N is a loop number.
+    const symbol_tablet &symbol_table = goto_model.get_symbol_table();
+    const symbolt *maybe_fn = symbol_table.lookup(id);
+    if(maybe_fn && maybe_fn->type.id() == ID_code)
+    {
+      // ok, recursion limit
+    }
+    else
+    {
+      auto last_dot_pos = val.rfind('.');
+      if(last_dot_pos == std::string::npos)
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "invalid loop identifier " + id, "unwindset"};
+      }
+
+      std::string function_id = id.substr(0, last_dot_pos);
+      std::string loop_nr_label = id.substr(last_dot_pos + 1);
+
+      if(loop_nr_label.empty() || !goto_model.can_produce_function(function_id))
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "invalid loop identifier " + id, "unwindset"};
+      }
+
+      const goto_functiont &goto_function =
+        goto_model.get_goto_function(function_id);
+      if(isdigit(loop_nr_label[0]))
+      {
+        auto nr = string2optional_unsigned(loop_nr_label);
+        if(!nr.has_value())
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "invalid loop identifier " + id, "unwindset"};
+        }
+
+        bool found = std::any_of(
+          goto_function.body.instructions.begin(),
+          goto_function.body.instructions.end(),
+          [&nr](const goto_programt::instructiont &instruction) {
+            return instruction.is_backwards_goto() &&
+                   instruction.loop_number == nr;
+          });
+        if(!found)
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "invalid loop identifier " + id, "unwindset"};
+        }
+      }
+      else
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "invalid loop identifier " + id, "unwindset"};
+      }
+    }
+
     std::string uw_string = val.substr(last_c_pos + 1);
 
     // the below initialisation makes g++-5 happy

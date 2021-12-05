@@ -16,6 +16,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/path_storage.h>
 
+#include <goto-instrument/unwindset.h>
+
 #include <chrono>
 
 class symex_bmct;
@@ -40,6 +42,7 @@ protected:
   guard_managert guard_manager;
   std::unique_ptr<path_storaget> worklist;
   std::chrono::duration<double> symex_runtime;
+  unwindsett unwindset;
 
   void equation_output(
     const symex_bmct &symex,

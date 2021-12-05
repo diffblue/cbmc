@@ -165,7 +165,7 @@ int goto_instrument_parse_optionst::doit()
 
       if(unwind_given || unwindset_given || unwindset_file_given)
       {
-        unwindsett unwindset;
+        unwindsett unwindset{goto_model};
 
         if(unwind_given)
           unwindset.parse_unwind(cmdline.get_value("unwind"));
