@@ -13,6 +13,9 @@ inline void longjmp(jmp_buf env, int val)
   (void)val;
   __CPROVER_assert(0, "longjmp requires instrumentation");
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: _longjmp */
@@ -29,6 +32,9 @@ inline void _longjmp(jmp_buf env, int val)
   (void)val;
   __CPROVER_assert(0, "_longjmp requires instrumentation");
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: siglongjmp */
@@ -47,6 +53,9 @@ inline void siglongjmp(sigjmp_buf env, int val)
   (void)val;
   __CPROVER_assert(0, "siglongjmp requires instrumentation");
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 #endif

@@ -330,6 +330,7 @@ char *fgets(char *str, int size, FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+char __VERIFIER_nondet_char();
 size_t __VERIFIER_nondet_size_t();
 
 inline size_t fread(
@@ -359,8 +360,7 @@ inline size_t fread(
 
   for(size_t i=0; i<bytes; i++)
   {
-    char nondet_char;
-    ((char *)ptr)[i]=nondet_char;
+    ((char *)ptr)[i] = __VERIFIER_nondet_char();
   }
 
   return nread;

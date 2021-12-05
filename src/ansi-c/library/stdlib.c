@@ -36,6 +36,9 @@ inline void exit(int status)
 {
   (void)status;
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: _Exit */
@@ -46,6 +49,9 @@ inline void _Exit(int status)
 {
   (void)status;
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: abort */
@@ -55,6 +61,9 @@ inline void _Exit(int status)
 inline void abort(void)
 {
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: calloc */

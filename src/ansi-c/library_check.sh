@@ -7,6 +7,7 @@ for f in "$@"; do
     echo "Checking ${f}"
     cp "${f}" __libcheck.c
     perl -p -i -e 's/(__builtin_[^v])/s$1/' __libcheck.c
+    perl -p -i -e 's/s(__builtin_unreachable)/$1/' __libcheck.c
     perl -p -i -e 's/(_mm_.fence)/s$1/' __libcheck.c
     perl -p -i -e 's/(__sync_)/s$1/' __libcheck.c
     perl -p -i -e 's/(__atomic_)/s$1/' __libcheck.c

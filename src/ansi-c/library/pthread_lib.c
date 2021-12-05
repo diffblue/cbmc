@@ -314,6 +314,9 @@ inline void pthread_exit(void *value_ptr)
 #endif
   __CPROVER_threads_exited[__CPROVER_thread_id]=1;
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: pthread_join */
