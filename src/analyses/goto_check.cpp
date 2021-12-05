@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_check.h"
 
 #include "goto_check_c.h"
-#include "goto_check_java.h"
 
 #include <util/symbol.h>
 
@@ -30,11 +29,6 @@ void goto_check(
     goto_check_c(
       function_identifier, goto_function, ns, options, message_handler);
   }
-  else if(function_symbol.mode == ID_java)
-  {
-    goto_check_java(
-      function_identifier, goto_function, ns, options, message_handler);
-  }
 }
 
 void goto_check(
@@ -44,7 +38,6 @@ void goto_check(
   message_handlert &message_handler)
 {
   goto_check_c(ns, options, goto_functions, message_handler);
-  goto_check_java(ns, options, goto_functions, message_handler);
 }
 
 void goto_check(
@@ -53,5 +46,4 @@ void goto_check(
   message_handlert &message_handler)
 {
   goto_check_c(options, goto_model, message_handler);
-  goto_check_java(options, goto_model, message_handler);
 }

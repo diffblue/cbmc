@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language.h>
 
-#include <analyses/goto_check_java.h>
-
 #include <goto-checker/bmc_util.h>
 
 #include <goto-programs/class_hierarchy.h>
@@ -29,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/strings/string_refinement.h>
 
+#include <java_bytecode/goto_check_java.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_trace_validation.h>
 

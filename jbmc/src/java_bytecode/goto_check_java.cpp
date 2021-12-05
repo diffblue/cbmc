@@ -41,8 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include "guard.h"
-#include "local_bitvector_analysis.h"
+#include <analyses/local_bitvector_analysis.h>
 
 class goto_check_javat
 {
@@ -84,7 +83,6 @@ protected:
   const namespacet &ns;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
-  guard_managert guard_manager;
   messaget log;
 
   /// Check an address-of expression:

@@ -12,7 +12,7 @@ Author: Peter Schrammel
 #ifndef CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
 #define CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
 
-#include <analyses/goto_check_java.h>
+#include <java_bytecode/goto_check_java.h>
 
 #include <util/parse_options.h>
 #include <util/timestamper.h>
