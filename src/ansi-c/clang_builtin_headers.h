@@ -1,8 +1,8 @@
+// clang-format off
 __gcc_v2di __builtin_ia32_undef128(void);
 __gcc_v4di __builtin_ia32_undef256(void);
 __gcc_v8di __builtin_ia32_undef512(void);
 
-// clang-format off
 __gcc_v8hi __builtin_ia32_cvtne2ps2bf16_128(__gcc_v4sf, __gcc_v4sf);
 __gcc_v16hi __builtin_ia32_cvtne2ps2bf16_256(__gcc_v8sf, __gcc_v8sf);
 __gcc_v32hi __builtin_ia32_cvtne2ps2bf16_512(__gcc_v16sf, __gcc_v16sf);
@@ -54,7 +54,6 @@ void __builtin_nontemporal_load();
 
 int __builtin_flt_rounds(void);
 
-// clang-format off
 unsigned char __builtin_rotateleft8(unsigned char, unsigned char);
 unsigned short __builtin_rotateleft16(unsigned short, unsigned short);
 unsigned int __builtin_rotateleft32(unsigned int, unsigned int);

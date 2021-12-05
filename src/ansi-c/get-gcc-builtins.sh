@@ -9,14 +9,19 @@ fi
 
 builtin_defs=" \
   builtin-types.def builtins.def sync-builtins.def \
-  omp-builtins.def gtm-builtins.def cilk-builtins.def cilkplus.def \
-  sanitizer.def chkp-builtins.def hsa-builtins.def brig-builtins.def \
+  omp-builtins.def gtm-builtins.def \
+  sanitizer.def brig-builtins.def coroutine-builtins.def \
   config/i386/i386-builtin.def config/i386/i386-builtin-types.def"
 
 for f in $builtin_defs ; do
-  [ ! -s `basename $f` ] || continue
-  echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/$f
-  svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/$f > /dev/null
+  bn=`basename $f`
+  [ ! -s $bn ] || continue
+  echo Downloading git://gcc.gnu.org/git/gcc/$f
+  if [ `dirname $f` = "." ] ; then
+    git archive --remote=git://gcc.gnu.org/git/gcc.git HEAD:gcc/ $bn | tar -x > $bn
+  else
+    git archive --remote=git://gcc.gnu.org/git/gcc.git HEAD:gcc/`dirname $f`/ $bn | tar -x > $bn
+  fi
 done
 
 cat > gcc-builtins.h <<EOF
@@ -25,6 +30,7 @@ cat > gcc-builtins.h <<EOF
 #include <unistd.h>
 #include <stdio.h>
 #include <wctype.h>
+#include <fenv.h>
 
 typedef   char   __gcc_v8qi  __attribute__ ((__vector_size__ (8)));
 typedef   char   __gcc_v16qi __attribute__ ((__vector_size__ (16)));
@@ -49,7 +55,7 @@ typedef   long long __gcc_v1di __attribute__ ((__vector_size__ (8)));
 typedef   long long __gcc_v2di __attribute__ ((__vector_size__ (16)));
 typedef   long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
 typedef   long long __gcc_v8di __attribute__ ((__vector_size__ (64)));
-typedef   unsigned long long __gcc_di;
+typedef   long long __gcc_di;
 
 EOF
 
@@ -98,6 +104,10 @@ cat > builtins.h <<EOF
 #define short_unsigned_type_node unsigned short
 #define short_integer_type_node short
 #define unsigned_char_type_node unsigned char
+#define fenv_t_ptr_type_node fenv_t*
+#define const_fenv_t_ptr_type_node const fenv_t*
+#define fexcept_t_ptr_type_node fexcept_t*
+#define const_fexcept_t_ptr_type_node const fexcept_t*
 
 // some newer versions of GCC apparently support __floatXYZ
 #define dfloat32_type_node __float32
@@ -167,9 +177,9 @@ TYPE(MANGLE(NAME));
 
 #include "i386-builtin-types-expanded.def"
 
-NEXTDEF BDESC(mask, icode, name, code, comparison, flag) \
+NEXTDEF BDESC(mask, mask2, icode, name, code, comparison, flag) \
 flag(MANGLEi386(name));
-NEXTDEF BDESC_FIRST(kind, KIND, mask, icode, name, code, comparison, flag) \
+NEXTDEF BDESC_FIRST(kind, KIND, mask, mask2, icode, name, code, comparison, flag) \
 flag(MANGLEi386(name));
 EOF
 
@@ -192,9 +202,18 @@ cat i386-builtin-types.def | tr -c -d ',\n' | awk '{ print length }' | \
   sed 's/^\([0-9]\)[[:space:]]*\([^[:space:]]*\)[[:space:]]*DEF_FUNCTION_TYPE[[:space:]]*(/DEF_FUNCTION_TYPE_\1(\2, /' | \
   grep ^DEF_FUNCTION_TYPE >> i386-builtin-types-expanded.def
 
+cat >> i386-builtin-types-expanded.def <<EOF
+DEF_FUNCTION_TYPE_4(UHI_FTYPE_V16SI_V16SI_INT_UHI, UHI, V16SI, V16SI, INT, UHI)
+DEF_FUNCTION_TYPE_2(UQI_FTYPE_UQI_UQI_CONST, UQI, UQI, UQI)
+EOF
+
 gcc -E builtins.h | sed 's/^NEXTDEF/#define/' | \
   cat - builtins.def i386-builtin.def | \
+  sed 's/_\(COUNT\|CONVERT\|ROUND\|PTEST\|SWAP\|VEC_MERGE\))$/)/' | \
   gcc -E -P - | \
+  sed 's/BT_FN_VOID_VAR\*/void (*)()/g' |
+  sed 's/BT_FN_VOID_PTR\*/void (*)(void *)/g' |
+  sed 's/BT_FN_VOID_PTR_PTR\*/void (*)(void *, void *)/g' |
   sed 's/MANGLE("__builtin_" "\(.*\)")/__builtin_\1/' | \
   sed 's/MANGLEi386("__builtin_\(.*\)")/__builtin_\1/' | \
   sed 's/^(int) //' | \
@@ -222,16 +241,12 @@ remove_line() {
 
 remove_line MANGLE
 remove_line builtin_type_for_size
-remove_line BT_FN
 remove_line lang_hooks.types.type_for_mode
-remove_line __float
-remove_line pointer_bounds_type_node
 remove_line BT_LAST
 remove_line BDESC_END
 remove_line error_mark_node
 remove_line '^0('
 remove_line 'CC.mode('
-remove_line FTYPE
 remove_line MULTI_ARG
 
 ifs=$IFS

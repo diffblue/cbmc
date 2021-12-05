@@ -1,3 +1,4 @@
+// clang-format off
 void __CPROVER_assume(__CPROVER_bool assumption);
 void __VERIFIER_assume(__CPROVER_bool assumption);
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
@@ -121,3 +122,4 @@ __CPROVER_bool __CPROVER_overflow_unary_minus();
 
 // enumerations
 __CPROVER_bool __CPROVER_enum_is_in_range();
+// clang-format on
