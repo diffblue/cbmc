@@ -115,15 +115,18 @@ protected:
     message_handlert &message_handler);
 
   static restrictionst parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts);
+    const std::list<std::string> &restriction_opts,
+    const goto_modelt &goto_model);
 
   static restrictionst parse_function_pointer_restrictions(
     const std::list<std::string> &restriction_opts,
-    const std::string &option);
+    const std::string &option,
+    const goto_modelt &goto_model);
 
   static restrictiont parse_function_pointer_restriction(
     const std::string &restriction_opt,
-    const std::string &option);
+    const std::string &option,
+    const goto_modelt &goto_model);
 
   static optionalt<restrictiont> get_by_name_restriction(
     const goto_functiont &goto_function,

@@ -238,7 +238,8 @@ function_pointer_restrictionst::merge_function_pointer_restrictions(
 function_pointer_restrictionst::restrictionst
 function_pointer_restrictionst::parse_function_pointer_restrictions(
   const std::list<std::string> &restriction_opts,
-  const std::string &option)
+  const std::string &option,
+  const goto_modelt &goto_model)
 {
   auto function_pointer_restrictions =
     function_pointer_restrictionst::restrictionst{};
@@ -246,7 +247,7 @@ function_pointer_restrictionst::parse_function_pointer_restrictions(
   for(const std::string &restriction_opt : restriction_opts)
   {
     const auto restriction =
-      parse_function_pointer_restriction(restriction_opt, option);
+      parse_function_pointer_restriction(restriction_opt, option, goto_model);
 
     const bool inserted = function_pointer_restrictions
                             .emplace(restriction.first, restriction.second)
@@ -265,10 +266,11 @@ function_pointer_restrictionst::parse_function_pointer_restrictions(
 
 function_pointer_restrictionst::restrictionst function_pointer_restrictionst::
   parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts)
+    const std::list<std::string> &restriction_opts,
+    const goto_modelt &goto_model)
 {
   return parse_function_pointer_restrictions(
-    restriction_opts, "--" RESTRICT_FUNCTION_POINTER_OPT);
+    restriction_opts, "--" RESTRICT_FUNCTION_POINTER_OPT, goto_model);
 }
 
 function_pointer_restrictionst::restrictionst
@@ -292,7 +294,8 @@ function_pointer_restrictionst::parse_function_pointer_restrictions_from_file(
 function_pointer_restrictionst::restrictiont
 function_pointer_restrictionst::parse_function_pointer_restriction(
   const std::string &restriction_opt,
-  const std::string &option)
+  const std::string &option,
+  const goto_modelt &goto_model)
 {
   // the format for restrictions is <pointer_name>/<target[,more_targets]*>
   // exactly one pointer and at least one target
@@ -321,7 +324,52 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
       "couldn't find target name before '/' in `" + restriction_opt + "'"};
   }
 
-  auto const pointer_name = restriction_opt.substr(0, pointer_name_end);
+  auto pointer_name = restriction_opt.substr(0, pointer_name_end);
+  const auto last_dot = pointer_name.rfind('.');
+  if(
+    last_dot != std::string::npos && last_dot + 1 != pointer_name.size() &&
+    !isdigit(pointer_name[last_dot + 1]))
+  {
+    const auto function_id = pointer_name.substr(0, last_dot);
+    const auto label = pointer_name.substr(last_dot + 1);
+
+    bool found = false;
+    const auto it = goto_model.goto_functions.function_map.find(function_id);
+    if(it != goto_model.goto_functions.function_map.end())
+    {
+      optionalt<source_locationt> location;
+      for(const auto &instruction : it->second.body.instructions)
+      {
+        if(
+          std::find(
+            instruction.labels.begin(), instruction.labels.end(), label) !=
+          instruction.labels.end())
+        {
+          location = instruction.source_location();
+        }
+
+        if(
+          instruction.is_function_call() &&
+          instruction.call_function().id() == ID_dereference &&
+          location.has_value() && instruction.source_location() == *location)
+        {
+          auto const &called_function_pointer =
+            to_dereference_expr(instruction.call_function()).pointer();
+          pointer_name =
+            id2string(to_symbol_expr(called_function_pointer).get_identifier());
+          found = true;
+          break;
+        }
+      }
+    }
+    if(!found)
+    {
+      throw invalid_restriction_exceptiont{"non-existent pointer name " +
+                                             pointer_name,
+                                           restriction_format_message};
+    }
+  }
+
   auto const target_names_substring =
     restriction_opt.substr(pointer_name_end + 1);
   auto const target_name_strings = split_string(target_names_substring, ',');
@@ -405,7 +453,8 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
   try
   {
     commandline_restrictions =
-      parse_function_pointer_restrictions_from_command_line(restriction_opts);
+      parse_function_pointer_restrictions_from_command_line(
+        restriction_opts, goto_model);
     typecheck_function_pointer_restrictions(
       goto_model, commandline_restrictions);
   }
@@ -549,7 +598,9 @@ function_pointer_restrictionst::get_function_pointer_by_name_restrictions(
 {
   function_pointer_restrictionst::restrictionst by_name_restrictions =
     parse_function_pointer_restrictions(
-      restriction_name_opts, "--" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT);
+      restriction_name_opts,
+      "--" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT,
+      goto_model);
 
   function_pointer_restrictionst::restrictionst restrictions;
   for(auto const &goto_function : goto_model.goto_functions.function_map)
