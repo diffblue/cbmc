@@ -108,7 +108,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "thread_instrumentation.h"
 #include "undefined_functions.h"
 #include "unwind.h"
-#include "unwindset.h"
 #include "value_set_fi_fp_removal.h"
 
 /// invoke main modules
@@ -1726,7 +1725,6 @@ void goto_instrument_parse_optionst::help()
     HELP_DUMP_C
     "\n"
     "Diagnosis:\n"
-    " --show-loops                 show the loops in the program\n"
     HELP_SHOW_PROPERTIES
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
@@ -1763,8 +1761,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Semantic transformations:\n"
     << HELP_NONDET_VOLATILE <<
-    " --unwind <n>                 unwinds the loops <n> times\n"
-    " --unwindset L:B,...          unwind loop L with a bound of B\n"
+    HELP_UNWINDSET
     " --unwindset-file <file>      read unwindset from file\n"
     " --partial-loops              permit paths with partial loops\n"
     " --unwinding-assertions       generate unwinding assertions\n"

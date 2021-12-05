@@ -56,4 +56,16 @@ protected:
   void parse_unwindset_one_loop(std::string loop_limit);
 };
 
+#define OPT_UNWINDSET                                                          \
+  "(show-loops)"                                                               \
+  "(unwind):"                                                                  \
+  "(unwindset):"
+
+#define HELP_UNWINDSET                                                         \
+  " --show-loops                 show the loops in the program\n"              \
+  " --unwind nr                  unwind nr times\n"                            \
+  " --unwindset [T:]L:B,...      unwind loop L with a bound of B\n"            \
+  "                              (optionally restricted to thread T)\n"        \
+  "                              (use --show-loops to get the loop IDs)\n"
+
 #endif // CPROVER_GOTO_INSTRUMENT_UNWINDSET_H

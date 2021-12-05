@@ -137,8 +137,12 @@ Only show program expression
 Limit search depth
 .IP "--unwind nr "
 Unwind loops nr times
-.IP "--unwindset L:B,..."
-Unwind loop L with a bound of B (use \-\-show\-loops to get the loop IDs)
+.IP "--unwindset [T:]L:B,..."
+Unwind loop L with a bound of B, optionally restricted to thread T. Use
+\-\-show\-loops to get the loop IDs. Thread numbers are set as follows: The
+initial thread has index 0, and threads are consecutively numbered in program
+order of threads being spawned.  The`--unwindset` option can be given multiple
+times.
 .IP --show-vcc
 Show the verification conditions
 .IP --slice-formula
