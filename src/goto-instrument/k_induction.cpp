@@ -92,12 +92,12 @@ void k_inductiont::process_loop(
     // step case
 
     // find out what can get changed in the loop
-    modifiest modifies;
-    get_modifies(local_may_alias, loop, modifies);
+    assignst assigns;
+    get_assigns(local_may_alias, loop, assigns);
 
     // build the havocking code
     goto_programt havoc_code;
-    havoc_utilst havoc_gen(modifies);
+    havoc_utilst havoc_gen(assigns);
     havoc_gen.append_full_havoc_code(loop_head->source_location(), havoc_code);
 
     // unwind to get k+1 copies

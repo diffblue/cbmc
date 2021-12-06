@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_skip.h>
 
-#include "function_modifies.h"
+#include "function_assigns.h"
 #include "havoc_utils.h"
 #include "loop_utils.h"
 
@@ -26,12 +26,12 @@ public:
   typedef goto_functionst::goto_functiont goto_functiont;
 
   havoc_loopst(
-    function_modifiest &_function_modifies,
-    goto_functiont &_goto_function):
-    goto_function(_goto_function),
-    local_may_alias(_goto_function),
-    function_modifies(_function_modifies),
-    natural_loops(_goto_function.body)
+    function_assignst &_function_assigns,
+    goto_functiont &_goto_function)
+    : goto_function(_goto_function),
+      local_may_alias(_goto_function),
+      function_assigns(_function_assigns),
+      natural_loops(_goto_function.body)
   {
     havoc_loops();
   }
@@ -39,10 +39,10 @@ public:
 protected:
   goto_functiont &goto_function;
   local_may_aliast local_may_alias;
-  function_modifiest &function_modifies;
+  function_assignst &function_assigns;
   natural_loops_mutablet natural_loops;
 
-  typedef std::set<exprt> modifiest;
+  typedef std::set<exprt> assignst;
   typedef const natural_loops_mutablet::natural_loopt loopt;
 
   void havoc_loops();
@@ -51,9 +51,7 @@ protected:
     const goto_programt::targett loop_head,
     const loopt &);
 
-  void get_modifies(
-    const loopt &,
-    modifiest &);
+  void get_assigns(const loopt &, assignst &);
 };
 
 void havoc_loopst::havoc_loop(
@@ -63,12 +61,12 @@ void havoc_loopst::havoc_loop(
   assert(!loop.empty());
 
   // first find out what can get changed in the loop
-  modifiest modifies;
-  get_modifies(loop, modifies);
+  assignst assigns;
+  get_assigns(loop, assigns);
 
   // build the havocking code
   goto_programt havoc_code;
-  havoc_utilst havoc_gen(modifies);
+  havoc_utilst havoc_gen(assigns);
   havoc_gen.append_full_havoc_code(loop_head->source_location(), havoc_code);
 
   // Now havoc at the loop head. Use insert_swap to
@@ -101,12 +99,10 @@ void havoc_loopst::havoc_loop(
   remove_skip(goto_function.body);
 }
 
-void havoc_loopst::get_modifies(
-  const loopt &loop,
-  modifiest &modifies)
+void havoc_loopst::get_assigns(const loopt &loop, assignst &assigns)
 {
   for(const auto &instruction_it : loop)
-    function_modifies.get_modifies(local_may_alias, instruction_it, modifies);
+    function_assigns.get_assigns(local_may_alias, instruction_it, assigns);
 }
 
 void havoc_loopst::havoc_loops()
@@ -119,8 +115,8 @@ void havoc_loopst::havoc_loops()
 
 void havoc_loops(goto_modelt &goto_model)
 {
-  function_modifiest function_modifies(goto_model.goto_functions);
+  function_assignst function_assigns(goto_model.goto_functions);
 
   for(auto &gf_entry : goto_model.goto_functions.function_map)
-    havoc_loopst(function_modifies, gf_entry.second);
+    havoc_loopst(function_assigns, gf_entry.second);
 }

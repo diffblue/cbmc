@@ -16,19 +16,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class local_may_aliast;
 
-typedef std::set<exprt> modifiest;
+typedef std::set<exprt> assignst;
 typedef natural_loops_mutablet::natural_loopt loopt;
 
-void get_modifies(
+void get_assigns(
   const local_may_aliast &local_may_alias,
   const loopt &loop,
-  modifiest &modifies);
+  assignst &assigns);
 
-void get_modifies_lhs(
+void get_assigns_lhs(
   const local_may_aliast &local_may_alias,
   goto_programt::const_targett t,
   const exprt &lhs,
-  modifiest &modifies);
+  assignst &assigns);
 
 goto_programt::targett get_loop_exit(const loopt &);
 

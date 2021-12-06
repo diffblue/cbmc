@@ -150,7 +150,7 @@ void code_contractst::check_apply_loop_contracts(
       loop_end = t;
 
   // check for assigns, invariant, and decreases clauses
-  auto assigns = static_cast<const exprt &>(
+  auto assigns_clause = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_assigns));
   auto invariant = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_loop_invariant));
@@ -158,13 +158,13 @@ void code_contractst::check_apply_loop_contracts(
     loop_end->get_condition().find(ID_C_spec_decreases));
 
   assigns_clauset loop_assigns(
-    assigns.operands(), log, ns, function_name, symbol_table);
+    assigns_clause.operands(), log, ns, function_name, symbol_table);
 
   loop_assigns.add_static_locals_to_write_set(goto_functions, function_name);
 
   if(invariant.is_nil())
   {
-    if(decreases_clause.is_nil() && assigns.is_nil())
+    if(decreases_clause.is_nil() && assigns_clause.is_nil())
       return;
     else
     {
@@ -253,12 +253,12 @@ void code_contractst::check_apply_loop_contracts(
     add_pragma_disable_assigns_check(generated_code));
 
   // havoc the variables that may be modified
-  modifiest modifies;
-  if(assigns.is_nil())
+  assignst assigns;
+  if(assigns_clause.is_nil())
   {
     try
     {
-      get_modifies(local_may_alias, loop, modifies);
+      get_assigns(local_may_alias, loop, assigns);
     }
     catch(const analysis_exceptiont &exc)
     {
@@ -271,7 +271,8 @@ void code_contractst::check_apply_loop_contracts(
   }
   else
   {
-    modifies.insert(assigns.operands().cbegin(), assigns.operands().cend());
+    assigns.insert(
+      assigns_clause.operands().cbegin(), assigns_clause.operands().cend());
 
     // Create snapshots of write set CARs.
     // This must be done before havocing the write set.
@@ -287,13 +288,13 @@ void code_contractst::check_apply_loop_contracts(
       function_name, goto_function.body, loop_head, loop_end, loop_assigns);
   }
 
-  havoc_assigns_targetst havoc_gen(modifies, ns);
+  havoc_assigns_targetst havoc_gen(assigns, ns);
   havoc_gen.append_full_havoc_code(
     loop_head->source_location(), generated_code);
 
   // Add the havocing code, but only check against the enclosing scope's
   // write set if it was manually specified.
-  if(assigns.is_nil())
+  if(assigns_clause.is_nil())
     insert_before_swap_and_advance(
       goto_function.body,
       loop_head,
@@ -624,7 +625,7 @@ bool code_contractst::apply_function_contract(
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
   // Isolate each component of the contract.
-  auto assigns = type.assigns();
+  auto assigns_clause = type.assigns();
   auto requires = conjunction(type.requires());
   auto ensures = conjunction(type.ensures());
 
@@ -740,7 +741,7 @@ bool code_contractst::apply_function_contract(
   // ASSIGNS clause should not refer to any quantified variables,
   // and only refer to the common symbols to be replaced.
   exprt targets;
-  for(auto &target : assigns)
+  for(auto &target : assigns_clause)
     targets.add_to_operands(std::move(target));
   common_replace(targets);
 
@@ -748,16 +749,16 @@ bool code_contractst::apply_function_contract(
   goto_programt havoc_instructions;
 
   // ...for assigns clause targets
-  if(!assigns.empty())
+  if(!assigns_clause.empty())
   {
     assigns_clauset assigns_clause(
       targets.operands(), log, ns, target_function, symbol_table);
 
     // Havoc all targets in the write set
-    modifiest modifies;
-    modifies.insert(targets.operands().cbegin(), targets.operands().cend());
+    assignst assigns;
+    assigns.insert(targets.operands().cbegin(), targets.operands().cend());
 
-    havoc_assigns_targetst havoc_gen(modifies, ns);
+    havoc_assigns_targetst havoc_gen(assigns, ns);
     havoc_gen.append_full_havoc_code(location, havoc_instructions);
   }
 
