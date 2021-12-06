@@ -133,8 +133,7 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
 
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
-    minus_exprt{plus_exprt{slice.first, slice.second},
-                from_integer(1, slice.second.type())},
+    plus_exprt{slice.first, slice.second},
     location_overflow_check));
   instructions.destructive_append(skip_program);
 
