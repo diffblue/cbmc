@@ -3,15 +3,24 @@ main.c
 --apply-loop-contracts _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.1\] .* assertion \*x1 == z1: SUCCESS$
-^\[main.3\] .* Check loop invariant before entry: SUCCESS$
-^\[main.4\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.2\] .* assertion x2 == z2: SUCCESS$
-^\[main.5\] .* Check loop invariant before entry: SUCCESS$
-^\[main.6\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.3\] .* assertion \*\(s1\.n\) == \*\(s2->n\): SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion \*x1 == z1: SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion x2 == z2: SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] .* Check that y1 is assignable: SUCCESS$
+^\[main\.\d+\] line 18 Check that \*x1 is assignable: SUCCESS$
+^\[main\.\d+\] line 19 Check that \*x1 is assignable: SUCCESS$
+^\[main\.\d+\] .* Check that y2 is assignable: SUCCESS$
+^\[main\.\d+\] line 30 Check that x2 is assignable: SUCCESS$
+^\[main\.\d+\] line 31 Check that x2 is assignable: SUCCESS$
+^\[main\.\d+\] .* Check that y3 is assignable: SUCCESS$
+^\[main\.\d+\] .* Check that s0\.n is assignable: SUCCESS$
+^\[main\.\d+\] .* Check that s2->n is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion \*\(s1\.n\) == \*\(s2->n\): SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

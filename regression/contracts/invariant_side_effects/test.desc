@@ -3,9 +3,10 @@ main.c
 --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.1\] .* assertion \*a == N: SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] .* Check that \*a is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion \*a == N: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 This test checks that C expressions are correctly converted to logic

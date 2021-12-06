@@ -3,10 +3,10 @@ main.c
 --apply-loop-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.1\] .* assertion __CPROVER_same_object\(old_data123, &\(data\[1\]\[2\]\[3\]\)\): SUCCESS$
-^\[main.assertion.2\] .* assertion data\[1\]\[2\]\[3\] == 0: FAILURE$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion __CPROVER_same_object\(old_data123, &\(data\[1\]\[2\]\[3\]\)\): SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion data\[1\]\[2\]\[3\] == 0: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

@@ -3,10 +3,12 @@ main.c
 --apply-loop-contracts --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.1\] .* Check loop invariant before entry: SUCCESS$
-^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.1\] .* assertion data == copy: SUCCESS$
-^\[main.assertion.2\] .* assertion \*copy = 42: SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] .* Check that \*data is assignable: SUCCESS$
+^\[main\.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion data == copy: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion \*copy = 42: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^\[main.pointer_dereference.*\] line .* dereference failure: pointer NULL in \*data: FAILURE

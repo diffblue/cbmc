@@ -3,9 +3,10 @@ main.c
 --apply-loop-contracts
 activate-multi-line-match
 ^The loop at file main.c line 4 function main does not have an invariant.*.\nHence, a default invariant \('true'\) is being used to prove those.$
-^\[main.1\].*Check loop invariant before entry: SUCCESS$
-^\[main.2\].*Check that loop invariant is preserved: SUCCESS$
-^\[main.3\].*Check decreases clause on loop iteration: SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[main\.\d+\] .* Check that i is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

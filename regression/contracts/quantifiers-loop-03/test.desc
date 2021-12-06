@@ -3,9 +3,11 @@ main.c
 --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.1\] line .* Check loop invariant before entry: SUCCESS
-^\[main.2\] line .* Check that loop invariant is preserved: SUCCESS
-^\[main.assertion.1\] line .* assertion .*: SUCCESS
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main\.\d+\] .* Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] line .* assertion .*: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

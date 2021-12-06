@@ -6,12 +6,13 @@
 void main()
 {
   unsigned N;
-  __CPROVER_assume(N <= MAX_SIZE);
+  __CPROVER_assume(0 < N && N <= MAX_SIZE);
 
   int *a = malloc(N * sizeof(int));
 
   for(int i = 0; i < N; ++i)
     // clang-format off
+    __CPROVER_assigns(i, __CPROVER_POINTER_OBJECT(a))
     __CPROVER_loop_invariant(
       (0 <= i) && (i <= N) &&
       (i != 0 ==> __CPROVER_exists {
