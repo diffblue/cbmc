@@ -30,7 +30,7 @@ class optionst;
 #define GOTO_DIFF_OPTIONS \
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
-  OPT_SHOW_PROPERTIES \
+  "(show-loops)" \
   OPT_GOTO_CHECK \
   OPT_COVER \
   "(verbosity):(version)" \
