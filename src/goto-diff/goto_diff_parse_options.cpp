@@ -58,56 +58,11 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
     exit(1);
   }
 
-  if(cmdline.isset("program-only"))
-    options.set_option("program-only", true);
-
-  if(cmdline.isset("show-byte-ops"))
-    options.set_option("show-byte-ops", true);
-
-  if(cmdline.isset("show-vcc"))
-    options.set_option("show-vcc", true);
-
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  if(cmdline.isset("debug-level"))
-    options.set_option("debug-level", cmdline.get_value("debug-level"));
-
-  if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.get_value("unwindset"));
-
-  // constant propagation
-  if(cmdline.isset("no-propagation"))
-    options.set_option("propagation", false);
-  else
-    options.set_option("propagation", true);
-
-  // all checks supported by goto_check
-  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  // generate unwinding assertions
-  if(cmdline.isset("cover"))
-    options.set_option("unwinding-assertions", false);
-  else
-    options.set_option(
-      "unwinding-assertions",
-      cmdline.isset("unwinding-assertions"));
-
-  // generate unwinding assumptions otherwise
-  options.set_option("partial-loops", cmdline.isset("partial-loops"));
-
-  if(options.get_bool_option("partial-loops") &&
-     options.get_bool_option("unwinding-assertions"))
-  {
-    log.error() << "--partial-loops and --unwinding-assertions"
-                << " must not be given together" << messaget::eom;
-    exit(1);
-  }
-
-  options.set_option("show-properties", cmdline.isset("show-properties"));
 
   // Options for process_goto_program
   options.set_option("rewrite-union", true);
@@ -235,6 +190,8 @@ bool goto_diff_parse_optionst::process_goto_program(
       get_cover_config(options, goto_model.symbol_table, ui_message_handler);
     if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
       return true;
+
+    goto_model.goto_functions.update();
   }
 
   // label the assertions
@@ -267,8 +224,7 @@ void goto_diff_parse_optionst::help()
     "\n"
     "Diff options:\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    HELP_SHOW_PROPERTIES
-    " --syntactic                  do syntactic diff (default)\n"
+    " --show-loops                 show the loops in the programs\n"
     " -u | --unified               output unified diff\n"
     " --change-impact | \n"
     "  --forward-impact |\n"
