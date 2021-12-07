@@ -527,6 +527,7 @@ public:
       swap(instruction._type, _type);
       swap(instruction.guard, guard);
       swap(instruction.targets, targets);
+      swap(instruction.labels, labels);
     }
 
     /// Uniquely identify an invalid target or location
