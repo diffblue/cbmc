@@ -4,6 +4,8 @@
 
 #include <solvers/smt2_incremental/smt_terms.h>
 
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/type.h>
@@ -35,7 +37,23 @@ private:
 
   void visit(const smt_bit_vector_constant_termt &bit_vector_constant) override
   {
-    UNIMPLEMENTED;
+    if(
+      const auto integer_type =
+        type_try_dynamic_cast<integer_bitvector_typet>(type_to_construct))
+    {
+      INVARIANT(
+        integer_type->get_width() == bit_vector_constant.get_sort().bit_width(),
+        "Width of smt bit vector term must match the width of bit vector "
+        "type.");
+      result = from_integer(bit_vector_constant.value(), type_to_construct);
+      return;
+    }
+
+    INVARIANT(
+      false,
+      "construct_value_expr_from_smt for bit vector should not be applied to "
+      "unsupported type " +
+        type_to_construct.pretty());
   }
 
   void
