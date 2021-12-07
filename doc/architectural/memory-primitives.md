@@ -199,17 +199,21 @@ CBMC has the option `--pointer-primitive-check` to detect potential misuses of
 the memory primitives. It checks that the pointers that appear in the following
 primitives are either null or valid:
 
-- `__CPROVER_POINTER_OBJECT`
-- `__CPROVER_POINTER_OFFSET`
-- `__CPROVER_same_object`
 - `__CPROVER_OBJECT_SIZE`
 - `__CPROVER_DYNAMIC_OBJECT`
 - `__CPROVER_r_ok`
 - `__CPROVER_w_ok`
 
-While the first three primitives have well-defined semantics even on invalid
-pointers, using them on invalid pointers is usually unintended in user programs.
-Thus, they have been included in the `--pointer-primitive-check` option.
+The following three primitives have well-defined semantics even on invalid
+pointers. Thus, they have been excluded from the `--pointer-primitive-check`
+option.
+
+- `__CPROVER_POINTER_OBJECT`
+- `__CPROVER_POINTER_OFFSET`
+- `__CPROVER_same_object`
+
+Using them on invalid pointers, however, may still be unintended in user
+programs.
 
 <sup>1</sup> Pointers with negative offsets never point to memory objects.
 Negative values are used internally to detect pointer underflows.

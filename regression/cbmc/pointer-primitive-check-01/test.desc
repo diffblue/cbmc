@@ -3,35 +3,36 @@ main.c
 --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
-\[main.pointer_primitives.1\] line \d+ pointer invalid in POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
-\[main.pointer_primitives.2\] line \d+ deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
-\[main.pointer_primitives.3\] line \d+ dead object in POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
-\[main.pointer_primitives.4\] line \d+ pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
-\[main.pointer_primitives.5\] line \d+ pointer invalid in POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
-\[main.pointer_primitives.6\] line \d+ deallocated dynamic object in POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
-\[main.pointer_primitives.7\] line \d+ dead object in POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
-\[main.pointer_primitives.8\] line \d+ pointer outside object bounds in POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
-\[main.pointer_primitives.9\] line \d+ pointer invalid in POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
-\[main.pointer_primitives.10\] line \d+ deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
-\[main.pointer_primitives.11\] line \d+ dead object in POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
-\[main.pointer_primitives.12\] line \d+ pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
-\[main.pointer_primitives.13\] line \d+ pointer invalid in OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
-\[main.pointer_primitives.14\] line \d+ deallocated dynamic object in OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
-\[main.pointer_primitives.15\] line \d+ dead object in OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
-\[main.pointer_primitives.16\] line \d+ pointer outside object bounds in OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
-\[main.pointer_primitives.17\] line \d+ pointer invalid in R_OK\(p5, .*1\): FAILURE
-\[main.pointer_primitives.18\] line \d+ deallocated dynamic object in R_OK\(p5, .*1\): SUCCESS
-\[main.pointer_primitives.19\] line \d+ dead object in R_OK\(p5, .*1\): SUCCESS
-\[main.pointer_primitives.20\] line \d+ pointer outside object bounds in R_OK\(p5, .*1\): FAILURE
-\[main.pointer_primitives.21\] line \d+ pointer invalid in W_OK\(p6, \(.*\)1\): FAILURE
-\[main.pointer_primitives.22\] line \d+ deallocated dynamic object in W_OK\(p6, .*1\): SUCCESS
-\[main.pointer_primitives.23\] line \d+ dead object in W_OK\(p6, .*1\): SUCCESS
-\[main.pointer_primitives.24\] line \d+ pointer outside object bounds in W_OK\(p6, .*1\): FAILURE
-\[main.pointer_primitives.25\] line \d+ pointer invalid in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): FAILURE
-\[main.pointer_primitives.26\] line \d+ deallocated dynamic object in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): SUCCESS
-\[main.pointer_primitives.27\] line \d+ dead object in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): SUCCESS
-\[main.pointer_primitives.28\] line \d+ pointer outside object bounds in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ pointer invalid in OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ dead object in OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ pointer invalid in R_OK\(p5, .*1\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in R_OK\(p5, .*1\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ dead object in R_OK\(p5, .*1\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in R_OK\(p5, .*1\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ pointer invalid in W_OK\(p6, \(.*\)1\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in W_OK\(p6, .*1\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ dead object in W_OK\(p6, .*1\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in W_OK\(p6, .*1\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ pointer invalid in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ dead object in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): FAILURE
 --
 ^warning: ignoring
+\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ dead object in POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ dead object in POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ dead object in POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
 --
-Verifies that checks are added for all pointer primitives
+Verifies that checks are added for exactly those pointer primitives that are not
+universally well defined.

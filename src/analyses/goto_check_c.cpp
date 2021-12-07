@@ -206,12 +206,13 @@ protected:
   /// \param guard: the condition under which the operation happens
   void pointer_primitive_check(const exprt &expr, const guardt &guard);
 
-  /// Returns true if the given expression is a pointer primitive such as
-  /// __CPROVER_r_ok()
+  /// Returns true if the given expression is a pointer primitive
+  /// that requires validation of the operand to guard against misuse
   ///
   /// \param expr expression
-  /// \return true if the given expression is a pointer primitive
-  bool is_pointer_primitive(const exprt &expr);
+  /// \return true if the given expression is a pointer primitive that requires
+  ///   checking
+  bool requires_pointer_primitive_check(const exprt &expr);
 
   optionalt<goto_check_ct::conditiont>
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
@@ -1354,13 +1355,19 @@ void goto_check_ct::pointer_primitive_check(
   }
 }
 
-bool goto_check_ct::is_pointer_primitive(const exprt &expr)
+bool goto_check_ct::requires_pointer_primitive_check(const exprt &expr)
 {
   // we don't need to include the __CPROVER_same_object primitive here as it
   // is replaced by lower level primitives in the special function handling
   // during typechecking (see c_typecheck_expr.cpp)
-  return expr.id() == ID_pointer_object || expr.id() == ID_pointer_offset ||
-         expr.id() == ID_object_size || expr.id() == ID_r_ok ||
+
+  // pointer_object and pointer_offset are well-defined for an arbitrary
+  // pointer-typed operand (and the operands themselves have been checked
+  // separately for, e.g., invalid pointer dereferencing via check_rec):
+  // pointer_object and pointer_offset just extract a subset of bits from the
+  // pointer. If that pointer was unconstrained (non-deterministic), the result
+  // will equally be non-deterministic.
+  return expr.id() == ID_object_size || expr.id() == ID_r_ok ||
          expr.id() == ID_w_ok || expr.id() == ID_rw_ok ||
          expr.id() == ID_is_dynamic_object;
 }
@@ -1835,7 +1842,7 @@ void goto_check_ct::check_rec(const exprt &expr, guardt &guard)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
   }
-  else if(is_pointer_primitive(expr))
+  else if(requires_pointer_primitive_check(expr))
   {
     pointer_primitive_check(expr, guard);
   }
