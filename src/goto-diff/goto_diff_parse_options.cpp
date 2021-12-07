@@ -64,6 +64,8 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
+  options.set_option("show-properties", cmdline.isset("show-properties"));
+
   // Options for process_goto_program
   options.set_option("rewrite-union", true);
 }
@@ -224,6 +226,7 @@ void goto_diff_parse_optionst::help()
     "\n"
     "Diff options:\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_PROPERTIES
     " --show-loops                 show the loops in the programs\n"
     " -u | --unified               output unified diff\n"
     " --change-impact | \n"
