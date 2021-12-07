@@ -90,10 +90,12 @@ first use:
 to obtain a list of all loops in the program. Then identify the loops
 you need to set a separate bound for, and note their loop ID. Then use:
 
-    --unwindset L:B
+    --unwindset [T:]L:B
 
-where `L` denotes a loop ID and `B` denotes the bound for that loop. The
-option can be given multiple times.
+where `L` denotes a loop ID and `B` denotes the bound for that loop in thread T,
+if a thread number is included. The initial thread has index 0, and threads are
+consecutively numbered in program order of threads being spawned. The
+`--unwindset` option can be given multiple times.
 
 As an example, consider a program with two loops in the function main:
 

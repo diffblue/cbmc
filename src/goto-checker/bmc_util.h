@@ -17,6 +17,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/build_goto_trace.h>
 
+#include <goto-instrument/unwindset.h>
+
 #include "incremental_goto_checker.h"
 #include "properties.h"
 
@@ -172,7 +174,6 @@ void run_property_decider(
 #define OPT_BMC \
   "(program-only)" \
   "(show-byte-ops)" \
-  "(show-loops)" \
   "(show-vcc)" \
   "(show-goto-symex-steps)" \
   "(show-points-to-sets)" \
@@ -185,11 +186,9 @@ void run_property_decider(
   "(paths):" \
   "(show-symex-strategies)" \
   "(depth):" \
-  "(unwind):" \
   "(max-field-sensitivity-array-size):" \
   "(no-array-field-sensitivity)" \
   "(graphml-witness):" \
-  "(unwindset):" \
   "(symex-complexity-limit):" \
   "(symex-complexity-failed-child-loops-limit):" \
   "(incremental-loop):" \
@@ -197,6 +196,7 @@ void run_property_decider(
   "(unwind-max):" \
   "(ignore-properties-before-unwind-min)" \
   "(symex-cache-dereferences)" \
+  OPT_UNWINDSET \
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -207,7 +207,6 @@ void run_property_decider(
   "                              pointer dereference. Requires --json-ui.\n" \
   " --program-only               only show program expression\n" \
   " --show-byte-ops              show all byte extracts and updates\n" \
-  " --show-loops                 show the loops in the program\n" \
   " --depth nr                   limit search depth\n" \
   " --max-field-sensitivity-array-size M\n" \
   "                              maximum size M of arrays for which field\n" \
@@ -218,9 +217,7 @@ void run_property_decider(
   "this is\n" \
   "                              equivalent to setting the maximum field \n" \
   "                              sensitivity size for arrays to 0\n" \
-  " --unwind nr                  unwind nr times\n" \
-  " --unwindset L:B,...          unwind loop L with a bound of B\n" \
-  "                              (use --show-loops to get the loop IDs)\n" \
+  HELP_UNWINDSET \
   " --incremental-loop L         check properties after each unwinding\n" \
   "                              of loop L\n" \
   "                              (use --show-loops to get the loop IDs)\n" \

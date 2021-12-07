@@ -25,21 +25,26 @@ void unwindsett::parse_unwind(const std::string &unwind)
 
 void unwindsett::parse_unwindset_one_loop(std::string val)
 {
-  unsigned thread_nr = 0;
-  bool thread_nr_set = false;
+  if(val.empty())
+    return;
 
-  if(!val.empty() && isdigit(val[0]) && val.find(":") != std::string::npos)
+  optionalt<unsigned> thread_nr;
+  if(isdigit(val[0]))
   {
-    std::string nr = val.substr(0, val.find(":"));
-    thread_nr = unsafe_string2unsigned(nr);
-    thread_nr_set = true;
-    val.erase(0, nr.size() + 1);
+    auto c_pos = val.find(':');
+    if(c_pos != std::string::npos)
+    {
+      std::string nr = val.substr(0, c_pos);
+      thread_nr = unsafe_string2unsigned(nr);
+      val.erase(0, nr.size() + 1);
+    }
   }
 
-  if(val.rfind(":") != std::string::npos)
+  auto last_c_pos = val.rfind(':');
+  if(last_c_pos != std::string::npos)
   {
-    std::string id = val.substr(0, val.rfind(":"));
-    std::string uw_string = val.substr(val.rfind(":") + 1);
+    std::string id = val.substr(0, last_c_pos);
+    std::string uw_string = val.substr(last_c_pos + 1);
 
     // the below initialisation makes g++-5 happy
     optionalt<unsigned> uw(0);
@@ -49,8 +54,8 @@ void unwindsett::parse_unwindset_one_loop(std::string val)
     else
       uw = unsafe_string2unsigned(uw_string);
 
-    if(thread_nr_set)
-      thread_loop_map[std::pair<irep_idt, unsigned>(id, thread_nr)] = uw;
+    if(thread_nr.has_value())
+      thread_loop_map[std::pair<irep_idt, unsigned>(id, *thread_nr)] = uw;
     else
       loop_map[id] = uw;
   }

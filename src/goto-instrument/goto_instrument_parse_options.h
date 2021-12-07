@@ -41,6 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_volatile.h"
 #include "replace_calls.h"
 #include "uninitialized.h"
+#include "unwindset.h"
 #include "wmm/weak_memory.h"
 
 // clang-format off
@@ -54,7 +55,8 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_UNINITIALIZED_CHECK \
   OPT_WMM \
   "(race-check)" \
-  "(unwind):(unwindset):(unwindset-file):" \
+  OPT_UNWINDSET \
+  "(unwindset-file):" \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
   "(log):" \
   "(call-graph)(reachable-call-graph)" \
@@ -86,7 +88,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
   "(string-abstraction)" \
-  "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \
+  "(verbosity):(version)(xml-ui)(json-ui)" \
   "(accelerate)(constant-propagator)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \
