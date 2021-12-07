@@ -165,65 +165,63 @@ bool jdiff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
+  // remove function pointers
+  log.status() << "Removing function pointers and virtual functions"
+               << messaget::eom;
+  remove_function_pointers(
+    ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+
+  // Java virtual functions -> explicit dispatch tables:
+  remove_virtual_functions(goto_model);
+
+  // remove Java throw and catch
+  // This introduces instanceof, so order is important:
+  remove_exceptions_using_instanceof(goto_model, ui_message_handler);
+
+  // Java instanceof -> clsid comparison:
+  class_hierarchyt class_hierarchy(goto_model.symbol_table);
+  remove_instanceof(goto_model, class_hierarchy, ui_message_handler);
+
+  mm_io(goto_model);
+
+  // instrument library preconditions
+  instrument_preconditions(goto_model);
+
+  // remove returns
+  remove_returns(goto_model);
+
+  // add generic checks
+  log.status() << "Generic Property Instrumentation" << messaget::eom;
+  goto_check_java(options, goto_model, ui_message_handler);
+
+  // checks don't know about adjusted float expressions
+  adjust_float_expressions(goto_model);
+
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
+
+  // instrument cover goals
+  if(cmdline.isset("cover"))
   {
-    // remove function pointers
-    log.status() << "Removing function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
-
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
-
-    // remove Java throw and catch
-    // This introduces instanceof, so order is important:
-    remove_exceptions_using_instanceof(goto_model, ui_message_handler);
-
-    // Java instanceof -> clsid comparison:
-    class_hierarchyt class_hierarchy(goto_model.symbol_table);
-    remove_instanceof(goto_model, class_hierarchy, ui_message_handler);
-
-    mm_io(goto_model);
-
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
-
-    // remove returns
-    remove_returns(goto_model);
-
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check_java(options, goto_model, ui_message_handler);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // instrument cover goals
-    if(cmdline.isset("cover"))
-    {
-      // remove skips such that trivial GOTOs are deleted and not considered for
-      // coverage annotation:
-      remove_skip(goto_model);
-
-      const auto cover_config =
-        get_cover_config(options, goto_model.symbol_table, ui_message_handler);
-      if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
-        return true;
-    }
-
-    // label the assertions
-    // This must be done after adding assertions and
-    // before using the argument of the "property" option.
-    // Do not re-label after using the property slicer because
-    // this would cause the property identifiers to change.
-    label_properties(goto_model);
-
-    // remove any skips introduced since coverage instrumentation
+    // remove skips such that trivial GOTOs are deleted and not considered for
+    // coverage annotation:
     remove_skip(goto_model);
+
+    const auto cover_config =
+      get_cover_config(options, goto_model.symbol_table, ui_message_handler);
+    if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
+      return true;
   }
+
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
+
+  // remove any skips introduced since coverage instrumentation
+  remove_skip(goto_model);
 
   return false;
 }
