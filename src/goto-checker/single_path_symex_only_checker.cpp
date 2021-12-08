@@ -30,7 +30,8 @@ single_path_symex_only_checkert::single_path_symex_only_checkert(
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
     worklist(get_path_strategy(options.get_option("exploration-strategy"))),
-    symex_runtime(0)
+    symex_runtime(0),
+    unwindset(goto_model)
 {
 }
 
@@ -70,7 +71,8 @@ void single_path_symex_only_checkert::initialize_worklist()
     equation,
     options,
     *worklist,
-    guard_manager);
+    guard_manager,
+    unwindset);
   setup_symex(symex);
 
   symex.initialize_path_storage_from_entry_point_of(
@@ -95,7 +97,8 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
     path.equation,
     options,
     *worklist,
-    guard_manager);
+    guard_manager,
+    unwindset);
   setup_symex(symex);
 
   symex.resume_symex_from_saved_state(

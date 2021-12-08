@@ -12,6 +12,8 @@ Author: Peter Schrammel, Daniel Kroening, kroening@kroening.com
 
 #include <util/structured_data.h>
 
+#include <goto-instrument/unwindset.h>
+
 symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
   message_handlert &message_handler,
   const symbol_tablet &outer_symbol_table,
@@ -19,6 +21,7 @@ symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
   const optionst &options,
   path_storaget &path_storage,
   guard_managert &guard_manager,
+  unwindsett &unwindset,
   ui_message_handlert::uit output_ui)
   : symex_bmct(
       message_handler,
@@ -26,7 +29,8 @@ symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
       target,
       options,
       path_storage,
-      guard_manager),
+      guard_manager,
+      unwindset),
     incr_loop_id(options.get_option("incremental-loop")),
     incr_max_unwind(
       options.is_set("unwind-max") ? options.get_signed_int_option("unwind-max")

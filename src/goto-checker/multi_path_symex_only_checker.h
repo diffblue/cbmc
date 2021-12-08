@@ -16,6 +16,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/path_storage.h>
 
+#include <goto-instrument/unwindset.h>
+
 #include "symex_bmc.h"
 
 class multi_path_symex_only_checkert : public incremental_goto_checkert
@@ -35,6 +37,7 @@ protected:
   symex_target_equationt equation;
   guard_managert guard_manager;
   path_fifot path_storage; // should go away
+  unwindsett unwindset;
   symex_bmct symex;
 
   /// Generates the equation by running goto-symex

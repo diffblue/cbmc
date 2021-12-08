@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/goto_symex.h>
 
-#include <goto-instrument/unwindset.h>
-
 #include "symex_coverage.h"
+
+class unwindsett;
 
 class symex_bmct : public goto_symext
 {
@@ -29,7 +29,8 @@ public:
     symex_target_equationt &_target,
     const optionst &options,
     path_storaget &path_storage,
-    guard_managert &guard_manager);
+    guard_managert &guard_manager,
+    unwindsett &unwindset);
 
   // To show progress
   source_locationt last_source_location;
@@ -81,7 +82,7 @@ public:
   const bool record_coverage;
   const bool havoc_bodyless_functions;
 
-  unwindsett unwindset;
+  unwindsett &unwindset;
 
 protected:
   /// Callbacks that may provide an unwind/do-not-unwind decision for a loop
