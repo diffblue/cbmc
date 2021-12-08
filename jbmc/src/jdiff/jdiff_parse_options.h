@@ -29,6 +29,7 @@ class goto_modelt;
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
+  "(show-loops)" \
   OPT_GOTO_CHECK_JAVA \
   OPT_COVER \
   "(verbosity):(version)" \
