@@ -706,9 +706,8 @@ jobs:
           lcov --capture --directory build --output-file lcov.info
           lcov --remove lcov.info '/usr/*' --output-file lcov.info
       - name: Upload coverage statistics to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./lcov.info
           fail_ci_if_error: true
           verbose: true
