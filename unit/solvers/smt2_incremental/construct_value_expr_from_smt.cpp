@@ -4,14 +4,19 @@
 
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 
+#include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
+
+#include <testing-utils/invariant.h>
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/mp_arith.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+
+#include <string>
 
 static mp_integer power2(unsigned exponent)
 {
@@ -78,5 +83,42 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     REQUIRE(
       construct_value_expr_from_smt(*input_term, expected_result->type()) ==
       *expected_result);
+  }
+}
+
+TEST_CASE(
+  "Invariant violations in value expr construction from smt.",
+  "[core][smt2_incremental]")
+{
+  optionalt<smt_termt> input_term;
+  optionalt<typet> input_type;
+  std::string invariant_reason;
+
+  using rowt = std::tuple<smt_termt, typet, std::string>;
+  std::tie(input_term, input_type, invariant_reason) = GENERATE(
+    rowt{smt_bool_literal_termt{true},
+         unsignedbv_typet{16},
+         "Bool terms may only be used to construct bool typed expressions."},
+    rowt{smt_identifier_termt{"foo", smt_bit_vector_sortt{16}},
+         unsignedbv_typet{16},
+         "Unexpected conversion of identifier to value expression."},
+    rowt{
+      smt_bit_vector_constant_termt{0, 8},
+      unsignedbv_typet{16},
+      "Width of smt bit vector term must match the width of bit vector type."},
+    rowt{smt_bit_vector_constant_termt{0, 8},
+         empty_typet{},
+         "construct_value_expr_from_smt for bit vector should not be applied "
+         "to unsupported type empty"},
+    rowt{smt_core_theoryt::make_not(smt_bool_literal_termt{true}),
+         unsignedbv_typet{16},
+         "Unexpected conversion of function application to value expression."});
+  SECTION(invariant_reason)
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS_MATCHES(
+      construct_value_expr_from_smt(*input_term, *input_type),
+      invariant_failedt,
+      invariant_failure_containing(invariant_reason));
   }
 }
