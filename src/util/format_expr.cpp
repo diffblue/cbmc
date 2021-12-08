@@ -369,9 +369,26 @@ void format_expr_configt::setup()
   };
 
   expr_map[ID_let] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << "LET " << format(to_let_expr(expr).symbol()) << " = "
-              << format(to_let_expr(expr).value()) << " IN "
-              << format(to_let_expr(expr).where());
+    const auto &let_expr = to_let_expr(expr);
+
+    os << "LET ";
+
+    bool first = true;
+
+    const auto &values = let_expr.values();
+    auto values_it = values.begin();
+    for(auto &v : let_expr.variables())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+
+      os << format(v) << " = " << format(*values_it);
+      ++values_it;
+    }
+
+    return os << " IN " << format(let_expr.where());
   };
 
   expr_map[ID_lambda] =

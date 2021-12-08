@@ -924,18 +924,24 @@ std::string expr2ct::convert_let(
   const let_exprt &src,
   unsigned precedence)
 {
-  if(src.operands().size()<3)
-    return convert_norep(src, precedence);
+  std::string dest = "LET ";
 
-  unsigned p0;
-  std::string op0=convert_with_precedence(src.op0(), p0);
+  bool first = true;
 
-  std::string dest="LET ";
-  dest+=convert(src.symbol());
-  dest+='=';
-  dest+=convert(src.value());
-  dest+=" IN ";
-  dest+=convert(src.where());
+  const auto &values = src.values();
+  auto values_it = values.begin();
+  for(auto &v : src.variables())
+  {
+    if(first)
+      first = false;
+    else
+      dest += ", ";
+
+    dest += convert(v) + "=" + convert(*values_it);
+    ++values_it;
+  }
+
+  dest += " IN " + convert(src.where());
 
   return dest;
 }
