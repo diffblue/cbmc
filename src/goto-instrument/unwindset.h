@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <string>
 
+class message_handlert;
+
 class unwindsett
 {
 public:
@@ -34,13 +36,17 @@ public:
   void parse_unwind(const std::string &unwind);
 
   // limit for instances of a loop
-  void parse_unwindset(const std::list<std::string> &unwindset);
+  void parse_unwindset(
+    const std::list<std::string> &unwindset,
+    message_handlert &message_handler);
 
   // queries
   optionalt<unsigned> get_limit(const irep_idt &loop, unsigned thread_id) const;
 
   // read unwindset directives from a file
-  void parse_unwindset_file(const std::string &file_name);
+  void parse_unwindset_file(
+    const std::string &file_name,
+    message_handlert &message_handler);
 
 protected:
   abstract_goto_modelt &goto_model;
@@ -57,7 +63,9 @@ protected:
     std::map<std::pair<irep_idt, unsigned>, optionalt<unsigned>>;
   thread_loop_mapt thread_loop_map;
 
-  void parse_unwindset_one_loop(std::string loop_limit);
+  void parse_unwindset_one_loop(
+    std::string loop_limit,
+    message_handlert &message_handler);
 };
 
 #define OPT_UNWINDSET                                                          \

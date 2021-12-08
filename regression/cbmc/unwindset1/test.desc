@@ -1,10 +1,9 @@
 CORE
 main.c
 --unwindset main.0:2,main.2:2
-^Invalid User Input$
-^Option: unwindset$
-^Reason: invalid loop identifier main\.2$
-^EXIT=1$
+^loop identifier main.2 provided with unwindset does not match any loop$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring

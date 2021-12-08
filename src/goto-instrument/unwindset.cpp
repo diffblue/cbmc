@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwindset.h"
 
 #include <util/exception_utils.h>
+#include <util/message.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 
@@ -24,7 +25,9 @@ void unwindsett::parse_unwind(const std::string &unwind)
     global_limit = unsafe_string2unsigned(unwind);
 }
 
-void unwindsett::parse_unwindset_one_loop(std::string val)
+void unwindsett::parse_unwindset_one_loop(
+  std::string val,
+  message_handlert &message_handler)
 {
   if(val.empty())
     return;
@@ -94,8 +97,11 @@ void unwindsett::parse_unwindset_one_loop(std::string val)
           });
         if(!found)
         {
-          throw invalid_command_line_argument_exceptiont{
-            "invalid loop identifier " + id, "unwindset"};
+          messaget log{message_handler};
+          log.warning() << "loop identifier " << id
+                        << " provided with unwindset does not match any loop"
+                        << messaget::eom;
+          return;
         }
       }
       else
@@ -122,8 +128,11 @@ void unwindsett::parse_unwindset_one_loop(std::string val)
         }
         if(!nr.has_value())
         {
-          throw invalid_command_line_argument_exceptiont{
-            "loop identifier " + id + " does not match any loop", "unwindset"};
+          messaget log{message_handler};
+          log.warning() << "loop identifier " << id
+                        << " provided with unwindset does not match any loop"
+                        << messaget::eom;
+          return;
         }
         else
           id = function_id + "." + std::to_string(*nr);
@@ -147,7 +156,9 @@ void unwindsett::parse_unwindset_one_loop(std::string val)
   }
 }
 
-void unwindsett::parse_unwindset(const std::list<std::string> &unwindset)
+void unwindsett::parse_unwindset(
+  const std::list<std::string> &unwindset,
+  message_handlert &message_handler)
 {
   for(auto &element : unwindset)
   {
@@ -155,7 +166,7 @@ void unwindsett::parse_unwindset(const std::list<std::string> &unwindset)
       split_string(element, ',', true, true);
 
     for(auto &element : unwindset_elements)
-      parse_unwindset_one_loop(element);
+      parse_unwindset_one_loop(element, message_handler);
   }
 }
 
@@ -181,7 +192,9 @@ unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
   return global_limit;
 }
 
-void unwindsett::parse_unwindset_file(const std::string &file_name)
+void unwindsett::parse_unwindset_file(
+  const std::string &file_name,
+  message_handlert &message_handler)
 {
   #ifdef _MSC_VER
   std::ifstream file(widen(file_name));
@@ -199,5 +212,5 @@ void unwindsett::parse_unwindset_file(const std::string &file_name)
     split_string(buffer.str(), ',', true, true);
 
   for(auto &element : unwindset_elements)
-    parse_unwindset_one_loop(element);
+    parse_unwindset_one_loop(element, message_handler);
 }
