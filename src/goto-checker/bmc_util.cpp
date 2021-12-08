@@ -192,7 +192,8 @@ void setup_symex(
   symex.last_source_location.make_nil();
 
   symex.unwindset.parse_unwind(options.get_option("unwind"));
-  symex.unwindset.parse_unwindset(options.get_list_option("unwindset"));
+  symex.unwindset.parse_unwindset(
+    options.get_list_option("unwindset"), ui_message_handler);
 }
 
 void slice(

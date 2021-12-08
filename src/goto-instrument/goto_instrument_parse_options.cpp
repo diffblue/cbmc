@@ -171,10 +171,16 @@ int goto_instrument_parse_optionst::doit()
           unwindset.parse_unwind(cmdline.get_value("unwind"));
 
         if(unwindset_file_given)
-          unwindset.parse_unwindset_file(cmdline.get_value("unwindset-file"));
+        {
+          unwindset.parse_unwindset_file(
+            cmdline.get_value("unwindset-file"), ui_message_handler);
+        }
 
         if(unwindset_given)
-          unwindset.parse_unwindset(cmdline.get_values("unwindset"));
+        {
+          unwindset.parse_unwindset(
+            cmdline.get_values("unwindset"), ui_message_handler);
+        }
 
         bool unwinding_assertions=cmdline.isset("unwinding-assertions");
         bool partial_loops=cmdline.isset("partial-loops");
