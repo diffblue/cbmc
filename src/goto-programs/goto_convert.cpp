@@ -1184,6 +1184,27 @@ void goto_convertt::convert_switch(
   goto_programt sideeffects;
   clean_expr(argument, sideeffects, mode);
 
+  // Avoid potential performance penalties caused by evaluating the value
+  // multiple times (as the below chain-of-ifs does). "needs_cleaning" isn't
+  // necessarily the right check here, and we may need to introduce a different
+  // way of identifying the class of non-trivial expressions that warrant
+  // introduction of a temporary.
+  if(needs_cleaning(argument))
+  {
+    symbolt &new_symbol = new_tmp_symbol(
+      argument.type(),
+      "switch_value",
+      sideeffects,
+      code.source_location(),
+      mode);
+
+    code_assignt copy_value{
+      new_symbol.symbol_expr(), argument, code.source_location()};
+    convert(copy_value, sideeffects, mode);
+
+    argument = new_symbol.symbol_expr();
+  }
+
   // save break/default/cases targets
   break_switch_targetst old_targets(targets);
 
