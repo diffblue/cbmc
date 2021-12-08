@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^\*\* Results:$
+^\[main.assertion.1\] line 12 assertion tmp_if_expr(\$\d+)?: SUCCESS$
+^\[main.assertion.2\] line 13 assertion tmp_if_expr\$\d+: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

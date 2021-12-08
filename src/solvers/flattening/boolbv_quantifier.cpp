@@ -48,6 +48,9 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
         return to_constant_expr(y_binary.rhs());
       }
     }
+
+    if(var_expr.type().id() == ID_unsignedbv)
+      return from_integer(0, var_expr.type());
   }
   else if(quantifier_expr.id() == ID_and)
   {
@@ -66,6 +69,9 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
         return to_constant_expr(x_binary.rhs());
       }
     }
+
+    if(var_expr.type().id() == ID_unsignedbv)
+      return from_integer(0, var_expr.type());
   }
 
   return {};
