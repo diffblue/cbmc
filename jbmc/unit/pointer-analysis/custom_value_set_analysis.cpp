@@ -35,26 +35,12 @@ Author: Chris Smowton, chris@smowton.net
 class test_value_sett:public value_sett
 {
 public:
-  static bool assigns_to_ignored_variable(const code_assignt &assign)
+  static bool assigns_to_ignored_variable(const exprt &lhs)
   {
-    if(assign.lhs().id()!=ID_symbol)
+    if(lhs.id() != ID_symbol)
       return false;
-    const irep_idt &id=to_symbol_expr(assign.lhs()).get_identifier();
+    const irep_idt &id = to_symbol_expr(lhs).get_identifier();
     return id2string(id).find("ignored")!=std::string::npos;
-  }
-
-  void apply_code_rec(const codet &code, const namespacet &ns) override
-  {
-    // Ignore assignments to the local "ignored"
-    if(code.get_statement()==ID_assign &&
-       assigns_to_ignored_variable(to_code_assign(code)))
-    {
-      return;
-    }
-    else
-    {
-      value_sett::apply_code_rec(code, ns);
-    }
   }
 
   void assign_rec(
@@ -64,6 +50,12 @@ public:
     const namespacet &ns,
     bool add_to_sets) override
   {
+    // Ignore assignments to the local "ignored"
+    if(assigns_to_ignored_variable(lhs))
+    {
+      return;
+    }
+
     // Disregard writes against variables containing 'no_write':
     if(lhs.id()==ID_symbol)
     {

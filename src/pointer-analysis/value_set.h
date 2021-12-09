@@ -325,18 +325,17 @@ public:
     const exprt &expr,
     const namespacet &ns);
 
-  /// Transforms this value-set by executing a given statement against it.
-  /// For example, assignment statements will update `valuest` by reading
-  /// the value-set corresponding to their right-hand side and assigning it
-  /// to their LHS.
-  /// \param code: instruction to apply
+  /// Transforms this value-set by executing a given DECL
+  /// instruction against it.
+  /// \param symbol: symbol that is declared
   /// \param ns: global namespace
-  void apply_code(
-    const codet &code,
-    const namespacet &ns)
-  {
-    apply_code_rec(code, ns);
-  }
+  void apply_decl(const symbol_exprt &symbol, const namespacet &ns);
+
+  /// Transforms this value-set by executing a given SET_RETURN_VALUE
+  /// instruction against it.
+  /// \param value: value that is returned
+  /// \param ns: global namespace
+  void apply_set_return_value(const exprt &value, const namespacet &ns);
 
   /// Transforms this value-set by executing executing the assignment
   /// `lhs := rhs` against it.
@@ -488,11 +487,6 @@ protected:
     const std::string &suffix,
     const namespacet &ns,
     bool add_to_sets);
-
-  /// Subclass customisation point for applying code to this domain:
-  virtual void apply_code_rec(
-    const codet &code,
-    const namespacet &ns);
 
  private:
   /// Subclass customisation point to filter or otherwise alter the value-set
