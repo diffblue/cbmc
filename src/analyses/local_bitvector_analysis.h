@@ -61,14 +61,15 @@ public:
     // the bits for the "bitvector analysis"
     enum bitst
     {
-      B_unknown=1<<0,
-      B_uninitialized=1<<1,
-      B_uses_offset=1<<2,
-      B_dynamic_local=1<<3,
-      B_dynamic_heap=1<<4,
-      B_null=1<<5,
-      B_static_lifetime=1<<6,
-      B_integer_address=1<<7
+      B_unknown = 1 << 0,
+      B_uninitialized = 1 << 1,
+      B_uses_offset = 1 << 2,
+      B_dynamic_local = 1 << 3,
+      B_dynamic_heap = 1 << 4,
+      B_null = 1 << 5,
+      B_static_lifetime = 1 << 6,
+      B_integer_address = 1 << 7,
+      B_maybe_alive = 1 << 8
     };
 
     explicit flagst(const bitst _bits):bits(_bits)
@@ -162,6 +163,16 @@ public:
     bool is_integer_address() const
     {
       return (bits&B_integer_address)!=0;
+    }
+
+    static flagst mk_maybe_alive()
+    {
+      return flagst(B_maybe_alive);
+    }
+
+    bool is_maybe_alive() const
+    {
+      return (bits & B_maybe_alive) != 0;
     }
 
     void print(std::ostream &) const;
