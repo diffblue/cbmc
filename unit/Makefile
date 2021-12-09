@@ -100,6 +100,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
        solvers/smt2/smt2irep.cpp \
+       solvers/smt2_incremental/construct_value_expr_from_smt.cpp \
        solvers/smt2_incremental/convert_expr_to_smt.cpp \
        solvers/smt2_incremental/smt2_incremental_decision_procedure.cpp \
        solvers/smt2_incremental/smt_bit_vector_theory.cpp \
