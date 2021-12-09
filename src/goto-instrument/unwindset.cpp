@@ -71,10 +71,19 @@ void unwindsett::parse_unwindset_one_loop(
       std::string function_id = id.substr(0, last_dot_pos);
       std::string loop_nr_label = id.substr(last_dot_pos + 1);
 
-      if(loop_nr_label.empty() || !goto_model.can_produce_function(function_id))
+      if(loop_nr_label.empty())
       {
         throw invalid_command_line_argument_exceptiont{
           "invalid loop identifier " + id, "unwindset"};
+      }
+
+      if(!goto_model.can_produce_function(function_id))
+      {
+        messaget log{message_handler};
+        log.warning() << "loop identifier " << id
+                      << " for non-existent function provided with unwindset"
+                      << messaget::eom;
+        return;
       }
 
       const goto_functiont &goto_function =
