@@ -20,13 +20,11 @@ Sending command to SMT2 solver - \(define-fun |B4| \(\) Bool \(|not| false\)\)
 Sending command to SMT2 solver - \(assert |B4|\)
 Sending command to SMT2 solver - \(check-sat\)
 Solver response - sat
-^EXIT=(0|127|134|137)$
+^EXIT=10$
 ^SIGNAL=0$
 --
 type: pointer
 --
 Test that running cbmc with the `--incremental-smt2-solver` argument can be used
 to send a valid SMT2 formula to a sub-process solver for an example input file
-which include control flow constructs. Note that at the time of adding this
-test, an invariant violation is expected due to the unimplemented response
-parsing.
+which include control flow constructs.

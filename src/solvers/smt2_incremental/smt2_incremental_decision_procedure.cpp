@@ -2,6 +2,7 @@
 
 #include "smt2_incremental_decision_procedure.h"
 
+#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
@@ -163,9 +164,70 @@ exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
   return expr;
 }
 
+static optionalt<smt_termt> get_identifier(
+  const exprt &expr,
+  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
+    &expression_handle_identifiers,
+  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
+    &expression_identifiers)
+{
+  const auto handle_find_result = expression_handle_identifiers.find(expr);
+  if(handle_find_result != expression_handle_identifiers.cend())
+    return handle_find_result->second;
+  const auto expr_find_result = expression_identifiers.find(expr);
+  if(expr_find_result != expression_identifiers.cend())
+    return expr_find_result->second;
+  return {};
+}
+
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
-  UNIMPLEMENTED_FEATURE("`get` of:\n  " + expr.pretty(2, 0));
+  log.debug() << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
+  optionalt<smt_termt> descriptor =
+    get_identifier(expr, expression_handle_identifiers, expression_identifiers);
+  if(!descriptor)
+  {
+    if(gather_dependent_expressions(expr).empty())
+    {
+      descriptor = convert_expr_to_smt(expr);
+    }
+    else
+    {
+      const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
+      INVARIANT(
+        symbol_expr, "Unhandled expressions are expected to be symbols");
+      // Note this case is currently expected to be encountered during trace
+      // generation for -
+      //  * Steps which were removed via --slice-formula.
+      //  * Getting concurrency clock values.
+      // The below implementation which returns the given expression was chosen
+      // based on the implementation of `smt2_convt::get` in the non-incremental
+      // smt2 decision procedure.
+      log.warning()
+        << "`get` attempted for unknown symbol, with identifier - \n"
+        << symbol_expr->get_identifier() << messaget::eom;
+      return expr;
+    }
+  }
+  const smt_get_value_commandt get_value_command{*descriptor};
+  const smt_responset response =
+    get_response_to_command(*solver_process, get_value_command);
+  const auto get_value_response = response.cast<smt_get_value_responset>();
+  if(!get_value_response)
+  {
+    throw analysis_exceptiont{
+      "Expected get-value response from solver, but received - " +
+      response.pretty()};
+  }
+  if(get_value_response->pairs().size() > 1)
+  {
+    throw analysis_exceptiont{
+      "Expected single valuation pair in get-value response from solver, but "
+      "received multiple pairs - " +
+      response.pretty()};
+  }
+  return construct_value_expr_from_smt(
+    get_value_response->pairs()[0].get().value(), expr.type());
 }
 
 void smt2_incremental_decision_proceduret::print_assignment(

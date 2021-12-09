@@ -12,14 +12,13 @@ Sending command to SMT2 solver - \(define-fun |B2| \(\) Bool \(|not| false\)\)
 Sending command to SMT2 solver - \(assert |B2|\)
 Sending command to SMT2 solver - \(check-sat\)
 Solver response - sat
-^EXIT=(0|127|134|137)$
+^EXIT=10$
 ^SIGNAL=0$
 --
 type: pointer
 --
 Test that running cbmc with the `--incremental-smt2-solver` argument causes the
-incremental smt2 solving to be used. Note that at the time of adding this test,
-an invariant violation is expected due to the unimplemented response parsing.
+incremental smt2 solving to be used.
 
 The sliced formula is expected to use only the implemented subset of exprts.
 This is implementation is sufficient to send this example to the solver and
