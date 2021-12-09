@@ -57,8 +57,7 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
 bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_sett::const_iterator it = locals.locals.find(identifier);
-  return it != locals.locals.end() && ns.lookup(*it).type.id() == ID_pointer &&
-         !dirty(identifier);
+  return it != locals.locals.end() && !dirty(identifier);
 }
 
 void local_bitvector_analysist::assign_lhs(
