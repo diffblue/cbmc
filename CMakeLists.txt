@@ -154,6 +154,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
               "$<TARGET_FILE:driver>"
               "$<TARGET_FILE:goto-analyzer>"
               "$<TARGET_FILE:goto-cc>"
+              "$<TARGET_FILE:goto-contracts>"
               "$<TARGET_FILE:goto-diff>"
               "$<TARGET_FILE:goto-instrument>"
               "$<TARGET_FILE:janalyzer>"
@@ -221,6 +222,8 @@ cprover_default_properties(
     goto-analyzer-lib
     goto-cc
     goto-cc-lib
+    goto-contracts
+    goto-contracts-lib
     goto-checker
     goto-diff
     goto-diff-lib

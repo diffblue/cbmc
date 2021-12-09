@@ -7,6 +7,7 @@ DIRS = analyses \
        crangler \
        goto-analyzer \
        goto-cc \
+       goto-contracts \
        goto-checker \
        goto-diff \
        goto-instrument \
@@ -31,6 +32,7 @@ all: cbmc.dir \
      crangler.dir \
      goto-analyzer.dir \
      goto-cc.dir \
+     goto-contracts.dir \
      goto-diff.dir \
      goto-instrument.dir \
      goto-harness.dir \
@@ -62,6 +64,10 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 cpp.dir: ansi-c.dir linking.dir
 
 crangler.dir: util.dir json.dir
+
+goto-contracts.dir: util.dir goto-programs.dir langapi.dir \
+                    json.dir \
+                    goto-instrument.dir
 
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \
