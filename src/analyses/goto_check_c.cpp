@@ -42,7 +42,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include "guard.h"
 #include "local_bitvector_analysis.h"
 
 class goto_check_ct
@@ -101,17 +100,19 @@ protected:
   const namespacet &ns;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
-  guard_managert guard_manager;
   messaget log;
 
   bool no_enum_check;
+
+  using guardt = std::function<exprt(exprt)>;
+  const guardt identity = [](exprt expr) { return expr; };
 
   /// Check an address-of expression:
   ///  if it is a dereference then check the pointer
   ///  if it is an index then address-check the array and then check the index
   /// \param expr: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
-  void check_rec_address(const exprt &expr, guardt &guard);
+  /// \param guard: the condition for the check
+  void check_rec_address(const exprt &expr, const guardt &guard);
 
   /// Check a logical operation: check each operand in separation while
   /// extending the guarding condition as follows.
@@ -120,7 +121,7 @@ protected:
   /// \param expr: the expression to be checked
   /// \param guard: the condition for the check (extended with the previous
   ///   operands (or their negations) for recursively calls)
-  void check_rec_logical_op(const exprt &expr, guardt &guard);
+  void check_rec_logical_op(const exprt &expr, const guardt &guard);
 
   /// Check an if expression: check the if-condition alone, and then check the
   ///   true/false-cases with the guard extended with if-condition and it's
@@ -128,7 +129,7 @@ protected:
   /// \param if_expr: the expression to be checked
   /// \param guard: the condition for the check (extended with the (negation of
   ///   the) if-condition for recursively calls)
-  void check_rec_if(const if_exprt &if_expr, guardt &guard);
+  void check_rec_if(const if_exprt &if_expr, const guardt &guard);
 
   /// Check that a member expression is valid:
   /// - check the structure this expression is a member of (via pointer of its
@@ -137,29 +138,29 @@ protected:
   ///   `s->member' to avoid checking safety of `s'
   /// - check all operands of the expression
   /// \param member: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
+  /// \param guard: the condition for the check
   /// \return true if no more checks are required for \p member or its
   ///   sub-expressions
-  bool check_rec_member(const member_exprt &member, guardt &guard);
+  bool check_rec_member(const member_exprt &member, const guardt &guard);
 
   /// Check that a division is valid: check for division by zero, overflow and
   ///   NaN (for floating point numbers).
   /// \param div_expr: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
-  void check_rec_div(const div_exprt &div_expr, guardt &guard);
+  /// \param guard: the condition for the check
+  void check_rec_div(const div_exprt &div_expr, const guardt &guard);
 
   /// Check that an arithmetic operation is valid: overflow check, NaN-check
   ///   (for floating point numbers), and pointer overflow check.
   /// \param expr: the expression to be checked
-  /// \param guard: the condition for the check (unmodified here)
-  void check_rec_arithmetic_op(const exprt &expr, guardt &guard);
+  /// \param guard: the condition for the check
+  void check_rec_arithmetic_op(const exprt &expr, const guardt &guard);
 
   /// Recursively descend into \p expr and run the appropriate check for each
   ///   sub-expression, while collecting the condition for the check in \p
   ///   guard.
   /// \param expr: the expression to be checked
   /// \param guard: the condition for when the check should be made
-  void check_rec(const exprt &expr, guardt &guard);
+  void check_rec(const exprt &expr, const guardt &guard);
 
   /// Initiate the recursively analysis of \p expr with its `guard' set to TRUE.
   /// \param expr: the expression to be checked
@@ -337,6 +338,21 @@ protected:
   /// and the name is known, nothing otherwise.
   named_check_statust match_named_check(const irep_idt &named_check) const;
 };
+
+static exprt implication(exprt lhs, exprt rhs)
+{
+  // rewrite a => (b => c) to (a && b) => c
+  if(rhs.id() == ID_implies)
+  {
+    const auto &rhs_implication = to_implies_expr(rhs);
+    return implies_exprt(
+      and_exprt(std::move(lhs), rhs_implication.lhs()), rhs_implication.rhs());
+  }
+  else
+  {
+    return implies_exprt(std::move(lhs), std::move(rhs));
+  }
+}
 
 void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
 {
@@ -1601,10 +1617,7 @@ void goto_check_ct::add_guarded_property(
     return;
 
   // add the guard
-  exprt guarded_expr =
-    guard.is_true()
-      ? std::move(simplified_expr)
-      : implies_exprt{guard.as_expr(), std::move(simplified_expr)};
+  exprt guarded_expr = guard(simplified_expr);
 
   if(assertions.insert(std::make_pair(src_expr, guarded_expr)).second)
   {
@@ -1625,7 +1638,7 @@ void goto_check_ct::add_guarded_property(
   }
 }
 
-void goto_check_ct::check_rec_address(const exprt &expr, guardt &guard)
+void goto_check_ct::check_rec_address(const exprt &expr, const guardt &guard)
 {
   // we don't look into quantifiers
   if(expr.id() == ID_exists || expr.id() == ID_forall)
@@ -1648,7 +1661,7 @@ void goto_check_ct::check_rec_address(const exprt &expr, guardt &guard)
   }
 }
 
-void goto_check_ct::check_rec_logical_op(const exprt &expr, guardt &guard)
+void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
 {
   PRECONDITION(
     expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies);
@@ -1656,7 +1669,7 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, guardt &guard)
     expr.is_boolean(),
     "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
 
-  guardt old_guard = guard;
+  exprt::operandst constraints;
 
   for(const auto &op : expr.operands())
   {
@@ -1665,14 +1678,17 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, guardt &guard)
       "'" + expr.id_string() + "' takes Boolean operands only, but got " +
         op.pretty());
 
-    check_rec(op, guard);
-    guard.add(expr.id() == ID_or ? boolean_negate(op) : op);
-  }
+    auto new_guard = [&guard, &constraints](exprt expr) {
+      return guard(implication(conjunction(constraints), expr));
+    };
 
-  guard = std::move(old_guard);
+    check_rec(op, new_guard);
+
+    constraints.push_back(expr.id() == ID_or ? boolean_negate(op) : op);
+  }
 }
 
-void goto_check_ct::check_rec_if(const if_exprt &if_expr, guardt &guard)
+void goto_check_ct::check_rec_if(const if_exprt &if_expr, const guardt &guard)
 {
   INVARIANT(
     if_expr.cond().is_boolean(),
@@ -1681,21 +1697,23 @@ void goto_check_ct::check_rec_if(const if_exprt &if_expr, guardt &guard)
   check_rec(if_expr.cond(), guard);
 
   {
-    guardt old_guard = guard;
-    guard.add(if_expr.cond());
-    check_rec(if_expr.true_case(), guard);
-    guard = std::move(old_guard);
+    auto new_guard = [&guard, &if_expr](exprt expr) {
+      return guard(implication(if_expr.cond(), std::move(expr)));
+    };
+    check_rec(if_expr.true_case(), new_guard);
   }
 
   {
-    guardt old_guard = guard;
-    guard.add(not_exprt{if_expr.cond()});
-    check_rec(if_expr.false_case(), guard);
-    guard = std::move(old_guard);
+    auto new_guard = [&guard, &if_expr](exprt expr) {
+      return guard(implication(not_exprt(if_expr.cond()), std::move(expr)));
+    };
+    check_rec(if_expr.false_case(), new_guard);
   }
 }
 
-bool goto_check_ct::check_rec_member(const member_exprt &member, guardt &guard)
+bool goto_check_ct::check_rec_member(
+  const member_exprt &member,
+  const guardt &guard)
 {
   const dereference_exprt &deref = to_dereference_expr(member.struct_op());
 
@@ -1733,7 +1751,9 @@ bool goto_check_ct::check_rec_member(const member_exprt &member, guardt &guard)
   return false;
 }
 
-void goto_check_ct::check_rec_div(const div_exprt &div_expr, guardt &guard)
+void goto_check_ct::check_rec_div(
+  const div_exprt &div_expr,
+  const guardt &guard)
 {
   div_by_zero_check(to_div_expr(div_expr), guard);
 
@@ -1746,7 +1766,9 @@ void goto_check_ct::check_rec_div(const div_exprt &div_expr, guardt &guard)
   }
 }
 
-void goto_check_ct::check_rec_arithmetic_op(const exprt &expr, guardt &guard)
+void goto_check_ct::check_rec_arithmetic_op(
+  const exprt &expr,
+  const guardt &guard)
 {
   if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
   {
@@ -1771,7 +1793,7 @@ void goto_check_ct::check_rec_arithmetic_op(const exprt &expr, guardt &guard)
   }
 }
 
-void goto_check_ct::check_rec(const exprt &expr, guardt &guard)
+void goto_check_ct::check_rec(const exprt &expr, const guardt &guard)
 {
   // we don't look into quantifiers
   if(expr.id() == ID_exists || expr.id() == ID_forall)
@@ -1855,8 +1877,7 @@ void goto_check_ct::check_rec(const exprt &expr, guardt &guard)
 
 void goto_check_ct::check(const exprt &expr)
 {
-  guardt guard{true_exprt{}, guard_manager};
-  check_rec(expr, guard);
+  check_rec(expr, identity);
 }
 
 /// expand the r_ok, w_ok and rw_ok predicates
@@ -2157,7 +2178,7 @@ void goto_check_ct::goto_check(
           "pointer dereference",
           i.source_location(),
           pointer,
-          guardt(true_exprt(), guard_manager));
+          identity);
       }
 
       // this has no successor
@@ -2253,7 +2274,7 @@ void goto_check_ct::goto_check(
           "memory-leak",
           source_location,
           eq,
-          guardt(true_exprt(), guard_manager));
+          identity);
       }
     }
 
