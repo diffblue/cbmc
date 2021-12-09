@@ -128,8 +128,10 @@ void remove_returnst::replace_returns(
         code_assignt assignment(*return_symbol, instruction.return_value());
 
         // now turn the `return' into `assignment'
+        auto labels = std::move(instruction.labels);
         instruction = goto_programt::make_assignment(
           assignment, instruction.source_location());
+        instruction.labels = std::move(labels);
       }
       else
         instruction.turn_into_skip();
