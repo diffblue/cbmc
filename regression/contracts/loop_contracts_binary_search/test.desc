@@ -3,10 +3,13 @@ main.c
 --apply-loop-contracts _ --pointer-check --bounds-check --signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
-^\[binary_search.1\] .* Check loop invariant before entry: SUCCESS$
-^\[binary_search.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[binary_search.3\] .* Check decreases clause on loop iteration: SUCCESS$
-^\[main.assertion.1\] .* assertion buf\[idx\] == val: SUCCESS$
+^\[binary_search\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[binary_search\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[binary_search\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[binary_search\.2\] .* Check that lb is assignable: SUCCESS$
+^\[binary_search\.3\] .* Check that ub is assignable: SUCCESS$
+^\[binary_search\.4\] .* Check that mid is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion buf\[idx\] == val: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

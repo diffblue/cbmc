@@ -1,11 +1,15 @@
 CORE
 main.c
 --apply-loop-contracts --replace-call-with-contract ackermann
-^\[precondition.1\] .* Check requires clause: SUCCESS$
-^\[precondition.2\] .* Check requires clause: SUCCESS$
-^\[ackermann.1\] .* Check loop invariant before entry: SUCCESS$
-^\[ackermann.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[ackermann.3\] .* Check decreases clause on loop iteration: SUCCESS$
+^\[precondition\.\d+\] .* line 17 Check requires clause: SUCCESS$
+^\[precondition\.\d+\] .* line 17 Check requires clause: SUCCESS$
+^\[ackermann\.\d+\] line 21 Check loop invariant before entry: SUCCESS$
+^\[ackermann\.\d+\] line 21 Check that loop invariant is preserved: SUCCESS$
+^\[ackermann\.\d+\] line 21 Check decreases clause on loop iteration: SUCCESS$
+^\[ackermann\.\d+\] line 29 Check that m is assignable: SUCCESS$
+^\[ackermann\.\d+\] line 30 Check that n is assignable: SUCCESS$
+^\[ackermann\.\d+\] line 34 Check that n is assignable: SUCCESS$
+^\[ackermann\.\d+\] line 35 Check that m is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

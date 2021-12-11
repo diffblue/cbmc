@@ -1,11 +1,13 @@
-CORE smt-backend broken-cprover-smt-backend
+CORE smt-backend broken-cprover-smt-backend thorough-smt-backend
 main.c
 --apply-loop-contracts _ --z3
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.\d+\] line .* Check loop invariant before entry: SUCCESS
-^\[main.\d+\] line .* Check that loop invariant is preserved: SUCCESS
-^\[main.assertion.\d+\] line .* assertion .*: SUCCESS
+^\[main.\d+\] line .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] line .* Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] line .* Check that i is assignable: SUCCESS$
+^\[main\.\d+\] line .* Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+^\[main.assertion.\d+\] line .* assertion .*: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

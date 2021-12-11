@@ -31,6 +31,7 @@ Date: February 2016
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
+#include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
 #include <util/mathematical_expr.h>
@@ -252,13 +253,30 @@ void code_contractst::check_apply_loop_contracts(
     loop_head,
     add_pragma_disable_assigns_check(generated_code));
 
-  // havoc the variables that may be modified
-  assignst assigns;
+  assignst to_havoc;
+
   if(assigns_clause.is_nil())
   {
+    // No assigns clause was specified for this loop.
+    // Infer memory locations assigned by the loop from the loop instructions
+    // and the inferred aliasing relation.
     try
     {
-      get_assigns(local_may_alias, loop, assigns);
+      get_assigns(local_may_alias, loop, to_havoc);
+      log.debug() << "No loop assigns clause provided. Inferred targets {";
+      // Add inferred targets to the loop assigns clause.
+      bool ran_once = false;
+      for(const auto &target : to_havoc)
+      {
+        if(ran_once)
+          log.debug() << ", ";
+        ran_once = true;
+        log.debug() << format(target);
+        loop_assigns.add_to_write_set(target);
+      }
+      log.debug()
+        << "}. Please specify an assigns clause if verification fails."
+        << messaget::eom;
     }
     catch(const analysis_exceptiont &exc)
     {
@@ -271,24 +289,29 @@ void code_contractst::check_apply_loop_contracts(
   }
   else
   {
-    assigns.insert(
+    // An assigns clause was specified for this loop.
+    // Add the targets to the set of expressions to havoc.
+    // TODO: Should we add the automatically detected local static variables
+    // too ? (they are present in loop_assigns but not in assigns_clause, and
+    // they are not necessarily touched by the loop).
+    to_havoc.insert(
       assigns_clause.operands().cbegin(), assigns_clause.operands().cend());
-
-    // Create snapshots of write set CARs.
-    // This must be done before havocing the write set.
-    for(const auto &car : loop_assigns.get_write_set())
-    {
-      auto snapshot_instructions = car.generate_snapshot_instructions();
-      insert_before_swap_and_advance(
-        goto_function.body, loop_head, snapshot_instructions);
-    };
-
-    // Perform write set instrumentation on the entire loop.
-    check_frame_conditions(
-      function_name, goto_function.body, loop_head, loop_end, loop_assigns);
   }
 
-  havoc_assigns_targetst havoc_gen(assigns, ns);
+  // Create snapshots of write set CARs.
+  // This must be done before havocing the write set.
+  for(const auto &car : loop_assigns.get_write_set())
+  {
+    auto snapshot_instructions = car.generate_snapshot_instructions();
+    insert_before_swap_and_advance(
+      goto_function.body, loop_head, snapshot_instructions);
+  };
+
+  // Perform write set instrumentation on the entire loop.
+  check_frame_conditions(
+    function_name, goto_function.body, loop_head, loop_end, loop_assigns);
+
+  havoc_assigns_targetst havoc_gen(to_havoc, ns);
   havoc_gen.append_full_havoc_code(
     loop_head->source_location(), generated_code);
 
