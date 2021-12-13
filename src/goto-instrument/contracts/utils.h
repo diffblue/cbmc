@@ -17,6 +17,8 @@ Date: September 2021
 
 #include <goto-programs/goto_model.h>
 
+#include <util/message.h>
+
 #define CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK "contracts:disable:assigns-check"
 
 /// \brief A class that overrides the low-level havocing functions in the base
@@ -136,5 +138,16 @@ bool is_parameter_assign(
 bool is_auxiliary_decl_dead_or_assign(
   const goto_programt::targett &instruction_it,
   namespacet &ns);
+
+/// Turns goto instructions `IF cond GOTO label` where the condition
+/// statically simplifies to `false` into SKIP instructions.
+void simplify_gotos(goto_programt &goto_program, namespacet &ns);
+
+/// Returns true iff the given program is loop-free,
+/// i.e. if each SCC of its CFG contains a single element.
+bool is_loop_free(
+  const goto_programt &goto_program,
+  namespacet &ns,
+  messaget &log);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

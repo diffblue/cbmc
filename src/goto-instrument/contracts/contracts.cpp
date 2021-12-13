@@ -1128,7 +1128,9 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     return true;
   }
 
-  if(check_for_looped_mallocs(function_obj->second.body))
+  auto &function_body = function_obj->second.body;
+
+  if(check_for_looped_mallocs(function_body))
   {
     return true;
   }
@@ -1142,20 +1144,23 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function,
     symbol_table);
 
-  // detect and add static local variables
+  // Detect and add static local variables
   assigns.add_static_locals_to_write_set(goto_functions, function);
 
   // Add formal parameters to write set
   for(const auto &param : to_code_type(target.type).parameters())
     assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
 
-  auto instruction_it = function_obj->second.body.instructions.begin();
+  auto instruction_it = function_body.instructions.begin();
   for(const auto &car : assigns.get_write_set())
   {
     auto snapshot_instructions = car.generate_snapshot_instructions();
     insert_before_swap_and_advance(
-      function_obj->second.body, instruction_it, snapshot_instructions);
+      function_body, instruction_it, snapshot_instructions);
   };
+
+  // Restore internal coherence in the programs
+  goto_functions.update();
 
   // Full inlining of the function body
   // Inlining is performed so that function calls to a same function
@@ -1168,15 +1173,23 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     decorated.get_recursive_function_warnings_count() == 0,
     "Recursive functions found during inlining");
 
-  // restore internal invariants
+  // Clean up possible fake loops that are due to `IF 0!=0 GOTO i` instructions
+  simplify_gotos(function_body, ns);
+
+  // Restore internal coherence in the programs
   goto_functions.update();
+
+  INVARIANT(
+    is_loop_free(function_body, ns, log),
+    "Loops remain in function '" + id2string(function) +
+      "', assigns clause checking instrumentation cannot be applied.");
 
   // Insert write set inclusion checks.
   check_frame_conditions(
-    function_obj->first,
-    function_obj->second.body,
+    function,
+    function_body,
     instruction_it,
-    function_obj->second.body.instructions.end(),
+    function_body.instructions.end(),
     assigns,
     // skip checks on function parameter assignments
     true);
