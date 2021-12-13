@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-void bar(int *z) __CPROVER_assigns(z)
+void bar(int *z) __CPROVER_assigns()
   __CPROVER_ensures(__CPROVER_is_fresh(z, sizeof(int)))
 {
   z = malloc(sizeof(*z));

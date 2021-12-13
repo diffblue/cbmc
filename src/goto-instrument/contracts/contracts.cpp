@@ -309,7 +309,13 @@ void code_contractst::check_apply_loop_contracts(
 
   // Perform write set instrumentation on the entire loop.
   check_frame_conditions(
-    function_name, goto_function.body, loop_head, loop_end, loop_assigns);
+    function_name,
+    goto_function.body,
+    loop_head,
+    loop_end,
+    loop_assigns,
+    // do not skip checks on function parameter assignments
+    false);
 
   havoc_assigns_targetst havoc_gen(to_havoc, ns);
   havoc_gen.append_full_havoc_code(
@@ -1171,7 +1177,9 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function_obj->second.body,
     instruction_it,
     function_obj->second.body.instructions.end(),
-    assigns);
+    assigns,
+    // skip checks on function parameter assignments
+    true);
 
   return false;
 }
@@ -1181,12 +1189,19 @@ void code_contractst::check_frame_conditions(
   goto_programt &body,
   goto_programt::targett instruction_it,
   const goto_programt::targett &instruction_end,
-  assigns_clauset &assigns)
+  assigns_clauset &assigns,
+  bool skip_parameter_assigns)
 {
   for(; instruction_it != instruction_end; ++instruction_it)
   {
     const auto &pragmas = instruction_it->source_location().get_pragmas();
     if(pragmas.find(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK) != pragmas.end())
+      continue;
+
+    if(skip_parameter_assigns && is_parameter_assign(instruction_it, ns))
+      continue;
+
+    if(is_auxiliary_decl_dead_or_assign(instruction_it, ns))
       continue;
 
     // Do not instrument this instruction again in the future,

@@ -3,7 +3,6 @@ main.c
 --enforce-contract bar
 ^EXIT=0$
 ^SIGNAL=0$
-^\[bar.1\] line \d+ Check that fun\_ptr is assignable: SUCCESS$
 ^\[main.assertion.\d+\] line \d+ assertion x \=\= 0: SUCCESS$
 ^\[main.assertion.\d+\] line \d+ assertion x \=\= 1: SUCCESS$
 ^VERIFICATION SUCCESSFUL$

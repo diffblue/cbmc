@@ -112,7 +112,7 @@ void insert_before_swap_and_advance(
 /// \param mode: The mode for the new symbol, e.g. ID_C, ID_java.
 /// \param symtab: The symbol table to which the new symbol is to be added.
 /// \param suffix: Suffix to use to generate the unique name
-/// \param is_auxiliary: Do not print symbol in traces if true (default = false)
+/// \param is_auxiliary: Do not print symbol in traces if true (default = true)
 /// \return The new symbolt object.
 const symbolt &new_tmp_symbol(
   const typet &type,
@@ -120,9 +120,21 @@ const symbolt &new_tmp_symbol(
   const irep_idt &mode,
   symbol_table_baset &symtab,
   std::string suffix = "tmp_cc",
-  bool is_auxiliary = false);
+  bool is_auxiliary = true);
 
 /// Add disable pragmas for all pointer checks on the given location
 void disable_pointer_checks(source_locationt &source_location);
+
+/// Returns true iff the instruction is a `DECL x`, `DEAD x`,
+/// or `ASSIGN x := expr` where `x` has the `is_parameter` flag set.
+bool is_parameter_assign(
+  const goto_programt::targett &instruction_it,
+  namespacet &ns);
+
+/// Returns true iff the instruction is a `DECL x`, `DEAD x`,
+/// or `ASSIGN x := expr` where `x` has the `is_auxiliary` flag set.
+bool is_auxiliary_decl_dead_or_assign(
+  const goto_programt::targett &instruction_it,
+  namespacet &ns);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

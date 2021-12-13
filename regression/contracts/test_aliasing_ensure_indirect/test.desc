@@ -4,7 +4,6 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 \[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS
-\[bar.\d+\] line \d+ Check that z is assignable: SUCCESS
 \[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion \!\(n \< 4\): SUCCESS
 ^VERIFICATION SUCCESSFUL$

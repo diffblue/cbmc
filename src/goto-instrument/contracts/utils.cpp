@@ -163,3 +163,50 @@ void disable_pointer_checks(source_locationt &source_location)
   source_location.add_pragma("disable:pointer-primitive-check");
   source_location.add_pragma("disable:pointer-overflow-check");
 }
+
+bool is_parameter_assign(
+  const goto_programt::targett &instruction_it,
+  namespacet &ns)
+{
+  optionalt<symbol_exprt> sym = {};
+
+  // extract symbol
+  if(instruction_it->is_assign())
+  {
+    const auto &lhs = instruction_it->assign_lhs();
+    if(can_cast_expr<symbol_exprt>(lhs))
+      sym = to_symbol_expr(lhs);
+  }
+
+  // check condition
+  if(sym.has_value())
+    return ns.lookup(sym.value().get_identifier()).is_parameter;
+
+  return false;
+}
+
+bool is_auxiliary_decl_dead_or_assign(
+  const goto_programt::targett &instruction_it,
+  namespacet &ns)
+{
+  optionalt<symbol_exprt> sym = {};
+
+  // extract symbol
+  if(instruction_it->is_decl())
+    sym = instruction_it->decl_symbol();
+  else if(instruction_it->is_dead())
+    sym = instruction_it->dead_symbol();
+  else if(instruction_it->is_assign())
+  {
+    const auto &lhs = instruction_it->assign_lhs();
+    if(can_cast_expr<symbol_exprt>(lhs))
+      sym = to_symbol_expr(lhs);
+  }
+
+  // check condition
+  if(sym.has_value())
+    return ns.lookup(sym.value().get_identifier()).is_auxiliary;
+
+  return false;
+}
+

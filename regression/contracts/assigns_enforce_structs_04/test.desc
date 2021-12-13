@@ -6,7 +6,6 @@ main.c
 ^\[f1.\d+\] line \d+ Check that p->y is assignable: FAILURE$
 ^\[f2.\d+\] line \d+ Check that p->x is assignable: FAILURE$
 ^\[f3.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
-^\[f4.\d+\] line \d+ Check that p is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --

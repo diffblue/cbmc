@@ -132,7 +132,8 @@ protected:
     goto_programt &,
     goto_programt::targett,
     const goto_programt::targett &,
-    assigns_clauset &);
+    assigns_clauset &,
+    bool skip_parameter_assigns);
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
