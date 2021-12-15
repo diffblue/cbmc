@@ -1,0 +1,16 @@
+CORE
+test.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+\[main\.assertion\.2\] line \d+ assertion __CPROVER_forall \{ int i ; \(0 <= i && i < 10\) ==> \*\(a\+i\) == \*\(a\+i\) \}: SUCCESS
+\[main\.pointer_dereference\.7\] line \d+ dereference failure: pointer NULL in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.8\] line \d+ dereference failure: pointer invalid in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.9\] line \d+ dereference failure: deallocated dynamic object in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.10\] line \d+ dereference failure: dead object in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.11\] line \d+ dereference failure: pointer outside object bounds in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.12\] line \d+ dereference failure: invalid integer address in a\[\(signed (long|long long) int\)i\]: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+This is fixing an issue first reported in https://github.com/diffblue/cbmc/issues/6231
