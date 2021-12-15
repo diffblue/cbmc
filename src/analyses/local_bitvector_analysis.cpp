@@ -242,8 +242,8 @@ void local_bitvector_analysist::build()
   if(cfg.nodes.empty())
     return;
 
-  work_queuet work_queue;
-  work_queue.push(0);
+  std::set<unsigned> work_queue;
+  work_queue.insert(0);
 
   loc_infos.resize(cfg.nodes.size());
 
@@ -258,10 +258,10 @@ void local_bitvector_analysist::build()
 
   while(!work_queue.empty())
   {
-    unsigned loc_nr=work_queue.top();
+    unsigned loc_nr = *work_queue.begin();
     const local_cfgt::nodet &node=cfg.nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
-    work_queue.pop();
+    work_queue.erase(work_queue.begin());
 
     auto &loc_info_src=loc_infos[loc_nr];
     auto loc_info_dest=loc_infos[loc_nr];
@@ -338,7 +338,7 @@ void local_bitvector_analysist::build()
     {
       assert(succ<loc_infos.size());
       if(merge(loc_infos[succ], (loc_info_dest)))
-        work_queue.push(succ);
+        work_queue.insert(succ);
     }
   }
 }
