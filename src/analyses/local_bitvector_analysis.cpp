@@ -45,10 +45,7 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
     std::max(a.size(), b.size());
 
   for(std::size_t i=0; i<max_index; i++)
-  {
-    if(a[i].merge(b[i]))
-      result=true;
-  }
+    result |= a[i].merge(b[i]);
 
   return result;
 }
