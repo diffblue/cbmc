@@ -45,10 +45,7 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
     std::max(a.size(), b.size());
 
   for(std::size_t i=0; i<max_index; i++)
-  {
-    if(a[i].merge(b[i]))
-      result=true;
-  }
+    result |= a[i].merge(b[i]);
 
   return result;
 }
@@ -73,7 +70,7 @@ void local_bitvector_analysist::assign_lhs(
 
     if(is_tracked(identifier))
     {
-      unsigned dest_pointer=pointers.number(identifier);
+      const auto dest_pointer = pointers.number(identifier);
       flagst rhs_flags=get_rec(rhs, loc_info_src);
       loc_info_dest[dest_pointer]=rhs_flags;
     }
@@ -128,7 +125,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
     if(is_tracked(identifier))
     {
-      unsigned src_pointer=pointers.number(identifier);
+      const auto src_pointer = pointers.number(identifier);
       return loc_info_src[src_pointer];
     }
     else
@@ -242,8 +239,8 @@ void local_bitvector_analysist::build()
   if(cfg.nodes.empty())
     return;
 
-  work_queuet work_queue;
-  work_queue.push(0);
+  std::set<local_cfgt::node_nrt> work_queue;
+  work_queue.insert(0);
 
   loc_infos.resize(cfg.nodes.size());
 
@@ -258,10 +255,10 @@ void local_bitvector_analysist::build()
 
   while(!work_queue.empty())
   {
-    unsigned loc_nr=work_queue.top();
+    const auto loc_nr = *work_queue.begin();
     const local_cfgt::nodet &node=cfg.nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
-    work_queue.pop();
+    work_queue.erase(work_queue.begin());
 
     auto &loc_info_src=loc_infos[loc_nr];
     auto loc_info_dest=loc_infos[loc_nr];
@@ -338,7 +335,7 @@ void local_bitvector_analysist::build()
     {
       assert(succ<loc_infos.size());
       if(merge(loc_infos[succ], (loc_info_dest)))
-        work_queue.push(succ);
+        work_queue.insert(succ);
     }
   }
 }
@@ -348,7 +345,7 @@ void local_bitvector_analysist::output(
   const goto_functiont &goto_function,
   const namespacet &ns) const
 {
-  unsigned l=0;
+  std::size_t l = 0;
 
   for(const auto &instruction : goto_function.body.instructions)
   {
