@@ -410,7 +410,7 @@ bool ai_baset::visit_edge(
   return return_value;
 }
 
-bool ai_baset::visit_edge_function_call(
+bool ai_localt::visit_edge_function_call(
   const irep_idt &calling_function_id,
   trace_ptrt p_call,
   locationt l_return,
@@ -421,11 +421,11 @@ bool ai_baset::visit_edge_function_call(
   const namespacet &ns)
 {
   messaget log(message_handler);
-  log.progress() << "ai_baset::visit_edge_function_call from "
+  log.progress() << "ai_localt::visit_edge_function_call from "
                  << p_call->current_location()->location_number << " to "
                  << l_return->location_number << messaget::eom;
 
-  // The default implementation is not interprocedural
+  // This implementation is not interprocedural
   // so the effects of the call are approximated but nothing else
   return visit_edge(
     calling_function_id,

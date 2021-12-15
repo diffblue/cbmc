@@ -467,7 +467,7 @@ protected:
     working_sett &working_set,
     const goto_programt &callee,
     const goto_functionst &goto_functions,
-    const namespacet &ns);
+    const namespacet &ns) = 0;
 
   /// For creating history objects
   std::unique_ptr<ai_history_factory_baset> history_factory;
@@ -503,6 +503,41 @@ protected:
   message_handlert &message_handler;
 };
 
+// Perform function local analysis on all functions in a program.
+// No interprocedural analysis other than what a domain does when
+// visit()'ing an edge that skips a function call.
+class ai_localt : public ai_baset
+{
+public:
+  ai_localt(
+    std::unique_ptr<ai_history_factory_baset> &&hf,
+    std::unique_ptr<ai_domain_factory_baset> &&df,
+    std::unique_ptr<ai_storage_baset> &&st,
+    message_handlert &mh)
+    : ai_baset(std::move(hf), std::move(df), std::move(st), mh)
+  {
+  }
+
+  // Handle every function independently
+  void operator()(const goto_functionst &goto_functions, const namespacet &ns)
+    override;
+  void operator()(const abstract_goto_modelt &goto_model) override;
+
+protected:
+  // Implement the function that handles a single function call edge
+  // using a single edge that gets the domain to approximate the whole
+  // function call
+  bool visit_edge_function_call(
+    const irep_idt &calling_function_id,
+    trace_ptrt p_call,
+    locationt l_return,
+    const irep_idt &callee_function_id,
+    working_sett &working_set,
+    const goto_programt &callee,
+    const goto_functionst &goto_functions,
+    const namespacet &ns) override;
+};
+
 // Perform interprocedural analysis by simply recursing in the interpreter
 // This can lead to a call stack overflow if the domain has a large height
 class ai_recursive_interproceduralt : public ai_baset
@@ -523,7 +558,8 @@ public:
   void operator()(const abstract_goto_modelt &goto_model) override;
 
 protected:
-  // Override the function that handles a single function call edge
+  // Implement the function that handles a single function call edge
+  // by a recursive call to fixpoint
   bool visit_edge_function_call(
     const irep_idt &calling_function_id,
     trace_ptrt p_call,
