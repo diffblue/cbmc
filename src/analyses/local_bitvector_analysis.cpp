@@ -70,7 +70,7 @@ void local_bitvector_analysist::assign_lhs(
 
     if(is_tracked(identifier))
     {
-      unsigned dest_pointer=pointers.number(identifier);
+      const auto dest_pointer = pointers.number(identifier);
       flagst rhs_flags=get_rec(rhs, loc_info_src);
       loc_info_dest[dest_pointer]=rhs_flags;
     }
@@ -125,7 +125,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
     if(is_tracked(identifier))
     {
-      unsigned src_pointer=pointers.number(identifier);
+      const auto src_pointer = pointers.number(identifier);
       return loc_info_src[src_pointer];
     }
     else
@@ -239,7 +239,7 @@ void local_bitvector_analysist::build()
   if(cfg.nodes.empty())
     return;
 
-  std::set<unsigned> work_queue;
+  std::set<local_cfgt::node_nrt> work_queue;
   work_queue.insert(0);
 
   loc_infos.resize(cfg.nodes.size());
@@ -255,7 +255,7 @@ void local_bitvector_analysist::build()
 
   while(!work_queue.empty())
   {
-    unsigned loc_nr = *work_queue.begin();
+    const auto loc_nr = *work_queue.begin();
     const local_cfgt::nodet &node=cfg.nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
     work_queue.erase(work_queue.begin());
@@ -345,7 +345,7 @@ void local_bitvector_analysist::output(
   const goto_functiont &goto_function,
   const namespacet &ns) const
 {
-  unsigned l=0;
+  std::size_t l = 0;
 
   for(const auto &instruction : goto_function.body.instructions)
   {
