@@ -536,6 +536,47 @@ bool ai_baset::visit_end_function(
   return false;
 }
 
+void ai_localt::operator()(
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  initialize(goto_functions);
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
+    {
+      trace_ptrt p = entry_state(gf_entry.second.body);
+      fixedpoint(p, gf_entry.first, gf_entry.second.body, goto_functions, ns);
+    }
+  }
+  finalize();
+}
+
+void ai_localt::operator()(const abstract_goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.get_symbol_table());
+  operator()(goto_model.get_goto_functions(), ns);
+}
+
+void ai_recursive_interproceduralt::
+operator()(const goto_functionst &goto_functions, const namespacet &ns)
+{
+  initialize(goto_functions);
+  trace_ptrt p = entry_state(goto_functions);
+  fixedpoint(p, goto_functions, ns);
+  finalize();
+}
+
+void ai_recursive_interproceduralt::operator()(
+  const abstract_goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.get_symbol_table());
+  initialize(goto_model.get_goto_functions());
+  trace_ptrt p = entry_state(goto_model.get_goto_functions());
+  fixedpoint(p, goto_model.get_goto_functions(), ns);
+  finalize();
+}
+
 bool ai_recursive_interproceduralt::visit_edge_function_call(
   const irep_idt &calling_function_id,
   trace_ptrt p_call,

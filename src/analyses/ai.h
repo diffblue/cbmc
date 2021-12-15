@@ -153,28 +153,12 @@ public:
   }
 
   /// Run abstract interpretation on a whole program
-  void operator()(
-    const goto_functionst &goto_functions,
-    const namespacet &ns)
-  {
-    initialize(goto_functions);
-    trace_ptrt p = entry_state(goto_functions);
-    fixedpoint(p, goto_functions, ns);
-    finalize();
-  }
-
-  /// Run abstract interpretation on a whole program
-  void operator()(const abstract_goto_modelt &goto_model)
-  {
-    const namespacet ns(goto_model.get_symbol_table());
-    initialize(goto_model.get_goto_functions());
-    trace_ptrt p = entry_state(goto_model.get_goto_functions());
-    fixedpoint(p, goto_model.get_goto_functions(), ns);
-    finalize();
-  }
+  virtual void
+  operator()(const goto_functionst &goto_functions, const namespacet &ns) = 0;
+  virtual void operator()(const abstract_goto_modelt &goto_model) = 0;
 
   /// Run abstract interpretation on a single function
-  void operator()(
+  virtual void operator()(
     const irep_idt &function_id,
     const goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
@@ -308,9 +292,7 @@ public:
     std::ostream &out) const;
 
   /// Output the abstract states for a whole program
-  void output(
-    const goto_modelt &goto_model,
-    std::ostream &out) const
+  virtual void output(const goto_modelt &goto_model, std::ostream &out) const
   {
     const namespacet ns(goto_model.symbol_table);
     output(ns, goto_model.goto_functions, out);
@@ -534,6 +516,11 @@ public:
     : ai_baset(std::move(hf), std::move(df), std::move(st), mh)
   {
   }
+
+  // Whole program analysis by starting at the entry function and recursing
+  void operator()(const goto_functionst &goto_functions, const namespacet &ns)
+    override;
+  void operator()(const abstract_goto_modelt &goto_model) override;
 
 protected:
   // Override the function that handles a single function call edge
