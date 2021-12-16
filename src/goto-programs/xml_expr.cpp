@@ -16,6 +16,7 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
@@ -220,7 +221,7 @@ xmlt xml(const exprt &expr, const namespacet &ns)
       result.name = "pointer";
       result.set_attribute(
         "binary", integer2binary(bvrep2integer(value, width, false), width));
-      if(constant_expr.get(ID_value) == ID_NULL)
+      if(is_null_pointer(constant_expr))
         result.data = "NULL";
     }
     else if(type.id() == ID_bool)

@@ -12,12 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_DUMP_C_CLASS_H
 #define CPROVER_GOTO_INSTRUMENT_DUMP_C_CLASS_H
 
-#include <set>
-#include <string>
-
+#include <util/namespace.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/system_library_symbols.h>
+
+#include <set>
+#include <string>
+#include <unordered_set>
 
 /// Used for configuring the behaviour of dump_c
 struct dump_c_configurationt final

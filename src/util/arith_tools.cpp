@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 
 #include "c_types.h"
+#include "expr_util.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "invariant.h"
@@ -24,7 +25,7 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 
   if(type_id==ID_pointer)
   {
-    if(value==ID_NULL)
+    if(is_null_pointer(expr))
     {
       int_value=0;
       return false;

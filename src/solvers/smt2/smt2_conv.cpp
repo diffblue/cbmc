@@ -3035,15 +3035,14 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id()==ID_pointer)
   {
-    const irep_idt &value = expr.get_value();
-
-    if(value==ID_NULL)
+    if(is_null_pointer(expr))
     {
       out << "(_ bv0 " << boolbv_width(expr_type)
           << ")";
     }
     else
-      UNEXPECTEDCASE("unknown pointer constant: "+id2string(value));
+      UNEXPECTEDCASE(
+        "unknown pointer constant: " + id2string(expr.get_value()));
   }
   else if(expr_type.id()==ID_bool)
   {

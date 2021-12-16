@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "bitvector_types.h"
 #include "expr_iterator.h"
+#include "expr_util.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "rational.h"
@@ -97,8 +98,7 @@ bool exprt::is_zero() const
     }
     else if(type_id==ID_pointer)
     {
-      return constant.value_is_zero_string() ||
-             constant.get_value()==ID_NULL;
+      return is_null_pointer(constant);
     }
   }
 
