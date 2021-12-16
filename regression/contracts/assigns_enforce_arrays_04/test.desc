@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract assigns_single --enforce-contract assigns_range --enforce-contract assigns_big_range
+--enforce-contract uses_assigns
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

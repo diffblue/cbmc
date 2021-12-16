@@ -1,4 +1,4 @@
-void assign_out_under(int a[], int len) __CPROVER_assigns(a)
+void assign_out_under(int a[], int len) __CPROVER_assigns()
 {
   a[1] = 5;
 }

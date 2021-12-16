@@ -7,9 +7,6 @@ main.c
 ^\[bar.\d+\] line \d+ Check that \*b is assignable: SUCCESS$
 ^\[baz.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)c\) is assignable: FAILURE$
 ^\[baz.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that a is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that yp is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that z is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*xp is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that y is assignable: FAILURE$
 ^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)yp\) is assignable: SUCCESS$

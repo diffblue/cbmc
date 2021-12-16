@@ -1,9 +1,11 @@
 CORE
 main.c
 --enforce-contract f1
-^EXIT=6$
+^Invariant check failed$
+^Condition: is_loop_free
+^Reason: Loops remain in function 'f1', assigns clause checking instrumentation cannot be applied\.
+^EXIT=(127|134)$
 ^SIGNAL=0$
-Unable to complete instrumentation, as this malloc may be in a loop.$
 --
 --
 This test checks that an error is thrown when malloc is called within a loop.

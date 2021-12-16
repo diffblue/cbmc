@@ -28,6 +28,7 @@ Date: February 2016
 
 #include <util/message.h>
 #include <util/namespace.h>
+#include <util/optional.h>
 #include <util/pointer_expr.h>
 
 #include "assigns.h"
@@ -110,6 +111,13 @@ public:
 
   namespacet ns;
 
+  /// Tells wether to skip or not skip an action
+  enum class skipt
+  {
+    DontSkip,
+    Skip
+  };
+
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
@@ -125,22 +133,38 @@ protected:
   /// Instrument functions to check frame conditions.
   bool check_frame_conditions_function(const irep_idt &function);
 
-  /// Insert assertion statements into the goto program to ensure that
+  ///  \brief Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
+  ///
+  /// \param function Name of the function getting instrumented.
+  /// \param body Body of the function getting instrumented.
+  /// \param instruction_it Iterator to the instruction from which to start
+  /// instrumentation (inclusive).
+  /// \param instruction_end Iterator to the instruction at which to stop
+  /// instrumentation (exclusive).
+  /// \param assigns Assigns clause of the function (its write set attribute
+  /// gets extended during the instrumentation).
+  /// \param skip_parameter_assigns If true, will cause assignments to symbol
+  /// marked as is_parameter to not be instrumented.
+  /// \param cfg_info_opt Control flow graph information can will be used
+  /// for write set optimisation if available.
   void check_frame_conditions(
-    const irep_idt &,
-    goto_programt &,
-    goto_programt::targett,
-    const goto_programt::targett &,
-    assigns_clauset &);
+    const irep_idt &function,
+    goto_programt &body,
+    goto_programt::targett instruction_it,
+    const goto_programt::targett &instruction_end,
+    assigns_clauset &assigns,
+    skipt skip_parameter_assigns,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
   const assigns_clauset::conditional_address_ranget add_inclusion_check(
-    goto_programt &,
-    const assigns_clauset &,
-    goto_programt::instructionst::iterator &,
-    const exprt &);
+    goto_programt &program,
+    const assigns_clauset &assigns,
+    goto_programt::targett &instruction_it,
+    const exprt &lhs,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.
@@ -150,18 +174,20 @@ protected:
   /// instruction_it, to ensure that the left-hand-side of the assignment
   /// is "included" in the (conditional address ranges in the) write set.
   void instrument_assign_statement(
-    goto_programt::instructionst::iterator &,
-    goto_programt &,
-    assigns_clauset &);
+    goto_programt::targett &instruction_it,
+    goto_programt &program,
+    assigns_clauset &assigns_clause,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Inserts an assertion into program immediately before the function call at
   /// instruction_it, to ensure that all memory locations written to by the
   // callee are "included" in the (conditional address ranges in the) write set.
   void instrument_call_statement(
-    goto_programt::instructionst::iterator &,
-    const irep_idt &,
-    goto_programt &,
-    assigns_clauset &);
+    goto_programt::targett &instruction_it,
+    const irep_idt &function,
+    goto_programt &body,
+    assigns_clauset &assigns,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Apply loop contracts, whenever available, to all loops in `function`.
   /// Loop invariants, loop variants, and loop assigns clauses.
@@ -173,10 +199,10 @@ protected:
   /// non-deterministic assignments for the write set, and assumptions
   /// based on ensures clauses.
   bool apply_function_contract(
-    const irep_idt &,
-    const source_locationt &,
-    goto_programt &,
-    goto_programt::targett &);
+    const irep_idt &function,
+    const source_locationt &location,
+    goto_programt &function_body,
+    goto_programt::targett &target);
 
   /// Instruments `wrapper_function` adding assumptions based on requires
   /// clauses and assertions based on ensures clauses.

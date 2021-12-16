@@ -1,9 +1,12 @@
 CORE
 main.c
---enforce-contract f1
+--enforce-contract f
 ^EXIT=0$
 ^SIGNAL=0$
+^\[f\.\d+\] line \d+ Check that \*a is assignable: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that verification succeeds when a formal parameter pointer outside of the assigns clause is instead pointed as freshly allocated memory before being assigned.
+This test checks that verification succeeds when a formal parameter
+with a pointer type is first updated to point to a locally malloc'd object
+before being assigned to.

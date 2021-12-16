@@ -3,22 +3,36 @@
 
 int x = 0;
 
+struct fptr_t
+{
+  void (*f)();
+};
+
 void foo()
 {
   x = 1;
 }
 
-void bar(void (*fun_ptr)()) __CPROVER_assigns(fun_ptr)
+void foofoo()
 {
-  fun_ptr = &foo;
+  x = 2;
+}
+
+void bar(struct fptr_t *s, void (**f)()) __CPROVER_assigns(s->f, *f)
+{
+  s->f = &foo;
+  *f = &foofoo;
 }
 
 int main()
 {
   assert(x == 0);
-  void (*fun_ptr)() = NULL;
-  bar(fun_ptr);
-  fun_ptr();
+  struct fptr_t s;
+  void (*f)();
+  bar(&s, &f);
+  s.f();
   assert(x == 1);
+  f();
+  assert(x == 2);
   return 0;
 }

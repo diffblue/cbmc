@@ -16,6 +16,7 @@ Date: February 2016
 #include <algorithm>
 #include <map>
 
+#include <analyses/local_bitvector_analysis.h>
 #include <analyses/local_may_alias.h>
 
 #include <ansi-c/c_expr.h>
@@ -307,9 +308,19 @@ void code_contractst::check_apply_loop_contracts(
       goto_function.body, loop_head, snapshot_instructions);
   };
 
+  optionalt<cfg_infot> cfg_empty_info;
+
   // Perform write set instrumentation on the entire loop.
   check_frame_conditions(
-    function_name, goto_function.body, loop_head, loop_end, loop_assigns);
+    function_name,
+    goto_function.body,
+    loop_head,
+    loop_end,
+    loop_assigns,
+    // do not skip checks on function parameter assignments
+    skipt::DontSkip,
+    // do not use CFG info for now
+    cfg_empty_info);
 
   havoc_assigns_targetst havoc_gen(to_havoc, ns);
   havoc_gen.append_full_havoc_code(
@@ -908,23 +919,25 @@ goto_functionst &code_contractst::get_goto_functions()
 }
 
 void code_contractst::instrument_assign_statement(
-  goto_programt::instructionst::iterator &instruction_it,
+  goto_programt::targett &instruction_it,
   goto_programt &program,
-  assigns_clauset &assigns_clause)
+  assigns_clauset &assigns_clause,
+  optionalt<cfg_infot> &cfg_info_opt)
 {
-  INVARIANT(
-    instruction_it->is_assign(),
-    "The first instruction of instrument_assign_statement should always be"
-    " an assignment");
   add_inclusion_check(
-    program, assigns_clause, instruction_it, instruction_it->assign_lhs());
+    program,
+    assigns_clause,
+    instruction_it,
+    instruction_it->assign_lhs(),
+    cfg_info_opt);
 }
 
 void code_contractst::instrument_call_statement(
-  goto_programt::instructionst::iterator &instruction_it,
+  goto_programt::targett &instruction_it,
   const irep_idt &function,
   goto_programt &body,
-  assigns_clauset &assigns)
+  assigns_clauset &assigns,
+  optionalt<cfg_infot> &cfg_info_opt)
 {
   INVARIANT(
     instruction_it->is_function_call(),
@@ -962,7 +975,8 @@ void code_contractst::instrument_call_statement(
       body,
       assigns,
       instruction_it,
-      pointer_object(instruction_it->call_arguments().front()));
+      pointer_object(instruction_it->call_arguments().front()),
+      cfg_info_opt);
 
     // skip all invalidation business if we're freeing invalid memory
     goto_programt alias_checking_instructions, skip_program;
@@ -1122,10 +1136,8 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     return true;
   }
 
-  if(check_for_looped_mallocs(function_obj->second.body))
-  {
-    return true;
-  }
+  const auto &goto_function = function_obj->second;
+  auto &function_body = function_obj->second.body;
 
   // Get assigns clause for function
   const symbolt &target = ns.lookup(function);
@@ -1136,20 +1148,8 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function,
     symbol_table);
 
-  // detect and add static local variables
+  // Detect and add static local variables
   assigns.add_static_locals_to_write_set(goto_functions, function);
-
-  // Add formal parameters to write set
-  for(const auto &param : to_code_type(target.type).parameters())
-    assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
-
-  auto instruction_it = function_obj->second.body.instructions.begin();
-  for(const auto &car : assigns.get_write_set())
-  {
-    auto snapshot_instructions = car.generate_snapshot_instructions();
-    insert_before_swap_and_advance(
-      function_obj->second.body, instruction_it, snapshot_instructions);
-  };
 
   // Full inlining of the function body
   // Inlining is performed so that function calls to a same function
@@ -1162,18 +1162,118 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     decorated.get_recursive_function_warnings_count() == 0,
     "Recursive functions found during inlining");
 
-  // restore internal invariants
+  // Clean up possible fake loops that are due to `IF 0!=0 GOTO i` instructions
+  simplify_gotos(function_body, ns);
+
+  // Restore internal coherence in the programs
+  goto_functions.update();
+
+  INVARIANT(
+    is_loop_free(function_body, ns, log),
+    "Loops remain in function '" + id2string(function) +
+      "', assigns clause checking instrumentation cannot be applied.");
+
+  // Create a deep copy of the original goto_function object
+  // and compute static control flow graph information on it
+  goto_functiont goto_function_orig;
+  goto_function_orig.copy_from(goto_function);
+  cfg_infot cfg_info(ns, goto_function_orig);
+  optionalt<cfg_infot> cfg_info_opt{cfg_info};
+
+  // Add formal parameters to write set
+  for(const auto &param : to_code_type(target.type).parameters())
+    assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
+
+  auto instruction_it = function_body.instructions.begin();
+  for(const auto &car : assigns.get_write_set())
+  {
+    auto snapshot_instructions = car.generate_snapshot_instructions();
+    insert_before_swap_and_advance(
+      function_body, instruction_it, snapshot_instructions);
+  };
+
+  // Restore internal coherence in the programs
   goto_functions.update();
 
   // Insert write set inclusion checks.
   check_frame_conditions(
-    function_obj->first,
-    function_obj->second.body,
+    function,
+    function_body,
     instruction_it,
-    function_obj->second.body.instructions.end(),
-    assigns);
+    function_body.instructions.end(),
+    assigns,
+    // skip checks on function parameter assignments
+    skipt::Skip,
+    cfg_info_opt);
 
   return false;
+}
+
+/// Returns true iff the target instruction is tagged with a
+/// 'CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK' pragma.
+bool has_disable_assigns_check_pragma(
+  const goto_programt::const_targett &target)
+{
+  const auto &pragmas = target->source_location().get_pragmas();
+  return pragmas.find(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK) != pragmas.end();
+}
+
+/// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.
+bool must_check_assign(
+  const goto_programt::const_targett &target,
+  code_contractst::skipt skip_parameter_assigns,
+  const namespacet ns,
+  const optionalt<cfg_infot> cfg_info_opt)
+{
+  if(
+    const auto &symbol_expr =
+      expr_try_dynamic_cast<symbol_exprt>(target->assign_lhs()))
+  {
+    if(
+      skip_parameter_assigns == code_contractst::skipt::DontSkip &&
+      ns.lookup(symbol_expr->get_identifier()).is_parameter)
+      return true;
+
+    if(cfg_info_opt.has_value())
+      return !cfg_info_opt.value().is_local(symbol_expr->get_identifier());
+  }
+
+  return true;
+}
+
+/// Returns true iff a `DECL x` must be added to the local write set.
+///
+/// A variable is called 'dirty' if its address gets taken at some point in
+/// the program.
+///
+/// Assuming the goto program is obtained from a structured C program that
+/// passed C compiler checks, non-dirty variables can only be assigned to
+/// directly by name, cannot escape their lexical scope, and are always safe
+/// to assign. Hence, we only track dirty variables in the write set.
+bool must_track_decl(
+  const goto_programt::const_targett &target,
+  const optionalt<cfg_infot> &cfg_info_opt)
+{
+  if(cfg_info_opt.has_value())
+    return cfg_info_opt.value().is_not_local_or_dirty_local(
+      target->decl_symbol().get_identifier());
+
+  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
+  return true;
+}
+
+/// Returns true iff a `DEAD x` must be processed to upate the local write set.
+/// The conditions are the same than for tracking a `DECL x` instruction.
+bool must_track_dead(
+  const goto_programt::const_targett &target,
+  const optionalt<cfg_infot> &cfg_info_opt)
+{
+  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
+  if(!cfg_info_opt.has_value())
+    return true;
+
+  return cfg_info_opt.value().is_not_local_or_dirty_local(
+    target->dead_symbol().get_identifier());
 }
 
 void code_contractst::check_frame_conditions(
@@ -1181,19 +1281,28 @@ void code_contractst::check_frame_conditions(
   goto_programt &body,
   goto_programt::targett instruction_it,
   const goto_programt::targett &instruction_end,
-  assigns_clauset &assigns)
+  assigns_clauset &assigns,
+  skipt skip_parameter_assigns,
+  optionalt<cfg_infot> &cfg_info_opt)
 {
-  for(; instruction_it != instruction_end; ++instruction_it)
+  while(instruction_it != instruction_end)
   {
-    const auto &pragmas = instruction_it->source_location().get_pragmas();
-    if(pragmas.find(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK) != pragmas.end())
+    // Skip instructions marked as disabled for assigns clause checking
+    if(has_disable_assigns_check_pragma(instruction_it))
+    {
+      instruction_it++;
+      if(cfg_info_opt.has_value())
+        cfg_info_opt.value().step();
       continue;
+    }
 
     // Do not instrument this instruction again in the future,
     // since we are going to instrument it now below.
     add_pragma_disable_assigns_check(*instruction_it);
 
-    if(instruction_it->is_decl())
+    if(
+      instruction_it->is_decl() &&
+      must_track_decl(instruction_it, cfg_info_opt))
     {
       // grab the declared symbol
       const auto &decl_symbol = instruction_it->decl_symbol();
@@ -1205,18 +1314,24 @@ void code_contractst::check_frame_conditions(
         body, instruction_it, snapshot_instructions);
       // since CAR was inserted *after* the DECL instruction,
       // move the instruction pointer backward,
-      // because the `for` loop takes care of the increment
+      // because the loop step takes care of the increment
       instruction_it--;
     }
-    else if(instruction_it->is_assign())
+    else if(
+      instruction_it->is_assign() &&
+      must_check_assign(
+        instruction_it, skip_parameter_assigns, ns, cfg_info_opt))
     {
-      instrument_assign_statement(instruction_it, body, assigns);
+      instrument_assign_statement(instruction_it, body, assigns, cfg_info_opt);
     }
     else if(instruction_it->is_function_call())
     {
-      instrument_call_statement(instruction_it, function, body, assigns);
+      instrument_call_statement(
+        instruction_it, function, body, assigns, cfg_info_opt);
     }
-    else if(instruction_it->is_dead())
+    else if(
+      instruction_it->is_dead() &&
+      must_track_dead(instruction_it, cfg_info_opt))
     {
       const auto &symbol = instruction_it->dead_symbol();
       source_locationt location_no_checks = instruction_it->source_location();
@@ -1232,10 +1347,10 @@ void code_contractst::check_frame_conditions(
           symbol_car->validity_condition_var,
           false_exprt{},
           instruction_it->source_location());
-        // note that the CAR must be invalidated _after_ the DEAD instruction
-        body.insert_after(
+        body.insert_before_swap(
           instruction_it,
           add_pragma_disable_assigns_check(invalidation_assignment));
+        instruction_it++;
       }
       else
       {
@@ -1257,8 +1372,14 @@ void code_contractst::check_frame_conditions(
     {
       const auto havoc_argument =
         pointer_object(instruction_it->get_other().operands().front());
-      add_inclusion_check(body, assigns, instruction_it, havoc_argument);
+      add_inclusion_check(
+        body, assigns, instruction_it, havoc_argument, cfg_info_opt);
     }
+
+    // Move to the next instruction
+    instruction_it++;
+    if(cfg_info_opt.has_value())
+      cfg_info_opt.value().step();
   }
 }
 
@@ -1266,10 +1387,11 @@ const assigns_clauset::conditional_address_ranget
 code_contractst::add_inclusion_check(
   goto_programt &program,
   const assigns_clauset &assigns,
-  goto_programt::instructionst::iterator &instruction_it,
-  const exprt &expr)
+  goto_programt::targett &instruction_it,
+  const exprt &lhs,
+  optionalt<cfg_infot> &cfg_info_opt)
 {
-  const assigns_clauset::conditional_address_ranget car{assigns, expr};
+  const assigns_clauset::conditional_address_ranget car{assigns, lhs};
   auto snapshot_instructions = car.generate_snapshot_instructions();
   insert_before_swap_and_advance(
     program, instruction_it, snapshot_instructions);
@@ -1279,9 +1401,9 @@ code_contractst::add_inclusion_check(
     instruction_it->source_location_nonconst();
   disable_pointer_checks(location_no_checks);
   location_no_checks.set_comment(
-    "Check that " + from_expr(ns, expr.id(), expr) + " is assignable");
+    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
   assertion.add(goto_programt::make_assertion(
-    assigns.generate_inclusion_check(car), location_no_checks));
+    assigns.generate_inclusion_check(car, cfg_info_opt), location_no_checks));
   insert_before_swap_and_advance(program, instruction_it, assertion);
 
   return car;

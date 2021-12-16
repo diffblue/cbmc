@@ -6,9 +6,6 @@ main.c
 main.c function bar
 ^\[bar.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
 ^\[bar.\d+\] line \d+ Check that x is assignable: FAILURE$
-^\[baz.\d+\] line \d+ Check that w is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that w is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that z is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --

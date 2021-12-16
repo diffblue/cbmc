@@ -6,7 +6,7 @@ int z;
 
 // clang-format off
 int foo(int *x, int *y)
-  __CPROVER_assigns(z, *x, y)
+  __CPROVER_assigns(z, *x)
   __CPROVER_requires(
     __CPROVER_is_fresh(x, sizeof(int)) &&
     *x > 0 &&

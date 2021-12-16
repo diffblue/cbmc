@@ -23,7 +23,7 @@ void bar(struct pair *p) __CPROVER_assigns(p->y)
   p->y = (p->y + 5);
 }
 
-void baz(struct pair p) __CPROVER_assigns(p)
+void baz(struct pair p) __CPROVER_assigns()
   __CPROVER_ensures(p == __CPROVER_old(p))
 {
   struct pair pp = p;

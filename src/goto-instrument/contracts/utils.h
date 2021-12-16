@@ -13,9 +13,15 @@ Date: September 2021
 
 #include <vector>
 
+#include <analyses/dirty.h>
+#include <analyses/locals.h>
+
 #include <goto-instrument/havoc_utils.h>
 
 #include <goto-programs/goto_model.h>
+
+#include <util/expr_cast.h>
+#include <util/message.h>
 
 #define CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK "contracts:disable:assigns-check"
 
@@ -112,7 +118,7 @@ void insert_before_swap_and_advance(
 /// \param mode: The mode for the new symbol, e.g. ID_C, ID_java.
 /// \param symtab: The symbol table to which the new symbol is to be added.
 /// \param suffix: Suffix to use to generate the unique name
-/// \param is_auxiliary: Do not print symbol in traces if true (default = false)
+/// \param is_auxiliary: Do not print symbol in traces if true (default = true)
 /// \return The new symbolt object.
 const symbolt &new_tmp_symbol(
   const typet &type,
@@ -120,9 +126,84 @@ const symbolt &new_tmp_symbol(
   const irep_idt &mode,
   symbol_table_baset &symtab,
   std::string suffix = "tmp_cc",
-  bool is_auxiliary = false);
+  bool is_auxiliary = true);
 
 /// Add disable pragmas for all pointer checks on the given location
 void disable_pointer_checks(source_locationt &source_location);
+
+/// Turns goto instructions `IF cond GOTO label` where the condition
+/// statically simplifies to `false` into SKIP instructions.
+void simplify_gotos(goto_programt &goto_program, namespacet &ns);
+
+/// Returns true iff the given program is loop-free,
+/// i.e. if each SCC of its CFG contains a single element.
+bool is_loop_free(
+  const goto_programt &goto_program,
+  namespacet &ns,
+  messaget &log);
+
+/// Stores information about a goto function computed from its CFG,
+/// together with a `target` iterator into the instructions of the function.
+///
+/// The methods of this class provide information about identifiers at
+/// the current `target` instruction to allow simplifying assigns
+/// clause checking assertions.
+class cfg_infot
+{
+public:
+  cfg_infot(const namespacet &_ns, goto_functiont &_goto_function)
+    : ns(_ns),
+      goto_function(_goto_function),
+      target(goto_function.body.instructions.begin()),
+      dirty_analysis(goto_function),
+      locals(goto_function)
+  {
+  }
+
+  /// Steps the `target` iterator forward.
+  void step()
+  {
+    target++;
+  }
+
+  /// Returns true iff the given `ident` is either not a `goto_function` local
+  /// or is a local that is dirty.
+  bool is_not_local_or_dirty_local(irep_idt ident) const
+  {
+    if(is_local(ident))
+      return dirty_analysis.get_dirty_ids().find(ident) !=
+             dirty_analysis.get_dirty_ids().end();
+    else
+      return true;
+  }
+
+  /// Returns true whenever the given `symbol_expr` might be alive
+  /// at the current `target` instruction.
+  bool is_maybe_alive(const symbol_exprt &symbol_expr)
+  {
+    // TODO query the static analysis when available
+    return true;
+  }
+
+  /// Returns true iff `ident` is a local (or parameter) of `goto_function`.
+  bool is_local(irep_idt ident) const
+  {
+    const auto &symbol = ns.lookup(ident);
+    return locals.is_local(ident) || symbol.is_parameter;
+  }
+
+  /// returns the current target instruction
+  const goto_programt::targett &get_current_target() const
+  {
+    return target;
+  }
+
+private:
+  const namespacet &ns;
+  goto_functiont &goto_function;
+  goto_programt::targett target;
+  const dirtyt dirty_analysis;
+  const localst locals;
+};
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

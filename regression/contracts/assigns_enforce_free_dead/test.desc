@@ -7,12 +7,6 @@ main.c
 ^\[foo.\d+\] line \d+ Check that \*q is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*w is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that a is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that q is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that w is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that x is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that y is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that z is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -22,16 +16,7 @@ main.c
 ^\[foo.\d+\] line \d+ Check that \*q is assignable: FAILURE$
 ^\[foo.\d+\] line \d+ Check that \*w is assignable: FAILURE$
 ^\[foo.\d+\] line \d+ Check that \*x is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that a is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that q is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that w is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that x is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that y is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that z is assignable: FAILURE$
 ^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: FAILURE$
-^.*__car_valid.*: FAILURE$
-^.*__car_lb.*: FAILURE$
-^.*__car_ub.*: FAILURE$
 --
 Checks that invalidated CARs are correctly tracked on `free` and `DEAD`.
 
@@ -40,6 +25,3 @@ we rule out all failures using the negative regex matches above.
 
 We also check (using positive regex matches above) that
 `**p` should be assignable in one case and should not be assignable in the other.
-
-Finally, we check that there should be no "internal" assertion failures
-on `__car_valid`, `__car_ub`, `__car_lb` variables used to track CARs.

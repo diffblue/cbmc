@@ -3,28 +3,15 @@ main.c
 --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
-^main.c function bar$
-^\[bar.1\] line \d+ Check that x is assignable: SUCCESS$
-^\[bar.2\] line \d+ Check that y is assignable: SUCCESS$
-^\[bar.3\] line \d+ Check that x is assignable: SUCCESS$
-^\[bar.4\] line \d+ Check that y is assignable: SUCCESS$
 ^main.c function baz$
 ^\[baz.1\] line \d+ Check that \*x is assignable: SUCCESS$
 ^\[baz.2\] line \d+ Check that \*x is assignable: SUCCESS$
 ^\[baz.3\] line \d+ Check that \*x is assignable: FAILURE$
 ^\[baz.4\] line \d+ Check that \*x is assignable: FAILURE$
 ^main.c function foo$
-^\[foo.1\] line \d+ Check that x is assignable: SUCCESS$
-^\[foo.2\] line \d+ Check that y is assignable: SUCCESS$
 ^\[foo.assertion.1\] line \d+ foo.x.set: SUCCESS$
-^\[foo.3\] line \d+ Check that x is assignable: SUCCESS$
-^\[foo.4\] line \d+ Check that y is assignable: SUCCESS$
 ^\[foo.assertion.2\] line \d+ foo.local.set: SUCCESS$
-^\[foo.5\] line \d+ Check that x is assignable: SUCCESS$
-^\[foo.6\] line \d+ Check that y is assignable: SUCCESS$
 ^\[foo.assertion.3\] line \d+ foo.y.set: SUCCESS$
-^\[foo.7\] line \d+ Check that x is assignable: SUCCESS$
-^\[foo.8\] line \d+ Check that y is assignable: SUCCESS$
 ^\[foo.assertion.4\] line \d+ foo.z.set: SUCCESS$
 ^VERIFICATION FAILED$
 --

@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1
+--enforce-contract f
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

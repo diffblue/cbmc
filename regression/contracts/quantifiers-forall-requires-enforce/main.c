@@ -12,8 +12,16 @@ bool f1(int *arr)
 // clang-format on
 {
   bool is_identity = true;
-  for(int i = 0; i < 10; ++i)
-    is_identity &= (arr[i] == i);
+  is_identity &= (arr[0] == 0);
+  is_identity &= (arr[1] == 1);
+  is_identity &= (arr[2] == 2);
+  is_identity &= (arr[3] == 3);
+  is_identity &= (arr[4] == 4);
+  is_identity &= (arr[5] == 5);
+  is_identity &= (arr[6] == 6);
+  is_identity &= (arr[7] == 7);
+  is_identity &= (arr[8] == 8);
+  is_identity &= (arr[9] == 9);
   return is_identity;
 }
 

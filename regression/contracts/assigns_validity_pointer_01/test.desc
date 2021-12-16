@@ -8,7 +8,6 @@ SUCCESS
 // bar
 ASSERT \*foo::x > 0
 IF ¬\(\*foo::x = 3\) THEN GOTO \d
-IF ¬\(.*0.* = NULL\) THEN GOTO \d
 ASSIGN .*::tmp_if_expr := \(\*\(.*0.*\) = 5 \? true : false\)
 ASSIGN .*::tmp_if_expr\$\d := .*::tmp_if_expr \? true : false
 ASSUME .*::tmp_if_expr\$\d

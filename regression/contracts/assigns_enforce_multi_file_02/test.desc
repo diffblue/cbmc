@@ -3,6 +3,7 @@ main.c
 --enforce-contract f1
 ^EXIT=0$
 ^SIGNAL=0$
+^\[f1\.\d+\] line \d+ Check that b->y is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --
