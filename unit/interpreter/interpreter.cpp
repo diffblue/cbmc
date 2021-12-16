@@ -46,7 +46,7 @@ SCENARIO("interpreter evaluation null pointer expressions")
     unsignedbv_typet java_char(16);
     pointer_typet pointer_type(java_char, 64);
 
-    constant_exprt constant_expr(ID_NULL, pointer_type);
+    null_pointer_exprt constant_expr{pointer_type};
 
     mp_vectort mp_vector = interpreter_test.evaluate(constant_expr);
 

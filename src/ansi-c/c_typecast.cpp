@@ -537,8 +537,7 @@ void c_typecastt::implicit_typecast_followed(
        src_type.id()==ID_natural ||
        src_type.id()==ID_integer))
     {
-      expr=exprt(ID_constant, orig_dest_type);
-      expr.set(ID_value, ID_NULL);
+      expr = null_pointer_exprt{to_pointer_type(orig_dest_type)};
       return; // ok
     }
 
