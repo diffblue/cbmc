@@ -625,6 +625,22 @@ public:
 
   /// Insertion that preserves jumps to "target".
   /// The instruction is destroyed.
+  ///
+  /// Turns:
+  /// ```
+  /// ...->[a]->...
+  ///       ^
+  ///     target
+  /// ```
+  ///
+  /// Into:
+  /// ```
+  /// ...->[i]->[a]->...
+  ///       ^
+  ///     target
+  /// ```
+  ///
+  /// So that jumps to `a` now jump to the newly inserted `i`.
   void insert_before_swap(targett target, instructiont &instruction)
   {
     insert_before_swap(target);
