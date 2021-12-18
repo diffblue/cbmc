@@ -47,6 +47,11 @@ public:
       }
     };
 
+    /// Returns true whenever this CAR's `source_expr` and associated address
+    /// range may be alive at the instruction currently pointed to by
+    /// `cfg_info.target`.
+    bool maybe_alive(cfg_infot &cfg_info) const;
+
     const exprt source_expr;
     const source_locationt &location;
     const assigns_clauset &parent;
@@ -82,7 +87,9 @@ public:
   write_sett::const_iterator add_to_write_set(const exprt &);
   void remove_from_write_set(const exprt &);
 
-  exprt generate_inclusion_check(const conditional_address_ranget &) const;
+  exprt generate_inclusion_check(
+    const conditional_address_ranget &lhs,
+    optionalt<cfg_infot> &cfg_info_opt) const;
 
   const write_sett &get_write_set() const
   {

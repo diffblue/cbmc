@@ -3,13 +3,9 @@ main.c
 --enforce-contract foo1 --enforce-contract foo2 --enforce-contract foo3 --enforce-contract foo4 --enforce-contract foo5 --enforce-contract foo6 --enforce-contract foo7 --enforce-contract foo8 --enforce-contract foo9 --enforce-contract foo10 _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
-^\[foo1.\d+\] line \d+ Check that a is assignable: SUCCESS$
 ^\[foo10.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
 ^\[foo10.\d+\] line \d+ Check that buffer->aux\.allocated is assignable: SUCCESS$
-^\[foo2.\d+\] line \d+ Check that b is assignable: SUCCESS$
-^\[foo3.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[foo3.\d+\] line \d+ Check that y is assignable: SUCCESS$
-^\[foo4.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[foo4.\d+\] line \d+ Check that \*c is assignable: SUCCESS$
 ^\[foo4.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^\[foo5.\d+\] line \d+ Check that buffer.data is assignable: SUCCESS$
@@ -28,7 +24,6 @@ main.c
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)7\] is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)8\] is assignable: SUCCESS$
 ^\[foo8.\d+\] line \d+ Check that array\[\(.* int\)9\] is assignable: SUCCESS$
-^\[foo9.\d+\] line \d+ Check that array is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 Checks whether CBMC parses correctly all standard cases for assigns clauses.

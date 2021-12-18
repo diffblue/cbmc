@@ -1,11 +1,10 @@
 CORE
 main.c
---enforce-contract assigns_range
-^EXIT=10$
+--enforce-contract uses_assigns
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^\[assigns_ptr\.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 --
 --
-Checks whether verification fails when an assigns clause of a function
-indicates the pointer might change, but one of its internal function only
-modified its content.
+Checks whether verification succeeds for array elements at a symbolic index. 

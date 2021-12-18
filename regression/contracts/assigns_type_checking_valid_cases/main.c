@@ -14,17 +14,17 @@ struct buf
   struct blob aux;
 };
 
-void foo1(int a) __CPROVER_assigns(a)
+void foo1(int a) __CPROVER_assigns()
 {
   a = 0;
 }
 
-void foo2(int *b) __CPROVER_assigns(b)
+void foo2(int *b) __CPROVER_assigns()
 {
   b = NULL;
 }
 
-void foo3(int a, int *b) __CPROVER_assigns(b, x, y)
+void foo3(int a, int *b) __CPROVER_assigns(x, y)
 {
   b = NULL;
   x = malloc(sizeof(*x));
@@ -32,14 +32,14 @@ void foo3(int a, int *b) __CPROVER_assigns(b, x, y)
 }
 
 void foo4(int a, int *b, int *c) __CPROVER_requires(c != NULL)
-  __CPROVER_requires(x != NULL) __CPROVER_assigns(b, *c, *x)
+  __CPROVER_requires(x != NULL) __CPROVER_assigns(*c, *x)
 {
   b = NULL;
   *c = 0;
   *x = 0;
 }
 
-void foo5(struct buf buffer) __CPROVER_assigns(buffer)
+void foo5(struct buf buffer) __CPROVER_assigns()
 {
   buffer.data = NULL;
   buffer.len = 0;
@@ -73,7 +73,7 @@ void foo8(int array[]) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(array))
   array[9] = 1;
 }
 
-void foo9(int array[]) __CPROVER_assigns(array)
+void foo9(int array[]) __CPROVER_assigns()
 {
   int *new_array = NULL;
   array = new_array;

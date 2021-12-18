@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-contract foo
+^--- begin invariant violation report ---$
+^Invariant check failed$
+^Condition: is_loop_free\(.*\)
+^Reason: Loops remain in function 'foo', assigns clause checking instrumentation cannot be applied\.$
+^EXIT=(127|134)$
+^SIGNAL=0$
+--
+--
+This test checks that loops that remain in the program when attempting to 
+instrument assigns clauses are detected and trigger an INVARIANT.

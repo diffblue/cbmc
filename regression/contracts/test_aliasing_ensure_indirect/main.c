@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-void bar(int *z) __CPROVER_assigns(z)
+void bar(int *z) __CPROVER_assigns()
   __CPROVER_ensures(__CPROVER_is_fresh(z, sizeof(int)))
 {
   z = malloc(sizeof(*z));
@@ -11,7 +11,7 @@ void bar(int *z) __CPROVER_assigns(z)
 
 // clang-format off
 int foo(int *x, int *y)
-  __CPROVER_assigns(*x, y)
+  __CPROVER_assigns(*x)
   __CPROVER_requires(
     __CPROVER_is_fresh(x, sizeof(int)) &&
     *x > 0 &&

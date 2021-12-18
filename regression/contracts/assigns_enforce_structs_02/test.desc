@@ -1,13 +1,12 @@
 CORE
 main.c
---enforce-contract f1
+--enforce-contract f
 ^EXIT=0$
 ^SIGNAL=0$
+^\[f\.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --
-Checks whether verification succeeds when a formal parameter pointer outside
-of the assigns clause is assigned after being pointed at the location of a
-member of a sub-struct of a freshly allocated struct before being assigned.
-This is meant to show that all contained members (and their contained members)
-of assignable structs are valid to assign.
+Checks whether verification succeeds when a pointer deref that is not
+specified in the assigns clause is first pointed at a member of a locally
+malloc'd struct before being assigned (with extra nesting).

@@ -1,13 +1,12 @@
 CORE
 main.c
 --enforce-contract bar
+^\[foo.\d+\] line 14 Check that foo\$\$1\$\$x is assignable: SUCCESS
+^\[foo.\d+\] line 17 Check that \*y is assignable: SUCCESS
+^\[foo.\d+\] line 20 Check that \*yy is assignable: FAILURE
+^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-^\[foo.\d+\] line \d+ Check that y is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that foo\$\$1\$\$x is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*yy is assignable: FAILURE$
-^VERIFICATION FAILED$
 --
 --
 Checks whether static local and global variables are correctly tracked

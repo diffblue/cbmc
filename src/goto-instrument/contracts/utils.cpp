@@ -10,9 +10,13 @@ Date: September 2021
 
 #include "utils.h"
 
+#include <goto-programs/cfg.h>
 #include <util/fresh_symbol.h>
+#include <util/graph.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
+#include <util/simplify_expr.h>
 
 goto_programt::instructiont &
 add_pragma_disable_assigns_check(goto_programt::instructiont &instr)
@@ -162,4 +166,65 @@ void disable_pointer_checks(source_locationt &source_location)
   source_location.add_pragma("disable:pointer-check");
   source_location.add_pragma("disable:pointer-primitive-check");
   source_location.add_pragma("disable:pointer-overflow-check");
+}
+
+void simplify_gotos(goto_programt &goto_program, namespacet &ns)
+{
+  for(auto &instruction : goto_program.instructions)
+  {
+    if(
+      instruction.is_goto() &&
+      simplify_expr(instruction.get_condition(), ns).is_false())
+      instruction.turn_into_skip();
+  }
+}
+
+bool is_loop_free(
+  const goto_programt &goto_program,
+  namespacet &ns,
+  messaget &log)
+{
+  // create cfg from instruction list
+  cfg_baset<empty_cfg_nodet> cfg;
+  cfg(goto_program);
+
+  // check that all nodes are there
+  INVARIANT(
+    goto_program.instructions.size() == cfg.size(),
+    "Instruction list vs CFG size mismatch.");
+
+  // compute SCCs
+  using idxt = graph_nodet<empty_cfg_nodet>::node_indext;
+  std::vector<idxt> node_to_scc(cfg.size(), -1);
+  auto nof_sccs = cfg.SCCs(node_to_scc);
+
+  // compute size of each SCC
+  std::vector<int> scc_size(nof_sccs, 0);
+  for(auto scc : node_to_scc)
+  {
+    INVARIANT(
+      0 <= scc && scc < nof_sccs, "Could not determine SCC for instruction");
+    scc_size[scc]++;
+  }
+
+  // check they are all of size 1
+  for(size_t scc_id = 0; scc_id < nof_sccs; scc_id++)
+  {
+    auto size = scc_size[scc_id];
+    if(size > 1)
+    {
+      log.error() << "Found CFG SCC with size " << size << messaget::eom;
+      for(const auto &node_id : node_to_scc)
+      {
+        if(node_to_scc[node_id] == scc_id)
+        {
+          const auto &pc = cfg[node_id].PC;
+          goto_program.output_instruction(ns, "", log.error(), *pc);
+          log.error() << messaget::eom;
+        }
+      }
+      return false;
+    }
+  }
+  return true;
 }

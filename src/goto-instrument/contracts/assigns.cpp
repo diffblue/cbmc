@@ -159,6 +159,15 @@ assigns_clauset::conditional_address_ranget::generate_unsafe_inclusion_check(
                               pointer_offset(upper_bound_address_var)}});
 }
 
+bool assigns_clauset::conditional_address_ranget::maybe_alive(
+  cfg_infot &cfg_info) const
+{
+  if(can_cast_expr<symbol_exprt>(source_expr))
+    return cfg_info.is_maybe_alive(to_symbol_expr(source_expr));
+
+  return true;
+}
+
 assigns_clauset::assigns_clauset(
   const exprt::operandst &assigns,
   const messaget &log,
@@ -192,14 +201,26 @@ void assigns_clauset::remove_from_write_set(const exprt &target_expr)
 }
 
 exprt assigns_clauset::generate_inclusion_check(
-  const conditional_address_ranget &lhs) const
+  const conditional_address_ranget &lhs,
+  optionalt<cfg_infot> &cfg_info_opt) const
 {
   if(write_set.empty())
     return not_exprt{lhs.validity_condition_var};
 
   exprt::operandst conditions{not_exprt{lhs.validity_condition_var}};
-  for(const auto &target : write_set)
-    conditions.push_back(target.generate_unsafe_inclusion_check(lhs));
+
+  if(cfg_info_opt.has_value())
+  {
+    auto &cfg_info = cfg_info_opt.value();
+    for(const auto &target : write_set)
+      if(target.maybe_alive(cfg_info))
+        conditions.push_back(target.generate_unsafe_inclusion_check(lhs));
+  }
+  else
+  {
+    for(const auto &target : write_set)
+      conditions.push_back(target.generate_unsafe_inclusion_check(lhs));
+  }
 
   return disjunction(conditions);
 }
