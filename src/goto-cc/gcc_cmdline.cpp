@@ -216,6 +216,7 @@ const char *gcc_options_without_argument[]=
   "-EB",
   "-EL",
   "-fast", // Apple only
+  "-coverage",
   nullptr
 };
 // clang-format on
