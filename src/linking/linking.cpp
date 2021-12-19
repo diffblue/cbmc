@@ -796,12 +796,12 @@ void linkingt::duplicate_code_symbol(
     else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
     {
       // keep the one in old_symbol -- libraries come last!
-      warning().source_location=new_symbol.location;
+      debug().source_location = new_symbol.location;
 
-      warning() << "function '" << old_symbol.name << "' in module '"
-                << new_symbol.module
-                << "' is shadowed by a definition in module '"
-                << old_symbol.module << "'" << eom;
+      debug() << "function '" << old_symbol.name << "' in module '"
+              << new_symbol.module
+              << "' is shadowed by a definition in module '"
+              << old_symbol.module << "'" << eom;
     }
     else
       link_error(
