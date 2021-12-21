@@ -672,6 +672,9 @@ bool code_contractst::apply_function_contract(
   // keep track of the call's return expression to make it nondet later
   optionalt<exprt> call_ret_opt = {};
 
+  // if true, the call return variable variable was created during replacement
+  bool call_ret_is_fresh_var = false;
+
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
@@ -696,6 +699,7 @@ bool code_contractst::apply_function_contract(
       {
         // The postcondition does mention __CPROVER_return_value, so mint a
         // fresh variable to replace __CPROVER_return_value with.
+        call_ret_is_fresh_var = true;
         const symbolt &fresh = get_fresh_aux_symbol(
           type.return_type(),
           id2string(target_function),
@@ -803,6 +807,12 @@ bool code_contractst::apply_function_contract(
     auto &call_ret = call_ret_opt.value();
     auto &loc = call_ret.source_location();
     auto &type = call_ret.type();
+
+    // Declare if fresh
+    if(call_ret_is_fresh_var)
+      havoc_instructions.add(
+        goto_programt::make_decl(to_symbol_expr(call_ret), loc));
+
     side_effect_expr_nondett expr(type, location);
     auto target = havoc_instructions.add(
       goto_programt::make_assignment(call_ret, expr, loc));
@@ -819,6 +829,17 @@ bool code_contractst::apply_function_contract(
     is_fresh.update_ensures(ensures_pair.first);
     insert_before_swap_and_advance(function_body, target, ensures_pair.first);
   }
+
+  // Kill return value variable if fresh
+  if(call_ret_is_fresh_var)
+  {
+    function_body.output_instruction(ns, "", log.warning(), *target);
+    auto dead_inst =
+      goto_programt::make_dead(to_symbol_expr(call_ret_opt.value()), location);
+    function_body.insert_before_swap(target, dead_inst);
+    ++target;
+  }
+
   *target = goto_programt::make_skip();
 
   // Add this function to the set of replaced functions.
