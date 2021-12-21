@@ -15,5 +15,9 @@ int main()
 
   a = p - q;
 
+  // mixing types: the C front-end will insert casts
+  unsigned long long u;
+  p = (p + a) + u;
+
   assert(0);
 }
