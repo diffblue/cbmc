@@ -131,7 +131,10 @@ protected:
     return type_to_string_verbose(symbol, symbol.type);
   }
 
-  void detailed_conflict_report_rec(
+  /// Returns true iff the conflict report on a particular branch of the tree of
+  /// types was a definitive result, and not contingent on conflicts within a
+  /// tag type.
+  bool detailed_conflict_report_rec(
     const symbolt &old_symbol,
     const symbolt &new_symbol,
     const typet &type1,

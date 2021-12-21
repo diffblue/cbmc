@@ -126,7 +126,7 @@ std::string linkingt::type_to_string_verbose(
   return type_to_string(symbol.name, type);
 }
 
-void linkingt::detailed_conflict_report_rec(
+bool linkingt::detailed_conflict_report_rec(
   const symbolt &old_symbol,
   const symbolt &new_symbol,
   const typet &type1,
@@ -134,9 +134,11 @@ void linkingt::detailed_conflict_report_rec(
   unsigned depth,
   exprt &conflict_path)
 {
-  #ifdef DEBUG
+  bool conclusive = false;
+
+#ifdef DEBUG
   debug() << "<BEGIN DEPTH " << depth << ">" << eom;
-  #endif
+#endif
 
   std::string msg;
 
@@ -144,7 +146,10 @@ void linkingt::detailed_conflict_report_rec(
   const typet &t2=follow_tags_symbols(ns, type2);
 
   if(t1.id()!=t2.id())
+  {
     msg="type classes differ";
+    conclusive = true;
+  }
   else if(t1.id()==ID_pointer ||
           t1.id()==ID_array)
   {
@@ -155,7 +160,7 @@ void linkingt::detailed_conflict_report_rec(
       if(conflict_path.type().id() == ID_pointer)
         conflict_path = dereference_exprt(conflict_path);
 
-      detailed_conflict_report_rec(
+      conclusive = detailed_conflict_report_rec(
         old_symbol,
         new_symbol,
         to_type_with_subtype(t1).subtype(),
@@ -184,6 +189,7 @@ void linkingt::detailed_conflict_report_rec(
       msg="number of members is different (";
       msg+=std::to_string(components1.size())+'/';
       msg+=std::to_string(components2.size())+')';
+      conclusive = true;
     }
     else
     {
@@ -197,7 +203,7 @@ void linkingt::detailed_conflict_report_rec(
           msg="names of member "+std::to_string(i)+" differ (";
           msg+=id2string(components1[i].get_name())+'/';
           msg+=id2string(components2[i].get_name())+')';
-          break;
+          conclusive = true;
         }
         else if(subtype1 != subtype2)
         {
@@ -210,6 +216,7 @@ void linkingt::detailed_conflict_report_rec(
                 e.id()==ID_index)
           {
             parent_types.insert(e.type());
+            parent_types.insert(follow_tags_symbols(ns, e.type()));
             if(e.id() == ID_dereference)
               e = to_dereference_expr(e).pointer();
             else if(e.id() == ID_member)
@@ -220,44 +227,32 @@ void linkingt::detailed_conflict_report_rec(
               UNREACHABLE;
           }
 
-          conflict_path=conflict_path_before;
-          conflict_path.type()=t1;
-          conflict_path=
-            member_exprt(conflict_path, components1[i]);
-
-          if(depth>0 &&
-             parent_types.find(t1)==parent_types.end())
-            detailed_conflict_report_rec(
-              old_symbol,
-              new_symbol,
-              subtype1,
-              subtype2,
-              depth-1,
-              conflict_path);
-          else
+          if(parent_types.find(subtype1) == parent_types.end())
           {
-            msg="type of member "+
-                id2string(components1[i].get_name())+
-                " differs";
-            if(depth>0)
+            conflict_path = conflict_path_before;
+            conflict_path.type() = t1;
+            conflict_path = member_exprt(conflict_path, components1[i]);
+
+            if(depth > 0)
             {
-              std::string msg_bak;
-              msg_bak.swap(msg);
-              symbol_exprt c = symbol_exprt::typeless(ID_C_this);
-              detailed_conflict_report_rec(
+              conclusive = detailed_conflict_report_rec(
                 old_symbol,
                 new_symbol,
                 subtype1,
                 subtype2,
-                depth-1,
-                c);
-              msg.swap(msg_bak);
+                depth - 1,
+                conflict_path);
             }
           }
-
-          if(parent_types.find(t1)==parent_types.end())
-            break;
+          else
+          {
+            msg = "type of member " + id2string(components1[i].get_name()) +
+                  " differs (recursive)";
+          }
         }
+
+        if(conclusive)
+          break;
       }
     }
   }
@@ -280,12 +275,14 @@ void linkingt::detailed_conflict_report_rec(
       msg +=
         type_to_string(new_symbol.name, to_c_enum_type(t2).underlying_type()) +
         ')';
+      conclusive = true;
     }
     else if(members1.size()!=members2.size())
     {
       msg="number of enum members is different (";
       msg+=std::to_string(members1.size())+'/';
       msg+=std::to_string(members2.size())+')';
+      conclusive = true;
     }
     else
     {
@@ -296,15 +293,18 @@ void linkingt::detailed_conflict_report_rec(
           msg="names of member "+std::to_string(i)+" differ (";
           msg+=id2string(members1[i].get_base_name())+'/';
           msg+=id2string(members2[i].get_base_name())+')';
-          break;
+          conclusive = true;
         }
         else if(members1[i].get_value()!=members2[i].get_value())
         {
           msg="values of member "+std::to_string(i)+" differ (";
           msg+=id2string(members1[i].get_value())+'/';
           msg+=id2string(members2[i].get_value())+')';
-          break;
+          conclusive = true;
         }
+
+        if(conclusive)
+          break;
       }
     }
 
@@ -328,21 +328,25 @@ void linkingt::detailed_conflict_report_rec(
       msg="parameter counts differ (";
       msg+=std::to_string(parameters1.size())+'/';
       msg+=std::to_string(parameters2.size())+')';
+      conclusive = true;
     }
     else if(return_type1 != return_type2)
     {
+      conflict_path.type() = array_typet{void_type(), nil_exprt{}};
       conflict_path=
         index_exprt(conflict_path,
                     constant_exprt(std::to_string(-1), integer_typet()));
 
       if(depth>0)
-        detailed_conflict_report_rec(
+      {
+        conclusive = detailed_conflict_report_rec(
           old_symbol,
           new_symbol,
           return_type1,
           return_type2,
-          depth-1,
+          depth - 1,
           conflict_path);
+      }
       else
         msg="return types differ";
     }
@@ -355,30 +359,37 @@ void linkingt::detailed_conflict_report_rec(
 
         if(subtype1 != subtype2)
         {
+          conflict_path.type() = array_typet{void_type(), nil_exprt{}};
           conflict_path=
             index_exprt(conflict_path,
                         constant_exprt(std::to_string(i), integer_typet()));
 
           if(depth>0)
-            detailed_conflict_report_rec(
+          {
+            conclusive = detailed_conflict_report_rec(
               old_symbol,
               new_symbol,
               subtype1,
               subtype2,
-              depth-1,
+              depth - 1,
               conflict_path);
+          }
           else
             msg="parameter types differ";
-
-          break;
         }
+
+        if(conclusive)
+          break;
       }
     }
   }
   else
+  {
     msg="conflict on POD";
+    conclusive = true;
+  }
 
-  if(!msg.empty())
+  if(conclusive && !msg.empty())
   {
     error() << '\n';
     error() << "reason for conflict at "
@@ -392,6 +403,8 @@ void linkingt::detailed_conflict_report_rec(
   #ifdef DEBUG
   debug() << "<END DEPTH " << depth << ">" << eom;
   #endif
+
+  return conclusive;
 }
 
 void linkingt::link_error(
@@ -685,8 +698,16 @@ void linkingt::duplicate_code_symbol(
                 old_symbol.value.is_nil()!=new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
+          {
             warn_msg="pointer parameter types differ between "
                      "declaration and definition";
+            detailed_conflict_report(
+              old_symbol,
+              new_symbol,
+              conflicts.front().first,
+              conflicts.front().second);
+          }
+
           replace=new_symbol.value.is_not_nil();
         }
         // transparent union with (or entirely without) implementation is
