@@ -562,9 +562,10 @@ void code_contractst::replace_history_parameter(
   {
     const auto &parameter = to_history_expr(expr, id).expression();
 
+    const auto &id = parameter.id();
     if(
-      parameter.id() == ID_dereference || parameter.id() == ID_member ||
-      parameter.id() == ID_symbol || parameter.id() == ID_ptrmember)
+      id == ID_dereference || id == ID_member || id == ID_symbol ||
+      id == ID_ptrmember || id == ID_constant || id == ID_typecast)
     {
       auto it = parameter2history.find(parameter);
 
