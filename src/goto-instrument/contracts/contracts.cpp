@@ -43,6 +43,7 @@ Date: February 2016
 #include <util/replace_symbol.h>
 #include <util/std_code.h>
 
+#include "havoc_assigns_clause_targets.h"
 #include "memory_predicates.h"
 #include "utils.h"
 
@@ -790,15 +791,17 @@ bool code_contractst::apply_function_contract(
   // ...for assigns clause targets
   if(!assigns_clause.empty())
   {
-    assigns_clauset assigns_clause(
-      targets.operands(), log, ns, target_function, symbol_table);
-
-    // Havoc all targets in the write set
-    assignst assigns;
-    assigns.insert(targets.operands().cbegin(), targets.operands().cend());
-
-    havoc_assigns_targetst havoc_gen(assigns, ns);
-    havoc_gen.append_full_havoc_code(location, havoc_instructions);
+    // Havoc all targets in the assigns clause
+    // TODO: handle local statics possibly touched by this function
+    havoc_assigns_clause_targets(
+      target_function,
+      targets.operands(),
+      havoc_instructions,
+      // context parameters
+      location,
+      mode,
+      ns,
+      symbol_table);
   }
 
   // ...for the return value
@@ -840,6 +843,7 @@ bool code_contractst::apply_function_contract(
     ++target;
   }
 
+  // Erase original function call
   *target = goto_programt::make_skip();
 
   // Add this function to the set of replaced functions.
@@ -1422,8 +1426,20 @@ code_contractst::add_inclusion_check(
   source_locationt location_no_checks =
     instruction_it->source_location_nonconst();
   disable_pointer_checks(location_no_checks);
-  location_no_checks.set_comment(
-    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
+
+  // does this assignment come from some contract replacement ?
+  const auto &comment = location_no_checks.get_comment();
+  if(is_assigns_clause_replacement_tracking_comment(comment))
+  {
+    location_no_checks.set_comment(
+      "Check that " + id2string(comment) + " is assignable");
+  }
+  else
+  {
+    location_no_checks.set_comment(
+      "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
+  }
+
   assertion.add(goto_programt::make_assertion(
     assigns.generate_inclusion_check(car, cfg_info_opt), location_no_checks));
   insert_before_swap_and_advance(program, instruction_it, assertion);

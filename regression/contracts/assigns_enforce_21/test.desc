@@ -4,8 +4,8 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 main.c function bar
-^\[bar.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
-^\[bar.\d+\] line \d+ Check that x is assignable: FAILURE$
+^\[bar\.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
+^\[bar\.\d+\] line \d+ Check that x \(assigned by the contract of quz\) is assignable: FAILURE
 ^VERIFICATION FAILED$
 --
 --
