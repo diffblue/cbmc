@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Pretty Printing
 
+#include <iostream>
 #include "format_expr.h"
 
 #include "arith_tools.h"
@@ -329,6 +330,28 @@ void format_expr_configt::setup()
     const auto &index_expr = to_index_expr(expr);
     return os << format(index_expr.array()) << '[' << format(index_expr.index())
               << ']';
+  };
+
+  expr_map[ID_array_store] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << "(store " << format(expr.operands()[0])
+              << ' '  << format(expr.operands()[1])
+              << ' '  << format(expr.operands()[2])
+              << ')';
+  };
+
+  expr_map[ID_array_select] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << "(select " << format(expr.operands()[0])
+              << ' '  << format(expr.operands()[1])
+              << ')';
+  };
+
+  expr_map[ID_function_application] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << format(expr.operands()[0])
+              << " ("  << format(expr.operands()[1])
+              << ')';
   };
 
   expr_map[ID_type] =

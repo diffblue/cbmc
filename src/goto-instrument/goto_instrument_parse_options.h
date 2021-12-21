@@ -99,7 +99,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(interpreter)(show-reaching-definitions)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
-  "(horn)(skip-loops):(model-argc-argv):" \
+  "(horn)(mem)(bb)(skip-loops):(model-argc-argv):" \
   "(" FLAG_REPLACE_CALL "):" \
   "(" FLAG_REPLACE_ALL_CALLS ")" \
   "(" FLAG_ENFORCE_CONTRACT "):" \

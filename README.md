@@ -10,6 +10,31 @@
 About
 =====
 
+CBMC is a Bounded Model Checker for C and C++ programs. This fork provides
+experimental support for encoding of verification conditions to
+*Constrained Horn Clauses (CHC)* to be further solved by [z3](https://github.com/Z3Prover/z3).
+The encoding targets bit-precise analysis of sequential programs
+taking into account memory and aliases (work in progress). The CHC generator is
+implemented in the *goto-instrument* component of CBMC and should be enabled
+by options `--horn --inline --bb --mem`.  The `regression/chc` directory
+contains a set of small tests (including the C programs, the generated CHCs,
+dumped CHC topologies, and a running script).
+
+TODO
+====
+
+The following features are not fully supported, and thus our immediate future work:
+* switch statements
+* gotos and labels
+* break/contunue in nested loops
+
+We further seek to improve the length of the generated CHCs (e.g., by eliminating
+  redundand equalities) and develop a set of CHC transformations to simplify solving.
+
+
+Original README
+==============
+
 CBMC is a Bounded Model Checker for C and C++ programs. It supports C89, C99,
 most of C11 and most compiler extensions provided by gcc and Visual Studio. It
 also supports SystemC using Scoot. It allows verifying array bounds (buffer
