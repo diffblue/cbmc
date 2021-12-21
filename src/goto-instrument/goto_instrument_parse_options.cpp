@@ -850,12 +850,18 @@ int goto_instrument_parse_optionst::doit()
       remove_skip(goto_model);
     }
 
-    if(cmdline.isset("horn-encoding"))
+    if(cmdline.isset("horn"))
     {
       log.status() << "Horn-clause encoding" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
 
-      if(cmdline.args.size()==2)
+      if(cmdline.isset("bb"))
+      {
+        horn_encoding(goto_model, std::cout, cmdline.isset("mem"),
+            messaget::eval_verbosity(cmdline.get_value("verbosity"),
+            messaget::M_STATISTICS, ui_message_handler) >= 10);
+      }
+      else if(cmdline.args.size()==2)
       {
         #ifdef _MSC_VER
         std::ofstream out(widen(cmdline.args[1]));
@@ -869,7 +875,6 @@ int goto_instrument_parse_optionst::doit()
                       << messaget::eom;
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
-
         horn_encoding(goto_model, horn_formatt::SMT2, out);
       }
       else

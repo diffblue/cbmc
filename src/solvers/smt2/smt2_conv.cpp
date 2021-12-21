@@ -1236,9 +1236,12 @@ void smt2_convt::convert_expr(const exprt &expr)
       "logical and, or, and xor expressions should have at least two operands");
 
     out << "(" << expr.id();
+    bool first = true;
     forall_operands(it, expr)
     {
-      out << " ";
+      if (!first && expr.id()==ID_and) out << "\n       ";
+      else out << " ";
+      first = false;
       convert_expr(*it);
     }
     out << ")";
@@ -1253,9 +1256,9 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     out << "(=> ";
     convert_expr(implies_expr.op0());
-    out << " ";
+    out << ' ';
     convert_expr(implies_expr.op1());
-    out << ")";
+    out << ')';
   }
   else if(expr.id()==ID_not)
   {
@@ -1272,7 +1275,6 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id() == ID_equal)
   {
     const equal_exprt &equal_expr = to_equal_expr(expr);
-
     DATA_INVARIANT(
       equal_expr.op0().type() == equal_expr.op1().type(),
       "operands of equal expression shall have same type");
@@ -1972,16 +1974,18 @@ void smt2_convt::convert_expr(const exprt &expr)
     else if(quantifier_expr.id() == ID_exists)
       out << "(exists ";
 
-    out << "( ";
-    for(const auto &bound : quantifier_expr.variables())
+    out << "(";
+    for(unsigned i = 0; i < quantifier_expr.variables().size(); i++)
     {
+      auto & bound = quantifier_expr.variables()[i];
       out << "(";
       convert_expr(bound);
       out << " ";
       convert_type(bound.type());
-      out << ") ";
+      out << ")";
+      if (i != quantifier_expr.variables().size() - 1) out << " ";
     }
-    out << ") ";
+    out << ")\n  ";
 
     convert_expr(quantifier_expr.where());
 
@@ -2134,11 +2138,42 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     out << "()";
   }
+  else if(expr.id() == ID_function_application)
+  {
+    const auto &function_application = to_function_application_expr(expr);
+    out << "\n    ";
+    if (!function_application.arguments().empty()) out << '(';
+    convert_expr(function_application.function());
+    for(const auto &argument : function_application.arguments())
+    {
+      out << " ";
+      convert_expr(argument);
+    }
+    if (!function_application.arguments().empty()) out << ')';
+  }
+  else if (expr.id() == ID_array_select)
+  {
+    out << "(select ";
+    convert_expr(expr.operands()[0]);
+    out << ' ';
+    convert_expr(expr.operands()[1]);
+    out << ")";
+  }
+  else if (expr.id() == ID_array_store)
+  {
+    out << "(store ";
+    convert_expr(expr.operands()[0]);
+    out << ' ';
+    convert_expr(expr.operands()[1]);
+    out << ' ';
+    convert_expr(expr.operands()[2]);
+    out << ")";
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
       "smt2_convt::convert_expr should not be applied to unsupported type",
-      expr.id_string());
+      expr.id());
 }
 
 void smt2_convt::convert_typecast(const typecast_exprt &expr)
@@ -4479,8 +4514,9 @@ void smt2_convt::set_to(const exprt &expr, bool value)
       << format(expr) << "\n";
 #endif
 
-  out << "; set_to " << (value?"true":"false") << "\n"
-      << "(assert ";
+  // out << "; set_to " << (value?"true":"false") << "\n"
+  out << "(assert ";
+
   if(!value)
   {
     out << "(not ";
@@ -4607,12 +4643,34 @@ void smt2_convt::find_symbols(const exprt &expr)
       std::string smt2_identifier=convert_identifier(identifier);
       smt2_identifiers.insert(smt2_identifier);
 
-      out << "; find_symbols\n";
-      out << "(declare-fun |"
-          << smt2_identifier
-          << "| () ";
-      convert_type(expr.type());
-      out << ")" << "\n";
+      if(expr.type().id() == ID_mathematical_function)
+      {
+        out << "(declare-fun |"
+            << smt2_identifier
+            << "| ";
+
+        const auto &function_type = to_mathematical_function_type(expr.type());
+        out << '(';
+        for(const auto &domain_type : function_type.domain())
+        {
+          convert_type(domain_type);
+          out << ' ';
+        }
+        out << ") ";
+
+        convert_type(function_type.codomain());
+        out << ")" << "\n\n";
+      }
+      else
+      {
+        out << "; find_symbols\n";
+        out << "(declare-fun |"
+            << smt2_identifier
+            << "| () ";
+        convert_type(expr.type());
+        out << ")" << "\n";
+
+      }
     }
   }
   else if(expr.id() == ID_array_of)
@@ -4870,13 +4928,11 @@ void smt2_convt::convert_type(const typet &type)
     CHECK_RETURN(array_type.size().is_not_nil());
 
     // we always use array theory for top-level arrays
-    const typet &subtype = array_type.element_type();
-
     out << "(Array ";
     convert_type(array_type.size().type());
     out << " ";
 
-    if(subtype.id()==ID_bool && !use_array_of_bool)
+    if(array_type.element_type().id()==ID_bool && !use_array_of_bool)
       out << "(_ BitVec 1)";
     else
       convert_type(array_type.element_type());

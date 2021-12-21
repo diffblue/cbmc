@@ -165,4 +165,6 @@ public:
 
 void horn_encoding(const goto_modelt &, horn_formatt, ostream &);
 
+void horn_encoding(const goto_modelt &, ostream &, bool mem, bool dump_cfg);
+
 #endif // CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H

@@ -48,6 +48,7 @@ SRC = accelerate/accelerate.cpp \
       havoc_loops.cpp \
       havoc_utils.cpp \
       horn_encoding.cpp \
+      mem_horn_encoding.cpp \
       insert_final_assert_false.cpp \
       interrupt.cpp \
       k_induction.cpp \
