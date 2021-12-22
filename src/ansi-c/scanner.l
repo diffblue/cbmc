@@ -1637,6 +1637,10 @@ __decltype          { if(PARSER.cpp98 &&
   /* The following ugly stuff avoids two-token lookahead in the parser;
      e.g., asm void f()  vs.  asm ("xyz") or asm { ... } */
 <GCC_ASM>{
+{cpplineno}     {
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
+                }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 "{"             { yyless(0); BEGIN(GRAMMAR); loc(); PARSER.asm_block_following=true; return TOK_GCC_ASM_PAREN; }
