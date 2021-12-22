@@ -481,7 +481,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
   const binary_relation_exprt &expr)
 {
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   exprt::operandst new_inequality_ops;
   for(const auto &operand : expr.operands())

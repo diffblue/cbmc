@@ -73,7 +73,7 @@ exprt float_bvt::convert(const exprt &expr) const
       return nil_exprt();
   }
   else if(
-    expr.id() == ID_typecast && expr.type().id() == ID_bool &&
+    expr.id() == ID_typecast && expr.is_boolean() &&
     to_typecast_expr(expr).op().type().id() == ID_floatbv) // float -> bool
   {
     return not_exprt(is_zero(to_typecast_expr(expr).op()));

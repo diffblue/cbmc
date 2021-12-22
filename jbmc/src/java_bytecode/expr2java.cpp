@@ -175,7 +175,7 @@ std::string expr2javat::convert_constant(
     else
       return "false";
   }
-  else if(src.type().id()==ID_bool)
+  else if(src.is_boolean())
   {
     if(src.is_true())
       return "true";

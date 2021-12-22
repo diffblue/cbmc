@@ -431,7 +431,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // This is one of the few places where it's detectable
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
-    if(op.type().id() == ID_bool)
+    if(op.is_boolean())
       op = typecast_exprt(op, signed_int_type());
 
     irept::subt &generic_associations=
@@ -960,7 +960,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     // This is one of the few places where it's detectable
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
-    if(op.type().id() == ID_bool)
+    if(op.is_boolean())
       type = signed_int_type();
     else
       type = op.type();
@@ -1102,7 +1102,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // This is one of the few places where it's detectable
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
-    if(op.type().id() == ID_bool)
+    if(op.is_boolean())
       op = typecast_exprt(op, signed_int_type());
 
     // we need to find a member with the right type
@@ -1718,7 +1718,7 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
     throw 0;
   }
 
-  if(op.type().id() == ID_bool)
+  if(op.is_boolean())
   {
     error().source_location = expr.source_location();
     error() << "cannot take address of a single bit" << eom;
@@ -4352,7 +4352,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     {
       implicit_typecast_arithmetic(op0, op1);
       if(
-        op1.type().id() == ID_bool || op1.type().id() == ID_c_bool ||
+        op1.is_boolean() || op1.type().id() == ID_c_bool ||
         op1.type().id() == ID_c_enum_tag || op1.type().id() == ID_unsignedbv ||
         op1.type().id() == ID_signedbv || op1.type().id() == ID_c_bit_field)
       {
@@ -4418,7 +4418,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
       implicit_typecast_arithmetic(op1);
 
       if(
-        is_number(op1.type()) || op1.type().id() == ID_bool ||
+        is_number(op1.type()) || op1.is_boolean() ||
         op1.type().id() == ID_c_bool || op1.type().id() == ID_c_enum_tag)
       {
         op1 = typecast_exprt(op1, o_type0);
@@ -4429,22 +4429,24 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
             o_type0.id()==ID_c_bool)
     {
       implicit_typecast_arithmetic(op0, op1);
-      if(op1.type().id()==ID_bool ||
-         op1.type().id()==ID_c_bool ||
-         op1.type().id()==ID_c_enum_tag ||
-         op1.type().id()==ID_unsignedbv ||
-         op1.type().id()==ID_signedbv)
+      if(
+        op1.is_boolean() || op1.type().id() == ID_c_bool ||
+        op1.type().id() == ID_c_enum_tag || op1.type().id() == ID_unsignedbv ||
+        op1.type().id() == ID_signedbv)
+      {
         return;
+      }
     }
     else
     {
       implicit_typecast_arithmetic(op0, op1);
 
-      if(is_number(op1.type()) ||
-         op1.type().id()==ID_bool ||
-         op1.type().id()==ID_c_bool ||
-         op1.type().id()==ID_c_enum_tag)
+      if(
+        is_number(op1.type()) || op1.is_boolean() ||
+        op1.type().id() == ID_c_bool || op1.type().id() == ID_c_enum_tag)
+      {
         return;
+      }
     }
   }
 

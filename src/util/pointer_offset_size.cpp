@@ -42,7 +42,7 @@ optionalt<mp_integer> member_offset(
       result += bit_field_bits / config.ansi_c.char_width;
       bit_field_bits %= config.ansi_c.char_width;
     }
-    else if(comp.type().id() == ID_bool)
+    else if(comp.is_boolean())
     {
       ++bit_field_bits;
       result += bit_field_bits / config.ansi_c.char_width;
@@ -255,7 +255,7 @@ optionalt<exprt> member_offset_expr(
       if(bytes > 0)
         result = plus_exprt(result, from_integer(bytes, result.type()));
     }
-    else if(c.type().id() == ID_bool)
+    else if(c.is_boolean())
     {
       ++bit_field_bits;
       const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
@@ -365,7 +365,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         if(bytes > 0)
           result = plus_exprt(result, from_integer(bytes, result.type()));
       }
-      else if(c.type().id() == ID_bool)
+      else if(c.is_boolean())
       {
         ++bit_field_bits;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;

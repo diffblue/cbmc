@@ -381,7 +381,7 @@ void invariant_sett::strengthen(const exprt &expr)
 
 void invariant_sett::strengthen_rec(const exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     throw "non-Boolean argument to strengthen()";
 
   #if 0
@@ -584,7 +584,7 @@ tvt invariant_sett::implies(const exprt &expr) const
 
 tvt invariant_sett::implies_rec(const exprt &expr) const
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     throw "implies: non-Boolean expression";
 
   #if 0
@@ -696,7 +696,7 @@ void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
 
 void invariant_sett::nnf(exprt &expr, bool negate)
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     throw "nnf: non-Boolean expression";
 
   if(expr.is_true())

@@ -1011,7 +1011,7 @@ public:
     const exprt &_cond,
     const source_locationt &l = source_locationt::nil())
   {
-    PRECONDITION(_cond.type().id() == ID_bool);
+    PRECONDITION(_cond.is_boolean());
     return instructiont(
       static_cast<const goto_instruction_codet &>(get_nil_irep()),
       l,

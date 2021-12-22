@@ -99,7 +99,7 @@ static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
 
   std::string operator_str = id2string(src.id()); // default
 
-  if(src.id() == ID_equal && to_equal_expr(src).op0().type().id() == ID_bool)
+  if(src.id() == ID_equal && to_equal_expr(src).op0().is_boolean())
   {
     operator_str = u8"\u21d4"; // <=>, U+21D4
   }

@@ -696,7 +696,7 @@ public:
 
     DATA_CHECK(
       vm,
-      expr.type().id() == ID_bool,
+      expr.is_boolean(),
       "result of binary predicate expression should be of type bool");
   }
 };
@@ -2279,7 +2279,7 @@ class not_exprt:public unary_exprt
 public:
   explicit not_exprt(exprt _op) : unary_exprt(ID_not, std::move(_op))
   {
-    PRECONDITION(as_const(*this).op().type().id() == ID_bool);
+    PRECONDITION(as_const(*this).op().is_boolean());
   }
 };
 
@@ -3304,7 +3304,7 @@ public:
   /// \param value: the value for the case
   void add_case(const exprt &condition, const exprt &value)
   {
-    PRECONDITION(condition.type().id() == ID_bool);
+    PRECONDITION(condition.is_boolean());
     operands().reserve(operands().size() + 2);
     operands().push_back(condition);
     operands().push_back(value);

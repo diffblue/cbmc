@@ -22,16 +22,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
   if(!expr.has_operands())
     return unchanged(expr);
 
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     return unchanged(expr);
 
   if(expr.id()==ID_implies)
   {
     const auto &implies_expr = to_implies_expr(expr);
 
-    if(
-      implies_expr.op0().type().id() != ID_bool ||
-      implies_expr.op1().type().id() != ID_bool)
+    if(!implies_expr.op0().is_boolean() || !implies_expr.op1().is_boolean())
     {
       return unchanged(expr);
     }
@@ -53,7 +51,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
     for(exprt::operandst::const_iterator it = new_operands.begin();
         it != new_operands.end();)
     {
-      if(it->type().id()!=ID_bool)
+      if(!it->is_boolean())
         return unchanged(expr);
 
       bool erase;
@@ -107,7 +105,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
     for(exprt::operandst::const_iterator it = new_operands.begin();
         it != new_operands.end();)
     {
-      if(it->type().id()!=ID_bool)
+      if(!it->is_boolean())
         return unchanged(expr);
 
       bool is_true=it->is_true();
@@ -201,7 +199,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
     // search for a and !a
     for(const exprt &op : new_operands)
       if(
-        op.id() == ID_not && op.type().id() == ID_bool &&
+        op.id() == ID_not && op.is_boolean() &&
         expr_set.find(to_not_expr(op).op()) != expr_set.end())
       {
         return make_boolean_expr(expr.id() == ID_or);
@@ -231,8 +229,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
 {
   const exprt &op = expr.op();
 
-  if(expr.type().id()!=ID_bool ||
-     op.type().id()!=ID_bool)
+  if(!expr.is_boolean() || !op.is_boolean())
   {
     return unchanged(expr);
   }

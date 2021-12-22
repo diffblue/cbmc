@@ -13,7 +13,7 @@ Author: Daniel Kroening
 
 bool is_condition(const exprt &src)
 {
-  if(src.type().id() != ID_bool)
+  if(!src.is_boolean())
     return false;
 
   // conditions are 'atomic predicates'
@@ -73,7 +73,7 @@ void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
     return;
   }
 
-  if(src.type().id() == ID_bool)
+  if(src.is_boolean())
   {
     if(src.is_constant())
     {

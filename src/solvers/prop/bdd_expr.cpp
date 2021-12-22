@@ -18,7 +18,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   if(expr.is_constant())
     return expr.is_false() ? bdd_mgr.bdd_false() : bdd_mgr.bdd_true();
@@ -49,8 +49,7 @@ bddt bdd_exprt::from_expr_rec(const exprt &expr)
 
     return n_lhs.bdd_or(rhs);
   }
-  else if(
-    expr.id() == ID_equal && to_equal_expr(expr).lhs().type().id() == ID_bool)
+  else if(expr.id() == ID_equal && to_equal_expr(expr).lhs().is_boolean())
   {
     const equal_exprt &eq_expr=to_equal_expr(expr);
 

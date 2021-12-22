@@ -143,7 +143,7 @@ std::string expr2stlt::convert(const exprt &expr)
     convert(to_equal_expr(expr));
   else if(ID_symbol == expr.id())
     convert(to_symbol_expr(expr));
-  else if(ID_not == expr.id() && to_not_expr(expr).op().type().id() == ID_bool)
+  else if(ID_not == expr.id() && to_not_expr(expr).op().is_boolean())
     convert(to_not_expr(expr));
   else // TODO: support more instructions in expr2stl.
     return expr2c(expr, ns);

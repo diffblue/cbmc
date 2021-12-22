@@ -262,7 +262,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // We should only attempt to assume Boolean things
   // This should be enforced by the well-structured-ness of the
   // goto-program and the way assume is used.
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   auto simplified = simplify_expr(expr, ns);
   auto assumption = do_assume(simplified, ns);
@@ -270,8 +270,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   if(assumption.id() != ID_nil) // I.E. actually a value
   {
     // Should be of the right type
-    INVARIANT(
-      assumption.type().id() == ID_bool, "simplification preserves type");
+    INVARIANT(assumption.is_boolean(), "simplification preserves type");
 
     if(assumption.is_false())
     {

@@ -121,7 +121,7 @@ bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   const exprt::operandst &operands=expr.operands();
 

@@ -285,7 +285,7 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
 {
   auto binding = this->binding(id);
 
-  if(binding.second.type().id() != ID_bool)
+  if(!binding.second.is_boolean())
     throw error() << id << " expects a boolean term";
 
   return quantifier_exprt(id, binding.first, binding.second);
@@ -557,7 +557,7 @@ exprt smt2_parsert::function_application()
         if(smt2_tokenizer.get_buffer() == "named")
         {
           // 'named terms' must be Boolean
-          if(term.type().id() != ID_bool)
+          if(!term.is_boolean())
             throw error("named terms must be Boolean");
 
           if(next_token() == smt2_tokenizert::SYMBOL)
@@ -1242,7 +1242,7 @@ void smt2_parsert::setup_expressions()
     if(op.size() != 3)
       throw error("ite takes three operands");
 
-    if(op[0].type().id() != ID_bool)
+    if(!op[0].is_boolean())
       throw error("ite takes a boolean as first operand");
 
     if(op[1].type() != op[2].type())

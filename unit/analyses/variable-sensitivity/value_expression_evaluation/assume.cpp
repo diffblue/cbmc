@@ -802,7 +802,7 @@ void ASSUME_TRUE(
   {
     auto assumption = env.do_assume(expr, ns);
     REQUIRE(assumption.id() != ID_nil);
-    REQUIRE(assumption.type().id() == ID_bool);
+    REQUIRE(assumption.is_boolean());
     REQUIRE(assumption.is_true());
   }
 }
@@ -816,7 +816,7 @@ void ASSUME_FALSE(
   {
     auto assumption = env.do_assume(expr, ns);
     REQUIRE(assumption.id() != ID_nil);
-    REQUIRE(assumption.type().id() == ID_bool);
+    REQUIRE(assumption.is_boolean());
     REQUIRE(assumption.is_false());
   }
 }

@@ -193,8 +193,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       const auto width = to_c_bit_field_type(it->type()).get_width();
       bit_field_bits += width;
     }
-    else if(
-      it->type().id() == ID_bool && underlying_bits == config.ansi_c.char_width)
+    else if(it->is_boolean() && underlying_bits == config.ansi_c.char_width)
     {
       ++bit_field_bits;
     }
@@ -242,7 +241,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
         const auto width = to_c_bit_field_type(it->type()).get_width();
         bit_field_bits += width;
       }
-      else if(it->type().id() == ID_bool)
+      else if(it->is_boolean())
       {
         underlying_bits = config.ansi_c.char_width;
         ++bit_field_bits;
@@ -304,7 +303,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         const std::size_t width = to_c_bit_field_type(it->type()).get_width();
         bit_field_bits+=width;
       }
-      else if(it->type().id() == ID_bool)
+      else if(it->is_boolean())
       {
         ++bit_field_bits;
       }

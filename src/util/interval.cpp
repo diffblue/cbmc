@@ -221,7 +221,7 @@ tvt constant_interval_exprt::is_definitely_true() const
 
 tvt constant_interval_exprt::is_definitely_false() const
 {
-  if(type().id() == ID_bool)
+  if(is_boolean())
   {
     if(is_single_value_interval())
     {
@@ -252,8 +252,8 @@ tvt constant_interval_exprt::is_definitely_false() const
 
 tvt constant_interval_exprt::logical_or(const constant_interval_exprt &o) const
 {
-  PRECONDITION(type().id() == ID_bool);
-  PRECONDITION(o.type().id() == ID_bool);
+  PRECONDITION(is_boolean());
+  PRECONDITION(o.is_boolean());
 
   tvt a = is_definitely_true();
   tvt b = o.is_definitely_true();
@@ -263,16 +263,16 @@ tvt constant_interval_exprt::logical_or(const constant_interval_exprt &o) const
 
 tvt constant_interval_exprt::logical_and(const constant_interval_exprt &o) const
 {
-  PRECONDITION(type().id() == ID_bool);
-  PRECONDITION(o.type().id() == ID_bool);
+  PRECONDITION(is_boolean());
+  PRECONDITION(o.is_boolean());
 
   return (is_definitely_true() && o.is_definitely_true());
 }
 
 tvt constant_interval_exprt::logical_xor(const constant_interval_exprt &o) const
 {
-  PRECONDITION(type().id() == ID_bool);
-  PRECONDITION(o.type().id() == ID_bool);
+  PRECONDITION(is_boolean());
+  PRECONDITION(o.is_boolean());
 
   return (
     (is_definitely_true() && !o.is_definitely_true()) ||
@@ -281,7 +281,7 @@ tvt constant_interval_exprt::logical_xor(const constant_interval_exprt &o) const
 
 tvt constant_interval_exprt::logical_not() const
 {
-  PRECONDITION(type().id() == ID_bool);
+  PRECONDITION(is_boolean());
 
   if(is_definitely_true().is_true())
   {
@@ -1623,7 +1623,7 @@ constant_interval_exprt::unary_minus(const constant_interval_exprt &a)
 constant_interval_exprt
 constant_interval_exprt::typecast(const typet &type) const
 {
-  if(this->type().id() == ID_bool && is_int(type))
+  if(is_boolean() && is_int(type))
   {
     bool lower = !has_no_lower_bound() && get_lower().is_true();
     bool upper = has_no_upper_bound() || get_upper().is_true();

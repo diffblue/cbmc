@@ -51,11 +51,10 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   // Now assign
   for(const auto &binding : make_range(fresh_variables).zip(converted_values))
   {
-    bool is_boolean = binding.first.type().id() == ID_bool;
     const auto &identifier = binding.first.get_identifier();
 
     // make the symbol visible
-    if(is_boolean)
+    if(binding.first.is_boolean())
     {
       DATA_INVARIANT(binding.second.size() == 1, "boolean values have one bit");
       symbols[identifier] = binding.second[0];

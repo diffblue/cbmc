@@ -278,7 +278,7 @@ exprt boolbvt::bv_get(const bvt &bv, const typet &type) const
 
 exprt boolbvt::bv_get_cache(const exprt &expr) const
 {
-  if(expr.type().id()==ID_bool) // boolean?
+  if(expr.is_boolean())
     return get(expr);
 
   // look up literals in cache
