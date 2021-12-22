@@ -252,7 +252,7 @@ public:
     // simplifies to a plain constant.
     return lvalue.id() == ID_string_constant || lvalue.id() == ID_null_object ||
            lvalue.id() == "zero_string" || lvalue.id() == "is_zero_string" ||
-           lvalue.id() == "zero_string_length" || lvalue.id() == ID_constant ||
+           lvalue.id() == "zero_string_length" || lvalue.is_constant() ||
            lvalue.id() == ID_array;
   }
 

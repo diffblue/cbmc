@@ -310,7 +310,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   const exprt this_va_list_expr = target->assign_lhs();
   const exprt &r = skip_typecast(target->assign_rhs());
 
-  if(r.id() == ID_constant && is_null_pointer(to_constant_expr(r)))
+  if(r.is_constant() && is_null_pointer(to_constant_expr(r)))
   {
     code_function_callt f(
       symbol_exprt("va_end", code_typet({}, empty_typet())),
@@ -1901,7 +1901,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   else if(expr.id()==ID_isnan ||
           expr.id()==ID_sign)
     system_headers.insert("math.h");
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     if(expr.type().id()==ID_floatbv)
     {

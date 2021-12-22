@@ -148,7 +148,7 @@ interval_from_x_gt_value(const exprt &value)
 static inline bool represents_interval(const exprt &expr)
 {
   const exprt &e = skip_typecast(expr);
-  return (e.id() == ID_constant_interval || e.id() == ID_constant);
+  return (e.id() == ID_constant_interval || e.is_constant());
 }
 
 static inline constant_interval_exprt make_interval_expr(const exprt &expr)
@@ -159,7 +159,7 @@ static inline constant_interval_exprt make_interval_expr(const exprt &expr)
   {
     return to_constant_interval_expr(e);
   }
-  else if(e.id() == ID_constant)
+  else if(e.is_constant())
   {
     return constant_interval_exprt(e, e);
   }
@@ -201,8 +201,8 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
   PRECONDITION(
     relation == ID_le || relation == ID_lt || relation == ID_ge ||
     relation == ID_gt || relation == ID_equal);
-  PRECONDITION(lhs.id() == ID_constant || lhs.id() == ID_symbol);
-  PRECONDITION(rhs.id() == ID_constant || rhs.id() == ID_symbol);
+  PRECONDITION(lhs.is_constant() || lhs.id() == ID_symbol);
+  PRECONDITION(rhs.is_constant() || rhs.id() == ID_symbol);
   PRECONDITION(lhs.id() != rhs.id());
 
   const auto the_constant_part_of_the_relation =
@@ -334,8 +334,7 @@ void interval_abstract_valuet::output(
     else
     {
       INVARIANT(
-        interval.get_lower().id() == ID_constant,
-        "We only support constant limits");
+        interval.get_lower().is_constant(), "We only support constant limits");
       lower_string =
         id2string(to_constant_expr(interval.get_lower()).get_value());
     }
@@ -347,8 +346,7 @@ void interval_abstract_valuet::output(
     else
     {
       INVARIANT(
-        interval.get_upper().id() == ID_constant,
-        "We only support constant limits");
+        interval.get_upper().is_constant(), "We only support constant limits");
       upper_string =
         id2string(to_constant_expr(interval.get_upper()).get_value());
     }

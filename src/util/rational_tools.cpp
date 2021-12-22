@@ -26,7 +26,7 @@ static mp_integer power10(size_t i)
 
 bool to_rational(const exprt &expr, rationalt &rational_value)
 {
-  if(expr.id()!=ID_constant)
+  if(!expr.is_constant())
     return true;
 
   const std::string &value=expr.get_string(ID_value);

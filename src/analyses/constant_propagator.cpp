@@ -777,7 +777,7 @@ void constant_propagator_ait::replace(
 
       if(!constant_propagator_domaint::partial_evaluate(d.values, rhs, ns))
       {
-        if(rhs.id() == ID_constant)
+        if(rhs.is_constant())
           rhs.add_source_location() = it->assign_lhs().source_location();
       }
     }

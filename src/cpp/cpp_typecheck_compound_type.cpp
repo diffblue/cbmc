@@ -546,7 +546,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       component.type().set(ID_C_virtual_name, virtual_name);
 
       // Check if it is a pure virtual method
-      if(value.is_not_nil() && value.id() == ID_constant)
+      if(value.is_not_nil() && value.is_constant())
       {
         mp_integer i;
         to_integer(to_constant_expr(value), i);

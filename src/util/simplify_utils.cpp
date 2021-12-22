@@ -416,7 +416,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
   // extract bits from lowest to highest memory address
   const typet &type = expr.type();
 
-  if(expr.id() == ID_constant)
+  if(expr.is_constant())
   {
     const auto &value = to_constant_expr(expr).get_value();
 

@@ -135,7 +135,7 @@ exprt field_sensitivityt::apply(
 
     if(
       is_ssa_expr(index.array()) && index.array().type().id() == ID_array &&
-      index.index().id() == ID_constant)
+      index.index().is_constant())
     {
       // place the entire index expression, not just the array operand, in an
       // SSA expression
@@ -157,11 +157,11 @@ exprt field_sensitivityt::apply(
       }
 
       if(
-        l2_size.id() == ID_constant &&
+        l2_size.is_constant() &&
         numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
           max_field_sensitivity_array_size)
       {
-        if(l2_index.get().id() == ID_constant)
+        if(l2_index.get().is_constant())
         {
           // place the entire index expression, not just the array operand,
           // in an SSA expression
@@ -238,7 +238,7 @@ exprt field_sensitivityt::get_fields(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     ssa_expr.type().id() == ID_array &&
-    to_array_type(ssa_expr.type()).size().id() == ID_constant)
+    to_array_type(ssa_expr.type()).size().is_constant())
   {
     const mp_integer mp_array_size = numeric_cast_v<mp_integer>(
       to_constant_expr(to_array_type(ssa_expr.type()).size()));
@@ -496,7 +496,7 @@ bool field_sensitivityt::is_divisible(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   if(
     expr.type().id() == ID_array &&
-    to_array_type(expr.type()).size().id() == ID_constant &&
+    to_array_type(expr.type()).size().is_constant() &&
     numeric_cast_v<mp_integer>(to_constant_expr(
       to_array_type(expr.type()).size())) <= max_field_sensitivity_array_size)
   {

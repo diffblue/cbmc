@@ -39,8 +39,7 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
       if(y.id()!=ID_ge)
         continue;
       const auto &y_binary = to_binary_relation_expr(y);
-      if(
-        expr_eq(var_expr, y_binary.lhs()) && y_binary.rhs().id() == ID_constant)
+      if(expr_eq(var_expr, y_binary.lhs()) && y_binary.rhs().is_constant())
       {
         return to_constant_expr(y_binary.rhs());
       }
@@ -60,8 +59,7 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
       if(x.id()!=ID_ge)
         continue;
       const auto &x_binary = to_binary_relation_expr(x);
-      if(
-        expr_eq(var_expr, x_binary.lhs()) && x_binary.rhs().id() == ID_constant)
+      if(expr_eq(var_expr, x_binary.lhs()) && x_binary.rhs().is_constant())
       {
         return to_constant_expr(x_binary.rhs());
       }
@@ -90,8 +88,7 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
       if(x.id()!=ID_ge)
         continue;
       const auto &x_binary = to_binary_relation_expr(x);
-      if(
-        expr_eq(var_expr, x_binary.lhs()) && x_binary.rhs().id() == ID_constant)
+      if(expr_eq(var_expr, x_binary.lhs()) && x_binary.rhs().is_constant())
       {
         const constant_exprt &over_expr = to_constant_expr(x_binary.rhs());
 
@@ -121,8 +118,7 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
       if(y.id()!=ID_ge)
         continue;
       const auto &y_binary = to_binary_relation_expr(y);
-      if(
-        expr_eq(var_expr, y_binary.lhs()) && y_binary.rhs().id() == ID_constant)
+      if(expr_eq(var_expr, y_binary.lhs()) && y_binary.rhs().is_constant())
       {
         const constant_exprt &over_expr = to_constant_expr(y_binary.rhs());
         mp_integer over_i = numeric_cast_v<mp_integer>(over_expr);

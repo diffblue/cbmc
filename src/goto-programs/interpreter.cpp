@@ -488,7 +488,7 @@ exprt interpretert::get_value(
     const exprt &size_expr = to_array_type(type).size();
     mp_integer subtype_size = get_size(to_array_type(type).element_type());
     mp_integer count;
-    if(size_expr.id()!=ID_constant)
+    if(!size_expr.is_constant())
     {
       count=base_address_to_actual_size(offset)/subtype_size;
     }

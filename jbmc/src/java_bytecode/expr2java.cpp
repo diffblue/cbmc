@@ -427,7 +427,7 @@ std::string expr2javat::convert_with_precedence(
   {
     return '"' + MetaString(id2string(literal->value())) + '"';
   }
-  else if(src.id()==ID_constant)
+  else if(src.is_constant())
     return convert_constant(to_constant_expr(src), precedence=16);
   else
     return expr2ct::convert_with_precedence(src, precedence);

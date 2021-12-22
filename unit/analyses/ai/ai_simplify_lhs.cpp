@@ -98,7 +98,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
     REQUIRE_FALSE(compile_failed);
     REQUIRE(simplifiable_expression.id()==ID_plus);
     exprt simplified_version=simplify_expr(simplifiable_expression, ns);
-    REQUIRE(simplified_version.id()==ID_constant);
+    REQUIRE(simplified_version.is_constant());
 
     WHEN(
       "Simplifying an index expression with constant index but variable array")
@@ -115,7 +115,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
         REQUIRE(index_expr.id()==ID_index);
 
         index_exprt simplified_index_expr=to_index_expr(out_expr);
-        REQUIRE(simplified_index_expr.index().id()==ID_constant);
+        REQUIRE(simplified_index_expr.index().is_constant());
 
         constant_exprt constant_index=
           to_constant_expr(simplified_index_expr.index());
@@ -171,7 +171,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
         REQUIRE(out_expr.id()==ID_index);
 
         index_exprt simplified_index_expr=to_index_expr(out_expr);
-        REQUIRE(simplified_index_expr.index().id()==ID_constant);
+        REQUIRE(simplified_index_expr.index().is_constant());
 
         constant_exprt constant_index=
           to_constant_expr(simplified_index_expr.index());

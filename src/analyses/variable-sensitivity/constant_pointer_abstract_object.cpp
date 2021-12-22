@@ -181,7 +181,7 @@ void constant_pointer_abstract_objectt::output(
         {
           auto const &array_symbol = to_symbol_expr(array);
           out << array_symbol.get_identifier() << "[";
-          if(array_index.index().id() == ID_constant)
+          if(array_index.index().is_constant())
             out << to_constant_expr(array_index.index()).get_value();
           else
             out << "?";

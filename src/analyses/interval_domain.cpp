@@ -272,7 +272,7 @@ void interval_domaint::assume_rec(
             << from_expr(rhs) << "\n";
   #endif
 
-  if(lhs.id()==ID_symbol && rhs.id()==ID_constant)
+  if(lhs.id() == ID_symbol && rhs.is_constant())
   {
     irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
 
@@ -297,7 +297,7 @@ void interval_domaint::assume_rec(
         make_bottom();
     }
   }
-  else if(lhs.id()==ID_constant && rhs.id()==ID_symbol)
+  else if(lhs.is_constant() && rhs.id() == ID_symbol)
   {
     irep_idt rhs_identifier=to_symbol_expr(rhs).get_identifier();
 

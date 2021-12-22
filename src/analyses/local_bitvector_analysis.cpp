@@ -113,7 +113,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   const exprt &rhs,
   points_tot &loc_info_src)
 {
-  if(rhs.id()==ID_constant)
+  if(rhs.is_constant())
   {
     if(rhs.is_zero())
       return flagst::mk_null();

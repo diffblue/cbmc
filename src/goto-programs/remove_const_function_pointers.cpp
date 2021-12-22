@@ -168,7 +168,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
       resolved=false;
     }
   }
-  else if(simplified_expr.id()==ID_constant)
+  else if(simplified_expr.is_constant())
   {
     if(simplified_expr.is_zero())
     {
@@ -470,8 +470,9 @@ bool remove_const_function_pointerst::try_resolve_index_value(
   bool resolved=try_resolve_expression(expr, index_value_expressions, is_const);
   if(resolved)
   {
-    if(index_value_expressions.size()==1 &&
-       index_value_expressions.front().id()==ID_constant)
+    if(
+      index_value_expressions.size() == 1 &&
+      index_value_expressions.front().is_constant())
     {
       const constant_exprt &constant_expr=
         to_constant_expr(index_value_expressions.front());

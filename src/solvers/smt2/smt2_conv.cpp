@@ -701,10 +701,9 @@ void smt2_convt::convert_address_of_rec(
   const exprt &expr,
   const pointer_typet &result_type)
 {
-  if(expr.id()==ID_symbol ||
-     expr.id()==ID_constant ||
-     expr.id()==ID_string_constant ||
-     expr.id()==ID_label)
+  if(
+    expr.id() == ID_symbol || expr.is_constant() ||
+    expr.id() == ID_string_constant || expr.id() == ID_label)
   {
     out
       << "(concat (_ bv"
@@ -1133,7 +1132,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_union(to_union_expr(expr));
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     convert_constant(to_constant_expr(expr));
   }
@@ -3262,7 +3261,7 @@ void smt2_convt::flatten_array(const exprt &expr)
 {
   const array_typet &array_type = to_array_type(expr.type());
   const auto &size_expr = array_type.size();
-  PRECONDITION(size_expr.id() == ID_constant);
+  PRECONDITION(size_expr.is_constant());
 
   mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
   CHECK_RETURN_WITH_DIAGNOSTICS(size != 0, "can't convert zero-sized array");
@@ -3809,7 +3808,7 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
    * the macros from fenv.h to avoid portability problems.
    */
 
-  if(expr.id()==ID_constant)
+  if(expr.is_constant())
   {
     const constant_exprt &cexpr=to_constant_expr(expr);
 

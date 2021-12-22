@@ -2975,7 +2975,7 @@ public:
 template <>
 inline bool can_cast_expr<constant_exprt>(const exprt &base)
 {
-  return base.id() == ID_constant;
+  return base.is_constant();
 }
 
 inline void validate_expr(const constant_exprt &value)
@@ -2991,14 +2991,14 @@ inline void validate_expr(const constant_exprt &value)
 /// \return Object of type \ref constant_exprt
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
-  PRECONDITION(expr.id()==ID_constant);
+  PRECONDITION(expr.is_constant());
   return static_cast<const constant_exprt &>(expr);
 }
 
 /// \copydoc to_constant_expr(const exprt &)
 inline constant_exprt &to_constant_expr(exprt &expr)
 {
-  PRECONDITION(expr.id()==ID_constant);
+  PRECONDITION(expr.is_constant());
   return static_cast<constant_exprt &>(expr);
 }
 

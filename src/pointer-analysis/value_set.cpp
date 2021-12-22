@@ -1389,8 +1389,7 @@ void value_sett::assign(
           is_simplified,
           add_to_sets);
       }
-      else if(rhs.id()==ID_array ||
-              rhs.id()==ID_constant)
+      else if(rhs.id() == ID_array || rhs.is_constant())
       {
         for(const auto &op : rhs.operands())
         {

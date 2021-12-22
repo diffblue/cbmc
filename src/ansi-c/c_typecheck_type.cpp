@@ -1248,8 +1248,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       else if(tmp_v.is_false())
         value=0;
       else if(
-        tmp_v.id() == ID_constant &&
-        !to_integer(to_constant_expr(tmp_v), value))
+        tmp_v.is_constant() && !to_integer(to_constant_expr(tmp_v), value))
       {
       }
       else

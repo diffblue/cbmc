@@ -360,7 +360,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
 
       if(
         constant && symbol.value.is_not_nil() && is_number(symbol.type) &&
-        symbol.value.id() == ID_constant)
+        symbol.value.is_constant())
       {
         e=symbol.value;
       }

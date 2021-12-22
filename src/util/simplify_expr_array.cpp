@@ -106,8 +106,7 @@ simplify_exprt::simplify_index(const index_exprt &expr)
     }
   }
   else if(
-    array.id() == ID_constant || array.id() == ID_array ||
-    array.id() == ID_vector)
+    array.is_constant() || array.id() == ID_array || array.id() == ID_vector)
   {
     const auto i = numeric_cast<mp_integer>(index);
 

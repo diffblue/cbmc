@@ -975,7 +975,7 @@ static exprt unpack_rec(
       ns,
       unpack_byte_array);
   }
-  else if(src.id() == ID_constant && src.type().id() == ID_string)
+  else if(src.is_constant() && src.type().id() == ID_string)
   {
     return unpack_rec(
       string_constantt(to_constant_expr(src).get_value()).to_array_expr(),

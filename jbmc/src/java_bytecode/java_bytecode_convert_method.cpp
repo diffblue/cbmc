@@ -1447,8 +1447,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     {
       CHECK_RETURN(results.size() == 1);
       DATA_INVARIANT(
-        arg0.id()==ID_constant,
-        "ipush argument expected to be constant");
+        arg0.is_constant(), "ipush argument expected to be constant");
       results[0] = typecast_exprt::conditional_cast(arg0, java_int_type());
     }
     else if(bytecode == patternt("if_?cmp??"))

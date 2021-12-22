@@ -162,7 +162,7 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_symbol)
     typecheck_symbol_expr(to_symbol_expr(expr));
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
   }
   else

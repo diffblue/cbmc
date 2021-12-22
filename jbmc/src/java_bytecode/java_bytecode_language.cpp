@@ -581,7 +581,7 @@ static exprt get_ldc_result(
   else
   {
     INVARIANT(
-      ldc_arg0.id() == ID_constant,
+      ldc_arg0.is_constant(),
       "ldc argument should be constant, string literal or class literal");
     return ldc_arg0;
   }

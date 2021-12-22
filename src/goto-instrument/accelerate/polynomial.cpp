@@ -136,7 +136,7 @@ void polynomialt::from_expr(const exprt &expr)
       mult(poly2);
     }
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     monomialt monomial;
     monomial.coeff = numeric_cast_v<int>(to_constant_expr(expr));

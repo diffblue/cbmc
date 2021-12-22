@@ -38,7 +38,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 
   exprt simp=simplify_expr(p_o, ns);
 
-  REQUIRE(simp.id()==ID_constant);
+  REQUIRE(simp.is_constant());
   const mp_integer offset_value =
     numeric_cast_v<mp_integer>(to_constant_expr(simp));
   REQUIRE(offset_value==1);
@@ -59,7 +59,7 @@ TEST_CASE("Simplify const pointer offset", "[core][util]")
 
   exprt simp=simplify_expr(p_o, ns);
 
-  REQUIRE(simp.id()==ID_constant);
+  REQUIRE(simp.is_constant());
   const mp_integer offset_value =
     numeric_cast_v<mp_integer>(to_constant_expr(simp));
   REQUIRE(offset_value==1234);

@@ -376,7 +376,7 @@ simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
 
     return changed(simplify_plus(new_expr));
   }
-  else if(ptr.id()==ID_constant)
+  else if(ptr.is_constant())
   {
     const constant_exprt &c_ptr = to_constant_expr(ptr);
 
@@ -499,7 +499,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
         return unchanged(expr);
       }
     }
-    else if(op.id() != ID_constant || !op.is_zero())
+    else if(!op.is_constant() || !op.is_zero())
     {
       return unchanged(expr);
     }
@@ -580,7 +580,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
   }
 
   // NULL is not dynamic
-  if(op.id() == ID_constant && is_null_pointer(to_constant_expr(op)))
+  if(op.is_constant() && is_null_pointer(to_constant_expr(op)))
     return false_exprt();
 
   // &something depends on the something
@@ -628,7 +628,7 @@ simplify_exprt::simplify_is_invalid_pointer(const unary_exprt &expr)
   }
 
   // NULL is not invalid
-  if(op.id() == ID_constant && is_null_pointer(to_constant_expr(op)))
+  if(op.is_constant() && is_null_pointer(to_constant_expr(op)))
   {
     return false_exprt();
   }

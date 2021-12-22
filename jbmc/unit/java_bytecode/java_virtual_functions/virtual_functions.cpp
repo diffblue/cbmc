@@ -22,7 +22,7 @@ void check_function_call(
   const irep_idt &function_name,
   const goto_programt::targetst &targets)
 {
-  REQUIRE(eq_expr.op0().id() == ID_constant);
+  REQUIRE(eq_expr.op0().is_constant());
   REQUIRE(eq_expr.op0().type().id() == ID_string);
   REQUIRE(to_constant_expr(eq_expr.op0()).get_value() == class_name);
 
@@ -99,8 +99,9 @@ SCENARIO(
                   equal_exprt eq_expr1 =
                     to_equal_expr(disjunction.op1());
 
-                  if(eq_expr0.op0().id() == ID_constant &&
-                     to_constant_expr(eq_expr0.op0()).get_value() == "java::O")
+                  if(
+                    eq_expr0.op0().is_constant() &&
+                    to_constant_expr(eq_expr0.op0()).get_value() == "java::O")
                   {
                     // Allow either order of the D and O comparisons:
                     std::swap(eq_expr0, eq_expr1);

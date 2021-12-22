@@ -990,7 +990,7 @@ simplify_exprt::simplify_shifts(const shift_exprt &expr)
 
   if(
     !value.has_value() && expr.op().type().id() == ID_bv &&
-    expr.op().id() == ID_constant)
+    expr.op().is_constant())
   {
     const std::size_t width = to_bitvector_type(expr.op().type()).get_width();
     value =
@@ -1223,7 +1223,7 @@ simplify_exprt::simplify_unary_minus(const unary_minus_exprt &expr)
 
     return to_unary_minus_expr(operand).op();
   }
-  else if(operand.id()==ID_constant)
+  else if(operand.is_constant())
   {
     const irep_idt &type_id=expr.type().id();
     const auto &constant_expr = to_constant_expr(operand);
@@ -1279,7 +1279,7 @@ simplify_exprt::simplify_bitnot(const bitnot_exprt &expr)
 
     if(op.type() == type)
     {
-      if(op.id()==ID_constant)
+      if(op.is_constant())
       {
         const auto &value = to_constant_expr(op).get_value();
         const auto new_value =
