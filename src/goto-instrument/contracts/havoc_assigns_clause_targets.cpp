@@ -15,9 +15,12 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <langapi/language_util.h>
 
+#include <ansi-c/c_expr.h>
+
 #include <util/c_types.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -71,6 +74,7 @@ static exprt build_address_of(
 
     return address_of_exprt{target};
   }
+
   UNREACHABLE;
 }
 
@@ -78,18 +82,20 @@ static exprt build_address_of(
 /// of `target_pointer` into `target_snapshot_var`.
 ///
 /// ```
-/// DECL target_valid_var : bool
-/// DECL target_snapshot_var : <target_pointer.type()>
-/// ASSIGN target_valid_var := <all_dereferences_valid(target_pointer)>
-/// ASSIGN target_snapshot_var := NULL
-/// IF !target_valid_var GOTO skip_target
+/// DECL target_valid_var : bool;
+/// DECL target_snapshot_var : <target_pointer.type()>;
+/// ASSIGN target_valid_var := <condition> &
+///                            <all_dereferences_valid(target_pointer)>;
+/// ASSIGN target_snapshot_var := NULL;
+/// IF !target_valid_var GOTO skip_target;
 /// ASSIGN target_snapshot_var := target_pointer;
-/// skip_target: SKIP
+/// skip_target: SKIP;
 /// ```
 ///
 static void snapshot_if_valid(
   const symbol_exprt &target_valid_var,
   const symbol_exprt &target_snapshot_var,
+  const exprt &condition,
   const exprt &target_pointer,
   goto_programt &dest,
   // context parameters
@@ -105,7 +111,7 @@ static void snapshot_if_valid(
 
   dest.add(goto_programt::make_assignment(
     target_valid_var,
-    all_dereferences_are_valid(target_pointer, ns),
+    and_exprt{condition, all_dereferences_are_valid(target_pointer, ns)},
     source_location_no_checks));
 
   dest.add(goto_programt::make_assignment(
@@ -196,6 +202,53 @@ static void havoc_if_valid(
     goto_programt::make_dead(target_snapshot_var, source_location_no_checks));
 }
 
+void havoc_single_target(
+  const exprt &condition,
+  const exprt &target,
+  const source_locationt &source_location,
+  const irep_idt &replaced_function_id,
+  goto_programt &snapshot_program,
+  goto_programt &havoc_program,
+  const namespacet &ns,
+  symbol_tablet &st,
+  irep_idt mode)
+{
+  const auto target_pointer = build_address_of(target, ns);
+  const auto target_snapshot_var = new_tmp_symbol(
+                                     target_pointer.type(),
+                                     source_location,
+                                     mode,
+                                     st,
+                                     "__target_snapshot_var",
+                                     true)
+                                     .symbol_expr();
+  const auto target_valid_var =
+    new_tmp_symbol(
+      bool_typet(), source_location, mode, st, "__target_valid_var", true)
+      .symbol_expr();
+
+  snapshot_if_valid(
+    target_valid_var,
+    target_snapshot_var,
+    condition,
+    target_pointer,
+    snapshot_program,
+    source_location,
+    ns);
+
+  const auto &tracking_comment =
+    make_tracking_comment(target, replaced_function_id, ns);
+
+  havoc_if_valid(
+    target_valid_var,
+    target_snapshot_var,
+    target,
+    tracking_comment,
+    havoc_program,
+    source_location,
+    ns);
+}
+
 void havoc_assigns_clause_targets(
   const irep_idt &replaced_function_id,
   const std::vector<exprt> &targets,
@@ -204,45 +257,52 @@ void havoc_assigns_clause_targets(
   const source_locationt &source_location,
   const irep_idt &mode,
   namespacet &ns,
-  symbol_tablet &st)
+  symbol_tablet &st,
+  message_handlert &message_handler)
 {
   goto_programt snapshot_program;
   goto_programt havoc_program;
 
   for(const auto &target : targets)
   {
-    const auto &tracking_comment =
-      make_tracking_comment(target, replaced_function_id, ns);
+    if(can_cast_expr<conditional_target_group_exprt>(target))
+    {
+      const auto &cond_target = to_conditional_target_group_expr(target);
 
-    const auto target_pointer = build_address_of(target, ns);
-    const auto target_snapshot_var = new_tmp_symbol(
-                                       target_pointer.type(),
-                                       source_location,
-                                       mode,
-                                       st,
-                                       "__target_snapshot_var",
-                                       true)
-                                       .symbol_expr();
-    const auto target_valid_var =
-      new_tmp_symbol(
-        bool_typet(), source_location, mode, st, "__target_valid_var", true)
-        .symbol_expr();
+      // clean the condition if needed
+      cleanert cleaner(st, message_handler);
+      exprt condition(cond_target.condition());
+      if(has_subexpr(condition, ID_side_effect))
+        cleaner.clean(condition, snapshot_program, mode);
 
-    snapshot_if_valid(
-      target_valid_var,
-      target_snapshot_var,
-      target_pointer,
-      snapshot_program,
-      source_location,
-      ns);
-    havoc_if_valid(
-      target_valid_var,
-      target_snapshot_var,
-      target,
-      tracking_comment,
-      havoc_program,
-      source_location,
-      ns);
+      for(const auto &actual_target : cond_target.targets())
+      {
+        havoc_single_target(
+          condition,
+          actual_target,
+          source_location,
+          replaced_function_id,
+          snapshot_program,
+          havoc_program,
+          ns,
+          st,
+          mode);
+      }
+    }
+    else
+    {
+      // nonconditional target
+      havoc_single_target(
+        true_exprt{},
+        target,
+        source_location,
+        replaced_function_id,
+        snapshot_program,
+        havoc_program,
+        ns,
+        st,
+        mode);
+    }
   }
 
   dest.destructive_append(snapshot_program);

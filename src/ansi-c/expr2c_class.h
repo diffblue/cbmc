@@ -275,6 +275,8 @@ protected:
     const exprt &src,
     unsigned &precedence,
     bool include_padding_components);
+
+  std::string convert_conditional_target_group(const exprt &src);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

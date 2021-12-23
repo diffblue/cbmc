@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^.*error: assigns clause target must be an lvalue or __CPROVER_POINTER_OBJECT expression$
+^CONVERSION ERROR
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that non-lvalue targets are rejected from conditional targets.

@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-contract foo
+main.c function foo
+^\[foo\.\d+\] line 7 Check that \*x is assignable: SUCCESS$
+^\[foo\.\d+\] line 8 Check that \*y is assignable: FAILURE$
+^\[foo\.\d+\] line 12 Check that \*x is assignable: FAILURE$
+^\[foo\.\d+\] line 13 Check that \*y is assignable: SUCCESS$
+^\[foo\.\d+\] line 16 Check that \*x is assignable: FAILURE$
+^\[foo\.\d+\] line 17 Check that \*y is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Check that lvalue conditional assigns clause targets
+match with control flow path conditions.

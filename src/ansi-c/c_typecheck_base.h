@@ -147,6 +147,8 @@ protected:
 
   // contracts
   virtual void typecheck_spec_assigns(exprt::operandst &targets);
+  virtual void typecheck_spec_assigns_condition(exprt &condition);
+  virtual void typecheck_spec_assigns_target(exprt &target);
   virtual void typecheck_spec_loop_invariant(codet &code);
   virtual void typecheck_spec_decreases(codet &code);
 

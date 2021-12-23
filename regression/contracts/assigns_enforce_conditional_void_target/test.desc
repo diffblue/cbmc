@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^.* error: void-typed expressions not allowed as assigns clause targets$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that void-typed expressions are rejected from conditional targets.

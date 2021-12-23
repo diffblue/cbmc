@@ -3,7 +3,7 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: non-lvalue target in assigns clause$
+^.*error: assigns clause target must be an lvalue or __CPROVER_POINTER_OBJECT expression$
 ^CONVERSION ERROR$
 --
 --

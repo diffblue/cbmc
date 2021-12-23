@@ -225,4 +225,99 @@ to_history_expr(const exprt &expr, const irep_idt &id)
   return ret;
 }
 
+/// \brief A class for an expression that represents a conditional target or
+/// a list of targets sharing a common condition
+/// in an assigns clause.
+class conditional_target_group_exprt : public exprt
+{
+public:
+  explicit conditional_target_group_exprt(exprt _condition, exprt _target_list)
+    : exprt(ID_conditional_target_group, empty_typet{})
+  {
+    add_to_operands(std::move(_condition));
+    add_to_operands(std::move(_target_list));
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 2,
+      "conditional target expression must have two operands");
+
+    DATA_CHECK(
+      vm,
+      expr.operands()[1].id() == ID_expression_list,
+      "conditional target second operand must be an ID_expression_list "
+      "expression, found " +
+        id2string(expr.operands()[1].id()));
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
+  const exprt &condition() const
+  {
+    return op0();
+  }
+
+  exprt &condition()
+  {
+    return op0();
+  }
+
+  const exprt::operandst &targets() const
+  {
+    return op1().operands();
+  }
+
+  exprt::operandst &targets()
+  {
+    return op1().operands();
+  }
+};
+
+inline void validate_expr(const conditional_target_group_exprt &value)
+{
+  conditional_target_group_exprt::check(value);
+}
+
+template <>
+inline bool can_cast_expr<conditional_target_group_exprt>(const exprt &base)
+{
+  return base.id() == ID_conditional_target_group;
+}
+
+/// \brief Cast an exprt to a \ref conditional_target_group_exprt
+///
+/// \a expr must be known to be \ref conditional_target_group_exprt
+///
+/// \param expr: Source expression
+/// \return Object of type \ref conditional_target_group_exprt
+inline const conditional_target_group_exprt &
+to_conditional_target_group_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_conditional_target_group);
+  auto &ret = static_cast<const conditional_target_group_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_conditional_target_group_expr(const exprt &expr)
+inline conditional_target_group_exprt &
+to_conditional_target_group_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_conditional_target_group);
+  auto &ret = static_cast<conditional_target_group_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_ANSI_C_C_EXPR_H

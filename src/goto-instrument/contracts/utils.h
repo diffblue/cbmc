@@ -18,6 +18,7 @@ Date: September 2021
 
 #include <goto-instrument/havoc_utils.h>
 
+#include <goto-programs/goto_convert_class.h>
 #include <goto-programs/goto_model.h>
 
 #include <util/expr_cast.h>
@@ -204,6 +205,23 @@ private:
   goto_programt::targett target;
   const dirtyt dirty_analysis;
   const localst locals;
+};
+
+/// Allows to clean expressions of side effects.
+class cleanert : public goto_convertt
+{
+public:
+  cleanert(
+    symbol_table_baset &_symbol_table,
+    message_handlert &_message_handler)
+    : goto_convertt(_symbol_table, _message_handler)
+  {
+  }
+
+  void clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
+  {
+    goto_convertt::clean_expr(guard, dest, mode, true);
+  }
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

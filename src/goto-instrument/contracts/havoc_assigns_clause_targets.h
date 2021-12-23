@@ -17,6 +17,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 class namespacet;
 class symbol_tablet;
 class goto_programt;
+class message_handlert;
 
 /// Generates havocking instructions for target expressions of a
 /// function contract's assign clause (replacement).
@@ -29,6 +30,7 @@ class goto_programt;
 /// \param mode Language mode to use for newly generated symbols
 /// \param ns Namespace of the model
 /// \param st Symbol table of the model (new symbols will be added)
+/// \param message_handler handler used to log translation warnings/errors
 ///
 /// Assigns clause targets can be interdependent as shown in this example:
 ///
@@ -55,7 +57,8 @@ void havoc_assigns_clause_targets(
   const source_locationt &source_location,
   const irep_idt &mode,
   namespacet &ns,
-  symbol_tablet &st);
+  symbol_tablet &st,
+  message_handlert &message_handler);
 
 bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
 
