@@ -1,0 +1,11 @@
+CORE
+Linking7-main.c
+Linking7-module.c
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\*\* 1 of 3 failed
+line 21 assertion \*g\.a == 42: SUCCESS
+line 22 assertion \*g\.b == 41: FAILURE
+--
+^warning: ignoring

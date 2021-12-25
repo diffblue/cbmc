@@ -10,9 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// ANSI-C Linking
 
 #include "linking.h"
-
-#include <deque>
-#include <unordered_set>
+#include "linking_class.h"
 
 #include <util/c_types.h>
 #include <util/find_symbols.h>
@@ -20,11 +18,77 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
 
-#include "linking_class.h"
+#include <deque>
+
+bool casting_replace_symbolt::replace(exprt &dest) const
+{
+  bool result = true; // unchanged
+
+  // first look at type
+
+  const exprt &const_dest(dest);
+  if(have_to_replace(const_dest.type()))
+    if(!replace_symbolt::replace(dest.type()))
+      result = false;
+
+  // now do expression itself
+
+  if(!have_to_replace(dest))
+    return result;
+
+  if(dest.id() == ID_side_effect)
+  {
+    if(auto call = expr_try_dynamic_cast<side_effect_expr_function_callt>(dest))
+    {
+      if(!have_to_replace(call->function()))
+        return replace_symbolt::replace(dest);
+
+      exprt before = dest;
+      code_typet type = to_code_type(call->function().type());
+
+      result &= replace_symbolt::replace(call->function());
+
+      // maybe add type casts here?
+      for(auto &arg : call->arguments())
+        result &= replace_symbolt::replace(arg);
+
+      if(
+        type.return_type() !=
+        to_code_type(call->function().type()).return_type())
+      {
+        call->type() = to_code_type(call->function().type()).return_type();
+        dest = typecast_exprt(*call, type.return_type());
+        result = true;
+      }
+
+      return result;
+    }
+  }
+  else if(dest.id() == ID_address_of)
+  {
+    pointer_typet ptr_type = to_pointer_type(dest.type());
+
+    result &= replace_symbolt::replace(dest);
+
+    address_of_exprt address_of = to_address_of_expr(dest);
+    if(address_of.object().type() != ptr_type.base_type())
+    {
+      to_pointer_type(address_of.type()).base_type() =
+        address_of.object().type();
+      dest = typecast_exprt{address_of, std::move(ptr_type)};
+      result = true;
+    }
+
+    return result;
+  }
+
+  return replace_symbolt::replace(dest);
+}
 
 bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 {
@@ -35,7 +99,7 @@ bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 
   const exprt &e = it->second;
 
-  if(e.type().id() != ID_array)
+  if(e.type().id() != ID_array && e.type().id() != ID_code)
   {
     typet type = s.type();
     static_cast<exprt &>(s) = typecast_exprt::conditional_cast(e, type);
@@ -490,19 +554,9 @@ void linkingt::duplicate_code_symbol(
     const code_typet &old_t=to_code_type(old_symbol.type);
     const code_typet &new_t=to_code_type(new_symbol.type);
 
-    // if one of them was an implicit declaration then only conflicts on the
-    // return type are an error as we would end up with assignments with
-    // mismatching types; as we currently do not patch these by inserting type
-    // casts we need to fail hard
     if(old_symbol.type.get_bool(ID_C_incomplete) && old_symbol.value.is_nil())
     {
-      if(old_t.return_type() == new_t.return_type())
-        link_warning(old_symbol, new_symbol, "implicit function declaration");
-      else
-        link_error(
-          old_symbol,
-          new_symbol,
-          "implicit function declaration");
+      link_warning(old_symbol, new_symbol, "implicit function declaration");
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
@@ -511,24 +565,16 @@ void linkingt::duplicate_code_symbol(
     else if(
       new_symbol.type.get_bool(ID_C_incomplete) && new_symbol.value.is_nil())
     {
-      if(old_t.return_type() == new_t.return_type())
-        link_warning(
-          old_symbol,
-          new_symbol,
-          "ignoring conflicting implicit function declaration");
-      else
-        link_error(
-          old_symbol,
-          new_symbol,
-          "implicit function declaration");
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "ignoring conflicting implicit function declaration");
     }
     // handle (incomplete) function prototypes
-    else if(
-      old_t.return_type() == new_t.return_type() &&
-      ((old_t.parameters().empty() && old_t.has_ellipsis() &&
-        old_symbol.value.is_nil()) ||
-       (new_t.parameters().empty() && new_t.has_ellipsis() &&
-        new_symbol.value.is_nil())))
+    else if(((old_t.parameters().empty() && old_t.has_ellipsis() &&
+              old_symbol.value.is_nil()) ||
+             (new_t.parameters().empty() && new_t.has_ellipsis() &&
+              new_symbol.value.is_nil())))
     {
       if(old_t.parameters().empty() &&
          old_t.has_ellipsis() &&
@@ -578,9 +624,7 @@ void linkingt::duplicate_code_symbol(
     }
     // conflicting declarations without a definition, matching return
     // types
-    else if(
-      old_t.return_type() == new_t.return_type() && old_symbol.value.is_nil() &&
-      new_symbol.value.is_nil())
+    else if(old_symbol.value.is_nil() && new_symbol.value.is_nil())
     {
       link_warning(
         old_symbol,
@@ -620,8 +664,11 @@ void linkingt::duplicate_code_symbol(
       conflictst conflicts;
 
       if(old_t.return_type() != new_t.return_type())
-        conflicts.push_back(
-          std::make_pair(old_t.return_type(), new_t.return_type()));
+      {
+        link_warning(old_symbol, new_symbol, "conflicting return types");
+
+        conflicts.emplace_back(old_t.return_type(), new_t.return_type());
+      }
 
       code_typet::parameterst::const_iterator
         n_it=new_t.parameters().begin(),
@@ -671,21 +718,11 @@ void linkingt::duplicate_code_symbol(
         const typet &t1=follow_tags_symbols(ns, conflicts.front().first);
         const typet &t2=follow_tags_symbols(ns, conflicts.front().second);
 
-        // void vs. non-void return type may be acceptable if the
-        // return value is never used
-        if((t1.id()==ID_empty || t2.id()==ID_empty) &&
-           (old_symbol.value.is_nil() || new_symbol.value.is_nil()))
-        {
-          if(warn_msg.empty())
-            warn_msg="void/non-void return type conflict on function";
-          replace=
-            new_symbol.value.is_not_nil() ||
-            (old_symbol.value.is_nil() && t2.id()==ID_empty);
-        }
         // different pointer arguments without implementation may work
-        else if((t1.id()==ID_pointer || t2.id()==ID_pointer) &&
-                pointer_offset_bits(t1, ns)==pointer_offset_bits(t2, ns) &&
-                old_symbol.value.is_nil() && new_symbol.value.is_nil())
+        if(
+          (t1.id() == ID_pointer || t2.id() == ID_pointer) &&
+          pointer_offset_bits(t1, ns) == pointer_offset_bits(t2, ns) &&
+          old_symbol.value.is_nil() && new_symbol.value.is_nil())
         {
           if(warn_msg.empty())
             warn_msg="different pointer types in extern function";
@@ -788,6 +825,9 @@ void linkingt::duplicate_code_symbol(
         }
       }
     }
+
+    object_type_updates.insert(
+      old_symbol.symbol_expr(), old_symbol.symbol_expr());
   }
 
   if(!new_symbol.value.is_nil())
@@ -802,6 +842,11 @@ void linkingt::duplicate_code_symbol(
       old_symbol.is_weak=new_symbol.is_weak;
       old_symbol.location=new_symbol.location;
       old_symbol.is_macro=new_symbol.is_macro;
+
+      // replace any previous update
+      object_type_updates.erase(old_symbol.name);
+      object_type_updates.insert(
+        old_symbol.symbol_expr(), old_symbol.symbol_expr());
     }
     else if(to_code_type(old_symbol.type).get_inlined())
     {

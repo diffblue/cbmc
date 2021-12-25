@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE gcc-only
 fileA.c
 fileB.c --validate-goto-model
 ^EXIT=0$

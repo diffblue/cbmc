@@ -19,8 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/typecheck.h>
 
+#include <unordered_set>
+
 class casting_replace_symbolt : public replace_symbolt
 {
+public:
+  bool replace(exprt &dest) const override;
+
 private:
   bool replace_symbol_expr(symbol_exprt &dest) const override;
 };
