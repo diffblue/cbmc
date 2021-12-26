@@ -421,7 +421,7 @@ void linkingt::link_warning(
             << type_to_string_verbose(new_symbol) << eom;
 }
 
-irep_idt linkingt::rename(const irep_idt id)
+irep_idt linkingt::rename(const irep_idt &id)
 {
   unsigned cnt=0;
 
@@ -1313,14 +1313,15 @@ void linkingt::do_type_dependencies(
   }
 }
 
-void linkingt::rename_symbols(
+std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
   const std::unordered_set<irep_idt> &needs_to_be_renamed)
 {
+  std::unordered_map<irep_idt, irep_idt> new_identifiers;
   namespacet src_ns(src_symbol_table);
 
   for(const irep_idt &id : needs_to_be_renamed)
   {
-    symbolt &new_symbol = src_symbol_table.get_writeable_ref(id);
+    const symbolt &new_symbol = src_ns.lookup(id);
 
     irep_idt new_identifier;
 
@@ -1329,21 +1330,24 @@ void linkingt::rename_symbols(
     else
       new_identifier=rename(id);
 
-    new_symbol.name=new_identifier;
+    new_identifiers.emplace(id, new_identifier);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     debug() << "LINKING: renaming " << id << " to "
             << new_identifier << eom;
-    #endif
+#endif
 
     if(new_symbol.is_type)
       rename_symbol.insert_type(id, new_identifier);
     else
       rename_symbol.insert_expr(id, new_identifier);
   }
+
+  return new_identifiers;
 }
 
-void linkingt::copy_symbols()
+void linkingt::copy_symbols(
+  const std::unordered_map<irep_idt, irep_idt> &new_identifiers)
 {
   std::map<irep_idt, symbolt> src_symbols;
   // First apply the renaming
@@ -1353,7 +1357,10 @@ void linkingt::copy_symbols()
     // apply the renaming
     rename_symbol(symbol.type);
     rename_symbol(symbol.value);
-    // Add to vector
+    auto it = new_identifiers.find(named_symbol.first);
+    if(it != new_identifiers.end())
+      symbol.name = it->second;
+
     src_symbols.emplace(named_symbol.first, std::move(symbol));
   }
 
@@ -1435,15 +1442,15 @@ void linkingt::typecheck()
   do_type_dependencies(needs_to_be_renamed);
 
   // PHASE 2: actually rename them
-  rename_symbols(needs_to_be_renamed);
+  auto new_identifiers = rename_symbols(needs_to_be_renamed);
 
   // PHASE 3: copy new symbols to main table
-  copy_symbols();
+  copy_symbols(new_identifiers);
 }
 
 bool linking(
   symbol_tablet &dest_symbol_table,
-  symbol_tablet &new_symbol_table,
+  const symbol_tablet &new_symbol_table,
   message_handlert &message_handler)
 {
   linkingt linking(
