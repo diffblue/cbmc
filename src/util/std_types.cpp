@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_types.h"
 
+#include "c_types.h"
 #include "namespace.h"
 #include "std_expr.h"
 
@@ -26,6 +27,12 @@ void array_typet::check(const typet &type, const validation_modet vm)
       array_type.size() == nil_exprt{},
       "nil array size must be exactly nil");
   }
+}
+
+typet array_typet::index_type() const
+{
+  // we may wish to make the index type part of the array type
+  return ::index_type();
 }
 
 /// Return the sequence number of the component with given name.
@@ -234,6 +241,12 @@ vector_typet::vector_typet(const typet &_subtype, const constant_exprt &_size)
   : type_with_subtypet(ID_vector, _subtype)
 {
   size() = _size;
+}
+
+typet vector_typet::index_type() const
+{
+  // we may wish to make the index type part of the vector type
+  return ::index_type();
 }
 
 const constant_exprt &vector_typet::size() const

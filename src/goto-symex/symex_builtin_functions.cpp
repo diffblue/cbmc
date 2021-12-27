@@ -197,8 +197,8 @@ void goto_symext::symex_allocate(
   {
     const auto &array_type = to_array_type(*object_type);
     index_exprt index_expr(
-      value_symbol.symbol_expr(), from_integer(0, index_type()));
-    rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
+      value_symbol.symbol_expr(), from_integer(0, array_type.index_type()));
+    rhs = address_of_exprt(index_expr, pointer_type(array_type.element_type()));
   }
   else
   {
@@ -277,10 +277,11 @@ void goto_symext::symex_va_start(
       va_list_entry(parameter, to_pointer_type(lhs.type()), ns));
   }
   const std::size_t va_arg_size = va_arg_operands.size();
-  exprt array =
-    array_exprt{std::move(va_arg_operands),
-                array_typet{pointer_type(empty_typet{}),
-                            from_integer(va_arg_size, size_type())}};
+
+  const auto array_type = array_typet{pointer_type(empty_typet{}),
+                                      from_integer(va_arg_size, size_type())};
+
+  exprt array = array_exprt{std::move(va_arg_operands), array_type};
 
   symbolt &va_array = get_fresh_aux_symbol(
     array.type(),
@@ -296,8 +297,8 @@ void goto_symext::symex_va_start(
   do_simplify(array);
   symex_assign(state, va_array.symbol_expr(), std::move(array));
 
-  exprt rhs = address_of_exprt{
-    index_exprt{va_array.symbol_expr(), from_integer(0, index_type())}};
+  exprt rhs = address_of_exprt{index_exprt{
+    va_array.symbol_expr(), from_integer(0, array_type.index_type())}};
   rhs = state.rename(std::move(rhs), ns).get();
   symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 }
@@ -517,8 +518,9 @@ void goto_symext::symex_cpp_new(
 
   if(do_array)
   {
-    rhs.add_to_operands(
-      index_exprt(symbol.symbol_expr(), from_integer(0, index_type())));
+    rhs.add_to_operands(index_exprt(
+      symbol.symbol_expr(),
+      from_integer(0, to_array_type(symbol.type).index_type())));
   }
   else
     rhs.copy_to_operands(symbol.symbol_expr());

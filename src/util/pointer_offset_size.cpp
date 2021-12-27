@@ -675,7 +675,9 @@ optionalt<exprt> get_subexpression_at_offset(
       {
         return get_subexpression_at_offset(
           index_exprt(
-            expr, from_integer(offset_bytes / elem_size_bytes, index_type())),
+            expr,
+            from_integer(
+              offset_bytes / elem_size_bytes, array_type.index_type())),
           offset_inside_elem,
           target_type_raw,
           ns);

@@ -768,6 +768,17 @@ public:
     add(ID_size, std::move(_size));
   }
 
+  /// The type of the index expressions into any instance of this type.
+  typet index_type() const;
+
+  /// The type of the elements of the array.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  const typet &element_type() const
+  {
+    return subtype();
+  }
+
   const exprt &size() const
   {
     return static_cast<const exprt &>(find(ID_size));
@@ -975,6 +986,17 @@ class vector_typet:public type_with_subtypet
 {
 public:
   vector_typet(const typet &_subtype, const constant_exprt &_size);
+
+  /// The type of any index expression into an instance of this type.
+  typet index_type() const;
+
+  /// The type of the elements of the vector.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  const typet &element_type() const
+  {
+    return subtype();
+  }
 
   const constant_exprt &size() const;
   constant_exprt &size();

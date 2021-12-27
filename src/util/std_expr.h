@@ -1327,6 +1327,9 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
 class index_exprt:public binary_exprt
 {
 public:
+  // When _array has array_type, the type of _index
+  // must be array_type.index_type().
+  // This will eventually be enforced using a precondition.
   index_exprt(const exprt &_array, exprt _index)
     : binary_exprt(_array, ID_index, std::move(_index), _array.type().subtype())
   {
