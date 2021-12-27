@@ -412,3 +412,9 @@ those two options are used, CBMC will assume that `malloc` does not fail.
 Malloc may also fail for external reasons which are not modelled by CProver. If
 you want to replicate this behaviour use the option `--malloc-may-fail` in
 conjunction with one of the above modes of failure.
+
+These malloc failure options need to be set when the C library model is added to
+the program. Typically this is upon invoking CBMC, but if the user has chosen to
+do so via `goto-instrument --add-library`, then the malloc failure mode needs to
+be specified with that `goto-instrument` invocation, i.e., as an option to
+`goto-instrument`.

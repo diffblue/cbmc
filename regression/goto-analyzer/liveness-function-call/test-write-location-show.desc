@@ -3,7 +3,7 @@ main.c
 --variable-sensitivity --show
 ^EXIT=0$
 ^SIGNAL=0$
-globalX .* 0 @ \[27\]
+globalX .* 0 @ \[25\]
 globalX .* 1 @ \[0\]
 globalX .* TOP @ \[0, 3\]
 --

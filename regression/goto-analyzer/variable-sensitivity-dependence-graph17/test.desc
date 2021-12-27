@@ -4,5 +4,5 @@ main.c
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-\*\*\*\* 9 file .*main\.c line 22 function main\nControl dependencies: 36 \[UNCONDITIONAL\]\nData dependencies: 1 \[g_a\[\([^)]*\)i\]\], 2 \[g_a\[\([^)]*\)i\]\], 3 \[g_a\[\([^)]*\)i\]\], 7 \[g_a\[\([^)]*\)i\]\]
+\*\*\*\* 9 file .*main\.c line 22 function main\nControl dependencies: 34 \[UNCONDITIONAL\]\nData dependencies: 1 \[g_a\[\([^)]*\)i\]\], 2 \[g_a\[\([^)]*\)i\]\], 3 \[g_a\[\([^)]*\)i\]\], 7 \[g_a\[\([^)]*\)i\]\]
 --

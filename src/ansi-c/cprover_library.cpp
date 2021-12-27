@@ -21,6 +21,21 @@ static std::string get_cprover_library_text(
 {
   std::ostringstream library_text;
 
+  library_text << "#line 1 \"<built-in-additions>\"\n"
+                  "#define " CPROVER_PREFIX "malloc_failure_mode "
+               << std::to_string(config.ansi_c.malloc_failure_mode)
+               << "\n"
+                  "#define " CPROVER_PREFIX "malloc_failure_mode_return_null "
+               << std::to_string(config.ansi_c.malloc_failure_mode_return_null)
+               << "\n"
+                  "#define " CPROVER_PREFIX
+                  "malloc_failure_mode_assert_then_assume "
+               << std::to_string(
+                    config.ansi_c.malloc_failure_mode_assert_then_assume)
+               << "\n"
+                  "#define " CPROVER_PREFIX "malloc_may_fail "
+               << std::to_string(config.ansi_c.malloc_may_fail) << "\n";
+
   library_text <<
     "#line 1 \"<builtin-library>\"\n"
     "#undef inline\n";

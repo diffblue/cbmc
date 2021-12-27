@@ -721,10 +721,6 @@ int jbmc_parse_optionst::get_goto_program(
 
     goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
 
-    // if we added the ansi-c library models here this should also call
-    // add_malloc_may_fail_variable_initializations(goto_model);
-    // here
-
     if(cmdline.isset("validate-goto-model"))
     {
       goto_model.validate();
