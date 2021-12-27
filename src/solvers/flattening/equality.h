@@ -26,10 +26,12 @@ public:
 
   virtual literalt equality(const exprt &e1, const exprt &e2);
 
-  void post_process() override
+  using SUB = prop_conv_solvert;
+
+  void finish_eager_conversion() override
   {
     add_equality_constraints();
-    prop_conv_solvert::post_process();
+    SUB::finish_eager_conversion();
     typemap.clear(); // if called incrementally, don't do it twice
   }
 
@@ -50,6 +52,8 @@ protected:
   typemapt typemap;
 
   virtual literalt equality2(const exprt &e1, const exprt &e2);
+
+  // an eager conversion of the transitivity constraints
   virtual void add_equality_constraints();
   virtual void add_equality_constraints(const typestructt &typestruct);
 };

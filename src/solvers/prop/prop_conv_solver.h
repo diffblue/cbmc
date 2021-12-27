@@ -35,6 +35,9 @@ public:
 
   virtual ~prop_conv_solvert() = default;
 
+  // non-iterative eager conversion
+  virtual void finish_eager_conversion();
+
   // overloading from decision_proceduret
   decision_proceduret::resultt dec_solve() override;
   void print_assignment(std::ostream &out) const override;
@@ -99,8 +102,6 @@ public:
   void enable_hardness_collection() override;
 
 protected:
-  virtual void post_process();
-
   bool post_processing_done = false;
 
   /// Get a _boolean_ value from the model if the formula is satisfiable.

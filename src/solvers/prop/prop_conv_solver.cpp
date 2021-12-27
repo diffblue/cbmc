@@ -429,7 +429,7 @@ void prop_conv_solvert::ignoring(const exprt &expr)
   log.warning() << "warning: ignoring " << expr.pretty() << messaget::eom;
 }
 
-void prop_conv_solvert::post_process()
+void prop_conv_solvert::finish_eager_conversion()
 {
 }
 
@@ -441,7 +441,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
     const auto post_process_start = std::chrono::steady_clock::now();
 
     log.statistics() << "Post-processing" << messaget::eom;
-    post_process();
+    finish_eager_conversion();
     post_processing_done = true;
 
     const auto post_process_stop = std::chrono::steady_clock::now();

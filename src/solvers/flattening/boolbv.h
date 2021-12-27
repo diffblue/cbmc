@@ -72,11 +72,11 @@ public:
     bv_cache.clear();
   }
 
-  void post_process() override
+  void finish_eager_conversion() override
   {
-    post_process_quantifiers();
-    functions.post_process();
-    SUB::post_process();
+    finish_eager_conversion_quantifiers();
+    functions.finish_eager_conversion();
+    SUB::finish_eager_conversion();
   }
 
   enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
@@ -266,7 +266,7 @@ protected:
   typedef std::list<quantifiert> quantifier_listt;
   quantifier_listt quantifier_list;
 
-  void post_process_quantifiers();
+  void finish_eager_conversion_quantifiers();
 
   typedef std::vector<std::size_t> offset_mapt;
   offset_mapt build_offset_map(const struct_typet &src);

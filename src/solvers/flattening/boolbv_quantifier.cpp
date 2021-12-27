@@ -271,7 +271,7 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   return quantifier_list.back().l;
 }
 
-void boolbvt::post_process_quantifiers()
+void boolbvt::finish_eager_conversion_quantifiers()
 {
   if(quantifier_list.empty())
     return;

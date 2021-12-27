@@ -976,10 +976,10 @@ void bv_pointerst::do_postponed(
     UNREACHABLE;
 }
 
-void bv_pointerst::post_process()
+void bv_pointerst::finish_eager_conversion()
 {
   // post-processing arrays may yield further objects, do this first
-  SUB::post_process();
+  SUB::finish_eager_conversion();
 
   for(postponed_listt::const_iterator
       it=postponed_list.begin();
