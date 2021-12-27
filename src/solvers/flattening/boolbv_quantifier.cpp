@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/optional.h>
 #include <util/range.h>
-#include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 
 /// A method to detect equivalence between experts that can contain typecast
@@ -161,11 +160,11 @@ static optionalt<exprt> eager_quantifier_instantiation(
    * an OR/AND expr.
    **/
 
-  const exprt re = simplify_expr(expr.where(), ns);
+  const exprt where_simplified = simplify_expr(expr.where(), ns);
 
-  if(re.is_true() || re.is_false())
+  if(where_simplified.is_true() || where_simplified.is_false())
   {
-    return re;
+    return where_simplified;
   }
 
   if(var_expr.is_boolean())
@@ -189,9 +188,9 @@ static optionalt<exprt> eager_quantifier_instantiation(
   }
 
   const optionalt<constant_exprt> min_i =
-    get_quantifier_var_min(var_expr, re);
+    get_quantifier_var_min(var_expr, where_simplified);
   const optionalt<constant_exprt> max_i =
-    get_quantifier_var_max(var_expr, re);
+    get_quantifier_var_max(var_expr, where_simplified);
 
   if(!min_i.has_value() || !max_i.has_value())
     return nullopt;
@@ -202,40 +201,45 @@ static optionalt<exprt> eager_quantifier_instantiation(
   if(lb > ub)
     return nullopt;
 
+  auto expr_simplified =
+    quantifier_exprt(expr.id(), expr.variables(), where_simplified);
+
   std::vector<exprt> expr_insts;
   for(mp_integer i = lb; i <= ub; ++i)
   {
-    exprt constraint_expr = re;
-    replace_expr(var_expr, from_integer(i, var_expr.type()), constraint_expr);
+    exprt constraint_expr =
+      expr_simplified.instantiate({from_integer(i, var_expr.type())});
     expr_insts.push_back(constraint_expr);
   }
 
   if(expr.id() == ID_forall)
   {
-    // maintain the domain constraint if it isn't guaranteed by the
-    // instantiations (for a disjunction the domain constraint is implied by the
-    // instantiations)
-    if(re.id() == ID_and)
+    // maintain the domain constraint if it isn't guaranteed
+    // by the instantiations (for a disjunction the domain
+    // constraint is implied by the instantiations)
+    if(where_simplified.id() == ID_and)
     {
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_gt, from_integer(lb, var_expr.type())));
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_le, from_integer(ub, var_expr.type())));
     }
+
     return simplify_expr(conjunction(expr_insts), ns);
   }
   else if(expr.id() == ID_exists)
   {
-    // maintain the domain constraint if it isn't trivially satisfied by the
-    // instantiations (for a conjunction the instantiations are stronger
-    // constraints)
-    if(re.id() == ID_or)
+    // maintain the domain constraint if it isn't trivially satisfied
+    // by the instantiations (for a conjunction the instantiations are
+    // stronger constraints)
+    if(where_simplified.id() == ID_or)
     {
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_gt, from_integer(lb, var_expr.type())));
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_le, from_integer(ub, var_expr.type())));
     }
+
     return simplify_expr(disjunction(expr_insts), ns);
   }
 
