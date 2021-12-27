@@ -17,7 +17,6 @@ Author: Michael Tautschnig, Daniel Kroening
 #include <util/rename_symbol.h>
 
 #include <linking/linking_class.h>
-#include <util/exception_utils.h>
 
 #include "goto_model.h"
 
@@ -54,8 +53,7 @@ static bool link_functions(
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const rename_symbolt &rename_symbol,
-  const std::unordered_set<irep_idt> &weak_symbols,
-  const replace_symbolt &object_type_updates)
+  const std::unordered_set<irep_idt> &weak_symbols)
 {
   namespacet ns(dest_symbol_table);
   namespacet src_ns(src_symbol_table);
@@ -109,6 +107,58 @@ static bool link_functions(
     }
   }
 
+  return false;
+}
+
+optionalt<replace_symbolt::expr_mapt> link_goto_model(
+  goto_modelt &dest,
+  goto_modelt &&src,
+  message_handlert &message_handler)
+{
+  std::unordered_set<irep_idt> weak_symbols;
+
+  for(const auto &symbol_pair : dest.symbol_table.symbols)
+  {
+    if(symbol_pair.second.is_weak)
+      weak_symbols.insert(symbol_pair.first);
+  }
+
+  linkingt linking(dest.symbol_table, src.symbol_table, message_handler);
+
+  if(linking.typecheck_main())
+  {
+    messaget log{message_handler};
+    log.error() << "typechecking main failed" << messaget::eom;
+    return {};
+  }
+
+  if(link_functions(
+       dest.symbol_table,
+       dest.goto_functions,
+       src.symbol_table,
+       src.goto_functions,
+       linking.rename_symbol,
+       weak_symbols))
+  {
+    messaget log{message_handler};
+    log.error() << "linking failed" << messaget::eom;
+    return {};
+  }
+
+  return linking.object_type_updates.get_expr_map();
+}
+
+void finalize_linking(
+  goto_modelt &dest,
+  const replace_symbolt::expr_mapt &type_updates)
+{
+  unchecked_replace_symbolt object_type_updates;
+  object_type_updates.get_expr_map().insert(
+    type_updates.begin(), type_updates.end());
+
+  goto_functionst &dest_functions = dest.goto_functions;
+  symbol_tablet &dest_symbol_table = dest.symbol_table;
+
   // apply macros
   rename_symbolt macro_application;
 
@@ -156,41 +206,5 @@ static bool link_functions(
         });
       }
     }
-  }
-
-  return false;
-}
-
-void link_goto_model(
-  goto_modelt &dest,
-  goto_modelt &src,
-  message_handlert &message_handler)
-{
-  std::unordered_set<irep_idt> weak_symbols;
-
-  for(const auto &symbol_pair : dest.symbol_table.symbols)
-  {
-    if(symbol_pair.second.is_weak)
-      weak_symbols.insert(symbol_pair.first);
-  }
-
-  linkingt linking(dest.symbol_table,
-                   src.symbol_table,
-                   message_handler);
-
-  if(linking.typecheck_main())
-  {
-    throw invalid_source_file_exceptiont("typechecking main failed");
-  }
-  if(link_functions(
-       dest.symbol_table,
-       dest.goto_functions,
-       src.symbol_table,
-       src.goto_functions,
-       linking.rename_symbol,
-       weak_symbols,
-       linking.object_type_updates))
-  {
-    throw invalid_source_file_exceptiont("linking failed");
   }
 }
