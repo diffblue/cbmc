@@ -142,6 +142,18 @@ static optionalt<exprt> eager_quantifier_instantiation(
   const quantifier_exprt &expr,
   const namespacet &ns)
 {
+  if(expr.variables().size() > 1)
+  {
+    // Qx,y.P(x,y) is the same as Qx.Qy.P(x,y)
+    auto new_variables = expr.variables();
+    new_variables.pop_back();
+    auto new_expression = quantifier_exprt(
+      expr.id(),
+      expr.variables().back(),
+      quantifier_exprt(expr.id(), new_variables, expr.where()));
+    return eager_quantifier_instantiation(new_expression, ns);
+  }
+
   const symbol_exprt &var_expr = expr.symbol();
 
   /**
