@@ -168,8 +168,30 @@ static optionalt<exprt> eager_quantifier_instantiation(
     return re;
   }
 
-  const optionalt<constant_exprt> min_i = get_quantifier_var_min(var_expr, re);
-  const optionalt<constant_exprt> max_i = get_quantifier_var_max(var_expr, re);
+  if(var_expr.is_boolean())
+  {
+    // Expand in full.
+    // This grows worst-case exponentially in the quantifier nesting depth.
+    if(expr.id() == ID_forall)
+    {
+      // ∀b.f(b) <===> f(0)∧f(1)
+      return and_exprt(
+        expr.instantiate({false_exprt()}), expr.instantiate({true_exprt()}));
+    }
+    else if(expr.id() == ID_exists)
+    {
+      // ∃b.f(b) <===> f(0)∨f(1)
+      return or_exprt(
+        expr.instantiate({false_exprt()}), expr.instantiate({true_exprt()}));
+    }
+    else
+      UNREACHABLE;
+  }
+
+  const optionalt<constant_exprt> min_i =
+    get_quantifier_var_min(var_expr, re);
+  const optionalt<constant_exprt> max_i =
+    get_quantifier_var_max(var_expr, re);
 
   if(!min_i.has_value() || !max_i.has_value())
     return nullopt;
@@ -177,20 +199,18 @@ static optionalt<exprt> eager_quantifier_instantiation(
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
-  if(lb>ub)
+  if(lb > ub)
     return nullopt;
 
   std::vector<exprt> expr_insts;
-  for(mp_integer i=lb; i<=ub; ++i)
+  for(mp_integer i = lb; i <= ub; ++i)
   {
     exprt constraint_expr = re;
-    replace_expr(var_expr,
-                 from_integer(i, var_expr.type()),
-                 constraint_expr);
+    replace_expr(var_expr, from_integer(i, var_expr.type()), constraint_expr);
     expr_insts.push_back(constraint_expr);
   }
 
-  if(expr.id()==ID_forall)
+  if(expr.id() == ID_forall)
   {
     // maintain the domain constraint if it isn't guaranteed by the
     // instantiations (for a disjunction the domain constraint is implied by the
