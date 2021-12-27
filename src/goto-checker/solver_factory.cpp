@@ -36,6 +36,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/strings/string_refinement.h>
 
+#include <goto-symex/solver_hardness.h>
+
 solver_factoryt::solver_factoryt(
   const optionst &_options,
   const namespacet &_ns,
@@ -190,11 +192,10 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
     if(
       auto hardness_collector = dynamic_cast<hardness_collectort *>(&*satcheck))
     {
-      hardness_collector->enable_hardness_collection();
-      hardness_collector->with_solver_hardness(
-        [&options](solver_hardnesst &hardness) {
-          hardness.set_outfile(options.get_option("write-solver-stats-to"));
-        });
+      std::unique_ptr<solver_hardnesst> solver_hardness =
+        util_make_unique<solver_hardnesst>();
+      solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
+      hardness_collector->solver_hardness = std::move(solver_hardness);
     }
     else
     {

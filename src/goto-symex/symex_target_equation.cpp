@@ -16,12 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
-#include <solvers/decision_procedure.h>
-#include <solvers/hardness_collector.h>
-
+#include "solver_hardness.h"
 #include "ssa_step.h"
 
-static hardness_collectort::handlert
+static std::function<void(solver_hardnesst &)>
 hardness_register_ssa(std::size_t step_index, const SSA_stept &step)
 {
   return [step_index, &step](solver_hardnesst &hardness) {
