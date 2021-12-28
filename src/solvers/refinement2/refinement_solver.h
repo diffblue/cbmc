@@ -35,6 +35,10 @@ protected:
   };
 
   refinement_resultt model_refinement();
+  refinement_resultt refine_quantifier(const quantifiert &);
+
+  bool existential(const quantifiert &) const;
+  bool universal(const quantifiert &) const;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT2_REFINEMENT_SOLVER_H

@@ -266,9 +266,14 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
     return convert_bool(*res);
 
   // we failed to instantiate here, need to pass to post-processing
-  quantifier_list.emplace_back(quantifiert(src, prop.new_variable()));
+  auto l = prop.new_variable();
 
-  return quantifier_list.back().l;
+  quantifier_list.emplace_back(quantifiert(src, l));
+
+  // ensure that the variable isn't eliminated, for later refinement
+  prop.set_frozen(l);
+
+  return l;
 }
 
 void boolbvt::finish_eager_conversion_quantifiers()
