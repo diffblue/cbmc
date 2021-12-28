@@ -19,8 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 
+#include <solvers/refinement2/refinement_solver.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/flattening/boolbv.h>
 
 class smt2_solvert:public smt2_parsert
 {
@@ -416,9 +416,9 @@ int solver(std::istream &in)
   message_handler.set_verbosity(messaget::M_STATISTICS);
 
   satcheckt satcheck{message_handler};
-  boolbvt boolbv{ns, satcheck, message_handler};
+  refinement_solver2t solver{ns, satcheck, message_handler};
 
-  smt2_solvert smt2_solver{in, boolbv};
+  smt2_solvert smt2_solver{in, solver};
   bool error_found = false;
 
   while(!smt2_solver.exit)
