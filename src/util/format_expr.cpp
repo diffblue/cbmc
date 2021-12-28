@@ -356,16 +356,32 @@ void format_expr_configt::setup()
 
   expr_map[ID_forall] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << u8"\u2200 " << format(to_quantifier_expr(expr).symbol())
-              << " : " << format(to_quantifier_expr(expr).symbol().type())
-              << " . " << format(to_quantifier_expr(expr).where());
+    os << u8"\u2200 ";
+    bool first = true;
+    for(const auto &symbol : to_quantifier_expr(expr).variables())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+      os << format(symbol) << " : " << format(symbol.type());
+    }
+    return os << " . " << format(to_quantifier_expr(expr).where());
   };
 
   expr_map[ID_exists] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << u8"\u2203 " << format(to_quantifier_expr(expr).symbol())
-              << " : " << format(to_quantifier_expr(expr).symbol().type())
-              << " . " << format(to_quantifier_expr(expr).where());
+    os << u8"\u2203 ";
+    bool first = true;
+    for(const auto &symbol : to_quantifier_expr(expr).variables())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+      os << format(symbol) << " : " << format(symbol.type());
+    }
+    return os << " . " << format(to_quantifier_expr(expr).where());
   };
 
   expr_map[ID_let] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
