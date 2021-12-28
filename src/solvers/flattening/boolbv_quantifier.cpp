@@ -260,7 +260,7 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   auto new_src =
     quantifier_exprt(src.id(), std::move(fresh_symbols), where_replaced);
 
-  const auto res = eager_quantifier_instantiation(src, ns);
+  const auto res = eager_quantifier_instantiation(new_src, ns);
 
   if(res)
     return convert_bool(*res);
@@ -268,7 +268,7 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   // we failed to instantiate here, need to pass to post-processing
   auto l = prop.new_variable();
 
-  quantifier_list.emplace_back(quantifiert(src, l));
+  quantifier_list.emplace_back(quantifiert(new_src, l));
 
   // ensure that the variable isn't eliminated, for later refinement
   prop.set_frozen(l);
