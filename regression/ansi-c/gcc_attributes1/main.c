@@ -39,6 +39,10 @@ void my_f1()
   while(1);
 }
 
+inline void a() __attribute__((noreturn))
+{
+}
+
 //
 // unused
 //
