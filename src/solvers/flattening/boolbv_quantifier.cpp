@@ -138,8 +138,9 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
   return {};
 }
 
-static optionalt<exprt>
-instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
+static optionalt<exprt> eager_quantifier_instantiation(
+  const quantifier_exprt &expr,
+  const namespacet &ns)
 {
   const symbol_exprt &var_expr = expr.symbol();
 
@@ -223,7 +224,7 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   auto new_src =
     quantifier_exprt(src.id(), std::move(fresh_symbols), where_replaced);
 
-  const auto res = instantiate_quantifier(src, ns);
+  const auto res = eager_quantifier_instantiation(src, ns);
 
   if(res)
     return convert_bool(*res);
