@@ -4,12 +4,14 @@ int nondet_int();
 int main()
 {
   size_t L = nondet_int();
-  long *x = malloc(sizeof(long)*L);
-  for (size_t i = 0; i < L; i++)
-  {
-    x[i] = i;
-  }
   size_t i = nondet_int();
-  if (i < L) assert(x[i] == i);
+  size_t j = nondet_int();
+  __CPROVER_assume (L > 10 && i != j);
+  long *x = malloc(sizeof(long)*L);
+  x[i] = 1;
+  long *y = x;
+  y[j] = 2;
+  assert(y[i] < y[j]);
+  free(x);
   return 0;
 }

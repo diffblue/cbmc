@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Pretty Printing
 
-#include <iostream>
 #include "format_expr.h"
 
 #include "arith_tools.h"
@@ -345,6 +344,14 @@ void format_expr_configt::setup()
     return os << "(select " << format(expr.operands()[0])
               << ' '  << format(expr.operands()[1])
               << ')';
+  };
+
+  expr_map[ID_array_const] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const array_typet &array_type = to_array_type(expr.type());
+    return os << "((as const (Array " << format(array_type.subtype()) <<
+                 " " << format(array_type.size().type()) << ") "
+              << format(expr.operands()[0]) << ")";
   };
 
   expr_map[ID_function_application] =

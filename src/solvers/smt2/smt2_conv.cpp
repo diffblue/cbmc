@@ -691,6 +691,14 @@ void smt2_convt::convert_address_of_rec(
     convert_address_of_rec(if_expr.false_case(), result_type);
     out << ")";
   }
+  else if(expr.id()==ID_array_select)
+  {
+    out << "(select ";
+    convert_expr(expr.operands()[0]);
+    out << " ";
+    convert_expr(expr.operands()[1]);
+    out << ")";
+  }
   else
     INVARIANT(
       false,
@@ -1176,9 +1184,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id() == ID_equal)
   {
     const equal_exprt &equal_expr = to_equal_expr(expr);
-    DATA_INVARIANT(
-      equal_expr.op0().type() == equal_expr.op1().type(),
-      "operands of equal expression shall have same type");
+    if (equal_expr.op0().type().id() != ID_array)
+      DATA_INVARIANT(
+        equal_expr.op0().type() == equal_expr.op1().type(),
+        "operands of equal expression shall have same type");
 
     out << "(= ";
     convert_expr(equal_expr.op0());
@@ -2017,7 +2026,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     convert_expr(expr.operands()[0]);
     out << ' ';
     convert_expr(expr.operands()[1]);
-    out << ")";
+    out << ')';
   }
   else if (expr.id() == ID_array_store)
   {
@@ -2027,7 +2036,18 @@ void smt2_convt::convert_expr(const exprt &expr)
     convert_expr(expr.operands()[1]);
     out << ' ';
     convert_expr(expr.operands()[2]);
-    out << ")";
+    out << ')';
+  }
+  else if (expr.id() == ID_array_const)
+  {
+    const array_typet &array_type = to_array_type(expr.type());
+    out << "((as const (Array ";
+    convert_type(array_type.subtype());
+    out << ' ';
+    convert_type(array_type.size().type());
+    out << "))";
+    convert_expr(expr.operands()[0]);
+    out << ')';
   }
   else
     INVARIANT_WITH_DIAGNOSTICS(
