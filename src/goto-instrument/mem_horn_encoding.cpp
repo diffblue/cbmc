@@ -30,17 +30,6 @@ std::vector<To> vector_map(const Container &input, To(*f)(const Ti &))
   return output;
 }
 
-// TODO: surely, there is a better way to write this kind of things
-static inline void add_suf_expr(exprt &expr, const std::string suf)
-{
-  auto ty = expr.type().id();
-  if (ty != ID_mathematical_function && ty != ID_code &&
-     ty != ID_pointer && ty != ID_array && expr.id() == ID_symbol)
-    expr.set("identifier", id2string(expr.get("identifier")) + "_" + suf);
-  for (auto &a : expr.operands())
-    add_suf_expr(a, suf);
-}
-
 static inline bool find_alloca(exprt &expr)
 {
   if (expr.id() == ID_symbol)
@@ -88,13 +77,16 @@ vector<irep_idt> var_ids;
 int m_num = 0;
 int n_num = 0;
 bool use_mem = false;
+bool deref_check = false;
 std::string m_pref = "memor_";
 std::string n_pref = "alloc_";
 typet intt, arr_int_intt, arrn_int_intt;
 std::ofstream enc_chc;
-int qunum = 0;
-int exnum = 0;
+int qu_num = 0;
+int ex_num = 0;
+int de_num = 0;
 bool dump_cfg;
+map<exprt, exprt> prime_unprime_vars;
 
 const irep_idt fun_names_to_continue[2] = {"free", "printf"};   // TODO: try
 bool check_fun_name_to_continue(const irep_idt fun_name)
@@ -110,8 +102,59 @@ static std::string get_irep_id(const irep_idt n)
   return std::to_string(std::hash<std::string>{}(id2string(n))%100000000000);
 }
 
+// TODO: surely, there is a better way to write this kind of things
+void add_suf_expr(exprt &expr, const std::string suf)
+{
+  auto ty = expr.type().id();
+  if(
+    ty != ID_mathematical_function && ty != ID_code && ty != ID_pointer &&
+    ty != ID_array && expr.id() == ID_symbol)
+  {
+    auto expr_copy = expr;
+    expr.set("identifier", id2string(expr.get("identifier")) + "_" + suf);
+    prime_unprime_vars[expr] = expr_copy;
+  }
+  for(auto &a : expr.operands())
+    add_suf_expr(a, suf);
+}
+
+symbol_exprt unprime(symbol_exprt s)
+{
+  auto unpr = prime_unprime_vars[s];
+  if(unpr == exprt())
+    return s;
+  else
+    return to_symbol_expr(unpr);
+}
+
+void find_deref_selects(exprt &expr, set<exprt> &sels)
+{
+  if(expr.id() == ID_array_select)
+  {
+    auto str = id2string(expr.operands()[0].get("identifier"));
+    if(str.find(n_pref) != -1)
+    {
+      sels.insert(expr);
+      return;
+    }
+  }
+  for(auto &a : expr.operands())
+    find_deref_selects(a, sels);
+}
+
 void rewrite_derefs(exprt &expr)
 {
+  if(expr.id() == ID_if)
+  {
+    // getting rid of if-then-elses while accessing address_of;
+    // maybe it's the source of some inaccuracy (TODO: test better)
+    // but our memory model should take care of this
+    auto cond = expr.operands()[0];
+    if(
+      cond.id() == ID_equal && cond.operands()[0].id() == ID_address_of &&
+      cond.operands()[1].id() == ID_address_of)
+      expr = cond.operands()[1].operands()[0];
+  }
   if (expr.id() == ID_dereference && expr.get_sub().size() == 1)
   {
     auto array_offset = expr.operands()[0];
@@ -198,6 +241,16 @@ void mk_chc(exprt src_inv, set<symbol_exprt>& src_args, exprt body_pref,
     mem.clear();
     n_num = 0;
     m_num = 0;
+    size_t sz = 0;
+    if(dst_inv.operands().size() >= 1)
+      sz = dst_inv.operands()[1].operands().size();
+    if(sz >= 2)
+    {
+      dst_inv.operands()[1].operands()[sz - 2] =
+        symbol_exprt(n_pref + std::to_string(0), arr_int_intt);
+      dst_inv.operands()[1].operands()[sz - 1] =
+        symbol_exprt(m_pref + std::to_string(0), arrn_int_intt);
+    }
   }
 
   if (body_pref != true_exprt())
@@ -221,30 +274,53 @@ void mk_chc(exprt src_inv, set<symbol_exprt>& src_args, exprt body_pref,
     }
   }
 
-  if (can_skip &&
-      body.size() == 1 &&
-      body[0].id() == ID_function_application &&
-      body[0].operands()[1] == dst_inv.operands()[1])
+  if(
+    can_skip && body.size() == 1 && dst_inv.id() == ID_function_application &&
+    body[0].id() == ID_function_application &&
+    body[0].operands()[1] == dst_inv.operands()[1])
   {
     // can skip
     cur_app = dst_inv;
     return;
   }
 
-  chcs.push_back(implies_exprt(conjunction(body), dst_inv));
+  auto body_cnjs = conjunction(body);
+  chcs.push_back(implies_exprt(body_cnjs, dst_inv));
+
+  if(deref_check)
+  {
+    set<exprt> sels;
+    vector<exprt> eqs;
+    find_deref_selects(body_cnjs, sels);
+    if(!sels.empty())
+    {
+      for(auto &a : sels) // TODO: clean duplicates
+        eqs.push_back(equal_exprt(a, constant_exprt("0", intt)));
+      body.push_back(disjunction(eqs));
+      chcs.push_back(implies_exprt(conjunction(body), false_exprt()));
+      if(dump_cfg)
+      {
+        enc_chc << ' ';
+        enc_chc << format(src_inv);
+        enc_chc << " -> ";
+        enc_chc << "deref_check_" << (de_num++);
+        enc_chc << '\n';
+      }
+    }
+  }
 
   if (dump_cfg)
   {
-    enc_chc <<(" ");
-    enc_chc <<(format(src_inv));
-    enc_chc <<(" -> ");
+    enc_chc << ' ';
+    enc_chc << format(src_inv);
+    enc_chc << " -> ";
     if (dst_inv.id() == ID_function_application)
-      enc_chc <<(format(dst_inv.operands()[0]));
+      enc_chc << format(dst_inv.operands()[0]);
     else if (dst_inv.is_true())
-        enc_chc << "exit_" <<(exnum++);
+      enc_chc << "exit_" << (ex_num++);
     else
-      enc_chc << "query_" <<(qunum++);
-    enc_chc <<("\n");
+      enc_chc << "query_" << (qu_num++);
+    enc_chc << '\n';
   }
 
   ssas.clear();
@@ -259,7 +335,19 @@ void mk_chc(exprt src_inv, set<symbol_exprt>& src_args,
 void mk_chc(exprt dst_inv, bool can_skip)
 {
   set<symbol_exprt> empt;
-  mk_chc(true_exprt(), empt, dst_inv, can_skip);
+  exprt body_pref;
+  if(deref_check)
+  {
+    exprt ini = exprt(ID_array_const, arr_int_intt);
+    ini.add_to_operands(constant_exprt("0", intt));
+    body_pref = equal_exprt(
+      symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt), ini);
+  }
+  else
+  {
+    body_pref = true_exprt();
+  }
+  mk_chc(true_exprt(), empt, body_pref, dst_inv, can_skip);
 }
 
 void collect_mem(
@@ -343,6 +431,12 @@ void collect_mem(
       {
         const auto & array_ptr = array_offset.operands()[0];
         auto offset = array_offset.operands()[1];
+
+        exprt eq = exprt(ID_equal);
+        eq.add_to_operands(
+          symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt));
+
+        m_num++;
         rewrite_derefs(rhs);
         rewrite_derefs(offset);
         if (ssas.size() > 0)
@@ -350,12 +444,6 @@ void collect_mem(
           add_suf_expr(offset, std::to_string(ssas.size()));
           add_suf_expr(rhs, std::to_string(ssas.size()));
         }
-
-        exprt eq = exprt(ID_equal);
-        eq.add_to_operands(
-          symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt));
-
-        m_num++;
 
         exprt sel = exprt(ID_array_select, intt);
         sel.add_to_operands(
@@ -572,7 +660,8 @@ void encode_block(
     }
     else if (stmt == ID_assign || stmt == ID_decl)
     {
-      if (use_mem) collect_mem(target, *it, ns);
+      if(use_mem)
+        collect_mem(target, *it, ns);
 
       set<symbol_exprt> dep_symbols_pre;
       map<exprt, exprt> next_vars;
@@ -601,16 +690,40 @@ void encode_block(
         auto wp_sym = wp(cod, s, ns);
         if (wp_sym.get("statement") == ID_nondet)
           wp_sym = s;     // to optimize
+        if(use_mem)
+          rewrite_derefs(wp_sym);
         next_vars[s] = wp_sym;
         find_var_symbols(wp_sym, dep_symbols_pre);
       }
-      if (next_vars.empty()) continue;
+      if(!next_vars.empty())
+      {
+        bool all_eq = true; // small optim
+        for(auto &v : next_vars)
+          if(v.first != v.second)
+            all_eq = false;
+        if(!all_eq)
+          ssas.push_back(next_vars);
+        cur_dep_symbols.insert(dep_symbols_pre.begin(), dep_symbols_pre.end());
+      }
+      if(use_mem)
+      {
+        set<symbol_exprt> primed_symbols;
+        for(auto &m : mem)
+          find_var_symbols(m, primed_symbols);
 
-      bool all_eq = true;   // small optim
-      for (auto & v : next_vars) if (v.first != v.second) all_eq = false;
-      if (!all_eq) ssas.push_back(next_vars);
+        for(auto &s : primed_symbols)
+        {
+          auto a = unprime(s);
+          cur_dep_symbols.insert(a);
+        }
 
-      cur_dep_symbols.insert(dep_symbols_pre.begin(), dep_symbols_pre.end());
+        if(!print_chcs)
+        {
+          mem.clear();
+          n_num = 0;
+          m_num = 0;
+        }
+      }
     }
     else if (stmt == ID_block)
     {
@@ -734,9 +847,11 @@ void horn_encoding(
   const goto_modelt &model,
   std::ostream &out,
   bool _use_mem,
+  bool _deref_check,
   bool _dump_cfg)
 {
   use_mem = _use_mem;
+  deref_check = _use_mem && _deref_check;
   dump_cfg = _dump_cfg;
   std::ofstream enc;
   enc.open("enc.smt2");

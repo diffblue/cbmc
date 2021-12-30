@@ -10,11 +10,14 @@ About
 
 CBMC is a Bounded Model Checker for C and C++ programs. This fork provides
 experimental support for encoding of verification conditions to
-*Constrained Horn Clauses (CHC)* to be further solved by [z3](https://github.com/Z3Prover/z3).
+*Constrained Horn Clauses (CHC)* to be further solved by a CHC solver, e.g.,
+ [z3](https://github.com/Z3Prover/z3) or
+ [freqhorn](https://github.com/grigoryfedyukovich/aeval/tree/rnd).
 The encoding targets bit-precise analysis of sequential programs
 taking into account memory and aliases (work in progress). The CHC generator is
 implemented in the *goto-instrument* component of CBMC and should be enabled
-by options `--horn --inline --bb --mem`.  The `regression/chc` directory
+by options `--horn --inline --bb --mem`. Pointer dereferencing check is available
+if additionally `--deref-check` is enabled. The `regression/chc` directory
 contains a set of small tests (including the C programs, the generated CHCs,
 dumped CHC topologies, and a running script).
 

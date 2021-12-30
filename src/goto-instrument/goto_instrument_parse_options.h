@@ -95,7 +95,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(interpreter)(show-reaching-definitions)" \
   "(list-symbols)(list-undefined-functions)" \
   "(z3)(add-library)(show-dependence-graph)" \
-  "(horn)(mem)(bb)(skip-loops):(model-argc-argv):" \
+  "(horn)(mem)(bb)(deref-check)(skip-loops):(model-argc-argv):" \
   "(" FLAG_LOOP_CONTRACTS ")" \
   "(" FLAG_REPLACE_CALL "):" \
   "(" FLAG_ENFORCE_CONTRACT "):" \

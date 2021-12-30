@@ -857,9 +857,15 @@ int goto_instrument_parse_optionst::doit()
 
       if(cmdline.isset("bb"))
       {
-        horn_encoding(goto_model, std::cout, cmdline.isset("mem"),
-            messaget::eval_verbosity(cmdline.get_value("verbosity"),
-            messaget::M_STATISTICS, ui_message_handler) >= 10);
+        horn_encoding(
+          goto_model,
+          std::cout,
+          cmdline.isset("mem"),
+          cmdline.isset("deref-check"),
+          messaget::eval_verbosity(
+            cmdline.get_value("verbosity"),
+            messaget::M_STATISTICS,
+            ui_message_handler) >= 10);
       }
       else if(cmdline.args.size()==2)
       {
