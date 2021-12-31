@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/suffix.h>
 
-#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
 
@@ -239,7 +238,7 @@ void java_static_lifetime_init(
   code_blockt code_block;
 
   const symbol_exprt rounding_mode =
-    symbol_table.lookup_ref(rounding_mode_identifier()).symbol_expr();
+    symbol_table.lookup_ref(config.rounding_mode_identifier()).symbol_expr();
   code_block.add(code_frontend_assignt{rounding_mode,
                                        from_integer(0, rounding_mode.type())});
 
