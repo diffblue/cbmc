@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/optional.h>
 #include <util/range.h>
-#include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 
 /// A method to detect equivalence between experts that can contain typecast
@@ -138,9 +137,22 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
   return {};
 }
 
-static optionalt<exprt>
-instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
+static optionalt<exprt> eager_quantifier_instantiation(
+  const quantifier_exprt &expr,
+  const namespacet &ns)
 {
+  if(expr.variables().size() > 1)
+  {
+    // Qx,y.P(x,y) is the same as Qx.Qy.P(x,y)
+    auto new_variables = expr.variables();
+    new_variables.pop_back();
+    auto new_expression = quantifier_exprt(
+      expr.id(),
+      expr.variables().back(),
+      quantifier_exprt(expr.id(), new_variables, expr.where()));
+    return eager_quantifier_instantiation(new_expression, ns);
+  }
+
   const symbol_exprt &var_expr = expr.symbol();
 
   /**
@@ -148,15 +160,37 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
    * an OR/AND expr.
    **/
 
-  const exprt re = simplify_expr(expr.where(), ns);
+  const exprt where_simplified = simplify_expr(expr.where(), ns);
 
-  if(re.is_true() || re.is_false())
+  if(where_simplified.is_true() || where_simplified.is_false())
   {
-    return re;
+    return where_simplified;
   }
 
-  const optionalt<constant_exprt> min_i = get_quantifier_var_min(var_expr, re);
-  const optionalt<constant_exprt> max_i = get_quantifier_var_max(var_expr, re);
+  if(var_expr.is_boolean())
+  {
+    // Expand in full.
+    // This grows worst-case exponentially in the quantifier nesting depth.
+    if(expr.id() == ID_forall)
+    {
+      // ∀b.f(b) <===> f(0)∧f(1)
+      return and_exprt(
+        expr.instantiate({false_exprt()}), expr.instantiate({true_exprt()}));
+    }
+    else if(expr.id() == ID_exists)
+    {
+      // ∃b.f(b) <===> f(0)∨f(1)
+      return or_exprt(
+        expr.instantiate({false_exprt()}), expr.instantiate({true_exprt()}));
+    }
+    else
+      UNREACHABLE;
+  }
+
+  const optionalt<constant_exprt> min_i =
+    get_quantifier_var_min(var_expr, where_simplified);
+  const optionalt<constant_exprt> max_i =
+    get_quantifier_var_max(var_expr, where_simplified);
 
   if(!min_i.has_value() || !max_i.has_value())
     return nullopt;
@@ -164,45 +198,48 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
-  if(lb>ub)
+  if(lb > ub)
     return nullopt;
 
+  auto expr_simplified =
+    quantifier_exprt(expr.id(), expr.variables(), where_simplified);
+
   std::vector<exprt> expr_insts;
-  for(mp_integer i=lb; i<=ub; ++i)
+  for(mp_integer i = lb; i <= ub; ++i)
   {
-    exprt constraint_expr = re;
-    replace_expr(var_expr,
-                 from_integer(i, var_expr.type()),
-                 constraint_expr);
+    exprt constraint_expr =
+      expr_simplified.instantiate({from_integer(i, var_expr.type())});
     expr_insts.push_back(constraint_expr);
   }
 
-  if(expr.id()==ID_forall)
+  if(expr.id() == ID_forall)
   {
-    // maintain the domain constraint if it isn't guaranteed by the
-    // instantiations (for a disjunction the domain constraint is implied by the
-    // instantiations)
-    if(re.id() == ID_and)
+    // maintain the domain constraint if it isn't guaranteed
+    // by the instantiations (for a disjunction the domain
+    // constraint is implied by the instantiations)
+    if(where_simplified.id() == ID_and)
     {
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_gt, from_integer(lb, var_expr.type())));
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_le, from_integer(ub, var_expr.type())));
     }
+
     return simplify_expr(conjunction(expr_insts), ns);
   }
   else if(expr.id() == ID_exists)
   {
-    // maintain the domain constraint if it isn't trivially satisfied by the
-    // instantiations (for a conjunction the instantiations are stronger
-    // constraints)
-    if(re.id() == ID_or)
+    // maintain the domain constraint if it isn't trivially satisfied
+    // by the instantiations (for a conjunction the instantiations are
+    // stronger constraints)
+    if(where_simplified.id() == ID_or)
     {
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_gt, from_integer(lb, var_expr.type())));
       expr_insts.push_back(binary_predicate_exprt(
         var_expr, ID_le, from_integer(ub, var_expr.type())));
     }
+
     return simplify_expr(disjunction(expr_insts), ns);
   }
 
@@ -223,7 +260,7 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   auto new_src =
     quantifier_exprt(src.id(), std::move(fresh_symbols), where_replaced);
 
-  const auto res = instantiate_quantifier(src, ns);
+  const auto res = eager_quantifier_instantiation(src, ns);
 
   if(res)
     return convert_bool(*res);
