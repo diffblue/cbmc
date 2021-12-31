@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_lifetime_init.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
@@ -90,10 +88,7 @@ static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
   else
     rhs = symbol.value;
 
-  code_assignt code(symbol.symbol_expr(), rhs);
-  code.add_source_location() = symbol.location;
-
-  return std::move(code);
+  return code_frontend_assignt{symbol.symbol_expr(), rhs, symbol.location};
 }
 
 void static_lifetime_init(
@@ -156,9 +151,8 @@ void static_lifetime_init(
       code_type.return_type().id() == ID_constructor &&
       code_type.parameters().empty())
     {
-      code_function_callt function_call(symbol.symbol_expr());
-      function_call.add_source_location()=source_location;
-      dest.add(function_call);
+      dest.add(code_expressiont{side_effect_expr_function_callt{
+        symbol.symbol_expr(), {}, code_type.return_type(), source_location}});
     }
   }
 }
