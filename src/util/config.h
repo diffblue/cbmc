@@ -369,6 +369,10 @@ public:
   static irep_idt this_architecture();
   static irep_idt this_operating_system();
 
+  /// Return the identifier of the program symbol used to
+  /// store the current rounding mode.
+  irep_idt rounding_mode_identifier() const;
+
 private:
   void set_classpath(const std::string &cp);
 };

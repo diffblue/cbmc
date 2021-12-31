@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 
-#include <goto-programs/adjust_float_expressions.h>
-
 #include <linking/static_lifetime_init.h>
 
 #include "ansi_c_parser.h"
@@ -170,7 +168,7 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
 
     // float stuff
     "int " CPROVER_PREFIX "thread_local " +
-      id2string(rounding_mode_identifier()) + '='+
+      id2string(config.rounding_mode_identifier()) + '='+
       std::to_string(config.ansi_c.rounding_mode)+";\n"
 
     // pipes, write, read, close
