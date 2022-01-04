@@ -832,22 +832,17 @@ std::string expr2ct::convert_trinary(
 std::string expr2ct::convert_quantifier(
   const quantifier_exprt &src,
   const std::string &symbol,
-  unsigned precedence)
+  unsigned)
 {
-  // our made-up syntax can only do one symbol
-  if(src.op0().operands().size() != 1)
-    return convert_norep(src, precedence);
-
-  unsigned p0, p1;
-
-  std::string op0 = convert_with_precedence(src.symbol(), p0);
-  std::string op1 = convert_with_precedence(src.where(), p1);
-
-  std::string dest=symbol+" { ";
-  dest += convert(src.symbol().type());
-  dest+=" "+op0+"; ";
-  dest+=op1;
-  dest+=" }";
+  unsigned p1;
+ 
+  std::string dest = symbol + " { ";
+  for(const auto &v : src.variables()) {
+    unsigned p;
+    dest += convert(v.type()) + " " + convert_with_precedence(v, p) + "; ";
+  }
+  dest += convert_with_precedence(src.where(), p1);
+  dest += " }";
 
   return dest;
 }
