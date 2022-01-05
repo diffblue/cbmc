@@ -1,0 +1,11 @@
+CORE
+nondet.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+try_filter_value_sets must not end up in a situation where it deems the guard
+trivially true. This situation arises when the value set wrongly is empty.
