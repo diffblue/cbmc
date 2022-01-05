@@ -43,6 +43,7 @@ Date: February 2016
 #include <util/replace_symbol.h>
 #include <util/std_code.h>
 
+#include "havoc_assigns_clause_targets.h"
 #include "memory_predicates.h"
 #include "utils.h"
 
@@ -562,9 +563,10 @@ void code_contractst::replace_history_parameter(
   {
     const auto &parameter = to_history_expr(expr, id).expression();
 
+    const auto &id = parameter.id();
     if(
-      parameter.id() == ID_dereference || parameter.id() == ID_member ||
-      parameter.id() == ID_symbol || parameter.id() == ID_ptrmember)
+      id == ID_dereference || id == ID_member || id == ID_symbol ||
+      id == ID_ptrmember || id == ID_constant || id == ID_typecast)
     {
       auto it = parameter2history.find(parameter);
 
@@ -671,6 +673,9 @@ bool code_contractst::apply_function_contract(
   // keep track of the call's return expression to make it nondet later
   optionalt<exprt> call_ret_opt = {};
 
+  // if true, the call return variable variable was created during replacement
+  bool call_ret_is_fresh_var = false;
+
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
@@ -695,6 +700,7 @@ bool code_contractst::apply_function_contract(
       {
         // The postcondition does mention __CPROVER_return_value, so mint a
         // fresh variable to replace __CPROVER_return_value with.
+        call_ret_is_fresh_var = true;
         const symbolt &fresh = get_fresh_aux_symbol(
           type.return_type(),
           id2string(target_function),
@@ -785,15 +791,17 @@ bool code_contractst::apply_function_contract(
   // ...for assigns clause targets
   if(!assigns_clause.empty())
   {
-    assigns_clauset assigns_clause(
-      targets.operands(), log, ns, target_function, symbol_table);
-
-    // Havoc all targets in the write set
-    assignst assigns;
-    assigns.insert(targets.operands().cbegin(), targets.operands().cend());
-
-    havoc_assigns_targetst havoc_gen(assigns, ns);
-    havoc_gen.append_full_havoc_code(location, havoc_instructions);
+    // Havoc all targets in the assigns clause
+    // TODO: handle local statics possibly touched by this function
+    havoc_assigns_clause_targets(
+      target_function,
+      targets.operands(),
+      havoc_instructions,
+      // context parameters
+      location,
+      mode,
+      ns,
+      symbol_table);
   }
 
   // ...for the return value
@@ -802,6 +810,12 @@ bool code_contractst::apply_function_contract(
     auto &call_ret = call_ret_opt.value();
     auto &loc = call_ret.source_location();
     auto &type = call_ret.type();
+
+    // Declare if fresh
+    if(call_ret_is_fresh_var)
+      havoc_instructions.add(
+        goto_programt::make_decl(to_symbol_expr(call_ret), loc));
+
     side_effect_expr_nondett expr(type, location);
     auto target = havoc_instructions.add(
       goto_programt::make_assignment(call_ret, expr, loc));
@@ -818,6 +832,18 @@ bool code_contractst::apply_function_contract(
     is_fresh.update_ensures(ensures_pair.first);
     insert_before_swap_and_advance(function_body, target, ensures_pair.first);
   }
+
+  // Kill return value variable if fresh
+  if(call_ret_is_fresh_var)
+  {
+    function_body.output_instruction(ns, "", log.warning(), *target);
+    auto dead_inst =
+      goto_programt::make_dead(to_symbol_expr(call_ret_opt.value()), location);
+    function_body.insert_before_swap(target, dead_inst);
+    ++target;
+  }
+
+  // Erase original function call
   *target = goto_programt::make_skip();
 
   // Add this function to the set of replaced functions.
@@ -1400,8 +1426,20 @@ code_contractst::add_inclusion_check(
   source_locationt location_no_checks =
     instruction_it->source_location_nonconst();
   disable_pointer_checks(location_no_checks);
-  location_no_checks.set_comment(
-    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
+
+  // does this assignment come from some contract replacement ?
+  const auto &comment = location_no_checks.get_comment();
+  if(is_assigns_clause_replacement_tracking_comment(comment))
+  {
+    location_no_checks.set_comment(
+      "Check that " + id2string(comment) + " is assignable");
+  }
+  else
+  {
+    location_no_checks.set_comment(
+      "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
+  }
+
   assertion.add(goto_programt::make_assertion(
     assigns.generate_inclusion_check(car, cfg_info_opt), location_no_checks));
   insert_before_swap_and_advance(program, instruction_it, assertion);

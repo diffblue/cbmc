@@ -1,0 +1,16 @@
+CORE
+main_replace.c
+--replace-call-with-contract resize_vec --enforce-contract resize_vec_incr10 _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
+^\[.*\] .* Check that v->size \(assigned by the contract of resize_vec\) is assignable: SUCCESS
+^\[.*\] .* Check that v->arr \(assigned by the contract of resize_vec\) is assignable: FAILURE
+^\[.*\] .* Check that POINTER_OBJECT\(\(const void \*\)v->arr\) \(assigned by the contract of resize_vec\) is assignable: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Shows that when an assigns clause contains targets that are dependent, 
+in this case, a pointer variable `v->arr` and
+the object it points to `__CPROVER_POINTER_OBJECT(v->arr)`, we can correctly
+havoc them when replacing the call by the contract.
+In this version of the test the inclusion check must fail.

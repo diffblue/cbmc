@@ -1,0 +1,13 @@
+CORE
+main.c
+--replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^[.*] Check that .*ignored_return_value.* is assignable: FAILURE
+--
+This test checks that when replacing a call by a contract for a call that
+ignores the return value of the function, the temporary introduced to 
+receive the call result does not trigger errors with assigns clause Checking
+in the function under verification.

@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Tracking history of constant expressions is not supported yet
+--
+This test checks that history variables are supported for constant expressions.
