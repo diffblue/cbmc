@@ -521,6 +521,8 @@ void value_sett::get_value_set_rec(
         exprt(ID_null_object, to_pointer_type(expr_type).subtype()),
         offsett());
     }
+    else
+      insert(dest, exprt(ID_unknown, original_type));
   }
   else if(expr.id()==ID_if)
   {
