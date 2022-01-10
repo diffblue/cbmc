@@ -22,6 +22,27 @@ Date: July 2021
 
 typedef std::pair<const exprt, const exprt> slicet;
 
+/// A guarded slice of memory
+typedef struct guarded_slicet
+{
+  guarded_slicet(exprt _guard, exprt _expr, exprt _start_address, exprt _size)
+    : guard(_guard), expr(_expr), start_adress(_start_address), size(_size)
+  {
+  }
+
+  /// Guard expression (may contain side_effect_exprt expressions)
+  const exprt guard;
+
+  /// Target expression
+  const exprt expr;
+
+  /// Start address of the target
+  const exprt start_adress;
+
+  /// Size of the target
+  const exprt size;
+} guarded_slicet;
+
 /// \brief A class for representing assigns clauses in code contracts
 class assigns_clauset
 {
@@ -56,7 +77,7 @@ public:
     const source_locationt &location;
     const assigns_clauset &parent;
 
-    const slicet slice;
+    const guarded_slicet guarded_slice;
     const symbol_exprt validity_condition_var;
     const symbol_exprt lower_bound_address_var;
     const symbol_exprt upper_bound_address_var;
@@ -78,11 +99,11 @@ public:
       write_sett;
 
   assigns_clauset(
-    const exprt::operandst &,
-    const messaget &,
-    const namespacet &,
-    const irep_idt &,
-    symbol_tablet &);
+    const exprt::operandst &assigns,
+    messaget &log,
+    const namespacet &ns,
+    const irep_idt &function_name,
+    symbol_tablet &symbol_table);
 
   write_sett::const_iterator add_to_write_set(const exprt &);
   void remove_from_write_set(const exprt &);
@@ -111,7 +132,7 @@ public:
     const goto_functionst &functions,
     const irep_idt &root_function);
 
-  const messaget &log;
+  messaget &log;
   const namespacet &ns;
   const irep_idt &function_name;
 

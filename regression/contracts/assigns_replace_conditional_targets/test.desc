@@ -1,0 +1,19 @@
+CORE
+main.c
+--replace-call-with-contract foo
+^main.c function main$
+^\[main\.assertion\.\d+\] line 55 a unchanged, expecting SUCCESS: SUCCESS$
+^\[main\.assertion\.\d+\] line 57 x changed, expecting FAILURE: FAILURE$
+^\[main\.assertion\.\d+\] line 59 x unchanged, expecting SUCCESS: SUCCESS$
+^\[main\.assertion\.\d+\] line 62 y changed, expecting FAILURE: FAILURE$
+^\[main\.assertion\.\d+\] line 64 y unchanged, expecting SUCCESS: SUCCESS$
+^\[main\.assertion\.\d+\] line 67 z changed, expecting FAILURE: FAILURE$
+^\[main\.assertion\.\d+\] line 69 z unchanged, expecting SUCCESS: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that havocking of conditional targets works as expected when 
+replacing a call by a contract. We manually express frame conditions as 
+assertions in the main function.

@@ -1,0 +1,22 @@
+CORE
+main.c
+--enforce-contract update _ --pointer-check --pointer-overflow-check --signed-overflow-check --unsigned-overflow-check --conversion-check
+^\[is_high_level.\d+\] line 50 Check that latch is assignable: SUCCESS$
+^\[is_high_level.\d+\] line 51 Check that once is assignable: SUCCESS$
+^\[update.\d+\] line 84 Check that POINTER_OBJECT\(\(void \*\)state->digest.high_level.first.ctx->digest\) is assignable: SUCCESS$
+^\[update.\d+\] line 85 Check that state->digest.high_level.first.ctx->flags is assignable: SUCCESS$
+^\[update.\d+\] line 90 Check that POINTER_OBJECT\(\(void \*\)state->digest.high_level.second.ctx->digest\) is assignable: SUCCESS$
+^\[update.\d+\] line 91 Check that state->digest.high_level.second.ctx->flags is assignable: SUCCESS$
+^\[update.\d+\] line 95 Check that POINTER_OBJECT\(\(void \*\)state->digest.high_level.second.ctx->digest\) is assignable: FAILURE$
+^\[update.\d+\] line 96 Check that state->digest.high_level.second.ctx->flags is assignable: FAILURE$
+^\[update.\d+\] line 100 Check that POINTER_OBJECT\(\(void \*\)state->digest.high_level.first.ctx->digest\) is assignable: FAILURE$
+^\[update.\d+\] line 101 Check that state->digest.high_level.first.ctx->flags is assignable: FAILURE$
+^\[update.\d+\] line 104 Check that POINTER_OBJECT\(\(void \*\)state->digest.high_level.second.ctx->digest\) is assignable: FAILURE$
+^\[update.\d+\] line 105 Check that state->digest.high_level.second.ctx->flags is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Tests that conditional assignments to whole objects and lvalues are supported,
+when conditions determine how to interpret a union type.

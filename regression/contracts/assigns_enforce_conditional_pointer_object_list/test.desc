@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-contract foo
+main.c function foo
+^\[foo\.\d+\] line 12 Check that x\[\(signed (long )?long int\)0\] is assignable: SUCCESS$
+^\[foo\.\d+\] line 13 Check that y\[\(signed (long )?long int\)0\] is assignable: SUCCESS$
+^\[foo\.\d+\] line 17 Check that x\[\(signed (long )?long int\)0\] is assignable: FAILURE$
+^\[foo\.\d+\] line 18 Check that y\[\(signed (long )?long int\)0\] is assignable: FAILURE$
+^\[foo\.\d+\] line 21 Check that x\[\(signed (long )?long int\)0\] is assignable: FAILURE$
+^\[foo\.\d+\] line 22 Check that y\[\(signed (long )?long int\)0\] is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Check that conditional assigns clause  `c ? {__CPROVER_POINTER_OBJECT((p), .. }`
+match with control flow path conditions.

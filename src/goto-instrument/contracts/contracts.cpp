@@ -801,7 +801,8 @@ bool code_contractst::apply_function_contract(
       location,
       mode,
       ns,
-      symbol_table);
+      symbol_table,
+      log.get_message_handler());
   }
 
   // ...for the return value

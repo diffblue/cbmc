@@ -4,6 +4,6 @@ main.c
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
-error: non-lvalue target in assigns clause
+^.*error: assigns clause target must be an lvalue or __CPROVER_POINTER_OBJECT expression$
 --
-Checks whether type checking reports illegal target in assigns clause.
+Checks whether type checking rejects literal constants in assigns clause.

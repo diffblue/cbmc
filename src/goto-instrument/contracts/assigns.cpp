@@ -18,8 +18,11 @@ Date: July 2021
 
 #include <langapi/language_util.h>
 
+#include <ansi-c/c_expr.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
@@ -42,7 +45,7 @@ static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
 
     INVARIANT(
       size.has_value(),
-      "`sizeof` must always be computable on l-value assigns clause targets.");
+      "no definite size for lvalue target: \n" + expr.pretty());
 
     return {typecast_exprt::conditional_cast(
               address_of_exprt{expr}, pointer_type(char_type())),
@@ -50,6 +53,41 @@ static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
   }
 
   UNREACHABLE;
+}
+
+/// Normalises a assigns target expression to a guarded slice struct.
+///
+/// ```
+/// case expr of
+///  | guard ? target ->
+///          {guard
+///           target,
+///           normalize_to_slice(target)}
+///  | target ->
+///          {true,
+///           target,
+///           normalize_to_slice(target)}
+/// ```
+static const guarded_slicet
+normalize_to_guarded_slice(const exprt &expr, const namespacet &ns)
+{
+  if(can_cast_expr<conditional_target_group_exprt>(expr))
+  {
+    const auto &conditional_target_group =
+      to_conditional_target_group_expr(expr);
+    INVARIANT(
+      conditional_target_group.targets().size() == 1,
+      "expecting only a single target");
+    const auto &target = conditional_target_group.targets().front();
+    const auto slice = normalize_to_slice(target, ns);
+    return {
+      conditional_target_group.condition(), target, slice.first, slice.second};
+  }
+  else
+  {
+    const auto slice = normalize_to_slice(expr, ns);
+    return {true_exprt{}, expr, slice.first, slice.second};
+  }
 }
 
 const symbolt assigns_clauset::conditional_address_ranget::generate_new_symbol(
@@ -71,15 +109,19 @@ assigns_clauset::conditional_address_ranget::conditional_address_ranget(
   : source_expr(expr),
     location(expr.source_location()),
     parent(parent),
-    slice(normalize_to_slice(expr, parent.ns)),
+    guarded_slice(normalize_to_guarded_slice(expr, parent.ns)),
     validity_condition_var(
       generate_new_symbol("__car_valid", bool_typet(), location).symbol_expr()),
-    lower_bound_address_var(
-      generate_new_symbol("__car_lb", slice.first.type(), location)
-        .symbol_expr()),
-    upper_bound_address_var(
-      generate_new_symbol("__car_ub", slice.first.type(), location)
-        .symbol_expr())
+    lower_bound_address_var(generate_new_symbol(
+                              "__car_lb",
+                              guarded_slice.start_adress.type(),
+                              location)
+                              .symbol_expr()),
+    upper_bound_address_var(generate_new_symbol(
+                              "__car_ub",
+                              guarded_slice.start_adress.type(),
+                              location)
+                              .symbol_expr())
 {
 }
 
@@ -93,6 +135,19 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
   source_locationt location_no_checks = location;
   disable_pointer_checks(location_no_checks);
 
+  // clean up side effects from the guard expression if needed
+  cleanert cleaner(parent.symbol_table, parent.log.get_message_handler());
+  exprt clean_guard(guarded_slice.guard);
+
+  if(has_subexpr(clean_guard, ID_side_effect))
+    cleaner.clean(
+      clean_guard,
+      instructions,
+      parent.symbol_table.lookup_ref(parent.function_name).mode);
+
+  // we want checks on the guard because it is user code
+  clean_guard.add_source_location() = location;
+
   instructions.add(
     goto_programt::make_decl(validity_condition_var, location_no_checks));
   instructions.add(
@@ -102,11 +157,11 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
 
   instructions.add(goto_programt::make_assignment(
     lower_bound_address_var,
-    null_pointer_exprt{to_pointer_type(slice.first.type())},
+    null_pointer_exprt{to_pointer_type(guarded_slice.start_adress.type())},
     location_no_checks));
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
-    null_pointer_exprt{to_pointer_type(slice.first.type())},
+    null_pointer_exprt{to_pointer_type(guarded_slice.start_adress.type())},
     location_no_checks));
 
   goto_programt skip_program;
@@ -114,8 +169,10 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
     skip_program.add(goto_programt::make_skip(location_no_checks));
 
   const auto validity_check_expr =
-    and_exprt{all_dereferences_are_valid(source_expr, parent.ns),
-              w_ok_exprt{slice.first, slice.second}};
+    and_exprt{clean_guard,
+              all_dereferences_are_valid(guarded_slice.expr, parent.ns),
+              w_ok_exprt{guarded_slice.start_adress, guarded_slice.size}};
+
   instructions.add(goto_programt::make_assignment(
     validity_condition_var, validity_check_expr, location_no_checks));
 
@@ -123,7 +180,7 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
     skip_target, not_exprt{validity_condition_var}, location_no_checks));
 
   instructions.add(goto_programt::make_assignment(
-    lower_bound_address_var, slice.first, location_no_checks));
+    lower_bound_address_var, guarded_slice.start_adress, location_no_checks));
 
   // the computation of the CAR upper bound can overflow into the object ID bits
   // of the pointer with very large allocation sizes.
@@ -133,7 +190,7 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
 
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
-    plus_exprt{slice.first, slice.second},
+    plus_exprt{guarded_slice.start_adress, guarded_slice.size},
     location_overflow_check));
   instructions.destructive_append(skip_program);
 
@@ -170,7 +227,7 @@ bool assigns_clauset::conditional_address_ranget::maybe_alive(
 
 assigns_clauset::assigns_clauset(
   const exprt::operandst &assigns,
-  const messaget &log,
+  messaget &log,
   const namespacet &ns,
   const irep_idt &function_name,
   symbol_tablet &symbol_table)

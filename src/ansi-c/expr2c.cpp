@@ -3470,6 +3470,31 @@ std::string expr2ct::convert_sizeof(
   return dest;
 }
 
+std::string expr2ct::convert_conditional_target_group(const exprt &src)
+{
+  std::string dest;
+  unsigned p;
+  const auto &cond = src.operands().front();
+  if(!cond.is_true())
+  {
+    dest += convert_with_precedence(cond, p);
+    dest += ": ";
+  }
+
+  const auto &targets = src.operands()[1];
+  forall_operands(it, targets)
+  {
+    std::string op = convert_with_precedence(*it, p);
+
+    if(it != targets.operands().begin())
+      dest += ", ";
+
+    dest += op;
+  }
+
+  return dest;
+}
+
 std::string expr2ct::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
@@ -3872,6 +3897,11 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id() == ID_rol || src.id() == ID_ror)
     return convert_rox(to_shift_expr(src), precedence);
+
+  else if(src.id() == ID_conditional_target_group)
+  {
+    return convert_conditional_target_group(src);
+  }
 
   auto function_string_opt = convert_function(src);
   if(function_string_opt.has_value())

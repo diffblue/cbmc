@@ -3297,12 +3297,65 @@ cprover_function_contract:
         | cprover_contract_assigns
         ;
 
+unary_expression_list:
+          unary_expression
+        {
+          init($$, ID_expression_list);
+          parser_stack($$).add_source_location()=parser_stack($1).source_location();
+          mto($$, $1);
+        }
+        | unary_expression_list ',' unary_expression
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+conditional_target_group:
+          unary_expression_list
+        {
+          init($$, ID_conditional_target_group);
+          parser_stack($$).add_source_location()=parser_stack($1).source_location();
+          parser_stack($$).add_to_operands(true_exprt{});
+          mto($$, $1);
+        }
+        | logical_equivalence_expression ':' unary_expression_list
+        { 
+          $$=$2;
+          set($$, ID_conditional_target_group);
+          mto($$, $1);
+          mto($$, $3);
+        }
+        ;
+
+conditional_target_list:
+          conditional_target_group
+        {
+          init($$, ID_target_list);
+          mto($$, $1);
+        }
+        | conditional_target_list ';' conditional_target_group
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+conditional_target_list_opt_semicol:
+          conditional_target_list ';'
+        {
+          $$ = $1;
+        }
+        | conditional_target_list
+        {
+          $$ = $1;          
+        }
+
 cprover_contract_assigns:
-         TOK_CPROVER_ASSIGNS '(' argument_expression_list ')'
+         TOK_CPROVER_ASSIGNS '(' conditional_target_list_opt_semicol ')'
         {
           $$=$1;
           set($$, ID_C_spec_assigns);
-          parser_stack($3).id(ID_target_list);
           mto($$, $3);
         }
         | TOK_CPROVER_ASSIGNS '(' ')'

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
@@ -18,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 
 #include "ansi_c_declaration.h"
+#include "c_expr.h"
 
 void c_typecheck_baset::start_typecheck_code()
 {
@@ -842,35 +844,168 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
   }
 }
 
+void c_typecheck_baset::typecheck_spec_assigns_condition(exprt &condition)
+{
+  // compute type
+  typecheck_expr(condition);
+
+  // make it boolean if needed
+  implicit_typecast_bool(condition);
+
+  // non-fatal warnings
+  if(has_subexpr(condition, can_cast_expr<side_effect_expr_function_callt>))
+  {
+    // Remark: we allow function calls without further checks for now because
+    // they are mandatory for some applications.
+    // The next step must be to check that the called functions have a contract
+    // with an empty assigns clause and that they indeed satisfy their contract
+    // using a CI check.
+    warning().source_location = condition.source_location();
+    warning()
+      << "function with possible side-effect called in target's condition"
+      << eom;
+  }
+
+  // fatal errors
+  bool must_throw = false;
+
+  if(condition.type().id() == ID_empty)
+  {
+    must_throw = true;
+    error().source_location = condition.source_location();
+    error() << "void-typed expressions not allowed as assigns clause conditions"
+            << eom;
+  }
+
+  if(has_subexpr(condition, [&](const exprt &subexpr) {
+       return can_cast_expr<side_effect_exprt>(subexpr) &&
+              !can_cast_expr<side_effect_expr_function_callt>(subexpr);
+     }))
+  {
+    must_throw = true;
+    error().source_location = condition.source_location();
+    error() << "side-effects not allowed in assigns clause conditions" << eom;
+  }
+
+  if(has_subexpr(condition, ID_if))
+  {
+    must_throw = true;
+    error().source_location = condition.source_location();
+    error() << "ternary expressions not allowed in assigns "
+               "clause conditions"
+            << eom;
+  }
+
+  if(must_throw)
+    throw 0;
+}
+
+void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
+{
+  // compute type
+  typecheck_expr(target);
+
+  // fatal errors
+  bool must_throw = false;
+  if(target.type().id() == ID_empty)
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "void-typed expressions not allowed as assigns clause targets"
+            << eom;
+  }
+
+  if(!target.get_bool(ID_C_lvalue) && target.id() != ID_pointer_object)
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "assigns clause target must be an lvalue or " CPROVER_PREFIX
+               "POINTER_OBJECT expression"
+            << eom;
+  }
+
+  // Remark: an expression can be an lvalue and still contain side effects
+  // or ternary expressions. We detect them in a second step.
+  if(has_subexpr(target, ID_side_effect))
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "side-effects not allowed in assigns clause targets" << eom;
+  }
+
+  if(has_subexpr(target, ID_if))
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "ternary expressions not allowed in assigns "
+               "clause targets"
+            << eom;
+  }
+
+  if(must_throw)
+    throw 0;
+}
+
 void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
 {
+  exprt::operandst tmp;
+  bool must_throw = false;
+
   for(auto &target : targets)
   {
-    typecheck_expr(target);
+    if(!can_cast_expr<conditional_target_group_exprt>(target))
+    {
+      must_throw = true;
+      error().source_location = target.source_location();
+      error() << "expected ID_conditional_target_group expression in assigns "
+                 "clause, found "
+              << id2string(target.id()) << eom;
+    }
 
-    if(target.type().id() == ID_empty)
+    auto &conditional_target_group = to_conditional_target_group_expr(target);
+    validate_expr(conditional_target_group);
+
+    // typecheck condition
+    auto &condition = conditional_target_group.condition();
+    typecheck_spec_assigns_condition(condition);
+
+    if(condition.is_true())
     {
-      error().source_location = target.source_location();
-      error() << "void-typed targets not permitted in assigns clause" << eom;
-      throw 0;
+      // if the condition is trivially true,
+      // simplify expr and expose the bare expressions
+      for(auto &actual_target : conditional_target_group.targets())
+      {
+        typecheck_spec_assigns_target(actual_target);
+        tmp.push_back(actual_target);
+      }
     }
-    else if(target.id() == ID_pointer_object)
+    else
     {
-      // skip
-    }
-    else if(!target.get_bool(ID_C_lvalue))
-    {
-      error().source_location = target.source_location();
-      error() << "non-lvalue target in assigns clause" << eom;
-      throw 0;
-    }
-    else if(has_subexpr(target, ID_side_effect))
-    {
-      error().source_location = target.source_location();
-      error() << "assigns clause is not side-effect free" << eom;
-      throw 0;
+      // if the condition is not trivially true,
+      // place each single target in its own conditional target expr,
+      // distributing the condition
+      for(auto &actual_target : conditional_target_group.targets())
+      {
+        typecheck_spec_assigns_target(actual_target);
+        exprt ops{ID_expression_list};
+        ops.add_to_operands(actual_target);
+        conditional_target_group_exprt result{condition, ops};
+        result.add_source_location() =
+          conditional_target_group.source_location();
+        tmp.push_back(std::move(result));
+      }
     }
   }
+
+  // at least one target was not as expected
+  if(must_throw)
+    throw 0;
+
+  // now each target is either a simple side-effect-free lvalue expression
+  // or a conditional target expression with a single target
+
+  // update original vector in-place
+  std::swap(targets, tmp);
 }
 
 void c_typecheck_baset::typecheck_spec_loop_invariant(codet &code)
