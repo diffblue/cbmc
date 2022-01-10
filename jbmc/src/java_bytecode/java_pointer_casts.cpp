@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_pointer_casts.h"
 
+#include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -64,21 +65,6 @@ bool find_superclass_with_type(
   }
 }
 
-
-/// \par parameters: input expression
-/// \return recursively search target of typecast
-static const exprt &look_through_casts(const exprt &in)
-{
-  if(in.id()==ID_typecast)
-  {
-    assert(in.type().id()==ID_pointer);
-    return look_through_casts(to_typecast_expr(in).op());
-  }
-  else
-    return in;
-}
-
-
 /// \par parameters: raw pointer
 /// target type
 /// namespace
@@ -88,7 +74,7 @@ exprt make_clean_pointer_cast(
   const pointer_typet &target_type,
   const namespacet &ns)
 {
-  const exprt &ptr=look_through_casts(rawptr);
+  const exprt &ptr = skip_typecast(rawptr);
 
   PRECONDITION(ptr.type().id()==ID_pointer);
 

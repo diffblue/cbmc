@@ -10,6 +10,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/simplify_expr.h>
@@ -72,15 +73,6 @@ static index_range_implementation_ptrt make_interval_index_range(
   const namespacet &n)
 {
   return util_make_unique<interval_index_ranget>(interval, n);
-}
-
-static inline exprt look_through_casts(exprt e)
-{
-  while(e.id() == ID_typecast)
-  {
-    e = to_typecast_expr(e).op();
-  }
-  return e;
 }
 
 static inline bool
@@ -153,15 +145,16 @@ interval_from_x_gt_value(const exprt &value)
     return constant_interval_exprt::bottom(value.type());
 }
 
-static inline bool represents_interval(exprt e)
+static inline bool represents_interval(const exprt &expr)
 {
-  e = look_through_casts(e);
+  const exprt &e = skip_typecast(expr);
   return (e.id() == ID_constant_interval || e.id() == ID_constant);
 }
 
-static inline constant_interval_exprt make_interval_expr(exprt e)
+static inline constant_interval_exprt make_interval_expr(const exprt &expr)
 {
-  e = look_through_casts(e);
+  const exprt &e = skip_typecast(expr);
+
   if(e.id() == ID_constant_interval)
   {
     return to_constant_interval_expr(e);
