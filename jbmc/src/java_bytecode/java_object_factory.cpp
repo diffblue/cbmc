@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
+#include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/nondet_bool.h>
 #include <util/prefix.h>
@@ -1551,23 +1552,17 @@ exprt object_factory(
   const select_pointer_typet &pointer_type_selector,
   message_handlert &log)
 {
-  irep_idt identifier=id2string(goto_functionst::entry_point())+
-    "::"+id2string(base_name);
+  const symbolt &main_symbol = get_fresh_aux_symbol(
+    type,
+    id2string(goto_functionst::entry_point()),
+    id2string(base_name),
+    loc,
+    ID_java,
+    symbol_table);
 
-  auxiliary_symbolt main_symbol;
-  main_symbol.mode=ID_java;
-  main_symbol.is_static_lifetime=false;
-  main_symbol.name=identifier;
-  main_symbol.base_name=base_name;
-  main_symbol.type=type;
-  main_symbol.location=loc;
   parameters.function_id = goto_functionst::entry_point();
 
   exprt object=main_symbol.symbol_expr();
-
-  symbolt *main_symbol_ptr;
-  bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
-  CHECK_RETURN(!moving_symbol_failed);
 
   java_object_factoryt state(
     loc, parameters, symbol_table, pointer_type_selector, log);
@@ -1583,7 +1578,7 @@ exprt object_factory(
     update_in_placet::NO_UPDATE_IN_PLACE,
     loc);
 
-  state.add_created_symbol(main_symbol_ptr);
+  state.add_created_symbol(&main_symbol);
   state.declare_created_symbols(init_code);
 
   assert_type_consistency(assignments);
