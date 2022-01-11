@@ -39,4 +39,7 @@ Author: Michael Tautschnig
 /// Add to the end of test tags to mark a test that is expected to fail
 #define XFAIL "[.][!shouldfail]"
 
+class irept;
+std::ostream &operator<<(std::ostream &os, const irept &value);
+
 #endif // CPROVER_TESTING_UTILS_USE_CATCH_H
