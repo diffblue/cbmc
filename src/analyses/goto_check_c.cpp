@@ -2067,16 +2067,6 @@ void goto_check_ct::goto_check(
     if(i.has_condition())
     {
       check(i.get_condition());
-
-      if(has_subexpr(i.get_condition(), [](const exprt &expr) {
-           return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
-                  expr.id() == ID_rw_ok;
-         }))
-      {
-        auto rw_ok_cond = rw_ok_check(i.get_condition());
-        if(rw_ok_cond.has_value())
-          i.set_condition(*rw_ok_cond);
-      }
     }
 
     // magic ERROR label?
@@ -2128,16 +2118,6 @@ void goto_check_ct::goto_check(
 
       // the LHS might invalidate any assertion
       invalidate(assign_lhs);
-
-      if(has_subexpr(assign_rhs, [](const exprt &expr) {
-           return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
-                  expr.id() == ID_rw_ok;
-         }))
-      {
-        auto rw_ok_cond = rw_ok_check(assign_rhs);
-        if(rw_ok_cond.has_value())
-          i.assign_rhs_nonconst() = *rw_ok_cond;
-      }
     }
     else if(i.is_function_call())
     {
@@ -2155,17 +2135,6 @@ void goto_check_ct::goto_check(
       check(i.return_value());
       // the return value invalidate any assertion
       invalidate(i.return_value());
-
-      if(has_subexpr(i.return_value(), [](const exprt &expr) {
-           return expr.id() == ID_r_ok || expr.id() == ID_w_ok ||
-                  expr.id() == ID_rw_ok;
-         }))
-      {
-        exprt &return_value = i.return_value();
-        auto rw_ok_cond = rw_ok_check(return_value);
-        if(rw_ok_cond.has_value())
-          return_value = *rw_ok_cond;
-      }
     }
     else if(i.is_throw())
     {
@@ -2286,6 +2255,8 @@ void goto_check_ct::goto_check(
           identity);
       }
     }
+
+    i.transform([this](exprt expr) { return rw_ok_check(expr); });
 
     for(auto &instruction : new_code.instructions)
     {

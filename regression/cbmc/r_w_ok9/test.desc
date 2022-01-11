@@ -1,0 +1,11 @@
+CORE
+main.c
+
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+__CPROVER_{r,w,rw}_ok must be rewritten everywhere, which includes function call
+arguments.
