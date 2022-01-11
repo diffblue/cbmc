@@ -26,7 +26,7 @@ typedef std::pair<const exprt, const exprt> slicet;
 typedef struct guarded_slicet
 {
   guarded_slicet(exprt _guard, exprt _expr, exprt _start_address, exprt _size)
-    : guard(_guard), expr(_expr), start_adress(_start_address), size(_size)
+    : guard(_guard), expr(_expr), start_address(_start_address), size(_size)
   {
   }
 
@@ -37,7 +37,7 @@ typedef struct guarded_slicet
   const exprt expr;
 
   /// Start address of the target
-  const exprt start_adress;
+  const exprt start_address;
 
   /// Size of the target
   const exprt size;
