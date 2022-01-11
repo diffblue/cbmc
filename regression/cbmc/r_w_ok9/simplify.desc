@@ -1,0 +1,11 @@
+CORE
+main.c
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+false ∨
+∨ false
+--
+__CPROVER_{r,w,rw}_ok must be rewritten everywhere, and the resulting expression
+should be simplified (and, therefore, not contain "false" in a disjunction).

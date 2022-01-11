@@ -1918,7 +1918,10 @@ optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
     for(const auto &c : conditions)
       conjuncts.push_back(c.assertion);
 
-    return conjunction(conjuncts);
+    exprt c = conjunction(conjuncts);
+    if(enable_simplify)
+      simplify(c, ns);
+    return c;
   }
   else if(modified)
     return std::move(expr);
