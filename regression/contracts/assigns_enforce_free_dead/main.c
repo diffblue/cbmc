@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-int foo(int *x, int **p) __CPROVER_assigns(*x, *p, **p)
+int foo(int *x, int **p) __CPROVER_assigns(*x; p : *p; p && *p : **p)
 {
   if(p && *p)
     **p = 0;
@@ -44,12 +44,12 @@ int foo(int *x, int **p) __CPROVER_assigns(*x, *p, **p)
     // q goes DEAD here, unconditionally
   }
 
-  free(z);
+  free(z); // should not fail because free(NULL) is allowed in C
 
   z = malloc(sizeof(int));
   if(nondet_bool())
   {
-    free(z);
+    free(z); // should not fail because free(NULL) is allowed in C
     // here z is deallocated, conditionally
   }
 

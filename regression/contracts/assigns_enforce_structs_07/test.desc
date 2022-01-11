@@ -3,13 +3,14 @@ main.c
 --enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
-^\[f1.pointer\_dereference.\d+\] line \d+ dereference failure: pointer invalid in p->buf\[\(.*\)0\]: FAILURE$
-^\[f1.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in p->buf: FAILURE$
-^\[f2.\d+\] line \d+ Check that pp->p->buf\[\(.*\)0\] is assignable: SUCCESS$
-^\[f2.pointer\_dereference.\d+\] line \d+ dereference failure: pointer invalid in pp->p->buf\[\(.*\)0\]: FAILURE$
+^\[f1.*\d+\].*line 18 Check assigns target validity 'TRUE: p->buf\[\(.*\)0\]': FAILURE$
+^\[f2.*\d+\].*line 23 Check assigns target validity 'TRUE: pp->p->buf\[\(.*\)0\]': FAILURE$
 ^VERIFICATION FAILED$
 --
 --
-Checks whether CBMC properly evaluates write set of members
-from invalid objects. In this case, they are not writable.
+In f1, the assigns clause specifies `*(p->buf)` as target (which can be invalid)
+and assigns `p->buf[0]` unconditionally. When both target and lhs are invalid,
+its inclusion check can be trivially satisfied (or not) but we expect the target
+validity check to fail.
+
+In f2 tests this behaviour with chained dereferences.

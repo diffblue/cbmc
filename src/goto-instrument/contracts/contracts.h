@@ -157,6 +157,13 @@ protected:
     skipt skip_parameter_assigns,
     optionalt<cfg_infot> &cfg_info_opt);
 
+  /// Allow or do not allow NULL targets in inclusion checks
+  enum class allow_null_lhst
+  {
+    YES,
+    NO
+  };
+
   /// Inserts an assertion into the goto program to ensure that
   /// an expression is within the assignable memory frame.
   const assigns_clauset::conditional_address_ranget add_inclusion_check(
@@ -164,6 +171,7 @@ protected:
     const assigns_clauset &assigns,
     goto_programt::targett &instruction_it,
     const exprt &lhs,
+    allow_null_lhst allow_null_lhs,
     optionalt<cfg_infot> &cfg_info_opt);
 
   /// Check if there are any malloc statements which may be repeated because of

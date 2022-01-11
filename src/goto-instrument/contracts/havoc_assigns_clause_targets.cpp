@@ -109,9 +109,12 @@ static void snapshot_if_valid(
 
   dest.add(goto_programt::make_decl(target_snapshot_var));
 
+  const not_exprt not_null(null_pointer(target_pointer));
+  const not_exprt not_invalid{is_invalid_pointer_exprt{target_pointer}};
+
   dest.add(goto_programt::make_assignment(
     target_valid_var,
-    and_exprt{condition, all_dereferences_are_valid(target_pointer, ns)},
+    and_exprt{condition, not_null, not_invalid},
     source_location_no_checks));
 
   dest.add(goto_programt::make_assignment(

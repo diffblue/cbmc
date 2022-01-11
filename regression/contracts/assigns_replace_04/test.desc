@@ -1,9 +1,16 @@
 CORE
 main.c
 --replace-call-with-contract f2 --replace-call-with-contract f3
-^EXIT=0$
+main.c function main
+^\[.*\d+\] line 29 assertion p > 100: SUCCESS$
+^\[.*\d+\] line 30 assertion q == 2: SUCCESS$
+^\[.*\d+\] line 31 reachability test: FAILURE$
+^\*\* 1 of 3 failed
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that verification succeeds when an assigns clause is combined with a function contract in a loop properly.
+This test checks that replacing function calls with their contracts within a
+loop, when the contracts impose contradictory post conditions at different loop
+iterations on a same program variable, do not cause vacuity.

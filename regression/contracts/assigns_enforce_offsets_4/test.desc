@@ -1,9 +1,13 @@
-KNOWNBUG
+CORE
 main.c
---enforce-contract foo
+--enforce-contract foo _ --pointer-check
+^\[.*\d+\].* line 8 Check assigns target validity 'TRUE: x\[\(.*\)10\]': FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
 --
-Check that a write at *x fails when the assigns clause specifies *(x + 1) and the actual underlying object is of size 1.
+Check that a write at *(x+10) fails when the assigns clause specifies *(x + 10)
+and the actual underlying object is too small.
+In that case the target inclusion succeeds because the LHS is in an invalid
+state, but the target validity check must fail.

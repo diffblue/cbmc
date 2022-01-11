@@ -47,13 +47,36 @@ typedef struct guarded_slicet
 class assigns_clauset
 {
 public:
+  enum class check_target_validityt
+  {
+    YES,
+    YES_ALLOW_NULL,
+    NO
+  };
+
   /// \brief A class for representing Conditional Address Ranges
   class conditional_address_ranget
   {
   public:
     conditional_address_ranget(const assigns_clauset &, const exprt &);
 
-    goto_programt generate_snapshot_instructions() const;
+    /// \brief Returns a program that computes a snapshot of the CAR.
+    ///
+    /// In addition, if check_target_validity is Yes, generates:
+    /// ```
+    /// ASSERT
+    /// condition ==> w_ok(target_start_address, target_size)
+    /// ```
+    //
+    /// else if check_target_validity is YesAlloNull, generates:
+    /// ```
+    /// ASSERT
+    /// condition ==>
+    ///    (target_start_address==NULL ||
+    ///      w_ok(target_start_address, target_size))
+    /// ```
+    goto_programt generate_snapshot_instructions(
+      check_target_validityt check_target_validity) const;
 
     bool operator==(const conditional_address_ranget &other) const
     {
@@ -110,6 +133,7 @@ public:
 
   exprt generate_inclusion_check(
     const conditional_address_ranget &lhs,
+    check_target_validityt allow_null_target,
     optionalt<cfg_infot> &cfg_info_opt) const;
 
   const write_sett &get_write_set() const

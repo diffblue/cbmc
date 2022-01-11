@@ -1,12 +1,16 @@
-KNOWNBUG
+CORE
 main.c
 --replace-call-with-contract f2 --replace-call-with-contract f3
-^EXIT=10$
+main.c function main
+^\[.*\d+\] line 29 assertion p < 0: SUCCESS$
+^\[.*\d+\] line 30 assertion q == 32: SUCCESS$
+^\[.*\d+\] line 31 reachability test: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
 --
 --
-This test checks that verification fails when assigns clauses are combined with function contracts
-in a loop improperly, i.e., always assumes memory not mention in ensures clauses are unchanged.
-
-BUG: Currently, function call replacement using 'ensures' specifications encodes an implicit assumption that any memory not mentioned in the ensures clause remains unchanged throughout the function, even when an 'assigns' clause is not present.
+This test demonstrates that replacing a function call with a contract that has
+an empty assigns clause and a post condition involving its input parameters can 
+causes vacuous proofs. Checking the contract against the function would fail
+the assigns clause checks. *This is not a bug*.

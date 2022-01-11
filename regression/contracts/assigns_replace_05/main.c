@@ -1,8 +1,8 @@
 #include <assert.h>
 
-void f2(int *x2, int *y2) __CPROVER_assigns(*x2) __CPROVER_ensures(*x2 > 5)
+void f2(int *x2, int *y2) __CPROVER_assigns(*x2) __CPROVER_ensures(*x2 < 5)
 {
-  *x2 = 10;
+  *x2 = 1;
 }
 
 void f3(int *x3, int *y3) __CPROVER_ensures(*x3 > 100)
@@ -26,8 +26,9 @@ int main()
       f3(&p, &q);
     }
   }
-  assert(p > 100);
-  assert(q == 2);
+  assert(p < 0);
+  assert(q == 32);
+  __CPROVER_assert(0, "reachability test");
 
   return 0;
 }
