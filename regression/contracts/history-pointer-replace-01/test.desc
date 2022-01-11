@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 ASSERT \*\(address_of.*n.*\) > 0
-ASSUME \*\(address_of.*n.*\) = .*::tmp_cc[\$\d]? \+ 2
+ASSUME \*\(address_of.*n.*\) = tmp_cc[\$\d]? \+ 2
 --
 --
 Verification:
