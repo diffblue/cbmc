@@ -188,7 +188,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
       symbol.name,
       symbol_table);
     const symbol_exprt &init_symbol_expression = init_symbol.symbol_expr();
-    code_assignt get_argument(
+    code_frontend_assignt get_argument(
       init_symbol_expression,
       symbol_exprt(this_argument.get_identifier(), this_type));
     get_argument.add_source_location() = synthesized_source_location;
@@ -242,7 +242,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
           0,
           false,
           false);
-      new_instructions.add(code_returnt(to_return));
+      new_instructions.add(code_frontend_returnt(to_return));
     }
   }
 

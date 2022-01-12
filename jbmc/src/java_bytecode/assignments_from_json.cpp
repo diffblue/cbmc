@@ -8,16 +8,6 @@ Author: Diffblue Ltd.
 
 #include "assignments_from_json.h"
 
-#include "ci_lazy_methods_needed.h"
-#include "code_with_references.h"
-#include "java_static_initializers.h"
-#include "java_string_literals.h"
-#include "java_types.h"
-#include "java_utils.h"
-
-#include <goto-programs/allocate_objects.h>
-#include <goto-programs/class_identifier.h>
-
 #include <util/arith_tools.h>
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
@@ -25,6 +15,17 @@ Author: Diffblue Ltd.
 #include <util/json.h>
 #include <util/symbol_table_base.h>
 #include <util/unicode.h>
+
+#include <goto-programs/allocate_objects.h>
+#include <goto-programs/class_identifier.h>
+#include <goto-programs/goto_instruction_code.h>
+
+#include "ci_lazy_methods_needed.h"
+#include "code_with_references.h"
+#include "java_static_initializers.h"
+#include "java_string_literals.h"
+#include "java_types.h"
+#include "java_utils.h"
 
 /// Values passed around between most functions of the recursive deterministic
 /// assignment algorithm entered from \ref assign_from_json.
@@ -345,43 +346,44 @@ assign_primitive_from_json(const exprt &expr, const jsont &json)
     return result;
   if(expr.type() == java_boolean_type())
   {
-    result.add(code_assignt{
+    result.add(code_frontend_assignt{
       expr, json.is_true() ? (exprt)true_exprt{} : (exprt)false_exprt{}});
   }
   else if(
     expr.type() == java_int_type() || expr.type() == java_byte_type() ||
     expr.type() == java_short_type() || expr.type() == java_long_type())
   {
-    result.add(
-      code_assignt{expr, from_integer(std::stoll(json.value), expr.type())});
+    result.add(code_frontend_assignt{
+      expr, from_integer(std::stoll(json.value), expr.type())});
   }
   else if(expr.type() == java_double_type())
   {
     ieee_floatt ieee_float(to_floatbv_type(expr.type()));
     ieee_float.from_double(std::stod(json.value));
-    result.add(code_assignt{expr, ieee_float.to_expr()});
+    result.add(code_frontend_assignt{expr, ieee_float.to_expr()});
   }
   else if(expr.type() == java_float_type())
   {
     ieee_floatt ieee_float(to_floatbv_type(expr.type()));
     ieee_float.from_float(std::stof(json.value));
-    result.add(code_assignt{expr, ieee_float.to_expr()});
+    result.add(code_frontend_assignt{expr, ieee_float.to_expr()});
   }
   else if(expr.type() == java_char_type())
   {
     const std::wstring wide_value = utf8_to_utf16_native_endian(json.value);
     PRECONDITION(wide_value.length() == 1);
-    result.add(
-      code_assignt{expr, from_integer(wide_value.front(), expr.type())});
+    result.add(code_frontend_assignt{
+      expr, from_integer(wide_value.front(), expr.type())});
   }
   return result;
 }
 
 /// One of the base cases of the recursive algorithm. See
 /// \ref assign_from_json_rec.
-static code_assignt assign_null(const exprt &expr)
+static code_frontend_assignt assign_null(const exprt &expr)
 {
-  return code_assignt{expr, null_pointer_exprt{to_pointer_type(expr.type())}};
+  return code_frontend_assignt{
+    expr, null_pointer_exprt{to_pointer_type(expr.type())}};
 }
 
 /// In the case of an assignment of an array given a JSON representation, this
@@ -405,7 +407,8 @@ static code_with_references_listt assign_array_data_component_from_json(
     info.allocate_objects.allocate_automatic_local_object(
       data_member_expr.type(), "user_specified_array_data_init");
   code_with_references_listt result;
-  result.add(code_assignt{array_init_data, data_member_expr, info.loc});
+  result.add(
+    code_frontend_assignt{array_init_data, data_member_expr, info.loc});
 
   size_t index = 0;
   const optionalt<std::string> inferred_element_type =
@@ -432,8 +435,8 @@ nondet_length(allocate_objectst &allocate, source_locationt loc)
   symbol_exprt length_expr = allocate.allocate_automatic_local_object(
     java_int_type(), "user_specified_array_length");
   code_with_references_listt code;
-  code.add(
-    code_assignt{length_expr, side_effect_expr_nondett{java_int_type(), loc}});
+  code.add(code_frontend_assignt{
+    length_expr, side_effect_expr_nondett{java_int_type(), loc}});
   code.add(code_assumet{binary_predicate_exprt{
     length_expr, ID_ge, from_integer(0, java_int_type())}});
   return std::make_pair(length_expr, std::move(code));
@@ -506,16 +509,17 @@ static code_with_references_listt assign_nondet_length_array_from_json(
 /// One of the cases in the recursive algorithm: the case where \p expr
 /// represents a string.
 /// See \ref assign_from_json_rec.
-static code_assignt assign_string_from_json(
+static code_frontend_assignt assign_string_from_json(
   const jsont &json,
   const exprt &expr,
   object_creation_infot &info)
 {
   const auto json_string = get_untyped_string(json);
   PRECONDITION(json_string.is_string());
-  return code_assignt{expr,
-                      get_or_create_string_literal_symbol(
-                        json_string.value, info.symbol_table, true)};
+  return code_frontend_assignt{
+    expr,
+    get_or_create_string_literal_symbol(
+      json_string.value, info.symbol_table, true)};
 }
 
 /// Helper function for \ref assign_struct_from_json which recursively assigns
@@ -586,7 +590,7 @@ static code_with_references_listt assign_struct_from_json(
       to_struct_expr(*initial_object),
       ns,
       struct_tag_typet("java::" + id2string(java_class_type.get_tag())));
-    result.add(code_assignt{expr, *initial_object});
+    result.add(code_frontend_assignt{expr, *initial_object});
     result.append(assign_struct_components_from_json(expr, json, info));
   }
   return result;
@@ -646,7 +650,7 @@ static code_with_references_listt assign_enum_from_json(
   const exprt ordinal_expr =
     from_integer(std::stoi(json["ordinal"].value), java_int_type());
 
-  result.add(code_assignt{
+  result.add(code_frontend_assignt{
     expr,
     typecast_exprt::conditional_cast(
       array_element_from_pointer(values_data, ordinal_expr), expr.type())});
@@ -696,7 +700,8 @@ static code_with_references_listt assign_pointer_with_given_type_from_json(
     }
 
     auto result = assign_pointer_from_json(new_symbol, json, info);
-    result.add(code_assignt{expr, typecast_exprt{new_symbol, pointer_type}});
+    result.add(
+      code_frontend_assignt{expr, typecast_exprt{new_symbol, pointer_type}});
     return result;
   }
   else
@@ -828,7 +833,7 @@ static code_with_references_listt assign_reference_from_json(
         assign_struct_from_json(dereference_exprt(reference.expr), json, info));
     }
   }
-  result.add(code_assignt{
+  result.add(code_frontend_assignt{
     expr, typecast_exprt::conditional_cast(reference.expr, expr.type())});
   return result;
 }
