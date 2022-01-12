@@ -41,11 +41,18 @@ else()
     COMMAND "${CMAKE_COMMAND}" -E create_symlink
       goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-ld
     BYPRODUCTS ${CMAKE_BINARY_DIR}/bin/goto-ld)
+  add_custom_command(TARGET goto-cc
+    POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/ls_parse.py
+      $<TARGET_FILE_DIR:goto-cc>/ls_parse.py
+    BYPRODUCTS ${CMAKE_BINARY_DIR}/bin/ls_parse.py)
 
   install(
     FILES
       ${CMAKE_BINARY_DIR}/bin/goto-ld
       ${CMAKE_BINARY_DIR}/bin/goto-gcc
+      ${CMAKE_BINARY_DIR}/bin/ls_parse.py
     DESTINATION
       ${CMAKE_INSTALL_BINDIR})
 endif()

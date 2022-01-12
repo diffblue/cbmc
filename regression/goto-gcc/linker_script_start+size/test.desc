@@ -1,9 +1,10 @@
-CORE
+CORE gnu-ld-only
 main.c
--o out.gb -T script.ld -nostdlib
+-o out.gb -T script.ld -nostdlib -static -Wall
 ^EXIT=0$
 ^SIGNAL=0$
 --
+Problem parsing linker script
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
