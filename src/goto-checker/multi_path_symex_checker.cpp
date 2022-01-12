@@ -15,7 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/ui_message.h>
 
-#include <solvers/hardness_collector.h>
+#include <goto-symex/solver_hardness.h>
 
 #include "bmc_util.h"
 #include "counterexample_beautification.h"

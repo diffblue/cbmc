@@ -22,10 +22,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prop_conv.h"
 #include "solver_resource_limits.h"
 
+class equal_exprt;
+
 class prop_conv_solvert : public conflict_providert,
                           public prop_convt,
-                          public solver_resource_limitst,
-                          public hardness_collectort
+                          public solver_resource_limitst
 {
 public:
   prop_conv_solvert(propt &_prop, message_handlert &message_handler)
@@ -95,8 +96,10 @@ public:
 
   std::size_t get_number_of_solver_calls() const override;
 
-  void with_solver_hardness(handlert handler) override;
-  void enable_hardness_collection() override;
+  hardness_collectort *get_hardness_collector()
+  {
+    return dynamic_cast<hardness_collectort *>(&prop);
+  }
 
 protected:
   virtual void post_process();

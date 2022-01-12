@@ -8,10 +8,11 @@ Author: Diffblue Ltd.
 
 #include "string_constraint.h"
 
-#include <solvers/sat/satcheck.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
+#include <solvers/sat/satcheck.h>
 
 /// Runs a solver instance to verify whether an expression can only be
 /// non-negative.

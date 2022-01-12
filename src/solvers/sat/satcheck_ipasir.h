@@ -46,28 +46,12 @@ public:
     return true;
   }
 
-  void
-  with_solver_hardness(std::function<void(solver_hardnesst &)> handler) override
-  {
-    if(solver_hardness.has_value())
-    {
-      handler(solver_hardness.value());
-    }
-  }
-
-  void enable_hardness_collection() override
-  {
-    solver_hardness = solver_hardnesst{};
-  }
-
 protected:
   resultt do_prop_solve() override;
 
   void *solver;
 
   bvt assumptions;
-
-  optionalt<solver_hardnesst> solver_hardness;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_IPASIR_H

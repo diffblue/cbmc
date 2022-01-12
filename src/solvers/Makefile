@@ -80,7 +80,6 @@ SRC = $(BOOLEFORCE_SRC) \
       $(SQUOLEM2_SRC) \
       $(CADICAL_SRC) \
       decision_procedure.cpp \
-      solver_hardness.cpp \
       flattening/arrays.cpp \
       flattening/boolbv.cpp \
       flattening/boolbv_abs.cpp \

@@ -37,6 +37,7 @@ class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class member_exprt;
 class replication_exprt;
+class union_typet;
 
 class boolbvt:public arrayst
 {

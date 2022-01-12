@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/namespace.h>
 
 #include <solvers/floatbv/float_utils.h>
 

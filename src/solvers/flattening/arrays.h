@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "equality.h"
 
+class array_comprehension_exprt;
+class array_exprt;
 class array_of_exprt;
 class equal_exprt;
 class if_exprt;

@@ -144,7 +144,8 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
     solver->addClause_(c);
 
-    with_solver_hardness([this, &bv](solver_hardnesst &hardness) {
+    if(solver_hardness)
+    {
       // To map clauses to lines of program code, track clause indices in the
       // dimacs cnf output. Dimacs output is generated after processing
       // clauses to remove duplicates and clauses that are trivially true.
@@ -158,8 +159,9 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
       if(!clause_removed)
         cnf_clause_index++;
 
-      hardness.register_clause(bv, cnf, cnf_clause_index, !clause_removed);
-    });
+      solver_hardness->register_clause(
+        bv, cnf, cnf_clause_index, !clause_removed);
+    }
 
     clause_counter++;
   }

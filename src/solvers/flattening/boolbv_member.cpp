@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include <util/c_types.h>
+#include <util/namespace.h>
 
 static bvt convert_member_struct(
   const member_exprt &expr,
