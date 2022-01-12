@@ -116,7 +116,7 @@ symbol_exprt allocate_objectst::allocate_automatic_local_object(
     symbol_mode,
     symbol_table);
 
-  symbols_created.push_back(&aux_symbol);
+  add_created_symbol(aux_symbol);
 
   return aux_symbol.symbol_expr();
 }
@@ -153,7 +153,7 @@ exprt allocate_objectst::allocate_dynamic_object_symbol(
     symbol_mode,
     symbol_table);
 
-  symbols_created.push_back(&malloc_sym);
+  add_created_symbol(malloc_sym);
 
   code_frontend_assignt assign =
     make_allocate_code(malloc_sym.symbol_expr(), object_size.value());
@@ -194,7 +194,7 @@ exprt allocate_objectst::allocate_non_dynamic_object(
     symbol_table);
 
   aux_symbol.is_static_lifetime = static_lifetime;
-  symbols_created.push_back(&aux_symbol);
+  add_created_symbol(aux_symbol);
 
   exprt aoe = typecast_exprt::conditional_cast(
     address_of_exprt(aux_symbol.symbol_expr()), target_expr.type());
@@ -215,10 +215,10 @@ exprt allocate_objectst::allocate_non_dynamic_object(
 
 /// Add a pointer to a symbol to the list of pointers to symbols created so far
 ///
-/// \param symbol_ptr: pointer to a symbol in the symbol table
-void allocate_objectst::add_created_symbol(const symbolt *symbol_ptr)
+/// \param symbol: symbol in the symbol table
+void allocate_objectst::add_created_symbol(const symbolt &symbol)
 {
-  symbols_created.push_back(symbol_ptr);
+  symbols_created.push_back(symbol.name);
 }
 
 /// Adds declarations for all non-static symbols created
@@ -228,11 +228,12 @@ void allocate_objectst::declare_created_symbols(code_blockt &init_code)
 {
   // Add the following code to init_code for each symbol that's been created:
   //   <type> <identifier>;
-  for(const symbolt *const symbol_ptr : symbols_created)
+  for(const auto &symbol_id : symbols_created)
   {
-    if(!symbol_ptr->is_static_lifetime)
+    const symbolt &symbol = ns.lookup(symbol_id);
+    if(!symbol.is_static_lifetime)
     {
-      code_declt decl(symbol_ptr->symbol_expr());
+      code_declt decl{symbol.symbol_expr()};
       decl.add_source_location() = source_location;
       init_code.add(decl);
     }
@@ -246,10 +247,11 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
 {
   // Add the following code to init_code for each symbol that's been created:
   //   INPUT("<identifier>", <identifier>);
-  for(symbolt const *symbol_ptr : symbols_created)
+  for(const auto &symbol_id : symbols_created)
   {
-    init_code.add(code_inputt{
-      symbol_ptr->base_name, symbol_ptr->symbol_expr(), source_location});
+    const symbolt &symbol = ns.lookup(symbol_id);
+    init_code.add(
+      code_inputt{symbol.base_name, symbol.symbol_expr(), source_location});
   }
 }
 

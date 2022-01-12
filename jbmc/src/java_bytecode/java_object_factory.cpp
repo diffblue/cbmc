@@ -104,7 +104,7 @@ public:
     update_in_placet,
     const source_locationt &location);
 
-  void add_created_symbol(const symbolt *symbol);
+  void add_created_symbol(const symbolt &symbol);
 
   void declare_created_symbols(code_blockt &init_code);
 
@@ -1111,9 +1111,9 @@ void java_object_factoryt::gen_nondet_init(
   }
 }
 
-void java_object_factoryt::add_created_symbol(const symbolt *symbol_ptr)
+void java_object_factoryt::add_created_symbol(const symbolt &symbol)
 {
-  allocate_objects.add_created_symbol(symbol_ptr);
+  allocate_objects.add_created_symbol(symbol);
 }
 
 void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
@@ -1578,7 +1578,7 @@ exprt object_factory(
     update_in_placet::NO_UPDATE_IN_PLACE,
     loc);
 
-  state.add_created_symbol(&main_symbol);
+  state.add_created_symbol(main_symbol);
   state.declare_created_symbols(init_code);
 
   assert_type_consistency(assignments);

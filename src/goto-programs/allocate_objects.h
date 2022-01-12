@@ -93,7 +93,7 @@ public:
     const typet &allocate_type,
     const irep_idt &basename_prefix = "tmp");
 
-  void add_created_symbol(const symbolt *symbol_ptr);
+  void add_created_symbol(const symbolt &symbol);
 
   void declare_created_symbols(code_blockt &init_code);
 
@@ -107,7 +107,7 @@ private:
   symbol_table_baset &symbol_table;
   const namespacet ns;
 
-  std::vector<const symbolt *> symbols_created;
+  std::vector<irep_idt> symbols_created;
 
   exprt allocate_non_dynamic_object(
     code_blockt &assignments,

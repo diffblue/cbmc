@@ -224,7 +224,7 @@ symbol_exprt c_nondet_symbol_factory(
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 
-  state.add_created_symbol(&main_symbol);
+  state.add_created_symbol(main_symbol);
   state.declare_created_symbols(init_code);
 
   init_code.append(assignments);
