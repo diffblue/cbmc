@@ -115,12 +115,12 @@ assigns_clauset::conditional_address_ranget::conditional_address_ranget(
       generate_new_symbol("__car_valid", bool_typet(), location).symbol_expr()),
     lower_bound_address_var(generate_new_symbol(
                               "__car_lb",
-                              guarded_slice.start_adress.type(),
+                              guarded_slice.start_address.type(),
                               location)
                               .symbol_expr()),
     upper_bound_address_var(generate_new_symbol(
                               "__car_ub",
-                              guarded_slice.start_adress.type(),
+                              guarded_slice.start_address.type(),
                               location)
                               .symbol_expr())
 {
@@ -158,10 +158,10 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions(
   auto validity_check_expr =
     check_target_validity == check_target_validityt::YES_ALLOW_NULL
       ? or_exprt{not_exprt{clean_guard},
-                 null_pointer(guarded_slice.start_adress),
-                 w_ok_exprt{guarded_slice.start_adress, guarded_slice.size}}
+                 null_pointer(guarded_slice.start_address),
+                 w_ok_exprt{guarded_slice.start_address, guarded_slice.size}}
       : or_exprt{not_exprt{clean_guard},
-                 w_ok_exprt{guarded_slice.start_adress, guarded_slice.size}};
+                 w_ok_exprt{guarded_slice.start_address, guarded_slice.size}};
 
   if(check_target_validity != check_target_validityt::NO)
   {
@@ -185,7 +185,7 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions(
     validity_condition_var,
     simplify_expr(
       and_exprt{clean_guard,
-                not_exprt{null_pointer(guarded_slice.start_adress)}},
+                not_exprt{null_pointer(guarded_slice.start_address)}},
       parent.ns),
     location_no_checks));
 
@@ -193,7 +193,7 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions(
     goto_programt::make_decl(lower_bound_address_var, location_no_checks));
 
   instructions.add(goto_programt::make_assignment(
-    lower_bound_address_var, guarded_slice.start_adress, location_no_checks));
+    lower_bound_address_var, guarded_slice.start_address, location_no_checks));
 
   instructions.add(
     goto_programt::make_decl(upper_bound_address_var, location_no_checks));
@@ -201,7 +201,7 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions(
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
     simplify_expr(
-      plus_exprt{guarded_slice.start_adress, guarded_slice.size}, parent.ns),
+      plus_exprt{guarded_slice.start_address, guarded_slice.size}, parent.ns),
     location_no_checks));
 
   // The snapshot assignments involve only instrumentation variables
@@ -277,7 +277,7 @@ exprt assigns_clauset::generate_inclusion_check(
     if(allow_null_target == check_target_validityt::YES_ALLOW_NULL)
       return false_exprt{};
     else
-      return null_pointer(lhs.guarded_slice.start_adress);
+      return null_pointer(lhs.guarded_slice.start_address);
   }
 
   exprt::operandst conditions;
@@ -297,7 +297,7 @@ exprt assigns_clauset::generate_inclusion_check(
 
   if(allow_null_target == check_target_validityt::YES_ALLOW_NULL)
     return or_exprt{
-      null_pointer(lhs.guarded_slice.start_adress),
+      null_pointer(lhs.guarded_slice.start_address),
       and_exprt{lhs.validity_condition_var, disjunction(conditions)}};
   else
     return and_exprt{lhs.validity_condition_var, disjunction(conditions)};
