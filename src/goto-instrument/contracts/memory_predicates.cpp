@@ -16,6 +16,8 @@ Date: July 2021
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/expr2c.h>
 
+#include <goto-programs/goto_convert_functions.h>
+
 #include <linking/static_lifetime_init.h>
 
 #include <util/config.h>
@@ -188,21 +190,18 @@ void is_fresh_baset::add_declarations(const std::string &decl_string)
     }
   }
 
-  // We have to set the global memory map array to
-  // all zeros for this to work properly
-  const array_typet ty =
-    to_array_type(tmp_symbol_table.lookup_ref(memmap_name).type);
-  constant_exprt initial_value(irep_idt(dstringt("0")), ty.subtype());
-  array_of_exprt memmap_init(initial_value, ty);
-  goto_programt::instructiont a =
-    goto_programt::make_assignment(symbol_exprt(memmap_name, ty), memmap_init);
-
-  // insert the assignment into the initialize function.
-  auto called_func =
-    parent.get_goto_functions().function_map.find(INITIALIZE_FUNCTION);
-  goto_programt &body = called_func->second.body;
-  auto target = body.get_end_function();
-  body.insert_before(target, a);
+  if(parent.get_goto_functions().function_map.erase(INITIALIZE_FUNCTION) != 0)
+  {
+    static_lifetime_init(
+      parent.get_symbol_table(),
+      parent.get_symbol_table().lookup_ref(INITIALIZE_FUNCTION).location);
+    goto_convert(
+      INITIALIZE_FUNCTION,
+      parent.get_symbol_table(),
+      parent.get_goto_functions(),
+      log.get_message_handler());
+    parent.get_goto_functions().update();
+  }
 }
 
 void is_fresh_baset::update_fn_call(
