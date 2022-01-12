@@ -25,6 +25,7 @@ Date: July 2021
 #include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/simplify_expr.h>
 
 static const slicet normalize_to_slice(const exprt &expr, const namespacet &ns)
 {
@@ -126,14 +127,10 @@ assigns_clauset::conditional_address_ranget::conditional_address_ranget(
 }
 
 goto_programt
-assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
-  const
+assigns_clauset::conditional_address_ranget::generate_snapshot_instructions(
+  check_target_validityt check_target_validity) const
 {
   goto_programt instructions;
-  // adding pragmas to the location to selectively disable checks
-  // where it is sound to do so
-  source_locationt location_no_checks = location;
-  disable_pointer_checks(location_no_checks);
 
   // clean up side effects from the guard expression if needed
   cleanert cleaner(parent.symbol_table, parent.log.get_message_handler());
@@ -148,54 +145,67 @@ assigns_clauset::conditional_address_ranget::generate_snapshot_instructions()
   // we want checks on the guard because it is user code
   clean_guard.add_source_location() = location;
 
+  // adding pragmas to the location to selectively disable checks
+  // where it is sound to do so
+  source_locationt location_no_checks(location);
+  disable_pointer_checks(location_no_checks);
+
+  // If requested, we check that when guard condition is true,
+  // the target's `start_address` pointer satisfies w_ok with the expected size
+  // (or is NULL if we allow it explicitly).
+  // This assertion will be falsified whenever `start_address` is invalid or
+  // not of the right size (or is NULL if we dot not allow it expliclitly).
+  auto validity_check_expr =
+    check_target_validity == check_target_validityt::YES_ALLOW_NULL
+      ? or_exprt{not_exprt{clean_guard},
+                 null_pointer(guarded_slice.start_adress),
+                 w_ok_exprt{guarded_slice.start_adress, guarded_slice.size}}
+      : or_exprt{not_exprt{clean_guard},
+                 w_ok_exprt{guarded_slice.start_adress, guarded_slice.size}};
+
+  if(check_target_validity != check_target_validityt::NO)
+  {
+    auto target_validity_assert =
+      instructions.add(goto_programt::make_assertion(
+        simplify_expr(validity_check_expr, parent.ns), location_no_checks));
+
+    target_validity_assert->source_location_nonconst().set_comment(
+      "Check assigns target validity '" +
+      from_expr(parent.ns, "", guarded_slice.guard) + ": " +
+      from_expr(parent.ns, "", guarded_slice.expr) + "'");
+  }
+
+  // ~~~ From then on we implicitly assume that the assertion holds ~~~ //
+
+  // We snapshot the validity condition, lower bound and upper bound addresses
   instructions.add(
     goto_programt::make_decl(validity_condition_var, location_no_checks));
+
+  instructions.add(goto_programt::make_assignment(
+    validity_condition_var,
+    simplify_expr(
+      and_exprt{clean_guard,
+                not_exprt{null_pointer(guarded_slice.start_adress)}},
+      parent.ns),
+    location_no_checks));
+
   instructions.add(
     goto_programt::make_decl(lower_bound_address_var, location_no_checks));
-  instructions.add(
-    goto_programt::make_decl(upper_bound_address_var, location_no_checks));
-
-  instructions.add(goto_programt::make_assignment(
-    lower_bound_address_var,
-    null_pointer_exprt{to_pointer_type(guarded_slice.start_adress.type())},
-    location_no_checks));
-  instructions.add(goto_programt::make_assignment(
-    upper_bound_address_var,
-    null_pointer_exprt{to_pointer_type(guarded_slice.start_adress.type())},
-    location_no_checks));
-
-  goto_programt skip_program;
-  const auto skip_target =
-    skip_program.add(goto_programt::make_skip(location_no_checks));
-
-  const auto validity_check_expr =
-    and_exprt{clean_guard,
-              all_dereferences_are_valid(guarded_slice.expr, parent.ns),
-              w_ok_exprt{guarded_slice.start_adress, guarded_slice.size}};
-
-  instructions.add(goto_programt::make_assignment(
-    validity_condition_var, validity_check_expr, location_no_checks));
-
-  instructions.add(goto_programt::make_goto(
-    skip_target, not_exprt{validity_condition_var}, location_no_checks));
 
   instructions.add(goto_programt::make_assignment(
     lower_bound_address_var, guarded_slice.start_adress, location_no_checks));
 
-  // the computation of the CAR upper bound can overflow into the object ID bits
-  // of the pointer with very large allocation sizes.
-  // We enable pointer overflow checks to detect such cases.
-  source_locationt location_overflow_check = location;
-  location_overflow_check.add_pragma("enable:pointer-overflow-check");
+  instructions.add(
+    goto_programt::make_decl(upper_bound_address_var, location_no_checks));
 
   instructions.add(goto_programt::make_assignment(
     upper_bound_address_var,
-    plus_exprt{guarded_slice.start_adress, guarded_slice.size},
-    location_overflow_check));
-  instructions.destructive_append(skip_program);
+    simplify_expr(
+      plus_exprt{guarded_slice.start_adress, guarded_slice.size}, parent.ns),
+    location_no_checks));
 
-  // The assignments above are only performed on locally defined temporaries
-  // and need not be checked for inclusion in the enclosing scope's write set.
+  // The snapshot assignments involve only instrumentation variables
+  // need not be checked against the surrounding assigns clause.
   add_pragma_disable_assigns_check(instructions);
   return instructions;
 }
@@ -259,12 +269,18 @@ void assigns_clauset::remove_from_write_set(const exprt &target_expr)
 
 exprt assigns_clauset::generate_inclusion_check(
   const conditional_address_ranget &lhs,
+  check_target_validityt allow_null_target,
   optionalt<cfg_infot> &cfg_info_opt) const
 {
   if(write_set.empty())
-    return not_exprt{lhs.validity_condition_var};
+  {
+    if(allow_null_target == check_target_validityt::YES_ALLOW_NULL)
+      return false_exprt{};
+    else
+      return null_pointer(lhs.guarded_slice.start_adress);
+  }
 
-  exprt::operandst conditions{not_exprt{lhs.validity_condition_var}};
+  exprt::operandst conditions;
 
   if(cfg_info_opt.has_value())
   {
@@ -279,7 +295,12 @@ exprt assigns_clauset::generate_inclusion_check(
       conditions.push_back(target.generate_unsafe_inclusion_check(lhs));
   }
 
-  return disjunction(conditions);
+  if(allow_null_target == check_target_validityt::YES_ALLOW_NULL)
+    return or_exprt{
+      null_pointer(lhs.guarded_slice.start_adress),
+      and_exprt{lhs.validity_condition_var, disjunction(conditions)}};
+  else
+    return and_exprt{lhs.validity_condition_var, disjunction(conditions)};
 }
 
 void havoc_assigns_targetst::append_havoc_code_for_expr(

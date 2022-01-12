@@ -1,8 +1,8 @@
 CORE
 main.c
 --enforce-contract foo _ --malloc-may-fail --malloc-fail-null --pointer-primitive-check
-^\[foo.\d+\] line \d+ Check that \*\(\*p\) is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*\(\*p\) is assignable: FAILURE$
+^\[foo.\d+\] line 7 Check that \*\(\*p\) is assignable: SUCCESS$
+^\[foo.\d+\] line 24 Check that \*\(\*p\) is assignable: FAILURE$
 ^\[foo.\d+\] line \d+ Check that \*p is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*q is assignable: SUCCESS$
 ^\[foo.\d+\] line \d+ Check that \*w is assignable: SUCCESS$

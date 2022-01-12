@@ -13,8 +13,8 @@ int main()
 {
   int *x = malloc(2 * sizeof(int));
   *x = 0;
-  *(x + 1) == 0
-    // write should fail because x points to a size 2 object and the contracts expects size 10 at least.
-    foo(x);
+  *(x + 1) == 0;
+  // write should fail because x points to a size 2 object and the contracts expects size 10 at least.
+  foo(x);
   return 0;
 }

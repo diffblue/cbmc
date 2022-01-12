@@ -1,0 +1,21 @@
+CORE
+main.c
+--enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
+^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
+^\[f2.\d+\] line \d+ Check that pp->p->buf\[\(.*\)0\] is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^\[f1.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in p->buf: FAILURE$
+^\[f1.pointer\_dereference.\d+\] line \d+ dereference failure: pointer invalid in p->buf\[\(.*\)0\]: FAILURE$
+^\[f2.pointer\_dereference.\d+\] line \d+ dereference failure: pointer NULL in pp->p->buf\[\(.*\)0\]: FAILURE$
+^\[f2.pointer\_dereference.\d+\] line \d+ dereference failure: pointer invalid in pp->p->buf\[\(.*\)0\]: FAILURE$
+--
+In f1, the assigns clause specifies `*(p->buf)` as target (which can be invalid)
+and assigns `p->buf[0]` unconditionally. When both target and lhs are invalid,
+its  inclusion check can be trivially satisfied or not but we expect in all
+cases a  null pointer failure and an invalid pointer error to occur 
+on the assignment.
+
+In f2 tests this behaviour with chained dereferences.

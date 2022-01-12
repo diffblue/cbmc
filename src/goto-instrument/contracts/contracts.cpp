@@ -304,7 +304,8 @@ void code_contractst::check_apply_loop_contracts(
   // This must be done before havocing the write set.
   for(const auto &car : loop_assigns.get_write_set())
   {
-    auto snapshot_instructions = car.generate_snapshot_instructions();
+    auto snapshot_instructions = car.generate_snapshot_instructions(
+      assigns_clauset::check_target_validityt::YES_ALLOW_NULL);
     insert_before_swap_and_advance(
       goto_function.body, loop_head, snapshot_instructions);
   };
@@ -956,6 +957,7 @@ void code_contractst::instrument_assign_statement(
     assigns_clause,
     instruction_it,
     instruction_it->assign_lhs(),
+    allow_null_lhst::NO,
     cfg_info_opt);
 }
 
@@ -985,7 +987,9 @@ void code_contractst::instrument_call_statement(
       // move past the call and then insert the CAR
       instruction_it++;
       const auto car = assigns.add_to_write_set(pointer_object(object));
-      auto snapshot_instructions = car->generate_snapshot_instructions();
+      auto snapshot_instructions = car->generate_snapshot_instructions(
+        // no check because malloc always returns a null or valid pointer
+        assigns_clauset::check_target_validityt::NO);
       insert_before_swap_and_advance(
         body, instruction_it, snapshot_instructions);
       // since CAR was inserted *after* the malloc call,
@@ -1003,6 +1007,8 @@ void code_contractst::instrument_call_statement(
       assigns,
       instruction_it,
       pointer_object(instruction_it->call_arguments().front()),
+      // NULL pointers are a allowed and a no-op with free
+      allow_null_lhst::YES,
       cfg_info_opt);
 
     // skip all invalidation business if we're freeing invalid memory
@@ -1214,7 +1220,8 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   auto instruction_it = function_body.instructions.begin();
   for(const auto &car : assigns.get_write_set())
   {
-    auto snapshot_instructions = car.generate_snapshot_instructions();
+    auto snapshot_instructions = car.generate_snapshot_instructions(
+      assigns_clauset::check_target_validityt::YES_ALLOW_NULL);
     insert_before_swap_and_advance(
       function_body, instruction_it, snapshot_instructions);
   };
@@ -1336,7 +1343,10 @@ void code_contractst::check_frame_conditions(
       // move past the call and then insert the CAR
       instruction_it++;
       const auto car = assigns.add_to_write_set(decl_symbol);
-      auto snapshot_instructions = car->generate_snapshot_instructions();
+      // we do not need to check target validity because DECL
+      // are always backed by adequately sized objects
+      auto snapshot_instructions = car->generate_snapshot_instructions(
+        assigns_clauset::check_target_validityt::NO);
       insert_before_swap_and_advance(
         body, instruction_it, snapshot_instructions);
       // since CAR was inserted *after* the DECL instruction,
@@ -1400,7 +1410,12 @@ void code_contractst::check_frame_conditions(
       const auto havoc_argument =
         pointer_object(instruction_it->get_other().operands().front());
       add_inclusion_check(
-        body, assigns, instruction_it, havoc_argument, cfg_info_opt);
+        body,
+        assigns,
+        instruction_it,
+        havoc_argument,
+        allow_null_lhst::NO,
+        cfg_info_opt);
     }
 
     // Move to the next instruction
@@ -1416,10 +1431,18 @@ code_contractst::add_inclusion_check(
   const assigns_clauset &assigns,
   goto_programt::targett &instruction_it,
   const exprt &lhs,
+  allow_null_lhst allow_null_lhs,
   optionalt<cfg_infot> &cfg_info_opt)
 {
   const assigns_clauset::conditional_address_ranget car{assigns, lhs};
-  auto snapshot_instructions = car.generate_snapshot_instructions();
+
+  auto check_target_validity =
+    allow_null_lhs == allow_null_lhst::YES
+      ? assigns_clauset::check_target_validityt::YES_ALLOW_NULL
+      : assigns_clauset::check_target_validityt::YES;
+
+  auto snapshot_instructions =
+    car.generate_snapshot_instructions(check_target_validity);
   insert_before_swap_and_advance(
     program, instruction_it, snapshot_instructions);
 
@@ -1442,7 +1465,8 @@ code_contractst::add_inclusion_check(
   }
 
   assertion.add(goto_programt::make_assertion(
-    assigns.generate_inclusion_check(car, cfg_info_opt), location_no_checks));
+    assigns.generate_inclusion_check(car, check_target_validity, cfg_info_opt),
+    location_no_checks));
   insert_before_swap_and_advance(program, instruction_it, assertion);
 
   return car;

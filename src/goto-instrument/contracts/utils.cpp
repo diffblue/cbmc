@@ -161,6 +161,9 @@ void disable_pointer_checks(source_locationt &source_location)
   source_location.add_pragma("disable:pointer-check");
   source_location.add_pragma("disable:pointer-primitive-check");
   source_location.add_pragma("disable:pointer-overflow-check");
+  source_location.add_pragma("disable:signed-overflow-check");
+  source_location.add_pragma("disable:unsigned-overflow-check");
+  source_location.add_pragma("disable:conversion-check");
 }
 
 void simplify_gotos(goto_programt &goto_program, namespacet &ns)

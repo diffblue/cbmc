@@ -4,15 +4,13 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^main.c function baz$
-^\[baz.1\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[baz.2\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[baz.3\] line \d+ Check that \*x is assignable: FAILURE$
-^\[baz.4\] line \d+ Check that \*x is assignable: FAILURE$
+^\[baz.\d+\] line 6 Check that \*x is assignable: SUCCESS$
+^\[baz.\d+\] line 6 Check that \*x is assignable: FAILURE$
 ^main.c function foo$
-^\[foo.assertion.1\] line \d+ foo.x.set: SUCCESS$
-^\[foo.assertion.2\] line \d+ foo.local.set: SUCCESS$
-^\[foo.assertion.3\] line \d+ foo.y.set: SUCCESS$
-^\[foo.assertion.4\] line \d+ foo.z.set: SUCCESS$
+^\[foo.assertion.\d+\] line 20 foo.x.set: SUCCESS$
+^\[foo.assertion.\d+\] line 25 foo.local.set: SUCCESS$
+^\[foo.assertion.\d+\] line 29 foo.y.set: SUCCESS$
+^\[foo.assertion.\d+\] line 33 foo.z.set: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --
