@@ -405,9 +405,9 @@ void goto_program2codet::convert_assign_rec(
     forall_operands(it, assign.rhs())
     {
       index_exprt index(
-          assign.lhs(),
-          from_integer(i++, index_type()),
-          type.subtype());
+        assign.lhs(),
+        from_integer(i++, type.index_type()),
+        type.element_type());
       convert_assign_rec(code_assignt(index, *it), dest);
     }
   }
