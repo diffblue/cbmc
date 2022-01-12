@@ -72,6 +72,9 @@ static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
   if((symbol.value.is_nil() && symbol.is_extern) ||
      symbol.value.id() == ID_nondet)
   {
+    if(symbol.value.get_bool(ID_C_no_nondet_initialization))
+      return {};
+
     // Nondet initialise if not linked, or if explicitly requested.
     // Compilers would usually complain about the unlinked symbol case.
     const auto nondet = nondet_initializer(symbol.type, symbol.location, ns);

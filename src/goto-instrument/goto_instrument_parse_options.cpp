@@ -1376,7 +1376,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
-    slice_global_inits(goto_model);
+    slice_global_inits(goto_model, ui_message_handler);
   }
 
   if(cmdline.isset("string-abstraction"))
@@ -1663,7 +1663,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
-    slice_global_inits(goto_model);
+    slice_global_inits(goto_model, ui_message_handler);
 
     log.status() << "Performing an aggressive slice" << messaget::eom;
     aggressive_slicert aggressive_slicer(goto_model, ui_message_handler);

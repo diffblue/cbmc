@@ -17,6 +17,7 @@ Date:   December 2016
 #include <util/exception_utils.h>
 
 class goto_modelt;
+class message_handlert;
 
 class user_input_error_exceptiont : public cprover_exception_baset
 {
@@ -35,6 +36,11 @@ private:
   std::string message;
 };
 
-void slice_global_inits(goto_modelt &);
+/// Remove initialization of global variables that are not used in any function
+/// reachable from the entry point of \p goto_model.
+/// Warnings are reported via \p message_handler.
+void slice_global_inits(
+  goto_modelt &goto_model,
+  message_handlert &message_handler);
 
 #endif

@@ -20,15 +20,15 @@ Date:   December 2016
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
-#include <util/invariant.h>
-
-#include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_model.h>
-#include <goto-programs/remove_skip.h>
-
 #include <linking/static_lifetime_init.h>
 
-void slice_global_inits(goto_modelt &goto_model)
+#include "goto_convert_functions.h"
+#include "goto_functions.h"
+#include "goto_model.h"
+
+void slice_global_inits(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
   // gather all functions reachable from the entry point
   const irep_idt entry_point=goto_functionst::entry_point();
@@ -115,22 +115,35 @@ void slice_global_inits(goto_modelt &goto_model)
   }
 
   // now remove unnecessary initializations
-  for(auto &instruction : goto_program.instructions)
+  bool changed = false;
+  for(auto &entry : goto_model.symbol_table)
   {
-    if(instruction.is_assign())
+    if(
+      entry.second.is_static_lifetime && !entry.second.is_type &&
+      !entry.second.is_macro && entry.second.type.id() != ID_code &&
+      !has_prefix(id2string(entry.first), CPROVER_PREFIX) &&
+      symbols_to_keep.find(entry.first) == symbols_to_keep.end())
     {
-      const symbol_exprt &symbol_expr =
-        to_symbol_expr(instruction.assign_lhs());
-      const irep_idt id=symbol_expr.get_identifier();
-
-      if(
-        !has_prefix(id2string(id), CPROVER_PREFIX) &&
-        symbols_to_keep.find(id) == symbols_to_keep.end())
-      {
-        instruction.turn_into_skip();
-      }
+      symbolt &symbol = goto_model.symbol_table.get_writeable_ref(entry.first);
+      symbol.is_extern = true;
+      symbol.value.make_nil();
+      symbol.value.set(ID_C_no_nondet_initialization, 1);
+      changed = true;
     }
   }
 
-  remove_skip(goto_functions);
+  if(
+    changed &&
+    goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION) != 0)
+  {
+    static_lifetime_init(
+      goto_model.symbol_table,
+      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
+    goto_convert(
+      INITIALIZE_FUNCTION,
+      goto_model.symbol_table,
+      goto_model.goto_functions,
+      message_handler);
+    goto_model.goto_functions.update();
+  }
 }
