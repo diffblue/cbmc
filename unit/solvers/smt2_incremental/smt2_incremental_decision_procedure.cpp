@@ -85,6 +85,14 @@ public:
   ~smt_mock_solver_processt() override = default;
 };
 
+/// \brief Data structures and their initialisation shared between tests.
+/// \details
+///   Instantiates a `smt2_incremental_decision_proceduret` using a mock of the
+///   solver process to direct communication with the solver to collections of
+///   `sent_commands` and `mock_responses`. The `mock_respones` must be
+///   populated by the test, before the decision procedure expects them. The
+///   `sent_commands` should be checked by the test after the decision procedure
+///   has sent them.
 struct decision_procedure_test_environmentt final
 {
   void send(const smt_commandt &smt_command);
