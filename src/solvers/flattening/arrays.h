@@ -38,10 +38,10 @@ public:
     message_handlert &message_handler,
     bool get_array_constraints = false);
 
-  void post_process() override
+  void finish_eager_conversion() override
   {
-    post_process_arrays();
-    SUB::post_process();
+    finish_eager_conversion_arrays();
+    SUB::finish_eager_conversion();
     if(get_array_constraints)
       display_array_constraint_count();
   }
@@ -57,7 +57,7 @@ protected:
   messaget log;
   message_handlert &message_handler;
 
-  virtual void post_process_arrays()
+  virtual void finish_eager_conversion_arrays()
   {
     add_array_constraints();
   }

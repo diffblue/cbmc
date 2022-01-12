@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/satcheck.h>
 
 /// generate array constraints
-void bv_refinementt::post_process_arrays()
+void bv_refinementt::finish_eager_conversion_arrays()
 {
   collect_indices();
   // at this point all indices should in the index set
