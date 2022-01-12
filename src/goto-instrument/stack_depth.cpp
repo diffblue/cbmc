@@ -16,11 +16,14 @@ Date: November 2011
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 
+#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
 #include <linking/static_lifetime_init.h>
 
-symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
+static symbol_exprt add_stack_depth_symbol(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
   const irep_idt identifier="$stack_depth";
   unsignedbv_typet type(sizeof(std::size_t)*8);
@@ -36,12 +39,26 @@ symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
 
-  symbol_table.insert(std::move(new_symbol));
+  bool failed = goto_model.symbol_table.add(new_symbol);
+  CHECK_RETURN(!failed);
 
-  return symbol_exprt(identifier, type);
+  if(goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION) != 0)
+  {
+    static_lifetime_init(
+      goto_model.symbol_table,
+      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
+    goto_convert(
+      INITIALIZE_FUNCTION,
+      goto_model.symbol_table,
+      goto_model.goto_functions,
+      message_handler);
+    goto_model.goto_functions.update();
+  }
+
+  return new_symbol.symbol_expr();
 }
 
-void stack_depth(
+static void stack_depth(
   goto_programt &goto_program,
   const symbol_exprt &symbol,
   const std::size_t i_depth,
@@ -77,10 +94,10 @@ void stack_depth(
 
 void stack_depth(
   goto_modelt &goto_model,
-  const std::size_t depth)
+  const std::size_t depth,
+  message_handlert &message_handler)
 {
-  const symbol_exprt sym=
-    add_stack_depth_symbol(goto_model.symbol_table);
+  const symbol_exprt sym = add_stack_depth_symbol(goto_model, message_handler);
 
   const exprt depth_expr(from_integer(depth, sym.type()));
 
@@ -94,21 +111,6 @@ void stack_depth(
       stack_depth(gf_entry.second.body, sym, depth, depth_expr);
     }
   }
-
-  // initialize depth to 0
-  goto_functionst::function_mapt::iterator i_it =
-    goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION);
-  DATA_INVARIANT(
-    i_it!=goto_model.goto_functions.function_map.end(),
-    INITIALIZE_FUNCTION " must exist");
-
-  goto_programt &init=i_it->second.body;
-  goto_programt::targett first=init.instructions.begin();
-  init.insert_before(
-    first,
-    goto_programt::make_assignment(
-      code_assignt(sym, from_integer(0, sym.type()))));
-  // no suitable value for source location -- omitted
 
   // update counters etc.
   goto_model.goto_functions.update();

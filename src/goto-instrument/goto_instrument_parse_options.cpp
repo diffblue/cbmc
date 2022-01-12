@@ -1349,7 +1349,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     log.status() << "Adding check for maximum call stack size" << messaget::eom;
     stack_depth(
       goto_model,
-      safe_string2size_t(cmdline.get_value("stack-depth")));
+      safe_string2size_t(cmdline.get_value("stack-depth")),
+      ui_message_handler);
   }
 
   // ignore default/user-specified initialization of variables with static
