@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
 #include <util/pointer_expr.h>
@@ -204,22 +205,14 @@ symbol_exprt c_nondet_symbol_factory(
   const c_object_factory_parameterst &object_factory_parameters,
   const lifetimet lifetime)
 {
-  irep_idt identifier=id2string(goto_functionst::entry_point())+
-    "::"+id2string(base_name);
-
-  auxiliary_symbolt main_symbol;
-  main_symbol.mode=ID_C;
-  main_symbol.is_static_lifetime=false;
-  main_symbol.name=identifier;
-  main_symbol.base_name=base_name;
-  main_symbol.type=type;
-  main_symbol.location=loc;
-
+  const symbolt &main_symbol = get_fresh_aux_symbol(
+    type,
+    id2string(goto_functionst::entry_point()),
+    id2string(base_name),
+    loc,
+    ID_C,
+    symbol_table);
   symbol_exprt main_symbol_expr=main_symbol.symbol_expr();
-
-  symbolt *main_symbol_ptr;
-  bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
-  CHECK_RETURN(!moving_symbol_failed);
 
   symbol_factoryt state(
     symbol_table,
@@ -231,7 +224,7 @@ symbol_exprt c_nondet_symbol_factory(
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 
-  state.add_created_symbol(main_symbol_ptr);
+  state.add_created_symbol(main_symbol);
   state.declare_created_symbols(init_code);
 
   init_code.append(assignments);

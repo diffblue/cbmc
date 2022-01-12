@@ -56,9 +56,9 @@ public:
     recursion_sett recursion_set = recursion_sett(),
     const bool assign_const = true);
 
-  void add_created_symbol(const symbolt *symbol_ptr)
+  void add_created_symbol(const symbolt &symbol)
   {
-    allocate_objects.add_created_symbol(symbol_ptr);
+    allocate_objects.add_created_symbol(symbol);
   }
 
   void declare_created_symbols(code_blockt &init_code)
