@@ -151,12 +151,7 @@ const symbolt &new_tmp_symbol(
   bool is_auxiliary)
 {
   symbolt &new_symbol = get_fresh_aux_symbol(
-    type,
-    id2string(location.get_function()) + "::",
-    suffix,
-    location,
-    mode,
-    symtab);
+    type, id2string(location.get_function()), suffix, location, mode, symtab);
   new_symbol.is_auxiliary = is_auxiliary;
   return new_symbol;
 }
