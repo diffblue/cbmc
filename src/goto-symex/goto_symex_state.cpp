@@ -244,7 +244,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   {
     auto &address_of_expr = to_address_of_expr(expr);
     rename_address<level>(address_of_expr.object(), ns);
-    to_pointer_type(expr.type()).subtype() =
+    to_pointer_type(expr.type()).base_type() =
       as_const(address_of_expr).object().type();
     return renamedt<exprt, level>{std::move(expr)};
   }
@@ -660,7 +660,7 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   }
   else if(type.id() == ID_pointer)
   {
-    return requires_renaming(to_pointer_type(type).subtype(), ns);
+    return requires_renaming(to_pointer_type(type).base_type(), ns);
   }
   else if(type.id() == ID_union_tag)
   {
@@ -742,7 +742,7 @@ void goto_symex_statet::rename(
   }
   else if(type.id()==ID_pointer)
   {
-    rename<level>(to_pointer_type(type).subtype(), irep_idt(), ns);
+    rename<level>(to_pointer_type(type).base_type(), irep_idt(), ns);
   }
 
   if(level==L2 &&

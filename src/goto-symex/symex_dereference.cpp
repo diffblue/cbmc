@@ -389,9 +389,7 @@ void goto_symext::dereference_rec(
     exprt &object=address_of_expr.object();
 
     expr = address_arithmetic(
-      object,
-      state,
-      to_pointer_type(expr.type()).subtype().id() == ID_array);
+      object, state, to_pointer_type(expr.type()).base_type().id() == ID_array);
   }
   else if(expr.id()==ID_typecast)
   {

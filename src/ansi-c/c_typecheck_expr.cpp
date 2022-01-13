@@ -2665,7 +2665,7 @@ exprt c_typecheck_baset::do_special_functions(
     else
     {
       // Won't do void *
-      const auto &subtype = to_pointer_type(pointer_expr.type()).subtype();
+      const auto &subtype = to_pointer_type(pointer_expr.type()).base_type();
       if(subtype.id() == ID_empty)
       {
         error().source_location = f_op.source_location();

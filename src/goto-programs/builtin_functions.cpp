@@ -1207,7 +1207,7 @@ void goto_convertt::do_function_call_symbol(
       exprt list_arg_cast = list_arg;
       if(
         list_arg.type().id() == ID_pointer &&
-        to_pointer_type(list_arg.type()).subtype().id() == ID_empty)
+        to_pointer_type(list_arg.type()).base_type().id() == ID_empty)
       {
         list_arg_cast =
           typecast_exprt{list_arg, pointer_type(pointer_type(empty_typet{}))};
@@ -1272,7 +1272,7 @@ void goto_convertt::do_function_call_symbol(
 
     if(
       dest_expr.type().id() == ID_pointer &&
-      to_pointer_type(dest_expr.type()).subtype().id() == ID_empty)
+      to_pointer_type(dest_expr.type()).base_type().id() == ID_empty)
     {
       dest_expr =
         typecast_exprt{dest_expr, pointer_type(pointer_type(empty_typet{}))};

@@ -480,7 +480,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 {
   PRECONDITION(expr.type().id()==ID_pointer);
   const namespacet ns(symbol_table);
-  const typet &subtype = pointer_type.subtype();
+  const typet &subtype = pointer_type.base_type();
   const typet &followed_subtype = ns.follow(subtype);
   PRECONDITION(followed_subtype.id() == ID_struct);
   const pointer_typet &replacement_pointer_type =
@@ -499,7 +499,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
     generic_parameter_specialization_map_keys.insert(
-      replacement_pointer_type, ns.follow(replacement_pointer_type.subtype()));
+      replacement_pointer_type,
+      ns.follow(replacement_pointer_type.base_type()));
 
     const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
       assignments, lifetime, replacement_pointer_type, depth, location);
@@ -1019,7 +1020,7 @@ void java_object_factoryt::gen_nondet_init(
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
     generic_parameter_specialization_map_keys.insert(
-      pointer_type, ns.follow(pointer_type.subtype()));
+      pointer_type, ns.follow(pointer_type.base_type()));
 
     gen_nondet_pointer_init(
       assignments,

@@ -66,7 +66,7 @@ xmlt xml(const typet &type, const namespacet &ns)
   {
     result.name = "pointer";
     result.new_element("subtype").new_element() =
-      xml(to_pointer_type(type).subtype(), ns);
+      xml(to_pointer_type(type).base_type(), ns);
   }
   else if(type.id() == ID_bool)
   {

@@ -129,21 +129,21 @@ object_address_exprt::object_address_exprt(const symbol_exprt &object)
 
 symbol_exprt object_address_exprt::object_expr() const
 {
-  return symbol_exprt(object_identifier(), to_pointer_type(type()).subtype());
+  return symbol_exprt(object_identifier(), to_pointer_type(type()).base_type());
 }
 
 field_address_exprt::field_address_exprt(
-  exprt base,
+  exprt compound_ptr,
   const irep_idt &component_name,
   pointer_typet _type)
-  : unary_exprt(ID_field_address, std::move(base), std::move(_type))
+  : unary_exprt(ID_field_address, std::move(compound_ptr), std::move(_type))
 {
-  const auto &base_type = base.type();
-  PRECONDITION(base_type.id() == ID_pointer);
-  const auto &base_sub_type = base_type.subtype();
+  const auto &compound_ptr_type = compound_ptr.type();
+  PRECONDITION(compound_ptr_type.id() == ID_pointer);
+  const auto &compound_type = to_pointer_type(compound_ptr_type).base_type();
   PRECONDITION(
-    base_sub_type.id() == ID_struct || base_sub_type.id() == ID_struct_tag ||
-    base_sub_type.id() == ID_union || base_sub_type.id() == ID_union_tag);
+    compound_type.id() == ID_struct || compound_type.id() == ID_struct_tag ||
+    compound_type.id() == ID_union || compound_type.id() == ID_union_tag);
   set(ID_component_name, component_name);
 }
 
@@ -153,7 +153,7 @@ element_address_exprt::element_address_exprt(exprt base, exprt index)
       ID_element_address,
       std::move(index),
       pointer_typet(
-        to_array_type(base.type()).subtype(),
+        to_array_type(base.type()).element_type(),
         to_pointer_type(base.type()).get_width()))
 {
 }
@@ -176,7 +176,7 @@ const exprt &object_descriptor_exprt::root_object(const exprt &expr)
 }
 
 /// Check that the dereference expression has the right number of operands,
-/// refers to something with a pointer type, and that its type is the subtype
+/// refers to something with a pointer type, and that its type is the base type
 /// of that pointer type. Throws or raises an invariant if not, according to
 /// validation mode.
 /// \param expr: expression to validate
@@ -203,7 +203,7 @@ void dereference_exprt::validate(
 
   DATA_CHECK(
     vm,
-    dereference_expr.type() == pointer_type->subtype(),
-    "dereference expression's type must match the subtype of the type of its "
+    dereference_expr.type() == pointer_type->base_type(),
+    "dereference expression's type must match the base type of the type of its "
     "operand");
 }

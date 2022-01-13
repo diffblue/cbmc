@@ -518,7 +518,7 @@ void value_sett::get_value_set_rec(
       // we'll add null, in case it's not there yet
       insert(
         dest,
-        exprt(ID_null_object, to_pointer_type(expr_type).subtype()),
+        exprt(ID_null_object, to_pointer_type(expr_type).base_type()),
         offsett());
     }
     else

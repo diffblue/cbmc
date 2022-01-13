@@ -1235,7 +1235,7 @@ void mark_java_implicitly_generic_class_type(
                                 id2string(strip_java_namespace_prefix(
                                   outer_generic_type_parameter.get_name()));
           java_generic_parameter_tagt bound = to_java_generic_parameter_tag(
-            outer_generic_type_parameter.subtype());
+            outer_generic_type_parameter.base_type());
           bound.type_variable_ref().set_identifier(identifier);
           implicit_generic_type_parameters.emplace_back(identifier, bound);
         }

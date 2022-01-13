@@ -20,8 +20,8 @@ codet allocate_array(
 {
   pointer_typet pointer_type = to_pointer_type(expr.type());
   const auto &element_type =
-    java_array_element_type(to_struct_tag_type(pointer_type.subtype()));
-  pointer_type.subtype().set(ID_element_type, element_type);
+    java_array_element_type(to_struct_tag_type(pointer_type.base_type()));
+  pointer_type.base_type().set(ID_element_type, element_type);
   side_effect_exprt java_new_array{
     ID_java_new_array, {array_length_expr}, pointer_type, loc};
   return code_frontend_assignt{expr, java_new_array, loc};

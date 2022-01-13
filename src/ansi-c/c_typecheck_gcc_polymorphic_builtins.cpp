@@ -914,7 +914,7 @@ static void instantiate_sync_lock_release(
   // This built-in function releases the lock acquired by
   // __sync_lock_test_and_set. Normally this means writing the constant 0 to
   // *ptr.
-  const typet &type = to_pointer_type(parameter_exprs[0].type()).subtype();
+  const typet &type = to_pointer_type(parameter_exprs[0].type()).base_type();
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{

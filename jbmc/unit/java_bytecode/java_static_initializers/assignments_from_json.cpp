@@ -133,7 +133,7 @@ SCENARIO(
     {
       REQUIRE(
         make_query(block)[3].as<code_assignt>()[1].get().type() ==
-        test_class_type.subtype());
+        test_class_type.base_type());
     }
     THEN("The instruction assigns the field to 42")
     {
@@ -236,7 +236,7 @@ SCENARIO(
     {
       REQUIRE(
         make_query(block)[4].as<code_assignt>()[0].get().type() ==
-        test_class_type.subtype());
+        test_class_type.base_type());
     }
     THEN("The instruction allocates the array field, with a size of exactly 1")
     {
@@ -370,7 +370,7 @@ SCENARIO(
     {
       REQUIRE(
         make_query(block)[5].as<code_assignt>()[0].get().type() ==
-        test_class_type.subtype());
+        test_class_type.base_type());
     }
     THEN("The instruction makes the length nondet")
     {

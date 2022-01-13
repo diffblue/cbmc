@@ -319,7 +319,7 @@ SCENARIO(
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
         const auto &tmp_object_struct_tag = to_struct_tag_type(
-          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
+          to_pointer_type(tmp_object_declaration.symbol().type()).base_type());
         REQUIRE(tmp_object_struct_tag.get_identifier() == "java::Wrapper");
 
         THEN("Object 'v' has field 'field' of type IWrapper")
@@ -369,7 +369,7 @@ SCENARIO(
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
         const auto &tmp_object_struct_tag = to_struct_tag_type(
-          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
+          to_pointer_type(tmp_object_declaration.symbol().type()).base_type());
         REQUIRE(tmp_object_struct_tag.get_identifier() == "java::Wrapper");
 
         THEN(
@@ -419,7 +419,7 @@ SCENARIO(
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
         const auto &tmp_object_struct_tag = to_struct_tag_type(
-          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
+          to_pointer_type(tmp_object_declaration.symbol().type()).base_type());
         REQUIRE(
           tmp_object_struct_tag.get_identifier() ==
           "java::GenericFields$GenericInnerOuter$Outer");
@@ -484,7 +484,7 @@ SCENARIO(
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
         const auto &tmp_object_struct_tag = to_struct_tag_type(
-          to_pointer_type(tmp_object_declaration.symbol().type()).subtype());
+          to_pointer_type(tmp_object_declaration.symbol().type()).base_type());
         REQUIRE(
           tmp_object_struct_tag.get_identifier() ==
           "java::GenericFields$GenericRewriteParameter$A");

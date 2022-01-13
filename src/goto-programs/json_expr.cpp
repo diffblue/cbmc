@@ -144,7 +144,7 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
   else if(type.id() == ID_pointer)
   {
     result["name"] = json_stringt("pointer");
-    result["subtype"] = json(to_pointer_type(type).subtype(), ns, mode);
+    result["subtype"] = json(to_pointer_type(type).base_type(), ns, mode);
   }
   else if(type.id() == ID_bool)
   {

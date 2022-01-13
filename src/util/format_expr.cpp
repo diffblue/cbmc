@@ -193,7 +193,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
       const auto &unary_expr = to_unary_expr(src);
       const auto &pointer_type = to_pointer_type(src.type());
       return os << "pointer(" << format(unary_expr.op()) << ", "
-                << format(pointer_type.subtype()) << ')';
+                << format(pointer_type.base_type()) << ')';
     }
     else
     {
@@ -201,7 +201,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
       const auto width = pointer_type.get_width();
       auto int_value = bvrep2integer(src.get_value(), width, false);
       return os << "pointer(0x" << integer2string(int_value, 16) << ", "
-                << format(pointer_type.subtype()) << ')';
+                << format(pointer_type.base_type()) << ')';
     }
   }
   else

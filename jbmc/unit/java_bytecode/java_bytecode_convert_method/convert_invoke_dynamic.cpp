@@ -72,7 +72,7 @@ void validate_lambda_assignment(
     require_type::require_pointer(side_effect_expr.type(), {});
 
   const struct_tag_typet &lambda_implementor_type =
-    require_type::require_struct_tag(lambda_temp_type.subtype());
+    require_type::require_struct_tag(lambda_temp_type.base_type());
 
   const irep_idt &tmp_class_identifier =
     lambda_implementor_type.get_identifier();

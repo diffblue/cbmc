@@ -1148,7 +1148,7 @@ bool goto_check_javat::check_rec_member(const member_exprt &member)
   if(member_offset_opt.has_value())
   {
     pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
-    new_pointer_type.subtype() = member.type();
+    new_pointer_type.base_type() = member.type();
 
     const exprt char_pointer = typecast_exprt::conditional_cast(
       deref.pointer(), pointer_type(char_type()));

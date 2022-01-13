@@ -83,26 +83,26 @@ void base_type_rec(
   }
   else if(type.id()==ID_pointer)
   {
-    typet &subtype=to_pointer_type(type).subtype();
+    typet &base_type = to_pointer_type(type).base_type();
 
     // we need to avoid running into an infinite loop
     if(
-      subtype.id() == ID_c_enum_tag || subtype.id() == ID_struct_tag ||
-      subtype.id() == ID_union_tag)
+      base_type.id() == ID_c_enum_tag || base_type.id() == ID_struct_tag ||
+      base_type.id() == ID_union_tag)
     {
-      const irep_idt &id = to_tag_type(subtype).get_identifier();
+      const irep_idt &id = to_tag_type(base_type).get_identifier();
 
       if(symb.find(id)!=symb.end())
         return;
 
       symb.insert(id);
 
-      base_type_rec(subtype, ns, symb);
+      base_type_rec(base_type, ns, symb);
 
       symb.erase(id);
     }
     else
-      base_type_rec(subtype, ns, symb);
+      base_type_rec(base_type, ns, symb);
   }
 }
 
@@ -228,7 +228,7 @@ bool base_type_eqt::base_type_eq_rec(
   else if(type1.id()==ID_pointer)
   {
     return base_type_eq_rec(
-      to_pointer_type(type1).subtype(), to_pointer_type(type2).subtype());
+      to_pointer_type(type1).base_type(), to_pointer_type(type2).base_type());
   }
   else if(type1.id()==ID_array)
   {

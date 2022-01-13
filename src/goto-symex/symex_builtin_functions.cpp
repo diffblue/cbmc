@@ -67,9 +67,9 @@ void goto_symext::symex_allocate(
   // is the type given?
   if(
     code.type().id() == ID_pointer &&
-    to_pointer_type(code.type()).subtype().id() != ID_empty)
+    to_pointer_type(code.type()).base_type().id() != ID_empty)
   {
-    object_type = to_pointer_type(code.type()).subtype();
+    object_type = to_pointer_type(code.type()).base_type();
   }
   else
   {
@@ -223,7 +223,7 @@ static exprt va_list_entry(
 
   // Visual Studio has va_list == char* and stores parameters of size no
   // greater than the size of a pointer as immediate values
-  if(lhs_type.subtype().id() != ID_pointer)
+  if(lhs_type.base_type().id() != ID_pointer)
   {
     auto parameter_size = size_of_expr(parameter_expr.type(), ns);
     CHECK_RETURN(parameter_size.has_value());
@@ -503,10 +503,10 @@ void goto_symext::symex_cpp_new(
   {
     exprt size_arg =
       clean_expr(static_cast<const exprt &>(code.find(ID_size)), state, false);
-    symbol.type = array_typet(pointer_type.subtype(), size_arg);
+    symbol.type = array_typet(pointer_type.base_type(), size_arg);
   }
   else
-    symbol.type = pointer_type.subtype();
+    symbol.type = pointer_type.base_type();
 
   symbol.type.set(ID_C_dynamic, true);
 
