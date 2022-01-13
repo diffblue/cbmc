@@ -109,9 +109,7 @@ std::string graphml_witnesst::convert_assign_rec(
     forall_operands(it, assign.rhs())
     {
       index_exprt index(
-        assign.lhs(),
-        from_integer(i++, index_type()),
-        type.subtype());
+        assign.lhs(), from_integer(i++, c_index_type()), type.subtype());
       if(!result.empty())
         result+=' ';
       result+=convert_assign_rec(identifier, code_assignt(index, *it));

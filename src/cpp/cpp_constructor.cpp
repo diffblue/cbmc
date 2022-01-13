@@ -97,7 +97,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       {
         exprt::operandst tmp_operands;
 
-        exprt constant=from_integer(i, index_type());
+        exprt constant = from_integer(i, c_index_type());
         constant.add_source_location()=source_location;
 
         index_exprt index(object, constant);

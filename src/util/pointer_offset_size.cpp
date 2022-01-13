@@ -707,7 +707,7 @@ optionalt<exprt> get_subexpression_at_offset(
   }
 
   return make_byte_extract(
-    expr, from_integer(offset_bytes, index_type()), target_type_raw);
+    expr, from_integer(offset_bytes, c_index_type()), target_type_raw);
 }
 
 optionalt<exprt> get_subexpression_at_offset(

@@ -111,7 +111,7 @@ void goto_symext::parameter_assignments(
         // clang-format on
         {
           rhs = make_byte_extract(
-            rhs, from_integer(0, index_type()), parameter_type);
+            rhs, from_integer(0, c_index_type()), parameter_type);
         }
         else
         {

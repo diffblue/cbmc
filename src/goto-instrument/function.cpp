@@ -67,7 +67,7 @@ code_function_callt function_to_call(
     symbol_exprt(s_it->second.name, s_it->second.type),
     {typecast_exprt(
       address_of_exprt(
-        index_exprt(function_id_string, from_integer(0, index_type()))),
+        index_exprt(function_id_string, from_integer(0, c_index_type()))),
       to_code_type(s_it->second.type).parameters()[0].type())});
 
   return call;

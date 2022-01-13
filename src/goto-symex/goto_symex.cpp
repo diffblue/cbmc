@@ -267,7 +267,7 @@ void goto_symext::assign_string_constant(
     "symbol shall have value derived from char array content");
 
   const address_of_exprt string_data(
-    index_exprt(aux_symbol.symbol_expr(), from_integer(0, index_type())));
+    index_exprt(aux_symbol.symbol_expr(), from_integer(0, c_index_type())));
 
   symex_assign.assign_symbol(char_array, expr_skeletont{}, string_data, {});
 

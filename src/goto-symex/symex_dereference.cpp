@@ -66,7 +66,7 @@ exprt goto_symext::address_arithmetic(
       for(const typet *t = &(a.type().subtype());
           t->id() == ID_array && expr.type() != *t;
           t = &(t->subtype()))
-        a.object()=index_exprt(a.object(), from_integer(0, index_type()));
+        a.object() = index_exprt(a.object(), from_integer(0, c_index_type()));
     }
 
     // do (expr.type() *)(((char *)op)+offset)
@@ -138,7 +138,7 @@ exprt goto_symext::address_arithmetic(
 
     // turn &array into &array[0]
     if(result.type().id() == ID_array && !keep_array)
-      result=index_exprt(result, from_integer(0, index_type()));
+      result = index_exprt(result, from_integer(0, c_index_type()));
 
     // handle field-sensitive SSA symbol
     mp_integer offset=0;
@@ -153,7 +153,7 @@ exprt goto_symext::address_arithmetic(
     {
       const byte_extract_exprt be = make_byte_extract(
         to_ssa_expr(expr).get_l1_object(),
-        from_integer(offset, index_type()),
+        from_integer(offset, c_index_type()),
         expr.type());
 
       result = address_arithmetic(be, state, keep_array);
@@ -404,11 +404,8 @@ void goto_symext::dereference_rec(
       expr.type() ==
         pointer_type(to_address_of_expr(tc_op).object().type().subtype()))
     {
-      expr=
-        address_of_exprt(
-          index_exprt(
-            to_address_of_expr(tc_op).object(),
-            from_integer(0, index_type())));
+      expr = address_of_exprt(index_exprt(
+        to_address_of_expr(tc_op).object(), from_integer(0, c_index_type())));
 
       dereference_rec(expr, state, write, is_in_quantifier);
     }

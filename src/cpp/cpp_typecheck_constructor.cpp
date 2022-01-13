@@ -90,7 +90,7 @@ static void copy_array(
   exprt &block)
 {
   // Build the index expression
-  const exprt constant = from_integer(i, index_type());
+  const exprt constant = from_integer(i, c_index_type());
 
   const cpp_namet array(member_base_name, source_location);
 

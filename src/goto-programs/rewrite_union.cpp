@@ -82,14 +82,14 @@ void rewrite_union(exprt &expr)
 
     if(op.type().id() == ID_union_tag || op.type().id() == ID_union)
     {
-      exprt offset=from_integer(0, index_type());
+      exprt offset = from_integer(0, c_index_type());
       expr = make_byte_extract(op, offset, expr.type());
     }
   }
   else if(expr.id()==ID_union)
   {
     const union_exprt &union_expr=to_union_expr(expr);
-    exprt offset=from_integer(0, index_type());
+    exprt offset = from_integer(0, c_index_type());
     side_effect_expr_nondett nondet(expr.type(), expr.source_location());
     expr = make_byte_update(nondet, offset, union_expr.op());
   }

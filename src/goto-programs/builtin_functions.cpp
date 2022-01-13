@@ -260,7 +260,7 @@ void goto_convertt::do_scanf(
               const address_of_exprt rhs(
                 index_exprt(
                   tmp_symbol.symbol_expr(),
-                  from_integer(0, index_type())));
+                  from_integer(0, c_index_type())));
 
               // now use array copy
               codet array_copy_statement;
@@ -274,7 +274,7 @@ void goto_convertt::do_scanf(
               copy(array_copy_statement, OTHER, dest);
               #else
               const index_exprt new_lhs(
-                dereference_exprt{ptr}, from_integer(0, index_type()));
+                dereference_exprt{ptr}, from_integer(0, c_index_type()));
               const side_effect_expr_nondett rhs(
                 type->subtype(), function.source_location());
               code_assignt assign(new_lhs, rhs);
@@ -605,7 +605,7 @@ exprt make_va_list(const exprt &expr)
   while(result.type().id() == ID_array &&
         to_array_type(result.type()).size().is_one())
   {
-    result = index_exprt{result, from_integer(0, index_type())};
+    result = index_exprt{result, from_integer(0, c_index_type())};
   }
 
   return result;
@@ -704,8 +704,8 @@ void goto_convertt::do_havoc_slice(
 
   const symbolt &nondet_contents =
     new_tmp_symbol(array_type, "nondet_contents", dest, source_location, mode);
-  const exprt &nondet_contents_expr = address_of_exprt{
-    index_exprt{nondet_contents.symbol_expr(), from_integer(0, index_type())}};
+  const exprt &nondet_contents_expr = address_of_exprt{index_exprt{
+    nondet_contents.symbol_expr(), from_integer(0, c_index_type())}};
 
   const exprt &arg0 =
     typecast_exprt::conditional_cast(arguments[0], pointer_type(empty_typet{}));

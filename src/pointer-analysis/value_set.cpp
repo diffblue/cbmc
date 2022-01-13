@@ -227,7 +227,7 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
   od.object()=object;
 
   if(it.second)
-    od.offset() = from_integer(*it.second, index_type());
+    od.offset() = from_integer(*it.second, c_index_type());
 
   od.type()=od.object().type();
 
@@ -1117,7 +1117,7 @@ void value_sett::get_reference_set_rec(
       {
         const index_exprt deref_index_expr(
           typecast_exprt::conditional_cast(object, array_type),
-          from_integer(0, index_type()));
+          from_integer(0, c_index_type()));
 
         offsett o = a_it->second;
         const auto i = numeric_cast<mp_integer>(offset);
@@ -1265,7 +1265,7 @@ void value_sett::assign(
   else if(type.id()==ID_array)
   {
     const index_exprt lhs_index(
-      lhs, exprt(ID_unknown, index_type()), type.subtype());
+      lhs, exprt(ID_unknown, c_index_type()), type.subtype());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
@@ -1307,7 +1307,7 @@ void value_sett::assign(
       {
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
-          exprt(ID_unknown, index_type()),
+          exprt(ID_unknown, c_index_type()),
           type.subtype());
 
         assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
@@ -1317,7 +1317,7 @@ void value_sett::assign(
       else
       {
         const index_exprt rhs_index(
-          rhs, exprt(ID_unknown, index_type()), type.subtype());
+          rhs, exprt(ID_unknown, c_index_type()), type.subtype());
         assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
