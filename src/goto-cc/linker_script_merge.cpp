@@ -25,6 +25,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include <linking/static_lifetime_init.h>
 
+#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 
@@ -72,27 +73,32 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  fail=1;
   linker_valuest linker_values;
-  const auto &pair =
-    original_goto_model->goto_functions.function_map.find(INITIALIZE_FUNCTION);
-  if(pair == original_goto_model->goto_functions.function_map.end())
-  {
-    log.error() << "No " << INITIALIZE_FUNCTION << " found in goto_functions"
-                << messaget::eom;
-    return fail;
-  }
   fail = ls_data2instructions(
     data,
     cmdline.get_value('T'),
-    pair->second.body,
     original_goto_model->symbol_table,
     linker_values);
   if(fail!=0)
   {
-    log.error() << "Could not add linkerscript defs to " INITIALIZE_FUNCTION
+    log.error() << "Could not add linkerscript defs to symbol table"
                 << messaget::eom;
     return fail;
+  }
+  if(
+    original_goto_model->goto_functions.function_map.erase(
+      INITIALIZE_FUNCTION) != 0)
+  {
+    static_lifetime_init(
+      original_goto_model->symbol_table,
+      original_goto_model->symbol_table.lookup_ref(INITIALIZE_FUNCTION)
+        .location);
+    goto_convert(
+      INITIALIZE_FUNCTION,
+      original_goto_model->symbol_table,
+      original_goto_model->goto_functions,
+      log.get_message_handler());
+    original_goto_model->goto_functions.update();
   }
 
   fail=goto_and_object_mismatch(linker_defined_symbols, linker_values);
@@ -217,17 +223,6 @@ int linker_script_merget::pointerize_linker_defined_symbols(
   const namespacet ns(goto_model.symbol_table);
 
   int ret=0;
-  // First, pointerize the actual linker-defined symbols
-  for(const auto &pair : linker_values)
-  {
-    const auto maybe_symbol = goto_model.symbol_table.get_writeable(pair.first);
-    if(!maybe_symbol)
-      continue;
-    symbolt &entry=*maybe_symbol;
-    entry.type=pointer_type(char_type());
-    entry.is_extern=false;
-    entry.value=pair.second.second;
-  }
 
   // Next, find all occurrences of linker-defined symbols that are _values_
   // of some symbol in the symbol table, and pointerize them too
@@ -421,12 +416,10 @@ the right behaviour for both implementations.
 int linker_script_merget::ls_data2instructions(
     jsont &data,
     const std::string &linker_script,
-    goto_programt &gp,
     symbol_tablet &symbol_table,
     linker_valuest &linker_values)
 #if 1
 {
-  goto_programt::instructionst initialize_instructions=gp.instructions;
   std::map<irep_idt, std::size_t> truncated_symbols;
   for(auto &d : to_json_array(data["regions"]))
   {
@@ -453,24 +446,46 @@ int linker_script_merget::ls_data2instructions(
 
     constant_exprt    array_size_expr=from_integer(array_size, size_type());
     array_typet       array_type(char_type(), array_size_expr);
-    symbol_exprt      array_expr(array_name.str(), array_type);
-    source_locationt  array_loc;
 
+    source_locationt array_loc;
     array_loc.set_file(linker_script);
     std::ostringstream array_comment;
     array_comment << "Object section '" << d["section"].value << "' of size "
                   << array_size << " bytes";
     array_loc.set_comment(array_comment.str());
-    array_expr.add_source_location()=array_loc;
+
+    namespacet ns(symbol_table);
+    const auto zi = zero_initializer(array_type, array_loc, ns);
+    CHECK_RETURN(zi.has_value());
+
+    // Add the array to the symbol table.
+    symbolt array_sym;
+    array_sym.is_static_lifetime = true;
+    array_sym.is_lvalue = true;
+    array_sym.is_state_var = true;
+    array_sym.name = array_name.str();
+    array_sym.type = array_type;
+    array_sym.value = *zi;
+    array_sym.location = array_loc;
+
+    bool failed = symbol_table.add(array_sym);
+    CHECK_RETURN(!failed);
 
     // Array start address
-    index_exprt       zero_idx(array_expr, from_integer(0, size_type()));
+    index_exprt zero_idx{array_sym.symbol_expr(), from_integer(0, size_type())};
     address_of_exprt  array_start(zero_idx);
 
     // Linker-defined symbol_exprt pointing to start address
-    symbol_exprt start_sym(d["start-symbol"].value, pointer_type(char_type()));
+    symbolt start_sym;
+    start_sym.is_static_lifetime = true;
+    start_sym.is_lvalue = true;
+    start_sym.is_state_var = true;
+    start_sym.name = d["start-symbol"].value;
+    start_sym.type = pointer_type(char_type());
+    start_sym.value = array_start;
     linker_values.emplace(
-      d["start-symbol"].value, std::make_pair(start_sym, array_start));
+      d["start-symbol"].value,
+      std::make_pair(start_sym.symbol_expr(), array_start));
 
     // Since the value of the pointer will be a random CBMC address, write a
     // note about the real address in the object file
@@ -494,22 +509,26 @@ int linker_script_merget::ls_data2instructions(
                   << d["section"].value << "'. Original address in object file"
                   << " is " << (*it)["val"].value;
     start_loc.set_comment(start_comment.str());
-    start_sym.add_source_location()=start_loc;
+    start_sym.location = start_loc;
 
-    // Instruction for start-address pointer in __CPROVER_initialize
-    code_assignt start_assign(start_sym, array_start);
-    start_assign.add_source_location()=start_loc;
-    goto_programt::instructiont start_assign_i =
-      goto_programt::make_assignment(start_assign, start_loc);
-    initialize_instructions.push_front(start_assign_i);
+    auto start_sym_entry = symbol_table.insert(start_sym);
+    if(!start_sym_entry.second)
+      start_sym_entry.first = start_sym;
 
     if(has_end) // Same for pointer to end of array
     {
       plus_exprt array_end(array_start, array_size_expr);
 
-      symbol_exprt end_sym(d["end-symbol"].value, pointer_type(char_type()));
+      symbolt end_sym;
+      end_sym.is_static_lifetime = true;
+      end_sym.is_lvalue = true;
+      end_sym.is_state_var = true;
+      end_sym.name = d["end-symbol"].value;
+      end_sym.type = pointer_type(char_type());
+      end_sym.value = array_end;
       linker_values.emplace(
-        d["end-symbol"].value, std::make_pair(end_sym, array_end));
+        d["end-symbol"].value,
+        std::make_pair(end_sym.symbol_expr(), array_end));
 
       auto entry = std::find_if(
         to_json_array(data["addresses"]).begin(),
@@ -531,37 +550,12 @@ int linker_script_merget::ls_data2instructions(
                   << "'. Original address in object file"
                   << " is " << (*entry)["val"].value;
       end_loc.set_comment(end_comment.str());
-      end_sym.add_source_location()=end_loc;
+      end_sym.location = end_loc;
 
-      code_assignt end_assign(end_sym, array_end);
-      end_assign.add_source_location()=end_loc;
-      goto_programt::instructiont end_assign_i =
-        goto_programt::make_assignment(end_assign, end_loc);
-      initialize_instructions.push_front(end_assign_i);
+      auto end_sym_entry = symbol_table.insert(end_sym);
+      if(!end_sym_entry.second)
+        end_sym_entry.first = end_sym;
     }
-
-    // Add the array to the symbol table. We don't add the pointer(s) to the
-    // symbol table because they were already there, but declared as extern and
-    // probably with a different type. We change the externness and type in
-    // pointerize_linker_defined_symbols.
-    symbolt array_sym;
-    array_sym.name=array_name.str();
-    array_sym.pretty_name=array_name.str();
-    array_sym.is_lvalue=array_sym.is_static_lifetime=true;
-    array_sym.type=array_type;
-    array_sym.location=array_loc;
-    symbol_table.add(array_sym);
-
-    // Push the array initialization to the front now, so that it happens before
-    // the initialization of the symbols that point to it.
-    namespacet ns(symbol_table);
-    const auto zi = zero_initializer(array_type, array_loc, ns);
-    CHECK_RETURN(zi.has_value());
-    code_assignt array_assign(array_expr, *zi);
-    array_assign.add_source_location()=array_loc;
-    goto_programt::instructiont array_assign_i =
-      goto_programt::make_assignment(array_assign, array_loc);
-    initialize_instructions.push_front(array_assign_i);
   }
 
   // We've added every linker-defined symbol that marks the start or end of a
@@ -597,8 +591,6 @@ int linker_script_merget::ls_data2instructions(
     loc.set_comment("linker script-defined symbol: char *"+
         d["sym"].value+"="+"(char *)"+id2string(symbol_value)+"u;");
 
-    symbol_exprt lhs(d["sym"].value, pointer_type(char_type()));
-
     constant_exprt rhs(
       integer2bvrep(
         string2integer(id2string(symbol_value)),
@@ -607,14 +599,15 @@ int linker_script_merget::ls_data2instructions(
 
     typecast_exprt rhs_tc(rhs, pointer_type(char_type()));
 
-    linker_values.emplace(
-      irep_idt(d["sym"].value), std::make_pair(lhs, rhs_tc));
+    symbolt &symbol = symbol_table.get_writeable_ref(d["sym"].value);
+    symbol.is_extern = false;
+    symbol.is_static_lifetime = true;
+    symbol.location = loc;
+    symbol.type = pointer_type(char_type());
+    symbol.value = rhs_tc;
 
-    code_assignt assign(lhs, rhs_tc);
-    assign.add_source_location()=loc;
-    goto_programt::instructiont assign_i =
-      goto_programt::make_assignment(assign, loc);
-    initialize_instructions.push_front(assign_i);
+    linker_values.emplace(
+      irep_idt(d["sym"].value), std::make_pair(symbol.symbol_expr(), rhs_tc));
   }
   return 0;
 }
