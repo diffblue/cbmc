@@ -188,8 +188,8 @@ typet get_original_name(typet type)
   }
   else if(type.id() == ID_pointer)
   {
-    type.subtype() =
-      get_original_name(std::move(to_pointer_type(type).subtype()));
+    to_pointer_type(type).base_type() =
+      get_original_name(std::move(to_pointer_type(type).base_type()));
   }
   return type;
 }

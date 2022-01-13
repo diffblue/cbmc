@@ -53,17 +53,16 @@ void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
   else if(type.id()==ID_pointer)
   {
     const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype = pointer_type.subtype();
+    const typet &base_type = pointer_type.base_type();
 
     // we don't like function pointers and
     // we don't like void *
-    if(subtype.id()!=ID_code &&
-       subtype.id()!=ID_empty)
+    if(base_type.id() != ID_code && base_type.id() != ID_empty)
     {
       // could be NULL nondeterministically
 
       address_of_exprt address_of_expr(
-        make_auto_object(pointer_type.subtype(), state), pointer_type);
+        make_auto_object(base_type, state), pointer_type);
 
       if_exprt rhs(
         side_effect_expr_nondett(bool_typet(), expr.source_location()),

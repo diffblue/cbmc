@@ -613,9 +613,9 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       // Support for void* is a gcc extension, with the size treated as 1 byte
       // (no division required below).
       // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      if(lhs_pt.subtype().id() != ID_empty)
+      if(lhs_pt.base_type().id() != ID_empty)
       {
-        auto element_size_opt = pointer_offset_size(lhs_pt.subtype(), ns);
+        auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
         CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
 
         if(*element_size_opt != 1)

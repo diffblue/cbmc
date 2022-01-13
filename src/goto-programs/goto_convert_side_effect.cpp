@@ -655,7 +655,7 @@ void goto_convertt::remove_overflow(
   optionalt<typet> result_type;
   if(result.type().id() == ID_pointer)
   {
-    result_type = to_pointer_type(result.type()).subtype();
+    result_type = to_pointer_type(result.type()).base_type();
     code_assignt result_assignment{dereference_exprt{result},
                                    typecast_exprt{operation, *result_type},
                                    expr.source_location()};

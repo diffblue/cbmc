@@ -51,9 +51,9 @@ void symbol_factoryt::gen_nondet_init(
   {
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype = pointer_type.subtype();
+    const typet &base_type = pointer_type.base_type();
 
-    if(subtype.id() == ID_code)
+    if(base_type.id() == ID_code)
     {
       // Handle the pointer-to-code case separately:
       // leave as nondet_ptr to allow `remove_function_pointers`
@@ -63,9 +63,10 @@ void symbol_factoryt::gen_nondet_init(
       return;
     }
 
-    if(subtype.id() == ID_struct_tag)
+    if(base_type.id() == ID_struct_tag)
     {
-      const irep_idt struct_tag = to_struct_tag_type(subtype).get_identifier();
+      const irep_idt struct_tag =
+        to_struct_tag_type(base_type).get_identifier();
 
       if(
         recursion_set.find(struct_tag) != recursion_set.end() &&
@@ -80,7 +81,7 @@ void symbol_factoryt::gen_nondet_init(
 
     code_blockt non_null_inst;
 
-    typet object_type = subtype;
+    typet object_type = base_type;
     if(object_type.id() == ID_empty)
       object_type = char_type();
 

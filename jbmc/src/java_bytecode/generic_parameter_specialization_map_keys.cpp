@@ -18,7 +18,7 @@ void generic_parameter_specialization_map_keyst::insert(
     return;
   // The supplied type must be the full type of the pointer's subtype
   PRECONDITION(
-    pointer_type.subtype().get(ID_identifier) ==
+    pointer_type.base_type().get(ID_identifier) ==
     pointer_subtype_struct.get(ID_name));
 
   // If the pointer points to:

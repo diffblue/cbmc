@@ -73,7 +73,7 @@ exprt good_pointer_def(
   const namespacet &ns)
 {
   const pointer_typet &pointer_type = to_pointer_type(pointer.type());
-  const typet &dereference_type=pointer_type.subtype();
+  const typet &dereference_type = pointer_type.base_type();
 
   const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
   CHECK_RETURN(size_of_expr_opt.has_value());

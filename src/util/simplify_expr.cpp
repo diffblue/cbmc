@@ -881,7 +881,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
          to_constant_expr(op_plus_expr.op0()).get_value() == ID_NULL)))
     {
       auto sub_size =
-        pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
+        pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
       if(sub_size.has_value())
       {
         auto new_expr = expr;
@@ -956,7 +956,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
     op_type.id() == ID_pointer && expr.op().id() == ID_plus)
   {
-    const auto step = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
+    const auto step =
+      pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
 
     if(step.has_value() && *step != 0)
     {

@@ -126,7 +126,7 @@ void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
                                            id2string(restriction.first)};
     }
     auto const &function_type =
-      to_pointer_type(function_pointer_type).subtype();
+      to_pointer_type(function_pointer_type).base_type();
     if(function_type.id() != ID_code)
     {
       throw invalid_restriction_exceptiont{"not a function pointer: " +

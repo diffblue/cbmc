@@ -2711,10 +2711,10 @@ void java_bytecode_convert_methodt::convert_getstatic(
     else if(arg0.type().id() == ID_pointer)
     {
       const auto &pointer_type = to_pointer_type(arg0.type());
-      if(pointer_type.subtype().id() == ID_struct_tag)
+      if(pointer_type.base_type().id() == ID_struct_tag)
       {
         needed_lazy_methods->add_needed_class(
-          to_struct_tag_type(pointer_type.subtype()).get_identifier());
+          to_struct_tag_type(pointer_type.base_type()).get_identifier());
       }
     }
     else if(is_assertions_disabled_field)

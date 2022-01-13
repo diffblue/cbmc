@@ -273,7 +273,7 @@ pointer_typet pointer_to_replacement_type(
   const pointer_typet &given_pointer_type,
   const java_class_typet &replacement_class_type)
 {
-  if(can_cast_type<struct_tag_typet>(given_pointer_type.subtype()))
+  if(can_cast_type<struct_tag_typet>(given_pointer_type.base_type()))
   {
     struct_tag_typet struct_tag_subtype{replacement_class_type.get_name()};
     return pointer_type(struct_tag_subtype);

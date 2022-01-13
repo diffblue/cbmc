@@ -66,8 +66,8 @@ static java_class_typet
 followed_class_type(const exprt &expr, const symbol_table_baset &symbol_table)
 {
   const pointer_typet &pointer_type = to_pointer_type(expr.type());
-  const java_class_typet &java_class_type =
-    to_java_class_type(namespacet{symbol_table}.follow(pointer_type.subtype()));
+  const java_class_typet &java_class_type = to_java_class_type(
+    namespacet{symbol_table}.follow(pointer_type.base_type()));
   return java_class_type;
 }
 
@@ -602,7 +602,7 @@ static code_with_references_listt assign_non_enum_pointer_from_json(
   code_blockt output_code;
   exprt dereferenced_symbol_expr =
     info.allocate_objects.allocate_dynamic_object(
-      output_code, expr, to_pointer_type(expr.type()).subtype());
+      output_code, expr, to_pointer_type(expr.type()).base_type());
   for(codet &code : output_code.statements())
     result.add(std::move(code));
   result.append(assign_struct_from_json(dereferenced_symbol_expr, json, info));
@@ -754,7 +754,7 @@ static get_or_create_reference_resultt get_or_create_reference(
     {
       code_blockt block;
       reference.expr = info.allocate_objects.allocate_dynamic_object_symbol(
-        block, expr, pointer_type.subtype());
+        block, expr, pointer_type.base_type());
       code.add(block);
     }
     auto iterator_inserted_pair = info.references.insert({id, reference});

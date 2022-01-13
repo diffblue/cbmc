@@ -53,10 +53,9 @@ static void require_matching_annotations(
     annotations.begin(),
     annotations.end(),
     std::back_inserter(annotation_names),
-    [](const java_bytecode_parse_treet::annotationt &annotation)
-    {
+    [](const java_bytecode_parse_treet::annotationt &annotation) {
       return get_base_name(
-        require_type::require_pointer(annotation.type, {}).subtype());
+        require_type::require_pointer(annotation.type, {}).base_type());
     });
   std::sort(annotation_names.begin(), annotation_names.end());
   std::sort(expected_annotations.begin(), expected_annotations.end());

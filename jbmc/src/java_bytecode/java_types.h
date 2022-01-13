@@ -1056,7 +1056,7 @@ inline const typet &java_generic_class_type_bound(size_t index, const typet &t)
   PRECONDITION(index<gen_types.size());
   const java_generic_parametert &gen_type=gen_types[index];
 
-  return gen_type.subtype();
+  return gen_type.base_type();
 }
 
 /// Type to hold a Java class that is implicitly generic, e.g., an inner

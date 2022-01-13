@@ -1049,9 +1049,9 @@ java_generic_struct_tag_typet::java_generic_struct_tag_typet(
   const java_generic_typet &gen_base_type = to_java_generic_type(*base_type);
   INVARIANT(
     type.get_identifier() ==
-      to_struct_tag_type(gen_base_type.subtype()).get_identifier(),
+      to_struct_tag_type(gen_base_type.base_type()).get_identifier(),
     "identifier of " + type.pretty() + "\n and identifier of type " +
-      gen_base_type.subtype().pretty() +
+      gen_base_type.base_type().pretty() +
       "\ncreated by java_type_from_string for " + base_ref +
       " should be equal");
   generic_types().insert(

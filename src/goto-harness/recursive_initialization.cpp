@@ -980,10 +980,10 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
 {
   PRECONDITION(can_cast_type<pointer_typet>(result.type()));
   const auto &result_type = to_pointer_type(result.type());
-  PRECONDITION(can_cast_type<pointer_typet>(result_type.subtype()));
-  const auto &function_pointer_type = to_pointer_type(result_type.subtype());
-  PRECONDITION(can_cast_type<code_typet>(function_pointer_type.subtype()));
-  const auto &function_type = to_code_type(function_pointer_type.subtype());
+  PRECONDITION(can_cast_type<pointer_typet>(result_type.base_type()));
+  const auto &function_pointer_type = to_pointer_type(result_type.base_type());
+  PRECONDITION(can_cast_type<code_typet>(function_pointer_type.base_type()));
+  const auto &function_type = to_code_type(function_pointer_type.base_type());
 
   std::vector<exprt> targets;
 

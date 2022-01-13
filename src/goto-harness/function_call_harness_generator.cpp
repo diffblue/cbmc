@@ -400,7 +400,7 @@ void function_call_harness_generatort::validate_options(
     }
 
     if(!can_cast_type<code_typet>(
-         to_pointer_type(function_pointer_type).subtype()))
+         to_pointer_type(function_pointer_type).base_type()))
     {
       throw invalid_command_line_argument_exceptiont{
         "`" + id2string(nullable) + "' is not pointing to a function",

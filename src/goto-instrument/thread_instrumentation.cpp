@@ -134,6 +134,6 @@ void mutex_init_instrumentation(goto_modelt &goto_model)
     mutex_init_instrumentation(
       goto_model.symbol_table,
       gf_entry.second.body,
-      to_pointer_type(lock_type).subtype());
+      to_pointer_type(lock_type).base_type());
   }
 }

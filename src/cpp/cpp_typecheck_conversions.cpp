@@ -899,7 +899,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           pointer_typet ptr_sub=pointer_type(type);
           c_qualifierst qual_from;
           qual_from.read(expr.type());
-          qual_from.write(ptr_sub.subtype());
+          qual_from.write(ptr_sub.base_type());
           make_ptr_typecast(address, ptr_sub);
 
           const dereference_exprt deref(address);

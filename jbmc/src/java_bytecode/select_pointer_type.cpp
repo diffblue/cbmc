@@ -59,13 +59,13 @@ pointer_typet select_pointer_typet::specialize_generics(
     }
   }
 
-  auto subtype =
-    type_try_dynamic_cast<struct_tag_typet>(pointer_type.subtype());
-  if(subtype != nullptr && is_java_array_tag(subtype->get_identifier()))
+  auto base_type =
+    type_try_dynamic_cast<struct_tag_typet>(pointer_type.base_type());
+  if(base_type != nullptr && is_java_array_tag(base_type->get_identifier()))
   {
     // if the pointer is an array, recursively specialize its element type
     const auto *array_element_type =
-      type_try_dynamic_cast<pointer_typet>(java_array_element_type(*subtype));
+      type_try_dynamic_cast<pointer_typet>(java_array_element_type(*base_type));
     if(array_element_type == nullptr)
       return pointer_type;
 
@@ -73,7 +73,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       *array_element_type, generic_parameter_specialization_map);
 
     pointer_typet replacement_array_type = java_array_type('a');
-    replacement_array_type.subtype().set(ID_element_type, new_array_type);
+    replacement_array_type.base_type().set(ID_element_type, new_array_type);
     return replacement_array_type;
   }
 

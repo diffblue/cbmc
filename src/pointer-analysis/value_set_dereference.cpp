@@ -447,7 +447,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 {
   const pointer_typet &pointer_type =
     type_checked_cast<pointer_typet>(pointer_expr.type());
-  const typet &dereference_type = pointer_type.subtype();
+  const typet &dereference_type = pointer_type.base_type();
 
   if(what.id()==ID_unknown ||
      what.id()==ID_invalid)
