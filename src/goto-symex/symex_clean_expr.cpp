@@ -45,7 +45,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     {
       byte_extract_exprt be = make_byte_extract(
         if_expr.false_case(),
-        from_integer(0, index_type()),
+        from_integer(0, c_index_type()),
         if_expr.true_case().type());
 
       if_expr.false_case().swap(be);
@@ -93,7 +93,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
           simplify(array_size.value(), ns);
         expr = make_byte_extract(
           expr,
-          from_integer(0, index_type()),
+          from_integer(0, c_index_type()),
           array_typet(char_type(), array_size.value()));
       }
 

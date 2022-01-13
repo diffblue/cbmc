@@ -413,7 +413,7 @@ static exprt::operandst instantiate_byte_array(
   bytes.reserve(upper_bound - lower_bound);
   for(std::size_t i = lower_bound; i < upper_bound; ++i)
   {
-    const index_exprt idx{src, from_integer(i, index_type())};
+    const index_exprt idx{src, from_integer(i, c_index_type())};
     bytes.push_back(simplify_expr(idx, ns));
   }
   return bytes;
@@ -439,11 +439,11 @@ static exprt unpack_array_vector_no_known_bounds(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_a_v" +
       std::to_string(array_comprehension_index_counter),
-    index_type()};
+    c_index_type()};
 
-  index_exprt element{
-    src,
-    div_exprt{array_comprehension_index, from_integer(el_bytes, index_type())}};
+  index_exprt element{src,
+                      div_exprt{array_comprehension_index,
+                                from_integer(el_bytes, c_index_type())}};
 
   exprt sub = unpack_rec(element, little_endian, {}, {}, ns, false);
   exprt::operandst sub_operands = instantiate_byte_array(sub, 0, el_bytes, ns);
@@ -552,7 +552,7 @@ static exprt unpack_array_vector(
     }
     else
     {
-      element = index_exprt(src_simp, from_integer(i, index_type()));
+      element = index_exprt(src_simp, from_integer(i, c_index_type()));
     }
 
     // recursively unpack each element so that we eventually just have an array
@@ -925,8 +925,8 @@ static exprt unpack_rec(
     {
       extractbits_exprt extractbits(
         src_as_bitvector,
-        from_integer(bit_offset + 7, index_type()),
-        from_integer(bit_offset, index_type()),
+        from_integer(bit_offset + 7, c_index_type()),
+        from_integer(bit_offset, c_index_type()),
         byte_type);
 
       // endianness_mapt should be the point of reference for mapping out
@@ -1007,7 +1007,7 @@ static exprt lower_byte_extract_array_vector(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_a" +
       std::to_string(array_comprehension_index_counter),
-    index_type()};
+    c_index_type()};
 
   plus_exprt new_offset{
     unpacked.offset(),
@@ -1329,7 +1329,7 @@ static exprt lower_byte_update_byte_array_vector_non_const(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_u_a_v" +
       std::to_string(array_comprehension_index_counter),
-    index_type()};
+    c_index_type()};
 
   binary_predicate_exprt lower_bound{
     typecast_exprt::conditional_cast(
@@ -1459,7 +1459,7 @@ static exprt lower_byte_update_array_vector_unbounded(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_u_a_v_u" +
       std::to_string(array_comprehension_index_counter),
-    index_type()};
+    c_index_type()};
 
   // all arithmetic uses offset/index types
   PRECONDITION(subtype_size.type() == src.offset().type());
@@ -1760,7 +1760,7 @@ static exprt lower_byte_update_array_vector(
   std::size_t i = 0;
   // copy the prefix not affected by the update
   for(; i < num_elements && (i + 1) * *subtype_bits <= offset_bytes * 8; ++i)
-    elements.push_back(index_exprt{src.op(), from_integer(i, index_type())});
+    elements.push_back(index_exprt{src.op(), from_integer(i, c_index_type())});
 
   // the modified elements
   for(; i < num_elements &&
@@ -1795,7 +1795,7 @@ static exprt lower_byte_update_array_vector(
 
     const byte_update_exprt bu{
       src.id(),
-      index_exprt{src.op(), from_integer(i, index_type())},
+      index_exprt{src.op(), from_integer(i, c_index_type())},
       from_integer(update_offset < 0 ? 0 : update_offset, src.offset().type()),
       array_exprt{
         std::move(update_values),
@@ -1805,7 +1805,7 @@ static exprt lower_byte_update_array_vector(
 
   // copy the tail not affected by the update
   for(; i < num_elements; ++i)
-    elements.push_back(index_exprt{src.op(), from_integer(i, index_type())});
+    elements.push_back(index_exprt{src.op(), from_integer(i, c_index_type())});
 
   if(is_array)
     return simplify_expr(

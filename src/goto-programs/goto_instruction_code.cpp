@@ -34,7 +34,7 @@ code_inputt::code_inputt(
   optionalt<source_locationt> location)
   : code_inputt{{address_of_exprt(index_exprt(
                    string_constantt(description),
-                   from_integer(0, index_type()))),
+                   from_integer(0, c_index_type()))),
                  std::move(expression)},
                 std::move(location)}
 {
@@ -62,7 +62,7 @@ code_outputt::code_outputt(
   optionalt<source_locationt> location)
   : code_outputt{{address_of_exprt(index_exprt(
                     string_constantt(description),
-                    from_integer(0, index_type()))),
+                    from_integer(0, c_index_type()))),
                   std::move(expression)},
                  std::move(location)}
 {

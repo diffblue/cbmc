@@ -256,9 +256,9 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     {
       // array-to-pointer conversion
 
-      index_exprt index1(expr.op1(), from_integer(0, index_type()));
+      index_exprt index1(expr.op1(), from_integer(0, c_index_type()));
 
-      index_exprt index2(expr.op2(), from_integer(0, index_type()));
+      index_exprt index2(expr.op2(), from_integer(0, c_index_type()));
 
       address_of_exprt addr1(index1);
       address_of_exprt addr2(index2);

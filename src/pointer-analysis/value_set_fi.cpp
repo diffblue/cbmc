@@ -229,7 +229,7 @@ exprt value_set_fit::to_expr(const object_map_dt::value_type &it) const
   od.object()=object;
 
   if(it.second)
-    od.offset() = from_integer(*it.second, index_type());
+    od.offset() = from_integer(*it.second, c_index_type());
 
   od.type()=od.object().type();
 
@@ -868,7 +868,7 @@ void value_set_fit::get_reference_set_sharing_rec(
       else
       {
         index_exprt index_expr(
-          object, from_integer(0, index_type()), expr.type());
+          object, from_integer(0, c_index_type()), expr.type());
 
         exprt casted_index;
 
@@ -1045,7 +1045,7 @@ void value_set_fit::assign(
   else if(type.id()==ID_array)
   {
     const index_exprt lhs_index(
-      lhs, exprt(ID_unknown, index_type()), type.subtype());
+      lhs, exprt(ID_unknown, c_index_type()), type.subtype());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
@@ -1079,7 +1079,7 @@ void value_set_fit::assign(
       {
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
-          exprt(ID_unknown, index_type()),
+          exprt(ID_unknown, c_index_type()),
           type.subtype());
 
         assign(lhs_index, op0_index, ns);
@@ -1088,7 +1088,7 @@ void value_set_fit::assign(
       else
       {
         const index_exprt rhs_index(
-          rhs, exprt(ID_unknown, index_type()), type.subtype());
+          rhs, exprt(ID_unknown, c_index_type()), type.subtype());
         assign(lhs_index, rhs_index, ns);
       }
     }

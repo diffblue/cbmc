@@ -1445,7 +1445,7 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
     for(std::size_t i = 0; i < indices_size; ++i)
     {
       // only the least significant bits of each mask element are considered
-      mod_exprt mod_index{index_exprt{indices, from_integer(i, index_type())},
+      mod_exprt mod_index{index_exprt{indices, from_integer(i, c_index_type())},
                           size};
       mod_index.add_source_location() = source_location;
       operands.push_back(std::move(mod_index));

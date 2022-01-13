@@ -217,7 +217,7 @@ void local_may_aliast::get_rec(
       if(index_expr.array().id()==ID_symbol)
       {
         index_exprt tmp1=index_expr;
-        tmp1.index()=from_integer(0, index_type());
+        tmp1.index() = from_integer(0, c_index_type());
         address_of_exprt tmp2(tmp1);
         unsigned object_nr=objects.number(tmp2);
         dest.insert(object_nr);
@@ -229,7 +229,7 @@ void local_may_aliast::get_rec(
       else if(index_expr.array().id()==ID_string_constant)
       {
         index_exprt tmp1=index_expr;
-        tmp1.index()=from_integer(0, index_type());
+        tmp1.index() = from_integer(0, c_index_type());
         address_of_exprt tmp2(tmp1);
         unsigned object_nr=objects.number(tmp2);
         dest.insert(object_nr);

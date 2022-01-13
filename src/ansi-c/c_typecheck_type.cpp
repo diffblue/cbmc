@@ -1011,7 +1011,7 @@ void c_typecheck_baset::typecheck_compound_body(
 
         // make it zero-length
         c_type.id(ID_array);
-        c_type.set(ID_size, from_integer(0, index_type()));
+        c_type.set(ID_size, from_integer(0, c_index_type()));
       }
     }
   }

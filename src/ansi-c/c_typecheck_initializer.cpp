@@ -542,7 +542,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         if(current_symbol.is_static_lifetime)
         {
           byte_update_exprt byte_update =
-            make_byte_update(*dest, from_integer(0, index_type()), *zero);
+            make_byte_update(*dest, from_integer(0, c_index_type()), *zero);
           byte_update.add_source_location() = value.source_location();
           *dest = std::move(byte_update);
           dest = &(to_byte_update_expr(*dest).op2());
@@ -1029,7 +1029,7 @@ exprt c_typecheck_baset::do_initializer_list(
     // make complete by setting array size
     size_t size=result.operands().size();
     result.type().id(ID_array);
-    result.type().set(ID_size, from_integer(size, index_type()));
+    result.type().set(ID_size, from_integer(size, c_index_type()));
   }
 
   return result;

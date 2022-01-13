@@ -214,7 +214,7 @@ void goto_convertt::remove_pre(
   typet constant_type;
 
   if(op_type.id() == ID_pointer)
-    constant_type = index_type();
+    constant_type = c_index_type();
   else if(is_number(op_type))
     constant_type = op_type;
   else
@@ -300,7 +300,7 @@ void goto_convertt::remove_post(
   typet constant_type;
 
   if(op_type.id() == ID_pointer)
-    constant_type = index_type();
+    constant_type = c_index_type();
   else if(is_number(op_type))
     constant_type = op_type;
   else

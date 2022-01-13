@@ -56,7 +56,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     // for each element of the array, call the destructor
     for(mp_integer i=0; i < s; ++i)
     {
-      exprt constant=from_integer(i, index_type());
+      exprt constant = from_integer(i, c_index_type());
       constant.add_source_location()=source_location;
 
       index_exprt index(object, constant);

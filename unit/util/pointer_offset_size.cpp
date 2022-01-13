@@ -35,24 +35,24 @@ TEST_CASE("Build subexpression to access element at offset into array")
 
   {
     const auto result = get_subexpression_at_offset(a, 0, t, ns);
-    REQUIRE(result.value() == index_exprt(a, from_integer(0, index_type())));
+    REQUIRE(result.value() == index_exprt(a, from_integer(0, c_index_type())));
   }
 
   {
     const auto result = get_subexpression_at_offset(a, 32 / 8, t, ns);
-    REQUIRE(result.value() == index_exprt(a, from_integer(1, index_type())));
+    REQUIRE(result.value() == index_exprt(a, from_integer(1, c_index_type())));
   }
 
   {
     const auto result =
       get_subexpression_at_offset(a, from_integer(0, size_type()), t, ns);
-    REQUIRE(result.value() == index_exprt(a, from_integer(0, index_type())));
+    REQUIRE(result.value() == index_exprt(a, from_integer(0, c_index_type())));
   }
 
   {
     const auto result =
       get_subexpression_at_offset(a, size_of_expr(t, ns).value(), t, ns);
-    REQUIRE(result.value() == index_exprt(a, from_integer(1, index_type())));
+    REQUIRE(result.value() == index_exprt(a, from_integer(1, c_index_type())));
   }
 
   {
@@ -60,8 +60,8 @@ TEST_CASE("Build subexpression to access element at offset into array")
     const auto result = get_subexpression_at_offset(a, 1, small_t, ns);
     REQUIRE(
       result.value() == make_byte_extract(
-                          index_exprt(a, from_integer(0, index_type())),
-                          from_integer(1, index_type()),
+                          index_exprt(a, from_integer(0, c_index_type())),
+                          from_integer(1, c_index_type()),
                           small_t));
   }
 
@@ -73,7 +73,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
     // index_exprt.
     REQUIRE(
       result.value() ==
-      make_byte_extract(a, from_integer(3, index_type()), int16_t));
+      make_byte_extract(a, from_integer(3, c_index_type()), int16_t));
   }
 }
 
@@ -121,6 +121,6 @@ TEST_CASE("Build subexpression to access element at offset into struct")
     REQUIRE(
       result.value() ==
       make_byte_extract(
-        member_exprt(s, "foo", t), from_integer(1, index_type()), small_t));
+        member_exprt(s, "foo", t), from_integer(1, c_index_type()), small_t));
   }
 }

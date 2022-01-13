@@ -1185,7 +1185,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(op_type.id()==ID_array)
   {
-    index_exprt index(op, from_integer(0, index_type()));
+    index_exprt index(op, from_integer(0, c_index_type()));
     op=address_of_exprt(index);
   }
   else if(op_type.id()==ID_empty)
@@ -1245,7 +1245,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
 void c_typecheck_baset::make_index_type(exprt &expr)
 {
-  implicit_typecast(expr, index_type());
+  implicit_typecast(expr, c_index_type());
 }
 
 void c_typecheck_baset::typecheck_expr_index(exprt &expr)
@@ -1456,7 +1456,7 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
   if(op0_type.id() == ID_array)
   {
     // a->f is the same as a[0].f
-    exprt zero=from_integer(0, index_type());
+    exprt zero = from_integer(0, c_index_type());
     index_exprt index_expr(op, zero, op0_type.subtype());
     index_expr.set(ID_C_lvalue, true);
     op.swap(index_expr);
@@ -1774,7 +1774,7 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
     // *a is the same as a[0]
     expr.id(ID_index);
     expr.type()=op_type.subtype();
-    expr.copy_to_operands(from_integer(0, index_type()));
+    expr.copy_to_operands(from_integer(0, c_index_type()));
     assert(expr.operands().size()==2);
   }
   else if(op_type.id()==ID_pointer)

@@ -448,7 +448,7 @@ bool generate_ansi_c_start_function(
 
         {
           index_exprt index_expr(
-            argv_symbol.symbol_expr(), from_integer(0, index_type()));
+            argv_symbol.symbol_expr(), from_integer(0, c_index_type()));
 
           // disable bounds check on that one
           index_expr.set(ID_C_bounds_check, false);
@@ -466,7 +466,7 @@ bool generate_ansi_c_start_function(
           const symbolt &envp_symbol=ns.lookup("envp'");
 
           index_exprt index_expr(
-            envp_symbol.symbol_expr(), from_integer(0, index_type()));
+            envp_symbol.symbol_expr(), from_integer(0, c_index_type()));
 
           const pointer_typet &pointer_type =
             to_pointer_type(parameters[2].type());

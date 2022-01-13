@@ -31,7 +31,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 
   array_typet array_type(char_type(), from_integer(2, size_type()));
   symbol_exprt array("A", array_type);
-  index_exprt index(array, from_integer(1, index_type()));
+  index_exprt index(array, from_integer(1, c_index_type()));
   address_of_exprt address_of(index);
 
   exprt p_o=pointer_offset(address_of);
@@ -79,7 +79,7 @@ TEST_CASE("Simplify byte extract", "[core][util]")
   // object
   symbol_exprt s("foo", size_type());
   byte_extract_exprt be =
-    make_byte_extract(s, from_integer(0, index_type()), size_type());
+    make_byte_extract(s, from_integer(0, c_index_type()), size_type());
 
   exprt simp = simplify_expr(be, ns);
 
