@@ -15,6 +15,7 @@ Author: Daniel Poetzl
 #include "goto_program.h"
 
 class goto_functionst;
+class message_handlert;
 
 class remove_calls_no_bodyt
 {
@@ -32,9 +33,10 @@ protected:
 public:
   void operator()(
     goto_programt &goto_program,
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    message_handlert &);
 
-  void operator()(goto_functionst &goto_functions);
+  void operator()(goto_functionst &goto_functions, message_handlert &);
 };
 
 #define OPT_REMOVE_CALLS_NO_BODY "(remove-calls-no-body)"

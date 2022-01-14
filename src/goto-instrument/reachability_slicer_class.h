@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_program.h>
 
 class goto_functionst;
+class message_handlert;
 class slicing_criteriont;
 
 class reachability_slicert
@@ -23,7 +24,8 @@ public:
   void operator()(
     goto_functionst &goto_functions,
     const slicing_criteriont &criterion,
-    bool include_forward_reachability);
+    bool include_forward_reachability,
+    message_handlert &);
 
 protected:
   struct slicer_entryt

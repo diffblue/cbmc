@@ -944,19 +944,29 @@ bool cbmc_parse_optionst::process_goto_program(
     log.status() << "Performing a forwards-backwards reachability slice"
                  << messaget::eom;
     if(options.is_set("property"))
+    {
       reachability_slicer(
-        goto_model, options.get_list_option("property"), true);
+        goto_model,
+        options.get_list_option("property"),
+        true,
+        log.get_message_handler());
+    }
     else
-      reachability_slicer(goto_model, true);
+      reachability_slicer(goto_model, true, log.get_message_handler());
   }
 
   if(options.get_bool_option("reachability-slice"))
   {
     log.status() << "Performing a reachability slice" << messaget::eom;
     if(options.is_set("property"))
-      reachability_slicer(goto_model, options.get_list_option("property"));
+    {
+      reachability_slicer(
+        goto_model,
+        options.get_list_option("property"),
+        log.get_message_handler());
+    }
     else
-      reachability_slicer(goto_model);
+      reachability_slicer(goto_model, log.get_message_handler());
   }
 
   // full slice?

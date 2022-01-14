@@ -16,25 +16,30 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 class goto_modelt;
+class message_handlert;
 
-void reachability_slicer(goto_modelt &);
-
-void reachability_slicer(
-  goto_modelt &,
-  const std::list<std::string> &properties);
-
-void function_path_reachability_slicer(
-  goto_modelt &goto_model,
-  const std::list<std::string> &functions_list);
-
-void reachability_slicer(
-  goto_modelt &,
-  const bool include_forward_reachability);
+void reachability_slicer(goto_modelt &, message_handlert &);
 
 void reachability_slicer(
   goto_modelt &,
   const std::list<std::string> &properties,
-  const bool include_forward_reachability);
+  message_handlert &);
+
+void function_path_reachability_slicer(
+  goto_modelt &goto_model,
+  const std::list<std::string> &functions_list,
+  message_handlert &);
+
+void reachability_slicer(
+  goto_modelt &,
+  const bool include_forward_reachability,
+  message_handlert &);
+
+void reachability_slicer(
+  goto_modelt &,
+  const std::list<std::string> &properties,
+  const bool include_forward_reachability,
+  message_handlert &);
 
 // clang-format off
 #define OPT_REACHABILITY_SLICER                                                \
