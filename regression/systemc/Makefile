@@ -12,15 +12,14 @@ endif
 ifeq ($(BUILD_ENV_),MSVC)
 	excluded_tests = -X gcc-only -X winbug
 else
+ifeq ($(BUILD_ENV_),OSX)
 	# In MacOS, a change in the assert.h header file
 	# is causing template errors when exercising the
 	# C++ front end (because of a transitive include
 	# of <type_traits>) for files that include the
 	# <assert.h> or <cassert> headers.
-	OS := $(shell uname)
-	ifeq ($(OS),Darwin)
-		excluded_tests = -X macos-assert-broken
-	endif
+  excluded_tests = -X macos-assert-broken
+endif
 endif
 
 default: tests.log
