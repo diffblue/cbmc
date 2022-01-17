@@ -119,11 +119,6 @@ void cpp_internal_additions(std::ostream &out)
       << "  short next_avail;\n"
       << "  short next_unread;\n"
       << "};\n";
-  out << "extern struct " CPROVER_PREFIX "pipet "
-      << "" CPROVER_PREFIX "pipes[__CPROVER::constant_infinity_uint];" << '\n';
-  // offset to make sure we don't collide with other fds
-  out << "extern const int " CPROVER_PREFIX "pipe_offset;" << '\n';
-  out << "unsigned " CPROVER_PREFIX "pipe_count=0;" << '\n';
 
   // This function needs to be declared, or otherwise can't be called
   // by the entry-point construction.

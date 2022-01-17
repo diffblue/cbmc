@@ -206,11 +206,6 @@ void ansi_c_internal_additions(std::string &code)
     "  short next_avail;\n"
     "  short next_unread;\n"
     "};\n"
-    "extern struct " CPROVER_PREFIX "pipet " CPROVER_PREFIX "pipes["
-      CPROVER_PREFIX "constant_infinity_uint];\n"
-    // offset to make sure we don't collide with other fds
-    "extern const int " CPROVER_PREFIX "pipe_offset;\n"
-    "unsigned " CPROVER_PREFIX "pipe_count=0;\n"
     "\n"
     // This function needs to be declared, or otherwise can't be called
     // by the entry-point construction.
