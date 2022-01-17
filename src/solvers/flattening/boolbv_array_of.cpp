@@ -29,7 +29,7 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
   {
     // A zero-length array is acceptable;
     // an element with unknown size is not.
-    if(boolbv_width(array_type.subtype())==0)
+    if(boolbv_width(array_type.element_type()) == 0)
       return conversion_failed(expr);
     else
       return bvt();

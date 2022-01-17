@@ -1440,7 +1440,8 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
     CHECK_RETURN(input_size.has_value());
     if(arg1.has_value())
       input_size = *input_size * 2;
-    constant_exprt size = from_integer(*input_size, indices_type.subtype());
+    constant_exprt size =
+      from_integer(*input_size, indices_type.element_type());
 
     for(std::size_t i = 0; i < indices_size; ++i)
     {

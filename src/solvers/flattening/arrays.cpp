@@ -679,8 +679,8 @@ void arrayst::add_array_constraints_array_of(
 
   for(const auto &index : index_set)
   {
-    const typet &subtype = expr.type().subtype();
-    index_exprt index_expr(expr, index, subtype);
+    const typet &element_type = expr.type().element_type();
+    index_exprt index_expr(expr, index, element_type);
 
     DATA_INVARIANT(
       index_expr.type() == expr.what().type(),
@@ -703,8 +703,8 @@ void arrayst::add_array_constraints_array_constant(
 
   for(const auto &index : index_set)
   {
-    const typet &subtype = expr.type().subtype();
-    const index_exprt index_expr{expr, index, subtype};
+    const typet &element_type = expr.type().element_type();
+    const index_exprt index_expr{expr, index, element_type};
 
     if(index.is_constant())
     {

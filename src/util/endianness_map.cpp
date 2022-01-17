@@ -94,7 +94,7 @@ void endianness_mapt::build_big_endian(const typet &src)
     {
       while(*s > 0)
       {
-        build_big_endian(array_type.subtype());
+        build_big_endian(array_type.element_type());
         --(*s);
       }
     }
@@ -107,7 +107,7 @@ void endianness_mapt::build_big_endian(const typet &src)
 
     while(s > 0)
     {
-      build_big_endian(vector_type.subtype());
+      build_big_endian(vector_type.element_type());
       --s;
     }
   }

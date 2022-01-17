@@ -197,8 +197,8 @@ void goto_symext::symex_other(
 
     const array_typet &array_type = to_array_type(array_expr.type());
 
-    if(array_type.subtype() != value.type())
-      value = typecast_exprt(value, array_type.subtype());
+    if(array_type.element_type() != value.type())
+      value = typecast_exprt(value, array_type.element_type());
 
     symex_assign(state, array_expr, array_of_exprt(value, array_type));
   }

@@ -223,8 +223,9 @@ bool check_c_implicit_typecast(
       }
     }
 
-    if(dest_type.id()==ID_array &&
-       src_type.subtype()==dest_type.subtype())
+    if(
+      dest_type.id() == ID_array &&
+      src_type.subtype() == to_array_type(dest_type).element_type())
       return false;
 
     if(dest_type.id()==ID_bool ||

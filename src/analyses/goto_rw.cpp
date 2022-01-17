@@ -262,7 +262,7 @@ void rw_range_sett::get_objects_index(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    auto subtype_bits = pointer_offset_bits(vector_type.subtype(), ns);
+    auto subtype_bits = pointer_offset_bits(vector_type.element_type(), ns);
 
     sub_size = subtype_bits.has_value() ? to_range_spect(*subtype_bits) : -1;
   }
@@ -270,7 +270,7 @@ void rw_range_sett::get_objects_index(
   {
     const array_typet &array_type=to_array_type(type);
 
-    auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+    auto subtype_bits = pointer_offset_bits(array_type.element_type(), ns);
 
     sub_size = subtype_bits.has_value() ? to_range_spect(*subtype_bits) : -1;
   }
@@ -301,7 +301,7 @@ void rw_range_sett::get_objects_array(
 {
   const array_typet &array_type = expr.type();
 
-  auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+  auto subtype_bits = pointer_offset_bits(array_type.element_type(), ns);
 
   range_spect sub_size;
 
@@ -608,7 +608,7 @@ void rw_range_sett::get_objects_rec(const typet &type)
   if(type.id()==ID_array)
   {
     const auto &array_type = to_array_type(type);
-    get_objects_rec(array_type.subtype());
+    get_objects_rec(array_type.element_type());
     get_objects_rec(get_modet::READ, array_type.size());
   }
 }

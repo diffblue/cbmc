@@ -536,7 +536,7 @@ void smt2_convt::walk_array_tree(
     if(failure)
       return;
     long index = tempint.to_long();
-    exprt value = parse_rec(src.get_sub()[3], type.subtype());
+    exprt value = parse_rec(src.get_sub()[3], type.element_type());
     operands_map->emplace(index, value);
   }
   else if(src.get_sub().size() == 3 && src.get_sub()[0].id() == "let")
@@ -553,7 +553,7 @@ void smt2_convt::walk_array_tree(
           src.get_sub()[0].get_sub()[1].id()=="const")
   {
     // (as const type_info default_value)
-    exprt default_value = parse_rec(src.get_sub()[1], type.subtype());
+    exprt default_value = parse_rec(src.get_sub()[1], type.element_type());
     operands_map->emplace(-1, default_value);
   }
 }
@@ -3383,9 +3383,11 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
       summands.reserve(expr.operands().size());
       for(const auto &op : expr.operands())
         summands.push_back(index_exprt(
-          op, from_integer(size - i - 1, index_type), vector_type.subtype()));
+          op,
+          from_integer(size - i - 1, index_type),
+          vector_type.element_type()));
 
-      plus_exprt tmp(std::move(summands), vector_type.subtype());
+      plus_exprt tmp(std::move(summands), vector_type.element_type());
 
       out << " ";
       convert_expr(tmp);
@@ -3575,13 +3577,12 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
     // subtract component-by-component
     for(mp_integer i=0; i!=size; ++i)
     {
-      exprt tmp(ID_minus, vector_type.subtype());
+      exprt tmp(ID_minus, vector_type.element_type());
       forall_operands(it, expr)
-        tmp.copy_to_operands(
-          index_exprt(
-            *it,
-            from_integer(size-i-1, index_type),
-            vector_type.subtype()));
+        tmp.copy_to_operands(index_exprt(
+          *it,
+          from_integer(size - i - 1, index_type),
+          vector_type.element_type()));
 
       out << " ";
       convert_expr(tmp);
@@ -3839,7 +3840,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
     {
       // fixed-width
       std::size_t array_width=boolbv_width(array_type);
-      std::size_t sub_width=boolbv_width(array_type.subtype());
+      std::size_t sub_width = boolbv_width(array_type.element_type());
       std::size_t index_width=boolbv_width(expr.where().type());
 
       // We mask out the updated bits with AND,
@@ -4084,9 +4085,9 @@ void smt2_convt::convert_index(const index_exprt &expr)
       std::size_t array_width=boolbv_width(array_type);
       CHECK_RETURN(array_width != 0);
 
-      unflatten(wheret::BEGIN, array_type.subtype());
+      unflatten(wheret::BEGIN, array_type.element_type());
 
-      std::size_t sub_width=boolbv_width(array_type.subtype());
+      std::size_t sub_width = boolbv_width(array_type.element_type());
       std::size_t index_width=boolbv_width(expr.index().type());
 
       out << "((_ extract " << sub_width-1 << " 0) ";
@@ -4112,7 +4113,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
       out << ")))"; // mult, bvlshr, extract
 
-      unflatten(wheret::END, array_type.subtype());
+      unflatten(wheret::END, array_type.element_type());
     }
   }
   else if(array_op_type.id()==ID_vector)
@@ -4318,7 +4319,7 @@ void smt2_convt::unflatten(
       // extract elements
       const vector_typet &vector_type=to_vector_type(type);
 
-      std::size_t subtype_width=boolbv_width(vector_type.subtype());
+      std::size_t subtype_width = boolbv_width(vector_type.element_type());
 
       mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
 
@@ -4335,10 +4336,10 @@ void smt2_convt::unflatten(
         for(mp_integer i=0; i!=size; ++i, offset+=subtype_width)
         {
           out << " ";
-          unflatten(wheret::BEGIN, vector_type.subtype(), nesting+1);
+          unflatten(wheret::BEGIN, vector_type.element_type(), nesting + 1);
           out << "((_ extract " << offset+subtype_width-1 << " "
               << offset << ") ?ufop" << nesting << ")";
-          unflatten(wheret::END, vector_type.subtype(), nesting+1);
+          unflatten(wheret::END, vector_type.element_type(), nesting + 1);
         }
 
         out << "))"; // mk-, let
@@ -4630,7 +4631,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << "(assert (forall ((i ";
         convert_type(array_type.size().type());
         out << ")) (= (select " << id << " i) ";
-        if(array_type.subtype().id() == ID_bool && !use_array_of_bool)
+        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
         {
           out << "(ite ";
           convert_expr(array_of.what());
@@ -4678,7 +4679,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << ")) (= (select " << id << " ";
         convert_expr(array_comprehension.arg());
         out << ") ";
-        if(array_type.subtype().id() == ID_bool && !use_array_of_bool)
+        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
         {
           out << "(ite ";
           convert_expr(array_comprehension.body());
@@ -4711,7 +4712,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         out << "(assert (= (select " << id << " ";
         convert_expr(from_integer(i, array_type.size().type()));
         out << ") "; // select
-        if(array_type.subtype().id() == ID_bool && !use_array_of_bool)
+        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
         {
           out << "(ite ";
           convert_expr(expr.operands()[i]);
@@ -4865,7 +4866,7 @@ void smt2_convt::convert_type(const typet &type)
     CHECK_RETURN(array_type.size().is_not_nil());
 
     // we always use array theory for top-level arrays
-    const typet &subtype = array_type.subtype();
+    const typet &subtype = array_type.element_type();
 
     out << "(Array ";
     convert_type(array_type.size().type());
@@ -4874,7 +4875,7 @@ void smt2_convt::convert_type(const typet &type)
     if(subtype.id()==ID_bool && !use_array_of_bool)
       out << "(_ BitVec 1)";
     else
-      convert_type(array_type.subtype());
+      convert_type(array_type.element_type());
 
     out << ")";
   }
@@ -5008,7 +5009,7 @@ void smt2_convt::find_symbols_rec(
   {
     const array_typet &array_type=to_array_type(type);
     find_symbols(array_type.size());
-    find_symbols_rec(array_type.subtype(), recstack);
+    find_symbols_rec(array_type.element_type(), recstack);
   }
   else if(type.id()==ID_complex)
   {

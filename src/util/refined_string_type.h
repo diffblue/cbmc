@@ -39,7 +39,7 @@ public:
 
   const typet &get_char_type() const
   {
-    return get_content_type().subtype();
+    return get_content_type().element_type();
   }
 
   const typet &get_index_type() const

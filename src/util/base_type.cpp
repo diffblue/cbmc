@@ -70,7 +70,7 @@ void base_type_rec(
   }
   else if(type.id()==ID_array)
   {
-    base_type_rec(to_array_type(type).subtype(), ns, symb);
+    base_type_rec(to_array_type(type).element_type(), ns, symb);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -233,7 +233,8 @@ bool base_type_eqt::base_type_eq_rec(
   else if(type1.id()==ID_array)
   {
     if(!base_type_eq_rec(
-      to_array_type(type1).subtype(), to_array_type(type2).subtype()))
+         to_array_type(type1).element_type(),
+         to_array_type(type2).element_type()))
       return false;
 
     if(to_array_type(type1).size()!=to_array_type(type2).size())

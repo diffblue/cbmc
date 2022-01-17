@@ -829,7 +829,7 @@ exprt smt2_parsert::function_application()
 
           auto value = expression();
 
-          if(value.type() != array_sort.subtype())
+          if(value.type() != array_sort.element_type())
             throw error() << "unexpected 'as const' with wrong element type";
 
           if(smt2_tokenizer.next_token() != smt2_tokenizert::CLOSE)
@@ -1215,7 +1215,7 @@ void smt2_parsert::setup_expressions()
     if(op[0].type().id() != ID_array)
       throw error("store expects array operand");
 
-    if(to_array_type(op[0].type()).subtype() != op[2].type())
+    if(to_array_type(op[0].type()).element_type() != op[2].type())
       throw error("store expects value that matches array element type");
 
     return with_exprt(op[0], op[1], op[2]);

@@ -175,7 +175,8 @@ typet get_original_name(typet type)
   if(type.id() == ID_array)
   {
     auto &array_type = to_array_type(type);
-    array_type.subtype() = get_original_name(std::move(array_type.subtype()));
+    array_type.element_type() =
+      get_original_name(std::move(array_type.element_type()));
     array_type.size() = get_original_name(std::move(array_type.size()));
   }
   else if(type.id() == ID_struct || type.id() == ID_union)

@@ -26,7 +26,7 @@ std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
   {
     const auto &array_type = to_array_type(type);
     out << "(Array " << smt2_format(array_type.size().type()) << ' '
-        << smt2_format(array_type.subtype()) << ')';
+        << smt2_format(array_type.element_type()) << ')';
   }
   else if(type.id() == ID_floatbv)
   {

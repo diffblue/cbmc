@@ -102,7 +102,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_array)
   {
-    auto sub = pointer_offset_bits(to_array_type(type).subtype(), ns);
+    auto sub = pointer_offset_bits(to_array_type(type).element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -115,7 +115,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_vector)
   {
-    auto sub = pointer_offset_bits(to_vector_type(type).subtype(), ns);
+    auto sub = pointer_offset_bits(to_vector_type(type).element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -283,7 +283,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto &array_type = to_array_type(type);
 
     // special-case arrays of bits
-    if(array_type.subtype().id() == ID_bool)
+    if(array_type.element_type().id() == ID_bool)
     {
       auto bits = pointer_offset_bits(array_type, ns);
 
@@ -291,7 +291,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         return from_integer((*bits + 7) / 8, size_type());
     }
 
-    auto sub = size_of_expr(array_type.subtype(), ns);
+    auto sub = size_of_expr(array_type.element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -310,7 +310,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto &vector_type = to_vector_type(type);
 
     // special-case vectors of bits
-    if(vector_type.subtype().id() == ID_bool)
+    if(vector_type.element_type().id() == ID_bool)
     {
       auto bits = pointer_offset_bits(vector_type, ns);
 
@@ -318,7 +318,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         return from_integer((*bits + 7) / 8, size_type());
     }
 
-    auto sub = size_of_expr(vector_type.subtype(), ns);
+    auto sub = size_of_expr(vector_type.element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -521,7 +521,7 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
     if(o.has_value())
     {
       const auto &array_type = to_array_type(index_expr.array().type());
-      auto sub_size = pointer_offset_size(array_type.subtype(), ns);
+      auto sub_size = pointer_offset_size(array_type.element_type(), ns);
 
       if(sub_size.has_value() && *sub_size > 0)
       {
@@ -660,7 +660,8 @@ optionalt<exprt> get_subexpression_at_offset(
   {
     const array_typet &array_type = to_array_type(source_type);
 
-    const auto elem_size_bits = pointer_offset_bits(array_type.subtype(), ns);
+    const auto elem_size_bits =
+      pointer_offset_bits(array_type.element_type(), ns);
 
     // no arrays of non-byte-aligned, zero-, or unknown-sized objects
     if(

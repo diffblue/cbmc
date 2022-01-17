@@ -102,7 +102,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
       // type T[N-(B/sizeof(T))]
       const array_typet &prev_array_type = to_array_type(expr.type());
       const typet &array_size_type = prev_array_type.size().type();
-      const typet &subtype = prev_array_type.subtype();
+      const typet &subtype = prev_array_type.element_type();
 
       exprt new_offset =
         typecast_exprt::conditional_cast(ode.offset(), array_size_type);

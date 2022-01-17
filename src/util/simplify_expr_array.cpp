@@ -171,9 +171,9 @@ simplify_exprt::simplify_index(const index_exprt &expr)
     {
       optionalt<typet> subtype;
       if(array.type().id() == ID_array)
-        subtype = to_array_type(array.type()).subtype();
+        subtype = to_array_type(array.type()).element_type();
       else
-        subtype = to_vector_type(array.type()).subtype();
+        subtype = to_vector_type(array.type()).element_type();
 
       // This rewrites byte_extract(s, o, array_type)[i]
       // to byte_extract(s, o+offset, sub_type)

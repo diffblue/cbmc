@@ -30,7 +30,7 @@ array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
   std::size_t string_size=str.size()+1; // we add the zero
-  const typet &char_type = to_array_type(type()).subtype();
+  const typet &char_type = to_array_type(type()).element_type();
   bool char_is_unsigned=char_type.id()==ID_unsignedbv;
 
   exprt size = from_integer(string_size, c_index_type());

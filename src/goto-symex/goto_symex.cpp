@@ -131,7 +131,7 @@ void goto_symext::symex_assign(
 static std::string get_alnum_string(const array_exprt &char_array)
 {
   const auto &ibv_type =
-    to_integer_bitvector_type(to_array_type(char_array.type()).subtype());
+    to_integer_bitvector_type(to_array_type(char_array.type()).element_type());
 
   const std::size_t n_bits = ibv_type.get_width();
   CHECK_RETURN(n_bits % 8 == 0);

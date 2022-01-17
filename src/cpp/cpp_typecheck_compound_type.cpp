@@ -794,7 +794,7 @@ void cpp_typecheckt::check_fixed_size_array(typet &type)
     }
 
     // recursive call for multi-dimensional arrays
-    check_fixed_size_array(array_type.subtype());
+    check_fixed_size_array(array_type.element_type());
   }
 }
 

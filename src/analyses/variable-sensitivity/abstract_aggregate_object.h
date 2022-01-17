@@ -164,7 +164,7 @@ struct array_aggregate_typet
   static typet read_type(const typet &, const typet &object_type)
   {
     array_typet array_type(to_array_type(object_type));
-    return array_type.subtype();
+    return array_type.element_type();
   }
 
   static void get_statistics(

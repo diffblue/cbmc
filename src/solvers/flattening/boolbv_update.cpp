@@ -73,7 +73,7 @@ void boolbvt::convert_update_rec(
     bvt index_bv = convert_bv(to_index_designator(designator).index());
 
     const array_typet &array_type=to_array_type(type);
-    const typet &subtype = array_type.subtype();
+    const typet &subtype = array_type.element_type();
     const exprt &size_expr = array_type.size();
 
     std::size_t element_size=boolbv_width(subtype);

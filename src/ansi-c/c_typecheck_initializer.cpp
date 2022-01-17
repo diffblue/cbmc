@@ -318,7 +318,7 @@ void c_typecheck_baset::designator_enter(
     if(array_type.size().is_nil())
     {
       entry.size=0;
-      entry.subtype=array_type.subtype();
+      entry.subtype = array_type.element_type();
     }
     else
     {
@@ -332,7 +332,7 @@ void c_typecheck_baset::designator_enter(
       }
 
       entry.size = numeric_cast_v<std::size_t>(*array_size);
-      entry.subtype=array_type.subtype();
+      entry.subtype = array_type.element_type();
     }
   }
   else if(full_type.id()==ID_vector)
@@ -350,7 +350,7 @@ void c_typecheck_baset::designator_enter(
     }
 
     entry.size = numeric_cast_v<std::size_t>(*vector_size);
-    entry.subtype=vector_type.subtype();
+    entry.subtype = vector_type.element_type();
   }
   else
     UNREACHABLE;
