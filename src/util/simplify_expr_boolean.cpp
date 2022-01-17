@@ -204,13 +204,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
   else if(op.id()==ID_exists) // !(exists: a) <-> forall: not a
   {
     auto const &op_as_exists = to_exists_expr(op);
-    return forall_exprt{op_as_exists.symbol(),
+    return forall_exprt{op_as_exists.variables(),
                         simplify_not(not_exprt(op_as_exists.where()))};
   }
   else if(op.id() == ID_forall) // !(forall: a) <-> exists: not a
   {
     auto const &op_as_forall = to_forall_expr(op);
-    return exists_exprt{op_as_forall.symbol(),
+    return exists_exprt{op_as_forall.variables(),
                         simplify_not(not_exprt(op_as_forall.where()))};
   }
 
