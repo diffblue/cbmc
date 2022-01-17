@@ -1,0 +1,17 @@
+CORE winbug
+trace.c
+--incremental-smt2-solver "z3 --smt2 -in" --trace
+Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+Assert of inequality to 4\.: FAILURE
+Assert of inequality to 2\.: FAILURE
+y=4
+y=2
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+type: pointer
+--
+Test that running cbmc with the `--incremental-smt2-solver` argument can be used
+to send a valid SMT2 formula to a sub-process solver for an example input file
+which include control flow constructs.

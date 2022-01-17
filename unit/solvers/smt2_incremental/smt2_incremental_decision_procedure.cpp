@@ -9,6 +9,7 @@
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
+#include <testing-utils/invariant.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/exception_utils.h>
@@ -85,6 +86,14 @@ public:
   ~smt_mock_solver_processt() override = default;
 };
 
+/// \brief Data structures and their initialisation shared between tests.
+/// \details
+///   Instantiates a `smt2_incremental_decision_proceduret` using a mock of the
+///   solver process to direct communication with the solver to collections of
+///   `sent_commands` and `mock_responses`. The `mock_respones` must be
+///   populated by the test, before the decision procedure expects them. The
+///   `sent_commands` should be checked by the test after the decision procedure
+///   has sent them.
 struct decision_procedure_test_environmentt final
 {
   void send(const smt_commandt &smt_command);
@@ -376,5 +385,114 @@ TEST_CASE(
       analysis_exceptiont,
       analysis_execption_with_messaget{
         "SMT solver does not support given command."});
+  }
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret getting values back from solver.",
+  "[core][smt2_incremental]")
+{
+  decision_procedure_test_environmentt test{};
+  const symbolt foo = make_test_symbol("foo", signedbv_typet{16});
+  const smt_identifier_termt foo_term{"foo", smt_bit_vector_sortt{16}};
+  const exprt expr_42 = from_integer({42}, signedbv_typet{16});
+  const smt_bit_vector_constant_termt term_42{42, 16};
+  SECTION("Set \"foo\" identifier and solve.")
+  {
+    test.sent_commands.clear();
+    const exprt equal_42 = equal_exprt{foo.symbol_expr(), expr_42};
+    test.procedure.set_to(equal_42, true);
+    test.mock_responses.push_back(smt_check_sat_responset{smt_sat_responset{}});
+    test.procedure();
+    REQUIRE(
+      test.sent_commands ==
+      std::vector<smt_commandt>{
+        smt_declare_function_commandt{foo_term, {}},
+        smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
+        smt_check_sat_commandt{}});
+    SECTION("Get \"foo\" value back")
+    {
+      test.sent_commands.clear();
+      test.mock_responses.push_back(
+        smt_get_value_responset{{{foo_term, term_42}}});
+      REQUIRE(test.procedure.get(foo.symbol_expr()) == expr_42);
+      REQUIRE(
+        test.sent_commands ==
+        std::vector<smt_commandt>{smt_get_value_commandt{foo_term}});
+    }
+    SECTION("Get value of non-set symbol")
+    {
+      // smt2_incremental_decision_proceduret is used this way when cbmc is
+      // invoked with the combination of `--trace` and `--slice-formula`.
+      test.sent_commands.clear();
+      const exprt bar =
+        make_test_symbol("bar", signedbv_typet{16}).symbol_expr();
+      REQUIRE(test.procedure.get(bar) == bar);
+      REQUIRE(test.sent_commands.empty());
+    }
+    SECTION("Get value of type less symbol back")
+    {
+      // smt2_incremental_decision_proceduret is used this way as part of
+      // building the goto trace, to get the partial order concurrency clock
+      // values.
+      test.sent_commands.clear();
+      const symbol_exprt baz = symbol_exprt::typeless("baz");
+      REQUIRE(test.procedure.get(baz) == baz);
+      REQUIRE(test.sent_commands.empty());
+    }
+    SECTION("Get value of trivially solved expression")
+    {
+      test.sent_commands.clear();
+      const smt_termt not_true_term =
+        smt_core_theoryt::make_not(smt_bool_literal_termt{true});
+      test.mock_responses.push_back(smt_get_value_responset{
+        {{not_true_term, smt_bool_literal_termt{false}}}});
+      REQUIRE(test.procedure.get(not_exprt{true_exprt{}}) == false_exprt{});
+      REQUIRE(
+        test.sent_commands ==
+        std::vector<smt_commandt>{smt_get_value_commandt{not_true_term}});
+    }
+    SECTION("Invariant violated due to expression in unexpected form.")
+    {
+      const mult_exprt unexpected{foo.symbol_expr(), from_integer(2, foo.type)};
+      const cbmc_invariants_should_throwt invariants_throw;
+      REQUIRE_THROWS_MATCHES(
+        test.procedure.get(unexpected),
+        invariant_failedt,
+        invariant_failure_containing(
+          "Unhandled expressions are expected to be symbols"));
+    }
+    SECTION("Error handling of mismatched response.")
+    {
+      test.sent_commands.clear();
+      const smt_check_sat_responset unexpected{smt_sat_responset{}};
+      test.mock_responses.push_back(unexpected);
+      REQUIRE_THROWS_MATCHES(
+        test.procedure.get(foo.symbol_expr()),
+        analysis_exceptiont,
+        analysis_execption_with_messaget{
+          "Expected get-value response from solver, but received - " +
+          unexpected.pretty()});
+      REQUIRE(
+        test.sent_commands ==
+        std::vector<smt_commandt>{smt_get_value_commandt{foo_term}});
+    }
+    SECTION("Error handling of multiple responses.")
+    {
+      test.sent_commands.clear();
+      const smt_get_value_responset unexpected{
+        {{foo_term, term_42}, {foo_term, term_42}}};
+      test.mock_responses.push_back(unexpected);
+      REQUIRE_THROWS_MATCHES(
+        test.procedure.get(foo.symbol_expr()),
+        analysis_exceptiont,
+        analysis_execption_with_messaget{
+          "Expected single valuation pair in get-value response from solver, "
+          "but received multiple pairs - " +
+          unexpected.pretty()});
+      REQUIRE(
+        test.sent_commands ==
+        std::vector<smt_commandt>{smt_get_value_commandt{foo_term}});
+    }
   }
 }
