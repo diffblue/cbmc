@@ -1972,13 +1972,16 @@ void smt2_convt::convert_expr(const exprt &expr)
     else if(quantifier_expr.id() == ID_exists)
       out << "(exists ";
 
-    exprt bound = quantifier_expr.symbol();
-
-    out << "((";
-    convert_expr(bound);
-    out << " ";
-    convert_type(bound.type());
-    out << ")) ";
+    out << "( ";
+    for(const auto &bound : quantifier_expr.variables())
+    {
+      out << "(";
+      convert_expr(bound);
+      out << " ";
+      convert_type(bound.type());
+      out << ") ";
+    }
+    out << ") ";
 
     convert_expr(quantifier_expr.where());
 
@@ -4566,10 +4569,13 @@ void smt2_convt::find_symbols(const exprt &expr)
     // do not declare the quantified symbol, but record
     // as 'bound symbol'
     const auto &q_expr = to_quantifier_expr(expr);
-    const auto identifier = q_expr.symbol().get_identifier();
-    identifiert &id = identifier_map[identifier];
-    id.type = q_expr.symbol().type();
-    id.is_bound = true;
+    for(const auto &symbol : q_expr.variables())
+    {
+      const auto identifier = symbol.get_identifier();
+      identifiert &id = identifier_map[identifier];
+      id.type = symbol.type();
+      id.is_bound = true;
+    }
     find_symbols(q_expr.where());
     return;
   }
