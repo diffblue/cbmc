@@ -3,6 +3,6 @@ use_after_free1.c
 --text --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state . S21\(ς\) ⇒ S22\(ς\[❝main::\$tmp::return_value_malloc❞:=allocate\(ς, 4\)\]\)$
-^\(\d+\) ∀ ς : state . S25\(ς\) ⇒ S26\(deallocate_state\(ς, cast\(ς\(❝main::1::p❞\), empty\*\)\)\)$
+^\(\d+\) ∀ ς : state . S20\(ς\) ⇒ S21\(ς\[❝main::\$tmp::return_value_malloc❞:=allocate\(ς, 4\)\]\)$
+^\(\d+\) ∀ ς : state . S24\(ς\) ⇒ S25\(deallocate_state\(ς, cast\(ς\(❝main::1::p❞\), empty\*\)\)\)$
 --

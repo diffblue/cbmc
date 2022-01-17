@@ -18,6 +18,8 @@ typedef __typeof__(sizeof(int)) __CPROVER_size_t;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef signed long long __CPROVER_ssize_t;
 
+#define __CPROVER_constant_infinity_uint 1
+
 void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);
 void __CPROVER_deallocate(void *);
 extern const void *__CPROVER_deallocated;

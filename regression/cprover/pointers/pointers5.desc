@@ -3,7 +3,7 @@ pointers5.c
 --text --solve --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. \(S22\(ς\) ∧ ς\(❝main::1::p❞\) = ς\(❝main::1::q❞\)\) ⇒ S23\(ς\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = ς\(ς\(❝main::1::q❞\)\)\)$
+^\(\d+\) ∀ ς : state \. \(S21\(ς\) ∧ ς\(❝main::1::p❞\) = ς\(❝main::1::q❞\)\) ⇒ S22\(ς\)$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = ς\(ς\(❝main::1::q❞\)\)\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --

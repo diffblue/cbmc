@@ -3,8 +3,8 @@ struct_pointer2.c
 --text --solve --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝main::1::my_struct_ptr❞:=❝main::1::my_struct❞\]\)$
-^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ S23\(ς\[ς\(❝main::1::my_struct_ptr❞\)\.❝data❞:=123\]\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(❝main::1::my_struct❞\.❝data❞\) = 123\)$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S21\(ς\[❝main::1::my_struct_ptr❞:=❝main::1::my_struct❞\]\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[ς\(❝main::1::my_struct_ptr❞\)\.❝data❞:=123\]\)$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(❝main::1::my_struct❞\.❝data❞\) = 123\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --
