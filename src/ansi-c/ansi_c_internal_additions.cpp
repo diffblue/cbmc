@@ -15,45 +15,43 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/adjust_float_expressions.h>
 
-const char gcc_builtin_headers_types[]=
-"# 1 \"gcc_builtin_headers_types.h\"\n"
+const char gcc_builtin_headers_types[] =
+  "#line 1 \"gcc_builtin_headers_types.h\"\n"
 #include "gcc_builtin_headers_types.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_generic[]=
-"# 1 \"gcc_builtin_headers_generic.h\"\n"
+const char gcc_builtin_headers_generic[] =
+  "#line 1 \"gcc_builtin_headers_generic.h\"\n"
 #include "gcc_builtin_headers_generic.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_math[]=
-"# 1 \"gcc_builtin_headers_math.h\"\n"
+const char gcc_builtin_headers_math[] =
+  "#line 1 \"gcc_builtin_headers_math.h\"\n"
 #include "gcc_builtin_headers_math.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_mem_string[]=
-"# 1 \"gcc_builtin_headers_mem_string.h\"\n"
+const char gcc_builtin_headers_mem_string[] =
+  "#line 1 \"gcc_builtin_headers_mem_string.h\"\n"
 #include "gcc_builtin_headers_mem_string.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_omp[]=
-"# 1 \"gcc_builtin_headers_omp.h\"\n"
+const char gcc_builtin_headers_omp[] = "#line 1 \"gcc_builtin_headers_omp.h\"\n"
 #include "gcc_builtin_headers_omp.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_tm[]=
-"# 1 \"gcc_builtin_headers_tm.h\"\n"
+const char gcc_builtin_headers_tm[] = "#line 1 \"gcc_builtin_headers_tm.h\"\n"
 #include "gcc_builtin_headers_tm.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_ubsan[]=
-"# 1 \"gcc_builtin_headers_ubsan.h\"\n"
+const char gcc_builtin_headers_ubsan[] =
+  "#line 1 \"gcc_builtin_headers_ubsan.h\"\n"
 #include "gcc_builtin_headers_ubsan.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_ia32[]=
-"# 1 \"gcc_builtin_headers_ia32.h\"\n"
+const char gcc_builtin_headers_ia32[] =
+  "#line 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers_ia32.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_2[]=
 #include "gcc_builtin_headers_ia32-2.inc"
 ; // NOLINT(whitespace/semicolon)
@@ -67,50 +65,44 @@ const char gcc_builtin_headers_ia32_5[] =
 #include "gcc_builtin_headers_ia32-5.inc"
   ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_alpha[]=
-"# 1 \"gcc_builtin_headers_alpha.h\"\n"
+const char gcc_builtin_headers_alpha[] =
+  "#line 1 \"gcc_builtin_headers_alpha.h\"\n"
 #include "gcc_builtin_headers_alpha.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_arm[]=
-"# 1 \"gcc_builtin_headers_arm.h\"\n"
+const char gcc_builtin_headers_arm[] = "#line 1 \"gcc_builtin_headers_arm.h\"\n"
 #include "gcc_builtin_headers_arm.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_mips[]=
-"# 1 \"gcc_builtin_headers_mips.h\"\n"
+const char gcc_builtin_headers_mips[] =
+  "#line 1 \"gcc_builtin_headers_mips.h\"\n"
 #include "gcc_builtin_headers_mips.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_power[]=
-"# 1 \"gcc_builtin_headers_power.h\"\n"
+const char gcc_builtin_headers_power[] =
+  "#line 1 \"gcc_builtin_headers_power.h\"\n"
 #include "gcc_builtin_headers_power.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char arm_builtin_headers[]=
-"# 1 \"arm_builtin_headers.h\"\n"
+const char arm_builtin_headers[] = "#line 1 \"arm_builtin_headers.h\"\n"
 #include "arm_builtin_headers.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char cw_builtin_headers[]=
-"# 1 \"cw_builtin_headers.h\"\n"
+const char cw_builtin_headers[] = "#line 1 \"cw_builtin_headers.h\"\n"
 #include "cw_builtin_headers.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char clang_builtin_headers[]=
-"# 1 \"clang_builtin_headers.h\"\n"
+const char clang_builtin_headers[] = "#line 1 \"clang_builtin_headers.h\"\n"
 #include "clang_builtin_headers.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char cprover_builtin_headers[]=
-"# 1 \"cprover_builtin_headers.h\"\n"
+const char cprover_builtin_headers[] = "#line 1 \"cprover_builtin_headers.h\"\n"
 #include "cprover_builtin_headers.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
-const char windows_builtin_headers[]=
-"# 1 \"windows_builtin_headers.h\"\n"
+const char windows_builtin_headers[] = "#line 1 \"windows_builtin_headers.h\"\n"
 #include "windows_builtin_headers.inc"
-; // NOLINT(whitespace/semicolon)
+  ; // NOLINT(whitespace/semicolon)
 
 static std::string architecture_string(const std::string &value, const char *s)
 {
@@ -158,7 +150,7 @@ void ansi_c_internal_additions(std::string &code)
   // clang-format off
   // do the built-in types and variables
   code+=
-    "# 1 \"<built-in-additions>\"\n"
+    "#line 1 \"<built-in-additions>\"\n"
     "typedef __typeof__(sizeof(int)) " CPROVER_PREFIX "size_t;\n"
     "typedef "+c_type_as_string(signed_size_type().get(ID_C_c_type))+
       " " CPROVER_PREFIX "ssize_t;\n"
@@ -188,15 +180,9 @@ void ansi_c_internal_additions(std::string &code)
       CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);\n"
     "const void *" CPROVER_PREFIX "alloca_object = 0;\n"
 
-    "extern int " CPROVER_PREFIX "malloc_failure_mode;\n"
-    "int " CPROVER_PREFIX "malloc_failure_mode_return_null="+
-    std::to_string(config.ansi_c.malloc_failure_mode_return_null)+";\n"
-    "int " CPROVER_PREFIX "malloc_failure_mode_assert_then_assume="+
-    std::to_string(config.ansi_c.malloc_failure_mode_assert_then_assume)+";\n"
     CPROVER_PREFIX "size_t " CPROVER_PREFIX "max_malloc_size="+
     integer2string(max_malloc_size(config.ansi_c.pointer_width, config
     .bv_encoding.object_bits))+";\n"
-    "extern " CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_may_fail;\n"
 
     // this is ANSI-C
     "extern " CPROVER_PREFIX "thread_local const char __func__["
@@ -318,7 +304,7 @@ void ansi_c_architecture_strings(std::string &code)
   // They allow identifying the architectural settings used
   // at compile time from a goto-binary.
 
-  code+="# 1 \"<builtin-architecture-strings>\"\n";
+  code += "#line 1 \"<builtin-architecture-strings>\"\n";
 
   code+=architecture_string(config.ansi_c.int_width, "int_width");
   code+=architecture_string(config.ansi_c.int_width, "word_size"); // old

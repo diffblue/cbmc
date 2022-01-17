@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
+#include <util/config.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -87,7 +88,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
-  "(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(json-ui)" \
   "(accelerate)(constant-propagator)" \
   "(k-induction):(step-case)(base-case)" \
@@ -117,6 +117,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_RESTRICT_FUNCTION_POINTER \
   OPT_NONDET_VOLATILE \
   "(ensure-one-backedge-per-target)" \
+  OPT_CONFIG_LIBRARY \
   // empty last line
 
 // clang-format on

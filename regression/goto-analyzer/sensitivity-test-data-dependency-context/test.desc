@@ -5,8 +5,8 @@ data-dependency-context.c
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-st \(\) -> \{.a=.* @ \[2, 54\]\[Data dependencies: 54, 2\]\[Data dominators: \], .b=.* @ \[5, 54\]\[Data dependencies: 54, 5\]\[Data dominators: \]\} @ \[2, 5, 54\]\[Data dependencies: 54, 5, 2\]\[Data dominators: 54\]
-ar \(\) -> \{\[0\] = TOP @ \[11\, 48\]\[Data dependencies: 48\, 11\]\[Data dominators: \]\n\[1\] = TOP @ \[14\, 48\]\[Data dependencies: 48\, 14\]\[Data dominators: \]\n\} @ \[11\, 14\, 48\]\[Data dependencies: 48\, 14\, 11\]\[Data dominators: 48\]
-arr \(\) -> \{\[0\] = 1 @ \[19\]\[Data dependencies: 19\]\[Data dominators: 19\]\n\[1\] = 2 @ \[20\]\[Data dependencies: 20\]\[Data dominators: 20\]\n\[2\] = TOP @ \[21, 23\]\[Data dependencies: 23, 21\]\[Data dominators: \]\n\} @ \[21, 23\]\[Data dependencies: 23, 21\]\[Data dominators: 49\]
+st \(\) -> \{.a=.* @ \[2, 52\]\[Data dependencies: 52, 2\]\[Data dominators: \], .b=.* @ \[5, 52\]\[Data dependencies: 52, 5\]\[Data dominators: \]\} @ \[2, 5, 52\]\[Data dependencies: 52, 5, 2\]\[Data dominators: 52\]
+ar \(\) -> \{\[0\] = TOP @ \[11\, 46\]\[Data dependencies: 46\, 11\]\[Data dominators: \]\n\[1\] = TOP @ \[14\, 46\]\[Data dependencies: 46\, 14\]\[Data dominators: \]\n\} @ \[11\, 14\, 46\]\[Data dependencies: 46\, 14\, 11\]\[Data dominators: 46\]
+arr \(\) -> \{\[0\] = 1 @ \[19\]\[Data dependencies: 19\]\[Data dominators: 19\]\n\[1\] = 2 @ \[20\]\[Data dependencies: 20\]\[Data dominators: 20\]\n\[2\] = TOP @ \[21, 23\]\[Data dependencies: 23, 21\]\[Data dominators: \]\n\} @ \[21, 23\]\[Data dependencies: 23, 21\]\[Data dominators: 47\]
 --
 ^warning: ignoring

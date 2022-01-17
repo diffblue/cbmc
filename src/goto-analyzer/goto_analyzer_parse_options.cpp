@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cpp/cprover_library.h>
 
-#include <goto-programs/add_malloc_may_fail_variable_initializations.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
@@ -666,8 +665,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
                << messaget::eom;
   link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
   link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
-
-  add_malloc_may_fail_variable_initializations(goto_model);
 
   // Common removal of types and complex constructs
   if(::process_goto_program(goto_model, options, log))

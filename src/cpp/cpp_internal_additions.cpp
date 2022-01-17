@@ -44,7 +44,7 @@ std::string c2cpp(const std::string &s)
 
 void cpp_internal_additions(std::ostream &out)
 {
-  out << "# 1 \"<built-in-additions>\"" << '\n';
+  out << "#line 1 \"<built-in-additions>\"" << '\n';
 
   // __CPROVER namespace
   out << "namespace __CPROVER { }" << '\n';

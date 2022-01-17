@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/json.h>
@@ -1349,7 +1348,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     log.status() << "Adding check for maximum call stack size" << messaget::eom;
     stack_depth(
       goto_model,
-      safe_string2size_t(cmdline.get_value("stack-depth")));
+      safe_string2size_t(cmdline.get_value("stack-depth")),
+      ui_message_handler);
   }
 
   // ignore default/user-specified initialization of variables with static
@@ -1375,7 +1375,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
-    slice_global_inits(goto_model);
+    slice_global_inits(goto_model, ui_message_handler);
   }
 
   if(cmdline.isset("string-abstraction"))
@@ -1662,7 +1662,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
-    slice_global_inits(goto_model);
+    slice_global_inits(goto_model, ui_message_handler);
 
     log.status() << "Performing an aggressive slice" << messaget::eom;
     aggressive_slicert aggressive_slicer(goto_model, ui_message_handler);
@@ -1830,6 +1830,7 @@ void goto_instrument_parse_optionst::help()
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
+    HELP_CONFIG_LIBRARY
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
