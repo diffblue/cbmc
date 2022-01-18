@@ -392,7 +392,7 @@ jobs:
           nuget-version: '5.8.x'
       - name: Fetch dependencies
         run: |
-          choco install winflexbison3
+          choco install winflexbison3 Ninja
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
@@ -415,9 +415,9 @@ jobs:
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
-        run: cmake -S . -B build
+        run: cmake -S . -B build -G Ninja
       - name: Build Release
-        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
+        run: cmake --build build --config Release -- /p:CLToolExe=clcache
       - name: Print ccache stats
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1.4.1
