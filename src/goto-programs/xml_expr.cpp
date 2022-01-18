@@ -54,8 +54,8 @@ xmlt xml(const typet &type, const namespacet &ns)
   }
   else if(type.id() == ID_c_enum_tag)
   {
-    // we return the base type
-    return xml(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns);
+    // we return the underlying type
+    return xml(ns.follow_tag(to_c_enum_tag_type(type)).underlying_type(), ns);
   }
   else if(type.id() == ID_fixedbv)
   {
@@ -148,9 +148,10 @@ xmlt xml(const exprt &expr, const namespacet &ns)
       result.set_attribute("binary", integer2binary(i, width));
       result.set_attribute("width", width);
 
-      const typet &underlying_type = type.id() == ID_c_bit_field
-                                       ? to_c_bit_field_type(type).subtype()
-                                       : type;
+      const typet &underlying_type =
+        type.id() == ID_c_bit_field
+          ? to_c_bit_field_type(type).underlying_type()
+          : type;
 
       bool is_signed = underlying_type.id() == ID_signedbv;
 
@@ -174,7 +175,7 @@ xmlt xml(const exprt &expr, const namespacet &ns)
     else if(type.id() == ID_c_enum)
     {
       const auto width =
-        to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
+        to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width();
 
       const auto integer_value = bvrep2integer(value, width, false);
       result.name = "integer";

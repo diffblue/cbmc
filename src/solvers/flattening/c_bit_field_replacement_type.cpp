@@ -16,22 +16,22 @@ typet c_bit_field_replacement_type(
   const c_bit_field_typet &src,
   const namespacet &ns)
 {
-  const typet &subtype=src.subtype();
+  const typet &underlying_type = src.underlying_type();
 
-  if(subtype.id()==ID_unsignedbv ||
-     subtype.id()==ID_signedbv ||
-     subtype.id()==ID_c_bool)
+  if(
+    underlying_type.id() == ID_unsignedbv ||
+    underlying_type.id() == ID_signedbv || underlying_type.id() == ID_c_bool)
   {
-    bitvector_typet result=to_bitvector_type(subtype);
+    bitvector_typet result = to_bitvector_type(underlying_type);
     result.set_width(src.get_width());
     return std::move(result);
   }
   else
   {
-    PRECONDITION(subtype.id() == ID_c_enum_tag);
+    PRECONDITION(underlying_type.id() == ID_c_enum_tag);
 
-    const typet &sub_subtype=
-      ns.follow_tag(to_c_enum_tag_type(subtype)).subtype();
+    const typet &sub_subtype =
+      ns.follow_tag(to_c_enum_tag_type(underlying_type)).underlying_type();
 
     PRECONDITION(
       sub_subtype.id() == ID_signedbv || sub_subtype.id() == ID_unsignedbv);

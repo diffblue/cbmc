@@ -38,7 +38,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     {
       exprt &value = static_cast<exprt &>(component.add(ID_value));
       typecheck_expr(value);
-      implicit_typecast(value, c_enum_type.subtype());
+      implicit_typecast(value, c_enum_type.underlying_type());
       make_constant(value);
       if(to_integer(to_constant_expr(value), i))
       {
@@ -48,7 +48,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
       }
     }
 
-    exprt value_expr=from_integer(i, c_enum_type.subtype());
+    exprt value_expr = from_integer(i, c_enum_type.underlying_type());
     value_expr.type()=enum_tag_type; // override type
 
     symbolt symbol;

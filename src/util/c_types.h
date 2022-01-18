@@ -25,7 +25,17 @@ public:
     subtype().swap(_subtype);
   }
 
-  // These have a sub-type
+  // These have a sub-type. The preferred way to access it
+  // are the underlying_type methods.
+  const typet &underlying_type() const
+  {
+    return subtype();
+  }
+
+  typet &underlying_type()
+  {
+    return subtype();
+  }
 };
 
 /// Check whether a reference to a typet is a \ref c_bit_field_typet.
@@ -255,6 +265,18 @@ public:
   void make_incomplete()
   {
     set(ID_incomplete, true);
+  }
+
+  // The preferred way to access the subtype
+  // are the underlying_type methods.
+  const typet &underlying_type() const
+  {
+    return subtype();
+  }
+
+  typet &underlying_type()
+  {
+    return subtype();
   }
 };
 

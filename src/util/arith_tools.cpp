@@ -56,14 +56,14 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_c_enum)
   {
-    const typet &subtype=to_c_enum_type(type).subtype();
-    if(subtype.id()==ID_signedbv)
+    const typet &underlying_type = to_c_enum_type(type).underlying_type();
+    if(underlying_type.id() == ID_signedbv)
     {
       const auto width = to_signedbv_type(type).get_width();
       int_value = bvrep2integer(value, width, true);
       return false;
     }
-    else if(subtype.id()==ID_unsignedbv)
+    else if(underlying_type.id() == ID_unsignedbv)
     {
       const auto width = to_unsignedbv_type(type).get_width();
       int_value = bvrep2integer(value, width, false);
@@ -74,19 +74,19 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   {
     const auto &c_bit_field_type = to_c_bit_field_type(type);
     const auto width = c_bit_field_type.get_width();
-    const typet &subtype = c_bit_field_type.subtype();
+    const typet &underlying_type = c_bit_field_type.underlying_type();
 
-    if(subtype.id()==ID_signedbv)
+    if(underlying_type.id() == ID_signedbv)
     {
       int_value = bvrep2integer(value, width, true);
       return false;
     }
-    else if(subtype.id()==ID_unsignedbv)
+    else if(underlying_type.id() == ID_unsignedbv)
     {
       int_value = bvrep2integer(value, width, false);
       return false;
     }
-    else if(subtype.id() == ID_c_bool)
+    else if(underlying_type.id() == ID_c_bool)
     {
       int_value = bvrep2integer(value, width, false);
       return false;
@@ -129,7 +129,7 @@ constant_exprt from_integer(
   else if(type_id==ID_c_enum)
   {
     const std::size_t width =
-      to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width();
     return constant_exprt(integer2bvrep(int_value, width), type);
   }
   else if(type_id==ID_c_bool)

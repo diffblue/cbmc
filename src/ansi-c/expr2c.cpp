@@ -412,8 +412,9 @@ std::string expr2ct::convert_rec(
     if(!to_c_enum_type(src).is_incomplete())
     {
       const c_enum_typet &c_enum_type = to_c_enum_type(src);
-      const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
-      const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
+      const bool is_signed = c_enum_type.underlying_type().id() == ID_signedbv;
+      const auto width =
+        to_bitvector_type(c_enum_type.underlying_type()).get_width();
 
       result += '{';
 
