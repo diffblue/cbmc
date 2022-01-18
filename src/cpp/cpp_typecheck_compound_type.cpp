@@ -229,17 +229,10 @@ void cpp_typecheckt::typecheck_compound_type(
   else
   {
     // produce new symbol
-    symbolt symbol;
-
-    symbol.name=symbol_name;
+    type_symbolt symbol{symbol_name, type, ID_cpp};
     symbol.base_name=base_name;
-    symbol.value.make_nil();
     symbol.location=type.source_location();
-    symbol.mode=ID_cpp;
     symbol.module=module;
-    symbol.type.swap(type);
-    symbol.is_type=true;
-    symbol.is_macro=false;
     symbol.pretty_name=
       cpp_scopes.current_scope().prefix+
       id2string(symbol.base_name)+
@@ -577,16 +570,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
       if(!symbol_table.has_symbol(vt_name))
       {
         // first time: create a virtual-table symbol type
-        symbolt vt_symb_type;
-        vt_symb_type.name= vt_name;
+        type_symbolt vt_symb_type{vt_name, struct_typet(), ID_cpp};
         vt_symb_type.base_name="virtual_table::"+id2string(symbol.base_name);
         vt_symb_type.pretty_name=vt_symb_type.base_name;
-        vt_symb_type.mode=ID_cpp;
         vt_symb_type.module=module;
         vt_symb_type.location=symbol.location;
-        vt_symb_type.type=struct_typet();
         vt_symb_type.type.set(ID_name, vt_symb_type.name);
-        vt_symb_type.is_type=true;
 
         const bool failed=!symbol_table.insert(std::move(vt_symb_type)).second;
         CHECK_RETURN(!failed);
@@ -626,15 +615,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
         irep_idt virtual_base=*virtual_bases.begin();
 
         // a new function that does 'late casting' of the 'this' parameter
-        symbolt func_symb;
-        func_symb.name=
-          id2string(component.get_name())+"::"+id2string(virtual_base);
+        symbolt func_symb{
+          id2string(component.get_name()) + "::" + id2string(virtual_base),
+          component.type(),
+          symbol.mode};
         func_symb.base_name = component.get_base_name();
         func_symb.pretty_name = component.get_base_name();
-        func_symb.mode = symbol.mode;
         func_symb.module=module;
         func_symb.location=component.source_location();
-        func_symb.type=component.type();
 
         // change the type of the 'this' pointer
         code_typet &code_type=to_code_type(func_symb.type);
@@ -653,14 +641,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
           if(param_base_name.empty())
             param_base_name = "arg" + std::to_string(i++);
 
-          symbolt arg_symb;
-          arg_symb.name =
-            id2string(func_symb.name) + "::" + id2string(param_base_name);
+          symbolt arg_symb{
+            id2string(func_symb.name) + "::" + id2string(param_base_name),
+            arg.type(),
+            symbol.mode};
           arg_symb.base_name = param_base_name;
           arg_symb.pretty_name = param_base_name;
-          arg_symb.mode = symbol.mode;
           arg_symb.location=func_symb.location;
-          arg_symb.type=arg.type();
 
           arg.set_identifier(arg_symb.name);
 
@@ -725,10 +712,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_static && !is_method) // static non-method member
   {
     // add as global variable to symbol_table
-    symbolt static_symbol;
-    static_symbol.mode=symbol.mode;
-    static_symbol.name=identifier;
-    static_symbol.type=component.type();
+    symbolt static_symbol{identifier, component.type(), symbol.mode};
     static_symbol.base_name = component.get_base_name();
     static_symbol.is_lvalue=true;
     static_symbol.is_static_lifetime=true;
@@ -1282,8 +1266,6 @@ void cpp_typecheckt::typecheck_member_function(
   const typet &method_qualifier,
   exprt &value)
 {
-  symbolt symbol;
-
   code_typet &type = to_code_type(component.type());
 
   if(component.get_bool(ID_is_static))
@@ -1322,14 +1304,10 @@ void cpp_typecheckt::typecheck_member_function(
   if(value.is_not_nil())
     to_code_type(type).set_inlined(true);
 
-  symbol.name=identifier;
+  symbolt symbol{identifier, type, compound_symbol.mode};
   symbol.base_name=component.get_base_name();
   symbol.value.swap(value);
-  symbol.mode = compound_symbol.mode;
   symbol.module=module;
-  symbol.type=type;
-  symbol.is_type=false;
-  symbol.is_macro=false;
   symbol.location=component.source_location();
 
   // move early, it must be visible before doing any value

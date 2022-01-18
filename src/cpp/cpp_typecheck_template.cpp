@@ -166,15 +166,11 @@ void cpp_typecheckt::typecheck_class_template(
 
   // it's not there yet
 
-  symbolt symbol;
-
-  symbol.name=symbol_name;
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
   symbol.base_name=base_name;
   symbol.location=cpp_name.source_location();
-  symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.type.swap(declaration);
-  symbol.is_macro=false;
   symbol.value = exprt(ID_template_decls);
 
   symbol.pretty_name=
@@ -274,14 +270,10 @@ void cpp_typecheckt::typecheck_function_template(
     return;
   }
 
-  symbolt symbol;
-  symbol.name=symbol_name;
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
   symbol.base_name=base_name;
   symbol.location=cpp_name.source_location();
-  symbol.mode=ID_cpp;
   symbol.module=module;
-  symbol.value.make_nil();
-
   symbol.type.swap(declaration);
   symbol.pretty_name=
     cpp_scopes.current_scope().prefix+id2string(symbol.base_name);

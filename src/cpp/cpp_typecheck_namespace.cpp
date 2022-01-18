@@ -62,15 +62,10 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   }
   else
   {
-    symbolt symbol;
-
-    symbol.name=identifier;
+    symbolt symbol{identifier, typet(ID_namespace), ID_cpp};
     symbol.base_name=final_name;
-    symbol.value.make_nil();
     symbol.location=namespace_spec.source_location();
-    symbol.mode=ID_cpp;
     symbol.module=module;
-    symbol.type=typet(ID_namespace);
 
     if(!symbol_table.insert(std::move(symbol)).second)
     {

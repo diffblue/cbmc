@@ -183,11 +183,9 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 
   // Create as incomplete struct, but mark as
   // "template_class_instance", to be elaborated later.
-  symbolt new_symbol;
-  new_symbol.name=identifier;
+  type_symbolt new_symbol{identifier, struct_typet(), template_symbol.mode};
   new_symbol.pretty_name=template_symbol.pretty_name;
   new_symbol.location=template_symbol.location;
-  new_symbol.type = struct_typet();
   to_struct_type(new_symbol.type).make_incomplete();
   new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
   if(template_symbol.type.get_bool(ID_C_class))
@@ -198,9 +196,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
     ID_specialization_template_args, specialization_template_args);
   new_symbol.type.set(ID_full_template_args, full_template_args);
   new_symbol.type.set(ID_identifier, template_symbol.name);
-  new_symbol.mode=template_symbol.mode;
   new_symbol.base_name=template_symbol.base_name;
-  new_symbol.is_type=true;
 
   symbolt *s_ptr;
   symbol_table.move(new_symbol, s_ptr);
