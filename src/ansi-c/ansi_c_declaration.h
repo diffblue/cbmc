@@ -195,9 +195,7 @@ public:
     set(ID_is_weak, is_weak);
   }
 
-  void to_symbol(
-    const ansi_c_declaratort &,
-    symbolt &symbol) const;
+  symbolt to_symbol(const ansi_c_declaratort &) const;
 
   typet full_type(const ansi_c_declaratort &) const;
 

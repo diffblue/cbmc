@@ -92,7 +92,7 @@ public:
     return static_cast<code_blockt &>(add(ID_value));
   }
 
-  void to_symbol(symbolt &symbol) const;
+  symbolt to_symbol() const;
 
   void output(std::ostream &) const;
 };
