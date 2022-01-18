@@ -253,22 +253,6 @@ void system_library_symbolst::add_to_system_library(
   }
 }
 
-/// Helper function to call `is_symbol_internal_symbol` on a nameless
-/// fake symbol with the given type, to determine whether the type alone
-/// is sufficient to classify a symbol of that type as internal.
-/// \param type: the type to check
-/// \param [out] out_system_headers: specific system headers that need to be
-///   included
-/// \return True if the type is an internal type
-bool system_library_symbolst::is_type_internal(
-  const typet &type,
-  std::set<std::string> &out_system_headers) const
-{
-  symbolt symbol;
-  symbol.type=type;
-  return is_symbol_internal_symbol(symbol, out_system_headers);
-}
-
 /// To find out if a symbol is an internal symbol.
 /// \param symbol: the symbol to check
 /// \param [out] out_system_headers: specific system headers that need to be
@@ -336,17 +320,36 @@ bool system_library_symbolst::is_symbol_internal_symbol(
     return true;
   }
 
-  if(use_all_headers &&
-     has_prefix(file_str, "/usr/include/"))
+  if(use_all_headers)
   {
-    if(file_str.find("/bits/")==std::string::npos)
+    if(
+      has_prefix(file_str, "/usr/include/") ||
+      ((has_prefix(file_str, "/Library/Developer/") ||
+        has_prefix(file_str, "/Applications/Xcode")) &&
+       file_str.find("/usr/include/") != std::string::npos))
     {
-      // Do not include transitive includes of system headers!
-      std::string::size_type prefix_len=std::string("/usr/include/").size();
-      out_system_headers.insert(file_str.substr(prefix_len));
-    }
+      if(file_str.find("/bits/") == std::string::npos)
+      {
+        // Do not include transitive includes of system headers!
+        const std::string::size_type prefix_len =
+          file_str.find("/usr/include/") + std::string("/usr/include/").size();
+        out_system_headers.insert(file_str.substr(prefix_len));
+      }
 
-    return true;
+      return true;
+    }
+    else if(
+      (has_prefix(
+         file_str, "C:\\Program Files (x86)\\Microsoft Visual Studio\\") ||
+       has_prefix(file_str, "C:\\Program Files\\Microsoft Visual Studio\\")) &&
+      file_str.find("\\include\\") != std::string::npos)
+    {
+      const std::string::size_type prefix_len =
+        file_str.find("\\include\\") + std::string("\\include\\").size();
+      out_system_headers.insert(file_str.substr(prefix_len));
+
+      return true;
+    }
   }
 
   return false;
