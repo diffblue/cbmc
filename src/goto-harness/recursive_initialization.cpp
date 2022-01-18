@@ -377,12 +377,13 @@ symbol_exprt recursive_initializationt::get_malloc_function()
   auto malloc_sym = goto_model.symbol_table.lookup("malloc");
   if(malloc_sym == nullptr)
   {
-    symbolt new_malloc_sym;
-    new_malloc_sym.type = code_typet{code_typet{
-      {code_typet::parametert{size_type()}}, pointer_type(empty_typet{})}};
-    new_malloc_sym.name = new_malloc_sym.pretty_name =
-      new_malloc_sym.base_name = "malloc";
-    new_malloc_sym.mode = initialization_config.mode;
+    symbolt new_malloc_sym{
+      "malloc",
+      code_typet{
+        {code_typet::parametert{size_type()}}, pointer_type(empty_typet{})},
+      initialization_config.mode};
+    new_malloc_sym.pretty_name = "malloc";
+    new_malloc_sym.base_name = "malloc";
     goto_model.symbol_table.insert(new_malloc_sym);
     return new_malloc_sym.symbol_expr();
   }
@@ -634,12 +635,13 @@ symbol_exprt recursive_initializationt::get_free_function()
   auto free_sym = goto_model.symbol_table.lookup("free");
   if(free_sym == nullptr)
   {
-    symbolt new_free_sym;
-    new_free_sym.type = code_typet{code_typet{
-      {code_typet::parametert{pointer_type(empty_typet{})}}, empty_typet{}}};
-    new_free_sym.name = new_free_sym.pretty_name = new_free_sym.base_name =
-      "free";
-    new_free_sym.mode = initialization_config.mode;
+    symbolt new_free_sym{
+      "free",
+      code_typet{
+        {code_typet::parametert{pointer_type(empty_typet{})}}, empty_typet{}},
+      initialization_config.mode};
+    new_free_sym.pretty_name = "free";
+    new_free_sym.base_name = "free";
     goto_model.symbol_table.insert(new_free_sym);
     return new_free_sym.symbol_expr();
   }
