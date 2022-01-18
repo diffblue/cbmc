@@ -26,12 +26,9 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 static void create_initialize(symbol_table_baset &symbol_table)
 {
-  symbolt initialize;
-  initialize.name = INITIALIZE_FUNCTION;
+  symbolt initialize{
+    INITIALIZE_FUNCTION, code_typet({}, empty_typet()), "jsil"};
   initialize.base_name = INITIALIZE_FUNCTION;
-  initialize.mode="jsil";
-
-  initialize.type = code_typet({}, empty_typet());
 
   code_blockt init_code;
 
@@ -150,11 +147,9 @@ bool jsil_entry_point(
   init_code.add(call_main);
 
   // add "main"
-  symbolt new_symbol;
-
-  new_symbol.name=goto_functionst::entry_point();
+  symbolt new_symbol{
+    goto_functionst::entry_point(), code_typet{{}, empty_typet{}}, "jsil"};
   new_symbol.base_name = goto_functionst::entry_point();
-  new_symbol.type = code_typet({}, empty_typet());
   new_symbol.value.swap(init_code);
 
   if(!symbol_table.insert(std::move(new_symbol)).second)
