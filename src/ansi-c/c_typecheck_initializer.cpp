@@ -1039,13 +1039,11 @@ exprt c_typecheck_baset::do_initializer_list(
 
         // mimic bits of typecheck_compound_type to produce a new struct tag
         actual_struct_type.remove(ID_tag);
-        type_symbolt compound_symbol{actual_struct_type};
-        compound_symbol.mode = mode;
-        compound_symbol.location = value.source_location();
-        std::string typestr = type2name(compound_symbol.type, *this);
+        std::string typestr = type2name(actual_struct_type, *this);
+        irep_idt tag_identifier = "tag-#anon#" + typestr;
+        type_symbolt compound_symbol{tag_identifier, actual_struct_type, mode};
         compound_symbol.base_name = "#anon#" + typestr;
-        compound_symbol.name = "tag-#anon#" + typestr;
-        irep_idt tag_identifier = compound_symbol.name;
+        compound_symbol.location = value.source_location();
 
         // We might already have the same anonymous struct, which is fine as it
         // will be exactly the same type.
