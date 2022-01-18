@@ -51,6 +51,7 @@ DIRS = cbmc \
        goto-interpreter \
        cbmc-sequentialization \
        cpp-linter \
+       catch-framework \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

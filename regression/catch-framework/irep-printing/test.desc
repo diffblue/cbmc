@@ -1,0 +1,12 @@
+CORE
+[irep_error_printing]
+
+REQUIRE\( foo == bar \)
+key: value
+^EXIT=0$
+^SIGNAL=0$
+--
+\{\?\}
+--
+Test that when unit tests fail on mismatching ireps, the ireps are
+pretty-printed and not printed as catch's default of {?}.
