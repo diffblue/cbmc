@@ -36,14 +36,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     // int x = 1;
     // int y = 2;
 
-    symbolt local_x;
-    symbolt local_y;
-    local_x.name = "x";
-    local_x.type = integer_typet();
-    local_x.mode = ID_C;
-    local_y.name = "y";
-    local_y.type = integer_typet();
-    local_y.mode = ID_C;
+    symbolt local_x{"x", integer_typet(), ID_C};
+    symbolt local_y{"y", integer_typet(), ID_C};
 
     code_blockt code(
       {code_declt(local_x.symbol_expr()),
@@ -53,11 +47,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
        code_assignt(
          local_y.symbol_expr(), constant_exprt("2", integer_typet()))});
 
-    symbolt main_function_symbol;
-    main_function_symbol.name = "main";
-    main_function_symbol.type = code_typet({}, empty_typet());
+    symbolt main_function_symbol{"main", code_typet({}, empty_typet()), ID_C};
     main_function_symbol.value = code;
-    main_function_symbol.mode = ID_C;
 
     goto_model.symbol_table.add(local_x);
     goto_model.symbol_table.add(local_y);
@@ -120,14 +111,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     goto_modelt goto_model;
     namespacet ns(goto_model.symbol_table);
 
-    symbolt bool_local;
-    symbolt c_bool_local;
-    bool_local.name = "bool_local";
-    bool_local.type = bool_typet();
-    bool_local.mode = ID_C;
-    c_bool_local.name = "c_bool_local";
-    c_bool_local.type = c_bool_typet(8);
-    c_bool_local.mode = ID_C;
+    symbolt bool_local{"bool_local", bool_typet(), ID_C};
+    symbolt c_bool_local{"c_bool_local", c_bool_typet(8), ID_C};
 
     code_blockt code({code_declt(bool_local.symbol_expr()),
                       code_declt(c_bool_local.symbol_expr())});
@@ -144,11 +129,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     code.add(std::move(bool_cond_block));
     code.add(std::move(c_bool_cond_block));
 
-    symbolt main_function_symbol;
-    main_function_symbol.name = "main";
-    main_function_symbol.type = code_typet({}, empty_typet());
+    symbolt main_function_symbol{"main", code_typet({}, empty_typet()), ID_C};
     main_function_symbol.value = code;
-    main_function_symbol.mode = ID_C;
 
     goto_model.symbol_table.add(bool_local);
     goto_model.symbol_table.add(c_bool_local);
@@ -216,19 +198,13 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 
     for(size_t i = 0; i < n_bool_locals; ++i)
     {
-      symbolt bool_local;
-      bool_local.name = "b" + std::to_string(i);
-      bool_local.type = bool_typet();
-      bool_local.mode = ID_C;
+      symbolt bool_local{"b" + std::to_string(i), bool_typet(), ID_C};
       bool_locals.push_back(bool_local);
     }
 
     for(size_t i = 0; i < n_c_bool_locals; ++i)
     {
-      symbolt c_bool_local;
-      c_bool_local.name = "cb" + std::to_string(i);
-      c_bool_local.type = c_bool_typet(8);
-      c_bool_local.mode = ID_C;
+      symbolt c_bool_local{"cb" + std::to_string(i), c_bool_typet(8), ID_C};
       c_bool_locals.push_back(c_bool_local);
     }
 
@@ -272,10 +248,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     const bool c_bool_expectations[n_c_bool_locals] = {
       true, true, true, false, false, true, false, true};
 
-    symbolt marker_symbol;
-    marker_symbol.type = signedbv_typet(32);
-    marker_symbol.name = "marker";
-    marker_symbol.mode = ID_C;
+    symbolt marker_symbol{"marker", signedbv_typet(32), ID_C};
 
     codet program = code_assignt(
       marker_symbol.symbol_expr(), from_integer(1234, marker_symbol.type));
@@ -294,11 +267,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
     for(const symbolt &symbol : c_bool_locals)
       goto_model.symbol_table.add(symbol);
 
-    symbolt main_function_symbol;
-    main_function_symbol.name = "main";
-    main_function_symbol.type = code_typet({}, empty_typet());
+    symbolt main_function_symbol{"main", code_typet({}, empty_typet()), ID_C};
     main_function_symbol.value = program;
-    main_function_symbol.mode = ID_C;
 
     goto_model.symbol_table.add(marker_symbol);
     goto_model.symbol_table.add(main_function_symbol);

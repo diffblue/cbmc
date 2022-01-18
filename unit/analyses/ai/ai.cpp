@@ -146,28 +146,16 @@ SCENARIO(
 
   // g:
 
-  symbolt gy;
-  gy.name = "gy";
-  gy.mode = ID_C;
-  gy.type = signed_int_type();
+  symbolt gy{"gy", signed_int_type(), ID_C};
 
-  symbolt g;
-  g.name = "g";
-  g.mode = ID_C;
-  g.type = code_typet({}, empty_typet());
+  symbolt g{"g", code_typet({}, empty_typet()), ID_C};
   g.value = code_assignt(gy.symbol_expr(), from_integer(0, signed_int_type()));
 
   // h:
 
-  symbolt hy;
-  hy.name = "hy";
-  hy.mode = ID_C;
-  hy.type = signed_int_type();
+  symbolt hy{"hy", signed_int_type(), ID_C};
 
-  symbolt h;
-  h.name = "h";
-  h.mode = ID_C;
-  h.type = code_typet({}, empty_typet());
+  symbolt h{"h", code_typet({}, empty_typet()), ID_C};
   h.value = code_assignt(hy.symbol_expr(), from_integer(0, signed_int_type()));
 
   goto_model.symbol_table.add(g);
@@ -177,15 +165,9 @@ SCENARIO(
 
   // f:
 
-  symbolt x;
-  x.name = "x";
-  x.mode = ID_C;
-  x.type = signed_int_type();
+  symbolt x{"x", signed_int_type(), ID_C};
 
-  symbolt y;
-  y.name = "y";
-  y.mode = ID_C;
-  y.type = signed_int_type();
+  symbolt y{"y", signed_int_type(), ID_C};
 
   goto_model.symbol_table.add(x);
   goto_model.symbol_table.add(y);
@@ -221,21 +203,16 @@ SCENARIO(
 
   f_body.copy_to_operands(make_void_call(g.symbol_expr()));
 
-  symbolt f;
-  f.name = "f";
-  f.mode = ID_C;
-  f.type = code_typet({}, empty_typet());
+  symbolt f{"f", code_typet({}, empty_typet()), ID_C};
   f.value = f_body;
 
   goto_model.symbol_table.add(f);
 
   // __CPROVER_start:
 
-  symbolt start;
-  start.name = goto_functionst::entry_point();
+  symbolt start{
+    goto_functionst::entry_point(), code_typet{{}, empty_typet{}}, ID_C};
   start.base_name = goto_functionst::entry_point();
-  start.mode = ID_C;
-  start.type = code_typet({}, empty_typet());
   start.value = make_void_call(f.symbol_expr());
 
   goto_model.symbol_table.add(start);

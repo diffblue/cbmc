@@ -14,9 +14,8 @@
 
 static symbolt simple_symbol(const irep_idt &identifier, const typet &type)
 {
-  symbolt b1;
-  b1.name = b1.base_name = b1.pretty_name = identifier;
-  b1.type = type;
+  symbolt b1{identifier, type, irep_idt{}};
+  b1.base_name = b1.pretty_name = identifier;
   return b1;
 }
 
