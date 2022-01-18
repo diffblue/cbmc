@@ -242,14 +242,10 @@ symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 
   if(s_it==symbol_table.symbols.end())
   {
-    symbolt new_symbol;
+    symbolt new_symbol{id, bool_typet{}, mode};
     new_symbol.base_name="$exception_flag";
-    new_symbol.name=id;
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=true;
-    new_symbol.is_file_local=false;
-    new_symbol.type=bool_typet();
-    new_symbol.mode = mode;
     symbol_table.insert(std::move(new_symbol));
   }
 
