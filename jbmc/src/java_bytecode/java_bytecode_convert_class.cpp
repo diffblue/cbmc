@@ -449,14 +449,10 @@ void java_bytecode_convert_classt::convert(
   }(id2string(c.name));
 
   // produce class symbol
-  symbolt new_symbol;
+  class_type.set_name(qualified_classname);
+  type_symbolt new_symbol{qualified_classname, class_type, ID_java};
   new_symbol.base_name = base_name;
   new_symbol.pretty_name=c.name;
-  new_symbol.name=qualified_classname;
-  class_type.set_name(new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
 
   symbolt *class_symbol;
 
@@ -714,14 +710,15 @@ void java_bytecode_convert_classt::convert(
     component.type() = field_type;
 
     // Create the symbol
-    symbolt new_symbol;
+    symbolt new_symbol{
+      id2string(class_symbol.name) + "." + id2string(f.name),
+      field_type,
+      ID_java};
 
     new_symbol.is_static_lifetime=true;
     new_symbol.is_lvalue=true;
     new_symbol.is_state_var=true;
-    new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
-    new_symbol.type=field_type;
     // Provide a static field -> class link, like
     // java_bytecode_convert_method::convert does for method -> class.
     set_declaring_class(new_symbol, class_symbol.name);
@@ -729,8 +726,6 @@ void java_bytecode_convert_classt::convert(
     new_symbol.type.set(ID_C_constant, f.is_final);
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+
       "."+id2string(f.name);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
 
     // These annotations use `ID_C_access` instead of `ID_access` like methods
     // to avoid type clashes in expressions like `some_static_field = 0`, where
@@ -862,12 +857,8 @@ void add_java_array_types(symbol_table_baset &symbol_table)
       "Constructed a new type representing a Java Array "
       "object that doesn't match expectations");
 
-    symbolt symbol;
-    symbol.name = struct_tag_type_identifier;
+    type_symbolt symbol{struct_tag_type_identifier, class_type, ID_java};
     symbol.base_name = struct_tag_type.get(ID_C_base_name);
-    symbol.is_type=true;
-    symbol.type = class_type;
-    symbol.mode = ID_java;
     symbol_table.add(symbol);
 
     // Also provide a clone method:
@@ -992,14 +983,11 @@ void add_java_array_types(symbol_table_baset &symbol_table)
                                   copy_loop,
                                   return_inst});
 
-    symbolt clone_symbol;
-    clone_symbol.name=clone_name;
+    symbolt clone_symbol{clone_name, clone_type, ID_java};
     clone_symbol.pretty_name =
       id2string(struct_tag_type_identifier) + ".clone:()";
     clone_symbol.base_name="clone";
-    clone_symbol.type=clone_type;
     clone_symbol.value=clone_body;
-    clone_symbol.mode=ID_java;
     symbol_table.add(clone_symbol);
   }
 }

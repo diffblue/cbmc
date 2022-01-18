@@ -102,15 +102,11 @@ void create_method_stub_symbol(
 {
   messaget log(message_handler);
 
-  symbolt symbol;
-  symbol.name = identifier;
+  symbolt symbol{identifier, type, ID_java};
   symbol.base_name = base_name;
   symbol.pretty_name = pretty_name;
-  symbol.type = type;
   symbol.type.set(ID_access, ID_private);
   to_java_method_type(symbol.type).set_is_final(true);
-  symbol.value.make_nil();
-  symbol.mode = ID_java;
   assign_parameter_names(
     to_java_method_type(symbol.type), symbol.name, symbol_table);
   set_declaring_class(symbol, declaring_class);
@@ -307,8 +303,6 @@ void java_bytecode_convert_method_lazy(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
-  symbolt method_symbol;
-
   java_method_typet member_type = member_type_lazy(
     m.descriptor,
     m.signature,
@@ -316,9 +310,8 @@ void java_bytecode_convert_method_lazy(
     id2string(m.base_name),
     message_handler);
 
-  method_symbol.name=method_identifier;
+  symbolt method_symbol{method_identifier, typet{}, ID_java};
   method_symbol.base_name=m.base_name;
-  method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
 
@@ -1900,13 +1893,9 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
   // Add anonymous locals to the symtab:
   for(const auto &var : used_local_names)
   {
-    symbolt new_symbol;
-    new_symbol.name=var.get_identifier();
-    new_symbol.type=var.type();
+    symbolt new_symbol{var.get_identifier(), var.type(), ID_java};
     new_symbol.base_name=var.get(ID_C_base_name);
     new_symbol.pretty_name=strip_java_namespace_prefix(var.get_identifier());
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
     new_symbol.is_file_local=true;
     new_symbol.is_thread_local=true;
     new_symbol.is_lvalue=true;

@@ -94,10 +94,7 @@ SCENARIO(
 
 static symbolt create_method_symbol(const std::string &method_name)
 {
-  symbolt new_symbol;
-  new_symbol.name = method_name;
-  new_symbol.type = java_method_typet{{}, typet{}};
-  return new_symbol;
+  return symbolt{method_name, java_method_typet{{}, typet{}}, ID_java};
 }
 
 static void require_result_for_pattern(

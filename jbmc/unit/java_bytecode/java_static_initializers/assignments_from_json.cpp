@@ -26,8 +26,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 static irep_idt
 add_clinit(symbol_tablet &symbol_table, const std::string &class_name)
 {
-  symbolt clinit_symbol;
-  clinit_symbol.name = "java::" + class_name + ".<clinit>:()V";
+  symbolt clinit_symbol{
+    "java::" + class_name + ".<clinit>:()V", typet{}, ID_java};
   set_declaring_class(clinit_symbol, "java::" + class_name);
   symbol_table.insert(clinit_symbol);
   return clinit_symbol.name;
@@ -38,18 +38,19 @@ static void add_class_with_components(
   const std::string &class_name,
   const std::vector<std::pair<std::string, typet>> &components)
 {
-  symbolt test_class_symbol;
-  test_class_symbol.name = "java::" + class_name;
-  test_class_symbol.is_type = true;
-  test_class_symbol.type = [&] {
-    java_class_typet type;
-    // TODO java_class_typet constructors should ensure there is always a
-    // @class_identifier field, and that name is always set
-    type.set_name(test_class_symbol.name);
-    for(const auto &pair : components)
-      type.components().emplace_back(pair.first, pair.second);
-    return type;
-  }();
+  irep_idt type_name = "java::" + class_name;
+  type_symbolt test_class_symbol{
+    type_name,
+    [&] {
+      java_class_typet type;
+      // TODO java_class_typet constructors should ensure there is always a
+      // @class_identifier field, and that name is always set
+      type.set_name(type_name);
+      for(const auto &pair : components)
+        type.components().emplace_back(pair.first, pair.second);
+      return type;
+    }(),
+    ID_java};
   symbol_table.insert(test_class_symbol);
 }
 
@@ -76,10 +77,8 @@ SCENARIO(
       return entry;
     }();
     class_to_declared_symbols.emplace("java::TestClass", [] {
-      symbolt field_symbol;
+      symbolt field_symbol{"field_name_for_codet", java_int_type(), ID_java};
       field_symbol.base_name = "field_name";
-      field_symbol.name = "field_name_for_codet";
-      field_symbol.type = java_int_type();
       field_symbol.is_static_lifetime = true;
       return field_symbol;
     }());
@@ -165,10 +164,8 @@ SCENARIO(
       return entry;
     }();
     class_to_declared_symbols.emplace("java::TestClass", [] {
-      symbolt field_symbol;
+      symbolt field_symbol{"field_name_for_codet", java_int_type(), ID_java};
       field_symbol.base_name = "array_field";
-      field_symbol.name = "field_name_for_codet";
-      field_symbol.type = java_int_type();
       field_symbol.is_static_lifetime = true;
       return field_symbol;
     }());
@@ -290,10 +287,8 @@ SCENARIO(
       return entry;
     }();
     class_to_declared_symbols.emplace("java::TestClass", [] {
-      symbolt field_symbol;
+      symbolt field_symbol{"field_name_for_codet", java_int_type(), ID_java};
       field_symbol.base_name = "array_field";
-      field_symbol.name = "field_name_for_codet";
-      field_symbol.type = java_int_type();
       field_symbol.is_static_lifetime = true;
       return field_symbol;
     }());
@@ -449,18 +444,14 @@ SCENARIO(
       return entry;
     }();
     class_to_declared_symbols.emplace("java::TestClass", [] {
-      symbolt field_symbol;
+      symbolt field_symbol{"field_name_1_for_codet", java_int_type(), ID_java};
       field_symbol.base_name = "array_field_1";
-      field_symbol.name = "field_name_1_for_codet";
-      field_symbol.type = java_int_type();
       field_symbol.is_static_lifetime = true;
       return field_symbol;
     }());
     class_to_declared_symbols.emplace("java::TestClass", [] {
-      symbolt field_symbol;
+      symbolt field_symbol{"field_name_2_for_codet", java_int_type(), ID_java};
       field_symbol.base_name = "array_field_2";
-      field_symbol.name = "field_name_2_for_codet";
-      field_symbol.type = java_int_type();
       field_symbol.is_static_lifetime = true;
       return field_symbol;
     }());

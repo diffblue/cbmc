@@ -171,14 +171,11 @@ void generate_class_stub(
   class_type.set_is_stub(true);
 
   // produce class symbol
-  symbolt new_symbol;
+  irep_idt qualified_class_name = "java::" + id2string(class_name);
+  class_type.set_name(qualified_class_name);
+  type_symbolt new_symbol{qualified_class_name, std::move(class_type), ID_java};
   new_symbol.base_name=class_name;
   new_symbol.pretty_name=class_name;
-  new_symbol.name="java::"+id2string(class_name);
-  class_type.set_name(new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
 
   std::pair<symbolt &, bool> res=symbol_table.insert(std::move(new_symbol));
 
