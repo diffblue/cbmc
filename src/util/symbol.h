@@ -58,17 +58,39 @@ public:
   }
 
   // global use
-  bool is_type, is_macro, is_exported,
-       is_input, is_output, is_state_var, is_property;
+  bool is_type = false;
+  bool is_macro = false;
+  bool is_exported = false;
+  bool is_input = false;
+  bool is_output = false;
+  bool is_state_var = false;
+  bool is_property = false;
 
   // ANSI-C
-  bool is_static_lifetime, is_thread_local;
-  bool is_lvalue, is_file_local, is_extern, is_volatile,
-       is_parameter, is_auxiliary, is_weak;
+  bool is_static_lifetime = false;
+  bool is_thread_local = false;
+  bool is_lvalue = false;
+  bool is_file_local = false;
+  bool is_extern = false;
+  bool is_volatile = false;
+  bool is_parameter = false;
+  bool is_auxiliary = false;
+  bool is_weak = false;
 
   symbolt()
+    : type(static_cast<const typet &>(get_nil_irep())),
+      value(static_cast<const exprt &>(get_nil_irep())),
+      location(source_locationt::nil())
   {
-    clear();
+  }
+
+  symbolt(const irep_idt &_name, typet _type, const irep_idt &_mode)
+    : type(std::move(_type)),
+      value(static_cast<const exprt &>(get_nil_irep())),
+      location(source_locationt::nil()),
+      name(_name),
+      mode(_mode)
+  {
   }
 
   /// Zero initialise a symbol object.
@@ -132,10 +154,10 @@ std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
 class type_symbolt:public symbolt
 {
 public:
-  explicit type_symbolt(const typet &_type)
+  type_symbolt(const irep_idt &_name, typet _type, const irep_idt &_mode)
+    : symbolt(_name, _type, _mode)
   {
-    type=_type;
-    is_type=true;
+    is_type = true;
   }
 };
 
@@ -155,12 +177,14 @@ public:
     is_auxiliary=true;
   }
 
-  auxiliary_symbolt(const irep_idt &name, const typet &type):
-    auxiliary_symbolt()
+  auxiliary_symbolt(const irep_idt &name, typet type, const irep_idt &mode)
+    : symbolt(name, type, mode)
   {
-    this->name=name;
-    this->base_name=name;
-    this->type=type;
+    is_lvalue = true;
+    is_state_var = true;
+    is_thread_local = true;
+    is_file_local = true;
+    is_auxiliary = true;
   }
 };
 

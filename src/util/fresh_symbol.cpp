@@ -48,10 +48,9 @@ symbolt &get_fresh_aux_symbol(
   identifier = get_new_name(identifier, ns, '$');
   std::string basename = id2string(identifier).substr(prefix_size);
 
-  auxiliary_symbolt new_symbol(basename, type);
-  new_symbol.name = identifier;
+  auxiliary_symbolt new_symbol(identifier, type, symbol_mode);
+  new_symbol.base_name = basename;
   new_symbol.location = source_location;
-  new_symbol.mode = symbol_mode;
   std::pair<symbolt &, bool> res = symbol_table.insert(std::move(new_symbol));
   CHECK_RETURN(res.second);
 
