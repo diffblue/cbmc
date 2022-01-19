@@ -12,8 +12,7 @@ base_name=${name%.c}
 base_name=${base_name%.cpp}
 
 if [[ "${is_windows}" == "true" ]]; then
-  "${goto_cc}" "${name}" ${options}
-  mv "${base_name}.exe" "${base_name}.gb"
+  "${goto_cc}" "${name}" ${options} "/Fe${base_name}.gb"
 else
   "${goto_cc}" "${name}" -o "${base_name}.gb" ${options}
 fi

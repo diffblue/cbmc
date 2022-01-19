@@ -21,8 +21,7 @@ else
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "${name}.c"
-  mv "${name}.exe" "${name}.gb"
+  $goto_cc "${name}.c" "/Fe${name}.gb"
 else
   $goto_cc -o "${name}.gb" "${name}.c"
 fi
@@ -35,8 +34,7 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   mv "${name}-mod.gb" "${name}-mod.c"
 
   if [[ "${is_windows}" == "true" ]]; then
-    $goto_cc "${name}-mod.c"
-    mv "${name}-mod.exe" "${name}-mod.gb"
+    $goto_cc "${name}-mod.c" "/Fe${name}-mod.gb"
   else
     $goto_cc -o "${name}-mod.gb" "${name}-mod.c"
   fi
