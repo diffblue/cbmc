@@ -1,10 +1,7 @@
 CORE
 main.c
 --pointer-check --no-simplify --no-propagation
-^\[main.pointer_dereference.\d+\] line 8 dereference failure: pointer outside object bounds in \*p1: FAILURE$
-^\*\* 1 of \d+ failed
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^warning: ignoring

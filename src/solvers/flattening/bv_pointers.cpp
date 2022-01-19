@@ -120,37 +120,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  if(expr.id() == ID_is_invalid_pointer)
-  {
-    if(operands.size()==1 &&
-       operands[0].type().id()==ID_pointer)
-    {
-      const bvt &bv=convert_bv(operands[0]);
-
-      if(!bv.empty())
-      {
-        const pointer_typet &type = to_pointer_type(operands[0].type());
-        bvt object_bv = object_literals(bv, type);
-
-        bvt invalid_bv = object_literals(
-          encode(pointer_logic.get_invalid_object(), type), type);
-
-        const std::size_t object_bits =
-          bv_pointers_width.get_object_width(type);
-
-        bvt equal_invalid_bv;
-        equal_invalid_bv.reserve(object_bits);
-
-        for(std::size_t i=0; i<object_bits; i++)
-        {
-          equal_invalid_bv.push_back(prop.lequal(object_bv[i], invalid_bv[i]));
-        }
-
-        return prop.land(equal_invalid_bv);
-      }
-    }
-  }
-  else if(expr.id() == ID_is_dynamic_object)
+  if(expr.id() == ID_is_dynamic_object || expr.id() == ID_is_invalid_pointer)
   {
     if(operands.size()==1 &&
        operands[0].type().id()==ID_pointer)
@@ -932,6 +902,28 @@ void bv_pointerst::do_postponed(
 
       prop.l_set_to_true(prop.limplies(l1, l2));
     }
+  }
+  else if(postponed.expr.id() == ID_is_invalid_pointer)
+  {
+    const auto &type =
+      to_pointer_type(to_unary_expr(postponed.expr).op().type());
+    const auto &objects = pointer_logic.objects;
+
+    // only compare object part
+    bvt bv = object_literals(encode(objects.size(), type), type);
+
+    bvt saved_bv = object_literals(postponed.op, type);
+
+    POSTCONDITION(bv.size() == saved_bv.size());
+    PRECONDITION(postponed.bv.size() == 1);
+
+    // the pointer is invalid iff the object number is greater or
+    // equal objects.size()
+    literalt l1 = bv_utils.lt_or_le(
+      true, bv, saved_bv, bv_utilst::representationt::UNSIGNED);
+    literalt l2 = postponed.bv.front();
+
+    prop.l_set_to_true(prop.lequal(l1, l2));
   }
   else if(postponed.expr.id()==ID_object_size)
   {
