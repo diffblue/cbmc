@@ -25,6 +25,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['integer-assignments1', 'integer-typecheck.desc'],
     ['destructors', 'compound_literal.desc'],
     ['destructors', 'enter_lexical_block.desc'],
+    ['enum_is_in_range', 'format.desc'],
     ['r_w_ok9', 'simplify.desc'],
     ['reachability-slice-interproc2', 'test.desc'],
     # this one wants show-properties instead producing a trace
