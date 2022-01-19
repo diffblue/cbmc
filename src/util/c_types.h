@@ -58,6 +58,7 @@ inline bool can_cast_type<c_bit_field_typet>(const typet &type)
 inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 {
   PRECONDITION(can_cast_type<c_bit_field_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const c_bit_field_typet &>(type);
 }
 
@@ -65,6 +66,7 @@ inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 {
   PRECONDITION(can_cast_type<c_bit_field_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<c_bit_field_typet &>(type);
 }
 
@@ -300,6 +302,7 @@ inline bool can_cast_type<c_enum_typet>(const typet &type)
 inline const c_enum_typet &to_c_enum_type(const typet &type)
 {
   PRECONDITION(can_cast_type<c_enum_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const c_enum_typet &>(type);
 }
 
@@ -307,6 +310,7 @@ inline const c_enum_typet &to_c_enum_type(const typet &type)
 inline c_enum_typet &to_c_enum_type(typet &type)
 {
   PRECONDITION(can_cast_type<c_enum_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<c_enum_typet &>(type);
 }
 

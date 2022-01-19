@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void array_typet::check(const typet &type, const validation_modet vm)
 {
   PRECONDITION(type.id() == ID_array);
+  type_with_subtypet::check(type);
   const array_typet &array_type = static_cast<const array_typet &>(type);
   if(array_type.size().is_nil())
   {
