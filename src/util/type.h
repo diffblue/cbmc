@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class namespacet;
 
 #include "source_location.h"
+#include "validate.h"
 #include "validate_types.h"
 #include "validation_mode.h"
 
@@ -63,7 +64,9 @@ public:
   { return !get_sub().empty(); }
 
   bool has_subtype() const
-  { return !get_sub().empty(); }
+  {
+    return get_sub().size() == 1;
+  }
 
   void remove_subtype()
   { get_sub().clear(); }
@@ -149,17 +152,37 @@ public:
     : typet(std::move(_id), std::move(_subtype))
   {
   }
+
+  const typet &subtype() const
+  {
+    // the existence of get_sub().front() is established by check()
+    return static_cast<const typet &>(get_sub().front());
+  }
+
+  typet &subtype()
+  {
+    // the existence of get_sub().front() is established by check()
+    return static_cast<typet &>(get_sub().front());
+  }
+
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, type.get_sub().size() == 1, "type must have one type parameter");
+  }
 };
 
 inline const type_with_subtypet &to_type_with_subtype(const typet &type)
 {
-  PRECONDITION(type.has_subtype());
+  type_with_subtypet::check(type);
   return static_cast<const type_with_subtypet &>(type);
 }
 
 inline type_with_subtypet &to_type_with_subtype(typet &type)
 {
-  PRECONDITION(type.has_subtype());
+  type_with_subtypet::check(type);
   return static_cast<type_with_subtypet &>(type);
 }
 

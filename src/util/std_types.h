@@ -832,6 +832,7 @@ inline bool can_cast_type<array_typet>(const typet &type)
 inline const array_typet &to_array_type(const typet &type)
 {
   PRECONDITION(can_cast_type<array_typet>(type));
+  array_typet::check(type);
   return static_cast<const array_typet &>(type);
 }
 
@@ -839,6 +840,7 @@ inline const array_typet &to_array_type(const typet &type)
 inline array_typet &to_array_type(typet &type)
 {
   PRECONDITION(can_cast_type<array_typet>(type));
+  array_typet::check(type);
   return static_cast<array_typet &>(type);
 }
 
@@ -1038,6 +1040,7 @@ inline bool can_cast_type<vector_typet>(const typet &type)
 inline const vector_typet &to_vector_type(const typet &type)
 {
   PRECONDITION(can_cast_type<vector_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const vector_typet &>(type);
 }
 
@@ -1045,6 +1048,7 @@ inline const vector_typet &to_vector_type(const typet &type)
 inline vector_typet &to_vector_type(typet &type)
 {
   PRECONDITION(can_cast_type<vector_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<vector_typet &>(type);
 }
 
@@ -1078,6 +1082,7 @@ inline bool can_cast_type<complex_typet>(const typet &type)
 inline const complex_typet &to_complex_type(const typet &type)
 {
   PRECONDITION(can_cast_type<complex_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const complex_typet &>(type);
 }
 
@@ -1085,6 +1090,7 @@ inline const complex_typet &to_complex_type(const typet &type)
 inline complex_typet &to_complex_type(typet &type)
 {
   PRECONDITION(can_cast_type<complex_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<complex_typet &>(type);
 }
 

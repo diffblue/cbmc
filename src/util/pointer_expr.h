@@ -54,6 +54,7 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+    type_with_subtypet::check(type);
     DATA_CHECK(vm, !type.get(ID_width).empty(), "pointer must have width");
   }
 };
@@ -116,6 +117,8 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     PRECONDITION(type.id() == ID_pointer);
+    DATA_CHECK(
+      vm, type.get_sub().size() == 1, "reference must have one type parameter");
     const reference_typet &reference_type =
       static_cast<const reference_typet &>(type);
     DATA_CHECK(
