@@ -58,7 +58,7 @@ template <typename Iter>
 static array_string_exprt
 make_string(Iter begin, Iter end, const array_typet &array_type)
 {
-  const typet &char_type = array_type.subtype();
+  const typet &char_type = array_type.element_type();
   array_exprt array_expr({}, array_type);
   const auto &insert = std::back_inserter(array_expr.operands());
   std::transform(begin, end, insert, [&](const mp_integer &i) {

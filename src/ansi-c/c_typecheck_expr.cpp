@@ -3389,15 +3389,16 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
     return false;
 
   // compare subtype
-  if((type0.subtype().id()==ID_signedbv ||
-      type0.subtype().id()==ID_unsignedbv) &&
-     (type1.subtype().id()==ID_signedbv ||
-      type1.subtype().id()==ID_unsignedbv) &&
-     to_bitvector_type(type0.subtype()).get_width()==
-     to_bitvector_type(type1.subtype()).get_width())
+  if(
+    (type0.element_type().id() == ID_signedbv ||
+     type0.element_type().id() == ID_unsignedbv) &&
+    (type1.element_type().id() == ID_signedbv ||
+     type1.element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(type0.element_type()).get_width() ==
+      to_bitvector_type(type1.element_type()).get_width())
     return true;
 
-  return type0.subtype()==type1.subtype();
+  return type0.element_type() == type1.element_type();
 }
 
 void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)

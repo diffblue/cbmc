@@ -244,8 +244,8 @@ void cpp_typecheckt::zero_initializer(
     for(mp_integer i=0; i<size; ++i)
     {
       index_exprt index(
-        object, from_integer(i, c_index_type()), array_type.subtype());
-      zero_initializer(index, array_type.subtype(), source_location, ops);
+        object, from_integer(i, c_index_type()), array_type.element_type());
+      zero_initializer(index, array_type.element_type(), source_location, ops);
     }
   }
   else if(final_type.id()==ID_union)

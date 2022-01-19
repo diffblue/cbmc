@@ -154,13 +154,13 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
   else if(type.id() == ID_array)
   {
     result["name"] = json_stringt("array");
-    result["subtype"] = json(to_array_type(type).subtype(), ns, mode);
+    result["subtype"] = json(to_array_type(type).element_type(), ns, mode);
     result["size"] = json(to_array_type(type).size(), ns, mode);
   }
   else if(type.id() == ID_vector)
   {
     result["name"] = json_stringt("vector");
-    result["subtype"] = json(to_vector_type(type).subtype(), ns, mode);
+    result["subtype"] = json(to_vector_type(type).element_type(), ns, mode);
     result["size"] = json(to_vector_type(type).size(), ns, mode);
   }
   else if(type.id() == ID_struct)

@@ -779,6 +779,14 @@ public:
     return subtype();
   }
 
+  /// The type of the elements of the array.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  typet &element_type()
+  {
+    return subtype();
+  }
+
   const exprt &size() const
   {
     return static_cast<const exprt &>(find(ID_size));
@@ -994,6 +1002,14 @@ public:
   /// This method is preferred over .subtype(),
   /// which will eventually be deprecated.
   const typet &element_type() const
+  {
+    return subtype();
+  }
+
+  /// The type of the elements of the vector.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  typet &element_type()
   {
     return subtype();
   }

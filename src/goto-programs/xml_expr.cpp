@@ -76,7 +76,7 @@ xmlt xml(const typet &type, const namespacet &ns)
   {
     result.name = "array";
     result.new_element("subtype").new_element() =
-      xml(to_array_type(type).subtype(), ns);
+      xml(to_array_type(type).element_type(), ns);
     result.new_element("size").new_element() =
       xml(to_array_type(type).size(), ns);
   }
@@ -84,7 +84,7 @@ xmlt xml(const typet &type, const namespacet &ns)
   {
     result.name = "vector";
     result.new_element("subtype").new_element() =
-      xml(to_vector_type(type).subtype(), ns);
+      xml(to_vector_type(type).element_type(), ns);
     result.new_element("size").new_element() =
       xml(to_vector_type(type).size(), ns);
   }

@@ -23,8 +23,8 @@ void template_mapt::apply(typet &type) const
 {
   if(type.id()==ID_array)
   {
-    apply(type.subtype());
-    apply(static_cast<exprt &>(type.add(ID_size)));
+    apply(to_array_type(type).element_type());
+    apply(to_array_type(type).size());
   }
   else if(type.id()==ID_pointer)
   {

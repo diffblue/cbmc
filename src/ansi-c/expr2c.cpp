@@ -587,7 +587,7 @@ std::string expr2ct::convert_rec(
     const mp_integer size_int = numeric_cast_v<mp_integer>(vector_type.size());
     std::string dest="__gcc_v"+integer2string(size_int);
 
-    std::string tmp=convert(vector_type.subtype());
+    std::string tmp = convert(vector_type.element_type());
 
     if(tmp=="signed char" || tmp=="char")
       dest+="qi";
@@ -603,7 +603,7 @@ std::string expr2ct::convert_rec(
       dest+="df";
     else
     {
-      const std::string subtype=convert(vector_type.subtype());
+      const std::string subtype = convert(vector_type.element_type());
       dest=subtype;
       dest+=" __attribute__((vector_size (";
       dest+=convert(vector_type.size());

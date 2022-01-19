@@ -487,7 +487,7 @@ exprt interpretert::get_value(
   {
     // Get size of array
     array_exprt result({}, to_array_type(real_type));
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
+    const exprt &size_expr = to_array_type(type).size();
     mp_integer subtype_size=get_size(type.subtype());
     mp_integer count;
     if(size_expr.id()!=ID_constant)
@@ -553,7 +553,7 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_array)
   {
     array_exprt result({}, to_array_type(real_type));
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
+    const exprt &size_expr = to_array_type(real_type).size();
 
     // Get size of array
     mp_integer subtype_size=get_size(type.subtype());
@@ -888,7 +888,7 @@ typet interpretert::concretize_type(const typet &type)
 {
   if(type.id()==ID_array)
   {
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
+    const exprt &size_expr = to_array_type(type).size();
     mp_vectort computed_size = evaluate(size_expr);
     if(computed_size.size()==1 &&
        computed_size[0]>=0)
@@ -1006,7 +1006,7 @@ mp_integer interpretert::get_size(const typet &type)
   }
   else if(type.id()==ID_array)
   {
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
+    const exprt &size_expr = to_array_type(type).size();
 
     mp_integer subtype_size=get_size(type.subtype());
 

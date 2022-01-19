@@ -1170,7 +1170,7 @@ static exprt substitute_array_access(
   const exprt &index,
   symbol_generatort &symbol_generator)
 {
-  const typet &char_type = array_expr.type().subtype();
+  const typet &char_type = array_expr.type().element_type();
   const exprt default_val = symbol_generator("out_of_bound_access", char_type);
   const interval_sparse_arrayt sparse_array(array_expr, default_val);
   return sparse_array.to_if_expression(index);

@@ -881,7 +881,7 @@ bool string_abstractiont::build_if(const if_exprt &o_if,
 bool string_abstractiont::build_array(const array_exprt &object,
     exprt &dest, bool write)
 {
-  PRECONDITION(is_char_type(object.type().subtype()));
+  PRECONDITION(is_char_type(object.type().element_type()));
 
   // writing is invalid
   if(write)

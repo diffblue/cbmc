@@ -1313,7 +1313,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     // turn &array into &array[0] when casting to pointer-to-element-type
     if(
       o.type().id() == ID_array &&
-      expr_type == pointer_type(o.type().subtype()))
+      expr_type == pointer_type(to_array_type(o.type()).element_type()))
     {
       auto result =
         address_of_exprt(index_exprt(o, from_integer(0, size_type())));
@@ -1374,7 +1374,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
         index_exprt idx(
           old.array(),
           pointer_offset_sum(old.index(), pointer_plus_expr.op1()),
-          old.array().type().subtype());
+          to_array_type(old.array().type()).element_type());
         return changed(simplify_rec(idx));
       }
     }
@@ -1967,7 +1967,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       }
       else if(tp.id()==ID_array)
       {
-        auto i = pointer_offset_size(to_array_type(tp).subtype(), ns);
+        auto i = pointer_offset_size(to_array_type(tp).element_type(), ns);
         if(i.has_value())
         {
           const exprt &index=with.where();

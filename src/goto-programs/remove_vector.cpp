@@ -116,7 +116,7 @@ static void remove_vector(exprt &expr)
       const mp_integer dimension =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      const typet subtype=array_type.subtype();
+      const typet subtype = array_type.element_type();
       // do component-wise:
       // x+y -> vector(x[0]+y[0],x[1]+y[1],...)
       array_exprt array_expr({}, array_type);
@@ -144,7 +144,7 @@ static void remove_vector(exprt &expr)
       const mp_integer dimension =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      const typet subtype=array_type.subtype();
+      const typet subtype = array_type.element_type();
       // do component-wise:
       // -x -> vector(-x[0],-x[1],...)
       array_exprt array_expr({}, array_type);
@@ -173,7 +173,7 @@ static void remove_vector(exprt &expr)
       const vector_typet &vector_type = to_vector_type(expr.type());
       const auto dimension = numeric_cast_v<std::size_t>(vector_type.size());
 
-      const typet &subtype = vector_type.subtype();
+      const typet &subtype = vector_type.element_type();
       PRECONDITION(subtype.id() == ID_signedbv);
       exprt minus_one = from_integer(-1, subtype);
       exprt zero = from_integer(0, subtype);
@@ -237,7 +237,7 @@ static void remove_vector(exprt &expr)
         const auto dimension =
           numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
         exprt casted_op =
-          typecast_exprt::conditional_cast(op, array_type.subtype());
+          typecast_exprt::conditional_cast(op, array_type.element_type());
         source_locationt source_location = expr.source_location();
         expr = array_exprt(exprt::operandst(dimension, casted_op), array_type);
         expr.add_source_location() = std::move(source_location);
@@ -285,10 +285,10 @@ static void remove_vector(typet &type)
   {
     vector_typet &vector_type=to_vector_type(type);
 
-    remove_vector(type.subtype());
+    remove_vector(vector_type.element_type());
 
     // Replace by an array with appropriate number of members.
-    array_typet array_type(vector_type.subtype(), vector_type.size());
+    array_typet array_type(vector_type.element_type(), vector_type.size());
     array_type.add_source_location()=type.source_location();
     type=array_type;
   }

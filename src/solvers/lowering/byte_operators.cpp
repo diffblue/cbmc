@@ -159,7 +159,7 @@ static array_exprt bv_to_array_expr(
   const namespacet &ns)
 {
   auto num_elements = numeric_cast<std::size_t>(array_type.size());
-  auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+  auto subtype_bits = pointer_offset_bits(array_type.element_type(), ns);
 
   const std::size_t total_bits =
     to_bitvector_type(bitvector_expr.type()).get_width();
@@ -189,14 +189,14 @@ static array_exprt bv_to_array_expr(
       operands.push_back(bv_to_expr(
         extractbits_exprt{
           bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
-        array_type.subtype(),
+        array_type.element_type(),
         endianness_map,
         ns));
     }
     else
     {
-      operands.push_back(
-        bv_to_expr(bitvector_expr, array_type.subtype(), endianness_map, ns));
+      operands.push_back(bv_to_expr(
+        bitvector_expr, array_type.element_type(), endianness_map, ns));
     }
   }
 
@@ -213,7 +213,7 @@ static vector_exprt bv_to_vector_expr(
 {
   const std::size_t num_elements =
     numeric_cast_v<std::size_t>(vector_type.size());
-  auto subtype_bits = pointer_offset_bits(vector_type.subtype(), ns);
+  auto subtype_bits = pointer_offset_bits(vector_type.element_type(), ns);
   DATA_INVARIANT(
     !subtype_bits.has_value() ||
       *subtype_bits * num_elements ==
@@ -234,14 +234,14 @@ static vector_exprt bv_to_vector_expr(
       operands.push_back(bv_to_expr(
         extractbits_exprt{
           bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
-        vector_type.subtype(),
+        vector_type.element_type(),
         endianness_map,
         ns));
     }
     else
     {
-      operands.push_back(
-        bv_to_expr(bitvector_expr, vector_type.subtype(), endianness_map, ns));
+      operands.push_back(bv_to_expr(
+        bitvector_expr, vector_type.element_type(), endianness_map, ns));
     }
   }
 
@@ -803,7 +803,7 @@ static exprt unpack_rec(
   if(src.type().id()==ID_array)
   {
     const array_typet &array_type=to_array_type(src.type());
-    const typet &subtype=array_type.subtype();
+    const typet &subtype = array_type.element_type();
 
     auto element_bits = pointer_offset_bits(subtype, ns);
     CHECK_RETURN(element_bits.has_value());
@@ -824,7 +824,7 @@ static exprt unpack_rec(
   else if(src.type().id() == ID_vector)
   {
     const vector_typet &vector_type = to_vector_type(src.type());
-    const typet &subtype = vector_type.subtype();
+    const typet &subtype = vector_type.element_type();
 
     auto element_bits = pointer_offset_bits(subtype, ns);
     CHECK_RETURN(element_bits.has_value());
@@ -1232,9 +1232,9 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
   optionalt<typet> subtype;
   if(root.type().id() == ID_vector)
-    subtype = to_vector_type(root.type()).subtype();
+    subtype = to_vector_type(root.type()).element_type();
   else
-    subtype = to_array_type(root.type()).subtype();
+    subtype = to_array_type(root.type()).element_type();
 
   auto subtype_bits = pointer_offset_bits(*subtype, ns);
 
@@ -2055,9 +2055,9 @@ static exprt lower_byte_update(
   {
     optionalt<typet> subtype;
     if(src.type().id() == ID_vector)
-      subtype = to_vector_type(src.type()).subtype();
+      subtype = to_vector_type(src.type()).element_type();
     else
-      subtype = to_array_type(src.type()).subtype();
+      subtype = to_array_type(src.type()).element_type();
 
     auto element_width = pointer_offset_bits(*subtype, ns);
     CHECK_RETURN(element_width.has_value());

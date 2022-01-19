@@ -123,7 +123,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    std::size_t sub_width=operator()(array_type.subtype());
+    std::size_t sub_width = operator()(array_type.element_type());
 
     const auto array_size = numeric_cast<mp_integer>(array_type.size());
 
@@ -146,7 +146,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_vector)
   {
     const vector_typet &vector_type=to_vector_type(type);
-    std::size_t sub_width=operator()(vector_type.subtype());
+    std::size_t sub_width = operator()(vector_type.element_type());
 
     const auto vector_size = numeric_cast_v<mp_integer>(vector_type.size());
 

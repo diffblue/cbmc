@@ -335,7 +335,7 @@ optionalt<exprt> bits2expr(
     const std::size_t number_of_elements =
       numeric_cast_v<std::size_t>(to_constant_expr(size_expr));
 
-    const auto el_size_opt = pointer_offset_bits(array_type.subtype(), ns);
+    const auto el_size_opt = pointer_offset_bits(array_type.element_type(), ns);
     CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
 
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
@@ -346,7 +346,8 @@ optionalt<exprt> bits2expr(
     for(std::size_t i = 0; i < number_of_elements; ++i)
     {
       std::string el_bits = std::string(bits, i * el_size, el_size);
-      auto el = bits2expr(el_bits, array_type.subtype(), little_endian, ns);
+      auto el =
+        bits2expr(el_bits, array_type.element_type(), little_endian, ns);
       if(!el.has_value())
         return {};
       result.add_to_operands(std::move(*el));
@@ -360,7 +361,8 @@ optionalt<exprt> bits2expr(
 
     const std::size_t n_el = numeric_cast_v<std::size_t>(vector_type.size());
 
-    const auto el_size_opt = pointer_offset_bits(vector_type.subtype(), ns);
+    const auto el_size_opt =
+      pointer_offset_bits(vector_type.element_type(), ns);
     CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
 
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
@@ -371,7 +373,8 @@ optionalt<exprt> bits2expr(
     for(std::size_t i = 0; i < n_el; ++i)
     {
       std::string el_bits = std::string(bits, i * el_size, el_size);
-      auto el = bits2expr(el_bits, vector_type.subtype(), little_endian, ns);
+      auto el =
+        bits2expr(el_bits, vector_type.element_type(), little_endian, ns);
       if(!el.has_value())
         return {};
       result.add_to_operands(std::move(*el));

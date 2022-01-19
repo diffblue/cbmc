@@ -128,7 +128,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     }
     else
     {
-      auto tmpval = expr_initializer_rec(array_type.subtype(), source_location);
+      auto tmpval =
+        expr_initializer_rec(array_type.element_type(), source_location);
       if(!tmpval.has_value())
         return {};
 
@@ -159,7 +160,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    auto tmpval = expr_initializer_rec(vector_type.subtype(), source_location);
+    auto tmpval =
+      expr_initializer_rec(vector_type.element_type(), source_location);
     if(!tmpval.has_value())
       return {};
 

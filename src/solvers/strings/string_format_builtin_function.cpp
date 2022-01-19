@@ -242,7 +242,8 @@ static exprt format_arg_from_string(
   array_poolt &array_pool)
 {
   PRECONDITION(
-    to_array_type(string.content().type()).subtype() == unsignedbv_typet(16));
+    to_array_type(string.content().type()).element_type() ==
+    unsignedbv_typet(16));
 
   if(id == "string_expr")
     return string;

@@ -136,7 +136,7 @@ bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
     if(array_size_vec.size()!=1)
       return true;
     mp_integer subtype_count;
-    if(count_type_leaves(at.subtype(), subtype_count))
+    if(count_type_leaves(at.element_type(), subtype_count))
       return true;
     result=array_size_vec[0]*subtype_count;
     return false;
@@ -205,12 +205,12 @@ bool interpretert::byte_offset_to_memory_offset(
       return true;
 
     mp_integer array_size=array_size_vec[0];
-    auto elem_size_bytes = pointer_offset_size(at.subtype(), ns);
+    auto elem_size_bytes = pointer_offset_size(at.element_type(), ns);
     if(!elem_size_bytes.has_value() || *elem_size_bytes == 0)
       return true;
 
     mp_integer elem_size_leaves;
-    if(count_type_leaves(at.subtype(), elem_size_leaves))
+    if(count_type_leaves(at.element_type(), elem_size_leaves))
       return true;
 
     mp_integer this_idx = offset / (*elem_size_bytes);
@@ -219,7 +219,7 @@ bool interpretert::byte_offset_to_memory_offset(
 
     mp_integer subtype_result;
     bool ret = byte_offset_to_memory_offset(
-      at.subtype(), offset % (*elem_size_bytes), subtype_result);
+      at.element_type(), offset % (*elem_size_bytes), subtype_result);
 
     result=subtype_result+(elem_size_leaves*this_idx);
     return ret;
@@ -280,12 +280,12 @@ bool interpretert::memory_offset_to_byte_offset(
     if(array_size_vec.size()!=1)
       return true;
 
-    auto elem_size = pointer_offset_size(at.subtype(), ns);
+    auto elem_size = pointer_offset_size(at.element_type(), ns);
     if(!elem_size.has_value())
       return true;
 
     mp_integer elem_count;
-    if(count_type_leaves(at.subtype(), elem_count))
+    if(count_type_leaves(at.element_type(), elem_count))
       return true;
 
     mp_integer this_idx=full_cell_offset/elem_count;
@@ -293,11 +293,8 @@ bool interpretert::memory_offset_to_byte_offset(
       return true;
 
     mp_integer subtype_result;
-    bool ret=
-      memory_offset_to_byte_offset(
-        at.subtype(),
-        full_cell_offset%elem_count,
-        subtype_result);
+    bool ret = memory_offset_to_byte_offset(
+      at.element_type(), full_cell_offset % elem_count, subtype_result);
     result = subtype_result + ((*elem_size) * this_idx);
     return ret;
   }

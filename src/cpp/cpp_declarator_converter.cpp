@@ -313,10 +313,11 @@ void cpp_declarator_convertert::combine_types(
   }
   else if(symbol.type==decl_type)
     return; // ok
-  else if(symbol.type.id()==ID_array &&
-          symbol.type.find(ID_size).is_nil() &&
-          decl_type.id()==ID_array &&
-          symbol.type.subtype()==decl_type.subtype())
+  else if(
+    symbol.type.id() == ID_array &&
+    to_array_type(symbol.type).size().is_nil() && decl_type.id() == ID_array &&
+    to_array_type(symbol.type).element_type() ==
+      to_array_type(decl_type).element_type())
   {
     symbol.type = decl_type;
     return; // ok
