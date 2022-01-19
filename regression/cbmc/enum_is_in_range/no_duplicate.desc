@@ -5,4 +5,7 @@ no_duplicate.c
 ^EXIT=0$
 ^SIGNAL=0$
 --
+line 17 enum range check in e: SUCCESS$
 --
+Test that enum range checks aren't applied to function-call left-hand sides, and
+that no extra checks are generated for uses of __CPROVER_enum_is_in_range.

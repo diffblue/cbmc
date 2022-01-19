@@ -638,6 +638,7 @@ void goto_convertt::do_enum_is_in_range(
 
   code_assignt assignment(lhs, disjunction(disjuncts));
   assignment.add_source_location() = function.source_location();
+  assignment.add_source_location().add_pragma("disable:enum-range-check");
   copy(assignment, ASSIGN, dest);
 }
 
