@@ -56,6 +56,24 @@ static boundst map_bounds(
   return result;
 }
 
+/// changes the width of the given bitvector type
+bitvector_typet adjust_width(const typet &src, std::size_t new_width)
+{
+  if(src.id() == ID_unsignedbv)
+    return unsignedbv_typet(new_width);
+  else if(src.id() == ID_signedbv)
+    return signedbv_typet(new_width);
+  else if(src.id() == ID_bv)
+    return bv_typet(new_width);
+  else if(src.id() == ID_c_enum) // we use the underlying type
+    return adjust_width(to_c_enum_type(src).underlying_type(), new_width);
+  else if(src.id() == ID_c_bit_field)
+    return c_bit_field_typet(
+      to_c_bit_field_type(src).underlying_type(), new_width);
+  else
+    PRECONDITION(false);
+}
+
 /// Convert a bitvector-typed expression \p bitvector_expr to a struct-typed
 /// expression. See \ref bv_to_expr for an overview.
 static struct_exprt bv_to_struct_expr(
@@ -89,7 +107,7 @@ static struct_exprt bv_to_struct_expr(
       endianness_map,
       member_offset_bits,
       member_offset_bits + component_bits - 1);
-    bitvector_typet type{bitvector_expr.type().id(), component_bits};
+    bitvector_typet type = adjust_width(bitvector_expr.type(), component_bits);
     operands.push_back(bv_to_expr(
       extractbits_exprt{bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
       comp.type(),
@@ -133,7 +151,7 @@ static union_exprt bv_to_union_expr(
   }
 
   const auto bounds = map_bounds(endianness_map, 0, component_bits - 1);
-  bitvector_typet type{bitvector_expr.type().id(), component_bits};
+  bitvector_typet type = adjust_width(bitvector_expr.type(), component_bits);
   const irep_idt &component_name = widest_member.has_value()
                                      ? widest_member->first.get_name()
                                      : components.front().get_name();
@@ -185,7 +203,8 @@ static array_exprt bv_to_array_expr(
         numeric_cast_v<std::size_t>(*subtype_bits);
       const auto bounds = map_bounds(
         endianness_map, i * subtype_bits_int, ((i + 1) * subtype_bits_int) - 1);
-      bitvector_typet type{bitvector_expr.type().id(), subtype_bits_int};
+      bitvector_typet type =
+        adjust_width(bitvector_expr.type(), subtype_bits_int);
       operands.push_back(bv_to_expr(
         extractbits_exprt{
           bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
@@ -230,7 +249,8 @@ static vector_exprt bv_to_vector_expr(
         numeric_cast_v<std::size_t>(*subtype_bits);
       const auto bounds = map_bounds(
         endianness_map, i * subtype_bits_int, ((i + 1) * subtype_bits_int) - 1);
-      bitvector_typet type{bitvector_expr.type().id(), subtype_bits_int};
+      bitvector_typet type =
+        adjust_width(bitvector_expr.type(), subtype_bits_int);
       operands.push_back(bv_to_expr(
         extractbits_exprt{
           bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
@@ -274,7 +294,8 @@ static complex_exprt bv_to_complex_expr(
   const auto bounds_imag =
     map_bounds(endianness_map, subtype_bits, subtype_bits * 2 - 1);
 
-  const bitvector_typet type{bitvector_expr.type().id(), subtype_bits};
+  const bitvector_typet type =
+    adjust_width(bitvector_expr.type(), subtype_bits);
 
   return complex_exprt{
     bv_to_expr(
@@ -1293,7 +1314,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   else // width_bytes>=2
   {
     concatenation_exprt concatenation(
-      std::move(op), bitvector_typet(subtype->id(), width_bytes * 8));
+      std::move(op), adjust_width(*subtype, width_bytes * 8));
 
     endianness_mapt map(concatenation.type(), little_endian, ns);
     return bv_to_expr(concatenation, src.type(), map, ns);
@@ -2304,12 +2325,11 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
       extractbits_exprt extra_bits{
         src.op(), bounds.ub, bounds.lb, bv_typet{n_extra_bits}};
 
-      update_value =
-        concatenation_exprt{typecast_exprt::conditional_cast(
-                              update_value, bv_typet{update_bits_int}),
-                            extra_bits,
-                            bitvector_typet{update_value.type().id(),
-                                            update_bits_int + n_extra_bits}};
+      update_value = concatenation_exprt{
+        typecast_exprt::conditional_cast(
+          update_value, bv_typet{update_bits_int}),
+        extra_bits,
+        adjust_width(update_value.type(), update_bits_int + n_extra_bits)};
     }
     else
     {
