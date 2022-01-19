@@ -187,8 +187,11 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     c_qualifiers.is_transparent_union=true;
   }
-  else if(type.id()==ID_vector)
-    vector_size=to_vector_type(type).size();
+  else if(type.id() == ID_frontend_vector)
+  {
+    // note that this is not yet a vector_typet -- this is a size only
+    vector_size = static_cast<const constant_exprt &>(type.find(ID_size));
+  }
   else if(type.id()==ID_void)
   {
     // we store 'void' as 'empty'

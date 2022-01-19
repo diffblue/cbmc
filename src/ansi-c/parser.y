@@ -1607,7 +1607,7 @@ gcc_type_attribute:
         | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION
         { $$=$1; set($$, ID_transparent_union); }
         | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
-        { $$=$1; set($$, ID_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
+        { $$=$1; set($$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
         | TOK_GCC_ATTRIBUTE_ALIGNED
         { $$=$1; set($$, ID_aligned); }
         | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
