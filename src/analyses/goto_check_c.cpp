@@ -517,8 +517,7 @@ void goto_check_ct::enum_range_check(const exprt &expr, const guardt &guard)
     return;
 
   const c_enum_tag_typet &c_enum_tag_type = to_c_enum_tag_type(expr.type());
-  symbolt enum_type = ns.lookup(c_enum_tag_type.get_identifier());
-  const c_enum_typet &c_enum_type = to_c_enum_type(enum_type.type);
+  const c_enum_typet &c_enum_type = ns.follow_tag(c_enum_tag_type);
 
   const c_enum_typet::memberst enum_values = c_enum_type.members();
 
@@ -2148,7 +2147,13 @@ void goto_check_ct::goto_check(
     }
     else if(i.is_function_call())
     {
-      check(i.call_lhs());
+      // Disable enum range checks for left-hand sides as their values are yet
+      // to be set (by this function call).
+      {
+        flag_overridet resetter(i.source_location());
+        resetter.disable_flag(enable_enum_range_check, "enum_range_check");
+        check(i.call_lhs());
+      }
       check(i.call_function());
 
       for(const auto &arg : i.call_arguments())

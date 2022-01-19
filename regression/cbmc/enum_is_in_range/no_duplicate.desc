@@ -1,0 +1,8 @@
+CORE
+no_duplicate.c
+--enum-range-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
