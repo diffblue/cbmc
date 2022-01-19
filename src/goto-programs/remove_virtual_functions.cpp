@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/symbol_table.h>
 
@@ -329,7 +330,7 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
   INVARIANT(
     this_expr.type().id() == ID_pointer, "this parameter must be a pointer");
   INVARIANT(
-    this_expr.type().subtype() != empty_typet(),
+    to_pointer_type(this_expr.type()).base_type() != empty_typet(),
     "this parameter must not be a void pointer");
 
   // So long as `this` is already not `void*` typed, the second parameter

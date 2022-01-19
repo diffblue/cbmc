@@ -367,9 +367,12 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
 {
   if(type.id() == ID_array)
   {
-    if(to_array_type(type).size().is_nil())
+    const auto &array_type = to_array_type(type);
+
+    if(array_type.size().is_nil())
       return false;
-    return is_complete_type(type.subtype());
+
+    return is_complete_type(array_type.element_type());
   }
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
@@ -383,7 +386,7 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
         return false;
   }
   else if(type.id()==ID_vector)
-    return is_complete_type(type.subtype());
+    return is_complete_type(to_vector_type(type).element_type());
   else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
     return is_complete_type(follow(type));

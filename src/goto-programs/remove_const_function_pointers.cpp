@@ -784,10 +784,10 @@ bool remove_const_function_pointerst::is_const_expression(
 ///   arrays are implicitly const in C.
 bool remove_const_function_pointerst::is_const_type(const typet &type) const
 {
-  if(type.id() == ID_array && type.subtype().get_bool(ID_C_constant))
-    return true;
-
-  return type.get_bool(ID_C_constant);
+  if(type.id() == ID_array)
+    return to_array_type(type).element_type().get_bool(ID_C_constant);
+  else
+    return type.get_bool(ID_C_constant);
 }
 
 /// To extract the value of the specific component within a struct

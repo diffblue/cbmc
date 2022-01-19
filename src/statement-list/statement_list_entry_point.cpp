@@ -106,7 +106,8 @@ static void add_main_function_block_call(
   symbolt instance_data_block;
   instance_data_block.name =
     id2string(data_block_interface.get_base_name()) + DB_ENTRY_POINT_POSTFIX;
-  instance_data_block.type = data_block_interface.type().subtype();
+  instance_data_block.type =
+    to_type_with_subtype(data_block_interface.type()).subtype();
   instance_data_block.is_static_lifetime = true;
   instance_data_block.mode = ID_statement_list;
   symbol_table.add(instance_data_block);

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_analysis_fi.h"
 
+#include <util/pointer_expr.h>
 #include <util/symbol_table.h>
 
 void value_set_analysis_fit::initialize(
@@ -102,7 +103,8 @@ void value_set_analysis_fit::get_entries_rec(
   }
   else if(t.id()==ID_array)
   {
-    get_entries_rec(identifier, suffix+"[]", t.subtype(), dest);
+    get_entries_rec(
+      identifier, suffix + "[]", to_array_type(t).element_type(), dest);
   }
   else if(check_type(t))
   {
@@ -163,7 +165,8 @@ bool value_set_analysis_fit::check_type(const typet &type)
         if(type.id()==ID_pointer)
         {
           const typet *t = &type;
-          while(t->id()==ID_pointer) t = &(t->subtype());
+          while(t->id() == ID_pointer)
+            t = &(to_pointer_type(*t).base_type());
 
           return (t->id()==ID_code);
         }
@@ -184,7 +187,7 @@ bool value_set_analysis_fit::check_type(const typet &type)
     }
   }
   else if(type.id()==ID_array)
-    return check_type(type.subtype());
+    return check_type(to_array_type(type).element_type());
   else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
     return check_type(ns.follow(type));
 

@@ -30,9 +30,10 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     member_exprt(plain_expr, "member", java_int_type());
   const constant_exprt invalid_constant = constant_exprt("", java_int_type());
   const constant_exprt valid_constant = constant_exprt("0", java_int_type());
-  const index_exprt valid_index =
-    index_exprt(valid_symbol_expr, valid_constant);
-  const index_exprt index_plain = index_exprt(exprt(), exprt());
+  const index_exprt valid_index = index_exprt(
+    symbol_exprt("id", array_typet(typet(), nil_exprt())), valid_constant);
+  const index_exprt index_plain =
+    index_exprt(exprt(ID_nil, array_typet(typet(), nil_exprt())), exprt());
   const byte_extract_exprt byte_little_endian = byte_extract_exprt(
     ID_byte_extract_little_endian, exprt(), exprt(), typet());
   const byte_extract_exprt byte_big_endian =

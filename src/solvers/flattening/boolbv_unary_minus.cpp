@@ -36,7 +36,7 @@ bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
   if(bvtype==bvtypet::IS_UNKNOWN &&
      (type.id()==ID_vector || type.id()==ID_complex))
   {
-    const typet &subtype = type.subtype();
+    const typet &subtype = to_type_with_subtype(type).subtype();
 
     std::size_t sub_width=boolbv_width(subtype);
 
@@ -58,7 +58,7 @@ bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
       const auto sub_it = std::next(op_bv.begin(), sub_idx);
       std::copy_n(sub_it, sub_width, std::back_inserter(tmp_op));
 
-      if(type.subtype().id() == ID_floatbv)
+      if(subtype.id() == ID_floatbv)
       {
         float_utilst float_utils(prop, to_floatbv_type(subtype));
         tmp_op = float_utils.negate(tmp_op);

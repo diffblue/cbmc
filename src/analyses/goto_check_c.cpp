@@ -1352,7 +1352,8 @@ void goto_check_ct::pointer_primitive_check(
       return;
   }
 
-  const auto size_of_expr_opt = size_of_expr(pointer.type().subtype(), ns);
+  const auto size_of_expr_opt =
+    size_of_expr(to_pointer_type(pointer.type()).base_type(), ns);
 
   const exprt size = !size_of_expr_opt.has_value()
                        ? from_integer(1, size_type())

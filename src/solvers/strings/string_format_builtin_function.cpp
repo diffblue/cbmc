@@ -302,7 +302,7 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
   const std::vector<format_elementt> format_strings = parse_format_string(s);
   std::vector<array_string_exprt> intermediary_strings;
   std::size_t arg_count = 0;
-  const typet &char_type = res.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
   const typet &index_type = res.length_type();
 
   array_string_exprt string_arg;

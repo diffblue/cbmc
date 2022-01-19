@@ -73,7 +73,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
       const cpp_namet cppname(c.get_base_name());
 
       const symbolt &virtual_table_symbol_type =
-        lookup(c.type().subtype().get(ID_identifier));
+        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var = lookup(
         id2string(virtual_table_symbol_type.name) + "@" +

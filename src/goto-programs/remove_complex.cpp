@@ -86,7 +86,7 @@ static bool have_to_remove_complex(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_vector ||
           type.id()==ID_array)
-    return have_to_remove_complex(type.subtype());
+    return have_to_remove_complex(to_type_with_subtype(type).subtype());
   else if(type.id()==ID_complex)
     return true;
 
@@ -180,7 +180,7 @@ static void remove_complex(exprt &expr)
     else if(expr.id()==ID_typecast)
     {
       auto const &typecast_expr = to_typecast_expr(expr);
-      typet subtype = typecast_expr.type().subtype();
+      typet subtype = to_complex_type(typecast_expr.type()).subtype();
 
       if(typecast_expr.op().type().id() == ID_struct)
       {

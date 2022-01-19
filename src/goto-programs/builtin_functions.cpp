@@ -276,7 +276,8 @@ void goto_convertt::do_scanf(
               const index_exprt new_lhs(
                 dereference_exprt{ptr}, from_integer(0, c_index_type()));
               const side_effect_expr_nondett rhs(
-                type->subtype(), function.source_location());
+                to_array_type(*type).element_type(),
+                function.source_location());
               code_assignt assign(new_lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -441,7 +442,8 @@ void goto_convertt::do_cpp_new(
     if(new_array)
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
-    new_call.set(ID_C_cxx_alloc_type, lhs.type().subtype());
+    new_call.set(
+      ID_C_cxx_alloc_type, to_type_with_subtype(lhs.type()).subtype());
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
@@ -472,7 +474,8 @@ void goto_convertt::do_cpp_new(
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
     new_call.arguments().push_back(to_unary_expr(rhs).op()); // memory location
-    new_call.set(ID_C_cxx_alloc_type, lhs.type().subtype());
+    new_call.set(
+      ID_C_cxx_alloc_type, to_type_with_subtype(lhs.type()).subtype());
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
@@ -521,7 +524,8 @@ void goto_convertt::cpp_new_initializer(
     else if(rhs.get_statement()==ID_cpp_new)
     {
       // just one object
-      const dereference_exprt deref_lhs(lhs, rhs.type().subtype());
+      const dereference_exprt deref_lhs(
+        lhs, to_pointer_type(rhs.type()).base_type());
 
       replace_new_object(deref_lhs, initializer);
       convert(to_code(initializer), dest, ID_cpp);

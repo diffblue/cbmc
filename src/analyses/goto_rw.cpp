@@ -98,7 +98,8 @@ void rw_range_sett::get_objects_complex_imag(
 {
   const exprt &op = expr.op();
 
-  auto subtype_bits = pointer_offset_bits(op.type().subtype(), ns);
+  auto subtype_bits =
+    pointer_offset_bits(to_complex_type(op.type()).subtype(), ns);
   CHECK_RETURN(subtype_bits.has_value());
 
   range_spect sub_size = to_range_spect(*subtype_bits);

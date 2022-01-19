@@ -183,7 +183,7 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_complex)
     {
-      const typet &subtype = type.subtype();
+      const typet &subtype = to_complex_type(type).subtype();
       std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width==sub_width*2)
@@ -334,7 +334,8 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
         if(index_mpint.has_value())
         {
           if(value.is_nil())
-            values[*index_mpint] = exprt(ID_unknown, type.subtype());
+            values[*index_mpint] =
+              exprt(ID_unknown, to_array_type(type).subtype());
           else
             values[*index_mpint] = value;
         }

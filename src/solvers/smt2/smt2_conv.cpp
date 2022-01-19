@@ -737,7 +737,7 @@ void smt2_convt::convert_address_of_rec(
 
       address_of_exprt address_of_expr(
         new_index_expr,
-        pointer_type(array.type().subtype()));
+        pointer_type(to_array_type(array.type()).element_type()));
 
       plus_exprt plus_expr{address_of_expr, index};
 
@@ -3329,8 +3329,10 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         p.type().id() == ID_pointer,
         "one of the operands should have pointer type");
 
+      const auto &base_type = to_pointer_type(expr.type()).base_type();
+
       mp_integer element_size;
-      if(expr.type().subtype().id() == ID_empty)
+      if(base_type.id() == ID_empty)
       {
         // This is a gcc extension.
         // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
@@ -3338,7 +3340,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
       }
       else
       {
-        auto element_size_opt = pointer_offset_size(expr.type().subtype(), ns);
+        auto element_size_opt = pointer_offset_size(base_type, ns);
         CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 1);
         element_size = *element_size_opt;
       }
@@ -3470,8 +3472,10 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
 
   PRECONDITION(
     type.id() == ID_floatbv ||
-    (type.id() == ID_complex && type.subtype().id() == ID_floatbv) ||
-    (type.id() == ID_vector && type.subtype().id() == ID_floatbv));
+    (type.id() == ID_complex &&
+     to_complex_type(type).subtype().id() == ID_floatbv) ||
+    (type.id() == ID_vector &&
+     to_vector_type(type).element_type().id() == ID_floatbv));
 
   if(use_FPA_theory)
   {
@@ -3521,7 +3525,8 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
        expr.op1().type().id()==ID_pointer)
     {
       // Pointer difference
-      auto element_size = pointer_offset_size(expr.op0().type().subtype(), ns);
+      auto element_size =
+        pointer_offset_size(to_pointer_type(expr.op0().type()).base_type(), ns);
       CHECK_RETURN(element_size.has_value() && *element_size >= 1);
 
       if(*element_size >= 2)
@@ -4953,9 +4958,10 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_c_enum)
   {
-    // these have a subtype
+    // these have an underlying type
     out << "(_ BitVec "
-        << to_bitvector_type(type.subtype()).get_width() << ")";
+        << to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width()
+        << ")";
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -5021,7 +5027,7 @@ void smt2_convt::find_symbols_rec(
   }
   else if(type.id()==ID_complex)
   {
-    find_symbols_rec(type.subtype(), recstack);
+    find_symbols_rec(to_complex_type(type).subtype(), recstack);
 
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
@@ -5034,11 +5040,11 @@ void smt2_convt::find_symbols_rec(
           << "(mk-" << smt_typename;
 
       out << " (" << smt_typename << ".imag ";
-      convert_type(type.subtype());
+      convert_type(to_complex_type(type).subtype());
       out << ")";
 
       out << " (" << smt_typename << ".real ";
-      convert_type(type.subtype());
+      convert_type(to_complex_type(type).subtype());
       out << ")";
 
       out << "))))\n";
@@ -5046,7 +5052,7 @@ void smt2_convt::find_symbols_rec(
   }
   else if(type.id()==ID_vector)
   {
-    find_symbols_rec(type.subtype(), recstack);
+    find_symbols_rec(to_vector_type(type).element_type(), recstack);
 
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
@@ -5065,7 +5071,7 @@ void smt2_convt::find_symbols_rec(
       for(mp_integer i=0; i!=size; ++i)
       {
         out << " (" << smt_typename << "." << i << " ";
-        convert_type(type.subtype());
+        convert_type(to_vector_type(type).element_type());
         out << ")";
       }
 
@@ -5187,7 +5193,7 @@ void smt2_convt::find_symbols_rec(
   }
   else if(type.id()==ID_pointer)
   {
-    find_symbols_rec(type.subtype(), recstack);
+    find_symbols_rec(to_pointer_type(type).base_type(), recstack);
   }
   else if(type.id() == ID_struct_tag)
   {

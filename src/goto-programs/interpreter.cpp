@@ -488,7 +488,7 @@ exprt interpretert::get_value(
     // Get size of array
     array_exprt result({}, to_array_type(real_type));
     const exprt &size_expr = to_array_type(type).size();
-    mp_integer subtype_size=get_size(type.subtype());
+    mp_integer subtype_size = get_size(to_array_type(type).element_type());
     mp_integer count;
     if(size_expr.id()!=ID_constant)
     {
@@ -503,9 +503,8 @@ exprt interpretert::get_value(
     result.reserve_operands(numeric_cast_v<std::size_t>(count));
     for(mp_integer i=0; i<count; ++i)
     {
-      const exprt operand=get_value(
-        type.subtype(),
-        offset+i*subtype_size);
+      const exprt operand = get_value(
+        to_array_type(type).element_type(), offset + i * subtype_size);
       result.copy_to_operands(operand);
     }
     return std::move(result);
@@ -556,7 +555,7 @@ exprt interpretert::get_value(
     const exprt &size_expr = to_array_type(real_type).size();
 
     // Get size of array
-    mp_integer subtype_size=get_size(type.subtype());
+    mp_integer subtype_size = get_size(to_array_type(type).element_type());
 
     mp_integer count;
     if(unbounded_size(type))
@@ -572,8 +571,8 @@ exprt interpretert::get_value(
     result.reserve_operands(numeric_cast_v<std::size_t>(count));
     for(mp_integer i=0; i<count; ++i)
     {
-      const exprt operand=get_value(type.subtype(), rhs,
-          offset+i*subtype_size);
+      const exprt operand = get_value(
+        to_array_type(type).element_type(), rhs, offset + i * subtype_size);
       result.copy_to_operands(operand);
     }
     return std::move(result);
@@ -895,10 +894,9 @@ typet interpretert::concretize_type(const typet &type)
     {
       output.result() << "Concretized array with size " << computed_size[0]
                       << messaget::eom;
-      return
-        array_typet(
-          type.subtype(),
-          from_integer(computed_size[0], integer_typet()));
+      return array_typet(
+        to_array_type(type).element_type(),
+        from_integer(computed_size[0], integer_typet()));
     }
     else
     {
@@ -949,7 +947,7 @@ bool interpretert::unbounded_size(const typet &type)
     const exprt &size=to_array_type(type).size();
     if(size.id()==ID_infinity)
       return true;
-    return unbounded_size(type.subtype());
+    return unbounded_size(to_array_type(type).element_type());
   }
   else if(type.id()==ID_struct)
   {
@@ -1008,7 +1006,7 @@ mp_integer interpretert::get_size(const typet &type)
   {
     const exprt &size_expr = to_array_type(type).size();
 
-    mp_integer subtype_size=get_size(type.subtype());
+    mp_integer subtype_size = get_size(to_array_type(type).element_type());
 
     mp_vectort i = evaluate(size_expr);
     if(i.size()==1)

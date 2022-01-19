@@ -1554,8 +1554,8 @@ exprt statement_list_typecheckt::typecheck_identifier(
     const symbolt &data_block{symbol_table.get_writeable_ref(
       id2string(tia_element.name) + "::" + DATA_BLOCK_PARAMETER_NAME)};
     const symbol_exprt db_expr = data_block.symbol_expr();
-    const struct_typet *const db_type =
-      type_try_dynamic_cast<struct_typet>(db_expr.type().subtype());
+    const struct_typet *const db_type = type_try_dynamic_cast<struct_typet>(
+      to_type_with_subtype(db_expr.type()).subtype());
     if(!db_type)
       UNREACHABLE;
     for(const struct_union_typet::componentt &member : db_type->components())

@@ -94,7 +94,8 @@ void cpp_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_frontend_pointer)
   {
     // add width and turn into ID_pointer
-    pointer_typet tmp(type.subtype(), config.ansi_c.pointer_width);
+    pointer_typet tmp(
+      to_type_with_subtype(type).subtype(), config.ansi_c.pointer_width);
     tmp.add_source_location()=type.source_location();
     if(type.get_bool(ID_C_reference))
       tmp.set(ID_C_reference, true);

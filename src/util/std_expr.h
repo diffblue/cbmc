@@ -1331,7 +1331,13 @@ public:
   // must be array_type.index_type().
   // This will eventually be enforced using a precondition.
   index_exprt(const exprt &_array, exprt _index)
-    : binary_exprt(_array, ID_index, std::move(_index), _array.type().subtype())
+    : binary_exprt(
+        _array,
+        ID_index,
+        std::move(_index),
+        _array.type().has_subtype()
+          ? to_type_with_subtype(_array.type()).subtype()
+          : typet(ID_nil))
   {
   }
 

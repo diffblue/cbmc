@@ -53,8 +53,9 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
   bool no_overflow=(expr.id()=="no-overflow-plus" ||
                     expr.id()=="no-overflow-minus");
 
-  typet arithmetic_type =
-    (type.id() == ID_vector || type.id() == ID_complex) ? type.subtype() : type;
+  typet arithmetic_type = (type.id() == ID_vector || type.id() == ID_complex)
+                            ? to_type_with_subtype(type).subtype()
+                            : type;
 
   bv_utilst::representationt rep=
     (arithmetic_type.id()==ID_signedbv ||
@@ -72,7 +73,8 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
     if(type.id()==ID_vector || type.id()==ID_complex)
     {
-      std::size_t sub_width = boolbv_width(type.subtype());
+      std::size_t sub_width =
+        boolbv_width(to_type_with_subtype(type).subtype());
 
       INVARIANT(sub_width != 0, "vector elements shall have nonzero bit width");
       INVARIANT(
@@ -104,10 +106,11 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
           tmp_result[j] = bv[index];
         }
 
-        if(type.subtype().id()==ID_floatbv)
+        if(to_type_with_subtype(type).subtype().id() == ID_floatbv)
         {
           // needs to change due to rounding mode
-          float_utilst float_utils(prop, to_floatbv_type(type.subtype()));
+          float_utilst float_utils(
+            prop, to_floatbv_type(to_type_with_subtype(type).subtype()));
           tmp_result=float_utils.add_sub(tmp_result, tmp_op, subtract);
         }
         else

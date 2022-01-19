@@ -144,10 +144,11 @@ protected:
 
   bool is_string_type(const typet &t) const
   {
-    return
-      (t.id()==ID_pointer || t.id()==ID_array) &&
-      (t.subtype().id()==ID_signedbv || t.subtype().id()==ID_unsignedbv) &&
-      (to_bitvector_type(t.subtype()).get_width()==config.ansi_c.char_width);
+    return (t.id() == ID_pointer || t.id() == ID_array) &&
+           (to_type_with_subtype(t).subtype().id() == ID_signedbv ||
+            to_type_with_subtype(t).subtype().id() == ID_unsignedbv) &&
+           (to_bitvector_type(to_type_with_subtype(t).subtype()).get_width() ==
+            config.ansi_c.char_width);
   }
 
   void invalidate_buffer(
@@ -841,7 +842,9 @@ void string_instrumentationt::invalidate_buffer(
   else
   {
     index_exprt index(
-      buffer, from_integer(0, c_index_type()), buf_type.subtype());
+      buffer,
+      from_integer(0, c_index_type()),
+      to_type_with_subtype(buf_type).subtype());
     bufp=address_of_exprt(index);
   }
 

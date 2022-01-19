@@ -78,8 +78,8 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
   PRECONDITION(char_pointer.type().id() == ID_pointer);
   PRECONDITION(char_array_type.id() == ID_array);
   PRECONDITION(
-    char_array_type.subtype().id() == ID_unsignedbv ||
-    char_array_type.subtype().id() == ID_signedbv);
+    to_array_type(char_array_type).element_type().id() == ID_unsignedbv ||
+    to_array_type(char_array_type).element_type().id() == ID_signedbv);
 
   if(char_pointer.id() == ID_if)
   {
@@ -89,7 +89,7 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
     const array_string_exprt f =
       make_char_array_for_char_pointer(if_expr.false_case(), char_array_type);
     const array_typet array_type(
-      char_array_type.subtype(),
+      to_array_type(char_array_type).element_type(),
       if_exprt(
         if_expr.cond(),
         to_array_type(t.type()).size(),
@@ -183,7 +183,8 @@ array_poolt::created_strings() const
 
 array_string_exprt array_poolt::find(const exprt &pointer, const exprt &length)
 {
-  const array_typet array_type(pointer.type().subtype(), length);
+  const array_typet array_type(
+    to_pointer_type(pointer.type()).base_type(), length);
   const array_string_exprt array =
     make_char_array_for_char_pointer(pointer, array_type);
   return array;

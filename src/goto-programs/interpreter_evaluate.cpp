@@ -445,13 +445,14 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
     {
       if(show)
         output.error() << "heap memory allocation not fully implemented "
-                       << expr.type().subtype().pretty() << messaget::eom;
+                       << to_pointer_type(expr.type()).base_type().pretty()
+                       << messaget::eom;
       std::stringstream buffer;
       num_dynamic_objects++;
       buffer << "interpreter::dynamic_object" << num_dynamic_objects;
       irep_idt id(buffer.str().c_str());
-      mp_integer address =
-        build_memory_map(symbol_exprt{id, expr.type().subtype()});
+      mp_integer address = build_memory_map(
+        symbol_exprt{id, to_pointer_type(expr.type()).base_type()});
       // TODO: check array of type
       // TODO: interpret zero-initialization argument
       return {address};
@@ -954,7 +955,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
     mp_vectort where = evaluate(wexpr.where());
     mp_vectort new_value = evaluate(wexpr.new_value());
 
-    const auto &subtype=expr.type().subtype();
+    const auto &subtype = to_array_type(expr.type()).element_type();
 
     if(!new_value.empty() && where.size()==1 && !unbounded_size(subtype))
     {

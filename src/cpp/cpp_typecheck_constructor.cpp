@@ -224,7 +224,7 @@ void cpp_typecheckt::default_cpctor(
       const cpp_namet cppname(mem_c.get_base_name(), source_location);
 
       const symbolt &virtual_table_symbol_type =
-        lookup(mem_c.type().subtype().get(ID_identifier));
+        lookup(to_pointer_type(mem_c.type()).base_type().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var = lookup(
         id2string(virtual_table_symbol_type.name) + "@" +
@@ -676,7 +676,7 @@ void cpp_typecheckt::full_member_initialization(
       const cpp_namet cppname(c.get_base_name(), c.source_location());
 
       const symbolt &virtual_table_symbol_type =
-        lookup(c.type().subtype().get(ID_identifier));
+        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var  =
         lookup(id2string(virtual_table_symbol_type.name) + "@" +
@@ -785,8 +785,12 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
     if(!is_reference(parameter1_type))
       continue;
 
-    if(parameter1_type.subtype().get(ID_identifier)!=symbol.name)
+    if(
+      to_reference_type(parameter1_type).base_type().get(ID_identifier) !=
+      symbol.name)
+    {
       continue;
+    }
 
     bool defargs=true;
     for(std::size_t i=2; i<parameters.size(); i++)
@@ -835,7 +839,9 @@ bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
     if(!is_reference(arg1_type))
       continue;
 
-    if(arg1_type.subtype().get(ID_identifier)!=symbol.name)
+    if(
+      to_reference_type(arg1_type).base_type().get(ID_identifier) !=
+      symbol.name)
       continue;
 
     return true;

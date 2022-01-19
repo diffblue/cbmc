@@ -2098,7 +2098,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   // byte_extract
   if(root.id()==ID_array)
   {
-    auto el_size = pointer_offset_bits(op_type.subtype(), ns);
+    auto el_size =
+      pointer_offset_bits(to_type_with_subtype(op_type).subtype(), ns);
 
     if(!el_size.has_value() || *el_size == 0 ||
        (*el_size) % 8 != 0 || (*val_size) % 8 != 0)

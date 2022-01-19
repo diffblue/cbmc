@@ -394,7 +394,11 @@ void dump_ct::convert_compound(
     if(!recursive)
       return;
 
-    convert_compound(type.subtype(), type.subtype(), recursive, os);
+    convert_compound(
+      to_type_with_subtype(type).subtype(),
+      to_type_with_subtype(type).subtype(),
+      recursive,
+      os);
 
     // sizeof may contain a type symbol that has to be declared first
     if(type.id()==ID_array)
@@ -491,7 +495,7 @@ void dump_ct::convert_compound(
 
     const typet *non_array_type = &comp_type;
     while(non_array_type->id()==ID_array)
-      non_array_type = &(non_array_type->subtype());
+      non_array_type = &(to_array_type(*non_array_type).element_type());
 
     if(recursive)
     {
@@ -725,7 +729,8 @@ void dump_ct::collect_typedefs_rec(
   }
   else if(type.id()==ID_pointer || type.id()==ID_array)
   {
-    collect_typedefs_rec(type.subtype(), early, local_deps);
+    collect_typedefs_rec(
+      to_type_with_subtype(type).subtype(), early, local_deps);
   }
   else if(
     type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||

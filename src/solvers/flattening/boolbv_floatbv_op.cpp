@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
 #include <util/floatbv_expr.h>
 
 #include <solvers/floatbv/float_utils.h>
@@ -34,7 +35,9 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   {
     // go through underlying type
     return convert_floatbv_typecast(floatbv_typecast_exprt(
-      typecast_exprt(op0, src_type.subtype()), op1, dest_type));
+      typecast_exprt(op0, to_c_bit_field_type(src_type).underlying_type()),
+      op1,
+      dest_type));
   }
 
   float_utilst float_utils(prop);
@@ -116,7 +119,7 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
   }
   else if(expr.type().id() == ID_vector || expr.type().id() == ID_complex)
   {
-    const typet &subtype = expr.type().subtype();
+    const typet &subtype = to_type_with_subtype(expr.type()).subtype();
 
     if(subtype.id()==ID_floatbv)
     {

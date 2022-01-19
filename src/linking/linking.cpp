@@ -119,7 +119,9 @@ std::string linkingt::type_to_string_verbose(
   }
   else if(followed.id()==ID_pointer)
   {
-    return type_to_string_verbose(symbol, followed.subtype()) + " *";
+    return type_to_string_verbose(
+             symbol, to_pointer_type(followed).base_type()) +
+           " *";
   }
 
   return type_to_string(symbol.name, type);
@@ -147,8 +149,11 @@ void linkingt::detailed_conflict_report_rec(
   else if(t1.id()==ID_pointer ||
           t1.id()==ID_array)
   {
-    if(depth>0 &&
-       !base_type_eq(t1.subtype(), t2.subtype(), ns))
+    if(
+      depth > 0 && !base_type_eq(
+                     to_type_with_subtype(t1).subtype(),
+                     to_type_with_subtype(t2).subtype(),
+                     ns))
     {
       if(conflict_path.type().id() == ID_pointer)
         conflict_path = dereference_exprt(conflict_path);
@@ -156,9 +161,9 @@ void linkingt::detailed_conflict_report_rec(
       detailed_conflict_report_rec(
         old_symbol,
         new_symbol,
-        t1.subtype(),
-        t2.subtype(),
-        depth-1,
+        to_type_with_subtype(t1).subtype(),
+        to_type_with_subtype(t2).subtype(),
+        depth - 1,
         conflict_path);
     }
     else if(t1.id()==ID_pointer)
@@ -267,11 +272,17 @@ void linkingt::detailed_conflict_report_rec(
     const c_enum_typet::memberst &members2=
       to_c_enum_type(t2).members();
 
-    if(t1.subtype()!=t2.subtype())
+    if(
+      to_c_enum_type(t1).underlying_type() !=
+      to_c_enum_type(t2).underlying_type())
     {
       msg="enum value types are different (";
-      msg += type_to_string(old_symbol.name, t1.subtype()) + '/';
-      msg += type_to_string(new_symbol.name, t2.subtype()) + ')';
+      msg +=
+        type_to_string(old_symbol.name, to_c_enum_type(t1).underlying_type()) +
+        '/';
+      msg +=
+        type_to_string(new_symbol.name, to_c_enum_type(t2).underlying_type()) +
+        ')';
     }
     else if(members1.size()!=members2.size())
     {
@@ -915,8 +926,10 @@ bool linkingt::adjust_object_type_rec(
 
     return false;
   }
-  else if(t1.id()==ID_array &&
-          !adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+  else if(
+    t1.id() == ID_array &&
+    !adjust_object_type_rec(
+      to_array_type(t1).element_type(), to_array_type(t2).element_type(), info))
   {
     // still need to compare size
     const exprt &old_size=to_array_type(t1).size();
@@ -1180,9 +1193,12 @@ void linkingt::duplicate_type_symbol(
     return;
   }
 
-  if(old_symbol.type.id()==ID_array &&
-     new_symbol.type.id()==ID_array &&
-     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  if(
+    old_symbol.type.id() == ID_array && new_symbol.type.id() == ID_array &&
+    base_type_eq(
+      to_array_type(old_symbol.type).element_type(),
+      to_array_type(new_symbol.type).element_type(),
+      ns))
   {
     if(to_array_type(old_symbol.type).size().is_nil() &&
        to_array_type(new_symbol.type).size().is_not_nil())
@@ -1252,9 +1268,12 @@ bool linkingt::needs_renaming_type(
     to_union_type(new_symbol.type).is_incomplete())
     return false; // not different
 
-  if(old_symbol.type.id()==ID_array &&
-     new_symbol.type.id()==ID_array &&
-     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  if(
+    old_symbol.type.id() == ID_array && new_symbol.type.id() == ID_array &&
+    base_type_eq(
+      to_array_type(old_symbol.type).element_type(),
+      to_array_type(new_symbol.type).element_type(),
+      ns))
   {
     if(to_array_type(old_symbol.type).size().is_nil() &&
        to_array_type(new_symbol.type).size().is_not_nil())

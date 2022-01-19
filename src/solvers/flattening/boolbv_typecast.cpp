@@ -64,7 +64,7 @@ bool boolbvt::type_conversion(
 
   if(dest_type.id()==ID_complex)
   {
-    if(src_type==dest_type.subtype())
+    if(src_type == to_complex_type(dest_type).subtype())
     {
       dest.insert(dest.end(), src.begin(), src.end());
 
@@ -81,9 +81,15 @@ bool boolbvt::type_conversion(
       lower.assign(src.begin(), src.begin()+src.size()/2);
       upper.assign(src.begin()+src.size()/2, src.end());
       type_conversion(
-        src_type.subtype(), lower, dest_type.subtype(), lower_res);
+        to_complex_type(src_type).subtype(),
+        lower,
+        to_complex_type(dest_type).subtype(),
+        lower_res);
       type_conversion(
-        src_type.subtype(), upper, dest_type.subtype(), upper_res);
+        to_complex_type(src_type).subtype(),
+        upper,
+        to_complex_type(dest_type).subtype(),
+        upper_res);
       INVARIANT(
         lower_res.size() + upper_res.size() == dest_width,
         "lower result bitvector size plus upper result bitvector size shall "
@@ -112,7 +118,8 @@ bool boolbvt::type_conversion(
       // is (T) __real__ x.
       bvt tmp_src(src);
       tmp_src.resize(src.size()/2); // cut off imag part
-      return type_conversion(src_type.subtype(), tmp_src, dest_type, dest);
+      return type_conversion(
+        to_complex_type(src_type).subtype(), tmp_src, dest_type, dest);
     }
   }
 

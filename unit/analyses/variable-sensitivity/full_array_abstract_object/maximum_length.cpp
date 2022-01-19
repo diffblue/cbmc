@@ -33,7 +33,9 @@ static abstract_object_ptrt write_array(
     env,
     ns,
     std::stack<exprt>(),
-    index_exprt(nil_exprt(), from_integer(index, type)),
+    index_exprt(
+      exprt(ID_nil, array_typet(typet(), nil_exprt())),
+      from_integer(index, type)),
     env.eval(from_integer(new_value, type), ns),
     false);
 }
