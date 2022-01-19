@@ -6743,7 +6743,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case TOK_NULLPTR:
     lex.get_token(tk);
     // as an exception, we set the width of pointer
-    exp=constant_exprt(ID_NULL, pointer_type(typet(ID_nullptr)));
+    exp = null_pointer_exprt{pointer_type(typet(ID_nullptr))};
     set_location(exp, tk);
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 6\n";
