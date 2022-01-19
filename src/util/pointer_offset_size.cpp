@@ -178,7 +178,8 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_c_enum)
   {
-    return mp_integer(to_bitvector_type(to_c_enum_type(type).subtype()).get_width());
+    return mp_integer(
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width());
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -451,7 +452,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
   else if(type.id()==ID_c_enum)
   {
     std::size_t width =
-      to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width();
     std::size_t bytes=width/8;
     if(bytes*8!=width)
       bytes++;

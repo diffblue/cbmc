@@ -931,7 +931,7 @@ std::string smt2_convt::type2id(const typet &type) const
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return type2id(ns.follow_tag(to_c_enum_tag_type(type)).subtype());
+    return type2id(ns.follow_tag(to_c_enum_tag_type(type)).underlying_type());
   }
   else if(type.id() == ID_pointer)
   {
@@ -2775,10 +2775,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
       // We first convert to 'underlying type'
       floatbv_typecast_exprt tmp=expr;
-      tmp.op()=
-        typecast_exprt(
-          src,
-          ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
+      tmp.op() = typecast_exprt(
+        src, ns.follow_tag(to_c_enum_tag_type(src_type)).underlying_type());
       convert_floatbv_typecast(tmp);
     }
     else

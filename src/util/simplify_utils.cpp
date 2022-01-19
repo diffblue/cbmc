@@ -235,8 +235,8 @@ optionalt<exprt> bits2expr(
   }
   else if(type.id() == ID_c_enum)
   {
-    auto val =
-      bits2expr(bits, to_c_enum_type(type).subtype(), little_endian, ns);
+    auto val = bits2expr(
+      bits, to_c_enum_type(type).underlying_type(), little_endian, ns);
     if(val.has_value())
     {
       val->type() = type;
@@ -443,7 +443,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     else if(type.id() == ID_c_enum)
     {
       return expr2bits(
-        constant_exprt(value, to_c_enum_type(type).subtype()),
+        constant_exprt(value, to_c_enum_type(type).underlying_type()),
         little_endian,
         ns);
     }

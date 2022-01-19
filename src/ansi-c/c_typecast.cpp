@@ -365,17 +365,17 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     // of bits given
     typet underlying_type;
 
-    if(bit_field_type.subtype().id() == ID_c_enum_tag)
+    if(bit_field_type.underlying_type().id() == ID_c_enum_tag)
     {
       const auto &followed =
-        ns.follow_tag(to_c_enum_tag_type(bit_field_type.subtype()));
+        ns.follow_tag(to_c_enum_tag_type(bit_field_type.underlying_type()));
       if(followed.is_incomplete())
         return INT;
       else
-        underlying_type = followed.subtype();
+        underlying_type = followed.underlying_type();
     }
     else
-      underlying_type = bit_field_type.subtype();
+      underlying_type = bit_field_type.underlying_type();
 
     const bitvector_typet new_type(
       underlying_type.id(), bit_field_type.get_width());

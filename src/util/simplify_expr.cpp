@@ -1269,7 +1269,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     else if(op_type_id==ID_c_enum_tag) // enum to int
     {
       const typet &base_type =
-        ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+        ns.follow_tag(to_c_enum_tag_type(op_type)).underlying_type();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
@@ -1280,7 +1280,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     }
     else if(op_type_id==ID_c_enum) // enum to int
     {
-      const typet &base_type=to_c_enum_type(op_type).subtype();
+      const typet &base_type = to_c_enum_type(op_type).underlying_type();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type

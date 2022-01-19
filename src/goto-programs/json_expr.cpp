@@ -132,8 +132,9 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
   }
   else if(type.id() == ID_c_enum_tag)
   {
-    // we return the base type
-    return json(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns, mode);
+    // we return the underlying type
+    return json(
+      ns.follow_tag(to_c_enum_tag_type(type)).underlying_type(), ns, mode);
   }
   else if(type.id() == ID_fixedbv)
   {
@@ -206,7 +207,8 @@ static std::string binary(const constant_exprt &src)
 {
   std::size_t width;
   if(src.type().id() == ID_c_enum)
-    width = to_bitvector_type(to_c_enum_type(src.type()).subtype()).get_width();
+    width = to_bitvector_type(to_c_enum_type(src.type()).underlying_type())
+              .get_width();
   else
     width = to_bitvector_type(src.type()).get_width();
   const auto int_val = bvrep2integer(src.get_value(), width, false);
@@ -236,7 +238,8 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
       lang = std::unique_ptr<languaget>(get_default_language());
 
     const typet &underlying_type =
-      type.id() == ID_c_bit_field ? to_c_bit_field_type(type).subtype() : type;
+      type.id() == ID_c_bit_field ? to_c_bit_field_type(type).underlying_type()
+                                  : type;
 
     std::string type_string;
     bool error = lang->from_type(underlying_type, type_string, ns);
@@ -262,7 +265,7 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
       result["name"] = json_stringt("integer");
       result["binary"] = json_stringt(binary(constant_expr));
       result["width"] = json_numbert(std::to_string(
-        to_bitvector_type(to_c_enum_type(type).subtype()).get_width()));
+        to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width()));
       result["type"] = json_stringt("enum");
       result["data"] = json_stringt(value_string);
     }

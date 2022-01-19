@@ -1849,13 +1849,14 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       }
 
       // increment/decrement on underlying type
-      to_unary_expr(expr).op() = typecast_exprt(op0, enum_type.subtype());
-      expr.type() = enum_type.subtype();
+      to_unary_expr(expr).op() =
+        typecast_exprt(op0, enum_type.underlying_type());
+      expr.type() = enum_type.underlying_type();
     }
     else if(type0.id() == ID_c_bit_field)
     {
       // promote to underlying type
-      typet underlying_type = to_c_bit_field_type(type0).subtype();
+      typet underlying_type = to_c_bit_field_type(type0).underlying_type();
       to_unary_expr(expr).op() = typecast_exprt(op0, underlying_type);
       expr.type()=underlying_type;
     }
@@ -3057,7 +3058,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     // use underlying type for bit fields
     if(type.id() == ID_c_bit_field)
-      type = to_c_bit_field_type(type).subtype();
+      type = to_c_bit_field_type(type).underlying_type();
 
     unsigned type_number;
 

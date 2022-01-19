@@ -170,7 +170,7 @@ static std::string numeric_representation(
 
   const typet &underlying_type =
     expr_type.id() == ID_c_enum_tag
-      ? ns.follow_tag(to_c_enum_tag_type(expr_type)).subtype()
+      ? ns.follow_tag(to_c_enum_tag_type(expr_type)).underlying_type()
       : expr_type;
 
   const irep_idt &value = expr.get_value();
