@@ -347,11 +347,16 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
   }
 #ifdef _WIN32
   const auto message_size = narrow<DWORD>(message.size());
-  if(!WriteFile(child_std_IN_Wr, message.c_str(), message_size, NULL, NULL))
+  DWORD bytes_written = 0;
+  if(!WriteFile(
+       child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL))
   {
     // Error handling with GetLastError ?
     return send_responset::FAILED;
   }
+  INVARIANT(
+    message_size == bytes_written,
+    "Number of bytes written to sub process must match message size.");
 #else
   // send message to solver process
   int send_status = fputs(message.c_str(), command_stream);
