@@ -233,6 +233,8 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   // recognize that the child process has ended (but maybe we don't care).
   CloseHandle(child_std_OUT_Wr);
   CloseHandle(child_std_IN_Rd);
+  if(!success)
+    throw system_exceptiont("Process creation failed.");
 #  else
 
   if(pipe(pipe_input) == -1)
