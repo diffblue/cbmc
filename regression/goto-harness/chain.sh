@@ -26,8 +26,7 @@ args=${*:1:$#-1}
 
 
 if [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "$input_c_file"
-  mv "${name}.exe" "$input_goto_binary"
+  $goto_cc "$input_c_file" "/Fe$input_goto_binary"
 else
   $goto_cc -o "$input_goto_binary" "$input_c_file"
 fi

@@ -15,8 +15,7 @@ if test -f ${buildgoto}; then
   ./${buildgoto} ${goto_cc} ${is_windows}
 else
   if [[ "${is_windows}" == "true" ]]; then
-    "${goto_cc}" "${name}.c"
-    mv "${name}.exe" "${name}.gb"
+    "${goto_cc}" "${name}.c" "/Fe${name}.gb"
   else
     "${goto_cc}" "${name}.c" -o "${name}.gb"
   fi

@@ -11,8 +11,7 @@ name=${*:$#}
 name=${name%.c}
 
 if [[ "${is_windows}" == "true" ]]; then
-  ${goto_cc} ${name}.c ${args}
-  mv ${name}.exe ${name}.gb
+  ${goto_cc} ${name}.c ${args} "/Fe${name}.gb"
 else
   ${goto_cc} ${name}.c ${args} -o ${name}.gb
 fi
