@@ -17,7 +17,9 @@ INCLUDES= -I ..
 include ../config.inc
 include ../../$(CPROVER_DIR)/src/common
 
-CLEANFILES = crangler$(LIBEXT)
+CLEANFILES = crangler$(LIBEXT) \
+  c_lex.yy.cpp \
+  crangler$(EXEEXT)
 
 all: crangler$(EXEEXT)
 
