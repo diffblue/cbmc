@@ -1,5 +1,9 @@
 #include <assert.h>
 
+#ifndef __GNUC__
+_Bool __atomic_test_and_set(void *, int);
+#endif
+
 int main()
 {
   char c = 0;
