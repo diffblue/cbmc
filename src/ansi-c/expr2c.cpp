@@ -1994,23 +1994,11 @@ std::string expr2ct::convert_constant(
       if(to_pointer_type(type).base_type().id() != ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
-    else if(src.operands().size() == 1)
+    else if(
+      value == "INVALID" || has_prefix(id2string(value), "INVALID-") ||
+      value == "NULL+offset")
     {
-      const auto &annotation = to_unary_expr(src).op();
-
-      if(annotation.id() == ID_constant)
-      {
-        const irep_idt &op_value = to_constant_expr(annotation).get_value();
-
-        if(op_value=="INVALID" ||
-           has_prefix(id2string(op_value), "INVALID-") ||
-           op_value=="NULL+offset")
-          dest=id2string(op_value);
-        else
-          return convert_norep(src, precedence);
-      }
-      else
-        return convert_with_precedence(annotation, precedence);
+      dest = id2string(value);
     }
     else
     {
@@ -2027,6 +2015,15 @@ std::string expr2ct::convert_constant(
     return convert_norep(src, precedence);
 
   return dest;
+}
+
+std::string expr2ct::convert_annotated_pointer_constant(
+  const annotated_pointer_constant_exprt &src,
+  unsigned &precedence)
+{
+  const auto &annotation = src.symbolic_pointer();
+
+  return convert_with_precedence(annotation, precedence);
 }
 
 /// To get the C-like representation of a given boolean value.
@@ -3887,6 +3884,12 @@ std::string expr2ct::convert_with_precedence(
 
   else if(src.id()==ID_constant)
     return convert_constant(to_constant_expr(src), precedence);
+
+  else if(src.id() == ID_annotated_pointer_constant)
+  {
+    return convert_annotated_pointer_constant(
+      to_annotated_pointer_constant_expr(src), precedence);
+  }
 
   else if(src.id()==ID_string_constant)
     return '"' + MetaString(id2string(to_string_constant(src).get_value())) +

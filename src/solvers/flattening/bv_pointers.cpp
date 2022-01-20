@@ -805,10 +805,8 @@ exprt bv_pointerst::bv_get_rec(
     numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
   pointer.offset=binary2integer(value_offset, true);
 
-  // we add the elaborated expression as operand
-  result.copy_to_operands(pointer_logic.pointer_expr(pointer, pt));
-
-  return std::move(result);
+  return annotated_pointer_constant_exprt{
+    bvrep, pointer_logic.pointer_expr(pointer, pt)};
 }
 
 bvt bv_pointerst::encode(std::size_t addr, const pointer_typet &type) const
