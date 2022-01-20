@@ -71,6 +71,7 @@ inline void abort(void)
 #undef calloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+_Bool __CPROVER_malloc_is_new_array = 0;
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
@@ -141,6 +142,9 @@ __CPROVER_HIDE:;
 #undef malloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
+_Bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
@@ -199,7 +203,10 @@ __CPROVER_HIDE:;
 /* FUNCTION: __builtin_alloca */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-extern void *__CPROVER_alloca_object;
+const void *__CPROVER_alloca_object = 0;
+#ifndef LIBRARY_CHECK
+_Bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
@@ -242,7 +249,13 @@ __CPROVER_HIDE:;
 #undef free
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-extern void *__CPROVER_alloca_object;
+#ifndef LIBRARY_CHECK
+const void *__CPROVER_alloca_object = 0;
+#endif
+const void *__CPROVER_new_object = 0;
+#ifndef LIBRARY_CHECK
+_Bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void free(void *ptr)
 {

@@ -90,13 +90,9 @@ void cpp_internal_additions(std::ostream &out)
   // malloc
   out << "const void *" CPROVER_PREFIX "deallocated = 0;" << '\n';
   out << "const void *" CPROVER_PREFIX "dead_object = 0;" << '\n';
-  out << "const void *" CPROVER_PREFIX "new_object = 0;" << '\n';
-  out << "" CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_is_new_array = 0;"
-      << '\n';
   out << "const void *" CPROVER_PREFIX "memory_leak = 0;" << '\n';
   out << "void *" CPROVER_PREFIX "allocate("
       << CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);" << '\n';
-  out << "const void *" CPROVER_PREFIX "alloca_object = 0;" << '\n';
 
   // auxiliaries for new/delete
   out << "void *__new(__CPROVER::size_t);" << '\n';
