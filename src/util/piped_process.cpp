@@ -156,7 +156,7 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
     throw system_exceptiont("Input pipe creation failed for child_std_IN_Rd");
   }
   // Connect to the other side of the pipe
-  child_std_IN_Wr = CreateFileA(
+  child_std_IN_Wr = CreateFile(
     in_name.c_str(),
     GENERIC_WRITE,                                  // Write side
     FILE_SHARE_READ | FILE_SHARE_WRITE,             // Shared read/write
@@ -187,7 +187,7 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   {
     throw system_exceptiont("Output pipe creation failed for child_std_OUT_Rd");
   }
-  child_std_OUT_Wr = CreateFileA(
+  child_std_OUT_Wr = CreateFile(
     out_name.c_str(),
     GENERIC_WRITE,                                  // Write side
     FILE_SHARE_READ | FILE_SHARE_WRITE,             // Shared read/write
