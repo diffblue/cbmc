@@ -482,6 +482,7 @@ jobs:
       - name: Run CBMC and JBMC unit tests
         run: |
           make CXX=clcache BUILD_ENV=MSVC -C unit      test
+          make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression test
