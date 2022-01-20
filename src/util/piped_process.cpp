@@ -138,9 +138,9 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   // Use process ID as a unique ID for this process at this time.
   base_name.append(std::to_string(GetCurrentProcessId()));
   const std::string in_name = base_name + "\\IN";
-  child_std_IN_Rd = CreateNamedPipe(
+  child_std_IN_Wr = CreateNamedPipe(
     in_name.c_str(),
-    PIPE_ACCESS_INBOUND,          // Reading for us
+    PIPE_ACCESS_OUTBOUND,         // Writing for us
     PIPE_TYPE_BYTE | PIPE_NOWAIT, // Bytes and non-blocking
     PIPE_UNLIMITED_INSTANCES,     // Probably doesn't matter
     BUFSIZE,
@@ -156,9 +156,9 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
     throw system_exceptiont("Input pipe creation failed for child_std_IN_Rd");
   }
   // Connect to the other side of the pipe
-  child_std_IN_Wr = CreateFile(
+  child_std_IN_Rd = CreateFile(
     in_name.c_str(),
-    GENERIC_WRITE,                                  // Write side
+    GENERIC_READ,                                   // Read side
     FILE_SHARE_READ | FILE_SHARE_WRITE,             // Shared read/write
     &sec_attr,                                      // Need this for inherit
     OPEN_EXISTING,                                  // Opening other end
@@ -168,7 +168,8 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   {
     throw system_exceptiont("Input pipe creation failed for child_std_IN_Wr");
   }
-  if(!SetHandleInformation(child_std_IN_Rd, HANDLE_FLAG_INHERIT, 0))
+  if(!SetHandleInformation(
+       child_std_IN_Rd, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
   {
     throw system_exceptiont(
       "Input pipe creation failed on SetHandleInformation");
