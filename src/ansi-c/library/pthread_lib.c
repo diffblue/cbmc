@@ -531,16 +531,10 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
   return 0; // we never fail
 }
 
-/* FUNCTION: pthread_create */
-
-#ifndef __CPROVER_PTHREAD_H_INCLUDED
-#include <pthread.h>
-#define __CPROVER_PTHREAD_H_INCLUDED
-#endif
+/* FUNCTION: __spawned_thread */
 
 extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
-extern unsigned long __CPROVER_next_thread_id;
 
 extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
@@ -594,6 +588,26 @@ __CPROVER_HIDE:;
 #endif
   __CPROVER_threads_exited[this_thread_id] = 1;
 }
+
+/* FUNCTION: pthread_create */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#  include <pthread.h>
+#  define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+extern unsigned long __CPROVER_next_thread_id;
+
+void __spawned_thread(
+  unsigned long this_thread_id,
+#if 0
+  // Destructor support is disabled as it is too expensive due to its extensive
+  // use of shared variables.
+  void (**thread_key_dtors)(void *),
+#endif
+  unsigned long next_thread_key,
+  void *(*start_routine)(void *),
+  void *arg);
 
 inline int pthread_create(
   pthread_t *thread, // must not be null
