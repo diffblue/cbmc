@@ -335,6 +335,7 @@ piped_processt::~piped_processt()
 #  endif
 }
 
+NODISCARD
 piped_processt::send_responset piped_processt::send(const std::string &message)
 {
   if(process_state != statet::RUNNING)
