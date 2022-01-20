@@ -418,15 +418,22 @@ bool piped_processt::can_receive(optionalt<std::size_t> wait_time)
   const int timeout = wait_time ? narrow<int>(*wait_time) : -1;
 #ifdef _WIN32
   int waited_time = 0;
-  // The next four need to be initialised for compiler warnings
-  DWORD buffer = 0;
-  LPDWORD nbytes = 0;
-  LPDWORD rbytes = 0;
-  LPDWORD rmbytes = 0;
+  DWORD total_bytes_available = 0;
   while(timeout < 0 || waited_time >= timeout)
   {
-    PeekNamedPipe(child_std_OUT_Rd, &buffer, 1, nbytes, rbytes, rmbytes);
-    if(buffer != 0)
+    const LPVOID lpBuffer = nullptr;
+    const DWORD nBufferSize = 0;
+    const LPDWORD lpBytesRead = nullptr;
+    const LPDWORD lpTotalBytesAvail = &total_bytes_available;
+    const LPDWORD lpBytesLeftThisMessage = nullptr;
+    PeekNamedPipe(
+      child_std_OUT_Rd,
+      lpBuffer,
+      nBufferSize,
+      lpBytesRead,
+      lpTotalBytesAvail,
+      lpBytesLeftThisMessage);
+    if(total_bytes_available > 0)
     {
       return true;
     }
