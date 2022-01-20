@@ -2799,11 +2799,11 @@ inline type_exprt &to_type_expr(exprt &expr)
 }
 
 /// \brief A constant literal expression
-class constant_exprt : public expr_protectedt
+class constant_exprt : public nullary_exprt
 {
 public:
   constant_exprt(const irep_idt &_value, typet _type)
-    : expr_protectedt(ID_constant, std::move(_type))
+    : nullary_exprt(ID_constant, std::move(_type))
   {
     set_value(_value);
   }
@@ -2825,6 +2825,11 @@ template <>
 inline bool can_cast_expr<constant_exprt>(const exprt &base)
 {
   return base.id() == ID_constant;
+}
+
+inline void validate_expr(const constant_exprt &value)
+{
+  validate_operands(value, 0, "Constants must not have operands");
 }
 
 /// \brief Cast an exprt to a \ref constant_exprt

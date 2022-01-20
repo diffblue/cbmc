@@ -22,29 +22,7 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
 
   const typet &expr_type=expr.type();
 
-  if(expr_type.id()==ID_array)
-  {
-    std::size_t op_width=width/expr.operands().size();
-    std::size_t offset=0;
-
-    forall_operands(it, expr)
-    {
-      const bvt &tmp=convert_bv(*it);
-
-      DATA_INVARIANT_WITH_DIAGNOSTICS(
-        tmp.size() == op_width,
-        "convert_constant: unexpected operand width",
-        irep_pretty_diagnosticst{expr});
-
-      for(std::size_t j=0; j<op_width; j++)
-        bv[offset+j]=tmp[j];
-
-      offset+=op_width;
-    }
-
-    return bv;
-  }
-  else if(expr_type.id()==ID_string)
+  if(expr_type.id() == ID_string)
   {
     // we use the numbering for strings
     std::size_t number = string_numbering.number(expr.get_value());
