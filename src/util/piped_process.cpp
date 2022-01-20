@@ -346,7 +346,8 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
     return send_responset::ERRORED;
   }
 #ifdef _WIN32
-  if(!WriteFile(child_std_IN_Wr, message.c_str(), message.size(), NULL, NULL))
+  const auto message_size = narrow<DWORD>(message.size());
+  if(!WriteFile(child_std_IN_Wr, message.c_str(), message_size, NULL, NULL))
   {
     // Error handling with GetLastError ?
     return send_responset::FAILED;
