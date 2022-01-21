@@ -2134,6 +2134,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     out << "()";
   }
+  else if(expr.id() == ID_bitreverse)
+  {
+    convert_expr(simplify_expr(to_bitreverse_expr(expr).lower(), ns));
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,

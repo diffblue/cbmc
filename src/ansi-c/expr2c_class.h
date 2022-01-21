@@ -277,6 +277,7 @@ protected:
     bool include_padding_components);
 
   std::string convert_conditional_target_group(const exprt &src);
+  std::string convert_bitreverse(const bitreverse_exprt &src);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

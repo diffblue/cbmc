@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arrays.h"
 
 class array_comprehension_exprt;
+class bitreverse_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -192,6 +193,7 @@ protected:
   virtual bvt convert_power(const binary_exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
+  virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
 
   virtual exprt make_bv_expr(const typet &type, const bvt &bv);
   virtual exprt make_free_bv_expr(const typet &type);

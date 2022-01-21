@@ -54,6 +54,11 @@ void __builtin_nontemporal_load();
 
 int __builtin_flt_rounds(void);
 
+unsigned char __builtin_bitreverse8(unsigned char);
+unsigned short __builtin_bitreverse16(unsigned short);
+unsigned int __builtin_bitreverse32(unsigned int);
+unsigned long long __builtin_bitreverse64(unsigned long long);
+
 unsigned char __builtin_rotateleft8(unsigned char, unsigned char);
 unsigned short __builtin_rotateleft16(unsigned short, unsigned short);
 unsigned int __builtin_rotateleft32(unsigned int, unsigned int);

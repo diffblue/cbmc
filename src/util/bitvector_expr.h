@@ -1008,4 +1008,52 @@ inline count_trailing_zeros_exprt &to_count_trailing_zeros_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Reverse the order of bits in a bit-vector.
+class bitreverse_exprt : public unary_exprt
+{
+public:
+  explicit bitreverse_exprt(exprt op)
+    : unary_exprt(ID_bitreverse, std::move(op))
+  {
+  }
+
+  /// Lower a bitreverse_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<bitreverse_exprt>(const exprt &base)
+{
+  return base.id() == ID_bitreverse;
+}
+
+inline void validate_expr(const bitreverse_exprt &value)
+{
+  validate_operands(value, 1, "Bit-wise reverse must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref bitreverse_exprt
+///
+/// \a expr must be known to be \ref bitreverse_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref bitreverse_exprt
+inline const bitreverse_exprt &to_bitreverse_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_bitreverse);
+  const bitreverse_exprt &ret = static_cast<const bitreverse_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_bitreverse_expr(const exprt &)
+inline bitreverse_exprt &to_bitreverse_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_bitreverse);
+  bitreverse_exprt &ret = static_cast<bitreverse_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_BITVECTOR_EXPR_H

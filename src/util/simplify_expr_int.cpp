@@ -1822,3 +1822,27 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
 #endif
   return unchanged(expr);
 }
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_bitreverse(const bitreverse_exprt &expr)
+{
+  auto const_bits_opt = expr2bits(
+    expr.op(),
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
+    ns);
+
+  if(!const_bits_opt.has_value())
+    return unchanged(expr);
+
+  std::reverse(const_bits_opt->begin(), const_bits_opt->end());
+
+  auto result = bits2expr(
+    *const_bits_opt,
+    expr.type(),
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
+    ns);
+  if(!result.has_value())
+    return unchanged(expr);
+
+  return std::move(*result);
+}

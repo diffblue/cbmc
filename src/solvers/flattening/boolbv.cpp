@@ -227,6 +227,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_bv(
       simplify_expr(to_count_trailing_zeros_expr(expr).lower(), ns));
   }
+  else if(expr.id() == ID_bitreverse)
+    return convert_bitreverse(to_bitreverse_expr(expr));
 
   return conversion_failed(expr);
 }
