@@ -36,6 +36,7 @@ void add_library(
 
 void cprover_c_library_factory(
   const std::set<irep_idt> &functions,
+  const symbol_tablet &,
   symbol_tablet &,
   message_handlert &);
 

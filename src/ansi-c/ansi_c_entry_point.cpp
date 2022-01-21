@@ -242,6 +242,8 @@ bool generate_ansi_c_start_function(
   const code_typet::parameterst &parameters=
     to_code_type(symbol.type).parameters();
 
+  const namespacet ns(symbol_table);
+
   if(symbol.name==ID_main)
   {
     if(parameters.empty())
@@ -250,8 +252,6 @@ bool generate_ansi_c_start_function(
     }
     else if(parameters.size()==2 || parameters.size()==3)
     {
-      namespacet ns(symbol_table);
-
       {
         symbolt argc_symbol;
 
@@ -498,11 +498,46 @@ bool generate_ansi_c_start_function(
       parameters, init_code, symbol_table, object_factory_parameters);
   }
 
+  exprt return_value = call_main.lhs();
   init_code.add(std::move(call_main));
+
+  const symbolt &exit_symbol = ns.lookup("exit");
+  const typet &arg_type = to_code_type(exit_symbol.type).parameters()[0].type();
+  code_function_callt call_exit{exit_symbol.symbol_expr()};
+  if(return_value.is_not_nil())
+  {
+    call_exit.arguments().push_back(
+      typecast_exprt::conditional_cast(return_value, arg_type));
+  }
+  else
+    call_exit.arguments().push_back(from_integer(0, arg_type));
+  call_exit.add_source_location() = symbol.location;
+  call_exit.function().add_source_location() = symbol.location;
+  init_code.add(std::move(call_exit));
 
   // TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT
 
   record_function_outputs(symbol, init_code, symbol_table);
+
+  // now call destructor functions (a GCC extension)
+
+  for(const auto &symbol_table_entry : symbol_table.symbols)
+  {
+    const symbolt &symbol = symbol_table_entry.second;
+
+    if(symbol.type.id() != ID_code)
+      continue;
+
+    const code_typet &code_type = to_code_type(symbol.type);
+    if(
+      code_type.return_type().id() == ID_destructor &&
+      code_type.parameters().empty())
+    {
+      code_function_callt function_call(symbol.symbol_expr());
+      function_call.add_source_location() = symbol.location;
+      init_code.add(std::move(function_call));
+    }
+  }
 
   // add the entry point symbol
   symbolt new_symbol;

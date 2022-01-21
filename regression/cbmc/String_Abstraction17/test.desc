@@ -1,7 +1,7 @@
 CORE
 strcpy-no-decl.c
 --string-abstraction --validate-goto-model
-Condition: strlen type inconsistency
+^Condition: fct_type.parameters\(\).size\(\) == parameter_identifiers.size\(\)$
 ^EXIT=(127|134)$
 ^SIGNAL=0$
 --

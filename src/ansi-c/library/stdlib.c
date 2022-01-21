@@ -32,9 +32,20 @@ inline long long int __builtin_llabs(long long int i) { return __CPROVER_llabs(i
 
 #undef exit
 
+__CPROVER_thread_local void (*__CPROVER_atexit_table[32])(void);
+__CPROVER_thread_local int __CPROVER_atexit_table_use = 0;
+
 inline void exit(int status)
 {
+__CPROVER_HIDE:;
   (void)status;
+
+  while(__CPROVER_atexit_table_use > 0)
+  {
+    --__CPROVER_atexit_table_use;
+    __CPROVER_atexit_table[__CPROVER_atexit_table_use]();
+  }
+
   __CPROVER_assume(0);
 #ifdef LIBRARY_CHECK
   __builtin_unreachable();
@@ -71,6 +82,7 @@ inline void abort(void)
 #undef calloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+_Bool __CPROVER_malloc_is_new_array = 0;
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
@@ -141,6 +153,9 @@ __CPROVER_HIDE:;
 #undef malloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
+_Bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
@@ -199,7 +214,10 @@ __CPROVER_HIDE:;
 /* FUNCTION: __builtin_alloca */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-extern void *__CPROVER_alloca_object;
+const void *__CPROVER_alloca_object = 0;
+#ifndef LIBRARY_CHECK
+_Bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
@@ -242,7 +260,13 @@ __CPROVER_HIDE:;
 #undef free
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-extern void *__CPROVER_alloca_object;
+#ifndef LIBRARY_CHECK
+const void *__CPROVER_alloca_object = 0;
+#endif
+const void *__CPROVER_new_object = 0;
+#ifndef LIBRARY_CHECK
+_Bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void free(void *ptr)
 {
@@ -590,4 +614,29 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   __CPROVER_assume(result >= 0);
   return result;
+}
+
+/* FUNCTION: atexit */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef LIBRARY_CHECK
+__CPROVER_thread_local void (*__CPROVER_atexit_table[32])(void);
+__CPROVER_thread_local int __CPROVER_atexit_table_use = 0;
+#endif
+
+int atexit(void (*function)(void))
+{
+__CPROVER_HIDE:;
+  if(__CPROVER_atexit_table_use >= 32)
+  {
+    errno = ENOMEM;
+    return -1;
+  }
+
+  __CPROVER_atexit_table[__CPROVER_atexit_table_use++] = function;
+  return 0;
 }

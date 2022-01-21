@@ -2213,6 +2213,28 @@ void goto_check_ct::goto_check(
         i.turn_into_skip();
         did_something = true;
       }
+
+      if(enable_memory_leak_check && function_identifier == "exit")
+      {
+        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
+        const symbol_exprt leak_expr = leak.symbol_expr();
+
+        // add self-assignment to get helpful counterexample output
+        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
+
+        source_locationt source_location;
+        source_location.set_function(function_identifier);
+
+        equal_exprt eq(
+          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
+        add_guarded_property(
+          eq,
+          "dynamically allocated memory never freed",
+          "memory-leak",
+          source_location,
+          eq,
+          identity);
+      }
     }
     else if(i.is_dead())
     {
@@ -2262,29 +2284,6 @@ void goto_check_ct::goto_check(
     }
     else if(i.is_end_function())
     {
-      if(
-        function_identifier == goto_functionst::entry_point() &&
-        enable_memory_leak_check)
-      {
-        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
-        const symbol_exprt leak_expr = leak.symbol_expr();
-
-        // add self-assignment to get helpful counterexample output
-        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
-
-        source_locationt source_location;
-        source_location.set_function(function_identifier);
-
-        equal_exprt eq(
-          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
-        add_guarded_property(
-          eq,
-          "dynamically allocated memory never freed",
-          "memory-leak",
-          source_location,
-          eq,
-          identity);
-      }
     }
 
     for(auto &instruction : new_code.instructions)

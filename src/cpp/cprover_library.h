@@ -18,6 +18,7 @@ class symbol_tablet;
 
 void cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
+  const symbol_tablet &,
   symbol_tablet &,
   message_handlert &);
 

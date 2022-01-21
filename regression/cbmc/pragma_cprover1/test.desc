@@ -2,7 +2,7 @@ CORE
 main.c
 --signed-overflow-check --bounds-check
 line 14 array 'y' upper bound in y\[\(signed long( long)? int\)1\]: FAILURE$
-^\*\* 1 of 1 failed
+^\*\* 1 of 4 failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

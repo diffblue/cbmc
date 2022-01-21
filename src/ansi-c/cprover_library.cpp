@@ -94,7 +94,8 @@ std::string get_cprover_library_text(
 
 void cprover_c_library_factory(
   const std::set<irep_idt> &functions,
-  symbol_tablet &symbol_table,
+  const symbol_tablet &symbol_table,
+  symbol_tablet &dest_symbol_table,
   message_handlert &message_handler)
 {
   if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
@@ -104,7 +105,7 @@ void cprover_c_library_factory(
 
   library_text=get_cprover_library_text(functions, symbol_table);
 
-  add_library(library_text, symbol_table, message_handler);
+  add_library(library_text, dest_symbol_table, message_handler);
 }
 
 void add_library(

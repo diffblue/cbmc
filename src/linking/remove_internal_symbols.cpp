@@ -127,6 +127,7 @@ void remove_internal_symbols(
   special.insert("__placement_new_array");
   special.insert("__delete");
   special.insert("__delete_array");
+  special.insert("exit");
 
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
