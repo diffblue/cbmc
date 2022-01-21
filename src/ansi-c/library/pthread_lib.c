@@ -290,12 +290,15 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern __CPROVER_bool __CPROVER_threads_exited[];
-extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
-
-extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
-extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
-extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
+#if 0
+__CPROVER_thread_local const void
+  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local void (
+  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+#endif
 
 inline void pthread_exit(void *value_ptr)
 {
@@ -331,9 +334,11 @@ inline void pthread_exit(void *value_ptr)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
-extern __CPROVER_bool __CPROVER_threads_exited[];
-extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
-extern unsigned long __CPROVER_next_thread_id;
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+#ifndef LIBRARY_CHECK
+__CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
+#endif
+unsigned long __CPROVER_next_thread_id = 0;
 
 inline int pthread_join(pthread_t thread, void **value_ptr)
 {
@@ -368,9 +373,11 @@ __CPROVER_HIDE:;
 #endif
 
 #ifdef __APPLE__
-extern __CPROVER_bool __CPROVER_threads_exited[];
-extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
-extern unsigned long __CPROVER_next_thread_id;
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+#ifndef LIBRARY_CHECK
+__CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
+unsigned long __CPROVER_next_thread_id = 0;
+#endif
 
 inline int _pthread_join(pthread_t thread, void **value_ptr)
 {
@@ -533,12 +540,17 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 
 /* FUNCTION: __spawned_thread */
 
-extern __CPROVER_bool __CPROVER_threads_exited[];
-extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
-
-extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
-extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
-extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+#ifndef LIBRARY_CHECK
+__CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
+#endif
+#if 0
+__CPROVER_thread_local const void
+  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local void (
+  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+#endif
+__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
 
 inline void __spawned_thread(
   unsigned long this_thread_id,
@@ -596,7 +608,14 @@ __CPROVER_HIDE:;
 #  define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern unsigned long __CPROVER_next_thread_id;
+#ifndef LIBRARY_CHECK
+unsigned long __CPROVER_next_thread_id = 0;
+#  if 0
+__CPROVER_thread_local void (
+  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+#  endif
+__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+#endif
 
 void __spawned_thread(
   unsigned long this_thread_id,
@@ -932,9 +951,15 @@ inline int pthread_barrier_wait(pthread_barrier_t *barrier)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
-extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
-extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
+__CPROVER_thread_local const void
+  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+#ifndef LIBRARY_CHECK
+#  if 0
+__CPROVER_thread_local void (
+  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+#  endif
+__CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
+#endif
 
 inline int pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 {
@@ -958,7 +983,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
+__CPROVER_thread_local const void
+  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
 
 inline int pthread_key_delete(pthread_key_t key)
 {
@@ -974,7 +1000,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
+__CPROVER_thread_local const void
+  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
 
 inline void *pthread_getspecific(pthread_key_t key)
 {
@@ -989,7 +1016,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
+__CPROVER_thread_local const void
+  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
 
 inline int pthread_setspecific(pthread_key_t key, const void *value)
 {
