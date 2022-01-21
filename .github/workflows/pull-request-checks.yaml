@@ -700,7 +700,9 @@ jobs:
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest and collect coverage statistics
-        run: cmake --build build --target coverage -- -j2
+        run: |
+          echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
+          cmake --build build --target coverage -- -j2
       - name: Upload coverage statistics to Codecov
         uses: codecov/codecov-action@v2
         with:
