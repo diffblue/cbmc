@@ -313,12 +313,10 @@ bool generate_ansi_c_start_function(
         init_code.add(code_assumet(std::move(ge)));
       }
 
+      if(config.ansi_c.max_argc.has_value())
       {
-        // assume argc is at most MAX/8-1
-        mp_integer upper_bound=
-          power(2, config.ansi_c.int_width-4);
-
-        exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
+        exprt bound_expr =
+          from_integer(*config.ansi_c.max_argc, argc_symbol.type);
 
         binary_relation_exprt le(
           argc_symbol.symbol_expr(), ID_le, std::move(bound_expr));

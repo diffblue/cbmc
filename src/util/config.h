@@ -258,6 +258,11 @@ public:
     malloc_failure_modet malloc_failure_mode = malloc_failure_mode_none;
 
     static const std::size_t default_object_bits = 8;
+
+    /// Maximum value of argc, which is operating-systems dependent: Windows
+    /// limits the number of characters accepte by CreateProcess, and Unix
+    /// systems have sysconf(ARG_MAX).
+    optionalt<mp_integer> max_argc;
   } ansi_c;
 
   struct cppt
