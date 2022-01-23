@@ -23,17 +23,9 @@ class user_input_error_exceptiont : public cprover_exception_baset
 {
 public:
   explicit user_input_error_exceptiont(std::string message)
-    : message(std::move(message))
+    : cprover_exception_baset(std::move(message))
   {
   }
-
-  std::string what() const override
-  {
-    return message;
-  }
-
-private:
-  std::string message;
 };
 
 /// Remove initialization of global variables that are not used in any function

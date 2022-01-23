@@ -9,6 +9,11 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 #include "exception_utils.h"
 #include <utility>
 
+std::string cprover_exception_baset::what() const
+{
+  return reason;
+}
+
 std::string invalid_command_line_argument_exceptiont::what() const
 {
   std::string res;
@@ -28,42 +33,32 @@ invalid_command_line_argument_exceptiont::
     std::string reason,
     std::string option,
     std::string correct_input)
-  : reason(std::move(reason)),
+  : cprover_exception_baset(std::move(reason)),
     option(std::move(option)),
     correct_input(std::move(correct_input))
 {
 }
 
 system_exceptiont::system_exceptiont(std::string message)
-  : message(std::move(message))
+  : cprover_exception_baset(std::move(message))
 {
-}
-
-std::string system_exceptiont::what() const
-{
-  return message;
 }
 
 deserialization_exceptiont::deserialization_exceptiont(std::string message)
-  : message(std::move(message))
+  : cprover_exception_baset(std::move(message))
 {
-}
-
-std::string deserialization_exceptiont::what() const
-{
-  return message;
 }
 
 incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
   std::string message)
-  : message(std::move(message))
+  : cprover_exception_baset(std::move(message)),
+    source_location(source_locationt::nil())
 {
-  source_location.make_nil();
 }
 
 std::string incorrect_goto_program_exceptiont::what() const
 {
-  std::string ret(message);
+  std::string ret(reason);
 
   if(!source_location.is_nil())
     ret += " (at: " + source_location.as_string() + ")";
@@ -76,32 +71,17 @@ std::string incorrect_goto_program_exceptiont::what() const
 
 unsupported_operation_exceptiont::unsupported_operation_exceptiont(
   std::string message)
-  : message(std::move(message))
+  : cprover_exception_baset(std::move(message))
 {
-}
-
-std::string unsupported_operation_exceptiont::what() const
-{
-  return message;
 }
 
 analysis_exceptiont::analysis_exceptiont(std::string reason)
-  : reason(std::move(reason))
+  : cprover_exception_baset(std::move(reason))
 {
-}
-
-std::string analysis_exceptiont::what() const
-{
-  return reason;
 }
 
 invalid_source_file_exceptiont::invalid_source_file_exceptiont(
   std::string reason)
-  : reason(std::move(reason))
+  : cprover_exception_baset(std::move(reason))
 {
-}
-
-std::string invalid_source_file_exceptiont::what() const
-{
-  return reason;
 }

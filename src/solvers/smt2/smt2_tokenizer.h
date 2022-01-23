@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_TOKENIZER_H
 #define CPROVER_SOLVERS_SMT2_SMT2_TOKENIZER_H
 
-#include <util/exception_utils.h>
-
 #include <sstream>
 #include <string>
 
@@ -23,7 +21,7 @@ public:
     line_no=1;
   }
 
-  class smt2_errort : public cprover_exception_baset
+  class smt2_errort
   {
   public:
     smt2_errort(const std::string &_message, unsigned _line_no)
@@ -36,7 +34,7 @@ public:
     {
     }
 
-    std::string what() const override
+    std::string what() const
     {
       return message.str();
     }
