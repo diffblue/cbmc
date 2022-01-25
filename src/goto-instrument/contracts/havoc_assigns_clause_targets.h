@@ -21,8 +21,6 @@ class goto_programt;
 class goto_functionst;
 class message_handlert;
 
-bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
-
 /// Class to generate havocking instructions for target expressions of a
 /// function contract's assign clause (replacement).
 ///
@@ -73,8 +71,11 @@ public:
   void get_instructions(goto_programt &dest);
 
 private:
-  /// \brief Generates instructions to conditionally havoc
-  /// the given `car_exprt`.
+  /// \brief Generates instructions to conditionally havoc the given conditional
+  /// address range expression `car`, adding results to `dest`.
+  ///
+  /// Adds a special comment on the havoc instructions in order to trace back
+  /// the origin of the havoc expressions to the function being replaced.
   ///
   /// Generates these instructions for a `__CPROVER_POINTER_OBJECT(...)` target:
   ///
@@ -91,14 +92,13 @@ private:
   ///
   /// ```
   /// IF !__car_writable GOTO skip_target
-  /// ASSIGN * ((<target.type()> *)_car_lb) = nondet_<target.type()>;
+  /// ASSIGN *((target_type *) _car_lb) = nondet(target_type);
   /// skip_target: SKIP
   /// DEAD __car_writable
   /// DEAD __car_lb
   /// DEAD __car_ub
   /// ```
-  /// Adds a special comment on the havoc instructions in order to trace back
-  /// the havoc to the replaced function.
+  /// Where `target_type` is the type of the target expression.
   void havoc_if_valid(car_exprt car, goto_programt &dest);
 
   const std::vector<exprt> &targets;

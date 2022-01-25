@@ -11,6 +11,7 @@ Date: September 2021
 #include "utils.h"
 
 #include <goto-programs/cfg.h>
+
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
 #include <util/message.h>
@@ -18,20 +19,7 @@ Date: September 2021
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 
-goto_programt::instructiont &
-add_pragma_disable_assigns_check(goto_programt::instructiont &instr)
-{
-  instr.source_location_nonconst().add_pragma(
-    CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK);
-  return instr;
-}
-
-goto_programt &add_pragma_disable_assigns_check(goto_programt &prog)
-{
-  Forall_goto_program_instructions(it, prog)
-    add_pragma_disable_assigns_check(*it);
-  return prog;
-}
+#include <langapi/language_util.h>
 
 static void append_safe_havoc_code_for_expr(
   const source_locationt location,
@@ -72,6 +60,63 @@ void havoc_if_validt::append_scalar_havoc_code_for_expr(
   append_safe_havoc_code_for_expr(location, ns, expr, dest, [&]() {
     havoc_utilst::append_scalar_havoc_code_for_expr(location, expr, dest);
   });
+}
+
+void havoc_assigns_targetst::append_havoc_code_for_expr(
+  const source_locationt location,
+  const exprt &expr,
+  goto_programt &dest) const
+{
+  if(expr.id() == ID_pointer_object)
+  {
+    append_object_havoc_code_for_expr(location, expr.operands().front(), dest);
+    return;
+  }
+
+  havoc_utilst::append_havoc_code_for_expr(location, expr, dest);
+}
+
+void add_pragma_disable_pointer_checks(source_locationt &location)
+{
+  location.add_pragma("disable:pointer-check");
+  location.add_pragma("disable:pointer-primitive-check");
+  location.add_pragma("disable:pointer-overflow-check");
+  location.add_pragma("disable:signed-overflow-check");
+  location.add_pragma("disable:unsigned-overflow-check");
+  location.add_pragma("disable:conversion-check");
+}
+
+goto_programt::instructiont &
+add_pragma_disable_pointer_checks(goto_programt::instructiont &instr)
+{
+  add_pragma_disable_pointer_checks(instr.source_location_nonconst());
+  return instr;
+}
+
+goto_programt &add_pragma_disable_pointer_checks(goto_programt &prog)
+{
+  Forall_goto_program_instructions(it, prog)
+    add_pragma_disable_pointer_checks(*it);
+  return prog;
+}
+
+void add_pragma_disable_assigns_check(source_locationt &location)
+{
+  location.add_pragma(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK);
+}
+
+goto_programt::instructiont &
+add_pragma_disable_assigns_check(goto_programt::instructiont &instr)
+{
+  add_pragma_disable_assigns_check(instr.source_location_nonconst());
+  return instr;
+}
+
+goto_programt &add_pragma_disable_assigns_check(goto_programt &prog)
+{
+  Forall_goto_program_instructions(it, prog)
+    add_pragma_disable_assigns_check(*it);
+  return prog;
 }
 
 exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
@@ -156,16 +201,6 @@ const symbolt &new_tmp_symbol(
   return new_symbol;
 }
 
-void disable_pointer_checks(source_locationt &source_location)
-{
-  source_location.add_pragma("disable:pointer-check");
-  source_location.add_pragma("disable:pointer-primitive-check");
-  source_location.add_pragma("disable:pointer-overflow-check");
-  source_location.add_pragma("disable:signed-overflow-check");
-  source_location.add_pragma("disable:unsigned-overflow-check");
-  source_location.add_pragma("disable:conversion-check");
-}
-
 void simplify_gotos(goto_programt &goto_program, namespacet &ns)
 {
   for(auto &instruction : goto_program.instructions)
@@ -225,4 +260,23 @@ bool is_loop_free(
     }
   }
   return true;
+}
+
+/// Prefix for comments added to track assigns clause replacement.
+static const char ASSIGNS_CLAUSE_REPLACEMENT_TRACKING[] =
+  " (assigned by the contract of ";
+
+irep_idt make_assigns_clause_replacement_tracking_comment(
+  const exprt &target,
+  const irep_idt &function_id,
+  const namespacet &ns)
+{
+  return from_expr(ns, target.id(), target) +
+         ASSIGNS_CLAUSE_REPLACEMENT_TRACKING + id2string(function_id) + ")";
+}
+
+bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
+{
+  return id2string(comment).find(ASSIGNS_CLAUSE_REPLACEMENT_TRACKING) !=
+         std::string::npos;
 }

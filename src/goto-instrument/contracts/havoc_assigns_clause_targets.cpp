@@ -13,10 +13,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <map>
 
-#include <langapi/language_util.h>
-
-#include <ansi-c/c_expr.h>
-
 #include <util/c_types.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
@@ -26,26 +22,11 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/pointer_predicates.h>
 #include <util/std_code.h>
 
+#include <ansi-c/c_expr.h>
+#include <langapi/language_util.h>
+
 #include "instrument_spec_assigns.h"
 #include "utils.h"
-
-static const char ASSIGNS_CLAUSE_REPLACEMENT_TRACKING[] =
-  " (assigned by the contract of ";
-
-static irep_idt make_tracking_comment(
-  const exprt &target,
-  const irep_idt &function_id,
-  const namespacet &ns)
-{
-  return from_expr(ns, target.id(), target) +
-         ASSIGNS_CLAUSE_REPLACEMENT_TRACKING + id2string(function_id) + ")";
-}
-
-bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
-{
-  return id2string(comment).find(ASSIGNS_CLAUSE_REPLACEMENT_TRACKING) !=
-         std::string::npos;
-}
 
 void havoc_assigns_clause_targetst::get_instructions(goto_programt &dest)
 {
@@ -80,7 +61,8 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
   goto_programt &dest)
 {
   const irep_idt &tracking_comment =
-    make_tracking_comment(car.target(), function_id, ns);
+    make_assigns_clause_replacement_tracking_comment(
+      car.target(), function_id, ns);
 
   source_locationt source_location_no_checks(source_location);
   add_pragma_disable_pointer_checks(source_location_no_checks);
