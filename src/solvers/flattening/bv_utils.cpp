@@ -1817,6 +1817,50 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   }
 }
 
+bvt bv_utilst::unsigned_karatsuba_multiplier(const bvt &_op0, const bvt &_op1)
+{
+  if(_op0.size() != _op1.size())
+    return unsigned_multiplier(_op0, _op1);
+
+  const std::size_t op_size = _op0.size();
+  if(op_size != 32 && op_size != 16 && op_size != 8)
+    return unsigned_multiplier(_op0, _op1);
+
+  const std::size_t half_op_size = op_size >> 1;
+
+  bvt x0{_op0.begin(), _op0.begin() + half_op_size};
+  x0.resize(op_size, const_literal(false));
+  bvt x1{_op0.begin() + half_op_size, _op0.end()};
+  // x1.resize(op_size, const_literal(false));
+  bvt y0{_op1.begin(), _op1.begin() + half_op_size};
+  y0.resize(op_size, const_literal(false));
+  bvt y1{_op1.begin() + half_op_size, _op1.end()};
+  // y1.resize(op_size, const_literal(false));
+
+  bvt z0 = unsigned_multiplier(x0, y0);
+  bvt z2 = unsigned_karatsuba_multiplier(x1, y1);
+
+  bvt z0_half{z0.begin(), z0.begin() + half_op_size};
+  bvt z2_plus_z0 = add(z2, z0_half);
+  z2_plus_z0.resize(half_op_size);
+
+  bvt x0_half{x0.begin(), x0.begin() + half_op_size};
+  bvt xdiff = add(x0_half, x1);
+  // xdiff.resize(half_op_size);
+  bvt y0_half{y0.begin(), y0.begin() + half_op_size};
+  bvt ydiff = add(y1, y0_half);
+  // ydiff.resize(half_op_size);
+
+  bvt z1 = sub(unsigned_karatsuba_multiplier(xdiff, ydiff), z2_plus_z0);
+  for(std::size_t i = 0; i < half_op_size; ++i)
+    z1.insert(z1.begin(), const_literal(false));
+  // result.insert(result.end(), z1.begin(), z1.end());
+
+  // z1.resize(op_size);
+  z0.resize(op_size);
+  return add(z0, z1);
+}
+
 bvt bv_utilst::unsigned_multiplier_no_overflow(
   const bvt &op0,
   const bvt &op1)
@@ -1867,7 +1911,11 @@ bvt bv_utilst::signed_multiplier(const bvt &op0, const bvt &op1)
   bvt neg0=cond_negate(op0, sign0);
   bvt neg1=cond_negate(op1, sign1);
 
+#ifdef USE_KARATSUBA
+  bvt result = unsigned_karatsuba_multiplier(neg0, neg1);
+#else
   bvt result=unsigned_multiplier(neg0, neg1);
+#endif
 
   literalt result_sign=prop.lxor(sign0, sign1);
 
@@ -1935,7 +1983,12 @@ bvt bv_utilst::multiplier(
   switch(rep)
   {
   case representationt::SIGNED: return signed_multiplier(op0, op1);
+#ifdef USE_KARATSUBA
+  case representationt::UNSIGNED:
+    return unsigned_karatsuba_multiplier(op0, op1);
+#else
   case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
+#endif
   }
 
   UNREACHABLE;
