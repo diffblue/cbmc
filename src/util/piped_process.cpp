@@ -138,9 +138,9 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   // Use process ID as a unique ID for this process at this time.
   base_name.append(std::to_string(GetCurrentProcessId()));
   const std::string in_name = base_name + "\\IN";
-  child_std_IN_Rd = CreateNamedPipe(
+  child_std_IN_Wr = CreateNamedPipe(
     in_name.c_str(),
-    PIPE_ACCESS_INBOUND,          // Reading for us
+    PIPE_ACCESS_OUTBOUND,         // Writing for us
     PIPE_TYPE_BYTE | PIPE_NOWAIT, // Bytes and non-blocking
     PIPE_UNLIMITED_INSTANCES,     // Probably doesn't matter
     BUFSIZE,
@@ -156,9 +156,9 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
     throw system_exceptiont("Input pipe creation failed for child_std_IN_Rd");
   }
   // Connect to the other side of the pipe
-  child_std_IN_Wr = CreateFileA(
+  child_std_IN_Rd = CreateFile(
     in_name.c_str(),
-    GENERIC_WRITE,                                  // Write side
+    GENERIC_READ,                                   // Read side
     FILE_SHARE_READ | FILE_SHARE_WRITE,             // Shared read/write
     &sec_attr,                                      // Need this for inherit
     OPEN_EXISTING,                                  // Opening other end
@@ -168,7 +168,8 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   {
     throw system_exceptiont("Input pipe creation failed for child_std_IN_Wr");
   }
-  if(!SetHandleInformation(child_std_IN_Rd, HANDLE_FLAG_INHERIT, 0))
+  if(!SetHandleInformation(
+       child_std_IN_Rd, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
   {
     throw system_exceptiont(
       "Input pipe creation failed on SetHandleInformation");
@@ -187,7 +188,7 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   {
     throw system_exceptiont("Output pipe creation failed for child_std_OUT_Rd");
   }
-  child_std_OUT_Wr = CreateFileA(
+  child_std_OUT_Wr = CreateFile(
     out_name.c_str(),
     GENERIC_WRITE,                                  // Write side
     FILE_SHARE_READ | FILE_SHARE_WRITE,             // Shared read/write
@@ -233,6 +234,8 @@ piped_processt::piped_processt(const std::vector<std::string> &commandvec)
   // recognize that the child process has ended (but maybe we don't care).
   CloseHandle(child_std_OUT_Wr);
   CloseHandle(child_std_IN_Rd);
+  if(!success)
+    throw system_exceptiont("Process creation failed.");
 #  else
 
   if(pipe(pipe_input) == -1)
@@ -335,6 +338,7 @@ piped_processt::~piped_processt()
 #  endif
 }
 
+NODISCARD
 piped_processt::send_responset piped_processt::send(const std::string &message)
 {
   if(process_state != statet::RUNNING)
@@ -342,11 +346,17 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
     return send_responset::ERRORED;
   }
 #ifdef _WIN32
-  if(!WriteFile(child_std_IN_Wr, message.c_str(), message.size(), NULL, NULL))
+  const auto message_size = narrow<DWORD>(message.size());
+  DWORD bytes_written = 0;
+  if(!WriteFile(
+       child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL))
   {
     // Error handling with GetLastError ?
     return send_responset::FAILED;
   }
+  INVARIANT(
+    message_size == bytes_written,
+    "Number of bytes written to sub process must match message size.");
 #else
   // send message to solver process
   int send_status = fputs(message.c_str(), command_stream);
@@ -415,15 +425,22 @@ bool piped_processt::can_receive(optionalt<std::size_t> wait_time)
   const int timeout = wait_time ? narrow<int>(*wait_time) : -1;
 #ifdef _WIN32
   int waited_time = 0;
-  // The next four need to be initialised for compiler warnings
-  DWORD buffer = 0;
-  LPDWORD nbytes = 0;
-  LPDWORD rbytes = 0;
-  LPDWORD rmbytes = 0;
+  DWORD total_bytes_available = 0;
   while(timeout < 0 || waited_time >= timeout)
   {
-    PeekNamedPipe(child_std_OUT_Rd, &buffer, 1, nbytes, rbytes, rmbytes);
-    if(buffer != 0)
+    const LPVOID lpBuffer = nullptr;
+    const DWORD nBufferSize = 0;
+    const LPDWORD lpBytesRead = nullptr;
+    const LPDWORD lpTotalBytesAvail = &total_bytes_available;
+    const LPDWORD lpBytesLeftThisMessage = nullptr;
+    PeekNamedPipe(
+      child_std_OUT_Rd,
+      lpBuffer,
+      nBufferSize,
+      lpBytesRead,
+      lpTotalBytesAvail,
+      lpBytesLeftThisMessage);
+    if(total_bytes_available > 0)
     {
       return true;
     }

@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 trace.c
---incremental-smt2-solver "z3 --smt2 -in" --trace
+--incremental-smt2-solver 'z3 --smt2 -in' --trace
 Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
 Assert of inequality to 4\.: FAILURE
 Assert of inequality to 2\.: FAILURE

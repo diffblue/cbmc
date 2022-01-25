@@ -28,7 +28,17 @@ void smt_piped_solver_processt::send(const smt_commandt &smt_command)
   const std::string command_string = smt_to_smt2_string(smt_command);
   log.debug() << "Sending command to SMT2 solver - " << command_string
               << messaget::eom;
-  process.send(command_string + "\n");
+  const auto response = process.send(command_string + "\n");
+  switch(response)
+  {
+  case piped_processt::send_responset::SUCCEEDED:
+    return;
+  case piped_processt::send_responset::FAILED:
+    throw analysis_exceptiont{"Sending to SMT solver sub process failed."};
+  case piped_processt::send_responset::ERRORED:
+    throw analysis_exceptiont{"SMT solver sub process is in error state."};
+  }
+  UNREACHABLE;
 }
 
 /// Log messages and throw exception.
