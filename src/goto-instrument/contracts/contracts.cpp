@@ -44,6 +44,7 @@ Date: February 2016
 #include <util/std_code.h>
 
 #include "havoc_assigns_clause_targets.h"
+#include "instrument_spec_assigns.h"
 #include "memory_predicates.h"
 #include "utils.h"
 
@@ -160,11 +161,6 @@ void code_contractst::check_apply_loop_contracts(
   auto decreases_clause = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_decreases));
 
-  assigns_clauset loop_assigns(
-    assigns_clause.operands(), log, ns, function_name, symbol_table);
-
-  loop_assigns.add_static_locals_to_write_set(goto_functions, function_name);
-
   if(invariant.is_nil())
   {
     if(decreases_clause.is_nil() && assigns_clause.is_nil())
@@ -255,6 +251,19 @@ void code_contractst::check_apply_loop_contracts(
     loop_head,
     add_pragma_disable_assigns_check(generated_code));
 
+  instrument_spec_assignst instrument_spec_assigns(
+    function_name, goto_functions, symbol_table, log.get_message_handler());
+
+  // assigns clause snapshots
+  goto_programt snapshot_instructions;
+
+  instrument_spec_assigns.track_static_locals(snapshot_instructions);
+
+  // ^^^ FIXME ^^^ we should only allow assignments to static locals
+  // declared in functions that are called in the loop body, not from the whole
+  // function...
+
+  // set of targets to havoc
   assignst to_havoc;
 
   if(assigns_clause.is_nil())
@@ -265,6 +274,8 @@ void code_contractst::check_apply_loop_contracts(
     try
     {
       get_assigns(local_may_alias, loop, to_havoc);
+      // TODO: if the set contains pairs (i, a[i]),
+      // we must at least widen them to (i, pointer_object(a))
       log.debug() << "No loop assigns clause provided. Inferred targets {";
       // Add inferred targets to the loop assigns clause.
       bool ran_once = false;
@@ -274,7 +285,8 @@ void code_contractst::check_apply_loop_contracts(
           log.debug() << ", ";
         ran_once = true;
         log.debug() << format(target);
-        loop_assigns.add_to_write_set(target);
+        instrument_spec_assigns.track_spec_target(
+          target, snapshot_instructions);
       }
       log.debug()
         << "}. Please specify an assigns clause if verification fails."
@@ -293,22 +305,18 @@ void code_contractst::check_apply_loop_contracts(
   {
     // An assigns clause was specified for this loop.
     // Add the targets to the set of expressions to havoc.
-    // TODO: Should we add the automatically detected local static variables
-    // too ? (they are present in loop_assigns but not in assigns_clause, and
-    // they are not necessarily touched by the loop).
-    to_havoc.insert(
-      assigns_clause.operands().cbegin(), assigns_clause.operands().cend());
+    for(const auto &target : assigns_clause.operands())
+    {
+      to_havoc.insert(target);
+      instrument_spec_assigns.track_spec_target(target, snapshot_instructions);
+    }
   }
 
-  // Create snapshots of write set CARs.
+  // Insert instrumentation
   // This must be done before havocing the write set.
-  for(const auto &car : loop_assigns.get_write_set())
-  {
-    auto snapshot_instructions = car.generate_snapshot_instructions(
-      assigns_clauset::check_target_validityt::YES_ALLOW_NULL);
-    insert_before_swap_and_advance(
-      goto_function.body, loop_head, snapshot_instructions);
-  };
+  // ^^^ FIXME this is not true ^^^
+  insert_before_swap_and_advance(
+    goto_function.body, loop_head, snapshot_instructions);
 
   optionalt<cfg_infot> cfg_empty_info;
 
@@ -318,12 +326,13 @@ void code_contractst::check_apply_loop_contracts(
     goto_function.body,
     loop_head,
     loop_end,
-    loop_assigns,
+    instrument_spec_assigns,
     // do not skip checks on function parameter assignments
     skipt::DontSkip,
     // do not use CFG info for now
     cfg_empty_info);
 
+  // insert havocing code
   havoc_assigns_targetst havoc_gen(to_havoc, ns);
   havoc_gen.append_full_havoc_code(
     loop_head->source_location(), generated_code);
@@ -338,6 +347,13 @@ void code_contractst::check_apply_loop_contracts(
   else
     insert_before_swap_and_advance(
       goto_function.body, loop_head, generated_code);
+
+  // ^^^ FIXME ^^^
+  // comment by delmasrd: I did not reactivate this behaviour
+  // because I think we always want to check the loop assignments against
+  // the surrounding clause
+
+  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
@@ -794,16 +810,14 @@ bool code_contractst::apply_function_contract(
   {
     // Havoc all targets in the assigns clause
     // TODO: handle local statics possibly touched by this function
-    havoc_assigns_clause_targets(
+    havoc_assigns_clause_targetst havocker(
       target_function,
       targets.operands(),
-      havoc_instructions,
-      // context parameters
+      goto_functions,
       location,
-      mode,
-      ns,
       symbol_table,
       log.get_message_handler());
+    havocker.get_instructions(havoc_instructions);
   }
 
   // ...for the return value
@@ -949,23 +963,22 @@ goto_functionst &code_contractst::get_goto_functions()
 void code_contractst::instrument_assign_statement(
   goto_programt::targett &instruction_it,
   goto_programt &program,
-  assigns_clauset &assigns_clause,
+  instrument_spec_assignst &instrument_spec_assigns,
   optionalt<cfg_infot> &cfg_info_opt)
 {
-  add_inclusion_check(
-    program,
-    assigns_clause,
-    instruction_it,
-    instruction_it->assign_lhs(),
-    allow_null_lhst::NO,
-    cfg_info_opt);
+  auto lhs = instruction_it->assign_lhs();
+  lhs.add_source_location() = instruction_it->source_location();
+  goto_programt payload;
+  instrument_spec_assigns.check_inclusion_assignment(
+    lhs, cfg_info_opt, payload);
+  insert_before_swap_and_advance(program, instruction_it, payload);
 }
 
 void code_contractst::instrument_call_statement(
   goto_programt::targett &instruction_it,
   const irep_idt &function,
   goto_programt &body,
-  assigns_clauset &assigns,
+  instrument_spec_assignst &instrument_spec_assigns,
   optionalt<cfg_infot> &cfg_info_opt)
 {
   INVARIANT(
@@ -983,15 +996,13 @@ void code_contractst::instrument_call_statement(
     if(function_call.lhs().is_not_nil())
     {
       // grab the returned pointer from malloc
-      const auto &object = function_call.lhs();
+      auto object = pointer_object(function_call.lhs());
+      object.add_source_location() = function_call.source_location();
       // move past the call and then insert the CAR
       instruction_it++;
-      const auto car = assigns.add_to_write_set(pointer_object(object));
-      auto snapshot_instructions = car->generate_snapshot_instructions(
-        // no check because malloc always returns a null or valid pointer
-        assigns_clauset::check_target_validityt::NO);
-      insert_before_swap_and_advance(
-        body, instruction_it, snapshot_instructions);
+      goto_programt payload;
+      instrument_spec_assigns.track_heap_allocated(object, payload);
+      insert_before_swap_and_advance(body, instruction_it, payload);
       // since CAR was inserted *after* the malloc call,
       // move the instruction pointer backward,
       // because the caller increments it in a `for` loop
@@ -1000,97 +1011,14 @@ void code_contractst::instrument_call_statement(
   }
   else if(callee_name == "free")
   {
-    source_locationt location_no_checks = instruction_it->source_location();
-    disable_pointer_checks(location_no_checks);
-    const auto free_car = add_inclusion_check(
-      body,
-      assigns,
-      instruction_it,
-      pointer_object(instruction_it->call_arguments().front()),
-      // NULL pointers are a allowed and a no-op with free
-      allow_null_lhst::YES,
-      cfg_info_opt);
-
-    // skip all invalidation business if we're freeing invalid memory
-    goto_programt alias_checking_instructions, skip_program;
-    alias_checking_instructions.add(goto_programt::make_goto(
-      skip_program.add(goto_programt::make_skip(location_no_checks)),
-      not_exprt{free_car.validity_condition_var},
-      location_no_checks));
-
-    // Since the argument to free may be an "alias" (but not identical)
-    // to existing CARs' source_expr, structural equality wouldn't work.
-    // Moreover, multiple CARs in the writeset might be aliased to the
-    // same underlying object.
-    // So, we first find the corresponding CAR using `same_object` checks.
-    std::unordered_set<exprt, irep_hash> write_set_validity_addrs;
-    for(const auto &w_car : assigns.get_write_set())
-    {
-      const auto object_validity_var_addr =
-        new_tmp_symbol(
-          pointer_type(bool_typet{}),
-          location_no_checks,
-          symbol_table.lookup_ref(function).mode,
-          symbol_table,
-          "__car_valid")
-          .symbol_expr();
-      write_set_validity_addrs.insert(object_validity_var_addr);
-
-      alias_checking_instructions.add(
-        goto_programt::make_decl(object_validity_var_addr, location_no_checks));
-      // if the CAR was defined on the same_object as the one being `free`d,
-      // record its validity variable's address, otherwise record NULL
-      alias_checking_instructions.add(goto_programt::make_assignment(
-        object_validity_var_addr,
-        if_exprt{
-          and_exprt{
-            w_car.validity_condition_var,
-            same_object(
-              free_car.lower_bound_address_var, w_car.lower_bound_address_var)},
-          address_of_exprt{w_car.validity_condition_var},
-          null_pointer_exprt{to_pointer_type(object_validity_var_addr.type())}},
-        location_no_checks));
-    }
-
-    alias_checking_instructions.destructive_append(skip_program);
-    insert_before_swap_and_advance(
-      body,
-      instruction_it,
-      add_pragma_disable_assigns_check(alias_checking_instructions));
-
-    // move past the call and then insert the invalidation instructions
-    instruction_it++;
-
-    // skip all invalidation business if we're freeing invalid memory
-    goto_programt invalidation_instructions;
-    skip_program.clear();
-    invalidation_instructions.add(goto_programt::make_goto(
-      skip_program.add(goto_programt::make_skip(location_no_checks)),
-      not_exprt{free_car.validity_condition_var},
-      location_no_checks));
-
-    // invalidate all recorded CAR validity variables
-    for(const auto &w_car_validity_addr : write_set_validity_addrs)
-    {
-      goto_programt w_car_skip_program;
-      invalidation_instructions.add(goto_programt::make_goto(
-        w_car_skip_program.add(goto_programt::make_skip(location_no_checks)),
-        null_pointer(w_car_validity_addr),
-        location_no_checks));
-      invalidation_instructions.add(goto_programt::make_assignment(
-        dereference_exprt{w_car_validity_addr},
-        false_exprt{},
-        location_no_checks));
-      invalidation_instructions.destructive_append(w_car_skip_program);
-    }
-
-    invalidation_instructions.destructive_append(skip_program);
-    insert_before_swap_and_advance(
-      body,
-      instruction_it,
-      add_pragma_disable_assigns_check(invalidation_instructions));
-
-    instruction_it--;
+    const auto &ptr = instruction_it->call_arguments().front();
+    auto object = pointer_object(ptr);
+    object.add_source_location() = instruction_it->source_location();
+    goto_programt payload;
+    instrument_spec_assigns
+      .check_inclusion_heap_allocated_and_invalidate_aliases(
+        object, cfg_info_opt, payload);
+    insert_before_swap_and_advance(body, instruction_it, payload);
   }
 }
 
@@ -1173,16 +1101,16 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   auto &function_body = function_obj->second.body;
 
   // Get assigns clause for function
-  const symbolt &target = ns.lookup(function);
-  assigns_clauset assigns(
-    to_code_with_contract_type(target.type).assigns(),
-    log,
-    ns,
-    function,
-    symbol_table);
+  const symbolt &function_sybmol = ns.lookup(function);
+  const auto &function_with_contract =
+    to_code_with_contract_type(function_sybmol.type);
 
-  // Detect and add static local variables
-  assigns.add_static_locals_to_write_set(goto_functions, function);
+  instrument_spec_assignst instrument_spec_assigns(
+    function, goto_functions, symbol_table, log.get_message_handler());
+
+  // Detect and track static local variables before inlining
+  goto_programt snapshot_static_locals;
+  instrument_spec_assigns.track_static_locals(snapshot_static_locals);
 
   // Full inlining of the function body
   // Inlining is performed so that function calls to a same function
@@ -1206,25 +1134,37 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     "Loops remain in function '" + id2string(function) +
       "', assigns clause checking instrumentation cannot be applied.");
 
-  // Create a deep copy of the original goto_function object
-  // and compute static control flow graph information on it
+  // Create a deep copy of the inlined body before any instrumentation is added
+  // and compute static control flow graph information
   goto_functiont goto_function_orig;
   goto_function_orig.copy_from(goto_function);
   cfg_infot cfg_info(ns, goto_function_orig);
   optionalt<cfg_infot> cfg_info_opt{cfg_info};
 
-  // Add formal parameters to write set
-  for(const auto &param : to_code_type(target.type).parameters())
-    assigns.add_to_write_set(ns.lookup(param.get_identifier()).symbol_expr());
-
+  // Start instrumentation
   auto instruction_it = function_body.instructions.begin();
-  for(const auto &car : assigns.get_write_set())
+
+  // Inject local static snapshots
+  insert_before_swap_and_advance(
+    function_body, instruction_it, snapshot_static_locals);
+
+  // Track targets mentionned in the specification
+  for(auto &target : function_with_contract.assigns())
   {
-    auto snapshot_instructions = car.generate_snapshot_instructions(
-      assigns_clauset::check_target_validityt::YES_ALLOW_NULL);
-    insert_before_swap_and_advance(
-      function_body, instruction_it, snapshot_instructions);
-  };
+    goto_programt payload;
+    instrument_spec_assigns.track_spec_target(target, payload);
+    insert_before_swap_and_advance(function_body, instruction_it, payload);
+  }
+
+  // Track formal parameters
+  goto_programt snapshot_function_parameters;
+  for(const auto &param : to_code_type(function_sybmol.type).parameters())
+  {
+    goto_programt payload;
+    instrument_spec_assigns.track_stack_allocated(
+      ns.lookup(param.get_identifier()).symbol_expr(), payload);
+    insert_before_swap_and_advance(function_body, instruction_it, payload);
+  }
 
   // Restore internal coherence in the programs
   goto_functions.update();
@@ -1235,7 +1175,7 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function_body,
     instruction_it,
     function_body.instructions.end(),
-    assigns,
+    instrument_spec_assigns,
     // skip checks on function parameter assignments
     skipt::Skip,
     cfg_info_opt);
@@ -1315,7 +1255,7 @@ void code_contractst::check_frame_conditions(
   goto_programt &body,
   goto_programt::targett instruction_it,
   const goto_programt::targett &instruction_end,
-  assigns_clauset &assigns,
+  instrument_spec_assignst &instrument_spec_assigns,
   skipt skip_parameter_assigns,
   optionalt<cfg_infot> &cfg_info_opt)
 {
@@ -1342,13 +1282,9 @@ void code_contractst::check_frame_conditions(
       const auto &decl_symbol = instruction_it->decl_symbol();
       // move past the call and then insert the CAR
       instruction_it++;
-      const auto car = assigns.add_to_write_set(decl_symbol);
-      // we do not need to check target validity because DECL
-      // are always backed by adequately sized objects
-      auto snapshot_instructions = car->generate_snapshot_instructions(
-        assigns_clauset::check_target_validityt::NO);
-      insert_before_swap_and_advance(
-        body, instruction_it, snapshot_instructions);
+      goto_programt payload;
+      instrument_spec_assigns.track_stack_allocated(decl_symbol, payload);
+      insert_before_swap_and_advance(body, instruction_it, payload);
       // since CAR was inserted *after* the DECL instruction,
       // move the instruction pointer backward,
       // because the loop step takes care of the increment
@@ -1359,35 +1295,24 @@ void code_contractst::check_frame_conditions(
       must_check_assign(
         instruction_it, skip_parameter_assigns, ns, cfg_info_opt))
     {
-      instrument_assign_statement(instruction_it, body, assigns, cfg_info_opt);
+      instrument_assign_statement(
+        instruction_it, body, instrument_spec_assigns, cfg_info_opt);
     }
     else if(instruction_it->is_function_call())
     {
       instrument_call_statement(
-        instruction_it, function, body, assigns, cfg_info_opt);
+        instruction_it, function, body, instrument_spec_assigns, cfg_info_opt);
     }
     else if(
       instruction_it->is_dead() &&
       must_track_dead(instruction_it, cfg_info_opt))
     {
       const auto &symbol = instruction_it->dead_symbol();
-      source_locationt location_no_checks = instruction_it->source_location();
-      disable_pointer_checks(location_no_checks);
-
-      // CAR equality and hash are defined on source_expr alone,
-      // therefore this temporary CAR should be "found"
-      const auto &symbol_car = assigns.get_write_set().find(
-        assigns_clauset::conditional_address_ranget{assigns, symbol});
-      if(symbol_car != assigns.get_write_set().end())
+      if(instrument_spec_assigns.stack_allocated_is_tracked(symbol))
       {
-        auto invalidation_assignment = goto_programt::make_assignment(
-          symbol_car->validity_condition_var,
-          false_exprt{},
-          instruction_it->source_location());
-        body.insert_before_swap(
-          instruction_it,
-          add_pragma_disable_assigns_check(invalidation_assignment));
-        instruction_it++;
+        goto_programt payload;
+        instrument_spec_assigns.invalidate_stack_allocated(symbol, payload);
+        insert_before_swap_and_advance(body, instruction_it, payload);
       }
       else
       {
@@ -1407,15 +1332,13 @@ void code_contractst::check_frame_conditions(
       instruction_it->is_other() &&
       instruction_it->get_other().get_statement() == ID_havoc_object)
     {
-      const auto havoc_argument =
-        pointer_object(instruction_it->get_other().operands().front());
-      add_inclusion_check(
-        body,
-        assigns,
-        instruction_it,
-        havoc_argument,
-        allow_null_lhst::NO,
-        cfg_info_opt);
+      auto havoc_argument = instruction_it->get_other().operands().front();
+      auto havoc_object = pointer_object(havoc_argument);
+      havoc_object.add_source_location() = instruction_it->source_location();
+      goto_programt payload;
+      instrument_spec_assigns.check_inclusion_assignment(
+        havoc_object, cfg_info_opt, payload);
+      insert_before_swap_and_advance(body, instruction_it, payload);
     }
 
     // Move to the next instruction
@@ -1423,53 +1346,6 @@ void code_contractst::check_frame_conditions(
     if(cfg_info_opt.has_value())
       cfg_info_opt.value().step();
   }
-}
-
-const assigns_clauset::conditional_address_ranget
-code_contractst::add_inclusion_check(
-  goto_programt &program,
-  const assigns_clauset &assigns,
-  goto_programt::targett &instruction_it,
-  const exprt &lhs,
-  allow_null_lhst allow_null_lhs,
-  optionalt<cfg_infot> &cfg_info_opt)
-{
-  const assigns_clauset::conditional_address_ranget car{assigns, lhs};
-
-  auto check_target_validity =
-    allow_null_lhs == allow_null_lhst::YES
-      ? assigns_clauset::check_target_validityt::YES_ALLOW_NULL
-      : assigns_clauset::check_target_validityt::YES;
-
-  auto snapshot_instructions =
-    car.generate_snapshot_instructions(check_target_validity);
-  insert_before_swap_and_advance(
-    program, instruction_it, snapshot_instructions);
-
-  goto_programt assertion;
-  source_locationt location_no_checks =
-    instruction_it->source_location_nonconst();
-  disable_pointer_checks(location_no_checks);
-
-  // does this assignment come from some contract replacement ?
-  const auto &comment = location_no_checks.get_comment();
-  if(is_assigns_clause_replacement_tracking_comment(comment))
-  {
-    location_no_checks.set_comment(
-      "Check that " + id2string(comment) + " is assignable");
-  }
-  else
-  {
-    location_no_checks.set_comment(
-      "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-  }
-
-  assertion.add(goto_programt::make_assertion(
-    assigns.generate_inclusion_check(car, check_target_validity, cfg_info_opt),
-    location_no_checks));
-  insert_before_swap_and_advance(program, instruction_it, assertion);
-
-  return car;
 }
 
 bool code_contractst::enforce_contract(const irep_idt &function)
