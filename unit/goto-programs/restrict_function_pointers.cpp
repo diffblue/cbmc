@@ -46,32 +46,32 @@ void restriction_parsing_test()
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
       "func", "test", goto_model),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
       "/func", "test", goto_model),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
       "func/", "test", goto_model),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
       "func/,", "test", goto_model),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
       "func1/func2,", "test", goto_model),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
       "func1/,func2", "test", goto_model),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    invalid_restriction_exceptiont);
 }
 
 void merge_restrictions_test()
