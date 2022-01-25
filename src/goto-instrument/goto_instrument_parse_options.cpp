@@ -1029,12 +1029,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     {
       label_function_pointer_call_sites(goto_model);
 
-      const auto function_pointer_restrictions =
-        function_pointer_restrictionst::from_options(
-          options, goto_model, log.get_message_handler());
-
-      restrict_function_pointers(
-        ui_message_handler, goto_model, function_pointer_restrictions);
+      restrict_function_pointers(ui_message_handler, goto_model, options);
     }
   }
 

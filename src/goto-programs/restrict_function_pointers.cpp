@@ -169,8 +169,13 @@ void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
 void restrict_function_pointers(
   message_handlert &message_handler,
   goto_modelt &goto_model,
-  const function_pointer_restrictionst &restrictions)
+  const optionst &options)
 {
+  const auto restrictions = function_pointer_restrictionst::from_options(
+    options, goto_model, message_handler);
+  if(restrictions.restrictions.empty())
+    return;
+
   for(auto &function_item : goto_model.goto_functions.function_map)
   {
     goto_functiont &goto_function = function_item.second;

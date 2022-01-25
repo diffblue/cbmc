@@ -164,6 +164,6 @@ protected:
 void restrict_function_pointers(
   message_handlert &message_handler,
   goto_modelt &goto_model,
-  const function_pointer_restrictionst &restrictions);
+  const optionst &options);
 
 #endif // CPROVER_GOTO_PROGRAMS_RESTRICT_FUNCTION_POINTERS_H
