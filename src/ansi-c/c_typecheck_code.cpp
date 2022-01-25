@@ -984,19 +984,12 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
     }
     else
     {
-      // if the condition is not trivially true,
-      // place each single target in its own conditional target expr,
-      // distributing the condition
+      // if the condition is not trivially true, typecheck in place
       for(auto &actual_target : conditional_target_group.targets())
       {
         typecheck_spec_assigns_target(actual_target);
-        exprt ops{ID_expression_list};
-        ops.add_to_operands(actual_target);
-        conditional_target_group_exprt result{condition, ops};
-        result.add_source_location() =
-          conditional_target_group.source_location();
-        tmp.push_back(std::move(result));
       }
+      tmp.push_back(std::move(target));
     }
   }
 
@@ -1004,8 +997,9 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
   if(must_throw)
     throw 0;
 
-  // now each target is either a simple side-effect-free lvalue expression
-  // or a conditional target expression with a single target
+  // now each target is either:
+  // - a simple side-effect-free unconditional lvalue expression or
+  // - a conditional target group expression with a non-trivial condition
 
   // update original vector in-place
   std::swap(targets, tmp);
