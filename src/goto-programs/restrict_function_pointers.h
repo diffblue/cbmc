@@ -93,10 +93,12 @@ public:
     message_handlert &message_handler);
 
   jsont to_json() const;
-  static function_pointer_restrictionst from_json(const jsont &json);
+  static function_pointer_restrictionst
+  from_json(const jsont &json, const goto_modelt &goto_model);
 
   static function_pointer_restrictionst read_from_file(
     const std::string &filename,
+    const goto_modelt &goto_model,
     message_handlert &message_handler);
 
   void write_to_file(const std::string &filename) const;
@@ -112,6 +114,7 @@ protected:
 
   static restrictionst parse_function_pointer_restrictions_from_file(
     const std::list<std::string> &filenames,
+    const goto_modelt &goto_model,
     message_handlert &message_handler);
 
   static restrictionst parse_function_pointer_restrictions_from_command_line(

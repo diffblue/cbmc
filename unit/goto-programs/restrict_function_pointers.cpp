@@ -250,6 +250,7 @@ TEST_CASE("Json conversion", "[core]")
   // representation for the same restrictions can differ, due to the array
   // elements appearing in different orders)
 
+  goto_modelt goto_model;
   std::istringstream ss(
     "{"
     "  \"use_f.function_pointer_call.1\": [\"f\", \"g\"],"
@@ -262,7 +263,7 @@ TEST_CASE("Json conversion", "[core]")
 
   // json1 -> restrictions1
   const auto function_pointer_restrictions1 =
-    function_pointer_restrictionst::from_json(json1);
+    function_pointer_restrictionst::from_json(json1, goto_model);
 
   const auto &restrictions = function_pointer_restrictions1.restrictions;
 
@@ -284,7 +285,7 @@ TEST_CASE("Json conversion", "[core]")
 
   // json2 -> restrictions2
   const auto function_pointer_restrictions2 =
-    function_pointer_restrictionst::from_json(json2);
+    function_pointer_restrictionst::from_json(json2, goto_model);
 
   REQUIRE(
     function_pointer_restrictions1.restrictions ==

@@ -276,13 +276,15 @@ function_pointer_restrictionst::restrictionst function_pointer_restrictionst::
 function_pointer_restrictionst::restrictionst
 function_pointer_restrictionst::parse_function_pointer_restrictions_from_file(
   const std::list<std::string> &filenames,
+  const goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   auto merged_restrictions = function_pointer_restrictionst::restrictionst{};
 
   for(auto const &filename : filenames)
   {
-    auto const restrictions = read_from_file(filename, message_handler);
+    auto const restrictions =
+      read_from_file(filename, goto_model, message_handler);
 
     merged_restrictions = merge_function_pointer_restrictions(
       std::move(merged_restrictions), restrictions.restrictions);
@@ -487,7 +489,7 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
     auto const restriction_file_opts =
       options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT);
     file_restrictions = parse_function_pointer_restrictions_from_file(
-      restriction_file_opts, message_handler);
+      restriction_file_opts, goto_model, message_handler);
     typecheck_function_pointer_restrictions(goto_model, file_restrictions);
   }
   catch(const invalid_restriction_exceptiont &e)
@@ -515,8 +517,9 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
     merge_function_pointer_restrictions(file_restrictions, name_restrictions))};
 }
 
-function_pointer_restrictionst
-function_pointer_restrictionst::from_json(const jsont &json)
+function_pointer_restrictionst function_pointer_restrictionst::from_json(
+  const jsont &json,
+  const goto_modelt &goto_model)
 {
   function_pointer_restrictionst::restrictionst restrictions;
 
@@ -527,7 +530,9 @@ function_pointer_restrictionst::from_json(const jsont &json)
 
   for(auto const &restriction : to_json_object(json))
   {
-    restrictions.emplace(irep_idt{restriction.first}, [&] {
+    std::string pointer_name =
+      resolve_pointer_name(restriction.first, goto_model);
+    restrictions.emplace(irep_idt{pointer_name}, [&] {
       if(!restriction.second.is_array())
       {
         throw deserialization_exceptiont{"Value of " + restriction.first +
@@ -557,6 +562,7 @@ function_pointer_restrictionst::from_json(const jsont &json)
 
 function_pointer_restrictionst function_pointer_restrictionst::read_from_file(
   const std::string &filename,
+  const goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   auto inFile = std::ifstream{filename};
@@ -568,7 +574,7 @@ function_pointer_restrictionst function_pointer_restrictionst::read_from_file(
       "failed to read function pointer restrictions from " + filename};
   }
 
-  return from_json(json);
+  return from_json(json, goto_model);
 }
 
 jsont function_pointer_restrictionst::to_json() const
