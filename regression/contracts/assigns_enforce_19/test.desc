@@ -1,14 +1,15 @@
 CORE
 main.c
 --enforce-contract f --enforce-contract g
+^\[f.assigns.\d+\] line 9 Check that a is assignable: SUCCESS$
+^\[g.assigns.\d+\] line 14 Check that b is valid: SUCCESS$
+^\[g.assigns.\d+\] line 16 Check that b is assignable: SUCCESS$
+^\[g.assigns.\d+\] line 17 Check that c is assignable: FAILURE$
+^\[g.assigns.\d+\] line 18 Check that \*points_to_b is assignable: SUCCESS$
+^\[g.assigns.\d+\] line 19 Check that \*points_to_c is assignable: FAILURE$
+^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f.\d+\] line \d+ Check that a is assignable: SUCCESS$
-^\[g.\d+\] line \d+ Check that b is assignable: SUCCESS$
-^\[g.\d+\] line \d+ Check that c is assignable: FAILURE$
-^\[g.\d+\] line \d+ Check that \*points\_to\_b is assignable: SUCCESS$
-^\[g.\d+\] line \d+ Check that \*points\_to\_c is assignable: FAILURE$
-^VERIFICATION FAILED$
 --
 --
 Checks whether contract enforcement works with (local and global) static variables.

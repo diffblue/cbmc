@@ -1,12 +1,15 @@
 CORE
 main.c
 --enforce-contract f1
+^\[f1.assigns.\d+\] line 1 Check that \*x1 is valid: SUCCESS$
+^\[f1.assigns.\d+\] line 1 Check that \*y1 is valid: SUCCESS$
+^\[f1.assigns.\d+\] line 1 Check that \*z1 is valid: SUCCESS$
+^\[f3.assigns.\d+\] line 13 Check that \*x3 is assignable: SUCCESS$
+^\[f3.assigns.\d+\] line 14 Check that \*y3 is assignable: SUCCESS$
+^\[f3.assigns.\d+\] line 15 Check that \*z3 is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
-^\[f3.\d+\] line \d+ Check that \*x3 is assignable: SUCCESS$
-^\[f3.\d+\] line \d+ Check that \*y3 is assignable: SUCCESS$
-^\[f3.\d+\] line \d+ Check that \*z3 is assignable: SUCCESS$
-^VERIFICATION SUCCESSFUL$
 --
 --
 This test checks that verification only considers assigns clause from enforced function.

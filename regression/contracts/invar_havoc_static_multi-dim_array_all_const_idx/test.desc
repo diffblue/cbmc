@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main\.\d+\] .* Check that data\[\(signed long (long )?int\)4\]\[\(signed long (long )?int\)5\]\[\(signed long (long )?int\)6\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that data\[\(signed long (long )?int\)4\]\[\(signed long (long )?int\)5\]\[\(signed long (long )?int\)6\] is assignable: SUCCESS$
 ^\[main\.assertion\.\d+\] .* assertion data\[4\]\[5\]\[6\] == 0: FAILURE$
 ^\[main\.assertion\.\d+\] .* assertion data\[1\]\[2\]\[3\] == 0: SUCCESS$
 ^VERIFICATION FAILED$

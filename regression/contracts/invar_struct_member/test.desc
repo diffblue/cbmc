@@ -5,7 +5,10 @@ main.c
 ^SIGNAL=0$
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main\.\d+\] .* Check that t\.x is assignable: SUCCESS$
+^\[main.assigns.\d+\].* Check that i is valid: SUCCESS$
+^\[main.assigns.\d+\].* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\].* Check that t\.x is valid: SUCCESS$
+^\[main.assigns.\d+\].* Check that t\.x is assignable: SUCCESS$
 ^\[main\.assertion\.\d+\] .* assertion t.x == 0 || t.x == 2: FAILURE$
 ^VERIFICATION FAILED$
 --

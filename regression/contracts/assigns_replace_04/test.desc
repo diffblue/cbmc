@@ -5,7 +5,7 @@ main.c function main
 ^\[.*\d+\] line 29 assertion p > 100: SUCCESS$
 ^\[.*\d+\] line 30 assertion q == 2: SUCCESS$
 ^\[.*\d+\] line 31 reachability test: FAILURE$
-^\*\* 1 of 3 failed
+^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

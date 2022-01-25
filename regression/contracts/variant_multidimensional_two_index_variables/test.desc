@@ -4,9 +4,9 @@ main.c
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
-^\[main\.\d+\] line 14 Check that j is assignable: SUCCESS$
-^\[main\.\d+\] line 18 Check that i is assignable: SUCCESS$
-^\[main\.\d+\] line 19 Check that j is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 14 Check that j is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 18 Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 19 Check that j is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

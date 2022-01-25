@@ -4,7 +4,7 @@ main.c
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: FAILURE$
-^\[main\.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

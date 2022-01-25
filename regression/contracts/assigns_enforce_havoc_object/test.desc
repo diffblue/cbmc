@@ -3,8 +3,9 @@ main.c
 --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
-^\[bar.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: SUCCESS$
-^\[bar.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(const void \*\)a1->u.b->c\) is valid: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

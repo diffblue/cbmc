@@ -1,7 +1,7 @@
 CORE
 main.c
 --enforce-contract foo _ --pointer-check
-^\[.*\d+\].* line 8 Check assigns target validity 'TRUE: x\[\(.*\)10\]': FAILURE$
+^\[foo.assigns.*\d+\].* line 5 Check that x\[\(.*\)10\] is valid: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

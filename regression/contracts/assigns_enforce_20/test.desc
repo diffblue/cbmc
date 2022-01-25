@@ -3,8 +3,8 @@ main.c
 --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
-^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\((\(.+\))?y\) is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that x is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that POINTER_OBJECT\((\(.+\))?y\) is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that x is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

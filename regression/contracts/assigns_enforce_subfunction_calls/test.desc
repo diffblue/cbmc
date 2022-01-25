@@ -4,8 +4,8 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^main.c function baz$
-^\[baz.\d+\] line 6 Check that \*x is assignable: SUCCESS$
-^\[baz.\d+\] line 6 Check that \*x is assignable: FAILURE$
+^\[baz.assigns.\d+\] line 6 Check that \*x is assignable: SUCCESS$
+^\[baz.assigns.\d+\] line 6 Check that \*x is assignable: FAILURE$
 ^main.c function foo$
 ^\[foo.assertion.\d+\] line 20 foo.x.set: SUCCESS$
 ^\[foo.assertion.\d+\] line 25 foo.local.set: SUCCESS$

@@ -1,11 +1,12 @@
 CORE
 main.c
 --enforce-contract foo --enforce-contract baz --enforce-contract qux
+^\[foo.assigns.\d+\] line \d+ Check that \*x is valid: SUCCESS$
+^\[baz.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
+^\[qux.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
+^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-^\[baz.\d+\] line \d+ Check that global is assignable: FAILURE$
-^\[qux.\d+\] line \d+ Check that global is assignable: FAILURE$
-^VERIFICATION FAILED$
 --
 --
 Checks whether verification fails when enforcing a contract

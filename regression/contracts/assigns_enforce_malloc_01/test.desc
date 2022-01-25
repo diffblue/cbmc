@@ -3,7 +3,7 @@ main.c
 --enforce-contract f
 ^EXIT=0$
 ^SIGNAL=0$
-^\[f\.\d+\] line \d+ Check that \*a is assignable: SUCCESS
+^\[f\.assigns.\d+\] line \d+ Check that \*a is assignable: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 --

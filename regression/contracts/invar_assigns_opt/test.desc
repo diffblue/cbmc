@@ -8,8 +8,8 @@ main.c
 ^\[main.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
 ^\[main.assertion.\d+\] .* assertion r1 == 0: SUCCESS$
 ^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
-^\[main.\d+\] .* Check that s2 is assignable: SUCCESS$
-^\[main.\d+\] .* Check that r2 is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that s2 is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that r2 is assignable: SUCCESS$
 ^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
 ^\[main.assertion.\d+\] .* assertion r2 == 0: SUCCESS$

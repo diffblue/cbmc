@@ -4,9 +4,9 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 \[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS
-\[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS
-\[foo.\d+\] line \d+ Check that x\[\(.* int\)5\] is assignable: SUCCESS
-\[foo.\d+\] line \d+ Check that x\[\(.* int\)9\] is assignable: SUCCESS
+\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS
+\[foo.assigns.\d+\] line \d+ Check that x\[\(.* int\)5\] is assignable: SUCCESS
+\[foo.assigns.\d+\] line \d+ Check that x\[\(.* int\)9\] is assignable: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 --

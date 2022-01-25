@@ -1,9 +1,10 @@
 CORE
 main.c
 --enforce-contract foo _ --malloc-may-fail --malloc-fail-null
+^\[foo.assigns.\d+\] line 9 Check that POINTER_OBJECT\(\(const void \*\)a\) is valid when a != \(\(char \*\)NULL\): SUCCESS$
+^\[foo.assigns.\d+\] line 19 Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
-^\[foo\.\d+\] line 19 Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 This test checks that objects of size zero or __CPROVER_max_malloc_size

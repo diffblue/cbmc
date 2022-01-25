@@ -3,10 +3,10 @@ main.c
 --enforce-contract f1
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f1.\d+\] line \d+ Check that p->y is assignable: FAILURE$
-^\[f1.\d+\] line \d+ Check that p->x\[\(.*\)0\] is assignable: SUCCESS$
-^\[f1.\d+\] line \d+ Check that p->x\[\(.*\)1\] is assignable: SUCCESS$
-^\[f1.\d+\] line \d+ Check that p->x\[\(.*\)2\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->y is assignable: FAILURE$
+^\[f1.assigns.\d+\] line \d+ Check that p->x\[\(.*\)0\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->x\[\(.*\)1\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->x\[\(.*\)2\] is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --

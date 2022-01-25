@@ -4,8 +4,8 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
-^\[main.\d+\] .* Check that i is assignable: SUCCESS$
-^\[main.\d+\] .* Check that b->data\[(.*)i\] is assignable: FAILURE$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: FAILURE$
 ^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main.assertion.\d+\] .* assertion b->data\[5\] == 0: FAILURE$
 ^VERIFICATION FAILED$

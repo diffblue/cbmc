@@ -1,16 +1,20 @@
 CORE
 main.c
 --enforce-contract foo --enforce-contract bar --enforce-contract baz _ --pointer-primitive-check
+^\[foo.assigns.\d+\] line 7 Check that \*xp is valid: SUCCESS$
+^\[foo.assigns.\d+\] line 11 Check that POINTER_OBJECT\(\(void \*\)yp\) is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 13 Check that \*xp is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 14 Check that y is assignable: FAILURE$
+^\[bar.assigns.\d+\] line 17 Check that \*a is valid: SUCCESS$
+^\[bar.assigns.\d+\] line 17 Check that \*b is valid: SUCCESS$
+^\[bar.assigns.\d+\] line 19 Check that POINTER_OBJECT\(\(void \*\)a\) is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line 20 Check that \*b is assignable: SUCCESS$
+^\[baz.assigns.\d+\] line 23 Check that \*a is valid: SUCCESS$
+^\[baz.assigns.\d+\] line 25 Check that POINTER_OBJECT\(\(void \*\)c\) is assignable: FAILURE$
+^\[baz.assigns.\d+\] line 26 Check that \*a is assignable: SUCCESS$
+^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-^\[bar.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a\) is assignable: SUCCESS$
-^\[bar.\d+\] line \d+ Check that \*b is assignable: SUCCESS$
-^\[baz.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)c\) is assignable: FAILURE$
-^\[baz.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*xp is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that y is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)yp\) is assignable: SUCCESS$
-^VERIFICATION FAILED$
 --
 --
 Checks whether contract enforcement works with functions that deallocate memory.
