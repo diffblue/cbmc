@@ -1,5 +1,5 @@
 CORE
-main.c
+argv1.c
 --bounds-check --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$

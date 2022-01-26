@@ -304,11 +304,15 @@ bool generate_ansi_c_start_function(
       const symbolt &argv_symbol=ns.lookup("argv'");
 
       {
-        // assume argc is at least one
-        exprt one=from_integer(1, argc_symbol.type);
+        // Assume argc is at least zero. Note that we don't assume it's
+        // at least one, since this isn't guaranteed, as exemplified by
+        // https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkit.txt
+        // The C standard only guarantees "The value of argc shall be
+        // nonnegative." and "argv[argc] shall be a null pointer."
+        exprt zero = from_integer(0, argc_symbol.type);
 
         binary_relation_exprt ge(
-          argc_symbol.symbol_expr(), ID_ge, std::move(one));
+          argc_symbol.symbol_expr(), ID_ge, std::move(zero));
 
         init_code.add(code_assumet(std::move(ge)));
       }

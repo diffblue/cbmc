@@ -1,0 +1,9 @@
+CORE
+argc1.c
+--bounds-check --pointer-check --unwind 0
+^EXIT=10$
+^SIGNAL=0$
+^\[.*\] line .* dereference failure: pointer outside object bounds in argv\[.*n\]: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
