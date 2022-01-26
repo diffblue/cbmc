@@ -1,11 +1,13 @@
 #include <assert.h>
 
-int main(int argc, char **argv)
+int main()
 {
   int x;
   const char *c = "Hello world";
+  _Bool dummy;
+  __CPROVER_assume(dummy);
 
-  int *p = (argc ? &x : (int *)c);
+  int *p = (dummy ? &x : (int *)c);
 
   *p = 1;
 
