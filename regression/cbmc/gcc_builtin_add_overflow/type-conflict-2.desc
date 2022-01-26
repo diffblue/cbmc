@@ -1,0 +1,6 @@
+CORE
+type-conflict.c
+
+line 14 function main: __builtin_add_overflow takes exactly 3 arguments, but 2 were provided$
+^EXIT=6$
+^SIGNAL=0$

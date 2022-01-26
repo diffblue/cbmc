@@ -3170,76 +3170,88 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(
     identifier == "__builtin_add_overflow" ||
+    identifier == "__builtin_add_overflow_p")
+  {
+    return typecheck_builtin_overflow(expr, ID_plus);
+  }
+  else if(
     identifier == "__builtin_sub_overflow" ||
+    identifier == "__builtin_sub_overflow_p")
+  {
+    return typecheck_builtin_overflow(expr, ID_minus);
+  }
+  else if(
     identifier == "__builtin_mul_overflow" ||
-    identifier == "__builtin_add_overflow_p" ||
-    identifier == "__builtin_sub_overflow_p" ||
     identifier == "__builtin_mul_overflow_p")
   {
-    // check function signature
-    if(expr.arguments().size() != 3)
-    {
-      std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " takes exactly 3 arguments, but "
-                    << expr.arguments().size() << " were provided";
-      throw invalid_source_file_exceptiont{error_message.str()};
-    }
-
-    typecheck_function_call_arguments(expr);
-
-    auto lhs = expr.arguments()[0];
-    auto rhs = expr.arguments()[1];
-    auto result = expr.arguments()[2];
-
-    const bool is__p_variant = has_suffix(id2string(identifier), "_p");
-
-    {
-      auto const raise_wrong_argument_error =
-        [this, identifier](
-          const exprt &wrong_argument, std::size_t argument_number, bool _p) {
-          std::ostringstream error_message;
-          error_message << wrong_argument.source_location().as_string() << ": "
-                        << identifier << " has signature " << identifier
-                        << "(integral, integral, integral" << (_p ? "" : "*")
-                        << "), "
-                        << "but argument " << argument_number << " ("
-                        << expr2c(wrong_argument, *this) << ") has type `"
-                        << type2c(wrong_argument.type(), *this) << '`';
-          throw invalid_source_file_exceptiont{error_message.str()};
-        };
-      for(int arg_index = 0; arg_index <= (!is__p_variant ? 1 : 2); ++arg_index)
-      {
-        auto const &argument = expr.arguments()[arg_index];
-
-        if(!is_signed_or_unsigned_bitvector(argument.type()))
-        {
-          raise_wrong_argument_error(argument, arg_index + 1, is__p_variant);
-        }
-      }
-      if(
-        !is__p_variant &&
-        (result.type().id() != ID_pointer ||
-         !is_signed_or_unsigned_bitvector(result.type().subtype())))
-      {
-        raise_wrong_argument_error(result, 3, is__p_variant);
-      }
-    }
-
-    irep_idt kind =
-      has_prefix(id2string(identifier), "__builtin_add_overflow")
-        ? ID_plus
-        : has_prefix(id2string(identifier), "__builtin_sub_overflow") ? ID_minus
-                                                                      : ID_mult;
-
-    return side_effect_expr_overflowt{kind,
-                                      std::move(lhs),
-                                      std::move(rhs),
-                                      std::move(result),
-                                      expr.source_location()};
+    return typecheck_builtin_overflow(expr, ID_mult);
   }
   else
     return nil_exprt();
+  // NOLINTNEXTLINE(readability/fn_size)
+}
+
+exprt c_typecheck_baset::typecheck_builtin_overflow(
+  side_effect_expr_function_callt &expr,
+  const irep_idt &arith_op)
+{
+  const irep_idt &identifier = to_symbol_expr(expr.function()).get_identifier();
+
+  // check function signature
+  if(expr.arguments().size() != 3)
+  {
+    std::ostringstream error_message;
+    error_message << expr.source_location().as_string() << ": " << identifier
+                  << " takes exactly 3 arguments, but "
+                  << expr.arguments().size() << " were provided";
+    throw invalid_source_file_exceptiont{error_message.str()};
+  }
+
+  typecheck_function_call_arguments(expr);
+
+  auto lhs = expr.arguments()[0];
+  auto rhs = expr.arguments()[1];
+  auto result = expr.arguments()[2];
+
+  const bool is__p_variant = has_suffix(id2string(identifier), "_p");
+
+  {
+    auto const raise_wrong_argument_error =
+      [this, identifier](
+        const exprt &wrong_argument, std::size_t argument_number, bool _p) {
+        std::ostringstream error_message;
+        error_message << wrong_argument.source_location().as_string() << ": "
+                      << identifier << " has signature " << identifier
+                      << "(integral, integral, integral" << (_p ? "" : "*")
+                      << "), "
+                      << "but argument " << argument_number << " ("
+                      << expr2c(wrong_argument, *this) << ") has type `"
+                      << type2c(wrong_argument.type(), *this) << '`';
+        throw invalid_source_file_exceptiont{error_message.str()};
+      };
+    for(int arg_index = 0; arg_index <= (!is__p_variant ? 1 : 2); ++arg_index)
+    {
+      auto const &argument = expr.arguments()[arg_index];
+
+      if(!is_signed_or_unsigned_bitvector(argument.type()))
+      {
+        raise_wrong_argument_error(argument, arg_index + 1, is__p_variant);
+      }
+    }
+    if(
+      !is__p_variant &&
+      (result.type().id() != ID_pointer ||
+       !is_signed_or_unsigned_bitvector(result.type().subtype())))
+    {
+      raise_wrong_argument_error(result, 3, is__p_variant);
+    }
+  }
+
+  return side_effect_expr_overflowt{arith_op,
+                                    std::move(lhs),
+                                    std::move(rhs),
+                                    std::move(result),
+                                    expr.source_location()};
 }
 
 /// Typecheck the parameters in a function call expression, and where

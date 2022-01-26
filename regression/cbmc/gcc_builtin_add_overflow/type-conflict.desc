@@ -1,0 +1,6 @@
+CORE
+type-conflict.c
+-DCONFLICT1
+line 12 function main: __builtin_add_overflow has signature __builtin_add_overflow\(integral, integral, integral\*\), but argument 3 \(r\) has type `signed int`$
+^EXIT=6$
+^SIGNAL=0$
