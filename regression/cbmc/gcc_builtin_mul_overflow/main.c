@@ -2,6 +2,20 @@
 #include <limits.h>
 #include <stdint.h>
 
+#ifndef __GNUC__
+_Bool __builtin_mul_overflow();
+_Bool __builtin_mul_overflow_p();
+_Bool __builtin_smul_overflow(int, int, int *);
+_Bool __builtin_smull_overflow(long, long, long *);
+_Bool __builtin_smulll_overflow(long long, long long, long long *);
+_Bool __builtin_umul_overflow(unsigned int, unsigned int, unsigned int *);
+_Bool __builtin_umull_overflow(unsigned long, unsigned long, unsigned long *);
+_Bool __builtin_umulll_overflow(
+  unsigned long long,
+  unsigned long long,
+  unsigned long long *);
+#endif
+
 #define A_VALUE_X_SO_THAT_X_TIMES_X_DOES_NOT_OVERFLOW(T)                       \
   (((T)(1)) << (sizeof(T) * CHAR_BIT) / 2 - 1)
 

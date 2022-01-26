@@ -1,6 +1,20 @@
 #include <assert.h>
 #include <limits.h>
 
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_add_overflow_p();
+_Bool __builtin_sadd_overflow(int, int, int *);
+_Bool __builtin_saddl_overflow(long, long, long *);
+_Bool __builtin_saddll_overflow(long long, long long, long long *);
+_Bool __builtin_uadd_overflow(unsigned int, unsigned int, unsigned int *);
+_Bool __builtin_uaddl_overflow(unsigned long, unsigned long, unsigned long *);
+_Bool __builtin_uaddll_overflow(
+  unsigned long long,
+  unsigned long long,
+  unsigned long long *);
+#endif
+
 void check_int(void)
 {
   int const one = 1;
