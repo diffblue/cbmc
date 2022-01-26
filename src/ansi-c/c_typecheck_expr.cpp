@@ -3170,18 +3170,36 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(
     identifier == "__builtin_add_overflow" ||
+    identifier == "__builtin_sadd_overflow" ||
+    identifier == "__builtin_saddl_overflow" ||
+    identifier == "__builtin_saddll_overflow" ||
+    identifier == "__builtin_uadd_overflow" ||
+    identifier == "__builtin_uaddl_overflow" ||
+    identifier == "__builtin_uaddll_overflow" ||
     identifier == "__builtin_add_overflow_p")
   {
     return typecheck_builtin_overflow(expr, ID_plus);
   }
   else if(
     identifier == "__builtin_sub_overflow" ||
+    identifier == "__builtin_ssub_overflow" ||
+    identifier == "__builtin_ssubl_overflow" ||
+    identifier == "__builtin_ssubll_overflow" ||
+    identifier == "__builtin_usub_overflow" ||
+    identifier == "__builtin_usubl_overflow" ||
+    identifier == "__builtin_usubll_overflow" ||
     identifier == "__builtin_sub_overflow_p")
   {
     return typecheck_builtin_overflow(expr, ID_minus);
   }
   else if(
     identifier == "__builtin_mul_overflow" ||
+    identifier == "__builtin_smul_overflow" ||
+    identifier == "__builtin_smull_overflow" ||
+    identifier == "__builtin_smulll_overflow" ||
+    identifier == "__builtin_umul_overflow" ||
+    identifier == "__builtin_umull_overflow" ||
+    identifier == "__builtin_umulll_overflow" ||
     identifier == "__builtin_mul_overflow_p")
   {
     return typecheck_builtin_overflow(expr, ID_mult);
