@@ -1,0 +1,10 @@
+CORE
+enum_test3.c
+--show-goto-functions
+0 ≤ cast\(main::1::ev1, (un)?signedbv\[\d+\]\) ∧ cast\(main::1::ev1, (un)?signedbv\[\d+\]\) ≤ 4$
+^EXIT=0$
+^SIGNAL=0$
+--
+main::1::ev1 = 0
+--
+This test is to demonstrate simplification of enumerated ranges of integers.

@@ -8,11 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
-#include <unordered_set>
-
+#include "arith_tools.h"
+#include "c_types.h"
 #include "expr_util.h"
 #include "mathematical_expr.h"
+#include "namespace.h"
 #include "std_expr.h"
+
+#include <unordered_set>
 
 simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 {
@@ -96,6 +99,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
     std::unordered_set<exprt, irep_hash> expr_set;
 
     bool no_change = true;
+    bool may_be_reducible_to_interval =
+      expr.id() == ID_or && expr.operands().size() > 2;
 
     exprt::operandst new_operands = expr.operands();
 
@@ -127,7 +132,70 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
         no_change = false;
       }
       else
+      {
+        if(may_be_reducible_to_interval)
+          may_be_reducible_to_interval = it->id() == ID_equal;
         it++;
+      }
+    }
+
+    if(may_be_reducible_to_interval)
+    {
+      optionalt<symbol_exprt> symbol_opt;
+      std::set<mp_integer> values;
+      for(const exprt &op : new_operands)
+      {
+        equal_exprt eq = to_equal_expr(op);
+        if(eq.lhs().is_constant())
+          std::swap(eq.lhs(), eq.rhs());
+        if(auto s = expr_try_dynamic_cast<symbol_exprt>(eq.lhs()))
+        {
+          if(!symbol_opt.has_value())
+            symbol_opt = *s;
+
+          if(*s == *symbol_opt)
+          {
+            if(auto c = expr_try_dynamic_cast<constant_exprt>(eq.rhs()))
+            {
+              constant_exprt c_tmp = *c;
+              if(c_tmp.type().id() == ID_c_enum_tag)
+                c_tmp.type() = ns.follow_tag(to_c_enum_tag_type(c_tmp.type()));
+              if(auto int_opt = numeric_cast<mp_integer>(c_tmp))
+              {
+                values.insert(*int_opt);
+                continue;
+              }
+            }
+          }
+        }
+
+        symbol_opt.reset();
+        break;
+      }
+
+      if(symbol_opt.has_value() && values.size() >= 3)
+      {
+        mp_integer lower = *values.begin();
+        mp_integer upper = *std::prev(values.end());
+        if(upper - lower + 1 == mp_integer{values.size()})
+        {
+          typet type = symbol_opt->type();
+          if(symbol_opt->type().id() == ID_c_enum_tag)
+          {
+            type = ns.follow_tag(to_c_enum_tag_type(symbol_opt->type()))
+                     .underlying_type();
+          }
+
+          less_than_or_equal_exprt lb{
+            from_integer(lower, type),
+            typecast_exprt::conditional_cast(*symbol_opt, type)};
+          less_than_or_equal_exprt ub{
+            typecast_exprt::conditional_cast(*symbol_opt, type),
+            from_integer(upper, type)};
+
+          return and_exprt{lb, ub};
+        }
+      }
     }
 
     // search for a and !a

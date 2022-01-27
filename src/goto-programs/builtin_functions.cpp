@@ -636,7 +636,7 @@ void goto_convertt::do_enum_is_in_range(
     disjuncts.push_back(equal_exprt(enum_expr, std::move(val)));
   }
 
-  code_assignt assignment(lhs, disjunction(disjuncts));
+  code_assignt assignment(lhs, simplify_expr(disjunction(disjuncts), ns));
   assignment.add_source_location() = function.source_location();
   assignment.add_source_location().add_pragma("disable:enum-range-check");
   copy(assignment, ASSIGN, dest);

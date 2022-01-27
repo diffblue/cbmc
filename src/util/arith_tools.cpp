@@ -59,13 +59,13 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
     const typet &underlying_type = to_c_enum_type(type).underlying_type();
     if(underlying_type.id() == ID_signedbv)
     {
-      const auto width = to_signedbv_type(type).get_width();
+      const auto width = to_signedbv_type(underlying_type).get_width();
       int_value = bvrep2integer(value, width, true);
       return false;
     }
     else if(underlying_type.id() == ID_unsignedbv)
     {
-      const auto width = to_unsignedbv_type(type).get_width();
+      const auto width = to_unsignedbv_type(underlying_type).get_width();
       int_value = bvrep2integer(value, width, false);
       return false;
     }
