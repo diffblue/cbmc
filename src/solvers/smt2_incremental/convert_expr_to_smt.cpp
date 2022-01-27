@@ -391,8 +391,22 @@ convert_expr_to_smt(const euclidean_mod_exprt &euclidean_modulo)
 
 static smt_termt convert_expr_to_smt(const mult_exprt &multiply)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for multiply expression: " + multiply.pretty());
+  if(std::all_of(
+       multiply.operands().cbegin(),
+       multiply.operands().cend(),
+       [](exprt operand) {
+         return can_cast_type<integer_bitvector_typet>(operand.type());
+       }))
+  {
+    return convert_multiary_operator_to_terms(
+      multiply, smt_bit_vector_theoryt::multiply);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for multiply expression: " +
+      multiply.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const address_of_exprt &address_of)

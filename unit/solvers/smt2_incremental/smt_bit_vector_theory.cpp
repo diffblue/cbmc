@@ -213,4 +213,24 @@ TEST_CASE(
     // invariant violation.
     REQUIRE_THROWS(smt_bit_vector_theoryt::subtract(true_val, three));
   }
+
+  SECTION("Multiplication")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::multiply(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvmul", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    // Bit-vectors of mismatched sorts are going to hit an invariant violation.
+    REQUIRE_THROWS(smt_bit_vector_theoryt::multiply(three, four));
+    // A multiplication of a bool and a bitvector should hit an
+    // invariant violation.
+    REQUIRE_THROWS(smt_bit_vector_theoryt::multiply(true_val, three));
+  }
 }

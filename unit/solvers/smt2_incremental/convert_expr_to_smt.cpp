@@ -328,4 +328,21 @@ TEST_CASE(
     REQUIRE_THROWS(
       convert_expr_to_smt(minus_exprt{true_exprt{}, false_exprt{}}));
   }
+
+  SECTION("Multiplication of two constant size bit-vectors")
+  {
+    const auto constructed_term =
+      convert_expr_to_smt(mult_exprt{one_bvint, two_bvint});
+    const auto expected_term =
+      smt_bit_vector_theoryt::multiply(smt_term_one, smt_term_two);
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION(
+    "Ensure that multiplication node conversion fails if the operands are not "
+    "bit-vector based")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(convert_expr_to_smt(mult_exprt{one_bvint, false_exprt{}}));
+  }
 }

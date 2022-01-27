@@ -250,3 +250,26 @@ void smt_bit_vector_theoryt::subtractt::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::subtractt>
   smt_bit_vector_theoryt::subtract{};
+
+const char *smt_bit_vector_theoryt::multiplyt::identifier()
+{
+  return "bvmul";
+}
+
+smt_sortt smt_bit_vector_theoryt::multiplyt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::multiplyt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::multiplyt>
+  smt_bit_vector_theoryt::multiply{};
