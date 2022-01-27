@@ -239,3 +239,75 @@ TEST_CASE(
       smt_bit_vector_theoryt::unsigned_less_than_or_equal(one_term, two_term));
   }
 }
+
+TEST_CASE(
+  "expr to smt conversion for arithmetic operators",
+  "[core][smt2_incremental]")
+{
+  const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+  const smt_termt smt_term_two = smt_bit_vector_constant_termt{2, 8};
+
+  // Just regular (bit-vector) integers, to be used for the comparison
+  const auto one_bvint = from_integer({1}, signedbv_typet{8});
+  const auto two_bvint = from_integer({2}, signedbv_typet{8});
+  const auto one_bvint_unsigned = from_integer({1}, unsignedbv_typet{8});
+  const auto two_bvint_unsigned = from_integer({2}, unsignedbv_typet{8});
+
+  SECTION("Addition of two constant size bit-vectors")
+  {
+    const auto constructed_term =
+      convert_expr_to_smt(plus_exprt{one_bvint, two_bvint});
+    const auto expected_term =
+      smt_bit_vector_theoryt::add(smt_term_one, smt_term_two);
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION(
+    "Addition of four constant size bit-vectors - testing multi-ary handling "
+    "of plus_exprt")
+  {
+    const auto three_bv_int = from_integer({3}, signedbv_typet{8});
+    const auto four_bv_int = from_integer({4}, signedbv_typet{8});
+
+    const auto three_smt_term = smt_bit_vector_constant_termt{3, 8};
+    const auto four_smt_term = smt_bit_vector_constant_termt{4, 8};
+
+    const exprt::operandst plus_operands{
+      one_bvint, two_bvint, three_bv_int, four_bv_int};
+    const auto constructed_term =
+      convert_expr_to_smt(plus_exprt{plus_operands, signedbv_typet{8}});
+    const auto expected_term = smt_bit_vector_theoryt::add(
+      smt_bit_vector_theoryt::add(
+        smt_bit_vector_theoryt::add(smt_term_one, smt_term_two),
+        three_smt_term),
+      four_smt_term);
+
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION(
+    "Ensure that addition node conversion fails if the operands are not "
+    "bit-vector based")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(
+      convert_expr_to_smt(plus_exprt{true_exprt{}, false_exprt{}}));
+  }
+
+  SECTION(
+    "Ensure that addition node conversion fails if it has a malformed "
+    "expression")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    // No operands to expression
+    exprt::operandst zero_operands;
+    REQUIRE_THROWS(
+      convert_expr_to_smt(plus_exprt{zero_operands, signedbv_typet{8}}));
+
+    // One operand to expression
+    const auto four_bv_int = from_integer({4}, signedbv_typet{8});
+    exprt::operandst one_operand{four_bv_int};
+    REQUIRE_THROWS(
+      convert_expr_to_smt(plus_exprt{one_operand, signedbv_typet{8}}));
+  }
+}

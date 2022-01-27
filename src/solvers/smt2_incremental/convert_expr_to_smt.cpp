@@ -326,8 +326,19 @@ static optionalt<smt_termt> try_relational_conversion(const exprt &expr)
 
 static smt_termt convert_expr_to_smt(const plus_exprt &plus)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for plus expression: " + plus.pretty());
+  if(std::all_of(
+       plus.operands().cbegin(), plus.operands().cend(), [](exprt operand) {
+         return can_cast_type<integer_bitvector_typet>(operand.type());
+       }))
+  {
+    return convert_multiary_operator_to_terms(
+      plus, smt_bit_vector_theoryt::add);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for plus expression: " + plus.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const minus_exprt &minus)

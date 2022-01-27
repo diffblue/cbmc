@@ -205,3 +205,25 @@ void smt_bit_vector_theoryt::signed_greater_than_or_equalt::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::signed_greater_than_or_equalt>
   smt_bit_vector_theoryt::signed_greater_than_or_equal{};
+
+const char *smt_bit_vector_theoryt::addt::identifier()
+{
+  return "bvadd";
+}
+
+smt_sortt smt_bit_vector_theoryt::addt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::addt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::addt>
+  smt_bit_vector_theoryt::add{};

@@ -166,3 +166,31 @@ TEST_CASE("SMT bit vector predicates", "[core][smt2_incremental]")
       smt_bit_vector_theoryt::signed_greater_than_or_equal(two, wider));
   }
 }
+
+TEST_CASE(
+  "SMT bit vector arithmetic operator implementation tests",
+  "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bit_vector_constant_termt three{3, 8};
+  const smt_bit_vector_constant_termt four{4, 16};
+  const smt_bool_literal_termt true_val{true};
+
+  SECTION("Addition")
+  {
+    const auto function_application = smt_bit_vector_theoryt::add(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvadd", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    // Bit-vectors of mismatched sorts are going to hit an invariant violation.
+    REQUIRE_THROWS(smt_bit_vector_theoryt::add(three, four));
+    // An addition of a bool and a bitvector should hit an invariant violation.
+    REQUIRE_THROWS(smt_bit_vector_theoryt::add(three, true_val));
+  }
+}
