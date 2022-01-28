@@ -90,3 +90,26 @@ void smt_bit_vector_theoryt::unsigned_less_than_or_equalt::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::unsigned_less_than_or_equalt>
   smt_bit_vector_theoryt::unsigned_less_than_or_equal{};
+
+const char *smt_bit_vector_theoryt::unsigned_greater_thant::identifier()
+{
+  return "bvugt";
+}
+
+smt_sortt smt_bit_vector_theoryt::unsigned_greater_thant::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_bit_vector_theoryt::unsigned_greater_thant::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::unsigned_greater_thant>
+  smt_bit_vector_theoryt::unsigned_greater_than{};
