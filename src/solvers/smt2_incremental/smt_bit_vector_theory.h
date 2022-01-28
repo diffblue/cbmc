@@ -21,6 +21,7 @@ public:
 #include "smt_bit_vector_theory.def"
 #undef SMT_BITVECTOR_THEORY_PREDICATE
 
+  // Relational operator class declarations
   struct unsigned_less_thant final
   {
     static const char *identifier();
@@ -29,6 +30,16 @@ public:
   };
   static const smt_function_application_termt::factoryt<unsigned_less_thant>
     unsigned_less_than;
+
+  struct unsigned_less_than_or_equalt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<
+    unsigned_less_than_or_equalt>
+    unsigned_less_than_or_equal;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H
