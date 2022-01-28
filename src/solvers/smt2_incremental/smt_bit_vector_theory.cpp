@@ -160,3 +160,26 @@ void smt_bit_vector_theoryt::signed_less_thant::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::signed_less_thant>
   smt_bit_vector_theoryt::signed_less_than{};
+
+const char *smt_bit_vector_theoryt::signed_less_than_or_equalt::identifier()
+{
+  return "bvsle";
+}
+
+smt_sortt smt_bit_vector_theoryt::signed_less_than_or_equalt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_bit_vector_theoryt::signed_less_than_or_equalt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::signed_less_than_or_equalt>
+  smt_bit_vector_theoryt::signed_less_than_or_equal{};
