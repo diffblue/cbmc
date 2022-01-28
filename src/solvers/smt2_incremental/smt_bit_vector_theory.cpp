@@ -42,3 +42,26 @@ static void validate_bit_vector_predicate_arguments(
     smt_bit_vector_theoryt::the_name{};
 #include "smt_bit_vector_theory.def"
 #undef SMT_BITVECTOR_THEORY_PREDICATE
+
+const char *smt_bit_vector_theoryt::unsigned_less_thant::identifier()
+{
+  return "bvult";
+}
+
+smt_sortt smt_bit_vector_theoryt::unsigned_less_thant::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return smt_bool_sortt{};
+}
+
+void smt_bit_vector_theoryt::unsigned_less_thant::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::unsigned_less_thant>
+  smt_bit_vector_theoryt::unsigned_less_than{};
