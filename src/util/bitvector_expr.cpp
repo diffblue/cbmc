@@ -150,9 +150,9 @@ exprt bitreverse_exprt::lower() const
   exprt::operandst result_bits;
   result_bits.reserve(int_width);
 
-  const exprt operand = op();
+  const symbol_exprt to_reverse("to_reverse", op().type());
   for(std::size_t i = 0; i < int_width; ++i)
-    result_bits.push_back(extractbit_exprt{operand, i});
+    result_bits.push_back(extractbit_exprt{to_reverse, i});
 
-  return concatenation_exprt{result_bits, type()};
+  return let_exprt{to_reverse, op(), concatenation_exprt{result_bits, type()}};
 }
