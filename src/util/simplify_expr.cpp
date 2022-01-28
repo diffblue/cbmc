@@ -2542,6 +2542,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   {
     r = simplify_overflow_unary(to_unary_overflow_expr(expr));
   }
+  else if(expr.id() == ID_bitreverse)
+  {
+    r = simplify_bitreverse(to_bitreverse_expr(expr));
+  }
 
   if(!no_change_join_operands)
     r = changed(r);

@@ -3204,6 +3204,28 @@ exprt c_typecheck_baset::do_special_functions(
   {
     return typecheck_builtin_overflow(expr, ID_mult);
   }
+  else if(
+    identifier == "__builtin_bitreverse8" ||
+    identifier == "__builtin_bitreverse16" ||
+    identifier == "__builtin_bitreverse32" ||
+    identifier == "__builtin_bitreverse64")
+  {
+    // clang only
+    if(expr.arguments().size() != 1)
+    {
+      std::ostringstream error_message;
+      error_message << expr.source_location().as_string()
+                    << ": error: " << identifier << " expects one operand";
+      throw invalid_source_file_exceptiont{error_message.str()};
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    bitreverse_exprt bitreverse{expr.arguments()[0]};
+    bitreverse.add_source_location() = source_location;
+
+    return std::move(bitreverse);
+  }
   else
     return nil_exprt();
   // NOLINTNEXTLINE(readability/fn_size)

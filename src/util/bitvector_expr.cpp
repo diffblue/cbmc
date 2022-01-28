@@ -142,3 +142,17 @@ exprt count_trailing_zeros_exprt::lower() const
 
   return typecast_exprt::conditional_cast(result, type());
 }
+
+exprt bitreverse_exprt::lower() const
+{
+  const std::size_t int_width = to_bitvector_type(type()).get_width();
+
+  exprt::operandst result_bits;
+  result_bits.reserve(int_width);
+
+  const symbol_exprt to_reverse("to_reverse", op().type());
+  for(std::size_t i = 0; i < int_width; ++i)
+    result_bits.push_back(extractbit_exprt{to_reverse, i});
+
+  return let_exprt{to_reverse, op(), concatenation_exprt{result_bits, type()}};
+}

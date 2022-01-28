@@ -3496,6 +3496,22 @@ std::string expr2ct::convert_conditional_target_group(const exprt &src)
   return dest;
 }
 
+std::string expr2ct::convert_bitreverse(const bitreverse_exprt &src)
+{
+  if(auto type_ptr = type_try_dynamic_cast<unsignedbv_typet>(src.type()))
+  {
+    const std::size_t width = type_ptr->get_width();
+    if(width == 8 || width == 16 || width == 32 || width == 64)
+    {
+      return convert_function(
+        src, "__builtin_bitreverse" + std::to_string(width));
+    }
+  }
+
+  unsigned precedence;
+  return convert_norep(src, precedence);
+}
+
 std::string expr2ct::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
@@ -3903,6 +3919,9 @@ std::string expr2ct::convert_with_precedence(
   {
     return convert_conditional_target_group(src);
   }
+
+  else if(src.id() == ID_bitreverse)
+    return convert_bitreverse(to_bitreverse_expr(src));
 
   auto function_string_opt = convert_function(src);
   if(function_string_opt.has_value())
