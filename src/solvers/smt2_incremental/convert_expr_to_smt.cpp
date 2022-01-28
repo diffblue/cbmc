@@ -400,9 +400,22 @@ static smt_termt convert_expr_to_smt(const ieee_float_op_exprt &float_operation)
 
 static smt_termt convert_expr_to_smt(const mod_exprt &truncation_modulo)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for truncation modulo expression: " +
-    truncation_modulo.pretty());
+  const bool both_operands_bitvector =
+    can_cast_type<integer_bitvector_typet>(truncation_modulo.lhs().type()) &&
+    can_cast_type<integer_bitvector_typet>(truncation_modulo.rhs().type());
+
+  if(both_operands_bitvector)
+  {
+    return smt_bit_vector_theoryt::unsigned_remainder(
+      convert_expr_to_smt(truncation_modulo.lhs()),
+      convert_expr_to_smt(truncation_modulo.rhs()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for remainder (modulus) expression: " +
+      truncation_modulo.pretty());
+  }
 }
 
 static smt_termt
