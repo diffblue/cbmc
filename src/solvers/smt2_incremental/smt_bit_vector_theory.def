@@ -3,5 +3,4 @@
 /// [X-macro](https://en.wikipedia.org/wiki/X_Macro) pattern. These define the
 /// set of bitvector theory functions which are implemented and it is used to
 /// automate repetitive parts of the implementation.
-SMT_BITVECTOR_THEORY_PREDICATE(bvsgt, signed_greater_than)
 SMT_BITVECTOR_THEORY_PREDICATE(bvsge, signed_greater_than_or_equal)
