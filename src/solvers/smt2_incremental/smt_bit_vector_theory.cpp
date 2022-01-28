@@ -365,3 +365,22 @@ void smt_bit_vector_theoryt::signed_remaindert::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::signed_remaindert>
   smt_bit_vector_theoryt::signed_remainder{};
+
+const char *smt_bit_vector_theoryt::negatet::identifier()
+{
+  return "bvneg";
+}
+
+smt_sortt smt_bit_vector_theoryt::negatet::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+void smt_bit_vector_theoryt::negatet::validate(const smt_termt &operand)
+{
+  const auto operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "The operand is expected to have a bit-vector sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::negatet>
+  smt_bit_vector_theoryt::negate{};

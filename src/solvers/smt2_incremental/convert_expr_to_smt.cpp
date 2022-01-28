@@ -154,9 +154,19 @@ static smt_termt convert_expr_to_smt(const bitnot_exprt &bitwise_not)
 
 static smt_termt convert_expr_to_smt(const unary_minus_exprt &unary_minus)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for unary minus expression: " +
-    unary_minus.pretty());
+  const bool operand_is_bitvector =
+    can_cast_type<integer_bitvector_typet>(unary_minus.op().type());
+  if(operand_is_bitvector)
+  {
+    return smt_bit_vector_theoryt::negate(
+      convert_expr_to_smt(unary_minus.op()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for unary minus expression: " +
+      unary_minus.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const unary_plus_exprt &unary_plus)

@@ -399,4 +399,20 @@ TEST_CASE(
     const cbmc_invariants_should_throwt invariants_throw;
     REQUIRE_THROWS(convert_expr_to_smt(mod_exprt{one_bvint, false_exprt{}}));
   }
+
+  SECTION("Unary minus of constant size bit-vector")
+  {
+    const auto constructed_term =
+      convert_expr_to_smt(unary_minus_exprt{one_bvint});
+    const auto expected_term = smt_bit_vector_theoryt::negate(smt_term_one);
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION(
+    "Ensure that unary minus node conversion fails if the operand is not a "
+    "bit-vector")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(convert_expr_to_smt(unary_minus_exprt{true_exprt{}}));
+  }
 }

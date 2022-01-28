@@ -309,4 +309,19 @@ TEST_CASE(
     // A remainder of a bool and a bitvector should hit an invariant violation.
     REQUIRE_THROWS(smt_bit_vector_theoryt::signed_remainder(true_val, three));
   }
+
+  SECTION("Unary Minus")
+  {
+    const auto function_application = smt_bit_vector_theoryt::negate(two);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvneg", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    // Negation of a value of bool sort should fail with an invariant violation.
+    REQUIRE_THROWS(smt_bit_vector_theoryt::negate(true_val));
+  }
 }
