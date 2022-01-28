@@ -108,6 +108,15 @@ public:
     static void validate(const smt_termt &lhs, const smt_termt &rhs);
   };
   static const smt_function_application_termt::factoryt<multiplyt> multiply;
+
+  struct unsigned_dividet final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<unsigned_dividet>
+    unsigned_divide;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H

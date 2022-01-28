@@ -273,3 +273,26 @@ void smt_bit_vector_theoryt::multiplyt::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::multiplyt>
   smt_bit_vector_theoryt::multiply{};
+
+const char *smt_bit_vector_theoryt::unsigned_dividet::identifier()
+{
+  return "bvudiv";
+}
+
+smt_sortt smt_bit_vector_theoryt::unsigned_dividet::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::unsigned_dividet::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::unsigned_dividet>
+  smt_bit_vector_theoryt::unsigned_divide{};

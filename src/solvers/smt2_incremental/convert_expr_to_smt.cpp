@@ -361,8 +361,20 @@ static smt_termt convert_expr_to_smt(const minus_exprt &minus)
 
 static smt_termt convert_expr_to_smt(const div_exprt &divide)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for divide expression: " + divide.pretty());
+  const bool both_operands_bitvector =
+    can_cast_type<integer_bitvector_typet>(divide.lhs().type()) &&
+    can_cast_type<integer_bitvector_typet>(divide.rhs().type());
+
+  if(both_operands_bitvector)
+  {
+    return smt_bit_vector_theoryt::unsigned_divide(
+      convert_expr_to_smt(divide.lhs()), convert_expr_to_smt(divide.rhs()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for divide expression: " + divide.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const ieee_float_op_exprt &float_operation)

@@ -345,4 +345,23 @@ TEST_CASE(
     const cbmc_invariants_should_throwt invariants_throw;
     REQUIRE_THROWS(convert_expr_to_smt(mult_exprt{one_bvint, false_exprt{}}));
   }
+
+  // Division is defined over unsigned numbers only (theory notes say it
+  // truncates over zero)
+  SECTION("Division of two constant size bit-vectors")
+  {
+    const auto constructed_term =
+      convert_expr_to_smt(div_exprt{one_bvint_unsigned, two_bvint_unsigned});
+    const auto expected_term =
+      smt_bit_vector_theoryt::unsigned_divide(smt_term_one, smt_term_two);
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION(
+    "Ensure that division node conversion fails if the operands are not "
+    "bit-vector based")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(convert_expr_to_smt(div_exprt{one_bvint, false_exprt{}}));
+  }
 }
