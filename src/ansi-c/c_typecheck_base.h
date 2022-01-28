@@ -202,6 +202,9 @@ protected:
   virtual void typecheck_function_call_arguments(
     side_effect_expr_function_callt &expr);
   virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
+  exprt typecheck_builtin_overflow(
+    side_effect_expr_function_callt &expr,
+    const irep_idt &arith_op);
   virtual optionalt<symbol_exprt> typecheck_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const exprt::operandst &arguments,

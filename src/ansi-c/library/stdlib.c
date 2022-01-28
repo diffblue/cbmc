@@ -71,18 +71,16 @@ inline void abort(void)
 #undef calloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef __GNUC__
+_Bool __builtin_mul_overflow();
+#endif
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
-#pragma CPROVER check push
-#pragma CPROVER check disable "unsigned-overflow"
-  if(__CPROVER_overflow_mult(nmemb, size))
+  __CPROVER_size_t alloc_size;
+  if(__builtin_mul_overflow(nmemb, size, &alloc_size))
     return (void *)0;
-  // This is now safe; still do it within the scope of the pragma to avoid an
-  // unnecessary assertion to be generated.
-  __CPROVER_size_t alloc_size = nmemb * size;
-#pragma CPROVER check pop
 
   if(__CPROVER_malloc_failure_mode == __CPROVER_malloc_failure_mode_return_null)
   {
@@ -302,6 +300,11 @@ inline void free(void *ptr)
 int isspace(int);
 int isdigit(int);
 
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
 inline long strtol(const char *nptr, char **endptr, int base)
 {
   __CPROVER_HIDE:;
@@ -362,15 +365,8 @@ inline long strtol(const char *nptr, char **endptr, int base)
       break;
 
     in_number=1;
-    _Bool overflow = __CPROVER_overflow_mult(res, (long)base);
-#pragma CPROVER check push
-#pragma CPROVER check disable "signed-overflow"
-    // This is now safe; still do it within the scope of the pragma to avoid an
-    // unnecessary assertion to be generated.
-    if(!overflow)
-      res *= base;
-#pragma CPROVER check pop
-    if(overflow || __CPROVER_overflow_plus(res, (long)(ch - sub)))
+    _Bool overflow = __builtin_mul_overflow(res, (long)base, &res);
+    if(overflow || __builtin_add_overflow(res, (long)(ch - sub), &res))
     {
       errno=ERANGE;
       if(sign=='-')
@@ -378,7 +374,6 @@ inline long strtol(const char *nptr, char **endptr, int base)
       else
         return LONG_MAX;
     }
-    res += ch - sub;
   }
 
   if(endptr!=0)
