@@ -1,0 +1,10 @@
+CORE
+conversion-check.c
+--conversion-check --unsigned-overflow-check --signed-overflow-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^Generated [1-9]\d* VCC\(s\)
+--
+Zero VCCs should be generated.
