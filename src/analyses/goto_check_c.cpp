@@ -347,8 +347,8 @@ protected:
 class flag_resett
 {
 public:
-  explicit flag_resett(const goto_programt::instructiont &_instruction)
-    : instruction(_instruction)
+  explicit flag_resett(const source_locationt &source_location)
+    : source_location(source_location)
   {
   }
 
@@ -367,7 +367,7 @@ public:
     INVARIANT(
       flags_to_reset.find(&flag) == flags_to_reset.end(),
       "Flag " + id2string(flag_name) + " set twice at \n" +
-        instruction.source_location().pretty());
+        source_location.as_string());
     if(flag != new_value)
     {
       flags_to_reset[&flag] = flag;
@@ -384,7 +384,7 @@ public:
     INVARIANT(
       disabled_flags.find(&flag) == disabled_flags.end(),
       "Flag " + id2string(flag_name) + " disabled twice at \n" +
-        instruction.source_location().pretty());
+        source_location.as_string());
 
     disabled_flags.insert(&flag);
 
@@ -408,7 +408,7 @@ public:
   }
 
 private:
-  const goto_programt::instructiont &instruction;
+  const source_locationt &source_location;
   std::map<bool *, bool> flags_to_reset;
   std::set<bool *> disabled_flags;
 };
@@ -2027,7 +2027,7 @@ void goto_check_ct::goto_check(
     current_target = it;
     goto_programt::instructiont &i = *it;
 
-    flag_resett resetter(i);
+    flag_resett resetter(i.source_location());
     const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
@@ -2110,7 +2110,7 @@ void goto_check_ct::goto_check(
       // Disable enum range checks for left-hand sides as their values are yet
       // to be set (by this assignment).
       {
-        flag_resett resetter(i);
+        flag_resett resetter(i.source_location());
         resetter.disable_flag(enable_enum_range_check, "enum_range_check");
         check(assign_lhs);
       }
