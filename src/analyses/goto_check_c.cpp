@@ -1895,6 +1895,33 @@ void goto_check_ct::check_rec_arithmetic_op(
 
 void goto_check_ct::check_rec(const exprt &expr, const guardt &guard)
 {
+  flag_overridet resetter(expr.source_location());
+  const auto &pragmas = expr.source_location().get_pragmas();
+  for(const auto &d : pragmas)
+  {
+    // match named-check related pragmas
+    auto matched = match_named_check(d.first);
+    if(matched.has_value())
+    {
+      auto named_check = matched.value();
+      auto name = named_check.first;
+      auto status = named_check.second;
+      bool *flag = name_to_flag.find(name)->second;
+      switch(status)
+      {
+      case check_statust::ENABLE:
+        resetter.set_flag(*flag, true, name);
+        break;
+      case check_statust::DISABLE:
+        resetter.set_flag(*flag, false, name);
+        break;
+      case check_statust::CHECKED:
+        resetter.disable_flag(*flag, name);
+        break;
+      }
+    }
+  }
+
   if(expr.id() == ID_exists || expr.id() == ID_forall)
   {
     // the scoped variables may be used in the assertion

@@ -656,9 +656,12 @@ void goto_convertt::remove_overflow(
   if(result.type().id() == ID_pointer)
   {
     result_type = to_pointer_type(result.type()).base_type();
-    code_assignt result_assignment{dereference_exprt{result},
-                                   typecast_exprt{operation, *result_type},
-                                   expr.source_location()};
+    source_locationt source_location_annotated = expr.source_location();
+    source_location_annotated.add_pragma("disable:conversion-check");
+    code_assignt result_assignment{
+      dereference_exprt{result},
+      typecast_exprt{operation, *result_type},
+      source_location_annotated};
     convert_assign(result_assignment, dest, mode);
   }
   else
