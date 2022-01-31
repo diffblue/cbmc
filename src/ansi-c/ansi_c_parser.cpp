@@ -171,7 +171,7 @@ ansi_c_id_classt ansi_c_parsert::get_class(const typet &type)
     }
   }
   else if(type.has_subtype())
-    return get_class(type.subtype());
+    return get_class(to_type_with_subtype(type).subtype());
 
   return ansi_c_id_classt::ANSI_C_SYMBOL;
 }

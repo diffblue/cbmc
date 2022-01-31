@@ -405,7 +405,7 @@ bool generate_ansi_c_start_function(
       {
         // assign argv[argc] to NULL
         const null_pointer_exprt null(
-          to_pointer_type(argv_symbol.type.subtype()));
+          to_pointer_type(to_array_type(argv_symbol.type).element_type()));
 
         index_exprt index_expr(
           argv_symbol.symbol_expr(), argc_symbol.symbol_expr());
@@ -422,7 +422,8 @@ bool generate_ansi_c_start_function(
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp[envp_size] is NULL
-        null_pointer_exprt null(to_pointer_type(envp_symbol.type.subtype()));
+        null_pointer_exprt null(
+          to_pointer_type(to_array_type(envp_symbol.type).element_type()));
 
         index_exprt index_expr(
           envp_symbol.symbol_expr(), envp_size_symbol.symbol_expr());

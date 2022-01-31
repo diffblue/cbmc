@@ -90,7 +90,7 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
   input_opt.value().push_back(char_val);
   const auto length =
     from_integer(input_opt.value().size(), result.length_type());
-  const array_typet type(result.type().subtype(), length);
+  const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
   return make_string(input_opt.value(), type);
 }
 
@@ -137,7 +137,7 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
     input_opt.value()[numeric_cast_v<std::size_t>(*position_opt)] = *char_opt;
   const auto length =
     from_integer(input_opt.value().size(), result.length_type());
-  const array_typet type(result.type().subtype(), length);
+  const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
   return make_string(input_opt.value(), type);
 }
 
@@ -226,7 +226,7 @@ optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
   }
   const auto length =
     from_integer(input_opt.value().size(), result.length_type());
-  const array_typet type(result.type().subtype(), length);
+  const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
   return make_string(input_opt.value(), type);
 }
 
@@ -292,7 +292,7 @@ string_constraintst string_to_lower_case_builtin_functiont::constraints(
     const exprt conditional_convert = [&] {
       // The difference between upper-case and lower-case for the basic
       // latin and latin-1 supplement is 0x20.
-      const typet &char_type = result.type().subtype();
+      const typet &char_type = to_type_with_subtype(result.type()).subtype();
       const exprt diff = from_integer(0x20, char_type);
       const exprt converted =
         equal_exprt(result[idx], plus_exprt(input[idx], diff));
@@ -320,7 +320,7 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
   }
   const auto length =
     from_integer(input_opt.value().size(), result.length_type());
-  const array_typet type(result.type().subtype(), length);
+  const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
   return make_string(input_opt.value(), type);
 }
 
@@ -341,7 +341,8 @@ string_constraintst string_to_upper_case_builtin_functiont::constraints(
   constraints.universal.push_back([&] {
     const symbol_exprt idx =
       fresh_symbol("QA_upper_case", result.length_type());
-    const typet &char_type = input.content().type().subtype();
+    const typet &char_type =
+      to_type_with_subtype(input.content().type()).subtype();
     const exprt converted =
       minus_exprt(input[idx], from_integer(0x20, char_type));
     return string_constraintt(
@@ -398,7 +399,8 @@ optionalt<exprt> string_of_int_builtin_functiont::eval(
 
   const auto length = right_to_left_characters.size();
   const auto length_expr = from_integer(length, result.length_type());
-  const array_typet type(result.type().subtype(), length_expr);
+  const array_typet type(
+    to_type_with_subtype(result.type()).subtype(), length_expr);
   return make_string(
     right_to_left_characters.rbegin(), right_to_left_characters.rend(), type);
 }

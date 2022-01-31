@@ -65,7 +65,7 @@ exprt goto_symext::address_arithmetic(
       // turn &a of type T[i][j] into &(a[0][0])
       for(const typet *t = &(a.type().subtype());
           t->id() == ID_array && expr.type() != *t;
-          t = &(t->subtype()))
+          t = &(to_array_type(*t).element_type()))
         a.object() = index_exprt(a.object(), from_integer(0, c_index_type()));
     }
 
@@ -83,7 +83,7 @@ exprt goto_symext::address_arithmetic(
     typet dest_type_subtype;
 
     if(expr_type.id()==ID_array && !keep_array)
-      dest_type_subtype=expr_type.subtype();
+      dest_type_subtype = to_array_type(expr_type).element_type();
     else
       dest_type_subtype=expr_type;
 
@@ -174,7 +174,7 @@ exprt goto_symext::address_arithmetic(
     typet dest_type_subtype;
 
     if(expr_type.id() == ID_array && !keep_array)
-      dest_type_subtype = expr_type.subtype();
+      dest_type_subtype = to_array_type(expr_type).element_type();
     else
       dest_type_subtype = expr_type;
 

@@ -28,12 +28,14 @@ void cpp_exception_list_rec(
     if(src.get_bool(ID_C_reference))
     {
       // do not change
-      cpp_exception_list_rec(src.subtype(), ns, suffix, dest);
+      cpp_exception_list_rec(
+        to_reference_type(src).base_type(), ns, suffix, dest);
     }
     else
     {
       // append suffix _ptr
-      cpp_exception_list_rec(src.subtype(), ns, "_ptr"+suffix, dest);
+      cpp_exception_list_rec(
+        to_reference_type(src).base_type(), ns, "_ptr" + suffix, dest);
     }
   }
   else if(src.id() == ID_union_tag)

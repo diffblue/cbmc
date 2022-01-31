@@ -570,7 +570,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     else if(
       root_object_type.id() == ID_array &&
       dereference_type_compare(
-        root_object_type.subtype(), dereference_type, ns))
+        to_array_type(root_object_type).element_type(), dereference_type, ns))
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
@@ -587,12 +587,13 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       exprt adjusted_offset;
 
       // are we doing a byte?
-      auto element_size = pointer_offset_size(root_object_type.subtype(), ns);
+      auto element_size =
+        pointer_offset_size(to_array_type(root_object_type).element_type(), ns);
 
       if(!element_size.has_value() || *element_size == 0)
       {
         throw "unknown or invalid type size of:\n" +
-          root_object_type.subtype().pretty();
+          to_array_type(root_object_type).element_type().pretty();
       }
       else if(*element_size == 1)
       {
@@ -609,8 +610,10 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         // TODO: need to assert well-alignedness
       }
 
-      const index_exprt &index_expr =
-        index_exprt(root_object, adjusted_offset, root_object_type.subtype());
+      const index_exprt &index_expr = index_exprt(
+        root_object,
+        adjusted_offset,
+        to_array_type(root_object_type).element_type());
       result.value =
         typecast_exprt::conditional_cast(index_expr, dereference_type);
       result.pointer = typecast_exprt::conditional_cast(
@@ -757,12 +760,14 @@ bool value_set_dereferencet::memory_model_bytes(
   if(
     from_type.id() == ID_array && from_type_subtype_size.has_value() &&
     *from_type_subtype_size == 1 && to_type_size.has_value() &&
-    *to_type_size == 1 && is_a_bv_type(from_type.subtype()) &&
+    *to_type_size == 1 &&
+    is_a_bv_type(to_array_type(from_type).element_type()) &&
     is_a_bv_type(to_type))
   {
     // yes, can use 'index', but possibly need to convert
     result = typecast_exprt::conditional_cast(
-      index_exprt(value, offset, from_type.subtype()), to_type);
+      index_exprt(value, offset, to_array_type(from_type).element_type()),
+      to_type);
   }
   else
   {

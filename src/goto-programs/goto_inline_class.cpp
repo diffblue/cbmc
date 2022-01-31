@@ -81,11 +81,11 @@ void goto_inlinet::parameter_assignments(
         const typet &f_acttype = actual.type();
 
         // we are willing to do some conversion
-        if((f_partype.id()==ID_pointer &&
-            f_acttype.id()==ID_pointer) ||
-           (f_partype.id()==ID_pointer &&
-            f_acttype.id()==ID_array &&
-            f_partype.subtype()==f_acttype.subtype()))
+        if(
+          (f_partype.id() == ID_pointer && f_acttype.id() == ID_pointer) ||
+          (f_partype.id() == ID_pointer && f_acttype.id() == ID_array &&
+           to_type_with_subtype(f_partype).subtype() ==
+             to_type_with_subtype(f_acttype).subtype()))
         {
           actual = typecast_exprt(actual, f_partype);
         }

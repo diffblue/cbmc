@@ -51,9 +51,11 @@ static symbol_exprt typecheck_sync_with_pointer_parameter(
     throw 0;
   }
 
+  const auto &pointer_type = to_pointer_type(ptr_arg.type());
+
   code_typet t{{code_typet::parametert(ptr_arg.type()),
-                code_typet::parametert(ptr_arg.type().subtype())},
-               ptr_arg.type().subtype()};
+                code_typet::parametert(pointer_type.base_type())},
+               pointer_type.base_type()};
   t.make_ellipsis();
   symbol_exprt result{identifier, std::move(t)};
   result.add_source_location() = source_location;
@@ -88,14 +90,14 @@ static symbol_exprt typecheck_sync_compare_swap(
     throw 0;
   }
 
-  const typet &subtype = ptr_arg.type().subtype();
-  typet sync_return_type = subtype;
+  const typet &base_type = to_pointer_type(ptr_arg.type()).base_type();
+  typet sync_return_type = base_type;
   if(identifier == ID___sync_bool_compare_and_swap)
     sync_return_type = c_bool_type();
 
   code_typet t{{code_typet::parametert(ptr_arg.type()),
-                code_typet::parametert(subtype),
-                code_typet::parametert(subtype)},
+                code_typet::parametert(base_type),
+                code_typet::parametert(base_type)},
                sync_return_type};
   t.make_ellipsis();
   symbol_exprt result{identifier, std::move(t)};
@@ -168,7 +170,7 @@ static symbol_exprt typecheck_atomic_load_n(
   const code_typet t(
     {code_typet::parametert(ptr_arg.type()),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    to_pointer_type(ptr_arg.type()).base_type());
   symbol_exprt result(identifier, t);
   result.add_source_location() = source_location;
   return result;
@@ -200,9 +202,11 @@ static symbol_exprt typecheck_atomic_store_n(
     throw 0;
   }
 
+  const auto &base_type = to_pointer_type(ptr_arg.type()).base_type();
+
   const code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(base_type),
      code_typet::parametert(signed_int_type())},
     void_type());
   symbol_exprt result(identifier, t);
@@ -236,11 +240,13 @@ static symbol_exprt typecheck_atomic_exchange_n(
     throw 0;
   }
 
+  const auto &base_type = to_pointer_type(ptr_arg.type()).base_type();
+
   const code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(base_type),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    base_type);
   symbol_exprt result(identifier, t);
   result.add_source_location() = source_location;
   return result;
@@ -398,7 +404,8 @@ static symbol_exprt typecheck_atomic_compare_exchange(
   if(identifier == ID___atomic_compare_exchange)
     parameters.push_back(code_typet::parametert(ptr_arg.type()));
   else
-    parameters.push_back(code_typet::parametert(ptr_arg.type().subtype()));
+    parameters.push_back(
+      code_typet::parametert(to_pointer_type(ptr_arg.type()).base_type()));
 
   parameters.push_back(code_typet::parametert(c_bool_type()));
   parameters.push_back(code_typet::parametert(signed_int_type()));
@@ -438,9 +445,9 @@ static symbol_exprt typecheck_atomic_op_fetch(
 
   code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(to_pointer_type(ptr_arg.type()).base_type()),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    to_pointer_type(ptr_arg.type()).base_type());
   symbol_exprt result(identifier, std::move(t));
   result.add_source_location() = source_location;
   return result;
@@ -475,9 +482,9 @@ static symbol_exprt typecheck_atomic_fetch_op(
 
   code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(to_pointer_type(ptr_arg.type()).base_type()),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    to_pointer_type(ptr_arg.type()).base_type());
   symbol_exprt result(identifier, std::move(t));
   result.add_source_location() = source_location;
   return result;

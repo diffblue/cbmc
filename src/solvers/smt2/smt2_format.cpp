@@ -151,7 +151,9 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
       out << "(store ";
 
     out << "((as const " << smt2_format(expr.type()) << ")) "
-        << smt2_format(from_integer(0, expr.type().subtype())) << ')';
+        << smt2_format(
+             from_integer(0, to_array_type(expr.type()).element_type()))
+        << ')';
 
     for(std::size_t i = 0; i < array_list_expr.operands().size(); i += 2)
     {

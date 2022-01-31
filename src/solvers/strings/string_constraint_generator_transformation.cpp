@@ -46,7 +46,7 @@ string_constraint_generatort::add_axioms_for_set_length(
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &k = f.arguments()[3];
   const typet &index_type = s1.length_type();
-  const typet &char_type = s1.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(s1.content().type()).subtype();
 
   // We add axioms:
   // a1 : |res|=max(k, 0)
@@ -186,7 +186,7 @@ string_constraint_generatort::add_axioms_for_trim(
   const array_string_exprt &res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const typet &index_type = str.length_type();
-  const typet &char_type = str.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(str.content().type()).subtype();
   const symbol_exprt idx = fresh_symbol("index_trim", index_type);
   const exprt space_char = from_integer(' ', char_type);
 
@@ -381,7 +381,7 @@ string_constraint_generatort::add_axioms_for_delete(
   PRECONDITION(start.type() == str.length_type());
   PRECONDITION(end.type() == str.length_type());
   const typet &index_type = str.length_type();
-  const typet &char_type = str.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(str.content().type()).subtype();
   const array_string_exprt sub1 =
     array_pool.fresh_string(index_type, char_type);
   const array_string_exprt sub2 =

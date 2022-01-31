@@ -78,7 +78,7 @@ static bool have_to_remove_vector(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_complex ||
           type.id()==ID_array)
-    return have_to_remove_vector(type.subtype());
+    return have_to_remove_vector(to_type_with_subtype(type).subtype());
   else if(type.id()==ID_vector)
     return true;
 
@@ -182,7 +182,8 @@ static void remove_vector(exprt &expr)
       operands.reserve(dimension);
 
       const bool is_float =
-        binary_expr.lhs().type().subtype().id() == ID_floatbv;
+        to_array_type(binary_expr.lhs().type()).element_type().id() ==
+        ID_floatbv;
       irep_idt new_id;
       if(binary_expr.id() == ID_vector_notequal)
       {

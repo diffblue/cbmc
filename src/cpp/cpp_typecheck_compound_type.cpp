@@ -524,7 +524,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
           assert(!code_type.parameters().empty());
           const typet &pointer_type=code_type.parameters()[0].type();
           assert(pointer_type.id()==ID_pointer);
-          virtual_bases.insert(pointer_type.subtype().get(ID_identifier));
+          virtual_bases.insert(
+            to_pointer_type(pointer_type).base_type().get(ID_identifier));
         }
       }
     }
@@ -1704,11 +1705,11 @@ void cpp_typecheckt::make_ptr_typecast(
   assert(src_type.id()==  ID_pointer);
   assert(dest_type.id()== ID_pointer);
 
-  const struct_typet &src_struct =
-    to_struct_type(static_cast<const typet &>(follow(src_type.subtype())));
+  const struct_typet &src_struct = to_struct_type(
+    static_cast<const typet &>(follow(to_pointer_type(src_type).base_type())));
 
-  const struct_typet &dest_struct =
-    to_struct_type(static_cast<const typet &>(follow(dest_type.subtype())));
+  const struct_typet &dest_struct = to_struct_type(
+    static_cast<const typet &>(follow(to_pointer_type(dest_type).base_type())));
 
   PRECONDITION(
     subtype_typecast(src_struct, dest_struct) ||

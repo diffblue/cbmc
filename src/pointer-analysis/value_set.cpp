@@ -563,7 +563,8 @@ void value_sett::get_value_set_rec(
     if(expr.get(ID_value)==ID_NULL &&
        expr_type.id()==ID_pointer)
     {
-      insert(dest, exprt(ID_null_object, expr_type.subtype()), 0);
+      insert(
+        dest, exprt(ID_null_object, to_pointer_type(expr_type).base_type()), 0);
     }
     else if(expr_type.id()==ID_unsignedbv ||
             expr_type.id()==ID_signedbv)
@@ -762,7 +763,8 @@ void value_sett::get_value_set_rec(
       PRECONDITION(suffix.empty());
       assert(expr_type.id()==ID_pointer);
 
-      dynamic_object_exprt dynamic_object(expr_type.subtype());
+      dynamic_object_exprt dynamic_object(
+        to_pointer_type(expr_type).base_type());
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
@@ -1062,8 +1064,9 @@ void value_sett::get_reference_set_rec(
      expr.id()==ID_string_constant ||
      expr.id()==ID_array)
   {
-    if(expr.type().id()==ID_array &&
-       expr.type().subtype().id()==ID_array)
+    if(
+      expr.type().id() == ID_array &&
+      to_array_type(expr.type()).element_type().id() == ID_array)
       insert(dest, expr);
     else
       insert(dest, expr, 0);
@@ -1094,10 +1097,11 @@ void value_sett::get_reference_set_rec(
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &offset=index_expr.index();
-    const typet &array_type = array.type();
 
     DATA_INVARIANT(
-      array_type.id() == ID_array, "index takes array-typed operand");
+      array.type().id() == ID_array, "index takes array-typed operand");
+
+    const auto &array_type = to_array_type(array.type());
 
     object_mapt array_references;
     get_reference_set(array, array_references, ns);
@@ -1127,7 +1131,7 @@ void value_sett::get_reference_set_rec(
         }
         else if(i.has_value() && o)
         {
-          auto size = pointer_offset_size(array_type.subtype(), ns);
+          auto size = pointer_offset_size(array_type.element_type(), ns);
 
           if(!size.has_value() || *size == 0)
             o.reset();
@@ -1265,14 +1269,16 @@ void value_sett::assign(
   else if(type.id()==ID_array)
   {
     const index_exprt lhs_index(
-      lhs, exprt(ID_unknown, c_index_type()), type.subtype());
+      lhs,
+      exprt(ID_unknown, c_index_type()),
+      to_array_type(type).element_type());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
       assign(
         lhs_index,
-        exprt(rhs.id(), type.subtype()),
+        exprt(rhs.id(), to_array_type(type).element_type()),
         ns,
         is_simplified,
         add_to_sets);
@@ -1308,7 +1314,7 @@ void value_sett::assign(
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
           exprt(ID_unknown, c_index_type()),
-          type.subtype());
+          to_array_type(type).element_type());
 
         assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
         assign(
@@ -1317,7 +1323,9 @@ void value_sett::assign(
       else
       {
         const index_exprt rhs_index(
-          rhs, exprt(ID_unknown, c_index_type()), type.subtype());
+          rhs,
+          exprt(ID_unknown, c_index_type()),
+          to_array_type(type).element_type());
         assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
@@ -1560,7 +1568,8 @@ void value_sett::apply_code_rec(
 
     if(
       lhs_type.id() == ID_pointer ||
-      (lhs_type.id() == ID_array && lhs_type.subtype().id() == ID_pointer))
+      (lhs_type.id() == ID_array &&
+       to_array_type(lhs_type).element_type().id() == ID_pointer))
     {
       // assign the address of the failed object
       if(auto failed = get_failed_symbol(to_symbol_expr(lhs), ns))
@@ -1739,7 +1748,8 @@ void value_sett::erase_symbol_rec(
     erase_struct_union_symbol(
       ns.follow_tag(to_union_tag_type(type)), erase_prefix, ns);
   else if(type.id() == ID_array)
-    erase_symbol_rec(type.subtype(), erase_prefix + "[]", ns);
+    erase_symbol_rec(
+      to_array_type(type).element_type(), erase_prefix + "[]", ns);
   else if(values.has_key(erase_prefix))
     values.erase(erase_prefix);
 }

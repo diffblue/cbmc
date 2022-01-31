@@ -359,7 +359,8 @@ void arrayst::add_array_Ackermann_constraints()
 
           if(indices_equal_lit!=const_literal(false))
           {
-            const typet &subtype = arrays[i].type().subtype();
+            const typet &subtype =
+              to_array_type(arrays[i].type()).element_type();
             index_exprt index_expr1(arrays[i], *i1, subtype);
 
             index_exprt index_expr2=index_expr1;
@@ -438,11 +439,13 @@ void arrayst::add_array_constraints_equality(
 
   for(const auto &index : index_set)
   {
-    const typet &subtype1 = array_equality.f1.type().subtype();
-    index_exprt index_expr1(array_equality.f1, index, subtype1);
+    const typet &element_type1 =
+      to_array_type(array_equality.f1.type()).element_type();
+    index_exprt index_expr1(array_equality.f1, index, element_type1);
 
-    const typet &subtype2 = array_equality.f2.type().subtype();
-    index_exprt index_expr2(array_equality.f2, index, subtype2);
+    const typet &element_type2 =
+      to_array_type(array_equality.f2.type()).element_type();
+    index_exprt index_expr2(array_equality.f2, index, element_type2);
 
     DATA_INVARIANT(
       index_expr1.type()==index_expr2.type(),
@@ -507,9 +510,9 @@ void arrayst::add_array_constraints(
     // add a[i]=b[i]
     for(const auto &index : index_set)
     {
-      const typet &subtype = expr.type().subtype();
-      index_exprt index_expr1(expr, index, subtype);
-      index_exprt index_expr2(expr_typecast_op, index, subtype);
+      const typet &element_type = to_array_type(expr.type()).element_type();
+      index_exprt index_expr1(expr, index, element_type);
+      index_exprt index_expr2(expr_typecast_op, index, element_type);
 
       DATA_INVARIANT(
         index_expr1.type()==index_expr2.type(),
@@ -548,7 +551,8 @@ void arrayst::add_array_constraints_with(
     const exprt &index = operands[i];
     const exprt &value = operands[i + 1];
 
-    index_exprt index_expr(expr, index, expr.type().subtype());
+    index_exprt index_expr(
+      expr, index, to_array_type(expr.type()).element_type());
 
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       index_expr.type() == value.type(),
@@ -583,9 +587,9 @@ void arrayst::add_array_constraints_with(
 
       if(guard_lit!=const_literal(true))
       {
-        const typet &subtype = expr.type().subtype();
-        index_exprt index_expr1(expr, other_index, subtype);
-        index_exprt index_expr2(expr.old(), other_index, subtype);
+        const typet &element_type = to_array_type(expr.type()).element_type();
+        index_exprt index_expr1(expr, other_index, element_type);
+        index_exprt index_expr2(expr.old(), other_index, element_type);
 
         equal_exprt equality_expr(index_expr1, index_expr2);
 
@@ -814,9 +818,9 @@ void arrayst::add_array_constraints_if(
 
   for(const auto &index : index_set)
   {
-    const typet subtype = expr.type().subtype();
-    index_exprt index_expr1(expr, index, subtype);
-    index_exprt index_expr2(expr.true_case(), index, subtype);
+    const typet &element_type = to_array_type(expr.type()).element_type();
+    index_exprt index_expr1(expr, index, element_type);
+    index_exprt index_expr2(expr.true_case(), index, element_type);
 
     // add implication
     lazy_constraintt lazy(lazy_typet::ARRAY_IF,
@@ -833,9 +837,9 @@ void arrayst::add_array_constraints_if(
   // now the false case
   for(const auto &index : index_set)
   {
-    const typet subtype = expr.type().subtype();
-    index_exprt index_expr1(expr, index, subtype);
-    index_exprt index_expr2(expr.false_case(), index, subtype);
+    const typet &element_type = to_array_type(expr.type()).element_type();
+    index_exprt index_expr1(expr, index, element_type);
+    index_exprt index_expr2(expr.false_case(), index, element_type);
 
     // add implication
     lazy_constraintt lazy(

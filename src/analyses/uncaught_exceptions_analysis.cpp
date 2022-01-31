@@ -15,17 +15,17 @@ Author: Cristina David
 #include "uncaught_exceptions_analysis.h"
 
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_functions.h>
 
 /// Returns the compile type of an exception
-irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
+irep_idt
+uncaught_exceptions_domaint::get_exception_type(const pointer_typet &type)
 {
-  PRECONDITION(type.id()==ID_pointer);
-
-  if(type.subtype().id() == ID_struct_tag)
-    return to_struct_tag_type(type.subtype()).get_identifier();
+  if(type.base_type().id() == ID_struct_tag)
+    return to_struct_tag_type(type.base_type()).get_identifier();
   else
     return ID_empty;
 }
@@ -73,7 +73,8 @@ void uncaught_exceptions_domaint::transform(
   {
     const exprt &exc_symbol = get_exception_symbol(instruction.get_code());
     // retrieve the static type of the thrown exception
-    const irep_idt &type_id=get_exception_type(exc_symbol.type());
+    const irep_idt &type_id =
+      get_exception_type(to_pointer_type(exc_symbol.type()));
     join(type_id);
     // we must consider all the subtypes given that
     // the runtime type is a subtype of the static type

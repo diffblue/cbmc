@@ -82,8 +82,9 @@ protected:
 
   bool is_code_type(const typet &type) const
   {
-    return type.id()==ID_code ||
-           (type.id()==ID_template && type.subtype().id()==ID_code);
+    return type.id() == ID_code ||
+           (type.id() == ID_template &&
+            to_template_type(type).subtype().id() == ID_code);
   }
 
   void combine_types(

@@ -234,7 +234,7 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &index=index_expr.index();
-    const typet &array_type = array.type();
+    const auto &array_type = to_array_type(array.type());
 
     pointer_typet type = pointer_type(expr.type());
     const std::size_t bits = boolbv_width(type);
@@ -261,7 +261,7 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
       UNREACHABLE;
 
     // get size
-    auto size = pointer_offset_size(array_type.subtype(), ns);
+    auto size = pointer_offset_size(array_type.element_type(), ns);
     CHECK_RETURN(size.has_value() && *size >= 0);
 
     bv = offset_arithmetic(type, bv, *size, index);
@@ -438,9 +438,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         bv=convert_bv(*it);
         CHECK_RETURN(bv.size()==bits);
 
-        typet pointer_sub_type=it->type().subtype();
+        typet pointer_base_type = to_pointer_type(it->type()).base_type();
 
-        if(pointer_sub_type.id()==ID_empty)
+        if(pointer_base_type.id() == ID_empty)
         {
           // This is a gcc extension.
           // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
@@ -448,7 +448,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         }
         else
         {
-          auto size_opt = pointer_offset_size(pointer_sub_type, ns);
+          auto size_opt = pointer_offset_size(pointer_base_type, ns);
           CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
           size = *size_opt;
         }
@@ -508,10 +508,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     const bvt &bv = convert_bv(minus_expr.lhs());
 
-    typet pointer_sub_type = minus_expr.lhs().type().subtype();
+    typet pointer_base_type =
+      to_pointer_type(minus_expr.lhs().type()).base_type();
     mp_integer element_size;
 
-    if(pointer_sub_type.id()==ID_empty)
+    if(pointer_base_type.id() == ID_empty)
     {
       // This is a gcc extension.
       // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
@@ -519,7 +520,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     }
     else
     {
-      auto element_size_opt = pointer_offset_size(pointer_sub_type, ns);
+      auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
       CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
       element_size = *element_size_opt;
     }

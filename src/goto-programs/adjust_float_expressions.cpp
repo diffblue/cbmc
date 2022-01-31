@@ -44,7 +44,8 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
 
   if(
     type.id() == ID_floatbv ||
-    (type.id() == ID_complex && type.subtype().id() == ID_floatbv))
+    (type.id() == ID_complex &&
+     to_complex_type(type).subtype().id() == ID_floatbv))
   {
     if(
       expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
@@ -98,7 +99,8 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
 
   if(
     type.id() == ID_floatbv ||
-    (type.id() == ID_complex && type.subtype().id() == ID_floatbv))
+    (type.id() == ID_complex &&
+     to_complex_type(type).subtype().id() == ID_floatbv))
   {
     if(
       expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||

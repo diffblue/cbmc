@@ -12,9 +12,10 @@ Author: Diffblue Ltd.
 #include "does_remove_const.h"
 
 #include <goto-programs/goto_program.h>
-#include <util/type.h>
-#include <util/std_code.h>
+
 #include <util/base_type.h>
+#include <util/pointer_expr.h>
+#include <util/std_code.h>
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check
@@ -122,16 +123,20 @@ bool does_remove_constt::does_type_preserve_const_correctness(
 {
   while(target_type->id()==ID_pointer)
   {
-    bool direct_subtypes_at_least_as_const=
-      is_type_at_least_as_const_as(
-        target_type->subtype(), source_type->subtype());
+    PRECONDITION(source_type->id() == ID_pointer);
+
+    const auto &target_pointer_type = to_pointer_type(*target_type);
+    const auto &source_pointer_type = to_pointer_type(*source_type);
+
+    bool direct_subtypes_at_least_as_const = is_type_at_least_as_const_as(
+      target_pointer_type.base_type(), source_pointer_type.base_type());
     // We have a pointer to something, but the thing it is pointing to can't be
     // modified normally, but can through this pointer
     if(!direct_subtypes_at_least_as_const)
       return false;
     // Check the subtypes if they are pointers
-    target_type=&target_type->subtype();
-    source_type=&source_type->subtype();
+    target_type = &target_pointer_type.base_type();
+    source_type = &source_pointer_type.base_type();
   }
   return true;
 }

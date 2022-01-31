@@ -280,7 +280,9 @@ protected:
       const symbolt &parameter_symbol = ns.lookup(parameter);
       if(
         parameter_symbol.type.id() == ID_pointer &&
-        !parameter_symbol.type.subtype().get_bool(ID_C_constant) &&
+        !to_pointer_type(parameter_symbol.type)
+           .base_type()
+           .get_bool(ID_C_constant) &&
         should_havoc_param(id2string(parameter_symbol.base_name), i))
       {
         auto goto_instruction =
@@ -289,7 +291,8 @@ protected:
             null_pointer_exprt(to_pointer_type(parameter_symbol.type)))));
 
         dereference_exprt dereference_expr(
-          parameter_symbol.symbol_expr(), parameter_symbol.type.subtype());
+          parameter_symbol.symbol_expr(),
+          to_pointer_type(parameter_symbol.type).base_type());
 
         goto_programt dest;
         havoc_expr_rec(

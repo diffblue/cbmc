@@ -127,8 +127,8 @@ bool cpp_typecheckt::standard_conversion_qualification(
   if(expr.type()!=type)
     return false;
 
-  typet sub_from=expr.type().subtype();
-  typet sub_to=type.subtype();
+  typet sub_from = to_pointer_type(expr.type()).base_type();
+  typet sub_to = to_pointer_type(type).base_type();
   bool const_to=true;
 
   while(sub_from.id()==ID_pointer)
@@ -484,8 +484,8 @@ bool cpp_typecheckt::standard_conversion_pointer(
     return false;
   }
 
-  typet sub_from=follow(expr.type().subtype());
-  typet sub_to=follow(type.subtype());
+  typet sub_from = follow(to_pointer_type(expr.type()).base_type());
+  typet sub_to = follow(to_pointer_type(type).base_type());
 
   // std::nullptr_t to _any_ pointer type
   if(sub_from.id()==ID_nullptr)
@@ -495,7 +495,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
   if(sub_from.id()!=ID_code && sub_to.id()==ID_empty)
   {
     c_qualifierst qual_from;
-    qual_from.read(expr.type().subtype());
+    qual_from.read(to_pointer_type(expr.type()).base_type());
     new_expr = typecast_exprt::conditional_cast(expr, type);
     qual_from.write(new_expr.type().subtype());
     return true;
@@ -509,7 +509,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
     if(subtype_typecast(from_struct, to_struct))
     {
       c_qualifierst qual_from;
-      qual_from.read(expr.type().subtype());
+      qual_from.read(to_pointer_type(expr.type()).base_type());
       new_expr=expr;
       make_ptr_typecast(new_expr, type);
       qual_from.write(new_expr.type().subtype());
@@ -565,11 +565,14 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   if(expr.type().id() != ID_pointer || expr.type().find(ID_to_member).is_nil())
     return false;
 
-  if(type.subtype()!=expr.type().subtype())
+  if(
+    to_pointer_type(type).base_type() !=
+    to_pointer_type(expr.type()).base_type())
   {
-    // subtypes different
-    if(type.subtype().id()==ID_code  &&
-       expr.type().subtype().id()==ID_code)
+    // base types are different
+    if(
+      to_pointer_type(type).base_type().id() == ID_code &&
+      to_pointer_type(expr.type()).base_type().id() == ID_code)
     {
       code_typet code1=to_code_type(expr.type().subtype());
       assert(!code1.parameters().empty());
@@ -1239,7 +1242,9 @@ bool cpp_typecheckt::reference_binding(
       return false;
   }
 
-  if(expr.get_bool(ID_C_lvalue) || type.subtype().get_bool(ID_C_constant))
+  if(
+    expr.get_bool(ID_C_lvalue) ||
+    to_reference_type(type).base_type().get_bool(ID_C_constant))
   {
     if(reference_compatible(expr, type, rank))
     {
@@ -1248,7 +1253,7 @@ bool cpp_typecheckt::reference_binding(
         // create temporary object
         side_effect_exprt tmp{ID_temporary_object,
                               {std::move(expr)},
-                              type.subtype(),
+                              to_reference_type(type).base_type(),
                               expr.source_location()};
         tmp.set(ID_mode, ID_cpp);
         expr.swap(tmp);

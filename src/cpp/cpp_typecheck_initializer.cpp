@@ -100,7 +100,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         if(parameter.get_this())
         {
           fargs.has_object = true;
-          new_object.type() = parameter.type().subtype();
+          new_object.type() = to_pointer_type(parameter.type()).base_type();
         }
 
         fargs.operands.push_back(new_object);
@@ -112,7 +112,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         cpp_typecheck_resolvet::wantt::BOTH,
         fargs);
 
-      assert(symbol.type.subtype() == resolved_expr.type());
+      DATA_INVARIANT(
+        to_pointer_type(symbol.type).base_type() == resolved_expr.type(),
+        "symbol type must match");
 
       if(resolved_expr.id()==ID_symbol)
       {
@@ -227,8 +229,9 @@ void cpp_typecheckt::zero_initializer(
       zero_initializer(member, component.type(), source_location, ops);
     }
   }
-  else if(final_type.id()==ID_array &&
-          !cpp_is_pod(final_type.subtype()))
+  else if(
+    final_type.id() == ID_array &&
+    !cpp_is_pod(to_array_type(final_type).element_type()))
   {
     const array_typet &array_type=to_array_type(type);
     const exprt &size_expr=array_type.size();
@@ -298,7 +301,8 @@ void cpp_typecheckt::zero_initializer(
   else if(final_type.id()==ID_c_enum)
   {
     const unsignedbv_typet enum_type(
-      to_bitvector_type(final_type.subtype()).get_width());
+      to_bitvector_type(to_c_enum_type(final_type).underlying_type())
+        .get_width());
 
     exprt zero =
       typecast_exprt::conditional_cast(from_integer(0, enum_type), type);

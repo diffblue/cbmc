@@ -82,7 +82,7 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
 
   const auto result_value = eval(*input1_value, *input2_value, arg_values);
   const auto length = from_integer(result_value.size(), result.length_type());
-  const array_typet type(result.type().subtype(), length);
+  const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
   return make_string(result_value, type);
 }
 

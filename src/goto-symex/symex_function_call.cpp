@@ -299,10 +299,11 @@ void goto_symext::symex_function_call_post_clean(
       {
         if(
           arg.type().id() == ID_pointer &&
-          !arg.type().subtype().get_bool(ID_C_constant) &&
-          arg.type().subtype().id() != ID_code)
+          !to_pointer_type(arg.type()).base_type().get_bool(ID_C_constant) &&
+          to_pointer_type(arg.type()).base_type().id() != ID_code)
         {
-          exprt object = dereference_exprt(arg, arg.type().subtype());
+          exprt object =
+            dereference_exprt(arg, to_pointer_type(arg.type()).base_type());
           exprt cleaned_object = clean_expr(object, state, true);
           const guardt guard(true_exprt(), state.guard_manager);
           havoc_rec(state, guard, cleaned_object);

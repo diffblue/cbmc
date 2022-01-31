@@ -66,7 +66,7 @@ string_constraint_generatort::add_axioms_from_bool(
   const array_string_exprt &res,
   const exprt &b)
 {
-  const typet &char_type = res.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
   PRECONDITION(b.type() == bool_typet() || b.type().id() == ID_c_bool);
   string_constraintst constraints;
   typecast_exprt eq(b, bool_typet());
@@ -155,7 +155,7 @@ string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
     CHECK_RETURN(max_size < std::numeric_limits<size_t>::max());
   }
 
-  const typet &char_type = res.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
   const typecast_exprt radix_as_char(radix, char_type);
   const typecast_exprt radix_input_type(radix, type);
   const bool strict_formatting = true;
@@ -205,7 +205,7 @@ string_constraint_generatort::add_axioms_from_int_hex(
   PRECONDITION(type.id() == ID_signedbv);
   string_constraintst constraints;
   const typet &index_type = res.length_type();
-  const typet &char_type = res.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
   exprt sixteen = from_integer(16, index_type);
   exprt minus_char = from_integer('-', char_type);
   exprt zero_char = from_integer('0', char_type);
@@ -284,7 +284,7 @@ string_constraint_generatort::get_conjuncts_for_correct_number_format(
   const bool strict_formatting)
 {
   std::vector<exprt> conjuncts;
-  const typet &char_type = str.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(str.content().type()).subtype();
   const typet &index_type = str.length_type();
 
   const exprt &chr = str[0];
@@ -380,7 +380,7 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   const unsigned long radix_ul)
 {
   string_constraintst constraints;
-  const typet &char_type = str.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(str.content().type()).subtype();
 
   const equal_exprt starts_with_minus(str[0], from_integer('-', char_type));
   const constant_exprt zero_expr = from_integer(0, type);
@@ -497,7 +497,8 @@ string_constraint_generatort::add_axioms_for_is_valid_int(
     called_function == ID_cprover_string_is_valid_int_func ? 32 : 64)};
   auto args = unpack_parseint_arguments(f, target_int_type);
 
-  const typet &char_type = args.str.content().type().subtype();
+  const typet &char_type =
+    to_type_with_subtype(args.str.content().type()).subtype();
   const typecast_exprt radix_as_char(args.radix, char_type);
   const bool strict_formatting = false;
 

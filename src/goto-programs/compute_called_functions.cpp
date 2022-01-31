@@ -30,7 +30,7 @@ void compute_address_taken_functions(
 
     if(
       address.type().id() == ID_pointer &&
-      address.type().subtype().id() == ID_code)
+      to_pointer_type(address.type()).base_type().id() == ID_code)
     {
       const exprt &target = address.object();
       if(target.id() == ID_symbol)

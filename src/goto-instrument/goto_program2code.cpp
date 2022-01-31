@@ -1394,7 +1394,7 @@ void goto_program2codet::add_local_types(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_array)
   {
-    add_local_types(type.subtype());
+    add_local_types(to_type_with_subtype(type).subtype());
   }
 }
 

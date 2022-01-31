@@ -160,7 +160,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_complex)
   {
-    const mp_integer sub_width = operator()(type.subtype());
+    const mp_integer sub_width = operator()(to_complex_type(type).subtype());
     entry.total_width = numeric_cast_v<std::size_t>(2 * sub_width);
   }
   else if(type_id==ID_code)
@@ -176,7 +176,8 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_c_enum)
   {
     // these have a subtype
-    entry.total_width = to_bitvector_type(type.subtype()).get_width();
+    entry.total_width =
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width();
     CHECK_RETURN(entry.total_width > 0);
   }
   else if(type_id==ID_pointer)

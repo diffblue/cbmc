@@ -113,24 +113,26 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   {
     if(type2.id()==ID_c_enum) // both are enums
       return type1==type2; // compares the tag
-    else if(type2==type1.subtype())
+    else if(type2 == to_c_enum_type(type1).underlying_type())
       return true;
   }
   else if(type2.id()==ID_c_enum)
   {
-    if(type1==type2.subtype())
+    if(type1 == to_c_enum_type(type2).underlying_type())
       return true;
   }
   else if(type1.id()==ID_pointer &&
           type2.id()==ID_pointer)
   {
-    return gcc_types_compatible_p(type1.subtype(), type2.subtype());
+    return gcc_types_compatible_p(
+      to_pointer_type(type1).base_type(), to_pointer_type(type2).base_type());
   }
   else if(type1.id()==ID_array &&
           type2.id()==ID_array)
   {
-    return
-      gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
+    return gcc_types_compatible_p(
+      to_array_type(type1).element_type(),
+      to_array_type(type2).element_type()); // ignore size
   }
   else if(type1.id()==ID_code &&
           type2.id()==ID_code)
@@ -702,9 +704,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       // still need to typecheck index
       typecheck_expr(index);
 
-      auto sub_size_opt = size_of_expr(type.subtype(), *this);
+      auto element_size_opt =
+        size_of_expr(to_array_type(type).element_type(), *this);
 
-      if(!sub_size_opt.has_value())
+      if(!element_size_opt.has_value())
       {
         error().source_location = expr.source_location();
         error() << "offsetof failed to determine array element size" << eom;
@@ -713,7 +716,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
       index = typecast_exprt::conditional_cast(index, size_type());
 
-      result = plus_exprt(result, mult_exprt(sub_size_opt.value(), index));
+      result = plus_exprt(result, mult_exprt(element_size_opt.value(), index));
 
       typet tmp=type.subtype();
       type=tmp;
@@ -1277,7 +1280,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   if(final_array_type.id()==ID_array ||
      final_array_type.id()==ID_vector)
   {
-    expr.type() = final_array_type.subtype();
+    expr.type() = to_type_with_subtype(final_array_type).subtype();
 
     if(array_expr.get_bool(ID_C_lvalue))
       expr.set(ID_C_lvalue, true);
@@ -1295,7 +1298,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     expr.add_to_operands(plus_exprt(std::move(summands), array_expr.type()));
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
-    expr.type() = final_array_type.subtype();
+    expr.type() = to_pointer_type(final_array_type).base_type();
   }
   else
   {
@@ -1436,7 +1439,8 @@ void c_typecheck_baset::typecheck_expr_rel_vector(binary_exprt &expr)
 
   // Comparisons between vectors produce a vector of integers of the same width
   // with the same dimension.
-  auto subtype_width = to_bitvector_type(o_type0.subtype()).get_width();
+  auto subtype_width =
+    to_bitvector_type(to_vector_type(o_type0).element_type()).get_width();
   expr.type() =
     vector_typet{signedbv_typet{subtype_width}, to_vector_type(o_type0).size()};
 
@@ -1457,7 +1461,7 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
   {
     // a->f is the same as a[0].f
     exprt zero = from_integer(0, c_index_type());
-    index_exprt index_expr(op, zero, op0_type.subtype());
+    index_exprt index_expr(op, zero, to_array_type(op0_type).element_type());
     index_expr.set(ID_C_lvalue, true);
     op.swap(index_expr);
   }
@@ -1773,13 +1777,13 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
   {
     // *a is the same as a[0]
     expr.id(ID_index);
-    expr.type()=op_type.subtype();
+    expr.type() = to_array_type(op_type).element_type();
     expr.copy_to_operands(from_integer(0, c_index_type()));
     assert(expr.operands().size()==2);
   }
   else if(op_type.id()==ID_pointer)
   {
-    expr.type()=op_type.subtype();
+    expr.type() = to_pointer_type(op_type).base_type();
   }
   else
   {
@@ -3390,7 +3394,7 @@ void c_typecheck_baset::typecheck_expr_unary_arithmetic(exprt &expr)
 
   if(o_type.id()==ID_vector)
   {
-    if(is_number(o_type.subtype()))
+    if(is_number(to_vector_type(o_type).element_type()))
     {
       // Vector arithmetic.
       expr.type()=operand.type();
@@ -3468,7 +3472,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     if(
       gcc_vector_types_compatible(
         to_vector_type(o_type0), to_vector_type(o_type1)) &&
-      is_number(o_type0.subtype()))
+      is_number(to_vector_type(o_type0).element_type()))
     {
       // Vector arithmetic has fairly strict typing rules, no promotion
       op1 = typecast_exprt::conditional_cast(op1, op0.type());
@@ -3579,7 +3583,10 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
   {
-    if(o_type0.subtype() == o_type1.subtype() && is_number(o_type0.subtype()))
+    if(
+      to_vector_type(o_type0).element_type() ==
+        to_vector_type(o_type1).element_type() &&
+      is_number(to_vector_type(o_type0).element_type()))
     {
       // {a0, a1, ..., an} >> {b0, b1, ..., bn} ==
       // {a0 >> b0, a1 >> b1, ..., an >> bn}
@@ -3590,8 +3597,8 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   }
 
   if(
-    o_type0.id() == ID_vector && is_number(o_type0.subtype()) &&
-    is_number(o_type1))
+    o_type0.id() == ID_vector &&
+    is_number(to_vector_type(o_type0).element_type()) && is_number(o_type1))
   {
     // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
     op1 = typecast_exprt(op1, o_type0);
@@ -3637,21 +3644,21 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
 {
   const typet &type=expr.type();
-  assert(type.id()==ID_pointer);
+  PRECONDITION(type.id() == ID_pointer);
 
-  typet subtype=type.subtype();
+  const typet &base_type = to_pointer_type(type).base_type();
 
   if(
-    subtype.id() == ID_struct_tag &&
-    follow_tag(to_struct_tag_type(subtype)).is_incomplete())
+    base_type.id() == ID_struct_tag &&
+    follow_tag(to_struct_tag_type(base_type)).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
     throw 0;
   }
   else if(
-    subtype.id() == ID_union_tag &&
-    follow_tag(to_union_tag_type(subtype)).is_incomplete())
+    base_type.id() == ID_union_tag &&
+    follow_tag(to_union_tag_type(base_type)).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
@@ -3823,13 +3830,17 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   {
     if(o_type0.id() == ID_vector)
     {
+      auto &vector_o_type0 = to_vector_type(o_type0);
+
       if(
-        o_type1.id() == ID_vector && o_type0.subtype() == o_type1.subtype() &&
-        is_number(o_type0.subtype()))
+        o_type1.id() == ID_vector &&
+        vector_o_type0.element_type() ==
+          to_vector_type(o_type1).element_type() &&
+        is_number(vector_o_type0.element_type()))
       {
         return;
       }
-      else if(is_number(o_type0.subtype()) && is_number(o_type1))
+      else if(is_number(vector_o_type0.element_type()) && is_number(o_type1))
       {
         op1 = typecast_exprt(op1, o_type0);
         return;

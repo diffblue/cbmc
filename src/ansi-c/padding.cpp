@@ -58,7 +58,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   mp_integer result;
 
   if(type.id()==ID_array)
-    result=alignment(type.subtype(), ns);
+    result = alignment(to_array_type(type).element_type(), ns);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     result=1;
@@ -78,7 +78,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     result = *pointer_offset_size(type, ns);
   }
   else if(type.id()==ID_c_enum)
-    result=alignment(type.subtype(), ns);
+    result = alignment(to_c_enum_type(type).underlying_type(), ns);
   else if(type.id()==ID_c_enum_tag)
     result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   else if(type.id() == ID_struct_tag)
@@ -88,7 +88,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
-    result=alignment(type.subtype(), ns);
+    result = alignment(to_c_bit_field_type(type).underlying_type(), ns);
   }
   else
     result=1;

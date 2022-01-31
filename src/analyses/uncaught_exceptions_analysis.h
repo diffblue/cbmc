@@ -20,6 +20,7 @@ Author: Cristina David
 
 class goto_functionst;
 class namespacet;
+class pointer_typet;
 
 /// defines the domain used by the uncaught  exceptions analysis
 class uncaught_exceptions_analysist;
@@ -41,7 +42,7 @@ class uncaught_exceptions_domaint
     stack_caught.clear();
   }
 
-  static irep_idt get_exception_type(const typet &type);
+  static irep_idt get_exception_type(const pointer_typet &);
 
   static exprt get_exception_symbol(const exprt &exor);
 

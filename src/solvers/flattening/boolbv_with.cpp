@@ -22,8 +22,12 @@ bvt boolbvt::convert_with(const with_exprt &expr)
   if(width==0)
   {
     // A zero-length array is acceptable:
-    if(expr.type().id()==ID_array && boolbv_width(expr.type().subtype())!=0)
+    if(
+      expr.type().id() == ID_array &&
+      boolbv_width(to_array_type(expr.type()).element_type()) != 0)
+    {
       return bvt();
+    }
     else
       return conversion_failed(expr);
   }

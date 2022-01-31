@@ -112,7 +112,9 @@ void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)
   for(const auto &id : symbols)
   {
     const symbolt &symbol = ns.lookup(id);
-    if(symbol.type.id() != ID_pointer || is_c_char_type(symbol.type.subtype()))
+    if(
+      symbol.type.id() != ID_pointer ||
+      is_c_char_type(to_pointer_type(symbol.type).base_type()))
     {
       const symbol_exprt &symbol_expr = ns.lookup(id).symbol_expr();
       const address_of_exprt aoe(symbol_expr);
@@ -228,7 +230,7 @@ exprt gdb_value_extractort::get_char_pointer_value(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
-  PRECONDITION(is_c_char_type(expr.type().subtype()));
+  PRECONDITION(is_c_char_type(to_pointer_type(expr.type()).base_type()));
   PRECONDITION(!memory_location.is_null());
 
   auto it = values.find(memory_location);
@@ -254,12 +256,16 @@ exprt gdb_value_extractort::get_char_pointer_value(
     values.insert(std::make_pair(memory_location, new_symbol));
 
     // check that we are returning objects of the right type
-    CHECK_RETURN(new_symbol.type().subtype() == expr.type().subtype());
+    CHECK_RETURN(
+      to_array_type(new_symbol.type()).element_type() ==
+      to_pointer_type(expr.type()).base_type());
     return new_symbol;
   }
   else
   {
-    CHECK_RETURN(it->second.type().subtype() == expr.type().subtype());
+    CHECK_RETURN(
+      to_array_type(it->second.type()).element_type() ==
+      to_pointer_type(expr.type()).base_type());
     return it->second;
   }
 }
@@ -305,7 +311,8 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
     return index_exprt{
       struct_symbol_expr,
       from_integer(
-        member_offset / get_type_size(expr.type().subtype()), index_type())};
+        member_offset / get_type_size(to_pointer_type(expr.type()).base_type()),
+        index_type())};
   }
   if(struct_symbol->type.id() == ID_pointer)
   {
@@ -316,12 +323,16 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
   }
 
   const auto maybe_member_expr = get_subexpression_at_offset(
-    struct_symbol_expr, member_offset, expr.type().subtype(), ns);
+    struct_symbol_expr,
+    member_offset,
+    to_pointer_type(expr.type()).base_type(),
+    ns);
   DATA_INVARIANT(
     maybe_member_expr.has_value(), "structure doesn't have member");
 
   // check that we return the right type
-  CHECK_RETURN(maybe_member_expr->type() == expr.type().subtype());
+  CHECK_RETURN(
+    maybe_member_expr->type() == to_pointer_type(expr.type()).base_type());
   return *maybe_member_expr;
 }
 
@@ -331,7 +342,7 @@ exprt gdb_value_extractort::get_pointer_to_function_value(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
-  PRECONDITION(expr.type().subtype().id() == ID_code);
+  PRECONDITION(to_pointer_type(expr.type()).base_type().id() == ID_code);
   PRECONDITION(!pointer_value.address.is_null());
 
   const auto &function_name = pointer_value.pointee;
@@ -352,7 +363,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
-  PRECONDITION(!is_c_char_type(expr.type().subtype()));
+  PRECONDITION(!is_c_char_type(to_pointer_type(expr.type()).base_type()));
   const auto &memory_location = value.address;
   PRECONDITION(!memory_location.is_null());
 
@@ -371,7 +382,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
 
     values.insert(std::make_pair(memory_location, nil_exprt()));
 
-    const typet target_type = expr.type().subtype();
+    const typet target_type = to_pointer_type(expr.type()).base_type();
 
     symbol_exprt dummy("tmp", expr.type());
     code_blockt assignments;
@@ -438,7 +449,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
   else
   {
     const auto &known_value = it->second;
-    const auto &expected_type = expr.type().subtype();
+    const auto &expected_type = to_pointer_type(expr.type()).base_type();
     if(find_dynamic_allocation(memory_location) != dynamically_allocated.end())
       return known_value;
     if(known_value.is_not_nil() && known_value.type() != expected_type)
@@ -452,7 +463,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
 
 bool gdb_value_extractort::points_to_member(
   pointer_valuet &pointer_value,
-  const typet &expected_type)
+  const pointer_typet &expected_type)
 {
   if(pointer_value.has_known_offset())
     return true;
@@ -460,7 +471,7 @@ bool gdb_value_extractort::points_to_member(
   if(pointer_value.pointee.empty())
   {
     const auto maybe_pointee = get_malloc_pointee(
-      pointer_value.address, get_type_size(expected_type.subtype()));
+      pointer_value.address, get_type_size(expected_type.base_type()));
     if(maybe_pointee.has_value())
       pointer_value.pointee = *maybe_pointee;
     if(pointer_value.pointee.find("+") != std::string::npos)
@@ -501,7 +512,7 @@ exprt gdb_value_extractort::get_pointer_value(
   if(!memory_location.is_null())
   {
     // pointers-to-char can point to members as well, e.g. char[]
-    if(points_to_member(value, expr.type()))
+    if(points_to_member(value, to_pointer_type(expr.type())))
     {
       const auto target_expr =
         get_pointer_to_member_value(expr, value, location);
@@ -512,7 +523,7 @@ exprt gdb_value_extractort::get_pointer_value(
     }
 
     // pointer to function
-    if(expr.type().subtype().id() == ID_code)
+    if(to_pointer_type(expr.type()).base_type().id() == ID_code)
     {
       const auto target_expr =
         get_pointer_to_function_value(expr, value, location);
@@ -524,7 +535,7 @@ exprt gdb_value_extractort::get_pointer_value(
 
     // non-member: split for char/non-char
     const auto target_expr =
-      is_c_char_type(expr.type().subtype())
+      is_c_char_type(to_pointer_type(expr.type()).base_type())
         ? get_char_pointer_value(expr, memory_location, location)
         : get_non_char_pointer_value(expr, value, location);
 
@@ -542,7 +553,7 @@ exprt gdb_value_extractort::get_pointer_value(
     if(target_expr.type().id() == ID_array)
     {
       const auto result_indexed_expr = get_subexpression_at_offset(
-        target_expr, 0, zero_expr.type().subtype(), ns);
+        target_expr, 0, to_pointer_type(zero_expr.type()).base_type(), ns);
       CHECK_RETURN(result_indexed_expr.has_value());
       if(result_indexed_expr->type() == zero_expr.type())
         return *result_indexed_expr;

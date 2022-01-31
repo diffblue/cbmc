@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_instruction_code.h"
 
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 
 code_function_callt get_destructor(
   const namespacet &ns,
@@ -37,8 +38,9 @@ code_function_callt get_destructor(
         {
           const typet &arg_type=code_type.parameters().front().type();
 
-          if(arg_type.id()==ID_pointer &&
-             ns.follow(arg_type.subtype())==type)
+          if(
+            arg_type.id() == ID_pointer &&
+            ns.follow(to_pointer_type(arg_type).base_type()) == type)
           {
             const symbol_exprt symbol_expr(it->get(ID_name), it->type());
             return code_function_callt(symbol_expr);

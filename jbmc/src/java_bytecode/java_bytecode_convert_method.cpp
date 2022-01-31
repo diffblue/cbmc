@@ -2431,8 +2431,8 @@ void java_bytecode_convert_methodt::convert_athrow(
 {
   if(
     assert_no_exceptions_thrown ||
-    ((uncaught_exceptions_domaint::get_exception_type(op[0].type()) ==
-      "java::java.lang.AssertionError") &&
+    ((uncaught_exceptions_domaint::get_exception_type(
+        to_reference_type(op[0].type())) == "java::java.lang.AssertionError") &&
      !throw_assertion_error))
   {
     // we translate athrow into

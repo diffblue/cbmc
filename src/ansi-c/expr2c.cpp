@@ -259,7 +259,7 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_complex)
   {
     // these take more or less arbitrary subtypes
-    return q+"_Complex "+convert(src.subtype())+d;
+    return q + "_Complex " + convert(to_complex_type(src).subtype()) + d;
   }
   else if(src.id()==ID_floatbv)
   {
@@ -289,7 +289,8 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_c_bit_field)
   {
     std::string width=std::to_string(to_c_bit_field_type(src).get_width());
-    return q+convert(src.subtype())+d+" : "+width;
+    return q + convert(to_c_bit_field_type(src).underlying_type()) + d + " : " +
+           width;
   }
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
@@ -453,13 +454,13 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_pointer)
   {
     c_qualifierst sub_qualifiers;
-    sub_qualifiers.read(src.subtype());
-    const typet &subtype = src.subtype();
+    const typet &base_type = to_pointer_type(src).base_type();
+    sub_qualifiers.read(base_type);
 
     // The star gets attached to the declarator.
     std::string new_declarator="*";
 
-    if(!q.empty() && (!declarator.empty() || subtype.id() == ID_pointer))
+    if(!q.empty() && (!declarator.empty() || base_type.id() == ID_pointer))
     {
       new_declarator+=" "+q;
     }
@@ -468,13 +469,13 @@ std::string expr2ct::convert_rec(
 
     // Depending on precedences, we may add parentheses.
     if(
-      subtype.id() == ID_code ||
-      (sizeof_nesting == 0 && subtype.id() == ID_array))
+      base_type.id() == ID_code ||
+      (sizeof_nesting == 0 && base_type.id() == ID_array))
     {
       new_declarator="("+new_declarator+")";
     }
 
-    return convert_rec(subtype, sub_qualifiers, new_declarator);
+    return convert_rec(base_type, sub_qualifiers, new_declarator);
   }
   else if(src.id()==ID_array)
   {
@@ -562,7 +563,7 @@ std::string expr2ct::convert_rec(
     // return type may be a function pointer or array
     const typet *non_ptr_type = &return_type;
     while(non_ptr_type->id()==ID_pointer)
-      non_ptr_type = &(non_ptr_type->subtype());
+      non_ptr_type = &(to_pointer_type(*non_ptr_type).base_type());
 
     if(non_ptr_type->id()==ID_code ||
        non_ptr_type->id()==ID_array)
@@ -745,7 +746,9 @@ std::string expr2ct::convert_array_type(
   // This won't really parse without declarator.
   // Note that qualifiers are passed down.
   return convert_rec(
-    src.subtype(), qualifiers, declarator_str+array_suffix);
+    to_array_type(src).element_type(),
+    qualifiers,
+    declarator_str + array_suffix);
 }
 
 std::string expr2ct::convert_typecast(
@@ -1155,10 +1158,11 @@ std::string expr2ct::convert_allocate(const exprt &src, unsigned &precedence)
   std::string dest = "ALLOCATE";
   dest += '(';
 
-  if(src.type().id()==ID_pointer &&
-     src.type().subtype().id()!=ID_empty)
+  if(
+    src.type().id() == ID_pointer &&
+    to_pointer_type(src.type()).base_type().id() != ID_empty)
   {
-    dest+=convert(src.type().subtype());
+    dest += convert(to_pointer_type(src.type()).base_type());
     dest+=", ";
   }
 
@@ -1282,7 +1286,7 @@ std::string expr2ct::convert_complex(
   // float complex CMPLXF(float x, float y);
   // long double complex CMPLXL(long double x, long double y);
 
-  const typet &subtype = src.type().subtype();
+  const typet &subtype = to_complex_type(src.type()).subtype();
 
   std::string name;
 
@@ -1794,9 +1798,10 @@ std::string expr2ct::convert_constant(
     mp_integer int_value =
       bvrep2integer(value, width, type.id() == ID_signedbv);
 
-    const irep_idt &c_type=
-      type.id()==ID_c_bit_field?type.subtype().get(ID_C_c_type):
-                 type.get(ID_C_c_type);
+    const irep_idt &c_type =
+      type.id() == ID_c_bit_field
+        ? to_c_bit_field_type(type).underlying_type().get(ID_C_c_type)
+        : type.get(ID_C_c_type);
 
     if(type.id()==ID_c_bool)
     {
@@ -1942,7 +1947,7 @@ std::string expr2ct::convert_constant(
         dest = "NULL";
       else
         dest = "0";
-      if(type.subtype().id()!=ID_empty)
+      if(to_pointer_type(type).base_type().id() != ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
     else if(src.operands().size() == 1)
@@ -2154,7 +2159,7 @@ std::string expr2ct::convert_array(const exprt &src)
   // we treat arrays of characters as string constants,
   // and arrays of wchar_t as wide strings
 
-  const typet &subtype = src.type().subtype();
+  const typet &element_type = to_array_type(src.type()).element_type();
 
   bool all_constant=true;
 
@@ -2162,11 +2167,11 @@ std::string expr2ct::convert_array(const exprt &src)
     if(!it->is_constant())
       all_constant=false;
 
-  if(src.get_bool(ID_C_string_constant) &&
-     all_constant &&
-     (subtype==char_type() || subtype==wchar_t_type()))
+  if(
+    src.get_bool(ID_C_string_constant) && all_constant &&
+    (element_type == char_type() || element_type == wchar_t_type()))
   {
-    bool wide=subtype==wchar_t_type();
+    bool wide = element_type == wchar_t_type();
 
     if(wide)
       dest+='L';
@@ -3622,7 +3627,7 @@ std::string expr2ct::convert_with_precedence(
       return "&&" + object.get_string(ID_identifier);
     else if(object.id() == ID_index && to_index_expr(object).index().is_zero())
       return convert(to_index_expr(object).array());
-    else if(src.type().subtype().id()==ID_code)
+    else if(to_pointer_type(src.type()).base_type().id() == ID_code)
       return convert_unary(to_unary_expr(src), "", precedence = 15);
     else
       return convert_unary(to_unary_expr(src), "&", precedence = 15);
