@@ -340,13 +340,13 @@ std::string expr2javat::convert_java_new(const exprt &src)
       convert(static_cast<const exprt &>(src.find(ID_size)));
 
     dest+=' ';
-    dest+=convert(src.type().subtype());
+    dest += convert(to_pointer_type(src.type()).base_type());
     dest+='[';
     dest+=tmp_size;
     dest+=']';
   }
   else
-    dest="new "+convert(src.type().subtype());
+    dest = "new " + convert(to_pointer_type(src.type()).base_type());
 
   return dest;
 }

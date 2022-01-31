@@ -235,7 +235,8 @@ void recursive_initializationt::initialize(
 
 code_blockt build_null_pointer(const symbol_exprt &result_symbol)
 {
-  const typet &type_to_construct = result_symbol.type().subtype();
+  const typet &type_to_construct =
+    to_pointer_type(result_symbol.type()).base_type();
   const null_pointer_exprt nullptr_expr{to_pointer_type(type_to_construct)};
   const code_assignt assign_null{dereference_exprt{result_symbol},
                                  nullptr_expr};
@@ -250,18 +251,18 @@ code_blockt recursive_initializationt::build_constructor_body(
   const bool is_nullable)
 {
   PRECONDITION(result_symbol.type().id() == ID_pointer);
-  const typet &type = result_symbol.type().subtype();
+  const typet &type = to_pointer_type(result_symbol.type()).base_type();
   if(type.id() == ID_struct_tag)
   {
     return build_struct_constructor(depth_symbol, result_symbol);
   }
   else if(type.id() == ID_pointer)
   {
-    if(type.subtype().id() == ID_code)
+    if(to_pointer_type(type).base_type().id() == ID_code)
     {
       return build_function_pointer_constructor(result_symbol, is_nullable);
     }
-    if(type.subtype().id() == ID_empty)
+    if(to_pointer_type(type).base_type().id() == ID_empty)
     {
       // always initalize void* pointers as NULL
       return build_null_pointer(result_symbol);
@@ -610,12 +611,13 @@ std::string recursive_initializationt::type2id(const typet &type) const
     return st_tag;
   }
   else if(type.id() == ID_pointer)
-    return "ptr_" + type2id(type.subtype());
+    return "ptr_" + type2id(to_pointer_type(type).base_type());
   else if(type.id() == ID_array)
   {
     const auto array_size =
       numeric_cast_v<std::size_t>(to_constant_expr(to_array_type(type).size()));
-    return "arr_" + type2id(type.subtype()) + "_" + std::to_string(array_size);
+    return "arr_" + type2id(to_array_type(type).element_type()) + "_" +
+           std::to_string(array_size);
   }
   else if(type == char_type())
     return "char";
@@ -649,9 +651,9 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
-  const typet &type = result.type().subtype();
+  const typet &type = to_pointer_type(result.type()).base_type();
   PRECONDITION(type.id() == ID_pointer);
-  PRECONDITION(type.subtype().id() != ID_empty);
+  PRECONDITION(to_pointer_type(type).base_type().id() != ID_empty);
 
   code_blockt body{};
   // build:
@@ -677,8 +679,9 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   exprt::operandst should_not_recurse{depth_gt_max_depth};
 
   optionalt<symbol_exprt> has_seen;
-  if(can_cast_type<struct_tag_typet>(type.subtype()))
-    has_seen = get_fresh_global_symexpr("has_seen_" + type2id(type.subtype()));
+  if(can_cast_type<struct_tag_typet>(to_pointer_type(type).base_type()))
+    has_seen = get_fresh_global_symexpr(
+      "has_seen_" + type2id(to_pointer_type(type).base_type()));
 
   if(has_seen.has_value())
   {
@@ -686,7 +689,8 @@ code_blockt recursive_initializationt::build_pointer_constructor(
     should_not_recurse.push_back(has_seen_expr);
   }
 
-  null_pointer_exprt nullptr_expr{pointer_type(type.subtype())};
+  null_pointer_exprt nullptr_expr{
+    pointer_type(to_pointer_type(type).base_type())};
   const code_assignt assign_null{dereference_exprt{result}, nullptr_expr};
   code_blockt null_and_return{{assign_null, code_frontend_returnt{}}};
   body.add(code_ifthenelset{conjunction(should_not_recurse), null_and_return});
@@ -702,8 +706,8 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   code_assignt seen_assign_prev{};
   if(has_seen.has_value())
   {
-    const symbol_exprt &has_seen_prev =
-      get_fresh_local_symexpr("has_seen_prev_" + type2id(type.subtype()));
+    const symbol_exprt &has_seen_prev = get_fresh_local_symexpr(
+      "has_seen_prev_" + type2id(to_pointer_type(type).base_type()));
     then_case.add(code_declt{has_seen_prev});
     then_case.add(code_assignt{has_seen_prev, *has_seen});
     then_case.add(code_assignt{*has_seen, from_integer(1, has_seen->type())});
@@ -711,17 +715,17 @@ code_blockt recursive_initializationt::build_pointer_constructor(
   }
 
   // we want to initialize the pointee as non-const even for pointer to const
-  const typet non_const_pointer_type =
-    pointer_type(remove_const(type.subtype()));
+  const pointer_typet non_const_pointer_type =
+    pointer_type(remove_const(to_pointer_type(type).base_type()));
   const symbol_exprt &local_result =
     get_fresh_local_typed_symexpr("local_result", non_const_pointer_type);
 
   then_case.add(code_declt{local_result});
   const namespacet ns{goto_model.symbol_table};
-  then_case.add(
-    code_function_callt{local_result,
-                        get_malloc_function(),
-                        {*size_of_expr(non_const_pointer_type.subtype(), ns)}});
+  then_case.add(code_function_callt{
+    local_result,
+    get_malloc_function(),
+    {*size_of_expr(non_const_pointer_type.base_type(), ns)}});
   initialize(
     dereference_exprt{local_result},
     plus_exprt{depth, from_integer(1, depth.type())},
@@ -743,7 +747,7 @@ code_blockt recursive_initializationt::build_array_constructor(
   const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
-  const typet &type = result.type().subtype();
+  const typet &type = to_pointer_type(result.type()).base_type();
   PRECONDITION(type.id() == ID_array);
   const array_typet &array_type = to_array_type(type);
   const auto array_size =
@@ -765,7 +769,7 @@ code_blockt recursive_initializationt::build_struct_constructor(
   const symbol_exprt &result)
 {
   PRECONDITION(result.type().id() == ID_pointer);
-  const typet &struct_type = result.type().subtype();
+  const typet &struct_type = to_pointer_type(result.type()).base_type();
   PRECONDITION(struct_type.id() == ID_struct_tag);
   code_blockt body{};
   const namespacet ns{goto_model.symbol_table};
@@ -803,8 +807,8 @@ code_blockt recursive_initializationt::build_nondet_constructor(
 {
   PRECONDITION(result.type().id() == ID_pointer);
   code_blockt body{};
-  auto const nondet_symbol =
-    get_fresh_local_typed_symexpr("nondet", result.type().subtype());
+  auto const nondet_symbol = get_fresh_local_typed_symexpr(
+    "nondet", to_pointer_type(result.type()).base_type());
   body.add(code_declt{nondet_symbol});
   body.add(code_assignt{dereference_exprt{result}, nondet_symbol});
   return body;
@@ -817,9 +821,9 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
   const optionalt<irep_idt> &lhs_name)
 {
   PRECONDITION(result.type().id() == ID_pointer);
-  const typet &dynamic_array_type = result.type().subtype();
+  const typet &dynamic_array_type = to_pointer_type(result.type()).base_type();
   PRECONDITION(dynamic_array_type.id() == ID_pointer);
-  const typet &element_type = dynamic_array_type.subtype();
+  const typet &element_type = to_pointer_type(dynamic_array_type).base_type();
   PRECONDITION(element_type.id() != ID_empty);
 
   // builds:
@@ -911,14 +915,17 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
     notequal_exprt{size, null_pointer_exprt{to_pointer_type(size.type())}},
     code_assignt{
       dereference_exprt{size},
-      typecast_exprt::conditional_cast(nondet_size, size.type().subtype())}});
+      typecast_exprt::conditional_cast(
+        nondet_size, to_pointer_type(size.type()).base_type())}});
 
   return body;
 }
 
 bool recursive_initializationt::needs_freeing(const exprt &expr) const
 {
-  if(expr.type().id() != ID_pointer || expr.type().subtype().id() == ID_code)
+  if(
+    expr.type().id() != ID_pointer ||
+    to_pointer_type(expr.type()).base_type().id() == ID_code)
     return false;
   for(auto const &common_arguments_origin : common_arguments_origins)
   {

@@ -97,7 +97,9 @@ std::string java_qualifierst::as_string() const
   for(const java_annotationt &annotation : annotations)
   {
     out << '@';
-    out << annotation.get_type().subtype().get(ID_identifier);
+    out << to_reference_type(annotation.get_type())
+             .base_type()
+             .get(ID_identifier);
 
     if(!annotation.get_values().empty())
     {

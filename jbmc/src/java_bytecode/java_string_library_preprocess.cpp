@@ -556,7 +556,8 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
   allocate_objectst allocate_objects(ID_java, loc, function_id, symbol_table);
 
   code_blockt tmp;
-  allocate_objects.allocate_dynamic_object(tmp, str, str.type().subtype());
+  allocate_objects.allocate_dynamic_object(
+    tmp, str, to_reference_type(str.type()).base_type());
   allocate_objects.declare_created_symbols(code);
   code.append(tmp);
 

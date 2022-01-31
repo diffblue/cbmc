@@ -781,9 +781,12 @@ void value_set_fit::get_reference_set_sharing_rec(
           expr.id()==ID_dynamic_object ||
           expr.id()==ID_string_constant)
   {
-    if(expr.type().id()==ID_array &&
-       expr.type().subtype().id()==ID_array)
+    if(
+      expr.type().id() == ID_array &&
+      to_array_type(expr.type()).element_type().id() == ID_array)
+    {
       insert(dest, expr);
+    }
     else
       insert(dest, expr, mp_integer{0});
 
@@ -1046,12 +1049,15 @@ void value_set_fit::assign(
   else if(type.id()==ID_array)
   {
     const index_exprt lhs_index(
-      lhs, exprt(ID_unknown, c_index_type()), type.subtype());
+      lhs,
+      exprt(ID_unknown, c_index_type()),
+      to_array_type(type).element_type());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
-      assign(lhs_index, exprt(rhs.id(), type.subtype()), ns);
+      assign(
+        lhs_index, exprt(rhs.id(), to_array_type(type).element_type()), ns);
     }
     else if(rhs.is_nil())
     {

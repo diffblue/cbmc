@@ -574,13 +574,13 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
       to_pointer_type(type).base_type().id() == ID_code &&
       to_pointer_type(expr.type()).base_type().id() == ID_code)
     {
-      code_typet code1=to_code_type(expr.type().subtype());
+      code_typet code1 = to_code_type(to_pointer_type(expr.type()).base_type());
       assert(!code1.parameters().empty());
       code_typet::parametert this1=code1.parameters()[0];
       INVARIANT(this1.get_this(), "first parameter should be `this'");
       code1.parameters().erase(code1.parameters().begin());
 
-      code_typet code2=to_code_type(type.subtype());
+      code_typet code2 = to_code_type(to_pointer_type(type).base_type());
       assert(!code2.parameters().empty());
       code_typet::parametert this2=code2.parameters()[0];
       INVARIANT(this2.get_this(), "first parameter should be `this'");
@@ -1118,7 +1118,7 @@ bool cpp_typecheckt::reference_related(
   assert(!is_reference(expr.type()));
 
   typet from=follow(expr.type());
-  typet to=follow(type.subtype());
+  typet to = follow(to_reference_type(type).base_type());
 
   // need to check #c_type
   if(from.get(ID_C_c_type)!=to.get(ID_C_c_type))
@@ -1667,7 +1667,7 @@ bool cpp_typecheckt::const_typecast(
     if(!expr.get_bool(ID_C_lvalue))
       return false;
 
-    if(new_expr.type()!=type.subtype())
+    if(new_expr.type() != to_reference_type(type).base_type())
       return false;
 
     address_of_exprt address_of(expr, to_pointer_type(type));
@@ -1710,7 +1710,7 @@ bool cpp_typecheckt::dynamic_typecast(
 
   if(is_reference(type))
   {
-    if(type.subtype().id() != ID_struct_tag)
+    if(to_reference_type(type).base_type().id() != ID_struct_tag)
       return false;
   }
   else if(type.id()==ID_pointer)
@@ -1718,13 +1718,13 @@ bool cpp_typecheckt::dynamic_typecast(
     if(type.find(ID_to_member).is_not_nil())
       return false;
 
-    if(type.subtype().id()==ID_empty)
+    if(to_pointer_type(type).base_type().id() == ID_empty)
     {
       if(!e.get_bool(ID_C_lvalue))
         return false;
       UNREACHABLE; // currently not supported
     }
-    else if(type.subtype().id() == ID_struct_tag)
+    else if(to_pointer_type(type).base_type().id() == ID_struct_tag)
     {
       if(e.get_bool(ID_C_lvalue))
       {
@@ -1863,7 +1863,7 @@ bool cpp_typecheckt::static_typecast(
     if(reference_binding(e, type, new_expr, rank))
       return true;
 
-    typet subto=follow(type.subtype());
+    typet subto = follow(to_pointer_type(type).base_type());
     typet from=follow(e.type());
 
     if(subto.id()==ID_struct && from.id()==ID_struct)
@@ -1875,7 +1875,7 @@ bool cpp_typecheckt::static_typecast(
       qual_from.read(e.type());
 
       c_qualifierst qual_to;
-      qual_to.read(type.subtype());
+      qual_to.read(to_pointer_type(type).base_type());
 
       if(!qual_to.is_subset_of(qual_from))
         return false;
@@ -1945,8 +1945,8 @@ bool cpp_typecheckt::static_typecast(
   {
     if(type.find(ID_to_member).is_nil() && e.type().find(ID_to_member).is_nil())
     {
-      typet to=follow(type.subtype());
-      typet from=follow(e.type().subtype());
+      typet to = follow(to_pointer_type(type).base_type());
+      typet from = follow(to_pointer_type(e.type()).base_type());
 
       if(from.id()==ID_empty)
       {
@@ -1979,7 +1979,9 @@ bool cpp_typecheckt::static_typecast(
       type.find(ID_to_member).is_not_nil() &&
       e.type().find(ID_to_member).is_not_nil())
     {
-      if(type.subtype()!=e.type().subtype())
+      if(
+        to_pointer_type(type).base_type() !=
+        to_pointer_type(e.type()).base_type())
         return false;
 
       const struct_typet &from_struct = to_struct_type(
@@ -1998,8 +2000,12 @@ bool cpp_typecheckt::static_typecast(
       type.find(ID_to_member).is_nil() &&
       e.type().find(ID_to_member).is_not_nil())
     {
-      if(type.subtype() != e.type().subtype())
+      if(
+        to_pointer_type(type).base_type() !=
+        to_pointer_type(e.type()).base_type())
+      {
         return false;
+      }
 
       const struct_typet &from_struct = to_struct_type(
         follow(static_cast<const typet &>(e.type().find(ID_to_member))));

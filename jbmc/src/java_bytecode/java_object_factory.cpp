@@ -1381,16 +1381,16 @@ code_blockt gen_nondet_array_init(
   const size_t max_nondet_array_length)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
-  PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
+  PRECONDITION(to_pointer_type(expr.type()).base_type().id() == ID_struct_tag);
   PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
 
   code_blockt statements;
 
   const namespacet ns(symbol_table);
-  const typet &type = ns.follow(expr.type().subtype());
+  const typet &type = ns.follow(to_pointer_type(expr.type()).base_type());
   const struct_typet &struct_type = to_struct_type(type);
-  const typet &element_type =
-    static_cast<const typet &>(expr.type().subtype().find(ID_element_type));
+  const typet &element_type = static_cast<const typet &>(
+    to_pointer_type(expr.type()).base_type().find(ID_element_type));
 
   auto max_length_expr = from_integer(max_nondet_array_length, java_int_type());
 

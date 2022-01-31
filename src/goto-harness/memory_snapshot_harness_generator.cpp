@@ -201,7 +201,7 @@ size_t memory_snapshot_harness_generatort::pointer_depth(const typet &t) const
   if(t.id() != ID_pointer)
     return 0;
   else
-    return pointer_depth(t.subtype()) + 1;
+    return pointer_depth(to_pointer_type(t).base_type()) + 1;
 }
 
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
