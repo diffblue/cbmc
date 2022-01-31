@@ -86,7 +86,9 @@ static bool have_to_remove_complex(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_vector ||
           type.id()==ID_array)
+  {
     return have_to_remove_complex(to_type_with_subtype(type).subtype());
+  }
   else if(type.id()==ID_complex)
     return true;
 
@@ -248,16 +250,16 @@ static void remove_complex(typet &type)
           type.id()==ID_vector ||
           type.id()==ID_array)
   {
-    remove_complex(type.subtype());
+    remove_complex(to_type_with_subtype(type).subtype());
   }
   else if(type.id()==ID_complex)
   {
-    remove_complex(type.subtype());
+    auto &subtype = to_complex_type(type);
+    remove_complex(subtype);
 
     // Replace by a struct with two members.
     // The real part goes first.
-    struct_typet struct_type(
-      {{ID_real, type.subtype()}, {ID_imag, type.subtype()}});
+    struct_typet struct_type({{ID_real, subtype}, {ID_imag, subtype}});
     struct_type.add_source_location()=type.source_location();
 
     type = std::move(struct_type);

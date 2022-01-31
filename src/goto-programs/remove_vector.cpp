@@ -78,7 +78,9 @@ static bool have_to_remove_vector(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_complex ||
           type.id()==ID_array)
+  {
     return have_to_remove_vector(to_type_with_subtype(type).subtype());
+  }
   else if(type.id()==ID_vector)
     return true;
 
@@ -280,7 +282,7 @@ static void remove_vector(typet &type)
           type.id()==ID_complex ||
           type.id()==ID_array)
   {
-    remove_vector(type.subtype());
+    remove_vector(to_type_with_subtype(type).subtype());
   }
   else if(type.id()==ID_vector)
   {

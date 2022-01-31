@@ -30,7 +30,7 @@ static bool object_descriptor_matches(
   {
     return descriptor.object().id() == "NULL-object" &&
            descriptor.object().type() ==
-             to_pointer_type(target.type()).base_type();
+             to_pointer_type(target.type()).subtype();
   }
   else
   {

@@ -119,12 +119,13 @@ std::string cpp_type2name(const typet &type)
     result += CPROVER_PREFIX "bool";
   else if(type.id()==ID_pointer)
   {
+    const auto &base_type = to_pointer_type(type).base_type();
     if(is_reference(type))
-      result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
+      result += "ref_" + cpp_type2name(base_type);
     else if(is_rvalue_reference(type))
-      result += "rref_" + cpp_type2name(to_pointer_type(type).base_type());
+      result += "rref_" + cpp_type2name(base_type);
     else
-      result += "ptr_" + cpp_type2name(to_pointer_type(type).base_type());
+      result += "ptr_" + cpp_type2name(base_type);
   }
   else if(type.id()==ID_signedbv || type.id()==ID_unsignedbv)
   {

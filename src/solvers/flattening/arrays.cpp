@@ -359,9 +359,9 @@ void arrayst::add_array_Ackermann_constraints()
 
           if(indices_equal_lit!=const_literal(false))
           {
-            const typet &subtype =
+            const typet &element_type =
               to_array_type(arrays[i].type()).element_type();
-            index_exprt index_expr1(arrays[i], *i1, subtype);
+            index_exprt index_expr1(arrays[i], *i1, element_type);
 
             index_exprt index_expr2=index_expr1;
             index_expr2.index()=*i2;
@@ -628,7 +628,7 @@ void arrayst::add_array_constraints_update(
   const exprt &value=expr.new_value();
 
   {
-    index_exprt index_expr(expr, index, expr.type().subtype());
+    index_exprt index_expr(expr, index, to_array_type(expr.type()).element_type());
 
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       index_expr.type()==value.type(),

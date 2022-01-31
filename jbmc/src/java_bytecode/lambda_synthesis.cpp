@@ -586,7 +586,8 @@ static symbol_exprt instantiate_new_object(
     "REF_NewInvokeSpecial lambda must refer to a constructor");
   const auto &created_type = method_type.parameters().at(0).type();
   irep_idt created_class =
-    to_struct_tag_type(created_type.subtype()).get_identifier();
+    to_struct_tag_type(to_pointer_type(created_type).subtype())
+      .get_identifier();
 
   // Call static init if it exists:
   irep_idt static_init_name = clinit_wrapper_name(created_class);
@@ -615,7 +616,8 @@ static symbol_exprt instantiate_new_object(
 static optionalt<irep_idt> get_unboxing_method(const typet &maybe_boxed_type)
 {
   const irep_idt &boxed_type_id =
-    to_struct_tag_type(maybe_boxed_type.subtype()).get_identifier();
+    to_struct_tag_type(to_pointer_type(maybe_boxed_type).subtype())
+      .get_identifier();
   const java_boxed_type_infot *boxed_type_info =
     get_boxed_type_info_by_name(boxed_type_id);
   return boxed_type_info ? boxed_type_info->unboxing_function_name
@@ -633,7 +635,8 @@ exprt make_function_expr(
   if(!method_type.has_this())
     return function_symbol.symbol_expr();
   const irep_idt &declared_on_class_id =
-    to_struct_tag_type(method_type.get_this()->type().subtype())
+    to_struct_tag_type(
+      to_pointer_type(method_type.get_this()->type()).subtype())
       .get_identifier();
   const auto &this_symbol = symbol_table.lookup_ref(declared_on_class_id);
   if(to_java_class_type(this_symbol.type).get_final())

@@ -1884,7 +1884,7 @@ exprt string_refinementt::get(const exprt &expr) const
       if(const auto n = numeric_cast<std::size_t>(length))
       {
         const interval_sparse_arrayt sparse_array(
-          from_integer(CHARACTER_FOR_UNKNOWN, arr.type().subtype()));
+          from_integer(CHARACTER_FOR_UNKNOWN, to_array_type(arr.type()).element_type()));
         return sparse_array.concretize(*n, length.type());
       }
     }

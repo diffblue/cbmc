@@ -395,8 +395,8 @@ static code_with_references_listt assign_array_data_component_from_json(
 {
   const auto &java_class_type = followed_class_type(expr, info.symbol_table);
   const auto &data_component = java_class_type.components()[2];
-  const auto &element_type =
-    java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+  const auto &element_type = java_array_element_type(
+    to_struct_tag_type(to_pointer_type(expr.type()).subtype()));
   const exprt data_member_expr = typecast_exprt::conditional_cast(
     member_exprt{dereference_exprt{expr}, "data", data_component.type()},
     pointer_type(element_type));
@@ -458,8 +458,8 @@ assign_det_length_array_from_json(
   object_creation_infot &info)
 {
   PRECONDITION(is_java_array_type(expr.type()));
-  const auto &element_type =
-    java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+  const auto &element_type = java_array_element_type(
+    to_struct_tag_type(to_pointer_type(expr.type()).subtype()));
   const json_arrayt json_array = get_untyped_array(json, element_type);
   const auto number_of_elements =
     from_integer(json_array.size(), java_int_type());
@@ -487,8 +487,8 @@ static code_with_references_listt assign_nondet_length_array_from_json(
   object_creation_infot &info)
 {
   PRECONDITION(is_java_array_type(array.type()));
-  const auto &element_type =
-    java_array_element_type(to_struct_tag_type(array.type().subtype()));
+  const auto &element_type = java_array_element_type(
+    to_struct_tag_type(to_pointer_type(array.type()).subtype()));
   const json_arrayt json_array = get_untyped_array(json, element_type);
   code_with_references_listt result;
   exprt number_of_elements = from_integer(json_array.size(), java_int_type());
@@ -879,8 +879,8 @@ code_with_references_listt assign_from_json_rec(
       else
       {
         PRECONDITION(is_java_array_type(expr.type()));
-        const auto &element_type =
-          java_array_element_type(to_struct_tag_type(expr.type().subtype()));
+        const auto &element_type = java_array_element_type(
+          to_struct_tag_type(to_pointer_type(expr.type()).subtype()));
         const std::size_t length = get_untyped_array(json, element_type).size();
         result.add(allocate_array(
           expr, from_integer(length, java_int_type()), info.loc));

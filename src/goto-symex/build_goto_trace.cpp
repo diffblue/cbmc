@@ -188,7 +188,7 @@ replace_nondet_in_type(typet &type, const decision_proceduret &solver)
     array_type.size() = solver.get(array_type.size());
   }
   if(type.has_subtype())
-    replace_nondet_in_type(type.subtype(), solver);
+    replace_nondet_in_type(to_type_with_subtype(type).subtype(), solver);
 }
 
 /// Replace nondet values that appear in the type of \p expr and its

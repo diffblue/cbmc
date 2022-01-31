@@ -964,9 +964,11 @@ void add_java_array_types(symbol_tablet &symbol_table)
     code_declt declare_index(index_symexpr);
 
     dereference_exprt old_cell(
-      plus_exprt(old_data, index_symexpr), old_data.type().subtype());
+      plus_exprt(old_data, index_symexpr),
+      to_pointer_type(old_data.type()).subtype());
     dereference_exprt new_cell(
-      plus_exprt(new_data, index_symexpr), new_data.type().subtype());
+      plus_exprt(new_data, index_symexpr),
+      to_pointer_type(new_data.type()).subtype());
 
     const code_fort copy_loop = code_fort::from_index_bounds(
       from_integer(0, index_symexpr.type()),

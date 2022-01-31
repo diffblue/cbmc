@@ -335,7 +335,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
         {
           if(value.is_nil())
             values[*index_mpint] =
-              exprt(ID_unknown, to_array_type(type).subtype());
+              exprt(ID_unknown, to_array_type(type).element_type());
           else
             values[*index_mpint] = value;
         }

@@ -27,9 +27,10 @@ static bool is_nondet_pointer(exprt expr)
   // and we do not want to convert it. If the type is a ptr-to-void or a
   // function pointer then we also do not want to convert it.
   const typet &type = expr.type();
-  const bool non_void_non_function_pointer = type.id() == ID_pointer &&
-                                             type.subtype().id() != ID_empty &&
-                                             type.subtype().id() != ID_code;
+  const bool non_void_non_function_pointer =
+    type.id() == ID_pointer &&
+    to_pointer_type(type).base_type().id() != ID_empty &&
+    to_pointer_type(type).base_type().id() != ID_code;
   return can_cast_expr<side_effect_expr_nondett>(expr) &&
          non_void_non_function_pointer;
 }

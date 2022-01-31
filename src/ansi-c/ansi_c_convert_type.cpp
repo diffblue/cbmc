@@ -653,7 +653,7 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
   if(gcc_attribute_mode.is_not_nil())
   {
     typet new_type=gcc_attribute_mode;
-    new_type.subtype()=type;
+    to_type_with_subtype(new_type).subtype() = type;
     type.swap(new_type);
   }
 

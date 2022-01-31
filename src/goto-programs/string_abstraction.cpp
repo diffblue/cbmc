@@ -926,8 +926,9 @@ bool string_abstractiont::build_pointer(const exprt &object,
     dest=address_of_exprt(dest);
     return false;
   }
-  else if(ptr.pointer.id()==ID_symbol &&
-      is_char_type(object.type().subtype()))
+  else if(
+    ptr.pointer.id() == ID_symbol &&
+    is_char_type(to_pointer_type(object.type()).subtype()))
     // recursive call; offset will be handled by pointer_offset in SIZE/LENGTH
     // checks
     return build_wrap(ptr.pointer, dest, write);

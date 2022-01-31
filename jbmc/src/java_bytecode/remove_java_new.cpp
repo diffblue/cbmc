@@ -88,7 +88,7 @@ goto_programt::targett remove_java_newt::lower_java_new(
   PRECONDITION(rhs.operands().empty());
   PRECONDITION(rhs.type().id() == ID_pointer);
   source_locationt location = rhs.source_location();
-  typet object_type = rhs.type().subtype();
+  typet object_type = to_pointer_type(rhs.type()).subtype();
 
   // build size expression
   const auto object_size = size_of_expr(object_type, ns);
@@ -141,7 +141,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   PRECONDITION(rhs.type().id() == ID_pointer);
 
   source_locationt location = rhs.source_location();
-  struct_tag_typet object_type = to_struct_tag_type(rhs.type().subtype());
+  struct_tag_typet object_type =
+    to_struct_tag_type(to_pointer_type(rhs.type()).subtype());
   PRECONDITION(ns.follow(object_type).id() == ID_struct);
 
   // build size expression
@@ -201,7 +202,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
       goto_programt::make_assignment(code_assignt(
         object_array_element_type,
         constant_exprt(
-          to_struct_tag_type(underlying_type_and_dimension.first.subtype())
+          to_struct_tag_type(
+            to_pointer_type(underlying_type_and_dimension.first).subtype())
             .get_identifier(),
           string_typet()),
         location)));
@@ -278,7 +280,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   if(!rhs.get_bool(ID_skip_initialize))
   {
     const auto zero_element =
-      zero_initializer(data.type().subtype(), location, ns);
+      zero_initializer(to_pointer_type(data.type()).subtype(), location, ns);
     CHECK_RETURN(zero_element.has_value());
     codet array_set(ID_array_set);
     array_set.copy_to_operands(new_array_data_symbol, *zero_element);
@@ -308,14 +310,14 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     sub_java_new.operands().erase(sub_java_new.operands().begin());
 
     // we already know that rhs has pointer type
-    typet sub_type =
-      static_cast<const typet &>(rhs.type().subtype().find(ID_element_type));
+    typet sub_type = static_cast<const typet &>(
+      to_pointer_type(rhs.type()).subtype().find(ID_element_type));
     CHECK_RETURN(sub_type.id() == ID_pointer);
     sub_java_new.type() = sub_type;
 
     plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
     dereference_exprt deref_expr(
-      plus_exprt(data, tmp_i), data.type().subtype());
+      plus_exprt(data, tmp_i), to_pointer_type(data.type()).subtype());
 
     code_blockt for_body;
     symbol_exprt init_sym =

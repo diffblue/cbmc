@@ -1325,11 +1325,10 @@ void dump_ct::cleanup_expr(exprt &expr)
         expr = struct_exprt({}, struct_typet());
     }
     // add a typecast for NULL
-    else if(u.op().id()==ID_constant &&
-            u.op().type().id()==ID_pointer &&
-            u.op().type().subtype().id()==ID_empty &&
-            (u.op().is_zero() ||
-             to_constant_expr(u.op()).get_value()==ID_NULL))
+    else if(
+      u.op().id() == ID_constant && u.op().type().id() == ID_pointer &&
+      to_pointer_type(u.op().type()).subtype().id() == ID_empty &&
+      (u.op().is_zero() || to_constant_expr(u.op()).get_value() == ID_NULL))
     {
       const struct_union_typet::componentt &comp=
         u_type_f.get_component(u.get_component_name());

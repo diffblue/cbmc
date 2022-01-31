@@ -3483,7 +3483,7 @@ array_abstract_declarator:
           // these should be allowed in prototypes only
           $$=$1;
           set($$, ID_array);
-          stack_type($$).subtype()=typet(ID_abstract);
+          stack_type($$).add_subtype()=typet(ID_abstract);
           stack_type($$).add(ID_size).make_nil();
         }
         | '[' constant_expression ']'

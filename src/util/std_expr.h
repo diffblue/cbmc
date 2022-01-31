@@ -1322,7 +1322,6 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
   return ret;
 }
 
-
 /// \brief Array index operator
 class index_exprt:public binary_exprt
 {

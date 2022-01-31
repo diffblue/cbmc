@@ -166,7 +166,7 @@ bool replace_symbolt::replace(typet &dest) const
   bool result=true;
 
   if(dest.has_subtype())
-    if(!replace(dest.subtype()))
+    if(!replace(to_type_with_subtype(dest).subtype()))
       result=false;
 
   for(typet &subtype : to_type_with_subtypes(dest).subtypes())

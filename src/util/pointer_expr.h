@@ -45,6 +45,8 @@ public:
     return subtype();
   }
 
+  using typet::subtype;
+
   signedbv_typet difference_type() const
   {
     return signedbv_typet(get_width());

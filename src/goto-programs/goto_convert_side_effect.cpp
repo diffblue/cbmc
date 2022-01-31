@@ -226,9 +226,10 @@ void goto_convertt::remove_pre(
 
   if(constant_type.id() == ID_complex)
   {
-    exprt real = from_integer(1, constant_type.subtype());
-    exprt imag = from_integer(0, constant_type.subtype());
-    constant = complex_exprt(real, imag, to_complex_type(constant_type));
+    auto &complex_type = to_complex_type(constant_type);
+    exprt real = from_integer(1, complex_type.subtype());
+    exprt imag = from_integer(0, complex_type.subtype());
+    constant = complex_exprt(real, imag, complex_type);
   }
   else
     constant = from_integer(1, constant_type);
@@ -312,9 +313,10 @@ void goto_convertt::remove_post(
 
   if(constant_type.id() == ID_complex)
   {
-    exprt real = from_integer(1, constant_type.subtype());
-    exprt imag = from_integer(0, constant_type.subtype());
-    constant = complex_exprt(real, imag, to_complex_type(constant_type));
+    auto &complex_type = to_complex_type(constant_type);
+    exprt real = from_integer(1, complex_type.subtype());
+    exprt imag = from_integer(0, complex_type.subtype());
+    constant = complex_exprt(real, imag, complex_type);
   }
   else
     constant = from_integer(1, constant_type);

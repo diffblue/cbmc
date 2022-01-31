@@ -45,8 +45,20 @@ public:
   }
 #endif
 
+  // This is a temporary replacement for subtype() when
+  // the type does not yet have a subtype. It should
+  // be replaced by using type_with_subtypet.
+  inline typet &add_subtype()
+  {
+    PRECONDITION(!has_subtype());
+    get_sub().resize(1);
+    return static_cast<typet &>(get_sub().front());
+  }
+
+protected:
   const typet &subtype() const
   {
+    // This method will eventually get the precondition has_subtype().
     if(get_sub().empty())
       return static_cast<const typet &>(get_nil_irep());
     return static_cast<const typet &>(get_sub().front());
@@ -54,12 +66,14 @@ public:
 
   typet &subtype()
   {
+    // This method will eventually get the precondition has_subtype().
     subt &sub=get_sub();
     if(sub.empty())
       sub.resize(1);
     return static_cast<typet &>(sub.front());
   }
 
+public:
   bool has_subtypes() const
   { return !get_sub().empty(); }
 
@@ -183,6 +197,13 @@ inline const type_with_subtypet &to_type_with_subtype(const typet &type)
 inline type_with_subtypet &to_type_with_subtype(typet &type)
 {
   type_with_subtypet::check(type);
+  return static_cast<type_with_subtypet &>(type);
+}
+
+inline type_with_subtypet &add_subtype(typet &type)
+{
+  PRECONDITION(!type.has_subtype());
+  type.get_sub().resize(1);
   return static_cast<type_with_subtypet &>(type);
 }
 

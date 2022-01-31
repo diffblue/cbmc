@@ -37,7 +37,7 @@ bool find_superclass_with_type(
   assert(ptr.type().id()==ID_pointer);
   while(true)
   {
-    const typet ptr_base=ns.follow(ptr.type().subtype());
+    const typet ptr_base = ns.follow(to_pointer_type(ptr.type()).subtype());
 
     if(ptr_base.id()!=ID_struct)
       return false;

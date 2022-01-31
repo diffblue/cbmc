@@ -201,7 +201,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
     // Return top if dereferencing a null pointer or we are top
     bool is_value_top = is_top() || value_stack.is_top_value();
     return env.abstract_object_factory(
-      type().subtype(), ns, is_value_top, !is_value_top);
+      to_pointer_type(type()).base_type(), ns, is_value_top, !is_value_top);
   }
   else
   {

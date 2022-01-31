@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ostream>
 
 #include <util/invariant.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 #include "cpp_template_parameter.h"
@@ -28,7 +29,7 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_pointer)
   {
-    apply(type.subtype());
+    apply(to_pointer_type(type).base_type());
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
