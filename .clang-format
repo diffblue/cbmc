@@ -47,7 +47,18 @@ NamespaceIndentation: None
 PenaltyBreakString: 10000
 PointerAlignment: Right
 ReflowComments: 'false'
-SortIncludes: 'true'
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '<util/'
+    Priority: 1
+  - Regex: '<goto-programs/'
+    Priority: 2
+  - Regex: '<.+/.+>'
+    Priority: 3
+  - Regex: '^"[^/]+"$'
+    Priority: 4
+  - Regex: '<[^/]+>'
+    Priority: 5
 SpaceAfterCStyleCast: 'false'
 SpaceBeforeAssignmentOperators: 'true'
 SpaceBeforeParens: Never

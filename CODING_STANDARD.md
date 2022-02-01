@@ -148,7 +148,7 @@ Formatting is enforced using clang-format. For more information about this, see
 - The corresponding header for a given source file should always be the *first*
   include in the source file. For example, given `foo.h` and `foo.cpp`, the
   line `#include "foo.h"` should precede all other include statements in
-  `foo.cpp`.
+  `foo.cpp`. clang-format will enforce this.
 - Use the C++ versions of C headers (e.g. `cmath` instead of `math.h`).
   Some of the C headers use macros instead of functions which can have
   unexpected consequences.
