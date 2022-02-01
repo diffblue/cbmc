@@ -287,40 +287,41 @@ static smt_termt convert_relational_to_smt(
     binary_relation.pretty());
 }
 
-static smt_termt
-convert_expr_to_smt(const binary_relation_exprt &binary_relation)
+static optionalt<smt_termt> try_relational_conversion(const exprt &expr)
 {
-  if(can_cast_expr<greater_than_exprt>(binary_relation))
+  if(const auto greater_than = expr_try_dynamic_cast<greater_than_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *greater_than,
       smt_bit_vector_theoryt::unsigned_greater_than,
       smt_bit_vector_theoryt::signed_greater_than);
   }
-  if(can_cast_expr<greater_than_or_equal_exprt>(binary_relation))
+  if(
+    const auto greater_than_or_equal =
+      expr_try_dynamic_cast<greater_than_or_equal_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *greater_than_or_equal,
       smt_bit_vector_theoryt::unsigned_greater_than_or_equal,
       smt_bit_vector_theoryt::signed_greater_than_or_equal);
   }
-  if(can_cast_expr<less_than_exprt>(binary_relation))
+  if(const auto less_than = expr_try_dynamic_cast<less_than_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *less_than,
       smt_bit_vector_theoryt::unsigned_less_than,
       smt_bit_vector_theoryt::signed_less_than);
   }
-  if(can_cast_expr<less_than_or_equal_exprt>(binary_relation))
+  if(
+    const auto less_than_or_equal =
+      expr_try_dynamic_cast<less_than_or_equal_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *less_than_or_equal,
       smt_bit_vector_theoryt::unsigned_less_than_or_equal,
       smt_bit_vector_theoryt::signed_less_than_or_equal);
   }
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for binary relation expression: " +
-    binary_relation.pretty());
+  return {};
 }
 
 static smt_termt convert_expr_to_smt(const plus_exprt &plus)
@@ -686,11 +687,9 @@ smt_termt convert_expr_to_smt(const exprt &expr)
   {
     return convert_expr_to_smt(*float_not_equal);
   }
-  if(
-    const auto binary_relation =
-      expr_try_dynamic_cast<binary_relation_exprt>(expr))
+  if(const auto converted_relational = try_relational_conversion(expr))
   {
-    return convert_expr_to_smt(*binary_relation);
+    return *converted_relational;
   }
   if(const auto plus = expr_try_dynamic_cast<plus_exprt>(expr))
   {
