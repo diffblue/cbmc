@@ -9,11 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#include "goto_symex.h"
-#include "goto_symex_is_constant.h"
-
-#include <algorithm>
-
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
@@ -22,10 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
+#include <langapi/language_util.h>
 #include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/value_set_dereference.h>
 
+#include "goto_symex.h"
+#include "goto_symex_is_constant.h"
 #include "path_storage.h"
+
+#include <algorithm>
 
 void goto_symext::apply_goto_condition(
   goto_symex_statet &current_state,
@@ -279,10 +279,19 @@ void goto_symext::symex_goto(statet &state)
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
-      if(new_guard.is_true())
-        symex_assume_l2(state, false_exprt());
-      else
-        symex_assume_l2(state, not_exprt(new_guard));
+      exprt negated_guard = not_exprt{new_guard};
+      do_simplify(negated_guard);
+      log.statistics() << "replacing self-loop at "
+                       << state.source.pc->source_location() << " by assume("
+                       << from_expr(ns, state.source.function_id, negated_guard)
+                       << ")" << messaget::eom;
+      if(symex_config.unwinding_assertions)
+      {
+        log.warning()
+          << "no unwinding assertion will be generated for self-loop at "
+          << state.source.pc->source_location() << messaget::eom;
+      }
+      symex_assume_l2(state, negated_guard);
 
       // next instruction
       symex_transition(state);
