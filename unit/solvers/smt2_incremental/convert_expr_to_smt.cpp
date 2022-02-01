@@ -310,4 +310,22 @@ TEST_CASE(
     REQUIRE_THROWS(
       convert_expr_to_smt(plus_exprt{one_operand, signedbv_typet{8}}));
   }
+
+  SECTION("Subtraction of two constant size bit-vectors")
+  {
+    const auto constructed_term =
+      convert_expr_to_smt(minus_exprt{two_bvint, one_bvint});
+    const auto expected_term =
+      smt_bit_vector_theoryt::subtract(smt_term_two, smt_term_one);
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION(
+    "Ensure that subtraction node conversion fails if the operands are not "
+    "bit-vector based")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(
+      convert_expr_to_smt(minus_exprt{true_exprt{}, false_exprt{}}));
+  }
 }

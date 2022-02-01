@@ -343,8 +343,20 @@ static smt_termt convert_expr_to_smt(const plus_exprt &plus)
 
 static smt_termt convert_expr_to_smt(const minus_exprt &minus)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for minus expression: " + minus.pretty());
+  const bool both_operands_bitvector =
+    can_cast_type<integer_bitvector_typet>(minus.lhs().type()) &&
+    can_cast_type<integer_bitvector_typet>(minus.rhs().type());
+
+  if(both_operands_bitvector)
+  {
+    return smt_bit_vector_theoryt::subtract(
+      convert_expr_to_smt(minus.lhs()), convert_expr_to_smt(minus.rhs()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for minus expression: " + minus.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const div_exprt &divide)
