@@ -4,11 +4,11 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
-^\[f1.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
-^\[f1.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: FAILURE$
+^\[f1.assigns.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: FAILURE$
 --
 The purpose of this test is to ensure that we can safely use __CPROVER_forall
 within positive contexts (enforced ENSURES clauses).

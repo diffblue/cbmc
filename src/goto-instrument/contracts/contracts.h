@@ -31,8 +31,6 @@ Date: February 2016
 #include <util/optional.h>
 #include <util/pointer_expr.h>
 
-#include "assigns.h"
-
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
   " --apply-loop-contracts\n"                                                  \
@@ -49,6 +47,8 @@ Date: February 2016
 
 class local_may_aliast;
 class replace_symbolt;
+class instrument_spec_assignst;
+class cfg_infot;
 
 class code_contractst
 {
@@ -142,8 +142,7 @@ protected:
   /// instrumentation (inclusive).
   /// \param instruction_end Iterator to the instruction at which to stop
   /// instrumentation (exclusive).
-  /// \param assigns Assigns clause of the function (its write set attribute
-  /// gets extended during the instrumentation).
+  /// \param instrument_spec_assigns Assigns clause instrumenter of the function
   /// \param skip_parameter_assigns If true, will cause assignments to symbol
   /// marked as is_parameter to not be instrumented.
   /// \param cfg_info_opt Control flow graph information can will be used
@@ -153,25 +152,8 @@ protected:
     goto_programt &body,
     goto_programt::targett instruction_it,
     const goto_programt::targett &instruction_end,
-    assigns_clauset &assigns,
+    instrument_spec_assignst &instrument_spec_assigns,
     skipt skip_parameter_assigns,
-    optionalt<cfg_infot> &cfg_info_opt);
-
-  /// Allow or do not allow NULL targets in inclusion checks
-  enum class allow_null_lhst
-  {
-    YES,
-    NO
-  };
-
-  /// Inserts an assertion into the goto program to ensure that
-  /// an expression is within the assignable memory frame.
-  const assigns_clauset::conditional_address_ranget add_inclusion_check(
-    goto_programt &program,
-    const assigns_clauset &assigns,
-    goto_programt::targett &instruction_it,
-    const exprt &lhs,
-    allow_null_lhst allow_null_lhs,
     optionalt<cfg_infot> &cfg_info_opt);
 
   /// Check if there are any malloc statements which may be repeated because of
@@ -184,7 +166,7 @@ protected:
   void instrument_assign_statement(
     goto_programt::targett &instruction_it,
     goto_programt &program,
-    assigns_clauset &assigns_clause,
+    instrument_spec_assignst &instrument_spec_assigns,
     optionalt<cfg_infot> &cfg_info_opt);
 
   /// Inserts an assertion into program immediately before the function call at
@@ -194,7 +176,7 @@ protected:
     goto_programt::targett &instruction_it,
     const irep_idt &function,
     goto_programt &body,
-    assigns_clauset &assigns,
+    instrument_spec_assignst &instrument_spec_assigns,
     optionalt<cfg_infot> &cfg_info_opt);
 
   /// Apply loop contracts, whenever available, to all loops in `function`.

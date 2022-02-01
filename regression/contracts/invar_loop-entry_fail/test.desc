@@ -5,9 +5,9 @@ main.c
 ^SIGNAL=0$
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: FAILURE$
-^\[main\.\d+\] line 11 Check that y is assignable: SUCCESS$
-^\[main\.\d+\] line 12 Check that x is assignable: SUCCESS$
-^\[main\.\d+\] line 13 Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 11 Check that y is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 12 Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 13 Check that x is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --

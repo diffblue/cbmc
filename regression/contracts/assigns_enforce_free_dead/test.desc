@@ -1,22 +1,25 @@
 CORE
 main.c
 --enforce-contract foo _ --malloc-may-fail --malloc-fail-null --pointer-primitive-check
-^\[foo.\d+\] line 7 Check that \*\(\*p\) is assignable: SUCCESS$
-^\[foo.\d+\] line 24 Check that \*\(\*p\) is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that \*p is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*q is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*w is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: SUCCESS$
+\[foo.assigns.\d+\] line 4 Check that \*x is valid: SUCCESS$
+\[foo.assigns.\d+\] line 4 Check that \*p is valid when .*: SUCCESS$
+\[foo.assigns.\d+\] line 4 Check that \*\(\*p\) is valid when .*: SUCCESS$
+^\[foo.assigns.\d+\] line 7 Check that \*\(\*p\) is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 24 Check that \*\(\*p\) is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that \*p is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*q is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*w is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
-^\[foo.\d+\] line \d+ Check that \*p is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that \*q is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that \*w is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that \*x is assignable: FAILURE$
-^\[foo.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that \*p is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that \*q is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that \*w is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: FAILURE$
 --
 Checks that invalidated CARs are correctly tracked on `free` and `DEAD`.
 

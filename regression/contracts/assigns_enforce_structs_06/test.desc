@@ -3,14 +3,14 @@ main.c
 --enforce-contract f1 --enforce-contract f2 --enforce-contract f3
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
-^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)1\] is assignable: SUCCESS$
-^\[f1.\d+\] line \d+ Check that p->buf\[\(.*\)2\] is assignable: SUCCESS$
-^\[f1.\d+\] line \d+ Check that p->size is assignable: FAILURE$
-^\[f2.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: FAILURE$
-^\[f2.\d+\] line \d+ Check that p->size is assignable: SUCCESS$
-^\[f3.\d+\] line \d+ Check that p->buf is assignable: SUCCESS$
-^\[f3.\d+\] line \d+ Check that p->size is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)1\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)2\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->size is assignable: FAILURE$
+^\[f2.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: FAILURE$
+^\[f2.assigns.\d+\] line \d+ Check that p->size is assignable: SUCCESS$
+^\[f3.assigns.\d+\] line \d+ Check that p->buf is assignable: SUCCESS$
+^\[f3.assigns.\d+\] line \d+ Check that p->size is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --

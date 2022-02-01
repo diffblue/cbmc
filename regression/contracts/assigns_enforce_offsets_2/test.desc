@@ -1,9 +1,9 @@
 CORE
 main.c
 --enforce-contract foo _ --pointer-check
-^\[.*\d+\].* line 5 Check assigns target validity 'TRUE: \*x': SUCCESS$
-^\[.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: (SUCCESS|FAILURE)$
-^\[.*\d+\].* line 8 Check assigns target validity 'TRUE: x\[\(.*\)1\]': FAILURE$
+^\[foo.assigns.*\d+\].* line 5 Check that \*x is valid: SUCCESS$
+^\[foo.assigns.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: (SUCCESS|FAILURE)$
+^\[foo.assigns.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

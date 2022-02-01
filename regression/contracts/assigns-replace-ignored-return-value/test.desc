@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-^[.*] Check that .*ignored_return_value.* is assignable: FAILURE
+^\[.*assigns.*\].*ignored_return_value.*FAILURE
 --
 This test checks that when replacing a call by a contract for a call that
 ignores the return value of the function, the temporary introduced to 

@@ -1,10 +1,11 @@
 CORE
 main.c
 --enforce-contract uses_assigns
+^\[uses_assigns.assigns.\d+\] line \d+ Check that \*\(&a\[\(.*int\)i\]\) is valid: SUCCESS$
+^\[assigns_ptr.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
-^\[assigns_ptr\.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
-^VERIFICATION SUCCESSFUL$
 --
 --
 Checks whether verification succeeds for array elements at a symbolic index. 

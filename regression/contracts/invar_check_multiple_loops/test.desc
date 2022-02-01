@@ -10,10 +10,10 @@ main.c
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
 ^\[main\.assertion\.\d+\] .* assertion x == y \+ 2 \* n: SUCCESS$
-^\[main\.\d+\] line 8 Check that r is assignable: SUCCESS$
-^\[main\.\d+\] line 15 Check that x is assignable: SUCCESS$
-^\[main\.\d+\] line 23 Check that y is assignable: SUCCESS$
-^\[main\.\d+\] line 24 Check that r is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 8 Check that r is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 15 Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 23 Check that y is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 24 Check that r is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 This test checks that multiple loops and `for` loops are correctly handled.

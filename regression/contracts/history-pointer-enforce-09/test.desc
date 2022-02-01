@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
-^\[foo.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

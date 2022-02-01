@@ -4,7 +4,7 @@ main.c
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
-^\[main\.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
 ^\[main\.overflow\.\d+\] .* arithmetic overflow on unsigned - in max - i: SUCCESS$
 ^\[main\.overflow\.\d+\] .* arithmetic overflow on unsigned - in max - i: SUCCESS$
 ^\[main\.overflow\.\d+\] .* arithmetic overflow on unsigned \+ in i \+ 1u: SUCCESS$

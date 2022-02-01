@@ -3,10 +3,12 @@ main.c
 --enforce-contract foo _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
-^\[foo.\d+\] line \d+ Check that foo\$\$1\$\$x is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that x is valid: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that foo\$\$1\$\$x is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
+^\[.*assigns.*\].*: FAILURE$
 --
 Checks whether static local and global variables are correctly tracked
 in assigns clause verification.

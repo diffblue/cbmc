@@ -5,8 +5,8 @@ main.c
 ^SIGNAL=0$
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main\.\d+\] .* Check that i is assignable: SUCCESS$
-^\[main\.\d+\] .* Check that data\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that data\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
 ^\[main\.assertion\.\d+\] .* assertion data\[5\] == 0: FAILURE$
 ^\[main\.assertion\.\d+\] .* assertion data\[5\] == 1: FAILURE$
 ^VERIFICATION FAILED$

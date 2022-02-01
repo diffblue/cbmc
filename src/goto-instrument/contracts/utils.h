@@ -51,6 +51,46 @@ protected:
   const namespacet &ns;
 };
 
+/// \brief A class that further overrides the "safe" havoc utilities,
+///        and adds support for havocing pointer_object expressions.
+class havoc_assigns_targetst : public havoc_if_validt
+{
+public:
+  havoc_assigns_targetst(const assignst &mod, const namespacet &ns)
+    : havoc_if_validt(mod, ns)
+  {
+  }
+
+  void append_havoc_code_for_expr(
+    const source_locationt location,
+    const exprt &expr,
+    goto_programt &dest) const override;
+};
+
+/// \brief Adds a pragma on a source location disable all pointer checks.
+///
+/// The disabled checks are: "pointer-check", "pointer-primitive-check",
+/// "pointer-overflow-check", "signed-overflow-check",
+//  "unsigned-overflow-check", "conversion-check".
+void add_pragma_disable_pointer_checks(source_locationt &source_location);
+
+/// \brief Adds pragmas on a GOTO instruction to disable all pointer checks.
+///
+/// \param instr: A mutable reference to the GOTO instruction.
+/// \return The same reference after mutation (i.e., adding the pragma).
+goto_programt::instructiont &
+add_pragma_disable_pointer_checks(goto_programt::instructiont &instr);
+
+/// \brief Adds pragmas on all instructions in a GOTO program
+/// to disable all pointer checks.
+///
+/// \param prog: A mutable reference to the GOTO program.
+/// \return The same reference after mutation (i.e., adding the pragmas).
+goto_programt &add_pragma_disable_pointer_checks(goto_programt &prog);
+
+/// \brief Adds a pragma on a source_locationt to disable inclusion checking.
+void add_pragma_disable_assigns_check(source_locationt &source_location);
+
 /// \brief Adds a pragma on a GOTO instruction to disable inclusion checking.
 ///
 /// \param instr: A mutable reference to the GOTO instruction.
@@ -128,9 +168,6 @@ const symbolt &new_tmp_symbol(
   symbol_table_baset &symtab,
   std::string suffix = "tmp_cc",
   bool is_auxiliary = true);
-
-/// Add disable pragmas for all pointer checks on the given location
-void disable_pointer_checks(source_locationt &source_location);
 
 /// Turns goto instructions `IF cond GOTO label` where the condition
 /// statically simplifies to `false` into SKIP instructions.
@@ -223,5 +260,16 @@ public:
     goto_convertt::clean_expr(guard, dest, mode, true);
   }
 };
+
+/// Returns an \ref irep_idt that essentially says that
+/// `target` was assigned by the contract of `function_id`.
+irep_idt make_assigns_clause_replacement_tracking_comment(
+  const exprt &target,
+  const irep_idt &function_id,
+  const namespacet &ns);
+
+/// Returns true if the given comment matches the type of comments created by
+/// \ref make_assigns_clause_replacement_tracking_comment.
+bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

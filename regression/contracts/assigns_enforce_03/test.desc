@@ -1,9 +1,21 @@
 CORE
 main.c
 --enforce-contract f1 --enforce-contract f2 --enforce-contract f3
+^\[f1.assigns.\d+\] line 1 Check that \*x1 is valid: SUCCESS$
+^\[f1.assigns.\d+\] line 1 Check that \*y1 is valid: SUCCESS$
+^\[f1.assigns.\d+\] line 1 Check that \*z1 is valid: SUCCESS$
+^\[f2.assigns.\d+\] line 6 Check that \*x2 is valid: SUCCESS$
+^\[f2.assigns.\d+\] line 6 Check that \*y2 is valid: SUCCESS$
+^\[f2.assigns.\d+\] line 6 Check that \*z2 is valid: SUCCESS$
+^\[f3.assigns.\d+\] line 11 Check that \*x3 is valid: SUCCESS$
+^\[f3.assigns.\d+\] line 11 Check that \*y3 is valid: SUCCESS$
+^\[f3.assigns.\d+\] line 12 Check that \*z3 is valid: SUCCESS$
+^\[f3.assigns.\d+\] line 14 Check that \*x3 is assignable: SUCCESS$
+^\[f3.assigns.\d+\] line 15 Check that \*y3 is assignable: SUCCESS$
+^\[f3.assigns.\d+\] line 16 Check that \*z3 is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 --
 This test checks that verification succeeds when assigns clauses are respected through multiple function calls.

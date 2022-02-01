@@ -4,10 +4,10 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
-^\[bar.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[bar.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
-^\[baz.\d+\] line \d+ Check that \*z is assignable: SUCCESS$
-^\[foo.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
+^\[baz.assigns.\d+\] line \d+ Check that \*z is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$

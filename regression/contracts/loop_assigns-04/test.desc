@@ -3,10 +3,10 @@ main.c
 --apply-loop-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.\d+\] .* Check that i is assignable: SUCCESS$
-^\[main.\d+\] .* Check that j is assignable: SUCCESS$
-^\[main.\d+\] .* Check that b->data\[(.*)i\] is assignable: SUCCESS$
-^\[main.\d+\] .* Check that y is assignable: FAILURE$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that j is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that y is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --
@@ -15,4 +15,4 @@ The alias analysis in this case returns `unknown`,
 and so we must manually annotate an assigns clause on the loop.
 
 Note that the annotated assigns clause in this case is an underapproximation,
-because `i` is also assigned in the loop and should be marked as assignable.
+because `i`assigns. is also assigned in the loop and should be marked as assignable.
