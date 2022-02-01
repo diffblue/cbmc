@@ -502,8 +502,8 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-format-7
-      - name: Check updated lines of code match clang-format-7 style
+          sudo apt-get install --no-install-recommends -yq clang-format
+      - name: Check updated lines of code match clang-format-10 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
           MERGE_BRANCH: ${{ github.ref }}

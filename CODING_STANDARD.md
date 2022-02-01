@@ -340,13 +340,13 @@ To avoid waiting until you've made a PR to find formatting issues, you can
 install clang-format locally and run it against your code as you are working.
 
 Different versions of clang-format have slightly different behaviors. CBMC uses
-clang-format-7 as it is available the repositories for Ubuntu 18.04 and
+clang-format-10 as it is available the repositories for Ubuntu 18.04 and
 Homebrew.
 To install on a Unix-like system, try installing using the system package
 manager:
 ```
-apt-get install clang-format-7  # Run this on Ubuntu, Debian etc.
-brew install clang-format@7     # Run this on a Mac with Homebrew installed
+apt-get install clang-format-10  # Run this on Ubuntu, Debian etc.
+brew install clang-format@10     # Run this on a Mac with Homebrew installed
 ```
 
 If your platform doesn't have a package for clang-format, you can download a
@@ -358,12 +358,12 @@ the [LLVM Snapshot Builds page](http://llvm.org/builds/).
 
 ### FORMATTING A RANGE OF COMMITS
 
-Clang-format is distributed with a driver script called git-clang-format-7.
+Clang-format is distributed with a driver script called git-clang-format.
 This script can be used to format git diffs (rather than entire files).
 
 After committing some code, it is recommended to run:
 ```
-git-clang-format-7 upstream/develop
+git-clang-format upstream/develop
 ```
 *Important:* If your branch is based on a branch other than `upstream/develop`,
 use the name or checksum of that branch instead. It is strongly recommended to
@@ -373,7 +373,7 @@ rebase your work onto the tip of the branch it's based on before running
 Note: By default, git-clang-format uses the git config variable
 `clangformat.binary`. If you have multiple versions of clang-format installed,
 you might need to update this, or explicitly specify the binary to use via
-`--binary clang-format-7`.
+`--binary clang-format-10`.
 
 ### RETROACTIVELY FORMATTING INDIVIDUAL COMMITS
 
@@ -385,7 +385,7 @@ The following command will stop at each commit in the range and run
 clang-format on the diff at that point.  This rewrites git history, so it's
 *unsafe*, and you should back up your branch before running this command:
 ```
-git filter-branch --tree-filter 'git-clang-format-7 upstream/develop' \
+git filter-branch --tree-filter 'git-clang-format upstream/develop' \
   -- upstream/develop..HEAD
 ```
 *Important*: `upstream/develop` should be changed in *both* places in the
