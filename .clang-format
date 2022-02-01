@@ -49,6 +49,8 @@ PointerAlignment: Right
 ReflowComments: 'false'
 IncludeBlocks: Regroup
 IncludeCategories:
+  - Regex: '_class.h(>|")$'
+    Priority: 0
   - Regex: '<util/'
     Priority: 1
   - Regex: '<goto-programs/'
