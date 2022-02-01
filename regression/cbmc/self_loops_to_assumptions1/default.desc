@@ -1,6 +1,8 @@
 CORE
 main.c
 --unwind 1 --unwinding-assertions
+^replacing self-loop at file main.c line 3 function main by assume\(FALSE\)$
+^no unwinding assertion will be generated for self-loop at file main.c line 3 function main$
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
