@@ -634,30 +634,45 @@ void value_sett::get_value_set_rec(
     object_mapt pointer_expr_set;
     optionalt<mp_integer> i;
 
-    // special case for pointer+integer
-
+    // special case for plus/minus and exactly one pointer
+    optionalt<exprt> ptr_operand;
     if(
-      expr.operands().size() == 2 && expr_type.id() == ID_pointer &&
+      expr_type.id() == ID_pointer &&
       (expr.id() == ID_plus || expr.id() == ID_minus))
     {
-      exprt ptr_operand;
+      bool non_const_offset = false;
+      for(const auto &op : expr.operands())
+      {
+        if(op.type().id() == ID_pointer)
+        {
+          if(ptr_operand.has_value())
+          {
+            ptr_operand.reset();
+            break;
+          }
 
-      if(
-        to_binary_expr(expr).op0().type().id() != ID_pointer &&
-        to_binary_expr(expr).op0().is_constant())
-      {
-        i = numeric_cast<mp_integer>(to_binary_expr(expr).op0());
-        ptr_operand = to_binary_expr(expr).op1();
-      }
-      else
-      {
-        i = numeric_cast<mp_integer>(to_binary_expr(expr).op1());
-        ptr_operand = to_binary_expr(expr).op0();
+          ptr_operand = op;
+        }
+        else if(!non_const_offset)
+        {
+          auto offset = numeric_cast<mp_integer>(op);
+          if(!offset.has_value())
+          {
+            i.reset();
+            non_const_offset = true;
+          }
+          else
+          {
+            if(!i.has_value())
+              i = mp_integer{0};
+            i = *i + *offset;
+          }
+        }
       }
 
-      if(i.has_value())
+      if(ptr_operand.has_value() && i.has_value())
       {
-        typet pointer_sub_type=ptr_operand.type().subtype();
+        typet pointer_sub_type = ptr_operand->type().subtype();
         if(pointer_sub_type.id()==ID_empty)
           pointer_sub_type=char_type();
 
@@ -672,12 +687,20 @@ void value_sett::get_value_set_rec(
           *i *= *size;
 
           if(expr.id()==ID_minus)
+          {
+            DATA_INVARIANT(
+              to_minus_expr(expr).lhs() == *ptr_operand,
+              "unexpected subtraction of pointer from integer");
             i->negate();
+          }
         }
       }
+    }
 
+    if(ptr_operand.has_value())
+    {
       get_value_set_rec(
-        ptr_operand, pointer_expr_set, "", ptr_operand.type(), ns);
+        *ptr_operand, pointer_expr_set, "", ptr_operand->type(), ns);
     }
     else
     {
