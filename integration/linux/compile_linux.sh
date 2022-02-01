@@ -21,7 +21,7 @@ make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-diff.dir -j$(npr
 [ -d one-line-scan ] || git clone https://github.com/awslabs/one-line-scan.git one-line-scan
 
 # Get Linux v5.10, if we do not have it already
-[ -d linux_5_10 ] || git clone -b v5.10 --depth=1 https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git linux_5_10
+[ -d linux_5_10 ] || git clone -b v5.10 --depth=1 https://github.com/torvalds/linux/ linux_5_10
 
 # Prepare compile a part of the kernel with CBMC via one-line-scan
 ln -s goto-cc src/goto-cc/goto-ld
