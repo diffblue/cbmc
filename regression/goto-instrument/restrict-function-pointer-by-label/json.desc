@@ -1,0 +1,11 @@
+CORE
+test.c
+--function-pointer-restrictions-file restriction.json
+\[use_f\.assertion\.1\] line \d+ assertion fptr\(10\) == 11: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that the function f is called for the first function pointer
+call in function use_f when using the label to refer to the call site, with the
+restriction described in the JSON file instead of the command-line directly.

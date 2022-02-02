@@ -84,14 +84,14 @@ static void restrict_function_pointer(
 }
 } // namespace
 
-function_pointer_restrictionst::invalid_restriction_exceptiont::
-  invalid_restriction_exceptiont(std::string reason, std::string correct_format)
+invalid_restriction_exceptiont::invalid_restriction_exceptiont(
+  std::string reason,
+  std::string correct_format)
   : reason(std::move(reason)), correct_format(std::move(correct_format))
 {
 }
 
-std::string
-function_pointer_restrictionst::invalid_restriction_exceptiont::what() const
+std::string invalid_restriction_exceptiont::what() const
 {
   std::string res;
 
@@ -169,8 +169,13 @@ void function_pointer_restrictionst::typecheck_function_pointer_restrictions(
 void restrict_function_pointers(
   message_handlert &message_handler,
   goto_modelt &goto_model,
-  const function_pointer_restrictionst &restrictions)
+  const optionst &options)
 {
+  const auto restrictions = function_pointer_restrictionst::from_options(
+    options, goto_model, message_handler);
+  if(restrictions.restrictions.empty())
+    return;
+
   for(auto &function_item : goto_model.goto_functions.function_map)
   {
     goto_functiont &goto_function = function_item.second;
@@ -276,19 +281,81 @@ function_pointer_restrictionst::restrictionst function_pointer_restrictionst::
 function_pointer_restrictionst::restrictionst
 function_pointer_restrictionst::parse_function_pointer_restrictions_from_file(
   const std::list<std::string> &filenames,
+  const goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   auto merged_restrictions = function_pointer_restrictionst::restrictionst{};
 
   for(auto const &filename : filenames)
   {
-    auto const restrictions = read_from_file(filename, message_handler);
+    auto const restrictions =
+      read_from_file(filename, goto_model, message_handler);
 
     merged_restrictions = merge_function_pointer_restrictions(
       std::move(merged_restrictions), restrictions.restrictions);
   }
 
   return merged_restrictions;
+}
+
+/// Parse \p candidate to distinguish whether it refers to a function pointer
+/// symbol directly (as produced by \ref label_function_pointer_call_sites), or
+/// a source location via its statement label. In the latter case, resolve the
+/// name to the underlying function pointer symbol.
+static std::string resolve_pointer_name(
+  const std::string &candidate,
+  const goto_modelt &goto_model)
+{
+  const auto last_dot = candidate.rfind('.');
+  if(
+    last_dot == std::string::npos || last_dot + 1 == candidate.size() ||
+    isdigit(candidate[last_dot + 1]))
+  {
+    return candidate;
+  }
+
+  std::string pointer_name = candidate;
+
+  const auto function_id = pointer_name.substr(0, last_dot);
+  const auto label = pointer_name.substr(last_dot + 1);
+
+  bool found = false;
+  const auto it = goto_model.goto_functions.function_map.find(function_id);
+  if(it != goto_model.goto_functions.function_map.end())
+  {
+    optionalt<source_locationt> location;
+    for(const auto &instruction : it->second.body.instructions)
+    {
+      if(
+        std::find(
+          instruction.labels.begin(), instruction.labels.end(), label) !=
+        instruction.labels.end())
+      {
+        location = instruction.source_location();
+      }
+
+      if(
+        instruction.is_function_call() &&
+        instruction.call_function().id() == ID_dereference &&
+        location.has_value() && instruction.source_location() == *location)
+      {
+        auto const &called_function_pointer =
+          to_dereference_expr(instruction.call_function()).pointer();
+        pointer_name =
+          id2string(to_symbol_expr(called_function_pointer).get_identifier());
+        found = true;
+        break;
+      }
+    }
+  }
+  if(!found)
+  {
+    throw invalid_restriction_exceptiont{
+      "non-existent pointer name " + pointer_name,
+      "pointers should be identifiers or <function_name>.<label>"};
+  }
+
+  return pointer_name;
 }
 
 function_pointer_restrictionst::restrictiont
@@ -324,51 +391,8 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
       "couldn't find target name before '/' in `" + restriction_opt + "'"};
   }
 
-  auto pointer_name = restriction_opt.substr(0, pointer_name_end);
-  const auto last_dot = pointer_name.rfind('.');
-  if(
-    last_dot != std::string::npos && last_dot + 1 != pointer_name.size() &&
-    !isdigit(pointer_name[last_dot + 1]))
-  {
-    const auto function_id = pointer_name.substr(0, last_dot);
-    const auto label = pointer_name.substr(last_dot + 1);
-
-    bool found = false;
-    const auto it = goto_model.goto_functions.function_map.find(function_id);
-    if(it != goto_model.goto_functions.function_map.end())
-    {
-      optionalt<source_locationt> location;
-      for(const auto &instruction : it->second.body.instructions)
-      {
-        if(
-          std::find(
-            instruction.labels.begin(), instruction.labels.end(), label) !=
-          instruction.labels.end())
-        {
-          location = instruction.source_location();
-        }
-
-        if(
-          instruction.is_function_call() &&
-          instruction.call_function().id() == ID_dereference &&
-          location.has_value() && instruction.source_location() == *location)
-        {
-          auto const &called_function_pointer =
-            to_dereference_expr(instruction.call_function()).pointer();
-          pointer_name =
-            id2string(to_symbol_expr(called_function_pointer).get_identifier());
-          found = true;
-          break;
-        }
-      }
-    }
-    if(!found)
-    {
-      throw invalid_restriction_exceptiont{"non-existent pointer name " +
-                                             pointer_name,
-                                           restriction_format_message};
-    }
-  }
+  std::string pointer_name = resolve_pointer_name(
+    restriction_opt.substr(0, pointer_name_end), goto_model);
 
   auto const target_names_substring =
     restriction_opt.substr(pointer_name_end + 1);
@@ -470,7 +494,7 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
     auto const restriction_file_opts =
       options.get_list_option(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT);
     file_restrictions = parse_function_pointer_restrictions_from_file(
-      restriction_file_opts, message_handler);
+      restriction_file_opts, goto_model, message_handler);
     typecheck_function_pointer_restrictions(goto_model, file_restrictions);
   }
   catch(const invalid_restriction_exceptiont &e)
@@ -498,8 +522,9 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
     merge_function_pointer_restrictions(file_restrictions, name_restrictions))};
 }
 
-function_pointer_restrictionst
-function_pointer_restrictionst::from_json(const jsont &json)
+function_pointer_restrictionst function_pointer_restrictionst::from_json(
+  const jsont &json,
+  const goto_modelt &goto_model)
 {
   function_pointer_restrictionst::restrictionst restrictions;
 
@@ -510,7 +535,9 @@ function_pointer_restrictionst::from_json(const jsont &json)
 
   for(auto const &restriction : to_json_object(json))
   {
-    restrictions.emplace(irep_idt{restriction.first}, [&] {
+    std::string pointer_name =
+      resolve_pointer_name(restriction.first, goto_model);
+    restrictions.emplace(irep_idt{pointer_name}, [&] {
       if(!restriction.second.is_array())
       {
         throw deserialization_exceptiont{"Value of " + restriction.first +
@@ -540,6 +567,7 @@ function_pointer_restrictionst::from_json(const jsont &json)
 
 function_pointer_restrictionst function_pointer_restrictionst::read_from_file(
   const std::string &filename,
+  const goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   auto inFile = std::ifstream{filename};
@@ -551,7 +579,7 @@ function_pointer_restrictionst function_pointer_restrictionst::read_from_file(
       "failed to read function pointer restrictions from " + filename};
   }
 
-  return from_json(json);
+  return from_json(json, goto_model);
 }
 
 jsont function_pointer_restrictionst::to_json() const
