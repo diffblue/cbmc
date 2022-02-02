@@ -365,10 +365,22 @@ static smt_termt convert_expr_to_smt(const div_exprt &divide)
     can_cast_type<integer_bitvector_typet>(divide.lhs().type()) &&
     can_cast_type<integer_bitvector_typet>(divide.rhs().type());
 
+  const bool both_operands_unsigned =
+    can_cast_type<unsignedbv_typet>(divide.lhs().type()) &&
+    can_cast_type<unsignedbv_typet>(divide.rhs().type());
+
   if(both_operands_bitvector)
   {
-    return smt_bit_vector_theoryt::unsigned_divide(
-      convert_expr_to_smt(divide.lhs()), convert_expr_to_smt(divide.rhs()));
+    if(both_operands_unsigned)
+    {
+      return smt_bit_vector_theoryt::unsigned_divide(
+        convert_expr_to_smt(divide.lhs()), convert_expr_to_smt(divide.rhs()));
+    }
+    else
+    {
+      return smt_bit_vector_theoryt::signed_divide(
+        convert_expr_to_smt(divide.lhs()), convert_expr_to_smt(divide.rhs()));
+    }
   }
   else
   {

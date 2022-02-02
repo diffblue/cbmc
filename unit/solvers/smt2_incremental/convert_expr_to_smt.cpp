@@ -350,11 +350,19 @@ TEST_CASE(
   // truncates over zero)
   SECTION("Division of two constant size bit-vectors")
   {
+    // Check of division expression with unsigned operands
     const auto constructed_term =
       convert_expr_to_smt(div_exprt{one_bvint_unsigned, two_bvint_unsigned});
     const auto expected_term =
       smt_bit_vector_theoryt::unsigned_divide(smt_term_one, smt_term_two);
     CHECK(constructed_term == expected_term);
+
+    // Check of division expression with signed operands
+    const auto constructed_term_signed =
+      convert_expr_to_smt(div_exprt{one_bvint, two_bvint});
+    const auto expected_term_signed =
+      smt_bit_vector_theoryt::signed_divide(smt_term_one, smt_term_two);
+    CHECK(constructed_term_signed == expected_term_signed);
   }
 
   SECTION(
