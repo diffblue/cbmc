@@ -346,7 +346,7 @@ void build_goto_trace(
       if(SSA_step.is_assert())
       {
         goto_trace_step.comment = SSA_step.comment;
-        goto_trace_step.property_id = SSA_step.get_property_id();
+        goto_trace_step.property_id = SSA_step.property_id;
       }
       goto_trace_step.type = SSA_step.type;
       goto_trace_step.hidden = SSA_step.hidden;

@@ -376,10 +376,16 @@ protected:
     value_sett *jump_not_taken_value_set,
     const namespacet &ns);
 
+  /// Symbolically execute a verification condition (assertion).
+  /// \param cond: The guard of the assumption
+  /// \param property_id: Unique property identifier of this assertion
+  /// \param msg: The message associated with this assertion
+  /// \param state: Symbolic execution state for current instruction
   virtual void vcc(
-    const exprt &,
+    const exprt &cond,
+    const irep_idt &property_id,
     const std::string &msg,
-    statet &);
+    statet &state);
 
   /// Symbolically execute an ASSUME instruction or simulate such an execution
   /// for a synthetic assumption

@@ -129,10 +129,6 @@ public:
     return type == goto_trace_stept::typet::ATOMIC_END;
   }
 
-  /// Returns the property ID if this is a step resulting from an ASSERT, or
-  /// builds a unique name for an unwinding assertion.
-  irep_idt get_property_id() const;
-
   // we may choose to hide
   bool hidden = false;
 
@@ -149,6 +145,8 @@ public:
   exprt cond_expr;
   exprt cond_handle;
   std::string comment;
+  // for ASSERT (which includes loop unwinding assertions)
+  irep_idt property_id;
 
   exprt get_ssa_expr() const
   {

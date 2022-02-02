@@ -130,6 +130,7 @@ public:
   virtual void assertion(
     const exprt &guard,
     const exprt &cond,
+    const irep_idt &property_id,
     const std::string &msg,
     const sourcet &source);
 

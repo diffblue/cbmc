@@ -57,7 +57,7 @@ ssa_step_matches_failing_property(const irep_idt &property_id)
   return [property_id](
            symex_target_equationt::SSA_stepst::const_iterator step,
            const decision_proceduret &decision_procedure) {
-    return step->is_assert() && step->get_property_id() == property_id &&
+    return step->is_assert() && step->property_id == property_id &&
            decision_procedure.get(step->cond_handle).is_false();
   };
 }
@@ -246,7 +246,7 @@ void update_properties_status_from_symex_target_equation(
     if(!step.is_assert())
       continue;
 
-    irep_idt property_id = step.get_property_id();
+    const irep_idt &property_id = step.property_id;
     CHECK_RETURN(!property_id.empty());
 
     // Don't update status of properties that are constant 'false';
