@@ -1,20 +1,18 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
-
-#include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_terms.h>
-#include <solvers/smt2_incremental/smt_to_smt2_string.h>
-
-#include <testing-utils/invariant.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
 #include <util/mp_arith.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+
+#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
+#include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
+#include <testing-utils/invariant.h>
+#include <testing-utils/use_catch.h>
 
 #include <string>
 
@@ -68,6 +66,8 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
   std::tie(input_term, expected_result) = GENERATE(
     rowt{smt_bool_literal_termt{true}, true_exprt{}},
     rowt{smt_bool_literal_termt{false}, false_exprt{}},
+    rowt{smt_bit_vector_constant_termt{0, 8}, from_integer(0, c_bool_typet(8))},
+    rowt{smt_bit_vector_constant_termt{1, 8}, from_integer(1, c_bool_typet(8))},
     UNSIGNED_BIT_VECTOR_TESTS(8),
     SIGNED_BIT_VECTOR_TESTS(8),
     UNSIGNED_BIT_VECTOR_TESTS(16),
