@@ -194,7 +194,7 @@ int goto_instrument_parse_optionst::doit()
 
         if(unwinding_assertions)
         {
-          unwind_strategy=goto_unwindt::unwind_strategyt::ASSERT;
+          unwind_strategy = goto_unwindt::unwind_strategyt::ASSERT_ASSUME;
         }
         else if(partial_loops)
         {
