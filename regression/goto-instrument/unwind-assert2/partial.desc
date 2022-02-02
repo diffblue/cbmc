@@ -1,0 +1,10 @@
+CORE
+main.c
+--unwind 9 --unwinding-assertions --partial-loops
+^\[main.assertion.1\] line 6 fails when fully unwinding the loop: FAILURE$
+^\*\* 2 of 2 failed
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

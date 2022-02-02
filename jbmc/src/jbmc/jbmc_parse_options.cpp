@@ -241,14 +241,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     "partial-loops",
     cmdline.isset("partial-loops"));
 
-  if(options.get_bool_option("partial-loops") &&
-     options.get_bool_option("unwinding-assertions"))
-  {
-    log.error() << "--partial-loops and --unwinding-assertions "
-                << "must not be given together" << messaget::eom;
-    exit(1); // should contemplate EX_USAGE from sysexits.h
-  }
-
   // remove unused equations
   options.set_option(
     "slice-formula",

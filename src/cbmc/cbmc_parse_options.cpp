@@ -159,14 +159,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("no-array-field-sensitivity", true);
   }
 
-  if(cmdline.isset("partial-loops") && cmdline.isset("unwinding-assertions"))
-  {
-    log.error()
-      << "--partial-loops and --unwinding-assertions must not be given "
-      << "together" << messaget::eom;
-    exit(CPROVER_EXIT_USAGE_ERROR);
-  }
-
   if(cmdline.isset("reachability-slice") &&
      cmdline.isset("reachability-slice-fb"))
   {
