@@ -4,7 +4,7 @@
 
 #include <util/invariant.h>
 
-static void validate_bit_vector_predicate_arguments(
+static void validate_bit_vector_operator_arguments(
   const smt_termt &left,
   const smt_termt &right)
 {
@@ -37,7 +37,7 @@ void smt_bit_vector_theoryt::unsigned_less_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -60,7 +60,7 @@ void smt_bit_vector_theoryt::unsigned_less_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -83,7 +83,7 @@ void smt_bit_vector_theoryt::unsigned_greater_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -107,7 +107,7 @@ void smt_bit_vector_theoryt::unsigned_greater_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -130,7 +130,7 @@ void smt_bit_vector_theoryt::signed_less_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -153,7 +153,7 @@ void smt_bit_vector_theoryt::signed_less_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -176,7 +176,7 @@ void smt_bit_vector_theoryt::signed_greater_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -199,7 +199,7 @@ void smt_bit_vector_theoryt::signed_greater_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -222,7 +222,7 @@ void smt_bit_vector_theoryt::addt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::addt>
@@ -244,7 +244,7 @@ void smt_bit_vector_theoryt::subtractt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -267,7 +267,7 @@ void smt_bit_vector_theoryt::multiplyt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -290,7 +290,7 @@ void smt_bit_vector_theoryt::unsigned_dividet::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -313,7 +313,7 @@ void smt_bit_vector_theoryt::signed_dividet::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -336,7 +336,7 @@ void smt_bit_vector_theoryt::unsigned_remaindert::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -359,7 +359,7 @@ void smt_bit_vector_theoryt::signed_remaindert::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
