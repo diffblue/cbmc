@@ -374,14 +374,22 @@ TEST_CASE(
   }
 
   SECTION(
-    "Unsigned remainder (modulus) from truncating division of two constant "
+    "Remainder (modulus) from truncating division of two constant "
     "size bit-vectors")
   {
+    // Remainder expression with unsigned operands.
     const auto constructed_term =
       convert_expr_to_smt(mod_exprt{one_bvint_unsigned, two_bvint_unsigned});
     const auto expected_term =
       smt_bit_vector_theoryt::unsigned_remainder(smt_term_one, smt_term_two);
     CHECK(constructed_term == expected_term);
+
+    // Remainder expression with signed operands
+    const auto constructed_term_signed =
+      convert_expr_to_smt(mod_exprt{one_bvint, two_bvint});
+    const auto expected_term_signed =
+      smt_bit_vector_theoryt::signed_remainder(smt_term_one, smt_term_two);
+    CHECK(constructed_term_signed == expected_term_signed);
   }
 
   SECTION(

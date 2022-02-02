@@ -342,3 +342,26 @@ void smt_bit_vector_theoryt::unsigned_remaindert::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::unsigned_remaindert>
   smt_bit_vector_theoryt::unsigned_remainder{};
+
+const char *smt_bit_vector_theoryt::signed_remaindert::identifier()
+{
+  return "bvsrem";
+}
+
+smt_sortt smt_bit_vector_theoryt::signed_remaindert::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::signed_remaindert::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_predicate_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::signed_remaindert>
+  smt_bit_vector_theoryt::signed_remainder{};

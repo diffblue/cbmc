@@ -404,11 +404,24 @@ static smt_termt convert_expr_to_smt(const mod_exprt &truncation_modulo)
     can_cast_type<integer_bitvector_typet>(truncation_modulo.lhs().type()) &&
     can_cast_type<integer_bitvector_typet>(truncation_modulo.rhs().type());
 
+  const bool both_operands_unsigned =
+    can_cast_type<unsignedbv_typet>(truncation_modulo.lhs().type()) &&
+    can_cast_type<unsignedbv_typet>(truncation_modulo.rhs().type());
+
   if(both_operands_bitvector)
   {
-    return smt_bit_vector_theoryt::unsigned_remainder(
-      convert_expr_to_smt(truncation_modulo.lhs()),
-      convert_expr_to_smt(truncation_modulo.rhs()));
+    if(both_operands_unsigned)
+    {
+      return smt_bit_vector_theoryt::unsigned_remainder(
+        convert_expr_to_smt(truncation_modulo.lhs()),
+        convert_expr_to_smt(truncation_modulo.rhs()));
+    }
+    else
+    {
+      return smt_bit_vector_theoryt::signed_remainder(
+        convert_expr_to_smt(truncation_modulo.lhs()),
+        convert_expr_to_smt(truncation_modulo.rhs()));
+    }
   }
   else
   {
