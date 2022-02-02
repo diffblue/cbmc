@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-overflow-check
+^\[main.overflow.1\] line 10 arithmetic overflow on signed \* in (0x)?[0-9a-fA-F]+l* \* \(signed (long (long )?)?int\)4ul*: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
