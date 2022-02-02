@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "set_properties.h"
 
 #include <util/exception_utils.h>
+#include <util/string2int.h>
 
 #include "goto_model.h"
 
@@ -58,6 +59,21 @@ void label_properties(
   {
     if(!it->is_assert())
       continue;
+
+    if(!it->source_location().get_property_id().empty())
+    {
+      std::string id = id2string(it->source_location().get_property_id());
+      std::string::size_type prefix_end = id.rfind('.');
+      if(prefix_end != std::string::npos)
+      {
+        std::string prefix = id.substr(0, prefix_end + 1);
+        if(auto suffix = string2optional_size_t(id.substr(prefix_end + 1)))
+        {
+          if(property_counters.emplace(prefix, *suffix).second)
+            continue;
+        }
+      }
+    }
 
     irep_idt function = it->source_location().get_function();
 
