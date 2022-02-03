@@ -54,7 +54,6 @@ public:
     message_handlert &_message_handler)
     : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
   {
-    no_enum_check = false;
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
     enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
@@ -102,8 +101,6 @@ protected:
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
   messaget log;
-
-  bool no_enum_check;
 
   using guardt = std::function<exprt(exprt)>;
   const guardt identity = [](exprt expr) { return expr; };
@@ -440,7 +437,7 @@ void goto_check_ct::div_by_zero_check(
 
 void goto_check_ct::enum_range_check(const exprt &expr, const guardt &guard)
 {
-  if(!enable_enum_range_check || no_enum_check)
+  if(!enable_enum_range_check)
     return;
 
   const c_enum_tag_typet &c_enum_tag_type = to_c_enum_tag_type(expr.type());
@@ -2110,11 +2107,11 @@ void goto_check_ct::goto_check(
       const exprt &assign_lhs = i.assign_lhs();
       const exprt &assign_rhs = i.assign_rhs();
 
-      // Reset the no_enum_check with the flag reset for exception
-      // safety
+      // Disable enum range checks for left-hand sides as their values are yet
+      // to be set (by this assignment).
       {
         flag_resett resetter(i);
-        resetter.set_flag(no_enum_check, true, "no_enum_check");
+        resetter.disable_flag(enable_enum_range_check, "enum_range_check");
         check(assign_lhs);
       }
 
