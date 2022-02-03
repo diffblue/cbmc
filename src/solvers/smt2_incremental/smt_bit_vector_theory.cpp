@@ -4,7 +4,7 @@
 
 #include <util/invariant.h>
 
-static void validate_bit_vector_predicate_arguments(
+static void validate_bit_vector_operator_arguments(
   const smt_termt &left,
   const smt_termt &right)
 {
@@ -37,7 +37,7 @@ void smt_bit_vector_theoryt::unsigned_less_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -60,7 +60,7 @@ void smt_bit_vector_theoryt::unsigned_less_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -83,7 +83,7 @@ void smt_bit_vector_theoryt::unsigned_greater_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -107,7 +107,7 @@ void smt_bit_vector_theoryt::unsigned_greater_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -130,7 +130,7 @@ void smt_bit_vector_theoryt::signed_less_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -153,7 +153,7 @@ void smt_bit_vector_theoryt::signed_less_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -176,7 +176,7 @@ void smt_bit_vector_theoryt::signed_greater_thant::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
@@ -199,9 +199,188 @@ void smt_bit_vector_theoryt::signed_greater_than_or_equalt::validate(
   const smt_termt &lhs,
   const smt_termt &rhs)
 {
-  validate_bit_vector_predicate_arguments(lhs, rhs);
+  validate_bit_vector_operator_arguments(lhs, rhs);
 }
 
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::signed_greater_than_or_equalt>
   smt_bit_vector_theoryt::signed_greater_than_or_equal{};
+
+const char *smt_bit_vector_theoryt::addt::identifier()
+{
+  return "bvadd";
+}
+
+smt_sortt smt_bit_vector_theoryt::addt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::addt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::addt>
+  smt_bit_vector_theoryt::add{};
+
+const char *smt_bit_vector_theoryt::subtractt::identifier()
+{
+  return "bvsub";
+}
+
+smt_sortt smt_bit_vector_theoryt::subtractt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::subtractt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::subtractt>
+  smt_bit_vector_theoryt::subtract{};
+
+const char *smt_bit_vector_theoryt::multiplyt::identifier()
+{
+  return "bvmul";
+}
+
+smt_sortt smt_bit_vector_theoryt::multiplyt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::multiplyt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::multiplyt>
+  smt_bit_vector_theoryt::multiply{};
+
+const char *smt_bit_vector_theoryt::unsigned_dividet::identifier()
+{
+  return "bvudiv";
+}
+
+smt_sortt smt_bit_vector_theoryt::unsigned_dividet::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::unsigned_dividet::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::unsigned_dividet>
+  smt_bit_vector_theoryt::unsigned_divide{};
+
+const char *smt_bit_vector_theoryt::signed_dividet::identifier()
+{
+  return "bvsdiv";
+}
+
+smt_sortt smt_bit_vector_theoryt::signed_dividet::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::signed_dividet::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::signed_dividet>
+  smt_bit_vector_theoryt::signed_divide{};
+
+const char *smt_bit_vector_theoryt::unsigned_remaindert::identifier()
+{
+  return "bvurem";
+}
+
+smt_sortt smt_bit_vector_theoryt::unsigned_remaindert::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::unsigned_remaindert::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::unsigned_remaindert>
+  smt_bit_vector_theoryt::unsigned_remainder{};
+
+const char *smt_bit_vector_theoryt::signed_remaindert::identifier()
+{
+  return "bvsrem";
+}
+
+smt_sortt smt_bit_vector_theoryt::signed_remaindert::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::signed_remaindert::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::signed_remaindert>
+  smt_bit_vector_theoryt::signed_remainder{};
+
+const char *smt_bit_vector_theoryt::negatet::identifier()
+{
+  return "bvneg";
+}
+
+smt_sortt smt_bit_vector_theoryt::negatet::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+void smt_bit_vector_theoryt::negatet::validate(const smt_termt &operand)
+{
+  const auto operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "The operand is expected to have a bit-vector sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::negatet>
+  smt_bit_vector_theoryt::negate{};
