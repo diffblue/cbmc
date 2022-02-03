@@ -12,6 +12,7 @@ typedef int    __gcc_v2si  __attribute__ ((__vector_size__ (8)));
 typedef int    __gcc_v4si  __attribute__ ((__vector_size__ (16)));
 typedef int    __gcc_v8si  __attribute__ ((__vector_size__ (32)));
 typedef int    __gcc_v16si  __attribute__ ((__vector_size__ (64)));
+typedef int    __gcc_v256si  __attribute__ ((__vector_size__ (1024)));
 typedef short  __gcc_v4hi  __attribute__ ((__vector_size__ (8)));
 typedef short  __gcc_v8hi  __attribute__ ((__vector_size__ (16)));
 typedef short  __gcc_v16hi __attribute__ ((__vector_size__ (32)));
@@ -32,4 +33,6 @@ typedef unsigned long long __gcc_di;
 enum __gcc_atomic_memmodels {
   __ATOMIC_RELAXED, __ATOMIC_CONSUME, __ATOMIC_ACQUIRE, __ATOMIC_RELEASE, __ATOMIC_ACQ_REL, __ATOMIC_SEQ_CST
 };
+
+typedef unsigned char __tile __attribute__ ((__vector_size__ (1024)));
 // clang-format on
