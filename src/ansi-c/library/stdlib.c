@@ -415,15 +415,13 @@ inline long atol(const char *nptr)
 
 #undef getenv
 
-#ifndef __CPROVER_LIMITS_H_INCLUDED
-#include <limits.h>
-#define __CPROVER_LIMITS_H_INCLUDED
+#ifndef __CPROVER_STDDEF_H_INCLUDED
+#  include <stddef.h>
+#  define __CPROVER_STDDEF_H_INCLUDED
 #endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t();
-
-inline void *__builtin_alloca(__CPROVER_size_t alloca_size);
+ptrdiff_t __VERIFIER_nondet_ptrdiff_t();
 
 inline char *getenv(const char *name)
 {
@@ -435,29 +433,35 @@ inline char *getenv(const char *name)
     "zero-termination of argument of getenv");
   #endif
 
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_event("invalidate_pointer", "getenv_result");
   char *getenv_result;
   __CPROVER_set_must(getenv_result, "getenv_result");
   return getenv_result;
 
-  #else
+#else
 
   __CPROVER_bool found=__VERIFIER_nondet___CPROVER_bool();
   if(!found) return 0;
 
-  __CPROVER_size_t buf_size=__VERIFIER_nondet___CPROVER_size_t();
+  ptrdiff_t buf_size = __VERIFIER_nondet_ptrdiff_t();
 
   // It's reasonable to assume this won't exceed the signed
   // range in practice, but in principle, this could exceed
   // the range.
 
-  __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
-  char *buffer=(char *)__builtin_alloca(buf_size);
+  __CPROVER_assume(buf_size >= 1);
+  char *buffer = (char *)__CPROVER_allocate(buf_size * sizeof(char), 0);
   buffer[buf_size-1]=0;
 
+#  ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assume(__CPROVER_buffer_size(buffer) == buf_size);
+  __CPROVER_is_zero_string(buffer) = 1;
+  __CPROVER_zero_string_length(buffer) = buf_size - 1;
+#  endif
+
   return buffer;
-  #endif
+#endif
 }
 
 /* FUNCTION: realloc */
