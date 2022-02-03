@@ -176,7 +176,7 @@ const source_locationt &exprt::find_source_location() const
       return op_l;
   }
 
-  return static_cast<const source_locationt &>(get_nil_irep());
+  return source_locationt::nil();
 }
 
 template <typename T>
