@@ -169,4 +169,16 @@ cadical-download:
 doc :
 	doxygen
 
-.PHONY: minisat2-download cudd-download glucose-download cadical-download
+install: all
+	for b in \
+		cbmc crangler \
+		goto-analyzer goto-cc goto-diff goto-instrument goto-harness \
+		symtab2gb ; do \
+		  cp $$b/$$b $(PREFIX)/bin/ ; \
+			cp ../doc/man/$$b.1 $(PREFIX)/doc/man/man1/ ; \
+	done
+	ln -sf $(PREFIX)/bin/goto-cc $(PREFIX)/bin/goto-gcc
+	ln -sf $(PREFIX)/bin/goto-cc $(PREFIX)/bin/goto-ld
+	cp ../scripts/ls_parse.py $(PREFIX)/bin/
+
+.PHONY: minisat2-download cudd-download glucose-download cadical-download install
