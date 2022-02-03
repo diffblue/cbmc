@@ -2174,10 +2174,19 @@ simplify_exprt::simplify_complex(const unary_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
 {
-  // zero is a neutral element for all operations supported here
+  // When one operand is zero, an overflow can only occur for a subtraction from
+  // zero.
   if(
     expr.op1().is_zero() ||
     (expr.op0().is_zero() && expr.id() != ID_overflow_minus))
+  {
+    return false_exprt{};
+  }
+
+  // One is neutral element for multiplication
+  if(
+    expr.id() == ID_overflow_mult &&
+    (expr.op0().is_one() || expr.op1().is_one()))
   {
     return false_exprt{};
   }
