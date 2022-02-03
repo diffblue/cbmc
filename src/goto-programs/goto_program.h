@@ -497,7 +497,7 @@ public:
 
     explicit instructiont(goto_program_instruction_typet __type)
       : code(static_cast<const codet &>(get_nil_irep())),
-        _source_location(static_cast<const source_locationt &>(get_nil_irep())),
+        _source_location(source_locationt::nil()),
         _type(__type),
         guard(true_exprt())
     {
