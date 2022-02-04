@@ -1,0 +1,27 @@
+CORE
+simple_equation.c
+--incremental-smt2-solver 'z3 --smt2 -in' --trace
+\[main\.assertion\.1\] line \d+ a plus a always equals two times a: SUCCESS
+\[main\.assertion\.2\] line \d+ a minus a always equals 0: SUCCESS
+\[main\.assertion\.3\] line \d+ a plus its additive inverse equals 0: SUCCESS
+\[main\.assertion\.4\] line \d+ a minus its additive inverse equals two times a: SUCCESS
+\[main\.assertion\.5\] line \d+ a squared divided by a equals a: SUCCESS
+\[main\.assertion\.6\] line \d+ two times a divided by a equals two: SUCCESS
+\[main\.assertion\.7\] line \d+ a mod itself equals 0: SUCCESS
+\[main\.assertion\.8\] line \d+ b plus b always equals two times b: SUCCESS
+\[main\.assertion\.9\] line \d+ b minus b always equals 0: SUCCESS
+\[main\.assertion\.10\] line \d+ b plus its additive inverse equals 0: SUCCESS
+\[main\.assertion\.11\] line \d+ b minus its additive inverse equals two times b: SUCCESS
+\[main\.assertion\.12\] line \d+ b squared divided by b equals b: SUCCESS
+\[main\.assertion\.13\] line \d+ two times b divided by b equals two: SUCCESS
+\[main\.assertion\.14\] line \d+ b mod itself equals 0: SUCCESS
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This is a simple test that's trying to verify that some simple algebraic
+identities hold for all values insider an integral interval. This is expected
+to work as an end-to-end example driving the all of the conversion function
+for bitvector arithmetic in the new SMT backend, getting us to the point of
+a full verification run producing a result.
