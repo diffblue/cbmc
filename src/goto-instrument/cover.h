@@ -31,7 +31,12 @@ class optionst;
 
 #define HELP_COVER                                                             \
   " --cover CC                   create test-suite with coverage criterion "   \
-  "CC\n"                                                                       \
+  "CC,\n"                                                                      \
+  "                              where CC is one of assertion[s], "            \
+  "assume[s],\n"                                                               \
+  "                              branch[es], condition[s], cover, "            \
+  "decision[s],\n"                                                             \
+  "                              location[s], or mcdc\n"                       \
   " --cover-failed-assertions    do not stop coverage checking at failed "     \
   "assertions\n"                                                               \
   "                              (this is the default for --cover "            \

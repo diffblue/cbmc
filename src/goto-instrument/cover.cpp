@@ -130,7 +130,7 @@ parse_coverage_criterion(const std::string &criterion_string)
     c = coverage_criteriont::MCDC;
   else if(criterion_string == "cover")
     c = coverage_criteriont::COVER;
-  else if(criterion_string == "assume")
+  else if(criterion_string == "assume" || criterion_string == "assumes")
     c = coverage_criteriont::ASSUME;
   else
   {
