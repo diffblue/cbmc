@@ -65,6 +65,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
       !it->source_location().is_nil() &&
       !it->source_location().get_file().empty() &&
       !it->source_location().get_line().empty() &&
+      !it->source_location().is_built_in() &&
       block_info.source_location.is_nil())
     {
       block_info.representative_inst = it; // update
