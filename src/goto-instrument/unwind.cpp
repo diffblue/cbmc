@@ -128,6 +128,10 @@ void goto_unwindt::unwind(
   }
   else
   {
+    PRECONDITION(
+      unwind_strategy == unwind_strategyt::ASSERT_ASSUME ||
+      unwind_strategy == unwind_strategyt::ASSUME);
+
     goto_programt::const_targett t=loop_exit;
     t--;
     assert(t->is_backwards_goto());
@@ -144,22 +148,23 @@ void goto_unwindt::unwind(
         exit_cond = loop_head->get_condition();
     }
 
-    goto_programt::targett new_t;
-
-    if(unwind_strategy==unwind_strategyt::ASSERT)
+    if(unwind_strategy == unwind_strategyt::ASSERT_ASSUME)
     {
-      new_t = rest_program.add(goto_programt::make_assertion(exit_cond));
+      goto_programt::targett assertion = rest_program.add(
+        goto_programt::make_assertion(exit_cond, loop_head->source_location()));
+      unwind_log.insert(assertion, loop_head->location_number);
     }
-    else if(unwind_strategy==unwind_strategyt::ASSUME)
-    {
-      new_t = rest_program.add(goto_programt::make_assumption(exit_cond));
-    }
-    else
-      UNREACHABLE;
 
-    new_t->source_location_nonconst() = loop_head->source_location();
-    new_t->location_number=loop_head->location_number;
-    unwind_log.insert(new_t, loop_head->location_number);
+    if(
+      unwind_strategy == unwind_strategyt::ASSUME ||
+      unwind_strategy == unwind_strategyt::ASSERT_ASSUME)
+    {
+      goto_programt::targett assumption =
+        rest_program.add(goto_programt::make_assumption(
+          exit_cond, loop_head->source_location()));
+      unwind_log.insert(assumption, loop_head->location_number);
+    }
+
   }
 
   assert(!rest_program.empty());

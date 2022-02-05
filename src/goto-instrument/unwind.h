@@ -21,7 +21,13 @@ class unwindsett;
 class goto_unwindt
 {
 public:
-  enum class unwind_strategyt { CONTINUE, PARTIAL, ASSERT, ASSUME };
+  enum class unwind_strategyt
+  {
+    CONTINUE,
+    PARTIAL,
+    ASSERT_ASSUME,
+    ASSUME
+  };
 
   // unwind loop
 
