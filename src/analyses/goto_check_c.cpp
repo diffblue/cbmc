@@ -344,10 +344,10 @@ protected:
 ///
 /// A flag's initial value (before any `set_flag` or `disable_flag`) is restored
 /// when the entire object goes out of scope.
-class flag_resett
+class flag_overridet
 {
 public:
-  explicit flag_resett(const source_locationt &source_location)
+  explicit flag_overridet(const source_locationt &source_location)
     : source_location(source_location)
   {
   }
@@ -401,7 +401,7 @@ public:
 
   /// \brief Restore the values of all flags that have been
   /// modified via `set_flag`.
-  ~flag_resett()
+  ~flag_overridet()
   {
     for(const auto &flag_pair : flags_to_reset)
       *flag_pair.first = flag_pair.second;
@@ -2027,7 +2027,7 @@ void goto_check_ct::goto_check(
     current_target = it;
     goto_programt::instructiont &i = *it;
 
-    flag_resett resetter(i.source_location());
+    flag_overridet resetter(i.source_location());
     const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
@@ -2110,7 +2110,7 @@ void goto_check_ct::goto_check(
       // Disable enum range checks for left-hand sides as their values are yet
       // to be set (by this assignment).
       {
-        flag_resett resetter(i.source_location());
+        flag_overridet resetter(i.source_location());
         resetter.disable_flag(enable_enum_range_check, "enum_range_check");
         check(assign_lhs);
       }
