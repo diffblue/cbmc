@@ -337,6 +337,82 @@ protected:
   named_check_statust match_named_check(const irep_idt &named_check) const;
 };
 
+/// Allows to:
+/// - override a Boolean flag with a new value via `set_flag`
+/// - set a Boolean flag to false via `disable_flag`, such that
+///   previous `set_flag` are overridden and future `set_flag` are ignored.
+///
+/// A flag's initial value (before any `set_flag` or `disable_flag`) is restored
+/// when the entire object goes out of scope.
+class flag_overridet
+{
+public:
+  explicit flag_overridet(const source_locationt &source_location)
+    : source_location(source_location)
+  {
+  }
+
+  /// \brief Store the current value of \p flag and
+  /// then set its value to \p new_value.
+  ///
+  /// - calling `set_flag` after `disable_flag` is a no-op
+  /// - calling `set_flag` twice triggers an INVARIANT
+  void set_flag(bool &flag, bool new_value, const irep_idt &flag_name)
+  {
+    // make this a no-op if the flag is disabled
+    if(disabled_flags.find(&flag) != disabled_flags.end())
+      return;
+
+    // detect double sets
+    INVARIANT(
+      flags_to_reset.find(&flag) == flags_to_reset.end(),
+      "Flag " + id2string(flag_name) + " set twice at \n" +
+        source_location.as_string());
+    if(flag != new_value)
+    {
+      flags_to_reset[&flag] = flag;
+      flag = new_value;
+    }
+  }
+
+  /// Sets the given flag to false, overriding any previous value.
+  ///
+  /// - calling `disable_flag` after `set_flag` overrides the set value
+  /// - calling `disable_flag` twice triggers an INVARIANT
+  void disable_flag(bool &flag, const irep_idt &flag_name)
+  {
+    INVARIANT(
+      disabled_flags.find(&flag) == disabled_flags.end(),
+      "Flag " + id2string(flag_name) + " disabled twice at \n" +
+        source_location.as_string());
+
+    disabled_flags.insert(&flag);
+
+    // If the flag has not already been set,
+    // we store its current value in the reset map.
+    // Otherwise, the reset map already holds
+    // the initial value we want to reset it to, keep it as is.
+    if(flags_to_reset.find(&flag) == flags_to_reset.end())
+      flags_to_reset[&flag] = flag;
+
+    // set the flag to false in all cases.
+    flag = false;
+  }
+
+  /// \brief Restore the values of all flags that have been
+  /// modified via `set_flag`.
+  ~flag_overridet()
+  {
+    for(const auto &flag_pair : flags_to_reset)
+      *flag_pair.first = flag_pair.second;
+  }
+
+private:
+  const source_locationt &source_location;
+  std::map<bool *, bool> flags_to_reset;
+  std::set<bool *> disabled_flags;
+};
+
 static exprt implication(exprt lhs, exprt rhs)
 {
   // rewrite a => (b => c) to (a && b) => c
@@ -1267,6 +1343,32 @@ void goto_check_ct::pointer_overflow_check(
     expr.operands().size() == 2,
     "pointer arithmetic expected to have exactly 2 operands");
 
+  // multiplying the offset by the object size must not result in arithmetic
+  // overflow
+  const typet &object_type = to_pointer_type(expr.type()).base_type();
+  if(object_type.id() != ID_empty)
+  {
+    auto size_of_expr_opt = size_of_expr(object_type, ns);
+    CHECK_RETURN(size_of_expr_opt.has_value());
+    exprt object_size = size_of_expr_opt.value();
+
+    const binary_exprt &binary_expr = to_binary_expr(expr);
+    exprt offset_operand = binary_expr.lhs().type().id() == ID_pointer
+                             ? binary_expr.rhs()
+                             : binary_expr.lhs();
+    mult_exprt mul{
+      offset_operand,
+      typecast_exprt::conditional_cast(object_size, offset_operand.type())};
+    mul.add_source_location() = offset_operand.source_location();
+
+    flag_overridet override_overflow(offset_operand.source_location());
+    override_overflow.set_flag(
+      enable_signed_overflow_check, true, "signed_overflow_check");
+    override_overflow.set_flag(
+      enable_unsigned_overflow_check, true, "unsigned_overflow_check");
+    integer_overflow_check(mul, guard);
+  }
+
   // the result must be within object bounds or one past the end
   const auto size = from_integer(0, size_type());
   auto conditions = get_pointer_dereferenceable_conditions(expr, size);
@@ -1927,82 +2029,6 @@ optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
     return {};
 }
 
-/// Allows to:
-/// - override a Boolean flag with a new value via `set_flag`
-/// - set a Boolean flag to false via `disable_flag`, such that
-///   previous `set_flag` are overridden and future `set_flag` are ignored.
-///
-/// A flag's initial value (before any `set_flag` or `disable_flag`) is restored
-/// when the entire object goes out of scope.
-class flag_resett
-{
-public:
-  explicit flag_resett(const goto_programt::instructiont &_instruction)
-    : instruction(_instruction)
-  {
-  }
-
-  /// \brief Store the current value of \p flag and
-  /// then set its value to \p new_value.
-  ///
-  /// - calling `set_flag` after `disable_flag` is a no-op
-  /// - calling `set_flag` twice triggers an INVARIANT
-  void set_flag(bool &flag, bool new_value, const irep_idt &flag_name)
-  {
-    // make this a no-op if the flag is disabled
-    if(disabled_flags.find(&flag) != disabled_flags.end())
-      return;
-
-    // detect double sets
-    INVARIANT(
-      flags_to_reset.find(&flag) == flags_to_reset.end(),
-      "Flag " + id2string(flag_name) + " set twice at \n" +
-        instruction.source_location().pretty());
-    if(flag != new_value)
-    {
-      flags_to_reset[&flag] = flag;
-      flag = new_value;
-    }
-  }
-
-  /// Sets the given flag to false, overriding any previous value.
-  ///
-  /// - calling `disable_flag` after `set_flag` overrides the set value
-  /// - calling `disable_flag` twice triggers an INVARIANT
-  void disable_flag(bool &flag, const irep_idt &flag_name)
-  {
-    INVARIANT(
-      disabled_flags.find(&flag) == disabled_flags.end(),
-      "Flag " + id2string(flag_name) + " disabled twice at \n" +
-        instruction.source_location().pretty());
-
-    disabled_flags.insert(&flag);
-
-    // If the flag has not already been set,
-    // we store its current value in the reset map.
-    // Otherwise, the reset map already holds
-    // the initial value we want to reset it to, keep it as is.
-    if(flags_to_reset.find(&flag) == flags_to_reset.end())
-      flags_to_reset[&flag] = flag;
-
-    // set the flag to false in all cases.
-    flag = false;
-  }
-
-  /// \brief Restore the values of all flags that have been
-  /// modified via `set_flag`.
-  ~flag_resett()
-  {
-    for(const auto &flag_pair : flags_to_reset)
-      *flag_pair.first = flag_pair.second;
-  }
-
-private:
-  const goto_programt::instructiont &instruction;
-  std::map<bool *, bool> flags_to_reset;
-  std::set<bool *> disabled_flags;
-};
-
 void goto_check_ct::goto_check(
   const irep_idt &function_identifier,
   goto_functiont &goto_function)
@@ -2027,7 +2053,7 @@ void goto_check_ct::goto_check(
     current_target = it;
     goto_programt::instructiont &i = *it;
 
-    flag_resett resetter(i);
+    flag_overridet resetter(i.source_location());
     const auto &pragmas = i.source_location().get_pragmas();
     for(const auto &d : pragmas)
     {
@@ -2110,7 +2136,7 @@ void goto_check_ct::goto_check(
       // Disable enum range checks for left-hand sides as their values are yet
       // to be set (by this assignment).
       {
-        flag_resett resetter(i);
+        flag_overridet resetter(i.source_location());
         resetter.disable_flag(enable_enum_range_check, "enum_range_check");
         check(assign_lhs);
       }
