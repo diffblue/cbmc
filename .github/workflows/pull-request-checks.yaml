@@ -343,8 +343,8 @@ jobs:
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=3
 
-  check-macos-10_15-cmake-clang:
-    runs-on: macos-10.15
+  check-macos-11-cmake-clang:
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
         with:
@@ -426,8 +426,8 @@ jobs:
           Set-Location build
           ctest -V -L CORE -C Release . -j2
 
-  check-vs-2019-make-build-and-test:
-    runs-on: windows-2019
+  check-vs-2022-make-build-and-test:
+    runs-on: windows-2022
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

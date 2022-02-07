@@ -47,7 +47,30 @@ __gcc_v4sf __builtin_ia32_vfmsubss3_mask3(__gcc_v4sf, __gcc_v4sf, __gcc_v4sf, un
 
 __gcc_v4sf __builtin_ia32_cvtsd2ss_round_mask(__gcc_v4sf, __gcc_v2df, __gcc_v4sf, unsigned char, int);
 __gcc_v2df __builtin_ia32_cvtss2sd_round_mask(__gcc_v2df, __gcc_v4sf, __gcc_v2df, unsigned char, int);
-// clang-format on
+
+void __builtin_ia32_tile_loadconfig_internal(const void *);
+__gcc_v256si __builtin_ia32_tileloadd64_internal(unsigned short, unsigned short, const void *, __CPROVER_size_t);
+__gcc_v256si __builtin_ia32_tileloaddt164_internal(unsigned short, unsigned short, const void *, __CPROVER_size_t);
+__gcc_v256si __builtin_ia32_tdpbssd_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tdpbsud_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tdpbusd_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tdpbuud_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+void __builtin_ia32_tilestored64_internal(unsigned short, unsigned short, void *, __CPROVER_size_t, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tilezero_internal(unsigned short, unsigned short);
+__gcc_v256si __builtin_ia32_tdpbf16ps_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+void __builtin_ia32_tile_loadconfig(const void *);
+void __builtin_ia32_tile_storeconfig(const void *);
+void __builtin_ia32_tilerelease(void);
+void __builtin_ia32_tilezero(unsigned char);
+void __builtin_ia32_tileloadd64(__tile, const void *, __CPROVER_size_t);
+void __builtin_ia32_tileloaddt164(__tile, const void *, __CPROVER_size_t);
+void __builtin_ia32_tilestored64(__tile, void *, __CPROVER_size_t);
+void __builtin_ia32_tdpbssd(__tile, __tile, __tile);
+void __builtin_ia32_tdpbsud(__tile, __tile, __tile);
+void __builtin_ia32_tdpbusd(__tile, __tile, __tile);
+void __builtin_ia32_tdpbuud(__tile, __tile, __tile);
+void __builtin_ia32_tdpbf16ps(__tile, __tile, __tile);
+void __builtin_ia32_ptwrite64(unsigned long long);
 
 void __builtin_nontemporal_store();
 void __builtin_nontemporal_load();
