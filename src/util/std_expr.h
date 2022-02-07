@@ -39,10 +39,6 @@ public:
   const exprt &op3() const = delete;
   exprt &op3() = delete;
 
-  void move_to_operands(exprt &) = delete;
-  void move_to_operands(exprt &, exprt &) = delete;
-  void move_to_operands(exprt &, exprt &, exprt &) = delete;
-
   void copy_to_operands(const exprt &expr) = delete;
   void copy_to_operands(const exprt &, const exprt &) = delete;
   void copy_to_operands(const exprt &, const exprt &, const exprt &) = delete;
