@@ -204,6 +204,10 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
                 << format(pointer_type.base_type()) << ')';
     }
   }
+  else if(type == ID_c_enum_tag)
+  {
+    return os << string2integer(id2string(src.get_value()), 16);
+  }
   else
     return os << src.pretty();
 }
