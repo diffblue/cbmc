@@ -57,6 +57,11 @@ public:
     const bvt &op1,
     bool subtract,
     representationt rep);
+  bvt saturating_add_sub(
+    const bvt &op0,
+    const bvt &op1,
+    bool subtract,
+    representationt rep);
 
   bvt add(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, false); }
   bvt sub(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, true); }

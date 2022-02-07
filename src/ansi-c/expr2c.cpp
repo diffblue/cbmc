@@ -3977,6 +3977,8 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_object_size, "OBJECT_SIZE"},
     {ID_pointer_object, "POINTER_OBJECT"},
     {ID_pointer_offset, "POINTER_OFFSET"},
+    {ID_saturating_minus, CPROVER_PREFIX "saturating_minus"},
+    {ID_saturating_plus, CPROVER_PREFIX "saturating_plus"},
     {ID_r_ok, "R_OK"},
     {ID_w_ok, "W_OK"},
     {ID_rw_ok, "RW_OK"},

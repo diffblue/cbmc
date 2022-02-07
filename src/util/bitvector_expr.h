@@ -1056,4 +1056,103 @@ inline bitreverse_exprt &to_bitreverse_expr(exprt &expr)
   return ret;
 }
 
+/// \brief The saturating plus expression
+class saturating_plus_exprt : public binary_exprt
+{
+public:
+  saturating_plus_exprt(exprt _lhs, exprt _rhs)
+    : binary_exprt(std::move(_lhs), ID_saturating_plus, std::move(_rhs))
+  {
+  }
+
+  saturating_plus_exprt(exprt _lhs, exprt _rhs, typet _type)
+    : binary_exprt(
+        std::move(_lhs),
+        ID_saturating_plus,
+        std::move(_rhs),
+        std::move(_type))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<saturating_plus_exprt>(const exprt &base)
+{
+  return base.id() == ID_saturating_plus;
+}
+
+inline void validate_expr(const saturating_plus_exprt &value)
+{
+  validate_operands(value, 2, "saturating plus must have two operands");
+}
+
+/// \brief Cast an exprt to a \ref saturating_plus_exprt
+///
+/// \a expr must be known to be \ref saturating_plus_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref saturating_plus_exprt
+inline const saturating_plus_exprt &to_saturating_plus_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_saturating_plus);
+  const saturating_plus_exprt &ret =
+    static_cast<const saturating_plus_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_saturating_plus_expr(const exprt &)
+inline saturating_plus_exprt &to_saturating_plus_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_saturating_plus);
+  saturating_plus_exprt &ret = static_cast<saturating_plus_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief Saturating subtraction expression.
+class saturating_minus_exprt : public binary_exprt
+{
+public:
+  saturating_minus_exprt(exprt _lhs, exprt _rhs)
+    : binary_exprt(std::move(_lhs), ID_saturating_minus, std::move(_rhs))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<saturating_minus_exprt>(const exprt &base)
+{
+  return base.id() == ID_saturating_minus;
+}
+
+inline void validate_expr(const saturating_minus_exprt &value)
+{
+  validate_operands(value, 2, "saturating minus must have two operands");
+}
+
+/// \brief Cast an exprt to a \ref saturating_minus_exprt
+///
+/// \a expr must be known to be \ref saturating_minus_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref saturating_minus_exprt
+inline const saturating_minus_exprt &to_saturating_minus_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_saturating_minus);
+  const saturating_minus_exprt &ret =
+    static_cast<const saturating_minus_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_saturating_minus_expr(const exprt &)
+inline saturating_minus_exprt &to_saturating_minus_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_saturating_minus);
+  saturating_minus_exprt &ret = static_cast<saturating_minus_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_BITVECTOR_EXPR_H

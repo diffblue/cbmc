@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_expr.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
 #include "byte_operators.h"
 #include "format_type.h"
 #include "ieee_float.h"
@@ -491,6 +492,20 @@ void format_expr_configt::setup()
     else
       os << format(dereference_expr.pointer());
     return os;
+  };
+
+  expr_map[ID_saturating_minus] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &saturating_minus = to_saturating_minus_expr(expr);
+    return os << "saturating-(" << format(saturating_minus.lhs()) << ", "
+              << format(saturating_minus.rhs()) << ')';
+  };
+
+  expr_map[ID_saturating_plus] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &saturating_plus = to_saturating_plus_expr(expr);
+    return os << "saturating+(" << format(saturating_plus.lhs()) << ", "
+              << format(saturating_plus.rhs()) << ')';
   };
 
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {

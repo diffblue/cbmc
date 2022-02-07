@@ -229,6 +229,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   }
   else if(expr.id() == ID_bitreverse)
     return convert_bitreverse(to_bitreverse_expr(expr));
+  else if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
+    return convert_saturating_add_sub(to_binary_expr(expr));
 
   return conversion_failed(expr);
 }
