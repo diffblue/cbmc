@@ -8,6 +8,14 @@
 class smt_bit_vector_theoryt
 {
 public:
+  struct concatt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<concatt> concat;
+
   struct extractt final
   {
     std::size_t i;

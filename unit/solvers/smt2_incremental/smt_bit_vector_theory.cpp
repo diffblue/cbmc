@@ -7,6 +7,32 @@
 
 #include <util/mp_arith.h>
 
+TEST_CASE("SMT bit vector concatenation", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt a_valid{42, 8}, b_valid{42, 16};
+  SECTION("Valid operands")
+  {
+    const auto concat = smt_bit_vector_theoryt::concat(a_valid, b_valid);
+    const auto expected_return_sort = smt_bit_vector_sortt{24};
+    REQUIRE(
+      concat.function_identifier() ==
+      smt_identifier_termt("concat", expected_return_sort));
+    REQUIRE(concat.get_sort() == expected_return_sort);
+    REQUIRE(concat.arguments().size() == 2);
+    REQUIRE(concat.arguments()[0].get() == a_valid);
+    REQUIRE(concat.arguments()[1].get() == b_valid);
+  }
+  SECTION("Invalid operands")
+  {
+    const smt_bool_literal_termt false_term{false};
+    const smt_bool_literal_termt true_term{true};
+    cbmc_invariants_should_throwt invariants_throw;
+    CHECK_THROWS(smt_bit_vector_theoryt::concat(a_valid, false_term));
+    CHECK_THROWS(smt_bit_vector_theoryt::concat(false_term, a_valid));
+    CHECK_THROWS(smt_bit_vector_theoryt::concat(false_term, true_term));
+  }
+}
+
 TEST_CASE("SMT bit vector extract", "[core][smt2_incremental]")
 {
   const smt_bit_vector_constant_termt operand{42, 8};

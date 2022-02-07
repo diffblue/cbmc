@@ -4,6 +4,34 @@
 
 #include <util/invariant.h>
 
+const char *smt_bit_vector_theoryt::concatt::identifier()
+{
+  return "concat";
+}
+
+smt_sortt smt_bit_vector_theoryt::concatt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  const auto get_width = [](const smt_termt &term) {
+    return term.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  };
+  return smt_bit_vector_sortt{get_width(lhs) + get_width(rhs)};
+}
+
+void smt_bit_vector_theoryt::concatt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  const auto lhs_sort = lhs.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(lhs_sort, "Left operand must have bitvector sort.");
+  const auto rhs_sort = rhs.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(rhs_sort, "Right operand must have bitvector sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::concatt>
+  smt_bit_vector_theoryt::concat{};
+
 const char *smt_bit_vector_theoryt::extractt::identifier()
 {
   return "extract";
