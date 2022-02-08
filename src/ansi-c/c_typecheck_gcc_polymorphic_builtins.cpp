@@ -1459,7 +1459,7 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
       operands.push_back(std::move(mod_index));
     }
 
-    return shuffle_vector_exprt{arg0, arg1, std::move(operands)}.lower();
+    return shuffle_vector_exprt{arg0, arg1, std::move(operands)};
   }
   else if(identifier == "__builtin_shufflevector")
   {
@@ -1509,8 +1509,8 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
       }
     }
 
-    return shuffle_vector_exprt{arguments[0], arguments[1], std::move(operands)}
-      .lower();
+    return shuffle_vector_exprt{
+      arguments[0], arguments[1], std::move(operands)};
   }
   else
     UNREACHABLE;

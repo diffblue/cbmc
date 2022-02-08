@@ -16,6 +16,8 @@ Date:   September 2014
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
+#include <ansi-c/c_expr.h>
+
 #include "goto_model.h"
 
 static bool have_to_remove_vector(const typet &type);
@@ -41,6 +43,8 @@ static bool have_to_remove_vector(const exprt &expr)
     {
       return true;
     }
+    else if(expr.id() == ID_shuffle_vector)
+      return true;
     else if(expr.id()==ID_vector)
       return true;
   }
@@ -92,6 +96,14 @@ static void remove_vector(exprt &expr)
 {
   if(!have_to_remove_vector(expr))
     return;
+
+  if(expr.id() == ID_shuffle_vector)
+  {
+    exprt result = to_shuffle_vector_expr(expr).lower();
+    remove_vector(result);
+    expr.swap(result);
+    return;
+  }
 
   Forall_operands(it, expr)
     remove_vector(*it);
