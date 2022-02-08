@@ -229,16 +229,10 @@ protected:
 class gdb_interaction_exceptiont : public cprover_exception_baset
 {
 public:
-  explicit gdb_interaction_exceptiont(std::string reason) : reason(reason)
+  explicit gdb_interaction_exceptiont(std::string reason)
+    : cprover_exception_baset(std::move(reason))
   {
   }
-  std::string what() const override
-  {
-    return reason;
-  }
-
-private:
-  std::string reason;
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_GDB_API_H

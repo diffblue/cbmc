@@ -27,8 +27,21 @@ public:
   /// A human readable description of what went wrong.
   /// For readability, implementors should not add a leading
   /// or trailing newline to this description.
-  virtual std::string what() const = 0;
+  virtual std::string what() const;
   virtual ~cprover_exception_baset() = default;
+
+protected:
+  /// This constructor is marked protected to ensure this class isn't used
+  /// directly. Deriving classes should be used to more precisely describe the
+  /// problem that occurred.
+  explicit cprover_exception_baset(std::string reason)
+    : reason(std::move(reason))
+  {
+  }
+
+  /// The reason this exception was generated. This is the string returned by
+  /// `what()` unless that method is overridden
+  std::string reason;
 };
 
 /// Thrown when users pass incorrect command line arguments,
@@ -36,8 +49,6 @@ public:
 /// two mutually exclusive flags
 class invalid_command_line_argument_exceptiont : public cprover_exception_baset
 {
-  /// The reason this exception was generated.
-  std::string reason;
   /// The full command line option (not the argument) that got
   /// erroneous input.
   std::string option;
@@ -61,10 +72,6 @@ class system_exceptiont : public cprover_exception_baset
 {
 public:
   explicit system_exceptiont(std::string message);
-  std::string what() const override;
-
-private:
-  std::string message;
 };
 
 /// Thrown when failing to deserialize a value from some
@@ -73,11 +80,6 @@ class deserialization_exceptiont : public cprover_exception_baset
 {
 public:
   explicit deserialization_exceptiont(std::string message);
-
-  std::string what() const override;
-
-private:
-  std::string message;
 };
 
 /// Thrown when a goto program that's being processed is in an invalid format,
@@ -106,7 +108,6 @@ public:
   std::string what() const override;
 
 private:
-  std::string message;
   source_locationt source_location;
 
   std::string diagnostics;
@@ -117,8 +118,8 @@ incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
   std::string message,
   Diagnostic &&diagnostic,
   Diagnostics &&... diagnostics)
-  : message(std::move(message)),
-    source_location(),
+  : cprover_exception_baset(std::move(message)),
+    source_location(source_locationt::nil()),
     diagnostics(detail::assemble_diagnostics(
       std::forward<Diagnostic>(diagnostic),
       std::forward<Diagnostics>(diagnostics)...))
@@ -130,7 +131,7 @@ incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
   std::string message,
   source_locationt source_location,
   Diagnostics &&... diagnostics)
-  : message(std::move(message)),
+  : cprover_exception_baset(std::move(message)),
     source_location(std::move(source_location)),
     diagnostics(
       detail::assemble_diagnostics(std::forward<Diagnostics>(diagnostics)...))
@@ -143,12 +144,8 @@ incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
 class unsupported_operation_exceptiont : public cprover_exception_baset
 {
 public:
+  /// \p message is the unsupported operation causing this fault to occur.
   explicit unsupported_operation_exceptiont(std::string message);
-  std::string what() const override;
-
-private:
-  /// The unsupported operation causing this fault to occur.
-  std::string message;
 };
 
 /// Thrown when an unexpected error occurs during the analysis (e.g., when the
@@ -157,11 +154,6 @@ class analysis_exceptiont : public cprover_exception_baset
 {
 public:
   explicit analysis_exceptiont(std::string reason);
-  std::string what() const override;
-
-private:
-  /// The reason this exception was generated.
-  std::string reason;
 };
 
 /// Thrown when we can't handle something in an input source file.
@@ -171,10 +163,6 @@ class invalid_source_file_exceptiont : public cprover_exception_baset
 {
 public:
   explicit invalid_source_file_exceptiont(std::string reason);
-  std::string what() const override;
-
-private:
-  std::string reason;
 };
 
 #endif // CPROVER_UTIL_EXCEPTION_UTILS_H

@@ -87,7 +87,8 @@ static void restrict_function_pointer(
 invalid_restriction_exceptiont::invalid_restriction_exceptiont(
   std::string reason,
   std::string correct_format)
-  : reason(std::move(reason)), correct_format(std::move(correct_format))
+  : cprover_exception_baset(std::move(reason)),
+    correct_format(std::move(correct_format))
 {
 }
 
