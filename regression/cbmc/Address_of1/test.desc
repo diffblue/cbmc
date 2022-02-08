@@ -1,8 +1,12 @@
 CORE
 main.c
-
+--stop-on-fail
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Adding "--stop-on-fail" should not make a difference for successful
+verification, but previously caused an invariant failure when running CBMC with
+"--paths."
