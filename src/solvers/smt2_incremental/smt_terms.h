@@ -133,7 +133,7 @@ public:
 
   public:
     template <typename... function_type_argument_typest>
-    explicit factoryt(function_type_argument_typest &&... arguments)
+    explicit factoryt(function_type_argument_typest &&... arguments) noexcept
       : function{std::forward<function_type_argument_typest>(arguments)...}
     {
     }
