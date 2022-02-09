@@ -1,0 +1,13 @@
+CORE broken-smt-backend
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Invariant check failed
+--
+Taking the address of an empty struct resulted in an invariant failure in
+address-of flattening. This test was generated using C-Reduce plus some further
+manual simplification.
