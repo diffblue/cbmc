@@ -371,6 +371,78 @@ inline __m128i _mm_setr_epi32(int e3, int e2, int e1, int e0)
 }
 #endif
 
+/* FUNCTION: _mm_set_epi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_set_epi16(
+  short e7,
+  short e6,
+  short e5,
+  short e4,
+  short e3,
+  short e2,
+  short e1,
+  short e0)
+{
+  return (__m128i){.m128i_i16 = {e0, e1, e2, e3, e4, e5, e6, e7}};
+}
+#endif
+
+/* FUNCTION: _mm_setr_epi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_setr_epi16(
+  short e7,
+  short e6,
+  short e5,
+  short e4,
+  short e3,
+  short e2,
+  short e1,
+  short e0)
+{
+  return (__m128i){.m128i_i16 = {e7, e6, e5, e4, e3, e2, e1, e0}};
+}
+#endif
+
+/* FUNCTION: _mm_set_pi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m64 _mm_set_pi16(short e3, short e2, short e1, short e0)
+{
+  return (__m64){.m64_i16 = {e0, e1, e2, e3}};
+}
+#endif
+
+/* FUNCTION: _mm_setr_pi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m64 _mm_setr_pi16(short e3, short e2, short e1, short e0)
+{
+  return (__m64){.m64_i16 = {e3, e2, e1, e0}};
+}
+#endif
+
 /* FUNCTION: _mm_extract_epi32 */
 
 #ifdef _MSC_VER
@@ -382,5 +454,129 @@ inline __m128i _mm_setr_epi32(int e3, int e2, int e1, int e0)
 inline int _mm_extract_epi32(__m128i a, const int imm8)
 {
   return a.m128i_i32[imm8];
+}
+#endif
+
+/* FUNCTION: _mm_extract_epi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline int _mm_extract_epi16(__m128i a, const int imm8)
+{
+  return a.m128i_i16[imm8];
+}
+#endif
+
+/* FUNCTION: _mm_extract_pi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline int _mm_extract_pi16(__m64 a, const int imm8)
+{
+  return a.m64_i16[imm8];
+}
+#endif
+
+/* FUNCTION: _mm_adds_epi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_adds_epi16(__m128i a, __m128i b)
+{
+  return (__m128i){
+    .m128i_i16 = {
+      __CPROVER_saturating_plus(a.m128i_i16[0], b.m128i_i16[0]),
+      __CPROVER_saturating_plus(a.m128i_i16[1], b.m128i_i16[1]),
+      __CPROVER_saturating_plus(a.m128i_i16[2], b.m128i_i16[2]),
+      __CPROVER_saturating_plus(a.m128i_i16[3], b.m128i_i16[3]),
+      __CPROVER_saturating_plus(a.m128i_i16[4], b.m128i_i16[4]),
+      __CPROVER_saturating_plus(a.m128i_i16[5], b.m128i_i16[5]),
+      __CPROVER_saturating_plus(a.m128i_i16[6], b.m128i_i16[6]),
+      __CPROVER_saturating_plus(a.m128i_i16[7], b.m128i_i16[7]),
+    }};
+}
+#endif
+
+/* FUNCTION: _mm_subs_epi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_subs_epi16(__m128i a, __m128i b)
+{
+  return (__m128i){
+    .m128i_i16 = {
+      __CPROVER_saturating_minus(a.m128i_i16[0], b.m128i_i16[0]),
+      __CPROVER_saturating_minus(a.m128i_i16[1], b.m128i_i16[1]),
+      __CPROVER_saturating_minus(a.m128i_i16[2], b.m128i_i16[2]),
+      __CPROVER_saturating_minus(a.m128i_i16[3], b.m128i_i16[3]),
+      __CPROVER_saturating_minus(a.m128i_i16[4], b.m128i_i16[4]),
+      __CPROVER_saturating_minus(a.m128i_i16[5], b.m128i_i16[5]),
+      __CPROVER_saturating_minus(a.m128i_i16[6], b.m128i_i16[6]),
+      __CPROVER_saturating_minus(a.m128i_i16[7], b.m128i_i16[7]),
+    }};
+}
+#endif
+
+/* FUNCTION: _mm_subs_epi16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_subs_epi16(__m128i a, __m128i b)
+{
+  return (__m128i){
+    .m128i_i16 = {
+      __CPROVER_saturating_minus(a.m128i_i16[0], b.m128i_i16[0]),
+      __CPROVER_saturating_minus(a.m128i_i16[1], b.m128i_i16[1]),
+      __CPROVER_saturating_minus(a.m128i_i16[2], b.m128i_i16[2]),
+      __CPROVER_saturating_minus(a.m128i_i16[3], b.m128i_i16[3]),
+      __CPROVER_saturating_minus(a.m128i_i16[4], b.m128i_i16[4]),
+      __CPROVER_saturating_minus(a.m128i_i16[5], b.m128i_i16[5]),
+      __CPROVER_saturating_minus(a.m128i_i16[6], b.m128i_i16[6]),
+      __CPROVER_saturating_minus(a.m128i_i16[7], b.m128i_i16[7]),
+    }};
+}
+#endif
+
+/* FUNCTION: _mm_subs_epu16 */
+
+#ifdef _MSC_VER
+#  ifndef __CPROVER_INTRIN_H_INCLUDED
+#    include <intrin.h>
+#    define __CPROVER_INTRIN_H_INCLUDED
+#  endif
+
+inline __m128i _mm_subs_epu16(__m128i a, __m128i b)
+{
+  return (__m128i){
+    .m128i_u16 = {
+      __CPROVER_saturating_minus(a.m128i_u16[0], b.m128i_u16[0]),
+      __CPROVER_saturating_minus(a.m128i_u16[1], b.m128i_u16[1]),
+      __CPROVER_saturating_minus(a.m128i_u16[2], b.m128i_u16[2]),
+      __CPROVER_saturating_minus(a.m128i_u16[3], b.m128i_u16[3]),
+      __CPROVER_saturating_minus(a.m128i_u16[4], b.m128i_u16[4]),
+      __CPROVER_saturating_minus(a.m128i_u16[5], b.m128i_u16[5]),
+      __CPROVER_saturating_minus(a.m128i_u16[6], b.m128i_u16[6]),
+      __CPROVER_saturating_minus(a.m128i_u16[7], b.m128i_u16[7]),
+    }};
 }
 #endif

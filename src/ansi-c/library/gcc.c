@@ -192,6 +192,24 @@ __CPROVER_HIDE:;
   return size <= sizeof(__CPROVER_size_t);
 }
 
+/* FUNCTION: __builtin_ia32_vec_ext_v4hi */
+
+typedef short __gcc_v4hi __attribute__((__vector_size__(8)));
+
+short __builtin_ia32_vec_ext_v4hi(__gcc_v4hi vec, int offset)
+{
+  return *((short *)&vec + offset);
+}
+
+/* FUNCTION: __builtin_ia32_vec_ext_v8hi */
+
+typedef short __gcc_v8hi __attribute__((__vector_size__(16)));
+
+short __builtin_ia32_vec_ext_v8hi(__gcc_v8hi vec, int offset)
+{
+  return *((short *)&vec + offset);
+}
+
 /* FUNCTION: __builtin_ia32_vec_ext_v4si */
 
 typedef int __gcc_v4si __attribute__((__vector_size__(16)));
@@ -226,4 +244,71 @@ typedef float __gcc_v4sf __attribute__((__vector_size__(16)));
 float __builtin_ia32_vec_ext_v4sf(__gcc_v4sf vec, int offset)
 {
   return *((float *)&vec + offset);
+}
+
+/* FUNCTION: __builtin_ia32_psubsw128 */
+
+#ifndef LIBRARY_CHECK
+typedef short __gcc_v8hi __attribute__((__vector_size__(16)));
+#else
+__gcc_v8hi __CPROVER_saturating_minus();
+#endif
+
+__gcc_v8hi __builtin_ia32_psubsw128(__gcc_v8hi a, __gcc_v8hi b)
+{
+  return __CPROVER_saturating_minus(a, b);
+}
+
+/* FUNCTION: __builtin_ia32_psubusw128 */
+
+#ifndef LIBRARY_CHECK
+typedef short __gcc_v8hi __attribute__((__vector_size__(16)));
+#endif
+
+__gcc_v8hi __builtin_ia32_psubusw128(__gcc_v8hi a, __gcc_v8hi b)
+{
+  typedef unsigned short v8hi_u __attribute__((__vector_size__(16)));
+  return (__gcc_v8hi)__CPROVER_saturating_minus((v8hi_u)a, (v8hi_u)b);
+}
+
+/* FUNCTION: __builtin_ia32_paddsw */
+
+#ifndef LIBRARY_CHECK
+typedef short __gcc_v4hi __attribute__((__vector_size__(8)));
+#else
+__gcc_v4hi __CPROVER_saturating_plus();
+#endif
+
+__gcc_v4hi __builtin_ia32_paddsw(__gcc_v4hi a, __gcc_v4hi b)
+{
+  return __CPROVER_saturating_plus(a, b);
+}
+
+/* FUNCTION: __builtin_ia32_psubsw */
+
+#ifndef LIBRARY_CHECK
+typedef short __gcc_v4hi __attribute__((__vector_size__(8)));
+#else
+__gcc_v4hi __CPROVER_saturating_minus_v4hi(__gcc_v4hi, __gcc_v4hi);
+#  define __CPROVER_saturating_minus __CPROVER_saturating_minus_v4hi
+#endif
+
+__gcc_v4hi __builtin_ia32_psubsw(__gcc_v4hi a, __gcc_v4hi b)
+{
+  return __CPROVER_saturating_minus(a, b);
+}
+
+#ifdef LIBRARY_CHECK
+#  undef __CPROVER_saturating_minus
+#endif
+
+/* FUNCTION: __builtin_ia32_vec_init_v4hi */
+
+#ifndef LIBRARY_CHECK
+typedef short __gcc_v4hi __attribute__((__vector_size__(8)));
+#endif
+
+__gcc_v4hi __builtin_ia32_vec_init_v4hi(short e0, short e1, short e2, short e3)
+{
+  return (__gcc_v4hi){e0, e1, e2, e3};
 }

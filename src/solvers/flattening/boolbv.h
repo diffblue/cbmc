@@ -194,6 +194,7 @@ protected:
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
   virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
+  virtual bvt convert_saturating_add_sub(const binary_exprt &expr);
 
   virtual exprt make_bv_expr(const typet &type, const bvt &bv);
   virtual exprt make_free_bv_expr(const typet &type);

@@ -1968,6 +1968,15 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         return;
       }
       else if(
+        identifier == CPROVER_PREFIX "saturating_minus" ||
+        identifier == CPROVER_PREFIX "saturating_plus")
+      {
+        exprt result = typecheck_saturating_arithmetic(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {
@@ -3298,6 +3307,35 @@ exprt c_typecheck_baset::typecheck_builtin_overflow(
                                     expr.source_location()};
 }
 
+exprt c_typecheck_baset::typecheck_saturating_arithmetic(
+  const side_effect_expr_function_callt &expr)
+{
+  const irep_idt &identifier = to_symbol_expr(expr.function()).get_identifier();
+
+  // check function signature
+  if(expr.arguments().size() != 2)
+  {
+    std::ostringstream error_message;
+    error_message << expr.source_location().as_string() << ": " << identifier
+                  << " takes exactly two arguments, but "
+                  << expr.arguments().size() << " were provided";
+    throw invalid_source_file_exceptiont{error_message.str()};
+  }
+
+  exprt result;
+  if(identifier == CPROVER_PREFIX "saturating_minus")
+    result = saturating_minus_exprt{expr.arguments()[0], expr.arguments()[1]};
+  else if(identifier == CPROVER_PREFIX "saturating_plus")
+    result = saturating_plus_exprt{expr.arguments()[0], expr.arguments()[1]};
+  else
+    UNREACHABLE;
+
+  typecheck_expr_binary_arithmetic(result);
+  result.add_source_location() = expr.source_location();
+
+  return result;
+}
+
 /// Typecheck the parameters in a function call expression, and where
 /// necessary, make implicit casts around parameters explicit.
 void c_typecheck_baset::typecheck_function_call_arguments(
@@ -3499,9 +3537,15 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     return;
   }
 
-  // promote!
-
-  implicit_typecast_arithmetic(op0, op1);
+  if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
+  {
+    implicit_typecast(op1, o_type0);
+  }
+  else
+  {
+    // promote!
+    implicit_typecast_arithmetic(op0, op1);
+  }
 
   const typet &type0 = op0.type();
   const typet &type1 = op1.type();
@@ -3560,6 +3604,16 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
         expr.type()=type0;
         return;
       }
+    }
+  }
+  else if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
+  {
+    if(
+      type0 == type1 &&
+      (type0.id() == ID_signedbv || type0.id() == ID_unsignedbv))
+    {
+      expr.type() = type0;
+      return;
     }
   }
 

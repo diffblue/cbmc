@@ -29,6 +29,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['enum_is_in_range', 'format.desc'],
     ['r_w_ok9', 'simplify.desc'],
     ['reachability-slice-interproc2', 'test.desc'],
+    ['saturating_arithmetric', 'output-goto.desc'],
     # this one wants show-properties instead producing a trace
     ['show_properties1', 'test.desc'],
     # program-only instead of trace
@@ -36,6 +37,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['Pointer_Arithmetic19', 'test.desc'],
     ['Quantifiers-simplify', 'simplify_not_forall.desc'],
     ['array-cell-sensitivity15', 'test.desc'],
+    ['saturating_arithmetric', 'output-formula.desc'],
     # these test for invalid command line handling
     ['bad_option', 'test_multiple.desc'],
     ['bad_option', 'test.desc'],

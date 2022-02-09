@@ -142,3 +142,92 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   return bv;
 }
+
+bvt boolbvt::convert_saturating_add_sub(const binary_exprt &expr)
+{
+  PRECONDITION(
+    expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus);
+
+  const typet &type = expr.type();
+
+  if(
+    type.id() != ID_unsignedbv && type.id() != ID_signedbv &&
+    type.id() != ID_fixedbv && type.id() != ID_complex &&
+    type.id() != ID_vector)
+  {
+    return conversion_failed(expr);
+  }
+
+  std::size_t width = boolbv_width(type);
+
+  if(width == 0)
+    return conversion_failed(expr);
+
+  DATA_INVARIANT(
+    expr.lhs().type() == type && expr.rhs().type() == type,
+    "saturating add/sub with mixed types:\n" + expr.pretty());
+
+  const bool subtract = expr.id() == ID_saturating_minus;
+
+  typet arithmetic_type = (type.id() == ID_vector || type.id() == ID_complex)
+                            ? to_type_with_subtype(type).subtype()
+                            : type;
+
+  bv_utilst::representationt rep =
+    (arithmetic_type.id() == ID_signedbv || arithmetic_type.id() == ID_fixedbv)
+      ? bv_utilst::representationt::SIGNED
+      : bv_utilst::representationt::UNSIGNED;
+
+  bvt bv = convert_bv(expr.lhs(), width);
+  const bvt &op = convert_bv(expr.rhs(), width);
+
+  if(type.id() != ID_vector && type.id() != ID_complex)
+    return bv_utils.saturating_add_sub(bv, op, subtract, rep);
+
+  std::size_t sub_width = boolbv_width(to_type_with_subtype(type).subtype());
+
+  INVARIANT(sub_width != 0, "vector elements shall have nonzero bit width");
+  INVARIANT(
+    width % sub_width == 0,
+    "total vector bit width shall be a multiple of the element bit width");
+
+  std::size_t size = width / sub_width;
+
+  for(std::size_t i = 0; i < size; i++)
+  {
+    bvt tmp_op;
+    tmp_op.resize(sub_width);
+
+    for(std::size_t j = 0; j < tmp_op.size(); j++)
+    {
+      const std::size_t index = i * sub_width + j;
+      INVARIANT(index < op.size(), "bit index shall be within bounds");
+      tmp_op[j] = op[index];
+    }
+
+    bvt tmp_result;
+    tmp_result.resize(sub_width);
+
+    for(std::size_t j = 0; j < tmp_result.size(); j++)
+    {
+      const std::size_t index = i * sub_width + j;
+      INVARIANT(index < bv.size(), "bit index shall be within bounds");
+      tmp_result[j] = bv[index];
+    }
+
+    tmp_result = bv_utils.saturating_add_sub(tmp_result, tmp_op, subtract, rep);
+
+    INVARIANT(
+      tmp_result.size() == sub_width,
+      "applying the add/sub operation shall not change the bitwidth");
+
+    for(std::size_t j = 0; j < tmp_result.size(); j++)
+    {
+      const std::size_t index = i * sub_width + j;
+      INVARIANT(index < bv.size(), "bit index shall be within bounds");
+      bv[index] = tmp_result[j];
+    }
+  }
+
+  return bv;
+}
