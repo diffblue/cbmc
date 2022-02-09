@@ -1,21 +1,61 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_to_smt2_string.h>
+#include <util/range.h>
+#include <util/string_utils.h>
 
 #include <solvers/smt2/smt2_conv.h>
 #include <solvers/smt2_incremental/smt_commands.h>
+#include <solvers/smt2_incremental/smt_index.h>
 #include <solvers/smt2_incremental/smt_logics.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
-
-#include <util/range.h>
-#include <util/string_utils.h>
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <functional>
 #include <iostream>
 #include <sstream>
 #include <stack>
 #include <string>
+
+static std::string escape_identifier(const irep_idt &identifier)
+{
+  return std::string{"|"} + smt2_convt::convert_identifier(identifier) + "|";
+}
+
+class smt_index_output_visitort : public smt_index_const_downcast_visitort
+{
+protected:
+  std::ostream &os;
+
+public:
+  explicit smt_index_output_visitort(std::ostream &os) : os(os)
+  {
+  }
+
+  void visit(const smt_numeral_indext &numeral) override
+  {
+    os << numeral.value();
+  }
+
+  void visit(const smt_symbol_indext &symbol) override
+  {
+    os << escape_identifier(symbol.identifier());
+  }
+};
+
+std::ostream &operator<<(std::ostream &os, const smt_indext &index)
+{
+  smt_index_output_visitort visitor{os};
+  index.accept(visitor);
+  return os;
+}
+
+std::string smt_to_smt2_string(const smt_indext &index)
+{
+  std::stringstream ss;
+  ss << index;
+  return ss.str();
+}
 
 class smt_sort_output_visitort : public smt_sort_const_downcast_visitort
 {
@@ -73,10 +113,12 @@ private:
   std::stack<output_functiont> output_stack;
 
   static output_functiont make_output_function(const std::string &output);
+  static output_functiont make_output_function(const smt_indext &output);
   static output_functiont make_output_function(const smt_sortt &output);
   output_functiont make_output_function(const smt_termt &output);
+  template <typename elementt>
   output_functiont make_output_function(
-    const std::vector<std::reference_wrapper<const smt_termt>> &output);
+    const std::vector<std::reference_wrapper<const elementt>> &output);
 
   /// \brief Single argument version of `push_outputs`.
   template <typename outputt>
@@ -122,6 +164,12 @@ smt_term_to_string_convertert::make_output_function(const std::string &output)
 }
 
 smt_term_to_string_convertert::output_functiont
+smt_term_to_string_convertert::make_output_function(const smt_indext &output)
+{
+  return [=](std::ostream &os) { os << output; };
+}
+
+smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(const smt_sortt &output)
 {
   return [=](std::ostream &os) { os << output; };
@@ -133,9 +181,10 @@ smt_term_to_string_convertert::make_output_function(const smt_termt &output)
   return [=](std::ostream &os) { output.accept(*this); };
 }
 
+template <typename elementt>
 smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(
-  const std::vector<std::reference_wrapper<const smt_termt>> &outputs)
+  const std::vector<std::reference_wrapper<const elementt>> &outputs)
 {
   return [=](std::ostream &os) {
     for(const auto &output : make_range(outputs.rbegin(), outputs.rend()))
@@ -173,8 +222,16 @@ void smt_term_to_string_convertert::visit(
 void smt_term_to_string_convertert::visit(
   const smt_identifier_termt &identifier_term)
 {
-  push_outputs(
-    "|", smt2_convt::convert_identifier(identifier_term.identifier()), "|");
+  auto indices = identifier_term.indices();
+  auto escaped_identifier = escape_identifier(identifier_term.identifier());
+  if(indices.empty())
+  {
+    push_outputs(std::move(escaped_identifier));
+  }
+  else
+  {
+    push_outputs("(_ ", std::move(escaped_identifier), std::move(indices), ")");
+  }
 }
 
 void smt_term_to_string_convertert::visit(

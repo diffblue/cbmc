@@ -11,6 +11,12 @@
 
 #include <util/mp_arith.h>
 
+TEST_CASE("Test smt_indext to string conversion", "[core][smt2_incremental]")
+{
+  CHECK(smt_to_smt2_string(smt_symbol_indext{"green"}) == "|green|");
+  CHECK(smt_to_smt2_string(smt_numeral_indext{42}) == "42");
+}
+
 TEST_CASE("Test smt_sortt to string conversion", "[core][smt2_incremental]")
 {
   CHECK(smt_to_smt2_string(smt_bool_sortt{}) == "Bool");
@@ -36,12 +42,24 @@ TEST_CASE(
   "Test smt_identifier_termt to string conversion",
   "[core][smt2_incremental]")
 {
-  CHECK(
-    smt_to_smt2_string(smt_identifier_termt{"abc", smt_bool_sortt{}}) ==
-    "|abc|");
-  CHECK(
-    smt_to_smt2_string(smt_identifier_termt{"\\", smt_bool_sortt{}}) ==
-    "|&92;|");
+  SECTION("Simple identifiers")
+  {
+    CHECK(
+      smt_to_smt2_string(smt_identifier_termt{"abc", smt_bool_sortt{}}) ==
+      "|abc|");
+    CHECK(
+      smt_to_smt2_string(smt_identifier_termt{"\\", smt_bool_sortt{}}) ==
+      "|&92;|");
+  }
+  SECTION("Indexed identifier")
+  {
+    CHECK(
+      smt_to_smt2_string(smt_identifier_termt{
+        "foo",
+        smt_bool_sortt{},
+        {smt_symbol_indext{"bar"}, smt_numeral_indext{42}}}) ==
+      "(_ |foo| |bar| 42)");
+  }
 }
 
 TEST_CASE(
