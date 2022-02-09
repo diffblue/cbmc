@@ -44,9 +44,26 @@ TEST_CASE("smt_identifier_termt construction", "[core][smt2_incremental]")
 
 TEST_CASE("smt_identifier_termt getters.", "[core][smt2_incremental]")
 {
-  const smt_identifier_termt identifier{"foo", smt_bool_sortt{}};
-  CHECK(identifier.identifier() == "foo");
-  CHECK(identifier.get_sort() == smt_bool_sortt{});
+  SECTION("Simple identifier")
+  {
+    const smt_identifier_termt identifier{"foo", smt_bool_sortt{}};
+    CHECK(identifier.identifier() == "foo");
+    CHECK(identifier.get_sort() == smt_bool_sortt{});
+    CHECK(identifier.indices().empty());
+  }
+  SECTION("Indexed identifier")
+  {
+    const smt_symbol_indext baz{"baz"};
+    const smt_numeral_indext index_42{42};
+    const smt_identifier_termt indexed{
+      "bar", smt_bit_vector_sortt{8}, {baz, index_42}};
+    CHECK(indexed.identifier() == "bar");
+    CHECK(indexed.get_sort() == smt_bit_vector_sortt{8});
+    const auto indices = indexed.indices();
+    REQUIRE(indices.size() == 2);
+    CHECK(indices[0].get() == baz);
+    CHECK(indices[1].get() == index_42);
+  }
 }
 
 TEST_CASE("smt_bit_vector_constant_termt getters.", "[core][smt2_incremental]")
