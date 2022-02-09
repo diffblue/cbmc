@@ -424,9 +424,7 @@ void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
 
 void prop_conv_solvert::ignoring(const exprt &expr)
 {
-  // fall through
-
-  log.warning() << "warning: ignoring " << expr.pretty() << messaget::eom;
+  INVARIANT(false, "No known conversion for " + expr.pretty());
 }
 
 void prop_conv_solvert::finish_eager_conversion()
