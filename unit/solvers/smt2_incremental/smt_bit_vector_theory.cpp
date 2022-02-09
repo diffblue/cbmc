@@ -7,6 +7,33 @@
 
 #include <util/mp_arith.h>
 
+TEST_CASE("SMT bit vector extract", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt operand{42, 8};
+  const auto extract_4_3 = smt_bit_vector_theoryt::extract(4, 3);
+  SECTION("Valid construction")
+  {
+    const auto extraction = extract_4_3(operand);
+    const auto expected_return_sort = smt_bit_vector_sortt{2};
+    REQUIRE(
+      extraction.function_identifier() ==
+      smt_identifier_termt(
+        "extract",
+        expected_return_sort,
+        {smt_numeral_indext{4}, smt_numeral_indext{3}}));
+    REQUIRE(extraction.get_sort() == expected_return_sort);
+    REQUIRE(extraction.arguments().size() == 1);
+    REQUIRE(extraction.arguments()[0].get() == operand);
+  }
+  SECTION("Invalid constructions")
+  {
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::extract(3, 4));
+    REQUIRE_THROWS(extract_4_3(smt_bool_literal_termt{true}));
+    REQUIRE_THROWS(extract_4_3(smt_bit_vector_constant_termt{8, 4}));
+  }
+}
+
 TEST_CASE("SMT bit vector predicates", "[core][smt2_incremental]")
 {
   const smt_bit_vector_constant_termt two{2, 8};

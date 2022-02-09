@@ -8,6 +8,18 @@
 class smt_bit_vector_theoryt
 {
 public:
+  struct extractt final
+  {
+    std::size_t i;
+    std::size_t j;
+    static const char *identifier();
+    smt_sortt return_sort(const smt_termt &operand) const;
+    std::vector<smt_indext> indices() const;
+    void validate(const smt_termt &operand) const;
+  };
+  static smt_function_application_termt::factoryt<extractt>
+  extract(std::size_t i, std::size_t j);
+
   // Relational operator class declarations
   struct unsigned_less_thant final
   {
