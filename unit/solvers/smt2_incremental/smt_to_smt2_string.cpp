@@ -2,6 +2,7 @@
 
 #include <util/mp_arith.h>
 
+#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_logics.h>
@@ -27,6 +28,15 @@ TEST_CASE(
   "[core][smt2_incremental]")
 {
   CHECK(smt_to_smt2_string(smt_bit_vector_constant_termt{0, 8}) == "(_ bv0 8)");
+}
+
+TEST_CASE(
+  "Test smt_bit_vector extract to string conversion",
+  "[core][smt2_incremental]")
+{
+  CHECK(
+    smt_to_smt2_string(smt_bit_vector_theoryt::extract(7, 3)(
+      smt_bit_vector_constant_termt{0, 8})) == "((_ |extract| 7 3) (_ bv0 8))");
 }
 
 TEST_CASE(
