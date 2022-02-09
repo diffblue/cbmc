@@ -7,8 +7,10 @@
 
 #include <solvers/smt2_incremental/smt_index.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
+#include <solvers/smt2_incremental/type_traits.h>
 
 #include <functional>
+#include <utility>
 
 class BigInt;
 using mp_integer = BigInt;
@@ -136,6 +138,44 @@ private:
     smt_identifier_termt function_identifier,
     std::vector<smt_termt> arguments);
 
+  // This is used to detect if \p functiont has an `indicies` member function.
+  // It will resolve to std::true_type if it does or std::false type otherwise.
+  template <class functiont, class = void>
+  struct has_indicest : std::false_type
+  {
+  };
+
+  template <class functiont>
+  struct has_indicest<
+    functiont,
+    void_t<decltype(std::declval<functiont>().indices())>> : std::true_type
+  {
+  };
+
+  /// Overload for when \p functiont does not have indices.
+  template <class functiont>
+  static std::vector<smt_indext>
+  indices(const functiont &function, const std::false_type &has_indices)
+  {
+    return {};
+  }
+
+  /// Overload for when \p functiont has indices member function.
+  template <class functiont>
+  static std::vector<smt_indext>
+  indices(const functiont &function, const std::true_type &has_indices)
+  {
+    return function.indices();
+  }
+
+  /// Returns `function.indices` if `functiont` has an `indices` member function
+  /// or returns an empty collection otherwise.
+  template <class functiont>
+  static std::vector<smt_indext> indices(const functiont &function)
+  {
+    return indices(function, has_indicest<functiont>{});
+  }
+
 public:
   const smt_identifier_termt &function_identifier() const;
   std::vector<std::reference_wrapper<const smt_termt>> arguments() const;
@@ -160,7 +200,8 @@ public:
       function.validate(arguments...);
       auto return_sort = function.return_sort(arguments...);
       return smt_function_application_termt{
-        smt_identifier_termt{function.identifier(), std::move(return_sort)},
+        smt_identifier_termt{
+          function.identifier(), std::move(return_sort), indices(function)},
         {std::forward<argument_typest>(arguments)...}};
     }
   };
