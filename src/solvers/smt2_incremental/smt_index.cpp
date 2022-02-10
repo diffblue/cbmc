@@ -55,6 +55,7 @@ std::size_t smt_numeral_indext::value() const
 smt_symbol_indext::smt_symbol_indext(irep_idt identifier)
   : smt_indext{ID_smt_symbol_index}
 {
+  PRECONDITION(!identifier.empty());
   set(ID_identifier, identifier);
 }
 

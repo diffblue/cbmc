@@ -11,6 +11,13 @@ TEST_CASE("Test smt_indext.pretty is accessible.", "[core][smt2_incremental]")
   REQUIRE_FALSE(index.pretty().empty());
 }
 
+TEST_CASE("Test smt_symbol_index construction", "[core][smt2_incremental]")
+{
+  const cbmc_invariants_should_throwt invariants_throw;
+  CHECK_NOTHROW(smt_symbol_indext{"foo"});
+  CHECK_THROWS(smt_symbol_indext{""});
+}
+
 TEST_CASE("Test smt_index getters", "[core][smt2_incremental]")
 {
   SECTION("Numeral")
