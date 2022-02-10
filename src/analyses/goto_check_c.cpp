@@ -2047,6 +2047,10 @@ optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
     exprt c = conjunction(conjuncts);
     if(enable_simplify)
       simplify(c, ns);
+
+    // this is a logic expression, C language checks no longer apply
+    add_all_disable_named_check_pragmas(c.add_source_location());
+
     return c;
   }
   else if(modified)
