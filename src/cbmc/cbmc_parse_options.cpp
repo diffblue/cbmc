@@ -812,6 +812,18 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_SUCCESS;
   }
 
+  if(cmdline.isset("malloc-may-fail"))
+  {
+    auto malloc_entry = goto_model.goto_functions.function_map.find("malloc");
+    if(
+      malloc_entry != goto_model.goto_functions.function_map.end() &&
+      malloc_entry->second.body_available())
+    {
+      log.warning() << "malloc-may-fail has no effect when an implementation "
+                    << "of malloc is already provided" << messaget::eom;
+    }
+  }
+
   if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
     return CPROVER_EXIT_INTERNAL_ERROR;
 

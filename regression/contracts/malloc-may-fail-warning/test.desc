@@ -1,0 +1,11 @@
+CORE
+main.c
+--add-library _ --malloc-may-fail
+^malloc-may-fail has no effect when an implementation of malloc is already provided$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test is to confirm that ineffective use of malloc-may-fail yields a
+warning.
