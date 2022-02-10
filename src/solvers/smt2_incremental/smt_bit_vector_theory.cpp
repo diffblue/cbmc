@@ -78,6 +78,71 @@ static void validate_bit_vector_operator_arguments(
     "Left and right operands must have the same bit width.");
 }
 
+// Bitwise operator definitions
+
+const char *smt_bit_vector_theoryt::nott::identifier()
+{
+  return "bvnot";
+}
+
+smt_sortt smt_bit_vector_theoryt::nott::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+void smt_bit_vector_theoryt::nott::validate(const smt_termt &operand)
+{
+  const auto operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "The operand is expected to have a bit-vector sort.");
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::nott>
+  smt_bit_vector_theoryt::make_not{};
+
+const char *smt_bit_vector_theoryt::andt::identifier()
+{
+  return "bvand";
+}
+
+smt_sortt smt_bit_vector_theoryt::andt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::andt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::andt>
+  smt_bit_vector_theoryt::make_and{};
+
+const char *smt_bit_vector_theoryt::ort::identifier()
+{
+  return "bvor";
+}
+
+smt_sortt smt_bit_vector_theoryt::ort::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::ort::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::ort>
+  smt_bit_vector_theoryt::make_or{};
+
 // Relational operator definitions
 
 const char *smt_bit_vector_theoryt::unsigned_less_thant::identifier()

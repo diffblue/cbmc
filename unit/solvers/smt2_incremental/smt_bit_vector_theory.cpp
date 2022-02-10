@@ -60,6 +60,59 @@ TEST_CASE("SMT bit vector extract", "[core][smt2_incremental]")
   }
 }
 
+TEST_CASE("SMT bit vector bitwise operators", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bit_vector_constant_termt three{3, 8};
+  const smt_bit_vector_constant_termt wider{4, 16};
+  const smt_bool_literal_termt true_val{true};
+  SECTION("not")
+  {
+    const auto function_application = smt_bit_vector_theoryt::make_not(two);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvnot", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_not(true_val));
+  }
+  SECTION("or")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::make_or(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvor", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_or(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_or(true_val, three));
+  }
+  SECTION("and")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::make_and(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvand", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_and(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_and(true_val, three));
+  }
+}
+
 TEST_CASE("SMT bit vector predicates", "[core][smt2_incremental]")
 {
   const smt_bit_vector_constant_termt two{2, 8};

@@ -28,6 +28,31 @@ public:
   static smt_function_application_termt::factoryt<extractt>
   extract(std::size_t i, std::size_t j);
 
+  // Bitwise operators
+  struct nott final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &operand);
+    static void validate(const smt_termt &operand);
+  };
+  static const smt_function_application_termt::factoryt<nott> make_not;
+
+  struct andt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<andt> make_and;
+
+  struct ort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<ort> make_or;
+
   // Relational operator class declarations
   struct unsigned_less_thant final
   {
