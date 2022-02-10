@@ -431,3 +431,62 @@ TEST_CASE(
     REQUIRE_THROWS(smt_bit_vector_theoryt::negate(true_val));
   }
 }
+
+TEST_CASE("SMT bit vector shifts", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bit_vector_constant_termt three{3, 8};
+  const smt_bit_vector_constant_termt wider{4, 16};
+  const smt_bool_literal_termt true_val{true};
+  SECTION("shift left")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::shift_left(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvshl", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::shift_left(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::shift_left(true_val, three));
+  }
+  SECTION("logical shift right")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::logical_shift_right(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvlshr", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::logical_shift_right(three, wider));
+    REQUIRE_THROWS(
+      smt_bit_vector_theoryt::logical_shift_right(true_val, three));
+  }
+  SECTION("arithmetic shift right")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::arithmetic_shift_right(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvashr", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(
+      smt_bit_vector_theoryt::arithmetic_shift_right(three, wider));
+    REQUIRE_THROWS(
+      smt_bit_vector_theoryt::arithmetic_shift_right(true_val, three));
+  }
+}

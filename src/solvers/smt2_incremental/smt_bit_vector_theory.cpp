@@ -508,3 +508,72 @@ void smt_bit_vector_theoryt::negatet::validate(const smt_termt &operand)
 
 const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::negatet>
   smt_bit_vector_theoryt::negate{};
+
+const char *smt_bit_vector_theoryt::shift_leftt::identifier()
+{
+  return "bvshl";
+}
+
+smt_sortt smt_bit_vector_theoryt::shift_leftt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::shift_leftt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::shift_leftt>
+  smt_bit_vector_theoryt::shift_left{};
+
+const char *smt_bit_vector_theoryt::logical_shift_rightt::identifier()
+{
+  return "bvlshr";
+}
+
+smt_sortt smt_bit_vector_theoryt::logical_shift_rightt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::logical_shift_rightt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::logical_shift_rightt>
+  smt_bit_vector_theoryt::logical_shift_right{};
+
+const char *smt_bit_vector_theoryt::arithmetic_shift_rightt::identifier()
+{
+  return "bvashr";
+}
+
+smt_sortt smt_bit_vector_theoryt::arithmetic_shift_rightt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::arithmetic_shift_rightt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<
+  smt_bit_vector_theoryt::arithmetic_shift_rightt>
+  smt_bit_vector_theoryt::arithmetic_shift_right{};
