@@ -56,7 +56,10 @@ static bool is_valid_smt_identifier(irep_idt identifier)
   return std::regex_match(id2string(identifier), valid);
 }
 
-smt_identifier_termt::smt_identifier_termt(irep_idt identifier, smt_sortt sort)
+smt_identifier_termt::smt_identifier_termt(
+  irep_idt identifier,
+  smt_sortt sort,
+  std::vector<smt_indext> indices)
   : smt_termt(ID_smt_identifier_term, std::move(sort))
 {
   // The below invariant exists as a sanity check that the string being used for
@@ -67,11 +70,25 @@ smt_identifier_termt::smt_identifier_termt(irep_idt identifier, smt_sortt sort)
     is_valid_smt_identifier(identifier),
     R"(Identifiers may not contain | characters.)");
   set(ID_identifier, identifier);
+  for(auto &index : indices)
+  {
+    get_sub().push_back(
+      smt_indext::storert<smt_identifier_termt>::upcast(std::move(index)));
+  }
 }
 
 irep_idt smt_identifier_termt::identifier() const
 {
   return get(ID_identifier);
+}
+
+std::vector<std::reference_wrapper<const smt_indext>>
+smt_identifier_termt::indices() const
+{
+  return make_range(get_sub()).map([](const irept &index) {
+    return std::cref(
+      smt_indext::storert<smt_identifier_termt>::downcast(index));
+  });
 }
 
 smt_bit_vector_constant_termt::smt_bit_vector_constant_termt(

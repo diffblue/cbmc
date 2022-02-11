@@ -1,15 +1,21 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
+#include <util/mp_arith.h>
 
+#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_logics.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
+#include <testing-utils/use_catch.h>
 
-#include <util/mp_arith.h>
+TEST_CASE("Test smt_indext to string conversion", "[core][smt2_incremental]")
+{
+  CHECK(smt_to_smt2_string(smt_symbol_indext{"green"}) == "|green|");
+  CHECK(smt_to_smt2_string(smt_numeral_indext{42}) == "42");
+}
 
 TEST_CASE("Test smt_sortt to string conversion", "[core][smt2_incremental]")
 {
@@ -25,6 +31,15 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "Test smt_bit_vector extract to string conversion",
+  "[core][smt2_incremental]")
+{
+  CHECK(
+    smt_to_smt2_string(smt_bit_vector_theoryt::extract(7, 3)(
+      smt_bit_vector_constant_termt{0, 8})) == "((_ |extract| 7 3) (_ bv0 8))");
+}
+
+TEST_CASE(
   "Test smt_bool_literal_termt to string conversion",
   "[core][smt2_incremental]")
 {
@@ -36,12 +51,24 @@ TEST_CASE(
   "Test smt_identifier_termt to string conversion",
   "[core][smt2_incremental]")
 {
-  CHECK(
-    smt_to_smt2_string(smt_identifier_termt{"abc", smt_bool_sortt{}}) ==
-    "|abc|");
-  CHECK(
-    smt_to_smt2_string(smt_identifier_termt{"\\", smt_bool_sortt{}}) ==
-    "|&92;|");
+  SECTION("Simple identifiers")
+  {
+    CHECK(
+      smt_to_smt2_string(smt_identifier_termt{"abc", smt_bool_sortt{}}) ==
+      "|abc|");
+    CHECK(
+      smt_to_smt2_string(smt_identifier_termt{"\\", smt_bool_sortt{}}) ==
+      "|&92;|");
+  }
+  SECTION("Indexed identifier")
+  {
+    CHECK(
+      smt_to_smt2_string(smt_identifier_termt{
+        "foo",
+        smt_bool_sortt{},
+        {smt_symbol_indext{"bar"}, smt_numeral_indext{42}}}) ==
+      "(_ |foo| |bar| 42)");
+  }
 }
 
 TEST_CASE(

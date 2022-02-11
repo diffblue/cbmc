@@ -4,6 +4,37 @@
 
 #include <util/invariant.h>
 
+const char *smt_bit_vector_theoryt::extractt::identifier()
+{
+  return "extract";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::extractt::return_sort(const smt_termt &operand) const
+{
+  return smt_bit_vector_sortt{i - j + 1};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::extractt::indices() const
+{
+  return {smt_numeral_indext{i}, smt_numeral_indext{j}};
+}
+
+void smt_bit_vector_theoryt::extractt::validate(const smt_termt &operand) const
+{
+  PRECONDITION(i >= j);
+  const auto bit_vector_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  PRECONDITION(bit_vector_sort);
+  PRECONDITION(i < bit_vector_sort->bit_width());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::extractt>
+smt_bit_vector_theoryt::extract(std::size_t i, std::size_t j)
+{
+  PRECONDITION(i >= j);
+  return smt_function_application_termt::factoryt<extractt>(i, j);
+}
+
 static void validate_bit_vector_operator_arguments(
   const smt_termt &left,
   const smt_termt &right)
