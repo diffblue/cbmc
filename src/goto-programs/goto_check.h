@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Checks for Errors in C and Java Programs
 
-#ifndef CPROVER_ANALYSES_GOTO_CHECK_H
-#define CPROVER_ANALYSES_GOTO_CHECK_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
 
-#include <goto-programs/goto_functions.h>
+#include "goto_functions.h"
 
 class goto_modelt;
 class namespacet;
@@ -48,4 +48,4 @@ void transform_assertions_assumptions(
   const optionst &options,
   goto_programt &goto_program);
 
-#endif // CPROVER_ANALYSES_GOTO_CHECK_H
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H

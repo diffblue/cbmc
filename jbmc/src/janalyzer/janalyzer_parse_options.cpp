@@ -11,13 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "janalyzer_parse_options.h"
 
-#include <cstdlib> // exit()
-#include <fstream>
-#include <iostream>
-#include <memory>
+#include <util/config.h>
+#include <util/exit_codes.h>
+#include <util/options.h>
+#include <util/version.h>
 
-#include <ansi-c/ansi_c_language.h>
-
+#include <goto-programs/goto_check.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_virtual_functions.h>
@@ -27,30 +26,26 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
-#include <analyses/goto_check.h>
 #include <analyses/interval_domain.h>
 #include <analyses/local_may_alias.h>
-
-#include <java_bytecode/java_bytecode_language.h>
-#include <java_bytecode/lazy_goto_model.h>
-#include <java_bytecode/remove_exceptions.h>
-#include <java_bytecode/remove_instanceof.h>
-
-#include <langapi/language.h>
-#include <langapi/mode.h>
-
-#include <linking/static_lifetime_init.h>
-
-#include <util/config.h>
-#include <util/exit_codes.h>
-#include <util/options.h>
-#include <util/version.h>
-
+#include <ansi-c/ansi_c_language.h>
 #include <goto-analyzer/static_show_domain.h>
 #include <goto-analyzer/static_simplifier.h>
 #include <goto-analyzer/static_verifier.h>
 #include <goto-analyzer/taint_analysis.h>
 #include <goto-analyzer/unreachable_instructions.h>
+#include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/lazy_goto_model.h>
+#include <java_bytecode/remove_exceptions.h>
+#include <java_bytecode/remove_instanceof.h>
+#include <langapi/language.h>
+#include <langapi/mode.h>
+#include <linking/static_lifetime_init.h>
+
+#include <cstdlib> // exit()
+#include <fstream>
+#include <iostream>
+#include <memory>
 
 janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
   : parse_options_baset(

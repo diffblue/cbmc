@@ -12,8 +12,6 @@ SRC = ai.cpp \
       escape_analysis.cpp \
       flow_insensitive_analysis.cpp \
       global_may_alias.cpp \
-      goto_check.cpp \
-      goto_check_c.cpp \
       goto_rw.cpp \
       guard_bdd.cpp \
       guard_expr.cpp \

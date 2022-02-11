@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
-#ifndef CPROVER_ANALYSES_GOTO_CHECK_C_H
-#define CPROVER_ANALYSES_GOTO_CHECK_C_H
+#ifndef CPROVER_ANSI_C_GOTO_CHECK_C_H
+#define CPROVER_ANSI_C_GOTO_CHECK_C_H
 
 #include <goto-programs/goto_functions.h>
 

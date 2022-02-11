@@ -11,7 +11,8 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include "process_goto_program.h"
 
-#include <analyses/goto_check.h>
+#include <util/message.h>
+#include <util/options.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_inline.h>
@@ -26,8 +27,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 
-#include <util/message.h>
-#include <util/options.h>
+#include "goto_check.h"
 
 bool process_goto_program(
   goto_modelt &goto_model,

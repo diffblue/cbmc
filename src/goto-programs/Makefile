@@ -10,6 +10,7 @@ SRC = allocate_objects.cpp \
       ensure_one_backedge_per_target.cpp \
       format_strings.cpp \
       goto_asm.cpp \
+      goto_check.cpp \
       goto_clean_expr.cpp \
       goto_convert.cpp \
       goto_convert_exceptions.cpp \

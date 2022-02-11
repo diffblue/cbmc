@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_check_c.h"
 
-#include <algorithm>
-#include <optional>
-
 #include <util/arith_tools.h>
 #include <util/array_name.h>
 #include <util/bitvector_expr.h>
@@ -37,13 +34,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
-#include <langapi/language.h>
-#include <langapi/mode.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include "local_bitvector_analysis.h"
+#include <analyses/local_bitvector_analysis.h>
+#include <langapi/language.h>
+#include <langapi/mode.h>
+
+#include <algorithm>
+#include <optional>
 
 class goto_check_ct
 {

@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include "goto_check_c.h"
+#include <ansi-c/goto_check_c.h>
 
 void goto_check(
   const irep_idt &function_identifier,
