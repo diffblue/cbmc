@@ -348,11 +348,29 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
 #ifdef _WIN32
   const auto message_size = narrow<DWORD>(message.size());
   DWORD bytes_written = 0;
-  if(!WriteFile(
-       child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL))
+  const auto write_file = [&]() {
+    return WriteFile(
+      child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL);
+  };
+  if(!write_file())
   {
     // Error handling with GetLastError ?
     return send_responset::FAILED;
+  }
+  // `WriteFile` can return a success status but write 0 bytes if we write
+  // messages quickly enough. This problem has been observed when using a
+  // release build, but resolved when using a debug build or `--verbosity 10`.
+  // Presumably this happens if cbmc gets too far ahead of the sub process.
+  // Flushing the buffer and retrying should then succeed to write the message
+  // in this case.
+  if(bytes_written == 0)
+  {
+    FlushFileBuffers(child_std_IN_Wr);
+    if(!write_file())
+    {
+      // Error handling with GetLastError ?
+      return send_responset::FAILED;
+    }
   }
   INVARIANT(
     message_size == bytes_written,
