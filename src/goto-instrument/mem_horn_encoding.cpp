@@ -73,7 +73,6 @@ exprt cur_app = true_exprt();
 vector<exprt> nearest_loop_exit;
 vector<exprt> nearest_loop_head;
 vector<exprt> chcs;
-vector<irep_idt> var_ids;
 int m_num = 0;
 int n_num = 0;
 bool use_mem = false;
@@ -87,6 +86,7 @@ int ex_num = 0;
 int de_num = 0;
 bool dump_cfg;
 map<exprt, exprt> prime_unprime_vars;
+map<irep_idt, std::string> var_ids;
 
 const irep_idt fun_names_to_continue[2] = {"free", "printf"};   // TODO: try
 bool check_fun_name_to_continue(const irep_idt fun_name)
@@ -97,9 +97,12 @@ bool check_fun_name_to_continue(const irep_idt fun_name)
   return false;
 }
 
-static std::string get_irep_id(const irep_idt n)
+std::string get_irep_id(const irep_idt n)
 {
-  return std::to_string(std::hash<std::string>{}(id2string(n))%100000000000);
+  if (var_ids[n] != "") return var_ids[n];
+  auto str = std::to_string(var_ids.size());
+  var_ids[n] = str;
+  return str;
 }
 
 // TODO: surely, there is a better way to write this kind of things
@@ -129,7 +132,7 @@ symbol_exprt unprime(symbol_exprt s)
 
 void find_deref_selects(exprt &expr, set<exprt> &sels)
 {
-  if(expr.id() == ID_array_select)
+  if(expr.id() == ID_index)
   {
     auto str = id2string(expr.operands()[0].get("identifier"));
     if(str.find(n_pref) != -1)
@@ -168,23 +171,13 @@ void rewrite_derefs(exprt &expr)
         rewrite_derefs(array_ptr);
         rewrite_derefs(offset);
 
-        exprt sel = exprt(ID_array_select, arr_int_intt);
-        sel.add_to_operands(
-          symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
-        sel.add_to_operands(
-          constant_exprt(get_irep_id(array_ptr.get("identifier")), intt));
-        //(select N array_ptr)
-
-        exprt sel2 = exprt(ID_array_select, arr_int_intt);
-        sel2.add_to_operands(
-          symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt));
-        sel2.add_to_operands(sel);
-        // (select M (select N array_ptr))
-
-        exprt sel3 = exprt(ID_array_select, expr.type());
-        sel3.add_to_operands(sel2);
-        sel3.add_to_operands(offset);
-        //(select (select M (select N array_ptr)) offset)
+        index_exprt sel(
+            symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt),
+            constant_exprt(get_irep_id(array_ptr.get("identifier")), intt));
+        index_exprt sel2(
+            symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt),
+            sel);
+        index_exprt sel3(sel2, offset);
         expr = sel3;
       }
     }
@@ -338,7 +331,7 @@ void mk_chc(exprt dst_inv, bool can_skip)
   exprt body_pref;
   if(deref_check)
   {
-    exprt ini = exprt(ID_array_const, arr_int_intt);
+    exprt ini = exprt(ID_array_of, arr_int_intt);
     ini.add_to_operands(constant_exprt("0", intt));
     body_pref = equal_exprt(
       symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt), ini);
@@ -359,7 +352,7 @@ void collect_mem(
   exprt rhs;
   if (code.get_statement() == ID_decl)
   {
-    auto cdecl = to_code_decl(code);
+    auto cdecl = to_code_frontend_decl(code);
     if (cdecl.operands().size() == 2)
     {
       lhs = cdecl.operands()[0];
@@ -379,14 +372,13 @@ void collect_mem(
   if (lhs.type().id() == ID_pointer && find_alloca(rhs))
   {
     exprt eq = exprt(ID_equal);
-    eq.add_to_operands(symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
-
+    eq.add_to_operands(
+      symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
     n_num++;
 
-    exprt str = exprt(ID_array_store, arr_int_intt);
-    str.add_to_operands(symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
-    str.add_to_operands(constant_exprt(get_irep_id(lhs.get("identifier")), intt));
-    str.add_to_operands(constant_exprt(get_irep_id(lhs.get("identifier")), intt));
+    with_exprt str(symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt),
+      constant_exprt(get_irep_id(lhs.get("identifier")), intt),
+      constant_exprt(get_irep_id(lhs.get("identifier")), intt));
 
     eq.add_to_operands(str);
     mem.push_back(eq);
@@ -404,18 +396,14 @@ void collect_mem(
 
     n_num++;
 
-    exprt sel = exprt(ID_array_select, intt);
-    sel.add_to_operands(
-      symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
-    sel.add_to_operands(
-      constant_exprt(get_irep_id(rhs.get("identifier")), intt));
+    index_exprt sel(
+        symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt),
+        constant_exprt(get_irep_id(rhs.get("identifier")), intt));
 
-    exprt str = exprt(ID_array_store, arr_int_intt);
-    str.add_to_operands(
-      symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
-    str.add_to_operands(
-      constant_exprt(get_irep_id(lhs.get("identifier")), intt));
-    str.add_to_operands(sel);
+    with_exprt str(
+      symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt),
+      constant_exprt(get_irep_id(lhs.get("identifier")), intt),
+      sel);
 
     eq.add_to_operands(str);
     mem.push_back(eq);
@@ -445,27 +433,16 @@ void collect_mem(
           add_suf_expr(rhs, std::to_string(ssas.size()));
         }
 
-        exprt sel = exprt(ID_array_select, intt);
-        sel.add_to_operands(
-          symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt));
-        sel.add_to_operands(
-          constant_exprt(get_irep_id(array_ptr.get("identifier")), intt));
+        index_exprt sel(
+            symbol_exprt(n_pref + std::to_string(n_num), arr_int_intt),
+            constant_exprt(get_irep_id(array_ptr.get("identifier")), intt));
+        index_exprt sel2(
+            symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt), sel);
 
-        exprt sel2 = exprt(ID_array_select, arr_int_intt);
-        sel2.add_to_operands(
-          symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt));
-        sel2.add_to_operands(sel);
-
-        exprt str = exprt(ID_array_store, arr_int_intt);
-        str.add_to_operands(sel2);
-        str.add_to_operands(offset);
-        str.add_to_operands(rhs);
-
-        exprt str2 = exprt(ID_array_store, arrn_int_intt);
-        str2.add_to_operands(
-          symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt));
-        str2.add_to_operands(sel);
-        str2.add_to_operands(str);
+        with_exprt str(sel2, offset, rhs);
+        with_exprt str2(
+            symbol_exprt(m_pref + std::to_string(m_num), arrn_int_intt),
+            sel, str);
 
         eq.add_to_operands(str2);
         mem.push_back(eq);
@@ -674,7 +651,7 @@ void encode_block(
       }
       else
       {
-        auto cdecl = to_code_decl(*it);
+        auto cdecl = to_code_frontend_decl(*it);
         if (cdecl.operands().size() < 2)
           cod = cdecl;
         else
@@ -818,7 +795,7 @@ std::function<void(encoding_targett &)> mem_encode_function(
       }
 
       // init types used in for  memory model
-      intt = integer_bitvector_typet(ID_unsignedbv, 64);
+      intt = integer_bitvector_typet(ID_signedbv, 64);
       arr_int_intt = array_typet(intt, symbol_exprt("tmp", intt));
       arrn_int_intt = array_typet(arr_int_intt, symbol_exprt("tmp", intt));
 
@@ -829,11 +806,15 @@ std::function<void(encoding_targett &)> mem_encode_function(
       // finalizing the degug file
       if (dump_cfg)
       {
-        enc_chc <<("}");
+        enc_chc << "}";
         enc_chc.close();
         // this needs a graphiz package installed:
         system("dot -Tpdf -o chc.pdf chc.dot");
       }
+
+      for (auto v : var_ids)
+        target.output("; var_id: " + id2string(v.first) +
+                     "; " + v.second + "\n");
 
       // print to CHC file
       output_result(target);

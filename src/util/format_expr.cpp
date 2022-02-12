@@ -349,22 +349,15 @@ void format_expr_configt::setup()
               << ']';
   };
 
-  expr_map[ID_array_store] =
+  expr_map[ID_with] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << "(store " << format(expr.operands()[0])
-              << ' '  << format(expr.operands()[1])
-              << ' '  << format(expr.operands()[2])
-              << ')';
+    return os << format(expr.operands()[0])
+              << "["  << format(expr.operands()[1])
+              << " <- "  << format(expr.operands()[2])
+              << ']';
   };
 
-  expr_map[ID_array_select] =
-    [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << "(select " << format(expr.operands()[0])
-              << ' '  << format(expr.operands()[1])
-              << ')';
-  };
-
-  expr_map[ID_array_const] =
+  expr_map[ID_array_of] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const array_typet &array_type = to_array_type(expr.type());
     return os << "((as const (Array " << format(array_type.subtype()) << " "

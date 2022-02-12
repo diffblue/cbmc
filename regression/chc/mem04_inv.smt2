@@ -2,6 +2,9 @@
 ; Generated for Z3
 (set-info :source "")
 (set-option :produce-models true)
+; var_id: main::1::y; 3
+; var_id: main::1::z; 1
+; var_id: main::1::x; 2
 
 (declare-fun |inv_15| (Bool (_ BitVec 32) (_ BitVec 32) (_ BitVec 32) (_ BitVec 64) (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)) (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64))) ) Bool)
 
@@ -47,10 +50,10 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|memor_1| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|memor_2| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|alloc_1| (Array (_ BitVec 64) (_ BitVec 64))) (|alloc_2| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::$tmp::return_value_nondet_int$1| (_ BitVec 32)) (|main::1::i| (_ BitVec 64)))
   (=> (and 
     (|inv_13| |main::$tmp::tmp_if_expr| |main::$tmp::return_value_nondet_int$1| |main::1::i| |alloc_2| |memor_2|)
-       (= |memor_0| (store |memor_1| (select |alloc_0| (_ bv6053561456450 64)) (store (select |memor_1| (select |alloc_0| (_ bv6053561456450 64))) |main::1::i| (_ bv1 64))))
-       (= |memor_1| (store |memor_2| (select |alloc_0| (_ bv9363835545496 64)) (store (select |memor_2| (select |alloc_0| (_ bv9363835545496 64))) |main::1::i| (_ bv0 64))))
-       (= |alloc_0| (store |alloc_1| (_ bv6053561456450 64) (_ bv6053561456450 64)))
-       (= |alloc_1| (store |alloc_2| (_ bv9363835545496 64) (_ bv9363835545496 64)))) 
+       (= |memor_0| (store |memor_1| (select |alloc_0| (_ bv3 64)) (store (select |memor_1| (select |alloc_0| (_ bv3 64))) |main::1::i| (_ bv1 64))))
+       (= |memor_1| (store |memor_2| (select |alloc_0| (_ bv2 64)) (store (select |memor_2| (select |alloc_0| (_ bv2 64))) |main::1::i| (_ bv0 64))))
+       (= |alloc_0| (store |alloc_1| (_ bv3 64) (_ bv3 64)))
+       (= |alloc_1| (store |alloc_2| (_ bv2 64) (_ bv2 64)))) 
     (|inv_12| |main::$tmp::tmp_if_expr| |main::$tmp::return_value_nondet_int$1| |main::1::i| |alloc_0| |memor_0|))))
 
 (declare-fun |inv_10| (Bool (_ BitVec 32) (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)) (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64))) ) Bool)
@@ -73,7 +76,7 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|alloc_1| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::$tmp::return_value_nondet_int$1| (_ BitVec 32)) (|main::1::i| (_ BitVec 64)))
   (=> (and 
     (|inv_11| |main::$tmp::tmp_if_expr| |main::$tmp::return_value_nondet_int$1| |main::1::i| |alloc_1| |memor_0|)
-       (= |alloc_0| (store |alloc_1| (_ bv6907487098696 64) (select |alloc_1| (_ bv6053561456450 64))))) 
+       (= |alloc_0| (store |alloc_1| (_ bv1 64) (select |alloc_1| (_ bv3 64))))) 
     (|inv_8| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_0|))))
 
 (declare-fun |inv_9| (Bool (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)) (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64))) ) Bool)
@@ -87,7 +90,7 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|alloc_1| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::1::i| (_ BitVec 64)))
   (=> (and 
     (|inv_9| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_1| |memor_0|)
-       (= |alloc_0| (store |alloc_1| (_ bv6907487098696 64) (select |alloc_1| (_ bv9363835545496 64))))) 
+       (= |alloc_0| (store |alloc_1| (_ bv1 64) (select |alloc_1| (_ bv2 64))))) 
     (|inv_8| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_0|))))
 
 (declare-fun |inv_7| (Bool (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)) (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64))) ) Bool)
@@ -95,7 +98,7 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|memor_1| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::1::i| (_ BitVec 64)))
   (=> (and 
     (|inv_8| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_1|)
-       (= |memor_0| (store |memor_1| (select |alloc_0| (_ bv6907487098696 64)) (store (select |memor_1| (select |alloc_0| (_ bv6907487098696 64))) |main::1::i| (bvadd (select (select |memor_1| (select |alloc_0| (_ bv6907487098696 64))) |main::1::i|) (_ bv1 64)))))) 
+       (= |memor_0| (store |memor_1| (select |alloc_0| (_ bv1 64)) (store (select |memor_1| (select |alloc_0| (_ bv1 64))) |main::1::i| (bvadd (select (select |memor_1| (select |alloc_0| (_ bv1 64))) |main::1::i|) (_ bv1 64)))))) 
     (|inv_7| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_0|))))
 
 (declare-fun |inv_5| (Bool (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)) (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64))) ) Bool)
@@ -110,7 +113,7 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::1::i| (_ BitVec 64)))
   (=> (and 
     (|inv_7| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_0|)
-       (not (= (select (select |memor_0| (select |alloc_0| (_ bv6907487098696 64))) |main::1::i|) (_ bv1 64)))) 
+       (not (= (select (select |memor_0| (select |alloc_0| (_ bv1 64))) |main::1::i|) (_ bv1 64)))) 
     (|inv_6| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_0|))))
 
 (declare-fun |inv_3| (Bool (Array (_ BitVec 64) (_ BitVec 64)) (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64))) ) Bool)
@@ -118,7 +121,7 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::$tmp::tmp_if_expr_1| Bool) (|main::1::i| (_ BitVec 64)) (|main::1::i_1| (_ BitVec 64)))
   (=> (and 
     (|inv_6| |main::$tmp::tmp_if_expr_1| |main::1::i_1| |alloc_0| |memor_0|)
-       (= (ite (= (select (select |memor_0| (select |alloc_0| (_ bv6907487098696 64))) |main::1::i_1|) (_ bv2 64)) true false) |main::$tmp::tmp_if_expr|)
+       (= (ite (= (select (select |memor_0| (select |alloc_0| (_ bv1 64))) |main::1::i_1|) (_ bv2 64)) true false) |main::$tmp::tmp_if_expr|)
        (= |main::1::i_1| |main::1::i|)) 
     (|inv_3| |main::$tmp::tmp_if_expr| |alloc_0| |memor_0|))))
 
@@ -127,7 +130,7 @@
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::1::i| (_ BitVec 64)))
   (=> (and 
     (|inv_5| |main::$tmp::tmp_if_expr| |main::1::i| |alloc_0| |memor_0|)
-       (= (select (select |memor_0| (select |alloc_0| (_ bv6907487098696 64))) |main::1::i|) (_ bv1 64))) 
+       (= (select (select |memor_0| (select |alloc_0| (_ bv1 64))) |main::1::i|) (_ bv1 64))) 
     (|inv_4| |main::$tmp::tmp_if_expr| |alloc_0| |memor_0|))))
 
 (assert (forall ((|memor_0| (Array (_ BitVec 64) (Array (_ BitVec 64) (_ BitVec 64)))) (|alloc_0| (Array (_ BitVec 64) (_ BitVec 64))) (|main::$tmp::tmp_if_expr| Bool) (|main::$tmp::tmp_if_expr_1| Bool))
