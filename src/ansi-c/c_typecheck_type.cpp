@@ -1010,8 +1010,8 @@ void c_typecheck_baset::typecheck_compound_body(
         }
 
         // make it zero-length
-        c_type.id(ID_array);
-        c_type.set(ID_size, from_integer(0, c_index_type()));
+        to_array_type(c_type).size() = from_integer(0, c_index_type());
+        c_type.set(ID_C_flexible_array_member, true);
       }
     }
   }

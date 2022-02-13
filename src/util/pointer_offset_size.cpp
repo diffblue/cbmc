@@ -368,6 +368,11 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         if(bytes > 0)
           result = plus_exprt(result, from_integer(bytes, result.type()));
       }
+      else if(c.type().get_bool(ID_C_flexible_array_member))
+      {
+        // flexible array members do not change the sizeof result
+        continue;
+      }
       else
       {
         DATA_INVARIANT(

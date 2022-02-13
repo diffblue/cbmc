@@ -868,6 +868,7 @@ IREP_ID_ONE(bitreverse)
 IREP_ID_ONE(saturating_minus)
 IREP_ID_ONE(saturating_plus)
 IREP_ID_ONE(annotated_pointer_constant)
+IREP_ID_TWO(C_flexible_array_member, #flexible_array_member)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
