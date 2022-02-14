@@ -1,0 +1,12 @@
+CORE
+main.c
+--string-abstraction
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed
+--
+String abstraction is not necessarily precise enough to reason across type casts
+from non-char pointer types, but must not fail to process such examples.
