@@ -1,0 +1,11 @@
+KNOWNBUG
+signed_overflow.c
+--incremental-smt2-solver 'z3 --smt2 -in' --signed-overflow-check --trace
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+Invariant check failed
+Reason: Reached unimplemented Generation of SMT formula for unknown kind of expression: overflow-\+
+--
+This tests exercise the driving of the `--signed-overflow-check` flag.
