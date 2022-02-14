@@ -174,6 +174,32 @@ TEST_CASE("SMT bit vector bitwise operators", "[core][smt2_incremental]")
   }
 }
 
+TEST_CASE("SMT bit vector comparison", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt a_valid{42, 16}, b_valid{8, 16};
+  SECTION("Valid operands")
+  {
+    const auto compare = smt_bit_vector_theoryt::compare(a_valid, b_valid);
+    const auto expected_return_sort = smt_bit_vector_sortt{1};
+    REQUIRE(
+      compare.function_identifier() ==
+      smt_identifier_termt("bvcomp", expected_return_sort));
+    REQUIRE(compare.get_sort() == expected_return_sort);
+    REQUIRE(compare.arguments().size() == 2);
+    REQUIRE(compare.arguments()[0].get() == a_valid);
+    REQUIRE(compare.arguments()[1].get() == b_valid);
+  }
+  SECTION("Invalid operands")
+  {
+    const smt_bool_literal_termt false_term{false};
+    const smt_bool_literal_termt true_term{true};
+    cbmc_invariants_should_throwt invariants_throw;
+    CHECK_THROWS(smt_bit_vector_theoryt::compare(a_valid, false_term));
+    CHECK_THROWS(smt_bit_vector_theoryt::compare(false_term, a_valid));
+    CHECK_THROWS(smt_bit_vector_theoryt::compare(false_term, true_term));
+  }
+}
+
 TEST_CASE("SMT bit vector predicates", "[core][smt2_incremental]")
 {
   const smt_bit_vector_constant_termt two{2, 8};

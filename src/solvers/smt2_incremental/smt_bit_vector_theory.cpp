@@ -245,6 +245,28 @@ void smt_bit_vector_theoryt::xnort::validate(
 const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::xnort>
   smt_bit_vector_theoryt::xnor{};
 
+const char *smt_bit_vector_theoryt::comparet::identifier()
+{
+  return "bvcomp";
+}
+
+smt_sortt smt_bit_vector_theoryt::comparet::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return smt_bit_vector_sortt{1};
+}
+
+void smt_bit_vector_theoryt::comparet::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_matched_bit_vector_sorts(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::comparet>
+  smt_bit_vector_theoryt::compare{};
+
 // Relational operator definitions
 
 const char *smt_bit_vector_theoryt::unsigned_less_thant::identifier()
