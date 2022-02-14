@@ -51,9 +51,6 @@ optionalt<exprt> member_offset_expr(
 
 optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns);
 
-optionalt<exprt>
-build_sizeof_expr(const constant_exprt &expr, const namespacet &ns);
-
 optionalt<exprt> get_subexpression_at_offset(
   const exprt &expr,
   const mp_integer &offset,

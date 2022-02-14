@@ -1728,6 +1728,52 @@ std::string expr2ct::convert_object_descriptor(
   return result;
 }
 
+static optionalt<exprt>
+build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
+{
+  const typet &type = static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
+
+  if(type.is_nil())
+    return {};
+
+  const auto type_size_expr = size_of_expr(type, ns);
+  optionalt<mp_integer> type_size;
+  if(type_size_expr.has_value())
+    type_size = numeric_cast<mp_integer>(*type_size_expr);
+  auto val = numeric_cast<mp_integer>(expr);
+
+  if(
+    !type_size.has_value() || *type_size < 0 || !val.has_value() ||
+    *val < *type_size || (*type_size == 0 && *val > 0))
+  {
+    return {};
+  }
+
+  const unsignedbv_typet t(size_type());
+  DATA_INVARIANT(
+    address_bits(*val + 1) <= t.get_width(),
+    "sizeof value does not fit size_type");
+
+  mp_integer remainder = 0;
+
+  if(*type_size != 0)
+  {
+    remainder = *val % *type_size;
+    *val -= remainder;
+    *val /= *type_size;
+  }
+
+  exprt result(ID_sizeof, t);
+  result.set(ID_type_arg, type);
+
+  if(*val > 1)
+    result = mult_exprt(result, from_integer(*val, t));
+  if(remainder > 0)
+    result = plus_exprt(result, from_integer(remainder, t));
+
+  return typecast_exprt::conditional_cast(result, expr.type());
+}
+
 std::string expr2ct::convert_constant(
   const constant_exprt &src,
   unsigned &precedence)
@@ -1852,11 +1898,9 @@ std::string expr2ct::convert_constant(
       else if(c_type==ID_signed_long_long_int)
         dest+="ll";
 
-      if(src.find(ID_C_c_sizeof_type).is_not_nil() &&
-         sizeof_nesting==0)
+      if(sizeof_nesting == 0)
       {
-        const auto sizeof_expr_opt =
-          build_sizeof_expr(to_constant_expr(src), ns);
+        const auto sizeof_expr_opt = build_sizeof_expr(src, ns);
 
         if(sizeof_expr_opt.has_value())
         {
