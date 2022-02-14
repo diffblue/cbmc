@@ -53,6 +53,38 @@ public:
   };
   static const smt_function_application_termt::factoryt<ort> make_or;
 
+  struct nandt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<nandt> nand;
+
+  struct nort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<nort> nor;
+
+  struct xort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<xort> make_xor;
+
+  struct xnort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<xnort> xnor;
+
   // Relational operator class declarations
   struct unsigned_less_thant final
   {

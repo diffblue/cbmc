@@ -111,6 +111,67 @@ TEST_CASE("SMT bit vector bitwise operators", "[core][smt2_incremental]")
     REQUIRE_THROWS(smt_bit_vector_theoryt::make_and(three, wider));
     REQUIRE_THROWS(smt_bit_vector_theoryt::make_and(true_val, three));
   }
+  SECTION("nand")
+  {
+    const auto function_application = smt_bit_vector_theoryt::nand(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvnand", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::nand(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::nand(true_val, three));
+  }
+  SECTION("nor")
+  {
+    const auto function_application = smt_bit_vector_theoryt::nor(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvnor", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::nor(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::nor(true_val, three));
+  }
+  SECTION("xor")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::make_xor(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvxor", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_xor(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::make_xor(true_val, three));
+  }
+  SECTION("xnor")
+  {
+    const auto function_application = smt_bit_vector_theoryt::xnor(two, three);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt("bvxnor", smt_bit_vector_sortt{8}));
+    REQUIRE(function_application.get_sort() == smt_bit_vector_sortt{8});
+    REQUIRE(function_application.arguments().size() == 2);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    REQUIRE(function_application.arguments()[1].get() == three);
+
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS(smt_bit_vector_theoryt::xnor(three, wider));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::xnor(true_val, three));
+  }
 }
 
 TEST_CASE("SMT bit vector predicates", "[core][smt2_incremental]")

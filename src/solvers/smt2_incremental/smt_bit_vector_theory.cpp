@@ -143,6 +143,94 @@ void smt_bit_vector_theoryt::ort::validate(
 const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::ort>
   smt_bit_vector_theoryt::make_or{};
 
+const char *smt_bit_vector_theoryt::nandt::identifier()
+{
+  return "bvnand";
+}
+
+smt_sortt smt_bit_vector_theoryt::nandt::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::nandt::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::nandt>
+  smt_bit_vector_theoryt::nand{};
+
+const char *smt_bit_vector_theoryt::nort::identifier()
+{
+  return "bvnor";
+}
+
+smt_sortt smt_bit_vector_theoryt::nort::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::nort::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::nort>
+  smt_bit_vector_theoryt::nor{};
+
+const char *smt_bit_vector_theoryt::xort::identifier()
+{
+  return "bvxor";
+}
+
+smt_sortt smt_bit_vector_theoryt::xort::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::xort::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::xort>
+  smt_bit_vector_theoryt::make_xor{};
+
+const char *smt_bit_vector_theoryt::xnort::identifier()
+{
+  return "bvxnor";
+}
+
+smt_sortt smt_bit_vector_theoryt::xnort::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return lhs.get_sort();
+}
+
+void smt_bit_vector_theoryt::xnort::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_bit_vector_operator_arguments(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::xnort>
+  smt_bit_vector_theoryt::xnor{};
+
 // Relational operator definitions
 
 const char *smt_bit_vector_theoryt::unsigned_less_thant::identifier()
