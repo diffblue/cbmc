@@ -264,6 +264,17 @@ public:
   };
   static const smt_function_application_termt::factoryt<arithmetic_shift_rightt>
     arithmetic_shift_right;
+
+  struct repeatt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    smt_sortt return_sort(const smt_termt &operand) const;
+    std::vector<smt_indext> indices() const;
+    void validate(const smt_termt &operand) const;
+  };
+  static smt_function_application_termt::factoryt<repeatt>
+  repeat(std::size_t i);
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H

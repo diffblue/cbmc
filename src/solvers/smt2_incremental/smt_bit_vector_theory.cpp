@@ -700,3 +700,34 @@ void smt_bit_vector_theoryt::arithmetic_shift_rightt::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::arithmetic_shift_rightt>
   smt_bit_vector_theoryt::arithmetic_shift_right{};
+
+const char *smt_bit_vector_theoryt::repeatt::identifier()
+{
+  return "repeat";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::repeatt::return_sort(const smt_termt &operand) const
+{
+  const std::size_t operand_width =
+    operand.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  return smt_bit_vector_sortt{i * operand_width};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::repeatt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::repeatt::validate(const smt_termt &operand) const
+{
+  PRECONDITION(i >= 1);
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::repeatt>
+smt_bit_vector_theoryt::repeat(std::size_t i)
+{
+  PRECONDITION(i >= 1);
+  return smt_function_application_termt::factoryt<repeatt>(i);
+}

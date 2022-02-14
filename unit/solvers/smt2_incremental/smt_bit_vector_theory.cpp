@@ -577,3 +577,21 @@ TEST_CASE("SMT bit vector shifts", "[core][smt2_incremental]")
       smt_bit_vector_theoryt::arithmetic_shift_right(true_val, three));
   }
 }
+
+TEST_CASE("SMT bit vector repeat", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const auto expected_return_sort = smt_bit_vector_sortt{32};
+  const smt_bool_literal_termt true_val{true};
+  const auto function_application = smt_bit_vector_theoryt::repeat(4)(two);
+  REQUIRE(
+    function_application.function_identifier() ==
+    smt_identifier_termt(
+      "repeat", expected_return_sort, {smt_numeral_indext{4}}));
+  REQUIRE(function_application.get_sort() == expected_return_sort);
+  REQUIRE(function_application.arguments().size() == 1);
+  REQUIRE(function_application.arguments()[0].get() == two);
+  cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_THROWS(smt_bit_vector_theoryt::repeat(0));
+  REQUIRE_THROWS(smt_bit_vector_theoryt::repeat(1)(true_val));
+}
