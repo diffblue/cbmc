@@ -731,3 +731,61 @@ smt_bit_vector_theoryt::repeat(std::size_t i)
   PRECONDITION(i >= 1);
   return smt_function_application_termt::factoryt<repeatt>(i);
 }
+
+const char *smt_bit_vector_theoryt::zero_extendt::identifier()
+{
+  return "zero_extend";
+}
+
+smt_sortt smt_bit_vector_theoryt::zero_extendt::return_sort(
+  const smt_termt &operand) const
+{
+  const std::size_t operand_width =
+    operand.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  return smt_bit_vector_sortt{i + operand_width};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::zero_extendt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::zero_extendt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::zero_extendt>
+smt_bit_vector_theoryt::zero_extend(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<zero_extendt>(i);
+}
+
+const char *smt_bit_vector_theoryt::sign_extendt::identifier()
+{
+  return "sign_extend";
+}
+
+smt_sortt smt_bit_vector_theoryt::sign_extendt::return_sort(
+  const smt_termt &operand) const
+{
+  const std::size_t operand_width =
+    operand.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  return smt_bit_vector_sortt{i + operand_width};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::sign_extendt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::sign_extendt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::sign_extendt>
+smt_bit_vector_theoryt::sign_extend(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<sign_extendt>(i);
+}

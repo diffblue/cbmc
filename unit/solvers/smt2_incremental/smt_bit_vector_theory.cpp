@@ -595,3 +595,41 @@ TEST_CASE("SMT bit vector repeat", "[core][smt2_incremental]")
   REQUIRE_THROWS(smt_bit_vector_theoryt::repeat(0));
   REQUIRE_THROWS(smt_bit_vector_theoryt::repeat(1)(true_val));
 }
+
+TEST_CASE("SMT bit vector extend", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bool_literal_termt true_val{true};
+  SECTION("Zero extension")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::zero_extend(4)(two);
+    const auto expected_return_sort = smt_bit_vector_sortt{12};
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "zero_extend", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::zero_extend(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::zero_extend(1)(true_val));
+  }
+  SECTION("Sign extension")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::sign_extend(4)(two);
+    const auto expected_return_sort = smt_bit_vector_sortt{12};
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "sign_extend", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::sign_extend(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::sign_extend(1)(true_val));
+  }
+}
