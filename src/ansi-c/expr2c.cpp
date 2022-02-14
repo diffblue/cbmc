@@ -1736,7 +1736,10 @@ build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
   if(type.is_nil())
     return {};
 
-  const auto type_size = pointer_offset_size(type, ns);
+  const auto type_size_expr = size_of_expr(type, ns);
+  optionalt<mp_integer> type_size;
+  if(type_size_expr.has_value())
+    type_size = numeric_cast<mp_integer>(*type_size_expr);
   auto val = numeric_cast<mp_integer>(expr);
 
   if(
@@ -1746,9 +1749,9 @@ build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
     return {};
   }
 
-  const typet t(size_type());
+  const unsignedbv_typet t(size_type());
   DATA_INVARIANT(
-    address_bits(*val + 1) <= *pointer_offset_bits(t, ns),
+    address_bits(*val + 1) <= t.get_width(),
     "sizeof value does not fit size_type");
 
   mp_integer remainder = 0;
