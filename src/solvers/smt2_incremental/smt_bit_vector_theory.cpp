@@ -789,3 +789,57 @@ smt_bit_vector_theoryt::sign_extend(std::size_t i)
 {
   return smt_function_application_termt::factoryt<sign_extendt>(i);
 }
+
+const char *smt_bit_vector_theoryt::rotate_leftt::identifier()
+{
+  return "rotate_left";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::rotate_leftt::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::rotate_leftt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::rotate_leftt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::rotate_leftt>
+smt_bit_vector_theoryt::rotate_left(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<rotate_leftt>(i);
+}
+
+const char *smt_bit_vector_theoryt::rotate_rightt::identifier()
+{
+  return "rotate_right";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::rotate_rightt::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::rotate_rightt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::rotate_rightt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::rotate_rightt>
+smt_bit_vector_theoryt::rotate_right(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<rotate_rightt>(i);
+}

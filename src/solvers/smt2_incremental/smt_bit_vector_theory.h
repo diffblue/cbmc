@@ -297,6 +297,28 @@ public:
   };
   static smt_function_application_termt::factoryt<sign_extendt>
   sign_extend(std::size_t i);
+
+  struct rotate_leftt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &operand);
+    std::vector<smt_indext> indices() const;
+    static void validate(const smt_termt &operand);
+  };
+  static smt_function_application_termt::factoryt<rotate_leftt>
+  rotate_left(std::size_t i);
+
+  struct rotate_rightt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &operand);
+    std::vector<smt_indext> indices() const;
+    static void validate(const smt_termt &operand);
+  };
+  static smt_function_application_termt::factoryt<rotate_rightt>
+  rotate_right(std::size_t i);
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H

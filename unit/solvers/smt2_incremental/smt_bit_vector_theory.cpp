@@ -633,3 +633,40 @@ TEST_CASE("SMT bit vector extend", "[core][smt2_incremental]")
     REQUIRE_THROWS(smt_bit_vector_theoryt::sign_extend(1)(true_val));
   }
 }
+
+TEST_CASE("SMT bit vector rotation", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bool_literal_termt true_val{true};
+  const auto expected_return_sort = smt_bit_vector_sortt{8};
+  SECTION("Left rotation")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::rotate_left(4)(two);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "rotate_left", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::rotate_left(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::rotate_left(1)(true_val));
+  }
+  SECTION("Right rotation")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::rotate_right(4)(two);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "rotate_right", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::rotate_right(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::rotate_right(1)(true_val));
+  }
+}
