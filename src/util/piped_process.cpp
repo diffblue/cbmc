@@ -372,6 +372,7 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
       break;
     // Give the sub-process chance to read the waiting message(s).
     FlushFileBuffers(child_std_IN_Wr);
+    Sleep(1 << send_attempts);
   }
   INVARIANT(
     message_size == bytes_written,
