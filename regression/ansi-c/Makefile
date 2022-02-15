@@ -23,13 +23,29 @@ endif
 endif
 
 test:
-	@../test.pl -e -p -c $(exe) $(excluded_tests)
+	if which clang ; then \
+	  ../test.pl -e -p -c "$(exe) --native-compiler clang" $(excluded_tests) ; \
+	fi
+	if which gcc ; then \
+	  ../test.pl -e -p -c "$(exe) --native-compiler gcc" $(excluded_tests) -X fake-gcc-version && \
+	  ../test.pl -e -p -c $(exe) $(excluded_tests) -I fake-gcc-version ; \
+	elif ! which clang ; then \
+	  ../test.pl -e -p -c $(exe) $(excluded_tests) ; \
+	fi
 ifneq ($(BUILD_ENV_),MSVC)
 	@../test.pl -e -p -c "$(exe) -xc++ -D_Bool=bool" -I test-c++-front-end -s c++-front-end $(excluded_tests)
 endif
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c $(exe) $(excluded_tests)
+	if which clang ; then \
+	  ../test.pl -e -p -c "$(exe) --native-compiler clang" $(excluded_tests) ; \
+	fi
+	if which gcc ; then \
+	  ../test.pl -e -p -c "$(exe) --native-compiler gcc" $(excluded_tests) -X fake-gcc-version && \
+	  ../test.pl -e -p -c $(exe) $(excluded_tests) -I fake-gcc-version ; \
+	elif ! which clang ; then \
+	  ../test.pl -e -p -c $(exe) $(excluded_tests) ; \
+	fi
 ifneq ($(BUILD_ENV_),MSVC)
 	@../test.pl -e -p -c "$(exe) -xc++ -D_Bool=bool" -I test-c++-front-end -s c++-front-end $(excluded_tests)
 endif
