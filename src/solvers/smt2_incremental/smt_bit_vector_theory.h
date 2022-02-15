@@ -8,6 +8,14 @@
 class smt_bit_vector_theoryt
 {
 public:
+  struct concatt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<concatt> concat;
+
   struct extractt final
   {
     std::size_t i;
@@ -19,6 +27,63 @@ public:
   };
   static smt_function_application_termt::factoryt<extractt>
   extract(std::size_t i, std::size_t j);
+
+  // Bitwise operators
+  struct nott final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &operand);
+    static void validate(const smt_termt &operand);
+  };
+  static const smt_function_application_termt::factoryt<nott> make_not;
+
+  struct andt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<andt> make_and;
+
+  struct ort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<ort> make_or;
+
+  struct nandt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<nandt> nand;
+
+  struct nort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<nort> nor;
+
+  struct xort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<xort> make_xor;
+
+  struct xnort final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<xnort> xnor;
 
   // Relational operator class declarations
   struct unsigned_less_thant final
@@ -164,6 +229,33 @@ public:
     static void validate(const smt_termt &operand);
   };
   static const smt_function_application_termt::factoryt<negatet> negate;
+
+  // Shift operations
+  struct shift_leftt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<shift_leftt> shift_left;
+
+  struct logical_shift_rightt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<logical_shift_rightt>
+    logical_shift_right;
+
+  struct arithmetic_shift_rightt final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<arithmetic_shift_rightt>
+    arithmetic_shift_right;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H
