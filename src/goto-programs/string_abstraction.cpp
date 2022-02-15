@@ -651,12 +651,18 @@ exprt string_abstractiont::build(
   // take care of pointer typecasts now
   if(pointer.id()==ID_typecast)
   {
+    const exprt &op = to_typecast_expr(pointer).op();
+
     // cast from another pointer type?
-    if(to_typecast_expr(pointer).op().type().id() != ID_pointer)
+    if(
+      op.type().id() != ID_pointer ||
+      !is_char_type(to_pointer_type(op.type()).base_type()))
+    {
       return build_unknown(what, write);
+    }
 
     // recursive call
-    return build(to_typecast_expr(pointer).op(), what, write, source_location);
+    return build(op, what, write, source_location);
   }
 
   exprt str_struct;
