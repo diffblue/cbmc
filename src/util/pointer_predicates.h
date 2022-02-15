@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_POINTER_PREDICATES_H
 #define CPROVER_UTIL_POINTER_PREDICATES_H
 
-#include "deprecate.h"
 #include "std_expr.h"
 
 #define SYMEX_DYNAMIC_PREFIX "symex_dynamic::"
@@ -23,8 +22,6 @@ exprt dead_object(const exprt &pointer, const namespacet &);
 exprt pointer_offset(const exprt &pointer);
 exprt pointer_object(const exprt &pointer);
 exprt object_size(const exprt &pointer);
-DEPRECATED(SINCE(2021, 5, 6, "Use is_dynamic_object_exprt instead"))
-exprt dynamic_object(const exprt &pointer);
 exprt good_pointer(const exprt &pointer);
 exprt good_pointer_def(const exprt &pointer, const namespacet &);
 exprt null_object(const exprt &pointer);

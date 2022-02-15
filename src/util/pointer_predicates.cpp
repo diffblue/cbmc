@@ -56,13 +56,6 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
-exprt dynamic_object(const exprt &pointer)
-{
-  exprt dynamic_expr(ID_is_dynamic_object, bool_typet());
-  dynamic_expr.copy_to_operands(pointer);
-  return dynamic_expr;
-}
-
 exprt good_pointer(const exprt &pointer)
 {
   return unary_exprt(ID_good_pointer, pointer, bool_typet());
