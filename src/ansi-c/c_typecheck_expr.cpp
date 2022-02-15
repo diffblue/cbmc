@@ -1784,6 +1784,15 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
   else if(op_type.id()==ID_pointer)
   {
     expr.type() = to_pointer_type(op_type).base_type();
+
+    if(
+      expr.type().id() == ID_empty &&
+      config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    {
+      error().source_location = expr.source_location();
+      error() << "dereferencing void pointer" << eom;
+      throw 0;
+    }
   }
   else
   {
@@ -3713,6 +3722,14 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
   else if(
     base_type.id() == ID_union_tag &&
     follow_tag(to_union_tag_type(base_type)).is_incomplete())
+  {
+    error().source_location = expr.source_location();
+    error() << "pointer arithmetic with unknown object size" << eom;
+    throw 0;
+  }
+  else if(
+    base_type.id() == ID_empty &&
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;

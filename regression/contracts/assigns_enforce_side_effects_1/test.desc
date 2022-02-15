@@ -1,9 +1,8 @@
 CORE
 main.c
 --enforce-contract foo
-^.*error: void-typed expressions not allowed as assigns clause targets$
-^.*error: side-effects not allowed in assigns clause targets$
-^.*error: ternary expressions not allowed in assigns clause targets$
+activate-multi-line-match
+.*error: (dereferencing void pointer|void-typed expressions not allowed as assigns clause targets\n.*\n.*error: side-effects not allowed in assigns clause targets\n.*\n.*error: ternary expressions not allowed in assigns clause targets\n)
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$
 ^SIGNAL=0$

@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.c
 --pointer-check
 ^EXIT=0$

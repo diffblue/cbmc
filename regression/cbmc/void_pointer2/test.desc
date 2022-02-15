@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.c
 --pointer-check --no-simplify --unwind 3
 ^EXIT=0$

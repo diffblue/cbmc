@@ -1,0 +1,9 @@
+CORE
+main.c
+
+error: pointer arithmetic with unknown object size
+^CONVERSION ERROR$
+^EXIT=(64|1)$
+^SIGNAL=0$
+--
+Invariant check failed

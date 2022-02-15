@@ -1,0 +1,9 @@
+CORE
+main.c
+-DVOID1
+error: dereferencing void pointer
+^CONVERSION ERROR$
+^EXIT=(64|1)$
+^SIGNAL=0$
+--
+Invariant check failed

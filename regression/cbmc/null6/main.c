@@ -1,4 +1,4 @@
-void *guard_malloc_counter = 0;
+char *guard_malloc_counter = 0;
 
 void *my_malloc(int size)
 {
