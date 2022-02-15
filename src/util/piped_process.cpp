@@ -99,7 +99,11 @@
 #  include "piped_process.h"
 #  include "string_utils.h"
 
+#ifdef _WIN32
+#  define BUFSIZE (1024 * 64)
+#else
 #  define BUFSIZE 2048
+#endif
 
 #ifdef _WIN32
 /// This function prepares a single wide string for the windows command
