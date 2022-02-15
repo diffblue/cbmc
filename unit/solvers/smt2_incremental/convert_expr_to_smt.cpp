@@ -3,6 +3,8 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
+#include <util/config.h>
 #include <util/format.h>
 #include <util/std_expr.h>
 
@@ -10,6 +12,7 @@
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
@@ -811,6 +814,55 @@ SCENARIO(
         REQUIRE_THROWS(
           convert_expr_to_smt(ashr_exprt{to_be_shifted, false_exprt{}}));
       }
+    }
+  }
+}
+
+TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
+{
+  const symbol_exprt bool_expr{"foo", bool_typet{}};
+  const smt_termt bool_term = smt_identifier_termt{"foo", smt_bool_sortt{}};
+  const symbol_exprt bv_expr{"bar", signedbv_typet(12)};
+  const smt_termt bv_term =
+    smt_identifier_termt{"bar", smt_bit_vector_sortt{12}};
+  SECTION("Casts to bool")
+  {
+    CHECK(
+      convert_expr_to_smt(typecast_exprt{bool_expr, bool_typet{}}) ==
+      bool_term);
+    CHECK(
+      convert_expr_to_smt(typecast_exprt{bv_expr, bool_typet{}}) ==
+      smt_core_theoryt::distinct(
+        bv_term, smt_bit_vector_constant_termt{0, 12}));
+  }
+  SECTION("Casts to C bool")
+  {
+    // The config lines are necessary because when we do casting to C bool the
+    // bit width depends on the configuration.
+    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+    config.ansi_c.set_arch_spec_i386();
+    const std::size_t c_bool_width = config.ansi_c.bool_width;
+    const smt_bit_vector_constant_termt c_true{1, c_bool_width};
+    const smt_bit_vector_constant_termt c_false{0, c_bool_width};
+    SECTION("from bool")
+    {
+      const auto cast_bool =
+        convert_expr_to_smt(typecast_exprt{bool_expr, c_bool_type()});
+      const auto expected_bool_conversion =
+        smt_core_theoryt::if_then_else(bool_term, c_true, c_false);
+      CHECK(cast_bool == expected_bool_conversion);
+    }
+    SECTION("from bit vector")
+    {
+      const auto cast_bit_vector =
+        convert_expr_to_smt(typecast_exprt{bv_expr, c_bool_type()});
+      const auto expected_bit_vector_conversion =
+        smt_core_theoryt::if_then_else(
+          smt_core_theoryt::distinct(
+            bv_term, smt_bit_vector_constant_termt{0, 12}),
+          c_true,
+          c_false);
+      CHECK(cast_bit_vector == expected_bit_vector_conversion);
     }
   }
 }

@@ -1,13 +1,9 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/convert_expr_to_smt.h>
-
-#include <solvers/prop/literal_expr.h>
-#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
-#include <solvers/smt2_incremental/smt_core_theory.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/expr.h>
 #include <util/expr_cast.h>
 #include <util/floatbv_expr.h>
@@ -17,6 +13,11 @@
 #include <util/range.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
+
+#include <solvers/prop/literal_expr.h>
+#include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
+#include <solvers/smt2_incremental/smt_core_theory.h>
 
 #include <functional>
 #include <numeric>
@@ -98,8 +99,37 @@ static smt_termt convert_expr_to_smt(const nondet_symbol_exprt &nondet_symbol)
     nondet_symbol.pretty());
 }
 
+/// \brief Makes a term which is true if \p input is not 0 / false.
+static smt_termt make_not_zero(const smt_termt &input, const typet &source_type)
+{
+  if(input.get_sort().cast<smt_bool_sortt>())
+    return input;
+  return smt_core_theoryt::distinct(
+    input, convert_expr_to_smt(from_integer(0, source_type)));
+}
+
+/// \brief Returns a cast to C bool expressed in smt terms.
+static smt_termt convert_c_bool_cast(
+  const smt_termt &from_term,
+  const typet &from_type,
+  const c_bool_typet &to_type)
+{
+  const std::size_t c_bool_width = to_type.get_width();
+  return smt_core_theoryt::if_then_else(
+    make_not_zero(from_term, from_type),
+    smt_bit_vector_constant_termt{1, c_bool_width},
+    smt_bit_vector_constant_termt{0, c_bool_width});
+}
+
 static smt_termt convert_expr_to_smt(const typecast_exprt &cast)
 {
+  const auto from_term = convert_expr_to_smt(cast.op());
+  const typet &from_type = cast.op().type();
+  const typet &to_type = cast.type();
+  if(const auto bool_type = type_try_dynamic_cast<bool_typet>(to_type))
+    return make_not_zero(from_term, cast.op().type());
+  if(const auto c_bool_type = type_try_dynamic_cast<c_bool_typet>(to_type))
+    return convert_c_bool_cast(from_term, from_type, *c_bool_type);
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for type cast expression: " + cast.pretty());
 }
