@@ -280,8 +280,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     const auto zero_element =
       zero_initializer(data.type().subtype(), location, ns);
     CHECK_RETURN(zero_element.has_value());
-    codet array_set(ID_array_set);
-    array_set.copy_to_operands(new_array_data_symbol, *zero_element);
+    codet array_set{ID_array_set, {new_array_data_symbol, *zero_element}};
     dest.insert_before(next, goto_programt::make_other(array_set, location));
   }
 

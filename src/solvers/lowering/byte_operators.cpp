@@ -1408,7 +1408,7 @@ static exprt lower_byte_update_byte_array_vector(
   {
     const exprt &element = value_as_byte_array.operands()[i];
 
-    const exprt where = simplify_expr(
+    exprt where = simplify_expr(
       plus_exprt{src.offset(), from_integer(i, src.offset().type())}, ns);
 
     // skip elements that wouldn't change (skip over typecasts as we might have
@@ -1437,9 +1437,9 @@ static exprt lower_byte_update_byte_array_vector(
       update_value = typecast_exprt::conditional_cast(element, subtype);
 
     if(result.id() != ID_with)
-      result = with_exprt{result, where, update_value};
+      result = with_exprt{result, std::move(where), std::move(update_value)};
     else
-      result.add_to_operands(where, update_value);
+      result.add_to_operands(std::move(where), std::move(update_value));
   }
 
   return simplify_expr(std::move(result), ns);

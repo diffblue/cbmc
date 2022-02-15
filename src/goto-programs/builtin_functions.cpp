@@ -100,7 +100,7 @@ void goto_convertt::do_prob_uniform(
     throw 0;
   }
 
-  rhs.copy_to_operands(arguments[0], arguments[1]);
+  rhs.add_to_operands(exprt{arguments[0]}, exprt{arguments[1]});
 
   code_assignt assignment(lhs, rhs);
   assignment.add_source_location()=function.source_location();

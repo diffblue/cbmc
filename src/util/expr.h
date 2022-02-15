@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_EXPR_H
 
 #include "as_const.h"
+#include "deprecate.h"
 #include "type.h"
 #include "validate_expressions.h"
 #include "validate_types.h"
@@ -148,6 +149,7 @@ public:
   /// Copy the given arguments to the end of `exprt`'s operands.
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
+  DEPRECATED(SINCE(2022, 2, 15, "use add_to_operands(&&, &&) instead"))
   void copy_to_operands(const exprt &e1, const exprt &e2)
   {
     operandst &op = operands();
@@ -161,6 +163,7 @@ public:
   /// Add the given arguments to the end of `exprt`'s operands.
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
+  DEPRECATED(SINCE(2022, 2, 15, "use add_to_operands(&&, &&) instead"))
   void add_to_operands(const exprt &e1, const exprt &e2)
   {
     copy_to_operands(e1, e2);
@@ -183,6 +186,7 @@ public:
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
   /// \param e3: third `exprt` to append to the operands
+  DEPRECATED(SINCE(2022, 2, 15, "use add_to_operands(&&, &&, &&) instead"))
   void add_to_operands(const exprt &e1, const exprt &e2, const exprt &e3)
   {
     copy_to_operands(e1, e2, e3);
@@ -192,6 +196,7 @@ public:
   /// \param e1: first `exprt` to append to the operands
   /// \param e2: second `exprt` to append to the operands
   /// \param e3: third `exprt` to append to the operands
+  DEPRECATED(SINCE(2022, 2, 15, "use add_to_operands(&&, &&, &&) instead"))
   void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3)
   {
     operandst &op = operands();
