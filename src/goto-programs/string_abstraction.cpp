@@ -68,28 +68,18 @@ static inline bool is_ptr_argument(const typet &type)
 }
 
 void string_abstraction(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  goto_functionst &dest)
-{
-  string_abstractiont string_abstraction(symbol_table, message_handler);
-  string_abstraction(dest);
-}
-
-void string_abstraction(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  string_abstractiont{goto_model.symbol_table, message_handler}.apply(
-    goto_model);
+  string_abstractiont{goto_model, message_handler}.apply();
 }
 
 string_abstractiont::string_abstractiont(
-  symbol_tablet &_symbol_table,
+  goto_modelt &goto_model,
   message_handlert &_message_handler)
   : sym_suffix("#str$fcn"),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
+    goto_model(goto_model),
+    ns(goto_model.symbol_table),
     temporary_counter(0),
     message_handler(_message_handler)
 {
@@ -101,7 +91,13 @@ string_abstractiont::string_abstractiont(
   s.components()[2].set_pretty_name("size");
 
   symbolt &struct_symbol = get_fresh_aux_symbol(
-    s, "tag-", "string_struct", source_locationt{}, ID_C, ns, symbol_table);
+    s,
+    "tag-",
+    "string_struct",
+    source_locationt{},
+    ID_C,
+    ns,
+    goto_model.symbol_table);
   struct_symbol.is_type = true;
   struct_symbol.is_lvalue = false;
   struct_symbol.is_state_var = false;
@@ -129,13 +125,11 @@ typet string_abstractiont::build_type(whatt what)
   return type;
 }
 
-void string_abstractiont::apply(goto_modelt &goto_model)
+void string_abstractiont::apply()
 {
-  operator()(goto_model.goto_functions);
-}
+  goto_functionst &dest = goto_model.goto_functions;
+  symbol_tablet &symbol_table = goto_model.symbol_table;
 
-void string_abstractiont::operator()(goto_functionst &dest)
-{
   // iterate over all previously known symbols as the body of the loop modifies
   // the symbol table and can thus invalidate iterators
   for(auto &sym_name : symbol_table.sorted_symbol_names())
@@ -184,7 +178,7 @@ void string_abstractiont::operator()(goto_functionst &dest)
   }
 }
 
-void string_abstractiont::operator()(goto_programt &dest)
+void string_abstractiont::apply(goto_programt &dest)
 {
   abstract(dest);
 
@@ -238,7 +232,7 @@ code_typet::parametert string_abstractiont::add_parameter(
       "#str",
     fct_symbol.location,
     fct_symbol.mode,
-    symbol_table);
+    goto_model.symbol_table);
   param_symbol.is_parameter = true;
   param_symbol.value.make_nil();
 
@@ -462,7 +456,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
       ref_instr->source_location();
   }
 
-  symbol_table.insert(std::move(new_symbol));
+  goto_model.symbol_table.insert(std::move(new_symbol));
 
   return sym_expr;
 }
@@ -767,7 +761,7 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
         existing_tag_symbol.location,
         existing_tag_symbol.mode,
         ns,
-        symbol_table);
+        goto_model.symbol_table);
       abstracted_type_symbol.is_type = true;
       abstracted_type_symbol.is_lvalue = false;
       abstracted_type_symbol.is_state_var = false;
@@ -988,7 +982,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   new_symbol.mode=ID_C;
   new_symbol.pretty_name=identifier;
 
-  symbol_table.insert(std::move(new_symbol));
+  goto_model.symbol_table.insert(std::move(new_symbol));
 
   return ns.lookup(identifier).symbol_expr();
 }
@@ -1014,14 +1008,14 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
     std::string sym_suffix_before = sym_suffix;
     sym_suffix = "#str";
     identifier = id2string(symbol.name) + sym_suffix;
-    if(symbol_table.symbols.find(identifier) == symbol_table.symbols.end())
+    if(!goto_model.symbol_table.has_symbol(identifier))
       build_new_symbol(symbol, identifier, abstract_type);
     sym_suffix = sym_suffix_before;
   }
   else
   {
     identifier=id2string(symbol.name)+sym_suffix;
-    if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
+    if(!goto_model.symbol_table.has_symbol(identifier))
       build_new_symbol(symbol, identifier, abstract_type);
   }
 
@@ -1053,7 +1047,7 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   new_symbol.is_static_lifetime=symbol.is_static_lifetime;
   new_symbol.is_thread_local=symbol.is_thread_local;
 
-  symbol_table.insert(std::move(new_symbol));
+  goto_model.symbol_table.insert(std::move(new_symbol));
 
   if(symbol.is_static_lifetime)
   {
@@ -1074,8 +1068,7 @@ bool string_abstractiont::build_symbol_constant(
     +"_"+integer2string(buf_size);
   irep_idt identifier="string_abstraction::"+id2string(base);
 
-  if(symbol_table.symbols.find(identifier)==
-     symbol_table.symbols.end())
+  if(!goto_model.symbol_table.has_symbol(identifier))
   {
     auxiliary_symbolt new_symbol;
     new_symbol.type=string_struct;
@@ -1100,7 +1093,7 @@ bool string_abstractiont::build_symbol_constant(
         code_assignt(new_symbol.symbol_expr(), value)));
     }
 
-    symbol_table.insert(std::move(new_symbol));
+    goto_model.symbol_table.insert(std::move(new_symbol));
   }
 
   dest=address_of_exprt(symbol_exprt(identifier, string_struct));
