@@ -85,6 +85,14 @@ public:
   };
   static const smt_function_application_termt::factoryt<xnort> xnor;
 
+  struct comparet final
+  {
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
+    static void validate(const smt_termt &lhs, const smt_termt &rhs);
+  };
+  static const smt_function_application_termt::factoryt<comparet> compare;
+
   // Relational operator class declarations
   struct unsigned_less_thant final
   {
@@ -256,6 +264,61 @@ public:
   };
   static const smt_function_application_termt::factoryt<arithmetic_shift_rightt>
     arithmetic_shift_right;
+
+  struct repeatt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    smt_sortt return_sort(const smt_termt &operand) const;
+    std::vector<smt_indext> indices() const;
+    void validate(const smt_termt &operand) const;
+  };
+  static smt_function_application_termt::factoryt<repeatt>
+  repeat(std::size_t i);
+
+  struct zero_extendt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    smt_sortt return_sort(const smt_termt &operand) const;
+    std::vector<smt_indext> indices() const;
+    static void validate(const smt_termt &operand);
+  };
+  static smt_function_application_termt::factoryt<zero_extendt>
+  zero_extend(std::size_t i);
+
+  struct sign_extendt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    smt_sortt return_sort(const smt_termt &operand) const;
+    std::vector<smt_indext> indices() const;
+    static void validate(const smt_termt &operand);
+  };
+  static smt_function_application_termt::factoryt<sign_extendt>
+  sign_extend(std::size_t i);
+
+  struct rotate_leftt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &operand);
+    std::vector<smt_indext> indices() const;
+    static void validate(const smt_termt &operand);
+  };
+  static smt_function_application_termt::factoryt<rotate_leftt>
+  rotate_left(std::size_t i);
+
+  struct rotate_rightt final
+  {
+    std::size_t i;
+    static const char *identifier();
+    static smt_sortt return_sort(const smt_termt &operand);
+    std::vector<smt_indext> indices() const;
+    static void validate(const smt_termt &operand);
+  };
+  static smt_function_application_termt::factoryt<rotate_rightt>
+  rotate_right(std::size_t i);
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H

@@ -174,6 +174,32 @@ TEST_CASE("SMT bit vector bitwise operators", "[core][smt2_incremental]")
   }
 }
 
+TEST_CASE("SMT bit vector comparison", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt a_valid{42, 16}, b_valid{8, 16};
+  SECTION("Valid operands")
+  {
+    const auto compare = smt_bit_vector_theoryt::compare(a_valid, b_valid);
+    const auto expected_return_sort = smt_bit_vector_sortt{1};
+    REQUIRE(
+      compare.function_identifier() ==
+      smt_identifier_termt("bvcomp", expected_return_sort));
+    REQUIRE(compare.get_sort() == expected_return_sort);
+    REQUIRE(compare.arguments().size() == 2);
+    REQUIRE(compare.arguments()[0].get() == a_valid);
+    REQUIRE(compare.arguments()[1].get() == b_valid);
+  }
+  SECTION("Invalid operands")
+  {
+    const smt_bool_literal_termt false_term{false};
+    const smt_bool_literal_termt true_term{true};
+    cbmc_invariants_should_throwt invariants_throw;
+    CHECK_THROWS(smt_bit_vector_theoryt::compare(a_valid, false_term));
+    CHECK_THROWS(smt_bit_vector_theoryt::compare(false_term, a_valid));
+    CHECK_THROWS(smt_bit_vector_theoryt::compare(false_term, true_term));
+  }
+}
+
 TEST_CASE("SMT bit vector predicates", "[core][smt2_incremental]")
 {
   const smt_bit_vector_constant_termt two{2, 8};
@@ -549,5 +575,98 @@ TEST_CASE("SMT bit vector shifts", "[core][smt2_incremental]")
       smt_bit_vector_theoryt::arithmetic_shift_right(three, wider));
     REQUIRE_THROWS(
       smt_bit_vector_theoryt::arithmetic_shift_right(true_val, three));
+  }
+}
+
+TEST_CASE("SMT bit vector repeat", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const auto expected_return_sort = smt_bit_vector_sortt{32};
+  const smt_bool_literal_termt true_val{true};
+  const auto function_application = smt_bit_vector_theoryt::repeat(4)(two);
+  REQUIRE(
+    function_application.function_identifier() ==
+    smt_identifier_termt(
+      "repeat", expected_return_sort, {smt_numeral_indext{4}}));
+  REQUIRE(function_application.get_sort() == expected_return_sort);
+  REQUIRE(function_application.arguments().size() == 1);
+  REQUIRE(function_application.arguments()[0].get() == two);
+  cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_THROWS(smt_bit_vector_theoryt::repeat(0));
+  REQUIRE_THROWS(smt_bit_vector_theoryt::repeat(1)(true_val));
+}
+
+TEST_CASE("SMT bit vector extend", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bool_literal_termt true_val{true};
+  SECTION("Zero extension")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::zero_extend(4)(two);
+    const auto expected_return_sort = smt_bit_vector_sortt{12};
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "zero_extend", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::zero_extend(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::zero_extend(1)(true_val));
+  }
+  SECTION("Sign extension")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::sign_extend(4)(two);
+    const auto expected_return_sort = smt_bit_vector_sortt{12};
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "sign_extend", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::sign_extend(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::sign_extend(1)(true_val));
+  }
+}
+
+TEST_CASE("SMT bit vector rotation", "[core][smt2_incremental]")
+{
+  const smt_bit_vector_constant_termt two{2, 8};
+  const smt_bool_literal_termt true_val{true};
+  const auto expected_return_sort = smt_bit_vector_sortt{8};
+  SECTION("Left rotation")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::rotate_left(4)(two);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "rotate_left", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::rotate_left(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::rotate_left(1)(true_val));
+  }
+  SECTION("Right rotation")
+  {
+    const auto function_application =
+      smt_bit_vector_theoryt::rotate_right(4)(two);
+    REQUIRE(
+      function_application.function_identifier() ==
+      smt_identifier_termt(
+        "rotate_right", expected_return_sort, {smt_numeral_indext{4}}));
+    REQUIRE(function_application.get_sort() == expected_return_sort);
+    REQUIRE(function_application.arguments().size() == 1);
+    REQUIRE(function_application.arguments()[0].get() == two);
+    cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_NOTHROW(smt_bit_vector_theoryt::rotate_right(0));
+    REQUIRE_THROWS(smt_bit_vector_theoryt::rotate_right(1)(true_val));
   }
 }

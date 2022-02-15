@@ -245,6 +245,28 @@ void smt_bit_vector_theoryt::xnort::validate(
 const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::xnort>
   smt_bit_vector_theoryt::xnor{};
 
+const char *smt_bit_vector_theoryt::comparet::identifier()
+{
+  return "bvcomp";
+}
+
+smt_sortt smt_bit_vector_theoryt::comparet::return_sort(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  return smt_bit_vector_sortt{1};
+}
+
+void smt_bit_vector_theoryt::comparet::validate(
+  const smt_termt &lhs,
+  const smt_termt &rhs)
+{
+  validate_matched_bit_vector_sorts(lhs, rhs);
+}
+
+const smt_function_application_termt::factoryt<smt_bit_vector_theoryt::comparet>
+  smt_bit_vector_theoryt::compare{};
+
 // Relational operator definitions
 
 const char *smt_bit_vector_theoryt::unsigned_less_thant::identifier()
@@ -678,3 +700,146 @@ void smt_bit_vector_theoryt::arithmetic_shift_rightt::validate(
 const smt_function_application_termt::factoryt<
   smt_bit_vector_theoryt::arithmetic_shift_rightt>
   smt_bit_vector_theoryt::arithmetic_shift_right{};
+
+const char *smt_bit_vector_theoryt::repeatt::identifier()
+{
+  return "repeat";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::repeatt::return_sort(const smt_termt &operand) const
+{
+  const std::size_t operand_width =
+    operand.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  return smt_bit_vector_sortt{i * operand_width};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::repeatt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::repeatt::validate(const smt_termt &operand) const
+{
+  PRECONDITION(i >= 1);
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::repeatt>
+smt_bit_vector_theoryt::repeat(std::size_t i)
+{
+  PRECONDITION(i >= 1);
+  return smt_function_application_termt::factoryt<repeatt>(i);
+}
+
+const char *smt_bit_vector_theoryt::zero_extendt::identifier()
+{
+  return "zero_extend";
+}
+
+smt_sortt smt_bit_vector_theoryt::zero_extendt::return_sort(
+  const smt_termt &operand) const
+{
+  const std::size_t operand_width =
+    operand.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  return smt_bit_vector_sortt{i + operand_width};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::zero_extendt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::zero_extendt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::zero_extendt>
+smt_bit_vector_theoryt::zero_extend(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<zero_extendt>(i);
+}
+
+const char *smt_bit_vector_theoryt::sign_extendt::identifier()
+{
+  return "sign_extend";
+}
+
+smt_sortt smt_bit_vector_theoryt::sign_extendt::return_sort(
+  const smt_termt &operand) const
+{
+  const std::size_t operand_width =
+    operand.get_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  return smt_bit_vector_sortt{i + operand_width};
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::sign_extendt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::sign_extendt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::sign_extendt>
+smt_bit_vector_theoryt::sign_extend(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<sign_extendt>(i);
+}
+
+const char *smt_bit_vector_theoryt::rotate_leftt::identifier()
+{
+  return "rotate_left";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::rotate_leftt::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::rotate_leftt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::rotate_leftt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::rotate_leftt>
+smt_bit_vector_theoryt::rotate_left(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<rotate_leftt>(i);
+}
+
+const char *smt_bit_vector_theoryt::rotate_rightt::identifier()
+{
+  return "rotate_right";
+}
+
+smt_sortt
+smt_bit_vector_theoryt::rotate_rightt::return_sort(const smt_termt &operand)
+{
+  return operand.get_sort();
+}
+
+std::vector<smt_indext> smt_bit_vector_theoryt::rotate_rightt::indices() const
+{
+  return {smt_numeral_indext{i}};
+}
+
+void smt_bit_vector_theoryt::rotate_rightt::validate(const smt_termt &operand)
+{
+  PRECONDITION(operand.get_sort().cast<smt_bit_vector_sortt>());
+}
+
+smt_function_application_termt::factoryt<smt_bit_vector_theoryt::rotate_rightt>
+smt_bit_vector_theoryt::rotate_right(std::size_t i)
+{
+  return smt_function_application_termt::factoryt<rotate_rightt>(i);
+}
