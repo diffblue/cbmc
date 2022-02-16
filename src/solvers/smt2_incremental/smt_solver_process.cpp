@@ -13,7 +13,7 @@ smt_piped_solver_processt::smt_piped_solver_processt(
   std::string command_line,
   message_handlert &message_handler)
   : command_line_description{"\"" + command_line + "\""},
-    process{split_string(command_line, ' ', false, true)},
+    process{split_string(command_line, ' ', false, true), message_handler},
     log{message_handler}
 {
 }

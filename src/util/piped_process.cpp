@@ -124,7 +124,10 @@ prepare_windows_command_line(const std::vector<std::string> &commandvec)
 }
 #endif
 
-piped_processt::piped_processt(const std::vector<std::string> &commandvec)
+piped_processt::piped_processt(
+  const std::vector<std::string> &commandvec,
+  message_handlert &message_handler)
+  : log{message_handler}
 {
 #  ifdef _WIN32
   // Security attributes for pipe creation
@@ -365,14 +368,19 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
     if(!WriteFile(
          child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL))
     {
-      // Error handling with GetLastError ?
+      const DWORD error_code = GetLastError();
+      log.debug() << "Last error code is " + std::to_string(error_code)
+                  << messaget::eom;
       return send_responset::FAILED;
     }
     if(bytes_written != 0)
       break;
     // Give the sub-process chance to read the waiting message(s).
+    const auto wait_milliseconds = narrow<DWORD>(1 << send_attempts);
+    log.debug() << "Zero bytes send to sub process. Retrying in "
+                << wait_milliseconds << " milliseconds." << messaget::eom;
     FlushFileBuffers(child_std_IN_Wr);
-    Sleep(1 << send_attempts);
+    Sleep(wait_milliseconds);
   }
   INVARIANT(
     message_size == bytes_written,
