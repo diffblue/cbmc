@@ -1,7 +1,7 @@
 CORE
 main.c
 --enforce-contract foo
-^.* error: void-typed expressions not allowed as assigns clause targets$
+^.* error: (void-typed expressions not allowed as assigns clause targets|dereferencing void pointer)$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$
 ^SIGNAL=0$
