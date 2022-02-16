@@ -349,6 +349,12 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<ashr_exprt>(const exprt &base)
+{
+  return base.id() == ID_ashr;
+}
+
 /// \brief Logical right shift
 class lshr_exprt : public shift_exprt
 {
@@ -363,6 +369,12 @@ public:
   {
   }
 };
+
+template <>
+inline bool can_cast_expr<lshr_exprt>(const exprt &base)
+{
+  return base.id() == ID_lshr;
+}
 
 /// \brief Extracts a single bit of a bit-vector operand
 class extractbit_exprt : public binary_predicate_exprt

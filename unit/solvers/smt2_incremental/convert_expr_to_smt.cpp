@@ -714,3 +714,103 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "Logical Right-shift expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("Two integer bitvectors, one for the value and one for the places")
+  {
+    const auto to_be_shifted = from_integer(1, signedbv_typet{8});
+    const auto places = from_integer(2, signedbv_typet{8});
+
+    WHEN("We construct a lshr_exprt and convert it to an SMT term")
+    {
+      const auto shift_expr = lshr_exprt{to_be_shifted, places};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN("We should get an logical shift right SMT term")
+      {
+        const smt_termt smt_term_value = smt_bit_vector_constant_termt{1, 8};
+        const smt_termt smt_term_places = smt_bit_vector_constant_termt{2, 8};
+        const auto expected_term = smt_bit_vector_theoryt::logical_shift_right(
+          smt_term_value, smt_term_places);
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN(
+      "We construct a malformed lshr_exprt and attempt to convert it to an SMT"
+      " term")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because of validation "
+        "failure")
+      {
+        REQUIRE_THROWS(
+          convert_expr_to_smt(lshr_exprt{to_be_shifted, false_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Arithmetic Right-shift expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("Two integer bitvectors, one for the value and one for the places")
+  {
+    const auto to_be_shifted = from_integer(1, signedbv_typet{8});
+    const auto places = from_integer(2, signedbv_typet{8});
+
+    WHEN("We construct a ashr_exprt and convert it to an SMT term")
+    {
+      const auto shift_expr = ashr_exprt{to_be_shifted, places};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN("We should get an arithmetic shift-right SMT term")
+      {
+        const smt_termt smt_term_value = smt_bit_vector_constant_termt{1, 8};
+        const smt_termt smt_term_places = smt_bit_vector_constant_termt{2, 8};
+        const auto expected_term =
+          smt_bit_vector_theoryt::arithmetic_shift_right(
+            smt_term_value, smt_term_places);
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN("We construct an ashr_exprt and with a shift of 0 places")
+    {
+      const auto zero_places = from_integer(0, signedbv_typet{8});
+      const auto shift_expr = ashr_exprt{to_be_shifted, zero_places};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN(
+        "When we convert it, we should be getting an arithmetic shift-right "
+        "term")
+      {
+        const smt_termt smt_term_value = smt_bit_vector_constant_termt{1, 8};
+        const smt_termt smt_term_places = smt_bit_vector_constant_termt{0, 8};
+        const auto expected_term =
+          smt_bit_vector_theoryt::arithmetic_shift_right(
+            smt_term_value, smt_term_places);
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN(
+      "We construct a malformed ashr_exprt and attempt to convert it to an SMT "
+      "term")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because of validation "
+        "failure")
+      {
+        REQUIRE_THROWS(
+          convert_expr_to_smt(ashr_exprt{to_be_shifted, false_exprt{}}));
+      }
+    }
+  }
+}
