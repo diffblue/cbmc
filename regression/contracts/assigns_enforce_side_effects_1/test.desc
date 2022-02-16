@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-contract foo
+^.*error: void-typed expressions not allowed as assigns clause targets$
+^.*error: side-effects not allowed in assigns clause targets$
+^.*error: ternary expressions not allowed in assigns clause targets$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Check that expressions with void type, side effects and/or ternay operators are 
+rejected from assigns clauses.

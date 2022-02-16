@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 
+#include "goto_instruction_code.h"
+
 #include <iosfwd>
 #include <set>
 #include <limits>
@@ -21,8 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
-#include <util/std_code.h>
 
+class code_gotot;
 enum class validation_modet;
 
 /// The type of an instruction in a GOTO program.
@@ -193,14 +195,6 @@ public:
       return code;
     }
 
-    /// Get the assignment for ASSIGN
-    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
-    const code_assignt &get_assign() const
-    {
-      PRECONDITION(is_assign());
-      return to_code_assign(code);
-    }
-
     /// Get the lhs of the assignment for ASSIGN
     const exprt &assign_lhs() const
     {
@@ -229,34 +223,11 @@ public:
       return to_code_assign(code).rhs();
     }
 
-    /// Set the assignment for ASSIGN
-    DEPRECATED(SINCE(2021, 2, 24, "Use assign_lhs/rhs instead"))
-    void set_assign(code_assignt c)
-    {
-      PRECONDITION(is_assign());
-      code = std::move(c);
-    }
-
-    /// Get the declaration for DECL
-    DEPRECATED(SINCE(2021, 2, 24, "Use decl_symbol instead"))
-    const code_declt &get_decl() const
-    {
-      PRECONDITION(is_decl());
-      const auto &decl = expr_checked_cast<code_declt>(code);
-      INVARIANT(
-        !decl.initial_value(),
-        "code_declt in goto program may not contain initialization.");
-      return decl;
-    }
-
     /// Get the declared symbol for DECL
     const symbol_exprt &decl_symbol() const
     {
       PRECONDITION(is_decl());
       auto &decl = expr_checked_cast<code_declt>(code);
-      INVARIANT(
-        !decl.initial_value(),
-        "code_declt in goto program may not contain initialization.");
       return decl.symbol();
     }
 
@@ -265,30 +236,7 @@ public:
     {
       PRECONDITION(is_decl());
       auto &decl = expr_checked_cast<code_declt>(code);
-      INVARIANT(
-        !decl.initial_value(),
-        "code_declt in goto program may not contain initialization.");
       return decl.symbol();
-    }
-
-    /// Set the declaration for DECL
-    DEPRECATED(SINCE(2021, 2, 24, "Use decl_symbol instead"))
-    void set_decl(code_declt c)
-    {
-      PRECONDITION(is_decl());
-      INVARIANT(
-        !c.initial_value(),
-        "Initialization must be separated from code_declt before adding to "
-        "goto_instructiont.");
-      code = std::move(c);
-    }
-
-    /// Get the dead statement for DEAD
-    DEPRECATED(SINCE(2021, 2, 24, "Use dead_symbol instead"))
-    const code_deadt &get_dead() const
-    {
-      PRECONDITION(is_dead());
-      return to_code_dead(code);
     }
 
     /// Get the symbol for DEAD
@@ -305,22 +253,6 @@ public:
       return to_code_dead(code).symbol();
     }
 
-    /// Set the dead statement for DEAD
-    DEPRECATED(SINCE(2021, 2, 24, "Use dead_symbol instead"))
-    void set_dead(code_deadt c)
-    {
-      PRECONDITION(is_dead());
-      code = std::move(c);
-    }
-
-    /// Get the return statement for READ
-    DEPRECATED(SINCE(2021, 2, 24, "Use return_value instead"))
-    const code_returnt &get_return() const
-    {
-      PRECONDITION(is_set_return_value());
-      return to_code_return(code);
-    }
-
     /// Get the return value of a SET_RETURN_VALUE instruction
     const exprt &return_value() const
     {
@@ -334,28 +266,6 @@ public:
       PRECONDITION(is_set_return_value());
       return to_code_return(code).return_value();
     }
-
-    /// Set the return statement for SET_RETURN_VALUE
-    DEPRECATED(SINCE(2021, 2, 24, "Use return_value instead"))
-    void set_return(code_returnt c)
-    {
-      PRECONDITION(is_set_return_value());
-      code = std::move(c);
-    }
-
-    /// Get the function call for FUNCTION_CALL
-#if 1
-    DEPRECATED(SINCE(
-      2021,
-      2,
-      24,
-      "Use call_function(), call_lhs(), call_arguments() instead"))
-    const code_function_callt &get_function_call() const
-    {
-      PRECONDITION(is_function_call());
-      return to_code_function_call(code);
-    }
-#endif
 
     /// Get the function that is called for FUNCTION_CALL
     const exprt &call_function() const
@@ -399,20 +309,6 @@ public:
       return to_code_function_call(code).arguments();
     }
 
-    /// Set the function call for FUNCTION_CALL
-#if 1
-    DEPRECATED(SINCE(
-      2021,
-      2,
-      24,
-      "Use call_function(), call_lhs(), call_arguments() instead"))
-    void set_function_call(code_function_callt c)
-    {
-      PRECONDITION(is_function_call());
-      code = std::move(c);
-    }
-#endif
-
     /// Get the statement for OTHER
     const codet &get_other() const
     {
@@ -427,14 +323,37 @@ public:
       code = std::move(c);
     }
 
-    /// The location of the instruction in the source file
-    source_locationt source_location;
+    /// The location of the instruction in the source file.
+    /// Use source_location() to access.
+  protected:
+    source_locationt _source_location;
+
+  public:
+    const source_locationt &source_location() const
+    {
+      return _source_location;
+    }
+
+    source_locationt &source_location_nonconst()
+    {
+      return _source_location;
+    }
 
     /// What kind of instruction?
-    goto_program_instruction_typet type;
+    goto_program_instruction_typet type() const
+    {
+      return _type;
+    }
 
+  protected:
+    // Use type() to access. To prevent malformed instructions, no non-const
+    // access method is provided.
+    goto_program_instruction_typet _type;
+
+  public:
     /// Guard for gotos, assume, assert
-    /// Use get_condition() to read, and set_condition(c) to write.
+    /// Use condition() method to access.
+    /// This member will eventually be protected.
     exprt guard;
 
     /// Does this instruction have a condition?
@@ -444,6 +363,7 @@ public:
     }
 
     /// Get the condition of gotos, assume, assert
+    DEPRECATED(SINCE(2021, 10, 12, "Use condition() instead"))
     const exprt &get_condition() const
     {
       PRECONDITION(has_condition());
@@ -451,10 +371,25 @@ public:
     }
 
     /// Set the condition of gotos, assume, assert
+    DEPRECATED(SINCE(2021, 10, 12, "Use condition_nonconst() instead"))
     void set_condition(exprt c)
     {
       PRECONDITION(has_condition());
       guard = std::move(c);
+    }
+
+    /// Get the condition of gotos, assume, assert
+    const exprt &condition() const
+    {
+      PRECONDITION(has_condition());
+      return guard;
+    }
+
+    /// Get the condition of gotos, assume, assert
+    exprt &condition_nonconst()
+    {
+      PRECONDITION(has_condition());
+      return guard;
     }
 
     // The below will eventually become a single target only.
@@ -500,9 +435,9 @@ public:
     { return target_number!=nil_target; }
 
     /// Clear the node
-    void clear(goto_program_instruction_typet _type)
+    void clear(goto_program_instruction_typet __type)
     {
-      type=_type;
+      _type = __type;
       targets.clear();
       guard=true_exprt();
       code.make_nil();
@@ -515,34 +450,44 @@ public:
       clear(SKIP);
     }
 
+    /// Transforms either an assertion or a GOTO instruction
+    /// into an assumption, with the same condition.
+    void turn_into_assume()
+    {
+      PRECONDITION(_type == GOTO || _type == ASSERT);
+      _type = ASSUME;
+      targets.clear();
+      code.make_nil();
+    }
+
     void complete_goto(targett _target)
     {
-      PRECONDITION(type == INCOMPLETE_GOTO);
+      PRECONDITION(_type == INCOMPLETE_GOTO);
       code.make_nil();
       targets.push_back(_target);
-      type = GOTO;
+      _type = GOTO;
     }
 
     // clang-format off
-    bool is_goto            () const { return type == GOTO;             }
-    bool is_set_return_value() const { return type == SET_RETURN_VALUE; }
-    bool is_assign          () const { return type == ASSIGN;           }
-    bool is_function_call   () const { return type == FUNCTION_CALL;    }
-    bool is_throw           () const { return type == THROW;            }
-    bool is_catch           () const { return type == CATCH;            }
-    bool is_skip            () const { return type == SKIP;             }
-    bool is_location        () const { return type == LOCATION;         }
-    bool is_other           () const { return type == OTHER;            }
-    bool is_decl            () const { return type == DECL;             }
-    bool is_dead            () const { return type == DEAD;             }
-    bool is_assume          () const { return type == ASSUME;           }
-    bool is_assert          () const { return type == ASSERT;           }
-    bool is_atomic_begin    () const { return type == ATOMIC_BEGIN;     }
-    bool is_atomic_end      () const { return type == ATOMIC_END;       }
-    bool is_start_thread    () const { return type == START_THREAD;     }
-    bool is_end_thread      () const { return type == END_THREAD;       }
-    bool is_end_function    () const { return type == END_FUNCTION;     }
-    bool is_incomplete_goto () const { return type == INCOMPLETE_GOTO;  }
+    bool is_goto            () const { return _type == GOTO;             }
+    bool is_set_return_value() const { return _type == SET_RETURN_VALUE; }
+    bool is_assign          () const { return _type == ASSIGN;           }
+    bool is_function_call   () const { return _type == FUNCTION_CALL;    }
+    bool is_throw           () const { return _type == THROW;            }
+    bool is_catch           () const { return _type == CATCH;            }
+    bool is_skip            () const { return _type == SKIP;             }
+    bool is_location        () const { return _type == LOCATION;         }
+    bool is_other           () const { return _type == OTHER;            }
+    bool is_decl            () const { return _type == DECL;             }
+    bool is_dead            () const { return _type == DEAD;             }
+    bool is_assume          () const { return _type == ASSUME;           }
+    bool is_assert          () const { return _type == ASSERT;           }
+    bool is_atomic_begin    () const { return _type == ATOMIC_BEGIN;     }
+    bool is_atomic_end      () const { return _type == ATOMIC_END;       }
+    bool is_start_thread    () const { return _type == START_THREAD;     }
+    bool is_end_thread      () const { return _type == END_THREAD;       }
+    bool is_end_function    () const { return _type == END_FUNCTION;     }
+    bool is_incomplete_goto () const { return _type == INCOMPLETE_GOTO;  }
     // clang-format on
 
     instructiont():
@@ -550,10 +495,10 @@ public:
     {
     }
 
-    explicit instructiont(goto_program_instruction_typet _type)
+    explicit instructiont(goto_program_instruction_typet __type)
       : code(static_cast<const codet &>(get_nil_irep())),
-        source_location(static_cast<const source_locationt &>(get_nil_irep())),
-        type(_type),
+        _source_location(source_locationt::nil()),
+        _type(__type),
         guard(true_exprt())
     {
     }
@@ -561,13 +506,13 @@ public:
     /// Constructor that can set all members, passed by value
     instructiont(
       codet _code,
-      source_locationt _source_location,
-      goto_program_instruction_typet _type,
+      source_locationt __source_location,
+      goto_program_instruction_typet __type,
       exprt _guard,
       targetst _targets)
       : code(std::move(_code)),
-        source_location(std::move(_source_location)),
-        type(_type),
+        _source_location(std::move(__source_location)),
+        _type(__type),
         guard(std::move(_guard)),
         targets(std::move(_targets))
     {
@@ -578,10 +523,11 @@ public:
     {
       using std::swap;
       swap(instruction.code, code);
-      swap(instruction.source_location, source_location);
-      swap(instruction.type, type);
+      swap(instruction._source_location, _source_location);
+      swap(instruction._type, _type);
       swap(instruction.guard, guard);
       swap(instruction.targets, targets);
+      swap(instruction.labels, labels);
     }
 
     /// Uniquely identify an invalid target or location
@@ -616,7 +562,7 @@ public:
     std::string to_string() const
     {
       std::ostringstream instruction_id_builder;
-      instruction_id_builder << type;
+      instruction_id_builder << _type;
       return instruction_id_builder.str();
     }
 
@@ -679,6 +625,22 @@ public:
 
   /// Insertion that preserves jumps to "target".
   /// The instruction is destroyed.
+  ///
+  /// Turns:
+  /// ```
+  /// ...->[a]->...
+  ///       ^
+  ///     target
+  /// ```
+  ///
+  /// Into:
+  /// ```
+  /// ...->[i]->[a]->...
+  ///       ^
+  ///     target
+  /// ```
+  ///
+  /// So that jumps to `a` now jump to the newly inserted `i`.
   void insert_before_swap(targett target, instructiont &instruction)
   {
     insert_before_swap(target);
@@ -898,12 +860,21 @@ public:
     }
   }
 
-  static instructiont make_return(
-    code_returnt c,
+  static instructiont make_set_return_value(
+    exprt return_value,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(std::move(c), l, SET_RETURN_VALUE, nil_exprt(), {});
+    return instructiont(
+      code_returnt(std::move(return_value)),
+      l,
+      SET_RETURN_VALUE,
+      nil_exprt(),
+      {});
   }
+
+  static instructiont make_set_return_value(
+    const code_returnt &code,
+    const source_locationt &l = source_locationt::nil()) = delete;
 
   static instructiont
   make_skip(const source_locationt &l = source_locationt::nil())
@@ -1047,11 +1018,8 @@ public:
   }
 
   static instructiont make_incomplete_goto(
-    const code_gotot &_code,
-    const source_locationt &l = source_locationt::nil())
-  {
-    return instructiont(_code, l, INCOMPLETE_GOTO, true_exprt(), {});
-  }
+    const code_gotot &,
+    const source_locationt & = source_locationt::nil());
 
   static instructiont make_goto(
     targett _target,

@@ -183,6 +183,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_struct(to_struct_expr(expr));
   else if(expr.id()==ID_union)
     return convert_union(to_union_expr(expr));
+  else if(expr.id() == ID_empty_union)
+    return convert_empty_union(to_empty_union_expr(expr));
   else if(expr.id()==ID_string_constant)
     return convert_bitvector(
       to_string_constant(expr).to_array_expr());
@@ -225,6 +227,10 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_bv(
       simplify_expr(to_count_trailing_zeros_expr(expr).lower(), ns));
   }
+  else if(expr.id() == ID_bitreverse)
+    return convert_bitreverse(to_bitreverse_expr(expr));
+  else if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
+    return convert_saturating_add_sub(to_binary_expr(expr));
 
   return conversion_failed(expr);
 }

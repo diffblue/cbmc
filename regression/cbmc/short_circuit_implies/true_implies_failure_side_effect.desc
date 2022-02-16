@@ -1,0 +1,12 @@
+CORE
+true_implies_failure_side_effect.c
+
+^EXIT=10$
+^SIGNAL=0$
+line 5 fail function: FAILURE
+VERIFICATION FAILED
+--
+^warning: ignoring
+--
+Test that side effects on the right hand side of the ==> operator can result
+in verification failure in the case where the left hand side is true.

@@ -234,9 +234,11 @@ CPROVER_PREFIX  "__CPROVER_"
 
 arith_check     ("conversion"|"undefined-shift"|"nan"|"div-by-zero")
 enum_check      "enum-range"
-memory_check    ("bounds"|"pointer"|"memory_leak")
+pointer_primitive "pointer-primitive"
+memory_check    ("bounds"|"pointer"|"memory-leak")
 overflow_check  ("signed"|"unsigned"|"pointer"|"float")"-overflow"
-named_check     ["]({arith_check}|{enum_check}|{memory_check}|{overflow_check})["]
+named_check     ["]({arith_check}|{enum_check}|{memory_check}|{overflow_check}|{pointer_primitive})["]
+enable_or_disable ("enable"|"disable")
 
 %x GRAMMAR
 %x COMMENT1
@@ -401,26 +403,31 @@ void ansi_c_scanner_init()
 
                 /* CProver specific pragmas: hint to disable named checks */
 <CPROVER_PRAGMA>{ws}"check"{ws}"push" {
-                  PARSER.pragma_cprover.push_back({});
+                  PARSER.pragma_cprover_push();
                 }
 <CPROVER_PRAGMA>{ws}"check"{ws}"pop" {
-                  if(!PARSER.pragma_cprover.empty())
+                  if(!PARSER.pragma_cprover_empty())
                   {
-                    PARSER.pragma_cprover.pop_back();
+                    PARSER.pragma_cprover_pop();
                     PARSER.set_pragma_cprover();
                   }
                 }
-<CPROVER_PRAGMA>{ws}"check"{ws}"disable"{ws}{named_check} {
+<CPROVER_PRAGMA>{ws}"check"{ws}{enable_or_disable}{ws}{named_check} {
                   std::string tmp(yytext);
+                  bool enable = tmp.find("enable")!=std::string::npos;
                   std::string::size_type p = tmp.find('"') + 1;
-                  std::string value =
-                    std::string("disable:") +
+                  std::string check_name =
                     std::string(tmp, p, tmp.size() - p - 1) +
                     std::string("-check");
-                  if(PARSER.pragma_cprover.empty())
-                    PARSER.pragma_cprover.push_back({value});
-                  else
-                    PARSER.pragma_cprover.back().insert(value);
+                  bool clash = PARSER.pragma_cprover_clash(check_name, enable);
+                  if(clash)
+                  {
+                    yyansi_cerror(
+                      "Found enable and disable pragmas for " +
+                      id2string(check_name));
+                    return TOK_SCANNER_ERROR;
+                  }
+                  PARSER.pragma_cprover_add_check(check_name, enable);
                   PARSER.set_pragma_cprover();
                 }
 
@@ -1630,6 +1637,10 @@ __decltype          { if(PARSER.cpp98 &&
   /* The following ugly stuff avoids two-token lookahead in the parser;
      e.g., asm void f()  vs.  asm ("xyz") or asm { ... } */
 <GCC_ASM>{
+{cpplineno}     {
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
+                }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 "{"             { yyless(0); BEGIN(GRAMMAR); loc(); PARSER.asm_block_following=true; return TOK_GCC_ASM_PAREN; }

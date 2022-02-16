@@ -1,4 +1,4 @@
-#WHAT ARCHITECTURE ?
+# What architecture?
 
 CPROVER now needs a C++11 compliant compiler and is known to work in the
 following environments:
@@ -18,7 +18,7 @@ past, but are not actively tested:
 - Solaris 11
 - FreeBSD 11
 
-#Building using CMake
+# Building using CMake
 
 Building with CMake is supported across Linux, MacOS X and Windows with Visual
 Studio 2019. There are also hand-written make files which can be used to build
@@ -81,6 +81,16 @@ files.
    `-DCMAKE_CXX_COMPILER=clang++` to the command line. You can also tell CMake
    to generate IDE projects by supplying the `-G` flag.  Run `cmake -G` for a
    comprehensive list of supported back-ends.
+
+   As part of this step, CMake will download the back-end solver (see Section
+   "Compiling with alternative SAT solvers" in this document for configuration
+   options). Should it be necessary to perform this step without network access,
+   a solver can be downloaded ahead of the above `cmake` invocation as follows:
+   ```
+   mkdir -p build/minisat2-download/minisat2-download-prefix/src/
+   wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz \
+     -O build/minisat2-download/minisat2-download-prefix/src/minisat2_2.2.1.orig.tar.gz
+   ```
 
    On macOS >10.14, the build will fail unless you explicitly specify
    the full path to the compiler. This issue is being tracked

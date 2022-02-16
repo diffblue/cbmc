@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^.* error: ternary expressions not allowed in assigns clause targets$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that ternary expressions are rejected from conditional targets.

@@ -2,24 +2,23 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-struct pair
+struct test
 {
-  uint8_t *buf;
-  size_t size;
+  uint8_t buf[8];
 };
 
-void f1(struct pair *p) __CPROVER_assigns(*(p->buf))
-  __CPROVER_ensures(p->buf[0] == 0)
+void f1(struct test *p) __CPROVER_assigns(p->buf)
+  __CPROVER_ensures((p == NULL) || p->buf[0] == 0)
 {
-  p->buf[0] = 0;
+  if(p != NULL)
+    p->buf[0] = 0;
 }
 
 int main()
 {
-  struct pair *p = nondet_bool() ? malloc(sizeof(*p)) : NULL;
+  struct test *p = malloc(sizeof(*p));
+  uint8_t buf_1 = (p == NULL) ? 0 : p->buf[1];
   f1(p);
-  // clang-format off
-  assert(p != NULL ==> p->buf[0] == 0);
-  // clang-format on
-  return 0;
+  assert(p == NULL || p->buf[0] == 0);
+  assert(p == NULL || p->buf[1] == buf_1);
 }

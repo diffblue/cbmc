@@ -1,0 +1,11 @@
+CORE
+main.c
+
+'main' with signature .* found
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+Invariant check failed
+--
+This is just to check that CBMC doesn’t crash when we see a ‘main’ function
+with an unexpected signature, see https://github.com/diffblue/cbmc/issues/5415

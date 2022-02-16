@@ -214,7 +214,7 @@ void goto_convertt::remove_pre(
   typet constant_type;
 
   if(op_type.id() == ID_pointer)
-    constant_type = index_type();
+    constant_type = c_index_type();
   else if(is_number(op_type))
     constant_type = op_type;
   else
@@ -300,7 +300,7 @@ void goto_convertt::remove_post(
   typet constant_type;
 
   if(op_type.id() == ID_pointer)
-    constant_type = index_type();
+    constant_type = c_index_type();
   else if(is_number(op_type))
     constant_type = op_type;
   else
@@ -381,9 +381,9 @@ void goto_convertt::remove_function_call(
     symbol_table);
 
   {
-    code_declt decl(new_symbol.symbol_expr());
+    code_frontend_declt decl(new_symbol.symbol_expr());
     decl.add_source_location()=new_symbol.location;
-    convert_decl(decl, dest, mode);
+    convert_frontend_decl(decl, dest, mode);
   }
 
   {
@@ -421,9 +421,9 @@ void goto_convertt::remove_cpp_new(
     ID_cpp,
     symbol_table);
 
-  code_declt decl(new_symbol.symbol_expr());
+  code_frontend_declt decl(new_symbol.symbol_expr());
   decl.add_source_location()=new_symbol.location;
-  convert_decl(decl, dest, ID_cpp);
+  convert_frontend_decl(decl, dest, ID_cpp);
 
   const code_assignt call(new_symbol.symbol_expr(), expr);
 
@@ -467,9 +467,9 @@ void goto_convertt::remove_malloc(
       mode,
       symbol_table);
 
-    code_declt decl(new_symbol.symbol_expr());
+    code_frontend_declt decl(new_symbol.symbol_expr());
     decl.add_source_location()=new_symbol.location;
-    convert_decl(decl, dest, mode);
+    convert_frontend_decl(decl, dest, mode);
 
     code_assignt call(new_symbol.symbol_expr(), expr);
     call.add_source_location()=expr.source_location();
@@ -655,7 +655,7 @@ void goto_convertt::remove_overflow(
   optionalt<typet> result_type;
   if(result.type().id() == ID_pointer)
   {
-    result_type = to_pointer_type(result.type()).subtype();
+    result_type = to_pointer_type(result.type()).base_type();
     code_assignt result_assignment{dereference_exprt{result},
                                    typecast_exprt{operation, *result_type},
                                    expr.source_location()};

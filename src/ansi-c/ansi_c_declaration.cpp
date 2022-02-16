@@ -141,9 +141,9 @@ void ansi_c_declarationt::to_symbol(
   symbol.is_weak=get_is_weak();
 
   // is it a function?
-  const typet &type = symbol.type.id() == ID_merged_type
-                        ? to_merged_type(symbol.type).last_type()
-                        : symbol.type;
+  typet &type = symbol.type.id() == ID_merged_type
+                  ? to_merged_type(symbol.type).last_type()
+                  : symbol.type;
 
   if(type.id() == ID_code && !symbol.is_type)
   {
@@ -153,7 +153,7 @@ void ansi_c_declarationt::to_symbol(
     symbol.is_file_local=get_is_static();
 
     if(get_is_inline())
-      to_code_type(symbol.type).set_inlined(true);
+      to_code_type(type).set_inlined(true);
 
     if(
       config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||

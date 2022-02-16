@@ -85,16 +85,17 @@ protected:
     const std::string &comment,
     const irep_idt &function_id) const
   {
-    t->source_location.set_comment(comment);
-    t->source_location.set(ID_coverage_criterion, coverage_criterion);
-    t->source_location.set_property_class(property_class);
-    t->source_location.set_function(function_id);
+    t->source_location_nonconst().set_comment(comment);
+    t->source_location_nonconst().set(
+      ID_coverage_criterion, coverage_criterion);
+    t->source_location_nonconst().set_property_class(property_class);
+    t->source_location_nonconst().set_function(function_id);
   }
 
   bool is_non_cover_assertion(goto_programt::const_targett t) const
   {
     return t->is_assert() &&
-           t->source_location.get_property_class() != property_class;
+           t->source_location().get_property_class() != property_class;
   }
 };
 

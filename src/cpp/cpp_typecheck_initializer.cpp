@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
@@ -98,7 +100,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         if(parameter.get_this())
         {
           fargs.has_object = true;
-          new_object.type() = parameter.type().subtype();
+          new_object.type() = to_pointer_type(parameter.type()).base_type();
         }
 
         fargs.operands.push_back(new_object);
@@ -110,7 +112,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         cpp_typecheck_resolvet::wantt::BOTH,
         fargs);
 
-      assert(symbol.type.subtype() == resolved_expr.type());
+      DATA_INVARIANT(
+        to_pointer_type(symbol.type).base_type() == resolved_expr.type(),
+        "symbol type must match");
 
       if(resolved_expr.id()==ID_symbol)
       {
@@ -225,8 +229,9 @@ void cpp_typecheckt::zero_initializer(
       zero_initializer(member, component.type(), source_location, ops);
     }
   }
-  else if(final_type.id()==ID_array &&
-          !cpp_is_pod(final_type.subtype()))
+  else if(
+    final_type.id() == ID_array &&
+    !cpp_is_pod(to_array_type(final_type).element_type()))
   {
     const array_typet &array_type=to_array_type(type);
     const exprt &size_expr=array_type.size();
@@ -242,8 +247,8 @@ void cpp_typecheckt::zero_initializer(
     for(mp_integer i=0; i<size; ++i)
     {
       index_exprt index(
-        object, from_integer(i, index_type()), array_type.subtype());
-      zero_initializer(index, array_type.subtype(), source_location, ops);
+        object, from_integer(i, c_index_type()), array_type.element_type());
+      zero_initializer(index, array_type.element_type(), source_location, ops);
     }
   }
   else if(final_type.id()==ID_union)
@@ -296,13 +301,14 @@ void cpp_typecheckt::zero_initializer(
   else if(final_type.id()==ID_c_enum)
   {
     const unsignedbv_typet enum_type(
-      to_bitvector_type(final_type.subtype()).get_width());
+      to_bitvector_type(to_c_enum_type(final_type).underlying_type())
+        .get_width());
 
     exprt zero =
       typecast_exprt::conditional_cast(from_integer(0, enum_type), type);
     already_typechecked_exprt::make_already_typechecked(zero);
 
-    code_assignt assign;
+    code_frontend_assignt assign;
     assign.lhs()=object;
     assign.rhs()=zero;
     assign.add_source_location()=source_location;
@@ -325,7 +331,7 @@ void cpp_typecheckt::zero_initializer(
       throw 0;
     }
 
-    code_assignt assign(object, *value);
+    code_frontend_assignt assign(object, *value);
     assign.add_source_location()=source_location;
 
     typecheck_expr(assign.lhs());

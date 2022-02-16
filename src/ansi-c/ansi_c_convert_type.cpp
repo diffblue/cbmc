@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/std_code.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
@@ -44,15 +45,20 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_volatile=true;
   else if(type.id()==ID_asm)
   {
-    if(type.has_subtype() &&
-       type.subtype().id()==ID_string_constant)
-      c_storage_spec.asm_label = to_string_constant(type.subtype()).get_value();
+    // These can have up to 5 subtypes; we only use the first one.
+    const auto &type_with_subtypes = to_type_with_subtypes(type);
+    if(
+      !type_with_subtypes.subtypes().empty() &&
+      type_with_subtypes.subtypes()[0].id() == ID_string_constant)
+      c_storage_spec.asm_label =
+        to_string_constant(type_with_subtypes.subtypes()[0]).get_value();
   }
-  else if(type.id()==ID_section &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_section && type.has_subtype() &&
+    to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
-    c_storage_spec.section = to_string_constant(type.subtype()).get_value();
+    c_storage_spec.section =
+      to_string_constant(to_type_with_subtype(type).subtype()).get_value();
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
@@ -64,7 +70,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     // this gets turned into the qualifier, uh
     c_qualifiers.is_atomic=true;
-    read_rec(type.subtype());
+    read_rec(to_type_with_subtype(type).subtype());
   }
   else if(type.id()==ID_char)
     char_cnt++;
@@ -186,8 +192,11 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     c_qualifiers.is_transparent_union=true;
   }
-  else if(type.id()==ID_vector)
-    vector_size=to_vector_type(type).size();
+  else if(type.id() == ID_frontend_vector)
+  {
+    // note that this is not yet a vector_typet -- this is a size only
+    vector_size = static_cast<const constant_exprt &>(type.find(ID_size));
+  }
   else if(type.id()==ID_void)
   {
     // we store 'void' as 'empty'
@@ -220,18 +229,20 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     constructor=true;
   else if(type.id()==ID_destructor)
     destructor=true;
-  else if(type.id()==ID_alias &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_alias && type.has_subtype() &&
+    to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
-    c_storage_spec.alias = to_string_constant(type.subtype()).get_value();
+    c_storage_spec.alias =
+      to_string_constant(to_type_with_subtype(type).subtype()).get_value();
   }
   else if(type.id()==ID_frontend_pointer)
   {
     // We turn ID_frontend_pointer to ID_pointer
     // Pointers have a width, much like integers,
     // which is added here.
-    pointer_typet tmp(type.subtype(), config.ansi_c.pointer_width);
+    pointer_typet tmp(
+      to_type_with_subtype(type).subtype(), config.ansi_c.pointer_width);
     tmp.add_source_location()=type.source_location();
     const irep_idt typedef_identifier=type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
@@ -253,25 +264,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
 
-    for(const exprt &operand : to_unary_expr(as_expr).op().operands())
-    {
-      if(
-        operand.id() != ID_symbol && operand.id() != ID_ptrmember &&
-        operand.id() != ID_member && operand.id() != ID_dereference)
-      {
-        error().source_location = source_location;
-        error() << "illegal target in assigns clause" << eom;
-        throw 0;
-      }
-    }
-
-    if(assigns.is_nil())
-      assigns = to_unary_expr(as_expr).op();
-    else
-    {
-      for(auto &assignment : to_unary_expr(as_expr).op().operands())
-        assigns.add_to_operands(std::move(assignment));
-    }
+    for(const exprt &target : to_unary_expr(as_expr).op().operands())
+      assigns.push_back(target);
   }
   else if(type.id() == ID_C_spec_ensures)
   {
@@ -328,7 +322,7 @@ void ansi_c_convert_typet::write(typet &type)
     if(!requires.empty())
       to_code_with_contract_type(type).requires() = std::move(requires);
 
-    if(assigns.is_not_nil())
+    if(!assigns.empty())
       to_code_with_contract_type(type).assigns() = std::move(assigns);
 
     if(!ensures.empty())

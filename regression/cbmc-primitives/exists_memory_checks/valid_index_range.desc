@@ -1,0 +1,17 @@
+CORE
+valid_index_range.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+\[main\.assertion\.1\] line 9 assertion __CPROVER_exists \{ int i; \(0 <= i && i < 10\) && a\[i\] == i \*i \}: SUCCESS
+\[main\.pointer_dereference\.7\] line 9 dereference failure: pointer NULL in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.8\] line 9 dereference failure: pointer invalid in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.9\] line 9 dereference failure: deallocated dynamic object in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.10\] line 9 dereference failure: dead object in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.11\] line 9 dereference failure: pointer outside object bounds in a\[\(signed (long|long long) int\)i\]: SUCCESS
+\[main\.pointer_dereference\.12\] line 9 dereference failure: invalid integer address in a\[\(signed (long|long long) int\)i\]: SUCCESS
+--
+--
+Check that memory checks pass for valid pointer dereferences inside an
+existential qualifier.

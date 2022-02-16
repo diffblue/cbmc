@@ -217,7 +217,7 @@ void local_may_aliast::get_rec(
       if(index_expr.array().id()==ID_symbol)
       {
         index_exprt tmp1=index_expr;
-        tmp1.index()=from_integer(0, index_type());
+        tmp1.index() = from_integer(0, c_index_type());
         address_of_exprt tmp2(tmp1);
         unsigned object_nr=objects.number(tmp2);
         dest.insert(object_nr);
@@ -229,7 +229,7 @@ void local_may_aliast::get_rec(
       else if(index_expr.array().id()==ID_string_constant)
       {
         index_exprt tmp1=index_expr;
-        tmp1.index()=from_integer(0, index_type());
+        tmp1.index() = from_integer(0, c_index_type());
         address_of_exprt tmp2(tmp1);
         unsigned object_nr=objects.number(tmp2);
         dest.insert(object_nr);
@@ -371,13 +371,15 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     const loc_infot &loc_info_src=loc_infos[loc_nr];
     loc_infot loc_info_dest=loc_infos[loc_nr];
 
-    switch(instruction.type)
+    switch(instruction.type())
     {
     case ASSIGN:
     {
-      const code_assignt &code_assign = instruction.get_assign();
       assign_lhs(
-        code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
+        instruction.assign_lhs(),
+        instruction.assign_rhs(),
+        loc_info_src,
+        loc_info_dest);
       break;
     }
 
@@ -469,7 +471,7 @@ void local_may_aliast::output(
 
   for(const auto &instruction : goto_function.body.instructions)
   {
-    out << "**** " << instruction.source_location << "\n";
+    out << "**** " << instruction.source_location() << "\n";
 
     const loc_infot &loc_info=loc_infos[l];
 

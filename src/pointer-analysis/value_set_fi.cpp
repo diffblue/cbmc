@@ -13,8 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
@@ -23,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <langapi/language_util.h>
-#include <util/c_types.h>
 
 const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank{};
 
@@ -227,7 +229,7 @@ exprt value_set_fit::to_expr(const object_map_dt::value_type &it) const
   od.object()=object;
 
   if(it.second)
-    od.offset() = from_integer(*it.second, index_type());
+    od.offset() = from_integer(*it.second, c_index_type());
 
   od.type()=od.object().type();
 
@@ -866,7 +868,7 @@ void value_set_fit::get_reference_set_sharing_rec(
       else
       {
         index_exprt index_expr(
-          object, from_integer(0, index_type()), expr.type());
+          object, from_integer(0, c_index_type()), expr.type());
 
         exprt casted_index;
 
@@ -1043,7 +1045,7 @@ void value_set_fit::assign(
   else if(type.id()==ID_array)
   {
     const index_exprt lhs_index(
-      lhs, exprt(ID_unknown, index_type()), type.subtype());
+      lhs, exprt(ID_unknown, c_index_type()), type.subtype());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
@@ -1077,7 +1079,7 @@ void value_set_fit::assign(
       {
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
-          exprt(ID_unknown, index_type()),
+          exprt(ID_unknown, c_index_type()),
           type.subtype());
 
         assign(lhs_index, op0_index, ns);
@@ -1086,7 +1088,7 @@ void value_set_fit::assign(
       else
       {
         const index_exprt rhs_index(
-          rhs, exprt(ID_unknown, index_type()), type.subtype());
+          rhs, exprt(ID_unknown, c_index_type()), type.subtype());
         assign(lhs_index, rhs_index, ns);
       }
     }
@@ -1377,12 +1379,9 @@ void value_set_fit::apply_code(const codet &code, const namespacet &ns)
   {
     const code_returnt &code_return = to_code_return(code);
     // this is turned into an assignment
-    if(code_return.has_return_value())
-    {
-      std::string rvs="value_set::return_value"+std::to_string(from_function);
-      symbol_exprt lhs(rvs, code_return.return_value().type());
-      assign(lhs, code_return.return_value(), ns);
-    }
+    std::string rvs = "value_set::return_value" + std::to_string(from_function);
+    symbol_exprt lhs(rvs, code_return.return_value().type());
+    assign(lhs, code_return.return_value(), ns);
   }
   else if(statement==ID_fence)
   {

@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
+#include <util/std_code.h>
 #include <util/string_container.h>
 
 #include <langapi/language_util.h>
@@ -131,12 +132,11 @@ bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
   else if(ty.id()==ID_array)
   {
     const auto &at=to_array_type(ty);
-    mp_vectort array_size_vec;
-    evaluate(at.size(), array_size_vec);
+    mp_vectort array_size_vec = evaluate(at.size());
     if(array_size_vec.size()!=1)
       return true;
     mp_integer subtype_count;
-    if(count_type_leaves(at.subtype(), subtype_count))
+    if(count_type_leaves(at.element_type(), subtype_count))
       return true;
     result=array_size_vec[0]*subtype_count;
     return false;
@@ -199,19 +199,18 @@ bool interpretert::byte_offset_to_memory_offset(
   {
     const auto &at=to_array_type(source_type);
 
-    mp_vectort array_size_vec;
-    evaluate(at.size(), array_size_vec);
+    mp_vectort array_size_vec = evaluate(at.size());
 
     if(array_size_vec.size()!=1)
       return true;
 
     mp_integer array_size=array_size_vec[0];
-    auto elem_size_bytes = pointer_offset_size(at.subtype(), ns);
+    auto elem_size_bytes = pointer_offset_size(at.element_type(), ns);
     if(!elem_size_bytes.has_value() || *elem_size_bytes == 0)
       return true;
 
     mp_integer elem_size_leaves;
-    if(count_type_leaves(at.subtype(), elem_size_leaves))
+    if(count_type_leaves(at.element_type(), elem_size_leaves))
       return true;
 
     mp_integer this_idx = offset / (*elem_size_bytes);
@@ -220,7 +219,7 @@ bool interpretert::byte_offset_to_memory_offset(
 
     mp_integer subtype_result;
     bool ret = byte_offset_to_memory_offset(
-      at.subtype(), offset % (*elem_size_bytes), subtype_result);
+      at.element_type(), offset % (*elem_size_bytes), subtype_result);
 
     result=subtype_result+(elem_size_leaves*this_idx);
     return ret;
@@ -277,17 +276,16 @@ bool interpretert::memory_offset_to_byte_offset(
   {
     const auto &at=to_array_type(source_type);
 
-    mp_vectort array_size_vec;
-    evaluate(at.size(), array_size_vec);
+    mp_vectort array_size_vec = evaluate(at.size());
     if(array_size_vec.size()!=1)
       return true;
 
-    auto elem_size = pointer_offset_size(at.subtype(), ns);
+    auto elem_size = pointer_offset_size(at.element_type(), ns);
     if(!elem_size.has_value())
       return true;
 
     mp_integer elem_count;
-    if(count_type_leaves(at.subtype(), elem_count))
+    if(count_type_leaves(at.element_type(), elem_count))
       return true;
 
     mp_integer this_idx=full_cell_offset/elem_count;
@@ -295,11 +293,8 @@ bool interpretert::memory_offset_to_byte_offset(
       return true;
 
     mp_integer subtype_result;
-    bool ret=
-      memory_offset_to_byte_offset(
-        at.subtype(),
-        full_cell_offset%elem_count,
-        subtype_result);
+    bool ret = memory_offset_to_byte_offset(
+      at.element_type(), full_cell_offset % elem_count, subtype_result);
     result = subtype_result + ((*elem_size) * this_idx);
     return ret;
   }
@@ -313,15 +308,14 @@ bool interpretert::memory_offset_to_byte_offset(
 
 /// Evaluate an expression
 /// \param expr: expression to evaluate
-/// \param [out] dest: vector in which the result of the evaluation is stored
-void interpretert::evaluate(
-  const exprt &expr,
-  mp_vectort &dest)
+/// \return vector in which the result of the evaluation is stored
+interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 {
   if(expr.id()==ID_constant)
   {
     if(expr.type().id()==ID_struct)
     {
+      mp_vectort dest;
       dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
       bool error=false;
 
@@ -334,8 +328,7 @@ void interpretert::evaluate(
         if(sub_size==0)
           continue;
 
-        mp_vectort tmp;
-        evaluate(*it, tmp);
+        mp_vectort tmp = evaluate(*it);
 
         if(tmp.size()==sub_size)
         {
@@ -347,7 +340,7 @@ void interpretert::evaluate(
       }
 
       if(!error)
-        return;
+        return dest;
 
       dest.clear();
     }
@@ -357,52 +350,39 @@ void interpretert::evaluate(
       {
         const exprt &object = skip_typecast(to_unary_expr(expr).op());
         if(object.id() == ID_address_of)
-        {
-          evaluate(object, dest);
-          return;
-        }
+          return evaluate(object);
         else if(const auto i = numeric_cast<mp_integer>(object))
-        {
-          dest.push_back(*i);
-          return;
-        }
+          return {*i};
       }
       // check if expression is constant null pointer without operands
       else
       {
         const auto i = numeric_cast<mp_integer>(expr);
         if(i && i->is_zero())
-        {
-          dest.push_back(*i);
-          return;
-        }
+          return {*i};
       }
     }
     else if(expr.type().id()==ID_floatbv)
     {
       ieee_floatt f;
       f.from_expr(to_constant_expr(expr));
-      dest.push_back(f.pack());
-      return;
+      return {f.pack()};
     }
     else if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
       f.from_expr(to_constant_expr(expr));
-      dest.push_back(f.get_value());
-      return;
+      return {f.get_value()};
     }
     else if(expr.type().id()==ID_c_bool)
     {
       const irep_idt &value=to_constant_expr(expr).get_value();
       const auto width = to_c_bool_type(expr.type()).get_width();
-      dest.push_back(bvrep2integer(value, width, false));
-      return;
+      return {bvrep2integer(value, width, false)};
     }
     else if(expr.type().id()==ID_bool)
     {
-      dest.push_back(expr.is_true());
-      return;
+      return {expr.is_true()};
     }
     else if(expr.type().id()==ID_string)
     {
@@ -410,20 +390,18 @@ void interpretert::evaluate(
       if(show)
         output.warning() << "string decoding not fully implemented "
                          << value.size() + 1 << messaget::eom;
-      dest.push_back(get_string_container()[value]);
-      return;
+      return {get_string_container()[value]};
     }
     else
     {
       if(const auto i = numeric_cast<mp_integer>(expr))
-      {
-        dest.push_back(*i);
-        return;
-      }
+        return {*i};
     }
   }
   else if(expr.id()==ID_struct)
   {
+    mp_vectort dest;
+
     if(!unbounded_size(expr.type()))
       dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
 
@@ -438,8 +416,7 @@ void interpretert::evaluate(
       if(sub_size==0)
         continue;
 
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
 
       if(unbounded_size(it->type()) || tmp.size()==sub_size)
       {
@@ -451,7 +428,7 @@ void interpretert::evaluate(
     }
 
     if(!error)
-      return;
+      return dest;
 
     dest.clear();
   }
@@ -462,23 +439,23 @@ void interpretert::evaluate(
     {
       if(show)
         output.error() << "nondet not implemented" << messaget::eom;
-      return;
+      return {};
     }
     else if(side_effect.get_statement()==ID_allocate)
     {
       if(show)
         output.error() << "heap memory allocation not fully implemented "
-                       << expr.type().subtype().pretty() << messaget::eom;
+                       << to_pointer_type(expr.type()).base_type().pretty()
+                       << messaget::eom;
       std::stringstream buffer;
       num_dynamic_objects++;
       buffer << "interpreter::dynamic_object" << num_dynamic_objects;
       irep_idt id(buffer.str().c_str());
-      mp_integer address =
-        build_memory_map(symbol_exprt{id, expr.type().subtype()});
+      mp_integer address = build_memory_map(
+        symbol_exprt{id, to_pointer_type(expr.type()).base_type()});
       // TODO: check array of type
       // TODO: interpret zero-initialization argument
-      dest.push_back(address);
-      return;
+      return {address};
     }
     if(show)
       output.error() << "side effect not implemented "
@@ -492,13 +469,11 @@ void interpretert::evaluate(
     mp_integer final=0;
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
       if(tmp.size()==1)
         final=bitwise_or(final, tmp.front());
     }
-    dest.push_back(final);
-    return;
+    return {final};
   }
   else if(expr.id()==ID_bitand)
   {
@@ -508,13 +483,12 @@ void interpretert::evaluate(
     mp_integer final=-1;
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
       if(tmp.size()==1)
         final=bitwise_and(final, tmp.front());
     }
-    dest.push_back(final);
-    return;
+
+    return {final};
   }
   else if(expr.id()==ID_bitxor)
   {
@@ -524,100 +498,88 @@ void interpretert::evaluate(
     mp_integer final=0;
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
       if(tmp.size()==1)
         final=bitwise_xor(final, tmp.front());
     }
-    dest.push_back(final);
-    return;
+
+    return {final};
   }
   else if(expr.id()==ID_bitnot)
   {
-    mp_vectort tmp;
-    evaluate(to_bitnot_expr(expr).op(), tmp);
+    mp_vectort tmp = evaluate(to_bitnot_expr(expr).op());
     if(tmp.size()==1)
     {
       const auto width =
         to_bitvector_type(to_bitnot_expr(expr).op().type()).get_width();
       const mp_integer mask = power(2, width) - 1;
-      dest.push_back(bitwise_xor(tmp.front(), mask));
-      return;
+
+      return {bitwise_xor(tmp.front(), mask)};
     }
   }
   else if(expr.id()==ID_shl)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_shl_expr(expr).op0(), tmp0);
-    evaluate(to_shl_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_shl_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_shl_expr(expr).op1());
     if(tmp0.size()==1 && tmp1.size()==1)
     {
       mp_integer final = arith_left_shift(
         tmp0.front(),
         tmp1.front(),
         to_bitvector_type(to_shl_expr(expr).op0().type()).get_width());
-      dest.push_back(final);
-      return;
+      return {final};
     }
   }
   else if(expr.id() == ID_shr || expr.id() == ID_lshr)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_shift_expr(expr).op0(), tmp0);
-    evaluate(to_shift_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_shift_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_shift_expr(expr).op1());
     if(tmp0.size()==1 && tmp1.size()==1)
     {
       mp_integer final = logic_right_shift(
         tmp0.front(),
         tmp1.front(),
         to_bitvector_type(to_shift_expr(expr).op0().type()).get_width());
-      dest.push_back(final);
-      return;
+      return {final};
     }
   }
   else if(expr.id()==ID_ashr)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_shift_expr(expr).op0(), tmp0);
-    evaluate(to_shift_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_shift_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_shift_expr(expr).op1());
     if(tmp0.size()==1 && tmp1.size()==1)
     {
       mp_integer final = arith_right_shift(
         tmp0.front(),
         tmp1.front(),
         to_bitvector_type(to_shift_expr(expr).op0().type()).get_width());
-      dest.push_back(final);
-      return;
+      return {final};
     }
   }
   else if(expr.id()==ID_ror)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_binary_expr(expr).op0(), tmp0);
-    evaluate(to_binary_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_binary_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_binary_expr(expr).op1());
     if(tmp0.size()==1 && tmp1.size()==1)
     {
       mp_integer final = rotate_right(
         tmp0.front(),
         tmp1.front(),
         to_bitvector_type(to_binary_expr(expr).op0().type()).get_width());
-      dest.push_back(final);
-      return;
+      return {final};
     }
   }
   else if(expr.id()==ID_rol)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_binary_expr(expr).op0(), tmp0);
-    evaluate(to_binary_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_binary_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_binary_expr(expr).op1());
     if(tmp0.size()==1 && tmp1.size()==1)
     {
       mp_integer final = rotate_left(
         tmp0.front(),
         tmp1.front(),
         to_bitvector_type(to_binary_expr(expr).op0().type()).get_width());
-      dest.push_back(final);
-      return;
+      return {final};
     }
   }
   else if(expr.id()==ID_equal ||
@@ -627,9 +589,8 @@ void interpretert::evaluate(
           expr.id()==ID_lt ||
           expr.id()==ID_gt)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_binary_expr(expr).op0(), tmp0);
-    evaluate(to_binary_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_binary_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_binary_expr(expr).op1());
 
     if(tmp0.size()==1 && tmp1.size()==1)
     {
@@ -637,20 +598,20 @@ void interpretert::evaluate(
       const mp_integer &op1=tmp1.front();
 
       if(expr.id()==ID_equal)
-        dest.push_back(op0==op1);
+        return {op0 == op1};
       else if(expr.id()==ID_notequal)
-        dest.push_back(op0!=op1);
+        return {op0 != op1};
       else if(expr.id()==ID_le)
-        dest.push_back(op0<=op1);
+        return {op0 <= op1};
       else if(expr.id()==ID_ge)
-        dest.push_back(op0>=op1);
+        return {op0 >= op1};
       else if(expr.id()==ID_lt)
-        dest.push_back(op0<op1);
+        return {op0 < op1};
       else if(expr.id()==ID_gt)
-        dest.push_back(op0>op1);
+        return {op0 > op1};
     }
 
-    return;
+    return {};
   }
   else if(expr.id()==ID_or)
   {
@@ -661,8 +622,7 @@ void interpretert::evaluate(
 
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
 
       if(tmp.size()==1 && tmp.front()!=0)
       {
@@ -671,29 +631,27 @@ void interpretert::evaluate(
       }
     }
 
-    dest.push_back(result);
-
-    return;
+    return {result};
   }
   else if(expr.id()==ID_if)
   {
     const auto &if_expr = to_if_expr(expr);
 
-    mp_vectort tmp0, tmp1;
-    evaluate(if_expr.cond(), tmp0);
+    mp_vectort tmp0 = evaluate(if_expr.cond());
+    mp_vectort tmp1;
 
     if(tmp0.size()==1)
     {
       if(tmp0.front()!=0)
-        evaluate(if_expr.true_case(), tmp1);
+        tmp1 = evaluate(if_expr.true_case());
       else
-        evaluate(if_expr.false_case(), tmp1);
+        tmp1 = evaluate(if_expr.false_case());
     }
 
     if(tmp1.size()==1)
-      dest.push_back(tmp1.front());
+      return {tmp1.front()};
 
-    return;
+    return {};
   }
   else if(expr.id()==ID_and)
   {
@@ -704,8 +662,7 @@ void interpretert::evaluate(
 
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
 
       if(tmp.size()==1 && tmp.front()==0)
       {
@@ -714,19 +671,16 @@ void interpretert::evaluate(
       }
     }
 
-    dest.push_back(result);
-
-    return;
+    return {result};
   }
   else if(expr.id()==ID_not)
   {
-    mp_vectort tmp;
-    evaluate(to_not_expr(expr).op(), tmp);
+    mp_vectort tmp = evaluate(to_not_expr(expr).op());
 
     if(tmp.size()==1)
-      dest.push_back(tmp.front()==0);
+      return {tmp.front() == 0};
 
-    return;
+    return {};
   }
   else if(expr.id()==ID_plus)
   {
@@ -734,14 +688,12 @@ void interpretert::evaluate(
 
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
       if(tmp.size()==1)
         result+=tmp.front();
     }
 
-    dest.push_back(result);
-    return;
+    return {result};
   }
   else if(expr.id()==ID_mult)
   {
@@ -766,8 +718,7 @@ void interpretert::evaluate(
 
     forall_operands(it, expr)
     {
-      mp_vectort tmp;
-      evaluate(*it, tmp);
+      mp_vectort tmp = evaluate(*it);
       if(tmp.size()==1)
       {
         if(expr.type().id()==ID_fixedbv)
@@ -794,42 +745,37 @@ void interpretert::evaluate(
       }
     }
 
-    dest.push_back(result);
-    return;
+    return {result};
   }
   else if(expr.id()==ID_minus)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_minus_expr(expr).op0(), tmp0);
-    evaluate(to_minus_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_minus_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_minus_expr(expr).op1());
 
     if(tmp0.size()==1 && tmp1.size()==1)
-      dest.push_back(tmp0.front()-tmp1.front());
-    return;
+      return {tmp0.front() - tmp1.front()};
+    return {};
   }
   else if(expr.id()==ID_div)
   {
-    mp_vectort tmp0, tmp1;
-    evaluate(to_div_expr(expr).op0(), tmp0);
-    evaluate(to_div_expr(expr).op1(), tmp1);
+    mp_vectort tmp0 = evaluate(to_div_expr(expr).op0());
+    mp_vectort tmp1 = evaluate(to_div_expr(expr).op1());
 
     if(tmp0.size()==1 && tmp1.size()==1)
-      dest.push_back(tmp0.front()/tmp1.front());
-    return;
+      return {tmp0.front() / tmp1.front()};
+    return {};
   }
   else if(expr.id()==ID_unary_minus)
   {
-    mp_vectort tmp0;
-    evaluate(to_unary_minus_expr(expr).op(), tmp0);
+    mp_vectort tmp0 = evaluate(to_unary_minus_expr(expr).op());
 
     if(tmp0.size()==1)
-      dest.push_back(-tmp0.front());
-    return;
+      return {-tmp0.front()};
+    return {};
   }
   else if(expr.id()==ID_address_of)
   {
-    dest.push_back(evaluate_address(to_address_of_expr(expr).op()));
-    return;
+    return {evaluate_address(to_address_of_expr(expr).op())};
   }
   else if(expr.id()==ID_pointer_offset)
   {
@@ -839,8 +785,7 @@ void interpretert::evaluate(
     if(to_unary_expr(expr).op().type().id() != ID_pointer)
       throw "pointer_offset expects a pointer operand";
 
-    mp_vectort result;
-    evaluate(to_unary_expr(expr).op(), result);
+    mp_vectort result = evaluate(to_unary_expr(expr).op());
 
     if(result.size()==1)
     {
@@ -854,10 +799,10 @@ void interpretert::evaluate(
         mp_integer offset=address_to_offset(address);
         mp_integer byte_offset;
         if(!memory_offset_to_byte_offset(obj_type, offset, byte_offset))
-          dest.push_back(byte_offset);
+          return {byte_offset};
       }
     }
-    return;
+    return {};
   }
   else if(
     expr.id() == ID_dereference || expr.id() == ID_index ||
@@ -877,8 +822,7 @@ void interpretert::evaluate(
       if(expr.id() == ID_index)
       {
         index_exprt evaluated_index = to_index_expr(expr);
-        mp_vectort idx;
-        evaluate(to_index_expr(expr).index(), idx);
+        mp_vectort idx = evaluate(to_index_expr(expr).index());
         if(idx.size() == 1)
         {
           evaluated_index.index() =
@@ -894,13 +838,11 @@ void interpretert::evaluate(
         // still left us with an unresolved index, member, etc.
         simplified = simplify_expr(expr, ns);
       }
+
       if(simplified.id() == expr.id())
         evaluate_address(expr); // Evaluate again to print error message.
       else
-      {
-        evaluate(simplified, dest);
-        return;
-      }
+        return evaluate(simplified);
     }
     else if(!address.is_zero())
     {
@@ -910,8 +852,7 @@ void interpretert::evaluate(
       {
         const auto &byte_extract_expr = to_byte_extract_expr(expr);
 
-        mp_vectort extract_from;
-        evaluate(byte_extract_expr.op(), extract_from);
+        mp_vectort extract_from = evaluate(byte_extract_expr.op());
         INVARIANT(
           !extract_from.empty(),
           "evaluate_address should have returned address == 0");
@@ -923,32 +864,34 @@ void interpretert::evaluate(
           !count_type_leaves(target_type, target_type_leaves) &&
           target_type_leaves > 0)
         {
+          mp_vectort dest;
           dest.insert(
             dest.end(),
             extract_from.begin() + numeric_cast_v<std::size_t>(memory_offset),
             extract_from.begin() +
               numeric_cast_v<std::size_t>(memory_offset + target_type_leaves));
-          return;
+          return dest;
         }
         // we fail
       }
       else if(!unbounded_size(expr.type()))
       {
+        mp_vectort dest;
         dest.resize(numeric_cast_v<std::size_t>(get_size(expr.type())));
         read(address, dest);
-        return;
+        return dest;
       }
       else
       {
+        mp_vectort dest;
         read_unbounded(address, dest);
-        return;
+        return dest;
       }
     }
   }
   else if(expr.id()==ID_typecast)
   {
-    mp_vectort tmp;
-    evaluate(to_typecast_expr(expr).op(), tmp);
+    mp_vectort tmp = evaluate(to_typecast_expr(expr).op());
 
     if(tmp.size()==1)
     {
@@ -956,69 +899,69 @@ void interpretert::evaluate(
 
       if(expr.type().id()==ID_pointer)
       {
-        dest.push_back(value);
-        return;
+        return {value};
       }
       else if(expr.type().id()==ID_signedbv)
       {
         const auto width = to_signedbv_type(expr.type()).get_width();
         const auto s = integer2bvrep(value, width);
-        dest.push_back(bvrep2integer(s, width, true));
-        return;
+        return {bvrep2integer(s, width, true)};
       }
       else if(expr.type().id()==ID_unsignedbv)
       {
         const auto width = to_unsignedbv_type(expr.type()).get_width();
         const auto s = integer2bvrep(value, width);
-        dest.push_back(bvrep2integer(s, width, false));
-        return;
+        return {bvrep2integer(s, width, false)};
       }
       else if((expr.type().id()==ID_bool) || (expr.type().id()==ID_c_bool))
-      {
-        dest.push_back(value!=0);
-        return;
-      }
+        return {value != 0};
     }
   }
   else if(expr.id()==ID_array)
   {
+    mp_vectort dest;
     forall_operands(it, expr)
     {
-      evaluate(*it, dest);
+      mp_vectort tmp = evaluate(*it);
+      dest.insert(dest.end(), tmp.begin(), tmp.end());
     }
-    return;
+    return dest;
   }
   else if(expr.id()==ID_array_of)
   {
     const auto &ty=to_array_type(expr.type());
-    std::vector<mp_integer> size;
+
+    mp_vectort size;
     if(ty.size().id()==ID_infinity)
       size.push_back(0);
     else
-      evaluate(ty.size(), size);
+      size = evaluate(ty.size());
 
     if(size.size()==1)
     {
       std::size_t size_int = numeric_cast_v<std::size_t>(size[0]);
+      mp_vectort tmp = evaluate(to_array_of_expr(expr).op());
+      mp_vectort dest;
       for(std::size_t i=0; i<size_int; ++i)
-        evaluate(to_array_of_expr(expr).op(), dest);
-      return;
+        dest.insert(dest.end(), tmp.begin(), tmp.end());
+      return dest;
     }
   }
   else if(expr.id()==ID_with)
   {
     const auto &wexpr=to_with_expr(expr);
-    evaluate(wexpr.old(), dest);
-    std::vector<mp_integer> where;
-    std::vector<mp_integer> new_value;
-    evaluate(wexpr.where(), where);
-    evaluate(wexpr.new_value(), new_value);
-    const auto &subtype=expr.type().subtype();
+
+    mp_vectort dest = evaluate(wexpr.old());
+    mp_vectort where = evaluate(wexpr.where());
+    mp_vectort new_value = evaluate(wexpr.new_value());
+
+    const auto &subtype = to_array_type(expr.type()).element_type();
+
     if(!new_value.empty() && where.size()==1 && !unbounded_size(subtype))
     {
       // Ignore indices < 0, which the string solver sometimes produces
       if(where[0]<0)
-        return;
+        return {};
 
       mp_integer where_idx=where[0];
       mp_integer subtype_size=get_size(subtype);
@@ -1031,26 +974,26 @@ void interpretert::evaluate(
         dest[numeric_cast_v<std::size_t>((where_idx * subtype_size) + i)] =
           new_value[i];
 
-      return;
+      return {};
     }
   }
   else if(expr.id()==ID_nil)
   {
-    dest.push_back(0);
-    return;
+    return {0};
   }
   else if(expr.id()==ID_infinity)
   {
     if(expr.type().id()==ID_signedbv)
     {
       output.warning() << "Infinite size arrays not supported" << messaget::eom;
-      return;
+      return {};
     }
   }
   output.error() << "!! failed to evaluate expression: "
                  << from_expr(ns, function->first, expr) << "\n"
                  << expr.id() << "[" << expr.type().id() << "]"
                  << messaget::eom;
+  return {};
 }
 
 mp_integer interpretert::evaluate_address(
@@ -1083,16 +1026,14 @@ mp_integer interpretert::evaluate_address(
   }
   else if(expr.id()==ID_dereference)
   {
-    mp_vectort tmp0;
-    evaluate(to_dereference_expr(expr).op(), tmp0);
+    mp_vectort tmp0 = evaluate(to_dereference_expr(expr).op());
 
     if(tmp0.size()==1)
       return tmp0.front();
   }
   else if(expr.id()==ID_index)
   {
-    mp_vectort tmp1;
-    evaluate(to_index_expr(expr).index(), tmp1);
+    mp_vectort tmp1 = evaluate(to_index_expr(expr).index());
 
     if(tmp1.size()==1)
     {
@@ -1127,10 +1068,8 @@ mp_integer interpretert::evaluate_address(
           expr.id()==ID_byte_extract_big_endian)
   {
     const auto &byte_extract_expr = to_byte_extract_expr(expr);
-    mp_vectort extract_offset;
-    evaluate(byte_extract_expr.op1(), extract_offset);
-    mp_vectort extract_from;
-    evaluate(byte_extract_expr.op0(), extract_from);
+    mp_vectort extract_offset = evaluate(byte_extract_expr.op1());
+    mp_vectort extract_from = evaluate(byte_extract_expr.op0());
     if(extract_offset.size()==1 && !extract_from.empty())
     {
       mp_integer memory_offset;
@@ -1142,15 +1081,14 @@ mp_integer interpretert::evaluate_address(
   }
   else if(expr.id()==ID_if)
   {
-    mp_vectort result;
     const auto &if_expr = to_if_expr(expr);
     if_exprt address_cond(
       if_expr.cond(),
       address_of_exprt(if_expr.true_case()),
       address_of_exprt(if_expr.false_case()));
-    evaluate(address_cond, result);
+    mp_vectort result = evaluate(address_cond);
     if(result.size()==1)
-      return result[0];
+      return {result[0]};
   }
   else if(expr.id()==ID_typecast)
   {

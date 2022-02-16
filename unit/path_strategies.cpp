@@ -24,6 +24,8 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <goto-symex/path_storage.h>
 
+#include <goto-instrument/unwindset.h>
+
 #include <langapi/mode.h>
 
 #include <util/cmdline.h>
@@ -335,8 +337,8 @@ void symex_eventt::validate_resume(
   REQUIRE(!events.empty());
 
   int dst = 0;
-  if(!state.saved_target->source_location.get_line().empty())
-    dst = std::stoi(state.saved_target->source_location.get_line().c_str());
+  if(!state.saved_target->source_location().get_line().empty())
+    dst = std::stoi(state.saved_target->source_location().get_line().c_str());
 
   if(state.has_saved_next_instruction)
   {
@@ -408,6 +410,7 @@ void _check_with_strategy(
   propertiest properties(initialize_properties(goto_model));
   std::unique_ptr<path_storaget> worklist = get_path_strategy(strategy);
   guard_managert guard_manager;
+  unwindsett unwindset{goto_model};
 
   {
     // Put initial state into the work list
@@ -418,7 +421,8 @@ void _check_with_strategy(
       equation,
       options,
       *worklist,
-      guard_manager);
+      guard_manager,
+      unwindset);
     setup_symex(symex, ns, options, ui_message_handler);
 
     symex.initialize_path_storage_from_entry_point_of(
@@ -438,7 +442,8 @@ void _check_with_strategy(
       resume.equation,
       options,
       *worklist,
-      guard_manager);
+      guard_manager,
+      unwindset);
     setup_symex(symex, ns, options, ui_message_handler);
 
     symex.resume_symex_from_saved_state(

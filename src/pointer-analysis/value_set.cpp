@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #ifdef DEBUG
@@ -226,7 +227,7 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
   od.object()=object;
 
   if(it.second)
-    od.offset() = from_integer(*it.second, index_type());
+    od.offset() = from_integer(*it.second, c_index_type());
 
   od.type()=od.object().type();
 
@@ -504,6 +505,25 @@ void value_sett::get_value_set_rec(
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
+  else if(expr.id() == ID_nondet_symbol)
+  {
+    if(expr.type().id() == ID_pointer)
+    {
+      // we'll take the union of all objects we see, with unspecified offsets
+      values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
+        for(const auto &object : value.object_map.read())
+          insert(dest, object.first, offsett());
+      });
+
+      // we'll add null, in case it's not there yet
+      insert(
+        dest,
+        exprt(ID_null_object, to_pointer_type(expr_type).base_type()),
+        offsett());
+    }
+    else
+      insert(dest, exprt(ID_unknown, original_type));
+  }
   else if(expr.id()==ID_if)
   {
     get_value_set_rec(
@@ -543,7 +563,8 @@ void value_sett::get_value_set_rec(
     if(expr.get(ID_value)==ID_NULL &&
        expr_type.id()==ID_pointer)
     {
-      insert(dest, exprt(ID_null_object, expr_type.subtype()), 0);
+      insert(
+        dest, exprt(ID_null_object, to_pointer_type(expr_type).base_type()), 0);
     }
     else if(expr_type.id()==ID_unsignedbv ||
             expr_type.id()==ID_signedbv)
@@ -613,30 +634,45 @@ void value_sett::get_value_set_rec(
     object_mapt pointer_expr_set;
     optionalt<mp_integer> i;
 
-    // special case for pointer+integer
-
+    // special case for plus/minus and exactly one pointer
+    optionalt<exprt> ptr_operand;
     if(
-      expr.operands().size() == 2 && expr_type.id() == ID_pointer &&
+      expr_type.id() == ID_pointer &&
       (expr.id() == ID_plus || expr.id() == ID_minus))
     {
-      exprt ptr_operand;
+      bool non_const_offset = false;
+      for(const auto &op : expr.operands())
+      {
+        if(op.type().id() == ID_pointer)
+        {
+          if(ptr_operand.has_value())
+          {
+            ptr_operand.reset();
+            break;
+          }
 
-      if(
-        to_binary_expr(expr).op0().type().id() != ID_pointer &&
-        to_binary_expr(expr).op0().is_constant())
-      {
-        i = numeric_cast<mp_integer>(to_binary_expr(expr).op0());
-        ptr_operand = to_binary_expr(expr).op1();
-      }
-      else
-      {
-        i = numeric_cast<mp_integer>(to_binary_expr(expr).op1());
-        ptr_operand = to_binary_expr(expr).op0();
+          ptr_operand = op;
+        }
+        else if(!non_const_offset)
+        {
+          auto offset = numeric_cast<mp_integer>(op);
+          if(!offset.has_value())
+          {
+            i.reset();
+            non_const_offset = true;
+          }
+          else
+          {
+            if(!i.has_value())
+              i = mp_integer{0};
+            i = *i + *offset;
+          }
+        }
       }
 
-      if(i.has_value())
+      if(ptr_operand.has_value() && i.has_value())
       {
-        typet pointer_sub_type=ptr_operand.type().subtype();
+        typet pointer_sub_type = ptr_operand->type().subtype();
         if(pointer_sub_type.id()==ID_empty)
           pointer_sub_type=char_type();
 
@@ -651,12 +687,20 @@ void value_sett::get_value_set_rec(
           *i *= *size;
 
           if(expr.id()==ID_minus)
+          {
+            DATA_INVARIANT(
+              to_minus_expr(expr).lhs() == *ptr_operand,
+              "unexpected subtraction of pointer from integer");
             i->negate();
+          }
         }
       }
+    }
 
+    if(ptr_operand.has_value())
+    {
       get_value_set_rec(
-        ptr_operand, pointer_expr_set, "", ptr_operand.type(), ns);
+        *ptr_operand, pointer_expr_set, "", ptr_operand->type(), ns);
     }
     else
     {
@@ -742,7 +786,8 @@ void value_sett::get_value_set_rec(
       PRECONDITION(suffix.empty());
       assert(expr_type.id()==ID_pointer);
 
-      dynamic_object_exprt dynamic_object(expr_type.subtype());
+      dynamic_object_exprt dynamic_object(
+        to_pointer_type(expr_type).base_type());
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
@@ -983,7 +1028,6 @@ void value_sett::get_value_set_rec(
   }
   else
   {
-    // for example: expr.id() == ID_nondet_symbol
     insert(dest, exprt(ID_unknown, original_type));
   }
 
@@ -1043,8 +1087,9 @@ void value_sett::get_reference_set_rec(
      expr.id()==ID_string_constant ||
      expr.id()==ID_array)
   {
-    if(expr.type().id()==ID_array &&
-       expr.type().subtype().id()==ID_array)
+    if(
+      expr.type().id() == ID_array &&
+      to_array_type(expr.type()).element_type().id() == ID_array)
       insert(dest, expr);
     else
       insert(dest, expr, 0);
@@ -1075,10 +1120,11 @@ void value_sett::get_reference_set_rec(
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &offset=index_expr.index();
-    const typet &array_type = array.type();
 
     DATA_INVARIANT(
-      array_type.id() == ID_array, "index takes array-typed operand");
+      array.type().id() == ID_array, "index takes array-typed operand");
+
+    const auto &array_type = to_array_type(array.type());
 
     object_mapt array_references;
     get_reference_set(array, array_references, ns);
@@ -1098,7 +1144,7 @@ void value_sett::get_reference_set_rec(
       {
         const index_exprt deref_index_expr(
           typecast_exprt::conditional_cast(object, array_type),
-          from_integer(0, index_type()));
+          from_integer(0, c_index_type()));
 
         offsett o = a_it->second;
         const auto i = numeric_cast<mp_integer>(offset);
@@ -1108,7 +1154,7 @@ void value_sett::get_reference_set_rec(
         }
         else if(i.has_value() && o)
         {
-          auto size = pointer_offset_size(array_type.subtype(), ns);
+          auto size = pointer_offset_size(array_type.element_type(), ns);
 
           if(!size.has_value() || *size == 0)
             o.reset();
@@ -1246,14 +1292,16 @@ void value_sett::assign(
   else if(type.id()==ID_array)
   {
     const index_exprt lhs_index(
-      lhs, exprt(ID_unknown, index_type()), type.subtype());
+      lhs,
+      exprt(ID_unknown, c_index_type()),
+      to_array_type(type).element_type());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
       assign(
         lhs_index,
-        exprt(rhs.id(), type.subtype()),
+        exprt(rhs.id(), to_array_type(type).element_type()),
         ns,
         is_simplified,
         add_to_sets);
@@ -1288,8 +1336,8 @@ void value_sett::assign(
       {
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
-          exprt(ID_unknown, index_type()),
-          type.subtype());
+          exprt(ID_unknown, c_index_type()),
+          to_array_type(type).element_type());
 
         assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
         assign(
@@ -1298,7 +1346,9 @@ void value_sett::assign(
       else
       {
         const index_exprt rhs_index(
-          rhs, exprt(ID_unknown, index_type()), type.subtype());
+          rhs,
+          exprt(ID_unknown, c_index_type()),
+          to_array_type(type).element_type());
         assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
@@ -1541,7 +1591,8 @@ void value_sett::apply_code_rec(
 
     if(
       lhs_type.id() == ID_pointer ||
-      (lhs_type.id() == ID_array && lhs_type.subtype().id() == ID_pointer))
+      (lhs_type.id() == ID_array &&
+       to_array_type(lhs_type).element_type().id() == ID_pointer))
     {
       // assign the address of the failed object
       if(auto failed = get_failed_symbol(to_symbol_expr(lhs), ns))
@@ -1582,12 +1633,9 @@ void value_sett::apply_code_rec(
   {
     const code_returnt &code_return = to_code_return(code);
     // this is turned into an assignment
-    if(code_return.has_return_value())
-    {
-      symbol_exprt lhs(
-        "value_set::return_value", code_return.return_value().type());
-      assign(lhs, code_return.return_value(), ns, false, false);
-    }
+    symbol_exprt lhs(
+      "value_set::return_value", code_return.return_value().type());
+    assign(lhs, code_return.return_value(), ns, false, false);
   }
   else if(statement==ID_array_set)
   {
@@ -1723,7 +1771,8 @@ void value_sett::erase_symbol_rec(
     erase_struct_union_symbol(
       ns.follow_tag(to_union_tag_type(type)), erase_prefix, ns);
   else if(type.id() == ID_array)
-    erase_symbol_rec(type.subtype(), erase_prefix + "[]", ns);
+    erase_symbol_rec(
+      to_array_type(type).element_type(), erase_prefix + "[]", ns);
   else if(values.has_key(erase_prefix))
     values.erase(erase_prefix);
 }

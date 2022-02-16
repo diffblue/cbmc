@@ -37,9 +37,12 @@ SCENARIO(
     auto val2 = std::vector<int>{1, 4, 5};
 
     // index_exprt for reading from an array
-    const index_exprt i0 = index_exprt(nil_exprt(), from_integer(0, type));
-    const index_exprt i1 = index_exprt(nil_exprt(), from_integer(1, type));
-    const index_exprt i2 = index_exprt(nil_exprt(), from_integer(2, type));
+    const index_exprt i0 = index_exprt(
+      exprt(ID_nil, array_typet(typet(), nil_exprt())), from_integer(0, type));
+    const index_exprt i1 = index_exprt(
+      exprt(ID_nil, array_typet(typet(), nil_exprt())), from_integer(1, type));
+    const index_exprt i2 = index_exprt(
+      exprt(ID_nil, array_typet(typet(), nil_exprt())), from_integer(2, type));
 
     auto object_factory = variable_sensitivity_object_factoryt::configured_with(
       vsd_configt::constant_domain());

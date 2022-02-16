@@ -75,6 +75,10 @@ operator()(propertiest &properties)
         return result;
     }
 
+    // leave the last worklist item in place for the benefit of output_proof
+    if(worklist->size() == 1)
+      break;
+
     worklist->pop();
   }
 
@@ -83,7 +87,7 @@ operator()(propertiest &properties)
 
   final_update_properties(properties, result.updated_properties);
 
-  // Worklist is empty: we are done.
+  // Worklist just has the last element left: we are done.
   return result;
 }
 
@@ -182,6 +186,8 @@ void single_path_symex_checkert::output_error_witness(
 void single_path_symex_checkert::output_proof()
 {
   // This is incorrect, but the best we can do at the moment.
+  // operator()(propertiest &properties) leaves in place the last worklist item
+  // just for this purpose.
   const path_storaget::patht &resume = worklist->peek();
   output_graphml(resume.equation, ns, options);
 }

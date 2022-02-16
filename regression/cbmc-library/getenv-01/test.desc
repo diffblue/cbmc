@@ -1,6 +1,6 @@
 CORE
 main.c
---signed-overflow-check --unsigned-overflow-check --pointer-overflow-check --pointer-check --bounds-check
+--signed-overflow-check --unsigned-overflow-check --pointer-overflow-check --pointer-check --bounds-check --memory-leak-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

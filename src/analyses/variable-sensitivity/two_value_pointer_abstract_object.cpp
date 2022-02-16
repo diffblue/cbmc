@@ -38,7 +38,7 @@ abstract_object_pointert two_value_pointer_abstract_objectt::read_dereference(
   const namespacet &ns) const
 {
   pointer_typet pointer_type(to_pointer_type(type()));
-  const typet &pointed_to_type = pointer_type.subtype();
+  const typet &pointed_to_type = pointer_type.base_type();
 
   return env.abstract_object_factory(pointed_to_type, ns, true, false);
 }

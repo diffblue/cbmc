@@ -3,6 +3,7 @@
 # listed with decreasing runtimes (i.e. longest running at the top)
 DIRS = cbmc \
        cbmc-library \
+       crangler \
        goto-analyzer \
        ansi-c \
        goto-instrument \
@@ -50,6 +51,7 @@ DIRS = cbmc \
        goto-interpreter \
        cbmc-sequentialization \
        cpp-linter \
+       catch-framework \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)

@@ -1,0 +1,14 @@
+CORE
+main.c
+--pointer-check --malloc-may-fail --malloc-fail-null
+activate-multi-line-match
+^\[main.pointer_dereference.\d+\] line 10 dereference failure: pointer NULL in \*p: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+\[main.pointer_dereference.\d+\] line 10 dereference failure: pointer NULL in \*p: SUCCESS\n.*\[main.pointer_dereference.\d+\] line 10 dereference failure: pointer NULL in \*p: SUCCESS\n
+--
+A pointer check for the switch value should be generated, but there should only
+be one such check.

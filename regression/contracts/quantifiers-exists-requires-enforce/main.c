@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define MAX_LEN 64
+#define MAX_LEN 10
 
 // clang-format off
 bool f1(int *arr, int len)
@@ -18,11 +18,27 @@ bool f1(int *arr, int len)
 // clang-format on
 {
   bool found_four = false;
-  for(int i = 0; i <= MAX_LEN; i++)
-  {
-    if(i < len)
-      found_four |= (arr[i] == 4);
-  }
+  if(0 < len)
+    found_four |= (arr[0] == 4);
+  if(1 < len)
+    found_four |= (arr[1] == 4);
+  if(2 < len)
+    found_four |= (arr[2] == 4);
+  if(3 < len)
+    found_four |= (arr[3] == 4);
+  if(4 < len)
+    found_four |= (arr[4] == 4);
+  if(5 < len)
+    found_four |= (arr[5] == 4);
+  if(6 < len)
+    found_four |= (arr[6] == 4);
+  if(7 < len)
+    found_four |= (arr[7] == 4);
+  if(8 < len)
+    found_four |= (arr[8] == 4);
+
+  if(9 < len)
+    found_four |= (arr[9] == 4);
 
   // clang-format off
   return (len > 0 ==> found_four);

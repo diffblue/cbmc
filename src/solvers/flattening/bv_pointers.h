@@ -24,7 +24,7 @@ public:
     message_handlert &message_handler,
     bool get_array_constraints = false);
 
-  void post_process() override;
+  void finish_eager_conversion() override;
 
   std::size_t boolbv_width(const typet &type) const override
   {

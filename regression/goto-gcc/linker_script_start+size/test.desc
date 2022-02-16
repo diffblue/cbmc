@@ -1,0 +1,20 @@
+CORE gnu-ld-only
+main.c
+-o out.gb -T script.ld -nostdlib -static -Wall
+^EXIT=0$
+^SIGNAL=0$
+--
+Problem parsing linker script
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Tesing the functionality of goto-cc's linker script parsing
+functionality, ensuring that it can get the values of symbols that are
+defined in linker scripts.
+
+This test ensures that goto-cc and ls-parse can:
+
+- get the value of a symbol whose value indicates the start of a section;
+- get the value of a symbol whose value indicates the size of a section,
+  and whose value has been generated through a basic arithmetic
+  expression in the linker script.

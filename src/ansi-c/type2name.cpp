@@ -251,7 +251,8 @@ static std::string type2name(
   if(type.has_subtype())
   {
     result+='{';
-    result+=type2name(type.subtype(), ns, symbol_number);
+    result +=
+      type2name(to_type_with_subtype(type).subtype(), ns, symbol_number);
     result+='}';
   }
 

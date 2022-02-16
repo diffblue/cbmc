@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 
+#include <util/pointer_expr.h>
 #include <util/source_location.h>
 #include <util/symbol.h>
 
@@ -68,7 +69,7 @@ const struct_typet &cpp_typecheckt::this_struct_type()
   assert(this_expr.is_not_nil());
   assert(this_expr.type().id()==ID_pointer);
 
-  const typet &t=follow(this_expr.type().subtype());
+  const typet &t = follow(to_pointer_type(this_expr.type()).base_type());
   assert(t.id()==ID_struct);
   return to_struct_type(t);
 }

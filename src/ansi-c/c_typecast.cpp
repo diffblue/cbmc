@@ -58,10 +58,12 @@ bool has_a_void_pointer(const typet &type)
 {
   if(type.id()==ID_pointer)
   {
-    if(type.subtype().id()==ID_empty)
+    const auto &pointer_type = to_pointer_type(type);
+
+    if(pointer_type.base_type().id() == ID_empty)
       return true;
 
-    return has_a_void_pointer(type.subtype());
+    return has_a_void_pointer(pointer_type.base_type());
   }
   else
     return false;
@@ -73,10 +75,13 @@ bool check_c_implicit_typecast(
 {
   // check qualifiers
 
-  if(src_type.id()==ID_pointer && dest_type.id()==ID_pointer &&
-     src_type.subtype().get_bool(ID_C_constant) &&
-     !dest_type.subtype().get_bool(ID_C_constant))
+  if(
+    src_type.id() == ID_pointer && dest_type.id() == ID_pointer &&
+    to_pointer_type(src_type).base_type().get_bool(ID_C_constant) &&
+    !to_pointer_type(dest_type).base_type().get_bool(ID_C_constant))
+  {
     return true;
+  }
 
   if(src_type==dest_type)
     return false;
@@ -84,10 +89,16 @@ bool check_c_implicit_typecast(
   const irep_idt &src_type_id=src_type.id();
 
   if(src_type_id==ID_c_bit_field)
-    return check_c_implicit_typecast(src_type.subtype(), dest_type);
+  {
+    return check_c_implicit_typecast(
+      to_c_bit_field_type(src_type).underlying_type(), dest_type);
+  }
 
   if(dest_type.id()==ID_c_bit_field)
-    return check_c_implicit_typecast(src_type, dest_type.subtype());
+  {
+    return check_c_implicit_typecast(
+      src_type, to_c_bit_field_type(dest_type).underlying_type());
+  }
 
   if(src_type_id==ID_natural)
   {
@@ -190,7 +201,11 @@ bool check_c_implicit_typecast(
   else if(src_type_id==ID_complex)
   {
     if(dest_type.id()==ID_complex)
-      return check_c_implicit_typecast(src_type.subtype(), dest_type.subtype());
+    {
+      return check_c_implicit_typecast(
+        to_complex_type(src_type).subtype(),
+        to_complex_type(dest_type).subtype());
+    }
     else
     {
       // 6.3.1.7, par 2:
@@ -200,7 +215,8 @@ bool check_c_implicit_typecast(
       // real part is converted according to the conversion rules for the
       // corresponding real type.
 
-      return check_c_implicit_typecast(src_type.subtype(), dest_type);
+      return check_c_implicit_typecast(
+        to_complex_type(src_type).subtype(), dest_type);
     }
   }
   else if(src_type_id==ID_array ||
@@ -208,8 +224,8 @@ bool check_c_implicit_typecast(
   {
     if(dest_type.id()==ID_pointer)
     {
-      const irept &dest_subtype=dest_type.subtype();
-      const irept &src_subtype =src_type.subtype();
+      const irept &dest_subtype = to_pointer_type(dest_type).base_type();
+      const irept &src_subtype = to_type_with_subtype(src_type).subtype();
 
       if(src_subtype == dest_subtype)
       {
@@ -223,9 +239,12 @@ bool check_c_implicit_typecast(
       }
     }
 
-    if(dest_type.id()==ID_array &&
-       src_type.subtype()==dest_type.subtype())
+    if(
+      dest_type.id() == ID_array && to_type_with_subtype(src_type).subtype() ==
+                                      to_array_type(dest_type).element_type())
+    {
       return false;
+    }
 
     if(dest_type.id()==ID_bool ||
        dest_type.id()==ID_c_bool ||
@@ -244,8 +263,12 @@ bool check_c_implicit_typecast(
     {
       // We convert between complex types if we convert between
       // their component types.
-      if(!check_c_implicit_typecast(src_type.subtype(), dest_type.subtype()))
+      if(!check_c_implicit_typecast(
+           to_complex_type(src_type).subtype(),
+           to_complex_type(dest_type).subtype()))
+      {
         return false;
+      }
     }
   }
 
@@ -338,7 +361,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   }
   else if(type.id()==ID_pointer)
   {
-    if(type.subtype().id()==ID_empty)
+    if(to_pointer_type(type).base_type().id() == ID_empty)
       return VOIDPTR;
     else
       return PTR;
@@ -365,23 +388,25 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     // of bits given
     typet underlying_type;
 
-    if(bit_field_type.subtype().id() == ID_c_enum_tag)
+    if(bit_field_type.underlying_type().id() == ID_c_enum_tag)
     {
       const auto &followed =
-        ns.follow_tag(to_c_enum_tag_type(bit_field_type.subtype()));
+        ns.follow_tag(to_c_enum_tag_type(bit_field_type.underlying_type()));
       if(followed.is_incomplete())
         return INT;
       else
-        underlying_type = followed.subtype();
+        underlying_type = followed.underlying_type();
     }
     else
-      underlying_type = bit_field_type.subtype();
+      underlying_type = bit_field_type.underlying_type();
 
     const bitvector_typet new_type(
       underlying_type.id(), bit_field_type.get_width());
 
     return get_c_type(new_type);
   }
+  else if(type.id() == ID_integer)
+    return INTEGER;
 
   return OTHER;
 }
@@ -506,9 +531,12 @@ void c_typecastt::implicit_typecast_followed(
     //  conversions.
     // But it is accepted, and Clang doesn't even emit a warning (GCC 4.7 does)
     typet src_type_no_const=src_type;
-    if(src_type.id()==ID_pointer &&
-       src_type.subtype().get_bool(ID_C_constant))
+    if(
+      src_type.id() == ID_pointer &&
+      to_pointer_type(src_type).base_type().get_bool(ID_C_constant))
+    {
       src_type_no_const.subtype().remove(ID_C_constant);
+    }
 
     // Check union members.
     for(const auto &comp : to_union_type(dest_type).components())
@@ -535,8 +563,7 @@ void c_typecastt::implicit_typecast_followed(
        src_type.id()==ID_natural ||
        src_type.id()==ID_integer))
     {
-      expr=exprt(ID_constant, orig_dest_type);
-      expr.set(ID_value, ID_NULL);
+      expr = null_pointer_exprt{to_pointer_type(orig_dest_type)};
       return; // ok
     }
 
@@ -545,8 +572,8 @@ void c_typecastt::implicit_typecast_followed(
     {
       // we are quite generous about pointers
 
-      const typet &src_sub = src_type.subtype();
-      const typet &dest_sub = dest_type.subtype();
+      const typet &src_sub = to_type_with_subtype(src_type).subtype();
+      const typet &dest_sub = to_pointer_type(dest_type).base_type();
 
       if(has_a_void_pointer(src_type) || has_a_void_pointer(dest_type))
       {
@@ -574,7 +601,8 @@ void c_typecastt::implicit_typecast_followed(
       }
       else if(
         src_sub.id() == ID_array && dest_sub.id() == ID_array &&
-        src_sub.subtype() == dest_sub.subtype())
+        to_array_type(src_sub).element_type() ==
+          to_array_type(dest_sub).element_type())
       {
         // we ignore the size of the top-level array
         // in the case of pointers to arrays
@@ -584,9 +612,12 @@ void c_typecastt::implicit_typecast_followed(
 
       // check qualifiers
 
-      if(src_type.subtype().get_bool(ID_C_volatile) &&
-         !dest_type.subtype().get_bool(ID_C_volatile))
+      if(
+        to_type_with_subtype(src_type).subtype().get_bool(ID_C_volatile) &&
+        !to_pointer_type(dest_type).base_type().get_bool(ID_C_volatile))
+      {
         warnings.push_back("disregarding volatile");
+      }
 
       if(src_type==dest_type)
       {
@@ -672,21 +703,25 @@ void c_typecastt::implicit_typecast_arithmetic(
     if(c_type1==COMPLEX && c_type2==COMPLEX)
     {
       // promote to the one with bigger subtype
-      if(get_c_type(type1.subtype())>get_c_type(type2.subtype()))
+      if(
+        get_c_type(to_complex_type(type1).subtype()) >
+        get_c_type(to_complex_type(type2).subtype()))
+      {
         do_typecast(expr2, type1);
+      }
       else
         do_typecast(expr1, type2);
     }
     else if(c_type1==COMPLEX)
     {
       assert(c_type1==COMPLEX && c_type2!=COMPLEX);
-      do_typecast(expr2, type1.subtype());
+      do_typecast(expr2, to_complex_type(type1).subtype());
       do_typecast(expr2, type1);
     }
     else
     {
       assert(c_type1!=COMPLEX && c_type2==COMPLEX);
-      do_typecast(expr1, type2.subtype());
+      do_typecast(expr1, to_complex_type(type2).subtype());
       do_typecast(expr1, type2);
     }
 
@@ -720,7 +755,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 
   if(src_type.id()==ID_array)
   {
-    index_exprt index(expr, from_integer(0, index_type()));
+    index_exprt index(expr, from_integer(0, c_index_type()));
     expr = typecast_exprt::conditional_cast(address_of_exprt(index), dest_type);
     return;
   }

@@ -302,3 +302,16 @@ SCENARIO("irept_memory", "[core][utils][irept]")
     }
   }
 }
+
+// This test is expected to fail so that we can test the error printing of the
+// unit test framework for regressions. It is not included in the [core] or
+// default set of tests, so that the usual output is not polluted with
+// irrelevant error messages.
+TEST_CASE(
+  "Catch2 printing of `irept` for test failures.",
+  "[irep_error_printing]" XFAIL)
+{
+  const irept foo{"foo", irept::named_subt{{"key", irept{"value"}}}, {}};
+  const irept bar{"bar"};
+  REQUIRE(foo == bar);
+}

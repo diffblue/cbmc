@@ -14,6 +14,8 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
+#include <util/std_code.h>
+
 #include <algorithm>
 #include <regex>
 
@@ -145,7 +147,7 @@ static bool is_assignment_from(
   {
     return false;
   }
-  const auto &rhs = instr.get_assign().rhs();
+  const auto &rhs = instr.assign_rhs();
   return is_symbol_with_id(rhs, identifier) ||
          is_typecast_with_id(rhs, identifier);
 }
@@ -223,7 +225,7 @@ static goto_programt::targett check_and_replace_target(
       "either have a variable for the return value in its lhs() or the next "
       "instruction should be an assignment of the return value to a temporary "
       "variable");
-    const exprt &return_value_assignment = next_instr->get_assign().lhs();
+    const exprt &return_value_assignment = next_instr->assign_lhs();
 
     // If the assignment is null, return.
     if(
@@ -274,28 +276,28 @@ static goto_programt::targett check_and_replace_target(
     const auto &nondet_var = target_instruction->return_value();
 
     side_effect_expr_nondett inserted_expr(
-      nondet_var.type(), target_instruction->source_location);
+      nondet_var.type(), target_instruction->source_location());
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
     target_instruction->code_nonconst() = code_returnt(inserted_expr);
     target_instruction->code_nonconst().add_source_location() =
-      target_instruction->source_location;
+      target_instruction->source_location();
   }
   else if(target_instruction->is_assign())
   {
     // Assume that the LHS of *this* assignment is the actual nondet variable
-    const auto &nondet_var = target_instruction->get_assign().lhs();
+    const auto &nondet_var = target_instruction->assign_lhs();
 
     side_effect_expr_nondett inserted_expr(
-      nondet_var.type(), target_instruction->source_location);
+      nondet_var.type(), target_instruction->source_location());
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
     target_instruction->code_nonconst() =
       code_assignt(nondet_var, inserted_expr);
     target_instruction->code_nonconst().add_source_location() =
-      target_instruction->source_location;
+      target_instruction->source_location();
   }
 
   goto_program.update();

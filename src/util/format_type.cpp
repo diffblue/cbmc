@@ -63,14 +63,14 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
   const auto &id = type.id();
 
   if(id == ID_pointer)
-    return os << format(to_pointer_type(type).subtype()) << '*';
+    return os << format(to_pointer_type(type).base_type()) << '*';
   else if(id == ID_array)
   {
     const auto &t = to_array_type(type);
     if(t.is_complete())
-      return os << format(t.subtype()) << '[' << format(t.size()) << ']';
+      return os << format(t.element_type()) << '[' << format(t.size()) << ']';
     else
-      return os << format(t.subtype()) << "[]";
+      return os << format(t.element_type()) << "[]";
   }
   else if(id == ID_struct)
     return format_rec(os, to_struct_type(type));

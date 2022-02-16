@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <atomic>
 
 #include "c_expr.h"
@@ -49,9 +51,11 @@ static symbol_exprt typecheck_sync_with_pointer_parameter(
     throw 0;
   }
 
+  const auto &pointer_type = to_pointer_type(ptr_arg.type());
+
   code_typet t{{code_typet::parametert(ptr_arg.type()),
-                code_typet::parametert(ptr_arg.type().subtype())},
-               ptr_arg.type().subtype()};
+                code_typet::parametert(pointer_type.base_type())},
+               pointer_type.base_type()};
   t.make_ellipsis();
   symbol_exprt result{identifier, std::move(t)};
   result.add_source_location() = source_location;
@@ -86,14 +90,14 @@ static symbol_exprt typecheck_sync_compare_swap(
     throw 0;
   }
 
-  const typet &subtype = ptr_arg.type().subtype();
-  typet sync_return_type = subtype;
+  const typet &base_type = to_pointer_type(ptr_arg.type()).base_type();
+  typet sync_return_type = base_type;
   if(identifier == ID___sync_bool_compare_and_swap)
     sync_return_type = c_bool_type();
 
   code_typet t{{code_typet::parametert(ptr_arg.type()),
-                code_typet::parametert(subtype),
-                code_typet::parametert(subtype)},
+                code_typet::parametert(base_type),
+                code_typet::parametert(base_type)},
                sync_return_type};
   t.make_ellipsis();
   symbol_exprt result{identifier, std::move(t)};
@@ -166,7 +170,7 @@ static symbol_exprt typecheck_atomic_load_n(
   const code_typet t(
     {code_typet::parametert(ptr_arg.type()),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    to_pointer_type(ptr_arg.type()).base_type());
   symbol_exprt result(identifier, t);
   result.add_source_location() = source_location;
   return result;
@@ -198,9 +202,11 @@ static symbol_exprt typecheck_atomic_store_n(
     throw 0;
   }
 
+  const auto &base_type = to_pointer_type(ptr_arg.type()).base_type();
+
   const code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(base_type),
      code_typet::parametert(signed_int_type())},
     void_type());
   symbol_exprt result(identifier, t);
@@ -234,11 +240,13 @@ static symbol_exprt typecheck_atomic_exchange_n(
     throw 0;
   }
 
+  const auto &base_type = to_pointer_type(ptr_arg.type()).base_type();
+
   const code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(base_type),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    base_type);
   symbol_exprt result(identifier, t);
   result.add_source_location() = source_location;
   return result;
@@ -396,7 +404,8 @@ static symbol_exprt typecheck_atomic_compare_exchange(
   if(identifier == ID___atomic_compare_exchange)
     parameters.push_back(code_typet::parametert(ptr_arg.type()));
   else
-    parameters.push_back(code_typet::parametert(ptr_arg.type().subtype()));
+    parameters.push_back(
+      code_typet::parametert(to_pointer_type(ptr_arg.type()).base_type()));
 
   parameters.push_back(code_typet::parametert(c_bool_type()));
   parameters.push_back(code_typet::parametert(signed_int_type()));
@@ -436,9 +445,9 @@ static symbol_exprt typecheck_atomic_op_fetch(
 
   code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(to_pointer_type(ptr_arg.type()).base_type()),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    to_pointer_type(ptr_arg.type()).base_type());
   symbol_exprt result(identifier, std::move(t));
   result.add_source_location() = source_location;
   return result;
@@ -473,9 +482,9 @@ static symbol_exprt typecheck_atomic_fetch_op(
 
   code_typet t(
     {code_typet::parametert(ptr_arg.type()),
-     code_typet::parametert(ptr_arg.type().subtype()),
+     code_typet::parametert(to_pointer_type(ptr_arg.type()).base_type()),
      code_typet::parametert(signed_int_type())},
-    ptr_arg.type().subtype());
+    to_pointer_type(ptr_arg.type()).base_type());
   symbol_exprt result(identifier, std::move(t));
   result.add_source_location() = source_location;
   return result;
@@ -634,7 +643,7 @@ static void instantiate_atomic_fetch_op(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -646,7 +655,7 @@ static void instantiate_atomic_fetch_op(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{result, deref_ptr});
+  block.add(code_frontend_assignt{result, deref_ptr});
 
   // build *ptr = result OP arguments[1];
   irep_idt op_id = identifier == ID___atomic_fetch_add
@@ -663,7 +672,7 @@ static void instantiate_atomic_fetch_op(
                                          ? ID_bitnand
                                          : ID_nil;
   binary_exprt op_expr{result, op_id, parameter_exprs[1], type};
-  block.add(code_assignt{deref_ptr, std::move(op_expr)});
+  block.add(code_frontend_assignt{deref_ptr, std::move(op_expr)});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -696,7 +705,7 @@ static void instantiate_atomic_op_fetch(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -723,9 +732,9 @@ static void instantiate_atomic_op_fetch(
                                          ? ID_bitnand
                                          : ID_nil;
   binary_exprt op_expr{deref_ptr, op_id, parameter_exprs[1], type};
-  block.add(code_assignt{result, std::move(op_expr)});
+  block.add(code_frontend_assignt{result, std::move(op_expr)});
 
-  block.add(code_assignt{deref_ptr, result});
+  block.add(code_frontend_assignt{deref_ptr, result});
 
   // this instruction implies an mfence, i.e., WRfence
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -809,7 +818,7 @@ static void instantiate_sync_val_compare_and_swap(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -821,9 +830,9 @@ static void instantiate_sync_val_compare_and_swap(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{result, deref_ptr});
+  block.add(code_frontend_assignt{result, deref_ptr});
 
-  code_assignt assign{deref_ptr, parameter_exprs[2]};
+  code_frontend_assignt assign{deref_ptr, parameter_exprs[2]};
   assign.add_source_location() = source_location;
   block.add(code_ifthenelset{equal_exprt{result, parameter_exprs[1]},
                              std::move(assign)});
@@ -867,7 +876,7 @@ static void instantiate_sync_lock_test_and_set(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -879,9 +888,9 @@ static void instantiate_sync_lock_test_and_set(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{result, deref_ptr});
+  block.add(code_frontend_assignt{result, deref_ptr});
 
-  block.add(code_assignt{deref_ptr, parameter_exprs[1]});
+  block.add(code_frontend_assignt{deref_ptr, parameter_exprs[1]});
 
   // This built-in function is not a full barrier, but rather an acquire
   // barrier.
@@ -912,7 +921,7 @@ static void instantiate_sync_lock_release(
   // This built-in function releases the lock acquired by
   // __sync_lock_test_and_set. Normally this means writing the constant 0 to
   // *ptr.
-  const typet &type = to_pointer_type(parameter_exprs[0].type()).subtype();
+  const typet &type = to_pointer_type(parameter_exprs[0].type()).base_type();
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -921,9 +930,9 @@ static void instantiate_sync_lock_release(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
-                         typecast_exprt::conditional_cast(
-                           from_integer(0, signed_int_type()), type)});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
+                                  typecast_exprt::conditional_cast(
+                                    from_integer(0, signed_int_type()), type)});
 
   // This built-in function is not a full barrier, but rather a release
   // barrier.
@@ -957,8 +966,8 @@ static void instantiate_atomic_load(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[1]},
-                         dereference_exprt{parameter_exprs[0]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[1]},
+                                  dereference_exprt{parameter_exprs[0]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -989,7 +998,7 @@ static void instantiate_atomic_load_n(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(ID___atomic_load),
@@ -1017,8 +1026,8 @@ static void instantiate_atomic_store(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
-                         dereference_exprt{parameter_exprs[1]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
+                                  dereference_exprt{parameter_exprs[1]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1070,10 +1079,10 @@ static void instantiate_atomic_exchange(
     code_typet{{}, void_type()},
     source_location}});
 
-  block.add(code_assignt{dereference_exprt{parameter_exprs[2]},
-                         dereference_exprt{parameter_exprs[0]}});
-  block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
-                         dereference_exprt{parameter_exprs[1]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[2]},
+                                  dereference_exprt{parameter_exprs[0]}});
+  block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
+                                  dereference_exprt{parameter_exprs[1]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1104,7 +1113,7 @@ static void instantiate_atomic_exchange_n(
   const symbol_exprt result =
     result_symbol(identifier_with_type, type, source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(ID___atomic_exchange),
@@ -1141,7 +1150,7 @@ static void instantiate_atomic_compare_exchange(
     result_symbol(
       identifier_with_type, c_bool_type(), source_location, symbol_table)
       .symbol_expr();
-  block.add(codet{ID_decl_block, {code_declt{result}}});
+  block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   // place operations on *ptr in an atomic section
   block.add(code_expressiont{side_effect_expr_function_callt{
@@ -1153,14 +1162,15 @@ static void instantiate_atomic_compare_exchange(
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
-  block.add(code_assignt{
+  block.add(code_frontend_assignt{
     result,
     typecast_exprt::conditional_cast(
       equal_exprt{deref_ptr, dereference_exprt{parameter_exprs[1]}},
       result.type())});
 
   // we never fail spuriously, and ignore parameter_exprs[3]
-  code_assignt assign{deref_ptr, dereference_exprt{parameter_exprs[2]}};
+  code_frontend_assignt assign{deref_ptr,
+                               dereference_exprt{parameter_exprs[2]}};
   assign.add_source_location() = source_location;
   code_expressiont success_fence{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1169,8 +1179,8 @@ static void instantiate_atomic_compare_exchange(
     source_location}};
   success_fence.add_source_location() = source_location;
 
-  code_assignt assign_not_equal{dereference_exprt{parameter_exprs[1]},
-                                deref_ptr};
+  code_frontend_assignt assign_not_equal{dereference_exprt{parameter_exprs[1]},
+                                         deref_ptr};
   assign_not_equal.add_source_location() = source_location;
   code_expressiont failure_fence{side_effect_expr_function_callt{
     symbol_exprt::typeless("__atomic_thread_fence"),
@@ -1437,18 +1447,19 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
     CHECK_RETURN(input_size.has_value());
     if(arg1.has_value())
       input_size = *input_size * 2;
-    constant_exprt size = from_integer(*input_size, indices_type.subtype());
+    constant_exprt size =
+      from_integer(*input_size, indices_type.element_type());
 
     for(std::size_t i = 0; i < indices_size; ++i)
     {
       // only the least significant bits of each mask element are considered
-      mod_exprt mod_index{index_exprt{indices, from_integer(i, index_type())},
+      mod_exprt mod_index{index_exprt{indices, from_integer(i, c_index_type())},
                           size};
       mod_index.add_source_location() = source_location;
       operands.push_back(std::move(mod_index));
     }
 
-    return shuffle_vector_exprt{arg0, arg1, std::move(operands)}.lower();
+    return shuffle_vector_exprt{arg0, arg1, std::move(operands)};
   }
   else if(identifier == "__builtin_shufflevector")
   {
@@ -1498,8 +1509,8 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
       }
     }
 
-    return shuffle_vector_exprt{arguments[0], arguments[1], std::move(operands)}
-      .lower();
+    return shuffle_vector_exprt{
+      arguments[0], arguments[1], std::move(operands)};
   }
   else
     UNREACHABLE;

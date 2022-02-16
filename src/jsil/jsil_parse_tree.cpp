@@ -66,7 +66,7 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
       static_cast<const codet&>(find(ID_value))));
 
   irept returns(find(ID_return));
-  code_returnt r(symbol_exprt::typeless(returns.get(ID_value)));
+  code_frontend_returnt r(symbol_exprt::typeless(returns.get(ID_value)));
 
   irept throws(find(ID_throw));
   side_effect_expr_throwt t(

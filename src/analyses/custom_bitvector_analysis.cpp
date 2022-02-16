@@ -283,13 +283,11 @@ void custom_bitvector_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case ASSIGN:
-    {
-      const code_assignt &code_assign = instruction.get_assign();
-      assign_struct_rec(from, code_assign.lhs(), code_assign.rhs(), cba, ns);
-    }
+    assign_struct_rec(
+      from, instruction.assign_lhs(), instruction.assign_rhs(), cba, ns);
     break;
 
   case DECL:
@@ -802,7 +800,7 @@ void custom_bitvector_analysist::check(
         const namespacet ns(goto_model.symbol_table);
         result = simplify_expr(std::move(tmp), ns);
 
-        description=i_it->source_location.get_comment();
+        description = i_it->source_location().get_comment();
       }
       else
         continue;
@@ -817,7 +815,7 @@ void custom_bitvector_analysist::check(
         else
           out << "UNKNOWN";
         out << "\">\n";
-        out << xml(i_it->source_location);
+        out << xml(i_it->source_location());
         out << "<description>"
             << description
             << "</description>\n";
@@ -825,7 +823,7 @@ void custom_bitvector_analysist::check(
       }
       else
       {
-        out << i_it->source_location;
+        out << i_it->source_location();
         if(!description.empty())
           out << ", " << description;
         out << ": ";

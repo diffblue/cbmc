@@ -1,0 +1,9 @@
+CORE
+main.c
+--program-only
+ASSERT\(__CPROVER_saturating_minus\(.*\)
+ASSERT\(__CPROVER_saturating_plus\(.*\)
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

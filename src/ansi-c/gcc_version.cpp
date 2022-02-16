@@ -120,6 +120,8 @@ void gcc_versiont::get(const std::string &executable)
               default_cxx_standard = configt::cppt::cpp_standardt::CPP11;
             else if(split[1] == "201402L")
               default_cxx_standard = configt::cppt::cpp_standardt::CPP14;
+            else if(split[1] == "201703L")
+              default_cxx_standard = configt::cppt::cpp_standardt::CPP17;
           }
         }
       }

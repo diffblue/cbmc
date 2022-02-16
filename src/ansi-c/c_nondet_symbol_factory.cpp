@@ -13,14 +13,15 @@ Author: Diffblue Ltd.
 
 #include <ansi-c/c_object_factory_parameters.h>
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
+#include <goto-programs/allocate_objects.h>
 #include <goto-programs/goto_functions.h>
 
 /// Creates a nondet for expr, including calling itself recursively to make
@@ -50,28 +51,29 @@ void symbol_factoryt::gen_nondet_init(
   {
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype = pointer_type.subtype();
+    const typet &base_type = pointer_type.base_type();
 
-    if(subtype.id() == ID_code)
+    if(base_type.id() == ID_code)
     {
       // Handle the pointer-to-code case separately:
       // leave as nondet_ptr to allow `remove_function_pointers`
       // to replace the pointer.
-      assignments.add(
-        code_assignt{expr, side_effect_expr_nondett{pointer_type, loc}});
+      assignments.add(code_frontend_assignt{
+        expr, side_effect_expr_nondett{pointer_type, loc}});
       return;
     }
 
-    if(subtype.id() == ID_struct_tag)
+    if(base_type.id() == ID_struct_tag)
     {
-      const irep_idt struct_tag = to_struct_tag_type(subtype).get_identifier();
+      const irep_idt struct_tag =
+        to_struct_tag_type(base_type).get_identifier();
 
       if(
         recursion_set.find(struct_tag) != recursion_set.end() &&
         depth >= object_factory_params.max_nondet_tree_depth)
       {
         assignments.add(
-          code_assignt{expr, null_pointer_exprt{pointer_type}, loc});
+          code_frontend_assignt{expr, null_pointer_exprt{pointer_type}, loc});
 
         return;
       }
@@ -79,7 +81,7 @@ void symbol_factoryt::gen_nondet_init(
 
     code_blockt non_null_inst;
 
-    typet object_type = subtype;
+    typet object_type = base_type;
     if(object_type.id() == ID_empty)
       object_type = char_type();
 
@@ -104,7 +106,7 @@ void symbol_factoryt::gen_nondet_init(
       //           <code from recursive call to gen_nondet_init() with
       //             tmp$<temporary_counter>>
       // And the next line is labelled label2
-      const code_assignt set_null_inst{
+      const code_frontend_assignt set_null_inst{
         expr, null_pointer_exprt{pointer_type}, loc};
 
       code_ifthenelset null_check(
@@ -154,7 +156,7 @@ void symbol_factoryt::gen_nondet_init(
     //   <expr> = NONDET(type);
     exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
                                        : side_effect_expr_nondett(type, loc);
-    code_assignt assign(expr, rhs);
+    code_frontend_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
     assignments.add(std::move(assign));
@@ -204,22 +206,14 @@ symbol_exprt c_nondet_symbol_factory(
   const c_object_factory_parameterst &object_factory_parameters,
   const lifetimet lifetime)
 {
-  irep_idt identifier=id2string(goto_functionst::entry_point())+
-    "::"+id2string(base_name);
-
-  auxiliary_symbolt main_symbol;
-  main_symbol.mode=ID_C;
-  main_symbol.is_static_lifetime=false;
-  main_symbol.name=identifier;
-  main_symbol.base_name=base_name;
-  main_symbol.type=type;
-  main_symbol.location=loc;
-
+  const symbolt &main_symbol = get_fresh_aux_symbol(
+    type,
+    id2string(goto_functionst::entry_point()),
+    id2string(base_name),
+    loc,
+    ID_C,
+    symbol_table);
   symbol_exprt main_symbol_expr=main_symbol.symbol_expr();
-
-  symbolt *main_symbol_ptr;
-  bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
-  CHECK_RETURN(!moving_symbol_failed);
 
   symbol_factoryt state(
     symbol_table,
@@ -231,7 +225,7 @@ symbol_exprt c_nondet_symbol_factory(
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 
-  state.add_created_symbol(main_symbol_ptr);
+  state.add_created_symbol(main_symbol);
   state.declare_created_symbols(init_code);
 
   init_code.append(assignments);

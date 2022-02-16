@@ -117,14 +117,14 @@ void ci_lazy_methods_neededt::initialize_instantiated_classes_from_pointer(
   const pointer_typet &pointer_type,
   const namespacet &ns)
 {
-  const auto &class_type = to_struct_tag_type(pointer_type.subtype());
+  const auto &class_type = to_struct_tag_type(pointer_type.base_type());
   const auto &param_classid = class_type.get_identifier();
 
   // Note here: different arrays may have different element types, so we should
   // explore again even if we've seen this classid before in the array case.
   if(add_needed_class(param_classid) || is_java_array_tag(param_classid))
   {
-    gather_field_types(pointer_type.subtype(), ns);
+    gather_field_types(pointer_type.base_type(), ns);
   }
 
   if(is_java_generic_type(pointer_type))
@@ -159,7 +159,7 @@ void ci_lazy_methods_neededt::gather_field_types(
         java_array_element_type(to_struct_tag_type(class_type));
       if(
         element_type.id() == ID_pointer &&
-        element_type.subtype().id() != ID_empty)
+        to_pointer_type(element_type).base_type().id() != ID_empty)
       {
         // This is a reference array -- mark its element type available.
         add_all_needed_classes(to_pointer_type(element_type));

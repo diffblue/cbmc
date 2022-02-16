@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/symbol_table.h>
 
@@ -153,12 +154,12 @@ static goto_programt analyse_checks_directly_preceding_function_call(
   {
     instr_it = std::prev(instr_it);
 
-    if(instr_it->type == ASSERT)
+    if(instr_it->is_assert())
     {
       continue;
     }
 
-    if(instr_it->type != ASSUME)
+    if(!instr_it->is_assume())
     {
       break;
     }
@@ -289,16 +290,19 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
     }
     else
     {
-      auto c = target->get_function_call();
+      auto c = code_function_callt(
+        target->call_lhs(), target->call_function(), target->call_arguments());
       create_static_function_call(c, *functions.front().symbol_expr, ns);
-      target->set_function_call(c);
+      target->call_function() = c.function();
+      target->call_arguments() = c.arguments();
     }
     return next_target;
   }
 
-  const auto &vcall_source_loc=target->source_location;
+  const auto &vcall_source_loc = target->source_location();
 
-  code_function_callt code(target->get_function_call());
+  code_function_callt code(
+    target->call_lhs(), target->call_function(), target->call_arguments());
   goto_programt new_code_for_this_argument;
 
   process_this_argument(
@@ -326,7 +330,7 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
   INVARIANT(
     this_expr.type().id() == ID_pointer, "this parameter must be a pointer");
   INVARIANT(
-    this_expr.type().subtype() != empty_typet(),
+    to_pointer_type(this_expr.type()).base_type() != empty_typet(),
     "this parameter must not be a void pointer");
 
   // So long as `this` is already not `void*` typed, the second parameter
@@ -377,7 +381,7 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
           goto_programt::make_assertion(false_exprt(), vcall_source_loc));
 
         // No definition for this type; shouldn't be possible...
-        t1->source_location.set_comment(
+        t1->source_location_nonconst().set_comment(
           "cannot find calls for " +
           id2string(code.function().get(ID_identifier)) + " dispatching " +
           id2string(fun.class_id));
@@ -418,8 +422,8 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
           !new_code_gotos.empty(),
           "a dispatch table entry has been processed already, "
           "which should have created a GOTO");
-        new_code_gotos.instructions.back().guard =
-          or_exprt(new_code_gotos.instructions.back().guard, class_id_test);
+        new_code_gotos.instructions.back().condition_nonconst() = or_exprt(
+          new_code_gotos.instructions.back().condition(), class_id_test);
       }
       else
       {
@@ -440,11 +444,11 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
   // set locations
   for(auto &instruction : new_code.instructions)
   {
-    source_locationt &source_location = instruction.source_location;
+    source_locationt &source_location = instruction.source_location_nonconst();
 
     const irep_idt property_class = source_location.get_property_class();
     const irep_idt comment = source_location.get_comment();
-    source_location = target->source_location;
+    source_location = target->source_location();
     if(!property_class.empty())
       source_location.set_property_class(property_class);
     if(!comment.empty())

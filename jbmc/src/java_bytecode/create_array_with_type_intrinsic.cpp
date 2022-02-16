@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
 /// Returns the symbol name for `org.cprover.CProver.createArrayWithType`
@@ -74,13 +75,13 @@ codet create_array_with_type_body(
   code_blockt code_block;
 
   // Declare new_array temporary:
-  code_block.add(code_declt(new_array_symbol_expr));
+  code_block.add(code_frontend_declt(new_array_symbol_expr));
 
   // new_array = new Object[length];
   side_effect_exprt new_array_expr{
     ID_java_new_array, new_array_symbol.type, source_locationt{}};
   new_array_expr.copy_to_operands(length_argument_symbol_expr);
-  code_block.add(code_assignt(new_array_symbol_expr, new_array_expr));
+  code_block.add(code_frontend_assignt(new_array_symbol_expr, new_array_expr));
 
   dereference_exprt existing_array(existing_array_argument_symbol_expr);
   dereference_exprt new_array(new_array_symbol_expr);
@@ -98,12 +99,13 @@ codet create_array_with_type_body(
   member_exprt new_array_element_classid(
     new_array, JAVA_ARRAY_ELEMENT_CLASSID_FIELD_NAME, string_typet());
 
-  code_block.add(code_assignt(new_array_dimension, old_array_dimension));
   code_block.add(
-    code_assignt(new_array_element_classid, old_array_element_classid));
+    code_frontend_assignt(new_array_dimension, old_array_dimension));
+  code_block.add(code_frontend_assignt(
+    new_array_element_classid, old_array_element_classid));
 
   // return new_array
-  code_block.add(code_returnt(new_array_symbol_expr));
+  code_block.add(code_frontend_returnt(new_array_symbol_expr));
 
   return std::move(code_block);
 }

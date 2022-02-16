@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -132,8 +134,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
     // but we'll try to interpret it the GCC way
     if(underlying_type.id()==ID_c_enum_tag)
     {
-      underlying_type=
-        follow_tag(to_c_enum_tag_type(underlying_type)).subtype();
+      underlying_type =
+        follow_tag(to_c_enum_tag_type(underlying_type)).underlying_type();
 
       assert(underlying_type.id()==ID_signedbv ||
              underlying_type.id()==ID_unsignedbv);
@@ -524,10 +526,10 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   const source_locationt size_source_location = size.find_source_location();
 
   // check subtype
-  typecheck_type(type.subtype());
+  typecheck_type(type.element_type());
 
   // we don't allow void as subtype
-  if(type.subtype().id() == ID_empty)
+  if(type.element_type().id() == ID_empty)
   {
     error().source_location=type.source_location();
     error() << "array of voids" << eom;
@@ -535,7 +537,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   }
 
   // we don't allow incomplete structs or unions as subtype
-  const typet &followed_subtype = follow(type.subtype());
+  const typet &followed_subtype = follow(type.element_type());
 
   if(
     (followed_subtype.id() == ID_struct || followed_subtype.id() == ID_union) &&
@@ -548,7 +550,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   }
 
   // we don't allow functions as subtype
-  if(type.subtype().id() == ID_code)
+  if(type.element_type().id() == ID_code)
   {
     // ISO/IEC 9899 6.7.5.2
     error().source_location = type.source_location();
@@ -633,10 +635,10 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       // produce the code that declares and initializes the symbol
       symbol_exprt symbol_expr = new_symbol.symbol_expr();
 
-      code_declt declaration(symbol_expr);
+      code_frontend_declt declaration(symbol_expr);
       declaration.add_source_location() = size_source_location;
 
-      code_assignt assignment;
+      code_frontend_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs() = new_symbol.value;
       assignment.add_source_location() = size_source_location;
@@ -1009,7 +1011,7 @@ void c_typecheck_baset::typecheck_compound_body(
 
         // make it zero-length
         c_type.id(ID_array);
-        c_type.set(ID_size, from_integer(0, index_type()));
+        c_type.set(ID_size, from_integer(0, c_index_type()));
       }
     }
   }
@@ -1478,7 +1480,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
 
 void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 {
-  typecheck_type(type.subtype());
+  typecheck_type(type.underlying_type());
 
   mp_integer i;
 
@@ -1506,28 +1508,28 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
     type.remove(ID_size);
   }
 
-  const typet &subtype = type.subtype();
+  const typet &underlying_type = type.underlying_type();
 
   std::size_t sub_width=0;
 
-  if(subtype.id()==ID_bool)
+  if(underlying_type.id() == ID_bool)
   {
     // This is the 'proper' bool.
     sub_width=1;
   }
-  else if(subtype.id()==ID_signedbv ||
-          subtype.id()==ID_unsignedbv ||
-          subtype.id()==ID_c_bool)
+  else if(
+    underlying_type.id() == ID_signedbv ||
+    underlying_type.id() == ID_unsignedbv || underlying_type.id() == ID_c_bool)
   {
-    sub_width=to_bitvector_type(subtype).get_width();
+    sub_width = to_bitvector_type(underlying_type).get_width();
   }
-  else if(subtype.id()==ID_c_enum_tag)
+  else if(underlying_type.id() == ID_c_enum_tag)
   {
     // These point to an enum, which has a sub-subtype,
     // which may be smaller or larger than int, and we thus have
     // to check.
     const auto &c_enum_type =
-      to_c_enum_type(follow_tag(to_c_enum_tag_type(subtype)));
+      to_c_enum_type(follow_tag(to_c_enum_tag_type(underlying_type)));
 
     if(c_enum_type.is_incomplete())
     {
@@ -1536,13 +1538,13 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
       throw 0;
     }
 
-    sub_width = to_bitvector_type(c_enum_type.subtype()).get_width();
+    sub_width = to_bitvector_type(c_enum_type.underlying_type()).get_width();
   }
   else
   {
     error().source_location=type.source_location();
-    error() << "bit field with non-integer type: "
-            << to_string(subtype) << eom;
+    error() << "bit field with non-integer type: " << to_string(underlying_type)
+            << eom;
     throw 0;
   }
 

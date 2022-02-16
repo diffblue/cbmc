@@ -175,7 +175,7 @@ void goto_symext::symex_assert(
   // now try simplifier on it
   do_simplify(l2_condition);
 
-  std::string msg = id2string(instruction.source_location.get_comment());
+  std::string msg = id2string(instruction.source_location().get_comment());
   if(msg.empty())
     msg = "assertion";
 
@@ -516,9 +516,9 @@ void goto_symext::print_symex_step(statet &state)
   // debugging and if there's no code block at this point.
   if(
     !symex_config.show_symex_steps || !state.reachable ||
-    state.source.pc->type == DEAD ||
+    state.source.pc->type() == DEAD ||
     (state.source.pc->get_code().is_nil() &&
-     state.source.pc->type != END_FUNCTION))
+     state.source.pc->type() != END_FUNCTION))
   {
     return;
   }
@@ -538,12 +538,12 @@ void goto_symext::print_symex_step(statet &state)
                  << format(state.source.pc->get_code());
 
     if(
-      state.source.pc->source_location.is_not_nil() &&
-      !state.source.pc->source_location.get_java_bytecode_index().empty())
+      state.source.pc->source_location().is_not_nil() &&
+      !state.source.pc->source_location().get_java_bytecode_index().empty())
     {
       log.status()
         << " bytecode index: "
-        << state.source.pc->source_location.get_java_bytecode_index();
+        << state.source.pc->source_location().get_java_bytecode_index();
     }
 
     log.status() << messaget::eom;
@@ -551,7 +551,7 @@ void goto_symext::print_symex_step(statet &state)
 
   // Print the method we're returning too.
   const auto &call_stack = state.threads[state.source.thread_nr].call_stack;
-  if(state.source.pc->type == END_FUNCTION)
+  if(state.source.pc->type() == END_FUNCTION)
   {
     log.status() << messaget::eom;
 
@@ -566,7 +566,7 @@ void goto_symext::print_symex_step(statet &state)
   }
 
   // On a function call print the entire call stack.
-  if(state.source.pc->type == FUNCTION_CALL)
+  if(state.source.pc->type() == FUNCTION_CALL)
   {
     log.status() << messaget::eom;
 
@@ -582,8 +582,8 @@ void goto_symext::print_symex_step(statet &state)
       print_callstack_entry(state.source) << messaget::eom;
 
       // Add the method we're about to enter with no location number.
-      log.status() << format(state.source.pc->get_function_call().function())
-                   << messaget::eom << messaget::eom;
+      log.status() << format(state.source.pc->call_function()) << messaget::eom
+                   << messaget::eom;
     }
   }
 }
@@ -620,7 +620,7 @@ void goto_symext::execute_next_instruction(
   state.depth++;
 
   // actually do instruction
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case SKIP:
     if(state.reachable)
@@ -661,8 +661,9 @@ void goto_symext::execute_next_instruction(
     break;
 
   case SET_RETURN_VALUE:
-    // This case should have been removed by return-value removal
-    UNREACHABLE;
+    if(state.reachable)
+      symex_set_return_value(state, instruction.return_value());
+    symex_transition(state);
     break;
 
   case ASSIGN:
@@ -674,10 +675,7 @@ void goto_symext::execute_next_instruction(
 
   case FUNCTION_CALL:
     if(state.reachable)
-    {
-      symex_function_call(
-        get_goto_function, state, instruction.get_function_call());
-    }
+      symex_function_call(get_goto_function, state, instruction);
     else
       symex_transition(state);
     break;

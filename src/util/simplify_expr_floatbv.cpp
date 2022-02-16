@@ -233,8 +233,8 @@ simplify_exprt::simplify_floatbv_typecast(const floatbv_typecast_exprt &expr)
       {
         // go through underlying type
         const auto &enum_type = ns.follow_tag(to_c_enum_tag_type(src_type));
-        exprt simplified_typecast =
-          simplify_expr(typecast_exprt(casted_expr, enum_type.subtype()), ns);
+        exprt simplified_typecast = simplify_expr(
+          typecast_exprt(casted_expr, enum_type.underlying_type()), ns);
         if(simplified_typecast.is_constant())
         {
           floatbv_typecast_exprt new_floatbv_typecast_expr = expr;

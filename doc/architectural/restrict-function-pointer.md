@@ -73,9 +73,12 @@ function where function pointers are being called, to this pattern:
 ```
 <function-name>.function_pointer_call.<N>
 ```
-
 where `N` is referring to which function call it is - so the first call to a
-function pointer in a function will have `N=1`, the 5th `N=5` etc.
+function pointer in a function will have `N=1`, the 5th `N=5` etc, or
+```
+<function-name>.<label>
+```
+when the function call is labelled.
 
 We can call `goto-instrument --restrict-function-pointer
 call.function_pointer_call.1/f,g in.gb out.gb`. This can be read as

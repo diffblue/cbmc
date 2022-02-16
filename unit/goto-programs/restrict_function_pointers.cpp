@@ -24,9 +24,11 @@ class fp_restrictionst : public function_pointer_restrictionst
 
 void restriction_parsing_test()
 {
+  goto_modelt goto_model;
+
   {
     const auto res = fp_restrictionst::parse_function_pointer_restriction(
-      "func1/func2", "test");
+      "func1/func2", "test", goto_model);
     REQUIRE(res.first == "func1");
     REQUIRE(res.second.size() == 1);
     REQUIRE(res.second.find("func2") != res.second.end());
@@ -34,7 +36,7 @@ void restriction_parsing_test()
 
   {
     const auto res = fp_restrictionst::parse_function_pointer_restriction(
-      "func1/func2,func3", "test");
+      "func1/func2,func3", "test", goto_model);
     REQUIRE(res.first == "func1");
     REQUIRE(res.second.size() == 2);
     REQUIRE(res.second.find("func2") != res.second.end());
@@ -42,30 +44,34 @@ void restriction_parsing_test()
   }
 
   REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func", "test"),
-    fp_restrictionst::invalid_restriction_exceptiont);
-
-  REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("/func", "test"),
-    fp_restrictionst::invalid_restriction_exceptiont);
-
-  REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func/", "test"),
-    fp_restrictionst::invalid_restriction_exceptiont);
-
-  REQUIRE_THROWS_AS(
-    fp_restrictionst::parse_function_pointer_restriction("func/,", "test"),
-    fp_restrictionst::invalid_restriction_exceptiont);
+    fp_restrictionst::parse_function_pointer_restriction(
+      "func", "test", goto_model),
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
-      "func1/func2,", "test"),
-    fp_restrictionst::invalid_restriction_exceptiont);
+      "/func", "test", goto_model),
+    invalid_restriction_exceptiont);
 
   REQUIRE_THROWS_AS(
     fp_restrictionst::parse_function_pointer_restriction(
-      "func1/,func2", "test"),
-    fp_restrictionst::invalid_restriction_exceptiont);
+      "func/", "test", goto_model),
+    invalid_restriction_exceptiont);
+
+  REQUIRE_THROWS_AS(
+    fp_restrictionst::parse_function_pointer_restriction(
+      "func/,", "test", goto_model),
+    invalid_restriction_exceptiont);
+
+  REQUIRE_THROWS_AS(
+    fp_restrictionst::parse_function_pointer_restriction(
+      "func1/func2,", "test", goto_model),
+    invalid_restriction_exceptiont);
+
+  REQUIRE_THROWS_AS(
+    fp_restrictionst::parse_function_pointer_restriction(
+      "func1/,func2", "test", goto_model),
+    invalid_restriction_exceptiont);
 }
 
 void merge_restrictions_test()
@@ -244,6 +250,7 @@ TEST_CASE("Json conversion", "[core]")
   // representation for the same restrictions can differ, due to the array
   // elements appearing in different orders)
 
+  goto_modelt goto_model;
   std::istringstream ss(
     "{"
     "  \"use_f.function_pointer_call.1\": [\"f\", \"g\"],"
@@ -256,7 +263,7 @@ TEST_CASE("Json conversion", "[core]")
 
   // json1 -> restrictions1
   const auto function_pointer_restrictions1 =
-    function_pointer_restrictionst::from_json(json1);
+    function_pointer_restrictionst::from_json(json1, goto_model);
 
   const auto &restrictions = function_pointer_restrictions1.restrictions;
 
@@ -278,7 +285,7 @@ TEST_CASE("Json conversion", "[core]")
 
   // json2 -> restrictions2
   const auto function_pointer_restrictions2 =
-    function_pointer_restrictionst::from_json(json2);
+    function_pointer_restrictionst::from_json(json2, goto_model);
 
   REQUIRE(
     function_pointer_restrictions1.restrictions ==

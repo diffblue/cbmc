@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/natural_loops.h>
 
+#include <util/std_code.h>
+
 class goto_program2codet
 {
   typedef std::list<irep_idt> id_listt;

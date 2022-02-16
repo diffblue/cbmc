@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
+#include <util/std_code.h>
 #include <util/string_expr.h>
 #include <util/string_utils.h>
 
@@ -97,7 +98,7 @@ void goto_symext::symex_assign(
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are executing a hidden instruction.
-    if(state.source.pc->source_location.get_hide())
+    if(state.source.pc->source_location().get_hide())
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     symex_assignt symex_assign{
@@ -130,7 +131,7 @@ void goto_symext::symex_assign(
 static std::string get_alnum_string(const array_exprt &char_array)
 {
   const auto &ibv_type =
-    to_integer_bitvector_type(to_array_type(char_array.type()).subtype());
+    to_integer_bitvector_type(to_array_type(char_array.type()).element_type());
 
   const std::size_t n_bits = ibv_type.get_width();
   CHECK_RETURN(n_bits % 8 == 0);
@@ -266,7 +267,7 @@ void goto_symext::assign_string_constant(
     "symbol shall have value derived from char array content");
 
   const address_of_exprt string_data(
-    index_exprt(aux_symbol.symbol_expr(), from_integer(0, index_type())));
+    index_exprt(aux_symbol.symbol_expr(), from_integer(0, c_index_type())));
 
   symex_assign.assign_symbol(char_array, expr_skeletont{}, string_data, {});
 
@@ -388,7 +389,7 @@ void goto_symext::constant_propagate_empty_string(
 {
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const constant_exprt length = from_integer(0, length_type);
 
@@ -416,7 +417,7 @@ bool goto_symext::constant_propagate_string_concat(
 {
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s1 = to_string_expr(f_l1.arguments().at(2));
   const auto s1_data_opt = try_evaluate_constant_string(state, s1.content());
@@ -471,7 +472,7 @@ bool goto_symext::constant_propagate_string_substring(
 
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());
@@ -563,7 +564,7 @@ bool goto_symext::constant_propagate_integer_to_string(
 
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const auto &integer_opt =
     try_evaluate_constant(state, f_l1.arguments().at(2));
@@ -639,7 +640,7 @@ bool goto_symext::constant_propagate_delete_char_at(
 
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());
@@ -713,7 +714,7 @@ bool goto_symext::constant_propagate_delete(
 
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());
@@ -806,7 +807,7 @@ bool goto_symext::constant_propagate_set_length(
 
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const auto &new_length_opt =
     try_evaluate_constant(state, f_l1.arguments().at(3));
@@ -888,7 +889,7 @@ bool goto_symext::constant_propagate_set_char_at(
 
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());
@@ -951,7 +952,7 @@ bool goto_symext::constant_propagate_case_change(
 {
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());
@@ -1012,7 +1013,7 @@ bool goto_symext::constant_propagate_replace(
 {
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());
@@ -1120,7 +1121,7 @@ bool goto_symext::constant_propagate_trim(
 {
   const auto &f_type = f_l1.function_type();
   const auto &length_type = f_type.domain().at(0);
-  const auto &char_type = to_pointer_type(f_type.domain().at(1)).subtype();
+  const auto &char_type = to_pointer_type(f_type.domain().at(1)).base_type();
 
   const refined_string_exprt &s = to_string_expr(f_l1.arguments().at(2));
   const auto s_data_opt = try_evaluate_constant_string(state, s.content());

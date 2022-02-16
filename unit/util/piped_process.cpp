@@ -107,8 +107,6 @@ TEST_CASE(
   REQUIRE(calc < 2);
 }
 
-#ifndef _WIN32
-// No Windows tests for z3 due to path and dependency issues.
 TEST_CASE(
   "Creating a sub process of z3 and read a response from an echo command.",
   "[core][util][piped_process][.z3]")
@@ -314,4 +312,3 @@ TEST_CASE(
   REQUIRE(
     process.send("(exit)\n") == piped_processt::send_responset::SUCCEEDED);
 }
-#endif

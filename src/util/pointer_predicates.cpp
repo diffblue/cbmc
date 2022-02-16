@@ -40,14 +40,6 @@ exprt pointer_offset(const exprt &pointer)
   return unary_exprt(ID_pointer_offset, pointer, signed_size_type());
 }
 
-exprt malloc_object(const exprt &pointer, const namespacet &ns)
-{
-  // we check __CPROVER_malloc_object!
-  const symbolt &malloc_object_symbol=ns.lookup(CPROVER_PREFIX "malloc_object");
-
-  return same_object(pointer, malloc_object_symbol.symbol_expr());
-}
-
 exprt deallocated(const exprt &pointer, const namespacet &ns)
 {
   // we check __CPROVER_deallocated!
@@ -62,11 +54,6 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   const symbolt &deallocated_symbol=ns.lookup(CPROVER_PREFIX "dead_object");
 
   return same_object(pointer, deallocated_symbol.symbol_expr());
-}
-
-exprt dynamic_size(const namespacet &ns)
-{
-  return ns.lookup(CPROVER_PREFIX "malloc_size").symbol_expr();
 }
 
 exprt dynamic_object(const exprt &pointer)
@@ -86,7 +73,7 @@ exprt good_pointer_def(
   const namespacet &ns)
 {
   const pointer_typet &pointer_type = to_pointer_type(pointer.type());
-  const typet &dereference_type=pointer_type.subtype();
+  const typet &dereference_type = pointer_type.base_type();
 
   const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
   CHECK_RETURN(size_of_expr_opt.has_value());
@@ -121,42 +108,6 @@ exprt null_pointer(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(pointer, null_pointer);
-}
-
-exprt dynamic_object_lower_bound(
-  const exprt &pointer,
-  const exprt &offset)
-{
-  return object_lower_bound(pointer, offset);
-}
-
-exprt dynamic_object_upper_bound(
-  const exprt &pointer,
-  const namespacet &ns,
-  const exprt &access_size)
-{
-  // this is
-  // POINTER_OFFSET(p)+access_size>__CPROVER_malloc_size
-
-  exprt malloc_size=dynamic_size(ns);
-
-  exprt object_offset=pointer_offset(pointer);
-
-  // need to add size
-  irep_idt op=ID_ge;
-  exprt sum=object_offset;
-
-  if(access_size.is_not_nil())
-  {
-    op=ID_gt;
-
-    sum = plus_exprt(
-      typecast_exprt::conditional_cast(object_offset, access_size.type()),
-      access_size);
-  }
-
-  return binary_relation_exprt(
-    typecast_exprt::conditional_cast(sum, malloc_size.type()), op, malloc_size);
 }
 
 exprt object_upper_bound(

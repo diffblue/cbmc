@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/threeval.h>
@@ -69,10 +70,12 @@ exprt boolbvt::bv_get_rec(
   {
     if(type.id()==ID_array)
     {
+      const auto &array_type = to_array_type(type);
+
       if(is_unbounded_array(type))
         return bv_get_unbounded_array(expr);
 
-      const typet &subtype=type.subtype();
+      const typet &subtype = array_type.element_type();
       std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0)
@@ -85,7 +88,8 @@ exprt boolbvt::bv_get_rec(
             new_offset+=sub_width)
         {
           const index_exprt index{
-            expr, from_integer(new_offset / sub_width, index_type())};
+            expr,
+            from_integer(new_offset / sub_width, array_type.index_type())};
           op.push_back(bv_get_rec(index, bv, offset + new_offset, subtype));
         }
 
@@ -95,7 +99,7 @@ exprt boolbvt::bv_get_rec(
       }
       else
       {
-        return array_exprt{{}, to_array_type(type)};
+        return array_exprt{{}, array_type};
       }
     }
     else if(type.id()==ID_struct_tag)
@@ -139,7 +143,8 @@ exprt boolbvt::bv_get_rec(
       const union_typet &union_type=to_union_type(type);
       const union_typet::componentst &components=union_type.components();
 
-      assert(!components.empty());
+      if(components.empty())
+        return empty_union_exprt(type);
 
       // Any idea that's better than just returning the first component?
       std::size_t component_nr=0;
@@ -155,20 +160,22 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_vector)
     {
-      const typet &subtype = type.subtype();
-      std::size_t sub_width=boolbv_width(subtype);
+      const auto &vector_type = to_vector_type(type);
+      const typet &element_type = vector_type.element_type();
+      std::size_t element_width = boolbv_width(element_type);
 
-      if(sub_width!=0 && width%sub_width==0)
+      if(element_width != 0 && width % element_width == 0)
       {
-        std::size_t size=width/sub_width;
-        vector_exprt value({}, to_vector_type(type));
+        std::size_t size = width / element_width;
+        vector_exprt value({}, vector_type);
         value.reserve_operands(size);
 
         for(std::size_t i=0; i<size; i++)
         {
-          const index_exprt index{expr, from_integer(i, index_type())};
+          const index_exprt index{expr,
+                                  from_integer(i, vector_type.index_type())};
           value.operands().push_back(
-            bv_get_rec(index, bv, i * sub_width, subtype));
+            bv_get_rec(index, bv, i * element_width, element_type));
         }
 
         return std::move(value);
@@ -176,7 +183,7 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_complex)
     {
-      const typet &subtype = type.subtype();
+      const typet &subtype = to_complex_type(type).subtype();
       std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width==sub_width*2)
@@ -327,7 +334,8 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
         if(index_mpint.has_value())
         {
           if(value.is_nil())
-            values[*index_mpint] = exprt(ID_unknown, type.subtype());
+            values[*index_mpint] =
+              exprt(ID_unknown, to_array_type(type).subtype());
           else
             values[*index_mpint] = value;
         }

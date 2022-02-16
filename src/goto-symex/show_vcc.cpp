@@ -42,8 +42,8 @@ show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
     else
       out << '\n';
 
-    if(s_it->source.pc->source_location.is_not_nil())
-      out << s_it->source.pc->source_location << '\n';
+    if(s_it->source.pc->source_location().is_not_nil())
+      out << s_it->source.pc->source_location() << '\n';
 
     if(!s_it->comment.empty())
       out << s_it->comment << '\n';
@@ -126,7 +126,8 @@ show_vcc_json(std::ostream &out, const symex_target_equationt &equation)
     // vcc object
     json_objectt &object = json_vccs.push_back(jsont()).make_object();
 
-    const source_locationt &source_location = s_it->source.pc->source_location;
+    const source_locationt &source_location =
+      s_it->source.pc->source_location();
     if(source_location.is_not_nil())
       object["sourceLocation"] = json(source_location);
 

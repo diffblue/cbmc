@@ -1,8 +1,10 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract f1
 ^EXIT=0$
 ^SIGNAL=0$
+^\[f1.assigns.\d+\] line \d+ Check that \*a is valid: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that b->y is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

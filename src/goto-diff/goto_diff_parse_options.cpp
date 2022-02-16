@@ -20,7 +20,6 @@ Author: Peter Schrammel
 #include <util/options.h>
 #include <util/version.h>
 
-#include <goto-programs/add_malloc_may_fail_variable_initializations.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
@@ -58,57 +57,11 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
     exit(1);
   }
 
-  if(cmdline.isset("program-only"))
-    options.set_option("program-only", true);
-
-  if(cmdline.isset("show-byte-ops"))
-    options.set_option("show-byte-ops", true);
-
-  if(cmdline.isset("show-vcc"))
-    options.set_option("show-vcc", true);
-
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 
-  if(cmdline.isset("mm"))
-    options.set_option("mm", cmdline.get_value("mm"));
-
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  if(cmdline.isset("debug-level"))
-    options.set_option("debug-level", cmdline.get_value("debug-level"));
-
-  if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.get_value("unwindset"));
-
-  // constant propagation
-  if(cmdline.isset("no-propagation"))
-    options.set_option("propagation", false);
-  else
-    options.set_option("propagation", true);
-
-  // all checks supported by goto_check
-  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  // generate unwinding assertions
-  if(cmdline.isset("cover"))
-    options.set_option("unwinding-assertions", false);
-  else
-    options.set_option(
-      "unwinding-assertions",
-      cmdline.isset("unwinding-assertions"));
-
-  // generate unwinding assumptions otherwise
-  options.set_option("partial-loops", cmdline.isset("partial-loops"));
-
-  if(options.get_bool_option("partial-loops") &&
-     options.get_bool_option("unwinding-assertions"))
-  {
-    log.error() << "--partial-loops and --unwinding-assertions"
-                << " must not be given together" << messaget::eom;
-    exit(1);
-  }
 
   options.set_option("show-properties", cmdline.isset("show-properties"));
 
@@ -221,8 +174,6 @@ bool goto_diff_parse_optionst::process_goto_program(
   link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
   link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
 
-  add_malloc_may_fail_variable_initializations(goto_model);
-
   // Common removal of types and complex constructs
   if(::process_goto_program(goto_model, options, log))
     return true;
@@ -238,6 +189,8 @@ bool goto_diff_parse_optionst::process_goto_program(
       get_cover_config(options, goto_model.symbol_table, ui_message_handler);
     if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
       return true;
+
+    goto_model.goto_functions.update();
   }
 
   // label the assertions
@@ -271,7 +224,7 @@ void goto_diff_parse_optionst::help()
     "Diff options:\n"
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_SHOW_PROPERTIES
-    " --syntactic                  do syntactic diff (default)\n"
+    " --show-loops                 show the loops in the programs\n"
     " -u | --unified               output unified diff\n"
     " --change-impact | \n"
     "  --forward-impact |\n"

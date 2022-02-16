@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.2)
 
+# Compile with /usr/bin/clang on MacOS
+# See https://github.com/diffblue/cbmc/issues/4956
+#
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+    if(NOT DEFINED CMAKE_C_COMPILER)
+        message(STATUS "Setting CMAKE_C_COMPILER to /usr/bin/clang for MacOS")
+        set(CMAKE_C_COMPILER "/usr/bin/clang")
+    endif()
+endif()
+
 # If cmake generates files inside of the cbmc source directory this can lead to important files being overwritten, so we prevent that here
 if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
   message(FATAL_ERROR
@@ -140,6 +150,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
               "$<TARGET_FILE:unit>"
               "$<TARGET_FILE:goto-harness>"
               "$<TARGET_FILE:cbmc>"
+              "$<TARGET_FILE:crangler>"
               "$<TARGET_FILE:driver>"
               "$<TARGET_FILE:goto-analyzer>"
               "$<TARGET_FILE:goto-cc>"
@@ -203,6 +214,8 @@ cprover_default_properties(
     cbmc
     cbmc-lib
     cpp
+    crangler
+    crangler-lib
     driver
     goto-analyzer
     goto-analyzer-lib

@@ -37,9 +37,12 @@ std::vector<goto_programt::const_targett> get_preconditions(
        i_it->is_skip())
       continue; // ignore
 
-    if(i_it->is_assert() &&
-       i_it->source_location.get_property_class()==ID_precondition)
+    if(
+      i_it->is_assert() &&
+      i_it->source_location().get_property_class() == ID_precondition)
+    {
       result.push_back(i_it);
+    }
     else
       break; // preconditions must be at the front
   }
@@ -55,9 +58,12 @@ void remove_preconditions(goto_programt &goto_program)
        instruction.is_skip())
       continue; // ignore
 
-    if(instruction.is_assert() &&
-       instruction.source_location.get_property_class()==ID_precondition)
-      instruction.type=LOCATION;
+    if(
+      instruction.is_assert() &&
+      instruction.source_location().get_property_class() == ID_precondition)
+    {
+      instruction = goto_programt::make_location(instruction.source_location());
+    }
     else
       break; // preconditions must be at the front
   }
@@ -109,7 +115,7 @@ void instrument_preconditions(
           to_symbol_expr(as_const(*it).call_function()),
           goto_model.goto_functions);
 
-        source_locationt source_location=it->source_location;
+        source_locationt source_location = it->source_location();
 
         replace_symbolt r = actuals_replace_map(
           as_const(*it).call_lhs(),
@@ -124,8 +130,10 @@ void instrument_preconditions(
           exprt instance = p->get_condition();
           r(instance);
           *it = goto_programt::make_assertion(instance, source_location);
-          it->source_location.set_property_class(ID_precondition_instance);
-          it->source_location.set_comment(p->source_location.get_comment());
+          it->source_location_nonconst().set_property_class(
+            ID_precondition_instance);
+          it->source_location_nonconst().set_comment(
+            p->source_location().get_comment());
           it++;
         }
       }

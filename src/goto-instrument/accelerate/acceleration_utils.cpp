@@ -94,10 +94,7 @@ void acceleration_utilst::find_modified(
   expr_sett &modified)
 {
   if(t->is_assign())
-  {
-    code_assignt assignment = t->get_assign();
-    modified.insert(assignment.lhs());
-  }
+    modified.insert(t->assign_lhs());
 }
 
 bool acceleration_utilst::check_inductive(
@@ -237,9 +234,8 @@ exprt acceleration_utilst::precondition(patht &path)
     if(t->is_assign())
     {
       // XXX Need to check for aliasing...
-      const code_assignt &assignment = t->get_assign();
-      const exprt &lhs=assignment.lhs();
-      const exprt &rhs=assignment.rhs();
+      const exprt &lhs = t->assign_lhs();
+      const exprt &rhs = t->assign_rhs();
 
       if(lhs.id()==ID_symbol ||
          lhs.id()==ID_index ||
@@ -501,16 +497,16 @@ acceleration_utilst::expr_pairst acceleration_utilst::gather_array_assignments(
     if(r_it->is_assign())
     {
       // Is this an array assignment?
-      code_assignt assignment = r_it->get_assign();
+      exprt assignment_lhs = r_it->assign_lhs();
+      exprt assignment_rhs = r_it->assign_rhs();
 
-      if(assignment.lhs().id()==ID_index)
+      if(assignment_lhs.id() == ID_index)
       {
         // This is an array assignment -- accumulate it in our list.
-        assignments.push_back(
-          std::make_pair(assignment.lhs(), assignment.rhs()));
+        assignments.push_back(std::make_pair(assignment_lhs, assignment_rhs));
 
         // Also add this array to the set of arrays written to.
-        index_exprt index_expr=to_index_expr(assignment.lhs());
+        index_exprt index_expr = to_index_expr(assignment_lhs);
         arrays_written.insert(index_expr.array());
       }
       else
@@ -521,8 +517,8 @@ acceleration_utilst::expr_pairst acceleration_utilst::gather_array_assignments(
             a_it!=assignments.end();
             ++a_it)
         {
-          replace_expr(assignment.lhs(), assignment.rhs(), a_it->first);
-          replace_expr(assignment.lhs(), assignment.rhs(), a_it->second);
+          replace_expr(assignment_lhs, assignment_rhs, a_it->first);
+          replace_expr(assignment_lhs, assignment_rhs, a_it->second);
         }
       }
     }

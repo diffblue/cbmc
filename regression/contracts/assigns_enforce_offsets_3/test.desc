@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Check that a write at *x fails when the assigns clause specifies *(x + 1) and the actual underlying object is of size 1.

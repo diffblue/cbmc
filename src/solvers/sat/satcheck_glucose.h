@@ -57,20 +57,6 @@ public:
     return true;
   }
 
-  void
-  with_solver_hardness(std::function<void(solver_hardnesst &)> handler) override
-  {
-    if(solver_hardness.has_value())
-    {
-      handler(solver_hardness.value());
-    }
-  }
-
-  void enable_hardness_collection() override
-  {
-    solver_hardness = solver_hardnesst{};
-  }
-
 protected:
   resultt do_prop_solve() override;
 
@@ -78,8 +64,6 @@ protected:
 
   void add_variables();
   bvt assumptions;
-
-  optionalt<solver_hardnesst> solver_hardness;
 };
 
 class satcheck_glucose_no_simplifiert:

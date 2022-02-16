@@ -37,3 +37,8 @@ bvt boolbvt::convert_union(const union_exprt &expr)
 
   return bv;
 }
+
+bvt boolbvt::convert_empty_union(const empty_union_exprt &expr)
+{
+  return {};
+}

@@ -33,6 +33,8 @@ public:
   {
     return (const template_parameterst &)find(ID_template_parameters).get_sub();
   }
+
+  using typet::subtype;
 };
 
 inline template_typet &to_template_type(typet &type)
@@ -50,7 +52,7 @@ inline const template_typet &to_template_type(const typet &type)
 inline const typet &template_subtype(const typet &type)
 {
   if(type.id()==ID_template)
-    return type.subtype();
+    return to_type_with_subtype(type).subtype();
 
   return type;
 }

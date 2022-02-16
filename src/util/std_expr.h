@@ -39,10 +39,6 @@ public:
   const exprt &op3() const = delete;
   exprt &op3() = delete;
 
-  void move_to_operands(exprt &) = delete;
-  void move_to_operands(exprt &, exprt &) = delete;
-  void move_to_operands(exprt &, exprt &, exprt &) = delete;
-
   void copy_to_operands(const exprt &expr) = delete;
   void copy_to_operands(const exprt &, const exprt &) = delete;
   void copy_to_operands(const exprt &, const exprt &, const exprt &) = delete;
@@ -1327,8 +1323,17 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
 class index_exprt:public binary_exprt
 {
 public:
+  // When _array has array_type, the type of _index
+  // must be array_type.index_type().
+  // This will eventually be enforced using a precondition.
   index_exprt(const exprt &_array, exprt _index)
-    : binary_exprt(_array, ID_index, std::move(_index), _array.type().subtype())
+    : binary_exprt(
+        _array,
+        ID_index,
+        std::move(_index),
+        _array.type().has_subtype()
+          ? to_type_with_subtype(_array.type()).subtype()
+          : typet(ID_nil))
   {
   }
 
@@ -1662,6 +1667,51 @@ inline union_exprt &to_union_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Union constructor to support unions without any member (a GCC/Clang
+/// feature).
+class empty_union_exprt : public nullary_exprt
+{
+public:
+  explicit empty_union_exprt(typet _type)
+    : nullary_exprt(ID_empty_union, std::move(_type))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<empty_union_exprt>(const exprt &base)
+{
+  return base.id() == ID_empty_union;
+}
+
+inline void validate_expr(const empty_union_exprt &value)
+{
+  validate_operands(
+    value, 0, "Empty-union constructor must not have any operand");
+}
+
+/// \brief Cast an exprt to an \ref empty_union_exprt
+///
+/// \a expr must be known to be \ref empty_union_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref empty_union_exprt
+inline const empty_union_exprt &to_empty_union_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_empty_union);
+  const empty_union_exprt &ret = static_cast<const empty_union_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_empty_union_expr(const exprt &)
+inline empty_union_exprt &to_empty_union_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_empty_union);
+  empty_union_exprt &ret = static_cast<empty_union_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
 
 /// \brief Struct constructor from list of elements
 class struct_exprt : public multi_ary_exprt

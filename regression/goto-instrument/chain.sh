@@ -7,48 +7,37 @@ goto_instrument=$2
 cbmc=$3
 is_windows=$4
 
-name=${*:$#}
-
-if [[ x$name == x ]];  then
-  name=${name%.c}
-fi
-
+sources=${*:$#}
 args=${*:5:$#-5}
 
-if [[ "${is_windows}" == "true" && x$name != x ]]; then
-  $goto_cc "main.gb" ${name}
-  name="main"
-  mv "${name}.exe" "${name}.gb"
-elif [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "${name}.c"
-  mv "${name}.exe" "${name}.gb"
-elif [[ x$name != x ]]; then
-  $goto_cc -o "main.gb" ${name}
-  echo "name: ${name}"
-  name="main"
+set -- $sources
+target=${*:$#}
+target=${target%.c}
+
+if [[ "${is_windows}" == "true" ]]; then
+  $goto_cc ${sources} "/Fe${target}.gb"
 else
-  $goto_cc -o "${name}.gb" "${name}.c"
+  $goto_cc -o ${target}.gb ${sources}
 fi
 
-rm -f "${name}-mod.gb"
-$goto_instrument ${args} "${name}.gb" "${name}-mod.gb"
-if [ ! -e "${name}-mod.gb" ] ; then
-  cp "$name.gb" "${name}-mod.gb"
+rm -f "${target}-mod.gb"
+$goto_instrument ${args} "${target}.gb" "${target}-mod.gb"
+if [ ! -e "${target}-mod.gb" ] ; then
+  cp "${target}.gb" "${target}-mod.gb"
 elif echo $args | grep -q -- "--dump-c-type-header" ; then
-  cat "${name}-mod.gb"
-  mv "${name}.gb" "${name}-mod.gb"
+  cat "${target}-mod.gb"
+  mv "${target}.gb" "${target}-mod.gb"
 elif echo $args | grep -q -- "--dump-c" ; then
-  cat "${name}-mod.gb"
-  mv "${name}-mod.gb" "${name}-mod.c"
+  cat "${target}-mod.gb"
+  mv "${target}-mod.gb" "${target}-mod.c"
 
   if [[ "${is_windows}" == "true" ]]; then
-    $goto_cc "${name}-mod.c"
-    mv "${name}-mod.exe" "${name}-mod.gb"
+    $goto_cc "${target}-mod.c" "/Fe${target}-mod.gb"
   else
-    $goto_cc -o "${name}-mod.gb" "${name}-mod.c"
+    $goto_cc -o "${target}-mod.gb" "${target}-mod.c"
   fi
 
-  rm "${name}-mod.c"
+  rm "${target}-mod.c"
 fi
-$goto_instrument --show-goto-functions "${name}-mod.gb"
-$cbmc "${name}-mod.gb"
+$goto_instrument --show-goto-functions "${target}-mod.gb"
+$cbmc "${target}-mod.gb"

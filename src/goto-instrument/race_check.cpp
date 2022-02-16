@@ -189,7 +189,7 @@ static void race_check(
       original_instruction.swap(instruction);
 
       instruction =
-        goto_programt::make_skip(original_instruction.source_location);
+        goto_programt::make_skip(original_instruction.source_location());
       i_it++;
 
       // now add assignments for what is written -- set
@@ -203,7 +203,7 @@ static void race_check(
           goto_programt::make_assignment(
             w_guards.get_w_guard_expr(w_entry.second),
             w_entry.second.guard,
-            original_instruction.source_location));
+            original_instruction.source_location()));
         i_it=++t;
       }
 
@@ -225,7 +225,7 @@ static void race_check(
           goto_programt::make_assignment(
             w_guards.get_w_guard_expr(w_entry.second),
             false_exprt(),
-            original_instruction.source_location));
+            original_instruction.source_location()));
         i_it = std::next(t);
       }
 
@@ -239,8 +239,9 @@ static void race_check(
           i_it,
           goto_programt::make_assertion(
             w_guards.get_assertion(r_entry.second),
-            original_instruction.source_location));
-        t->source_location.set_comment(comment(r_entry.second, false));
+            original_instruction.source_location()));
+        t->source_location_nonconst().set_comment(
+          comment(r_entry.second, false));
         i_it=++t;
       }
 
@@ -253,8 +254,9 @@ static void race_check(
           i_it,
           goto_programt::make_assertion(
             w_guards.get_assertion(w_entry.second),
-            original_instruction.source_location));
-        t->source_location.set_comment(comment(w_entry.second, true));
+            original_instruction.source_location()));
+        t->source_location_nonconst().set_comment(
+          comment(w_entry.second, true));
         i_it=++t;
       }
 

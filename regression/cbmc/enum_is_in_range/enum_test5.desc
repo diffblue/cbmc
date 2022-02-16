@@ -3,10 +3,10 @@ enum_test5.c
 --enum-range-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.enum-range-check.6\] line \d+ enum range check in ev3: SUCCESS$
-^\[main.enum-range-check.7\] line \d+ enum range check in ev2: FAILURE$
+^\[main.enum-range-check.\d\] line \d+ enum range check in ev3: SUCCESS$
+^\[main.enum-range-check.\d\] line \d+ enum range check in ev2: FAILURE$
 --
-^\[main.enum-range-check.6\] line \d+ enum range check in ev3: FAILURE$
+^\[main.enum-range-check.\d\] line \d+ enum range check in ev3: FAILURE$
 ^\*\*\*\* WARNING: no body for function __CPROVER_enum_is_in_range$
 --
 This test is for the enum_is_in_range working in assume statements

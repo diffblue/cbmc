@@ -551,6 +551,15 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu++14");
       break;
+
+    case configt::cppt::cpp_standardt::CPP17:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++17");
+      else
+#endif
+        argv.push_back("-std=gnu++17");
+      break;
     }
   }
   else

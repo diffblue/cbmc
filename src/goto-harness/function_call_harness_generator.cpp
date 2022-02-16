@@ -8,7 +8,6 @@ Author: Diffblue Ltd.
 
 #include "function_call_harness_generator.h"
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
@@ -18,6 +17,7 @@ Author: Diffblue Ltd.
 #include <util/string_utils.h>
 #include <util/ui_message.h>
 
+#include <goto-programs/allocate_objects.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
@@ -400,7 +400,7 @@ void function_call_harness_generatort::validate_options(
     }
 
     if(!can_cast_type<code_typet>(
-         to_pointer_type(function_pointer_type).subtype()))
+         to_pointer_type(function_pointer_type).base_type()))
     {
       throw invalid_command_line_argument_exceptiont{
         "`" + id2string(nullable) + "' is not pointing to a function",

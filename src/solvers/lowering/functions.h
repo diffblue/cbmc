@@ -33,7 +33,7 @@ public:
 
   void record(const function_application_exprt &function_application);
 
-  virtual void post_process()
+  virtual void finish_eager_conversion()
   {
     add_function_constraints();
   }

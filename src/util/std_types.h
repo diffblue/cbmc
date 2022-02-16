@@ -768,6 +768,25 @@ public:
     add(ID_size, std::move(_size));
   }
 
+  /// The type of the index expressions into any instance of this type.
+  typet index_type() const;
+
+  /// The type of the elements of the array.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  const typet &element_type() const
+  {
+    return subtype();
+  }
+
+  /// The type of the elements of the array.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  typet &element_type()
+  {
+    return subtype();
+  }
+
   const exprt &size() const
   {
     return static_cast<const exprt &>(find(ID_size));
@@ -813,6 +832,7 @@ inline bool can_cast_type<array_typet>(const typet &type)
 inline const array_typet &to_array_type(const typet &type)
 {
   PRECONDITION(can_cast_type<array_typet>(type));
+  array_typet::check(type);
   return static_cast<const array_typet &>(type);
 }
 
@@ -820,6 +840,7 @@ inline const array_typet &to_array_type(const typet &type)
 inline array_typet &to_array_type(typet &type)
 {
   PRECONDITION(can_cast_type<array_typet>(type));
+  array_typet::check(type);
   return static_cast<array_typet &>(type);
 }
 
@@ -976,6 +997,25 @@ class vector_typet:public type_with_subtypet
 public:
   vector_typet(const typet &_subtype, const constant_exprt &_size);
 
+  /// The type of any index expression into an instance of this type.
+  typet index_type() const;
+
+  /// The type of the elements of the vector.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  const typet &element_type() const
+  {
+    return subtype();
+  }
+
+  /// The type of the elements of the vector.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  typet &element_type()
+  {
+    return subtype();
+  }
+
   const constant_exprt &size() const;
   constant_exprt &size();
 };
@@ -1000,6 +1040,7 @@ inline bool can_cast_type<vector_typet>(const typet &type)
 inline const vector_typet &to_vector_type(const typet &type)
 {
   PRECONDITION(can_cast_type<vector_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const vector_typet &>(type);
 }
 
@@ -1007,6 +1048,7 @@ inline const vector_typet &to_vector_type(const typet &type)
 inline vector_typet &to_vector_type(typet &type)
 {
   PRECONDITION(can_cast_type<vector_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<vector_typet &>(type);
 }
 
@@ -1040,6 +1082,7 @@ inline bool can_cast_type<complex_typet>(const typet &type)
 inline const complex_typet &to_complex_type(const typet &type)
 {
   PRECONDITION(can_cast_type<complex_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const complex_typet &>(type);
 }
 
@@ -1047,6 +1090,7 @@ inline const complex_typet &to_complex_type(const typet &type)
 inline complex_typet &to_complex_type(typet &type)
 {
   PRECONDITION(can_cast_type<complex_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<complex_typet &>(type);
 }
 

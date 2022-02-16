@@ -33,6 +33,7 @@ class binary_exprt;
 class binary_overflow_exprt;
 class binary_relation_exprt;
 class bitnot_exprt;
+class bitreverse_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -209,6 +210,9 @@ public:
 
   /// Try to simplify count-trailing-zeros to a constant expression.
   NODISCARD resultt<> simplify_ctz(const count_trailing_zeros_exprt &);
+
+  /// Try to simplify bit-reversing to a constant expression.
+  NODISCARD resultt<> simplify_bitreverse(const bitreverse_exprt &);
 
   // auxiliary
   bool simplify_if_implies(

@@ -28,7 +28,7 @@ string_constraint_generatort::add_axioms_for_constant(
 {
   string_constraintst constraints;
   const typet index_type = array_pool.get_or_create_length(res).type();
-  const typet &char_type = res.content().type().subtype();
+  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
   std::string c_str = id2string(sval);
   std::wstring str;
 

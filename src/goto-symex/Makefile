@@ -17,6 +17,7 @@ SRC = auto_objects.cpp \
       show_program.cpp \
       show_vcc.cpp \
       slice.cpp \
+      solver_hardness.cpp \
       ssa_step.cpp \
       symex_assign.cpp \
       symex_atomic_section.cpp \
@@ -31,6 +32,7 @@ SRC = auto_objects.cpp \
       symex_goto.cpp \
       symex_main.cpp \
       symex_other.cpp \
+      symex_set_return_value.cpp \
       symex_start_thread.cpp \
       symex_target.cpp \
       symex_target_equation.cpp \

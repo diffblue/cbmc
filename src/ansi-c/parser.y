@@ -1607,7 +1607,7 @@ gcc_type_attribute:
         | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION
         { $$=$1; set($$, ID_transparent_union); }
         | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
-        { $$=$1; set($$, ID_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
+        { $$=$1; set($$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
         | TOK_GCC_ATTRIBUTE_ALIGNED
         { $$=$1; set($$, ID_aligned); }
         | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
@@ -2453,6 +2453,9 @@ iteration_statement:
           statement($$, ID_while);
           parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($8)));
 
+          if(!parser_stack($5).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($5).operands());
+
           if(!parser_stack($6).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($6).operands());
 
@@ -2467,6 +2470,9 @@ iteration_statement:
           $$=$1;
           statement($$, ID_dowhile);
           parser_stack($$).add_to_operands(std::move(parser_stack($5)), std::move(parser_stack($2)));
+
+          if(!parser_stack($7).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($7).operands());
 
           if(!parser_stack($8).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($8).operands());
@@ -2498,6 +2504,9 @@ iteration_statement:
           mto($$, $5);
           mto($$, $7);
           mto($$, $12);
+
+          if(!parser_stack($9).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($9).operands());
 
           if(!parser_stack($10).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($10).operands());
@@ -3288,12 +3297,65 @@ cprover_function_contract:
         | cprover_contract_assigns
         ;
 
+unary_expression_list:
+          unary_expression
+        {
+          init($$, ID_expression_list);
+          parser_stack($$).add_source_location()=parser_stack($1).source_location();
+          mto($$, $1);
+        }
+        | unary_expression_list ',' unary_expression
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+conditional_target_group:
+          unary_expression_list
+        {
+          init($$, ID_conditional_target_group);
+          parser_stack($$).add_source_location()=parser_stack($1).source_location();
+          parser_stack($$).add_to_operands(true_exprt{});
+          mto($$, $1);
+        }
+        | logical_equivalence_expression ':' unary_expression_list
+        { 
+          $$=$2;
+          set($$, ID_conditional_target_group);
+          mto($$, $1);
+          mto($$, $3);
+        }
+        ;
+
+conditional_target_list:
+          conditional_target_group
+        {
+          init($$, ID_target_list);
+          mto($$, $1);
+        }
+        | conditional_target_list ';' conditional_target_group
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+conditional_target_list_opt_semicol:
+          conditional_target_list ';'
+        {
+          $$ = $1;
+        }
+        | conditional_target_list
+        {
+          $$ = $1;          
+        }
+
 cprover_contract_assigns:
-         TOK_CPROVER_ASSIGNS '(' argument_expression_list ')'
+         TOK_CPROVER_ASSIGNS '(' conditional_target_list_opt_semicol ')'
         {
           $$=$1;
           set($$, ID_C_spec_assigns);
-          parser_stack($3).id(ID_target_list);
           mto($$, $3);
         }
         | TOK_CPROVER_ASSIGNS '(' ')'

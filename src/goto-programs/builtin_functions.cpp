@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
+#include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
@@ -259,7 +260,7 @@ void goto_convertt::do_scanf(
               const address_of_exprt rhs(
                 index_exprt(
                   tmp_symbol.symbol_expr(),
-                  from_integer(0, index_type())));
+                  from_integer(0, c_index_type())));
 
               // now use array copy
               codet array_copy_statement;
@@ -273,9 +274,10 @@ void goto_convertt::do_scanf(
               copy(array_copy_statement, OTHER, dest);
               #else
               const index_exprt new_lhs(
-                dereference_exprt{ptr}, from_integer(0, index_type()));
+                dereference_exprt{ptr}, from_integer(0, c_index_type()));
               const side_effect_expr_nondett rhs(
-                type->subtype(), function.source_location());
+                to_array_type(*type).element_type(),
+                function.source_location());
               code_assignt assign(new_lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -440,7 +442,8 @@ void goto_convertt::do_cpp_new(
     if(new_array)
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
-    new_call.set(ID_C_cxx_alloc_type, lhs.type().subtype());
+    new_call.set(
+      ID_C_cxx_alloc_type, to_type_with_subtype(lhs.type()).subtype());
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
@@ -471,7 +474,8 @@ void goto_convertt::do_cpp_new(
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
     new_call.arguments().push_back(to_unary_expr(rhs).op()); // memory location
-    new_call.set(ID_C_cxx_alloc_type, lhs.type().subtype());
+    new_call.set(
+      ID_C_cxx_alloc_type, to_type_with_subtype(lhs.type()).subtype());
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
@@ -520,7 +524,8 @@ void goto_convertt::cpp_new_initializer(
     else if(rhs.get_statement()==ID_cpp_new)
     {
       // just one object
-      const dereference_exprt deref_lhs(lhs, rhs.type().subtype());
+      const dereference_exprt deref_lhs(
+        lhs, to_pointer_type(rhs.type()).base_type());
 
       replace_new_object(deref_lhs, initializer);
       convert(to_code(initializer), dest, ID_cpp);
@@ -597,14 +602,14 @@ exprt make_va_list(const exprt &expr)
   if(result.id() == ID_address_of)
   {
     const auto &address_of_expr = to_address_of_expr(result);
-    if(is_lvalue(address_of_expr.object()))
+    if(is_assignable(address_of_expr.object()))
       result = address_of_expr.object();
   }
 
   while(result.type().id() == ID_array &&
         to_array_type(result.type()).size().is_one())
   {
-    result = index_exprt{result, from_integer(0, index_type())};
+    result = index_exprt{result, from_integer(0, c_index_type())};
   }
 
   return result;
@@ -631,9 +636,89 @@ void goto_convertt::do_enum_is_in_range(
     disjuncts.push_back(equal_exprt(enum_expr, std::move(val)));
   }
 
-  code_assignt assignment(lhs, disjunction(disjuncts));
+  code_assignt assignment(lhs, simplify_expr(disjunction(disjuncts), ns));
   assignment.add_source_location() = function.source_location();
+  assignment.add_source_location().add_pragma("disable:enum-range-check");
   copy(assignment, ASSIGN, dest);
+}
+
+void goto_convertt::do_havoc_slice(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  irep_idt identifier = CPROVER_PREFIX "havoc_slice";
+
+  // We disable checks on the generated instructions
+  // because we add our own rw_ok assertion that takes size into account
+  auto source_location = function.find_source_location();
+  source_location.add_pragma("disable:pointer-check");
+  source_location.add_pragma("disable:pointer-overflow-check");
+  source_location.add_pragma("disable:pointer-primitive-check");
+
+  // check # arguments
+  if(arguments.size() != 2)
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier << "' expected to have two arguments" << eom;
+    throw 0;
+  }
+
+  // check argument types
+  if(arguments[0].type().id() != ID_pointer)
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier
+            << "' first argument expected to have `void *` type" << eom;
+    throw 0;
+  }
+
+  if(arguments[1].type().id() != ID_unsignedbv)
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier
+            << "' second argument expected to have `size_t` type" << eom;
+    throw 0;
+  }
+
+  // check nil lhs
+  if(lhs.is_not_nil())
+  {
+    error().source_location = source_location;
+    error() << "'" << identifier << "' not expected to have a LHS" << eom;
+    throw 0;
+  }
+
+  // insert instructions
+  // assert(rw_ok(argument[0], argument[1]));
+  // char nondet_contents[argument[1]];
+  // __CPROVER_array_replace(p, nondet_contents);
+
+  r_or_w_ok_exprt ok_expr(ID_w_ok, arguments[0], arguments[1]);
+  ok_expr.add_source_location() = source_location;
+  goto_programt::targett t =
+    dest.add(goto_programt::make_assertion(ok_expr, source_location));
+  t->source_location_nonconst().set("user-provided", false);
+  t->source_location_nonconst().set_property_class(ID_assertion);
+  t->source_location_nonconst().set_comment(
+    "assertion havoc_slice " + from_expr(ns, identifier, ok_expr));
+
+  const array_typet array_type(char_type(), simplify_expr(arguments[1], ns));
+
+  const symbolt &nondet_contents =
+    new_tmp_symbol(array_type, "nondet_contents", dest, source_location, mode);
+  const exprt &nondet_contents_expr = address_of_exprt{index_exprt{
+    nondet_contents.symbol_expr(), from_integer(0, c_index_type())}};
+
+  const exprt &arg0 =
+    typecast_exprt::conditional_cast(arguments[0], pointer_type(empty_typet{}));
+  const exprt &arg1 = typecast_exprt::conditional_cast(
+    nondet_contents_expr, pointer_type(empty_typet{}));
+
+  codet array_replace(ID_array_replace, {arg0, arg1}, source_location);
+  dest.add(goto_programt::make_other(array_replace, source_location));
 }
 
 /// add function calls to function queue for later processing
@@ -641,7 +726,8 @@ void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
   const symbol_exprt &function,
   const exprt::operandst &arguments,
-  goto_programt &dest)
+  goto_programt &dest,
+  const irep_idt &mode)
 {
   if(function.get_bool(ID_C_invalid_object))
     return; // ignore
@@ -681,8 +767,12 @@ void goto_convertt::do_function_call_symbol(
     return;
   }
 
-  if(identifier==CPROVER_PREFIX "assume" ||
-     identifier=="__VERIFIER_assume")
+  if(identifier == CPROVER_PREFIX "havoc_slice")
+  {
+    do_havoc_slice(lhs, function, arguments, dest, mode);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "assume" || identifier == "__VERIFIER_assume")
   {
     if(arguments.size()!=1)
     {
@@ -696,7 +786,7 @@ void goto_convertt::do_function_call_symbol(
       typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
       function.source_location()));
 
-    t->source_location.set("user-provided", true);
+    t->source_location_nonconst().set("user-provided", true);
 
     if(lhs.is_not_nil())
     {
@@ -717,8 +807,8 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t = dest.add(
       goto_programt::make_assertion(false_exprt(), function.source_location()));
 
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
+    t->source_location_nonconst().set("user-provided", true);
+    t->source_location_nonconst().set_property_class(ID_assertion);
 
     if(lhs.is_not_nil())
     {
@@ -731,7 +821,7 @@ void goto_convertt::do_function_call_symbol(
     // are being checked
     goto_programt::targett a = dest.add(goto_programt::make_assumption(
       false_exprt(), function.source_location()));
-    a->source_location.set("user-provided", true);
+    a->source_location_nonconst().set("user-provided", true);
   }
   else if(
     identifier == "assert" &&
@@ -748,9 +838,9 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t = dest.add(goto_programt::make_assertion(
       typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
       function.source_location()));
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(
+    t->source_location_nonconst().set("user-provided", true);
+    t->source_location_nonconst().set_property_class(ID_assertion);
+    t->source_location_nonconst().set_comment(
       "assertion " + from_expr(ns, identifier, arguments.front()));
 
     if(lhs.is_not_nil())
@@ -790,21 +880,20 @@ void goto_convertt::do_function_call_symbol(
 
     if(is_precondition)
     {
-      t->source_location.set_property_class(ID_precondition);
+      t->source_location_nonconst().set_property_class(ID_precondition);
     }
     else if(is_postcondition)
     {
-      t->source_location.set_property_class(ID_postcondition);
+      t->source_location_nonconst().set_property_class(ID_postcondition);
     }
     else
     {
-      t->source_location.set(
-        "user-provided",
-        !function.source_location().is_built_in());
-      t->source_location.set_property_class(ID_assertion);
+      t->source_location_nonconst().set(
+        "user-provided", !function.source_location().is_built_in());
+      t->source_location_nonconst().set_property_class(ID_assertion);
     }
 
-    t->source_location.set_comment(description);
+    t->source_location_nonconst().set_comment(description);
 
     if(lhs.is_not_nil())
     {
@@ -999,9 +1088,9 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t = dest.add(
       goto_programt::make_assertion(false_exprt(), function.source_location()));
 
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(description);
+    t->source_location_nonconst().set("user-provided", true);
+    t->source_location_nonconst().set_property_class(ID_assertion);
+    t->source_location_nonconst().set_comment(description);
     // we ignore any LHS
   }
   else if(identifier=="__assert_rtn" ||
@@ -1037,9 +1126,9 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t = dest.add(
       goto_programt::make_assertion(false_exprt(), function.source_location()));
 
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(description);
+    t->source_location_nonconst().set("user-provided", true);
+    t->source_location_nonconst().set_property_class(ID_assertion);
+    t->source_location_nonconst().set_comment(description);
     // we ignore any LHS
   }
   else if(identifier=="__assert_func")
@@ -1071,9 +1160,9 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t = dest.add(
       goto_programt::make_assertion(false_exprt(), function.source_location()));
 
-    t->source_location.set("user-provided", true);
-    t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment(description);
+    t->source_location_nonconst().set("user-provided", true);
+    t->source_location_nonconst().set_property_class(ID_assertion);
+    t->source_location_nonconst().set_comment(description);
     // we ignore any LHS
   }
   else if(identifier==CPROVER_PREFIX "fence")
@@ -1123,7 +1212,7 @@ void goto_convertt::do_function_call_symbol(
       exprt list_arg_cast = list_arg;
       if(
         list_arg.type().id() == ID_pointer &&
-        to_pointer_type(list_arg.type()).subtype().id() == ID_empty)
+        to_pointer_type(list_arg.type()).base_type().id() == ID_empty)
       {
         list_arg_cast =
           typecast_exprt{list_arg, pointer_type(pointer_type(empty_typet{}))};
@@ -1156,7 +1245,7 @@ void goto_convertt::do_function_call_symbol(
     exprt dest_expr=make_va_list(arguments[0]);
     const typecast_exprt src_expr(arguments[1], dest_expr.type());
 
-    if(!is_lvalue(dest_expr))
+    if(!is_assignable(dest_expr))
     {
       error().source_location=dest_expr.find_source_location();
       error() << "va_copy argument expected to be lvalue" << eom;
@@ -1179,7 +1268,7 @@ void goto_convertt::do_function_call_symbol(
 
     exprt dest_expr=make_va_list(arguments[0]);
 
-    if(!is_lvalue(dest_expr))
+    if(!is_assignable(dest_expr))
     {
       error().source_location=dest_expr.find_source_location();
       error() << "va_start argument expected to be lvalue" << eom;
@@ -1188,7 +1277,7 @@ void goto_convertt::do_function_call_symbol(
 
     if(
       dest_expr.type().id() == ID_pointer &&
-      to_pointer_type(dest_expr.type()).subtype().id() == ID_empty)
+      to_pointer_type(dest_expr.type()).base_type().id() == ID_empty)
     {
       dest_expr =
         typecast_exprt{dest_expr, pointer_type(pointer_type(empty_typet{}))};
@@ -1214,7 +1303,7 @@ void goto_convertt::do_function_call_symbol(
 
     exprt dest_expr=make_va_list(arguments[0]);
 
-    if(!is_lvalue(dest_expr))
+    if(!is_assignable(dest_expr))
     {
       error().source_location=dest_expr.find_source_location();
       error() << "va_end argument expected to be lvalue" << eom;

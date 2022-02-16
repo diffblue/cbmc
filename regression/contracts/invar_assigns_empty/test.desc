@@ -5,7 +5,6 @@ main.c
 ^SIGNAL=0$
 ^\[main.1\] .* Check loop invariant before entry: SUCCESS$
 ^\[main.2\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.1\] .* assertion r == 0: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

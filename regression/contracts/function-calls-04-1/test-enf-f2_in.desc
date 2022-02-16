@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-contract f2_in _ --unwind 20 --unwinding-assertions
+^file main\.c line 13 function f2_out: recursion is ignored on call to 'f2_in'$
+^Invariant check failed$
+^Condition: decorated\.get_recursive_function_warnings_count\(\) == 0$
+^Reason: Recursive functions found during inlining$
+^EXIT=(127|134|137)$
+^SIGNAL=0$
+--
+--
+Test should fail because a recursive function is found during inlining.

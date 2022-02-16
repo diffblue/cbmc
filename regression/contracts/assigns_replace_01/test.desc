@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts
+--replace-call-with-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
 assertion n == 7: FAILURE

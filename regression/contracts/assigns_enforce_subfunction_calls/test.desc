@@ -1,0 +1,18 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^main.c function baz$
+^\[baz.assigns.\d+\] line 6 Check that \*x is assignable: SUCCESS$
+^\[baz.assigns.\d+\] line 6 Check that \*x is assignable: FAILURE$
+^main.c function foo$
+^\[foo.assertion.\d+\] line 20 foo.x.set: SUCCESS$
+^\[foo.assertion.\d+\] line 25 foo.local.set: SUCCESS$
+^\[foo.assertion.\d+\] line 29 foo.y.set: SUCCESS$
+^\[foo.assertion.\d+\] line 33 foo.z.set: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+Check that different invocations of a sub-function are instrumented differently.
+

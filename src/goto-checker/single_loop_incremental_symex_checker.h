@@ -16,6 +16,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/path_storage.h>
 
+#include <goto-instrument/unwindset.h>
+
 #include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "incremental_goto_checker.h"
@@ -57,6 +59,7 @@ protected:
   symex_target_equationt equation;
   path_fifot path_storage; // should go away
   guard_managert guard_manager;
+  unwindsett unwindset;
   symex_bmc_incremental_one_loopt symex;
   bool initial_equation_generated = false;
   bool full_equation_generated = false;

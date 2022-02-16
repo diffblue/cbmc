@@ -881,7 +881,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
          to_constant_expr(op_plus_expr.op0()).get_value() == ID_NULL)))
     {
       auto sub_size =
-        pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
+        pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
       if(sub_size.has_value())
       {
         auto new_expr = expr;
@@ -956,7 +956,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
     op_type.id() == ID_pointer && expr.op().id() == ID_plus)
   {
-    const auto step = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
+    const auto step =
+      pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
 
     if(step.has_value() && *step != 0)
     {
@@ -1268,7 +1269,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     else if(op_type_id==ID_c_enum_tag) // enum to int
     {
       const typet &base_type =
-        ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+        ns.follow_tag(to_c_enum_tag_type(op_type)).underlying_type();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
@@ -1279,7 +1280,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     }
     else if(op_type_id==ID_c_enum) // enum to int
     {
-      const typet &base_type=to_c_enum_type(op_type).subtype();
+      const typet &base_type = to_c_enum_type(op_type).underlying_type();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
@@ -1312,7 +1313,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     // turn &array into &array[0] when casting to pointer-to-element-type
     if(
       o.type().id() == ID_array &&
-      expr_type == pointer_type(o.type().subtype()))
+      expr_type == pointer_type(to_array_type(o.type()).element_type()))
     {
       auto result =
         address_of_exprt(index_exprt(o, from_integer(0, size_type())));
@@ -1373,7 +1374,7 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
         index_exprt idx(
           old.array(),
           pointer_offset_sum(old.index(), pointer_plus_expr.op1()),
-          old.array().type().subtype());
+          to_array_type(old.array().type()).element_type());
         return changed(simplify_rec(idx));
       }
     }
@@ -1966,7 +1967,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       }
       else if(tp.id()==ID_array)
       {
-        auto i = pointer_offset_size(to_array_type(tp).subtype(), ns);
+        auto i = pointer_offset_size(to_array_type(tp).element_type(), ns);
         if(i.has_value())
         {
           const exprt &index=with.where();
@@ -2097,7 +2098,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   // byte_extract
   if(root.id()==ID_array)
   {
-    auto el_size = pointer_offset_bits(op_type.subtype(), ns);
+    auto el_size =
+      pointer_offset_bits(to_type_with_subtype(op_type).subtype(), ns);
 
     if(!el_size.has_value() || *el_size == 0 ||
        (*el_size) % 8 != 0 || (*val_size) % 8 != 0)
@@ -2172,10 +2174,19 @@ simplify_exprt::simplify_complex(const unary_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
 {
-  // zero is a neutral element for all operations supported here
+  // When one operand is zero, an overflow can only occur for a subtraction from
+  // zero.
   if(
     expr.op1().is_zero() ||
     (expr.op0().is_zero() && expr.id() != ID_overflow_minus))
+  {
+    return false_exprt{};
+  }
+
+  // One is neutral element for multiplication
+  if(
+    expr.id() == ID_overflow_mult &&
+    (expr.op0().is_one() || expr.op1().is_one()))
   {
     return false_exprt{};
   }
@@ -2540,6 +2551,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   else if(expr.id() == ID_overflow_unary_minus)
   {
     r = simplify_overflow_unary(to_unary_overflow_expr(expr));
+  }
+  else if(expr.id() == ID_bitreverse)
+  {
+    r = simplify_bitreverse(to_bitreverse_expr(expr));
   }
 
   if(!no_change_join_operands)

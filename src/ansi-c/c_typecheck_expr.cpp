@@ -113,24 +113,26 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   {
     if(type2.id()==ID_c_enum) // both are enums
       return type1==type2; // compares the tag
-    else if(type2==type1.subtype())
+    else if(type2 == to_c_enum_type(type1).underlying_type())
       return true;
   }
   else if(type2.id()==ID_c_enum)
   {
-    if(type1==type2.subtype())
+    if(type1 == to_c_enum_type(type2).underlying_type())
       return true;
   }
   else if(type1.id()==ID_pointer &&
           type2.id()==ID_pointer)
   {
-    return gcc_types_compatible_p(type1.subtype(), type2.subtype());
+    return gcc_types_compatible_p(
+      to_pointer_type(type1).base_type(), to_pointer_type(type2).base_type());
   }
   else if(type1.id()==ID_array &&
           type2.id()==ID_array)
   {
-    return
-      gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
+    return gcc_types_compatible_p(
+      to_array_type(type1).element_type(),
+      to_array_type(type2).element_type()); // ignore size
   }
   else if(type1.id()==ID_code &&
           type2.id()==ID_code)
@@ -323,7 +325,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
 
     // replace declarations by symbol expressions
     for(auto &binding : bindings)
-      binding = to_code_decl(to_code(binding)).symbol();
+      binding = to_code_frontend_decl(to_code(binding)).symbol();
 
     if(expr.id() == ID_lambda)
     {
@@ -702,9 +704,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       // still need to typecheck index
       typecheck_expr(index);
 
-      auto sub_size_opt = size_of_expr(type.subtype(), *this);
+      auto element_size_opt =
+        size_of_expr(to_array_type(type).element_type(), *this);
 
-      if(!sub_size_opt.has_value())
+      if(!element_size_opt.has_value())
       {
         error().source_location = expr.source_location();
         error() << "offsetof failed to determine array element size" << eom;
@@ -713,7 +716,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
       index = typecast_exprt::conditional_cast(index, size_type());
 
-      result = plus_exprt(result, mult_exprt(sub_size_opt.value(), index));
+      result = plus_exprt(result, mult_exprt(element_size_opt.value(), index));
 
       typet tmp=type.subtype();
       type=tmp;
@@ -788,7 +791,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
         throw 0;
       }
 
-      code_declt decl(symbol.symbol_expr());
+      code_frontend_declt decl(symbol.symbol_expr());
       decl.add_source_location() = declaration.source_location();
 
       binding = decl;
@@ -1185,7 +1188,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(op_type.id()==ID_array)
   {
-    index_exprt index(op, from_integer(0, index_type()));
+    index_exprt index(op, from_integer(0, c_index_type()));
     op=address_of_exprt(index);
   }
   else if(op_type.id()==ID_empty)
@@ -1245,7 +1248,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
 void c_typecheck_baset::make_index_type(exprt &expr)
 {
-  implicit_typecast(expr, index_type());
+  implicit_typecast(expr, c_index_type());
 }
 
 void c_typecheck_baset::typecheck_expr_index(exprt &expr)
@@ -1277,7 +1280,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   if(final_array_type.id()==ID_array ||
      final_array_type.id()==ID_vector)
   {
-    expr.type() = final_array_type.subtype();
+    expr.type() = to_type_with_subtype(final_array_type).subtype();
 
     if(array_expr.get_bool(ID_C_lvalue))
       expr.set(ID_C_lvalue, true);
@@ -1295,7 +1298,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     expr.add_to_operands(plus_exprt(std::move(summands), array_expr.type()));
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
-    expr.type() = final_array_type.subtype();
+    expr.type() = to_pointer_type(final_array_type).base_type();
   }
   else
   {
@@ -1382,14 +1385,14 @@ void c_typecheck_baset::typecheck_expr_rel(
     if(type0.id()==ID_pointer &&
        simplify_expr(op1, *this).is_zero())
     {
-      op1=constant_exprt(ID_NULL, type0);
+      op1 = null_pointer_exprt{to_pointer_type(type0)};
       return;
     }
 
     if(type1.id()==ID_pointer &&
        simplify_expr(op0, *this).is_zero())
     {
-      op0=constant_exprt(ID_NULL, type1);
+      op0 = null_pointer_exprt{to_pointer_type(type1)};
       return;
     }
 
@@ -1436,7 +1439,8 @@ void c_typecheck_baset::typecheck_expr_rel_vector(binary_exprt &expr)
 
   // Comparisons between vectors produce a vector of integers of the same width
   // with the same dimension.
-  auto subtype_width = to_bitvector_type(o_type0.subtype()).get_width();
+  auto subtype_width =
+    to_bitvector_type(to_vector_type(o_type0).element_type()).get_width();
   expr.type() =
     vector_typet{signedbv_typet{subtype_width}, to_vector_type(o_type0).size()};
 
@@ -1456,8 +1460,8 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
   if(op0_type.id() == ID_array)
   {
     // a->f is the same as a[0].f
-    exprt zero=from_integer(0, index_type());
-    index_exprt index_expr(op, zero, op0_type.subtype());
+    exprt zero = from_integer(0, c_index_type());
+    index_exprt index_expr(op, zero, to_array_type(op0_type).element_type());
     index_expr.set(ID_C_lvalue, true);
     op.swap(index_expr);
   }
@@ -1773,13 +1777,13 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
   {
     // *a is the same as a[0]
     expr.id(ID_index);
-    expr.type()=op_type.subtype();
-    expr.copy_to_operands(from_integer(0, index_type()));
+    expr.type() = to_array_type(op_type).element_type();
+    expr.copy_to_operands(from_integer(0, c_index_type()));
     assert(expr.operands().size()==2);
   }
   else if(op_type.id()==ID_pointer)
   {
-    expr.type()=op_type.subtype();
+    expr.type() = to_pointer_type(op_type).base_type();
   }
   else
   {
@@ -1849,13 +1853,14 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       }
 
       // increment/decrement on underlying type
-      to_unary_expr(expr).op() = typecast_exprt(op0, enum_type.subtype());
-      expr.type() = enum_type.subtype();
+      to_unary_expr(expr).op() =
+        typecast_exprt(op0, enum_type.underlying_type());
+      expr.type() = enum_type.underlying_type();
     }
     else if(type0.id() == ID_c_bit_field)
     {
       // promote to underlying type
-      typet underlying_type = to_c_bit_field_type(type0).subtype();
+      typet underlying_type = to_c_bit_field_type(type0).underlying_type();
       to_unary_expr(expr).op() = typecast_exprt(op0, underlying_type);
       expr.type()=underlying_type;
     }
@@ -1958,6 +1963,15 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
       {
         exprt result = typecheck_shuffle_vector(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
+        identifier == CPROVER_PREFIX "saturating_minus" ||
+        identifier == CPROVER_PREFIX "saturating_plus")
+      {
+        exprt result = typecheck_saturating_arithmetic(expr);
         expr.swap(result);
 
         return;
@@ -2665,7 +2679,7 @@ exprt c_typecheck_baset::do_special_functions(
     else
     {
       // Won't do void *
-      const auto &subtype = to_pointer_type(pointer_expr.type()).subtype();
+      const auto &subtype = to_pointer_type(pointer_expr.type()).base_type();
       if(subtype.id() == ID_empty)
       {
         error().source_location = f_op.source_location();
@@ -3057,7 +3071,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     // use underlying type for bit fields
     if(type.id() == ID_c_bit_field)
-      type = to_c_bit_field_type(type).subtype();
+      type = to_c_bit_field_type(type).underlying_type();
 
     unsigned type_number;
 
@@ -3169,76 +3183,157 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(
     identifier == "__builtin_add_overflow" ||
+    identifier == "__builtin_sadd_overflow" ||
+    identifier == "__builtin_saddl_overflow" ||
+    identifier == "__builtin_saddll_overflow" ||
+    identifier == "__builtin_uadd_overflow" ||
+    identifier == "__builtin_uaddl_overflow" ||
+    identifier == "__builtin_uaddll_overflow" ||
+    identifier == "__builtin_add_overflow_p")
+  {
+    return typecheck_builtin_overflow(expr, ID_plus);
+  }
+  else if(
     identifier == "__builtin_sub_overflow" ||
+    identifier == "__builtin_ssub_overflow" ||
+    identifier == "__builtin_ssubl_overflow" ||
+    identifier == "__builtin_ssubll_overflow" ||
+    identifier == "__builtin_usub_overflow" ||
+    identifier == "__builtin_usubl_overflow" ||
+    identifier == "__builtin_usubll_overflow" ||
+    identifier == "__builtin_sub_overflow_p")
+  {
+    return typecheck_builtin_overflow(expr, ID_minus);
+  }
+  else if(
     identifier == "__builtin_mul_overflow" ||
-    identifier == "__builtin_add_overflow_p" ||
-    identifier == "__builtin_sub_overflow_p" ||
+    identifier == "__builtin_smul_overflow" ||
+    identifier == "__builtin_smull_overflow" ||
+    identifier == "__builtin_smulll_overflow" ||
+    identifier == "__builtin_umul_overflow" ||
+    identifier == "__builtin_umull_overflow" ||
+    identifier == "__builtin_umulll_overflow" ||
     identifier == "__builtin_mul_overflow_p")
   {
-    // check function signature
-    if(expr.arguments().size() != 3)
+    return typecheck_builtin_overflow(expr, ID_mult);
+  }
+  else if(
+    identifier == "__builtin_bitreverse8" ||
+    identifier == "__builtin_bitreverse16" ||
+    identifier == "__builtin_bitreverse32" ||
+    identifier == "__builtin_bitreverse64")
+  {
+    // clang only
+    if(expr.arguments().size() != 1)
     {
       std::ostringstream error_message;
-      error_message << expr.source_location().as_string() << ": " << identifier
-                    << " takes exactly 3 arguments, but "
-                    << expr.arguments().size() << " were provided";
+      error_message << expr.source_location().as_string()
+                    << ": error: " << identifier << " expects one operand";
       throw invalid_source_file_exceptiont{error_message.str()};
     }
 
     typecheck_function_call_arguments(expr);
 
-    auto lhs = expr.arguments()[0];
-    auto rhs = expr.arguments()[1];
-    auto result = expr.arguments()[2];
+    bitreverse_exprt bitreverse{expr.arguments()[0]};
+    bitreverse.add_source_location() = source_location;
 
-    const bool is__p_variant = has_suffix(id2string(identifier), "_p");
-
-    {
-      auto const raise_wrong_argument_error =
-        [this, identifier](
-          const exprt &wrong_argument, std::size_t argument_number, bool _p) {
-          std::ostringstream error_message;
-          error_message << wrong_argument.source_location().as_string() << ": "
-                        << identifier << " has signature " << identifier
-                        << "(integral, integral, integral" << (_p ? "" : "*")
-                        << "), "
-                        << "but argument " << argument_number << " ("
-                        << expr2c(wrong_argument, *this) << ") has type `"
-                        << type2c(wrong_argument.type(), *this) << '`';
-          throw invalid_source_file_exceptiont{error_message.str()};
-        };
-      for(int arg_index = 0; arg_index <= (!is__p_variant ? 1 : 2); ++arg_index)
-      {
-        auto const &argument = expr.arguments()[arg_index];
-
-        if(!is_signed_or_unsigned_bitvector(argument.type()))
-        {
-          raise_wrong_argument_error(argument, arg_index + 1, is__p_variant);
-        }
-      }
-      if(
-        !is__p_variant &&
-        (result.type().id() != ID_pointer ||
-         !is_signed_or_unsigned_bitvector(result.type().subtype())))
-      {
-        raise_wrong_argument_error(result, 3, is__p_variant);
-      }
-    }
-
-    irep_idt kind =
-      has_prefix(id2string(identifier), "__builtin_add_overflow")
-        ? ID_plus
-        : has_prefix(id2string(identifier), "__builtin_sub_overflow") ? ID_minus
-                                                                      : ID_mult;
-
-    return side_effect_expr_overflowt{kind,
-                                      std::move(lhs),
-                                      std::move(rhs),
-                                      std::move(result),
-                                      expr.source_location()};
+    return std::move(bitreverse);
   }
   else
     return nil_exprt();
+  // NOLINTNEXTLINE(readability/fn_size)
+}
+
+exprt c_typecheck_baset::typecheck_builtin_overflow(
+  side_effect_expr_function_callt &expr,
+  const irep_idt &arith_op)
+{
+  const irep_idt &identifier = to_symbol_expr(expr.function()).get_identifier();
+
+  // check function signature
+  if(expr.arguments().size() != 3)
+  {
+    std::ostringstream error_message;
+    error_message << expr.source_location().as_string() << ": " << identifier
+                  << " takes exactly 3 arguments, but "
+                  << expr.arguments().size() << " were provided";
+    throw invalid_source_file_exceptiont{error_message.str()};
+  }
+
+  typecheck_function_call_arguments(expr);
+
+  auto lhs = expr.arguments()[0];
+  auto rhs = expr.arguments()[1];
+  auto result = expr.arguments()[2];
+
+  const bool is__p_variant = has_suffix(id2string(identifier), "_p");
+
+  {
+    auto const raise_wrong_argument_error =
+      [this, identifier](
+        const exprt &wrong_argument, std::size_t argument_number, bool _p) {
+        std::ostringstream error_message;
+        error_message << wrong_argument.source_location().as_string() << ": "
+                      << identifier << " has signature " << identifier
+                      << "(integral, integral, integral" << (_p ? "" : "*")
+                      << "), "
+                      << "but argument " << argument_number << " ("
+                      << expr2c(wrong_argument, *this) << ") has type `"
+                      << type2c(wrong_argument.type(), *this) << '`';
+        throw invalid_source_file_exceptiont{error_message.str()};
+      };
+    for(int arg_index = 0; arg_index <= (!is__p_variant ? 1 : 2); ++arg_index)
+    {
+      auto const &argument = expr.arguments()[arg_index];
+
+      if(!is_signed_or_unsigned_bitvector(argument.type()))
+      {
+        raise_wrong_argument_error(argument, arg_index + 1, is__p_variant);
+      }
+    }
+    if(
+      !is__p_variant &&
+      (result.type().id() != ID_pointer ||
+       !is_signed_or_unsigned_bitvector(result.type().subtype())))
+    {
+      raise_wrong_argument_error(result, 3, is__p_variant);
+    }
+  }
+
+  return side_effect_expr_overflowt{arith_op,
+                                    std::move(lhs),
+                                    std::move(rhs),
+                                    std::move(result),
+                                    expr.source_location()};
+}
+
+exprt c_typecheck_baset::typecheck_saturating_arithmetic(
+  const side_effect_expr_function_callt &expr)
+{
+  const irep_idt &identifier = to_symbol_expr(expr.function()).get_identifier();
+
+  // check function signature
+  if(expr.arguments().size() != 2)
+  {
+    std::ostringstream error_message;
+    error_message << expr.source_location().as_string() << ": " << identifier
+                  << " takes exactly two arguments, but "
+                  << expr.arguments().size() << " were provided";
+    throw invalid_source_file_exceptiont{error_message.str()};
+  }
+
+  exprt result;
+  if(identifier == CPROVER_PREFIX "saturating_minus")
+    result = saturating_minus_exprt{expr.arguments()[0], expr.arguments()[1]};
+  else if(identifier == CPROVER_PREFIX "saturating_plus")
+    result = saturating_plus_exprt{expr.arguments()[0], expr.arguments()[1]};
+  else
+    UNREACHABLE;
+
+  typecheck_expr_binary_arithmetic(result);
+  result.add_source_location() = expr.source_location();
+
+  return result;
 }
 
 /// Typecheck the parameters in a function call expression, and where
@@ -3337,7 +3432,7 @@ void c_typecheck_baset::typecheck_expr_unary_arithmetic(exprt &expr)
 
   if(o_type.id()==ID_vector)
   {
-    if(is_number(o_type.subtype()))
+    if(is_number(to_vector_type(o_type).element_type()))
     {
       // Vector arithmetic.
       expr.type()=operand.type();
@@ -3388,15 +3483,16 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
     return false;
 
   // compare subtype
-  if((type0.subtype().id()==ID_signedbv ||
-      type0.subtype().id()==ID_unsignedbv) &&
-     (type1.subtype().id()==ID_signedbv ||
-      type1.subtype().id()==ID_unsignedbv) &&
-     to_bitvector_type(type0.subtype()).get_width()==
-     to_bitvector_type(type1.subtype()).get_width())
+  if(
+    (type0.element_type().id() == ID_signedbv ||
+     type0.element_type().id() == ID_unsignedbv) &&
+    (type1.element_type().id() == ID_signedbv ||
+     type1.element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(type0.element_type()).get_width() ==
+      to_bitvector_type(type1.element_type()).get_width())
     return true;
 
-  return type0.subtype()==type1.subtype();
+  return type0.element_type() == type1.element_type();
 }
 
 void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
@@ -3414,7 +3510,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     if(
       gcc_vector_types_compatible(
         to_vector_type(o_type0), to_vector_type(o_type1)) &&
-      is_number(o_type0.subtype()))
+      is_number(to_vector_type(o_type0).element_type()))
     {
       // Vector arithmetic has fairly strict typing rules, no promotion
       op1 = typecast_exprt::conditional_cast(op1, op0.type());
@@ -3441,9 +3537,15 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     return;
   }
 
-  // promote!
-
-  implicit_typecast_arithmetic(op0, op1);
+  if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
+  {
+    implicit_typecast(op1, o_type0);
+  }
+  else
+  {
+    // promote!
+    implicit_typecast_arithmetic(op0, op1);
+  }
 
   const typet &type0 = op0.type();
   const typet &type1 = op1.type();
@@ -3504,6 +3606,16 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
       }
     }
   }
+  else if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
+  {
+    if(
+      type0 == type1 &&
+      (type0.id() == ID_signedbv || type0.id() == ID_unsignedbv))
+    {
+      expr.type() = type0;
+      return;
+    }
+  }
 
   error().source_location = expr.source_location();
   error() << "operator '" << expr.id() << "' not defined for types '"
@@ -3525,7 +3637,10 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
   {
-    if(o_type0.subtype() == o_type1.subtype() && is_number(o_type0.subtype()))
+    if(
+      to_vector_type(o_type0).element_type() ==
+        to_vector_type(o_type1).element_type() &&
+      is_number(to_vector_type(o_type0).element_type()))
     {
       // {a0, a1, ..., an} >> {b0, b1, ..., bn} ==
       // {a0 >> b0, a1 >> b1, ..., an >> bn}
@@ -3536,8 +3651,8 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   }
 
   if(
-    o_type0.id() == ID_vector && is_number(o_type0.subtype()) &&
-    is_number(o_type1))
+    o_type0.id() == ID_vector &&
+    is_number(to_vector_type(o_type0).element_type()) && is_number(o_type1))
   {
     // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
     op1 = typecast_exprt(op1, o_type0);
@@ -3583,21 +3698,21 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
 {
   const typet &type=expr.type();
-  assert(type.id()==ID_pointer);
+  PRECONDITION(type.id() == ID_pointer);
 
-  typet subtype=type.subtype();
+  const typet &base_type = to_pointer_type(type).base_type();
 
   if(
-    subtype.id() == ID_struct_tag &&
-    follow_tag(to_struct_tag_type(subtype)).is_incomplete())
+    base_type.id() == ID_struct_tag &&
+    follow_tag(to_struct_tag_type(base_type)).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
     throw 0;
   }
   else if(
-    subtype.id() == ID_union_tag &&
-    follow_tag(to_union_tag_type(subtype)).is_incomplete())
+    base_type.id() == ID_union_tag &&
+    follow_tag(to_union_tag_type(base_type)).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
@@ -3769,13 +3884,17 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   {
     if(o_type0.id() == ID_vector)
     {
+      auto &vector_o_type0 = to_vector_type(o_type0);
+
       if(
-        o_type1.id() == ID_vector && o_type0.subtype() == o_type1.subtype() &&
-        is_number(o_type0.subtype()))
+        o_type1.id() == ID_vector &&
+        vector_o_type0.element_type() ==
+          to_vector_type(o_type1).element_type() &&
+        is_number(vector_o_type0.element_type()))
       {
         return;
       }
-      else if(is_number(o_type0.subtype()) && is_number(o_type1))
+      else if(is_number(vector_o_type0.element_type()) && is_number(o_type1))
       {
         op1 = typecast_exprt(op1, o_type0);
         return;
@@ -3925,6 +4044,38 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   throw 0;
 }
 
+class is_compile_time_constantt : public is_constantt
+{
+public:
+  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
+  {
+  }
+
+protected:
+  const namespacet &ns;
+
+  bool is_constant(const exprt &e) const override
+  {
+    if(e.id() == ID_infinity)
+      return true;
+    else
+      return is_constantt::is_constant(e);
+  }
+
+  bool is_constant_address_of(const exprt &e) const override
+  {
+    if(e.id() == ID_symbol)
+    {
+      return e.type().id() == ID_code ||
+             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
+    }
+    else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
+      return true;
+    else
+      return is_constantt::is_constant_address_of(e);
+  }
+};
+
 void c_typecheck_baset::make_constant(exprt &expr)
 {
   // Floating-point expressions may require a rounding mode.
@@ -3936,8 +4087,7 @@ void c_typecheck_baset::make_constant(exprt &expr)
 
   simplify(expr, *this);
 
-  if(!expr.is_constant() &&
-     expr.id()!=ID_infinity)
+  if(!is_compile_time_constantt(*this)(expr))
   {
     error().source_location=expr.find_source_location();
     error() << "expected constant expression, but got '" << to_string(expr)
@@ -3952,8 +4102,7 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
   make_index_type(expr);
   simplify(expr, *this);
 
-  if(!expr.is_constant() &&
-     expr.id()!=ID_infinity)
+  if(!is_compile_time_constantt(*this)(expr))
   {
     error().source_location=expr.find_source_location();
     error() << "conversion to integer constant failed" << eom;

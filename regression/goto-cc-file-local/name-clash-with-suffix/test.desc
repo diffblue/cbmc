@@ -4,7 +4,7 @@ use_find out-file-counter final-link wall suffix assertion-check
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^.*warning: function '__CPROVER_file_local_main_c_static_fun' in module 'main' is shadowed by a definition in module 'main'
+^.*: function '__CPROVER_file_local_main_c_static_fun' in module 'main' is shadowed by a definition in module 'main'
 ^warning: ignoring
 ^\*\*\*\* WARNING: no body for function
 --

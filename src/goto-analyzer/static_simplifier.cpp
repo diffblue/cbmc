@@ -125,14 +125,14 @@ bool static_simplifier(
       }
       else if(i_it->is_function_call())
       {
-        auto fcall = i_it->get_function_call();
+        // copy
+        auto call_function = as_const(*i_it).call_function();
+        auto call_arguments = as_const(*i_it).call_arguments();
 
         bool unchanged =
-          ai.abstract_state_before(i_it)->ai_simplify(fcall.function(), ns);
+          ai.abstract_state_before(i_it)->ai_simplify(call_function, ns);
 
-        exprt::operandst &args=fcall.arguments();
-
-        for(auto &o : args)
+        for(auto &o : call_arguments)
           unchanged &= ai.abstract_state_before(i_it)->ai_simplify(o, ns);
 
         if(unchanged)
@@ -140,7 +140,8 @@ bool static_simplifier(
         else
         {
           simplified.function_calls++;
-          i_it->set_function_call(fcall);
+          i_it->call_function() = std::move(call_function);
+          i_it->call_arguments() = std::move(call_arguments);
         }
       }
     }

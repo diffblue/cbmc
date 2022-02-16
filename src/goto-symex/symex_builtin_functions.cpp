@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/string_constant.h>
 
 #include "path_storage.h"
@@ -66,9 +67,9 @@ void goto_symext::symex_allocate(
   // is the type given?
   if(
     code.type().id() == ID_pointer &&
-    to_pointer_type(code.type()).subtype().id() != ID_empty)
+    to_pointer_type(code.type()).base_type().id() != ID_empty)
   {
-    object_type = to_pointer_type(code.type()).subtype();
+    object_type = to_pointer_type(code.type()).base_type();
   }
   else
   {
@@ -196,8 +197,8 @@ void goto_symext::symex_allocate(
   {
     const auto &array_type = to_array_type(*object_type);
     index_exprt index_expr(
-      value_symbol.symbol_expr(), from_integer(0, index_type()));
-    rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
+      value_symbol.symbol_expr(), from_integer(0, array_type.index_type()));
+    rhs = address_of_exprt(index_expr, pointer_type(array_type.element_type()));
   }
   else
   {
@@ -222,7 +223,7 @@ static exprt va_list_entry(
 
   // Visual Studio has va_list == char* and stores parameters of size no
   // greater than the size of a pointer as immediate values
-  if(lhs_type.subtype().id() != ID_pointer)
+  if(lhs_type.base_type().id() != ID_pointer)
   {
     auto parameter_size = size_of_expr(parameter_expr.type(), ns);
     CHECK_RETURN(parameter_size.has_value());
@@ -276,16 +277,17 @@ void goto_symext::symex_va_start(
       va_list_entry(parameter, to_pointer_type(lhs.type()), ns));
   }
   const std::size_t va_arg_size = va_arg_operands.size();
-  exprt array =
-    array_exprt{std::move(va_arg_operands),
-                array_typet{pointer_type(empty_typet{}),
-                            from_integer(va_arg_size, size_type())}};
+
+  const auto array_type = array_typet{pointer_type(empty_typet{}),
+                                      from_integer(va_arg_size, size_type())};
+
+  exprt array = array_exprt{std::move(va_arg_operands), array_type};
 
   symbolt &va_array = get_fresh_aux_symbol(
     array.type(),
     id2string(state.source.function_id),
     "va_args",
-    state.source.pc->source_location,
+    state.source.pc->source_location(),
     ns.lookup(state.source.function_id).mode,
     state.symbol_table);
   va_array.value = array;
@@ -295,8 +297,8 @@ void goto_symext::symex_va_start(
   do_simplify(array);
   symex_assign(state, va_array.symbol_expr(), std::move(array));
 
-  exprt rhs = address_of_exprt{
-    index_exprt{va_array.symbol_expr(), from_integer(0, index_type())}};
+  exprt rhs = address_of_exprt{index_exprt{
+    va_array.symbol_expr(), from_integer(0, array_type.index_type())}};
   rhs = state.rename(std::move(rhs), ns).get();
   symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 }
@@ -501,10 +503,10 @@ void goto_symext::symex_cpp_new(
   {
     exprt size_arg =
       clean_expr(static_cast<const exprt &>(code.find(ID_size)), state, false);
-    symbol.type = array_typet(pointer_type.subtype(), size_arg);
+    symbol.type = array_typet(pointer_type.base_type(), size_arg);
   }
   else
-    symbol.type = pointer_type.subtype();
+    symbol.type = pointer_type.base_type();
 
   symbol.type.set(ID_C_dynamic, true);
 
@@ -516,8 +518,9 @@ void goto_symext::symex_cpp_new(
 
   if(do_array)
   {
-    rhs.add_to_operands(
-      index_exprt(symbol.symbol_expr(), from_integer(0, index_type())));
+    rhs.add_to_operands(index_exprt(
+      symbol.symbol_expr(),
+      from_integer(0, to_array_type(symbol.type).index_type())));
   }
   else
     rhs.copy_to_operands(symbol.symbol_expr());
@@ -532,30 +535,5 @@ void goto_symext::symex_cpp_delete(
   // TODO
   #if 0
   bool do_array=code.get(ID_statement)==ID_cpp_delete_array;
-  #endif
-}
-
-void goto_symext::symex_fkt(
-  statet &,
-  const code_function_callt &)
-{
-  // TODO: uncomment this line when TG-4667 is done
-  // UNREACHABLE;
-  #if 0
-  exprt new_fc(ID_function, fc.type());
-
-  new_fc.reserve_operands(fc.operands().size()-1);
-
-  bool first=true;
-
-  Forall_operands(it, fc)
-    if(first)
-      first=false;
-    else
-      new_fc.add_to_operands(std::move(*it));
-
-  new_fc.set(ID_identifier, fc.op0().get(ID_identifier));
-
-  fc.swap(new_fc);
   #endif
 }

@@ -8,7 +8,20 @@
 #define ror(type, x, d)                                                        \
   ((type)(((x) >> (d)) | ((x) << ((8 * sizeof(type)) - (d)))))
 
-#ifdef __clang__
+#ifndef __clang__
+unsigned char __builtin_rotateleft8(unsigned char, unsigned char);
+unsigned short __builtin_rotateleft16(unsigned short, unsigned short);
+unsigned int __builtin_rotateleft32(unsigned int, unsigned int);
+unsigned long long
+__builtin_rotateleft64(unsigned long long, unsigned long long);
+
+unsigned char __builtin_rotateright8(unsigned char, unsigned char);
+unsigned short __builtin_rotateright16(unsigned short, unsigned short);
+unsigned int __builtin_rotateright32(unsigned int, unsigned int);
+unsigned long long
+__builtin_rotateright64(unsigned long long, unsigned long long);
+#endif
+
 void check_left8(void)
 {
   uint8_t op;
@@ -80,11 +93,9 @@ void check_right64(void)
   assert(__builtin_rotateright64(op, 3) == ror(uint64_t, op, 3));
   assert(__builtin_rotateright64(op, 4) == ror(uint64_t, op, 4));
 }
-#endif
 
 int main(void)
 {
-#ifdef __clang__
   check_left8();
   check_left16();
   check_left32();
@@ -93,5 +104,4 @@ int main(void)
   check_right16();
   check_right32();
   check_right64();
-#endif
 }

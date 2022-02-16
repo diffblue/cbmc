@@ -20,7 +20,7 @@ string_constantt::string_constantt(const irep_idt &_value)
 
 void string_constantt::set_value(const irep_idt &value)
 {
-  exprt size_expr=from_integer(value.size()+1, index_type());
+  exprt size_expr = from_integer(value.size() + 1, c_index_type());
   type()=array_typet(char_type(), size_expr);
   set(ID_value, value);
 }
@@ -30,10 +30,10 @@ array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
   std::size_t string_size=str.size()+1; // we add the zero
-  const typet &char_type = to_array_type(type()).subtype();
+  const typet &char_type = to_array_type(type()).element_type();
   bool char_is_unsigned=char_type.id()==ID_unsignedbv;
 
-  exprt size=from_integer(string_size, index_type());
+  exprt size = from_integer(string_size, c_index_type());
 
   array_exprt dest({}, array_typet(char_type, size));
 

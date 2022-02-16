@@ -1,0 +1,11 @@
+CORE
+main.c
+--apply-loop-contracts
+activate-multi-line-match
+Failed to infer variables being modified by the loop at file main.c line \d+ function main\.\nPlease specify an assigns clause\.\nReason:\nAlias analysis returned UNKNOWN!
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+This test (taken from #6021) shows the need for assigns clauses on loops.
+The alias analysis in this case returns `unknown`.

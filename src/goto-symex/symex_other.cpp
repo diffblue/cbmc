@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/std_code.h>
 
 void goto_symext::havoc_rec(
   statet &state,
@@ -32,7 +33,7 @@ void goto_symext::havoc_rec(
         guard.as_expr(), dest, exprt(ID_null_object, dest.type()));
 
     auto rhs =
-      side_effect_expr_nondett(dest.type(), state.source.pc->source_location);
+      side_effect_expr_nondett(dest.type(), state.source.pc->source_location());
 
     symex_assign(state, lhs, rhs);
   }
@@ -145,14 +146,14 @@ void goto_symext::symex_other(
       if(statement==ID_array_copy)
       {
         src_array = make_byte_extract(
-          src_array, from_integer(0, index_type()), dest_array.type());
+          src_array, from_integer(0, c_index_type()), dest_array.type());
         do_simplify(src_array);
       }
       else
       {
         // ID_array_replace
         dest_array = make_byte_extract(
-          dest_array, from_integer(0, index_type()), src_array.type());
+          dest_array, from_integer(0, c_index_type()), src_array.type());
         do_simplify(dest_array);
       }
     }
@@ -190,14 +191,14 @@ void goto_symext::symex_other(
       do_simplify(array_size.value());
       array_expr = make_byte_extract(
         array_expr,
-        from_integer(0, index_type()),
+        from_integer(0, c_index_type()),
         array_typet(char_type(), array_size.value()));
     }
 
     const array_typet &array_type = to_array_type(array_expr.type());
 
-    if(array_type.subtype() != value.type())
-      value = typecast_exprt(value, array_type.subtype());
+    if(array_type.element_type() != value.type())
+      value = typecast_exprt(value, array_type.element_type());
 
     symex_assign(state, array_expr, array_of_exprt(value, array_type));
   }

@@ -108,8 +108,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/goto_check.h>
-
+#include <java_bytecode/goto_check_java.h>
 #include <java_bytecode/java_bytecode_language.h>
 
 class abstract_goto_modelt;
@@ -128,7 +127,7 @@ class optionst;
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
-  OPT_GOTO_CHECK \
+  OPT_GOTO_CHECK_JAVA \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   "(show-reachable-properties)(property):" \

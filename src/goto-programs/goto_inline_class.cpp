@@ -30,7 +30,7 @@ void goto_inlinet::parameter_assignments(
   PRECONDITION(target->is_function_call());
   PRECONDITION(dest.empty());
 
-  const source_locationt &source_location=target->source_location;
+  const source_locationt &source_location = target->source_location();
 
   // iterates over the operands
   exprt::operandst::const_iterator it1=arguments.begin();
@@ -81,11 +81,11 @@ void goto_inlinet::parameter_assignments(
         const typet &f_acttype = actual.type();
 
         // we are willing to do some conversion
-        if((f_partype.id()==ID_pointer &&
-            f_acttype.id()==ID_pointer) ||
-           (f_partype.id()==ID_pointer &&
-            f_acttype.id()==ID_array &&
-            f_partype.subtype()==f_acttype.subtype()))
+        if(
+          (f_partype.id() == ID_pointer && f_acttype.id() == ID_pointer) ||
+          (f_partype.id() == ID_pointer && f_acttype.id() == ID_array &&
+           to_type_with_subtype(f_partype).subtype() ==
+             to_type_with_subtype(f_acttype).subtype()))
         {
           actual = typecast_exprt(actual, f_partype);
         }
@@ -129,7 +129,7 @@ void goto_inlinet::parameter_destruction(
   PRECONDITION(target->is_function_call());
   PRECONDITION(dest.empty());
 
-  const source_locationt &source_location=target->source_location;
+  const source_locationt &source_location = target->source_location();
 
   for(const auto &identifier : parameter_identifiers)
   {
@@ -162,15 +162,15 @@ void goto_inlinet::replace_return(
       {
         // a typecast may be necessary if the declared return type at the call
         // site differs from the defined return type
-        it->code_nonconst() = code_assignt(
+        *it = goto_programt::make_assignment(
           lhs,
-          typecast_exprt::conditional_cast(it->return_value(), lhs.type()));
-        it->type=ASSIGN;
+          typecast_exprt::conditional_cast(it->return_value(), lhs.type()),
+          it->source_location());
       }
       else
       {
-        it->code_nonconst() = code_expressiont(it->return_value());
-        it->type=OTHER;
+        *it = goto_programt::make_other(
+          code_expressiont(it->return_value()), it->source_location());
       }
     }
   }
@@ -232,7 +232,7 @@ void goto_inlinet::insert_function_body(
   DATA_INVARIANT(
     end.is_end_function(),
     "final instruction of a function must be an END_FUNCTION");
-  end.type=LOCATION;
+  end = goto_programt::make_location(end.source_location());
 
   // make sure the inlined function does not introduce hiding
   if(goto_function.is_hidden())
@@ -277,21 +277,20 @@ void goto_inlinet::insert_function_body(
   {
     for(auto &instruction : tmp.instructions)
     {
-      replace_location(instruction.source_location, target->source_location);
-      replace_location(instruction.code_nonconst(), target->source_location);
+      replace_location(
+        instruction.source_location_nonconst(), target->source_location());
+      replace_location(instruction.code_nonconst(), target->source_location());
 
       if(instruction.has_condition())
       {
-        exprt c = instruction.get_condition();
-        replace_location(c, target->source_location);
-        instruction.set_condition(c);
+        replace_location(
+          instruction.condition_nonconst(), target->source_location());
       }
     }
   }
 
   // kill call
-  target->type=LOCATION;
-  target->code_nonconst().clear();
+  *target = goto_programt::make_location(target->source_location());
   target++;
 
   dest.destructive_insert(target, tmp);

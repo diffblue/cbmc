@@ -1,0 +1,13 @@
+CORE
+main.c
+--replace-call-with-contract bar --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^\[foo.assigns.\d+\] line \d+ Check that \*z is valid: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*z \(assigned by the contract of bar\) is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^Condition: \!not\_found$
+--
+Checks whether CBMC properly evaluates subset relationship on assigns
+during replacement with static functions.

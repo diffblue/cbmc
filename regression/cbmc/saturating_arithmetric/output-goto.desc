@@ -1,0 +1,9 @@
+CORE
+main.c
+--show-goto-functions
+ASSERT saturating-\(.*\)
+ASSERT saturating\+\(.*\)
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

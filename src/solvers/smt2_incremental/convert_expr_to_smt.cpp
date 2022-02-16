@@ -46,8 +46,8 @@ smt_sortt convert_type_to_smt_sort(const typet &type)
 
 static smt_termt convert_expr_to_smt(const symbol_exprt &symbol_expr)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for symbol expression: " + symbol_expr.pretty());
+  return smt_identifier_termt{symbol_expr.get_identifier(),
+                              convert_type_to_smt_sort(symbol_expr.type())};
 }
 
 static smt_termt convert_expr_to_smt(const nondet_symbol_exprt &nondet_symbol)
@@ -154,9 +154,19 @@ static smt_termt convert_expr_to_smt(const bitnot_exprt &bitwise_not)
 
 static smt_termt convert_expr_to_smt(const unary_minus_exprt &unary_minus)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for unary minus expression: " +
-    unary_minus.pretty());
+  const bool operand_is_bitvector =
+    can_cast_type<integer_bitvector_typet>(unary_minus.op().type());
+  if(operand_is_bitvector)
+  {
+    return smt_bit_vector_theoryt::negate(
+      convert_expr_to_smt(unary_minus.op()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for unary minus expression: " +
+      unary_minus.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const unary_plus_exprt &unary_plus)
@@ -287,58 +297,106 @@ static smt_termt convert_relational_to_smt(
     binary_relation.pretty());
 }
 
-static smt_termt
-convert_expr_to_smt(const binary_relation_exprt &binary_relation)
+static optionalt<smt_termt> try_relational_conversion(const exprt &expr)
 {
-  if(can_cast_expr<greater_than_exprt>(binary_relation))
+  if(const auto greater_than = expr_try_dynamic_cast<greater_than_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *greater_than,
       smt_bit_vector_theoryt::unsigned_greater_than,
       smt_bit_vector_theoryt::signed_greater_than);
   }
-  if(can_cast_expr<greater_than_or_equal_exprt>(binary_relation))
+  if(
+    const auto greater_than_or_equal =
+      expr_try_dynamic_cast<greater_than_or_equal_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *greater_than_or_equal,
       smt_bit_vector_theoryt::unsigned_greater_than_or_equal,
       smt_bit_vector_theoryt::signed_greater_than_or_equal);
   }
-  if(can_cast_expr<less_than_exprt>(binary_relation))
+  if(const auto less_than = expr_try_dynamic_cast<less_than_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *less_than,
       smt_bit_vector_theoryt::unsigned_less_than,
       smt_bit_vector_theoryt::signed_less_than);
   }
-  if(can_cast_expr<less_than_or_equal_exprt>(binary_relation))
+  if(
+    const auto less_than_or_equal =
+      expr_try_dynamic_cast<less_than_or_equal_exprt>(expr))
   {
     return convert_relational_to_smt(
-      binary_relation,
+      *less_than_or_equal,
       smt_bit_vector_theoryt::unsigned_less_than_or_equal,
       smt_bit_vector_theoryt::signed_less_than_or_equal);
   }
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for binary relation expression: " +
-    binary_relation.pretty());
+  return {};
 }
 
 static smt_termt convert_expr_to_smt(const plus_exprt &plus)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for plus expression: " + plus.pretty());
+  if(std::all_of(
+       plus.operands().cbegin(), plus.operands().cend(), [](exprt operand) {
+         return can_cast_type<integer_bitvector_typet>(operand.type());
+       }))
+  {
+    return convert_multiary_operator_to_terms(
+      plus, smt_bit_vector_theoryt::add);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for plus expression: " + plus.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const minus_exprt &minus)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for minus expression: " + minus.pretty());
+  const bool both_operands_bitvector =
+    can_cast_type<integer_bitvector_typet>(minus.lhs().type()) &&
+    can_cast_type<integer_bitvector_typet>(minus.rhs().type());
+
+  if(both_operands_bitvector)
+  {
+    return smt_bit_vector_theoryt::subtract(
+      convert_expr_to_smt(minus.lhs()), convert_expr_to_smt(minus.rhs()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for minus expression: " + minus.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const div_exprt &divide)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for divide expression: " + divide.pretty());
+  const bool both_operands_bitvector =
+    can_cast_type<integer_bitvector_typet>(divide.lhs().type()) &&
+    can_cast_type<integer_bitvector_typet>(divide.rhs().type());
+
+  const bool both_operands_unsigned =
+    can_cast_type<unsignedbv_typet>(divide.lhs().type()) &&
+    can_cast_type<unsignedbv_typet>(divide.rhs().type());
+
+  if(both_operands_bitvector)
+  {
+    if(both_operands_unsigned)
+    {
+      return smt_bit_vector_theoryt::unsigned_divide(
+        convert_expr_to_smt(divide.lhs()), convert_expr_to_smt(divide.rhs()));
+    }
+    else
+    {
+      return smt_bit_vector_theoryt::signed_divide(
+        convert_expr_to_smt(divide.lhs()), convert_expr_to_smt(divide.rhs()));
+    }
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for divide expression: " + divide.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const ieee_float_op_exprt &float_operation)
@@ -352,9 +410,35 @@ static smt_termt convert_expr_to_smt(const ieee_float_op_exprt &float_operation)
 
 static smt_termt convert_expr_to_smt(const mod_exprt &truncation_modulo)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for truncation modulo expression: " +
-    truncation_modulo.pretty());
+  const bool both_operands_bitvector =
+    can_cast_type<integer_bitvector_typet>(truncation_modulo.lhs().type()) &&
+    can_cast_type<integer_bitvector_typet>(truncation_modulo.rhs().type());
+
+  const bool both_operands_unsigned =
+    can_cast_type<unsignedbv_typet>(truncation_modulo.lhs().type()) &&
+    can_cast_type<unsignedbv_typet>(truncation_modulo.rhs().type());
+
+  if(both_operands_bitvector)
+  {
+    if(both_operands_unsigned)
+    {
+      return smt_bit_vector_theoryt::unsigned_remainder(
+        convert_expr_to_smt(truncation_modulo.lhs()),
+        convert_expr_to_smt(truncation_modulo.rhs()));
+    }
+    else
+    {
+      return smt_bit_vector_theoryt::signed_remainder(
+        convert_expr_to_smt(truncation_modulo.lhs()),
+        convert_expr_to_smt(truncation_modulo.rhs()));
+    }
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for remainder (modulus) expression: " +
+      truncation_modulo.pretty());
+  }
 }
 
 static smt_termt
@@ -367,8 +451,22 @@ convert_expr_to_smt(const euclidean_mod_exprt &euclidean_modulo)
 
 static smt_termt convert_expr_to_smt(const mult_exprt &multiply)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for multiply expression: " + multiply.pretty());
+  if(std::all_of(
+       multiply.operands().cbegin(),
+       multiply.operands().cend(),
+       [](exprt operand) {
+         return can_cast_type<integer_bitvector_typet>(operand.type());
+       }))
+  {
+    return convert_multiary_operator_to_terms(
+      multiply, smt_bit_vector_theoryt::multiply);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for multiply expression: " +
+      multiply.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const address_of_exprt &address_of)
@@ -686,11 +784,9 @@ smt_termt convert_expr_to_smt(const exprt &expr)
   {
     return convert_expr_to_smt(*float_not_equal);
   }
-  if(
-    const auto binary_relation =
-      expr_try_dynamic_cast<binary_relation_exprt>(expr))
+  if(const auto converted_relational = try_relational_conversion(expr))
   {
-    return convert_expr_to_smt(*binary_relation);
+    return *converted_relational;
   }
   if(const auto plus = expr_try_dynamic_cast<plus_exprt>(expr))
   {

@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 #include <unordered_set>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/mathematical_expr.h>
@@ -198,7 +200,8 @@ protected:
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_switch_case(const code_switch_caset &src, unsigned indent);
   std::string convert_code_asm(const code_asmt &src, unsigned indent);
-  std::string convert_code_assign(const code_assignt &src, unsigned indent);
+  std::string
+  convert_code_frontend_assign(const code_frontend_assignt &, unsigned indent);
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_ifthenelse(const code_ifthenelset &src, unsigned indent);
   std::string convert_code_for(const code_fort &src, unsigned indent);
@@ -213,7 +216,7 @@ protected:
   std::string convert_code_break(unsigned indent);
   std::string convert_code_switch(const codet &src, unsigned indent);
   std::string convert_code_continue(unsigned indent);
-  std::string convert_code_decl(const codet &src, unsigned indent);
+  std::string convert_code_frontend_decl(const codet &, unsigned indent);
   std::string convert_code_decl_block(const codet &src, unsigned indent);
   std::string convert_code_dead(const codet &src, unsigned indent);
   // NOLINTNEXTLINE(whitespace/line_length)
@@ -272,6 +275,9 @@ protected:
     const exprt &src,
     unsigned &precedence,
     bool include_padding_components);
+
+  std::string convert_conditional_target_group(const exprt &src);
+  std::string convert_bitreverse(const bitreverse_exprt &src);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

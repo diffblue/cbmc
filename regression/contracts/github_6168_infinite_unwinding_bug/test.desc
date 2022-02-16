@@ -4,8 +4,8 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\[main.1\] line \d+ Check loop invariant before entry: SUCCESS$
-^\[main.2\] line \d+ Check that loop invariant is preserved: SUCCESS$
+^\[main.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
 --
 --
 This is guarding against an issue described in https://github.com/diffblue/cbmc/issues/6168.

@@ -102,7 +102,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_array)
   {
-    auto sub = pointer_offset_bits(to_array_type(type).subtype(), ns);
+    auto sub = pointer_offset_bits(to_array_type(type).element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -115,7 +115,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_vector)
   {
-    auto sub = pointer_offset_bits(to_vector_type(type).subtype(), ns);
+    auto sub = pointer_offset_bits(to_vector_type(type).element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -178,7 +178,8 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_c_enum)
   {
-    return mp_integer(to_bitvector_type(to_c_enum_type(type).subtype()).get_width());
+    return mp_integer(
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width());
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -283,7 +284,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto &array_type = to_array_type(type);
 
     // special-case arrays of bits
-    if(array_type.subtype().id() == ID_bool)
+    if(array_type.element_type().id() == ID_bool)
     {
       auto bits = pointer_offset_bits(array_type, ns);
 
@@ -291,7 +292,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         return from_integer((*bits + 7) / 8, size_type());
     }
 
-    auto sub = size_of_expr(array_type.subtype(), ns);
+    auto sub = size_of_expr(array_type.element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -310,7 +311,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     const auto &vector_type = to_vector_type(type);
 
     // special-case vectors of bits
-    if(vector_type.subtype().id() == ID_bool)
+    if(vector_type.element_type().id() == ID_bool)
     {
       auto bits = pointer_offset_bits(vector_type, ns);
 
@@ -318,7 +319,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         return from_integer((*bits + 7) / 8, size_type());
     }
 
-    auto sub = size_of_expr(vector_type.subtype(), ns);
+    auto sub = size_of_expr(vector_type.element_type(), ns);
     if(!sub.has_value())
       return {};
 
@@ -451,7 +452,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
   else if(type.id()==ID_c_enum)
   {
     std::size_t width =
-      to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width();
     std::size_t bytes=width/8;
     if(bytes*8!=width)
       bytes++;
@@ -521,7 +522,7 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
     if(o.has_value())
     {
       const auto &array_type = to_array_type(index_expr.array().type());
-      auto sub_size = pointer_offset_size(array_type.subtype(), ns);
+      auto sub_size = pointer_offset_size(array_type.element_type(), ns);
 
       if(sub_size.has_value() && *sub_size > 0)
       {
@@ -557,50 +558,6 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
     return mp_integer(0);
 
   return {}; // don't know
-}
-
-optionalt<exprt>
-build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
-{
-  const typet &type=
-    static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
-
-  if(type.is_nil())
-    return {};
-
-  const auto type_size = pointer_offset_size(type, ns);
-  auto val = numeric_cast<mp_integer>(expr);
-
-  if(
-    !type_size.has_value() || *type_size < 0 || !val.has_value() ||
-    *val < *type_size || (*type_size == 0 && *val > 0))
-  {
-    return {};
-  }
-
-  const typet t(size_type());
-  DATA_INVARIANT(
-    address_bits(*val + 1) <= *pointer_offset_bits(t, ns),
-    "sizeof value does not fit size_type");
-
-  mp_integer remainder=0;
-
-  if(*type_size != 0)
-  {
-    remainder = *val % *type_size;
-    *val -= remainder;
-    *val /= *type_size;
-  }
-
-  exprt result(ID_sizeof, t);
-  result.set(ID_type_arg, type);
-
-  if(*val > 1)
-    result = mult_exprt(result, from_integer(*val, t));
-  if(remainder>0)
-    result=plus_exprt(result, from_integer(remainder, t));
-
-  return typecast_exprt::conditional_cast(result, expr.type());
 }
 
 optionalt<exprt> get_subexpression_at_offset(
@@ -660,7 +617,8 @@ optionalt<exprt> get_subexpression_at_offset(
   {
     const array_typet &array_type = to_array_type(source_type);
 
-    const auto elem_size_bits = pointer_offset_bits(array_type.subtype(), ns);
+    const auto elem_size_bits =
+      pointer_offset_bits(array_type.element_type(), ns);
 
     // no arrays of non-byte-aligned, zero-, or unknown-sized objects
     if(
@@ -675,7 +633,9 @@ optionalt<exprt> get_subexpression_at_offset(
       {
         return get_subexpression_at_offset(
           index_exprt(
-            expr, from_integer(offset_bytes / elem_size_bytes, index_type())),
+            expr,
+            from_integer(
+              offset_bytes / elem_size_bytes, array_type.index_type())),
           offset_inside_elem,
           target_type_raw,
           ns);
@@ -705,7 +665,7 @@ optionalt<exprt> get_subexpression_at_offset(
   }
 
   return make_byte_extract(
-    expr, from_integer(offset_bytes, index_type()), target_type_raw);
+    expr, from_integer(offset_bytes, c_index_type()), target_type_raw);
 }
 
 optionalt<exprt> get_subexpression_at_offset(

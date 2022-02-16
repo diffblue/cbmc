@@ -164,21 +164,21 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         // is illegal for C++ non-pod types and impossible in Java in any case.
         if(not_prefix)
         {
-          debug().source_location = i.source_location;
+          debug().source_location = i.source_location();
           debug() << "encountered goto '" << goto_label
                   << "' that enters one or more lexical blocks; "
                   << "omitting constructors and destructors" << eom;
         }
         else
         {
-          debug().source_location = i.source_location;
+          debug().source_location = i.source_location();
           debug() << "adding goto-destructor code on jump to '" << goto_label
                   << "'" << eom;
 
           node_indext end_destruct = intersection_result.common_ancestor;
           goto_programt destructor_code;
           unwind_destructor_stack(
-            i.source_location,
+            i.source_location(),
             destructor_code,
             mode,
             end_destruct,
@@ -208,8 +208,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
     const exprt pointer = destination.pointer();
 
     // remember the expression for later checks
-    i.type=OTHER;
-    i.code_nonconst() = code_expressiont(pointer);
+    i =
+      goto_programt::make_other(code_expressiont(pointer), i.source_location());
 
     // insert huge case-split
     for(const auto &label : targets.labels)
@@ -221,7 +221,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 
       goto_program.insert_after(
         g_it,
-        goto_programt::make_goto(label.second.first, guard, i.source_location));
+        goto_programt::make_goto(
+          label.second.first, guard, i.source_location()));
     }
   }
 
@@ -269,7 +270,7 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
     if(it->get_target()->target_number == it_z->target_number)
     {
       it->set_target(it_goto_y->get_target());
-      it->set_condition(boolean_negate(it->get_condition()));
+      it->condition_nonconst() = boolean_negate(it->condition());
       it_goto_y->turn_into_skip();
     }
   }
@@ -436,7 +437,7 @@ void goto_convertt::convert(
   if(statement==ID_block)
     convert_block(to_code_block(code), dest, mode);
   else if(statement==ID_decl)
-    convert_decl(to_code_decl(code), dest, mode);
+    convert_frontend_decl(to_code_frontend_decl(code), dest, mode);
   else if(statement==ID_decl_type)
     convert_decl_type(code, dest);
   else if(statement==ID_expression)
@@ -469,7 +470,7 @@ void goto_convertt::convert(
   else if(statement==ID_break)
     convert_break(to_code_break(code), dest, mode);
   else if(statement==ID_return)
-    convert_return(to_code_return(code), dest, mode);
+    convert_return(to_code_frontend_return(code), dest, mode);
   else if(statement==ID_continue)
     convert_continue(to_code_continue(code), dest, mode);
   else if(statement==ID_goto)
@@ -606,8 +607,8 @@ void goto_convertt::convert_expression(
   }
 }
 
-void goto_convertt::convert_decl(
-  const code_declt &code,
+void goto_convertt::convert_frontend_decl(
+  const code_frontend_declt &code,
   goto_programt &dest,
   const irep_idt &mode)
 {
@@ -833,8 +834,8 @@ void goto_convertt::convert_assert(
 
   goto_programt::targett t =
     dest.add(goto_programt::make_assertion(cond, code.source_location()));
-  t->source_location.set(ID_property, ID_assertion);
-  t->source_location.set("user-provided", true);
+  t->source_location_nonconst().set(ID_property, ID_assertion);
+  t->source_location_nonconst().set("user-provided", true);
 }
 
 void goto_convertt::convert_skip(
@@ -862,11 +863,15 @@ void goto_convertt::convert_loop_contracts(
   goto_programt::targett loop,
   const irep_idt &mode)
 {
-  exprt invariant =
-    static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
-  exprt decreases_clause =
-    static_cast<const exprt &>(code.find(ID_C_spec_decreases));
+  auto assigns = static_cast<const unary_exprt &>(code.find(ID_C_spec_assigns));
+  if(assigns.is_not_nil())
+  {
+    PRECONDITION(loop->is_goto());
+    loop->guard.add(ID_C_spec_assigns).swap(assigns.op());
+  }
 
+  auto invariant =
+    static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
   if(!invariant.is_nil())
   {
     if(has_subexpr(invariant, ID_side_effect))
@@ -876,9 +881,11 @@ void goto_convertt::convert_loop_contracts(
     }
 
     PRECONDITION(loop->is_goto());
-    loop->guard.add(ID_C_spec_loop_invariant).swap(invariant);
+    loop->condition_nonconst().add(ID_C_spec_loop_invariant).swap(invariant);
   }
 
+  auto decreases_clause =
+    static_cast<const exprt &>(code.find(ID_C_spec_decreases));
   if(!decreases_clause.is_nil())
   {
     if(has_subexpr(decreases_clause, ID_side_effect))
@@ -889,7 +896,7 @@ void goto_convertt::convert_loop_contracts(
     }
 
     PRECONDITION(loop->is_goto());
-    loop->guard.add(ID_C_spec_decreases).swap(decreases_clause);
+    loop->condition_nonconst().add(ID_C_spec_decreases).swap(decreases_clause);
   }
 }
 
@@ -971,7 +978,7 @@ void goto_convertt::convert_for(
   goto_programt::targett y = tmp_y.add(
     goto_programt::make_goto(u, true_exprt(), code.source_location()));
 
-  // loop invariant and decreases clause
+  // assigns clause, loop invariant and decreases clause
   convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(sideeffects);
@@ -1029,7 +1036,7 @@ void goto_convertt::convert_while(
   goto_programt tmp_x;
   convert(code.body(), tmp_x, mode);
 
-  // loop invariant and decreases clause
+  // assigns clause, loop invariant and decreases clause
   convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(tmp_branch);
@@ -1098,7 +1105,7 @@ void goto_convertt::convert_dowhile(
   // y: if(c) goto w;
   y->complete_goto(w);
 
-  // loop invariant and decreases clause
+  // assigns_clause, loop invariant and decreases clause
   convert_loop_contracts(code, y, mode);
 
   dest.destructive_append(tmp_w);
@@ -1177,6 +1184,27 @@ void goto_convertt::convert_switch(
   goto_programt sideeffects;
   clean_expr(argument, sideeffects, mode);
 
+  // Avoid potential performance penalties caused by evaluating the value
+  // multiple times (as the below chain-of-ifs does). "needs_cleaning" isn't
+  // necessarily the right check here, and we may need to introduce a different
+  // way of identifying the class of non-trivial expressions that warrant
+  // introduction of a temporary.
+  if(needs_cleaning(argument))
+  {
+    symbolt &new_symbol = new_tmp_symbol(
+      argument.type(),
+      "switch_value",
+      sideeffects,
+      code.source_location(),
+      mode);
+
+    code_assignt copy_value{
+      new_symbol.symbol_expr(), argument, code.source_location()};
+    convert(copy_value, sideeffects, mode);
+
+    argument = new_symbol.symbol_expr();
+  }
+
   // save break/default/cases targets
   break_switch_targetst old_targets(targets);
 
@@ -1228,7 +1256,7 @@ void goto_convertt::convert_switch(
   }
 
   tmp_cases.add(goto_programt::make_goto(
-    targets.default_target, targets.default_target->source_location));
+    targets.default_target, targets.default_target->source_location()));
 
   dest.destructive_append(sideeffects);
   dest.destructive_append(tmp_cases);
@@ -1257,7 +1285,7 @@ void goto_convertt::convert_break(
 }
 
 void goto_convertt::convert_return(
-  const code_returnt &code,
+  const code_frontend_returnt &code,
   goto_programt &dest,
   const irep_idt &mode)
 {
@@ -1272,7 +1300,7 @@ void goto_convertt::convert_return(
     "return takes none or one operand",
     code.find_source_location());
 
-  code_returnt new_code(code);
+  code_frontend_returnt new_code(code);
 
   if(new_code.has_return_value())
   {
@@ -1295,8 +1323,9 @@ void goto_convertt::convert_return(
       "function must return value",
       new_code.find_source_location());
 
-    // Now add a return node to set the return value.
-    dest.add(goto_programt::make_return(new_code, new_code.source_location()));
+    // Now add a 'set return value' instruction to set the return value.
+    dest.add(goto_programt::make_set_return_value(
+      new_code.return_value(), new_code.source_location()));
   }
   else
   {
@@ -1607,7 +1636,7 @@ void goto_convertt::generate_ifthenelse(
   // x: goto z;
   CHECK_RETURN(!tmp_w.instructions.empty());
   x->complete_goto(z);
-  x->source_location = tmp_w.instructions.back().source_location;
+  x->source_location_nonconst() = tmp_w.instructions.back().source_location();
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -1845,9 +1874,9 @@ symbolt &goto_convertt::new_tmp_symbol(
     mode,
     symbol_table);
 
-  code_declt decl(new_symbol.symbol_expr());
+  code_frontend_declt decl(new_symbol.symbol_expr());
   decl.add_source_location()=source_location;
-  convert_decl(decl, dest, mode);
+  convert_frontend_decl(decl, dest, mode);
 
   return new_symbol;
 }
@@ -1934,7 +1963,7 @@ void goto_convertt::generate_thread_block(
     END_THREAD,
     nil_exprt(),
     {}));
-  e->source_location=thread_body.source_location();
+  e->source_location_nonconst() = thread_body.source_location();
   goto_programt::targett z = postamble.add(goto_programt::make_skip());
 
   preamble.add(goto_programt::instructiont(

@@ -14,32 +14,37 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_SOLVERS_HARDNESS_COLLECTOR_H
 #define CPROVER_SOLVERS_HARDNESS_COLLECTOR_H
 
-#include <functional>
-#include <solvers/solver_hardness.h>
+#include <solvers/prop/literal.h>
 
-class exprt;
+#include <memory>
+
+struct solver_hardnesst;
+
+class clause_hardness_collectort
+{
+public:
+  /// Called e.g. from the `satcheck_minisat2::lcnf`, this function adds the
+  ///   complexity statistics from the last SAT query to the `current_ssa_key`.
+  /// \param bv: the clause (vector of literals)
+  /// \param cnf: processed clause
+  /// \param cnf_clause_index: index of clause in dimacs output
+  /// \param register_cnf: negation of boolean variable tracking if the clause
+  /// can be eliminated
+  virtual void register_clause(
+    const bvt &bv,
+    const bvt &cnf,
+    const size_t cnf_clause_index,
+    bool register_cnf) = 0;
+
+  virtual ~clause_hardness_collectort()
+  {
+  }
+};
 
 class hardness_collectort
 {
 public:
-  using handlert = std::function<void(solver_hardnesst &)>;
-  virtual void with_solver_hardness(handlert handler) = 0;
-  virtual void enable_hardness_collection() = 0;
-  virtual ~hardness_collectort() = default;
+  std::unique_ptr<clause_hardness_collectort> solver_hardness;
 };
 
-template <typename T>
-void with_solver_hardness(
-  T &maybe_hardness_collector,
-  hardness_collectort::handlert handler)
-{
-  // FIXME I am wondering if there is a way to do this that is a bit less
-  // dynamically typed.
-  if(
-    auto hardness_collector =
-      dynamic_cast<hardness_collectort *>(&maybe_hardness_collector))
-  {
-    hardness_collector->with_solver_hardness(handler);
-  }
-}
 #endif // CPROVER_SOLVERS_HARDNESS_COLLECTOR_H

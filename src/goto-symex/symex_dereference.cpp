@@ -65,8 +65,8 @@ exprt goto_symext::address_arithmetic(
       // turn &a of type T[i][j] into &(a[0][0])
       for(const typet *t = &(a.type().subtype());
           t->id() == ID_array && expr.type() != *t;
-          t = &(t->subtype()))
-        a.object()=index_exprt(a.object(), from_integer(0, index_type()));
+          t = &(to_array_type(*t).element_type()))
+        a.object() = index_exprt(a.object(), from_integer(0, c_index_type()));
     }
 
     // do (expr.type() *)(((char *)op)+offset)
@@ -83,7 +83,7 @@ exprt goto_symext::address_arithmetic(
     typet dest_type_subtype;
 
     if(expr_type.id()==ID_array && !keep_array)
-      dest_type_subtype=expr_type.subtype();
+      dest_type_subtype = to_array_type(expr_type).element_type();
     else
       dest_type_subtype=expr_type;
 
@@ -138,7 +138,7 @@ exprt goto_symext::address_arithmetic(
 
     // turn &array into &array[0]
     if(result.type().id() == ID_array && !keep_array)
-      result=index_exprt(result, from_integer(0, index_type()));
+      result = index_exprt(result, from_integer(0, c_index_type()));
 
     // handle field-sensitive SSA symbol
     mp_integer offset=0;
@@ -153,7 +153,7 @@ exprt goto_symext::address_arithmetic(
     {
       const byte_extract_exprt be = make_byte_extract(
         to_ssa_expr(expr).get_l1_object(),
-        from_integer(offset, index_type()),
+        from_integer(offset, c_index_type()),
         expr.type());
 
       result = address_arithmetic(be, state, keep_array);
@@ -174,7 +174,7 @@ exprt goto_symext::address_arithmetic(
     typet dest_type_subtype;
 
     if(expr_type.id() == ID_array && !keep_array)
-      dest_type_subtype = expr_type.subtype();
+      dest_type_subtype = to_array_type(expr_type).element_type();
     else
       dest_type_subtype = expr_type;
 
@@ -389,9 +389,7 @@ void goto_symext::dereference_rec(
     exprt &object=address_of_expr.object();
 
     expr = address_arithmetic(
-      object,
-      state,
-      to_pointer_type(expr.type()).subtype().id() == ID_array);
+      object, state, to_pointer_type(expr.type()).base_type().id() == ID_array);
   }
   else if(expr.id()==ID_typecast)
   {
@@ -404,11 +402,8 @@ void goto_symext::dereference_rec(
       expr.type() ==
         pointer_type(to_address_of_expr(tc_op).object().type().subtype()))
     {
-      expr=
-        address_of_exprt(
-          index_exprt(
-            to_address_of_expr(tc_op).object(),
-            from_integer(0, index_type())));
+      expr = address_of_exprt(index_exprt(
+        to_address_of_expr(tc_op).object(), from_integer(0, c_index_type())));
 
       dereference_rec(expr, state, write, is_in_quantifier);
     }

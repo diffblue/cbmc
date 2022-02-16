@@ -71,7 +71,7 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
   }
   else if(type.id()==ID_array)
   {
-    return cpp_is_pod(type.subtype());
+    return cpp_is_pod(to_array_type(type).element_type());
   }
   else if(type.id()==ID_pointer)
   {

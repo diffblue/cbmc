@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-contract sum _ --trace
+^file main\.c line 6 function sum_rec: recursion is ignored on call to 'sum_rec'$
+^Invariant check failed$
+^Condition: decorated\.get_recursive_function_warnings_count\(\) == 0$
+^Reason: Recursive functions found during inlining$
+^EXIT=(127|134|137)$
+^SIGNAL=0$
+--
+--
+Test should fail because a recursive function is found during inlining.

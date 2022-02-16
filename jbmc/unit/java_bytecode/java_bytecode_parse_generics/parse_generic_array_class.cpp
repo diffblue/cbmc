@@ -37,7 +37,7 @@ SCENARIO(
           field_t.type(), JAVA_REFERENCE_ARRAY_CLASSID);
 
       const struct_tag_typet &field_t_subtype =
-        to_struct_tag_type(field_t_pointer.subtype());
+        to_struct_tag_type(field_t_pointer.base_type());
       const struct_typet &subtype_type = to_struct_type(
         new_symbol_table.lookup_ref(field_t_subtype.get_identifier()).type);
       REQUIRE(is_valid_java_array(subtype_type));
@@ -63,7 +63,7 @@ SCENARIO(
           field_t2.type(), JAVA_REFERENCE_ARRAY_CLASSID);
 
       const struct_tag_typet &field_t2_subtype =
-        to_struct_tag_type(field_t2_pointer.subtype());
+        to_struct_tag_type(field_t2_pointer.base_type());
       const struct_typet &subtype_struct = to_struct_type(
         new_symbol_table.lookup_ref(field_t2_subtype.get_identifier()).type);
       REQUIRE(is_valid_java_array(subtype_struct));
@@ -91,7 +91,7 @@ SCENARIO(
           field_t3.type(), JAVA_REFERENCE_ARRAY_CLASSID);
 
       const struct_tag_typet &field_t3_subtype =
-        to_struct_tag_type(field_t3_pointer.subtype());
+        to_struct_tag_type(field_t3_pointer.base_type());
       const struct_typet &subtype_struct = to_struct_type(
         new_symbol_table.lookup_ref(field_t3_subtype.get_identifier()).type);
       REQUIRE(is_valid_java_array(subtype_struct));

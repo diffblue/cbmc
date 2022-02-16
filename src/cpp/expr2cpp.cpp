@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/expr2c_class.h>
 
 #include "cpp_name.h"
+#include "cpp_template_type.h"
 
 class expr2cppt:public expr2ct
 {
@@ -139,11 +140,11 @@ std::string expr2cppt::convert_rec(
 
   if(is_reference(src))
   {
-    return q+convert(src.subtype())+" &"+d;
+    return q + convert(to_reference_type(src).base_type()) + " &" + d;
   }
   else if(is_rvalue_reference(src))
   {
-    return q+convert(src.subtype())+" &&"+d;
+    return q + convert(to_pointer_type(src).base_type()) + " &&" + d;
   }
   else if(!src.get(ID_C_c_type).empty())
   {
@@ -254,7 +255,7 @@ std::string expr2cppt::convert_rec(
       }
     }
 
-    dest+="> "+convert(src.subtype());
+    dest += "> " + convert(to_template_type(src).subtype());
     return dest;
   }
   else if(src.id()==ID_pointer && src.subtype().id()==ID_nullptr)

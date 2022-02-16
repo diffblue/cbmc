@@ -16,83 +16,127 @@ Date: February 2016
 #include <algorithm>
 #include <map>
 
+#include <analyses/local_bitvector_analysis.h>
 #include <analyses/local_may_alias.h>
 
 #include <ansi-c/c_expr.h>
 
 #include <goto-instrument/havoc_utils.h>
 
+#include <goto-programs/goto_inline.h>
+#include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
+
+#include <langapi/language_util.h>
 
 #include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
+#include <util/format_expr.h>
 #include <util/fresh_symbol.h>
+#include <util/graph.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
+#include <util/std_code.h>
 
-#include "assigns.h"
+#include "havoc_assigns_clause_targets.h"
+#include "instrument_spec_assigns.h"
 #include "memory_predicates.h"
+#include "utils.h"
 
-// Create a lexicographic less-than relation between two tuples of variables.
-// This is used in the implementation of multidimensional decreases clauses.
-static exprt create_lexicographic_less_than(
-  const std::vector<symbol_exprt> &lhs,
-  const std::vector<symbol_exprt> &rhs)
+/// Decorator for \ref message_handlert that keeps track of warnings
+/// occuring when inlining a function.
+///
+/// It counts the number of :
+/// - recursive functions warnings
+/// - missing functions warnings
+/// - missing function body warnings
+/// - missing function arguments warnings
+class inlining_decoratort : public message_handlert
 {
-  PRECONDITION(lhs.size() == rhs.size());
+private:
+  message_handlert &wrapped;
+  unsigned int recursive_function_warnings_count = 0;
 
-  if(lhs.empty())
+  void parse_message(const std::string &message)
   {
-    return false_exprt();
+    if(message.find("recursion is ignored on call") != std::string::npos)
+      recursive_function_warnings_count++;
   }
 
-  // Store conjunctions of equalities.
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 == l1, s1 == l1 && s2 == l2,
-  // s1 == l1 && s2 == l2 && s3 == l3>.
-  // In fact, the last element is unnecessary, so we do not create it.
-  exprt::operandst equality_conjunctions(lhs.size());
-  equality_conjunctions[0] = binary_relation_exprt(lhs[0], ID_equal, rhs[0]);
-  for(size_t i = 1; i < equality_conjunctions.size() - 1; i++)
+public:
+  explicit inlining_decoratort(message_handlert &_wrapped) : wrapped(_wrapped)
   {
-    binary_relation_exprt component_i_equality{lhs[i], ID_equal, rhs[i]};
-    equality_conjunctions[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_equality);
   }
 
-  // Store inequalities between the i-th components of the input vectors
-  // (i.e. lhs and rhs).
-  // For example, suppose that the two input vectors are <s1, s2, s3> and <l1,
-  // l2, l3>.
-  // Then this vector stores <s1 < l1, s1 == l1 && s2 < l2, s1 == l1 &&
-  // s2 == l2 && s3 < l3>.
-  exprt::operandst lexicographic_individual_comparisons(lhs.size());
-  lexicographic_individual_comparisons[0] =
-    binary_relation_exprt(lhs[0], ID_lt, rhs[0]);
-  for(size_t i = 1; i < lexicographic_individual_comparisons.size(); i++)
+  unsigned int get_recursive_function_warnings_count()
   {
-    binary_relation_exprt component_i_less_than{lhs[i], ID_lt, rhs[i]};
-    lexicographic_individual_comparisons[i] =
-      and_exprt(equality_conjunctions[i - 1], component_i_less_than);
+    return recursive_function_warnings_count;
   }
-  return disjunction(lexicographic_individual_comparisons);
-}
 
-static void insert_before_swap_and_advance(
-  goto_programt &program,
-  goto_programt::targett &target,
-  goto_programt &payload)
-{
-  const auto offset = payload.instructions.size();
-  program.insert_before_swap(target, payload);
-  std::advance(target, offset);
-}
+  void print(unsigned level, const std::string &message) override
+  {
+    parse_message(message);
+    wrapped.print(level, message);
+  }
+
+  void print(unsigned level, const xmlt &xml) override
+  {
+    wrapped.print(level, xml);
+  }
+
+  void print(unsigned level, const jsont &json) override
+  {
+    wrapped.print(level, json);
+  }
+
+  void print(unsigned level, const structured_datat &data) override
+  {
+    wrapped.print(level, data);
+  }
+
+  void print(
+    unsigned level,
+    const std::string &message,
+    const source_locationt &location) override
+  {
+    parse_message(message);
+    wrapped.print(level, message, location);
+    return;
+  }
+
+  void flush(unsigned i) override
+  {
+    return wrapped.flush(i);
+  }
+
+  void set_verbosity(unsigned _verbosity)
+  {
+    wrapped.set_verbosity(_verbosity);
+  }
+
+  unsigned get_verbosity() const
+  {
+    return wrapped.get_verbosity();
+  }
+
+  std::size_t get_message_count(unsigned level) const
+  {
+    return wrapped.get_message_count(level);
+  }
+
+  std::string command(unsigned i) const override
+  {
+    return wrapped.command(i);
+  }
+};
 
 void code_contractst::check_apply_loop_contracts(
+  const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
   goto_programt::targett loop_head,
@@ -109,7 +153,9 @@ void code_contractst::check_apply_loop_contracts(
       t->location_number > loop_end->location_number)
       loop_end = t;
 
-  // see whether we have an invariant and a decreases clause
+  // check for assigns, invariant, and decreases clauses
+  auto assigns_clause = static_cast<const exprt &>(
+    loop_end->get_condition().find(ID_C_spec_assigns));
   auto invariant = static_cast<const exprt &>(
     loop_end->get_condition().find(ID_C_spec_loop_invariant));
   auto decreases_clause = static_cast<const exprt &>(
@@ -117,15 +163,16 @@ void code_contractst::check_apply_loop_contracts(
 
   if(invariant.is_nil())
   {
-    if(decreases_clause.is_nil())
+    if(decreases_clause.is_nil() && assigns_clause.is_nil())
       return;
     else
     {
       invariant = true_exprt();
       log.warning()
-        << "The loop at " << loop_head->source_location.as_string()
-        << " does not have a loop invariant, but has a decreases clause. "
-        << "Hence, a default loop invariant ('true') is being used."
+        << "The loop at " << loop_head->source_location().as_string()
+        << " does not have an invariant, but has other clauses"
+        << " specified in its contract.\n"
+        << "Hence, a default invariant ('true') is being used to prove those."
         << messaget::eom;
     }
   }
@@ -149,23 +196,20 @@ void code_contractst::check_apply_loop_contracts(
   // to
   //   initialize loop_entry variables;
   //   H: assert(invariant);
+  //   snapshot(write_set);
   //   havoc;
   //   assume(invariant);
   //   if(guard) goto E:
-  //   old_decreases_value = decreases_clause(current_environment);
-  //   loop;
-  //   new_decreases_value = decreases_clause(current_environment);
+  //   old_decreases_value = decreases_clause_expr;
+  //   loop with optional write_set inclusion checks;
+  //   new_decreases_value = decreases_clause_expr;
   //   assert(invariant);
   //   assert(new_decreases_value < old_decreases_value);
   //   assume(false);
   //   E: ...
 
-  // find out what can get changed in the loop
-  modifiest modifies;
-  get_modifies(local_may_alias, loop, modifies);
-
-  // build the havocking code
-  goto_programt havoc_code;
+  // an intermediate goto_program to store generated instructions
+  goto_programt generated_code;
 
   // process quantified variables correctly (introduce a fresh temporary)
   // and return a copy of the invariant
@@ -183,35 +227,141 @@ void code_contractst::check_apply_loop_contracts(
   replace_history_parameter(
     invariant,
     parameter2history,
-    loop_head->source_location,
+    loop_head->source_location(),
     mode,
-    havoc_code,
+    generated_code,
     ID_loop_entry);
-
-  // Create 'loop_entry' history variables
-  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
 
   // Generate: assert(invariant) just before the loop
   // We use a block scope to create a temporary assertion,
   // and immediately convert it to goto instructions.
   {
     code_assertt assertion{invariant_expr()};
-    assertion.add_source_location() = loop_head->source_location;
-    converter.goto_convert(assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location.set_comment(
+    assertion.add_source_location() = loop_head->source_location();
+    converter.goto_convert(assertion, generated_code, mode);
+    generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check loop invariant before entry");
   }
 
-  // havoc the variables that may be modified
-  append_havoc_code(loop_head->source_location, modifies, havoc_code);
+  // Add 'loop_entry' history variables and base case assertion.
+  // These variables are local and thus
+  // need not be checked against the enclosing scope's write set.
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_head,
+    add_pragma_disable_assigns_check(generated_code));
+
+  instrument_spec_assignst instrument_spec_assigns(
+    function_name, goto_functions, symbol_table, log.get_message_handler());
+
+  // assigns clause snapshots
+  goto_programt snapshot_instructions;
+
+  instrument_spec_assigns.track_static_locals(snapshot_instructions);
+
+  // ^^^ FIXME ^^^ we should only allow assignments to static locals
+  // declared in functions that are called in the loop body, not from the whole
+  // function...
+
+  // set of targets to havoc
+  assignst to_havoc;
+
+  if(assigns_clause.is_nil())
+  {
+    // No assigns clause was specified for this loop.
+    // Infer memory locations assigned by the loop from the loop instructions
+    // and the inferred aliasing relation.
+    try
+    {
+      get_assigns(local_may_alias, loop, to_havoc);
+      // TODO: if the set contains pairs (i, a[i]),
+      // we must at least widen them to (i, pointer_object(a))
+      log.debug() << "No loop assigns clause provided. Inferred targets {";
+      // Add inferred targets to the loop assigns clause.
+      bool ran_once = false;
+      for(const auto &target : to_havoc)
+      {
+        if(ran_once)
+          log.debug() << ", ";
+        ran_once = true;
+        log.debug() << format(target);
+        instrument_spec_assigns.track_spec_target(
+          target, snapshot_instructions);
+      }
+      log.debug()
+        << "}. Please specify an assigns clause if verification fails."
+        << messaget::eom;
+    }
+    catch(const analysis_exceptiont &exc)
+    {
+      log.error() << "Failed to infer variables being modified by the loop at "
+                  << loop_head->source_location()
+                  << ".\nPlease specify an assigns clause.\nReason:"
+                  << messaget::eom;
+      throw exc;
+    }
+  }
+  else
+  {
+    // An assigns clause was specified for this loop.
+    // Add the targets to the set of expressions to havoc.
+    for(const auto &target : assigns_clause.operands())
+    {
+      to_havoc.insert(target);
+      instrument_spec_assigns.track_spec_target(target, snapshot_instructions);
+    }
+  }
+
+  // Insert instrumentation
+  // This must be done before havocing the write set.
+  // ^^^ FIXME this is not true ^^^
+  insert_before_swap_and_advance(
+    goto_function.body, loop_head, snapshot_instructions);
+
+  optionalt<cfg_infot> cfg_empty_info;
+
+  // Perform write set instrumentation on the entire loop.
+  check_frame_conditions(
+    function_name,
+    goto_function.body,
+    loop_head,
+    loop_end,
+    instrument_spec_assigns,
+    // do not skip checks on function parameter assignments
+    skipt::DontSkip,
+    // do not use CFG info for now
+    cfg_empty_info);
+
+  // insert havocing code
+  havoc_assigns_targetst havoc_gen(to_havoc, ns);
+  havoc_gen.append_full_havoc_code(
+    loop_head->source_location(), generated_code);
+
+  // Add the havocing code, but only check against the enclosing scope's
+  // write set if it was manually specified.
+  if(assigns_clause.is_nil())
+    insert_before_swap_and_advance(
+      goto_function.body,
+      loop_head,
+      add_pragma_disable_assigns_check(generated_code));
+  else
+    insert_before_swap_and_advance(
+      goto_function.body, loop_head, generated_code);
+
+  // ^^^ FIXME ^^^
+  // comment by delmasrd: I did not reactivate this behaviour
+  // because I think we always want to check the loop assignments against
+  // the surrounding clause
+
+  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
 
   // Generate: assume(invariant) just after havocing
   // We use a block scope to create a temporary assumption,
   // and immediately convert it to goto instructions.
   {
     code_assumet assumption{invariant_expr()};
-    assumption.add_source_location() = loop_head->source_location;
-    converter.goto_convert(assumption, havoc_code, mode);
+    assumption.add_source_location() = loop_head->source_location();
+    converter.goto_convert(assumption, generated_code, mode);
   }
 
   // Create fresh temporary variables that store the multidimensional
@@ -219,34 +369,61 @@ void code_contractst::check_apply_loop_contracts(
   for(const auto &clause : decreases_clause.operands())
   {
     const auto old_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
+      new_tmp_symbol(
+        clause.type(), loop_head->source_location(), mode, symbol_table)
         .symbol_expr();
-    havoc_code.add(
-      goto_programt::make_decl(old_decreases_var, loop_head->source_location));
+    generated_code.add(goto_programt::make_decl(
+      old_decreases_var, loop_head->source_location()));
     old_decreases_vars.push_back(old_decreases_var);
 
     const auto new_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head->source_location, mode)
+      new_tmp_symbol(
+        clause.type(), loop_head->source_location(), mode, symbol_table)
         .symbol_expr();
-    havoc_code.add(
-      goto_programt::make_decl(new_decreases_var, loop_head->source_location));
+    generated_code.add(goto_programt::make_decl(
+      new_decreases_var, loop_head->source_location()));
     new_decreases_vars.push_back(new_decreases_var);
   }
 
-  // non-deterministically skip the loop if it is a do-while loop
-  if(!loop_head->is_goto())
+  // TODO: Fix loop contract handling for do/while loops.
+  if(loop_end->is_goto() && !loop_end->get_condition().is_true())
   {
-    havoc_code.add(goto_programt::make_goto(
+    log.error() << "Loop contracts are unsupported on do/while loops: "
+                << loop_head->source_location() << messaget::eom;
+    throw 0;
+
+    // non-deterministically skip the loop if it is a do-while loop.
+    generated_code.add(goto_programt::make_goto(
       loop_end,
-      side_effect_expr_nondett(bool_typet(), loop_head->source_location)));
+      side_effect_expr_nondett(bool_typet(), loop_head->source_location())));
   }
 
-  // Now havoc at the loop head.
+  // Assume invariant & decl the variant temporaries (just before loop guard).
   // Use insert_before_swap to preserve jumps to loop head.
-  insert_before_swap_and_advance(goto_function.body, loop_head, havoc_code);
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_head,
+    add_pragma_disable_assigns_check(generated_code));
+
+  // Forward the loop_head iterator until the start of the body.
+  // This is necessary because complex C loop_head conditions could be
+  // converted to multiple GOTO instructions (e.g. temporaries are introduced).
+  // If the loop_head location shifts to a different function,
+  // assume that it's an inlined function and keep skipping.
+  // FIXME: This simple approach wouldn't work when
+  // the loop guard in the source file is split across multiple lines.
+  const auto head_loc = loop_head->source_location();
+  while(loop_head->source_location() == head_loc ||
+        loop_head->source_location().get_function() != head_loc.get_function())
+    loop_head++;
+
+  // At this point, we are just past the loop head,
+  // so at the beginning of the loop body.
+  auto loop_body = loop_head;
+  loop_head--;
 
   // Generate: assignments to store the multidimensional decreases clause's
-  // value before the loop
+  // value just before the loop body (but just after the loop guard)
   if(!decreases_clause.is_nil())
   {
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
@@ -254,11 +431,12 @@ void code_contractst::check_apply_loop_contracts(
       code_assignt old_decreases_assignment{old_decreases_vars[i],
                                             decreases_clause_exprs[i]};
       old_decreases_assignment.add_source_location() =
-        loop_head->source_location;
-      converter.goto_convert(old_decreases_assignment, havoc_code, mode);
+        loop_head->source_location();
+      converter.goto_convert(old_decreases_assignment, generated_code, mode);
     }
 
-    goto_function.body.destructive_insert(std::next(loop_head), havoc_code);
+    goto_function.body.destructive_insert(
+      loop_body, add_pragma_disable_assigns_check(generated_code));
   }
 
   // Generate: assert(invariant) just after the loop exits
@@ -266,9 +444,9 @@ void code_contractst::check_apply_loop_contracts(
   // and immediately convert it to goto instructions.
   {
     code_assertt assertion{invariant_expr()};
-    assertion.add_source_location() = loop_end->source_location;
-    converter.goto_convert(assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location.set_comment(
+    assertion.add_source_location() = loop_end->source_location();
+    converter.goto_convert(assertion, generated_code, mode);
+    generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check that loop invariant is preserved");
   }
 
@@ -281,47 +459,41 @@ void code_contractst::check_apply_loop_contracts(
       code_assignt new_decreases_assignment{new_decreases_vars[i],
                                             decreases_clause_exprs[i]};
       new_decreases_assignment.add_source_location() =
-        loop_head->source_location;
-      converter.goto_convert(new_decreases_assignment, havoc_code, mode);
+        loop_head->source_location();
+      converter.goto_convert(new_decreases_assignment, generated_code, mode);
     }
 
     // Generate: assertion that the multidimensional decreases clause's value
     // after the loop is smaller than the value before the loop.
     // Here, we use the lexicographic order.
     code_assertt monotonic_decreasing_assertion{
-      create_lexicographic_less_than(new_decreases_vars, old_decreases_vars)};
+      generate_lexicographic_less_than_check(
+        new_decreases_vars, old_decreases_vars)};
     monotonic_decreasing_assertion.add_source_location() =
-      loop_head->source_location;
-    converter.goto_convert(monotonic_decreasing_assertion, havoc_code, mode);
-    havoc_code.instructions.back().source_location.set_comment(
+      loop_head->source_location();
+    converter.goto_convert(
+      monotonic_decreasing_assertion, generated_code, mode);
+    generated_code.instructions.back().source_location_nonconst().set_comment(
       "Check decreases clause on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
     {
-      havoc_code.add(goto_programt::make_dead(
-        old_decreases_vars[i], loop_head->source_location));
-      havoc_code.add(goto_programt::make_dead(
-        new_decreases_vars[i], loop_head->source_location));
+      generated_code.add(goto_programt::make_dead(
+        old_decreases_vars[i], loop_head->source_location()));
+      generated_code.add(goto_programt::make_dead(
+        new_decreases_vars[i], loop_head->source_location()));
     }
   }
 
-  insert_before_swap_and_advance(goto_function.body, loop_end, havoc_code);
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_end,
+    add_pragma_disable_assigns_check(generated_code));
 
   // change the back edge into assume(false) or assume(guard)
-  loop_end->targets.clear();
-  loop_end->type = ASSUME;
-  if(loop_head->is_goto())
-    loop_end->set_condition(false_exprt());
-  else
-    loop_end->set_condition(boolean_negate(loop_end->get_condition()));
-}
-
-bool code_contractst::has_contract(const irep_idt fun_name)
-{
-  const symbolt &function_symbol = ns.lookup(fun_name);
-  const auto &type = to_code_with_contract_type(function_symbol.type);
-  return type.has_contract();
+  loop_end->turn_into_assume();
+  loop_end->set_condition(boolean_negate(loop_end->get_condition()));
 }
 
 void code_contractst::add_quantified_variable(
@@ -373,10 +545,8 @@ void code_contractst::add_quantified_variable(
       const auto &quantified_symbol = to_symbol_expr(quantified_variable);
 
       // 1. create fresh symbol
-      symbolt new_symbol = get_fresh_aux_symbol(
+      symbolt new_symbol = new_tmp_symbol(
         quantified_symbol.type(),
-        id2string(quantified_symbol.get_identifier()),
-        "tmp",
         quantified_symbol.source_location(),
         mode,
         symbol_table);
@@ -410,32 +580,48 @@ void code_contractst::replace_history_parameter(
   {
     const auto &parameter = to_history_expr(expr, id).expression();
 
+    const auto &id = parameter.id();
     if(
-      parameter.id() == ID_dereference || parameter.id() == ID_member ||
-      parameter.id() == ID_symbol || parameter.id() == ID_ptrmember)
+      id == ID_dereference || id == ID_member || id == ID_symbol ||
+      id == ID_ptrmember || id == ID_constant || id == ID_typecast)
     {
       auto it = parameter2history.find(parameter);
 
       if(it == parameter2history.end())
       {
+        // 0. Create a skip target to jump to, if the parameter is invalid
+        goto_programt skip_program;
+        const auto skip_target =
+          skip_program.add(goto_programt::make_skip(location));
+
         // 1. Create a temporary symbol expression that represents the
         // history variable
         symbol_exprt tmp_symbol =
-          new_tmp_symbol(parameter.type(), location, mode).symbol_expr();
+          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
+            .symbol_expr();
 
         // 2. Associate the above temporary variable to it's corresponding
         // expression
         parameter2history[parameter] = tmp_symbol;
 
         // 3. Add the required instructions to the instructions list
-        // 3.1 Declare the newly created temporary variable
+        // 3.1. Declare the newly created temporary variable
         history.add(goto_programt::make_decl(tmp_symbol, location));
 
-        // 3.2 Add an assignment such that the value pointed to by the new
+        // 3.2. Skip storing the history if the expression is invalid
+        history.add(goto_programt::make_goto(
+          skip_target,
+          not_exprt{all_dereferences_are_valid(parameter, ns)},
+          location));
+
+        // 3.3. Add an assignment such that the value pointed to by the new
         // temporary variable is equal to the value of the corresponding
         // parameter
         history.add(
           goto_programt::make_assignment(tmp_symbol, parameter, location));
+
+        // 3.4. Add a skip target
+        history.destructive_append(skip_program);
       }
 
       expr = parameter2history[parameter];
@@ -473,22 +659,26 @@ code_contractst::create_ensures_instruction(
 }
 
 bool code_contractst::apply_function_contract(
-  goto_programt &goto_program,
-  goto_programt::targett target)
+  const irep_idt &function,
+  const source_locationt &location,
+  goto_programt &function_body,
+  goto_programt::targett &target)
 {
+  const auto &const_target =
+    static_cast<const goto_programt::targett &>(target);
   // Return if the function is not named in the call; currently we don't handle
   // function pointers.
-  PRECONDITION(as_const(*target).call_function().id() == ID_symbol);
+  PRECONDITION(const_target->call_function().id() == ID_symbol);
 
   // Retrieve the function type, which is needed to extract the contract
   // components.
-  const irep_idt &function =
-    to_symbol_expr(as_const(*target).call_function()).get_identifier();
-  const symbolt &function_symbol = ns.lookup(function);
+  const irep_idt &target_function =
+    to_symbol_expr(const_target->call_function()).get_identifier();
+  const symbolt &function_symbol = ns.lookup(target_function);
   const auto &type = to_code_with_contract_type(function_symbol.type);
 
   // Isolate each component of the contract.
-  auto assigns = type.assigns();
+  auto assigns_clause = type.assigns();
   auto requires = conjunction(type.requires());
   auto ensures = conjunction(type.ensures());
 
@@ -496,18 +686,26 @@ bool code_contractst::apply_function_contract(
   // with expressions from the call site (e.g. the return value).
   // This object tracks replacements that are common to ENSURES and REQUIRES.
   replace_symbolt common_replace;
+
+  // keep track of the call's return expression to make it nondet later
+  optionalt<exprt> call_ret_opt = {};
+
+  // if true, the call return variable variable was created during replacement
+  bool call_ret_is_fresh_var = false;
+
   if(type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
-    if(as_const(*target).call_lhs().is_not_nil())
+    if(target->call_lhs().is_not_nil())
     {
       // If so, have it replaced appropriately.
       // For example, if foo() ensures that its return value is > 5, then
       // rewrite calls to foo as follows:
       // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
-      symbol_exprt ret_val(
-        CPROVER_PREFIX "return_value", as_const(*target).call_lhs().type());
-      common_replace.insert(ret_val, as_const(*target).call_lhs());
+      auto &lhs_expr = const_target->call_lhs();
+      call_ret_opt = lhs_expr;
+      symbol_exprt ret_val(CPROVER_PREFIX "return_value", lhs_expr.type());
+      common_replace.insert(ret_val, lhs_expr);
     }
     else
     {
@@ -519,22 +717,25 @@ bool code_contractst::apply_function_contract(
       {
         // The postcondition does mention __CPROVER_return_value, so mint a
         // fresh variable to replace __CPROVER_return_value with.
+        call_ret_is_fresh_var = true;
         const symbolt &fresh = get_fresh_aux_symbol(
           type.return_type(),
-          id2string(function),
+          id2string(target_function),
           "ignored_return_value",
-          target->source_location,
-          symbol_table.lookup_ref(function).mode,
+          const_target->source_location(),
+          symbol_table.lookup_ref(target_function).mode,
           ns,
           symbol_table);
         symbol_exprt ret_val(CPROVER_PREFIX "return_value", type.return_type());
-        common_replace.insert(ret_val, fresh.symbol_expr());
+        auto fresh_sym_expr = fresh.symbol_expr();
+        common_replace.insert(ret_val, fresh_sym_expr);
+        call_ret_opt = fresh_sym_expr;
       }
     }
   }
 
   // Replace formal parameters
-  const auto &arguments = target->call_arguments();
+  const auto &arguments = const_target->call_arguments();
   auto a_it = arguments.begin();
   for(auto p_it = type.parameters().begin();
       p_it != type.parameters().end() && a_it != arguments.end();
@@ -547,13 +748,9 @@ bool code_contractst::apply_function_contract(
     }
   }
 
-  // ASSIGNS clause should not refer to any quantified variables,
-  // and only refer to the common symbols to be replaced.
-  common_replace(assigns);
+  const auto &mode = symbol_table.lookup_ref(target_function).mode;
 
-  const auto &mode = symbol_table.lookup_ref(function).mode;
-
-  is_fresh_replacet is_fresh(*this, log, function);
+  is_fresh_replacet is_fresh(*this, log, target_function);
   is_fresh.create_declarations();
 
   // Insert assertion of the precondition immediately before the call site.
@@ -567,14 +764,15 @@ bool code_contractst::apply_function_contract(
     converter.goto_convert(
       code_assertt(requires),
       assertion,
-      symbol_table.lookup_ref(function).mode);
-    assertion.instructions.back().source_location = requires.source_location();
-    assertion.instructions.back().source_location.set_comment(
+      symbol_table.lookup_ref(target_function).mode);
+    assertion.instructions.back().source_location_nonconst() =
+      requires.source_location();
+    assertion.instructions.back().source_location_nonconst().set_comment(
       "Check requires clause");
-    assertion.instructions.back().source_location.set_property_class(
+    assertion.instructions.back().source_location_nonconst().set_property_class(
       ID_precondition);
     is_fresh.update_requires(assertion);
-    insert_before_swap_and_advance(goto_program, target, assertion);
+    insert_before_swap_and_advance(function_body, target, assertion);
   }
 
   // Gather all the instructions required to handle history variables
@@ -590,70 +788,166 @@ bool code_contractst::apply_function_contract(
     ensures_pair = create_ensures_instruction(
       assumption,
       ensures.source_location(),
-      symbol_table.lookup_ref(function).mode);
+      symbol_table.lookup_ref(target_function).mode);
 
     // add all the history variable initialization instructions
     // to the goto program
-    insert_before_swap_and_advance(goto_program, target, ensures_pair.second);
+    insert_before_swap_and_advance(function_body, target, ensures_pair.second);
   }
 
-  // Create a series of non-deterministic assignments to havoc the variables
-  // in the assigns clause.
-  if(assigns.is_not_nil())
+  // ASSIGNS clause should not refer to any quantified variables,
+  // and only refer to the common symbols to be replaced.
+  exprt targets;
+  for(auto &target : assigns_clause)
+    targets.add_to_operands(std::move(target));
+  common_replace(targets);
+
+  // Create a sequence of non-deterministic assignments...
+  goto_programt havoc_instructions;
+
+  // ...for assigns clause targets
+  if(!assigns_clause.empty())
   {
-    assigns_clauset assigns_cause(assigns, log, ns);
-    auto assigns_havoc = assigns_cause.generate_havoc_code();
-
-    // Insert the non-deterministic assignment immediately before the call site.
-    insert_before_swap_and_advance(goto_program, target, assigns_havoc);
+    // Havoc all targets in the assigns clause
+    // TODO: handle local statics possibly touched by this function
+    havoc_assigns_clause_targetst havocker(
+      target_function,
+      targets.operands(),
+      goto_functions,
+      location,
+      symbol_table,
+      log.get_message_handler());
+    havocker.get_instructions(havoc_instructions);
   }
+
+  // ...for the return value
+  if(call_ret_opt.has_value())
+  {
+    auto &call_ret = call_ret_opt.value();
+    auto &loc = call_ret.source_location();
+    auto &type = call_ret.type();
+
+    // Declare if fresh
+    if(call_ret_is_fresh_var)
+      havoc_instructions.add(
+        goto_programt::make_decl(to_symbol_expr(call_ret), loc));
+
+    side_effect_expr_nondett expr(type, location);
+    auto target = havoc_instructions.add(
+      goto_programt::make_assignment(call_ret, expr, loc));
+    target->code_nonconst().add_source_location() = loc;
+  }
+
+  // Insert havoc instructions immediately before the call site.
+  insert_before_swap_and_advance(function_body, target, havoc_instructions);
 
   // To remove the function call, insert statements related to the assumption.
   // Then, replace the function call with a SKIP statement.
   if(!ensures.is_false())
   {
     is_fresh.update_ensures(ensures_pair.first);
-    insert_before_swap_and_advance(goto_program, target, ensures_pair.first);
+    insert_before_swap_and_advance(function_body, target, ensures_pair.first);
   }
+
+  // Kill return value variable if fresh
+  if(call_ret_is_fresh_var)
+  {
+    function_body.output_instruction(ns, "", log.warning(), *target);
+    auto dead_inst =
+      goto_programt::make_dead(to_symbol_expr(call_ret_opt.value()), location);
+    function_body.insert_before_swap(target, dead_inst);
+    ++target;
+  }
+
+  // Erase original function call
   *target = goto_programt::make_skip();
 
   // Add this function to the set of replaced functions.
-  summarized.insert(function);
+  summarized.insert(target_function);
   return false;
 }
 
 void code_contractst::apply_loop_contract(
-  const irep_idt &function,
+  const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function)
 {
+  const bool may_have_loops = std::any_of(
+    goto_function.body.instructions.begin(),
+    goto_function.body.instructions.end(),
+    [](const goto_programt::instructiont &instruction) {
+      return instruction.is_backwards_goto();
+    });
+
+  if(!may_have_loops)
+    return;
+
+  inlining_decoratort decorated(log.get_message_handler());
+  goto_function_inline(
+    goto_functions, function_name, ns, log.get_message_handler());
+
+  INVARIANT(
+    decorated.get_recursive_function_warnings_count() == 0,
+    "Recursive functions found during inlining");
+
+  // restore internal invariants
+  goto_functions.update();
+
   local_may_aliast local_may_alias(goto_function);
   natural_loops_mutablet natural_loops(goto_function.body);
 
-  // Iterate over the (natural) loops in the function,
-  // and apply any invariant annotations that we find.
-  for(const auto &loop : natural_loops.loop_map)
+  // A graph node type that stores information about a loop.
+  // We create a DAG representing nesting of various loops in goto_function,
+  // sort them topologically, and instrument them in the top-sorted order.
+  //
+  // The goal here is not avoid explicit "subset checks" on nested write sets.
+  // When instrumenting in a top-sorted order,
+  // the outer loop would no longer observe the inner loop's write set,
+  // but only corresponding `havoc` statements,
+  // which can be instrumented in the usual way to achieve a "subset check".
+
+  struct loop_graph_nodet : public graph_nodet<empty_edget>
   {
+    typedef const goto_programt::targett &targett;
+    typedef const typename natural_loops_mutablet::loopt &loopt;
+
+    targett target;
+    loopt loop;
+
+    loop_graph_nodet(targett t, loopt l) : target(t), loop(l)
+    {
+    }
+  };
+  grapht<loop_graph_nodet> loop_nesting_graph;
+
+  for(const auto &loop : natural_loops.loop_map)
+    loop_nesting_graph.add_node(loop.first, loop.second);
+
+  for(size_t outer = 0; outer < loop_nesting_graph.size(); ++outer)
+  {
+    for(size_t inner = 0; inner < loop_nesting_graph.size(); ++inner)
+    {
+      if(inner == outer)
+        continue;
+
+      if(loop_nesting_graph[outer].loop.contains(
+           loop_nesting_graph[inner].target))
+        loop_nesting_graph.add_edge(outer, inner);
+    }
+  }
+
+  // Iterate over the (natural) loops in the function, in topo-sorted order,
+  // and apply any loop contracts that we find.
+  for(const auto &idx : loop_nesting_graph.topsort())
+  {
+    const auto &loop_node = loop_nesting_graph[idx];
     check_apply_loop_contracts(
+      function_name,
       goto_function,
       local_may_alias,
-      loop.first,
-      loop.second,
-      symbol_table.lookup_ref(function).mode);
+      loop_node.target,
+      loop_node.loop,
+      symbol_table.lookup_ref(function_name).mode);
   }
-}
-
-const symbolt &code_contractst::new_tmp_symbol(
-  const typet &type,
-  const source_locationt &source_location,
-  const irep_idt &mode)
-{
-  return get_fresh_aux_symbol(
-    type,
-    id2string(source_location.get_function()) + "::tmp_cc",
-    "tmp_cc",
-    source_location,
-    mode,
-    symbol_table);
 }
 
 symbol_tablet &code_contractst::get_symbol_table()
@@ -667,152 +961,64 @@ goto_functionst &code_contractst::get_goto_functions()
 }
 
 void code_contractst::instrument_assign_statement(
-  goto_programt::instructionst::iterator &instruction_iterator,
+  goto_programt::targett &instruction_it,
   goto_programt &program,
-  assigns_clauset &assigns_clause)
+  instrument_spec_assignst &instrument_spec_assigns,
+  optionalt<cfg_infot> &cfg_info_opt)
 {
-  INVARIANT(
-    instruction_iterator->is_assign(),
-    "The first instruction of instrument_assign_statement should always be"
-    " an assignment");
-
-  const exprt &lhs = instruction_iterator->assign_lhs();
-
-  // Local static variables are not declared locally, therefore, they are not
-  // included in the local write set during declaration. We check here whether
-  // lhs of the assignment is a local static variable and, if it is indeed
-  // true, we add lhs to our local write set before checking the assignment.
-  if(lhs.id() == ID_symbol)
-  {
-    auto lhs_sym = ns.lookup(lhs.get(ID_identifier));
-    if(
-      lhs_sym.is_static_lifetime &&
-      lhs_sym.location.get_function() ==
-        instruction_iterator->source_location.get_function())
-      assigns_clause.add_to_local_write_set(lhs);
-  }
-
-  goto_programt alias_assertion;
-  alias_assertion.add(goto_programt::make_assertion(
-    assigns_clause.generate_containment_check(lhs),
-    instruction_iterator->source_location));
-  alias_assertion.instructions.back().source_location.set_comment(
-    "Check that " + from_expr(ns, lhs.id(), lhs) + " is assignable");
-  insert_before_swap_and_advance(
-    program, instruction_iterator, alias_assertion);
+  auto lhs = instruction_it->assign_lhs();
+  lhs.add_source_location() = instruction_it->source_location();
+  goto_programt payload;
+  instrument_spec_assigns.check_inclusion_assignment(
+    lhs, cfg_info_opt, payload);
+  insert_before_swap_and_advance(program, instruction_it, payload);
 }
 
 void code_contractst::instrument_call_statement(
-  goto_programt::instructionst::iterator &instruction_iterator,
-  goto_programt &program,
-  assigns_clauset &assigns_clause)
+  goto_programt::targett &instruction_it,
+  const irep_idt &function,
+  goto_programt &body,
+  instrument_spec_assignst &instrument_spec_assigns,
+  optionalt<cfg_infot> &cfg_info_opt)
 {
   INVARIANT(
-    instruction_iterator->is_function_call(),
+    instruction_it->is_function_call(),
     "The first argument of instrument_call_statement should always be "
     "a function call");
 
-  irep_idt called_name;
-  if(instruction_iterator->call_function().id() == ID_dereference)
-  {
-    called_name =
-      to_symbol_expr(
-        to_dereference_expr(instruction_iterator->call_function()).pointer())
-        .get_identifier();
-  }
-  else
-  {
-    called_name =
-      to_symbol_expr(instruction_iterator->call_function()).get_identifier();
-  }
+  const auto &callee_name =
+    to_symbol_expr(instruction_it->call_function()).get_identifier();
 
-  if(called_name == "malloc")
+  if(callee_name == "malloc")
   {
-    // malloc statments return a void pointer, which is then cast and assigned
-    // to a result variable. We iterate one line forward to grab the result of
-    // the malloc once it is cast.
-    instruction_iterator++;
-    if(instruction_iterator->is_assign())
+    const auto &function_call =
+      to_code_function_call(instruction_it->get_code());
+    if(function_call.lhs().is_not_nil())
     {
-      instrument_assign_statement(
-        instruction_iterator, program, assigns_clause);
-      const exprt &lhs = instruction_iterator->assign_lhs();
-      assigns_clause.add_to_local_write_set(dereference_exprt(lhs));
+      // grab the returned pointer from malloc
+      auto object = pointer_object(function_call.lhs());
+      object.add_source_location() = function_call.source_location();
+      // move past the call and then insert the CAR
+      instruction_it++;
+      goto_programt payload;
+      instrument_spec_assigns.track_heap_allocated(object, payload);
+      insert_before_swap_and_advance(body, instruction_it, payload);
+      // since CAR was inserted *after* the malloc call,
+      // move the instruction pointer backward,
+      // because the caller increments it in a `for` loop
+      instruction_it--;
     }
-    return; // assume malloc edits no pre-existing memory objects.
   }
-  else if(called_name == "free")
+  else if(callee_name == "free")
   {
-    goto_programt alias_assertion;
-    const exprt &lhs_dereference = dereference_exprt(
-      to_typecast_expr(instruction_iterator->call_arguments().front()).op());
-    alias_assertion.add(goto_programt::make_assertion(
-      assigns_clause.generate_containment_check(lhs_dereference),
-      instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that " + from_expr(ns, lhs_dereference.id(), lhs_dereference) +
-      " is assignable");
-    assigns_clause.remove_from_local_write_set(lhs_dereference);
-    assigns_clause.remove_from_global_write_set(lhs_dereference);
-    insert_before_swap_and_advance(
-      program, instruction_iterator, alias_assertion);
-    return;
-  }
-
-  if(
-    instruction_iterator->call_lhs().is_not_nil() &&
-    instruction_iterator->call_lhs().id() == ID_symbol)
-  {
-    const auto alias_expr = assigns_clause.generate_containment_check(
-      instruction_iterator->call_lhs());
-
-    goto_programt alias_assertion;
-    alias_assertion.add(goto_programt::make_assertion(
-      alias_expr, instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that " + from_expr(ns, alias_expr.id(), alias_expr) +
-      " is assignable");
-    program.insert_before_swap(instruction_iterator, alias_assertion);
-    ++instruction_iterator;
-  }
-
-  const symbolt &called_symbol = ns.lookup(called_name);
-  // Called symbol might be a function pointer.
-  const typet &called_symbol_type = (called_symbol.type.id() == ID_pointer)
-                                      ? called_symbol.type.subtype()
-                                      : called_symbol.type;
-  exprt called_assigns =
-    to_code_with_contract_type(called_symbol_type).assigns();
-  const code_typet &called_type = to_code_type(called_symbol_type);
-
-  if(called_assigns.is_not_nil())
-  {
-    replace_symbolt replace_formal_params;
-    const auto &arguments = instruction_iterator->call_arguments();
-    auto a_it = arguments.begin();
-    for(auto p_it = called_type.parameters().begin();
-        p_it != called_type.parameters().end() && a_it != arguments.end();
-        ++p_it, ++a_it)
-    {
-      if(!p_it->get_identifier().empty())
-      {
-        symbol_exprt p(p_it->get_identifier(), p_it->type());
-        replace_formal_params.insert(p, *a_it);
-      }
-    }
-    replace_formal_params(called_assigns);
-
-    // check subset relationship of assigns clause for called function
-    assigns_clauset called_assigns_clause(called_assigns, log, ns);
-    const auto subset_check =
-      assigns_clause.generate_subset_check(called_assigns_clause);
-    goto_programt alias_assertion;
-    alias_assertion.add(goto_programt::make_assertion(
-      subset_check, instruction_iterator->source_location));
-    alias_assertion.instructions.back().source_location.set_comment(
-      "Check that callee's assigns clause is a subset of caller's");
-    program.insert_before_swap(instruction_iterator, alias_assertion);
-    ++instruction_iterator;
+    const auto &ptr = instruction_it->call_arguments().front();
+    auto object = pointer_object(ptr);
+    object.add_source_location() = instruction_it->source_location();
+    goto_programt payload;
+    instrument_spec_assigns
+      .check_inclusion_heap_allocated_and_invalidate_aliases(
+        object, cfg_info_opt, payload);
+    insert_before_swap_and_advance(body, instruction_it, payload);
   }
 }
 
@@ -882,70 +1088,263 @@ bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
 bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
-  auto old_function = goto_functions.function_map.find(function);
-  if(old_function == goto_functions.function_map.end())
+  auto function_obj = goto_functions.function_map.find(function);
+  if(function_obj == goto_functions.function_map.end())
   {
     log.error() << "Could not find function '" << function
                 << "' in goto-program; not enforcing contracts."
                 << messaget::eom;
     return true;
   }
-  goto_programt &program = old_function->second.body;
 
-  if(check_for_looped_mallocs(program))
-  {
-    return true;
-  }
+  const auto &goto_function = function_obj->second;
+  auto &function_body = function_obj->second.body;
 
   // Get assigns clause for function
-  const symbolt &target = ns.lookup(function);
-  assigns_clauset assigns(
-    to_code_with_contract_type(target.type).assigns(), log, ns);
+  const symbolt &function_sybmol = ns.lookup(function);
+  const auto &function_with_contract =
+    to_code_with_contract_type(function_sybmol.type);
 
-  // Adds formal parameters to freely assignable set
-  for(auto &parameter : to_code_type(target.type).parameters())
+  instrument_spec_assignst instrument_spec_assigns(
+    function, goto_functions, symbol_table, log.get_message_handler());
+
+  // Detect and track static local variables before inlining
+  goto_programt snapshot_static_locals;
+  instrument_spec_assigns.track_static_locals(snapshot_static_locals);
+
+  // Full inlining of the function body
+  // Inlining is performed so that function calls to a same function
+  // occurring under different write sets get instrumented specifically
+  // for each write set
+  inlining_decoratort decorated(log.get_message_handler());
+  goto_function_inline(goto_functions, function, ns, decorated);
+
+  INVARIANT(
+    decorated.get_recursive_function_warnings_count() == 0,
+    "Recursive functions found during inlining");
+
+  // Clean up possible fake loops that are due to `IF 0!=0 GOTO i` instructions
+  simplify_gotos(function_body, ns);
+
+  // Restore internal coherence in the programs
+  goto_functions.update();
+
+  INVARIANT(
+    is_loop_free(function_body, ns, log),
+    "Loops remain in function '" + id2string(function) +
+      "', assigns clause checking instrumentation cannot be applied.");
+
+  // Create a deep copy of the inlined body before any instrumentation is added
+  // and compute static control flow graph information
+  goto_functiont goto_function_orig;
+  goto_function_orig.copy_from(goto_function);
+  cfg_infot cfg_info(ns, goto_function_orig);
+  optionalt<cfg_infot> cfg_info_opt{cfg_info};
+
+  // Start instrumentation
+  auto instruction_it = function_body.instructions.begin();
+
+  // Inject local static snapshots
+  insert_before_swap_and_advance(
+    function_body, instruction_it, snapshot_static_locals);
+
+  // Track targets mentionned in the specification
+  for(auto &target : function_with_contract.assigns())
   {
-    assigns.add_to_local_write_set(
-      ns.lookup(parameter.get_identifier()).symbol_expr());
+    goto_programt payload;
+    instrument_spec_assigns.track_spec_target(target, payload);
+    insert_before_swap_and_advance(function_body, instruction_it, payload);
   }
 
-  // Insert aliasing assertions
-  check_frame_conditions(program, assigns);
+  // Track formal parameters
+  goto_programt snapshot_function_parameters;
+  for(const auto &param : to_code_type(function_sybmol.type).parameters())
+  {
+    goto_programt payload;
+    instrument_spec_assigns.track_stack_allocated(
+      ns.lookup(param.get_identifier()).symbol_expr(), payload);
+    insert_before_swap_and_advance(function_body, instruction_it, payload);
+  }
+
+  // Restore internal coherence in the programs
+  goto_functions.update();
+
+  // Insert write set inclusion checks.
+  check_frame_conditions(
+    function,
+    function_body,
+    instruction_it,
+    function_body.instructions.end(),
+    instrument_spec_assigns,
+    // skip checks on function parameter assignments
+    skipt::Skip,
+    cfg_info_opt);
 
   return false;
 }
 
-void code_contractst::check_frame_conditions(
-  goto_programt &program,
-  assigns_clauset &assigns)
+/// Returns true iff the target instruction is tagged with a
+/// 'CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK' pragma.
+bool has_disable_assigns_check_pragma(
+  const goto_programt::const_targett &target)
 {
-  for(auto instruction_it = program.instructions.begin();
-      instruction_it != program.instructions.end();
-      ++instruction_it)
+  const auto &pragmas = target->source_location().get_pragmas();
+  return pragmas.find(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK) != pragmas.end();
+}
+
+/// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.
+bool must_check_assign(
+  const goto_programt::const_targett &target,
+  code_contractst::skipt skip_parameter_assigns,
+  const namespacet ns,
+  const optionalt<cfg_infot> cfg_info_opt)
+{
+  if(
+    const auto &symbol_expr =
+      expr_try_dynamic_cast<symbol_exprt>(target->assign_lhs()))
   {
-    if(instruction_it->is_decl())
+    if(
+      skip_parameter_assigns == code_contractst::skipt::DontSkip &&
+      ns.lookup(symbol_expr->get_identifier()).is_parameter)
+      return true;
+
+    if(cfg_info_opt.has_value())
+      return !cfg_info_opt.value().is_local(symbol_expr->get_identifier());
+  }
+
+  return true;
+}
+
+/// Returns true iff a `DECL x` must be added to the local write set.
+///
+/// A variable is called 'dirty' if its address gets taken at some point in
+/// the program.
+///
+/// Assuming the goto program is obtained from a structured C program that
+/// passed C compiler checks, non-dirty variables can only be assigned to
+/// directly by name, cannot escape their lexical scope, and are always safe
+/// to assign. Hence, we only track dirty variables in the write set.
+bool must_track_decl(
+  const goto_programt::const_targett &target,
+  const optionalt<cfg_infot> &cfg_info_opt)
+{
+  if(cfg_info_opt.has_value())
+    return cfg_info_opt.value().is_not_local_or_dirty_local(
+      target->decl_symbol().get_identifier());
+
+  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
+  return true;
+}
+
+/// Returns true iff a `DEAD x` must be processed to upate the local write set.
+/// The conditions are the same than for tracking a `DECL x` instruction.
+bool must_track_dead(
+  const goto_programt::const_targett &target,
+  const optionalt<cfg_infot> &cfg_info_opt)
+{
+  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
+  if(!cfg_info_opt.has_value())
+    return true;
+
+  return cfg_info_opt.value().is_not_local_or_dirty_local(
+    target->dead_symbol().get_identifier());
+}
+
+void code_contractst::check_frame_conditions(
+  const irep_idt &function,
+  goto_programt &body,
+  goto_programt::targett instruction_it,
+  const goto_programt::targett &instruction_end,
+  instrument_spec_assignst &instrument_spec_assigns,
+  skipt skip_parameter_assigns,
+  optionalt<cfg_infot> &cfg_info_opt)
+{
+  while(instruction_it != instruction_end)
+  {
+    // Skip instructions marked as disabled for assigns clause checking
+    if(has_disable_assigns_check_pragma(instruction_it))
     {
-      // Local variables are always freely assignable
-      assigns.add_to_local_write_set(instruction_it->get_decl().symbol());
+      instruction_it++;
+      if(cfg_info_opt.has_value())
+        cfg_info_opt.value().step();
+      continue;
     }
-    else if(instruction_it->is_assign())
+
+    // Do not instrument this instruction again in the future,
+    // since we are going to instrument it now below.
+    add_pragma_disable_assigns_check(*instruction_it);
+
+    if(
+      instruction_it->is_decl() &&
+      must_track_decl(instruction_it, cfg_info_opt))
+    {
+      // grab the declared symbol
+      const auto &decl_symbol = instruction_it->decl_symbol();
+      // move past the call and then insert the CAR
+      instruction_it++;
+      goto_programt payload;
+      instrument_spec_assigns.track_stack_allocated(decl_symbol, payload);
+      insert_before_swap_and_advance(body, instruction_it, payload);
+      // since CAR was inserted *after* the DECL instruction,
+      // move the instruction pointer backward,
+      // because the loop step takes care of the increment
+      instruction_it--;
+    }
+    else if(
+      instruction_it->is_assign() &&
+      must_check_assign(
+        instruction_it, skip_parameter_assigns, ns, cfg_info_opt))
     {
       instrument_assign_statement(
-        instruction_it,
-        program,
-        assigns);
+        instruction_it, body, instrument_spec_assigns, cfg_info_opt);
     }
     else if(instruction_it->is_function_call())
     {
       instrument_call_statement(
-        instruction_it,
-        program,
-        assigns);
+        instruction_it, function, body, instrument_spec_assigns, cfg_info_opt);
     }
-    else if(instruction_it->is_dead())
+    else if(
+      instruction_it->is_dead() &&
+      must_track_dead(instruction_it, cfg_info_opt))
     {
-      assigns.remove_from_local_write_set(instruction_it->get_dead().symbol());
+      const auto &symbol = instruction_it->dead_symbol();
+      if(instrument_spec_assigns.stack_allocated_is_tracked(symbol))
+      {
+        goto_programt payload;
+        instrument_spec_assigns.invalidate_stack_allocated(symbol, payload);
+        insert_before_swap_and_advance(body, instruction_it, payload);
+      }
+      else
+      {
+        // For loops, the loop_head appears after the DECL of counters,
+        // and any other temporaries introduced during "initialization".
+        // However, they go `DEAD` (possible conditionally) inside the loop,
+        // in presence of return statements.
+        // Notice that for them those variables be writable,
+        // they must appear as assigns targets anyway,
+        // but their DECL statements are outside of the loop.
+        log.warning() << "Found a `DEAD` variable " << symbol.get_identifier()
+                      << " without corresponding `DECL`, at: "
+                      << instruction_it->source_location() << messaget::eom;
+      }
     }
+    else if(
+      instruction_it->is_other() &&
+      instruction_it->get_other().get_statement() == ID_havoc_object)
+    {
+      auto havoc_argument = instruction_it->get_other().operands().front();
+      auto havoc_object = pointer_object(havoc_argument);
+      havoc_object.add_source_location() = instruction_it->source_location();
+      goto_programt payload;
+      instrument_spec_assigns.check_inclusion_assignment(
+        havoc_object, cfg_info_opt, payload);
+      insert_before_swap_and_advance(body, instruction_it, payload);
+    }
+
+    // Move to the next instruction
+    instruction_it++;
+    if(cfg_info_opt.has_value())
+      cfg_info_opt.value().step();
   }
 }
 
@@ -1022,9 +1421,9 @@ void code_contractst::add_contract_check(
   const symbolt &function_symbol = ns.lookup(mangled_function);
   const auto &code_type = to_code_with_contract_type(function_symbol.type);
 
-  exprt assigns = code_type.assigns();
-  exprt requires = conjunction(code_type.requires());
-  exprt ensures = conjunction(code_type.ensures());
+  auto assigns = code_type.assigns();
+  auto requires = conjunction(code_type.requires());
+  auto ensures = conjunction(code_type.ensures());
 
   // build:
   // if(nondet)
@@ -1052,15 +1451,16 @@ void code_contractst::add_contract_check(
   replace_symbolt common_replace;
 
   // decl ret
-  code_returnt return_stmt;
+  optionalt<code_returnt> return_stmt;
   if(code_type.return_type() != empty_typet())
   {
     symbol_exprt r = new_tmp_symbol(
                        code_type.return_type(),
-                       skip->source_location,
-                       function_symbol.mode)
+                       skip->source_location(),
+                       function_symbol.mode,
+                       symbol_table)
                        .symbol_expr();
-    check.add(goto_programt::make_decl(r, skip->source_location));
+    check.add(goto_programt::make_decl(r, skip->source_location()));
 
     call.lhs() = r;
     return_stmt = code_returnt(r);
@@ -1081,12 +1481,13 @@ void code_contractst::add_contract_check(
     const symbolt &parameter_symbol = ns.lookup(parameter);
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
-                       skip->source_location,
-                       parameter_symbol.mode)
+                       skip->source_location(),
+                       parameter_symbol.mode,
+                       symbol_table)
                        .symbol_expr();
-    check.add(goto_programt::make_decl(p, skip->source_location));
+    check.add(goto_programt::make_decl(p, skip->source_location()));
     check.add(goto_programt::make_assignment(
-      p, parameter_symbol.symbol_expr(), skip->source_location));
+      p, parameter_symbol.symbol_expr(), skip->source_location()));
 
     call.arguments().push_back(p);
 
@@ -1131,10 +1532,12 @@ void code_contractst::add_contract_check(
     assertion.add_source_location() = ensures.source_location();
     ensures_pair = create_ensures_instruction(
       assertion, ensures.source_location(), function_symbol.mode);
-    ensures_pair.first.instructions.back().source_location.set_comment(
-      "Check ensures clause");
-    ensures_pair.first.instructions.back().source_location.set_property_class(
-      ID_postcondition);
+    ensures_pair.first.instructions.back()
+      .source_location_nonconst()
+      .set_comment("Check ensures clause");
+    ensures_pair.first.instructions.back()
+      .source_location_nonconst()
+      .set_property_class(ID_postcondition);
 
     // add all the history variable initializations
     visitor.update_ensures(ensures_pair.first);
@@ -1142,7 +1545,7 @@ void code_contractst::add_contract_check(
   }
 
   // ret=mangled_function(parameter1, ...)
-  check.add(goto_programt::make_function_call(call, skip->source_location));
+  check.add(goto_programt::make_function_call(call, skip->source_location()));
 
   // Generate: assert(ensures)
   if(ensures.is_not_nil())
@@ -1152,7 +1555,8 @@ void code_contractst::add_contract_check(
 
   if(code_type.return_type() != empty_typet())
   {
-    check.add(goto_programt::make_return(return_stmt, skip->source_location));
+    check.add(goto_programt::make_set_return_value(
+      return_stmt.value().return_value(), skip->source_location()));
   }
 
   // prepend the new code to dest
@@ -1160,22 +1564,12 @@ void code_contractst::add_contract_check(
   dest.destructive_insert(dest.instructions.begin(), check);
 }
 
-bool code_contractst::replace_calls(const std::set<std::string> &functions)
+bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
 {
+  if(to_replace.empty())
+    return false;
+
   bool fail = false;
-  for(const auto &function : functions)
-  {
-    if(!has_contract(function))
-    {
-      log.error() << "Function '" << function
-                  << "' does not have a contract; "
-                     "not replacing calls with contract."
-                  << messaget::eom;
-      fail = true;
-    }
-  }
-  if(fail)
-    return true;
 
   for(auto &goto_function : goto_functions.function_map)
   {
@@ -1189,11 +1583,15 @@ bool code_contractst::replace_calls(const std::set<std::string> &functions)
         const irep_idt &called_function =
           to_symbol_expr(ins->call_function()).get_identifier();
         auto found = std::find(
-          functions.begin(), functions.end(), id2string(called_function));
-        if(found == functions.end())
+          to_replace.begin(), to_replace.end(), id2string(called_function));
+        if(found == to_replace.end())
           continue;
 
-        fail |= apply_function_contract(goto_function.second.body, ins);
+        fail |= apply_function_contract(
+          goto_function.first,
+          ins->source_location(),
+          goto_function.second.body,
+          ins);
       }
     }
   }
@@ -1215,32 +1613,14 @@ void code_contractst::apply_loop_contracts()
     apply_loop_contract(goto_function.first, goto_function.second);
 }
 
-bool code_contractst::replace_calls()
+bool code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
 {
-  std::set<std::string> functions;
-  for(auto &goto_function : goto_functions.function_map)
-  {
-    if(has_contract(goto_function.first))
-      functions.insert(id2string(goto_function.first));
-  }
-  return replace_calls(functions);
-}
+  if(to_enforce.empty())
+    return false;
 
-bool code_contractst::enforce_contracts()
-{
-  std::set<std::string> functions;
-  for(auto &goto_function : goto_functions.function_map)
-  {
-    if(has_contract(goto_function.first))
-      functions.insert(id2string(goto_function.first));
-  }
-  return enforce_contracts(functions);
-}
-
-bool code_contractst::enforce_contracts(const std::set<std::string> &functions)
-{
   bool fail = false;
-  for(const auto &function : functions)
+
+  for(const auto &function : to_enforce)
   {
     auto goto_function = goto_functions.function_map.find(function);
     if(goto_function == goto_functions.function_map.end())
@@ -1249,14 +1629,6 @@ bool code_contractst::enforce_contracts(const std::set<std::string> &functions)
       log.error() << "Could not find function '" << function
                   << "' in goto-program; not enforcing contracts."
                   << messaget::eom;
-      continue;
-    }
-
-    if(!has_contract(function))
-    {
-      fail = true;
-      log.error() << "Could not find any contracts within function '"
-                  << function << "'; nothing to enforce." << messaget::eom;
       continue;
     }
 

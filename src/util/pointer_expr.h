@@ -23,10 +23,26 @@ class namespacet;
 class pointer_typet : public bitvector_typet
 {
 public:
-  pointer_typet(typet _subtype, std::size_t width)
+  pointer_typet(typet _base_type, std::size_t width)
     : bitvector_typet(ID_pointer, width)
   {
-    subtype().swap(_subtype);
+    subtype().swap(_base_type);
+  }
+
+  /// The type of the data what we point to.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  const typet &base_type() const
+  {
+    return subtype();
+  }
+
+  /// The type of the data what we point to.
+  /// This method is preferred over .subtype(),
+  /// which will eventually be deprecated.
+  typet &base_type()
+  {
+    return subtype();
   }
 
   signedbv_typet difference_type() const
@@ -38,6 +54,7 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+    type_with_subtypet::check(type);
     DATA_CHECK(vm, !type.get(ID_width).empty(), "pointer must have width");
   }
 };
@@ -78,7 +95,8 @@ inline pointer_typet &to_pointer_type(typet &type)
 /// if the given typet is a pointer of type void.
 inline bool is_void_pointer(const typet &type)
 {
-  return type.id() == ID_pointer && type.subtype().id() == ID_empty;
+  return type.id() == ID_pointer &&
+         to_pointer_type(type).base_type().id() == ID_empty;
 }
 
 /// The reference type
@@ -99,6 +117,8 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     PRECONDITION(type.id() == ID_pointer);
+    DATA_CHECK(
+      vm, type.get_sub().size() == 1, "reference must have one type parameter");
     const reference_typet &reference_type =
       static_cast<const reference_typet &>(type);
     DATA_CHECK(
@@ -416,7 +436,7 @@ public:
   /// returns the type of the object whose address is represented
   const typet &object_type() const
   {
-    return type().subtype();
+    return type().base_type();
   }
 
   symbol_exprt object_expr() const;
@@ -492,12 +512,12 @@ public:
   /// returns the type of the field whose address is represented
   const typet &field_type() const
   {
-    return type().subtype();
+    return type().base_type();
   }
 
   const typet &compound_type() const
   {
-    return to_pointer_type(base().type()).subtype();
+    return to_pointer_type(base().type()).base_type();
   }
 
   const irep_idt &component_name() const
@@ -564,7 +584,7 @@ public:
   /// returns the type of the array element whose address is represented
   const typet &element_type() const
   {
-    return type().subtype();
+    return type().base_type();
   }
 
   exprt &base()
@@ -627,10 +647,10 @@ inline element_address_exprt &to_element_address_expr(exprt &expr)
 class dereference_exprt : public unary_exprt
 {
 public:
+  // The given operand must have pointer type.
   explicit dereference_exprt(const exprt &op)
-    : unary_exprt(ID_dereference, op, op.type().subtype())
+    : unary_exprt(ID_dereference, op, to_pointer_type(op.type()).base_type())
   {
-    PRECONDITION(op.type().id() == ID_pointer);
   }
 
   dereference_exprt(exprt op, typet type)

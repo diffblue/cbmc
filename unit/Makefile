@@ -59,6 +59,7 @@ SRC += analyses/ai/ai.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
+       goto-programs/allocate_objects.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \
@@ -98,10 +99,16 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_cadical.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
+       solvers/smt2/smt2irep.cpp \
+       solvers/smt2_incremental/construct_value_expr_from_smt.cpp \
        solvers/smt2_incremental/convert_expr_to_smt.cpp \
+       solvers/smt2_incremental/smt2_incremental_decision_procedure.cpp \
        solvers/smt2_incremental/smt_bit_vector_theory.cpp \
        solvers/smt2_incremental/smt_commands.cpp \
        solvers/smt2_incremental/smt_core_theory.cpp \
+       solvers/smt2_incremental/smt_index.cpp \
+       solvers/smt2_incremental/smt_response_validation.cpp \
+       solvers/smt2_incremental/smt_responses.cpp \
        solvers/smt2_incremental/smt_sorts.cpp \
        solvers/smt2_incremental/smt_terms.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \
@@ -116,7 +123,6 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
-       util/allocate_objects.cpp \
        util/cmdline.cpp \
        util/dense_integer_map.cpp \
        util/edit_distance.cpp \

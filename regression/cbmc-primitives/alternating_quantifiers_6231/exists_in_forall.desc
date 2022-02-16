@@ -1,0 +1,16 @@
+CORE
+exists_in_forall.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+\[main\.assertion\.1\] line \d* for all z, there exists a y so that y = z \+ 10 and y > 1: SUCCESS
+\[main\.pointer_dereference\.7\] line \d+ dereference failure: pointer NULL in \*i: SUCCESS
+\[main\.pointer_dereference\.8\] line \d+ dereference failure: pointer invalid in \*i: SUCCESS
+\[main\.pointer_dereference\.9\] line \d+ dereference failure: deallocated dynamic object in \*i: SUCCESS
+\[main\.pointer_dereference\.10\] line \d+ dereference failure: dead object in \*i: SUCCESS
+\[main\.pointer_dereference\.11\] line \d+ dereference failure: pointer outside object bounds in \*i: SUCCESS
+\[main\.pointer_dereference\.12\] line \d+ dereference failure: invalid integer address in \*i: SUCCESS
+--
+--
+The assertion reference number here is present so that we make sure
+we always match the properties of the dereference inside the exists.

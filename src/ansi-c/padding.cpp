@@ -58,7 +58,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   mp_integer result;
 
   if(type.id()==ID_array)
-    result=alignment(type.subtype(), ns);
+    result = alignment(to_array_type(type).element_type(), ns);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     result=1;
@@ -78,7 +78,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     result = *pointer_offset_size(type, ns);
   }
   else if(type.id()==ID_c_enum)
-    result=alignment(type.subtype(), ns);
+    result = alignment(to_c_enum_type(type).underlying_type(), ns);
   else if(type.id()==ID_c_enum_tag)
     result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   else if(type.id() == ID_struct_tag)
@@ -88,7 +88,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
-    result=alignment(type.subtype(), ns);
+    result = alignment(to_c_bit_field_type(type).underlying_type(), ns);
   }
   else
     result=1;
@@ -104,28 +104,29 @@ mp_integer alignment(const typet &type, const namespacet &ns)
 static optionalt<std::size_t>
 underlying_width(const c_bit_field_typet &type, const namespacet &ns)
 {
-  const typet &subtype = type.subtype();
+  const typet &underlying_type = type.underlying_type();
 
-  if(subtype.id() == ID_bool)
+  if(underlying_type.id() == ID_bool)
   {
     // This is the 'proper' bool.
     return 1;
   }
   else if(
-    subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv ||
-    subtype.id() == ID_c_bool)
+    underlying_type.id() == ID_signedbv ||
+    underlying_type.id() == ID_unsignedbv || underlying_type.id() == ID_c_bool)
   {
-    return to_bitvector_type(subtype).get_width();
+    return to_bitvector_type(underlying_type).get_width();
   }
-  else if(subtype.id() == ID_c_enum_tag)
+  else if(underlying_type.id() == ID_c_enum_tag)
   {
     // These point to an enum, which has a sub-subtype,
     // which may be smaller or larger than int, and we thus have
     // to check.
-    const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(subtype));
+    const auto &c_enum_type =
+      ns.follow_tag(to_c_enum_tag_type(underlying_type));
 
     if(!c_enum_type.is_incomplete())
-      return to_bitvector_type(c_enum_type.subtype()).get_width();
+      return to_bitvector_type(c_enum_type.underlying_type()).get_width();
     else
       return {};
   }
@@ -352,7 +353,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 
     if(it_type.id()==ID_c_bit_field)
     {
-      a=alignment(to_c_bit_field_type(it_type).subtype(), ns);
+      a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
 
       // A zero-width bit-field causes alignment to the base-type.
       if(to_c_bit_field_type(it_type).get_width()==0)

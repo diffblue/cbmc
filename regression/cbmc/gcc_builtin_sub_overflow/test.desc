@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.c
 
 \[check_int.assertion.1\] line \d+ assertion !__builtin_ssub_overflow\(1, 1, &result\): SUCCESS
@@ -17,8 +17,7 @@ main.c
 \[check_long_long.assertion.2\] line \d+ assertion result == 0ll: SUCCESS
 \[check_long_long.assertion.3\] line \d+ assertion __builtin_ssubll_overflow\(.*, 1ll, &result\): SUCCESS
 \[check_long_long.assertion.4\] line \d+ assertion !__builtin_ssubll_overflow\(.* / 2ll, .* / 2ll, &result\): SUCCESS
-\[check_long_long.assertion.5\] line \d+ assertion result - 1ll == .*: SUCCESS
-\[check_long_long.assertion.6\] line \d+ assertion 0 && "reachability": FAILURE
+\[check_long_long.assertion.[56]\] line \d+ assertion 0 && "reachability": FAILURE
 \[check_unsigned.assertion.1\] line \d+ assertion !__builtin_usub_overflow\(1u, 1u, &result\): SUCCESS
 \[check_unsigned.assertion.2\] line \d+ assertion result == 0u: SUCCESS
 \[check_unsigned.assertion.3\] line \d+ assertion __builtin_usub_overflow\(0u, 1u, &result\): SUCCESS
@@ -40,15 +39,17 @@ main.c
 \[check_unsigned_long_long.assertion.5\] line \d+ assertion result == 0ull: SUCCESS
 \[check_unsigned_long_long.assertion.6\] line \d+ assertion __builtin_usubll_overflow\(.* / 2ull, .*, &result\): SUCCESS
 \[check_unsigned_long_long.assertion.7\] line \d+ assertion 0 && "reachability": FAILURE
-\[check_generic.assertion.1\] line 79 assertion __builtin_sub_overflow\(5, 10, &small_result\): SUCCESS
-\[check_generic.assertion.2\] line 80 assertion !__builtin_sub_overflow\(5, 10, &big_result\): SUCCESS
-\[check_generic.assertion.3\] line 81 assertion big_result == -5ll: SUCCESS
-\[check_generic.assertion.4\] line 82 assertion !__builtin_sub_overflow\(10, 5, &small_result\): SUCCESS
-\[check_generic.assertion.5\] line 83 assertion small_result == 5: SUCCESS
-\[check_generic.assertion.6\] line 84 assertion !__builtin_sub_overflow\(10, 5, &big_result\): SUCCESS
-\[check_generic.assertion.7\] line 85 assertion big_result == 5ll: SUCCESS
-\[check_generic.assertion.8\] line 86 assertion !__builtin_sub_overflow\(.*, .*, &big_result\): SUCCESS
-\[check_generic.assertion.9\] line 87 assertion big_result == 2ll \* .* \+ 1: SUCCESS
-\[check_generic.assertion.10\] line 88 assertion 0 && "reachability": FAILURE
+\[check_generic.assertion.1\] line 102 assertion __builtin_sub_overflow\(5, 10, &small_result\): SUCCESS
+\[check_generic.assertion.2\] line 103 assertion !__builtin_sub_overflow\(5, 10, &big_result\): SUCCESS
+\[check_generic.assertion.3\] line 104 assertion big_result == -5ll: SUCCESS
+\[check_generic.assertion.4\] line 105 assertion !__builtin_sub_overflow\(10, 5, &small_result\): SUCCESS
+\[check_generic.assertion.5\] line 106 assertion small_result == 5: SUCCESS
+\[check_generic.assertion.6\] line 107 assertion !__builtin_sub_overflow\(10, 5, &big_result\): SUCCESS
+\[check_generic.assertion.7\] line 108 assertion big_result == 5ll: SUCCESS
+\[check_generic.assertion.8\] line 109 assertion !__builtin_sub_overflow\(.*, .*, &big_result\): SUCCESS
+\[check_generic.assertion.9\] line 110 assertion big_result == 2ll \* .* \+ 1: SUCCESS
+\[check_generic.assertion.10\] line 111 assertion 0 && "reachability": FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
+--
+\[check_long_long.assertion.5\] line \d+ assertion result - 1ll == .*: FAILURE

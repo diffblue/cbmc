@@ -80,13 +80,13 @@ SRC = $(BOOLEFORCE_SRC) \
       $(SQUOLEM2_SRC) \
       $(CADICAL_SRC) \
       decision_procedure.cpp \
-      solver_hardness.cpp \
       flattening/arrays.cpp \
       flattening/boolbv.cpp \
       flattening/boolbv_abs.cpp \
       flattening/boolbv_add_sub.cpp \
       flattening/boolbv_array.cpp \
       flattening/boolbv_array_of.cpp \
+      flattening/boolbv_bitreverse.cpp \
       flattening/boolbv_bitwise.cpp \
       flattening/boolbv_bswap.cpp \
       flattening/boolbv_bv_rel.cpp \
@@ -193,12 +193,17 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2/smt2_parser.cpp \
       smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
+      smt2_incremental/construct_value_expr_from_smt.cpp \
       smt2_incremental/convert_expr_to_smt.cpp \
       smt2_incremental/smt_bit_vector_theory.cpp \
       smt2_incremental/smt_commands.cpp \
       smt2_incremental/smt_core_theory.cpp \
+      smt2_incremental/smt_index.cpp \
       smt2_incremental/smt_logics.cpp \
       smt2_incremental/smt_options.cpp \
+      smt2_incremental/smt_response_validation.cpp \
+      smt2_incremental/smt_responses.cpp \
+      smt2_incremental/smt_solver_process.cpp \
       smt2_incremental/smt_sorts.cpp \
       smt2_incremental/smt_terms.cpp \
       smt2_incremental/smt_to_smt2_string.cpp \

@@ -22,6 +22,7 @@ public:
     const optionst &,
     path_storaget &,
     guard_managert &,
+    unwindsett &,
     ui_message_handlert::uit output_ui);
 
   /// Return true if symex can be resumed

@@ -1,0 +1,14 @@
+CORE
+main.c
+--show-goto-functions
+^[[:space:]]*ASSIGN main::1::b := main::1::b \* cast\(100, ℤ\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+^[[:space:]]*ASSIGN main::1::b := main::1::b \* 100$
+--
+implicit_typecast_arithmetic previously failed to insert a typecast for the
+(mathematical) integer-typed expression. This resulted in a multiplication over
+mixed types, which sometimes (!) resulted in an invariant failure during
+simplification. This was first observed when compiling with GCC 10, cf.
+discussion in #6028.

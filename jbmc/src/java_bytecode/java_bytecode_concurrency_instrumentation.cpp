@@ -412,7 +412,7 @@ static void instrument_get_monitor_count(
 
   const namespacet ns(symbol_table);
   const auto &followed_type =
-    ns.follow(to_pointer_type(f_code.arguments()[0].type()).subtype());
+    ns.follow(to_pointer_type(f_code.arguments()[0].type()).base_type());
   const auto &object_type = to_struct_type(followed_type);
   code_assignt code_assign(
     f_code.lhs(),

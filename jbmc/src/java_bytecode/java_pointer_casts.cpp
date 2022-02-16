@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_pointer_casts.h"
 
+#include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -64,21 +65,6 @@ bool find_superclass_with_type(
   }
 }
 
-
-/// \par parameters: input expression
-/// \return recursively search target of typecast
-static const exprt &look_through_casts(const exprt &in)
-{
-  if(in.id()==ID_typecast)
-  {
-    assert(in.type().id()==ID_pointer);
-    return look_through_casts(to_typecast_expr(in).op());
-  }
-  else
-    return in;
-}
-
-
 /// \par parameters: raw pointer
 /// target type
 /// namespace
@@ -88,7 +74,7 @@ exprt make_clean_pointer_cast(
   const pointer_typet &target_type,
   const namespacet &ns)
 {
-  const exprt &ptr=look_through_casts(rawptr);
+  const exprt &ptr = skip_typecast(rawptr);
 
   PRECONDITION(ptr.type().id()==ID_pointer);
 
@@ -96,11 +82,13 @@ exprt make_clean_pointer_cast(
     return ptr;
 
   if(
-    ptr.type().subtype() == java_void_type() ||
-    target_type.subtype() == java_void_type())
+    to_pointer_type(ptr.type()).base_type() == java_void_type() ||
+    target_type.base_type() == java_void_type())
+  {
     return typecast_exprt(ptr, target_type);
+  }
 
-  const typet &target_base=ns.follow(target_type.subtype());
+  const typet &target_base = ns.follow(target_type.base_type());
 
   exprt bare_ptr=ptr;
   while(bare_ptr.id()==ID_typecast)
@@ -108,7 +96,7 @@ exprt make_clean_pointer_cast(
     assert(
       bare_ptr.type().id()==ID_pointer &&
       "Non-pointer in make_clean_pointer_cast?");
-    if(bare_ptr.type().subtype() == java_void_type())
+    if(to_pointer_type(bare_ptr.type()).base_type() == java_void_type())
       bare_ptr = to_typecast_expr(bare_ptr).op();
   }
 

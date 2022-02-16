@@ -11,12 +11,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/range.h>
 #include <util/string_constant.h>
 
 #include "ansi_c_declaration.h"
+#include "c_expr.h"
 
 void c_typecheck_baset::start_typecheck_code()
 {
@@ -68,7 +71,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_continue)
     typecheck_continue(code);
   else if(statement==ID_return)
-    typecheck_return(to_code_return(code));
+    typecheck_return(to_code_frontend_return(code));
   else if(statement==ID_decl)
     typecheck_decl(code);
   else if(statement==ID_assign)
@@ -308,15 +311,22 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     // see if it's a typedef
     // or a function
     // or static
-    if(symbol.is_type ||
-       symbol.type.id()==ID_code ||
-       symbol.is_static_lifetime)
+    if(symbol.is_type || symbol.type.id() == ID_code)
     {
       // we ignore
     }
+    else if(symbol.is_static_lifetime)
+    {
+      // make sure the initialization value is a compile-time constant
+      if(symbol.value.is_not_nil())
+      {
+        exprt init_value = symbol.value;
+        make_constant(init_value);
+      }
+    }
     else
     {
-      code_declt decl(symbol.symbol_expr());
+      code_frontend_declt decl(symbol.symbol_expr());
       decl.add_source_location() = symbol.location;
       decl.symbol().add_source_location() = symbol.location;
 
@@ -357,9 +367,12 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
 {
   if(type.id() == ID_array)
   {
-    if(to_array_type(type).size().is_nil())
+    const auto &array_type = to_array_type(type);
+
+    if(array_type.size().is_nil())
       return false;
-    return is_complete_type(type.subtype());
+
+    return is_complete_type(array_type.element_type());
   }
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
@@ -373,7 +386,7 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
         return false;
   }
   else if(type.id()==ID_vector)
-    return is_complete_type(type.subtype());
+    return is_complete_type(to_vector_type(type).element_type());
   else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
     return is_complete_type(follow(type));
@@ -486,12 +499,23 @@ void c_typecheck_baset::typecheck_for(codet &code)
 
   typecheck_spec_loop_invariant(code);
   typecheck_spec_decreases(code);
+
+  if(code.find(ID_C_spec_assigns).is_not_nil())
+  {
+    typecheck_spec_assigns(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_label(code_labelt &code)
 {
   // record the label
-  labels_defined[code.get_label()]=code.source_location();
+  if(!labels_defined.emplace(code.get_label(), code.source_location()).second)
+  {
+    error().source_location = code.source_location();
+    error() << "duplicate label '" << code.get_label() << "'" << eom;
+    throw 0;
+  }
 
   typecheck_code(code.code());
 }
@@ -643,7 +667,7 @@ void c_typecheck_baset::typecheck_start_thread(codet &code)
   typecheck_code(to_code(code.op0()));
 }
 
-void c_typecheck_baset::typecheck_return(code_returnt &code)
+void c_typecheck_baset::typecheck_return(code_frontend_returnt &code)
 {
   if(code.has_return_value())
   {
@@ -775,6 +799,12 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
 
   typecheck_spec_loop_invariant(code);
   typecheck_spec_decreases(code);
+
+  if(code.find(ID_C_spec_assigns).is_not_nil())
+  {
+    typecheck_spec_assigns(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
@@ -809,6 +839,170 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
 
   typecheck_spec_loop_invariant(code);
   typecheck_spec_decreases(code);
+
+  if(code.find(ID_C_spec_assigns).is_not_nil())
+  {
+    typecheck_spec_assigns(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
+}
+
+void c_typecheck_baset::typecheck_spec_assigns_condition(exprt &condition)
+{
+  // compute type
+  typecheck_expr(condition);
+
+  // make it boolean if needed
+  implicit_typecast_bool(condition);
+
+  // non-fatal warnings
+  if(has_subexpr(condition, can_cast_expr<side_effect_expr_function_callt>))
+  {
+    // Remark: we allow function calls without further checks for now because
+    // they are mandatory for some applications.
+    // The next step must be to check that the called functions have a contract
+    // with an empty assigns clause and that they indeed satisfy their contract
+    // using a CI check.
+    warning().source_location = condition.source_location();
+    warning()
+      << "function with possible side-effect called in target's condition"
+      << eom;
+  }
+
+  // fatal errors
+  bool must_throw = false;
+
+  if(condition.type().id() == ID_empty)
+  {
+    must_throw = true;
+    error().source_location = condition.source_location();
+    error() << "void-typed expressions not allowed as assigns clause conditions"
+            << eom;
+  }
+
+  if(has_subexpr(condition, [&](const exprt &subexpr) {
+       return can_cast_expr<side_effect_exprt>(subexpr) &&
+              !can_cast_expr<side_effect_expr_function_callt>(subexpr);
+     }))
+  {
+    must_throw = true;
+    error().source_location = condition.source_location();
+    error() << "side-effects not allowed in assigns clause conditions" << eom;
+  }
+
+  if(has_subexpr(condition, ID_if))
+  {
+    must_throw = true;
+    error().source_location = condition.source_location();
+    error() << "ternary expressions not allowed in assigns "
+               "clause conditions"
+            << eom;
+  }
+
+  if(must_throw)
+    throw 0;
+}
+
+void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
+{
+  // compute type
+  typecheck_expr(target);
+
+  // fatal errors
+  bool must_throw = false;
+  if(target.type().id() == ID_empty)
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "void-typed expressions not allowed as assigns clause targets"
+            << eom;
+  }
+
+  if(!target.get_bool(ID_C_lvalue) && target.id() != ID_pointer_object)
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "assigns clause target must be an lvalue or " CPROVER_PREFIX
+               "POINTER_OBJECT expression"
+            << eom;
+  }
+
+  // Remark: an expression can be an lvalue and still contain side effects
+  // or ternary expressions. We detect them in a second step.
+  if(has_subexpr(target, ID_side_effect))
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "side-effects not allowed in assigns clause targets" << eom;
+  }
+
+  if(has_subexpr(target, ID_if))
+  {
+    must_throw = true;
+    error().source_location = target.source_location();
+    error() << "ternary expressions not allowed in assigns "
+               "clause targets"
+            << eom;
+  }
+
+  if(must_throw)
+    throw 0;
+}
+
+void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
+{
+  exprt::operandst tmp;
+  bool must_throw = false;
+
+  for(auto &target : targets)
+  {
+    if(!can_cast_expr<conditional_target_group_exprt>(target))
+    {
+      must_throw = true;
+      error().source_location = target.source_location();
+      error() << "expected ID_conditional_target_group expression in assigns "
+                 "clause, found "
+              << id2string(target.id()) << eom;
+    }
+
+    auto &conditional_target_group = to_conditional_target_group_expr(target);
+    validate_expr(conditional_target_group);
+
+    // typecheck condition
+    auto &condition = conditional_target_group.condition();
+    typecheck_spec_assigns_condition(condition);
+
+    if(condition.is_true())
+    {
+      // if the condition is trivially true,
+      // simplify expr and expose the bare expressions
+      for(auto &actual_target : conditional_target_group.targets())
+      {
+        typecheck_spec_assigns_target(actual_target);
+        tmp.push_back(actual_target);
+      }
+    }
+    else
+    {
+      // if the condition is not trivially true, typecheck in place
+      for(auto &actual_target : conditional_target_group.targets())
+      {
+        typecheck_spec_assigns_target(actual_target);
+      }
+      tmp.push_back(std::move(target));
+    }
+  }
+
+  // at least one target was not as expected
+  if(must_throw)
+    throw 0;
+
+  // now each target is either:
+  // - a simple side-effect-free unconditional lvalue expression or
+  // - a conditional target group expression with a non-trivial condition
+
+  // update original vector in-place
+  std::swap(targets, tmp);
 }
 
 void c_typecheck_baset::typecheck_spec_loop_invariant(codet &code)

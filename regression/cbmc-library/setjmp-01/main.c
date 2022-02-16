@@ -1,9 +1,12 @@
-#include <assert.h>
 #include <setjmp.h>
+
+static jmp_buf env;
 
 int main()
 {
-  setjmp();
-  assert(0);
+  if(setjmp(env))
+    __CPROVER_assert(0, "reached via longjmp");
+  else
+    __CPROVER_assert(0, "setjmp called directly");
   return 0;
 }

@@ -95,10 +95,10 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
         {
           pointer_typet pointer_type = to_pointer_type(
             to_dereference_expr(new_index_expr.array()).pointer().type());
-          pointer_type.subtype() = new_index_expr.type();
+          pointer_type.base_type() = new_index_expr.type();
 
           typecast_exprt typecast_expr(
-            from_integer((*step_size) * (*index) + address, index_type()),
+            from_integer((*step_size) * (*index) + address, c_index_type()),
             pointer_type);
 
           return dereference_exprt{typecast_expr};
@@ -140,9 +140,9 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
         {
           pointer_typet pointer_type = to_pointer_type(
             to_dereference_expr(new_member_expr.struct_op()).pointer().type());
-          pointer_type.subtype() = new_member_expr.type();
+          pointer_type.base_type() = new_member_expr.type();
           typecast_exprt typecast_expr(
-            from_integer(address + *offset, index_type()), pointer_type);
+            from_integer(address + *offset, c_index_type()), pointer_type);
           return dereference_exprt{typecast_expr};
         }
       }

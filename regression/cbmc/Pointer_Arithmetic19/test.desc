@@ -1,0 +1,14 @@
+CORE
+main.c
+--program-only
+ASSERT\(\{ 42, 43 \}\[POINTER_OFFSET\(p!0@1#2\) / \d+l*\] == 43\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+p\$object
+^warning: ignoring
+--
+Value sets should be sufficiently precise to infer that dereferencing p is an
+access into the array at some offset, and not an access into any other object
+(or perhaps the invalid object). If that were the case, the assert instruction
+would include "p$object," the absence of which we check for in the above.

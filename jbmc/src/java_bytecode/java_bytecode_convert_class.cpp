@@ -909,7 +909,7 @@ void add_java_array_types(symbol_tablet &symbol_table)
     member_exprt old_length(
       old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
-    code_assignt create_blank(local_symexpr, java_new_array);
+    code_frontend_assignt create_blank(local_symexpr, java_new_array);
 
     codet copy_type_information = code_skipt();
     if(l == 'a')
@@ -930,8 +930,9 @@ void add_java_array_types(symbol_tablet &symbol_table)
         new_array, array_element_classid_component);
 
       copy_type_information = code_blockt{
-        {code_assignt(new_array_dimension, old_array_dimension),
-         code_assignt(new_array_element_classid, old_array_element_classid)}};
+        {code_frontend_assignt(new_array_dimension, old_array_dimension),
+         code_frontend_assignt(
+           new_array_element_classid, old_array_element_classid)}};
     }
 
     member_exprt old_data(
@@ -971,7 +972,7 @@ void add_java_array_types(symbol_tablet &symbol_table)
       from_integer(0, index_symexpr.type()),
       old_length,
       index_symexpr,
-      code_assignt(std::move(new_cell), std::move(old_cell)),
+      code_frontend_assignt(std::move(new_cell), std::move(old_cell)),
       location);
 
     member_exprt new_base_class(
@@ -1234,7 +1235,7 @@ void mark_java_implicitly_generic_class_type(
                                 id2string(strip_java_namespace_prefix(
                                   outer_generic_type_parameter.get_name()));
           java_generic_parameter_tagt bound = to_java_generic_parameter_tag(
-            outer_generic_type_parameter.subtype());
+            outer_generic_type_parameter.base_type());
           bound.type_variable_ref().set_identifier(identifier);
           implicit_generic_type_parameters.emplace_back(identifier, bound);
         }

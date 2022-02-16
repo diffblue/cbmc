@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <memory>
 
-#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/json.h>
@@ -52,7 +51,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/write_goto_binary.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
-#include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
 #include <pointer-analysis/value_set_analysis.h>
 
@@ -85,9 +83,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "branch.h"
 #include "call_sequences.h"
 #include "concurrency.h"
-#include "document_properties.h"
 #include "dot.h"
-#include "dump_c.h"
 #include "full_slicer.h"
 #include "function.h"
 #include "havoc_loops.h"
@@ -110,11 +106,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "stack_depth.h"
 #include "thread_instrumentation.h"
 #include "undefined_functions.h"
-#include "uninitialized.h"
 #include "unwind.h"
-#include "unwindset.h"
 #include "value_set_fi_fp_removal.h"
-#include "wmm/weak_memory.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -171,16 +164,22 @@ int goto_instrument_parse_optionst::doit()
 
       if(unwind_given || unwindset_given || unwindset_file_given)
       {
-        unwindsett unwindset;
+        unwindsett unwindset{goto_model};
 
         if(unwind_given)
           unwindset.parse_unwind(cmdline.get_value("unwind"));
 
         if(unwindset_file_given)
-          unwindset.parse_unwindset_file(cmdline.get_value("unwindset-file"));
+        {
+          unwindset.parse_unwindset_file(
+            cmdline.get_value("unwindset-file"), ui_message_handler);
+        }
 
         if(unwindset_given)
-          unwindset.parse_unwindset(cmdline.get_values("unwindset"));
+        {
+          unwindset.parse_unwindset(
+            cmdline.get_values("unwindset"), ui_message_handler);
+        }
 
         bool unwinding_assertions=cmdline.isset("unwinding-assertions");
         bool partial_loops=cmdline.isset("partial-loops");
@@ -195,7 +194,7 @@ int goto_instrument_parse_optionst::doit()
 
         if(unwinding_assertions)
         {
-          unwind_strategy=goto_unwindt::unwind_strategyt::ASSERT;
+          unwind_strategy = goto_unwindt::unwind_strategyt::ASSERT_ASSUME;
         }
         else if(partial_loops)
         {
@@ -1030,11 +1029,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     {
       label_function_pointer_call_sites(goto_model);
 
-      const auto function_pointer_restrictions =
-        function_pointer_restrictionst::from_options(
-          options, goto_model, log.get_message_handler());
-
-      restrict_function_pointers(goto_model, function_pointer_restrictions);
+      restrict_function_pointers(ui_message_handler, goto_model, options);
     }
   }
 
@@ -1135,56 +1130,30 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  const std::list<std::pair<std::string, std::string>> contract_flags(
-    {{FLAG_REPLACE_CALL, FLAG_REPLACE_ALL_CALLS},
-     {FLAG_ENFORCE_CONTRACT, FLAG_ENFORCE_ALL_CONTRACTS}});
-  for(const auto &pair : contract_flags)
-  {
-    if(cmdline.isset(pair.first.c_str()) && cmdline.isset(pair.second.c_str()))
-    {
-      log.error() << "Pass at most one of --" << pair.first << " and --"
-                  << pair.second << "." << messaget::eom;
-      exit(CPROVER_EXIT_USAGE_ERROR);
-    }
-  }
-
   if(
     cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
-    cmdline.isset(FLAG_REPLACE_ALL_CALLS) ||
-    cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
-    cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
+    cmdline.isset(FLAG_ENFORCE_CONTRACT))
   {
     do_indirect_call_and_rtti_removal();
-    code_contractst cont(goto_model, log);
+    code_contractst contracts(goto_model, log);
 
-    if(cmdline.isset(FLAG_REPLACE_CALL))
-    {
-      std::set<std::string> to_replace(
-        cmdline.get_values(FLAG_REPLACE_CALL).begin(),
-        cmdline.get_values(FLAG_REPLACE_CALL).end());
-      if(cont.replace_calls(to_replace))
-        exit(CPROVER_EXIT_USAGE_ERROR);
-    }
+    std::set<std::string> to_replace(
+      cmdline.get_values(FLAG_REPLACE_CALL).begin(),
+      cmdline.get_values(FLAG_REPLACE_CALL).end());
 
-    if(cmdline.isset(FLAG_REPLACE_ALL_CALLS))
-      if(cont.replace_calls())
-        exit(CPROVER_EXIT_USAGE_ERROR);
+    std::set<std::string> to_enforce(
+      cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
+      cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
 
-    if(cmdline.isset(FLAG_ENFORCE_CONTRACT))
-    {
-      std::set<std::string> to_enforce(
-        cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
-        cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
-      if(cont.enforce_contracts(to_enforce))
-        exit(CPROVER_EXIT_USAGE_ERROR);
-    }
-
-    if(cmdline.isset(FLAG_ENFORCE_ALL_CONTRACTS))
-      if(cont.enforce_contracts())
-        exit(CPROVER_EXIT_USAGE_ERROR);
+    // It’s important to keep the order of contracts instrumentation, i.e.,
+    // first replacement then enforcement. We rely on contract replacement
+    // and inlining of sub-function calls to properly annotate all
+    // assignments.
+    contracts.replace_calls(to_replace);
+    contracts.enforce_contracts(to_enforce);
 
     if(cmdline.isset(FLAG_LOOP_CONTRACTS))
-      cont.apply_loop_contracts();
+      contracts.apply_loop_contracts();
   }
 
   if(cmdline.isset("value-set-fi-fp-removal"))
@@ -1358,7 +1327,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   }
 
   // add generic checks, if needed
-  goto_check(options, goto_model);
+  goto_check(options, goto_model, ui_message_handler);
 
   // check for uninitalized local variables
   if(cmdline.isset("uninitialized-check"))
@@ -1374,7 +1343,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     log.status() << "Adding check for maximum call stack size" << messaget::eom;
     stack_depth(
       goto_model,
-      safe_string2size_t(cmdline.get_value("stack-depth")));
+      safe_string2size_t(cmdline.get_value("stack-depth")),
+      ui_message_handler);
   }
 
   // ignore default/user-specified initialization of variables with static
@@ -1400,7 +1370,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
-    slice_global_inits(goto_model);
+    slice_global_inits(goto_model, ui_message_handler);
   }
 
   if(cmdline.isset("string-abstraction"))
@@ -1687,7 +1657,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
-    slice_global_inits(goto_model);
+    slice_global_inits(goto_model, ui_message_handler);
 
     log.status() << "Performing an aggressive slice" << messaget::eom;
     aggressive_slicert aggressive_slicer(goto_model, ui_message_handler);
@@ -1748,16 +1718,14 @@ void goto_instrument_parse_optionst::help()
     " goto-instrument in out              perform instrumentation\n"
     "\n"
     "Main options:\n"
-    " --document-properties-html   generate HTML property documentation\n"
-    " --document-properties-latex  generate Latex property documentation\n"
-    " --dump-c                     generate C source\n"
-    " --dump-c-type-header m       generate a C header for types local in m\n"
-    " --dump-cpp                   generate C++ source\n"
+    HELP_DOCUMENT_PROPERTIES
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
     "\n"
+    "Dump Source:\n"
+    HELP_DUMP_C
+    "\n"
     "Diagnosis:\n"
-    " --show-loops                 show the loops in the program\n"
     HELP_SHOW_PROPERTIES
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
@@ -1788,14 +1756,13 @@ void goto_instrument_parse_optionst::help()
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
     HELP_GOTO_CHECK
-    " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
+    HELP_UNINITIALIZED_CHECK
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
     " --race-check                 add floating-point data race checks\n"
     "\n"
     "Semantic transformations:\n"
     << HELP_NONDET_VOLATILE <<
-    " --unwind <n>                 unwinds the loops <n> times\n"
-    " --unwindset L:B,...          unwind loop L with a bound of B\n"
+    HELP_UNWINDSET
     " --unwindset-file <file>      read unwindset from file\n"
     " --partial-loops              permit paths with partial loops\n"
     " --unwinding-assertions       generate unwinding assertions\n"
@@ -1806,7 +1773,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
-    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    HELP_REMOVE_POINTERS
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -1824,17 +1791,7 @@ void goto_instrument_parse_optionst::help()
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
     "\n"
     "Memory model instrumentations:\n"
-    " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"
-    " --scc                        detects critical cycles per SCC (one thread per SCC)\n" // NOLINT(*)
-    " --one-event-per-cycle        only instruments one event per cycle\n"
-    " --minimum-interference       instruments an optimal number of events\n"
-    " --my-events                  only instruments events whose ids appear in inst.evt\n" // NOLINT(*)
-    " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" // NOLINT(*)
-    " --no-dependencies            no dependency analysis\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --no-po-rendering            no representation of the threads in the dot\n"
-    " --render-cluster-file        clusterises the dot by files\n"
-    " --render-cluster-function    clusterises the dot by functions\n"
+    HELP_WMM_FULL
     "\n"
     "Slicing:\n"
     HELP_REACHABILITY_SLICER
@@ -1868,6 +1825,7 @@ void goto_instrument_parse_optionst::help()
     HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
+    HELP_CONFIG_LIBRARY
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
@@ -1876,16 +1834,12 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
     HELP_REPLACE_CALL
-    HELP_REPLACE_ALL_CALLS
     HELP_ENFORCE_CONTRACT
-    HELP_ENFORCE_ALL_CONTRACTS
     "\n"
     "Other options:\n"
-    " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
-    " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
-    " --harness                    with --dump-c/--dump-cpp: include input generator in output\n" // NOLINT(*)
     " --version                    show version and exit\n"
     HELP_FLUSH
+    " --xml                        output files in XML where supported\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_TIMESTAMP

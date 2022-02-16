@@ -322,11 +322,8 @@ bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
   convert_symbols(goto_model);
 
   // parse object files
-  for(const auto &file_name : object_files)
-  {
-    if(read_object_and_link(file_name, goto_model, log.get_message_handler()))
-      return true;
-  }
+  if(read_objects_and_link(object_files, goto_model, log.get_message_handler()))
+    return true;
 
   // produce entry point?
 

@@ -98,7 +98,8 @@ void rw_range_sett::get_objects_complex_imag(
 {
   const exprt &op = expr.op();
 
-  auto subtype_bits = pointer_offset_bits(op.type().subtype(), ns);
+  auto subtype_bits =
+    pointer_offset_bits(to_complex_type(op.type()).subtype(), ns);
   CHECK_RETURN(subtype_bits.has_value());
 
   range_spect sub_size = to_range_spect(*subtype_bits);
@@ -262,7 +263,7 @@ void rw_range_sett::get_objects_index(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    auto subtype_bits = pointer_offset_bits(vector_type.subtype(), ns);
+    auto subtype_bits = pointer_offset_bits(vector_type.element_type(), ns);
 
     sub_size = subtype_bits.has_value() ? to_range_spect(*subtype_bits) : -1;
   }
@@ -270,7 +271,7 @@ void rw_range_sett::get_objects_index(
   {
     const array_typet &array_type=to_array_type(type);
 
-    auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+    auto subtype_bits = pointer_offset_bits(array_type.element_type(), ns);
 
     sub_size = subtype_bits.has_value() ? to_range_spect(*subtype_bits) : -1;
   }
@@ -301,7 +302,7 @@ void rw_range_sett::get_objects_array(
 {
   const array_typet &array_type = expr.type();
 
-  auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+  auto subtype_bits = pointer_offset_bits(array_type.element_type(), ns);
 
   range_spect sub_size;
 
@@ -608,7 +609,7 @@ void rw_range_sett::get_objects_rec(const typet &type)
   if(type.id()==ID_array)
   {
     const auto &array_type = to_array_type(type);
-    get_objects_rec(array_type.subtype());
+    get_objects_rec(array_type.element_type());
     get_objects_rec(get_modet::READ, array_type.size());
   }
 }
@@ -717,16 +718,16 @@ void rw_guarded_range_set_value_sett::add(
     {range_start, {range_end, guard.as_expr()}});
 }
 
-static void goto_rw(
+static void goto_rw_assign(
   const irep_idt &function,
   goto_programt::const_targett target,
-  const code_assignt &assign,
+  const exprt &lhs,
+  const exprt &rhs,
   rw_range_sett &rw_set)
 {
   rw_set.get_objects_rec(
-    function, target, rw_range_sett::get_modet::LHS_W, assign.lhs());
-  rw_set.get_objects_rec(
-    function, target, rw_range_sett::get_modet::READ, assign.rhs());
+    function, target, rw_range_sett::get_modet::LHS_W, lhs);
+  rw_set.get_objects_rec(function, target, rw_range_sett::get_modet::READ, rhs);
 }
 
 static void goto_rw(
@@ -756,7 +757,7 @@ void goto_rw(
   goto_programt::const_targett target,
   rw_range_sett &rw_set)
 {
-  switch(target->type)
+  switch(target->type())
   {
   case NO_INSTRUCTION_TYPE:
   case INCOMPLETE_GOTO:
@@ -801,7 +802,8 @@ void goto_rw(
     break;
 
   case ASSIGN:
-    goto_rw(function, target, target->get_assign(), rw_set);
+    goto_rw_assign(
+      function, target, target->assign_lhs(), target->assign_rhs(), rw_set);
     break;
 
   case DEAD:

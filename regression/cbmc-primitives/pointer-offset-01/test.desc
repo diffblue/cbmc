@@ -1,4 +1,4 @@
-FUTURE
+CORE
 main.c
 
 ^EXIT=10$
@@ -8,5 +8,10 @@ main.c
 --
 ^warning: ignoring
 --
-Check that both positive and negative offsets can be chosen for uninitialized
-pointers. Recorded as ADA-528.
+For uninitialised pointers, CBMC chooses a nondeterministic value (though no memory
+is allocated). Since the offset of pointers is signed, negative offsets should be
+able to be chosen (along with positive ones) non-deterministically.
+`__CPROVER_POINTER_OFFSET` is the CBMC primitive that gets the pointer offset
+from the base address of the object. This test guards this, and especially
+against the case where we could only observe some cases where offsets were only
+positive (in some CI configurations, for instance).

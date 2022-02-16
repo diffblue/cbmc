@@ -127,7 +127,7 @@ exprt convert_string_literal(const std::string &src)
     result.set(ID_C_string_constant, true);
     result.type()=typet(ID_array);
     result.type().subtype()=subtype;
-    result.type().set(ID_size, from_integer(value.size(), index_type()));
+    result.type().set(ID_size, from_integer(value.size(), c_index_type()));
 
     result.operands().resize(value.size());
     for(std::size_t i=0; i<value.size(); i++)

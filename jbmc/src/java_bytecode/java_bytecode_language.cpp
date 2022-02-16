@@ -1486,7 +1486,7 @@ bool java_bytecode_languaget::convert_single_method_code(
       // TODO(tkiley): investigation
       namespacet ns{symbol_table};
       const java_class_typet &underlying_type =
-        to_java_class_type(ns.follow(pointer_return_type->subtype()));
+        to_java_class_type(ns.follow(pointer_return_type->base_type()));
 
       if(!underlying_type.is_abstract())
         needed_lazy_methods->add_all_needed_classes(*pointer_return_type);

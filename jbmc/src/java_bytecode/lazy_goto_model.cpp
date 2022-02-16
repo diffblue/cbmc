@@ -126,9 +126,7 @@ void lazy_goto_modelt::initialize(
       "language");
   }
 
-  std::vector<std::string> binaries, sources;
-  binaries.reserve(files.size());
-  sources.reserve(files.size());
+  std::list<std::string> binaries, sources;
 
   for(const auto &file : files)
   {
@@ -211,18 +209,8 @@ void lazy_goto_modelt::initialize(
     }
   }
 
-  for(const std::string &file : binaries)
-  {
-    msg.status() << "Reading GOTO program from file" << messaget::eom;
-
-    if(read_object_and_link(file, *goto_model, message_handler))
-    {
-      source_locationt source_location;
-      source_location.set_file(file);
-      throw incorrect_goto_program_exceptiont(
-        "failed to read/link goto model", source_location);
-    }
-  }
+  if(read_objects_and_link(binaries, *goto_model, message_handler))
+    throw incorrect_goto_program_exceptiont{"failed to read/link goto model"};
 
   bool binaries_provided_start =
     symbol_table.has_symbol(goto_functionst::entry_point());

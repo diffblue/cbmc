@@ -311,7 +311,7 @@ jsont dep_graph_domaint::output_json(
   {
     json_objectt link{
       {"locationNumber", json_numbert(std::to_string(cd->location_number))},
-      {"sourceLocation", json(cd->source_location)},
+      {"sourceLocation", json(cd->source_location())},
       {"type", json_stringt("control")}};
     graph.push_back(std::move(link));
   }
@@ -320,7 +320,7 @@ jsont dep_graph_domaint::output_json(
   {
     json_objectt link{
       {"locationNumber", json_numbert(std::to_string(dd->location_number))},
-      {"sourceLocation", json(dd->source_location)},
+      {"sourceLocation", json(dd->source_location())},
       {"type", json_stringt("data")}};
     graph.push_back(std::move(link));
   }

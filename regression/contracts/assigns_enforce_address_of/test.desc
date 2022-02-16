@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=(1|64)$
+^SIGNAL=0$
+^.*error: assigns clause target must be an lvalue or __CPROVER_POINTER_OBJECT expression$
+^CONVERSION ERROR$
+--
+--
+Check that address_of expressions are rejected in assigns clauses.

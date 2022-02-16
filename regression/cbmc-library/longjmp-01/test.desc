@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE
 main.c
 --pointer-check --bounds-check
-^EXIT=0$
+^\[longjmp.assertion.1\] line 12 longjmp requires instrumentation: FAILURE$
+^\[main.assertion.1\] line 8 unreachable: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

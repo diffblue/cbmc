@@ -1,4 +1,4 @@
-FUTURE
+CORE
 main.c
 --no-simplify --no-propagation
 ^EXIT=10$
@@ -11,4 +11,3 @@ main.c
 Check that both positive and negative offsets can be chosen for uninitialized
 pointers. We use --no-simplify and --no-propagation to ensure that the case is
 not solved by the constant propagation and thus tests the constraint encoding.
-Recorded as ADA-528.

@@ -71,7 +71,7 @@ void parameter_assignmentst::do_function_calls(
           exprt rhs = typecast_exprt::conditional_cast(
             as_const(*i_it).call_arguments()[nr], lhs.type());
           tmp.add(goto_programt::make_assignment(
-            code_assignt(lhs, rhs), i_it->source_location));
+            code_assignt(lhs, rhs), i_it->source_location()));
         }
       }
 

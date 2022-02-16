@@ -10,9 +10,11 @@
 #include "data_dependency_context.h"
 
 #include <langapi/language_util.h>
+
 #include <util/container_utils.h>
 #include <util/json.h>
 #include <util/json_irep.h>
+#include <util/std_code.h>
 
 /**
  * Evaluate an expression and accumulate all the data dependencies
@@ -140,8 +142,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   domain_data_deps.clear();
   if(to->is_assign())
   {
-    const code_assignt &inst = to->get_assign();
-    const exprt &rhs = inst.rhs();
+    const exprt &rhs = to->assign_rhs();
 
     // Handle return value of a 'no body' function
     if(rhs.id() == ID_side_effect)
@@ -196,7 +197,7 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
   }
   else if(to->is_goto())
   {
-    eval_data_deps(to->guard, ns, domain_data_deps);
+    eval_data_deps(to->condition(), ns, domain_data_deps);
   }
 }
 
@@ -551,7 +552,7 @@ jsont variable_sensitivity_dependence_domaint::output_json(
 
     link["locationNumber"] =
       json_numbert(std::to_string(target->location_number));
-    link["sourceLocation"] = json(target->source_location);
+    link["sourceLocation"] = json(target->source_location());
     link["type"] = json_stringt("control");
     link["branch"] = json_stringt(branch.to_string());
   }
@@ -561,7 +562,7 @@ jsont variable_sensitivity_dependence_domaint::output_json(
     json_objectt &link = graph.push_back().make_object();
     link["locationNumber"] =
       json_numbert(std::to_string(target->location_number));
-    link["sourceLocation"] = json(target->source_location);
+    link["sourceLocation"] = json(target->source_location());
     link["type"] = json_stringt("control");
     link["branch"] = json_stringt("UNCONDITIONAL");
   }
@@ -571,8 +572,8 @@ jsont variable_sensitivity_dependence_domaint::output_json(
     json_objectt &link = graph.push_back().make_object();
     link["locationNumber"] =
       json_numbert(std::to_string(dep.first->location_number));
-    link["sourceLocation"] = json(dep.first->source_location);
-    json_stringt(dep.first->source_location.as_string());
+    link["sourceLocation"] = json(dep.first->source_location());
+    json_stringt(dep.first->source_location().as_string());
     link["type"] = json_stringt("data");
 
     const std::set<exprt> &expr_set = dep.second;

@@ -19,4 +19,9 @@ We _could_ do a more precise analysis in future where we only havoc
 `data[4][5][6]` but not `data[1][2][3]` since the latter clearly cannot be
 modified in the given loop.
 
-Blocked on issue #6021 -- alias analysis is imprecise and returns `unknown`.
+Blocked on #6326:
+The assigns clause in this case would have an entire 2D grid,
+and some of it must be re-established, to the original objects
+but with different values at certain locations, by the loop invariant.
+However, currently we cannot restrict same_object for pointers
+within loop invariants.

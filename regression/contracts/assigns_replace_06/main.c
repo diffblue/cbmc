@@ -1,6 +1,7 @@
 #include <assert.h>
+#include <stdlib.h>
 
-void foo(char c[]) __CPROVER_assigns(c)
+void foo(char c[]) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(c))
 {
 }
 
@@ -28,6 +29,4 @@ int main()
   assert(b[1] == '1');
   assert(b[2] == 'c');
   assert(b[3] == '3');
-
-  return 0;
 }

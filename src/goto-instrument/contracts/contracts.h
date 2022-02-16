@@ -24,11 +24,11 @@ Date: February 2016
 #include <goto-programs/goto_convert_class.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
-
-#include <langapi/language_util.h>
+#include <goto-programs/instrument_preconditions.h>
 
 #include <util/message.h>
 #include <util/namespace.h>
+#include <util/optional.h>
 #include <util/pointer_expr.h>
 
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
@@ -41,22 +41,14 @@ Date: February 2016
   " --replace-call-with-contract <fun>\n"                                      \
   "                              replace calls to fun with fun's contract\n"
 
-#define FLAG_REPLACE_ALL_CALLS "replace-all-calls-with-contracts"
-#define HELP_REPLACE_ALL_CALLS                                                 \
-  " --replace-all-calls-with-contracts\n"                                      \
-  "                              as above for all functions with a contract\n"
-
 #define FLAG_ENFORCE_CONTRACT "enforce-contract"
 #define HELP_ENFORCE_CONTRACT                                                  \
   " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
 
-#define FLAG_ENFORCE_ALL_CONTRACTS "enforce-all-contracts"
-#define HELP_ENFORCE_ALL_CONTRACTS                                             \
-  " --enforce-all-contracts      as above for all functions with a contract\n"
-
-class assigns_clauset;
 class local_may_aliast;
 class replace_symbolt;
+class instrument_spec_assignst;
+class cfg_infot;
 
 class code_contractst
 {
@@ -67,7 +59,6 @@ public:
       goto_functions(goto_model.goto_functions),
       log(log),
       converter(symbol_table, log.get_message_handler())
-
   {
   }
 
@@ -84,7 +75,7 @@ public:
   /// it using `cbmc --function F`.
   ///
   /// \return `true` on failure, `false` otherwise
-  bool replace_calls(const std::set<std::string> &functions);
+  bool replace_calls(const std::set<std::string> &);
 
   /// \brief Turn requires & ensures into assumptions and assertions for each of
   ///        the named functions
@@ -104,23 +95,10 @@ public:
   /// \return `true` on failure, `false` otherwise
   bool enforce_contracts(const std::set<std::string> &functions);
 
-  /// \brief Call enforce_contracts() on all functions that have a contract
-  /// \return `true` on failure, `false` otherwise
-  bool enforce_contracts();
-
-  /// \brief Call replace_calls() on all calls to any function that has a
-  ///        contract
-  /// \return `true` on failure, `false` otherwise
-  bool replace_calls();
-
   void apply_loop_contracts();
 
-  const symbolt &new_tmp_symbol(
-    const typet &type,
-    const source_locationt &source_location,
-    const irep_idt &mode);
-
   void check_apply_loop_contracts(
+    const irep_idt &function_name,
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,
     goto_programt::targett loop_head,
@@ -132,6 +110,13 @@ public:
   goto_functionst &get_goto_functions();
 
   namespacet ns;
+
+  /// Tells wether to skip or not skip an action
+  enum class skipt
+  {
+    DontSkip,
+    Skip
+  };
 
 protected:
   symbol_tablet &symbol_table;
@@ -148,31 +133,51 @@ protected:
   /// Instrument functions to check frame conditions.
   bool check_frame_conditions_function(const irep_idt &function);
 
-  /// Insert assertion statements into the goto program to ensure that
+  ///  \brief Insert assertion statements into the goto program to ensure that
   /// assigned memory is within the assignable memory frame.
-  void check_frame_conditions(goto_programt &, assigns_clauset &);
+  ///
+  /// \param function Name of the function getting instrumented.
+  /// \param body Body of the function getting instrumented.
+  /// \param instruction_it Iterator to the instruction from which to start
+  /// instrumentation (inclusive).
+  /// \param instruction_end Iterator to the instruction at which to stop
+  /// instrumentation (exclusive).
+  /// \param instrument_spec_assigns Assigns clause instrumenter of the function
+  /// \param skip_parameter_assigns If true, will cause assignments to symbol
+  /// marked as is_parameter to not be instrumented.
+  /// \param cfg_info_opt Control flow graph information can will be used
+  /// for write set optimisation if available.
+  void check_frame_conditions(
+    const irep_idt &function,
+    goto_programt &body,
+    goto_programt::targett instruction_it,
+    const goto_programt::targett &instruction_end,
+    instrument_spec_assignst &instrument_spec_assigns,
+    skipt skip_parameter_assigns,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.
   bool check_for_looped_mallocs(const goto_programt &program);
 
-  /// Inserts an assertion statement into program before the assignment
+  /// Inserts an assertion into program immediately before the assignment
   /// instruction_it, to ensure that the left-hand-side of the assignment
-  /// aliases some expression in original_references, unless it is contained
-  /// in freely assignable set.
+  /// is "included" in the (conditional address ranges in the) write set.
   void instrument_assign_statement(
-    goto_programt::instructionst::iterator &,
-    goto_programt &,
-    assigns_clauset &);
+    goto_programt::targett &instruction_it,
+    goto_programt &program,
+    instrument_spec_assignst &instrument_spec_assigns,
+    optionalt<cfg_infot> &cfg_info_opt);
 
-  /// Inserts an assertion statement into program before the function call at
-  /// ins_it, to ensure that any memory which may be written by the call is
-  /// aliased by some expression in assigns_references, unless it is contained
-  /// in freely assignable set.
+  /// Inserts an assertion into program immediately before the function call at
+  /// instruction_it, to ensure that all memory locations written to by the
+  // callee are "included" in the (conditional address ranges in the) write set.
   void instrument_call_statement(
-    goto_programt::instructionst::iterator &,
-    goto_programt &,
-    assigns_clauset &);
+    goto_programt::targett &instruction_it,
+    const irep_idt &function,
+    goto_programt &body,
+    instrument_spec_assignst &instrument_spec_assigns,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Apply loop contracts, whenever available, to all loops in `function`.
   /// Loop invariants, loop variants, and loop assigns clauses.
@@ -180,15 +185,14 @@ protected:
     const irep_idt &function,
     goto_functionst::goto_functiont &goto_function);
 
-  /// \brief Does the named function have a contract?
-  bool has_contract(const irep_idt);
-
   /// Replaces function calls with assertions based on requires clauses,
   /// non-deterministic assignments for the write set, and assumptions
   /// based on ensures clauses.
   bool apply_function_contract(
-    goto_programt &goto_program,
-    goto_programt::targett target);
+    const irep_idt &function,
+    const source_locationt &location,
+    goto_programt &function_body,
+    goto_programt::targett &target);
 
   /// Instruments `wrapper_function` adding assumptions based on requires
   /// clauses and assertions based on ensures clauses.

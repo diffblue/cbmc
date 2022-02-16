@@ -58,15 +58,22 @@ bool process_goto_program(
   }
 
   // remove returns, gcc vectors, complex
-  remove_returns(goto_model);
+  if(
+    options.get_bool_option("remove-returns") ||
+    options.get_bool_option("string-abstraction"))
+  {
+    remove_returns(goto_model);
+  }
+
   remove_vector(goto_model);
   remove_complex(goto_model);
+
   if(options.get_bool_option("rewrite-union"))
     rewrite_union(goto_model);
 
   // add generic checks
   log.status() << "Generic Property Instrumentation" << messaget::eom;
-  goto_check(options, goto_model);
+  goto_check(options, goto_model, log.get_message_handler());
 
   // checks don't know about adjusted float expressions
   adjust_float_expressions(goto_model);

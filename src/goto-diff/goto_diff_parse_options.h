@@ -12,7 +12,7 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 
-#include <analyses/goto_check.h>
+#include <analyses/goto_check_c.h>
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -31,6 +31,7 @@ class optionst;
   "(json-ui)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
+  "(show-loops)" \
   OPT_GOTO_CHECK \
   OPT_COVER \
   "(verbosity):(version)" \

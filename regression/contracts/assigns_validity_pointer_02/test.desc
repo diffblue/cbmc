@@ -3,11 +3,15 @@ main.c
 --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
+^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
+^\[baz.assigns.\d+\] line \d+ Check that \*z is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
-//^([foo\.1] line 15 assertion: FAILURE)
 --
-\[foo\.1\] line 24 assertion: FAILURE
-\[foo\.3\] line 27 assertion: FAILURE
+^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$
+^\[foo.\d+\] line \d+ Check that \*x is assignable: FAILURE$
 --
 Verification:
 This test checks support for a NULL pointer that is assigned to by

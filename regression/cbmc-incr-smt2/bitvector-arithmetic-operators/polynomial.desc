@@ -1,0 +1,15 @@
+CORE
+polynomial.c
+--incremental-smt2-solver 'z3 --smt2 -in' --trace
+\[main\.assertion\.1\] line \d+ No negative solution: FAILURE
+\[main\.assertion\.2\] line \d+ No positive solution: FAILURE
+x=-8\ \(11111111 11111111 11111111 11111000\)
+x=42\ \(00000000 00000000 00000000 00101010\)
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This is an end-to-end test making sure that CBMC has encoded
+the problem and sent it to the SMT solver, and we manage to
+get the solutions to the polynomial back through the trace.

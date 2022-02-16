@@ -1,7 +1,7 @@
 CORE
 test.c
 --restrict-function-pointer use_f.function_pointer_call.1/f
-\[use_f\.assertion\.2\] line \d+ assertion fptr\(10\) == 11: SUCCESS
+\[use_f\.assertion\.1\] line \d+ assertion fptr\(10\) == 11: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$
 --

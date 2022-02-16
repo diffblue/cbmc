@@ -1,0 +1,16 @@
+CORE
+unsigned_behaviour.c
+--incremental-smt2-solver 'z3 --smt2 -in' --trace
+\[main\.assertion\.1\] line \d+ a plus b should be more than 27: FAILURE
+\[main\.assertion\.2\] line \d+ a plus b should be more than 27: FAILURE
+\[main\.assertion\.3\] line \d+ c plus d should be more than 27: FAILURE
+\[main\.assertion\.4\] line \d+ c plus d should be more than 27: FAILURE
+a=\d+(u|ul)?
+c=\d+(u|ul)?
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test checks for the correct behaviour of unsigned integers around
+boundary values.

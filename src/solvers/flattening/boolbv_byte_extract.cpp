@@ -59,9 +59,6 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   }
   #endif
 
-  if(width==0)
-    return conversion_failed(expr);
-
   // see if the byte number is constant and within bounds, else work from the
   // root object
   const auto op_bytes_opt = pointer_offset_size(expr.op().type(), ns);

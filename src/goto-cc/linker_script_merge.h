@@ -111,21 +111,17 @@ protected:
       const std::string &out_file,
       const std::string &def_out_file);
 
-  /// \brief Write a list of definitions derived from `data` into gp's
-  ///        `instructions` member.
+  /// \brief Write a list of definitions derived from `data` into the
+  ///        `symbol_table`.
   /// \pre `data` is in the format verified by #linker_data_is_malformed.
-  /// \post For every memory region in `data`, a function call to
-  ///       `__CPROVER_allocated_memory` is prepended to
-  ///       `initialize_instructions`.
   /// \post For every symbol in `data`, a declaration and initialization of that
-  ///       symbol is prepended to `initialize_instructions`.
+  ///       symbol is added to `symbol_table`.
   /// \post Every symbol in `data` shall be a key in `linker_values`; the value
   ///       shall be a constant expression with the actual value of the symbol
   ///       in the linker script.
   int ls_data2instructions(
     jsont &data,
     const std::string &linker_script,
-    goto_programt &gp,
     symbol_tablet &symbol_table,
     linker_valuest &linker_values);
 

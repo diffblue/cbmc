@@ -26,16 +26,16 @@ public:
   incorrect_source_program_exceptiont(
     std::string message,
     source_locationt source_location)
-    : message(std::move(message)), source_location(std::move(source_location))
+    : cprover_exception_baset(std::move(message)),
+      source_location(std::move(source_location))
   {
   }
   std::string what() const override
   {
-    return message + " (at: " + source_location.as_string() + ")";
+    return reason + " (at: " + source_location.as_string() + ")";
   }
 
 private:
-  std::string message;
   source_locationt source_location;
 };
 

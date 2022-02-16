@@ -1,0 +1,14 @@
+CORE
+main.c
+--enforce-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
+^EXIT=10$
+^SIGNAL=0$
+\[foo.assigns.\d+\] line \d+ Check that \*z \(assigned by the contract of bar\) is assignable: FAILURE$
+^.* 1 of \d+ failed \(\d+ iteration.*\)$
+^VERIFICATION FAILED$
+--
+\[\d+\] file main.c line \d+ Check that \*z is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC properly evaluates subset relationship on assigns
+during replacement.

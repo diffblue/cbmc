@@ -46,22 +46,25 @@ void c_storage_spect::read(const typet &type)
       if(it->id()==ID_thread)
         is_thread_local=true;
   }
-  else if(type.id()==ID_alias &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_alias && type.has_subtype() &&
+    to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
-    alias = to_string_constant(type.subtype()).get_value();
+    alias =
+      to_string_constant(to_type_with_subtype(type).subtype()).get_value();
   }
-  else if(type.id()==ID_asm &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_asm && !to_type_with_subtypes(type).subtypes().empty() &&
+    to_type_with_subtypes(type).subtypes()[0].id() == ID_string_constant)
   {
-    asm_label = to_string_constant(type.subtype()).get_value();
+    asm_label =
+      to_string_constant(to_type_with_subtypes(type).subtypes()[0]).get_value();
   }
-  else if(type.id()==ID_section &&
-          type.has_subtype() &&
-          type.subtype().id()==ID_string_constant)
+  else if(
+    type.id() == ID_section && type.has_subtype() &&
+    to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
-    section = to_string_constant(type.subtype()).get_value();
+    section =
+      to_string_constant(to_type_with_subtype(type).subtype()).get_value();
   }
 }

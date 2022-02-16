@@ -1,0 +1,16 @@
+CORE
+main.c
+
+Labels: label_zero$
+Labels: label_one$
+Labels: label_two$
+Labels: label_three$
+Labels: label_four$
+Labels: label_five$
+Labels: label_six$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test ensures that label names specified in the source code are preserved.

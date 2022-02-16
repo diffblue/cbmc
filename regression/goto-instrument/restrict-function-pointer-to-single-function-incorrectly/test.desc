@@ -1,7 +1,7 @@
 CORE
 test.c
 --restrict-function-pointer use_f.function_pointer_call.1/f
-\[use_f\.assertion\.1\] line \d+ dereferenced function pointer at use_f.function_pointer_call.1 must be f: FAILURE
+\[use_f\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be f: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
 --

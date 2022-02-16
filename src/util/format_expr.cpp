@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_expr.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
 #include "byte_operators.h"
 #include "format_type.h"
 #include "ieee_float.h"
@@ -19,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mp_arith.h"
 #include "pointer_expr.h"
 #include "prefix.h"
-#include "std_code.h"
 #include "string_utils.h"
 
 #include <map>
@@ -194,7 +194,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
       const auto &unary_expr = to_unary_expr(src);
       const auto &pointer_type = to_pointer_type(src.type());
       return os << "pointer(" << format(unary_expr.op()) << ", "
-                << format(pointer_type.subtype()) << ')';
+                << format(pointer_type.base_type()) << ')';
     }
     else
     {
@@ -202,8 +202,12 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
       const auto width = pointer_type.get_width();
       auto int_value = bvrep2integer(src.get_value(), width, false);
       return os << "pointer(0x" << integer2string(int_value, 16) << ", "
-                << format(pointer_type.subtype()) << ')';
+                << format(pointer_type.base_type()) << ')';
     }
+  }
+  else if(type == ID_c_enum_tag)
+  {
+    return os << string2integer(id2string(src.get_value()), 16);
   }
   else
     return os << src.pretty();
@@ -357,22 +361,55 @@ void format_expr_configt::setup()
 
   expr_map[ID_forall] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << u8"\u2200 " << format(to_quantifier_expr(expr).symbol())
-              << " : " << format(to_quantifier_expr(expr).symbol().type())
-              << " . " << format(to_quantifier_expr(expr).where());
+    os << u8"\u2200 ";
+    bool first = true;
+    for(const auto &symbol : to_quantifier_expr(expr).variables())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+      os << format(symbol) << " : " << format(symbol.type());
+    }
+    return os << " . " << format(to_quantifier_expr(expr).where());
   };
 
   expr_map[ID_exists] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << u8"\u2203 " << format(to_quantifier_expr(expr).symbol())
-              << " : " << format(to_quantifier_expr(expr).symbol().type())
-              << " . " << format(to_quantifier_expr(expr).where());
+    os << u8"\u2203 ";
+    bool first = true;
+    for(const auto &symbol : to_quantifier_expr(expr).variables())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+      os << format(symbol) << " : " << format(symbol.type());
+    }
+    return os << " . " << format(to_quantifier_expr(expr).where());
   };
 
   expr_map[ID_let] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << "LET " << format(to_let_expr(expr).symbol()) << " = "
-              << format(to_let_expr(expr).value()) << " IN "
-              << format(to_let_expr(expr).where());
+    const auto &let_expr = to_let_expr(expr);
+
+    os << "LET ";
+
+    bool first = true;
+
+    const auto &values = let_expr.values();
+    auto values_it = values.begin();
+    for(auto &v : let_expr.variables())
+    {
+      if(first)
+        first = false;
+      else
+        os << ", ";
+
+      os << format(v) << " = " << format(*values_it);
+      ++values_it;
+    }
+
+    return os << " IN " << format(let_expr.where());
   };
 
   expr_map[ID_lambda] =
@@ -424,53 +461,6 @@ void format_expr_configt::setup()
               << format(if_expr.false_case()) << ')';
   };
 
-  expr_map[ID_code] =
-    [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    const auto &code = to_code(expr);
-    const irep_idt &statement = code.get_statement();
-
-    if(statement == ID_assign)
-      return os << format(to_code_assign(code).lhs()) << " = "
-                << format(to_code_assign(code).rhs()) << ';';
-    else if(statement == ID_block)
-    {
-      os << '{';
-      for(const auto &s : to_code_block(code).statements())
-        os << ' ' << format(s);
-      return os << " }";
-    }
-    else if(statement == ID_dead)
-    {
-      return os << "dead " << format(to_code_dead(code).symbol()) << ";";
-    }
-    else if(const auto decl = expr_try_dynamic_cast<code_declt>(code))
-    {
-      const auto &declaration_symb = decl->symbol();
-      os << "decl " << format(declaration_symb.type()) << " "
-         << format(declaration_symb);
-      if(const optionalt<exprt> initial_value = decl->initial_value())
-        os << " = " << format(*initial_value);
-      return os << ";";
-    }
-    else if(statement == ID_function_call)
-    {
-      const auto &func_call = to_code_function_call(code);
-      os << to_symbol_expr(func_call.function()).get_identifier() << "(";
-
-      // Join all our arguments together.
-      join_strings(
-        os,
-        func_call.arguments().begin(),
-        func_call.arguments().end(),
-        ", ",
-        [](const exprt &expr) { return format(expr); });
-
-      return os << ");";
-    }
-    else
-      return fallback_format_rec(os, expr);
-  };
-
   expr_map[ID_string_constant] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << '"' << expr.get_string(ID_value) << '"';
@@ -502,6 +492,20 @@ void format_expr_configt::setup()
     else
       os << format(dereference_expr.pointer());
     return os;
+  };
+
+  expr_map[ID_saturating_minus] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &saturating_minus = to_saturating_minus_expr(expr);
+    return os << "saturating-(" << format(saturating_minus.lhs()) << ", "
+              << format(saturating_minus.rhs()) << ')';
+  };
+
+  expr_map[ID_saturating_plus] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &saturating_plus = to_saturating_plus_expr(expr);
+    return os << "saturating+(" << format(saturating_plus.lhs()) << ", "
+              << format(saturating_plus.rhs()) << ')';
   };
 
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {

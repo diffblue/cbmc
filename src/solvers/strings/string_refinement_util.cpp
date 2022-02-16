@@ -29,12 +29,14 @@ bool is_char_array_type(const typet &type, const namespacet &ns)
 {
   if(type.id() == ID_struct_tag)
     return is_char_array_type(ns.follow_tag(to_struct_tag_type(type)), ns);
-  return type.id() == ID_array && is_char_type(type.subtype());
+  return type.id() == ID_array &&
+         is_char_type(to_array_type(type).element_type());
 }
 
 bool is_char_pointer_type(const typet &type)
 {
-  return type.id() == ID_pointer && is_char_type(type.subtype());
+  return type.id() == ID_pointer &&
+         is_char_type(to_pointer_type(type).base_type());
 }
 
 bool has_char_pointer_subtype(const typet &type, const namespacet &ns)

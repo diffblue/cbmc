@@ -94,8 +94,8 @@ static void add_to_xml(
     xmlt &inst = x.new_element("instruction");
     inst.set_attribute("location_number",
                        std::to_string(it->second->location_number));
-    inst.set_attribute("source_location",
-                       it->second->source_location.as_string());
+    inst.set_attribute(
+      "source_location", it->second->source_location().as_string());
   }
   return;
 }
@@ -126,7 +126,7 @@ static void add_to_json(
                  "The last instruction in a goto-program must be END_FUNCTION");
 
   json_objectt entry{{"function", json_stringt(function_identifier)}};
-  if(auto file_name_opt = file_name_string_opt(end_function->source_location))
+  if(auto file_name_opt = file_name_string_opt(end_function->source_location()))
     entry["file"] = json_stringt{*file_name_opt};
 
   json_arrayt &dead_ins=entry["unreachableInstructions"].make_array();
@@ -149,7 +149,7 @@ static void add_to_json(
     s.erase(s.size()-1);
 
     // print info for file actually with full path
-    const source_locationt &l=it->second->source_location;
+    const source_locationt &l = it->second->source_location();
     json_objectt i_entry{{"sourceLocation", json(l)},
                          {"statement", json_stringt(s)}};
     dead_ins.push_back(std::move(i_entry));
@@ -179,10 +179,8 @@ void unreachable_instructions(
 
     const symbolt &decl = ns.lookup(gf_entry.first);
 
-    // gf_entry.first may be a link-time renamed version, use the
-    // base_name instead; do not list inlined functions
     if(
-      called.find(decl.base_name) != called.end() ||
+      called.find(decl.name) != called.end() ||
       to_code_type(decl.type).get_inlined())
     {
       unreachable_instructions(goto_program, dead_map);
@@ -314,10 +312,8 @@ static void list_functions(
   {
     const symbolt &decl = ns.lookup(gf_entry.first);
 
-    // gf_entry.first may be a link-time renamed version, use the
-    // base_name instead; do not list inlined functions
     if(
-      unreachable == (called.find(decl.base_name) != called.end() ||
+      unreachable == (called.find(decl.name) != called.end() ||
                       to_code_type(decl.type).get_inlined()))
     {
       continue;
@@ -339,7 +335,7 @@ static void list_functions(
       do
       {
         --end_function;
-        last_location = end_function->source_location;
+        last_location = end_function->source_location();
       }
       while(
         end_function != goto_program.instructions.begin() &&

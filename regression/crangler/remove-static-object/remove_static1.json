@@ -1,0 +1,20 @@
+{
+  "sources": [
+    "remove_static1.c"
+  ],
+  "functions": [
+    {
+      "foobar1": [
+        "remove static"
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "x": [
+        "remove static"
+      ]
+    }
+  ],
+  "output": "stdout"
+}

@@ -1,0 +1,10 @@
+CORE thorough-paths thorough-smt-backend
+test_array_symbolic_size.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^.*expecting FAILURE: SUCCESS$
+^.*expecting SUCCESS: FAILURE$
+^.*dereference .*: FAILURE$

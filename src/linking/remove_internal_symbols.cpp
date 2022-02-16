@@ -118,7 +118,6 @@ void remove_internal_symbols(
   special.insert("envp_size'");
   special.insert(CPROVER_PREFIX "memory");
   special.insert(INITIALIZE_FUNCTION);
-  special.insert(CPROVER_PREFIX "malloc_size");
   special.insert(CPROVER_PREFIX "deallocated");
   special.insert(CPROVER_PREFIX "dead_object");
   special.insert(rounding_mode_identifier());

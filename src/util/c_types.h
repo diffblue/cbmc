@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_C_TYPES_H
 #define CPROVER_UTIL_C_TYPES_H
 
+#include "deprecate.h"
 #include "pointer_expr.h"
 
 /// Type for C bit fields
@@ -24,7 +25,17 @@ public:
     subtype().swap(_subtype);
   }
 
-  // These have a sub-type
+  // These have a sub-type. The preferred way to access it
+  // are the underlying_type methods.
+  const typet &underlying_type() const
+  {
+    return subtype();
+  }
+
+  typet &underlying_type()
+  {
+    return subtype();
+  }
 };
 
 /// Check whether a reference to a typet is a \ref c_bit_field_typet.
@@ -47,6 +58,7 @@ inline bool can_cast_type<c_bit_field_typet>(const typet &type)
 inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 {
   PRECONDITION(can_cast_type<c_bit_field_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const c_bit_field_typet &>(type);
 }
 
@@ -54,6 +66,7 @@ inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 {
   PRECONDITION(can_cast_type<c_bit_field_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<c_bit_field_typet &>(type);
 }
 
@@ -255,6 +268,18 @@ public:
   {
     set(ID_incomplete, true);
   }
+
+  // The preferred way to access the subtype
+  // are the underlying_type methods.
+  const typet &underlying_type() const
+  {
+    return subtype();
+  }
+
+  typet &underlying_type()
+  {
+    return subtype();
+  }
 };
 
 /// Check whether a reference to a typet is a \ref c_enum_typet.
@@ -277,6 +302,7 @@ inline bool can_cast_type<c_enum_typet>(const typet &type)
 inline const c_enum_typet &to_c_enum_type(const typet &type)
 {
   PRECONDITION(can_cast_type<c_enum_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<const c_enum_typet &>(type);
 }
 
@@ -284,6 +310,7 @@ inline const c_enum_typet &to_c_enum_type(const typet &type)
 inline c_enum_typet &to_c_enum_type(typet &type)
 {
   PRECONDITION(can_cast_type<c_enum_typet>(type));
+  type_with_subtypet::check(type);
   return static_cast<c_enum_typet &>(type);
 }
 
@@ -339,22 +366,14 @@ public:
   {
   }
 
-  bool has_contract() const
+  const exprt::operandst &assigns() const
   {
-    return assigns().is_not_nil() || !requires().empty() || !ensures().empty();
+    return static_cast<const exprt &>(find(ID_C_spec_assigns)).operands();
   }
 
-  const exprt &assigns() const
+  exprt::operandst &assigns()
   {
-    return static_cast<const exprt &>(find(ID_C_spec_assigns));
-  }
-
-  exprt &assigns()
-  {
-    auto &result = static_cast<exprt &>(add(ID_C_spec_assigns));
-    if(result.id().empty()) // not initialized?
-      result.make_nil();
-    return result;
+    return static_cast<exprt &>(add(ID_C_spec_assigns)).operands();
   }
 
   const exprt::operandst &requires() const
@@ -411,8 +430,15 @@ inline code_with_contract_typet &to_code_with_contract_type(typet &type)
   return static_cast<code_with_contract_typet &>(type);
 }
 
+DEPRECATED(
+  SINCE(2022, 1, 13, "use c_index_type() or array_typet::index_type() instead"))
 bitvector_typet index_type();
+
+DEPRECATED(SINCE(2022, 1, 13, "use c_enum_constant_type() instead"))
 bitvector_typet enum_constant_type();
+
+bitvector_typet c_enum_constant_type();
+bitvector_typet c_index_type();
 signedbv_typet signed_int_type();
 unsignedbv_typet unsigned_int_type();
 signedbv_typet signed_long_int_type();

@@ -1361,7 +1361,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     else if(bytecode == BC_return)
     {
       PRECONDITION(op.empty() && results.empty());
-      c=code_returnt();
+      c = code_frontend_returnt();
     }
     else if(bytecode == patternt("?return"))
     {
@@ -1370,7 +1370,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       PRECONDITION(op.size() == 1 && results.empty());
       const exprt r =
         typecast_exprt::conditional_cast(op[0], method_return_type);
-      c=code_returnt(r);
+      c = code_frontend_returnt(r);
     }
     else if(bytecode == patternt("?astore"))
     {
@@ -2431,8 +2431,8 @@ void java_bytecode_convert_methodt::convert_athrow(
 {
   if(
     assert_no_exceptions_thrown ||
-    ((uncaught_exceptions_domaint::get_exception_type(op[0].type()) ==
-      "java::java.lang.AssertionError") &&
+    ((uncaught_exceptions_domaint::get_exception_type(
+        to_reference_type(op[0].type())) == "java::java.lang.AssertionError") &&
      !throw_assertion_error))
   {
     // we translate athrow into
@@ -2711,10 +2711,10 @@ void java_bytecode_convert_methodt::convert_getstatic(
     else if(arg0.type().id() == ID_pointer)
     {
       const auto &pointer_type = to_pointer_type(arg0.type());
-      if(pointer_type.subtype().id() == ID_struct_tag)
+      if(pointer_type.base_type().id() == ID_struct_tag)
       {
         needed_lazy_methods->add_needed_class(
-          to_struct_tag_type(pointer_type.subtype()).get_identifier());
+          to_struct_tag_type(pointer_type.base_type()).get_identifier());
       }
     }
     else if(is_assertions_disabled_field)

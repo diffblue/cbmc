@@ -1,0 +1,14 @@
+CORE
+div_by_zero.c
+--incremental-smt2-solver 'z3 --smt2 -in' --div-by-zero-check --trace
+\[main\.division-by-zero\.1\] line \d division by zero in x / y: FAILURE
+\[main\.division-by-zero\.2\] line \d+ division by zero in x / z: SUCCESS
+y=0
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test is designed to drive the `--div-by-zero-check` in both the positive
+and the negative case, and show that it's working for our current implementation-in-progress
+of the new SMT backend.

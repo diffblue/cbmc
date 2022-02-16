@@ -1,9 +1,11 @@
+// clang-format off
 void __CPROVER_assume(__CPROVER_bool assumption);
 void __VERIFIER_assume(__CPROVER_bool assumption);
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
 void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);
 void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 void __CPROVER_havoc_object(void *);
+void __CPROVER_havoc_slice(void *, __CPROVER_size_t);
 __CPROVER_bool __CPROVER_equal();
 __CPROVER_bool __CPROVER_same_object(const void *, const void *);
 __CPROVER_bool __CPROVER_is_invalid_pointer(const void *);
@@ -82,7 +84,7 @@ int __CPROVER_isunorderedd(double f, double g);
 // absolute value
 int __CPROVER_abs(int x);
 long int __CPROVER_labs(long int x);
-long int __CPROVER_llabs(long long int x);
+long long int __CPROVER_llabs(long long int x);
 double __CPROVER_fabs(double x);
 long double __CPROVER_fabsl(long double x);
 float __CPROVER_fabsf(float x);
@@ -120,3 +122,4 @@ __CPROVER_bool __CPROVER_overflow_unary_minus();
 
 // enumerations
 __CPROVER_bool __CPROVER_enum_is_in_range();
+// clang-format on

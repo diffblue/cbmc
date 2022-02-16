@@ -155,62 +155,6 @@ void code_function_bodyt::set_parameter_identifiers(
   }
 }
 
-code_inputt::code_inputt(
-  std::vector<exprt> arguments,
-  optionalt<source_locationt> location)
-  : codet{ID_input, std::move(arguments)}
-{
-  if(location)
-    add_source_location() = std::move(*location);
-  check(*this, validation_modet::INVARIANT);
-}
-
-code_inputt::code_inputt(
-  const irep_idt &description,
-  exprt expression,
-  optionalt<source_locationt> location)
-  : code_inputt{{address_of_exprt(index_exprt(
-                   string_constantt(description),
-                   from_integer(0, index_type()))),
-                 std::move(expression)},
-                std::move(location)}
-{
-}
-
-void code_inputt::check(const codet &code, const validation_modet vm)
-{
-  DATA_CHECK(
-    vm, code.operands().size() >= 2, "input must have at least two operands");
-}
-
-code_outputt::code_outputt(
-  std::vector<exprt> arguments,
-  optionalt<source_locationt> location)
-  : codet{ID_output, std::move(arguments)}
-{
-  if(location)
-    add_source_location() = std::move(*location);
-  check(*this, validation_modet::INVARIANT);
-}
-
-code_outputt::code_outputt(
-  const irep_idt &description,
-  exprt expression,
-  optionalt<source_locationt> location)
-  : code_outputt{{address_of_exprt(index_exprt(
-                    string_constantt(description),
-                    from_integer(0, index_type()))),
-                  std::move(expression)},
-                 std::move(location)}
-{
-}
-
-void code_outputt::check(const codet &code, const validation_modet vm)
-{
-  DATA_CHECK(
-    vm, code.operands().size() >= 2, "output must have at least two operands");
-}
-
 code_fort code_fort::from_index_bounds(
   exprt start_index,
   exprt end_index,
@@ -226,7 +170,7 @@ code_fort code_fort::from_index_bounds(
     location);
 
   return code_fort{
-    code_assignt{loop_index, std::move(start_index)},
+    code_frontend_assignt{loop_index, std::move(start_index)},
     binary_relation_exprt{loop_index, ID_lt, std::move(end_index)},
     std::move(inc),
     std::move(body)};

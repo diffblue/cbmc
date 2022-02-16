@@ -27,7 +27,7 @@ void show_locations(
       it!=goto_program.instructions.end();
       it++)
   {
-    const source_locationt &source_location=it->source_location;
+    const source_locationt &source_location = it->source_location();
 
     switch(ui)
     {
@@ -50,9 +50,8 @@ void show_locations(
       break;
 
     case ui_message_handlert::uit::PLAIN:
-      std::cout << function_id << " "
-                << it->location_number << " "
-                << it->source_location << '\n';
+      std::cout << function_id << " " << it->location_number << " "
+                << it->source_location() << '\n';
       break;
 
     case ui_message_handlert::uit::JSON_UI:

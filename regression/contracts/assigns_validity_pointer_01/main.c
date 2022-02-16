@@ -17,17 +17,17 @@ void baz() __CPROVER_assigns(*z) __CPROVER_ensures(z == NULL || *z == 7)
     *z = 7;
 }
 
-void foo(int *x) __CPROVER_assigns(*x) __CPROVER_requires(*x > 0)
+void foo(int *x) __CPROVER_assigns(*x, *z) __CPROVER_requires(*x > 0)
   __CPROVER_ensures(*x == 3)
 {
   bar(x, NULL);
-  z == NULL;
   baz();
 }
 
 int main()
 {
   int n;
+  z = malloc(sizeof(*z));
   foo(&n);
 
   assert(n == 3);

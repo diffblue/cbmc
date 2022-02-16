@@ -20,6 +20,7 @@ Date: November 2011
 #include "nondet_static.h"
 
 #include <util/prefix.h>
+#include <util/std_code.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -76,7 +77,7 @@ bool is_nondet_initializable_static(
 /// \param ns: Namespace for resolving type information.
 /// \param [out] goto_functions: Existing goto-functions to be updated.
 /// \param fct_name: Name of the goto-function to be updated.
-void nondet_static(
+static void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions,
   const irep_idt &fct_name)
@@ -92,11 +93,11 @@ void nondet_static(
     if(instruction.is_assign())
     {
       const symbol_exprt sym =
-        to_symbol_expr(as_const(instruction).get_assign().lhs());
+        to_symbol_expr(as_const(instruction).assign_lhs());
 
       if(is_nondet_initializable_static(sym, ns))
       {
-        const auto source_location = instruction.source_location;
+        const auto source_location = instruction.source_location();
         instruction = goto_programt::make_assignment(
           code_assignt(
             sym, side_effect_expr_nondett(sym.type(), source_location)),
@@ -186,6 +187,10 @@ void nondet_static(
     if(to_exclude.find(qualified_name) != to_exclude.end())
     {
       symbol.value.set(ID_C_no_nondet_initialization, 1);
+    }
+    else if(is_nondet_initializable_static(symbol.symbol_expr(), ns))
+    {
+      symbol.value = side_effect_expr_nondett(symbol.type, symbol.location);
     }
   }
 

@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^.* error: side-effects not allowed in assigns clause conditions$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that side-effect expressions in target conditions cause hard errors.

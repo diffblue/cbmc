@@ -1,0 +1,12 @@
+CORE
+main.c
+--show-goto-functions --error-label ERROR
+Labels: ERROR$
+ASSIGN main#return_value := 1$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test ensures that removal of return values (confirmed by the existence of
+the ASSIGN instruction) preserves labels attached to the return statement.

@@ -30,7 +30,7 @@ class linkingt:public typecheckt
 public:
   linkingt(
     symbol_table_baset &_main_symbol_table,
-    symbol_table_baset &_src_symbol_table,
+    const symbol_table_baset &_src_symbol_table,
     message_handlert &_message_handler)
     : typecheckt(_message_handler),
       main_symbol_table(_main_symbol_table),
@@ -65,8 +65,9 @@ protected:
 
   void do_type_dependencies(std::unordered_set<irep_idt> &);
 
-  void rename_symbols(const std::unordered_set<irep_idt> &needs_to_be_renamed);
-  void copy_symbols();
+  std::unordered_map<irep_idt, irep_idt>
+  rename_symbols(const std::unordered_set<irep_idt> &needs_to_be_renamed);
+  void copy_symbols(const std::unordered_map<irep_idt, irep_idt> &);
 
   void duplicate_non_type_symbol(
     symbolt &old_symbol,
@@ -169,14 +170,14 @@ protected:
     const struct_typet &new_type);
 
   symbol_table_baset &main_symbol_table;
-  symbol_table_baset &src_symbol_table;
+  const symbol_table_baset &src_symbol_table;
 
   namespacet ns;
 
   // X -> Y iff Y uses X for new symbol type IDs X and Y
   typedef std::unordered_map<irep_idt, std::unordered_set<irep_idt>> used_byt;
 
-  irep_idt rename(irep_idt);
+  irep_idt rename(const irep_idt &);
 
   // the new IDs created by renaming
   std::unordered_set<irep_idt> renamed_ids;

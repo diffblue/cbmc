@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/string_constant.h>
 
 #include <goto-programs/class_hierarchy.h>
@@ -75,9 +76,7 @@ void taint_analysist::instrument(
 
     if(instruction.is_function_call())
     {
-      const code_function_callt &function_call =
-        instruction.get_function_call();
-      const exprt &function = function_call.function();
+      const exprt &function = instruction.call_function();
 
       if(function.id() == ID_symbol)
       {
@@ -144,8 +143,8 @@ void taint_analysist::instrument(
             {
               unsigned nr =
                 have_this ? rule.parameter_number : rule.parameter_number - 1;
-              if(function_call.arguments().size() > nr)
-                where = function_call.arguments()[nr];
+              if(instruction.call_arguments().size() > nr)
+                where = instruction.call_arguments()[nr];
               break;
             }
 
@@ -153,9 +152,9 @@ void taint_analysist::instrument(
               if(have_this)
               {
                 DATA_INVARIANT(
-                  !function_call.arguments().empty(),
+                  !instruction.call_arguments().empty(),
                   "`this` implies at least one argument in function call");
-                where = function_call.arguments()[0];
+                where = instruction.call_arguments()[0];
               }
               break;
             }
@@ -170,7 +169,7 @@ void taint_analysist::instrument(
               code_set_may.op1() =
                 address_of_exprt(string_constantt(rule.taint));
               insert_after.add(goto_programt::make_other(
-                code_set_may, instruction.source_location));
+                code_set_may, instruction.source_location()));
               break;
             }
 
@@ -182,10 +181,10 @@ void taint_analysist::instrument(
                 address_of_exprt(string_constantt(rule.taint))};
               goto_programt::targett t =
                 insert_before.add(goto_programt::make_assertion(
-                  not_exprt(get_may), instruction.source_location));
-              t->source_location.set_property_class(
+                  not_exprt(get_may), instruction.source_location()));
+              t->source_location_nonconst().set_property_class(
                 "taint rule " + id2string(rule.id));
-              t->source_location.set_comment(rule.message);
+              t->source_location_nonconst().set_comment(rule.message);
               break;
             }
 
@@ -197,7 +196,7 @@ void taint_analysist::instrument(
               code_clear_may.op1() =
                 address_of_exprt(string_constantt(rule.taint));
               insert_after.add(goto_programt::make_other(
-                code_clear_may, instruction.source_location));
+                code_clear_may, instruction.source_location()));
               break;
             }
             }
@@ -360,21 +359,21 @@ bool taint_analysist::operator()(
         {
           json_objectt json{
             {"bugClass",
-             json_stringt(i_it->source_location.get_property_class())},
-            {"file", json_stringt(i_it->source_location.get_file())},
+             json_stringt(i_it->source_location().get_property_class())},
+            {"file", json_stringt(i_it->source_location().get_file())},
             {"line",
-             json_numbert(id2string(i_it->source_location.get_line()))}};
+             json_numbert(id2string(i_it->source_location().get_line()))}};
           json_result.push_back(std::move(json));
         }
         else
         {
-          std::cout << i_it->source_location;
-          if(!i_it->source_location.get_comment().empty())
-            std::cout << ": " << i_it->source_location.get_comment();
+          std::cout << i_it->source_location();
+          if(!i_it->source_location().get_comment().empty())
+            std::cout << ": " << i_it->source_location().get_comment();
 
-          if(!i_it->source_location.get_property_class().empty())
-            std::cout << " ("
-                      << i_it->source_location.get_property_class() << ")";
+          if(!i_it->source_location().get_property_class().empty())
+            std::cout << " (" << i_it->source_location().get_property_class()
+                      << ")";
 
           std::cout << '\n';
         }

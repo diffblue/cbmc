@@ -15,9 +15,10 @@ Author: Matt Lewis
 
 #include <goto-programs/goto_functions.h>
 
-#include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/find_symbols.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <iostream>
 #include <list>
@@ -208,8 +209,8 @@ void acceleratet::insert_looping_path(
     loop_body,
     goto_programt::make_goto(
       loop_body,
-      side_effect_expr_nondett(bool_typet(), loop_body->source_location),
-      loop_body->source_location));
+      side_effect_expr_nondett(bool_typet(), loop_body->source_location()),
+      loop_body->source_location()));
 
   program.destructive_insert(loop_body, looping_path);
 

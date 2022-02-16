@@ -360,6 +360,76 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
   return result;
 }
 
+bvt bv_utilst::saturating_add_sub(
+  const bvt &op0,
+  const bvt &op1,
+  bool subtract,
+  representationt rep)
+{
+  PRECONDITION(op0.size() == op1.size());
+  PRECONDITION(
+    rep == representationt::SIGNED || rep == representationt::UNSIGNED);
+
+  literalt carry_in = const_literal(subtract);
+  literalt carry_out;
+
+  bvt add_sub_result = op0;
+  bvt tmp_op1 = subtract ? inverted(op1) : op1;
+
+  adder(add_sub_result, tmp_op1, carry_in, carry_out);
+
+  bvt result;
+  result.reserve(add_sub_result.size());
+  if(rep == representationt::UNSIGNED)
+  {
+    // An unsigned overflow has occurred when carry_out is not equal to
+    // subtract: addition with a carry-out means an overflow beyond the maximum
+    // representable value, subtraction without a carry-out means an underflow
+    // below zero. For saturating arithmetic the former implies that all bits
+    // should be set to 1, in the latter case all bits should be set to zero.
+    for(const auto &literal : add_sub_result)
+    {
+      result.push_back(
+        subtract ? prop.land(literal, carry_out)
+                 : prop.lor(literal, carry_out));
+    }
+  }
+  else
+  {
+    // A signed overflow beyond the maximum representable value occurs when
+    // adding two positive numbers and the wrap-around result being negative, or
+    // when subtracting a negative from a positive number (and, again, the
+    // result being negative).
+    literalt overflow_to_max_int = prop.land(bvt{
+      !sign_bit(op0),
+      subtract ? sign_bit(op1) : !sign_bit(op1),
+      sign_bit(add_sub_result)});
+    // A signed underflow below the minimum representable value occurs when
+    // adding two negative numbers and arriving at a positive result, or
+    // subtracting a positive from a negative number (and, again, obtaining a
+    // positive wrap-around result).
+    literalt overflow_to_min_int = prop.land(bvt{
+      sign_bit(op0),
+      subtract ? !sign_bit(op1) : sign_bit(op1),
+      !sign_bit(add_sub_result)});
+
+    // set all bits except for the sign bit
+    PRECONDITION(!add_sub_result.empty());
+    for(std::size_t i = 0; i < add_sub_result.size() - 1; ++i)
+    {
+      const auto &literal = add_sub_result[i];
+      result.push_back(prop.land(
+        prop.lor(overflow_to_max_int, literal), !overflow_to_min_int));
+    }
+    // finally add the sign bit
+    result.push_back(prop.land(
+      prop.lor(overflow_to_min_int, add_sub_result.back()),
+      !overflow_to_max_int));
+  }
+
+  return result;
+}
+
 literalt bv_utilst::overflow_add(
   const bvt &op0, const bvt &op1, representationt rep)
 {

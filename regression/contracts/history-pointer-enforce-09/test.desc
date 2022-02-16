@@ -1,13 +1,13 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
-^\[foo.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --
 This test checks that history variables are supported for struct members.
-By using the --enforce-all-contracts flag, the post-condition (which contains
+By using the --enforce-contract flag, the post-condition (which contains
 the history variable) is asserted. In this case, this assertion should pass.

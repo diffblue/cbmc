@@ -5,7 +5,7 @@ activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED
-Trace for main\.assertion\.1:(\n.*){22}  assertion 4 \!= argc(\n.*){5}Trace for main\.assertion\.3:(\n.*){36}  assertion argc != 4(\n.*){5}Trace for main\.assertion\.4:(\n.*){50}  assertion argc \+ 1 != 5
+Trace for main\.assertion\.1:((\n.*){19}|(\n.*){22})  assertion 4 \!= argc(\n.*){5}Trace for main\.assertion\.3:((\n.*){33}|(\n.*){36})  assertion argc != 4(\n.*){5}Trace for main\.assertion\.4:((\n.*){47}|(\n.*){50})  assertion argc \+ 1 != 5
 \*\* 3 of 4 failed
 --
 ^warning: ignoring

@@ -47,7 +47,20 @@ NamespaceIndentation: None
 PenaltyBreakString: 10000
 PointerAlignment: Right
 ReflowComments: 'false'
-SortIncludes: 'true'
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '_class.h(>|")$'
+    Priority: 0
+  - Regex: '<util/'
+    Priority: 1
+  - Regex: '<goto-programs/'
+    Priority: 2
+  - Regex: '<.+/.+>'
+    Priority: 3
+  - Regex: '^"[^/]+"$'
+    Priority: 4
+  - Regex: '<[^/]+>'
+    Priority: 5
 SpaceAfterCStyleCast: 'false'
 SpaceBeforeAssignmentOperators: 'true'
 SpaceBeforeParens: Never
@@ -58,7 +71,7 @@ SpacesInCStyleCastParentheses: 'false'
 SpacesInContainerLiterals: 'false'
 SpacesInParentheses: 'false'
 SpacesInSquareBrackets: 'false'
-Standard: Cpp11
+Standard: c++11
 TabWidth: '2'
 UseTab: Never
 ---

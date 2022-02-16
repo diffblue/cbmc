@@ -50,13 +50,13 @@ TEST_CASE("object descriptor expression", "[unit][util][std_expr]")
   {
     const symbol_exprt s("array", array_type);
     // s[1]
-    const index_exprt index(s, from_integer(1, index_type()));
+    const index_exprt index(s, from_integer(1, c_index_type()));
 
     object_descriptor_exprt ode;
     ode.build(index, ns);
     REQUIRE(ode.root_object() == s);
     // in LP64 a signed int is 4 bytes
-    REQUIRE(simplify_expr(ode.offset(), ns) == from_integer(4, index_type()));
+    REQUIRE(simplify_expr(ode.offset(), ns) == from_integer(4, c_index_type()));
   }
 
   SECTION("object descriptors of member expressions")
@@ -65,12 +65,12 @@ TEST_CASE("object descriptor expression", "[unit][util][std_expr]")
     // s.foo
     const member_exprt member(s, "foo", array_type);
     // s.foo[1]
-    const index_exprt index(member, from_integer(1, index_type()));
+    const index_exprt index(member, from_integer(1, c_index_type()));
 
     object_descriptor_exprt ode;
     ode.build(index, ns);
     REQUIRE(ode.root_object() == s);
     // in LP64 a signed int is 4 bytes
-    REQUIRE(simplify_expr(ode.offset(), ns) == from_integer(4, index_type()));
+    REQUIRE(simplify_expr(ode.offset(), ns) == from_integer(4, c_index_type()));
   }
 }

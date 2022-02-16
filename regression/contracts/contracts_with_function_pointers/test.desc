@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-contract bar
+^EXIT=0$
+^SIGNAL=0$
+^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that \*return\_value\_baz is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC properly instrument functions with function pointers
+during contract enforcement.

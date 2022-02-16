@@ -123,11 +123,10 @@ void cone_of_influencet::cone_of_influence(
 
   if(i.is_assign())
   {
-    const code_assignt &assignment = i.get_assign();
     expr_sett lhs_syms;
     bool care=false;
 
-    gather_rvalues(assignment.lhs(), lhs_syms);
+    gather_rvalues(i.assign_lhs(), lhs_syms);
 
     for(const auto &expr : lhs_syms)
       if(curr.find(expr)!=curr.end())
@@ -136,11 +135,11 @@ void cone_of_influencet::cone_of_influence(
         break;
       }
 
-    next.erase(assignment.lhs());
+    next.erase(i.assign_lhs());
 
     if(care)
     {
-      gather_rvalues(assignment.rhs(), next);
+      gather_rvalues(i.assign_rhs(), next);
     }
   }
 }

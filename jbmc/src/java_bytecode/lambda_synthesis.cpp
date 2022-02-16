@@ -531,7 +531,7 @@ codet invokedynamic_synthetic_constructor(
     if(parameter.get_this())
       continue;
 
-    code_assignt assign_field(
+    code_frontend_assignt assign_field(
       member_exprt(deref_this, field_iterator->get_name(), parameter.type()),
       symbol_exprt(parameter.get_identifier(), parameter.type()));
     result.add(assign_field);
@@ -605,7 +605,7 @@ static symbol_exprt instantiate_new_object(
 
   // Instantiate the object:
   side_effect_exprt java_new_expr(ID_java_new, created_type, {});
-  result.add(code_assignt{new_instance_var, java_new_expr});
+  result.add(code_frontend_assignt{new_instance_var, java_new_expr});
 
   return new_instance_var;
 }

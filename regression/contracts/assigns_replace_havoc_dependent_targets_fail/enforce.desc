@@ -1,0 +1,9 @@
+CORE
+main_enforce.c
+--enforce-contract resize_vec _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Verifies the contract being replaced in `replace.desc`.

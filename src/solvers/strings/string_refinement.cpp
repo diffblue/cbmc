@@ -925,7 +925,8 @@ void string_refinementt::add_lemma(
     if(it->id() == ID_array && it->operands().empty())
     {
       it.mutate() = array_of_exprt(
-        from_integer(CHARACTER_FOR_UNKNOWN, it->type().subtype()),
+        from_integer(
+          CHARACTER_FOR_UNKNOWN, to_array_type(it->type()).subtype()),
         to_array_type(it->type()));
       it.next_sibling_or_parent();
     }
@@ -1030,7 +1031,7 @@ static optionalt<exprt> get_array(
   }
 
   const exprt arr_val = simplify_expr(super_get(arr), ns);
-  const typet char_type = arr.type().subtype();
+  const typet char_type = to_array_type(arr.type()).subtype();
   const typet &index_type = size.value().type();
 
   if(
@@ -1170,7 +1171,7 @@ static exprt substitute_array_access(
   const exprt &index,
   symbol_generatort &symbol_generator)
 {
-  const typet &char_type = array_expr.type().subtype();
+  const typet &char_type = array_expr.type().element_type();
   const exprt default_val = symbol_generator("out_of_bound_access", char_type);
   const interval_sparse_arrayt sparse_array(array_expr, default_val);
   return sparse_array.to_if_expression(index);

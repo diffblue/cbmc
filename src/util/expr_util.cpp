@@ -18,12 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_expr.h"
 #include "std_expr.h"
 
-bool is_lvalue(const exprt &expr)
+bool is_assignable(const exprt &expr)
 {
   if(expr.id() == ID_index)
-    return is_lvalue(to_index_expr(expr).array());
+    return is_assignable(to_index_expr(expr).array());
   else if(expr.id() == ID_member)
-    return is_lvalue(to_member_expr(expr).compound());
+    return is_assignable(to_member_expr(expr).compound());
   else if(expr.id() == ID_dereference)
     return true;
   else if(expr.id() == ID_symbol)
@@ -31,6 +31,7 @@ bool is_lvalue(const exprt &expr)
   else
     return false;
 }
+
 exprt make_binary(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
@@ -235,6 +236,7 @@ bool is_constantt::is_constant(const exprt &expr) const
     expr.id() == ID_typecast || expr.id() == ID_array_of ||
     expr.id() == ID_plus || expr.id() == ID_mult || expr.id() == ID_array ||
     expr.id() == ID_with || expr.id() == ID_struct || expr.id() == ID_union ||
+    expr.id() == ID_empty_union ||
     // byte_update works, byte_extract may be out-of-bounds
     expr.id() == ID_byte_update_big_endian ||
     expr.id() == ID_byte_update_little_endian)

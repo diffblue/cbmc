@@ -21,7 +21,7 @@ void goto_symext::symex_atomic_begin(statet &state)
   if(state.atomic_section_id != 0)
     throw incorrect_goto_program_exceptiont(
       "we don't support nesting of atomic sections",
-      state.source.pc->source_location);
+      state.source.pc->source_location());
 
   state.atomic_section_id=++atomic_section_counter;
   state.read_in_atomic_section.clear();
@@ -40,7 +40,7 @@ void goto_symext::symex_atomic_end(statet &state)
 
   if(state.atomic_section_id == 0)
     throw incorrect_goto_program_exceptiont(
-      "ATOMIC_END unmatched", state.source.pc->source_location);
+      "ATOMIC_END unmatched", state.source.pc->source_location());
 
   const unsigned atomic_section_id=state.atomic_section_id;
   state.atomic_section_id=0;

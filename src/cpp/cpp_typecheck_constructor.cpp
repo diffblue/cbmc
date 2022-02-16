@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
@@ -41,7 +43,7 @@ static void copy_parent(
   op1.get_sub().push_back(cpp_namet(arg_name, source_location));
   op1.add_source_location()=source_location;
 
-  code_assignt code(dereference_exprt(op0), op1);
+  code_frontend_assignt code(dereference_exprt(op0), op1);
   code.add_source_location() = source_location;
 
   block.operands().push_back(code);
@@ -88,7 +90,7 @@ static void copy_array(
   exprt &block)
 {
   // Build the index expression
-  const exprt constant = from_integer(i, index_type());
+  const exprt constant = from_integer(i, c_index_type());
 
   const cpp_namet array(member_base_name, source_location);
 
@@ -222,7 +224,7 @@ void cpp_typecheckt::default_cpctor(
       const cpp_namet cppname(mem_c.get_base_name(), source_location);
 
       const symbolt &virtual_table_symbol_type =
-        lookup(mem_c.type().subtype().get(ID_identifier));
+        lookup(to_pointer_type(mem_c.type()).base_type().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var = lookup(
         id2string(virtual_table_symbol_type.name) + "@" +
@@ -238,7 +240,7 @@ void cpp_typecheckt::default_cpctor(
       ptrmember.set(ID_component_name, mem_c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
-      code_assignt assign(ptrmember, address);
+      code_frontend_assignt assign(ptrmember, address);
       initializers.move_to_sub(assign);
       continue;
     }
@@ -674,7 +676,7 @@ void cpp_typecheckt::full_member_initialization(
       const cpp_namet cppname(c.get_base_name(), c.source_location());
 
       const symbolt &virtual_table_symbol_type =
-        lookup(c.type().subtype().get(ID_identifier));
+        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var  =
         lookup(id2string(virtual_table_symbol_type.name) + "@" +
@@ -690,7 +692,7 @@ void cpp_typecheckt::full_member_initialization(
       ptrmember.set(ID_component_name, c.get_name());
       ptrmember.operands().push_back(exprt("cpp-this"));
 
-      code_assignt assign(ptrmember, address);
+      code_frontend_assignt assign(ptrmember, address);
       final_initializers.move_to_sub(assign);
       continue;
     }
@@ -783,8 +785,12 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
     if(!is_reference(parameter1_type))
       continue;
 
-    if(parameter1_type.subtype().get(ID_identifier)!=symbol.name)
+    if(
+      to_reference_type(parameter1_type).base_type().get(ID_identifier) !=
+      symbol.name)
+    {
       continue;
+    }
 
     bool defargs=true;
     for(std::size_t i=2; i<parameters.size(); i++)
@@ -833,7 +839,9 @@ bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
     if(!is_reference(arg1_type))
       continue;
 
-    if(arg1_type.subtype().get(ID_identifier)!=symbol.name)
+    if(
+      to_reference_type(arg1_type).base_type().get(ID_identifier) !=
+      symbol.name)
       continue;
 
     return true;

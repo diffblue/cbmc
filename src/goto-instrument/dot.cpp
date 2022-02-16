@@ -144,7 +144,8 @@ void dott::write_dot_subgraph(
         tmp.str("Atomic End");
       else if(it->is_function_call())
       {
-        const auto &function_call = it->get_function_call();
+        const code_function_callt function_call(
+          it->call_lhs(), it->call_function(), it->call_arguments());
         std::string t = from_expr(ns, function_id, function_call);
         while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);

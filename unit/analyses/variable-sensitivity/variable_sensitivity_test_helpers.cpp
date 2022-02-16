@@ -301,7 +301,9 @@ void EXPECT_INDEX(
   namespacet &ns)
 {
   auto type = signedbv_typet(32);
-  auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
+  auto index_expr = index_exprt(
+    exprt(ID_nil, array_typet(typet(), nil_exprt())),
+    from_integer(index, type));
   auto expr = result->expression_transform(index_expr, {}, environment, ns)
                 ->to_constant();
 
@@ -320,7 +322,9 @@ void EXPECT_INDEX(
   namespacet &ns)
 {
   auto type = signedbv_typet(32);
-  auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
+  auto index_expr = index_exprt(
+    exprt(ID_nil, array_typet(typet(), nil_exprt())),
+    from_integer(index, type));
   auto value =
     as_value_set(result->expression_transform(index_expr, {}, environment, ns));
 
@@ -340,7 +344,9 @@ void EXPECT_INDEX_TOP(
   namespacet &ns)
 {
   auto type = signedbv_typet(32);
-  auto index_expr = index_exprt(nil_exprt(), from_integer(index, type));
+  auto index_expr = index_exprt(
+    exprt(ID_nil, array_typet(typet(), nil_exprt())),
+    from_integer(index, type));
   auto value = result->expression_transform(index_expr, {}, environment, ns);
 
   INFO("Expect array[" + std::to_string(index) + "] to be TOP");

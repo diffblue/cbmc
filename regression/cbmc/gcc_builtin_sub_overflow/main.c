@@ -1,6 +1,20 @@
 #include <assert.h>
 #include <limits.h>
 
+#ifndef __GNUC__
+_Bool __builtin_sub_overflow();
+_Bool __builtin_sub_overflow_p();
+_Bool __builtin_ssub_overflow(int, int, int *);
+_Bool __builtin_ssubl_overflow(long, long, long *);
+_Bool __builtin_ssubll_overflow(long long, long long, long long *);
+_Bool __builtin_usub_overflow(unsigned int, unsigned int, unsigned int *);
+_Bool __builtin_usubl_overflow(unsigned long, unsigned long, unsigned long *);
+_Bool __builtin_usubll_overflow(
+  unsigned long long,
+  unsigned long long,
+  unsigned long long *);
+#endif
+
 void check_int(void)
 {
   int result;
@@ -30,7 +44,16 @@ void check_long_long(void)
   assert(result == 0ll);
   assert(__builtin_ssubll_overflow(LLONG_MIN, 1ll, &result));
   assert(!__builtin_ssubll_overflow(LLONG_MIN / 2ll, LLONG_MAX / 2ll, &result));
+#if !defined(_WIN32)
+  // Visual Studio x86/32 bit has an 8-byte "long long" type with corresponding
+  // LLONG_MAX and LLONG_MIN constants (9223372036854775807i64 and
+  // -9223372036854775807i64 - 1, respectively), but compiles these to 32-bit
+  // values. The result is that -LLONG_MAX wraps around to the 32-bit value of
+  // -LLONG_MIN (-2147483648), with the consequence that result == LLONG_MIN
+  // after the above subtraction. Therefore, disable this assertion on Visual
+  // Studio x86/32 bit.
   assert(result - 1ll == LLONG_MIN);
+#endif
   assert(0 && "reachability");
 }
 

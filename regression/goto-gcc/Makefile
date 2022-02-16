@@ -9,11 +9,16 @@ test:
 tests.log: ../test.pl
 
 else
+ifeq ($(BUILD_ENV_),OSX)
+  not_gnu_ld = -X gnu-ld-only
+endif
 test: ../../src/goto-cc/goto-gcc
-	@../test.pl -e -p -c ../../../src/goto-cc/goto-gcc
+	@PATH=../../../scripts:$$PATH \
+		../test.pl -e -p -c ../../../src/goto-cc/goto-gcc $(not_gnu_ld)
 
 tests.log: ../test.pl ../../src/goto-cc/goto-gcc
-	@../test.pl -e -p -c ../../../src/goto-cc/goto-gcc
+	@PATH=../../../scripts:$$PATH \
+		../test.pl -e -p -c ../../../src/goto-cc/goto-gcc $(not_gnu_ld)
 
 ../../src/goto-cc/goto-gcc: ../../src/goto-cc/goto-cc
 	@ln -sf goto-cc ../../src/goto-cc/goto-gcc

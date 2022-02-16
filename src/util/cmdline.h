@@ -80,6 +80,8 @@ public:
   const std::list<std::string> &get_values(const std::string &option) const;
   const std::list<std::string> &get_values(char option) const;
 
+  /// Collect all occurrences of option \p option and split their values on each
+  /// comma, merging them into a single list of values.
   std::list<std::string> get_comma_separated_values(const char *option) const;
 
   virtual bool isset(char option) const;

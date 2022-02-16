@@ -56,7 +56,8 @@ inline bool is_c_integral_type(const typet &type)
 /// of the pointer has been a char type in the c program.
 inline bool is_c_char_pointer_type(const typet &type)
 {
-  return type.id() == ID_pointer && is_c_char_type(type.subtype());
+  return type.id() == ID_pointer &&
+         is_c_char_type(to_pointer_type(type).base_type());
 }
 
 /// This function checks, whether type is a pointer and the target type
@@ -64,7 +65,8 @@ inline bool is_c_char_pointer_type(const typet &type)
 /// is_c_int_derivate answers is used for checking the int type.
 inline bool is_c_integral_pointer_type(const typet &type)
 {
-  return type.id() == ID_pointer && is_c_integral_type(type.subtype());
+  return type.id() == ID_pointer &&
+         is_c_integral_type(to_pointer_type(type).base_type());
 }
 
 /// This function checks, whether the type

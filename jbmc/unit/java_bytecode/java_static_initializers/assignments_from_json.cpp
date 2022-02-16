@@ -7,13 +7,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include <java_bytecode/assignments_from_json.h>
-
 #include <java_bytecode/ci_lazy_methods_needed.h>
 #include <java_bytecode/java_bytecode_convert_class.h>
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
+
 #include <testing-utils/expr_query.h>
 #include <testing-utils/use_catch.h>
+
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/arith_tools.h>
 #include <util/json.h>
 #include <util/symbol_table.h>
@@ -130,7 +133,7 @@ SCENARIO(
     {
       REQUIRE(
         make_query(block)[3].as<code_assignt>()[1].get().type() ==
-        test_class_type.subtype());
+        test_class_type.base_type());
     }
     THEN("The instruction assigns the field to 42")
     {
@@ -233,7 +236,7 @@ SCENARIO(
     {
       REQUIRE(
         make_query(block)[4].as<code_assignt>()[0].get().type() ==
-        test_class_type.subtype());
+        test_class_type.base_type());
     }
     THEN("The instruction allocates the array field, with a size of exactly 1")
     {
@@ -367,7 +370,7 @@ SCENARIO(
     {
       REQUIRE(
         make_query(block)[5].as<code_assignt>()[0].get().type() ==
-        test_class_type.subtype());
+        test_class_type.base_type());
     }
     THEN("The instruction makes the length nondet")
     {

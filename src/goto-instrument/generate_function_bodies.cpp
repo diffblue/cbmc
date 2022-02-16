@@ -79,7 +79,7 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
+      instruction->source_location_nonconst() = function_symbol.location;
       return instruction;
     };
     add_instruction(goto_programt::make_assumption(false_exprt()));
@@ -99,8 +99,8 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
-      instruction->source_location.set_function(function_name);
+      instruction->source_location_nonconst() = function_symbol.location;
+      instruction->source_location_nonconst().set_function(function_name);
       return instruction;
     };
     auto assert_instruction =
@@ -109,8 +109,10 @@ protected:
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
                    << format(assert_instruction->get_condition());
-    assert_instruction->source_location.set_comment(comment_stream.str());
-    assert_instruction->source_location.set_property_class(ID_assertion);
+    assert_instruction->source_location_nonconst().set_comment(
+      comment_stream.str());
+    assert_instruction->source_location_nonconst().set_property_class(
+      ID_assertion);
     add_instruction(goto_programt::make_end_function());
   }
 };
@@ -128,8 +130,8 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
-      instruction->source_location.set_function(function_name);
+      instruction->source_location_nonconst() = function_symbol.location;
+      instruction->source_location_nonconst().set_function(function_name);
       return instruction;
     };
     auto assert_instruction =
@@ -138,8 +140,10 @@ protected:
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
                    << format(assert_instruction->get_condition());
-    assert_instruction->source_location.set_comment(comment_stream.str());
-    assert_instruction->source_location.set_property_class(ID_assertion);
+    assert_instruction->source_location_nonconst().set_comment(
+      comment_stream.str());
+    assert_instruction->source_location_nonconst().set_property_class(
+      ID_assertion);
     add_instruction(goto_programt::make_assumption(false_exprt()));
     add_instruction(goto_programt::make_end_function());
   }
@@ -266,7 +270,7 @@ protected:
     // NOLINTNEXTLINE
     auto add_instruction = [&](goto_programt::instructiont &&i) {
       auto instruction = function.body.add(std::move(i));
-      instruction->source_location = function_symbol.location;
+      instruction->source_location_nonconst() = function_symbol.location;
       return instruction;
     };
 
@@ -276,7 +280,9 @@ protected:
       const symbolt &parameter_symbol = ns.lookup(parameter);
       if(
         parameter_symbol.type.id() == ID_pointer &&
-        !parameter_symbol.type.subtype().get_bool(ID_C_constant) &&
+        !to_pointer_type(parameter_symbol.type)
+           .base_type()
+           .get_bool(ID_C_constant) &&
         should_havoc_param(id2string(parameter_symbol.base_name), i))
       {
         auto goto_instruction =
@@ -285,7 +291,8 @@ protected:
             null_pointer_exprt(to_pointer_type(parameter_symbol.type)))));
 
         dereference_exprt dereference_expr(
-          parameter_symbol.symbol_expr(), parameter_symbol.type.subtype());
+          parameter_symbol.symbol_expr(),
+          to_pointer_type(parameter_symbol.type).base_type());
 
         goto_programt dest;
         havoc_expr_rec(
@@ -353,7 +360,8 @@ protected:
       exprt return_expr =
         typecast_exprt::conditional_cast(aux_symbol.symbol_expr(), return_type);
 
-      add_instruction(goto_programt::make_return(code_returnt(return_expr)));
+      add_instruction(
+        goto_programt::make_set_return_value(std::move(return_expr)));
 
       add_instruction(goto_programt::make_dead(aux_symbol.symbol_expr()));
     }

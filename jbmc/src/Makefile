@@ -61,7 +61,18 @@ setup-submodules:
 dist: setup-submodules all
 	mkdir -p $(ROOT)dist/lib
 	cp ../lib/java-models-library/target/core-models.jar $(ROOT)dist/lib
+	cp ../lib/java-models-library/target/cprover-api.jar $(ROOT)dist/lib
 	mkdir -p $(ROOT)dist/bin
 	cp jbmc/jbmc $(ROOT)dist/bin
 	cp janalyzer/janalyzer $(ROOT)dist/bin
 	cp jdiff/jdiff $(ROOT)dist/bin
+
+.PHONY: install
+install: setup-submodules all
+	$(MAKE) $(MAKEARGS) -C $(CPROVER_DIR)/src install
+	cp ../lib/java-models-library/target/core-models.jar $(PREFIX)/lib/
+	cp ../lib/java-models-library/target/cprover-api.jar $(PREFIX)/lib/
+	cp jbmc/jbmc $(PREFIX)/bin/
+	cp janalyzer/janalyzer $(PREFIX)/bin/
+	cp jdiff/jdiff $(PREFIX)/bin/
+	cp ../../doc/man/j* $(PREFIX)/doc/man/man1/

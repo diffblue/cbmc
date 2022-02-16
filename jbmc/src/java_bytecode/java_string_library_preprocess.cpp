@@ -16,9 +16,9 @@ Date:   April 2017
 ///   java standard library. In particular methods from java.lang.String,
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
+#include <goto-programs/allocate_objects.h>
 #include <goto-programs/class_identifier.h>
 
-#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
@@ -64,8 +64,8 @@ bool java_string_library_preprocesst::is_java_string_pointer_type(
   if(type.id()==ID_pointer)
   {
     const pointer_typet &pt=to_pointer_type(type);
-    const typet &subtype=pt.subtype();
-    return is_java_string_type(subtype);
+    const typet &base_type = pt.base_type();
+    return is_java_string_type(base_type);
   }
   return false;
 }
@@ -95,8 +95,8 @@ bool java_string_library_preprocesst::is_java_string_builder_pointer_type(
   if(type.id()==ID_pointer)
   {
     const pointer_typet &pt=to_pointer_type(type);
-    const typet &subtype=pt.subtype();
-    return is_java_string_builder_type(subtype);
+    const typet &base_type = pt.base_type();
+    return is_java_string_builder_type(base_type);
   }
   return false;
 }
@@ -118,8 +118,8 @@ bool java_string_library_preprocesst::is_java_string_buffer_pointer_type(
   if(type.id()==ID_pointer)
   {
     const pointer_typet &pt=to_pointer_type(type);
-    const typet &subtype=pt.subtype();
-    return is_java_string_buffer_type(subtype);
+    const typet &base_type = pt.base_type();
+    return is_java_string_buffer_type(base_type);
   }
   return false;
 }
@@ -141,8 +141,8 @@ bool java_string_library_preprocesst::is_java_char_sequence_pointer_type(
   if(type.id()==ID_pointer)
   {
     const pointer_typet &pt=to_pointer_type(type);
-    const typet &subtype=pt.subtype();
-    return is_java_char_sequence_type(subtype);
+    const typet &base_type = pt.base_type();
+    return is_java_char_sequence_type(base_type);
   }
   return false;
 }
@@ -164,8 +164,8 @@ bool java_string_library_preprocesst::is_java_char_array_pointer_type(
   if(type.id()==ID_pointer)
   {
     const pointer_typet &pt=to_pointer_type(type);
-    const typet &subtype=pt.subtype();
-    return is_java_char_array_type(subtype);
+    const typet &base_type = pt.base_type();
+    return is_java_char_array_type(base_type);
   }
   return false;
 }

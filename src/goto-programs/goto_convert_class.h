@@ -16,14 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <unordered_set>
 
-#include <util/allocate_objects.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/replace_expr.h>
 #include <util/std_code.h>
 
-#include "goto_program.h"
+#include "allocate_objects.h"
 #include "destructor_tree.h"
+#include "goto_program.h"
 
 class side_effect_expr_overflowt;
 
@@ -203,7 +203,8 @@ protected:
     const exprt &lhs,
     const symbol_exprt &function,
     const exprt::operandst &arguments,
-    goto_programt &dest);
+    goto_programt &dest,
+    const irep_idt &mode);
 
   virtual void do_function_call_symbol(const symbolt &)
   {
@@ -222,9 +223,9 @@ protected:
     const code_blockt &code,
     goto_programt &dest,
     const irep_idt &mode);
-  void convert_decl(
-    const code_declt &code,
-    goto_programt &dest,
+  void convert_frontend_decl(
+    const code_frontend_declt &,
+    goto_programt &,
     const irep_idt &mode);
   void convert_decl_type(const codet &code, goto_programt &dest);
   void convert_expression(
@@ -267,7 +268,7 @@ protected:
     goto_programt &dest,
     const irep_idt &mode);
   void convert_return(
-    const code_returnt &code,
+    const code_frontend_returnt &,
     goto_programt &dest,
     const irep_idt &mode);
   void convert_continue(
@@ -672,6 +673,12 @@ protected:
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
+  void do_havoc_slice(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode);
 
   exprt get_array_argument(const exprt &src);
 };

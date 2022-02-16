@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-all-calls-with-contracts _ --pointer-primitive-check
+--replace-call-with-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
 ^\[main.assertion.1\] line \d+ assertion b\[0\] == 'a': FAILURE$
 ^\[main.assertion.2\] line \d+ assertion b\[1\] == 'b': FAILURE$
 ^\[main.assertion.3\] line \d+ assertion b\[2\] == 'c': FAILURE$

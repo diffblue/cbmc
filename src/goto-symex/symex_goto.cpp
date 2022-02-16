@@ -9,11 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#include "goto_symex.h"
-#include "goto_symex_is_constant.h"
-
-#include <algorithm>
-
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
@@ -22,10 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
+#include <langapi/language_util.h>
 #include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/value_set_dereference.h>
 
+#include "goto_symex.h"
+#include "goto_symex_is_constant.h"
 #include "path_storage.h"
+
+#include <algorithm>
 
 void goto_symext::apply_goto_condition(
   goto_symex_statet &current_state,
@@ -279,10 +279,19 @@ void goto_symext::symex_goto(statet &state)
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
-      if(new_guard.is_true())
-        symex_assume_l2(state, false_exprt());
-      else
-        symex_assume_l2(state, not_exprt(new_guard));
+      exprt negated_guard = not_exprt{new_guard};
+      do_simplify(negated_guard);
+      log.statistics() << "replacing self-loop at "
+                       << state.source.pc->source_location() << " by assume("
+                       << from_expr(ns, state.source.function_id, negated_guard)
+                       << ")" << messaget::eom;
+      if(symex_config.unwinding_assertions)
+      {
+        log.warning()
+          << "no unwinding assertion will be generated for self-loop at "
+          << state.source.pc->source_location() << messaget::eom;
+      }
+      symex_assume_l2(state, negated_guard);
 
       // next instruction
       symex_transition(state);
@@ -385,13 +394,13 @@ void goto_symext::symex_goto(statet &state)
     new_state_pc = state_pc;
     state_pc = tmp;
 
-    log.debug() << "Resuming from jump target '" << state_pc->source_location
+    log.debug() << "Resuming from jump target '" << state_pc->source_location()
                 << "'" << log.eom;
   }
   else if(state.has_saved_next_instruction)
   {
     log.debug() << "Resuming from next instruction '"
-                << state_pc->source_location << "'" << log.eom;
+                << state_pc->source_location() << "'" << log.eom;
   }
   else if(symex_config.doing_path_exploration)
   {
@@ -410,10 +419,10 @@ void goto_symext::symex_goto(statet &state)
     // so let its truth value for `backwards` be the same as ours for `forward`.
 
     log.debug() << "Saving next instruction '"
-                << next_instruction.state.saved_target->source_location << "'"
+                << next_instruction.state.saved_target->source_location() << "'"
                 << log.eom;
     log.debug() << "Saving jump target '"
-                << jump_target.state.saved_target->source_location << "'"
+                << jump_target.state.saved_target->source_location() << "'"
                 << log.eom;
     path_storage.push(next_instruction);
     path_storage.push(jump_target);
@@ -675,7 +684,7 @@ void goto_symext::merge_goto(
   if(state.atomic_section_id != goto_state.atomic_section_id)
     throw incorrect_goto_program_exceptiont(
       "atomic sections differ across branches",
-      state.source.pc->source_location);
+      state.source.pc->source_location());
 
   // Merge guards. Don't write this to `state` yet because we might move
   // goto_state over it below.

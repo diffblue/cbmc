@@ -138,12 +138,13 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 {
   assert(target!=goto_program.instructions.end());
 
-  if(target->type!=ASSERT &&
-     !target->source_location.get_comment().empty())
+  if(
+    target->type() != ASSERT &&
+    !target->source_location().get_comment().empty())
   {
     dest.add(code_skipt());
     dest.statements().back().add_source_location().set_comment(
-      target->source_location.get_comment());
+      target->source_location().get_comment());
   }
 
   // try do-while first
@@ -159,7 +160,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 
   convert_labels(target, dest);
 
-  switch(target->type)
+  switch(target->type())
   {
     case SKIP:
     case LOCATION:
@@ -170,7 +171,11 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return target;
 
     case FUNCTION_CALL:
-      dest.add(target->get_function_call());
+    {
+      code_function_callt call(
+        target->call_lhs(), target->call_function(), target->call_arguments());
+      dest.add(call);
+    }
       return target;
 
     case OTHER:
@@ -190,7 +195,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       system_headers.insert("assert.h");
       dest.add(code_assertt(target->get_condition()));
       dest.statements().back().add_source_location().set_comment(
-        target->source_location.get_comment());
+        target->source_location().get_comment());
       return target;
 
     case ASSUME:
@@ -248,7 +253,7 @@ void goto_program2codet::convert_labels(
     std::stringstream label;
     label << CPROVER_PREFIX "DUMP_L" << target->target_number;
     code_labelt l(label.str(), code_blockt());
-    l.add_source_location()=target->source_location;
+    l.add_source_location() = target->source_location();
     target_label=l.get_label();
     latest_block->add(std::move(l));
     latest_block =
@@ -271,7 +276,7 @@ void goto_program2codet::convert_labels(
     labels_in_use.insert(*it);
 
     code_labelt l(*it, code_blockt());
-    l.add_source_location()=target->source_location;
+    l.add_source_location() = target->source_location();
     latest_block->add(std::move(l));
     latest_block =
       &to_code_block(to_code_label(latest_block->statements().back()).code());
@@ -400,9 +405,9 @@ void goto_program2codet::convert_assign_rec(
     forall_operands(it, assign.rhs())
     {
       index_exprt index(
-          assign.lhs(),
-          from_integer(i++, index_type()),
-          type.subtype());
+        assign.lhs(),
+        from_integer(i++, type.index_type()),
+        type.element_type());
       convert_assign_rec(code_assignt(index, *it), dest);
     }
   }
@@ -445,7 +450,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  code_declt d = code_declt{target->decl_symbol()};
+  code_frontend_declt d = code_frontend_declt{target->decl_symbol()};
   symbol_exprt &symbol = d.symbol();
 
   goto_programt::const_targett next=target;
@@ -465,8 +470,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
      !next->is_target() &&
      (next->is_assign() || next->is_function_call()))
   {
-    exprt lhs =
-      next->is_assign() ? next->assign_lhs() : next->get_function_call().lhs();
+    exprt lhs = next->is_assign() ? next->assign_lhs() : next->call_lhs();
     if(lhs==symbol &&
        va_list_expr.find(lhs)==va_list_expr.end())
     {
@@ -477,9 +481,11 @@ goto_programt::const_targett goto_program2codet::convert_decl(
       else
       {
         // could hack this by just erasing the first operand
-        const code_function_callt &f = next->get_function_call();
         side_effect_expr_function_callt call(
-          f.function(), f.arguments(), typet{}, source_locationt{});
+          next->call_function(),
+          next->call_arguments(),
+          typet{},
+          source_locationt{});
         d.copy_to_operands(call);
       }
 
@@ -760,10 +766,9 @@ bool goto_program2codet::set_block_end_points(
       continue;
 
     // compute the block that belongs to this case
-    for(goto_programt::const_targett case_end=it->case_start;
-        case_end!=goto_program.instructions.end() &&
-        case_end->type!=END_FUNCTION &&
-        case_end!=upper_bound;
+    for(goto_programt::const_targett case_end = it->case_start;
+        case_end != goto_program.instructions.end() &&
+        case_end->type() != END_FUNCTION && case_end != upper_bound;
         ++case_end)
     {
       const auto &case_end_node = dominators.get_node(case_end);
@@ -1261,7 +1266,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
         labels_in_use.insert(*it);
 
         code_labelt l(*it, std::move(b));
-        l.add_source_location()=target->source_location;
+        l.add_source_location() = target->source_location();
         b = std::move(l);
       }
 
@@ -1299,15 +1304,16 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     thread_start->call_arguments().size() == 1 &&
     after_thread_start == thread_end)
   {
-    const code_function_callt &cf = thread_start->get_function_call();
-
     system_headers.insert("pthread.h");
 
     const null_pointer_exprt n(pointer_type(empty_typet()));
     dest.add(code_function_callt(
-      cf.lhs(),
+      thread_start->call_lhs(),
       symbol_exprt("pthread_create", code_typet({}, empty_typet())),
-      {n, n, cf.function(), cf.arguments().front()}));
+      {n,
+       n,
+       thread_start->call_function(),
+       thread_start->call_arguments().front()}));
 
     return thread_end;
   }
@@ -1326,7 +1332,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       labels_in_use.insert(*it);
 
       code_labelt l(*it, std::move(b));
-      l.add_source_location()=target->source_location;
+      l.add_source_location() = target->source_location();
       b = std::move(l);
     }
 
@@ -1388,7 +1394,7 @@ void goto_program2codet::add_local_types(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_array)
   {
-    add_local_types(type.subtype());
+    add_local_types(to_type_with_subtype(type).subtype());
   }
 }
 
@@ -1598,7 +1604,9 @@ void goto_program2codet::remove_const(typet &type)
       remove_const(it->type());
   }
   else if(type.id() == ID_c_bit_field)
-    to_c_bit_field_type(type).subtype().remove(ID_C_constant);
+  {
+    to_c_bit_field_type(type).underlying_type().remove(ID_C_constant);
+  }
 }
 
 static bool has_labels(const codet &code)
@@ -1944,6 +1952,6 @@ void goto_program2codet::copy_source_location(
 {
   if(src->get_code().source_location().is_not_nil())
     dst.add_source_location() = src->get_code().source_location();
-  else if(src->source_location.is_not_nil())
-    dst.add_source_location() = src->source_location;
+  else if(src->source_location().is_not_nil())
+    dst.add_source_location() = src->source_location();
 }

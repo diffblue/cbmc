@@ -343,8 +343,8 @@ jobs:
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=3
 
-  check-macos-10_15-cmake-clang:
-    runs-on: macos-10.15
+  check-macos-11-cmake-clang:
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
         with:
@@ -426,8 +426,8 @@ jobs:
           Set-Location build
           ctest -V -L CORE -C Release . -j2
 
-  check-vs-2019-make-build-and-test:
-    runs-on: windows-2019
+  check-vs-2022-make-build-and-test:
+    runs-on: windows-2022
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -482,6 +482,7 @@ jobs:
       - name: Run CBMC and JBMC unit tests
         run: |
           make CXX=clcache BUILD_ENV=MSVC -C unit      test
+          make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression test
@@ -501,8 +502,8 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-format-7
-      - name: Check updated lines of code match clang-format-7 style
+          sudo apt-get install --no-install-recommends -yq clang-format
+      - name: Check updated lines of code match clang-format-10 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
           MERGE_BRANCH: ${{ github.ref }}
@@ -699,16 +700,13 @@ jobs:
         run: cmake --build build -- -j2
       - name: Print ccache stats
         run: ccache -s
-      - name: Run CTest
-        run: cmake --build build --target coverage -- -j2
-      - name: Collect coverage statistics
+      - name: Run CTest and collect coverage statistics
         run: |
-          lcov --capture --directory build --output-file lcov.info
-          lcov --remove lcov.info '/usr/*' --output-file lcov.info
+          echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
+          cmake --build build --target coverage -- -j2
       - name: Upload coverage statistics to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./lcov.info
+          files: build/html/coverage.info
           fail_ci_if_error: true
           verbose: true

@@ -58,8 +58,9 @@ void undefined_function_abort_path(goto_modelt &goto_model)
       if(entry->second.body_available())
         continue;
 
-      ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
-      ins.source_location.set_comment(
+      ins =
+        goto_programt::make_assumption(false_exprt(), ins.source_location());
+      ins.source_location_nonconst().set_comment(
         "'" + id2string(function_identifier) + "' is undefined");
     }
   }

@@ -304,21 +304,23 @@ bool generate_ansi_c_start_function(
       const symbolt &argv_symbol=ns.lookup("argv'");
 
       {
-        // assume argc is at least one
-        exprt one=from_integer(1, argc_symbol.type);
+        // Assume argc is at least zero. Note that we don't assume it's
+        // at least one, since this isn't guaranteed, as exemplified by
+        // https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkit.txt
+        // The C standard only guarantees "The value of argc shall be
+        // nonnegative." and "argv[argc] shall be a null pointer."
+        exprt zero = from_integer(0, argc_symbol.type);
 
         binary_relation_exprt ge(
-          argc_symbol.symbol_expr(), ID_ge, std::move(one));
+          argc_symbol.symbol_expr(), ID_ge, std::move(zero));
 
         init_code.add(code_assumet(std::move(ge)));
       }
 
+      if(config.ansi_c.max_argc.has_value())
       {
-        // assume argc is at most MAX/8-1
-        mp_integer upper_bound=
-          power(2, config.ansi_c.int_width-4);
-
-        exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
+        exprt bound_expr =
+          from_integer(*config.ansi_c.max_argc, argc_symbol.type);
 
         binary_relation_exprt le(
           argc_symbol.symbol_expr(), ID_le, std::move(bound_expr));
@@ -403,7 +405,7 @@ bool generate_ansi_c_start_function(
       {
         // assign argv[argc] to NULL
         const null_pointer_exprt null(
-          to_pointer_type(argv_symbol.type.subtype()));
+          to_pointer_type(to_array_type(argv_symbol.type).element_type()));
 
         index_exprt index_expr(
           argv_symbol.symbol_expr(), argc_symbol.symbol_expr());
@@ -411,7 +413,7 @@ bool generate_ansi_c_start_function(
         // disable bounds check on that one
         index_expr.set(ID_C_bounds_check, false);
 
-        init_code.add(code_assignt(index_expr, null));
+        init_code.add(code_frontend_assignt(index_expr, null));
       }
 
       if(parameters.size()==3)
@@ -420,7 +422,8 @@ bool generate_ansi_c_start_function(
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp[envp_size] is NULL
-        null_pointer_exprt null(to_pointer_type(envp_symbol.type.subtype()));
+        null_pointer_exprt null(
+          to_pointer_type(to_array_type(envp_symbol.type).element_type()));
 
         index_exprt index_expr(
           envp_symbol.symbol_expr(), envp_size_symbol.symbol_expr());
@@ -448,7 +451,7 @@ bool generate_ansi_c_start_function(
 
         {
           index_exprt index_expr(
-            argv_symbol.symbol_expr(), from_integer(0, index_type()));
+            argv_symbol.symbol_expr(), from_integer(0, c_index_type()));
 
           // disable bounds check on that one
           index_expr.set(ID_C_bounds_check, false);
@@ -466,7 +469,7 @@ bool generate_ansi_c_start_function(
           const symbolt &envp_symbol=ns.lookup("envp'");
 
           index_exprt index_expr(
-            envp_symbol.symbol_expr(), from_integer(0, index_type()));
+            envp_symbol.symbol_expr(), from_integer(0, c_index_type()));
 
           const pointer_typet &pointer_type =
             to_pointer_type(parameters[2].type());
@@ -480,15 +483,19 @@ bool generate_ansi_c_start_function(
     {
       const namespacet ns{symbol_table};
       const std::string main_signature = type2c(symbol.type, ns);
-      throw invalid_source_file_exceptiont{
-        "'main' with signature '" + main_signature +
-        "' found,"
-        " but expecting one of:\n"
-        "   int main(void)\n"
-        "   int main(int argc, char *argv[])\n"
-        "   int main(int argc, char *argv[], char *envp[])\n"
-        "If this is a non-standard main entry point please provide a custom\n"
-        "entry function and point to it via cbmc --function instead"};
+      messaget message(message_handler);
+      message.error().source_location = symbol.location;
+      message.error() << "'main' with signature '" << main_signature
+                      << "' found,"
+                      << " but expecting one of:\n"
+                      << "   int main(void)\n"
+                      << "   int main(int argc, char *argv[])\n"
+                      << "   int main(int argc, char *argv[], char *envp[])\n"
+                      << "If this is a non-standard main entry point please "
+                         "provide a custom\n"
+                      << "entry function and use --function instead"
+                      << messaget::eom;
+      return true;
     }
   }
   else
@@ -503,6 +510,26 @@ bool generate_ansi_c_start_function(
   // TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT
 
   record_function_outputs(symbol, init_code, symbol_table);
+
+  // now call destructor functions (a GCC extension)
+
+  for(const auto &symbol_table_entry : symbol_table.symbols)
+  {
+    const symbolt &symbol = symbol_table_entry.second;
+
+    if(symbol.type.id() != ID_code)
+      continue;
+
+    const code_typet &code_type = to_code_type(symbol.type);
+    if(
+      code_type.return_type().id() == ID_destructor &&
+      code_type.parameters().empty())
+    {
+      code_function_callt destructor_call(symbol.symbol_expr());
+      destructor_call.add_source_location() = symbol.location;
+      init_code.add(std::move(destructor_call));
+    }
+  }
 
   // add the entry point symbol
   symbolt new_symbol;

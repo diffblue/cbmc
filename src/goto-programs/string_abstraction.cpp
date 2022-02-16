@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
+#include <util/std_code.h>
 #include <util/string_constant.h>
 
 #include "goto_model.h"
@@ -67,28 +68,18 @@ static inline bool is_ptr_argument(const typet &type)
 }
 
 void string_abstraction(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  goto_functionst &dest)
-{
-  string_abstractiont string_abstraction(symbol_table, message_handler);
-  string_abstraction(dest);
-}
-
-void string_abstraction(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  string_abstractiont{goto_model.symbol_table, message_handler}.apply(
-    goto_model);
+  string_abstractiont{goto_model, message_handler}.apply();
 }
 
 string_abstractiont::string_abstractiont(
-  symbol_tablet &_symbol_table,
+  goto_modelt &goto_model,
   message_handlert &_message_handler)
   : sym_suffix("#str$fcn"),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
+    goto_model(goto_model),
+    ns(goto_model.symbol_table),
     temporary_counter(0),
     message_handler(_message_handler)
 {
@@ -99,7 +90,23 @@ string_abstractiont::string_abstractiont(
   s.components()[1].set_pretty_name("length");
   s.components()[2].set_pretty_name("size");
 
-  string_struct = std::move(s);
+  symbolt &struct_symbol = get_fresh_aux_symbol(
+    s,
+    "tag-",
+    "string_struct",
+    source_locationt{},
+    ID_C,
+    ns,
+    goto_model.symbol_table);
+  struct_symbol.is_type = true;
+  struct_symbol.is_lvalue = false;
+  struct_symbol.is_state_var = false;
+  struct_symbol.is_thread_local = true;
+  struct_symbol.is_file_local = true;
+  struct_symbol.is_auxiliary = false;
+  struct_symbol.is_macro = true;
+
+  string_struct = struct_tag_typet{struct_symbol.name};
 }
 
 typet string_abstractiont::build_type(whatt what)
@@ -118,13 +125,11 @@ typet string_abstractiont::build_type(whatt what)
   return type;
 }
 
-void string_abstractiont::apply(goto_modelt &goto_model)
+void string_abstractiont::apply()
 {
-  operator()(goto_model.goto_functions);
-}
+  goto_functionst &dest = goto_model.goto_functions;
+  symbol_tablet &symbol_table = goto_model.symbol_table;
 
-void string_abstractiont::operator()(goto_functionst &dest)
-{
   // iterate over all previously known symbols as the body of the loop modifies
   // the symbol table and can thus invalidate iterators
   for(auto &sym_name : symbol_table.sorted_symbol_names())
@@ -173,7 +178,7 @@ void string_abstractiont::operator()(goto_functionst &dest)
   }
 }
 
-void string_abstractiont::operator()(goto_programt &dest)
+void string_abstractiont::apply(goto_programt &dest)
 {
   abstract(dest);
 
@@ -227,7 +232,7 @@ code_typet::parametert string_abstractiont::add_parameter(
       "#str",
     fct_symbol.location,
     fct_symbol.mode,
-    symbol_table);
+    goto_model.symbol_table);
   param_symbol.is_parameter = true;
   param_symbol.value.make_nil();
 
@@ -301,15 +306,15 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
   symbol_exprt sym_expr=symbol.symbol_expr();
 
   goto_programt::targett decl1 =
-    dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location));
-  decl1->code_nonconst().add_source_location() = ref_instr->source_location;
+    dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location()));
+  decl1->code_nonconst().add_source_location() = ref_instr->source_location();
 
   exprt val=symbol.value;
   // initialize pointers with suitable objects
   if(val.is_nil())
   {
     const symbolt &orig=ns.lookup(source_sym);
-    val=make_val_or_dummy_rec(dest, ref_instr, symbol, ns.follow(orig.type));
+    val = make_val_or_dummy_rec(dest, ref_instr, symbol, orig.type);
   }
 
   // may still be nil (structs, then assignments have been done already)
@@ -317,9 +322,9 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
   {
     goto_programt::targett assignment1 =
       dest.add(goto_programt::make_assignment(
-        code_assignt(sym_expr, val), ref_instr->source_location));
+        code_assignt(sym_expr, val), ref_instr->source_location()));
     assignment1->code_nonconst().add_source_location() =
-      ref_instr->source_location;
+      ref_instr->source_location();
   }
 }
 
@@ -327,29 +332,28 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
     goto_programt::targett ref_instr,
     const symbolt &symbol, const typet &source_type)
 {
-  const typet &eff_type=ns.follow(symbol.type);
-
-  if(eff_type.id()==ID_array || eff_type.id()==ID_pointer)
+  if(symbol.type.id() == ID_array || symbol.type.id() == ID_pointer)
   {
-    const typet &source_subt=is_ptr_string_struct(eff_type)?
-      source_type:ns.follow(source_type.subtype());
-    symbol_exprt sym_expr=add_dummy_symbol_and_value(
-        dest, ref_instr, symbol, irep_idt(),
-        eff_type.subtype(), source_subt);
+    const typet &source_subt =
+      is_ptr_string_struct(symbol.type) ? source_type : source_type.subtype();
+    symbol_exprt sym_expr = add_dummy_symbol_and_value(
+      dest, ref_instr, symbol, irep_idt(), symbol.type.subtype(), source_subt);
 
-    if(eff_type.id()==ID_array)
-      return array_of_exprt(sym_expr, to_array_type(eff_type));
+    if(symbol.type.id() == ID_array)
+      return array_of_exprt(sym_expr, to_array_type(symbol.type));
     else
       return address_of_exprt(sym_expr);
   }
   else if(
-    eff_type.id() == ID_union ||
-    (eff_type.id() == ID_struct && eff_type != string_struct))
+    symbol.type.id() == ID_union_tag ||
+    (symbol.type.id() == ID_struct_tag && symbol.type != string_struct))
   {
-    const struct_union_typet &su_source=to_struct_union_type(source_type);
+    const struct_union_typet &su_source =
+      to_struct_union_type(ns.follow(source_type));
     const struct_union_typet::componentst &s_components=
       su_source.components();
-    const struct_union_typet &struct_union_type=to_struct_union_type(eff_type);
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(ns.follow(symbol.type));
     const struct_union_typet::componentst &components=
       struct_union_type.components();
     unsigned seen=0;
@@ -363,23 +367,20 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
       if(it->get_name()!=it2->get_name())
         continue;
 
-      const typet &eff_sub_type=ns.follow(it2->type());
-      if(eff_sub_type.id()==ID_pointer ||
-          eff_sub_type.id()==ID_array ||
-          eff_sub_type.id()==ID_struct ||
-          eff_sub_type.id()==ID_union)
+      if(
+        it2->type().id() == ID_pointer || it2->type().id() == ID_array ||
+        it2->type().id() == ID_struct_tag || it2->type().id() == ID_union_tag)
       {
-        symbol_exprt sym_expr=add_dummy_symbol_and_value(
-            dest, ref_instr, symbol, it2->get_name(),
-            it2->type(), ns.follow(it->type()));
+        symbol_exprt sym_expr = add_dummy_symbol_and_value(
+          dest, ref_instr, symbol, it2->get_name(), it2->type(), it->type());
 
         member_exprt member(symbol.symbol_expr(), it2->get_name(), it2->type());
 
         goto_programt::targett assignment1 =
           dest.add(goto_programt::make_assignment(
-            code_assignt(member, sym_expr), ref_instr->source_location));
+            code_assignt(member, sym_expr), ref_instr->source_location()));
         assignment1->code_nonconst().add_source_location() =
-          ref_instr->source_location;
+          ref_instr->source_location();
       }
 
       ++seen;
@@ -411,7 +412,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   auxiliary_symbolt new_symbol;
   new_symbol.type=type;
   new_symbol.value.make_nil();
-  new_symbol.location=ref_instr->source_location;
+  new_symbol.location = ref_instr->source_location();
   new_symbol.name=dummy_identifier;
   new_symbol.module=symbol.module;
   new_symbol.base_name=id2string(symbol.base_name)+suffix;
@@ -423,8 +424,8 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
 
   // make sure it is declared before the recursive call
   goto_programt::targett decl =
-    dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location));
-  decl->code_nonconst().add_source_location() = ref_instr->source_location;
+    dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location()));
+  decl->code_nonconst().add_source_location() = ref_instr->source_location();
 
   // set the value - may be nil
   if(
@@ -449,12 +450,13 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   {
     goto_programt::targett assignment1 =
       dest.add(goto_programt::make_assignment(
-        code_assignt(sym_expr, new_symbol.value), ref_instr->source_location));
+        code_assignt(sym_expr, new_symbol.value),
+        ref_instr->source_location()));
     assignment1->code_nonconst().add_source_location() =
-      ref_instr->source_location;
+      ref_instr->source_location();
   }
 
-  symbol_table.insert(std::move(new_symbol));
+  goto_model.symbol_table.insert(std::move(new_symbol));
 
   return sym_expr;
 }
@@ -463,7 +465,7 @@ goto_programt::targett string_abstractiont::abstract(
   goto_programt &dest,
   goto_programt::targett it)
 {
-  switch(it->type)
+  switch(it->type())
   {
   case ASSIGN:
     it=abstract_assign(dest, it);
@@ -475,7 +477,7 @@ goto_programt::targett string_abstractiont::abstract(
     if(has_string_macros(it->get_condition()))
     {
       exprt tmp = it->get_condition();
-      replace_string_macros(tmp, false, it->source_location);
+      replace_string_macros(tmp, false, it->source_location());
       it->set_condition(tmp);
     }
     break;
@@ -522,12 +524,12 @@ goto_programt::targett string_abstractiont::abstract_assign(
 
     if(has_string_macros(lhs))
     {
-      replace_string_macros(lhs, true, target->source_location);
+      replace_string_macros(lhs, true, target->source_location());
       move_lhs_arithmetic(lhs, rhs);
     }
 
     if(has_string_macros(rhs))
-      replace_string_macros(rhs, false, target->source_location);
+      replace_string_macros(rhs, false, target->source_location());
   }
 
   const typet &type = target->assign_lhs().type();
@@ -565,7 +567,7 @@ void string_abstractiont::abstract_function_call(
         str_args.back().type().subtype() == abstract_type.subtype(),
         "argument array type differs from formal parameter pointer type");
 
-      index_exprt idx(str_args.back(), from_integer(0, index_type()));
+      index_exprt idx(str_args.back(), from_integer(0, c_index_type()));
       // disable bounds check on that one
       idx.set(ID_C_bounds_check, false);
 
@@ -643,12 +645,18 @@ exprt string_abstractiont::build(
   // take care of pointer typecasts now
   if(pointer.id()==ID_typecast)
   {
+    const exprt &op = to_typecast_expr(pointer).op();
+
     // cast from another pointer type?
-    if(to_typecast_expr(pointer).op().type().id() != ID_pointer)
+    if(
+      op.type().id() != ID_pointer ||
+      !is_char_type(to_pointer_type(op.type()).base_type()))
+    {
       return build_unknown(what, write);
+    }
 
     // recursive call
-    return build(to_typecast_expr(pointer).op(), what, write, source_location);
+    return build(op, what, write, source_location);
   }
 
   exprt str_struct;
@@ -673,58 +681,56 @@ exprt string_abstractiont::build(
 
 const typet &string_abstractiont::build_abstraction_type(const typet &type)
 {
-  const typet &eff_type=ns.follow(type);
-  abstraction_types_mapt::const_iterator map_entry=
-    abstraction_types_map.find(eff_type);
+  abstraction_types_mapt::const_iterator map_entry =
+    abstraction_types_map.find(type);
   if(map_entry!=abstraction_types_map.end())
     return map_entry->second;
 
   abstraction_types_mapt tmp;
   tmp.swap(abstraction_types_map);
-  build_abstraction_type_rec(eff_type, tmp);
+  build_abstraction_type_rec(type, tmp);
 
   abstraction_types_map.swap(tmp);
-  map_entry=tmp.find(eff_type);
-  CHECK_RETURN(map_entry != tmp.end());
-  return abstraction_types_map.insert(
-      std::make_pair(eff_type, map_entry->second)).first->second;
+  abstraction_types_map.insert(tmp.begin(), tmp.end());
+  map_entry = abstraction_types_map.find(type);
+  CHECK_RETURN(map_entry != abstraction_types_map.end());
+  return map_entry->second;
 }
 
 const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     const abstraction_types_mapt &known)
 {
-  const typet &eff_type=ns.follow(type);
-  abstraction_types_mapt::const_iterator known_entry=known.find(eff_type);
+  abstraction_types_mapt::const_iterator known_entry = known.find(type);
   if(known_entry!=known.end())
     return known_entry->second;
 
   ::std::pair<abstraction_types_mapt::iterator, bool> map_entry(
-    abstraction_types_map.insert(::std::make_pair(eff_type, typet{ID_nil})));
+    abstraction_types_map.insert(::std::make_pair(type, typet{ID_nil})));
   if(!map_entry.second)
     return map_entry.first->second;
 
-  if(eff_type.id()==ID_array || eff_type.id()==ID_pointer)
+  if(type.id() == ID_array || type.id() == ID_pointer)
   {
     // char* or void* or char[]
-    if(is_char_type(eff_type.subtype()) ||
-        eff_type.subtype().id()==ID_empty)
+    if(is_char_type(type.subtype()) || type.subtype().id() == ID_empty)
       map_entry.first->second=pointer_type(string_struct);
     else
     {
-      const typet &subt=build_abstraction_type_rec(eff_type.subtype(), known);
+      const typet &subt = build_abstraction_type_rec(type.subtype(), known);
       if(!subt.is_nil())
       {
-        if(eff_type.id()==ID_array)
-          map_entry.first->second=
-            array_typet(subt, to_array_type(eff_type).size());
+        if(type.id() == ID_array)
+          map_entry.first->second =
+            array_typet(subt, to_array_type(type).size());
         else
           map_entry.first->second=pointer_type(subt);
       }
     }
   }
-  else if(eff_type.id()==ID_struct || eff_type.id()==ID_union)
+  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    const struct_union_typet &struct_union_type=to_struct_union_type(eff_type);
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(ns.follow(type));
 
     struct_union_typet::componentst new_comp;
     for(const auto &comp : struct_union_type.components())
@@ -743,9 +749,31 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     }
     if(!new_comp.empty())
     {
-      struct_union_typet t(eff_type.id());
-      t.components().swap(new_comp);
-      map_entry.first->second=t;
+      struct_union_typet abstracted_type = struct_union_type;
+      abstracted_type.components().swap(new_comp);
+
+      const symbolt &existing_tag_symbol =
+        ns.lookup(to_tag_type(type).get_identifier());
+      symbolt &abstracted_type_symbol = get_fresh_aux_symbol(
+        abstracted_type,
+        "",
+        id2string(existing_tag_symbol.name),
+        existing_tag_symbol.location,
+        existing_tag_symbol.mode,
+        ns,
+        goto_model.symbol_table);
+      abstracted_type_symbol.is_type = true;
+      abstracted_type_symbol.is_lvalue = false;
+      abstracted_type_symbol.is_state_var = false;
+      abstracted_type_symbol.is_thread_local = true;
+      abstracted_type_symbol.is_file_local = true;
+      abstracted_type_symbol.is_auxiliary = false;
+      abstracted_type_symbol.is_macro = true;
+
+      if(type.id() == ID_struct_tag)
+        map_entry.first->second = struct_tag_typet{abstracted_type_symbol.name};
+      else
+        map_entry.first->second = union_tag_typet{abstracted_type_symbol.name};
     }
   }
 
@@ -853,7 +881,7 @@ bool string_abstractiont::build_if(const if_exprt &o_if,
 bool string_abstractiont::build_array(const array_exprt &object,
     exprt &dest, bool write)
 {
-  PRECONDITION(is_char_type(object.type().subtype()));
+  PRECONDITION(is_char_type(object.type().element_type()));
 
   // writing is invalid
   if(write)
@@ -954,7 +982,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   new_symbol.mode=ID_C;
   new_symbol.pretty_name=identifier;
 
-  symbol_table.insert(std::move(new_symbol));
+  goto_model.symbol_table.insert(std::move(new_symbol));
 
   return ns.lookup(identifier).symbol_expr();
 }
@@ -980,14 +1008,14 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
     std::string sym_suffix_before = sym_suffix;
     sym_suffix = "#str";
     identifier = id2string(symbol.name) + sym_suffix;
-    if(symbol_table.symbols.find(identifier) == symbol_table.symbols.end())
+    if(!goto_model.symbol_table.has_symbol(identifier))
       build_new_symbol(symbol, identifier, abstract_type);
     sym_suffix = sym_suffix_before;
   }
   else
   {
     identifier=id2string(symbol.name)+sym_suffix;
-    if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
+    if(!goto_model.symbol_table.has_symbol(identifier))
       build_new_symbol(symbol, identifier, abstract_type);
   }
 
@@ -1019,13 +1047,13 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   new_symbol.is_static_lifetime=symbol.is_static_lifetime;
   new_symbol.is_thread_local=symbol.is_thread_local;
 
-  symbol_table.insert(std::move(new_symbol));
+  goto_model.symbol_table.insert(std::move(new_symbol));
 
   if(symbol.is_static_lifetime)
   {
     goto_programt::targett dummy_loc =
       initialization.add(goto_programt::instructiont());
-    dummy_loc->source_location=symbol.location;
+    dummy_loc->source_location_nonconst() = symbol.location;
     make_decl_and_def(initialization, dummy_loc, identifier, symbol.name);
     initialization.instructions.erase(dummy_loc);
   }
@@ -1040,8 +1068,7 @@ bool string_abstractiont::build_symbol_constant(
     +"_"+integer2string(buf_size);
   irep_idt identifier="string_abstraction::"+id2string(base);
 
-  if(symbol_table.symbols.find(identifier)==
-     symbol_table.symbols.end())
+  if(!goto_model.symbol_table.has_symbol(identifier))
   {
     auxiliary_symbolt new_symbol;
     new_symbol.type=string_struct;
@@ -1066,7 +1093,7 @@ bool string_abstractiont::build_symbol_constant(
         code_assignt(new_symbol.symbol_expr(), value)));
     }
 
-    symbol_table.insert(std::move(new_symbol));
+    goto_model.symbol_table.insert(std::move(new_symbol));
   }
 
   dest=address_of_exprt(symbol_exprt(identifier, string_struct));
@@ -1128,8 +1155,9 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
   {
     goto_programt::instructiont assignment;
     assignment = goto_programt::make_assignment(
-      code_assignt(new_lhs, new_rhs), target->source_location);
-    assignment.code_nonconst().add_source_location() = target->source_location;
+      code_assignt(new_lhs, new_rhs), target->source_location());
+    assignment.code_nonconst().add_source_location() =
+      target->source_location();
     dest.insert_before_swap(target, assignment);
 
     return std::next(target);
@@ -1218,12 +1246,14 @@ goto_programt::targett string_abstractiont::char_assign(
     "failed to create is_zero-component for the left-hand-side");
 
   goto_programt::targett assignment1 = tmp.add(goto_programt::make_assignment(
-    code_assignt(i1, from_integer(1, i1.type())), target->source_location));
-  assignment1->code_nonconst().add_source_location() = target->source_location;
+    code_assignt(i1, from_integer(1, i1.type())), target->source_location()));
+  assignment1->code_nonconst().add_source_location() =
+    target->source_location();
 
   goto_programt::targett assignment2 = tmp.add(goto_programt::make_assignment(
-    code_assignt(lhs, rhs), target->source_location));
-  assignment2->code_nonconst().add_source_location() = target->source_location;
+    code_assignt(lhs, rhs), target->source_location()));
+  assignment2->code_nonconst().add_source_location() =
+    target->source_location();
 
   move_lhs_arithmetic(
     assignment2->code_nonconst().op0(), assignment2->code_nonconst().op1());
@@ -1291,13 +1321,13 @@ goto_programt::targett string_abstractiont::value_assignments_if(
 
   goto_programt::targett goto_else =
     tmp.add(goto_programt::make_incomplete_goto(
-      boolean_negate(rhs.cond()), target->source_location));
-  goto_programt::targett goto_out = tmp.add(
-    goto_programt::make_incomplete_goto(true_exprt(), target->source_location));
+      boolean_negate(rhs.cond()), target->source_location()));
+  goto_programt::targett goto_out = tmp.add(goto_programt::make_incomplete_goto(
+    true_exprt(), target->source_location()));
   goto_programt::targett else_target =
-    tmp.add(goto_programt::make_skip(target->source_location));
+    tmp.add(goto_programt::make_skip(target->source_location()));
   goto_programt::targett out_target =
-    tmp.add(goto_programt::make_skip(target->source_location));
+    tmp.add(goto_programt::make_skip(target->source_location()));
 
   goto_else->complete_goto(else_target);
   goto_out->complete_goto(out_target);
@@ -1325,24 +1355,27 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
     goto_programt::targett assignment = tmp.add(goto_programt::make_assignment(
       member(lhs, whatt::IS_ZERO),
       member(rhs, whatt::IS_ZERO),
-      target->source_location));
-    assignment->code_nonconst().add_source_location() = target->source_location;
+      target->source_location()));
+    assignment->code_nonconst().add_source_location() =
+      target->source_location();
   }
 
   {
     goto_programt::targett assignment = tmp.add(goto_programt::make_assignment(
       member(lhs, whatt::LENGTH),
       member(rhs, whatt::LENGTH),
-      target->source_location));
-    assignment->code_nonconst().add_source_location() = target->source_location;
+      target->source_location()));
+    assignment->code_nonconst().add_source_location() =
+      target->source_location();
   }
 
   {
     goto_programt::targett assignment = tmp.add(goto_programt::make_assignment(
       member(lhs, whatt::SIZE),
       member(rhs, whatt::SIZE),
-      target->source_location));
-    assignment->code_nonconst().add_source_location() = target->source_location;
+      target->source_location()));
+    assignment->code_nonconst().add_source_location() =
+      target->source_location();
   }
 
   goto_programt::targett last=target;

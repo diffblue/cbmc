@@ -705,7 +705,11 @@ void janalyzer_parse_optionst::process_goto_function(
 
   // add generic checks
   goto_check(
-    function.get_function_id(), function.get_goto_function(), ns, options);
+    function.get_function_id(),
+    function.get_goto_function(),
+    ns,
+    options,
+    ui_message_handler);
 }
 
 bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)
@@ -793,7 +797,7 @@ void janalyzer_parse_optionst::help()
     HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
+    HELP_GOTO_CHECK_JAVA
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

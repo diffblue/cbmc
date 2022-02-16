@@ -12,12 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_UNWINDSET_H
 #define CPROVER_GOTO_INSTRUMENT_UNWINDSET_H
 
+#include <goto-programs/goto_model.h>
+
 #include <list>
 #include <map>
 #include <string>
 
-#include <util/irep.h>
-#include <util/optional.h>
+class message_handlert;
 
 class unwindsett
 {
@@ -27,20 +28,29 @@ public:
   // 2) a limit per loop, all threads
   // 3) a limit for a particular thread.
   // We use the most specific of the above.
+  explicit unwindsett(abstract_goto_modelt &goto_model) : goto_model(goto_model)
+  {
+  }
 
   // global limit for all loops
   void parse_unwind(const std::string &unwind);
 
   // limit for instances of a loop
-  void parse_unwindset(const std::list<std::string> &unwindset);
+  void parse_unwindset(
+    const std::list<std::string> &unwindset,
+    message_handlert &message_handler);
 
   // queries
   optionalt<unsigned> get_limit(const irep_idt &loop, unsigned thread_id) const;
 
   // read unwindset directives from a file
-  void parse_unwindset_file(const std::string &file_name);
+  void parse_unwindset_file(
+    const std::string &file_name,
+    message_handlert &message_handler);
 
 protected:
+  abstract_goto_modelt &goto_model;
+
   optionalt<unsigned> global_limit;
 
   // Limit for all instances of a loop.
@@ -53,7 +63,21 @@ protected:
     std::map<std::pair<irep_idt, unsigned>, optionalt<unsigned>>;
   thread_loop_mapt thread_loop_map;
 
-  void parse_unwindset_one_loop(std::string loop_limit);
+  void parse_unwindset_one_loop(
+    std::string loop_limit,
+    message_handlert &message_handler);
 };
+
+#define OPT_UNWINDSET                                                          \
+  "(show-loops)"                                                               \
+  "(unwind):"                                                                  \
+  "(unwindset):"
+
+#define HELP_UNWINDSET                                                         \
+  " --show-loops                 show the loops in the program\n"              \
+  " --unwind nr                  unwind nr times\n"                            \
+  " --unwindset [T:]L:B,...      unwind loop L with a bound of B\n"            \
+  "                              (optionally restricted to thread T)\n"        \
+  "                              (use --show-loops to get the loop IDs)\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_UNWINDSET_H

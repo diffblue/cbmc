@@ -3,10 +3,14 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_TERMS_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_TERMS_H
 
-#include <solvers/smt2_incremental/smt_sorts.h>
 #include <util/irep.h>
 
+#include <solvers/smt2_incremental/smt_index.h>
+#include <solvers/smt2_incremental/smt_sorts.h>
+#include <solvers/smt2_incremental/type_traits.h>
+
 #include <functional>
+#include <utility>
 
 class BigInt;
 using mp_integer = BigInt;
@@ -77,7 +81,14 @@ public:
 
 /// Stores identifiers in unescaped and unquoted form. Any escaping or quoting
 /// required should be performed during printing.
-class smt_identifier_termt : public smt_termt
+/// \details
+/// The SMT-LIB standard Version 2.6 refers to "indexed" identifiers which have
+/// 1 or more indices and "simple" identifiers which have no indicies. The
+/// internal `smt_identifier_termt` class is used for both kinds of identifier
+/// which are distinguished based on whether the collection of `indices` is
+/// empty or not.
+class smt_identifier_termt : public smt_termt,
+                             private smt_indext::storert<smt_identifier_termt>
 {
 public:
   /// \brief Constructs an identifier term with the given \p identifier and
@@ -91,8 +102,14 @@ public:
   /// \param sort: The sort which this term will have. All terms in our abstract
   ///   form must be sorted, even if those sorts are not printed in all
   ///   contexts.
-  smt_identifier_termt(irep_idt identifier, smt_sortt sort);
+  /// \param indices: This should be collection of indices for an indexed
+  ///   identifier, or an empty collection for simple (non-indexed) identifiers.
+  smt_identifier_termt(
+    irep_idt identifier,
+    smt_sortt sort,
+    std::vector<smt_indext> indices = {});
   irep_idt identifier() const;
+  std::vector<std::reference_wrapper<const smt_indext>> indices() const;
 };
 
 class smt_bit_vector_constant_termt : public smt_termt
@@ -121,6 +138,44 @@ private:
     smt_identifier_termt function_identifier,
     std::vector<smt_termt> arguments);
 
+  // This is used to detect if \p functiont has an `indicies` member function.
+  // It will resolve to std::true_type if it does or std::false type otherwise.
+  template <class functiont, class = void>
+  struct has_indicest : std::false_type
+  {
+  };
+
+  template <class functiont>
+  struct has_indicest<
+    functiont,
+    void_t<decltype(std::declval<functiont>().indices())>> : std::true_type
+  {
+  };
+
+  /// Overload for when \p functiont does not have indices.
+  template <class functiont>
+  static std::vector<smt_indext>
+  indices(const functiont &function, const std::false_type &has_indices)
+  {
+    return {};
+  }
+
+  /// Overload for when \p functiont has indices member function.
+  template <class functiont>
+  static std::vector<smt_indext>
+  indices(const functiont &function, const std::true_type &has_indices)
+  {
+    return function.indices();
+  }
+
+  /// Returns `function.indices` if `functiont` has an `indices` member function
+  /// or returns an empty collection otherwise.
+  template <class functiont>
+  static std::vector<smt_indext> indices(const functiont &function)
+  {
+    return indices(function, has_indicest<functiont>{});
+  }
+
 public:
   const smt_identifier_termt &function_identifier() const;
   std::vector<std::reference_wrapper<const smt_termt>> arguments() const;
@@ -133,7 +188,7 @@ public:
 
   public:
     template <typename... function_type_argument_typest>
-    explicit factoryt(function_type_argument_typest &&... arguments)
+    explicit factoryt(function_type_argument_typest &&... arguments) noexcept
       : function{std::forward<function_type_argument_typest>(arguments)...}
     {
     }
@@ -145,7 +200,8 @@ public:
       function.validate(arguments...);
       auto return_sort = function.return_sort(arguments...);
       return smt_function_application_termt{
-        smt_identifier_termt{function.identifier(), std::move(return_sort)},
+        smt_identifier_termt{
+          function.identifier(), std::move(return_sort), indices(function)},
         {std::forward<argument_typest>(arguments)...}};
     }
   };

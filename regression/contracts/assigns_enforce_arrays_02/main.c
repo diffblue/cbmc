@@ -1,24 +1,24 @@
 #include <assert.h>
+#include <stdlib.h>
 
-int idx = 4;
+int *arr;
 
-int nextIdx() __CPROVER_assigns(idx)
+void f1(int *a, int len) __CPROVER_assigns(*a)
 {
-  idx++;
-  return idx;
+  a[0] = 0;
+  a[5] = 5;
 }
 
-void f1(int a[], int len) __CPROVER_assigns(*a, idx)
+void f2(int *a, int len) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(a))
 {
-  a[nextIdx()] = 5;
+  a[0] = 0;
+  a[5] = 5;
+  free(a);
 }
 
 int main()
 {
-  int arr[10];
-  f1(arr, 10);
-
-  assert(idx == 5);
-
-  return 0;
+  arr = malloc(100 * sizeof(int));
+  f1(arr, 100);
+  f2(arr, 100);
 }

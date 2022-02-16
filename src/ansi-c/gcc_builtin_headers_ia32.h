@@ -1,3 +1,4 @@
+// clang-format off
 // from
 // http://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/X86-Built_002din-Functions.html
 
@@ -23,14 +24,10 @@ __gcc_v4hi __builtin_ia32_psubusw(__gcc_v4hi, __gcc_v4hi);
 __gcc_v4hi __builtin_ia32_pmullw(__gcc_v4hi, __gcc_v4hi);
 __gcc_v4hi __builtin_ia32_pmulhw(__gcc_v4hi, __gcc_v4hi);
 
-__gcc_v2si __builtin_ia32_pand(__gcc_v2si, __gcc_v2si); // maybe di
-__gcc_v2si __builtin_ia32_pandn(__gcc_v2si, __gcc_v2si); // maybe di
-__gcc_v2si __builtin_ia32_por(__gcc_v2si, __gcc_v2si); // maybe di
-__gcc_v2si __builtin_ia32_pxor(__gcc_v2si, __gcc_v2si); // maybe di
-//__gcc_di __builtin_ia32_pand(__gcc_di, __gcc_di);
-//__gcc_di __builtin_ia32_pandn(__gcc_di, __gcc_di);
-//__gcc_di __builtin_ia32_por(__gcc_di, __gcc_di);
-//__gcc_di __builtin_ia32_pxor(__gcc_di, __gcc_di);
+__gcc_v1di __builtin_ia32_pand(__gcc_v1di, __gcc_v1di);
+__gcc_v1di __builtin_ia32_pandn(__gcc_v1di, __gcc_v1di);
+__gcc_v1di __builtin_ia32_por(__gcc_v1di, __gcc_v1di);
+__gcc_v1di __builtin_ia32_pxor(__gcc_v1di, __gcc_v1di);
 
 __gcc_v8qi __builtin_ia32_pcmpeqb(__gcc_v8qi, __gcc_v8qi);
 __gcc_v4hi __builtin_ia32_pcmpeqw(__gcc_v4hi, __gcc_v4hi);
@@ -514,9 +511,9 @@ __gcc_v2df __builtin_ia32_pd_pd256(__gcc_v4df);
 __gcc_v4df __builtin_ia32_pd256_pd(__gcc_v2df);
 __gcc_v4sf __builtin_ia32_ps_ps256(__gcc_v8sf);
 __gcc_v8sf __builtin_ia32_ps256_ps(__gcc_v4sf);
-int __builtin_ia32_ptestc256(__gcc_v4di,__gcc_v4di,...);
-int __builtin_ia32_ptestnzc256(__gcc_v4di,__gcc_v4di,...);
-int __builtin_ia32_ptestz256(__gcc_v4di,__gcc_v4di,...);
+int __builtin_ia32_ptestc256(__gcc_v4di, __gcc_v4di);
+int __builtin_ia32_ptestnzc256(__gcc_v4di, __gcc_v4di);
+int __builtin_ia32_ptestz256(__gcc_v4di, __gcc_v4di);
 __gcc_v8sf __builtin_ia32_rcpps256(__gcc_v8sf);
 __gcc_v4df __builtin_ia32_roundpd256(__gcc_v4df, int);
 __gcc_v8sf __builtin_ia32_roundps256(__gcc_v8sf, int);
@@ -564,18 +561,18 @@ __gcc_v2df __builtin_ia32_vpermilvarpd(__gcc_v2df, __gcc_v2di);
 __gcc_v4df __builtin_ia32_vpermilvarpd256(__gcc_v4df, __gcc_v4di);
 __gcc_v4sf __builtin_ia32_vpermilvarps(__gcc_v4sf, __gcc_v4si);
 __gcc_v8sf __builtin_ia32_vpermilvarps256(__gcc_v8sf, __gcc_v8si);
-int __builtin_ia32_vtestcpd(__gcc_v2df,__gcc_v2df,...);
-int __builtin_ia32_vtestcpd256(__gcc_v4df,__gcc_v4df,...);
-int __builtin_ia32_vtestcps(__gcc_v4sf,__gcc_v4sf,...);
-int __builtin_ia32_vtestcps256(__gcc_v8sf,__gcc_v8sf,...);
-int __builtin_ia32_vtestnzcpd(__gcc_v2df,__gcc_v2df,...);
-int __builtin_ia32_vtestnzcpd256(__gcc_v4df,__gcc_v4df,...);
-int __builtin_ia32_vtestnzcps(__gcc_v4sf,__gcc_v4sf,...);
-int __builtin_ia32_vtestnzcps256(__gcc_v8sf,__gcc_v8sf,...);
-int __builtin_ia32_vtestzpd(__gcc_v2df,__gcc_v2df,...);
-int __builtin_ia32_vtestzpd256(__gcc_v4df,__gcc_v4df,...);
-int __builtin_ia32_vtestzps(__gcc_v4sf,__gcc_v4sf,...);
-int __builtin_ia32_vtestzps256(__gcc_v8sf,__gcc_v8sf,...);
+int __builtin_ia32_vtestcpd(__gcc_v2df, __gcc_v2df);
+int __builtin_ia32_vtestcpd256(__gcc_v4df, __gcc_v4df);
+int __builtin_ia32_vtestcps(__gcc_v4sf, __gcc_v4sf);
+int __builtin_ia32_vtestcps256(__gcc_v8sf, __gcc_v8sf);
+int __builtin_ia32_vtestnzcpd(__gcc_v2df, __gcc_v2df);
+int __builtin_ia32_vtestnzcpd256(__gcc_v4df, __gcc_v4df);
+int __builtin_ia32_vtestnzcps(__gcc_v4sf, __gcc_v4sf);
+int __builtin_ia32_vtestnzcps256(__gcc_v8sf, __gcc_v8sf);
+int __builtin_ia32_vtestzpd(__gcc_v2df, __gcc_v2df);
+int __builtin_ia32_vtestzpd256(__gcc_v4df, __gcc_v4df);
+int __builtin_ia32_vtestzps(__gcc_v4sf, __gcc_v4sf);
+int __builtin_ia32_vtestzps256(__gcc_v8sf, __gcc_v8sf);
 void __builtin_ia32_vzeroall();
 void __builtin_ia32_vzeroupper();
 __gcc_v4df __builtin_ia32_xorpd256(__gcc_v4df, __gcc_v4df);
@@ -596,7 +593,7 @@ __gcc_v32qi __builtin_ia32_paddsb256(__gcc_v32qi, __gcc_v32qi);
 __gcc_v16hi __builtin_ia32_paddsw256(__gcc_v16hi, __gcc_v16hi);
 __gcc_v32qi __builtin_ia32_paddusb256(__gcc_v32qi, __gcc_v32qi);
 __gcc_v16hi __builtin_ia32_paddusw256(__gcc_v16hi, __gcc_v16hi);
-__gcc_v4di __builtin_ia32_palignr256(__gcc_v4di,__gcc_v4di,int);
+__gcc_v4di __builtin_ia32_palignr256(__gcc_v4di, __gcc_v4di, int);
 __gcc_v4di __builtin_ia32_andsi256(__gcc_v4di, __gcc_v4di);
 __gcc_v4di __builtin_ia32_andnotsi256(__gcc_v4di, __gcc_v4di);
 __gcc_v32qi __builtin_ia32_pavgb256(__gcc_v32qi, __gcc_v32qi);
@@ -660,24 +657,24 @@ __gcc_v16hi __builtin_ia32_pshuflw256(__gcc_v16hi, int);
 __gcc_v32qi __builtin_ia32_psignb256(__gcc_v32qi, __gcc_v32qi);
 __gcc_v16hi __builtin_ia32_psignw256(__gcc_v16hi, __gcc_v16hi);
 __gcc_v8si __builtin_ia32_psignd256(__gcc_v8si, __gcc_v8si);
-__gcc_v4di __builtin_ia32_pslldqi256(__gcc_v4di,int);
-__gcc_v16hi __builtin_ia32_psllwi256(__gcc_v16hi,int);
-__gcc_v16hi __builtin_ia32_psllw256(__gcc_v16hi,__gcc_v8hi);
-__gcc_v8si __builtin_ia32_pslldi256(__gcc_v8si,int);
-__gcc_v8si __builtin_ia32_pslld256(__gcc_v8si,__gcc_v4si);
-__gcc_v4di __builtin_ia32_psllqi256(__gcc_v4di,int);
-__gcc_v4di __builtin_ia32_psllq256(__gcc_v4di,__gcc_v2di);
-__gcc_v16hi __builtin_ia32_psrawi256(__gcc_v16hi,int);
-__gcc_v16hi __builtin_ia32_psraw256(__gcc_v16hi,__gcc_v8hi);
-__gcc_v8si __builtin_ia32_psradi256(__gcc_v8si,int);
-__gcc_v8si __builtin_ia32_psrad256(__gcc_v8si,__gcc_v4si);
+__gcc_v4di __builtin_ia32_pslldqi256(__gcc_v4di, int);
+__gcc_v16hi __builtin_ia32_psllwi256(__gcc_v16hi, int);
+__gcc_v16hi __builtin_ia32_psllw256(__gcc_v16hi, __gcc_v8hi);
+__gcc_v8si __builtin_ia32_pslldi256(__gcc_v8si, int);
+__gcc_v8si __builtin_ia32_pslld256(__gcc_v8si, __gcc_v4si);
+__gcc_v4di __builtin_ia32_psllqi256(__gcc_v4di, int);
+__gcc_v4di __builtin_ia32_psllq256(__gcc_v4di, __gcc_v2di);
+__gcc_v16hi __builtin_ia32_psrawi256(__gcc_v16hi, int);
+__gcc_v16hi __builtin_ia32_psraw256(__gcc_v16hi, __gcc_v8hi);
+__gcc_v8si __builtin_ia32_psradi256(__gcc_v8si, int);
+__gcc_v8si __builtin_ia32_psrad256(__gcc_v8si, __gcc_v4si);
 __gcc_v4di __builtin_ia32_psrldqi256(__gcc_v4di, int);
-__gcc_v16hi __builtin_ia32_psrlwi256(__gcc_v16hi,int);
-__gcc_v16hi __builtin_ia32_psrlw256(__gcc_v16hi,__gcc_v8hi);
-__gcc_v8si __builtin_ia32_psrldi256(__gcc_v8si,int);
-__gcc_v8si __builtin_ia32_psrld256(__gcc_v8si,__gcc_v4si);
-__gcc_v4di __builtin_ia32_psrlqi256(__gcc_v4di,int);
-__gcc_v4di __builtin_ia32_psrlq256(__gcc_v4di,__gcc_v2di);
+__gcc_v16hi __builtin_ia32_psrlwi256(__gcc_v16hi, int);
+__gcc_v16hi __builtin_ia32_psrlw256(__gcc_v16hi, __gcc_v8hi);
+__gcc_v8si __builtin_ia32_psrldi256(__gcc_v8si, int);
+__gcc_v8si __builtin_ia32_psrld256(__gcc_v8si, __gcc_v4si);
+__gcc_v4di __builtin_ia32_psrlqi256(__gcc_v4di, int);
+__gcc_v4di __builtin_ia32_psrlq256(__gcc_v4di, __gcc_v2di);
 __gcc_v32qi __builtin_ia32_psubb256(__gcc_v32qi, __gcc_v32qi);
 __gcc_v16hi __builtin_ia32_psubw256(__gcc_v16hi, __gcc_v16hi);
 __gcc_v8si __builtin_ia32_psubd256(__gcc_v8si, __gcc_v8si);
@@ -1165,3 +1162,4 @@ double __builtin_ia32_vec_ext_v2df(__gcc_v2df, int);
 __gcc_di __builtin_ia32_vec_ext_v2di(__gcc_v2di, int);
 float __builtin_ia32_vec_ext_v4sf(__gcc_v4sf, int);
 int __builtin_ia32_vec_ext_v4si(__gcc_v4si, int);
+// clang-format on

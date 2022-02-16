@@ -62,13 +62,14 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
 
     // set representative program location to instrument
     if(
-      !it->source_location.is_nil() &&
-      !it->source_location.get_file().empty() &&
-      !it->source_location.get_line().empty() &&
+      !it->source_location().is_nil() &&
+      !it->source_location().get_file().empty() &&
+      !it->source_location().get_line().empty() &&
+      !it->source_location().is_built_in() &&
       block_info.source_location.is_nil())
     {
       block_info.representative_inst = it; // update
-      block_info.source_location = it->source_location;
+      block_info.source_location = it->source_location();
     }
 
     next_is_target =
@@ -125,7 +126,7 @@ void cover_basic_blockst::report_block_anomalies(
       block_info.representative_inst == goto_program.instructions.end())
     {
       msg.warning() << "Ignoring block " << (block_nr + 1) << " location "
-                    << it->location_number << " " << it->source_location
+                    << it->location_number << " " << it->source_location()
                     << " (bytecode-index already instrumented)"
                     << messaget::eom;
     }
@@ -145,7 +146,7 @@ void cover_basic_blockst::report_block_anomalies(
 void cover_basic_blockst::output(std::ostream &out) const
 {
   for(const auto &block_pair : block_map)
-    out << block_pair.first->source_location << " -> " << block_pair.second
+    out << block_pair.first->source_location() << " -> " << block_pair.second
         << '\n';
 }
 
@@ -161,7 +162,7 @@ void cover_basic_blockst::add_block_lines(
       block.source_lines.insert(location);
     }
   };
-  add_location(instruction.source_location);
+  add_location(instruction.source_location());
   instruction.get_code().visit_pre(
     [&](const exprt &expr) { add_location(expr.source_location()); });
 }
@@ -197,7 +198,7 @@ cover_basic_blocks_javat::cover_basic_blocks_javat(
 
   forall_goto_program_instructions(it, _goto_program)
   {
-    const auto &location = it->source_location;
+    const auto &location = it->source_location();
     const auto &bytecode_index = location.get_java_bytecode_index();
     auto entry = index_to_block.emplace(bytecode_index, block_infos.size());
     if(entry.second)
@@ -225,7 +226,7 @@ cover_basic_blocks_javat::cover_basic_blocks_javat(
 std::size_t
 cover_basic_blocks_javat::block_of(goto_programt::const_targett t) const
 {
-  const auto &bytecode_index = t->source_location.get_java_bytecode_index();
+  const auto &bytecode_index = t->source_location().get_java_bytecode_index();
   const auto it = index_to_block.find(bytecode_index);
   INVARIANT(it != index_to_block.end(), "instruction must be part of a block");
   return it->second;

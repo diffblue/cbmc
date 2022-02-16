@@ -14,8 +14,8 @@ void SSA_stept::output(std::ostream &out) const
 {
   out << "Thread " << source.thread_nr;
 
-  if(source.pc->source_location.is_not_nil())
-    out << " " << source.pc->source_location << '\n';
+  if(source.pc->source_location().is_not_nil())
+    out << " " << source.pc->source_location() << '\n';
   else
     out << '\n';
 
@@ -192,19 +192,19 @@ irep_idt SSA_stept::get_property_id() const
 
   if(source.pc->is_assert())
   {
-    property_id = source.pc->source_location.get_property_id();
+    property_id = source.pc->source_location().get_property_id();
   }
   else if(source.pc->is_goto())
   {
     // this is likely an unwinding assertion
-    property_id = id2string(source.pc->source_location.get_function()) +
+    property_id = id2string(source.pc->source_location().get_function()) +
                   ".unwind." + std::to_string(source.pc->loop_number);
   }
   else if(source.pc->is_function_call())
   {
     // this is likely a recursion unwinding assertion
     property_id =
-      id2string(source.pc->source_location.get_function()) + ".recursion";
+      id2string(source.pc->source_location().get_function()) + ".recursion";
   }
   else
   {

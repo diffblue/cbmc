@@ -1,8 +1,8 @@
+// clang-format off
 __gcc_v2di __builtin_ia32_undef128(void);
 __gcc_v4di __builtin_ia32_undef256(void);
 __gcc_v8di __builtin_ia32_undef512(void);
 
-// clang-format off
 __gcc_v8hi __builtin_ia32_cvtne2ps2bf16_128(__gcc_v4sf, __gcc_v4sf);
 __gcc_v16hi __builtin_ia32_cvtne2ps2bf16_256(__gcc_v8sf, __gcc_v8sf);
 __gcc_v32hi __builtin_ia32_cvtne2ps2bf16_512(__gcc_v16sf, __gcc_v16sf);
@@ -47,14 +47,41 @@ __gcc_v4sf __builtin_ia32_vfmsubss3_mask3(__gcc_v4sf, __gcc_v4sf, __gcc_v4sf, un
 
 __gcc_v4sf __builtin_ia32_cvtsd2ss_round_mask(__gcc_v4sf, __gcc_v2df, __gcc_v4sf, unsigned char, int);
 __gcc_v2df __builtin_ia32_cvtss2sd_round_mask(__gcc_v2df, __gcc_v4sf, __gcc_v2df, unsigned char, int);
-// clang-format on
+
+void __builtin_ia32_tile_loadconfig_internal(const void *);
+__gcc_v256si __builtin_ia32_tileloadd64_internal(unsigned short, unsigned short, const void *, __CPROVER_size_t);
+__gcc_v256si __builtin_ia32_tileloaddt164_internal(unsigned short, unsigned short, const void *, __CPROVER_size_t);
+__gcc_v256si __builtin_ia32_tdpbssd_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tdpbsud_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tdpbusd_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tdpbuud_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+void __builtin_ia32_tilestored64_internal(unsigned short, unsigned short, void *, __CPROVER_size_t, __gcc_v256si);
+__gcc_v256si __builtin_ia32_tilezero_internal(unsigned short, unsigned short);
+__gcc_v256si __builtin_ia32_tdpbf16ps_internal(unsigned short, unsigned short, unsigned short, __gcc_v256si, __gcc_v256si, __gcc_v256si);
+void __builtin_ia32_tile_loadconfig(const void *);
+void __builtin_ia32_tile_storeconfig(const void *);
+void __builtin_ia32_tilerelease(void);
+void __builtin_ia32_tilezero(unsigned char);
+void __builtin_ia32_tileloadd64(__tile, const void *, __CPROVER_size_t);
+void __builtin_ia32_tileloaddt164(__tile, const void *, __CPROVER_size_t);
+void __builtin_ia32_tilestored64(__tile, void *, __CPROVER_size_t);
+void __builtin_ia32_tdpbssd(__tile, __tile, __tile);
+void __builtin_ia32_tdpbsud(__tile, __tile, __tile);
+void __builtin_ia32_tdpbusd(__tile, __tile, __tile);
+void __builtin_ia32_tdpbuud(__tile, __tile, __tile);
+void __builtin_ia32_tdpbf16ps(__tile, __tile, __tile);
+void __builtin_ia32_ptwrite64(unsigned long long);
 
 void __builtin_nontemporal_store();
 void __builtin_nontemporal_load();
 
 int __builtin_flt_rounds(void);
 
-// clang-format off
+unsigned char __builtin_bitreverse8(unsigned char);
+unsigned short __builtin_bitreverse16(unsigned short);
+unsigned int __builtin_bitreverse32(unsigned int);
+unsigned long long __builtin_bitreverse64(unsigned long long);
+
 unsigned char __builtin_rotateleft8(unsigned char, unsigned char);
 unsigned short __builtin_rotateleft16(unsigned short, unsigned short);
 unsigned int __builtin_rotateleft32(unsigned int, unsigned int);

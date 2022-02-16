@@ -552,15 +552,15 @@ memory_snapshot_harness_generatort::entry_source_locationt::
     instructions.begin(),
     instructions.end(),
     [this](const goto_programt::instructiont &instruction) {
-      return instruction.source_location.get_file() == file_name &&
+      return instruction.source_location().get_file() == file_name &&
              safe_string2unsigned(id2string(
-               instruction.source_location.get_line())) >= line_number;
+               instruction.source_location().get_line())) >= line_number;
     });
 
   if(it == instructions.end())
     return {it, 0};
   else
     return {it,
-            safe_string2unsigned(id2string(it->source_location.get_line())) -
+            safe_string2unsigned(id2string(it->source_location().get_line())) -
               line_number};
 }

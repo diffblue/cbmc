@@ -28,9 +28,9 @@ static bool object_descriptor_matches(
     target.type().id() == ID_pointer &&
     target == null_pointer_exprt(to_pointer_type(target.type())))
   {
-    return
-      descriptor.object().id() == "NULL-object" &&
-      descriptor.object().type() == target.type().subtype();
+    return descriptor.object().id() == "NULL-object" &&
+           descriptor.object().type() ==
+             to_pointer_type(target.type()).base_type();
   }
   else
   {

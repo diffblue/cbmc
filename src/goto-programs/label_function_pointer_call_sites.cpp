@@ -27,7 +27,7 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
       [&](goto_programt::targett &it) {
         auto const &function_pointer_dereference =
           to_dereference_expr(it->call_function());
-        auto const &source_location = it->source_location;
+        auto const &source_location = it->source_location();
         auto const &goto_function_symbol_mode =
           goto_model.symbol_table.lookup_ref(goto_function.first).mode;
 
@@ -42,7 +42,7 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
             function_call_site_symbol.pretty_name = call_site_symbol_name;
           function_call_site_symbol.type =
             function_pointer_dereference.pointer().type();
-          function_call_site_symbol.location = it->source_location;
+          function_call_site_symbol.location = it->source_location();
           function_call_site_symbol.is_lvalue = true;
           function_call_site_symbol.mode = goto_function_symbol_mode;
           return function_call_site_symbol;
@@ -52,24 +52,32 @@ void label_function_pointer_call_sites(goto_modelt &goto_model)
           goto_model.symbol_table.lookup_ref(call_site_symbol_name)
             .symbol_expr();
 
-        // add assignment to the new function pointer variable, followed by a
-        // call of the new variable
+        // add a DECL instruction for the function pointer variable
+        auto decl_instruction =
+          goto_programt::make_decl(new_function_pointer, source_location);
+
+        goto_function.second.body.insert_before_swap(it, decl_instruction);
+        ++it;
+
+        // add assignment to the new variable
         auto assign_instruction = goto_programt::make_assignment(
           code_assignt{new_function_pointer,
                        function_pointer_dereference.pointer()},
           source_location);
 
         goto_function.second.body.insert_before_swap(it, assign_instruction);
-        const auto next = std::next(it);
-        to_code_function_call(next->code_nonconst()).function() =
-          dereference_exprt{new_function_pointer};
-        // we need to increment the iterator once more (in addition to the
-        // increment already done by for_each_goto_function_if()). This is
-        // because insert_before_swap() inserts a new instruction after the
-        // instruction pointed to by it (and then swaps the contents with the
-        // previous instruction). We need to increment the iterator as we also
-        // need to skip over this newly inserted instruction.
-        it++;
+        ++it;
+
+        // transform original call into a call to the new variable
+        it->call_function() = dereference_exprt{new_function_pointer};
+        ++it;
+
+        // add a DEAD instruction for the new variable
+        auto dead_instruction =
+          goto_programt::make_dead(new_function_pointer, source_location);
+        goto_function.second.body.insert_before_swap(it, dead_instruction);
+        // the iterator now points to the DEAD instruction and will be
+        // incremented by the outer loop
       });
   }
 }

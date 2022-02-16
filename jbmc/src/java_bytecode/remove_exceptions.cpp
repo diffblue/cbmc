@@ -228,7 +228,7 @@ void remove_exceptionst::instrument_exception_handler(
   const goto_programt::targett &instr_it,
   bool may_catch)
 {
-  PRECONDITION(instr_it->type==CATCH);
+  PRECONDITION(instr_it->type() == CATCH);
 
   if(may_catch)
   {
@@ -246,7 +246,7 @@ void remove_exceptionst::instrument_exception_handler(
       instr_it,
       goto_programt::make_assignment(
         code_assignt(thrown_global_symbol, null_voidptr),
-        instr_it->source_location));
+        instr_it->source_location()));
 
     // add the assignment exc = @inflight_exception (before the null assignment)
     goto_program.insert_after(
@@ -255,7 +255,7 @@ void remove_exceptionst::instrument_exception_handler(
         code_assignt(
           thrown_exception_local,
           typecast_exprt(thrown_global_symbol, thrown_exception_local.type())),
-        instr_it->source_location));
+        instr_it->source_location()));
   }
 
   instr_it->turn_into_skip();
@@ -362,7 +362,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
         goto_programt::targett t_exc = goto_program.insert_after(
           instr_it,
           goto_programt::make_goto(
-            new_state_pc, true_exprt(), instr_it->source_location));
+            new_state_pc, true_exprt(), instr_it->source_location()));
 
         // use instanceof to check that this is the correct handler
         struct_tag_typet type(stack_catch[i][j].first);
@@ -385,13 +385,13 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   }
 
   *default_dispatch = goto_programt::make_goto(
-    default_target, true_exprt(), instr_it->source_location);
+    default_target, true_exprt(), instr_it->source_location());
 
   // add dead instructions
   for(const auto &local : locals)
   {
     goto_program.insert_after(
-      instr_it, goto_programt::make_dead(local, instr_it->source_location));
+      instr_it, goto_programt::make_dead(local, instr_it->source_location()));
   }
 }
 
@@ -404,7 +404,7 @@ bool remove_exceptionst::instrument_throw(
   const remove_exceptionst::stack_catcht &stack_catch,
   const std::vector<symbol_exprt> &locals)
 {
-  PRECONDITION(instr_it->type==THROW);
+  PRECONDITION(instr_it->type() == THROW);
 
   const exprt &exc_expr =
     uncaught_exceptions_domaint::get_exception_symbol(instr_it->get_code());
@@ -416,13 +416,11 @@ bool remove_exceptionst::instrument_throw(
   symbol_exprt exc_thrown =
     get_inflight_exception_global();
 
-  // add the assignment with the appropriate cast
-  code_assignt assignment(
+  // now turn the `throw' into an assignment with the appropriate cast
+  *instr_it = goto_programt::make_assignment(
     exc_thrown,
-    typecast_exprt(exc_expr, exc_thrown.type()));
-  // now turn the `throw' into `assignment'
-  instr_it->type=ASSIGN;
-  instr_it->code_nonconst() = assignment;
+    typecast_exprt(exc_expr, exc_thrown.type()),
+    instr_it->source_location());
 
   return true;
 }
@@ -437,7 +435,7 @@ remove_exceptionst::instrument_function_call(
   const stack_catcht &stack_catch,
   const std::vector<symbol_exprt> &locals)
 {
-  PRECONDITION(instr_it->type==FUNCTION_CALL);
+  PRECONDITION(instr_it->type() == FUNCTION_CALL);
 
   // save the address of the next instruction
   goto_programt::targett next_it=instr_it;
@@ -476,7 +474,7 @@ remove_exceptionst::instrument_function_call(
         goto_programt::make_goto(
           next_it,
           no_exception_currently_in_flight,
-          instr_it->source_location));
+          instr_it->source_location()));
 
       return instrumentation_resultt::ADDED_CODE_WITH_MAY_THROW;
     }
@@ -512,7 +510,7 @@ void remove_exceptionst::instrument_exceptions(
       locals.push_back(instr_it->decl_symbol());
     }
     // Is it a handler push/pop or catch landing-pad?
-    else if(instr_it->type==CATCH)
+    else if(instr_it->type() == CATCH)
     {
       const irep_idt &statement = instr_it->get_code().get_statement();
       // Is it an exception landing pad (start of a catch block)?
@@ -584,12 +582,12 @@ void remove_exceptionst::instrument_exceptions(
       instr_it->turn_into_skip();
       did_something = true;
     }
-    else if(instr_it->type==THROW)
+    else if(instr_it->type() == THROW)
     {
       did_something = instrument_throw(
         function_identifier, goto_program, instr_it, stack_catch, locals);
     }
-    else if(instr_it->type==FUNCTION_CALL)
+    else if(instr_it->type() == FUNCTION_CALL)
     {
       instrumentation_resultt result =
         instrument_function_call(

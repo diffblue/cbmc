@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -172,8 +173,30 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
-      return bv_utils.rel(
-        bv0, expr.id(), bv1, bv_utilst::representationt::UNSIGNED);
+      const pointer_typet &type0 = to_pointer_type(operands[0].type());
+      bvt offset_bv0 = offset_literals(bv0, type0);
+
+      const pointer_typet &type1 = to_pointer_type(operands[1].type());
+      bvt offset_bv1 = offset_literals(bv1, type1);
+
+      // Comparison over pointers to distinct objects is undefined behavior in
+      // C; we choose to always produce "false" in such a case.  Alternatively,
+      // we could do a comparison over the integer representation of a pointer
+
+      // do the same-object-test via an expression as this may permit re-using
+      // already cached encodings of the equality test
+      const exprt same_object = ::same_object(operands[0], operands[1]);
+      const literalt same_object_lit = convert(same_object);
+      if(same_object_lit.is_false())
+        return same_object_lit;
+
+      return prop.land(
+        same_object_lit,
+        bv_utils.rel(
+          offset_bv0,
+          expr.id(),
+          offset_bv1,
+          bv_utilst::representationt::SIGNED));
     }
   }
 
@@ -211,7 +234,7 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &index=index_expr.index();
-    const typet &array_type = array.type();
+    const auto &array_type = to_array_type(array.type());
 
     pointer_typet type = pointer_type(expr.type());
     const std::size_t bits = boolbv_width(type);
@@ -238,7 +261,7 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
       UNREACHABLE;
 
     // get size
-    auto size = pointer_offset_size(array_type.subtype(), ns);
+    auto size = pointer_offset_size(array_type.element_type(), ns);
     CHECK_RETURN(size.has_value() && *size >= 0);
 
     bv = offset_arithmetic(type, bv, *size, index);
@@ -415,9 +438,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         bv=convert_bv(*it);
         CHECK_RETURN(bv.size()==bits);
 
-        typet pointer_sub_type=it->type().subtype();
+        typet pointer_base_type = to_pointer_type(it->type()).base_type();
 
-        if(pointer_sub_type.id()==ID_empty)
+        if(pointer_base_type.id() == ID_empty)
         {
           // This is a gcc extension.
           // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
@@ -425,7 +448,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         }
         else
         {
-          auto size_opt = pointer_offset_size(pointer_sub_type, ns);
+          auto size_opt = pointer_offset_size(pointer_base_type, ns);
           CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
           size = *size_opt;
         }
@@ -485,10 +508,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     const bvt &bv = convert_bv(minus_expr.lhs());
 
-    typet pointer_sub_type = minus_expr.lhs().type().subtype();
+    typet pointer_base_type =
+      to_pointer_type(minus_expr.lhs().type()).base_type();
     mp_integer element_size;
 
-    if(pointer_sub_type.id()==ID_empty)
+    if(pointer_base_type.id() == ID_empty)
     {
       // This is a gcc extension.
       // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
@@ -496,7 +520,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     }
     else
     {
-      auto element_size_opt = pointer_offset_size(pointer_sub_type, ns);
+      auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
       CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
       element_size = *element_size_opt;
     }
@@ -590,9 +614,9 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       // Support for void* is a gcc extension, with the size treated as 1 byte
       // (no division required below).
       // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      if(lhs_pt.subtype().id() != ID_empty)
+      if(lhs_pt.base_type().id() != ID_empty)
       {
-        auto element_size_opt = pointer_offset_size(lhs_pt.subtype(), ns);
+        auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
         CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
 
         if(*element_size_opt != 1)
@@ -954,10 +978,10 @@ void bv_pointerst::do_postponed(
     UNREACHABLE;
 }
 
-void bv_pointerst::post_process()
+void bv_pointerst::finish_eager_conversion()
 {
   // post-processing arrays may yield further objects, do this first
-  SUB::post_process();
+  SUB::finish_eager_conversion();
 
   for(postponed_listt::const_iterator
       it=postponed_list.begin();

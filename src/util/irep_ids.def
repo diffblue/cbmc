@@ -578,6 +578,7 @@ IREP_ID_TWO(C_spec_requires, #spec_requires)
 IREP_ID_TWO(C_spec_ensures, #spec_ensures)
 IREP_ID_TWO(C_spec_assigns, #spec_assigns)
 IREP_ID_ONE(target_list)
+IREP_ID_ONE(conditional_target_group)
 IREP_ID_ONE(virtual_function)
 IREP_ID_TWO(element_type, element_type)
 IREP_ID_ONE(working_directory)
@@ -862,6 +863,10 @@ IREP_ID_TWO(vector_gt, vector->)
 IREP_ID_TWO(vector_lt, vector-<)
 IREP_ID_ONE(shuffle_vector)
 IREP_ID_ONE(count_trailing_zeros)
+IREP_ID_ONE(empty_union)
+IREP_ID_ONE(bitreverse)
+IREP_ID_ONE(saturating_minus)
+IREP_ID_ONE(saturating_plus)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

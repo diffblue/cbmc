@@ -83,3 +83,9 @@ if(WITH_MEMORY_ANALYZER)
   add_subdirectory(memory-analyzer)
   add_subdirectory(extract_type_header)
 endif()
+
+if(NOT WIN32)
+  add_subdirectory(crangler)
+endif()
+
+add_subdirectory(catch-framework)

@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H
 #define CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H
 
-#include <stack>
-
 #include <util/expanding_vector.h>
 #include <util/numbering.h>
 
@@ -181,8 +179,6 @@ public:
 protected:
   const namespacet &ns;
   void build();
-
-  typedef std::stack<unsigned> work_queuet;
 
   numberingt<irep_idt> pointers;
 

@@ -139,11 +139,16 @@ protected:
   virtual void typecheck_gcc_computed_goto(codet &code);
   virtual void typecheck_gcc_switch_case_range(code_gcc_switch_case_ranget &);
   virtual void typecheck_gcc_local_label(codet &code);
-  virtual void typecheck_return(code_returnt &code);
+  virtual void typecheck_return(code_frontend_returnt &);
   virtual void typecheck_switch(codet &code);
   virtual void typecheck_while(code_whilet &code);
   virtual void typecheck_dowhile(code_dowhilet &code);
   virtual void typecheck_start_thread(codet &code);
+
+  // contracts
+  virtual void typecheck_spec_assigns(exprt::operandst &targets);
+  virtual void typecheck_spec_assigns_condition(exprt &condition);
+  virtual void typecheck_spec_assigns_target(exprt &target);
   virtual void typecheck_spec_loop_invariant(codet &code);
   virtual void typecheck_spec_decreases(codet &code);
 
@@ -197,6 +202,11 @@ protected:
   virtual void typecheck_function_call_arguments(
     side_effect_expr_function_callt &expr);
   virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
+  exprt typecheck_builtin_overflow(
+    side_effect_expr_function_callt &expr,
+    const irep_idt &arith_op);
+  exprt
+  typecheck_saturating_arithmetic(const side_effect_expr_function_callt &expr);
   virtual optionalt<symbol_exprt> typecheck_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const exprt::operandst &arguments,

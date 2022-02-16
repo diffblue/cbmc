@@ -31,9 +31,9 @@ optionalt<source_locationt> find_property(
     {
       if(ins.is_assert())
       {
-        if(ins.source_location.get_property_id() == property)
+        if(ins.source_location().get_property_id() == property)
         {
-          return ins.source_location;
+          return ins.source_location();
         }
       }
     }
@@ -54,7 +54,7 @@ void show_properties(
     if(!ins.is_assert())
       continue;
 
-    const source_locationt &source_location=ins.source_location;
+    const source_locationt &source_location = ins.source_location();
 
     const irep_idt &comment=source_location.get_comment();
     const irep_idt &property_class=source_location.get_property_class();
@@ -91,7 +91,7 @@ void show_properties(
     case ui_message_handlert::uit::PLAIN:
       msg.result() << "Property " << property_id << ":\n";
 
-      msg.result() << "  " << ins.source_location << '\n'
+      msg.result() << "  " << ins.source_location() << '\n'
                    << "  " << description << '\n'
                    << "  " << from_expr(ns, identifier, ins.get_condition())
                    << '\n';
@@ -116,7 +116,7 @@ void convert_properties_json(
     if(!ins.is_assert())
       continue;
 
-    const source_locationt &source_location=ins.source_location;
+    const source_locationt &source_location = ins.source_location();
 
     const irep_idt &comment=source_location.get_comment();
     // const irep_idt &function=location.get_function();

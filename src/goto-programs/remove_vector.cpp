@@ -16,6 +16,8 @@ Date:   September 2014
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
+#include <ansi-c/c_expr.h>
+
 #include "goto_model.h"
 
 static bool have_to_remove_vector(const typet &type);
@@ -28,7 +30,8 @@ static bool have_to_remove_vector(const exprt &expr)
       expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
       expr.id() == ID_div || expr.id() == ID_mod || expr.id() == ID_bitxor ||
       expr.id() == ID_bitand || expr.id() == ID_bitor || expr.id() == ID_shl ||
-      expr.id() == ID_lshr || expr.id() == ID_ashr)
+      expr.id() == ID_lshr || expr.id() == ID_ashr ||
+      expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
     {
       return true;
     }
@@ -41,6 +44,8 @@ static bool have_to_remove_vector(const exprt &expr)
     {
       return true;
     }
+    else if(expr.id() == ID_shuffle_vector)
+      return true;
     else if(expr.id()==ID_vector)
       return true;
   }
@@ -78,7 +83,7 @@ static bool have_to_remove_vector(const typet &type)
   else if(type.id()==ID_pointer ||
           type.id()==ID_complex ||
           type.id()==ID_array)
-    return have_to_remove_vector(type.subtype());
+    return have_to_remove_vector(to_type_with_subtype(type).subtype());
   else if(type.id()==ID_vector)
     return true;
 
@@ -93,6 +98,14 @@ static void remove_vector(exprt &expr)
   if(!have_to_remove_vector(expr))
     return;
 
+  if(expr.id() == ID_shuffle_vector)
+  {
+    exprt result = to_shuffle_vector_expr(expr).lower();
+    remove_vector(result);
+    expr.swap(result);
+    return;
+  }
+
   Forall_operands(it, expr)
     remove_vector(*it);
 
@@ -102,7 +115,8 @@ static void remove_vector(exprt &expr)
       expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
       expr.id() == ID_div || expr.id() == ID_mod || expr.id() == ID_bitxor ||
       expr.id() == ID_bitand || expr.id() == ID_bitor || expr.id() == ID_shl ||
-      expr.id() == ID_lshr || expr.id() == ID_ashr)
+      expr.id() == ID_lshr || expr.id() == ID_ashr ||
+      expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
     {
       // FIXME plus, mult, bitxor, bitand and bitor are defined as n-ary
       //      operations rather than binary. This code assumes that they
@@ -116,7 +130,7 @@ static void remove_vector(exprt &expr)
       const mp_integer dimension =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      const typet subtype=array_type.subtype();
+      const typet subtype = array_type.element_type();
       // do component-wise:
       // x+y -> vector(x[0]+y[0],x[1]+y[1],...)
       array_exprt array_expr({}, array_type);
@@ -144,7 +158,7 @@ static void remove_vector(exprt &expr)
       const mp_integer dimension =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      const typet subtype=array_type.subtype();
+      const typet subtype = array_type.element_type();
       // do component-wise:
       // -x -> vector(-x[0],-x[1],...)
       array_exprt array_expr({}, array_type);
@@ -173,7 +187,7 @@ static void remove_vector(exprt &expr)
       const vector_typet &vector_type = to_vector_type(expr.type());
       const auto dimension = numeric_cast_v<std::size_t>(vector_type.size());
 
-      const typet &subtype = vector_type.subtype();
+      const typet &subtype = vector_type.element_type();
       PRECONDITION(subtype.id() == ID_signedbv);
       exprt minus_one = from_integer(-1, subtype);
       exprt zero = from_integer(0, subtype);
@@ -182,7 +196,8 @@ static void remove_vector(exprt &expr)
       operands.reserve(dimension);
 
       const bool is_float =
-        binary_expr.lhs().type().subtype().id() == ID_floatbv;
+        to_array_type(binary_expr.lhs().type()).element_type().id() ==
+        ID_floatbv;
       irep_idt new_id;
       if(binary_expr.id() == ID_vector_notequal)
       {
@@ -237,10 +252,36 @@ static void remove_vector(exprt &expr)
         const auto dimension =
           numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
         exprt casted_op =
-          typecast_exprt::conditional_cast(op, array_type.subtype());
+          typecast_exprt::conditional_cast(op, array_type.element_type());
         source_locationt source_location = expr.source_location();
         expr = array_exprt(exprt::operandst(dimension, casted_op), array_type);
         expr.add_source_location() = std::move(source_location);
+      }
+      else if(
+        expr.type().id() == ID_vector &&
+        to_vector_type(expr.type()).size() == to_array_type(op.type()).size())
+      {
+        // do component-wise typecast:
+        // (vector-type) x -> array((vector-sub-type)x[0], ...)
+        remove_vector(expr.type());
+        const array_typet &array_type = to_array_type(expr.type());
+        const std::size_t dimension =
+          numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
+        const typet subtype = array_type.element_type();
+
+        exprt::operandst elements;
+        elements.reserve(dimension);
+
+        for(std::size_t i = 0; i < dimension; i++)
+        {
+          exprt index = from_integer(i, array_type.size().type());
+          elements.push_back(
+            typecast_exprt{index_exprt{op, std::move(index)}, subtype});
+        }
+
+        array_exprt array_expr(std::move(elements), array_type);
+        array_expr.add_source_location() = expr.source_location();
+        expr.swap(array_expr);
       }
     }
   }
@@ -285,10 +326,10 @@ static void remove_vector(typet &type)
   {
     vector_typet &vector_type=to_vector_type(type);
 
-    remove_vector(type.subtype());
+    remove_vector(vector_type.element_type());
 
     // Replace by an array with appropriate number of members.
-    array_typet array_type(vector_type.subtype(), vector_type.size());
+    array_typet array_type(vector_type.element_type(), vector_type.size());
     array_type.add_source_location()=type.source_location();
     type=array_type;
   }

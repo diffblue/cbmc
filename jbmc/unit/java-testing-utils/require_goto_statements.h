@@ -9,8 +9,9 @@ Author: Diffblue Ltd.
 /// \file
 /// Utilties for inspecting goto functions
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/optional.h>
-#include <util/std_code.h>
 
 #include <regex>
 

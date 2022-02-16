@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_container.h>
@@ -257,7 +258,7 @@ void interpretert::step()
   goto_trace_stept &trace_step=steps.get_last_step();
   trace_step.thread_nr=thread_id;
   trace_step.pc=pc;
-  switch(pc->type)
+  switch(pc->type())
   {
   case GOTO:
     trace_step.type=goto_trace_stept::typet::GOTO;
@@ -298,8 +299,7 @@ void interpretert::step()
 
     if(call_stack.top().return_value_address != 0)
     {
-      mp_vectort rhs;
-      evaluate(pc->return_value(), rhs);
+      mp_vectort rhs = evaluate(pc->return_value());
       assign(call_stack.top().return_value_address, rhs);
     }
 
@@ -337,7 +337,7 @@ void interpretert::step()
     break;
   case THROW:
     trace_step.type=goto_trace_stept::typet::GOTO;
-    while(!done && (pc->type!=CATCH))
+    while(!done && (pc->type() != CATCH))
     {
       if(pc==function->second.body.instructions.end())
       {
@@ -390,15 +390,14 @@ void interpretert::execute_other()
     DATA_INVARIANT(
       pc->get_code().operands().size() == 1,
       "expression statement expected to have one operand");
-    mp_vectort rhs;
-    evaluate(pc->get_code().op0(), rhs);
+    mp_vectort rhs = evaluate(pc->get_code().op0());
   }
   else if(statement==ID_array_set)
   {
-    mp_vectort tmp, rhs;
-    evaluate(pc->get_code().op1(), tmp);
+    mp_vectort tmp = evaluate(pc->get_code().op1());
     mp_integer address = evaluate_address(pc->get_code().op0());
     mp_integer size = get_size(pc->get_code().op0().type());
+    mp_vectort rhs;
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
       output.error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -488,8 +487,8 @@ exprt interpretert::get_value(
   {
     // Get size of array
     array_exprt result({}, to_array_type(real_type));
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    mp_integer subtype_size=get_size(type.subtype());
+    const exprt &size_expr = to_array_type(type).size();
+    mp_integer subtype_size = get_size(to_array_type(type).element_type());
     mp_integer count;
     if(size_expr.id()!=ID_constant)
     {
@@ -504,9 +503,8 @@ exprt interpretert::get_value(
     result.reserve_operands(numeric_cast_v<std::size_t>(count));
     for(mp_integer i=0; i<count; ++i)
     {
-      const exprt operand=get_value(
-        type.subtype(),
-        offset+i*subtype_size);
+      const exprt operand = get_value(
+        to_array_type(type).element_type(), offset + i * subtype_size);
       result.copy_to_operands(operand);
     }
     return std::move(result);
@@ -554,10 +552,10 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_array)
   {
     array_exprt result({}, to_array_type(real_type));
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
+    const exprt &size_expr = to_array_type(real_type).size();
 
     // Get size of array
-    mp_integer subtype_size=get_size(type.subtype());
+    mp_integer subtype_size = get_size(to_array_type(type).element_type());
 
     mp_integer count;
     if(unbounded_size(type))
@@ -573,8 +571,8 @@ exprt interpretert::get_value(
     result.reserve_operands(numeric_cast_v<std::size_t>(count));
     for(mp_integer i=0; i<count; ++i)
     {
-      const exprt operand=get_value(type.subtype(), rhs,
-          offset+i*subtype_size);
+      const exprt operand = get_value(
+        to_array_type(type).element_type(), rhs, offset + i * subtype_size);
       result.copy_to_operands(operand);
     }
     return std::move(result);
@@ -653,15 +651,15 @@ exprt interpretert::get_value(
 /// executes the assign statement at the current pc value
 void interpretert::execute_assign()
 {
-  const code_assignt &code_assign = pc->get_assign();
+  const exprt &assign_lhs = pc->assign_lhs();
+  const exprt &assign_rhs = pc->assign_rhs();
 
-  mp_vectort rhs;
-  evaluate(code_assign.rhs(), rhs);
+  mp_vectort rhs = evaluate(assign_rhs);
 
   if(!rhs.empty())
   {
-    mp_integer address=evaluate_address(code_assign.lhs());
-    mp_integer size=get_size(code_assign.lhs().type());
+    mp_integer address = evaluate_address(assign_lhs);
+    mp_integer size = get_size(assign_lhs.type());
 
     if(size!=rhs.size())
       output.error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -671,20 +669,19 @@ void interpretert::execute_assign()
     {
       goto_trace_stept &trace_step=steps.get_last_step();
       assign(address, rhs);
-      trace_step.full_lhs=code_assign.lhs();
+      trace_step.full_lhs = assign_lhs;
       trace_step.full_lhs_value=get_value(trace_step.full_lhs.type(), rhs);
     }
   }
-  else if(code_assign.rhs().id()==ID_side_effect)
+  else if(assign_rhs.id() == ID_side_effect)
   {
-    side_effect_exprt side_effect=to_side_effect_expr(code_assign.rhs());
+    side_effect_exprt side_effect = to_side_effect_expr(assign_rhs);
     if(side_effect.get_statement()==ID_nondet)
     {
       mp_integer address =
-        numeric_cast_v<std::size_t>(evaluate_address(code_assign.lhs()));
+        numeric_cast_v<std::size_t>(evaluate_address(assign_lhs));
 
-      mp_integer size=
-        get_size(code_assign.lhs().type());
+      mp_integer size = get_size(assign_lhs.type());
 
       for(mp_integer i=0; i<size; ++i)
       {
@@ -780,7 +777,7 @@ void interpretert::execute_function_call()
   argument_values.resize(call_arguments.size());
 
   for(std::size_t i = 0; i < call_arguments.size(); i++)
-    evaluate(call_arguments[i], argument_values[i]);
+    argument_values[i] = evaluate(call_arguments[i]);
 
   // do the call
 
@@ -827,10 +824,10 @@ void interpretert::execute_function_call()
 
     if(it!=function_input_vars.end())
     {
-      mp_vectort value;
       PRECONDITION(!it->second.empty());
       PRECONDITION(!it->second.front().return_assignments.empty());
-      evaluate(it->second.front().return_assignments.back().value, value);
+      mp_vectort value =
+        evaluate(it->second.front().return_assignments.back().value);
       if(return_value_address>0)
       {
         assign(return_value_address, value);
@@ -890,18 +887,16 @@ typet interpretert::concretize_type(const typet &type)
 {
   if(type.id()==ID_array)
   {
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    mp_vectort computed_size;
-    evaluate(size_expr, computed_size);
+    const exprt &size_expr = to_array_type(type).size();
+    mp_vectort computed_size = evaluate(size_expr);
     if(computed_size.size()==1 &&
        computed_size[0]>=0)
     {
       output.result() << "Concretized array with size " << computed_size[0]
                       << messaget::eom;
-      return
-        array_typet(
-          type.subtype(),
-          from_integer(computed_size[0], integer_typet()));
+      return array_typet(
+        to_array_type(type).element_type(),
+        from_integer(computed_size[0], integer_typet()));
     }
     else
     {
@@ -952,7 +947,7 @@ bool interpretert::unbounded_size(const typet &type)
     const exprt &size=to_array_type(type).size();
     if(size.id()==ID_infinity)
       return true;
-    return unbounded_size(type.subtype());
+    return unbounded_size(to_array_type(type).element_type());
   }
   else if(type.id()==ID_struct)
   {
@@ -1009,12 +1004,11 @@ mp_integer interpretert::get_size(const typet &type)
   }
   else if(type.id()==ID_array)
   {
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
+    const exprt &size_expr = to_array_type(type).size();
 
-    mp_integer subtype_size=get_size(type.subtype());
+    mp_integer subtype_size = get_size(to_array_type(type).element_type());
 
-    mp_vectort i;
-    evaluate(size_expr, i);
+    mp_vectort i = evaluate(size_expr);
     if(i.size()==1)
     {
       // Go via the binary representation to reproduce any

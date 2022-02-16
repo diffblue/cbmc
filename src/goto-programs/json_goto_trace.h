@@ -120,7 +120,7 @@ void convert(
 
   for(const auto &step : goto_trace.steps)
   {
-    const source_locationt &source_location = step.pc->source_location;
+    const source_locationt &source_location = step.pc->source_location();
 
     jsont json_location;
 

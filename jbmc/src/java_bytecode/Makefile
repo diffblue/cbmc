@@ -9,6 +9,7 @@ SRC = assignments_from_json.cpp \
       expr2java.cpp \
       generic_parameter_specialization_map.cpp \
       generic_parameter_specialization_map_keys.cpp \
+      goto_check_java.cpp \
       jar_file.cpp \
       jar_pool.cpp \
       java_bmc_util.cpp \
@@ -48,6 +49,7 @@ SRC = assignments_from_json.cpp \
       lift_clinit_calls.cpp \
       load_method_by_regex.cpp \
       mz_zip_archive.cpp \
+      nondet.cpp \
       remove_exceptions.cpp \
       remove_instanceof.cpp \
       remove_java_new.cpp \

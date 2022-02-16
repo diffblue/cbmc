@@ -31,7 +31,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 
   array_typet array_type(char_type(), from_integer(2, size_type()));
   symbol_exprt array("A", array_type);
-  index_exprt index(array, from_integer(1, index_type()));
+  index_exprt index(array, from_integer(1, c_index_type()));
   address_of_exprt address_of(index);
 
   exprt p_o=pointer_offset(address_of);
@@ -79,7 +79,7 @@ TEST_CASE("Simplify byte extract", "[core][util]")
   // object
   symbol_exprt s("foo", size_type());
   byte_extract_exprt be =
-    make_byte_extract(s, from_integer(0, index_type()), size_type());
+    make_byte_extract(s, from_integer(0, c_index_type()), size_type());
 
   exprt simp = simplify_expr(be, ns);
 
@@ -108,6 +108,30 @@ TEST_CASE("expr2bits and bits2expr respect bit order", "[core][util]")
   const auto should_be_deadbeef2 =
     bits2expr(*be, unsignedbv_typet(32), false, ns);
   REQUIRE(deadbeef == *should_be_deadbeef2);
+
+  c_bit_field_typet four_bits{unsignedbv_typet{8}, 4};
+  struct_typet st{{{"s", unsignedbv_typet{16}},
+                   {"bf1", four_bits},
+                   {"bf2", four_bits},
+                   {"b", unsignedbv_typet{8}}}};
+
+  const auto fill_struct_le = bits2expr(*le, st, true, ns);
+  REQUIRE(fill_struct_le.has_value());
+  REQUIRE(
+    to_struct_expr(*fill_struct_le).operands()[1] ==
+    from_integer(0xd, four_bits));
+  REQUIRE(
+    to_struct_expr(*fill_struct_le).operands()[2] ==
+    from_integer(0xa, four_bits));
+
+  const auto fill_struct_be = bits2expr(*be, st, false, ns);
+  REQUIRE(fill_struct_be.has_value());
+  REQUIRE(
+    to_struct_expr(*fill_struct_be).operands()[1] ==
+    from_integer(0xb, four_bits));
+  REQUIRE(
+    to_struct_expr(*fill_struct_be).operands()[2] ==
+    from_integer(0xe, four_bits));
 }
 
 TEST_CASE("Simplify extractbit", "[core][util]")

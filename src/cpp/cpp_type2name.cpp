@@ -61,7 +61,7 @@ static std::string irep2name(const irept &irep)
       else
         result += ',';
 
-      result += do_prefix(name2string(named_sub.first));
+      result += do_prefix(id2string(named_sub.first));
 
       result += '=';
       result += irep2name(named_sub.second);
@@ -78,7 +78,7 @@ static std::string irep2name(const irept &irep)
         first=false;
       else
         result+=',';
-      result += do_prefix(name2string(named_sub.first));
+      result += do_prefix(id2string(named_sub.first));
       result+='=';
       result += irep2name(named_sub.second);
     }
@@ -120,11 +120,11 @@ std::string cpp_type2name(const typet &type)
   else if(type.id()==ID_pointer)
   {
     if(is_reference(type))
-      result+="ref_"+cpp_type2name(type.subtype());
+      result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
     else if(is_rvalue_reference(type))
-      result+="rref_"+cpp_type2name(type.subtype());
+      result += "rref_" + cpp_type2name(to_pointer_type(type).base_type());
     else
-      result+="ptr_"+cpp_type2name(type.subtype());
+      result += "ptr_" + cpp_type2name(to_pointer_type(type).base_type());
   }
   else if(type.id()==ID_signedbv || type.id()==ID_unsignedbv)
   {

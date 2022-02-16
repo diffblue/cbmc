@@ -64,6 +64,19 @@ void parse_function_pointer_restriction_options_from_cmdline(
   const cmdlinet &cmdline,
   optionst &options);
 
+class invalid_restriction_exceptiont : public cprover_exception_baset
+{
+public:
+  explicit invalid_restriction_exceptiont(
+    std::string reason,
+    std::string correct_format = "");
+
+  std::string what() const override;
+
+  std::string reason;
+  std::string correct_format;
+};
+
 class function_pointer_restrictionst
 {
 public:
@@ -80,28 +93,17 @@ public:
     message_handlert &message_handler);
 
   jsont to_json() const;
-  static function_pointer_restrictionst from_json(const jsont &json);
+  static function_pointer_restrictionst
+  from_json(const jsont &json, const goto_modelt &goto_model);
 
   static function_pointer_restrictionst read_from_file(
     const std::string &filename,
+    const goto_modelt &goto_model,
     message_handlert &message_handler);
 
   void write_to_file(const std::string &filename) const;
 
 protected:
-  class invalid_restriction_exceptiont : public cprover_exception_baset
-  {
-  public:
-    explicit invalid_restriction_exceptiont(
-      std::string reason,
-      std::string correct_format = "");
-
-    std::string what() const override;
-
-    std::string reason;
-    std::string correct_format;
-  };
-
   static void typecheck_function_pointer_restrictions(
     const goto_modelt &goto_model,
     const restrictionst &restrictions);
@@ -112,18 +114,22 @@ protected:
 
   static restrictionst parse_function_pointer_restrictions_from_file(
     const std::list<std::string> &filenames,
+    const goto_modelt &goto_model,
     message_handlert &message_handler);
 
   static restrictionst parse_function_pointer_restrictions_from_command_line(
-    const std::list<std::string> &restriction_opts);
+    const std::list<std::string> &restriction_opts,
+    const goto_modelt &goto_model);
 
   static restrictionst parse_function_pointer_restrictions(
     const std::list<std::string> &restriction_opts,
-    const std::string &option);
+    const std::string &option,
+    const goto_modelt &goto_model);
 
   static restrictiont parse_function_pointer_restriction(
     const std::string &restriction_opt,
-    const std::string &option);
+    const std::string &option,
+    const goto_modelt &goto_model);
 
   static optionalt<restrictiont> get_by_name_restriction(
     const goto_functiont &goto_function,
@@ -156,7 +162,8 @@ protected:
 /// Note: This requires label_function_pointer_call_sites to be run
 ///       before
 void restrict_function_pointers(
+  message_handlert &message_handler,
   goto_modelt &goto_model,
-  const function_pointer_restrictionst &restrictions);
+  const optionst &options);
 
 #endif // CPROVER_GOTO_PROGRAMS_RESTRICT_FUNCTION_POINTERS_H

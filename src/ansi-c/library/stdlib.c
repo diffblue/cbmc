@@ -36,6 +36,9 @@ inline void exit(int status)
 {
   (void)status;
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: _Exit */
@@ -46,6 +49,9 @@ inline void _Exit(int status)
 {
   (void)status;
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: abort */
@@ -55,6 +61,9 @@ inline void _Exit(int status)
 inline void abort(void)
 {
   __CPROVER_assume(0);
+#ifdef LIBRARY_CHECK
+  __builtin_unreachable();
+#endif
 }
 
 /* FUNCTION: calloc */
@@ -62,18 +71,16 @@ inline void abort(void)
 #undef calloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef __GNUC__
+_Bool __builtin_mul_overflow();
+#endif
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
-#pragma CPROVER check push
-#pragma CPROVER check disable "unsigned-overflow"
-  if(__CPROVER_overflow_mult(nmemb, size))
+  __CPROVER_size_t alloc_size;
+  if(__builtin_mul_overflow(nmemb, size, &alloc_size))
     return (void *)0;
-  // This is now safe; still do it within the scope of the pragma to avoid an
-  // unnecessary assertion to be generated.
-  __CPROVER_size_t alloc_size = nmemb * size;
-#pragma CPROVER check pop
 
   if(__CPROVER_malloc_failure_mode == __CPROVER_malloc_failure_mode_return_null)
   {
@@ -111,9 +118,6 @@ __CPROVER_HIDE:;
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object =
-    record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? alloc_size : __CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -176,9 +180,6 @@ __CPROVER_HIDE:;
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object =
-    record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? malloc_size : __CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
@@ -209,8 +210,6 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
-  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
-  __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // record alloca to detect invalid free
@@ -261,10 +260,9 @@ inline void free(void *ptr)
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
-  __CPROVER_precondition(ptr==0 ||
-                         __CPROVER_malloc_object!=ptr ||
-                         !__CPROVER_malloc_is_new_array,
-                         "free called for new[] object");
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_new_object != ptr || !__CPROVER_malloc_is_new_array,
+    "free called for new[] object");
 
   // catch people who try to use free(...) with alloca
   __CPROVER_precondition(
@@ -301,6 +299,11 @@ inline void free(void *ptr)
 
 int isspace(int);
 int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
 
 inline long strtol(const char *nptr, char **endptr, int base)
 {
@@ -362,15 +365,8 @@ inline long strtol(const char *nptr, char **endptr, int base)
       break;
 
     in_number=1;
-    _Bool overflow = __CPROVER_overflow_mult(res, (long)base);
-#pragma CPROVER check push
-#pragma CPROVER check disable "signed-overflow"
-    // This is now safe; still do it within the scope of the pragma to avoid an
-    // unnecessary assertion to be generated.
-    if(!overflow)
-      res *= base;
-#pragma CPROVER check pop
-    if(overflow || __CPROVER_overflow_plus(res, (long)(ch - sub)))
+    _Bool overflow = __builtin_mul_overflow(res, (long)base, &res);
+    if(overflow || __builtin_add_overflow(res, (long)(ch - sub), &res))
     {
       errno=ERANGE;
       if(sign=='-')
@@ -378,7 +374,6 @@ inline long strtol(const char *nptr, char **endptr, int base)
       else
         return LONG_MAX;
     }
-    res += ch - sub;
   }
 
   if(endptr!=0)
@@ -420,15 +415,13 @@ inline long atol(const char *nptr)
 
 #undef getenv
 
-#ifndef __CPROVER_LIMITS_H_INCLUDED
-#include <limits.h>
-#define __CPROVER_LIMITS_H_INCLUDED
+#ifndef __CPROVER_STDDEF_H_INCLUDED
+#  include <stddef.h>
+#  define __CPROVER_STDDEF_H_INCLUDED
 #endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t();
-
-inline void *__builtin_alloca(__CPROVER_size_t alloca_size);
+ptrdiff_t __VERIFIER_nondet_ptrdiff_t();
 
 inline char *getenv(const char *name)
 {
@@ -440,29 +433,35 @@ inline char *getenv(const char *name)
     "zero-termination of argument of getenv");
   #endif
 
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_event("invalidate_pointer", "getenv_result");
   char *getenv_result;
   __CPROVER_set_must(getenv_result, "getenv_result");
   return getenv_result;
 
-  #else
+#else
 
   __CPROVER_bool found=__VERIFIER_nondet___CPROVER_bool();
   if(!found) return 0;
 
-  __CPROVER_size_t buf_size=__VERIFIER_nondet___CPROVER_size_t();
+  ptrdiff_t buf_size = __VERIFIER_nondet_ptrdiff_t();
 
   // It's reasonable to assume this won't exceed the signed
   // range in practice, but in principle, this could exceed
   // the range.
 
-  __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
-  char *buffer=(char *)__builtin_alloca(buf_size);
+  __CPROVER_assume(buf_size >= 1);
+  char *buffer = (char *)__CPROVER_allocate(buf_size * sizeof(char), 0);
   buffer[buf_size-1]=0;
 
+#  ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assume(__CPROVER_buffer_size(buffer) == buf_size);
+  __CPROVER_is_zero_string(buffer) = 1;
+  __CPROVER_zero_string_length(buffer) = buf_size - 1;
+#  endif
+
   return buffer;
-  #endif
+#endif
 }
 
 /* FUNCTION: realloc */

@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/std_code.h>
 
 #include "expr_skeleton.h"
 #include "path_storage.h"
@@ -63,7 +64,7 @@ void goto_symext::parameter_assignments(
     // if you run out of actual arguments there was a mismatch
     if(it1==arguments.end())
     {
-      log.warning() << state.source.pc->source_location.as_string()
+      log.warning() << state.source.pc->source_location().as_string()
                     << ": "
                        "call to '"
                     << id2string(function_identifier)
@@ -72,7 +73,7 @@ void goto_symext::parameter_assignments(
                     << log.eom;
 
       rhs = side_effect_expr_nondett(
-        parameter_type, state.source.pc->source_location);
+        parameter_type, state.source.pc->source_location());
     }
     else
       rhs=*it1;
@@ -110,12 +111,12 @@ void goto_symext::parameter_assignments(
         // clang-format on
         {
           rhs = make_byte_extract(
-            rhs, from_integer(0, index_type()), parameter_type);
+            rhs, from_integer(0, c_index_type()), parameter_type);
         }
         else
         {
           std::ostringstream error;
-          error << state.source.pc->source_location.as_string() << ": "
+          error << state.source.pc->source_location().as_string() << ": "
                 << "function call: parameter \"" << identifier
                 << "\" type mismatch:\ngot " << rhs.type().pretty()
                 << "\nexpected " << parameter_type.pretty();
@@ -154,7 +155,7 @@ void goto_symext::parameter_assignments(
         it1->type(),
         id2string(function_identifier),
         "va_arg",
-        state.source.pc->source_location,
+        state.source.pc->source_location(),
         ns.lookup(function_identifier).mode,
         state.symbol_table);
       va_arg.is_parameter = true;
@@ -173,54 +174,58 @@ void goto_symext::parameter_assignments(
 void goto_symext::symex_function_call(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &code)
+  const goto_programt::instructiont &instruction)
 {
-  const exprt &function=code.function();
+  const exprt &function = instruction.call_function();
 
   // If at some point symex_function_call can support more
   // expression ids(), like ID_Dereference, please expand the
   // precondition appropriately.
   PRECONDITION(function.id() == ID_symbol);
-  symex_function_call_symbol(get_goto_function, state, code);
+
+  symex_function_call_symbol(
+    get_goto_function,
+    state,
+    instruction.call_lhs(),
+    to_symbol_expr(instruction.call_function()),
+    instruction.call_arguments());
 }
 
 void goto_symext::symex_function_call_symbol(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &original_code)
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments)
 {
-  code_function_callt code = original_code;
+  exprt cleaned_lhs;
 
-  if(code.lhs().is_not_nil())
-    code.lhs() = clean_expr(std::move(code.lhs()), state, true);
+  if(lhs.is_nil())
+    cleaned_lhs = lhs;
+  else
+    cleaned_lhs = clean_expr(lhs, state, true);
 
-  code.function() = clean_expr(std::move(code.function()), state, false);
+  // no need to clean the function, which is a symbol only
 
-  for(auto &argument : code.arguments())
-    argument = clean_expr(std::move(argument), state, false);
+  exprt::operandst cleaned_arguments;
+
+  for(auto &argument : arguments)
+    cleaned_arguments.push_back(clean_expr(argument, state, false));
 
   target.location(state.guard.as_expr(), state.source);
 
-  PRECONDITION(code.function().id() == ID_symbol);
-
-  const irep_idt &identifier=
-    to_symbol_expr(code.function()).get_identifier();
-
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
-  {
-    symex_fkt(state, code);
-  }
-  else
-    symex_function_call_code(get_goto_function, state, code);
+  symex_function_call_post_clean(
+    get_goto_function, state, cleaned_lhs, function, cleaned_arguments);
 }
 
-void goto_symext::symex_function_call_code(
+void goto_symext::symex_function_call_post_clean(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &call)
+  const exprt &cleaned_lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &cleaned_arguments)
 {
-  const irep_idt &identifier=
-    to_symbol_expr(call.function()).get_identifier();
+  const irep_idt &identifier = function.get_identifier();
 
   const goto_functionst::goto_functiont &goto_function =
     get_goto_function(identifier);
@@ -258,10 +263,10 @@ void goto_symext::symex_function_call_code(
   }
 
   // read the arguments -- before the locality renaming
-  const exprt::operandst &arguments = call.arguments();
   const std::vector<renamedt<exprt, L2>> renamed_arguments =
-    make_range(arguments).map(
-      [&](const exprt &a) { return state.rename(a, ns); });
+    make_range(cleaned_arguments).map([&](const exprt &a) {
+      return state.rename(a, ns);
+    });
 
   // we hide the call if the caller and callee are both hidden
   const bool hidden =
@@ -279,25 +284,26 @@ void goto_symext::symex_function_call_code(
     target.function_return(
       state.guard.as_expr(), identifier, state.source, hidden);
 
-    if(call.lhs().is_not_nil())
+    if(cleaned_lhs.is_not_nil())
     {
-      const auto rhs =
-        side_effect_expr_nondett(call.lhs().type(), call.source_location());
-      symex_assign(state, call.lhs(), rhs);
+      const auto rhs = side_effect_expr_nondett(
+        cleaned_lhs.type(), state.source.pc->source_location());
+      symex_assign(state, cleaned_lhs, rhs);
     }
 
     if(symex_config.havoc_undefined_functions)
     {
       // assign non det to function arguments if pointers
       // are not const
-      for(const auto &arg : call.arguments())
+      for(const auto &arg : cleaned_arguments)
       {
         if(
           arg.type().id() == ID_pointer &&
-          !arg.type().subtype().get_bool(ID_C_constant) &&
-          arg.type().subtype().id() != ID_code)
+          !to_pointer_type(arg.type()).base_type().get_bool(ID_C_constant) &&
+          to_pointer_type(arg.type()).base_type().id() != ID_code)
         {
-          exprt object = dereference_exprt(arg, arg.type().subtype());
+          exprt object =
+            dereference_exprt(arg, to_pointer_type(arg.type()).base_type());
           exprt cleaned_object = clean_expr(object, state, true);
           const guardt guard(true_exprt(), state.guard_manager);
           havoc_rec(state, guard, cleaned_object);
@@ -325,12 +331,34 @@ void goto_symext::symex_function_call_code(
   locality(identifier, state, path_storage, goto_function, ns);
 
   // assign actuals to formal parameters
-  parameter_assignments(identifier, goto_function, state, arguments);
+  parameter_assignments(identifier, goto_function, state, cleaned_arguments);
 
-  frame.end_of_function=--goto_function.body.instructions.end();
-  frame.return_value=call.lhs();
+  frame.call_lhs = cleaned_lhs;
+  frame.end_of_function = --goto_function.body.instructions.end();
   frame.function_identifier=identifier;
   frame.hidden_function = goto_function.is_hidden();
+
+  // set up the 'return value symbol' when needed
+  if(frame.call_lhs.is_not_nil())
+  {
+    irep_idt return_value_symbol_identifier =
+      "goto_symex::return_value::" + id2string(identifier);
+
+    if(!state.symbol_table.has_symbol(return_value_symbol_identifier))
+    {
+      const symbolt &function_symbol = ns.lookup(identifier);
+      auxiliary_symbolt
+        new_symbol; // these are thread-local and have dynamic lifetime
+      new_symbol.base_name = "return_value";
+      new_symbol.name = return_value_symbol_identifier;
+      new_symbol.type = to_code_type(function_symbol.type).return_type();
+      new_symbol.mode = function_symbol.mode;
+      state.symbol_table.add(new_symbol);
+    }
+
+    frame.return_value_symbol =
+      ns.lookup(return_value_symbol_identifier).symbol_expr();
+  }
 
   const framet &p_frame = state.call_stack().previous_frame();
   for(const auto &pair : p_frame.loop_iterations)
@@ -400,14 +428,33 @@ static void pop_frame(
 /// do function call by inlining
 void goto_symext::symex_end_of_function(statet &state)
 {
+  PRECONDITION(!state.call_stack().empty());
+
   const bool hidden = state.call_stack().top().hidden_function;
 
   // first record the return
   target.function_return(
     state.guard.as_expr(), state.source.function_id, state.source, hidden);
 
-  // then get rid of the frame
+  // before we drop the frame, remember the call LHS
+  // and the return value symbol, if any
+  auto call_lhs = state.call_stack().top().call_lhs;
+  auto return_value_symbol = state.call_stack().top().return_value_symbol;
+
+  // now get rid of the frame
   pop_frame(state, path_storage, symex_config.doing_path_exploration);
+
+  // after dropping the frame, assign the return value, if any
+  if(state.reachable && call_lhs.is_not_nil())
+  {
+    DATA_INVARIANT(
+      return_value_symbol.has_value(),
+      "must have return value symbol when assigning call lhs");
+    // the type of the call lhs and the return type might not match
+    auto casted_return_value = typecast_exprt::conditional_cast(
+      return_value_symbol.value(), call_lhs.type());
+    symex_assign(state, call_lhs, casted_return_value);
+  }
 }
 
 /// Preserves locality of parameters of a given function by applying L1

@@ -49,7 +49,7 @@ public:
 protected:
 
   // Refine array
-  void post_process_arrays() override;
+  void finish_eager_conversion_arrays() override;
 
   // Refine arithmetic
   bvt convert_mult(const mult_exprt &expr) override;

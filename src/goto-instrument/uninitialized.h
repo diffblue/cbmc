@@ -24,4 +24,10 @@ void show_uninitialized(
   const goto_modelt &,
   std::ostream &out);
 
+#define OPT_UNINITIALIZED_CHECK "(uninitialized-check)"
+
+#define HELP_UNINITIALIZED_CHECK                                               \
+  " --uninitialized-check        add checks for uninitialized locals "         \
+  "(experimental)\n" // NOLINT(whitespace/line_length)
+
 #endif // CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H

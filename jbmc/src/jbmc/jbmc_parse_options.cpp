@@ -228,8 +228,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     "self-loops-to-assumptions",
     !cmdline.isset("no-self-loops-to-assumptions"));
 
-  // all checks supported by goto_check
-  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
+  // all checks supported by goto_check_java
+  PARSE_OPTIONS_GOTO_CHECK_JAVA(cmdline, options);
 
   // unwind loops in java enum static initialization
   if(cmdline.isset("java-unwind-enum-static"))
@@ -721,10 +721,6 @@ int jbmc_parse_optionst::get_goto_program(
 
     goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
 
-    // if we added the ansi-c library models here this should also call
-    // add_malloc_may_fail_variable_initializations(goto_model);
-    // here
-
     if(cmdline.isset("validate-goto-model"))
     {
       goto_model.validate();
@@ -811,8 +807,12 @@ void jbmc_parse_optionst::process_goto_function(
   }
 
   // add generic checks
-  goto_check(
-    function.get_function_id(), function.get_goto_function(), ns, options);
+  goto_check_java(
+    function.get_function_id(),
+    function.get_goto_function(),
+    ns,
+    options,
+    ui_message_handler);
 
   // Replace Java new side effects
   remove_java_new(

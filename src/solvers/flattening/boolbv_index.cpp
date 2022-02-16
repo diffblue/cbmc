@@ -288,7 +288,7 @@ bvt boolbvt::convert_index(
 {
   const array_typet &array_type = to_array_type(array.type());
 
-  std::size_t width=boolbv_width(array_type.subtype());
+  std::size_t width = boolbv_width(array_type.element_type());
 
   if(width==0)
     return conversion_failed(array);
@@ -330,7 +330,7 @@ bvt boolbvt::convert_index(
     CHECK_RETURN(o.offset().id() != ID_unknown);
 
     const auto subtype_bytes_opt =
-      pointer_offset_size(array_type.subtype(), ns);
+      pointer_offset_size(array_type.element_type(), ns);
     CHECK_RETURN(subtype_bytes_opt.has_value());
 
     exprt new_offset = simplify_expr(
@@ -339,7 +339,7 @@ bvt boolbvt::convert_index(
       ns);
 
     byte_extract_exprt be =
-      make_byte_extract(o.root_object(), new_offset, array_type.subtype());
+      make_byte_extract(o.root_object(), new_offset, array_type.element_type());
 
     return convert_bv(be);
   }
@@ -350,7 +350,7 @@ bvt boolbvt::convert_index(
     const byte_extract_exprt &byte_extract_expr = to_byte_extract_expr(array);
 
     const auto subtype_bytes_opt =
-      pointer_offset_size(array_type.subtype(), ns);
+      pointer_offset_size(array_type.element_type(), ns);
     CHECK_RETURN(subtype_bytes_opt.has_value());
 
     // add offset to index
@@ -363,7 +363,7 @@ bvt boolbvt::convert_index(
 
     byte_extract_exprt be = byte_extract_expr;
     be.offset() = new_offset;
-    be.type() = array_type.subtype();
+    be.type() = array_type.element_type();
 
     return convert_bv(be);
   }

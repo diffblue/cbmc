@@ -42,7 +42,7 @@ void show_loop_ids(
                     << goto_programt::loop_id(function_id, instruction) << ":"
                     << "\n";
 
-          std::cout << "  " << instruction.source_location << "\n";
+          std::cout << "  " << instruction.source_location() << "\n";
           std::cout << "\n";
         }
       }
@@ -59,7 +59,7 @@ void show_loop_ids(
 
           xmlt xml_loop("loop", {{"name", id}}, {});
           xml_loop.new_element("loop-id").data=id;
-          xml_loop.new_element() = xml(instruction.source_location);
+          xml_loop.new_element() = xml(instruction.source_location());
           std::cout << xml_loop << "\n";
         }
       }
@@ -85,9 +85,9 @@ void show_loop_ids_json(
       std::string id =
         id2string(goto_programt::loop_id(function_id, instruction));
 
-      loops.push_back(
-        json_objectt({{"name", json_stringt(id)},
-                      {"sourceLocation", json(instruction.source_location)}}));
+      loops.push_back(json_objectt(
+        {{"name", json_stringt(id)},
+         {"sourceLocation", json(instruction.source_location())}}));
     }
   }
 }

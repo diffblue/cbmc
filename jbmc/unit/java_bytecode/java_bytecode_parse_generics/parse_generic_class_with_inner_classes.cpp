@@ -56,7 +56,7 @@ SCENARIO(
         require_type::require_pointer_to_tag(field.type(), inner_class_prefix);
       java_generic_struct_tag_typet inner_class_tag =
         require_type::require_java_generic_struct_tag_type(
-          field_type.subtype(),
+          field_type.base_type(),
           inner_class_prefix,
           {
             {require_type::type_argument_kindt::Var,
@@ -79,7 +79,7 @@ SCENARIO(
           shadowing_field.type(), shadowing_inner_class_prefix);
         java_generic_struct_tag_typet shadowing_inner_class_tag =
           require_type::require_java_generic_struct_tag_type(
-            shadowing_field_type.subtype(),
+            shadowing_field_type.base_type(),
             shadowing_inner_class_prefix,
             {
               {require_type::type_argument_kindt::Var,

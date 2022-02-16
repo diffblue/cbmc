@@ -20,11 +20,13 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <ansi-c/expr2c_class.h>
 
-#include <util/allocate_objects.h>
 #include <util/message.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/allocate_objects.h>
 
 class gdb_apit;
 class exprt;
@@ -328,8 +330,9 @@ private:
   /// \param pointer_value: pointer value to be analyzed
   /// \param expected_type: type of the potential member
   /// \return true if pointing to a member
-  bool
-  points_to_member(pointer_valuet &pointer_value, const typet &expected_type);
+  bool points_to_member(
+    pointer_valuet &pointer_value,
+    const pointer_typet &expected_type);
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H

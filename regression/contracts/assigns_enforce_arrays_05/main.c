@@ -1,18 +1,23 @@
-void assigns_ptr(int *x) __CPROVER_assigns(*x)
+void assigns_ptr(int *x)
 {
   *x = 200;
 }
 
-void assigns_range(int a[], int len) __CPROVER_assigns(a)
+void uses_assigns(int a[], int i, int len)
+  // clang-format off
+ __CPROVER_requires(0 <= i && i < len)
+  __CPROVER_assigns(*(&a[i]))
+// clang-format on
 {
-  int *ptr = &(a[7]);
+  int *ptr = &(a[i]);
   assigns_ptr(ptr);
 }
 
 int main()
 {
   int arr[10];
-  assigns_range(arr, 10);
-
+  int i;
+  __CPROVER_assume(0 <= i && i < 10);
+  uses_assigns(arr, i, 10);
   return 0;
 }

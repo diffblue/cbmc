@@ -1,0 +1,13 @@
+CORE
+stdbool_example.c
+--incremental-smt2-solver 'z3 --smt2 -in' --trace
+Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+VERIFICATION FAILED
+equal=FALSE\s*\([0 ]+\)
+equal=TRUE\s*\([0 ]+1\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that running cbmc with the `--incremental-smt2-solver` argument can be used
+to generate a trace including values of C bool variables.

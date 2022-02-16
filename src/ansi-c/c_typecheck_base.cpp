@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/std_types.h>
 
 #include "ansi_c_declaration.h"
@@ -236,10 +237,11 @@ void c_typecheck_baset::typecheck_redefinition_type(
       // under Windows, ignore this silently;
       // MSC doesn't think this is a problem, but GCC complains.
     }
-    else if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN &&
-            final_new.id()==ID_pointer && final_old.id()==ID_pointer &&
-            follow(final_new.subtype()).id()==ID_c_enum &&
-            follow(final_old.subtype()).id()==ID_c_enum)
+    else if(
+      config.ansi_c.os == configt::ansi_ct::ost::OS_WIN &&
+      final_new.id() == ID_pointer && final_old.id() == ID_pointer &&
+      follow(to_pointer_type(final_new).base_type()).id() == ID_c_enum &&
+      follow(to_pointer_type(final_old).base_type()).id() == ID_c_enum)
     {
       // under Windows, ignore this silently;
       // MSC doesn't think this is a problem, but GCC complains.
@@ -267,20 +269,23 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   const typet &final_old=follow(old_symbol.type);
   const typet &initial_new=follow(new_symbol.type);
 
-  if(final_old.id()==ID_array &&
-     to_array_type(final_old).size().is_not_nil() &&
-     initial_new.id()==ID_array &&
-     to_array_type(initial_new).size().is_nil() &&
-     final_old.subtype()==initial_new.subtype())
+  if(
+    final_old.id() == ID_array &&
+    to_array_type(final_old).size().is_not_nil() &&
+    initial_new.id() == ID_array &&
+    to_array_type(initial_new).size().is_nil() &&
+    to_array_type(final_old).element_type() ==
+      to_array_type(initial_new).element_type())
   {
     // this is ok, just use old type
     new_symbol.type=old_symbol.type;
   }
-  else if(final_old.id()==ID_array &&
-          to_array_type(final_old).size().is_nil() &&
-          initial_new.id()==ID_array &&
-          to_array_type(initial_new).size().is_not_nil() &&
-          final_old.subtype()==initial_new.subtype())
+  else if(
+    final_old.id() == ID_array && to_array_type(final_old).size().is_nil() &&
+    initial_new.id() == ID_array &&
+    to_array_type(initial_new).size().is_not_nil() &&
+    to_array_type(final_old).element_type() ==
+      to_array_type(initial_new).element_type())
   {
     // update the type to enable the use of sizeof(x) on the
     // right-hand side of a definition of x
@@ -409,18 +414,21 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
   if(final_old!=final_new)
   {
-    if(final_old.id()==ID_array &&
-       to_array_type(final_old).size().is_nil() &&
-       final_new.id()==ID_array &&
-       to_array_type(final_new).size().is_not_nil() &&
-       final_old.subtype()==final_new.subtype())
+    if(
+      final_old.id() == ID_array && to_array_type(final_old).size().is_nil() &&
+      final_new.id() == ID_array &&
+      to_array_type(final_new).size().is_not_nil() &&
+      to_array_type(final_old).element_type() ==
+        to_array_type(final_new).element_type())
     {
       old_symbol.type=new_symbol.type;
     }
     else if(
-      final_old.id() == ID_pointer && final_old.subtype().id() == ID_code &&
-      to_code_type(final_old.subtype()).has_ellipsis() &&
-      final_new.id() == ID_pointer && final_new.subtype().id() == ID_code)
+      final_old.id() == ID_pointer &&
+      to_pointer_type(final_old).base_type().id() == ID_code &&
+      to_code_type(to_pointer_type(final_old).base_type()).has_ellipsis() &&
+      final_new.id() == ID_pointer &&
+      to_pointer_type(final_new).base_type().id() == ID_code)
     {
       // to allow
       // int (*f) ();
@@ -428,9 +436,11 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       old_symbol.type=new_symbol.type;
     }
     else if(
-      final_old.id() == ID_pointer && final_old.subtype().id() == ID_code &&
-      final_new.id() == ID_pointer && final_new.subtype().id() == ID_code &&
-      to_code_type(final_new.subtype()).has_ellipsis())
+      final_old.id() == ID_pointer &&
+      to_pointer_type(final_old).base_type().id() == ID_code &&
+      final_new.id() == ID_pointer &&
+      to_pointer_type(final_new).base_type().id() == ID_code &&
+      to_code_type(to_pointer_type(final_new).base_type()).has_ellipsis())
     {
       // to allow
       // int (*f) (int)=0;
@@ -724,28 +734,21 @@ void c_typecheck_baset::typecheck_declaration(
         // available
         auto &code_type = to_code_with_contract_type(new_symbol.type);
 
-        if(!as_const(code_type).requires().empty())
+        for(auto &requires : code_type.requires())
         {
-          for(auto &requires : code_type.requires())
-          {
-            typecheck_expr(requires);
-            implicit_typecast_bool(requires);
-            disallow_subexpr_by_id(
-              requires,
-              ID_old,
-              CPROVER_PREFIX "old is not allowed in preconditions.");
-            disallow_subexpr_by_id(
-              requires,
-              ID_loop_entry,
-              CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
-          }
+          typecheck_expr(requires);
+          implicit_typecast_bool(requires);
+          disallow_subexpr_by_id(
+            requires,
+            ID_old,
+            CPROVER_PREFIX "old is not allowed in preconditions.");
+          disallow_subexpr_by_id(
+            requires,
+            ID_loop_entry,
+            CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
         }
 
-        if(as_const(code_type).assigns().is_not_nil())
-        {
-          for(auto &op : code_type.assigns().operands())
-            typecheck_expr(op);
-        }
+        typecheck_spec_assigns(code_type.assigns());
 
         if(!as_const(code_type).ensures().empty())
         {

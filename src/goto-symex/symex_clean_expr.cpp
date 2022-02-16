@@ -45,7 +45,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     {
       byte_extract_exprt be = make_byte_extract(
         if_expr.false_case(),
-        from_integer(0, index_type()),
+        from_integer(0, c_index_type()),
         if_expr.true_case().type());
 
       if_expr.false_case().swap(be);
@@ -93,7 +93,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
           simplify(array_size.value(), ns);
         expr = make_byte_extract(
           expr,
-          from_integer(0, index_type()),
+          from_integer(0, c_index_type()),
           array_typet(char_type(), array_size.value()));
       }
 
@@ -102,7 +102,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
       // type T[N-(B/sizeof(T))]
       const array_typet &prev_array_type = to_array_type(expr.type());
       const typet &array_size_type = prev_array_type.size().type();
-      const typet &subtype = prev_array_type.subtype();
+      const typet &subtype = prev_array_type.element_type();
 
       exprt new_offset =
         typecast_exprt::conditional_cast(ode.offset(), array_size_type);

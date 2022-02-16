@@ -547,8 +547,11 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
      We have some approaches that are correct but they really
      don't scale. */
 
-  // stub: do src1-(src1/src2)*src2
-  return sub(src1, mul(div(src1, src2), src2));
+  const unbiased_floatt unpacked2 = unpack(src2);
+
+  // stub: do (src2.infinity ? src1 : (src1/src2)*src2))
+  return bv_utils.select(
+    unpacked2.infinity, src1, sub(src1, mul(div(src1, src2), src2)));
 }
 
 bvt float_utilst::negate(const bvt &src)

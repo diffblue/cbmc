@@ -303,6 +303,10 @@ protected:
   /// Symbolically execute a GOTO instruction in the context of unreachable code
   /// \param state: Symbolic execution state for current instruction
   void symex_unreachable_goto(statet &state);
+  /// Symbolically execute a SET_RETURN_VALUE instruction
+  /// \param state: Symbolic execution state for current instruction
+  /// \param return_value: The value to be returned
+  void symex_set_return_value(statet &state, const exprt &return_value);
   /// Symbolically execute a START_THREAD instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_start_thread(statet &state);
@@ -431,29 +435,29 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
+  /// \param instruction: The function call instruction
   virtual void symex_function_call(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const code_function_callt &code);
+    const goto_programt::instructiont &instruction);
 
   /// Symbolically execute a END_FUNCTION instruction.
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_end_of_function(statet &);
 
   /// Symbolic execution of a call to a function call.
-  /// For functions starting with \c __CPROVER_fkt
-  /// \ref goto_symext::symex_fkt
-  /// For non-special functions see
-  /// \ref goto_symext::symex_function_call_code
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
+  /// \param lhs: nil or the lhs of the function call instruction
+  /// \param function: the symbol of the function to call
+  /// \param arguments: the arguments of the function call
   virtual void symex_function_call_symbol(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const code_function_callt &code);
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments);
 
   /// Symbolic execution of a function call by inlining.
   /// Records the call in \p target by appending a function call step and:
@@ -464,11 +468,15 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  /// \param call: The function call instruction
-  virtual void symex_function_call_code(
+  /// \param cleaned_lhs: nil or the lhs of the function call, cleaned
+  /// \param function: the symbol of the function to call
+  /// \param cleaned_arguments: the arguments of the function call, cleaned
+  virtual void symex_function_call_post_clean(
     const get_goto_functiont &get_goto_function,
     statet &state,
-    const code_function_callt &call);
+    const exprt &cleaned_lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &cleaned_arguments);
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
@@ -754,16 +762,7 @@ protected:
   /// \param code: right-hand side containing side effect
   virtual void
   symex_cpp_new(statet &state, const exprt &lhs, const side_effect_exprt &code);
-  /// Symbolically execute a FUNCTION_CALL instruction for a function whose
-  /// name starts with CPROVER_FKT_PREFIX
-  /// \remarks
-  /// While the name seems to imply that this would be called when symbolic
-  /// execution doesn't know what to do, it may actually be derived from a
-  /// German abbreviation for function.
-  /// This should not be called as these functions should already be removed
-  /// \param state: Symbolic execution state for current instruction
-  /// \param code: The function call instruction
-  virtual void symex_fkt(statet &state, const code_function_callt &code);
+
   /// Symbolically execute an OTHER instruction that does a CPP `printf`
   /// \param state: Symbolic execution state for current instruction
   /// \param rhs: The cleaned up CPP `printf` instruction

@@ -12,19 +12,18 @@ struct pair_of_pairs
   struct pair p2;
 };
 
-int f1(int *a, struct pair *b) __CPROVER_assigns(*a, b)
+int f(struct pair *a) __CPROVER_assigns()
 {
   struct pair_of_pairs *pop =
     (struct pair_of_pairs *)malloc(sizeof(struct pair_of_pairs));
-  b = &(pop->p2);
-  b->y = 5;
+  a = &(pop->p2);
+  a->y = 5;
 }
 
 int main()
 {
-  int m = 4;
-  struct pair n;
-  f1(&m, &n);
+  struct pair m;
+  f(&m);
 
   return 0;
 }

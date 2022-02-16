@@ -12,6 +12,8 @@ Author: Diffblue Ltd.
 
 #include <java_bytecode/java_static_initializers.h>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <util/expr_iterator.h>
 
 #include <algorithm>

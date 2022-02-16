@@ -35,7 +35,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   assert(end->is_end_function());
 
-  source_locationt source_location=end->source_location;
+  source_locationt source_location = end->source_location();
 
   goto_program.insert_before_swap(end);
 
@@ -49,7 +49,8 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   *end = goto_programt::make_assertion(not_exprt(get_may), source_location);
 
-  end->source_location.set_comment("mutexes must not be locked on thread exit");
+  end->source_location_nonconst().set_comment(
+    "mutexes must not be locked on thread exit");
 }
 
 void thread_exit_instrumentation(goto_modelt &goto_model)
@@ -94,17 +95,15 @@ void mutex_init_instrumentation(
   {
     if(it->is_assign())
     {
-      const code_assignt &code_assign = it->get_assign();
-
-      if(code_assign.lhs().type()==lock_type)
+      if(it->assign_lhs().type() == lock_type)
       {
         const code_function_callt call(
           f_it->second.symbol_expr(),
-          {address_of_exprt(code_assign.lhs()),
+          {address_of_exprt(it->assign_lhs()),
            address_of_exprt(string_constantt("mutex-init"))});
 
         goto_program.insert_after(
-          it, goto_programt::make_function_call(call, it->source_location));
+          it, goto_programt::make_function_call(call, it->source_location()));
       }
     }
   }
@@ -135,6 +134,6 @@ void mutex_init_instrumentation(goto_modelt &goto_model)
     mutex_init_instrumentation(
       goto_model.symbol_table,
       gf_entry.second.body,
-      to_pointer_type(lock_type).subtype());
+      to_pointer_type(lock_type).base_type());
   }
 }

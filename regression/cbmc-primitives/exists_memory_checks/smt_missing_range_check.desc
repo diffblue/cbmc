@@ -1,0 +1,15 @@
+CORE smt-backend
+smt_missing_range_check.c
+--pointer-check -z3
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main\.assertion\.1\] line \d assertion __CPROVER_exists \{ int i; a\[i\] == i \*i \}: SUCCESS
+\[main\.pointer_dereference\.11\] line \d dereference failure: pointer outside object bounds in a\[\(signed (long|long long) int\)i\]: FAILURE
+--
+--
+Check that memory checks fail for pointer dereferences inside an existential
+qualifier, for out of bounds memory access, when using the smt backend and
+the range of the index is unbound. Note that this test is not expected to work
+with the SAT backend at the time of writing, as the SAT backend does not support
+qualifiers in this form.

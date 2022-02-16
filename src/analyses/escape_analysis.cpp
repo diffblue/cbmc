@@ -19,7 +19,6 @@ bool escape_domaint::is_tracked(const symbol_exprt &symbol)
   const irep_idt &identifier=symbol.get_identifier();
   if(
     identifier == CPROVER_PREFIX "memory_leak" ||
-    identifier == CPROVER_PREFIX "malloc_object" ||
     identifier == CPROVER_PREFIX "dead_object" ||
     identifier == CPROVER_PREFIX "deallocated")
   {
@@ -184,19 +183,20 @@ void escape_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case ASSIGN:
     {
-      const code_assignt &code_assign = instruction.get_assign();
+      const exprt &assign_lhs = instruction.assign_lhs();
+      const exprt &assign_rhs = instruction.assign_rhs();
 
       std::set<irep_idt> cleanup_functions;
-      get_rhs_cleanup(code_assign.rhs(), cleanup_functions);
-      assign_lhs_cleanup(code_assign.lhs(), cleanup_functions);
+      get_rhs_cleanup(assign_rhs, cleanup_functions);
+      assign_lhs_cleanup(assign_lhs, cleanup_functions);
 
       std::set<irep_idt> rhs_aliases;
-      get_rhs_aliases(code_assign.rhs(), rhs_aliases);
-      assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
+      get_rhs_aliases(assign_rhs, rhs_aliases);
+      assign_lhs_aliases(assign_lhs, rhs_aliases);
     }
     break;
 
@@ -419,7 +419,7 @@ void escape_analysist::insert_cleanup(
   bool is_object,
   const namespacet &ns)
 {
-  source_locationt source_location=location->source_location;
+  source_locationt source_location = location->source_location();
 
   for(const auto &cleanup : cleanup_functions)
   {
@@ -459,21 +459,16 @@ void escape_analysist::instrument(
 
       const goto_programt::instructiont &instruction=*i_it;
 
-      if(instruction.type == ASSIGN)
+      if(instruction.type() == ASSIGN)
       {
-        const code_assignt &code_assign = instruction.get_assign();
+        const exprt &assign_lhs = instruction.assign_lhs();
 
         std::set<irep_idt> cleanup_functions;
-        operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
+        operator[](i_it).check_lhs(assign_lhs, cleanup_functions);
         insert_cleanup(
-          gf_entry.second,
-          i_it,
-          code_assign.lhs(),
-          cleanup_functions,
-          false,
-          ns);
+          gf_entry.second, i_it, assign_lhs, cleanup_functions, false, ns);
       }
-      else if(instruction.type == DEAD)
+      else if(instruction.type() == DEAD)
       {
         const auto &dead_symbol = instruction.dead_symbol();
 

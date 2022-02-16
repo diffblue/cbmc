@@ -122,7 +122,7 @@ void remove_function_pointer(
         as_const(*target).call_lhs(),
         fun,
         as_const(*target).call_arguments(),
-        target->source_location));
+        target->source_location()));
 
     // the signature of the function might not match precisely
     const namespacet ns(goto_model.symbol_table);
@@ -145,8 +145,8 @@ void remove_function_pointer(
 
   goto_programt::targett t =
     new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
-  t->source_location.set_property_class("pointer dereference");
-  t->source_location.set_comment("invalid function pointer");
+  t->source_location_nonconst().set_property_class("pointer dereference");
+  t->source_location_nonconst().set_comment("invalid function pointer");
 
   goto_programt new_code;
 
@@ -158,13 +158,14 @@ void remove_function_pointer(
   // set locations
   for(auto &instruction : new_code.instructions)
   {
-    irep_idt property_class = instruction.source_location.get_property_class();
-    irep_idt comment = instruction.source_location.get_comment();
-    instruction.source_location = target->source_location;
+    irep_idt property_class =
+      instruction.source_location().get_property_class();
+    irep_idt comment = instruction.source_location().get_comment();
+    instruction.source_location_nonconst() = target->source_location();
     if(!property_class.empty())
-      instruction.source_location.set_property_class(property_class);
+      instruction.source_location_nonconst().set_property_class(property_class);
     if(!comment.empty())
-      instruction.source_location.set_comment(comment);
+      instruction.source_location_nonconst().set_comment(comment);
   }
 
   goto_programt::targett next_target = target;
@@ -174,10 +175,8 @@ void remove_function_pointer(
 
   // We preserve the original dereferencing to possibly catch
   // further pointer-related errors.
-  code_expressiont code_expression(function);
-  code_expression.add_source_location() = function.source_location();
-  target->code_nonconst().swap(code_expression);
-  target->type = OTHER;
+  *target = goto_programt::make_other(
+    code_expressiont(function), function.source_location());
 }
 
 void value_set_fi_fp_removal(
@@ -205,7 +204,7 @@ void value_set_fi_fp_removal(
         const auto &function = as_const(*target).call_function();
         if(function.id() == ID_dereference)
         {
-          message.status() << "CALL at " << target->source_location << ":"
+          message.status() << "CALL at " << target->source_location() << ":"
                            << messaget::eom;
 
           const auto &pointer = to_dereference_expr(function).pointer();

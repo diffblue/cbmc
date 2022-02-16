@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/bitvector_types.h>
 #include <util/config.h>
-#include <util/deprecate.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
@@ -34,32 +33,26 @@ class message_handlert;
 class string_abstractiont
 {
 public:
-  // To be deprecated once the operator() methods have been removed, at which
-  // point a new constructor that only takes a message_handler should be
-  // introduced.
-  string_abstractiont(
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler);
-
-  DEPRECATED(SINCE(2020, 12, 14, "Use apply(goto_modelt &)"))
-  void operator()(goto_programt &dest);
-  DEPRECATED(SINCE(2020, 12, 14, "Use apply(goto_modelt &)"))
-  void operator()(goto_functionst &dest);
-
   /// Apply string abstraction to \p goto_model. If any abstractions are to be
   /// applied, the affected goto_functions and any affected symbols will be
   /// modified.
-  void apply(goto_modelt &goto_model);
+  string_abstractiont(
+    goto_modelt &goto_model,
+    message_handlert &_message_handler);
+
+  void apply();
 
 protected:
   std::string sym_suffix;
-  symbol_tablet &symbol_table;
+  goto_modelt &goto_model;
   namespacet ns;
   unsigned temporary_counter;
   message_handlert &message_handler;
 
   typedef ::std::map< typet, typet > abstraction_types_mapt;
   abstraction_types_mapt abstraction_types_map;
+
+  void apply(goto_programt &dest);
 
   static bool has_string_macros(const exprt &expr);
 
@@ -189,12 +182,5 @@ protected:
 void string_abstraction(
   goto_modelt &,
   message_handlert &);
-
-DEPRECATED(
-  SINCE(2020, 12, 14, "Use string_abstraction(goto_model, message_handler)"))
-void string_abstraction(
-  symbol_tablet &,
-  message_handlert &,
-  goto_functionst &);
 
 #endif // CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H

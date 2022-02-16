@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arrays.h"
 
 class array_comprehension_exprt;
+class bitreverse_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -37,6 +38,7 @@ class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class member_exprt;
 class replication_exprt;
+class union_typet;
 
 class boolbvt:public arrayst
 {
@@ -72,11 +74,11 @@ public:
     bv_cache.clear();
   }
 
-  void post_process() override
+  void finish_eager_conversion() override
   {
-    post_process_quantifiers();
-    functions.post_process();
-    SUB::post_process();
+    finish_eager_conversion_quantifiers();
+    functions.finish_eager_conversion();
+    SUB::finish_eager_conversion();
   }
 
   enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
@@ -162,6 +164,7 @@ protected:
   virtual bvt convert_let(const let_exprt &);
   virtual bvt convert_array_of(const array_of_exprt &expr);
   virtual bvt convert_union(const union_exprt &expr);
+  virtual bvt convert_empty_union(const empty_union_exprt &expr);
   virtual bvt convert_bv_typecast(const typecast_exprt &expr);
   virtual bvt convert_add_sub(const exprt &expr);
   virtual bvt convert_mult(const mult_exprt &expr);
@@ -190,6 +193,8 @@ protected:
   virtual bvt convert_power(const binary_exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
+  virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
+  virtual bvt convert_saturating_add_sub(const binary_exprt &expr);
 
   virtual exprt make_bv_expr(const typet &type, const bvt &bv);
   virtual exprt make_free_bv_expr(const typet &type);
@@ -265,7 +270,7 @@ protected:
   typedef std::list<quantifiert> quantifier_listt;
   quantifier_listt quantifier_list;
 
-  void post_process_quantifiers();
+  void finish_eager_conversion_quantifiers();
 
   typedef std::vector<std::size_t> offset_mapt;
   offset_mapt build_offset_map(const struct_typet &src);

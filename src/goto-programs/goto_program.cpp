@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program.h"
 
+#include "validate_code.h"
+
 #include <iomanip>
 
 #include <util/base_type.h>
@@ -20,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_type.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/validate.h>
@@ -29,6 +32,13 @@ Author: Daniel Kroening, kroening@kroening.com
 std::ostream &goto_programt::output(std::ostream &out) const
 {
   return output(namespacet(symbol_tablet()), irep_idt(), out);
+}
+
+goto_programt::instructiont goto_programt::make_incomplete_goto(
+  const code_gotot &_code,
+  const source_locationt &l)
+{
+  return instructiont(_code, l, INCOMPLETE_GOTO, true_exprt(), {});
 }
 
 /// Writes to \p out a two/three line string representation of a given
@@ -52,8 +62,8 @@ std::ostream &goto_programt::output_instruction(
 {
   out << "        // " << instruction.location_number << " ";
 
-  if(!instruction.source_location.is_nil())
-    out << instruction.source_location.as_string();
+  if(!instruction.source_location().is_nil())
+    out << instruction.source_location().as_string();
   else
     out << "no location";
 
@@ -73,7 +83,7 @@ std::ostream &goto_programt::output_instruction(
   else
     out << "        ";
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case NO_INSTRUCTION_TYPE:
     out << "NO INSTRUCTION TYPE SET" << '\n';
@@ -119,11 +129,11 @@ std::ostream &goto_programt::output_instruction(
       // fallthrough
     }
 
-    out << "OTHER " << format(instruction.get_other());
+    out << "OTHER " << format(instruction.get_other()) << '\n';
     break;
 
   case SET_RETURN_VALUE:
-    out << "RETURN " << format(instruction.return_value()) << '\n';
+    out << "SET RETURN VALUE " << format(instruction.return_value()) << '\n';
     break;
 
   case DECL:
@@ -171,7 +181,7 @@ std::ostream &goto_programt::output_instruction(
     {
       out << format(instruction.get_condition());
 
-      const irep_idt &comment=instruction.source_location.get_comment();
+      const irep_idt &comment = instruction.source_location().get_comment();
       if(!comment.empty())
         out << " // " << comment;
     }
@@ -321,7 +331,7 @@ std::list<exprt> expressions_read(
 {
   std::list<exprt> dest;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case ASSUME:
   case ASSERT:
@@ -370,7 +380,7 @@ std::list<exprt> expressions_written(
 {
   std::list<exprt> dest;
 
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case FUNCTION_CALL:
     if(instruction.call_lhs().is_not_nil())
@@ -476,7 +486,7 @@ std::string as_string(
 {
   std::string result;
 
-  switch(i.type)
+  switch(i.type())
   {
   case NO_INSTRUCTION_TYPE:
     return "(NO INSTRUCTION TYPE)";
@@ -518,7 +528,7 @@ std::string as_string(
     result += from_expr(ns, function, i.get_condition());
 
     {
-      const irep_idt &comment=i.source_location.get_comment();
+      const irep_idt &comment = i.source_location().get_comment();
       if(!comment.empty())
         result+=" /* "+id2string(comment)+" */";
     }
@@ -733,7 +743,7 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
 {
   // clang-format off
   return
-    type == other.type &&
+    _type == other._type &&
     code == other.code &&
     guard == other.guard &&
     targets.size() == other.targets.size() &&
@@ -759,11 +769,11 @@ void goto_programt::instructiont::validate(
         vm,
         !ns.lookup(identifier, symbol),
         id2string(identifier) + " not found",
-        source_location);
+        source_location());
     }
   };
 
-  auto &current_source_location = source_location;
+  auto &current_source_location = source_location();
   auto type_finder =
     [&ns, vm, &current_source_location](const exprt &e) {
       if(e.id() == ID_symbol)
@@ -832,7 +842,7 @@ void goto_programt::instructiont::validate(
     };
 
   const symbolt *table_symbol;
-  switch(type)
+  switch(_type)
   {
   case NO_INSTRUCTION_TYPE:
     break;
@@ -841,27 +851,27 @@ void goto_programt::instructiont::validate(
       vm,
       has_target(),
       "goto instruction expects at least one target",
-      source_location);
+      source_location());
     // get_target checks that targets.size()==1
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       get_target()->is_target() && get_target()->target_number != 0,
       "goto target has to be a target",
-      source_location);
+      source_location());
     break;
   case ASSUME:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       targets.empty(),
       "assume instruction should not have a target",
-      source_location);
+      source_location());
     break;
   case ASSERT:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       targets.empty(),
       "assert instruction should not have a target",
-      source_location);
+      source_location());
 
     std::for_each(guard.depth_begin(), guard.depth_end(), expr_symbol_finder);
     std::for_each(guard.depth_begin(), guard.depth_end(), type_finder);
@@ -887,7 +897,7 @@ void goto_programt::instructiont::validate(
       vm,
       code.get_statement() == ID_return,
       "SET_RETURN_VALUE instruction should contain a return statement",
-      source_location);
+      source_location());
     break;
   case ASSIGN:
     DATA_CHECK(
@@ -902,33 +912,33 @@ void goto_programt::instructiont::validate(
       vm,
       code.get_statement() == ID_decl,
       "declaration instructions should contain a declaration statement",
-      source_location);
+      source_location());
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       !ns.lookup(decl_symbol().get_identifier(), table_symbol),
       "declared symbols should be known",
       id2string(decl_symbol().get_identifier()),
-      source_location);
+      source_location());
     break;
   case DEAD:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       code.get_statement() == ID_dead,
       "dead instructions should contain a dead statement",
-      source_location);
+      source_location());
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       !ns.lookup(dead_symbol().get_identifier(), table_symbol),
       "removed symbols should be known",
       id2string(dead_symbol().get_identifier()),
-      source_location);
+      source_location());
     break;
   case FUNCTION_CALL:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       code.get_statement() == ID_function_call,
       "function call instruction should contain a call statement",
-      source_location);
+      source_location());
 
     std::for_each(code.depth_begin(), code.depth_end(), expr_symbol_finder);
     std::for_each(code.depth_begin(), code.depth_end(), type_finder);
@@ -945,7 +955,7 @@ void goto_programt::instructiont::validate(
 void goto_programt::instructiont::transform(
   std::function<optionalt<exprt>(exprt)> f)
 {
-  switch(type)
+  switch(_type)
   {
   case OTHER:
     if(get_other().get_statement() == ID_expression)
@@ -1049,7 +1059,7 @@ void goto_programt::instructiont::transform(
 void goto_programt::instructiont::apply(
   std::function<void(const exprt &)> f) const
 {
-  switch(type)
+  switch(_type)
   {
   case OTHER:
     if(get_other().get_statement() == ID_expression)

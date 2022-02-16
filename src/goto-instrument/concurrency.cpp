@@ -112,9 +112,7 @@ void concurrency_instrumentationt::instrument(
     }
     else if(it->is_assume() || it->is_assert() || it->is_goto())
     {
-      exprt cond = it->get_condition();
-      instrument(cond);
-      it->set_condition(cond);
+      instrument(it->condition_nonconst());
     }
     else if(it->is_function_call())
     {

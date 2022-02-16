@@ -1,10 +1,10 @@
 CORE
 main.c
---enforce-all-contracts
+--enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 \[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS
-\[foo.\d+\] line \d+ Check that x->str\[\(.*\)\(x->len - 1\)\] is assignable: SUCCESS
+\[foo.assigns.\d+\] line \d+ Check that x->str\[\(.*\)\(x->len - 1\)\] is assignable: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion rval \=\= 128: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --

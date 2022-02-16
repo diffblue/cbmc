@@ -14,13 +14,22 @@ class argument_separator_countert:
         self.separators = 0
 
     def read_text(self, text):
+        previous_character = None
+        in_quotes = False
         for character in text:
-            if character == '(' or character == '<':
-                self.bracket_depth += 1
-            elif character == ')' or character == '(':
-                self.bracket_depth -= 1
-            elif character == ',' and self.bracket_depth == 1:
-                self.separators += 1
+            if in_quotes:
+                if character == '"' and previous_character != "\\":
+                    in_quotes = False
+            else:
+                if character == '"':
+                    in_quotes = True
+                elif character == '(' or character == '<':
+                    self.bracket_depth += 1
+                elif character == ')' or character == '(':
+                    self.bracket_depth -= 1
+                elif character == ',' and self.bracket_depth == 1:
+                    self.separators += 1
+            previous_character = character
 
 
 def tests_in_file(file_path):

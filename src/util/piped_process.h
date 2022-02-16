@@ -13,6 +13,7 @@ typedef struct _PROCESS_INFORMATION PROCESS_INFORMATION; // NOLINT
 typedef void *HANDLE;                                    // NOLINT
 #endif
 
+#include "nodiscard.h"
 #include "optional.h"
 #include <vector>
 
@@ -42,7 +43,7 @@ public:
   /// Send a string message (command) to the child process.
   /// \param message The string message to be sent.
   /// \return
-  send_responset send(const std::string &message);
+  NODISCARD send_responset send(const std::string &message);
   /// Read a string from the child process' output.
   /// \return a string containing data from the process, empty string if no data
   std::string receive();

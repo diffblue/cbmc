@@ -33,7 +33,10 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/external_sat.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
+#include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/strings/string_refinement.h>
+
+#include <goto-symex/solver_hardness.h>
 
 solver_factoryt::solver_factoryt(
   const optionst &_options,
@@ -189,11 +192,10 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
     if(
       auto hardness_collector = dynamic_cast<hardness_collectort *>(&*satcheck))
     {
-      hardness_collector->enable_hardness_collection();
-      hardness_collector->with_solver_hardness(
-        [&options](solver_hardnesst &hardness) {
-          hardness.set_outfile(options.get_option("write-solver-stats-to"));
-        });
+      std::unique_ptr<solver_hardnesst> solver_hardness =
+        util_make_unique<solver_hardnesst>();
+      solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
+      hardness_collector->solver_hardness = std::move(solver_hardness);
     }
     else
     {
@@ -330,10 +332,12 @@ std::unique_ptr<solver_factoryt::solvert>
 solver_factoryt::get_incremental_smt2(std::string solver_command)
 {
   no_beautification();
+  auto solver_process = util_make_unique<smt_piped_solver_processt>(
+    std::move(solver_command), message_handler);
 
   return util_make_unique<solvert>(
     util_make_unique<smt2_incremental_decision_proceduret>(
-      std::move(solver_command)));
+      ns, std::move(solver_process), message_handler));
 }
 
 std::unique_ptr<solver_factoryt::solvert>

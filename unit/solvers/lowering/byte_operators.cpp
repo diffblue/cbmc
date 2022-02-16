@@ -24,6 +24,72 @@
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
 
+TEST_CASE("byte extract and bits", "[core][solvers][lowering][byte_extract]")
+{
+  // this test does require a proper architecture to be set so that byte extract
+  // uses adequate endianness
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  const unsignedbv_typet u16{16};
+  const exprt sixteen_bits = from_integer(0x1234, u16);
+  const array_typet bit_array_type{bv_typet{1}, from_integer(16, size_type())};
+
+  bool little_endian;
+  GIVEN("Little endian")
+  {
+    little_endian = true;
+
+    const auto bit_string = expr2bits(sixteen_bits, little_endian, ns);
+    REQUIRE(bit_string.has_value());
+    REQUIRE(bit_string->size() == 16);
+
+    const auto array_of_bits =
+      bits2expr(*bit_string, bit_array_type, little_endian, ns);
+    REQUIRE(array_of_bits.has_value());
+
+    const auto bit_string2 = expr2bits(*array_of_bits, little_endian, ns);
+    REQUIRE(bit_string2.has_value());
+    REQUIRE(*bit_string == *bit_string2);
+
+    const byte_extract_exprt be1{little_endian ? ID_byte_extract_little_endian
+                                               : ID_byte_extract_big_endian,
+                                 sixteen_bits,
+                                 from_integer(0, c_index_type()),
+                                 bit_array_type};
+    const exprt lower_be1 = lower_byte_extract(be1, ns);
+    REQUIRE(lower_be1 == *array_of_bits);
+  }
+
+  GIVEN("Big endian")
+  {
+    little_endian = false;
+
+    const auto bit_string = expr2bits(sixteen_bits, little_endian, ns);
+    REQUIRE(bit_string.has_value());
+    REQUIRE(bit_string->size() == 16);
+
+    const auto array_of_bits =
+      bits2expr(*bit_string, bit_array_type, little_endian, ns);
+    REQUIRE(array_of_bits.has_value());
+
+    const auto bit_string2 = expr2bits(*array_of_bits, little_endian, ns);
+    REQUIRE(bit_string2.has_value());
+    REQUIRE(*bit_string == *bit_string2);
+
+    const byte_extract_exprt be1{little_endian ? ID_byte_extract_little_endian
+                                               : ID_byte_extract_big_endian,
+                                 sixteen_bits,
+                                 from_integer(0, c_index_type()),
+                                 bit_array_type};
+    const exprt lower_be1 = lower_byte_extract(be1, ns);
+    REQUIRE(lower_be1 == *array_of_bits);
+  }
+}
+
 SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
 {
   // this test does require a proper architecture to be set so that byte extract
@@ -40,7 +106,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       deadbeef,
-      from_integer(1, index_type()),
+      from_integer(1, c_index_type()),
       signedbv_typet(8));
 
     THEN("byte_extract lowering yields the expected value")
@@ -69,7 +135,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       deadbeef,
-      from_integer(1, index_type()),
+      from_integer(1, c_index_type()),
       struct_typet(
         {{"unbounded_array",
           array_typet(
@@ -97,7 +163,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       deadbeef,
-      from_integer(1, index_type()),
+      from_integer(1, c_index_type()),
       union_typet(
         {{"unbounded_array",
           array_typet(
@@ -125,7 +191,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       deadbeef,
-      from_integer(1, index_type()),
+      from_integer(1, c_index_type()),
       union_typet{});
 
     THEN("byte_extract lowering does not raise an exception")
@@ -150,7 +216,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       s,
-      from_integer(1, index_type()),
+      from_integer(1, c_index_type()),
       unsignedbv_typet(16));
 
     THEN("byte_extract lowering yields the expected value")
@@ -265,7 +331,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             REQUIRE(r.has_value());
 
             const byte_extract_exprt be(
-              endianness, *s, from_integer(2, index_type()), t2);
+              endianness, *s, from_integer(2, c_index_type()), t2);
 
             const exprt lower_be = lower_byte_extract(be, ns);
             const exprt lower_be_s = simplify_expr(lower_be, ns);
@@ -298,7 +364,7 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
     const byte_update_exprt bu1(
       ID_byte_update_little_endian,
       deadbeef,
-      from_integer(1, index_type()),
+      from_integer(1, c_index_type()),
       from_integer(0x42, unsignedbv_typet(8)));
 
     THEN("byte_update lowering yields the expected value")
@@ -418,7 +484,7 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
             REQUIRE(r.has_value());
 
             const byte_update_exprt bu(
-              endianness, *s, from_integer(2, index_type()), *u);
+              endianness, *s, from_integer(2, c_index_type()), *u);
 
             const exprt lower_bu = lower_byte_operators(bu, ns);
             const exprt lower_bu_s = simplify_expr(lower_bu, ns);

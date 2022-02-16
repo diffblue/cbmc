@@ -76,30 +76,32 @@ exprt c_typecheck_baset::do_initializer_rec(
   if(
     value.id() == ID_array && value.get_bool(ID_C_string_constant) &&
     full_type.id() == ID_array &&
-    (full_type.subtype().id() == ID_signedbv ||
-     full_type.subtype().id() == ID_unsignedbv) &&
-    to_bitvector_type(full_type.subtype()).get_width() ==
-      to_bitvector_type(value.type().subtype()).get_width())
+    (to_array_type(full_type).element_type().id() == ID_signedbv ||
+     to_array_type(full_type).element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(to_array_type(full_type).element_type()).get_width() ==
+      to_bitvector_type(to_array_type(value.type()).element_type()).get_width())
   {
     exprt tmp=value;
 
     // adjust char type
-    tmp.type().subtype()=full_type.subtype();
+    to_array_type(tmp.type()).element_type() =
+      to_array_type(full_type).element_type();
 
     Forall_operands(it, tmp)
-      it->type()=full_type.subtype();
+      it->type() = to_array_type(full_type).element_type();
 
     if(full_type.id()==ID_array &&
        to_array_type(full_type).is_complete())
     {
+      const auto &array_type = to_array_type(full_type);
+
       // check size
-      const auto array_size =
-        numeric_cast<mp_integer>(to_array_type(full_type).size());
+      const auto array_size = numeric_cast<mp_integer>(array_type.size());
       if(!array_size.has_value())
       {
         error().source_location = value.source_location();
         error() << "array size needs to be constant, got "
-                << to_string(to_array_type(full_type).size()) << eom;
+                << to_string(array_type.size()) << eom;
         throw 0;
       }
 
@@ -120,13 +122,13 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp.type()=type;
-        const auto zero =
-          zero_initializer(full_type.subtype(), value.source_location(), *this);
+        const auto zero = zero_initializer(
+          array_type.element_type(), value.source_location(), *this);
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
           error() << "cannot zero-initialize array with subtype '"
-                  << to_string(full_type.subtype()) << "'" << eom;
+                  << to_string(array_type.element_type()) << "'" << eom;
           throw 0;
         }
         tmp.operands().resize(numeric_cast_v<std::size_t>(*array_size), *zero);
@@ -138,16 +140,16 @@ exprt c_typecheck_baset::do_initializer_rec(
 
   if(
     value.id() == ID_string_constant && full_type.id() == ID_array &&
-    (full_type.subtype().id() == ID_signedbv ||
-     full_type.subtype().id() == ID_unsignedbv) &&
-    to_bitvector_type(full_type.subtype()).get_width() ==
+    (to_array_type(full_type).element_type().id() == ID_signedbv ||
+     to_array_type(full_type).element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(to_array_type(full_type).element_type()).get_width() ==
       char_type().get_width())
   {
     // will go away, to be replaced by the above block
 
     string_constantt tmp1=to_string_constant(value);
     // adjust char type
-    tmp1.type().subtype()=full_type.subtype();
+    tmp1.type().subtype() = to_array_type(full_type).element_type();
 
     exprt tmp2=tmp1.to_array_expr();
 
@@ -182,13 +184,16 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp2.type()=type;
-        const auto zero =
-          zero_initializer(full_type.subtype(), value.source_location(), *this);
+        const auto zero = zero_initializer(
+          to_array_type(full_type).element_type(),
+          value.source_location(),
+          *this);
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
           error() << "cannot zero-initialize array with subtype '"
-                  << to_string(full_type.subtype()) << "'" << eom;
+                  << to_string(to_array_type(full_type).element_type()) << "'"
+                  << eom;
           throw 0;
         }
         tmp2.operands().resize(numeric_cast_v<std::size_t>(*array_size), *zero);
@@ -318,7 +323,7 @@ void c_typecheck_baset::designator_enter(
     if(array_type.size().is_nil())
     {
       entry.size=0;
-      entry.subtype=array_type.subtype();
+      entry.subtype = array_type.element_type();
     }
     else
     {
@@ -332,7 +337,7 @@ void c_typecheck_baset::designator_enter(
       }
 
       entry.size = numeric_cast_v<std::size_t>(*array_size);
-      entry.subtype=array_type.subtype();
+      entry.subtype = array_type.element_type();
     }
   }
   else if(full_type.id()==ID_vector)
@@ -350,7 +355,7 @@ void c_typecheck_baset::designator_enter(
     }
 
     entry.size = numeric_cast_v<std::size_t>(*vector_size);
-    entry.subtype=vector_type.subtype();
+    entry.subtype = vector_type.element_type();
   }
   else
     UNREACHABLE;
@@ -410,8 +415,9 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         if(!array_size.has_value())
         {
           error().source_location = value.source_location();
-          error() << "cannot zero-initialize array with subtype '"
-                  << to_string(full_type.subtype()) << "'" << eom;
+          error() << "cannot zero-initialize array with element type '"
+                  << to_string(to_type_with_subtype(full_type).subtype()) << "'"
+                  << eom;
           throw 0;
         }
         const exprt zero = to_array_of_expr(*dest).what();
@@ -427,12 +433,15 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         {
           // we are willing to grow an incomplete or zero-sized array
           const auto zero = zero_initializer(
-            full_type.subtype(), value.source_location(), *this);
+            to_array_type(full_type).element_type(),
+            value.source_location(),
+            *this);
           if(!zero.has_value())
           {
             error().source_location = value.source_location();
-            error() << "cannot zero-initialize array with subtype '"
-                    << to_string(full_type.subtype()) << "'" << eom;
+            error() << "cannot zero-initialize array with element type '"
+                    << to_string(to_type_with_subtype(full_type).subtype())
+                    << "'" << eom;
             throw 0;
           }
           dest->operands().resize(
@@ -542,7 +551,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         if(current_symbol.is_static_lifetime)
         {
           byte_update_exprt byte_update =
-            make_byte_update(*dest, from_integer(0, index_type()), *zero);
+            make_byte_update(*dest, from_integer(0, c_index_type()), *zero);
           byte_update.add_source_location() = value.source_location();
           *dest = std::move(byte_update);
           dest = &(to_byte_update_expr(*dest).op2());
@@ -644,8 +653,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       // initialize an array of scalars.
       if(
         full_type.id() == ID_array &&
-        (full_type.subtype().id() == ID_signedbv ||
-         full_type.subtype().id() == ID_unsignedbv))
+        (to_array_type(full_type).element_type().id() == ID_signedbv ||
+         to_array_type(full_type).element_type().id() == ID_unsignedbv))
       {
         *dest=do_initializer_rec(value, type, force_constant);
         return ++init_it; // done
@@ -822,7 +831,7 @@ designatort c_typecheck_baset::make_designator(
 
       entry.index = numeric_cast_v<std::size_t>(index);
       entry.size = numeric_cast_v<std::size_t>(size);
-      entry.subtype=full_type.subtype();
+      entry.subtype = to_array_type(full_type).element_type();
     }
     else if(full_type.id()==ID_struct ||
             full_type.id()==ID_union)
@@ -933,9 +942,9 @@ exprt c_typecheck_baset::do_initializer_list(
   if(
     full_type.id() == ID_array && value.operands().size() >= 1 &&
     to_multi_ary_expr(value).op0().id() == ID_string_constant &&
-    (full_type.subtype().id() == ID_signedbv ||
-     full_type.subtype().id() == ID_unsignedbv) &&
-    to_bitvector_type(full_type.subtype()).get_width() ==
+    (to_array_type(full_type).element_type().id() == ID_signedbv ||
+     to_array_type(full_type).element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(to_array_type(full_type).element_type()).get_width() ==
       char_type().get_width())
   {
     if(value.operands().size() > 1)
@@ -1029,7 +1038,7 @@ exprt c_typecheck_baset::do_initializer_list(
     // make complete by setting array size
     size_t size=result.operands().size();
     result.type().id(ID_array);
-    result.type().set(ID_size, from_integer(size, index_type()));
+    result.type().set(ID_size, from_integer(size, c_index_type()));
   }
 
   return result;

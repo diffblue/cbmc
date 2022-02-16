@@ -14,7 +14,7 @@ struct pair_of_pairs
 
 int f1(int *a, struct pair *b);
 
-int f1(int *a, struct pair *b) __CPROVER_assigns(*a, b)
+int f1(int *a, struct pair *b) __CPROVER_assigns(*a)
 {
   struct pair_of_pairs *pop =
     (struct pair_of_pairs *)malloc(sizeof(struct pair_of_pairs));

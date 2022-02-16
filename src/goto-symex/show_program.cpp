@@ -64,7 +64,7 @@ void show_program(const namespacet &ns, const symex_target_equationt &equation)
   for(const auto &step : equation.SSA_steps)
   {
     std::cout << "// " << step.source.pc->location_number << " ";
-    std::cout << step.source.pc->source_location.as_string() << "\n";
+    std::cout << step.source.pc->source_location().as_string() << "\n";
 
     if(step.is_assignment())
       show_step(ns, step, "", count);
@@ -118,7 +118,7 @@ void show_ssa_step_plain(
   const std::string ssa_expr_as_string = from_expr(ns, function_id, ssa_expr);
 
   out << messaget::faint << "// " << ssa_step.source.pc->location_number << " ";
-  out << ssa_step.source.pc->source_location.as_string() << "\n"
+  out << ssa_step.source.pc->source_location().as_string() << "\n"
       << messaget::reset;
   out << ssa_expr_as_string << "\n";
 }
@@ -136,7 +136,7 @@ json_objectt get_ssa_step_json(
   const std::string ssa_expr_as_string = from_expr(ns, function_id, ssa_expr);
 
   json_objectt json_ssa_step{
-    {key_srcloc, json(ssa_step.source.pc->source_location)},
+    {key_srcloc, json(ssa_step.source.pc->source_location())},
     {key_ssa_expr_as_string, json_stringt(ssa_expr_as_string)},
     {key_ssa_expr, json_irept(false).convert_from_irep(ssa_expr)}};
 

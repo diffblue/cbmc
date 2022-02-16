@@ -68,7 +68,7 @@ void interval_domaint::transform(
   locationt to{trace_to->current_location()};
 
   const goto_programt::instructiont &instruction=*from;
-  switch(instruction.type)
+  switch(instruction.type())
   {
   case DECL:
     havoc_rec(instruction.decl_symbol());
@@ -79,7 +79,7 @@ void interval_domaint::transform(
     break;
 
   case ASSIGN:
-    assign(instruction.get_assign());
+    assign(instruction.assign_lhs(), instruction.assign_rhs());
     break;
 
   case GOTO:
@@ -208,10 +208,10 @@ bool interval_domaint::join(
   return result;
 }
 
-void interval_domaint::assign(const code_assignt &code_assign)
+void interval_domaint::assign(const exprt &lhs, const exprt &rhs)
 {
-  havoc_rec(code_assign.lhs());
-  assume_rec(code_assign.lhs(), ID_equal, code_assign.rhs());
+  havoc_rec(lhs);
+  assume_rec(lhs, ID_equal, rhs);
 }
 
 void interval_domaint::havoc_rec(const exprt &lhs)

@@ -1,12 +1,13 @@
 CORE
 main.c
---replace-all-calls-with-contracts _ --pointer-check
+--replace-call-with-contract f1 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[pointer\_dereference.\d+\] file main.c line \d+ dereference failure: pointer NULL in p->buf: FAILURE$
-^\[main.assertion.\d+\] line \d+ assertion p \!\= NULL \=\=> p->buf\[0\] \=\= 0: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion p == NULL \|\| p->buf\[0\] == 0: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion p == NULL \|\| p->buf\[1\] == buf_1: FAILURE$
 ^VERIFICATION FAILED$
 --
 --
-Checks whether CBMC properly evaluates write set of members
-from invalid objects. In this case, they are not writable.
+Checks whether CBMC properly evaluates write set of members from invalid objects.
+Functions are not expected to write to invalid locations; CBMC flags such writes.
+For contract checking, we ignore invalid targets in assigns clauses and assignment LHS.

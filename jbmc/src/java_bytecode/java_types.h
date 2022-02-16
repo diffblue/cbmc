@@ -809,7 +809,8 @@ public:
 template <>
 inline bool can_cast_type<java_generic_parametert>(const typet &base)
 {
-  return is_reference(base) && is_java_generic_parameter_tag(base.subtype());
+  return is_reference(base) &&
+         is_java_generic_parameter_tag(to_reference_type(base).base_type());
 }
 
 /// Checks whether the type is a java generic parameter/variable, e.g., `T` in
@@ -937,7 +938,8 @@ public:
 template <>
 inline bool can_cast_type<java_generic_typet>(const typet &type)
 {
-  return is_reference(type) && is_java_generic_struct_tag_type(type.subtype());
+  return is_reference(type) &&
+         is_java_generic_struct_tag_type(to_reference_type(type).base_type());
 }
 
 /// \param type: the type to check
@@ -1056,7 +1058,7 @@ inline const typet &java_generic_class_type_bound(size_t index, const typet &t)
   PRECONDITION(index<gen_types.size());
   const java_generic_parametert &gen_type=gen_types[index];
 
-  return gen_type.subtype();
+  return gen_type.base_type();
 }
 
 /// Type to hold a Java class that is implicitly generic, e.g., an inner

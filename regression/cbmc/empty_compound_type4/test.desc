@@ -1,0 +1,12 @@
+CORE broken-smt-backend
+main.c
+--trace
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+Invariant check failed
+--
+Byte-extracting (which is what union operations yield) an empty struct should
+not result in a conversion warning in the flattening back-end.

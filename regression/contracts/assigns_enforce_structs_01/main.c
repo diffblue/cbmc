@@ -6,18 +6,17 @@ struct pair
   int y;
 };
 
-int f1(int *a, int *b) __CPROVER_assigns(*a, b)
+int f(int *a) __CPROVER_assigns()
 {
   struct pair *p = (struct pair *)malloc(sizeof(struct pair));
-  b = &(p->y);
-  *b = 5;
+  a = &(p->y);
+  *a = 5;
 }
 
 int main()
 {
   int m = 4;
-  int n = 3;
-  f1(&m, &n);
+  f(&m);
 
   return 0;
 }

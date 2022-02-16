@@ -4,9 +4,9 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-g[\(].*[\)]$
-h[\(].*[\)]$
+ g[\(].*[\)]$
+ h[\(].*[\)]$
 --
-f[\(].*[\)]$
-other_func[\(].*[\)]$
+ f[\(].*[\)]$
+ other_func[\(].*[\)]$
 ^warning: ignoring

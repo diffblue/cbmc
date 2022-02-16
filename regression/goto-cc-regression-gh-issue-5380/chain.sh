@@ -22,7 +22,7 @@ PROBLEM_OUTFILE="test.gb"
 
 # first drive: compile the problematic file into a gb
 if [[ "${is_windows}" == "true" ]]; then
-  "${goto_cc}" --export-file-local-symbols "${PROBLEM_SRC}" /Fe"${PROBLEM_OUTFILE}"
+  "${goto_cc}" --export-file-local-symbols "${PROBLEM_SRC}" "/Fe${PROBLEM_OUTFILE}"
 else
   "${goto_cc}" --export-file-local-symbols "${PROBLEM_SRC}" -o "${PROBLEM_OUTFILE}"
 fi

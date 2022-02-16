@@ -244,7 +244,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   {
     auto &address_of_expr = to_address_of_expr(expr);
     rename_address<level>(address_of_expr.object(), ns);
-    to_pointer_type(expr.type()).subtype() =
+    to_pointer_type(expr.type()).base_type() =
       as_const(address_of_expr).object().type();
     return renamedt<exprt, level>{std::move(expr)};
   }
@@ -573,7 +573,7 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
 
       rename_address<level>(index_expr.array(), ns);
       PRECONDITION(index_expr.array().type().id() == ID_array);
-      expr.type() = to_array_type(index_expr.array().type()).subtype();
+      expr.type() = to_array_type(index_expr.array().type()).element_type();
 
       // the index is not an address
       index_expr.index() =
@@ -632,7 +632,7 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   if(type.id() == ID_array)
   {
     const auto &array_type = to_array_type(type);
-    return requires_renaming(array_type.subtype(), ns) ||
+    return requires_renaming(array_type.element_type(), ns) ||
            !array_type.size().is_constant();
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
@@ -660,7 +660,7 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   }
   else if(type.id() == ID_pointer)
   {
-    return requires_renaming(to_pointer_type(type).subtype(), ns);
+    return requires_renaming(to_pointer_type(type).base_type(), ns);
   }
   else if(type.id() == ID_union_tag)
   {
@@ -719,7 +719,7 @@ void goto_symex_statet::rename(
   if(type.id()==ID_array)
   {
     auto &array_type = to_array_type(type);
-    rename<level>(array_type.subtype(), irep_idt(), ns);
+    rename<level>(array_type.element_type(), irep_idt(), ns);
     array_type.size() = rename<level>(std::move(array_type.size()), ns).get();
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
@@ -742,7 +742,7 @@ void goto_symex_statet::rename(
   }
   else if(type.id()==ID_pointer)
   {
-    rename<level>(to_pointer_type(type).subtype(), irep_idt(), ns);
+    rename<level>(to_pointer_type(type).base_type(), irep_idt(), ns);
   }
 
   if(level==L2 &&

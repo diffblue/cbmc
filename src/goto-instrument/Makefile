@@ -16,9 +16,11 @@ SRC = accelerate/accelerate.cpp \
       alignment_checks.cpp \
       branch.cpp \
       call_sequences.cpp \
-      contracts/assigns.cpp \
-      contracts/memory_predicates.cpp \
       contracts/contracts.cpp \
+      contracts/havoc_assigns_clause_targets.cpp \
+      contracts/instrument_spec_assigns.cpp \
+      contracts/memory_predicates.cpp \
+      contracts/utils.cpp \
       concurrency.cpp \
       count_eloc.cpp \
       cover.cpp \
@@ -37,7 +39,7 @@ SRC = accelerate/accelerate.cpp \
       dump_c.cpp \
       full_slicer.cpp \
       function.cpp \
-      function_modifies.cpp \
+      function_assigns.cpp \
       generate_function_bodies.cpp \
       goto_instrument_languages.cpp \
       goto_instrument_main.cpp \

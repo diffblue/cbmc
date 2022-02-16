@@ -1,3 +1,4 @@
+// clang-format off
 void __breakpoint(int val);
 void __cdp(unsigned int coproc, unsigned int ops, unsigned int regs);
 void __clrex(void);
@@ -41,3 +42,4 @@ int __usat(unsigned int val, unsigned int sat);
 void __wfe(void);
 void __wfi(void);
 void __yield(void);
+// clang-format on

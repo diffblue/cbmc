@@ -26,7 +26,7 @@ std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
   {
     const auto &array_type = to_array_type(type);
     out << "(Array " << smt2_format(array_type.size().type()) << ' '
-        << smt2_format(array_type.subtype()) << ')';
+        << smt2_format(array_type.element_type()) << ')';
   }
   else if(type.id() == ID_floatbv)
   {
@@ -151,7 +151,9 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
       out << "(store ";
 
     out << "((as const " << smt2_format(expr.type()) << ")) "
-        << smt2_format(from_integer(0, expr.type().subtype())) << ')';
+        << smt2_format(
+             from_integer(0, to_array_type(expr.type()).element_type()))
+        << ')';
 
     for(std::size_t i = 0; i < array_list_expr.operands().size(); i += 2)
     {

@@ -1,0 +1,15 @@
+CORE
+main.c
+--enforce-contract foo _ --pointer-check
+^\[foo.assigns.*\d+\].* line 5 Check that \*x is valid: SUCCESS$
+^\[foo.assigns.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: (SUCCESS|FAILURE)$
+^\[foo.assigns.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Check that a write at *x+1 fails when the assigns clause specifies a valid *x
+and the actual underlying object is of size 1.
+In this case the specified target is valid, the lhs of the assignment is invalid
+so the inclusion check passes, but the pointer check must fail with an OOB.
