@@ -21,6 +21,34 @@
 #include <functional>
 #include <numeric>
 
+/// \brief Converts operator expressions with 2 or more operands to terms
+///   expressed as binary operator application.
+/// \param expr: The expression to convert.
+/// \param factory: The factory function which makes applications of the
+///   relevant smt term, when applied to the term operands.
+/// \details The conversion used is left associative for instances with 3 or
+///   more operands. The SMT standard / core theory version 2.6 actually
+///   supports applying the `and`, `or` and `xor` to 3 or more operands.
+///   However our internal `smt_core_theoryt` does not support this currently
+///   and converting to binary application has the advantage of making the order
+///   of evaluation explicit.
+template <typename factoryt>
+static smt_termt convert_multiary_operator_to_terms(
+  const multi_ary_exprt &expr,
+  const factoryt &factory)
+{
+  PRECONDITION(expr.operands().size() >= 2);
+  const auto operand_terms =
+    make_range(expr.operands()).map([](const exprt &expr) {
+      return convert_expr_to_smt(expr);
+    });
+  return std::accumulate(
+    ++operand_terms.begin(),
+    operand_terms.end(),
+    *operand_terms.begin(),
+    factory);
+}
+
 static smt_sortt convert_type_to_smt_sort(const bool_typet &type)
 {
   return smt_bool_sortt{};
@@ -189,34 +217,6 @@ static smt_termt convert_expr_to_smt(const if_exprt &if_expression)
     convert_expr_to_smt(if_expression.cond()),
     convert_expr_to_smt(if_expression.true_case()),
     convert_expr_to_smt(if_expression.false_case()));
-}
-
-/// \brief Converts operator expressions with 2 or more operands to terms
-///   expressed as binary operator application.
-/// \param expr: The expression to convert.
-/// \param factory: The factory function which makes applications of the
-///   relevant smt term, when applied to the term operands.
-/// \details The conversion used is left associative for instances with 3 or
-///   more operands. The SMT standard / core theory version 2.6 actually
-///   supports applying the `and`, `or` and `xor` to 3 or more operands.
-///   However our internal `smt_core_theoryt` does not support this currently
-///   and converting to binary application has the advantage of making the order
-///   of evaluation explicit.
-template <typename factoryt>
-static smt_termt convert_multiary_operator_to_terms(
-  const multi_ary_exprt &expr,
-  const factoryt &factory)
-{
-  PRECONDITION(expr.operands().size() >= 2);
-  const auto operand_terms =
-    make_range(expr.operands()).map([](const exprt &expr) {
-      return convert_expr_to_smt(expr);
-    });
-  return std::accumulate(
-    ++operand_terms.begin(),
-    operand_terms.end(),
-    *operand_terms.begin(),
-    factory);
 }
 
 static smt_termt convert_expr_to_smt(const and_exprt &and_expression)
