@@ -154,9 +154,22 @@ static smt_termt convert_expr_to_smt(const concatenation_exprt &concatenation)
 
 static smt_termt convert_expr_to_smt(const bitand_exprt &bitwise_and_expr)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise and expression: " +
-    bitwise_and_expr.pretty());
+  if(std::all_of(
+       bitwise_and_expr.operands().cbegin(),
+       bitwise_and_expr.operands().cend(),
+       [](exprt operand) {
+         return can_cast_type<integer_bitvector_typet>(operand.type());
+       }))
+  {
+    return convert_multiary_operator_to_terms(
+      bitwise_and_expr, smt_bit_vector_theoryt::make_and);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitwise and expression: " +
+      bitwise_and_expr.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const bitor_exprt &bitwise_or_expr)

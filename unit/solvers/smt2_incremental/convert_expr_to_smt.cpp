@@ -1,16 +1,16 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
+#include <util/format.h>
+#include <util/std_expr.h>
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
-
-#include <util/arith_tools.h>
-#include <util/bitvector_types.h>
-#include <util/format.h>
-#include <util/std_expr.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
 {
@@ -414,5 +414,78 @@ TEST_CASE(
   {
     const cbmc_invariants_should_throwt invariants_throw;
     REQUIRE_THROWS(convert_expr_to_smt(unary_minus_exprt{true_exprt{}}));
+  }
+}
+
+SCENARIO(
+  "Bitwise \"AND\" expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("three integer bitvectors and their smt-term equivalents")
+  {
+    const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+    const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
+    const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
+
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto three_bvint = from_integer(3, signedbv_typet{8});
+    const auto five_bvint = from_integer(5, signedbv_typet{8});
+
+    WHEN("a bitand_exprt with two of them as arguments is converted")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitand_exprt{one_bvint, three_bvint});
+
+      THEN(
+        "it should be equivalent to a \"bvand\" term with the operands "
+        "converted as well")
+      {
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_and(smt_term_one, smt_term_three);
+
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // bitand_exprt derives from multiary exprt, so we need to be able to handle
+    // expressions with more than 2 operands.
+    WHEN("a ternary bitand_exprt gets connverted to smt terms")
+    {
+      // We need to jump through a bit of a hoop because bitand_exprt doesn't
+      // support direct construction with multiple operands - so we have to
+      // construct its parent class and downcast it.
+      const exprt::operandst and_operands{one_bvint, three_bvint, five_bvint};
+      const multi_ary_exprt first_step{
+        ID_bitand, and_operands, signedbv_typet{8}};
+      const auto bitand_expr = to_bitand_expr(first_step);
+
+      const auto constructed_term = convert_expr_to_smt(bitand_expr);
+
+      THEN(
+        "it should be converted to an appropriate number of nested binary "
+        "\"bvand\" terms")
+      {
+        const auto expected_term = smt_bit_vector_theoryt::make_and(
+          smt_bit_vector_theoryt::make_and(smt_term_one, smt_term_three),
+          smt_term_five);
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // Both of the above tests have been testing the positive case so far -
+    // where everything goes more or less how we expect. Let's see how it
+    // does with a negative case - where one of the terms is bad or otherwise
+    // unsuitable for expression.
+    WHEN("a bitand_exprt with operands of different types gets converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because bvand requires"
+        "operands of the same sort")
+      {
+        CHECK_THROWS(
+          convert_expr_to_smt(bitand_exprt{one_bvint, true_exprt{}}));
+      }
+    }
   }
 }
