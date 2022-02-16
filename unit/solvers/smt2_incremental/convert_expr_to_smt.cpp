@@ -637,3 +637,38 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "Bitwise \"NOT\" expressions are converted to SMT terms (1's complement)",
+  "[core][smt2_incremental]")
+{
+  GIVEN("An integer bitvector")
+  {
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+
+    WHEN("A bitnot_exprt is constructed and converted to an SMT term")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitnot_exprt{one_bvint});
+      THEN("it should be converted to bvnot smt term")
+      {
+        const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_not(smt_term_one);
+
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN("A bitnot_exprt is constructed with a false expression and converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception and not allow "
+        "construction")
+      {
+        REQUIRE_THROWS(convert_expr_to_smt(bitnot_exprt{false_exprt{}}));
+      }
+    }
+  }
+}

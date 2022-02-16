@@ -214,9 +214,19 @@ static smt_termt convert_expr_to_smt(const bitxor_exprt &bitwise_xor)
 
 static smt_termt convert_expr_to_smt(const bitnot_exprt &bitwise_not)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise not expression: " +
-    bitwise_not.pretty());
+  const bool operand_is_bitvector =
+    can_cast_type<integer_bitvector_typet>(bitwise_not.op().type());
+
+  if(operand_is_bitvector)
+  {
+    return smt_bit_vector_theoryt::make_not(
+      convert_expr_to_smt(bitwise_not.op()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitnot_exprt: " + bitwise_not.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const unary_minus_exprt &unary_minus)
