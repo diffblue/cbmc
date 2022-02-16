@@ -489,3 +489,79 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "Bitwise \"OR\" expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("three integer bitvectors and their smt-term equivalents")
+  {
+    const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+    const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
+    const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
+
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto three_bvint = from_integer(3, signedbv_typet{8});
+    const auto five_bvint = from_integer(5, signedbv_typet{8});
+
+    WHEN("a bitor_exprt with two of them as arguments is converted")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitor_exprt{one_bvint, three_bvint});
+
+      THEN(
+        "it should be equivalent to a \"bvor\" term with the operands "
+        "converted as well")
+      {
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_or(smt_term_one, smt_term_three);
+
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // bitor_exprt is similar to bitand_exprt in that it derives from multiary
+    // exprt, so we need to be able to handle expressions with more than 2
+    // operands. We're going to follow the same format and construct a
+    // multiary_exprt as if it was a bitor_exprt, then cast it to one, finally
+    // passing it on to convert_expt_to_smt to convert it to an appropriate SMT
+    // term.
+    WHEN("a ternary bitor_exprt gets connverted to smt terms")
+    {
+      const exprt::operandst or_operands{one_bvint, three_bvint, five_bvint};
+      const multi_ary_exprt first_step{
+        ID_bitor, or_operands, signedbv_typet{8}};
+      const auto bitor_expr = to_bitor_expr(first_step);
+
+      const auto constructed_term = convert_expr_to_smt(bitor_expr);
+
+      THEN(
+        "it should be converted to an appropriate number of nested binary "
+        "\"bvor\" terms")
+      {
+        // In QF_BV, bvor is defined as a binary function, so we need to
+        // construct bvor terms with arity > 2 in terms of nested bvor
+        // constructs.
+        const auto expected_term = smt_bit_vector_theoryt::make_or(
+          smt_bit_vector_theoryt::make_or(smt_term_one, smt_term_three),
+          smt_term_five);
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // Both of the above tests have been testing the positive case so far -
+    // where everything goes more or less how we expect. Let's see how it does
+    // with a negative case - where one of the terms is bad or otherwise
+    // unsuitable for expression.
+    WHEN("a bitor_exprt with operands of different types gets converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because bvor requires"
+        "operands of the same sort")
+      {
+        CHECK_THROWS(convert_expr_to_smt(bitor_exprt{one_bvint, true_exprt{}}));
+      }
+    }
+  }
+}

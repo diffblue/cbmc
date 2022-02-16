@@ -174,9 +174,22 @@ static smt_termt convert_expr_to_smt(const bitand_exprt &bitwise_and_expr)
 
 static smt_termt convert_expr_to_smt(const bitor_exprt &bitwise_or_expr)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise or expression: " +
-    bitwise_or_expr.pretty());
+  if(std::all_of(
+       bitwise_or_expr.operands().cbegin(),
+       bitwise_or_expr.operands().cend(),
+       [](exprt operand) {
+         return can_cast_type<integer_bitvector_typet>(operand.type());
+       }))
+  {
+    return convert_multiary_operator_to_terms(
+      bitwise_or_expr, smt_bit_vector_theoryt::make_or);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitwise or expression: " +
+      bitwise_or_expr.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const bitxor_exprt &bitwise_xor)
