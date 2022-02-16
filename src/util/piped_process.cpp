@@ -88,16 +88,16 @@
 #  include <unistd.h> // library for read/write/sleep/etc. functions
 #endif
 
-#  include <cstring> // library for strerror function (on linux)
-#  include <iostream>
-#  include <vector>
+#include "exception_utils.h"
+#include "invariant.h"
+#include "narrow.h"
+#include "optional.h"
+#include "piped_process.h"
+#include "string_utils.h"
 
-#  include "exception_utils.h"
-#  include "invariant.h"
-#  include "narrow.h"
-#  include "optional.h"
-#  include "piped_process.h"
-#  include "string_utils.h"
+#include <cstring> // library for strerror function (on linux)
+#include <iostream>
+#include <vector>
 
 #ifdef _WIN32
 #  define BUFSIZE (1024 * 64)

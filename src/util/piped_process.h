@@ -15,6 +15,7 @@ typedef void *HANDLE;                                    // NOLINT
 
 #include "nodiscard.h"
 #include "optional.h"
+
 #include <vector>
 
 #define PIPED_PROCESS_INFINITE_TIMEOUT                                         \
