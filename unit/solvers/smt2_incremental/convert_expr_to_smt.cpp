@@ -565,3 +565,75 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "Bitwise \"XOR\" expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("three integer bitvectors and their smt-term equivalents")
+  {
+    const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+    const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
+    const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
+
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto three_bvint = from_integer(3, signedbv_typet{8});
+    const auto five_bvint = from_integer(5, signedbv_typet{8});
+
+    WHEN("a bitxor_exprt with two of them as arguments is converted")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitxor_exprt{one_bvint, three_bvint});
+
+      THEN(
+        "it should be equivalent to a \"bvxor\" term with the operands "
+        "converted as well")
+      {
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_xor(smt_term_one, smt_term_three);
+
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // bitxor_exprt is similar to bitand_exprt and bitor_exprt, so we need
+    // to handle the case where we need to convert expressions with arity > 2.
+    WHEN("a ternary bitxor_exprt gets connverted to smt terms")
+    {
+      const exprt::operandst xor_operands{one_bvint, three_bvint, five_bvint};
+      const multi_ary_exprt first_step{
+        ID_bitxor, xor_operands, signedbv_typet{8}};
+      const auto bitxor_expr = to_bitxor_expr(first_step);
+
+      const auto constructed_term = convert_expr_to_smt(bitxor_expr);
+
+      THEN(
+        "it should be converted to an appropriate number of nested binary "
+        "\"bvxor\" terms")
+      {
+        // We handle this in much the same way as we do bvand and bvor.
+        // See the corresponding comments there.
+        const auto expected_term = smt_bit_vector_theoryt::make_xor(
+          smt_bit_vector_theoryt::make_xor(smt_term_one, smt_term_three),
+          smt_term_five);
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // Both of the above tests have been testing the positive case so far -
+    // where everything goes more or less how we expect. Let's see how it does
+    // with a negative case - where one of the terms is bad or otherwise
+    // unsuitable for expression.
+    WHEN("a bitxor_exprt with operands of different types gets converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because bvxor requires"
+        "operands of the same sort")
+      {
+        CHECK_THROWS(
+          convert_expr_to_smt(bitxor_exprt{one_bvint, true_exprt{}}));
+      }
+    }
+  }
+}
