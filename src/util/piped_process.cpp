@@ -88,18 +88,22 @@
 #  include <unistd.h> // library for read/write/sleep/etc. functions
 #endif
 
-#  include <cstring> // library for strerror function (on linux)
-#  include <iostream>
-#  include <vector>
+#include "exception_utils.h"
+#include "invariant.h"
+#include "narrow.h"
+#include "optional.h"
+#include "piped_process.h"
+#include "string_utils.h"
 
-#  include "exception_utils.h"
-#  include "invariant.h"
-#  include "narrow.h"
-#  include "optional.h"
-#  include "piped_process.h"
-#  include "string_utils.h"
+#include <cstring> // library for strerror function (on linux)
+#include <iostream>
+#include <vector>
 
+#ifdef _WIN32
+#  define BUFSIZE (1024 * 64)
+#else
 #  define BUFSIZE 2048
+#endif
 
 #ifdef _WIN32
 /// This function prepares a single wide string for the windows command
@@ -120,7 +124,10 @@ prepare_windows_command_line(const std::vector<std::string> &commandvec)
 }
 #endif
 
-piped_processt::piped_processt(const std::vector<std::string> &commandvec)
+piped_processt::piped_processt(
+  const std::vector<std::string> &commandvec,
+  message_handlert &message_handler)
+  : log{message_handler}
 {
 #  ifdef _WIN32
   // Security attributes for pipe creation
@@ -347,34 +354,40 @@ piped_processt::send_responset piped_processt::send(const std::string &message)
   }
 #ifdef _WIN32
   const auto message_size = narrow<DWORD>(message.size());
+  PRECONDITION(message_size > 0);
   DWORD bytes_written = 0;
-  const auto write_file = [&]() {
-    return WriteFile(
-      child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL);
-  };
-  if(!write_file())
+  const int retry_limit = 10;
+  for(int send_attempts = 0; send_attempts < retry_limit; ++send_attempts)
   {
-    // Error handling with GetLastError ?
-    return send_responset::FAILED;
-  }
-  // `WriteFile` can return a success status but write 0 bytes if we write
-  // messages quickly enough. This problem has been observed when using a
-  // release build, but resolved when using a debug build or `--verbosity 10`.
-  // Presumably this happens if cbmc gets too far ahead of the sub process.
-  // Flushing the buffer and retrying should then succeed to write the message
-  // in this case.
-  if(bytes_written == 0)
-  {
-    FlushFileBuffers(child_std_IN_Wr);
-    if(!write_file())
+    // `WriteFile` can return a success status but write 0 bytes if we write
+    // messages quickly enough. This problem has been observed when using a
+    // release build, but resolved when using a debug build or `--verbosity 10`.
+    // Presumably this happens if cbmc gets too far ahead of the sub process.
+    // Flushing the buffer and retrying should then succeed to write the message
+    // in this case.
+    if(!WriteFile(
+         child_std_IN_Wr, message.c_str(), message_size, &bytes_written, NULL))
     {
-      // Error handling with GetLastError ?
+      const DWORD error_code = GetLastError();
+      log.debug() << "Last error code is " + std::to_string(error_code)
+                  << messaget::eom;
       return send_responset::FAILED;
     }
+    if(bytes_written != 0)
+      break;
+    // Give the sub-process chance to read the waiting message(s).
+    const auto wait_milliseconds = narrow<DWORD>(1 << send_attempts);
+    log.debug() << "Zero bytes send to sub process. Retrying in "
+                << wait_milliseconds << " milliseconds." << messaget::eom;
+    FlushFileBuffers(child_std_IN_Wr);
+    Sleep(wait_milliseconds);
   }
   INVARIANT(
     message_size == bytes_written,
-    "Number of bytes written to sub process must match message size.");
+    "Number of bytes written to sub process must match message size."
+    "Message size is " +
+      std::to_string(message_size) + " but " + std::to_string(bytes_written) +
+      " bytes were written.");
 #else
   // send message to solver process
   int send_status = fputs(message.c_str(), command_stream);

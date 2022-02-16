@@ -13,8 +13,10 @@ typedef struct _PROCESS_INFORMATION PROCESS_INFORMATION; // NOLINT
 typedef void *HANDLE;                                    // NOLINT
 #endif
 
+#include "message.h"
 #include "nodiscard.h"
 #include "optional.h"
+
 #include <vector>
 
 #define PIPED_PROCESS_INFINITE_TIMEOUT                                         \
@@ -79,7 +81,10 @@ public:
   /// Initiate a new subprocess with pipes supporting communication
   /// between the parent (this process) and the child.
   /// \param commandvec The command and arguments to create the process
-  explicit piped_processt(const std::vector<std::string> &commandvec);
+  /// \param message_handler Optional message handler for logging debug messages
+  explicit piped_processt(
+    const std::vector<std::string> &commandvec,
+    message_handlert &message_handler);
 
   // Deleted due to declaring an explicit destructor and not wanting copy
   // constructors to be implemented.
@@ -108,6 +113,7 @@ protected:
   int pipe_output[2];
 #endif
   statet process_state;
+  messaget log;
 };
 
 #endif // endifndef CPROVER_UTIL_PIPED_PROCESS_H
