@@ -547,6 +547,14 @@ static smt_termt convert_expr_to_smt(const index_exprt &index)
 
 static smt_termt convert_expr_to_smt(const shift_exprt &shift)
 {
+  // TODO: Dispatch into different types of shifting
+  if(const auto left_shift = expr_try_dynamic_cast<shl_exprt>(shift))
+  {
+    return smt_bit_vector_theoryt::shift_left(
+      convert_expr_to_smt(left_shift->op0()),
+      convert_expr_to_smt(left_shift->op1()));
+  }
+
   // TODO: split into functions for separate types of shift including rotate.
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for shift expression: " + shift.pretty());

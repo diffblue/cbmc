@@ -672,3 +672,45 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "Left-shift expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("An integer bitvector and the number of places we're going to shift")
+  {
+    // This is going to act as both the value to be shifted, and a value
+    // signifying the places to the left we're shifting.
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+
+    WHEN("We construct a shl_exprt and convert it to an SMT term")
+    {
+      const auto shift_expr = shl_exprt{one_bvint, one_bvint};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN("It should be equivalent to a bvshl term")
+      {
+        const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+        const auto expected_term = smt_bit_vector_theoryt::shift_left(
+          /* term */
+          smt_term_one,
+          /* distance */
+          smt_term_one);
+      }
+    }
+
+    WHEN(
+      "We construct a malformed shl_exprt and attempt to convert it to an SMT "
+      "term")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because of validation "
+        "failure")
+      {
+        REQUIRE_THROWS(
+          convert_expr_to_smt(shl_exprt{one_bvint, false_exprt{}}));
+      }
+    }
+  }
+}

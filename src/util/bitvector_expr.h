@@ -305,6 +305,12 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<shl_exprt>(const exprt &base)
+{
+  return base.id() == ID_shl;
+}
+
 /// \brief Cast an exprt to a \ref shl_exprt
 ///
 /// \a expr must be known to be \ref shl_exprt.
