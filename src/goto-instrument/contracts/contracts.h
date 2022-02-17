@@ -111,13 +111,6 @@ public:
 
   namespacet ns;
 
-  /// Tells wether to skip or not skip an action
-  enum class skipt
-  {
-    DontSkip,
-    Skip
-  };
-
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
@@ -133,51 +126,9 @@ protected:
   /// Instrument functions to check frame conditions.
   bool check_frame_conditions_function(const irep_idt &function);
 
-  ///  \brief Insert assertion statements into the goto program to ensure that
-  /// assigned memory is within the assignable memory frame.
-  ///
-  /// \param function Name of the function getting instrumented.
-  /// \param body Body of the function getting instrumented.
-  /// \param instruction_it Iterator to the instruction from which to start
-  /// instrumentation (inclusive).
-  /// \param instruction_end Iterator to the instruction at which to stop
-  /// instrumentation (exclusive).
-  /// \param instrument_spec_assigns Assigns clause instrumenter of the function
-  /// \param skip_parameter_assigns If true, will cause assignments to symbol
-  /// marked as is_parameter to not be instrumented.
-  /// \param cfg_info_opt Control flow graph information can will be used
-  /// for write set optimisation if available.
-  void check_frame_conditions(
-    const irep_idt &function,
-    goto_programt &body,
-    goto_programt::targett instruction_it,
-    const goto_programt::targett &instruction_end,
-    instrument_spec_assignst &instrument_spec_assigns,
-    skipt skip_parameter_assigns,
-    optionalt<cfg_infot> &cfg_info_opt);
-
   /// Check if there are any malloc statements which may be repeated because of
   /// a goto statement that jumps back.
   bool check_for_looped_mallocs(const goto_programt &program);
-
-  /// Inserts an assertion into program immediately before the assignment
-  /// instruction_it, to ensure that the left-hand-side of the assignment
-  /// is "included" in the (conditional address ranges in the) write set.
-  void instrument_assign_statement(
-    goto_programt::targett &instruction_it,
-    goto_programt &program,
-    instrument_spec_assignst &instrument_spec_assigns,
-    optionalt<cfg_infot> &cfg_info_opt);
-
-  /// Inserts an assertion into program immediately before the function call at
-  /// instruction_it, to ensure that all memory locations written to by the
-  // callee are "included" in the (conditional address ranges in the) write set.
-  void instrument_call_statement(
-    goto_programt::targett &instruction_it,
-    const irep_idt &function,
-    goto_programt &body,
-    instrument_spec_assignst &instrument_spec_assigns,
-    optionalt<cfg_infot> &cfg_info_opt);
 
   /// Apply loop contracts, whenever available, to all loops in `function`.
   /// Loop invariants, loop variants, and loop assigns clauses.

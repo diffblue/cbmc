@@ -131,6 +131,37 @@ public:
   }
 };
 
+/// \brief Adds a pragma on a source location disable all pointer checks.
+///
+/// The disabled checks are: "pointer-check", "pointer-primitive-check",
+/// "pointer-overflow-check", "signed-overflow-check",
+//  "unsigned-overflow-check", "conversion-check".
+void add_pragma_disable_pointer_checks(source_locationt &source_location);
+
+/// \brief Adds a pragma on a source_locationt to disable inclusion checking.
+void add_pragma_disable_assigns_check(source_locationt &source_location);
+
+/// \brief Adds a pragma on a GOTO instruction to disable inclusion checking.
+///
+/// \param instr: A mutable reference to the GOTO instruction.
+/// \return The same reference after mutation (i.e., adding the pragma).
+goto_programt::instructiont &
+add_pragma_disable_assigns_check(goto_programt::instructiont &instr);
+
+/// \brief Adds pragmas on all instructions in a GOTO program
+///        to disable inclusion checking on them.
+///
+/// \param prog: A mutable reference to the GOTO program.
+/// \return The same reference after mutation (i.e., adding the pragmas).
+goto_programt &add_pragma_disable_assigns_check(goto_programt &prog);
+
+/// Skip or do not skip assignments to function parameters
+enum class skip_function_paramst
+{
+  YES,
+  NO
+};
+
 /// \brief A class that generates instrumentation for assigns clause checking.
 ///
 /// The `track_*` methods add targets to the sets of tracked targets and append
@@ -182,12 +213,36 @@ public:
   /// in dest.
   void track_heap_allocated(const exprt &expr, goto_programt &dest);
 
-  /// Search the call graph reachable from the instrumented function to identify
-  /// local static variables used directly or indirectly, add them to the
-  /// `stack-allocated` tracked locations, and generate corresponding snapshot
-  /// instructions in dest.
-  /// \param dest a snaphot program for the identified static locals.
+protected:
+  /// Collects (from the symbol table) symbols that have a static lifetime
+  /// and have a source location where the funciton name appears in the call
+  /// graph built from the given function identifier.
+  /// \param root_function_id the function to build the call graph from
+  /// \param dest the program where snapshots of the collected static locals
+  void collect_static_locals_from_root_function(
+    const irep_idt &root_function_id,
+    goto_programt &dest);
+
+public:
+  /// Searches the call graph reachable from the instrumented function to
+  /// collect local static variables used directly or indirectly, add them to
+  /// the `stack-allocated` tracked locations, and generate corresponding
+  /// snapshot instructions in dest.
+  /// \param dest pogram where snaphots instructions for the collected static
+  /// locals are added.
   void track_static_locals(goto_programt &dest);
+
+  /// Searches for function calls occurring between the start and stop
+  /// targets (inclusive) instructions, and collects the static locals declared
+  /// by these functions.
+  /// \param begin instruction to start the search from.
+  /// \param end instruction to stop the search at.
+  /// \param dest pogram where snaphots instructions for the collected static
+  /// locals are added.
+  void track_static_locals_from_calls(
+    const goto_programt::targett &begin,
+    const goto_programt::targett &end,
+    goto_programt &dest);
 
   /// Generates inclusion check instructions for an assignment, havoc or
   /// havoc_object instruction
@@ -201,7 +256,7 @@ public:
   void check_inclusion_assignment(
     const exprt &lhs,
     optionalt<cfg_infot> &cfg_info_opt,
-    goto_programt &dest);
+    goto_programt &dest) const;
 
   /// Generates inclusion check instructions for an argument passed to free
   /// \param expr the argument to the free operator
@@ -215,6 +270,13 @@ public:
     const exprt &expr,
     optionalt<cfg_infot> &cfg_info_opt,
     goto_programt &dest);
+
+  void instrument_instructions(
+    goto_programt &body,
+    goto_programt::targett instruction_it,
+    const goto_programt::targett &instruction_end,
+    skip_function_paramst skip_function_params,
+    optionalt<cfg_infot> &cfg_info_opt);
 
 protected:
   /// Name of the instrumented function
@@ -311,6 +373,47 @@ protected:
   void invalidate_heap_and_spec_aliases(
     const car_exprt &freed_car,
     goto_programt &dest) const;
+
+  /// Returns true iff a `DECL x` must be added to the local write set.
+  ///
+  /// A variable is called 'dirty' if its address gets taken at some point in
+  /// the program.
+  ///
+  /// Assuming the goto program is obtained from a structured C program that
+  /// passed C compiler checks, non-dirty variables can only be assigned to
+  /// directly by name, cannot escape their lexical scope, and are always safe
+  /// to assign. Hence, we only track dirty variables in the write set.
+  bool must_track_decl(
+    const goto_programt::const_targett &target,
+    const optionalt<cfg_infot> &cfg_info_opt) const;
+
+  /// Returns true iff a `DEAD x` must be processed to update the local write
+  /// set. The conditions are the same than for tracking a `DECL x` instruction.
+  bool must_track_dead(
+    const goto_programt::const_targett &target,
+    const optionalt<cfg_infot> &cfg_info_opt) const;
+
+  /// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.
+  bool must_check_assign(
+    const goto_programt::const_targett &target,
+    skip_function_paramst skip_function_params,
+    const optionalt<cfg_infot> cfg_info_opt);
+
+  /// Inserts an assertion in `body` immediately before the assignment
+  /// at `instruction_it`, to ensure that the LHS of the assignment
+  /// is included in the set of currently tracked CARs.
+  void instrument_assign_statement(
+    goto_programt::targett &instruction_it,
+    goto_programt &body,
+    optionalt<cfg_infot> &cfg_info_opt) const;
+
+  /// Inserts an assertion in `body` immediately before the function call at
+  /// `instruction_it`, to ensure that all memory locations written to by the
+  /// called function are included in the set of currently tracked CARs.
+  void instrument_call_statement(
+    goto_programt::targett &instruction_it,
+    goto_programt &body,
+    optionalt<cfg_infot> &cfg_info_opt);
 
   using cond_target_exprt_to_car_mapt = std::
     unordered_map<const conditional_target_exprt, const car_exprt, irep_hash>;
