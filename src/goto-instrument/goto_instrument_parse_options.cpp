@@ -1066,6 +1066,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // we add the library in some cases, as some analyses benefit
 
+  if(cmdline.isset("malloc-may-fail"))
+  {
+    auto malloc_entry = goto_model.goto_functions.function_map.find("malloc");
+    if(
+      malloc_entry != goto_model.goto_functions.function_map.end() &&
+      malloc_entry->second.body_available())
+    {
+      log.warning() << "malloc-may-fail has no effect when an implementation "
+                    << "of malloc is already provided" << messaget::eom;
+    }
+  }
+
   if(cmdline.isset("add-library") ||
      cmdline.isset("mm"))
   {
