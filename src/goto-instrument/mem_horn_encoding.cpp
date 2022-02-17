@@ -35,7 +35,7 @@ static inline bool find_alloca(exprt &expr)
   if (expr.id() == ID_symbol)
   {
     auto str = id2string(expr.get("identifier"));
-    if (str.find("return_value_malloc") != -1)
+    if (str.find("return_value_malloc") != str.npos)
       return true;
   }
   for (auto &a : expr.operands())
@@ -135,7 +135,7 @@ void find_deref_selects(exprt &expr, set<exprt> &sels)
   if(expr.id() == ID_index)
   {
     auto str = id2string(expr.operands()[0].get("identifier"));
-    if(str.find(n_pref) != -1)
+    if(str.find(n_pref) != str.npos)
     {
       sels.insert(expr);
       return;
@@ -183,7 +183,7 @@ void rewrite_derefs(exprt &expr)
     }
   }
   else
-    for  (int i = 0; i < expr.operands().size(); i++)
+    for  (size_t i = 0; i < expr.operands().size(); i++)
       rewrite_derefs(expr.operands()[i]);
 }
 
