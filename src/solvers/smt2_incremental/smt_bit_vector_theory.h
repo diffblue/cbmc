@@ -25,6 +25,15 @@ public:
     std::vector<smt_indext> indices() const;
     void validate(const smt_termt &operand) const;
   };
+  /// \brief
+  ///   Makes a factory for extract function applications.
+  /// \param i
+  ///   Index of the highest bit to be included in the resulting bit vector.
+  /// \param j
+  ///   Index of the lowest bit to be included in the resulting bit vector.
+  /// \note
+  ///   Bit vectors are zero indexed. So the lowest bit index is zero and the
+  ///   largest index is the size of the bit vector minus one.
   static smt_function_application_termt::factoryt<extractt>
   extract(std::size_t i, std::size_t j);
 
