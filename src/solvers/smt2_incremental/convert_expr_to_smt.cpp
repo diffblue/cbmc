@@ -112,13 +112,90 @@ static smt_termt make_not_zero(const smt_termt &input, const typet &source_type)
 static smt_termt convert_c_bool_cast(
   const smt_termt &from_term,
   const typet &from_type,
-  const c_bool_typet &to_type)
+  const bitvector_typet &to_type)
 {
   const std::size_t c_bool_width = to_type.get_width();
   return smt_core_theoryt::if_then_else(
     make_not_zero(from_term, from_type),
     smt_bit_vector_constant_termt{1, c_bool_width},
     smt_bit_vector_constant_termt{0, c_bool_width});
+}
+
+static smt_termt make_bitvector_resize_cast(
+  const smt_termt &from_term,
+  const bitvector_typet &from_type,
+  const bitvector_typet &to_type)
+{
+  if(const auto to_fixedbv_type = type_try_dynamic_cast<fixedbv_typet>(to_type))
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for type cast to fixed-point bitvector "
+      "type: " +
+      to_type.pretty());
+  }
+  if(const auto to_floatbv_type = type_try_dynamic_cast<floatbv_typet>(to_type))
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for type cast to floating-point bitvector "
+      "type: " +
+      to_type.pretty());
+  }
+  const std::size_t from_width = from_type.get_width();
+  const std::size_t to_width = to_type.get_width();
+  if(to_width == from_width)
+    return from_term;
+  if(to_width < from_width)
+    return smt_bit_vector_theoryt::extract(to_width - 1, 0)(from_term);
+  const std::size_t extension_size = to_width - from_width;
+  if(can_cast_type<signedbv_typet>(from_type))
+    return smt_bit_vector_theoryt::sign_extend(extension_size)(from_term);
+  else
+    return smt_bit_vector_theoryt::zero_extend(extension_size)(from_term);
+}
+
+struct sort_based_cast_to_bit_vector_convertert final
+  : public smt_sort_const_downcast_visitort
+{
+  const smt_termt &from_term;
+  const typet &from_type;
+  const bitvector_typet &to_type;
+  optionalt<smt_termt> result;
+
+  sort_based_cast_to_bit_vector_convertert(
+    const smt_termt &from_term,
+    const typet &from_type,
+    const bitvector_typet &to_type)
+    : from_term{from_term}, from_type{from_type}, to_type{to_type}
+  {
+  }
+
+  void visit(const smt_bool_sortt &) override
+  {
+    result = convert_c_bool_cast(
+      from_term, from_type, c_bool_typet{to_type.get_width()});
+  }
+
+  void visit(const smt_bit_vector_sortt &) override
+  {
+    if(const auto bitvector = type_try_dynamic_cast<bitvector_typet>(from_type))
+      result = make_bitvector_resize_cast(from_term, *bitvector, to_type);
+    else
+      UNIMPLEMENTED_FEATURE(
+        "Generation of SMT formula for type cast to bit vector from type: " +
+        from_type.pretty());
+  }
+};
+
+static smt_termt convert_bit_vector_cast(
+  const smt_termt &from_term,
+  const typet &from_type,
+  const bitvector_typet &to_type)
+{
+  sort_based_cast_to_bit_vector_convertert converter{
+    from_term, from_type, to_type};
+  from_term.get_sort().accept(converter);
+  POSTCONDITION(converter.result);
+  return *converter.result;
 }
 
 static smt_termt convert_expr_to_smt(const typecast_exprt &cast)
@@ -130,6 +207,8 @@ static smt_termt convert_expr_to_smt(const typecast_exprt &cast)
     return make_not_zero(from_term, cast.op().type());
   if(const auto c_bool_type = type_try_dynamic_cast<c_bool_typet>(to_type))
     return convert_c_bool_cast(from_term, from_type, *c_bool_type);
+  if(const auto bit_vector = type_try_dynamic_cast<bitvector_typet>(to_type))
+    return convert_bit_vector_cast(from_term, from_type, *bit_vector);
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for type cast expression: " + cast.pretty());
 }
