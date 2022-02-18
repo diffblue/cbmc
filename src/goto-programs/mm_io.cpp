@@ -62,7 +62,10 @@ void mm_io(
           source_locationt source_location = it->source_location();
           const code_typet &ct=to_code_type(mm_io_r.type());
 
-          if_exprt if_expr(integer_address(d.pointer()), mm_io_r_value, d);
+          if_exprt if_expr(
+            integer_address(d.pointer()),
+            typecast_exprt::conditional_cast(mm_io_r_value, d.type()),
+            d);
           replace_expr(d, if_expr, a_rhs);
 
           const typet &pt=ct.parameters()[0].type();
