@@ -104,7 +104,6 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
 {
   // Default true
   options.set_option("built-in-assertions", true);
-  options.set_option("pretty-names", true);
   options.set_option("propagation", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
@@ -340,9 +339,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       exit(CPROVER_EXIT_USAGE_ERROR);
     }
   }
-
-  if(cmdline.isset("no-pretty-names"))
-    options.set_option("pretty-names", false);
 
   if(cmdline.isset("graphml-witness"))
   {

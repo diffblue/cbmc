@@ -95,7 +95,6 @@ void jbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("assumptions", true);
   options.set_option("built-in-assertions", true);
   options.set_option("lazy-methods", true);
-  options.set_option("pretty-names", true);
   options.set_option("propagation", true);
   options.set_option("refine-strings", true);
   options.set_option("simple-slice", true);
@@ -288,10 +287,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
       "cannot use --max-nondet-string-length with --no-refine-strings",
       "--max-nondet-string-length");
   }
-
-  options.set_option(
-    "pretty-names",
-    !cmdline.isset("no-pretty-names"));
 
   if(cmdline.isset("graphml-witness"))
   {
