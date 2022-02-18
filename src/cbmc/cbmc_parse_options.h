@@ -45,8 +45,7 @@ class optionst;
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \
   "(debug-level):(no-propagation)(no-simplify-if)" \
-  "(document-subgoals)(outfile):(test-preprocessor)" \
-  "(write-solver-stats-to):"  \
+  "(document-subgoals)(test-preprocessor)" \
   "(show-array-constraints)"  \
   OPT_CONFIG_C_CPP \
   OPT_CONFIG_PLATFORM \
@@ -55,13 +54,7 @@ class optionst;
   OPT_GOTO_CHECK \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \
-  "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
-  "(cprover-smt2)" \
-  "(incremental-smt2-solver):" \
-  "(external-sat-solver):" \
-  "(no-sat-preprocessor)" \
-  "(beautify)" \
-  "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
+  OPT_SOLVER \
   OPT_STRING_REFINEMENT_CBMC \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \

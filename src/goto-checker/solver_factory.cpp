@@ -11,13 +11,14 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "solver_factory.h"
 
-#include <iostream>
-
+#include <util/cmdline.h>
 #include <util/exception_utils.h>
 #include <util/make_unique.h>
 #include <util/message.h>
 #include <util/options.h>
 #include <util/version.h>
+
+#include <iostream>
 
 #ifdef _MSC_VER
 #include <util/unicode.h>
@@ -448,5 +449,130 @@ void solver_factoryt::no_incremental_check()
     throw invalid_command_line_argument_exceptiont(
       "the chosen solver does not support incremental solving",
       "--incremental-loop");
+  }
+}
+
+static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
+{
+  if(cmdline.isset("external-sat-solver"))
+  {
+    options.set_option(
+      "external-sat-solver", cmdline.get_value("external-sat-solver"));
+  }
+
+  options.set_option("sat-preprocessor", !cmdline.isset("no-sat-preprocessor"));
+
+  if(cmdline.isset("dimacs"))
+    options.set_option("dimacs", true);
+}
+
+static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)
+{
+  if(cmdline.isset("smt2"))
+    options.set_option("smt2", true);
+
+  if(cmdline.isset("fpa"))
+    options.set_option("fpa", true);
+
+  bool solver_set = false;
+
+  if(cmdline.isset("boolector"))
+  {
+    options.set_option("boolector", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("cprover-smt2"))
+  {
+    options.set_option("cprover-smt2", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("mathsat"))
+  {
+    options.set_option("mathsat", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("cvc4"))
+  {
+    options.set_option("cvc4", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("incremental-smt2-solver"))
+  {
+    options.set_option(
+      "incremental-smt2-solver", cmdline.get_value("incremental-smt2-solver")),
+      solver_set = true;
+  }
+
+  if(cmdline.isset("yices"))
+  {
+    options.set_option("yices", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("z3"))
+  {
+    options.set_option("z3", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("smt2") && !solver_set)
+  {
+    if(cmdline.isset("outfile"))
+    {
+      // outfile and no solver should give standard compliant SMT-LIB
+      options.set_option("generic", true);
+    }
+    else
+    {
+      // the default smt2 solver
+      options.set_option("z3", true);
+    }
+  }
+}
+
+void parse_solver_options(const cmdlinet &cmdline, optionst &options)
+{
+  parse_sat_options(cmdline, options);
+  parse_smt2_options(cmdline, options);
+
+  if(cmdline.isset("outfile"))
+    options.set_option("outfile", cmdline.get_value("outfile"));
+
+  if(cmdline.isset("write-solver-stats-to"))
+  {
+    options.set_option(
+      "write-solver-stats-to", cmdline.get_value("write-solver-stats-to"));
+  }
+
+  if(cmdline.isset("beautify"))
+    options.set_option("beautify", true);
+
+  if(cmdline.isset("refine-arrays"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+  }
+
+  if(cmdline.isset("refine-arithmetic"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arithmetic", true);
+  }
+
+  if(cmdline.isset("refine"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+    options.set_option("refine-arithmetic", true);
+  }
+
+  if(cmdline.isset("max-node-refinement"))
+  {
+    options.set_option(
+      "max-node-refinement", cmdline.get_value("max-node-refinement"));
   }
 }

@@ -16,6 +16,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <solvers/smt2/smt2_dec.h>
 
+class cmdlinet;
 class message_handlert;
 class namespacet;
 class optionst;
@@ -90,5 +91,51 @@ protected:
   void no_beautification();
   void no_incremental_check();
 };
+
+/// Parse solver-related command-line parameters in \p cmdline and set
+/// corresponding values in \p options.
+void parse_solver_options(const cmdlinet &cmdline, optionst &options);
+
+#define OPT_SOLVER                                                             \
+  "(smt1)" /* rejected, will eventually disappear */                           \
+  "(smt2)"                                                                     \
+  "(fpa)" /* undocumented */                                                   \
+  "(cvc3)"                                                                     \
+  "(cvc4)(boolector)(yices)(z3)"                                               \
+  "(mathsat)"                                                                  \
+  "(cprover-smt2)"                                                             \
+  "(incremental-smt2-solver):"                                                 \
+  "(external-sat-solver):"                                                     \
+  "(no-sat-preprocessor)" /* undocumented */                                   \
+  "(beautify)"                                                                 \
+  "(dimacs)"                                                                   \
+  "(refine)"                                                                   \
+  "(max-node-refinement):" /* undocumented */                                  \
+  "(refine-arrays)"        /* undocumented */                                  \
+  "(refine-arithmetic)"    /* undocumented */                                  \
+  "(outfile):"                                                                 \
+  "(write-solver-stats-to):"
+
+#define HELP_SOLVER                                                            \
+  " --external-sat-solver cmd    command to invoke SAT solver process\n"       \
+  " --dimacs                     generate CNF in DIMACS format\n"              \
+  " --beautify                   beautify the counterexample\n"                \
+  "                              (greedy heuristic)\n"                         \
+  " --smt1                       use default SMT1 solver (obsolete)\n"         \
+  " --smt2                       use default SMT2 solver (Z3)\n"               \
+  " --boolector                  use Boolector\n"                              \
+  " --cprover-smt2               use CPROVER SMT2 solver\n"                    \
+  " --cvc3                       use CVC3\n"                                   \
+  " --cvc4                       use CVC4\n"                                   \
+  " --mathsat                    use MathSAT\n"                                \
+  " --yices                      use Yices\n"                                  \
+  " --z3                         use Z3\n"                                     \
+  " --refine                     use refinement procedure (experimental)\n"    \
+  " --incremental-smt2-solver cmd\n"                                           \
+  "                              command to invoke external SMT solver for\n"  \
+  "                              incremental solving (experimental)\n"         \
+  " --outfile filename           output formula to given file\n"               \
+  " --write-solver-stats-to json-file\n"                                       \
+  "                              collect the solver query complexity\n"
 
 #endif // CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
