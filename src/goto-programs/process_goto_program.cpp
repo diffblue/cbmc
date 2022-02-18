@@ -76,6 +76,7 @@ bool process_goto_program(
   // add generic checks
   log.status() << "Generic Property Instrumentation" << messaget::eom;
   goto_check_c(options, goto_model, log.get_message_handler());
+  remove_disabled_checks(options, goto_model);
   transform_assertions_assumptions(options, goto_model);
 
   // checks don't know about adjusted float expressions

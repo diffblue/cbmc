@@ -30,4 +30,6 @@ void transform_assertions_assumptions(
   const optionst &options,
   goto_programt &goto_program);
 
+void remove_disabled_checks(const optionst &, goto_modelt &);
+
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
