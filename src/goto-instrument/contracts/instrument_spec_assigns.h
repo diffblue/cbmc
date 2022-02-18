@@ -131,6 +131,14 @@ public:
   }
 };
 
+/// True iff the pragma to mark assignments to static local variables that need
+/// to be propagated upwards in the search is set
+bool has_propagate_static_local_pragma(source_locationt &source_location);
+
+/// Sets a pragma to mark assignments to static local variables that need to be
+/// propagated upwards in the search
+void add_propagate_static_local_pragma(source_locationt &source_location);
+
 /// \brief Adds a pragma on a source location disable all pointer checks.
 ///
 /// The disabled checks are: "pointer-check", "pointer-primitive-check",
@@ -213,37 +221,202 @@ public:
   /// in dest.
   void track_heap_allocated(const exprt &expr, goto_programt &dest);
 
-protected:
-  /// Collects (from the symbol table) symbols that have a static lifetime
-  /// and have a source location where the funciton name appears in the call
-  /// graph built from the given function identifier.
-  /// \param root_function_id the function to build the call graph from
-  /// \param dest the program where snapshots of the collected static locals
-  void collect_static_locals_from_root_function(
-    const irep_idt &root_function_id,
-    goto_programt &dest);
-
-public:
-  /// Searches the call graph reachable from the instrumented function to
-  /// collect local static variables used directly or indirectly, add them to
-  /// the `stack-allocated` tracked locations, and generate corresponding
-  /// snapshot instructions in dest.
-  /// \param dest pogram where snaphots instructions for the collected static
-  /// locals are added.
+  /// Searches the goto instructions reachable from the start to the end of the
+  /// instrumented function's instruction to identify local static variables,
+  /// declared directly in the function or indirectly in the functions it calls,
+  /// add them to the `stack-allocated` set of tracked locations, and generates
+  /// corresponding snapshot instructions in dest.
+  /// \param dest a snaphot program for the identified static locals.
   void track_static_locals(goto_programt &dest);
 
-  /// Searches for function calls occurring between the start and stop
-  /// targets (inclusive) instructions, and collects the static locals declared
-  /// by these functions.
-  /// \param begin instruction to start the search from.
-  /// \param end instruction to stop the search at.
-  /// \param dest pogram where snaphots instructions for the collected static
-  /// locals are added.
-  void track_static_locals_from_calls(
-    const goto_programt::targett &begin,
-    const goto_programt::targett &end,
+  /// Searches the goto instructions reachable between the given `it` and `end`
+  /// target instructions to identify local static variables,
+  /// declared directly in the function or indirectly in the functions it calls,
+  /// add them to the `stack-allocated` set of tracked locations, and generates
+  /// corresponding snapshot instructions in dest.
+  /// \param it start instruction (inclusive)
+  /// \param end end instruction (exclusive)
+  /// \param dest a snaphot program for the identified static locals.
+  void track_static_locals_between(
+    goto_programt::const_targett it,
+    const goto_programt::const_targett end,
     goto_programt &dest);
 
+protected:
+  /// \brief Represents an interval of source locations covered by the static
+  /// local variable search.
+  /// Interval bounds are represented with (line, col) positive integers.
+  /// Lexicographic ordering is used for comparisons.
+  /// Updates to the bounds and inclusion checks use pessimistic defaults
+  /// when source locations are undefined or only partially defined.
+  class location_intervalt
+  {
+  public:
+    /// Initializes to the empty interval
+    location_intervalt()
+    {
+      min_line = std::numeric_limits<std::size_t>::max();
+      min_col = std::numeric_limits<std::size_t>::max();
+      max_line = std::numeric_limits<std::size_t>::min();
+      max_col = std::numeric_limits<std::size_t>::min();
+    }
+
+    /// Grows the interval cover the maximum range
+    /// [(size_t::min, size_t::min), (size_t::min, size_t::max)]
+    void anywhere()
+    {
+      min_line = std::numeric_limits<std::size_t>::min();
+      min_col = std::numeric_limits<std::size_t>::min();
+      max_line = std::numeric_limits<std::size_t>::max();
+      max_col = std::numeric_limits<std::size_t>::max();
+    }
+
+    /// Grows the interval to include the given (line, col) location
+    void update(const source_locationt &source_location)
+    {
+      PRECONDITION(source_location.is_not_nil());
+      // use pessimistic lowest value to update min for undefined
+      update_min(
+        line_to_size_t(
+          source_location, std::numeric_limits<std::size_t>::min()),
+        col_to_size_t(
+          source_location, std::numeric_limits<std::size_t>::min()));
+
+      // use pessimistic highest value to update max for undefined
+      update_max(
+        line_to_size_t(
+          source_location, std::numeric_limits<std::size_t>::max()),
+        col_to_size_t(
+          source_location, std::numeric_limits<std::size_t>::max()));
+    }
+
+    /// True iff the interval contains the given location
+    bool contains(const source_locationt &source_location)
+    {
+      if(source_location.is_not_nil())
+      {
+        return
+          // use pessimistic highest value to compare to min for undefined
+          is_lte(
+            min_line,
+            min_col,
+            line_to_size_t(
+              source_location, std::numeric_limits<std::size_t>::max()),
+            col_to_size_t(
+              source_location, std::numeric_limits<std::size_t>::max())) &&
+          // use pessimistic lowest value to compare to max for undefined
+          is_lte(
+            line_to_size_t(
+              source_location, std::numeric_limits<std::size_t>::min()),
+            col_to_size_t(
+              source_location, std::numeric_limits<std::size_t>::min()),
+            max_line,
+            max_col);
+      }
+      else
+      {
+        return true;
+      }
+    }
+
+  private:
+    /// If line or col is missing use default
+    std::size_t col_to_size_t(
+      const source_locationt &source_location,
+      std::size_t default_value)
+    {
+      if(
+        source_location.get_line().empty() ||
+        source_location.get_column().empty())
+      {
+        return default_value;
+      }
+      else
+      {
+        std::stringstream stream(id2string(source_location.get_column()));
+        size_t res;
+        stream >> res;
+        return res;
+      }
+    }
+
+    /// If line is missing use default
+    std::size_t line_to_size_t(
+      const source_locationt &source_location,
+      std::size_t default_value)
+    {
+      if(source_location.get_line().empty())
+      {
+        return default_value;
+      }
+      else
+      {
+        std::stringstream stream(id2string(source_location.get_line()));
+        size_t res;
+        stream >> res;
+        return res;
+      }
+    }
+
+    /// True iff `(line0, col0) <= (line1, col1)` in lexicographic ordering
+    static bool is_lte(size_t line0, size_t col0, size_t line1, size_t col1)
+    {
+      return (line0 < line1) || ((line0 == line1) && (col0 <= col1));
+    }
+
+    /// Updates the min_line and min_col in place using the given values
+    /// iff they are smaller.
+    void update_min(size_t line, size_t col)
+    {
+      if(is_lte(line, col, min_line, min_col))
+      {
+        min_line = line;
+        min_col = col;
+      }
+    }
+
+    /// Updates the max_line and max_col in place using the given values
+    /// iff they are larger.
+    void update_max(size_t line, size_t col)
+    {
+      if(is_lte(max_line, max_col, line, col))
+      {
+        max_line = line;
+        max_col = col;
+      }
+    }
+
+    std::size_t min_line;
+    std::size_t min_col;
+    std::size_t max_line;
+    std::size_t max_col;
+  };
+
+  /// Map type from function identifiers to covered locations
+  typedef std::unordered_map<irep_idt, location_intervalt> covered_locationst;
+  typedef std::unordered_set<symbol_exprt, irep_hash> propagated_static_localst;
+
+  /// Traverses the given list of instructions, updating the given
+  /// coverage map, recursing into function calls only once.
+  /// When the traversal terminates, the map will contain one
+  /// entry per visited function, with the associated range of locations
+  /// covered by the traversal.
+  /// Function names and line numbers are collected from source
+  /// locations attached to the instructions.
+  void traverse_instructions(
+    const irep_idt ambient_function_id,
+    goto_programt::const_targett it,
+    const goto_programt::const_targett end,
+    covered_locationst &covered_locations,
+    propagated_static_localst &propagated) const;
+
+  /// Collects static symbols from the symbol table that have a source location
+  /// included in one of the `covered_locations` and writes them into dest.
+  void collect_static_symbols(
+    covered_locationst &covered_locations,
+    std::unordered_set<symbol_exprt, irep_hash> &dest);
+
+public:
   /// Generates inclusion check instructions for an assignment, havoc or
   /// havoc_object instruction
   /// \param lhs the assignment lhs or argument to havoc/havoc_object
@@ -418,7 +591,7 @@ protected:
   using cond_target_exprt_to_car_mapt = std::
     unordered_map<const conditional_target_exprt, const car_exprt, irep_hash>;
 
-  /// Map to from conditional target expressions of assigns clauses
+  /// Map from conditional target expressions of assigns clauses
   /// to corresponding conditional address ranges.
   cond_target_exprt_to_car_mapt from_spec_assigns;
 
@@ -428,7 +601,7 @@ protected:
   using symbol_exprt_to_car_mapt =
     std::unordered_map<const symbol_exprt, const car_exprt, irep_hash>;
 
-  /// Map to from DECL symbols to corresponding conditional address ranges.
+  /// Map from DECL symbols to corresponding conditional address ranges.
   symbol_exprt_to_car_mapt from_stack_alloc;
 
   const car_exprt &create_car_from_stack_alloc(const symbol_exprt &target);
@@ -436,10 +609,16 @@ protected:
   using exprt_to_car_mapt =
     std::unordered_map<const exprt, const car_exprt, irep_hash>;
 
-  /// Map to from malloc'd symbols to corresponding conditional address ranges.
+  /// Map from malloc'd symbols to corresponding conditional address ranges.
   exprt_to_car_mapt from_heap_alloc;
 
   const car_exprt &create_car_from_heap_alloc(const exprt &target);
+
+  /// Map to from detected or propagated static local symbols to corresponding
+  /// conditional address ranges.
+  symbol_exprt_to_car_mapt from_static_local;
+
+  const car_exprt &create_car_from_static_local(const symbol_exprt &target);
 
   /// Creates a conditional address range expression from a cleaned-up condition
   /// and target expression.

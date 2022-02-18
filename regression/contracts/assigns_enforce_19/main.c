@@ -6,7 +6,9 @@ static int c = 0;
 int f() __CPROVER_assigns()
 {
   static int a = 0;
+  static int aa = 0;
   a++;
+  aa++;
   return a;
 }
 
