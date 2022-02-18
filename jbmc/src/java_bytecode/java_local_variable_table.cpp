@@ -513,18 +513,18 @@ static void populate_live_range_holes(
     merge_vars.begin(), merge_vars.end());
   std::sort(sorted_by_startpc.begin(), sorted_by_startpc.end(), lt_startpc);
 
+  PRECONDITION(!sorted_by_startpc.empty());
   maybe_add_hole(
     merge_into,
     expanded_live_range_start,
     sorted_by_startpc[0]->var.start_pc);
-  for(java_bytecode_convert_methodt::method_offsett idx = 0;
-      idx < sorted_by_startpc.size() - 1;
-      ++idx)
+  for(auto it = std::next(sorted_by_startpc.begin());
+      it != sorted_by_startpc.end();
+      ++it)
   {
+    auto &local_var = (*std::prev(it))->var;
     maybe_add_hole(
-      merge_into,
-      sorted_by_startpc[idx]->var.start_pc+sorted_by_startpc[idx]->var.length,
-      sorted_by_startpc[idx+1]->var.start_pc);
+      merge_into, local_var.start_pc + local_var.length, (*it)->var.start_pc);
   }
 }
 
