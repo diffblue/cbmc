@@ -24,8 +24,6 @@ Date: September 2021
 #include <util/expr_cast.h>
 #include <util/message.h>
 
-#define CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK "contracts:disable:assigns-check"
-
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
 ///        i.e. if all dereferences within an expression are valid
@@ -66,44 +64,6 @@ public:
     const exprt &expr,
     goto_programt &dest) const override;
 };
-
-/// \brief Adds a pragma on a source location disable all pointer checks.
-///
-/// The disabled checks are: "pointer-check", "pointer-primitive-check",
-/// "pointer-overflow-check", "signed-overflow-check",
-//  "unsigned-overflow-check", "conversion-check".
-void add_pragma_disable_pointer_checks(source_locationt &source_location);
-
-/// \brief Adds pragmas on a GOTO instruction to disable all pointer checks.
-///
-/// \param instr: A mutable reference to the GOTO instruction.
-/// \return The same reference after mutation (i.e., adding the pragma).
-goto_programt::instructiont &
-add_pragma_disable_pointer_checks(goto_programt::instructiont &instr);
-
-/// \brief Adds pragmas on all instructions in a GOTO program
-/// to disable all pointer checks.
-///
-/// \param prog: A mutable reference to the GOTO program.
-/// \return The same reference after mutation (i.e., adding the pragmas).
-goto_programt &add_pragma_disable_pointer_checks(goto_programt &prog);
-
-/// \brief Adds a pragma on a source_locationt to disable inclusion checking.
-void add_pragma_disable_assigns_check(source_locationt &source_location);
-
-/// \brief Adds a pragma on a GOTO instruction to disable inclusion checking.
-///
-/// \param instr: A mutable reference to the GOTO instruction.
-/// \return The same reference after mutation (i.e., adding the pragma).
-goto_programt::instructiont &
-add_pragma_disable_assigns_check(goto_programt::instructiont &instr);
-
-/// \brief Adds pragmas on all instructions in a GOTO program
-///        to disable inclusion checking on them.
-///
-/// \param prog: A mutable reference to the GOTO program.
-/// \return The same reference after mutation (i.e., adding the pragmas).
-goto_programt &add_pragma_disable_assigns_check(goto_programt &prog);
 
 /// \brief Generate a validity check over all dereferences in an expression
 ///

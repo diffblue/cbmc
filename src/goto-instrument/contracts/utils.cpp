@@ -76,49 +76,6 @@ void havoc_assigns_targetst::append_havoc_code_for_expr(
   havoc_utilst::append_havoc_code_for_expr(location, expr, dest);
 }
 
-void add_pragma_disable_pointer_checks(source_locationt &location)
-{
-  location.add_pragma("disable:pointer-check");
-  location.add_pragma("disable:pointer-primitive-check");
-  location.add_pragma("disable:pointer-overflow-check");
-  location.add_pragma("disable:signed-overflow-check");
-  location.add_pragma("disable:unsigned-overflow-check");
-  location.add_pragma("disable:conversion-check");
-}
-
-goto_programt::instructiont &
-add_pragma_disable_pointer_checks(goto_programt::instructiont &instr)
-{
-  add_pragma_disable_pointer_checks(instr.source_location_nonconst());
-  return instr;
-}
-
-goto_programt &add_pragma_disable_pointer_checks(goto_programt &prog)
-{
-  Forall_goto_program_instructions(it, prog)
-    add_pragma_disable_pointer_checks(*it);
-  return prog;
-}
-
-void add_pragma_disable_assigns_check(source_locationt &location)
-{
-  location.add_pragma(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK);
-}
-
-goto_programt::instructiont &
-add_pragma_disable_assigns_check(goto_programt::instructiont &instr)
-{
-  add_pragma_disable_assigns_check(instr.source_location_nonconst());
-  return instr;
-}
-
-goto_programt &add_pragma_disable_assigns_check(goto_programt &prog)
-{
-  Forall_goto_program_instructions(it, prog)
-    add_pragma_disable_assigns_check(*it);
-  return prog;
-}
-
 exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
 {
   exprt::operandst validity_checks;

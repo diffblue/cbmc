@@ -321,14 +321,11 @@ void code_contractst::check_apply_loop_contracts(
   optionalt<cfg_infot> cfg_empty_info;
 
   // Perform write set instrumentation on the entire loop.
-  check_frame_conditions(
-    function_name,
+  instrument_spec_assigns.instrument_instructions(
     goto_function.body,
     loop_head,
     loop_end,
-    instrument_spec_assigns,
-    // do not skip checks on function parameter assignments
-    skipt::DontSkip,
+    skip_function_paramst::NO,
     // do not use CFG info for now
     cfg_empty_info);
 
@@ -960,68 +957,6 @@ goto_functionst &code_contractst::get_goto_functions()
   return goto_functions;
 }
 
-void code_contractst::instrument_assign_statement(
-  goto_programt::targett &instruction_it,
-  goto_programt &program,
-  instrument_spec_assignst &instrument_spec_assigns,
-  optionalt<cfg_infot> &cfg_info_opt)
-{
-  auto lhs = instruction_it->assign_lhs();
-  lhs.add_source_location() = instruction_it->source_location();
-  goto_programt payload;
-  instrument_spec_assigns.check_inclusion_assignment(
-    lhs, cfg_info_opt, payload);
-  insert_before_swap_and_advance(program, instruction_it, payload);
-}
-
-void code_contractst::instrument_call_statement(
-  goto_programt::targett &instruction_it,
-  const irep_idt &function,
-  goto_programt &body,
-  instrument_spec_assignst &instrument_spec_assigns,
-  optionalt<cfg_infot> &cfg_info_opt)
-{
-  INVARIANT(
-    instruction_it->is_function_call(),
-    "The first argument of instrument_call_statement should always be "
-    "a function call");
-
-  const auto &callee_name =
-    to_symbol_expr(instruction_it->call_function()).get_identifier();
-
-  if(callee_name == "malloc")
-  {
-    const auto &function_call =
-      to_code_function_call(instruction_it->get_code());
-    if(function_call.lhs().is_not_nil())
-    {
-      // grab the returned pointer from malloc
-      auto object = pointer_object(function_call.lhs());
-      object.add_source_location() = function_call.source_location();
-      // move past the call and then insert the CAR
-      instruction_it++;
-      goto_programt payload;
-      instrument_spec_assigns.track_heap_allocated(object, payload);
-      insert_before_swap_and_advance(body, instruction_it, payload);
-      // since CAR was inserted *after* the malloc call,
-      // move the instruction pointer backward,
-      // because the caller increments it in a `for` loop
-      instruction_it--;
-    }
-  }
-  else if(callee_name == "free")
-  {
-    const auto &ptr = instruction_it->call_arguments().front();
-    auto object = pointer_object(ptr);
-    object.add_source_location() = instruction_it->source_location();
-    goto_programt payload;
-    instrument_spec_assigns
-      .check_inclusion_heap_allocated_and_invalidate_aliases(
-        object, cfg_info_opt, payload);
-    insert_before_swap_and_advance(body, instruction_it, payload);
-  }
-}
-
 bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
 {
   // Collect all GOTOs and mallocs
@@ -1101,9 +1036,9 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   auto &function_body = function_obj->second.body;
 
   // Get assigns clause for function
-  const symbolt &function_sybmol = ns.lookup(function);
+  const symbolt &function_symbol = ns.lookup(function);
   const auto &function_with_contract =
-    to_code_with_contract_type(function_sybmol.type);
+    to_code_with_contract_type(function_symbol.type);
 
   instrument_spec_assignst instrument_spec_assigns(
     function, goto_functions, symbol_table, log.get_message_handler());
@@ -1158,7 +1093,7 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 
   // Track formal parameters
   goto_programt snapshot_function_parameters;
-  for(const auto &param : to_code_type(function_sybmol.type).parameters())
+  for(const auto &param : to_code_type(function_symbol.type).parameters())
   {
     goto_programt payload;
     instrument_spec_assigns.track_stack_allocated(
@@ -1170,182 +1105,14 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
   goto_functions.update();
 
   // Insert write set inclusion checks.
-  check_frame_conditions(
-    function,
+  instrument_spec_assigns.instrument_instructions(
     function_body,
     instruction_it,
     function_body.instructions.end(),
-    instrument_spec_assigns,
-    // skip checks on function parameter assignments
-    skipt::Skip,
+    skip_function_paramst::YES,
     cfg_info_opt);
 
   return false;
-}
-
-/// Returns true iff the target instruction is tagged with a
-/// 'CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK' pragma.
-bool has_disable_assigns_check_pragma(
-  const goto_programt::const_targett &target)
-{
-  const auto &pragmas = target->source_location().get_pragmas();
-  return pragmas.find(CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK) != pragmas.end();
-}
-
-/// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.
-bool must_check_assign(
-  const goto_programt::const_targett &target,
-  code_contractst::skipt skip_parameter_assigns,
-  const namespacet ns,
-  const optionalt<cfg_infot> cfg_info_opt)
-{
-  if(
-    const auto &symbol_expr =
-      expr_try_dynamic_cast<symbol_exprt>(target->assign_lhs()))
-  {
-    if(
-      skip_parameter_assigns == code_contractst::skipt::DontSkip &&
-      ns.lookup(symbol_expr->get_identifier()).is_parameter)
-      return true;
-
-    if(cfg_info_opt.has_value())
-      return !cfg_info_opt.value().is_local(symbol_expr->get_identifier());
-  }
-
-  return true;
-}
-
-/// Returns true iff a `DECL x` must be added to the local write set.
-///
-/// A variable is called 'dirty' if its address gets taken at some point in
-/// the program.
-///
-/// Assuming the goto program is obtained from a structured C program that
-/// passed C compiler checks, non-dirty variables can only be assigned to
-/// directly by name, cannot escape their lexical scope, and are always safe
-/// to assign. Hence, we only track dirty variables in the write set.
-bool must_track_decl(
-  const goto_programt::const_targett &target,
-  const optionalt<cfg_infot> &cfg_info_opt)
-{
-  if(cfg_info_opt.has_value())
-    return cfg_info_opt.value().is_not_local_or_dirty_local(
-      target->decl_symbol().get_identifier());
-
-  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
-  return true;
-}
-
-/// Returns true iff a `DEAD x` must be processed to upate the local write set.
-/// The conditions are the same than for tracking a `DECL x` instruction.
-bool must_track_dead(
-  const goto_programt::const_targett &target,
-  const optionalt<cfg_infot> &cfg_info_opt)
-{
-  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
-  if(!cfg_info_opt.has_value())
-    return true;
-
-  return cfg_info_opt.value().is_not_local_or_dirty_local(
-    target->dead_symbol().get_identifier());
-}
-
-void code_contractst::check_frame_conditions(
-  const irep_idt &function,
-  goto_programt &body,
-  goto_programt::targett instruction_it,
-  const goto_programt::targett &instruction_end,
-  instrument_spec_assignst &instrument_spec_assigns,
-  skipt skip_parameter_assigns,
-  optionalt<cfg_infot> &cfg_info_opt)
-{
-  while(instruction_it != instruction_end)
-  {
-    // Skip instructions marked as disabled for assigns clause checking
-    if(has_disable_assigns_check_pragma(instruction_it))
-    {
-      instruction_it++;
-      if(cfg_info_opt.has_value())
-        cfg_info_opt.value().step();
-      continue;
-    }
-
-    // Do not instrument this instruction again in the future,
-    // since we are going to instrument it now below.
-    add_pragma_disable_assigns_check(*instruction_it);
-
-    if(
-      instruction_it->is_decl() &&
-      must_track_decl(instruction_it, cfg_info_opt))
-    {
-      // grab the declared symbol
-      const auto &decl_symbol = instruction_it->decl_symbol();
-      // move past the call and then insert the CAR
-      instruction_it++;
-      goto_programt payload;
-      instrument_spec_assigns.track_stack_allocated(decl_symbol, payload);
-      insert_before_swap_and_advance(body, instruction_it, payload);
-      // since CAR was inserted *after* the DECL instruction,
-      // move the instruction pointer backward,
-      // because the loop step takes care of the increment
-      instruction_it--;
-    }
-    else if(
-      instruction_it->is_assign() &&
-      must_check_assign(
-        instruction_it, skip_parameter_assigns, ns, cfg_info_opt))
-    {
-      instrument_assign_statement(
-        instruction_it, body, instrument_spec_assigns, cfg_info_opt);
-    }
-    else if(instruction_it->is_function_call())
-    {
-      instrument_call_statement(
-        instruction_it, function, body, instrument_spec_assigns, cfg_info_opt);
-    }
-    else if(
-      instruction_it->is_dead() &&
-      must_track_dead(instruction_it, cfg_info_opt))
-    {
-      const auto &symbol = instruction_it->dead_symbol();
-      if(instrument_spec_assigns.stack_allocated_is_tracked(symbol))
-      {
-        goto_programt payload;
-        instrument_spec_assigns.invalidate_stack_allocated(symbol, payload);
-        insert_before_swap_and_advance(body, instruction_it, payload);
-      }
-      else
-      {
-        // For loops, the loop_head appears after the DECL of counters,
-        // and any other temporaries introduced during "initialization".
-        // However, they go `DEAD` (possible conditionally) inside the loop,
-        // in presence of return statements.
-        // Notice that for them those variables be writable,
-        // they must appear as assigns targets anyway,
-        // but their DECL statements are outside of the loop.
-        log.warning() << "Found a `DEAD` variable " << symbol.get_identifier()
-                      << " without corresponding `DECL`, at: "
-                      << instruction_it->source_location() << messaget::eom;
-      }
-    }
-    else if(
-      instruction_it->is_other() &&
-      instruction_it->get_other().get_statement() == ID_havoc_object)
-    {
-      auto havoc_argument = instruction_it->get_other().operands().front();
-      auto havoc_object = pointer_object(havoc_argument);
-      havoc_object.add_source_location() = instruction_it->source_location();
-      goto_programt payload;
-      instrument_spec_assigns.check_inclusion_assignment(
-        havoc_object, cfg_info_opt, payload);
-      insert_before_swap_and_advance(body, instruction_it, payload);
-    }
-
-    // Move to the next instruction
-    instruction_it++;
-    if(cfg_info_opt.has_value())
-      cfg_info_opt.value().step();
-  }
 }
 
 bool code_contractst::enforce_contract(const irep_idt &function)
