@@ -410,10 +410,10 @@ bool generate_ansi_c_start_function(
         index_exprt index_expr(
           argv_symbol.symbol_expr(), argc_symbol.symbol_expr());
 
-        // disable bounds check on that one
-        index_expr.set(ID_C_bounds_check, false);
-
         init_code.add(code_frontend_assignt(index_expr, null));
+        // disable bounds check on that one
+        init_code.statements().back().add_source_location().add_pragma(
+          "disable:bounds-check");
       }
 
       if(parameters.size()==3)
@@ -427,12 +427,13 @@ bool generate_ansi_c_start_function(
 
         index_exprt index_expr(
           envp_symbol.symbol_expr(), envp_size_symbol.symbol_expr());
-        // disable bounds check on that one
-        index_expr.set(ID_C_bounds_check, false);
 
         equal_exprt is_null(std::move(index_expr), std::move(null));
 
         init_code.add(code_assumet(is_null));
+        // disable bounds check on that one
+        init_code.statements().back().add_source_location().add_pragma(
+          "disable:bounds-check");
       }
 
       {
@@ -452,9 +453,8 @@ bool generate_ansi_c_start_function(
         {
           index_exprt index_expr(
             argv_symbol.symbol_expr(), from_integer(0, c_index_type()));
-
           // disable bounds check on that one
-          index_expr.set(ID_C_bounds_check, false);
+          index_expr.add_source_location().add_pragma("disable:bounds-check");
 
           const pointer_typet &pointer_type =
             to_pointer_type(parameters[1].type());
