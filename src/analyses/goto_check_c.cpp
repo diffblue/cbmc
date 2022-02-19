@@ -2170,27 +2170,6 @@ void goto_check_ct::goto_check(
     }
     else if(i.is_throw())
     {
-      if(
-        i.get_code().get_statement() == ID_expression &&
-        i.get_code().operands().size() == 1 &&
-        i.get_code().op0().operands().size() == 1)
-      {
-        // must not throw NULL
-
-        exprt pointer = to_unary_expr(i.get_code().op0()).op();
-
-        const notequal_exprt not_eq_null(
-          pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
-
-        add_guarded_property(
-          not_eq_null,
-          "throwing null",
-          "pointer dereference",
-          i.source_location(),
-          pointer,
-          identity);
-      }
-
       // this has no successor
       assertions.clear();
     }
