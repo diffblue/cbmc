@@ -16,6 +16,7 @@ int main()
 {
   long i=0x10;
   char *p=(char *)i;
+  unsigned char u = *(unsigned char *)i;
   char some_var=100;
   
   char z;
