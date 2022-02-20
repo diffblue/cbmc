@@ -93,10 +93,6 @@ void janalyzer_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("assumptions", true);
 
-  // magic error label
-  if(cmdline.isset("error-label"))
-    options.set_option("error-label", cmdline.get_values("error-label"));
-
   // Select a specific analysis
   if(cmdline.isset("taint"))
   {
@@ -791,7 +787,8 @@ void janalyzer_parse_optionst::help()
     HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK_JAVA
+    " --no-assertions              ignore user assertions\n"
+    " --no-assumptions             ignore user assumptions\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

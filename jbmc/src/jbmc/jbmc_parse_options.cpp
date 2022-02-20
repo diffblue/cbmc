@@ -220,9 +220,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     "self-loops-to-assumptions",
     !cmdline.isset("no-self-loops-to-assumptions"));
 
-  // all checks supported by goto_check_java
-  PARSE_OPTIONS_GOTO_CHECK_JAVA(cmdline, options);
-
   // unwind loops in java enum static initialization
   if(cmdline.isset("java-unwind-enum-static"))
     options.set_option("java-unwind-enum-static", true);
@@ -986,7 +983,6 @@ void jbmc_parse_optionst::help()
     "Program instrumentation options:\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
-    " --error-label label          check that label is unreachable\n"
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     HELP_REACHABILITY_SLICER
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)

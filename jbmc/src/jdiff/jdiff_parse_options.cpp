@@ -65,11 +65,20 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
   cmdline.set("no-refine-strings");
   parse_java_language_options(cmdline, options);
 
+  // check assertions
+  if(cmdline.isset("no-assertions"))
+    options.set_option("assertions", false);
+  else
+    options.set_option("assertions", true);
+
+  // use assumptions
+  if(cmdline.isset("no-assumptions"))
+    options.set_option("assumptions", false);
+  else
+    options.set_option("assumptions", true);
+
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
-
-  // all checks supported by goto_check
-  PARSE_OPTIONS_GOTO_CHECK_JAVA(cmdline, options);
 
   options.set_option("show-properties", cmdline.isset("show-properties"));
 }
@@ -251,7 +260,8 @@ void jdiff_parse_optionst::help()
     " --compact-output             output dependencies in compact mode\n"
     "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK_JAVA
+    " --no-assertions              ignore user assertions\n"
+    " --no-assumptions             ignore user assumptions\n"
     HELP_COVER
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
