@@ -703,13 +703,7 @@ void janalyzer_parse_optionst::process_goto_function(
 
   remove_returns(function, function_is_stub);
 
-  // add generic checks
-  goto_check(
-    function.get_function_id(),
-    function.get_goto_function(),
-    ns,
-    options,
-    ui_message_handler);
+  transform_assertions_assumptions(options, function.get_goto_function().body);
 }
 
 bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)
