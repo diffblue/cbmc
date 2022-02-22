@@ -24,16 +24,6 @@ class message_handlert;
 /// Class to generate havocking instructions for target expressions of a
 /// function contract's assign clause (replacement).
 ///
-/// \param replaced_function_id Name of the replaced function
-/// \param goto_functions Other functions forming the GOTO model
-/// \param targets Assigns clause targets for the replaced function
-/// \param source_location Source location of the replaced function call
-///        (added to all generated instructions)
-/// \param mode Language mode to use for newly generated symbols
-/// \param ns Namespace of the model
-/// \param st Symbol table of the model (new symbols will be added)
-/// \param message_handler handler used to log translation warnings/errors
-///
 /// Assigns clause targets can be interdependent as shown in this example:
 ///
 /// ```
@@ -54,6 +44,14 @@ class message_handlert;
 class havoc_assigns_clause_targetst : public instrument_spec_assignst
 {
 public:
+  /// \param _function_id Name of the replaced function
+  /// \param _targets Assigns clause targets of the replaced function
+  /// \param _functions Other functions forming the GOTO model
+  /// \param _source_location Source location of the replaced function call
+  ///        (added to all generated instructions)
+  /// \param _st Symbol table of the model (new symbols will be added)
+  /// \param _message_handler handler used to log translation warnings/errors
+  ///
   havoc_assigns_clause_targetst(
     const irep_idt &_function_id,
     const std::vector<exprt> &_targets,
@@ -100,6 +98,9 @@ private:
   /// ```
   /// Where `target_type` is the type of the target expression.
   void havoc_if_valid(car_exprt car, goto_programt &dest);
+
+  /// Havoc a static local expression
+  void havoc_static_local(car_exprt car, goto_programt &dest);
 
   const std::vector<exprt> &targets;
   const source_locationt &source_location;

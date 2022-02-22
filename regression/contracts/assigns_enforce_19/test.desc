@@ -1,12 +1,13 @@
 CORE
 main.c
 --enforce-contract f --enforce-contract g
-^\[f.assigns.\d+\] line 9 Check that a is assignable: SUCCESS$
-^\[g.assigns.\d+\] line 14 Check that b is valid: SUCCESS$
-^\[g.assigns.\d+\] line 16 Check that b is assignable: SUCCESS$
-^\[g.assigns.\d+\] line 17 Check that c is assignable: FAILURE$
-^\[g.assigns.\d+\] line 18 Check that \*points_to_b is assignable: SUCCESS$
-^\[g.assigns.\d+\] line 19 Check that \*points_to_c is assignable: FAILURE$
+^\[f.assigns.\d+\] line \d+ Check that a is assignable: SUCCESS$
+^\[f.assigns.\d+\] line \d+ Check that aa is assignable: SUCCESS$
+^\[g.assigns.\d+\] line \d+ Check that b is valid: SUCCESS$
+^\[g.assigns.\d+\] line \d+ Check that b is assignable: SUCCESS$
+^\[g.assigns.\d+\] line \d+ Check that c is assignable: FAILURE$
+^\[g.assigns.\d+\] line \d+ Check that \*points_to_b is assignable: SUCCESS$
+^\[g.assigns.\d+\] line \d+ Check that \*points_to_c is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -14,5 +15,7 @@ main.c
 --
 Checks whether contract enforcement works with (local and global) static variables.
 Local static variables should be part of the local write set.
+Shows that we detect using the source location  even when there is space 
+before the declaration and the actual start of the program.
 Global static variables should be included in the global write set,
 otherwise any assignment to it is invalid.

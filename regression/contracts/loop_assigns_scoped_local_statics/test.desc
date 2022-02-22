@@ -1,0 +1,28 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[body_1.assigns.\d+\] .* Check that j is assignable: SUCCESS$
+^\[body_2.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[body_3.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[incr.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assertion.\d+\] .* assertion j == 9: SUCCESS$
+^\[body_1.assigns.\d+\] line \d+ Check that __static_local is assignable: SUCCESS$
+^\[body_2.assigns.\d+\] line \d+ Check that __static_local is assignable: SUCCESS$
+^\[body_3.assigns.\d+\] line \d+ Check that __static_local is assignable: SUCCESS$
+^\[incr.assigns.\d+\] line \d+ Check that __static_local is assignable: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion before_loop\(\) == 0: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion after_loop\(\) == 0: SUCCESS$
+^\[upperbound.assigns.\d+\] line \d+ Check that __static_local is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks assigns clause checking presence of locally declared static 
+variables.
+We observe that the local static variables declared within the loop's
+scope are correctly gathered and added to the write set,
+and are havoced (body_1 and body_2 do not return 0 anymore after the loop). 

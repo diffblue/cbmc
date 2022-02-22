@@ -257,11 +257,8 @@ void code_contractst::check_apply_loop_contracts(
   // assigns clause snapshots
   goto_programt snapshot_instructions;
 
-  instrument_spec_assigns.track_static_locals(snapshot_instructions);
-
-  // ^^^ FIXME ^^^ we should only allow assignments to static locals
-  // declared in functions that are called in the loop body, not from the whole
-  // function...
+  instrument_spec_assigns.track_static_locals_between(
+    loop_head, loop_end, snapshot_instructions);
 
   // set of targets to havoc
   assignst to_havoc;
@@ -799,25 +796,22 @@ bool code_contractst::apply_function_contract(
     targets.add_to_operands(std::move(target));
   common_replace(targets);
 
-  // Create a sequence of non-deterministic assignments...
+  // Create a sequence of non-deterministic assignments ...
+
+  // ... for the assigns clause targets and static locals
   goto_programt havoc_instructions;
 
-  // ...for assigns clause targets
-  if(!assigns_clause.empty())
-  {
-    // Havoc all targets in the assigns clause
-    // TODO: handle local statics possibly touched by this function
-    havoc_assigns_clause_targetst havocker(
-      target_function,
-      targets.operands(),
-      goto_functions,
-      location,
-      symbol_table,
-      log.get_message_handler());
-    havocker.get_instructions(havoc_instructions);
-  }
+  havoc_assigns_clause_targetst havocker(
+    target_function,
+    targets.operands(),
+    goto_functions,
+    location,
+    symbol_table,
+    log.get_message_handler());
 
-  // ...for the return value
+  havocker.get_instructions(havoc_instructions);
+
+  // ... for the return value
   if(call_ret_opt.has_value())
   {
     auto &call_ret = call_ret_opt.value();

@@ -1,0 +1,24 @@
+CORE
+main.c
+--replace-call-with-contract bar --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assigns.\d+\] line \d+ Check that j \(assigned by the contract of bar\) is assignable: SUCCESS$
+^\[main.assigns.\d+\] line \d+ Check that __static_local \(assigned by the contract of bar\) is assignable: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion before_loop\(\) == 0: SUCCESS$
+^\[main.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
+^\[main.assigns.\d+\] line \d+ Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] line \d+ Check that i is valid: SUCCESS$
+^\[main.assigns.\d+\] line \d+ Check that j is valid: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion j == 9: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion before_loop\(\) == 0: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion after_loop\(\) == 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks assigns clause checking presence of locally declared static 
+variables and loops.
+We observe that the local static variables declared within the loop's
+scope are correctly gathered and added to the write set,
+and are havoced (body_1 and body_2 do not return 0 anymore after the loop). 

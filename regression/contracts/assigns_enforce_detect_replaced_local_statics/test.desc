@@ -1,0 +1,23 @@
+CORE
+main.c
+--replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --pointer-check
+^\[foo.assigns.\d+\] line \d+ Check that __local_static \(assigned by the contract of bar\) is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that __local_static_arr \(assigned by the contract of bar\) is assignable: SUCCESS$
+^\[main.assertion.\d+\] line \d+ expecting FAILURE: FAILURE$
+^\[main.assertion.\d+\] line \d+ expecting FAILURE: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test checks that locally declared static variables are correctly detected 
+and tracked when function contract replacement is used.
+Here, baz declares a local static variable, 
+bar calls baz, and we replace the call to baz in bar.
+bar also declares a local static array variable.
+the call to bar is replaced by its contract in foo.
+We see that in foo, two assignments to these local statics are checked,
+showing that the replacement of bar in foo is modeled as nondet assignments.
+We also see that these assignments are succesfully checked against the empty
+assigns clause of foo, which shows that they are automatically propagated to 
+the assigns clause of foo as expected.
