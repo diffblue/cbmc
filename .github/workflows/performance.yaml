@@ -1,0 +1,86 @@
+name: Performance benchmarking
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  run-llbmc-benchmarks:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache
+          sudo apt-get install --no-install-recommends -y bmt poppler-utils texlive-latex-base texlive-pictures
+          make -C src minisat2-download
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-Performance
+          restore-keys: |
+            ${{ runner.os }}-20.04-make-${{ github.ref }}
+            ${{ runner.os }}-20.04-make
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with make
+        run: |
+          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir -j2
+          mkdir pr-bin
+          cp src/cbmc/cbmc pr-bin/
+          cp src/goto-cc/goto-cc pr-bin/
+          cp .github/workflows/performance-compare.py pr-bin/
+          echo "PR_BIN=$PWD/pr-bin" >> $GITHUB_ENV
+      - name: Build base with make
+        run: |
+          git checkout -b ${{ github.ref }}
+          git checkout ${{ github.base_ref }}
+          git checkout -b base ${{ github.base_ref }}
+          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir -j2
+          mkdir base-bin
+          cp src/cbmc/cbmc base-bin/
+          cp src/goto-cc/goto-cc base-bin/
+          echo "BASE_BIN=$PWD/base-bin" >> $GITHUB_ENV
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run LLBMC benchmarks
+        run: |
+          git clone --depth=1 https://github.com/tautschnig/bmt.git bmt.git
+          cd bmt.git/pkgs
+          tar czf ../llbmc-bench.cprover-bm.tar.gz llbmc-bench
+          cd ..
+          cpbm unpack orig-src/llbmc-bench-vstte-2012.tgz llbmc-bench.cprover-bm.tar.gz
+          cd llbmc-bench
+          sed -i 's/\(ex36.*\)/\1 --unwind 11/' cprover/cbmc_opts
+          export PATH=$BASE_BIN:$PATH
+          cprover/rules -j2 table CONFIG=cbmc.base
+          export PATH=$PR_BIN:$PATH
+          rm -rf build
+          cprover/rules -j2 table CONFIG=cbmc.pr
+          # avoid downloading PGF as we use the Ubuntu package
+          mkdir -p base pgfplots
+          cpbm graph -s cprover/results.cbmc.base.csv cprover/results.cbmc.pr.csv
+          pdftoppm -png results.cbmc.base_results.cbmc.pr-scatter.pdf scatter
+      - uses: actions/upload-artifact@v2
+        with:
+          name: scatter.png
+          path: bmt.git/llbmc-bench/scatter-1.png
+          if-no-files-found: error
+      - name: Compare results
+        run: |
+          cd bmt.git/llbmc-bench
+          cut -d, -f2,3,5,10,13,17 cprover/results.cbmc.base.csv > base.csv
+          cut -d, -f2,3,5,10,13,17 cprover/results.cbmc.pr.csv > pr.csv
+          $PR_BIN/performance-compare.py base.csv pr.csv
