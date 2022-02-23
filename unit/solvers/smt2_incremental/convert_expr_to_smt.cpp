@@ -1,16 +1,16 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
+#include <util/format.h>
+#include <util/std_expr.h>
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
-
-#include <util/arith_tools.h>
-#include <util/bitvector_types.h>
-#include <util/format.h>
-#include <util/std_expr.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
 {
@@ -414,5 +414,403 @@ TEST_CASE(
   {
     const cbmc_invariants_should_throwt invariants_throw;
     REQUIRE_THROWS(convert_expr_to_smt(unary_minus_exprt{true_exprt{}}));
+  }
+}
+
+SCENARIO(
+  "Bitwise \"AND\" expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("three integer bitvectors and their smt-term equivalents")
+  {
+    const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+    const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
+    const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
+
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto three_bvint = from_integer(3, signedbv_typet{8});
+    const auto five_bvint = from_integer(5, signedbv_typet{8});
+
+    WHEN("a bitand_exprt with two of them as arguments is converted")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitand_exprt{one_bvint, three_bvint});
+
+      THEN(
+        "it should be equivalent to a \"bvand\" term with the operands "
+        "converted as well")
+      {
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_and(smt_term_one, smt_term_three);
+
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // bitand_exprt derives from multiary exprt, so we need to be able to handle
+    // expressions with more than 2 operands.
+    WHEN("a ternary bitand_exprt gets connverted to smt terms")
+    {
+      // We need to jump through a bit of a hoop because bitand_exprt doesn't
+      // support direct construction with multiple operands - so we have to
+      // construct its parent class and downcast it.
+      const exprt::operandst and_operands{one_bvint, three_bvint, five_bvint};
+      const multi_ary_exprt first_step{
+        ID_bitand, and_operands, signedbv_typet{8}};
+      const auto bitand_expr = to_bitand_expr(first_step);
+
+      const auto constructed_term = convert_expr_to_smt(bitand_expr);
+
+      THEN(
+        "it should be converted to an appropriate number of nested binary "
+        "\"bvand\" terms")
+      {
+        const auto expected_term = smt_bit_vector_theoryt::make_and(
+          smt_bit_vector_theoryt::make_and(smt_term_one, smt_term_three),
+          smt_term_five);
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // Both of the above tests have been testing the positive case so far -
+    // where everything goes more or less how we expect. Let's see how it
+    // does with a negative case - where one of the terms is bad or otherwise
+    // unsuitable for expression.
+    WHEN("a bitand_exprt with operands of different types gets converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because bvand requires"
+        "operands of the same sort")
+      {
+        CHECK_THROWS(
+          convert_expr_to_smt(bitand_exprt{one_bvint, true_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Bitwise \"OR\" expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("three integer bitvectors and their smt-term equivalents")
+  {
+    const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+    const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
+    const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
+
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto three_bvint = from_integer(3, signedbv_typet{8});
+    const auto five_bvint = from_integer(5, signedbv_typet{8});
+
+    WHEN("a bitor_exprt with two of them as arguments is converted")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitor_exprt{one_bvint, three_bvint});
+
+      THEN(
+        "it should be equivalent to a \"bvor\" term with the operands "
+        "converted as well")
+      {
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_or(smt_term_one, smt_term_three);
+
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // bitor_exprt is similar to bitand_exprt in that it derives from multiary
+    // exprt, so we need to be able to handle expressions with more than 2
+    // operands. We're going to follow the same format and construct a
+    // multiary_exprt as if it was a bitor_exprt, then cast it to one, finally
+    // passing it on to convert_expt_to_smt to convert it to an appropriate SMT
+    // term.
+    WHEN("a ternary bitor_exprt gets connverted to smt terms")
+    {
+      const exprt::operandst or_operands{one_bvint, three_bvint, five_bvint};
+      const multi_ary_exprt first_step{
+        ID_bitor, or_operands, signedbv_typet{8}};
+      const auto bitor_expr = to_bitor_expr(first_step);
+
+      const auto constructed_term = convert_expr_to_smt(bitor_expr);
+
+      THEN(
+        "it should be converted to an appropriate number of nested binary "
+        "\"bvor\" terms")
+      {
+        // In QF_BV, bvor is defined as a binary function, so we need to
+        // construct bvor terms with arity > 2 in terms of nested bvor
+        // constructs.
+        const auto expected_term = smt_bit_vector_theoryt::make_or(
+          smt_bit_vector_theoryt::make_or(smt_term_one, smt_term_three),
+          smt_term_five);
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // Both of the above tests have been testing the positive case so far -
+    // where everything goes more or less how we expect. Let's see how it does
+    // with a negative case - where one of the terms is bad or otherwise
+    // unsuitable for expression.
+    WHEN("a bitor_exprt with operands of different types gets converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because bvor requires"
+        "operands of the same sort")
+      {
+        CHECK_THROWS(convert_expr_to_smt(bitor_exprt{one_bvint, true_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Bitwise \"XOR\" expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("three integer bitvectors and their smt-term equivalents")
+  {
+    const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+    const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
+    const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
+
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto three_bvint = from_integer(3, signedbv_typet{8});
+    const auto five_bvint = from_integer(5, signedbv_typet{8});
+
+    WHEN("a bitxor_exprt with two of them as arguments is converted")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitxor_exprt{one_bvint, three_bvint});
+
+      THEN(
+        "it should be equivalent to a \"bvxor\" term with the operands "
+        "converted as well")
+      {
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_xor(smt_term_one, smt_term_three);
+
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // bitxor_exprt is similar to bitand_exprt and bitor_exprt, so we need
+    // to handle the case where we need to convert expressions with arity > 2.
+    WHEN("a ternary bitxor_exprt gets connverted to smt terms")
+    {
+      const exprt::operandst xor_operands{one_bvint, three_bvint, five_bvint};
+      const multi_ary_exprt first_step{
+        ID_bitxor, xor_operands, signedbv_typet{8}};
+      const auto bitxor_expr = to_bitxor_expr(first_step);
+
+      const auto constructed_term = convert_expr_to_smt(bitxor_expr);
+
+      THEN(
+        "it should be converted to an appropriate number of nested binary "
+        "\"bvxor\" terms")
+      {
+        // We handle this in much the same way as we do bvand and bvor.
+        // See the corresponding comments there.
+        const auto expected_term = smt_bit_vector_theoryt::make_xor(
+          smt_bit_vector_theoryt::make_xor(smt_term_one, smt_term_three),
+          smt_term_five);
+        CHECK(constructed_term == expected_term);
+      }
+    }
+
+    // Both of the above tests have been testing the positive case so far -
+    // where everything goes more or less how we expect. Let's see how it does
+    // with a negative case - where one of the terms is bad or otherwise
+    // unsuitable for expression.
+    WHEN("a bitxor_exprt with operands of different types gets converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because bvxor requires"
+        "operands of the same sort")
+      {
+        CHECK_THROWS(
+          convert_expr_to_smt(bitxor_exprt{one_bvint, true_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Bitwise \"NOT\" expressions are converted to SMT terms (1's complement)",
+  "[core][smt2_incremental]")
+{
+  GIVEN("An integer bitvector")
+  {
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+
+    WHEN("A bitnot_exprt is constructed and converted to an SMT term")
+    {
+      const auto constructed_term =
+        convert_expr_to_smt(bitnot_exprt{one_bvint});
+      THEN("it should be converted to bvnot smt term")
+      {
+        const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+        const auto expected_term =
+          smt_bit_vector_theoryt::make_not(smt_term_one);
+
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN("A bitnot_exprt is constructed with a false expression and converted")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception and not allow "
+        "construction")
+      {
+        REQUIRE_THROWS(convert_expr_to_smt(bitnot_exprt{false_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Left-shift expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("An integer bitvector and the number of places we're going to shift")
+  {
+    // This is going to act as both the value to be shifted, and a value
+    // signifying the places to the left we're shifting.
+    const auto one_bvint = from_integer(1, signedbv_typet{8});
+
+    WHEN("We construct a shl_exprt and convert it to an SMT term")
+    {
+      const auto shift_expr = shl_exprt{one_bvint, one_bvint};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN("It should be equivalent to a bvshl term")
+      {
+        const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
+        const auto expected_term = smt_bit_vector_theoryt::shift_left(
+          /* term */
+          smt_term_one,
+          /* distance */
+          smt_term_one);
+      }
+    }
+
+    WHEN(
+      "We construct a malformed shl_exprt and attempt to convert it to an SMT "
+      "term")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because of validation "
+        "failure")
+      {
+        REQUIRE_THROWS(
+          convert_expr_to_smt(shl_exprt{one_bvint, false_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Logical Right-shift expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("Two integer bitvectors, one for the value and one for the places")
+  {
+    const auto to_be_shifted = from_integer(1, signedbv_typet{8});
+    const auto places = from_integer(2, signedbv_typet{8});
+
+    WHEN("We construct a lshr_exprt and convert it to an SMT term")
+    {
+      const auto shift_expr = lshr_exprt{to_be_shifted, places};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN("We should get an logical shift right SMT term")
+      {
+        const smt_termt smt_term_value = smt_bit_vector_constant_termt{1, 8};
+        const smt_termt smt_term_places = smt_bit_vector_constant_termt{2, 8};
+        const auto expected_term = smt_bit_vector_theoryt::logical_shift_right(
+          smt_term_value, smt_term_places);
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN(
+      "We construct a malformed lshr_exprt and attempt to convert it to an SMT"
+      " term")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because of validation "
+        "failure")
+      {
+        REQUIRE_THROWS(
+          convert_expr_to_smt(lshr_exprt{to_be_shifted, false_exprt{}}));
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Arithmetic Right-shift expressions are converted to SMT terms",
+  "[core][smt2_incremental]")
+{
+  GIVEN("Two integer bitvectors, one for the value and one for the places")
+  {
+    const auto to_be_shifted = from_integer(1, signedbv_typet{8});
+    const auto places = from_integer(2, signedbv_typet{8});
+
+    WHEN("We construct a ashr_exprt and convert it to an SMT term")
+    {
+      const auto shift_expr = ashr_exprt{to_be_shifted, places};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN("We should get an arithmetic shift-right SMT term")
+      {
+        const smt_termt smt_term_value = smt_bit_vector_constant_termt{1, 8};
+        const smt_termt smt_term_places = smt_bit_vector_constant_termt{2, 8};
+        const auto expected_term =
+          smt_bit_vector_theoryt::arithmetic_shift_right(
+            smt_term_value, smt_term_places);
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN("We construct an ashr_exprt and with a shift of 0 places")
+    {
+      const auto zero_places = from_integer(0, signedbv_typet{8});
+      const auto shift_expr = ashr_exprt{to_be_shifted, zero_places};
+      const auto constructed_term = convert_expr_to_smt(shift_expr);
+
+      THEN(
+        "When we convert it, we should be getting an arithmetic shift-right "
+        "term")
+      {
+        const smt_termt smt_term_value = smt_bit_vector_constant_termt{1, 8};
+        const smt_termt smt_term_places = smt_bit_vector_constant_termt{0, 8};
+        const auto expected_term =
+          smt_bit_vector_theoryt::arithmetic_shift_right(
+            smt_term_value, smt_term_places);
+        REQUIRE(constructed_term == expected_term);
+      }
+    }
+
+    WHEN(
+      "We construct a malformed ashr_exprt and attempt to convert it to an SMT "
+      "term")
+    {
+      const cbmc_invariants_should_throwt invariants_throw;
+      THEN(
+        "convert_expr_to_smt should throw an exception because of validation "
+        "failure")
+      {
+        REQUIRE_THROWS(
+          convert_expr_to_smt(ashr_exprt{to_be_shifted, false_exprt{}}));
+      }
+    }
   }
 }

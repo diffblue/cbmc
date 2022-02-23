@@ -21,6 +21,47 @@
 #include <functional>
 #include <numeric>
 
+/// \brief Converts operator expressions with 2 or more operands to terms
+///   expressed as binary operator application.
+/// \param expr: The expression to convert.
+/// \param factory: The factory function which makes applications of the
+///   relevant smt term, when applied to the term operands.
+/// \details The conversion used is left associative for instances with 3 or
+///   more operands. The SMT standard / core theory version 2.6 actually
+///   supports applying the `and`, `or` and `xor` to 3 or more operands.
+///   However our internal `smt_core_theoryt` does not support this currently
+///   and converting to binary application has the advantage of making the order
+///   of evaluation explicit.
+template <typename factoryt>
+static smt_termt convert_multiary_operator_to_terms(
+  const multi_ary_exprt &expr,
+  const factoryt &factory)
+{
+  PRECONDITION(expr.operands().size() >= 2);
+  const auto operand_terms =
+    make_range(expr.operands()).map([](const exprt &expr) {
+      return convert_expr_to_smt(expr);
+    });
+  return std::accumulate(
+    ++operand_terms.begin(),
+    operand_terms.end(),
+    *operand_terms.begin(),
+    factory);
+}
+
+/// \brief Ensures that all operands of the argument expression have related
+///   types.
+/// \param expr: The expression of which the operands we evaluate for type
+///   equality.
+template <typename target_typet>
+static bool operands_are_of_type(const exprt &expr)
+{
+  return std::all_of(
+    expr.operands().cbegin(), expr.operands().cend(), [](const exprt &operand) {
+      return can_cast_type<target_typet>(operand.type());
+    });
+}
+
 static smt_sortt convert_type_to_smt_sort(const bool_typet &type)
 {
   return smt_bool_sortt{};
@@ -126,30 +167,64 @@ static smt_termt convert_expr_to_smt(const concatenation_exprt &concatenation)
 
 static smt_termt convert_expr_to_smt(const bitand_exprt &bitwise_and_expr)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise and expression: " +
-    bitwise_and_expr.pretty());
+  if(operands_are_of_type<integer_bitvector_typet>(bitwise_and_expr))
+  {
+    return convert_multiary_operator_to_terms(
+      bitwise_and_expr, smt_bit_vector_theoryt::make_and);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitwise and expression: " +
+      bitwise_and_expr.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const bitor_exprt &bitwise_or_expr)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise or expression: " +
-    bitwise_or_expr.pretty());
+  if(operands_are_of_type<integer_bitvector_typet>(bitwise_or_expr))
+  {
+    return convert_multiary_operator_to_terms(
+      bitwise_or_expr, smt_bit_vector_theoryt::make_or);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitwise or expression: " +
+      bitwise_or_expr.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const bitxor_exprt &bitwise_xor)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise xor expression: " +
-    bitwise_xor.pretty());
+  if(operands_are_of_type<integer_bitvector_typet>(bitwise_xor))
+  {
+    return convert_multiary_operator_to_terms(
+      bitwise_xor, smt_bit_vector_theoryt::make_xor);
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitwise xor expression: " +
+      bitwise_xor.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const bitnot_exprt &bitwise_not)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for bitwise not expression: " +
-    bitwise_not.pretty());
+  const bool operand_is_bitvector =
+    can_cast_type<integer_bitvector_typet>(bitwise_not.op().type());
+
+  if(operand_is_bitvector)
+  {
+    return smt_bit_vector_theoryt::make_not(
+      convert_expr_to_smt(bitwise_not.op()));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitnot_exprt: " + bitwise_not.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const unary_minus_exprt &unary_minus)
@@ -189,34 +264,6 @@ static smt_termt convert_expr_to_smt(const if_exprt &if_expression)
     convert_expr_to_smt(if_expression.cond()),
     convert_expr_to_smt(if_expression.true_case()),
     convert_expr_to_smt(if_expression.false_case()));
-}
-
-/// \brief Converts operator expressions with 2 or more operands to terms
-///   expressed as binary operator application.
-/// \param expr: The expression to convert.
-/// \param factory: The factory function which makes applications of the
-///   relevant smt term, when applied to the term operands.
-/// \details The conversion used is left associative for instances with 3 or
-///   more operands. The SMT standard / core theory version 2.6 actually
-///   supports applying the `and`, `or` and `xor` to 3 or more operands.
-///   However our internal `smt_core_theoryt` does not support this currently
-///   and converting to binary application has the advantage of making the order
-///   of evaluation explicit.
-template <typename factoryt>
-static smt_termt convert_multiary_operator_to_terms(
-  const multi_ary_exprt &expr,
-  const factoryt &factory)
-{
-  PRECONDITION(expr.operands().size() >= 2);
-  const auto operand_terms =
-    make_range(expr.operands()).map([](const exprt &expr) {
-      return convert_expr_to_smt(expr);
-    });
-  return std::accumulate(
-    ++operand_terms.begin(),
-    operand_terms.end(),
-    *operand_terms.begin(),
-    factory);
 }
 
 static smt_termt convert_expr_to_smt(const and_exprt &and_expression)
@@ -498,9 +545,32 @@ static smt_termt convert_expr_to_smt(const index_exprt &index)
 
 static smt_termt convert_expr_to_smt(const shift_exprt &shift)
 {
-  // TODO: split into functions for separate types of shift including rotate.
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for shift expression: " + shift.pretty());
+  // TODO: Dispatch into different types of shifting
+  const auto &first_operand = shift.op0();
+  const auto &second_operand = shift.op1();
+
+  if(const auto left_shift = expr_try_dynamic_cast<shl_exprt>(shift))
+  {
+    return smt_bit_vector_theoryt::shift_left(
+      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+  }
+  else if(
+    const auto right_logical_shift = expr_try_dynamic_cast<lshr_exprt>(shift))
+  {
+    return smt_bit_vector_theoryt::logical_shift_right(
+      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+  }
+  else if(
+    const auto right_arith_shift = expr_try_dynamic_cast<ashr_exprt>(shift))
+  {
+    return smt_bit_vector_theoryt::arithmetic_shift_right(
+      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+  }
+  else
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for shift expression: " + shift.pretty());
+  }
 }
 
 static smt_termt convert_expr_to_smt(const with_exprt &with)
