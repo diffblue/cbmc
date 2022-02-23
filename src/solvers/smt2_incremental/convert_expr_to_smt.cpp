@@ -49,6 +49,19 @@ static smt_termt convert_multiary_operator_to_terms(
     factory);
 }
 
+/// \brief Ensures that all operands of the argument expression have related
+///   types.
+/// \param expr: The expression of which the operands we evaluate for type
+///   equality.
+template <typename target_typet>
+static bool operands_are_of_type(const exprt &expr)
+{
+  return std::all_of(
+    expr.operands().cbegin(), expr.operands().cend(), [](const exprt &operand) {
+      return can_cast_type<target_typet>(operand.type());
+    });
+}
+
 static smt_sortt convert_type_to_smt_sort(const bool_typet &type)
 {
   return smt_bool_sortt{};
@@ -154,12 +167,7 @@ static smt_termt convert_expr_to_smt(const concatenation_exprt &concatenation)
 
 static smt_termt convert_expr_to_smt(const bitand_exprt &bitwise_and_expr)
 {
-  if(std::all_of(
-       bitwise_and_expr.operands().cbegin(),
-       bitwise_and_expr.operands().cend(),
-       [](exprt operand) {
-         return can_cast_type<integer_bitvector_typet>(operand.type());
-       }))
+  if(operands_are_of_type<integer_bitvector_typet>(bitwise_and_expr))
   {
     return convert_multiary_operator_to_terms(
       bitwise_and_expr, smt_bit_vector_theoryt::make_and);
@@ -174,12 +182,7 @@ static smt_termt convert_expr_to_smt(const bitand_exprt &bitwise_and_expr)
 
 static smt_termt convert_expr_to_smt(const bitor_exprt &bitwise_or_expr)
 {
-  if(std::all_of(
-       bitwise_or_expr.operands().cbegin(),
-       bitwise_or_expr.operands().cend(),
-       [](exprt operand) {
-         return can_cast_type<integer_bitvector_typet>(operand.type());
-       }))
+  if(operands_are_of_type<integer_bitvector_typet>(bitwise_or_expr))
   {
     return convert_multiary_operator_to_terms(
       bitwise_or_expr, smt_bit_vector_theoryt::make_or);
@@ -194,12 +197,7 @@ static smt_termt convert_expr_to_smt(const bitor_exprt &bitwise_or_expr)
 
 static smt_termt convert_expr_to_smt(const bitxor_exprt &bitwise_xor)
 {
-  if(std::all_of(
-       bitwise_xor.operands().cbegin(),
-       bitwise_xor.operands().cend(),
-       [](exprt operand) {
-         return can_cast_type<integer_bitvector_typet>(operand.type());
-       }))
+  if(operands_are_of_type<integer_bitvector_typet>(bitwise_xor))
   {
     return convert_multiary_operator_to_terms(
       bitwise_xor, smt_bit_vector_theoryt::make_xor);
