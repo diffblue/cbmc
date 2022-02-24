@@ -5,8 +5,8 @@ activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
 Not unwinding loop foo\.0 iteration 3 file main\.c line 5 function foo thread 0
-\{\n\s*"description": "assertion 0",\n\s*"property": "foo\.assertion\.(1|3)",\n\s*"status": "SUCCESS"\n\s*\}
-\{\n\s*"description": "assertion 0",\n\s*"property": "foo\.assertion\.(1|3)",\n\s*"status": "FAILURE",\n\s*"trace": \[
+\{\n\s*"description": "assertion 0",\n\s*"property": "foo\.assertion\.(1|3)",\n\s*"sourceLocation": \{\n\s*"file": "main.c",\n\s*"function": "foo",\n\s*"line": "(8|11)",\n\s*"workingDirectory": ".*json-interface1"\n\s*\},\n\s*"status": "SUCCESS"\n\s*\}
+\{\n\s*"description": "assertion 0",\n\s*"property": "foo\.assertion\.(1|3)",\n\s*"sourceLocation": \{\n\s*"file": "main.c",\n\s*"function": "foo",\n\s*"line": "(8|11)",\n\s*"workingDirectory": ".*json-interface1"\n\s*\},\n\s*"status": "FAILURE",\n\s*"trace": \[
 VERIFICATION FAILED
 --
 "property": "foo\.assertion\.2"

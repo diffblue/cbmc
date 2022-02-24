@@ -14,8 +14,10 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/json.h>
+#include <util/json_irep.h>
 #include <util/json_stream.h>
 #include <util/xml.h>
+#include <util/xml_irep.h>
 
 #include <goto-programs/abstract_goto_model.h>
 
@@ -110,6 +112,7 @@ xmlt xml(const irep_idt &property_id, const property_infot &property_info)
   xmlt xml_result("result");
   xml_result.set_attribute("property", id2string(property_id));
   xml_result.set_attribute("status", as_string(property_info.status));
+  xml_result.new_element(xml(property_info.pc->source_location()));
   return xml_result;
 }
 
@@ -122,6 +125,7 @@ static void json(
   result["property"] = json_stringt(property_id);
   result["description"] = json_stringt(property_info.description);
   result["status"] = json_stringt(as_string(property_info.status));
+  result["sourceLocation"] = json(property_info.pc->source_location());
 }
 
 json_objectt
