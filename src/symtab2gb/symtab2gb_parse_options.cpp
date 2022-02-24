@@ -90,8 +90,8 @@ static void run_symtab2gb(
 
     if(failed(linking(linked_symbol_table, symtab, message_handler)))
     {
-      throw invalid_source_file_exceptiont{"failed to link `" +
-                                           symtab_filename + "'"};
+      throw invalid_input_exceptiont{
+        "failed to link `" + symtab_filename + "'"};
     }
   }
 

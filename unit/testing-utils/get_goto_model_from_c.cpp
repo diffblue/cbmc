@@ -58,7 +58,7 @@ goto_modelt get_goto_model_from_c(std::istream &in)
     const bool error = language.parse(in, "");
 
     if(error)
-      throw invalid_source_file_exceptiont("parsing failed");
+      throw invalid_input_exceptiont("parsing failed");
   }
 
   language_file.get_modules();
@@ -69,7 +69,7 @@ goto_modelt get_goto_model_from_c(std::istream &in)
     const bool error = language_files.typecheck(goto_model.symbol_table);
 
     if(error)
-      throw invalid_source_file_exceptiont("typechecking failed");
+      throw invalid_input_exceptiont("typechecking failed");
   }
 
   {
@@ -77,8 +77,7 @@ goto_modelt get_goto_model_from_c(std::istream &in)
       language_files.generate_support_functions(goto_model.symbol_table);
 
     if(error)
-      throw invalid_source_file_exceptiont(
-        "support function generation failed");
+      throw invalid_input_exceptiont("support function generation failed");
   }
 
   goto_convert(

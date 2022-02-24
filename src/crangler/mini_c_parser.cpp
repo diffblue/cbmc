@@ -143,7 +143,7 @@ void mini_c_parsert::parse_brackets(char open, char close, tokenst &dest)
   while(true)
   {
     if(eof())
-      throw invalid_source_file_exceptiont("expected " + std::string(1, close));
+      throw invalid_input_exceptiont("expected " + std::string(1, close));
 
     auto &token = consume_token();
     dest.push_back(token);
@@ -297,7 +297,7 @@ mini_c_parsert::tokenst mini_c_parsert::parse_initializer()
     while(true)
     {
       if(eof())
-        throw invalid_source_file_exceptiont("expected an initializer");
+        throw invalid_input_exceptiont("expected an initializer");
       auto &token = consume_token();
       result.push_back(token);
       if(token == ';')
@@ -317,7 +317,7 @@ mini_c_parsert::tokenst mini_c_parsert::parse_initializer()
     while(true)
     {
       if(eof())
-        throw invalid_source_file_exceptiont("eof in function body");
+        throw invalid_input_exceptiont("eof in function body");
       auto &token = consume_token();
       result.push_back(token);
       if(token == '{')

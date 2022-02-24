@@ -350,7 +350,7 @@ exprt gdb_value_extractort::get_pointer_to_function_value(
   const auto function_symbol = symbol_table.lookup(function_name);
   if(function_symbol == nullptr)
   {
-    throw invalid_source_file_exceptiont{
+    throw invalid_input_exceptiont{
       "input source code does not contain function: " + function_name};
   }
   CHECK_RETURN(function_symbol->type.id() == ID_code);

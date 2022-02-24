@@ -80,6 +80,11 @@ analysis_exceptiont::analysis_exceptiont(std::string reason)
 {
 }
 
+invalid_input_exceptiont::invalid_input_exceptiont(std::string reason)
+  : cprover_exception_baset(std::move(reason))
+{
+}
+
 invalid_source_file_exceptiont::invalid_source_file_exceptiont(
   std::string reason)
   : cprover_exception_baset(std::move(reason))
