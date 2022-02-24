@@ -3,6 +3,9 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
+#include <util/config.h>
+#include <util/constructor_of.h>
 #include <util/format.h>
 #include <util/std_expr.h>
 
@@ -10,6 +13,7 @@
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
@@ -811,6 +815,129 @@ SCENARIO(
         REQUIRE_THROWS(
           convert_expr_to_smt(ashr_exprt{to_be_shifted, false_exprt{}}));
       }
+    }
+  }
+}
+
+TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
+{
+  const symbol_exprt bool_expr{"foo", bool_typet{}};
+  const smt_termt bool_term = smt_identifier_termt{"foo", smt_bool_sortt{}};
+  const symbol_exprt bv_expr{"bar", signedbv_typet(12)};
+  const smt_termt bv_term =
+    smt_identifier_termt{"bar", smt_bit_vector_sortt{12}};
+  SECTION("Casts to bool")
+  {
+    CHECK(
+      convert_expr_to_smt(typecast_exprt{bool_expr, bool_typet{}}) ==
+      bool_term);
+    CHECK(
+      convert_expr_to_smt(typecast_exprt{bv_expr, bool_typet{}}) ==
+      smt_core_theoryt::distinct(
+        bv_term, smt_bit_vector_constant_termt{0, 12}));
+  }
+  SECTION("Casts to C bool")
+  {
+    // The config lines are necessary because when we do casting to C bool the
+    // bit width depends on the configuration.
+    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+    config.ansi_c.set_arch_spec_i386();
+    const std::size_t c_bool_width = config.ansi_c.bool_width;
+    const smt_bit_vector_constant_termt c_true{1, c_bool_width};
+    const smt_bit_vector_constant_termt c_false{0, c_bool_width};
+    SECTION("from bool")
+    {
+      const auto cast_bool =
+        convert_expr_to_smt(typecast_exprt{bool_expr, c_bool_type()});
+      const auto expected_bool_conversion =
+        smt_core_theoryt::if_then_else(bool_term, c_true, c_false);
+      CHECK(cast_bool == expected_bool_conversion);
+    }
+    SECTION("from bit vector")
+    {
+      const auto cast_bit_vector =
+        convert_expr_to_smt(typecast_exprt{bv_expr, c_bool_type()});
+      const auto expected_bit_vector_conversion =
+        smt_core_theoryt::if_then_else(
+          smt_core_theoryt::distinct(
+            bv_term, smt_bit_vector_constant_termt{0, 12}),
+          c_true,
+          c_false);
+      CHECK(cast_bit_vector == expected_bit_vector_conversion);
+    }
+  }
+  SECTION("Casts to bit vector")
+  {
+    SECTION("Matched width casts")
+    {
+      typet from_type, to_type;
+      using rowt = std::pair<typet, typet>;
+      std::tie(from_type, to_type) = GENERATE(
+        rowt{unsignedbv_typet{8}, unsignedbv_typet{8}},
+        rowt{unsignedbv_typet{8}, signedbv_typet{8}},
+        rowt{signedbv_typet{8}, unsignedbv_typet{8}});
+      CHECK(
+        convert_expr_to_smt(
+          typecast_exprt{from_integer(1, from_type), to_type}) ==
+        smt_bit_vector_constant_termt{1, 8});
+    }
+    SECTION("Narrowing casts")
+    {
+      CHECK(
+        convert_expr_to_smt(typecast_exprt{bv_expr, signedbv_typet{8}}) ==
+        smt_bit_vector_theoryt::extract(7, 0)(bv_term));
+      CHECK(
+        convert_expr_to_smt(typecast_exprt{
+          from_integer(42, unsignedbv_typet{32}), unsignedbv_typet{16}}) ==
+        smt_bit_vector_theoryt::extract(15, 0)(
+          smt_bit_vector_constant_termt{42, 32}));
+    }
+    SECTION("Widening casts")
+    {
+      std::size_t from_width, to_width, extension_width;
+      using size_rowt = std::tuple<std::size_t, std::size_t, std::size_t>;
+      std::tie(from_width, to_width, extension_width) = GENERATE(
+        size_rowt{8, 64, 56}, size_rowt{16, 32, 16}, size_rowt{16, 128, 112});
+      PRECONDITION(from_width < to_width);
+      PRECONDITION(to_width - from_width == extension_width);
+      using make_typet = std::function<typet(std::size_t)>;
+      const make_typet make_unsigned = constructor_oft<unsignedbv_typet>{};
+      const make_typet make_signed = constructor_oft<signedbv_typet>{};
+      using make_extensiont =
+        std::function<std::function<smt_termt(smt_termt)>(std::size_t)>;
+      const make_extensiont zero_extend = smt_bit_vector_theoryt::zero_extend;
+      const make_extensiont sign_extend = smt_bit_vector_theoryt::sign_extend;
+      make_typet make_source_type, make_destination_type;
+      make_extensiont make_extension;
+      using types_rowt = std::tuple<make_typet, make_typet, make_extensiont>;
+      std::tie(make_source_type, make_destination_type, make_extension) =
+        GENERATE_REF(
+          types_rowt{make_unsigned, make_unsigned, zero_extend},
+          types_rowt{make_signed, make_signed, sign_extend},
+          types_rowt{make_signed, make_unsigned, sign_extend},
+          types_rowt{make_unsigned, make_signed, zero_extend});
+      const typecast_exprt cast{
+        from_integer(42, make_source_type(from_width)),
+        make_destination_type(to_width)};
+      const smt_termt expected_term = make_extension(extension_width)(
+        smt_bit_vector_constant_termt{42, from_width});
+      CHECK(convert_expr_to_smt(cast) == expected_term);
+    }
+    SECTION("from bool")
+    {
+      const exprt from_expr = GENERATE(
+        exprt{symbol_exprt{"baz", bool_typet{}}},
+        exprt{true_exprt{}},
+        exprt{false_exprt{}});
+      const smt_termt from_term = convert_expr_to_smt(from_expr);
+      const std::size_t width = GENERATE(1, 8, 16, 32, 64);
+      const typecast_exprt cast{from_expr, bitvector_typet{ID_bv, width}};
+      CHECK(
+        convert_expr_to_smt(cast) ==
+        smt_core_theoryt::if_then_else(
+          from_term,
+          smt_bit_vector_constant_termt{1, width},
+          smt_bit_vector_constant_termt{0, width}));
     }
   }
 }

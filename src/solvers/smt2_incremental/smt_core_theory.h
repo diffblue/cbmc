@@ -62,6 +62,8 @@ public:
     static smt_sortt return_sort(const smt_termt &lhs, const smt_termt &rhs);
     static void validate(const smt_termt &lhs, const smt_termt &rhs);
   };
+  /// Makes applications of the function which returns true iff its two
+  /// arguments are not identical.
   static const smt_function_application_termt::factoryt<distinctt> distinct;
 
   struct if_then_elset final
