@@ -189,13 +189,6 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     {
       return os << "INVALID-POINTER";
     }
-    else if(src.operands().size() == 1)
-    {
-      const auto &unary_expr = to_unary_expr(src);
-      const auto &pointer_type = to_pointer_type(src.type());
-      return os << "pointer(" << format(unary_expr.op()) << ", "
-                << format(pointer_type.base_type()) << ')';
-    }
     else
     {
       const auto &pointer_type = to_pointer_type(src.type());
@@ -306,6 +299,12 @@ void format_expr_configt::setup()
   expr_map[ID_constant] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_constant_expr(expr));
+  };
+
+  expr_map[ID_annotated_pointer_constant] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &annotated_pointer = to_annotated_pointer_constant_expr(expr);
+    return os << format(annotated_pointer.symbolic_pointer());
   };
 
   expr_map[ID_typecast] =

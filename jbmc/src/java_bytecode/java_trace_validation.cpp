@@ -68,6 +68,7 @@ bool valid_rhs_expr_high_level(const exprt &rhs)
 {
   return can_cast_expr<struct_exprt>(rhs) || can_cast_expr<array_exprt>(rhs) ||
          can_cast_expr<constant_exprt>(rhs) ||
+         can_cast_expr<annotated_pointer_constant_exprt>(rhs) ||
          can_cast_expr<address_of_exprt>(rhs) ||
          can_cast_expr<symbol_exprt>(rhs) ||
          can_cast_expr<array_list_exprt>(rhs) ||
@@ -96,14 +97,21 @@ bool check_struct_structure(const struct_exprt &expr)
     return false;
   if(const auto sub_struct = expr_try_dynamic_cast<struct_exprt>(expr.op0()))
     check_struct_structure(*sub_struct);
-  else if(!can_cast_expr<constant_exprt>(expr.op0()))
+  else if(
+    !can_cast_expr<constant_exprt>(expr.op0()) &&
+    !can_cast_expr<annotated_pointer_constant_exprt>(expr.op0()))
+  {
     return false;
+  }
   if(
-    expr.operands().size() > 1 &&
-    std::any_of(
-      ++expr.operands().begin(),
-      expr.operands().end(),
-      [&](const exprt &operand) { return operand.id() != ID_constant; }))
+    expr.operands().size() > 1 && std::any_of(
+                                    ++expr.operands().begin(),
+                                    expr.operands().end(),
+                                    [&](const exprt &operand) {
+                                      return operand.id() != ID_constant &&
+                                             operand.id() !=
+                                               ID_annotated_pointer_constant;
+                                    }))
   {
     return false;
   }
@@ -119,15 +127,19 @@ bool check_address_structure(const address_of_exprt &address)
 bool check_constant_structure(const constant_exprt &constant_expr)
 {
   if(constant_expr.has_operands())
-  {
-    const auto &operand = skip_typecast(constant_expr.operands()[0]);
-    return can_cast_expr<constant_exprt>(operand) ||
-           can_cast_expr<address_of_exprt>(operand) ||
-           can_cast_expr<plus_exprt>(operand);
-  }
+    return false;
   // All value types used in Java must be non-empty except string_typet:
   return !constant_expr.get_value().empty() ||
          constant_expr.type() == string_typet();
+}
+
+static bool check_annotated_pointer_constant_structure(
+  const annotated_pointer_constant_exprt &constant_expr)
+{
+  const auto &operand = skip_typecast(constant_expr.symbolic_pointer());
+  return can_cast_expr<constant_exprt>(operand) ||
+         can_cast_expr<address_of_exprt>(operand) ||
+         can_cast_expr<plus_exprt>(operand);
 }
 
 static void check_lhs_assumptions(
@@ -253,8 +265,21 @@ static void check_rhs_assumptions(
       check_constant_structure(*constant_expr),
       "RHS",
       rhs.pretty(),
-      "Expecting the first operand of a constant expression to be a constant, "
-      "address_of or plus expression, or no operands and a non-empty value.");
+      "Expecting a constant expression to have no operands and a non-empty "
+      "value.");
+  }
+  // check pointer constant rhs structure
+  else if(
+    const auto constant_expr =
+      expr_try_dynamic_cast<annotated_pointer_constant_exprt>(rhs))
+  {
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      check_annotated_pointer_constant_structure(*constant_expr),
+      "RHS",
+      rhs.pretty(),
+      "Expecting the operand of an annotated  pointer constant expression "
+      "to be a constant, address_of, or plus expression.");
   }
   // check byte extract rhs structure
   else if(const auto byte = expr_try_dynamic_cast<byte_extract_exprt>(rhs))

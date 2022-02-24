@@ -296,32 +296,4 @@ void show_goto_trace(
   if(cmdline.isset("stack-trace"))                                             \
     options.set_option("stack-trace", true);
 
-/// Variety of constant expression only used in the context of a GOTO trace, to
-/// give both the numeric value and the symbolic value of a pointer,
-/// e.g. numeric value "0xabcd0004" but symbolic value "&some_object + 4". The
-/// numeric value is stored in the `constant_exprt`'s usual value slot (see
-/// \ref constant_exprt::get_value) and the symbolic value is accessed using the
-/// `symbolic_pointer` method introduced by this class.
-class goto_trace_constant_pointer_exprt : public constant_exprt
-{
-public:
-  const exprt &symbolic_pointer() const
-  {
-    return static_cast<const exprt &>(operands()[0]);
-  }
-};
-
-template <>
-inline bool can_cast_expr<goto_trace_constant_pointer_exprt>(const exprt &base)
-{
-  return can_cast_expr<constant_exprt>(base) && base.operands().size() == 1;
-}
-
-inline const goto_trace_constant_pointer_exprt &
-to_goto_trace_constant_pointer_expr(const exprt &expr)
-{
-  PRECONDITION(can_cast_expr<goto_trace_constant_pointer_exprt>(expr));
-  return static_cast<const goto_trace_constant_pointer_exprt &>(expr);
-}
-
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H

@@ -31,24 +31,7 @@ Author: Peter Schrammel
 
 static exprt simplify_json_expr(const exprt &src)
 {
-  if(src.id() == ID_constant)
-  {
-    if(src.type().id() == ID_pointer)
-    {
-      const constant_exprt &c = to_constant_expr(src);
-
-      if(
-        c.get_value() != ID_NULL &&
-        (!c.value_is_zero_string() || !config.ansi_c.NULL_is_zero) &&
-        src.operands().size() == 1 &&
-        to_unary_expr(src).op().id() != ID_constant)
-      // try to simplify the constant pointer
-      {
-        return simplify_json_expr(to_unary_expr(src).op());
-      }
-    }
-  }
-  else if(src.id() == ID_typecast)
+  if(src.id() == ID_typecast)
   {
     return simplify_json_expr(to_typecast_expr(src).op());
   }
@@ -303,25 +286,8 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
     {
       result["name"] = json_stringt("pointer");
       result["type"] = json_stringt(type_string);
-      exprt simpl_expr = simplify_json_expr(expr);
-      if(
-        simpl_expr.get(ID_value) == ID_NULL ||
-        // remove typecast on NULL
-        (simpl_expr.id() == ID_constant &&
-         simpl_expr.type().id() == ID_pointer &&
-         to_unary_expr(simpl_expr).op().get(ID_value) == ID_NULL))
-      {
+      if(constant_expr.get_value() == ID_NULL)
         result["data"] = json_stringt(value_string);
-      }
-      else if(simpl_expr.id() == ID_symbol)
-      {
-        const irep_idt &ptr_id = to_symbol_expr(simpl_expr).get_identifier();
-        identifiert identifier(id2string(ptr_id));
-        DATA_INVARIANT(
-          !identifier.components.empty(),
-          "pointer identifier should have non-empty components");
-        result["data"] = json_stringt(identifier.components.back());
-      }
     }
     else if(type.id() == ID_bool)
     {
@@ -338,6 +304,46 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
     {
       result["name"] = json_stringt("unknown");
     }
+  }
+  else if(expr.id() == ID_annotated_pointer_constant)
+  {
+    const annotated_pointer_constant_exprt &c =
+      to_annotated_pointer_constant_expr(expr);
+    exprt simpl_expr = simplify_json_expr(c.symbolic_pointer());
+
+    if(simpl_expr.id() == ID_symbol)
+    {
+      result["name"] = json_stringt("pointer");
+
+      const typet &type = expr.type();
+
+      std::unique_ptr<languaget> lang;
+      if(mode != ID_unknown)
+        lang = std::unique_ptr<languaget>(get_language_from_mode(mode));
+      if(!lang)
+        lang = std::unique_ptr<languaget>(get_default_language());
+
+      const typet &underlying_type =
+        type.id() == ID_c_bit_field
+          ? to_c_bit_field_type(type).underlying_type()
+          : type;
+
+      std::string type_string;
+      bool error = lang->from_type(underlying_type, type_string, ns);
+      CHECK_RETURN(!error);
+      result["type"] = json_stringt(type_string);
+
+      const irep_idt &ptr_id = to_symbol_expr(simpl_expr).get_identifier();
+      identifiert identifier(id2string(ptr_id));
+      DATA_INVARIANT(
+        !identifier.components.empty(),
+        "pointer identifier should have non-empty components");
+      result["data"] = json_stringt(identifier.components.back());
+    }
+    else if(simpl_expr.id() == ID_constant)
+      return json(simpl_expr, ns, mode);
+    else
+      result["name"] = json_stringt("unknown");
   }
   else if(expr.id() == ID_array)
   {

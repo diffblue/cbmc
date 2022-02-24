@@ -794,4 +794,83 @@ inline const w_ok_exprt &to_w_ok_expr(const exprt &expr)
   return ret;
 }
 
+/// \brief Pointer-typed bitvector constant annotated with the pointer
+/// expression that the bitvector is the numeric representation of.
+/// This variation of a constant expression is only used in the context of a
+/// GOTO trace, to give both the numeric value and the symbolic value of a
+/// pointer, e.g. numeric value "0xabcd0004" but symbolic value
+/// "&some_object + 4". The numeric value is stored in the usual value slot and
+/// the symbolic value is accessed using the `symbolic_pointer` method
+/// introduced by this class.
+class annotated_pointer_constant_exprt : public unary_exprt
+{
+public:
+  annotated_pointer_constant_exprt(
+    const irep_idt &_value,
+    const exprt &_pointer)
+    : unary_exprt(ID_annotated_pointer_constant, _pointer, _pointer.type())
+  {
+    set_value(_value);
+  }
+
+  const irep_idt &get_value() const
+  {
+    return get(ID_value);
+  }
+
+  void set_value(const irep_idt &value)
+  {
+    set(ID_value, value);
+  }
+
+  exprt &symbolic_pointer()
+  {
+    return op0();
+  }
+
+  const exprt &symbolic_pointer() const
+  {
+    return op0();
+  }
+};
+
+template <>
+inline bool can_cast_expr<annotated_pointer_constant_exprt>(const exprt &base)
+{
+  return base.id() == ID_annotated_pointer_constant;
+}
+
+inline void validate_expr(const annotated_pointer_constant_exprt &value)
+{
+  validate_operands(
+    value, 1, "Annotated pointer constant must have one operand");
+}
+
+/// \brief Cast an exprt to an \ref annotated_pointer_constant_exprt
+///
+/// \a expr must be known to be \ref annotated_pointer_constant_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref annotated_pointer_constant_exprt
+inline const annotated_pointer_constant_exprt &
+to_annotated_pointer_constant_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_annotated_pointer_constant);
+  const annotated_pointer_constant_exprt &ret =
+    static_cast<const annotated_pointer_constant_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_annotated_pointer_constant_expr(const exprt &)
+inline annotated_pointer_constant_exprt &
+to_annotated_pointer_constant_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_annotated_pointer_constant);
+  annotated_pointer_constant_exprt &ret =
+    static_cast<annotated_pointer_constant_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H
