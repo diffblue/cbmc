@@ -12,6 +12,7 @@ Author: Daniel Poetzl
 #include "remove_calls_no_body.h"
 
 #include <util/invariant.h>
+#include <util/message.h>
 #include <util/std_code.h>
 
 #include "goto_functions.h"
@@ -94,14 +95,21 @@ bool remove_calls_no_bodyt::is_opaque_function_call(
 /// \param goto_program: goto program to operate on
 /// \param goto_functions: all goto functions; for looking up functions which
 ///   the goto program may call
-void remove_calls_no_bodyt::
-operator()(goto_programt &goto_program, const goto_functionst &goto_functions)
+/// \param message_handler: message handler
+void remove_calls_no_bodyt::operator()(
+  goto_programt &goto_program,
+  const goto_functionst &goto_functions,
+  message_handlert &message_handler)
 {
   for(goto_programt::targett it = goto_program.instructions.begin();
       it != goto_program.instructions.end();) // no it++
   {
     if(is_opaque_function_call(it, goto_functions))
     {
+      messaget log{message_handler};
+      log.status() << "Removing call to "
+                   << to_symbol_expr(it->call_function()).get_identifier()
+                   << ", which has no body" << messaget::eom;
       remove_call_no_body(
         goto_program, it, it->call_lhs(), it->call_arguments());
     }
@@ -116,10 +124,13 @@ operator()(goto_programt &goto_program, const goto_functionst &goto_functions)
 /// of the arguments of the call and a nondet assignment to the variable taking
 /// the return value.
 /// \param goto_functions: goto functions to operate on
-void remove_calls_no_bodyt::operator()(goto_functionst &goto_functions)
+/// \param message_handler: message handler
+void remove_calls_no_bodyt::operator()(
+  goto_functionst &goto_functions,
+  message_handlert &message_handler)
 {
   for(auto &gf_entry : goto_functions.function_map)
   {
-    (*this)(gf_entry.second.body, goto_functions);
+    (*this)(gf_entry.second.body, goto_functions, message_handler);
   }
 }

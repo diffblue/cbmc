@@ -1,0 +1,9 @@
+CORE
+main.c
+--reachability-slice
+Removing call to undefined_function, which has no body
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+should_be_sliced_away

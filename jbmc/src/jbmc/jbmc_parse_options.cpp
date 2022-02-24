@@ -962,18 +962,24 @@ bool jbmc_parse_optionst::process_goto_functions(
     log.status() << "Performing a forwards-backwards reachability slice"
                  << messaget::eom;
     if(cmdline.isset("property"))
-      reachability_slicer(goto_model, cmdline.get_values("property"), true);
+    {
+      reachability_slicer(
+        goto_model, cmdline.get_values("property"), true, ui_message_handler);
+    }
     else
-      reachability_slicer(goto_model, true);
+      reachability_slicer(goto_model, true, ui_message_handler);
   }
 
   if(cmdline.isset("reachability-slice"))
   {
     log.status() << "Performing a reachability slice" << messaget::eom;
     if(cmdline.isset("property"))
-      reachability_slicer(goto_model, cmdline.get_values("property"));
+    {
+      reachability_slicer(
+        goto_model, cmdline.get_values("property"), ui_message_handler);
+    }
     else
-      reachability_slicer(goto_model);
+      reachability_slicer(goto_model, ui_message_handler);
   }
 
   // full slice?

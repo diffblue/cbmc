@@ -841,7 +841,7 @@ int goto_instrument_parse_optionst::doit()
       log.status() << "Removing calls to functions without a body"
                    << messaget::eom;
       remove_calls_no_bodyt remove_calls_no_body;
-      remove_calls_no_body(goto_model.goto_functions);
+      remove_calls_no_body(goto_model.goto_functions, ui_message_handler);
 
       log.status() << "Accelerating" << messaget::eom;
       guard_managert guard_manager;
@@ -1066,8 +1066,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // we add the library in some cases, as some analyses benefit
 
-  if(cmdline.isset("add-library") ||
-     cmdline.isset("mm"))
+  if(
+    cmdline.isset("add-library") || cmdline.isset("mm") ||
+    cmdline.isset("reachability-slice") ||
+    cmdline.isset("reachability-slice-fb") ||
+    cmdline.isset("fp-reachability-slice"))
   {
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
@@ -1245,7 +1248,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
                  << messaget::eom;
 
     remove_calls_no_bodyt remove_calls_no_body;
-    remove_calls_no_body(goto_model.goto_functions);
+    remove_calls_no_body(goto_model.goto_functions, ui_message_handler);
 
     goto_model.goto_functions.update();
     goto_model.goto_functions.compute_loop_numbers();
@@ -1602,9 +1605,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
 
     if(cmdline.isset("property"))
-      reachability_slicer(goto_model, cmdline.get_values("property"));
+    {
+      reachability_slicer(
+        goto_model, cmdline.get_values("property"), ui_message_handler);
+    }
     else
-      reachability_slicer(goto_model);
+      reachability_slicer(goto_model, ui_message_handler);
   }
 
   if(cmdline.isset("fp-reachability-slice"))
@@ -1614,7 +1620,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     log.status() << "Performing a function pointer reachability slice"
                  << messaget::eom;
     function_path_reachability_slicer(
-      goto_model, cmdline.get_comma_separated_values("fp-reachability-slice"));
+      goto_model,
+      cmdline.get_comma_separated_values("fp-reachability-slice"),
+      ui_message_handler);
   }
 
   // full slice?
@@ -1687,9 +1695,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     log.status() << "Performing a reachability slice" << messaget::eom;
     if(cmdline.isset("property"))
-      reachability_slicer(goto_model, cmdline.get_values("property"));
+    {
+      reachability_slicer(
+        goto_model, cmdline.get_values("property"), ui_message_handler);
+    }
     else
-      reachability_slicer(goto_model);
+      reachability_slicer(goto_model, ui_message_handler);
   }
 
   if(cmdline.isset("ensure-one-backedge-per-target"))

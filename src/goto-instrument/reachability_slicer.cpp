@@ -13,17 +13,46 @@ Author: Daniel Kroening, kroening@kroening.com
 /// (and possibly, depending on the parameters, keep those that can be reached
 /// from the criterion).
 
-#include "reachability_slicer.h"
+#include "full_slicer_class.h"
+#include "reachability_slicer_class.h"
+
+#include <util/exception_utils.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
 
-#include <util/exception_utils.h>
+#include <analyses/is_threaded.h>
 
-#include "full_slicer_class.h"
-#include "reachability_slicer_class.h"
+#include "reachability_slicer.h"
+
+void reachability_slicert::operator()(
+  goto_functionst &goto_functions,
+  const slicing_criteriont &criterion,
+  bool include_forward_reachability,
+  message_handlert &message_handler)
+{
+  // Replace function calls without body by non-deterministic return values to
+  // ensure the CFG does not consider instructions after such a call to be
+  // unreachable.
+  remove_calls_no_bodyt remove_calls_no_body;
+  remove_calls_no_body(goto_functions, message_handler);
+  goto_functions.update();
+
+  cfg(goto_functions);
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    forall_goto_program_instructions(i_it, gf_entry.second.body)
+      cfg[cfg.entry_map[i_it]].function_id = gf_entry.first;
+  }
+
+  is_threadedt is_threaded(goto_functions);
+  fixedpoint_to_assertions(is_threaded, criterion);
+  if(include_forward_reachability)
+    fixedpoint_from_assertions(is_threaded, criterion);
+  slice(goto_functions);
+}
 
 /// Get the set of nodes that correspond to the given criterion, or that can
 /// appear in concurrent execution. None of these should be sliced away so
@@ -364,13 +393,18 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
 /// \param include_forward_reachability: Determines if only instructions
 ///   from which the criterion is reachable should be kept (false) or also
 ///   those reachable from the criterion (true)
+/// \param message_handler: message handler
 void reachability_slicer(
   goto_modelt &goto_model,
-  const bool include_forward_reachability)
+  const bool include_forward_reachability,
+  message_handlert &message_handler)
 {
   reachability_slicert s;
   assert_criteriont a;
-  s(goto_model.goto_functions, a, include_forward_reachability);
+  s(goto_model.goto_functions,
+    a,
+    include_forward_reachability,
+    message_handler);
 }
 
 /// Perform reachability slicing on goto_model for selected properties.
@@ -380,14 +414,19 @@ void reachability_slicer(
 /// \param include_forward_reachability: Determines if only instructions
 ///   from which the criterion is reachable should be kept (false) or also
 ///   those reachable from the criterion (true)
+/// \param message_handler: message handler
 void reachability_slicer(
   goto_modelt &goto_model,
   const std::list<std::string> &properties,
-  const bool include_forward_reachability)
+  const bool include_forward_reachability,
+  message_handlert &message_handler)
 {
   reachability_slicert s;
   properties_criteriont p(properties);
-  s(goto_model.goto_functions, p, include_forward_reachability);
+  s(goto_model.goto_functions,
+    p,
+    include_forward_reachability,
+    message_handler);
 }
 
 /// Perform reachability slicing on goto_model for selected functions.
@@ -395,19 +434,22 @@ void reachability_slicer(
 /// \param functions_list: The functions relevant for the slicing (i.e. starting
 ///   point for the search in the CFG). Anything that is reachable in the CFG
 ///   starting from these functions will be kept.
+/// \param message_handler: message handler
 void function_path_reachability_slicer(
   goto_modelt &goto_model,
-  const std::list<std::string> &functions_list)
+  const std::list<std::string> &functions_list,
+  message_handlert &message_handler)
 {
   for(const auto &function : functions_list)
   {
     in_function_criteriont matching_criterion(function);
     reachability_slicert slicer;
-    slicer(goto_model.goto_functions, matching_criterion, true);
+    slicer(
+      goto_model.goto_functions, matching_criterion, true, message_handler);
   }
 
   remove_calls_no_bodyt remove_calls_no_body;
-  remove_calls_no_body(goto_model.goto_functions);
+  remove_calls_no_body(goto_model.goto_functions, message_handler);
 
   goto_model.goto_functions.update();
   goto_model.goto_functions.compute_loop_numbers();
@@ -417,9 +459,12 @@ void function_path_reachability_slicer(
 /// comprising all properties. Only instructions from which the criterion
 /// is reachable will be kept.
 /// \param goto_model: Goto program to slice
-void reachability_slicer(goto_modelt &goto_model)
+/// \param message_handler: message handler
+void reachability_slicer(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
-  reachability_slicer(goto_model, false);
+  reachability_slicer(goto_model, false, message_handler);
 }
 
 /// Perform reachability slicing on goto_model for selected properties. Only
@@ -427,9 +472,11 @@ void reachability_slicer(goto_modelt &goto_model)
 /// \param goto_model: Goto program to slice
 /// \param properties: The properties relevant for the slicing (i.e. starting
 ///   point for the search in the cfg)
+/// \param message_handler: message handler
 void reachability_slicer(
   goto_modelt &goto_model,
-  const std::list<std::string> &properties)
+  const std::list<std::string> &properties,
+  message_handlert &message_handler)
 {
-  reachability_slicer(goto_model, properties, false);
+  reachability_slicer(goto_model, properties, false, message_handler);
 }
