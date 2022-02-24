@@ -106,7 +106,6 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("built-in-assertions", true);
   options.set_option("pretty-names", true);
   options.set_option("propagation", true);
-  options.set_option("sat-preprocessor", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
   options.set_option("simplify-if", true);
@@ -306,41 +305,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else if(cmdline.isset("arrays-uf-never"))
     options.set_option("arrays-uf", "never");
 
-  if(cmdline.isset("dimacs"))
-    options.set_option("dimacs", true);
-
   if(cmdline.isset("show-array-constraints"))
     options.set_option("show-array-constraints", true);
-
-  if(cmdline.isset("refine-arrays"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arrays", true);
-  }
-
-  if(cmdline.isset("refine-arithmetic"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arithmetic", true);
-  }
-
-  if(cmdline.isset("refine"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arrays", true);
-    options.set_option("refine-arithmetic", true);
-  }
 
   if(cmdline.isset("refine-strings"))
   {
     options.set_option("refine-strings", true);
     options.set_option("string-printable", cmdline.isset("string-printable"));
   }
-
-  if(cmdline.isset("max-node-refinement"))
-    options.set_option(
-      "max-node-refinement",
-      cmdline.get_value("max-node-refinement"));
 
   options.set_option(
     "symex-cache-dereferences", cmdline.isset("symex-cache-dereferences"));
@@ -369,103 +341,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     }
   }
 
-  // SMT Options
-
-  if(cmdline.isset("smt1"))
-  {
-    log.error() << "--smt1 is no longer supported" << messaget::eom;
-    exit(CPROVER_EXIT_USAGE_ERROR);
-  }
-
-  if(cmdline.isset("smt2"))
-    options.set_option("smt2", true);
-
-  if(cmdline.isset("fpa"))
-    options.set_option("fpa", true);
-
-  bool solver_set=false;
-
-  if(cmdline.isset("boolector"))
-  {
-    options.set_option("boolector", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("cprover-smt2"))
-  {
-    options.set_option("cprover-smt2", true), solver_set = true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("mathsat"))
-  {
-    options.set_option("mathsat", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("cvc4"))
-  {
-    options.set_option("cvc4", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("incremental-smt2-solver"))
-  {
-    options.set_option(
-      "incremental-smt2-solver", cmdline.get_value("incremental-smt2-solver")),
-      solver_set = true;
-  }
-
-  if(cmdline.isset("external-sat-solver"))
-  {
-    options.set_option(
-      "external-sat-solver", cmdline.get_value("external-sat-solver")),
-      solver_set = true;
-  }
-
-  if(cmdline.isset("yices"))
-  {
-    options.set_option("yices", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("z3"))
-  {
-    options.set_option("z3", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("smt2") && !solver_set)
-  {
-    if(cmdline.isset("outfile"))
-    {
-      // outfile and no solver should give standard compliant SMT-LIB
-      options.set_option("generic", true);
-    }
-    else
-    {
-      // the default smt2 solver
-      options.set_option("z3", true);
-    }
-  }
-
-  if(cmdline.isset("write-solver-stats-to"))
-  {
-    options.set_option(
-      "write-solver-stats-to", cmdline.get_value("write-solver-stats-to"));
-  }
-
-  if(cmdline.isset("beautify"))
-    options.set_option("beautify", true);
-
-  if(cmdline.isset("no-sat-preprocessor"))
-    options.set_option("sat-preprocessor", false);
-
   if(cmdline.isset("no-pretty-names"))
     options.set_option("pretty-names", false);
-
-  if(cmdline.isset("outfile"))
-    options.set_option("outfile", cmdline.get_value("outfile"));
 
   if(cmdline.isset("graphml-witness"))
   {
@@ -502,6 +379,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // Options for process_goto_program
   options.set_option("rewrite-union", true);
+
+  if(cmdline.isset("smt1"))
+  {
+    log.error() << "--smt1 is no longer supported" << messaget::eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
+  parse_solver_options(cmdline, options);
 }
 
 /// invoke main modules
@@ -1009,6 +894,7 @@ void cbmc_parse_optionst::help()
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     "                              (implies --trace)\n"
+    " --localize-faults            localize faults (experimental)\n"
     "\n"
     "C/C++ frontend options:\n"
     " --preprocess                 stop after preprocessing\n"
@@ -1046,23 +932,8 @@ void cbmc_parse_optionst::help()
     "\n"
     "Backend options:\n"
     HELP_CONFIG_BACKEND
-    " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
-    " --localize-faults            localize faults (experimental)\n"
-    " --smt2                       use default SMT2 solver (Z3)\n"
-    " --boolector                  use Boolector\n"
-    " --cprover-smt2               use CPROVER SMT2 solver\n"
-    " --cvc4                       use CVC4\n"
-    " --mathsat                    use MathSAT\n"
-    " --yices                      use Yices\n"
-    " --z3                         use Z3\n"
-    " --refine                     use refinement procedure (experimental)\n"
-    " --incremental-smt2-solver cmd\n"
-    "                              command to invoke external SMT solver for\n"
-    "                              incremental solving (experimental)\n"
-    " --external-sat-solver cmd    command to invoke SAT solver process\n"
+    HELP_SOLVER
     HELP_STRING_REFINEMENT_CBMC
-    " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
     "\n"
@@ -1075,8 +946,6 @@ void cbmc_parse_optionst::help()
     HELP_FLUSH
     " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
-    " --write-solver-stats-to json-file\n"
-    "                              collect the solver query complexity\n"
     " --show-array-constraints     show array theory constraints added\n"
     "                              during post processing.\n"
     "                              Requires --json-ui.\n"

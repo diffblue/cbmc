@@ -105,7 +105,6 @@ void jbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("pretty-names", true);
   options.set_option("propagation", true);
   options.set_option("refine-strings", true);
-  options.set_option("sat-preprocessor", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
   options.set_option("simplify-if", true);
@@ -274,28 +273,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   else if(cmdline.isset("arrays-uf-never"))
     options.set_option("arrays-uf", "never");
 
-  if(cmdline.isset("dimacs"))
-    options.set_option("dimacs", true);
-
-  if(cmdline.isset("refine-arrays"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arrays", true);
-  }
-
-  if(cmdline.isset("refine-arithmetic"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arithmetic", true);
-  }
-
-  if(cmdline.isset("refine"))
-  {
-    options.set_option("refine", true);
-    options.set_option("refine-arrays", true);
-    options.set_option("refine-arithmetic", true);
-  }
-
   if(cmdline.isset("no-refine-strings"))
     options.set_option("refine-strings", false);
 
@@ -322,83 +299,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
       "--max-nondet-string-length");
   }
 
-  if(cmdline.isset("max-node-refinement"))
-    options.set_option(
-      "max-node-refinement",
-      cmdline.get_value("max-node-refinement"));
-
-  // SMT Options
-
-  if(cmdline.isset("smt1"))
-  {
-    log.error() << "--smt1 is no longer supported" << messaget::eom;
-    exit(CPROVER_EXIT_USAGE_ERROR);
-  }
-
-  if(cmdline.isset("smt2"))
-    options.set_option("smt2", true);
-
-  if(cmdline.isset("fpa"))
-    options.set_option("fpa", true);
-
-  bool solver_set=false;
-
-  if(cmdline.isset("boolector"))
-  {
-    options.set_option("boolector", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("mathsat"))
-  {
-    options.set_option("mathsat", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("cvc4"))
-  {
-    options.set_option("cvc4", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("yices"))
-  {
-    options.set_option("yices", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("z3"))
-  {
-    options.set_option("z3", true), solver_set=true;
-    options.set_option("smt2", true);
-  }
-
-  if(cmdline.isset("smt2") && !solver_set)
-  {
-    if(cmdline.isset("outfile"))
-    {
-      // outfile and no solver should give standard compliant SMT-LIB
-      options.set_option("generic", true);
-    }
-    else
-    {
-      // the default smt2 solver
-      options.set_option("z3", true);
-    }
-  }
-
-  if(cmdline.isset("beautify"))
-    options.set_option("beautify", true);
-
-  if(cmdline.isset("no-sat-preprocessor"))
-    options.set_option("sat-preprocessor", false);
-
   options.set_option(
     "pretty-names",
     !cmdline.isset("no-pretty-names"));
-
-  if(cmdline.isset("outfile"))
-    options.set_option("outfile", cmdline.get_value("outfile"));
 
   if(cmdline.isset("graphml-witness"))
   {
@@ -457,6 +360,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-goto-symex-steps"))
     options.set_option("show-goto-symex-steps", true);
+
+  if(cmdline.isset("smt1"))
+  {
+    log.error() << "--smt1 is no longer supported" << messaget::eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
+  parse_solver_options(cmdline, options);
 }
 
 /// invoke main modules
@@ -1114,20 +1025,9 @@ void jbmc_parse_optionst::help()
     HELP_BMC
     "\n"
     "Backend options:\n"
-    " --object-bits n              number of bits used for object addresses\n"
-    " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
-    " --localize-faults            localize faults (experimental)\n"
-    " --smt1                       use default SMT1 solver (obsolete)\n"
-    " --smt2                       use default SMT2 solver (Z3)\n"
-    " --boolector                  use Boolector\n"
-    " --mathsat                    use MathSAT\n"
-    " --cvc4                       use CVC4\n"
-    " --yices                      use Yices\n"
-    " --z3                         use Z3\n"
-    " --refine                     use refinement procedure (experimental)\n"
+    HELP_CONFIG_BACKEND
+    HELP_SOLVER
     HELP_STRING_REFINEMENT
-    " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
     "\n"
