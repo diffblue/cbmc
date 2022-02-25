@@ -480,7 +480,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   {
     // constraint that it actually is a dynamic object
     // this is also our guard
-    result.pointer_guard = dynamic_object(pointer_expr);
+    result.pointer_guard = is_dynamic_object_exprt(pointer_expr);
 
     // can't remove here, turn into *p
     result.value = dereference_exprt{pointer_expr};
