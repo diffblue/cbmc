@@ -1,0 +1,19 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main.cover.\d+\] line \d+ y>9000: SUCCESS$
+^\[main.assertion.\d+\] line \d+ y==0: SUCCESS$
+^\[main.cover.\d+\] line \d+ x<12: SUCCESS$
+^\[main.cover.\d+\] line \d+ reachablility check: SUCCESS$
+^\[main.cover.\d+\] line \d+ reachablility check with trivially false condition: FAILURE$
+^\[main.cover.\d+\] line \d+ x>12: FAILURE$
+^\[main.cover.\d+\] line \d+ reachability check: FAILURE$
+^\[main.cover.\d+\] line \d+ reachablility check with trivially false condition: FAILURE$
+^\[main.assertion.\d+\] line \d+ assertion y == 12: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+Checks that __CPROVER_cover assertions pass when reachable and fail when
+not reachable.

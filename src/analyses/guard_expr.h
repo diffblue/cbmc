@@ -53,6 +53,9 @@ public:
   /// This can vary according to the guard implementation.
   static constexpr bool is_always_simplified = false;
 
+  /// Return `!(guard & expr)`.
+  exprt guard_expr_expected_satisfiable(exprt expr) const;
+
   /// Return `guard => dest` or a simplified variant thereof if either guard or
   /// dest are trivial.
   exprt guard_expr(exprt expr) const;

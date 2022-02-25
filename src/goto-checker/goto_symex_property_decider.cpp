@@ -36,6 +36,7 @@ exprt goto_symex_property_decidert::goalt::as_expr() const
   conjuncts.reserve(instances.size());
   for(const auto &inst : instances)
     conjuncts.push_back(inst->cond_handle);
+  
   return conjunction(conjuncts);
 }
 
@@ -131,27 +132,40 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
   case decision_proceduret::resultt::D_SATISFIABLE:
     for(auto &goal_pair : goal_map)
     {
-      auto &status = properties.at(goal_pair.first).status;
+      property_infot &property = properties.at(goal_pair.first);
+      auto &status = property.status;
       if(
         solver->decision_procedure()
           .get(goal_pair.second.condition)
           .is_true() &&
         status != property_statust::FAIL)
       {
-        status |= property_statust::FAIL;
+        if(property.pc->is_expected_valid())
+          status |= property_statust::FAIL;
+        else
+          status |= property_statust::PASS;
+
         updated_properties.insert(goal_pair.first);
       }
     }
     break;
   case decision_proceduret::resultt::D_UNSATISFIABLE:
-    if(!set_pass)
-      break;
+    // REMARK: do not exit early since we must go over
+    // the "expected_satisfiable" assertions to mark them as failed
+    // if(!set_pass)
+    //   break;
 
     for(auto &property_pair : properties)
     {
-      if(property_pair.second.status == property_statust::UNKNOWN)
+      property_infot &property = property_pair.second;
+      auto &status = property.status;
+      if(status == property_statust::UNKNOWN)
       {
-        property_pair.second.status |= property_statust::PASS;
+        if(property.pc->is_expected_valid())
+          status |= property_statust::PASS;
+        else
+          status |= property_statust::FAIL;
+
         updated_properties.insert(property_pair.first);
       }
     }

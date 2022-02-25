@@ -2,6 +2,7 @@
 void __CPROVER_assume(__CPROVER_bool assumption);
 void __VERIFIER_assume(__CPROVER_bool assumption);
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
+void __CPROVER_cover(__CPROVER_bool assertion, const char *description);
 void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);
 void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 void __CPROVER_havoc_object(void *);
@@ -29,7 +30,8 @@ __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 void __CPROVER_printf(const char *format, ...);
 void __CPROVER_input(const char *id, ...);
 void __CPROVER_output(const char *id, ...);
-void __CPROVER_cover(__CPROVER_bool condition);
+// HERE does not seem to be used anywhere
+// void __CPROVER_cover(__CPROVER_bool condition);
 
 // concurrency-related
 void __CPROVER_atomic_begin();

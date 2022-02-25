@@ -52,6 +52,13 @@ enum goto_program_instruction_typet
   INCOMPLETE_GOTO = 19   // goto where target is yet to be determined
 };
 
+/// Expected status for an ASSERT instruction
+enum goto_program_assert_expected_statust
+{
+  EXPECTED_VALID = 0,      // must be valid, ie `!guard` UNSAT
+  EXPECTED_SATISFIABLE = 1 // must be satisfiable, ie `guard` SAT
+};
+
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
 /// A generic container class for the GOTO intermediate representation of one
@@ -350,6 +357,9 @@ public:
     // access method is provided.
     goto_program_instruction_typet _type;
 
+    // expected status for ASSERT
+    goto_program_assert_expected_statust _assert_expected_status;
+
   public:
     /// Guard for gotos, assume, assert
     /// Use condition() method to access.
@@ -438,6 +448,7 @@ public:
     void clear(goto_program_instruction_typet __type)
     {
       _type = __type;
+      _assert_expected_status = EXPECTED_VALID;
       targets.clear();
       guard=true_exprt();
       code.make_nil();
@@ -452,6 +463,7 @@ public:
 
     /// Transforms either an assertion or a GOTO instruction
     /// into an assumption, with the same condition.
+    /// TODO be careful here in case of COVER assertions
     void turn_into_assume()
     {
       PRECONDITION(_type == GOTO || _type == ASSERT);
@@ -490,6 +502,30 @@ public:
     bool is_incomplete_goto () const { return _type == INCOMPLETE_GOTO;  }
     // clang-format on
 
+    bool is_expected_valid() const
+    {
+      PRECONDITION(is_assert());
+      return _assert_expected_status == EXPECTED_VALID;
+    }
+
+    void set_expected_valid()
+    {
+      PRECONDITION(is_assert());
+      _assert_expected_status = EXPECTED_VALID;
+    }
+
+    bool is_expected_satisfiable() const
+    {
+      PRECONDITION(is_assert());
+      return _assert_expected_status == EXPECTED_SATISFIABLE;
+    }
+
+    void set_expected_satisfiable()
+    {
+      PRECONDITION(is_assert());
+      _assert_expected_status = EXPECTED_SATISFIABLE;
+    }
+
     instructiont():
       instructiont(NO_INSTRUCTION_TYPE) // NOLINT(runtime/explicit)
     {
@@ -499,6 +535,7 @@ public:
       : code(static_cast<const codet &>(get_nil_irep())),
         _source_location(source_locationt::nil()),
         _type(__type),
+        _assert_expected_status(EXPECTED_VALID),
         guard(true_exprt())
     {
     }
@@ -513,6 +550,24 @@ public:
       : code(std::move(_code)),
         _source_location(std::move(__source_location)),
         _type(__type),
+        _assert_expected_status(EXPECTED_VALID),
+        guard(std::move(_guard)),
+        targets(std::move(_targets))
+    {
+    }
+
+    /// Constructor that can set all members, passed by value
+    instructiont(
+      codet _code,
+      source_locationt __source_location,
+      goto_program_instruction_typet __type,
+      goto_program_assert_expected_statust __assert_expected_status,
+      exprt _guard,
+      targetst _targets)
+      : code(std::move(_code)),
+        _source_location(std::move(__source_location)),
+        _type(__type),
+        _assert_expected_status(__assert_expected_status),
         guard(std::move(_guard)),
         targets(std::move(_targets))
     {
@@ -525,6 +580,7 @@ public:
       swap(instruction.code, code);
       swap(instruction._source_location, _source_location);
       swap(instruction._type, _type);
+      swap(instruction._assert_expected_status, _assert_expected_status);
       swap(instruction.guard, guard);
       swap(instruction.targets, targets);
       swap(instruction.labels, labels);
@@ -919,6 +975,19 @@ public:
       {});
   }
 
+  static instructiont make_cover_check(
+    const exprt &g,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      l,
+      ASSERT,
+      EXPECTED_SATISFIABLE,
+      exprt(g),
+      {});
+  }
+
   static instructiont make_assertion(
     const exprt &g,
     const source_locationt &l = source_locationt::nil())
@@ -927,6 +996,7 @@ public:
       static_cast<const codet &>(get_nil_irep()),
       l,
       ASSERT,
+      EXPECTED_VALID,
       exprt(g),
       {});
   }

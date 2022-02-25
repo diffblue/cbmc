@@ -1,3 +1,4 @@
+#include <iostream>
 /*******************************************************************\
 
 Module: Symbolic Execution
@@ -177,26 +178,50 @@ void goto_symext::symex_assert(
 
   std::string msg = id2string(instruction.source_location().get_comment());
   if(msg.empty())
-    msg = "assertion";
+  {
+    if(instruction.is_expected_valid())
+      msg = "assertion";
+    else
+      msg = "cover";
+  }
 
-  vcc(l2_condition, msg, state);
+  vcc(
+    l2_condition,
+    msg,
+    state,
+    instruction.is_expected_valid() ? expected_statust::VALID
+                                    : expected_statust::SATISFIABLE);
 }
 
 void goto_symext::vcc(
   const exprt &condition,
   const std::string &msg,
-  statet &state)
+  statet &state,
+  expected_statust expected_status)
 {
   state.total_vccs++;
   path_segment_vccs++;
+  bool expected_valid = expected_status == expected_statust::VALID;
 
-  if(condition.is_true())
+  // To preserve the usual behaviour, we only omit the VCC if we expect valid
+  if(expected_valid && condition.is_true())
     return;
 
-  const exprt guarded_condition = state.guard.guard_expr(condition);
+  // if we expect satisfiable, we really want a witness model where
+  // both path constraint and condition hold even if the condition is trivial
+
+  const exprt guarded_condition =
+    expected_valid ? state.guard.guard_expr(condition)
+                   : state.guard.guard_expr_expected_satisfiable(condition);
 
   state.remaining_vccs++;
-  target.assertion(state.guard.as_expr(), guarded_condition, msg, state.source);
+  target.assertion(
+    state.guard.as_expr(),
+    guarded_condition,
+    msg,
+    state.source,
+    expected_valid ? symex_targett::expected_statust::VALID
+                   : symex_targett::expected_statust::SATISFIABLE);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)

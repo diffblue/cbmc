@@ -20,6 +20,18 @@ to the program. If the expression evaluates to false, the execution
 aborts without failure. More detail on the use of assumptions is in the
 section on [Assumptions](../modeling/assumptions/).
 
+#### \_\_CPROVER\_cover
+
+```C
+void __CPROVER_cover(_Bool assertion, const char *description);
+```
+
+A **\_\_CPROVER\_cover**  statement specifies that at least one model
+should be found by the analysis for the given assertion. The cover check
+is considered as failed if the control flow of the program cannot reach 
+the location of the statement, or if it can reach it but the assertion is 
+cannot be satisfied under the active control flow conditions.
+
 #### \_\_CPROVER\_input, \_\_CPROVER\_output
 
 ```C

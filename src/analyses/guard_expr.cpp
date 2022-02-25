@@ -16,6 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
 
+exprt guard_exprt::guard_expr_expected_satisfiable(exprt expr) const
+{
+  return boolean_negate(and_exprt{as_expr(), expr});
+}
+
 exprt guard_exprt::guard_expr(exprt expr) const
 {
   if(is_true())

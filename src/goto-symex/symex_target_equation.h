@@ -131,7 +131,8 @@ public:
     const exprt &guard,
     const exprt &cond,
     const std::string &msg,
-    const sourcet &source);
+    const sourcet &source,
+    expected_statust expected_status = expected_statust::VALID);
 
   /// \copydoc symex_targett::goto_instruction()
   virtual void goto_instruction(

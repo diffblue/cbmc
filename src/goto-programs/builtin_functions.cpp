@@ -843,6 +843,17 @@ void goto_convertt::do_function_call_symbol(
     t->source_location_nonconst().set_comment(
       "assertion " + from_expr(ns, identifier, arguments.front()));
 
+#if 0
+    // TODO automatically add cover checks if command line switch is set
+    t = dest.add(goto_programt::make_assertion(
+      typecast_exprt::conditional_cast(arguments.front(), bool_typet()),
+      function.source_location()));
+    t->set_expected_satisfiable();
+    t->source_location_nonconst().set("user-provided", true);
+    t->source_location_nonconst().set_property_class(ID_cover);
+    t->source_location_nonconst().set_comment(
+      "cover " + from_expr(ns, identifier, arguments.front()));
+#endif
     if(lhs.is_not_nil())
     {
       error().source_location=function.find_source_location();
@@ -855,6 +866,7 @@ void goto_convertt::do_function_call_symbol(
     do_enum_is_in_range(lhs, function, arguments, dest);
   }
   else if(
+    identifier == CPROVER_PREFIX "cover" ||
     identifier == CPROVER_PREFIX "assert" ||
     identifier == CPROVER_PREFIX "precondition" ||
     identifier == CPROVER_PREFIX "postcondition")
@@ -869,6 +881,7 @@ void goto_convertt::do_function_call_symbol(
     bool is_precondition=
       identifier==CPROVER_PREFIX "precondition";
     bool is_postcondition = identifier == CPROVER_PREFIX "postcondition";
+    bool is_cover = identifier == CPROVER_PREFIX "cover";
 
     const irep_idt description=
       get_string_constant(arguments[1]);
@@ -886,6 +899,13 @@ void goto_convertt::do_function_call_symbol(
     {
       t->source_location_nonconst().set_property_class(ID_postcondition);
     }
+    else if(is_cover)
+    {
+      t->source_location_nonconst().set(
+        "user-provided", !function.source_location().is_built_in());
+      t->source_location_nonconst().set_property_class(ID_cover);
+      t->set_expected_satisfiable();
+    }
     else
     {
       t->source_location_nonconst().set(
@@ -894,6 +914,20 @@ void goto_convertt::do_function_call_symbol(
     }
 
     t->source_location_nonconst().set_comment(description);
+
+#if 0
+    // automatically add cover checks if command line switch is set
+    if(!is_cover) {
+      goto_programt::targett t = dest.add(goto_programt::make_assertion(
+        typecast_exprt::conditional_cast(arguments[0], bool_typet()),
+        function.source_location()));
+      t->set_expected_satisfiable();
+      t->source_location_nonconst().set("user-provided", true);
+      t->source_location_nonconst().set_property_class(ID_cover);
+      t->source_location_nonconst().set_comment(
+        "cover " + from_expr(ns, identifier, arguments.front()));
+    }
+#endif
 
     if(lhs.is_not_nil())
     {

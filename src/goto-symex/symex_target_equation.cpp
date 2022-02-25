@@ -283,7 +283,8 @@ void symex_target_equationt::assertion(
   const exprt &guard,
   const exprt &cond,
   const std::string &msg,
-  const sourcet &source)
+  const sourcet &source,
+  expected_statust expected_status)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSERT);
   SSA_stept &SSA_step=SSA_steps.back();

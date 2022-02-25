@@ -359,7 +359,8 @@ void output_properties_with_traces(
     output_properties_plain(sorted_properties, log);
     for(const auto &property_it : sorted_properties)
     {
-      if(property_it->second.status == property_statust::FAIL)
+      if((property_it->second.status == property_statust::FAIL &&
+          property_it->second.pc->is_expected_valid()))
       {
         log.result() << "\n"
                      << "Trace for " << property_it->first << ":"

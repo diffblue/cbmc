@@ -377,10 +377,18 @@ protected:
     value_sett *jump_not_taken_value_set,
     const namespacet &ns);
 
+  /// Expected status for a vcc
+  enum class expected_statust
+  {
+    VALID,      // always true under the path constraint
+    SATISFIABLE // sometimes true under the path constraint
+  };
+
   virtual void vcc(
     const exprt &,
     const std::string &msg,
-    statet &);
+    statet &state,
+    expected_statust expected_status = expected_statust::VALID);
 
   /// Symbolically execute an ASSUME instruction or simulate such an execution
   /// for a synthetic assumption

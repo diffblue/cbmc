@@ -833,9 +833,18 @@ void goto_convertt::convert_assert(
   clean_expr(cond, dest, mode);
 
   goto_programt::targett t =
-    dest.add(goto_programt::make_assertion(cond, code.source_location()));
+    dest.add(goto_programt::make_cover_check(cond, code.source_location()));
   t->source_location_nonconst().set(ID_property, ID_assertion);
   t->source_location_nonconst().set("user-provided", true);
+
+  // // HERE This does not seem to be executed
+  // // add coresponding cover assertion
+  // t =
+  //   dest.add(goto_programt::make_cover_check(cond, code.source_location()));
+  // t->source_location_nonconst().set(ID_property, ID_assertion);
+  // t->source_location_nonconst().set("user-provided", true);
+  // std::cout << "expect satisfiable " << t->is_expected_satisfiable()
+  //           << std::endl;
 }
 
 void goto_convertt::convert_skip(

@@ -176,7 +176,7 @@ std::ostream &goto_programt::output_instruction(
     if(instruction.is_assume())
       out << "ASSUME ";
     else
-      out << "ASSERT ";
+      out << "ASSERT "; // TODO add expected satisfiability status
 
     {
       out << format(instruction.get_condition());
@@ -521,9 +521,9 @@ std::string as_string(
   case ASSUME:
   case ASSERT:
     if(i.is_assume())
-      result+="ASSUME ";
+      result += "ASSUME ";
     else
-      result+="ASSERT ";
+      result += "ASSERT "; // TODO add expected validity status
 
     result += from_expr(ns, function, i.get_condition());
 
@@ -744,6 +744,7 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
   // clang-format off
   return
     _type == other._type &&
+    _assert_expected_status == other._assert_expected_status &&
     code == other.code &&
     guard == other.guard &&
     targets.size() == other.targets.size() &&
@@ -872,7 +873,6 @@ void goto_programt::instructiont::validate(
       targets.empty(),
       "assert instruction should not have a target",
       source_location());
-
     std::for_each(guard.depth_begin(), guard.depth_end(), expr_symbol_finder);
     std::for_each(guard.depth_begin(), guard.depth_end(), type_finder);
     break;
@@ -1137,6 +1137,22 @@ bool goto_programt::equals(const goto_programt &other) const
   }
 
   return true;
+}
+
+/// Outputs a string representation of a `goto_program_assert_expected_statust`
+std::ostream &
+operator<<(std::ostream &out, goto_program_assert_expected_statust t)
+{
+  switch(t)
+  {
+  case EXPECTED_VALID:
+    out << "EXPECTED_VALID";
+    break;
+  case EXPECTED_SATISFIABLE:
+    out << "EXPECTED_SATISFIABLE";
+    break;
+  }
+  return out;
 }
 
 /// Outputs a string representation of a `goto_program_instruction_typet`

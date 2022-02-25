@@ -75,6 +75,13 @@ public:
     GUARD,
   };
 
+  // expected validity status for an assertion
+  enum class expected_statust
+  {
+    VALID,
+    SATISFIABLE
+  };
+
   /// Read from a shared variable \p ssa_object (which is both the left- and the
   /// right--hand side of assignment): we effectively assign the value stored in
   /// \p ssa_object by another thread to \p ssa_object in the memory scope of
@@ -236,11 +243,13 @@ public:
   /// \param msg: The message associated with this assertion
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assertion
+  /// \param expected_status: Expected validity status for this assertion
   virtual void assertion(
     const exprt &guard,
     const exprt &cond,
     const std::string &msg,
-    const sourcet &source)=0;
+    const sourcet &source,
+    expected_statust expected_status = expected_statust::VALID) = 0;
 
   /// Record a goto instruction.
   /// \param guard: Precondition for reaching this goto instruction
