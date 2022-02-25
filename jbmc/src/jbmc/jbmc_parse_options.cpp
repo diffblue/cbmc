@@ -11,26 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jbmc_parse_options.h"
 
-#include <cstdlib> // exit()
-#include <iostream>
-#include <memory>
-
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/version.h>
 #include <util/xml.h>
-
-#include <langapi/language.h>
-
-#include <ansi-c/ansi_c_language.h>
-
-#include <goto-checker/all_properties_verifier.h>
-#include <goto-checker/all_properties_verifier_with_fault_localization.h>
-#include <goto-checker/all_properties_verifier_with_trace_storage.h>
-#include <goto-checker/stop_on_fail_verifier.h>
-#include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -45,18 +31,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
 
+#include <analyses/goto_check.h>
+#include <ansi-c/ansi_c_language.h>
+#include <goto-checker/all_properties_verifier.h>
+#include <goto-checker/all_properties_verifier_with_fault_localization.h>
+#include <goto-checker/all_properties_verifier_with_trace_storage.h>
+#include <goto-checker/stop_on_fail_verifier.h>
+#include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
-
 #include <goto-symex/path_storage.h>
-
-#include <linking/static_lifetime_init.h>
-
-#include <pointer-analysis/add_failed_symbols.h>
-
-#include <langapi/mode.h>
-
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_multi_path_symex_checker.h>
@@ -69,6 +54,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/remove_java_new.h>
 #include <java_bytecode/replace_java_nondet.h>
 #include <java_bytecode/simple_method_stubbing.h>
+#include <langapi/language.h>
+#include <langapi/mode.h>
+#include <linking/static_lifetime_init.h>
+#include <pointer-analysis/add_failed_symbols.h>
+
+#include <cstdlib> // exit()
+#include <iostream>
+#include <memory>
 
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(
@@ -717,13 +710,7 @@ void jbmc_parse_optionst::process_goto_function(
       ui_message_handler);
   }
 
-  // add generic checks
-  goto_check_java(
-    function.get_function_id(),
-    function.get_goto_function(),
-    ns,
-    options,
-    ui_message_handler);
+  transform_assertions_assumptions(options, function.get_goto_function().body);
 
   // Replace Java new side effects
   remove_java_new(

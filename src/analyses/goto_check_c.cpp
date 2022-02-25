@@ -74,10 +74,6 @@ public:
     enable_nan_check = _options.get_bool_option("nan-check");
     retain_trivial = _options.get_bool_option("retain-trivial-checks");
     enable_assert_to_assume = _options.get_bool_option("assert-to-assume");
-    enable_assertions = _options.get_bool_option("assertions");
-    enable_built_in_assertions =
-      _options.get_bool_option("built-in-assertions");
-    enable_assumptions = _options.get_bool_option("assumptions");
     error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
@@ -274,9 +270,6 @@ protected:
   bool enable_nan_check;
   bool retain_trivial;
   bool enable_assert_to_assume;
-  bool enable_assertions;
-  bool enable_built_in_assertions;
-  bool enable_assumptions;
   bool enable_pointer_primitive_check;
 
   /// Maps a named-check name to the corresponding boolean flag.
@@ -2172,27 +2165,6 @@ void goto_check_ct::goto_check(
     {
       // this has no successor
       assertions.clear();
-    }
-    else if(i.is_assert())
-    {
-      bool is_user_provided = i.source_location().get_bool("user-provided");
-
-      if(
-        (is_user_provided && !enable_assertions &&
-         i.source_location().get_property_class() != "error label") ||
-        (!is_user_provided && !enable_built_in_assertions))
-      {
-        i.turn_into_skip();
-        did_something = true;
-      }
-    }
-    else if(i.is_assume())
-    {
-      if(!enable_assumptions)
-      {
-        i.turn_into_skip();
-        did_something = true;
-      }
     }
     else if(i.is_dead())
     {

@@ -11,9 +11,6 @@ Author: Peter Schrammel
 
 #include "jdiff_parse_options.h"
 
-#include <cstdlib> // exit()
-#include <iostream>
-
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/options.h>
@@ -31,15 +28,18 @@ Author: Peter Schrammel
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 
+#include <analyses/goto_check.h>
+#include <goto-diff/change_impact.h>
+#include <goto-diff/unified_diff.h>
 #include <goto-instrument/cover.h>
-
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
 
 #include "java_syntactic_diff.h"
-#include <goto-diff/change_impact.h>
-#include <goto-diff/unified_diff.h>
+
+#include <cstdlib> // exit()
+#include <iostream>
 
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(
@@ -190,9 +190,7 @@ bool jdiff_parse_optionst::process_goto_program(
   // remove returns
   remove_returns(goto_model);
 
-  // add generic checks
-  log.status() << "Generic Property Instrumentation" << messaget::eom;
-  goto_check_java(options, goto_model, ui_message_handler);
+  transform_assertions_assumptions(options, goto_model);
 
   // checks don't know about adjusted float expressions
   adjust_float_expressions(goto_model);

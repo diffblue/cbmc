@@ -34,4 +34,18 @@ void goto_check(
 
 void goto_check(const optionst &, goto_modelt &, message_handlert &);
 
+/// Handle the options "assertions", "built-in-assertions", "assumptions" to
+/// remove assertions and assumptions in \p goto_model when these are set to
+/// false in \p options.
+void transform_assertions_assumptions(
+  const optionst &options,
+  goto_modelt &goto_model);
+
+/// Handle the options "assertions", "built-in-assertions", "assumptions" to
+/// remove assertions and assumptions in \p goto_program when these are set to
+/// false in \p options.
+void transform_assertions_assumptions(
+  const optionst &options,
+  goto_programt &goto_program);
+
 #endif // CPROVER_ANALYSES_GOTO_CHECK_H
