@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "bitvector_expr.h"
 #include "byte_operators.h"
+#include "expr_util.h"
 #include "format_type.h"
 #include "ieee_float.h"
 #include "mathematical_expr.h"
@@ -183,7 +184,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     return os << ieee_floatt(src);
   else if(type == ID_pointer)
   {
-    if(src.is_zero())
+    if(is_null_pointer(src))
       return os << ID_NULL;
     else if(has_prefix(id2string(src.get_value()), "INVALID-"))
     {

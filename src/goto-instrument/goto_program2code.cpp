@@ -309,8 +309,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   const exprt this_va_list_expr = target->assign_lhs();
   const exprt &r = skip_typecast(target->assign_rhs());
 
-  if(r.id()==ID_constant &&
-     (r.is_zero() || to_constant_expr(r).get_value()==ID_NULL))
+  if(r.id() == ID_constant && is_null_pointer(to_constant_expr(r)))
   {
     code_function_callt f(
       symbol_exprt("va_end", code_typet({}, empty_typet())),

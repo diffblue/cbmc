@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "config.h"
 #include "endianness_map.h"
+#include "expr_util.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "pointer_offset_size.h"
@@ -433,7 +434,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     }
     else if(type.id() == ID_pointer)
     {
-      if(value == ID_NULL && config.ansi_c.NULL_is_zero)
+      if(config.ansi_c.NULL_is_zero && is_null_pointer(to_constant_expr(expr)))
         return std::string(to_bitvector_type(type).get_width(), '0');
       else
         return {};

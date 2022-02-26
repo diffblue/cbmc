@@ -875,10 +875,11 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   {
     const auto &op_plus_expr = to_plus_expr(expr.op());
 
-    if(((op_plus_expr.op0().id() == ID_typecast &&
-         to_typecast_expr(op_plus_expr.op0()).op().is_zero()) ||
-        (op_plus_expr.op0().is_constant() &&
-         to_constant_expr(op_plus_expr.op0()).get_value() == ID_NULL)))
+    if(
+      (op_plus_expr.op0().id() == ID_typecast &&
+       to_typecast_expr(op_plus_expr.op0()).op().is_zero()) ||
+      (op_plus_expr.op0().is_constant() &&
+       is_null_pointer(to_constant_expr(op_plus_expr.op0()))))
     {
       auto sub_size =
         pointer_offset_size(to_pointer_type(op_type).base_type(), ns);

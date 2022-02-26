@@ -10,25 +10,23 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Dump Goto-Program as C/C++ Source
 
 #include "dump_c.h"
+#include "dump_c_class.h"
 
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
+#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
-#include <util/namespace.h>
 #include <util/replace_symbol.h>
-#include <util/std_code.h>
 #include <util/string_utils.h>
 
 #include <ansi-c/expr2c.h>
 #include <cpp/expr2cpp.h>
-
 #include <linking/static_lifetime_init.h>
 
-#include "dump_c_class.h"
 #include "goto_program2code.h"
 
 dump_c_configurationt dump_c_configurationt::default_configuration =
@@ -1325,11 +1323,9 @@ void dump_ct::cleanup_expr(exprt &expr)
         expr = struct_exprt({}, struct_typet());
     }
     // add a typecast for NULL
-    else if(u.op().id()==ID_constant &&
-            u.op().type().id()==ID_pointer &&
-            u.op().type().subtype().id()==ID_empty &&
-            (u.op().is_zero() ||
-             to_constant_expr(u.op()).get_value()==ID_NULL))
+    else if(
+      u.op().id() == ID_constant && is_null_pointer(to_constant_expr(u.op())) &&
+      u.op().type().subtype().id() == ID_empty)
     {
       const struct_union_typet::componentt &comp=
         u_type_f.get_component(u.get_component_name());
@@ -1385,8 +1381,7 @@ void dump_ct::cleanup_expr(exprt &expr)
             // add a typecast for NULL or 0
             if(
               argument.id() == ID_constant &&
-              (argument.is_zero() ||
-               to_constant_expr(argument).get_value() == ID_NULL))
+              is_null_pointer(to_constant_expr(argument)))
             {
               const typet &comp_type=
                 to_union_type(type).components().front().type();

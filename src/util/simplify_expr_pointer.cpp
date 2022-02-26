@@ -40,7 +40,7 @@ static bool is_dereference_integer_object(
     {
       const constant_exprt &constant = to_constant_expr(pointer);
 
-      if(constant.get_value() == ID_NULL && config.ansi_c.NULL_is_zero) // NULL
+      if(is_null_pointer(constant))
       {
         address=0;
         return true;
@@ -380,8 +380,7 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
   {
     const constant_exprt &c_ptr = to_constant_expr(ptr);
 
-    if(c_ptr.get_value()==ID_NULL ||
-       c_ptr.value_is_zero_string())
+    if(is_null_pointer(c_ptr))
     {
       return from_integer(0, expr.type());
     }
@@ -575,7 +574,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
   }
 
   // NULL is not dynamic
-  if(op.id() == ID_constant && op.get(ID_value) == ID_NULL)
+  if(op.id() == ID_constant && is_null_pointer(to_constant_expr(op)))
     return false_exprt();
 
   // &something depends on the something
@@ -623,7 +622,7 @@ simplify_exprt::simplify_is_invalid_pointer(const unary_exprt &expr)
   }
 
   // NULL is not invalid
-  if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
+  if(op.id() == ID_constant && is_null_pointer(to_constant_expr(op)))
   {
     return false_exprt();
   }

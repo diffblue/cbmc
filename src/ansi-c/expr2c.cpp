@@ -7,16 +7,13 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "expr2c.h"
-
-#include <algorithm>
-#include <sstream>
-
-#include <map>
+#include "expr2c_class.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/fixedbv.h>
 #include <util/floatbv_expr.h>
@@ -33,7 +30,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_misc.h"
 #include "c_qualifiers.h"
-#include "expr2c_class.h"
+
+#include <algorithm>
+#include <map>
+#include <sstream>
 
 // clang-format off
 
@@ -1983,9 +1983,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(
-      value == ID_NULL ||
-      (value == std::string(value.size(), '0') && config.ansi_c.NULL_is_zero))
+    if(is_null_pointer(src))
     {
       if(configuration.use_library_macros)
         dest = "NULL";

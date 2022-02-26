@@ -91,7 +91,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 
   if(
     skip_typecast(other_operand).id() != ID_address_of &&
-    (!constant_expr || constant_expr->get_value() != ID_NULL))
+    (!constant_expr || !is_null_pointer(*constant_expr)))
   {
     return {};
   }

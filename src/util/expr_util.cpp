@@ -8,15 +8,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr_util.h"
 
-#include <algorithm>
-#include <unordered_set>
-
 #include "arith_tools.h"
 #include "c_types.h"
+#include "config.h"
 #include "expr_iterator.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "std_expr.h"
+
+#include <algorithm>
+#include <unordered_set>
 
 bool is_assignable(const exprt &expr)
 {
@@ -309,4 +310,24 @@ exprt make_and(exprt a, exprt b)
     return b;
   }
   return and_exprt{std::move(a), std::move(b)};
+}
+
+bool is_null_pointer(const constant_exprt &expr)
+{
+  if(expr.type().id() != ID_pointer)
+    return false;
+
+  if(expr.get_value() == ID_NULL)
+    return true;
+
+    // We used to support "0" (when NULL_is_zero), but really front-ends should
+    // resolve this and generate ID_NULL instead.
+#if 0
+  return config.ansi_c.NULL_is_zero && expr.value_is_zero_string();
+#else
+  INVARIANT(
+    !expr.value_is_zero_string() || !config.ansi_c.NULL_is_zero,
+    "front-end should use ID_NULL");
+  return false;
+#endif
 }

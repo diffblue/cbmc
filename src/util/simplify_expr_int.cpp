@@ -1421,13 +1421,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
 static bool eliminate_common_addends(exprt &op0, exprt &op1)
 {
   // we can't eliminate zeros
-  if(op0.is_zero() ||
-     op1.is_zero() ||
-     (op0.is_constant() &&
-      to_constant_expr(op0).get_value()==ID_NULL) ||
-     (op1.is_constant() &&
-      to_constant_expr(op1).get_value()==ID_NULL))
+  if(
+    op0.is_zero() || op1.is_zero() ||
+    (op0.is_constant() && is_null_pointer(to_constant_expr(op0))) ||
+    (op1.is_constant() && is_null_pointer(to_constant_expr(op1))))
+  {
     return true;
+  }
 
   if(op0.id()==ID_plus)
   {
@@ -1572,9 +1572,12 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
     }
 
     // very special case for pointers
-    if(expr.id()==ID_equal &&
-       expr.op1().is_constant() &&
-       expr.op1().get(ID_value)==ID_NULL)
+    if(expr.id() != ID_equal)
+      return unchanged(expr);
+
+    const constant_exprt &op1_constant = to_constant_expr(expr.op1());
+
+    if(is_null_pointer(op1_constant))
     {
       // the address of an object is never NULL
 

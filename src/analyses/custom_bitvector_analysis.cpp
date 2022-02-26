@@ -345,8 +345,9 @@ void custom_bitvector_domaint::transform(
 
             if(lhs.type().id()==ID_pointer)
             {
-              if(lhs.is_constant() &&
-                 to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
+              if(
+                lhs.is_constant() &&
+                is_null_pointer(to_constant_expr(lhs))) // NULL means all
               {
                 if(mode==modet::CLEAR_MAY)
                 {
@@ -473,8 +474,9 @@ void custom_bitvector_domaint::transform(
 
         if(lhs.type().id()==ID_pointer)
         {
-          if(lhs.is_constant() &&
-             to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
+          if(
+            lhs.is_constant() &&
+            is_null_pointer(to_constant_expr(lhs))) // NULL means all
           {
             if(mode==modet::CLEAR_MAY)
             {
@@ -708,8 +710,9 @@ exprt custom_bitvector_domaint::eval(
       if(pointer.type().id()!=ID_pointer)
         return src;
 
-      if(pointer.is_constant() &&
-         to_constant_expr(pointer).get_value()==ID_NULL) // NULL means all
+      if(
+        pointer.is_constant() &&
+        is_null_pointer(to_constant_expr(pointer))) // NULL means all
       {
         if(src.id() == ID_get_may)
         {
