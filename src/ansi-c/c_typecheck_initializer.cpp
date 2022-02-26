@@ -232,43 +232,25 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
   if(has_prefix(id2string(symbol.name), CPROVER_PREFIX "constant_infinity"))
     return;
 
-  if(symbol.is_static_lifetime)
-  {
-    if(symbol.value.is_not_nil())
-    {
-      typecheck_expr(symbol.value);
-      do_initializer(symbol.value, symbol.type, true);
+  if(symbol.is_type)
+    return;
 
-      // need to adjust size?
-      if(
-        symbol.type.id() == ID_array &&
-        to_array_type(symbol.type).size().is_nil())
-        symbol.type=symbol.value.type();
+  if(symbol.value.is_not_nil())
+  {
+    typecheck_expr(symbol.value);
+    do_initializer(symbol.value, symbol.type, true);
+
+    // need to adjust size?
+    if(
+      !symbol.is_macro && symbol.type.id() == ID_array &&
+      to_array_type(symbol.type).size().is_nil())
+    {
+      symbol.type = symbol.value.type();
     }
   }
-  else if(!symbol.is_type)
-  {
-    if(symbol.is_macro)
-    {
-      // these must have a constant value
-      assert(symbol.value.is_not_nil());
-      typecheck_expr(symbol.value);
-      source_locationt location=symbol.value.source_location();
-      do_initializer(symbol.value, symbol.type, true);
-      make_constant(symbol.value);
-    }
-    else if(symbol.value.is_not_nil())
-    {
-      typecheck_expr(symbol.value);
-      do_initializer(symbol.value, symbol.type, true);
 
-      // need to adjust size?
-      if(
-        symbol.type.id() == ID_array &&
-        to_array_type(symbol.type).size().is_nil())
-        symbol.type=symbol.value.type();
-    }
-  }
+  if(symbol.is_macro)
+    make_constant(symbol.value);
 }
 
 void c_typecheck_baset::designator_enter(
