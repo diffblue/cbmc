@@ -522,8 +522,9 @@ void symex_target_equationt::convert_assertions(
       if(step.is_assert() && !step.ignore && !step.converted)
       {
         step.converted = true;
-        decision_procedure.set_to_false(step.cond_expr);
-        step.cond_handle = false_exprt();
+        step.cond_handle = decision_procedure.handle(step.cond_expr);
+        decision_procedure.set_to_true(
+          or_exprt{not_exprt{step.cond_handle}, step.guard_handle});
 
         with_solver_hardness(
           decision_procedure, hardness_register_ssa(step_index, step));
@@ -542,10 +543,10 @@ void symex_target_equationt::convert_assertions(
     UNREACHABLE; // unreachable
   }
 
-  // We do (NOT a1) OR (NOT a2) ...
+  // We do (NOT a1) OR a1.guard OR (NOT a2) OR a2.guard ...
   // where the a's are the assertions
   or_exprt::operandst disjuncts;
-  disjuncts.reserve(number_of_assertions);
+  disjuncts.reserve(2 * number_of_assertions);
 
   exprt assumption=true_exprt();
 
@@ -581,6 +582,7 @@ void symex_target_equationt::convert_assertions(
 
       // store disjunct
       disjuncts.push_back(not_exprt(step.cond_handle));
+      disjuncts.push_back(step.guard_handle);
     }
     else if(step.is_assume())
     {

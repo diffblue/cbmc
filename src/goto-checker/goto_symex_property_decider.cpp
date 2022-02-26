@@ -11,6 +11,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_symex_property_decider.h"
 
+#include <util/expr_util.h>
 #include <util/ui_message.h>
 
 #include <solvers/prop/prop.h>
@@ -28,15 +29,30 @@ goto_symex_property_decidert::goto_symex_property_decidert(
     ui_message_handler,
     ui_message_handler.get_ui() == ui_message_handlert::uit::XML_UI);
   solver = solvers.get_solver();
+
+  // TODO: make this configurable
+  cover_goals = true;
 }
 
-exprt goto_symex_property_decidert::goalt::as_expr() const
+exprt goto_symex_property_decidert::goalt::build_condition() const
 {
   exprt::operandst conjuncts;
   conjuncts.reserve(instances.size());
   for(const auto &inst : instances)
     conjuncts.push_back(inst->cond_handle);
-  return conjunction(conjuncts);
+
+  // Our goal is to falsify a property, i.e., we will
+  // add the negation of the property as goal.
+  return boolean_negate(conjunction(conjuncts));
+}
+
+exprt goto_symex_property_decidert::goalt::build_path_condition() const
+{
+  exprt::operandst disjuncts;
+  disjuncts.reserve(instances.size());
+  for(const auto &inst : instances)
+    disjuncts.push_back(inst->guard_handle);
+  return disjunction(disjuncts);
 }
 
 void goto_symex_property_decidert::
@@ -72,15 +88,19 @@ void goto_symex_property_decidert::convert_goals()
 {
   for(auto &goal_pair : goal_map)
   {
-    // Our goal is to falsify a property, i.e., we will
-    // add the negation of the property as goal.
-    goal_pair.second.condition = solver->decision_procedure().handle(
-      not_exprt(goal_pair.second.as_expr()));
+    goal_pair.second.condition =
+      solver->decision_procedure().handle(goal_pair.second.build_condition());
+    if(cover_goals)
+    {
+      goal_pair.second.path_condition = solver->decision_procedure().handle(
+        goal_pair.second.build_path_condition());
+    }
   }
 }
 
 void goto_symex_property_decidert::add_constraint_from_goals(
-  std::function<bool(const irep_idt &)> select_property)
+  std::function<bool(const irep_idt &)> select_property,
+  const propertiest &properties)
 {
   exprt::operandst disjuncts;
 
@@ -91,6 +111,12 @@ void goto_symex_property_decidert::add_constraint_from_goals(
       !goal_pair.second.condition.is_false())
     {
       disjuncts.push_back(goal_pair.second.condition);
+      if(cover_goals)
+      {
+        auto &status = properties.at(goal_pair.first).status;
+        if(status == property_statust::UNKNOWN)
+          disjuncts.push_back(goal_pair.second.path_condition);
+      }
     }
   }
 
@@ -141,6 +167,15 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
         status |= property_statust::FAIL;
         updated_properties.insert(goal_pair.first);
       }
+      else if(
+        cover_goals && status == property_statust::UNKNOWN &&
+        solver->decision_procedure()
+          .get(goal_pair.second.path_condition)
+          .is_true())
+      {
+        status = property_statust::NOT_CHECKED;
+        updated_properties.insert(goal_pair.first);
+      }
     }
     break;
   case decision_proceduret::resultt::D_UNSATISFIABLE:
@@ -150,6 +185,14 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
     for(auto &property_pair : properties)
     {
       if(property_pair.second.status == property_statust::UNKNOWN)
+      {
+        if(cover_goals)
+          property_pair.second.status |= property_statust::NOT_REACHABLE;
+        else
+          property_pair.second.status |= property_statust::PASS;
+        updated_properties.insert(property_pair.first);
+      }
+      else if(property_pair.second.status == property_statust::NOT_CHECKED)
       {
         property_pair.second.status |= property_statust::PASS;
         updated_properties.insert(property_pair.first);

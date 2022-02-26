@@ -127,7 +127,8 @@ operator()(propertiest &properties)
       property_decider.add_constraint_from_goals(
         [&properties](const irep_idt &property_id) {
           return is_property_to_check(properties.at(property_id).status);
-        });
+        },
+        properties);
 
       log.status()
         << "Running "
