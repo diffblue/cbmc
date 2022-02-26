@@ -1279,13 +1279,18 @@ void value_sett::assign(
           "rhs.type():\n" +
             rhs.type().pretty() + "\n" + "lhs.type():\n" + lhs.type().pretty());
 
-        const struct_typet &rhs_struct_type =
-          to_struct_type(ns.follow(rhs.type()));
+        const typet &followed = ns.follow(rhs.type());
 
-        const typet &rhs_subtype = rhs_struct_type.component_type(name);
-        rhs_member = simplify_expr(member_exprt{rhs, name, rhs_subtype}, ns);
+        if(followed.id() == ID_struct || followed.id() == ID_union)
+        {
+          const struct_union_typet &rhs_struct_union_type =
+            to_struct_union_type(followed);
 
-        assign(lhs_member, rhs_member, ns, true, add_to_sets);
+          const typet &rhs_subtype = rhs_struct_union_type.component_type(name);
+          rhs_member = simplify_expr(member_exprt{rhs, name, rhs_subtype}, ns);
+
+          assign(lhs_member, rhs_member, ns, true, add_to_sets);
+        }
       }
     }
   }
