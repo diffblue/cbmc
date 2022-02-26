@@ -1,10 +1,9 @@
-KNOWNBUG
+CORE
 main.c
 --function testFunc
---
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^EXIT=134$
 --
-Github issue #5093: Pointer to struct with flexible array member as parameter to entry point causes invariant violation
+Github issue #5093: Pointer to struct with flexible array member as parameter to
+entry point causes invariant violation

@@ -172,9 +172,11 @@ void symbol_factoryt::gen_nondet_array_init(
   auto const &array_type = to_array_type(expr.type());
   const auto &size = array_type.size();
   PRECONDITION(size.id() == ID_constant);
-  auto const array_size = numeric_cast_v<size_t>(to_constant_expr(size));
-  DATA_INVARIANT(array_size > 0, "Arrays should have positive size");
-  for(size_t index = 0; index < array_size; ++index)
+  auto const array_size = numeric_cast<mp_integer>(to_constant_expr(size));
+  DATA_INVARIANT(
+    array_size.has_value() && *array_size >= 0,
+    "Arrays should have positive size");
+  for(mp_integer index = 0; index < *array_size; ++index)
   {
     gen_nondet_init(
       assignments,
