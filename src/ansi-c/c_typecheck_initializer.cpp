@@ -431,17 +431,17 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
            (to_array_type(full_type).size().is_zero() ||
             to_array_type(full_type).size().is_nil()))
         {
-          // we are willing to grow an incomplete or zero-sized array
-          const auto zero = zero_initializer(
-            to_array_type(full_type).element_type(),
-            value.source_location(),
-            *this);
+          const typet &element_type = to_array_type(full_type).element_type();
+
+          // we are willing to grow an incomplete or zero-sized array --
+          // do_initializer_list will fix up the resulting type
+          const auto zero =
+            zero_initializer(element_type, value.source_location(), *this);
           if(!zero.has_value())
           {
             error().source_location = value.source_location();
             error() << "cannot zero-initialize array with element type '"
-                    << to_string(to_type_with_subtype(full_type).subtype())
-                    << "'" << eom;
+                    << to_string(element_type) << "'" << eom;
             throw 0;
           }
           dest->operands().resize(
@@ -978,7 +978,7 @@ exprt c_typecheck_baset::do_initializer_list(
     if(to_array_type(full_type).size().is_nil())
     {
       // start with empty array
-      result=exprt(ID_array, full_type);
+      result = array_exprt({}, to_array_type(full_type));
       result.add_source_location()=value.source_location();
     }
     else
@@ -1036,9 +1036,9 @@ exprt c_typecheck_baset::do_initializer_list(
      to_array_type(full_type).size().is_nil())
   {
     // make complete by setting array size
-    size_t size=result.operands().size();
-    result.type().id(ID_array);
-    result.type().set(ID_size, from_integer(size, c_index_type()));
+    array_typet &array_type = to_array_type(result.type());
+    array_type.size() =
+      from_integer(result.operands().size(), array_type.index_type());
   }
 
   return result;
