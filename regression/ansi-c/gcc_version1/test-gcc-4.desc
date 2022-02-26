@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE gcc-only fake-gcc-version
 gcc-4.c
 --native-compiler ./fake-gcc-4
 ^EXIT=0$

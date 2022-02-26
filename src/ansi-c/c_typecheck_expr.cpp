@@ -3092,9 +3092,7 @@ exprt c_typecheck_baset::do_special_functions(
     {
       // clang returns 4 for _Bool, gcc treats these as 'int'.
       type_number =
-        config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG
-          ? 4u
-          : 1u;
+        config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ? 4u : 1u;
     }
     else
     {
