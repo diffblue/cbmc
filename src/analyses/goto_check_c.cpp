@@ -1621,7 +1621,7 @@ void goto_check_ct::bounds_check_index(
                         ? to_array_type(array_type).size()
                         : to_vector_type(array_type).size();
 
-  if(size.is_nil())
+  if(size.is_nil() && !array_type.get_bool(ID_C_flexible_array_member))
   {
     // Linking didn't complete, we don't have a size.
     // Not clear what to do.
@@ -1629,7 +1629,9 @@ void goto_check_ct::bounds_check_index(
   else if(size.id() == ID_infinity)
   {
   }
-  else if(size.is_zero() && expr.array().id() == ID_member)
+  else if(
+    expr.array().id() == ID_member &&
+    (size.is_zero() || array_type.get_bool(ID_C_flexible_array_member)))
   {
     // a variable sized struct member
     //

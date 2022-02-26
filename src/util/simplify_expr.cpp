@@ -1746,6 +1746,9 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       if(comps.empty() || comps.back().type().id() != ID_array)
         return false;
 
+      if(comps.back().type().get_bool(ID_C_flexible_array_member))
+        return true;
+
       const auto size =
         numeric_cast<mp_integer>(to_array_type(comps.back().type()).size());
       return !size.has_value() || *size <= 1;
