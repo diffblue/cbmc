@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test demonstrates support for flexible array members with non-heap allocated
+objects.
