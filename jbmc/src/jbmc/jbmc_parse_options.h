@@ -27,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/strings/string_refinement.h>
 
-#include <java_bytecode/goto_check_java.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_trace_validation.h>
 
