@@ -568,9 +568,6 @@ void string_abstractiont::abstract_function_call(
         "argument array type differs from formal parameter pointer type");
 
       index_exprt idx(str_args.back(), from_integer(0, c_index_type()));
-      // disable bounds check on that one
-      idx.set(ID_C_bounds_check, false);
-
       str_args.back()=address_of_exprt(idx);
     }
 

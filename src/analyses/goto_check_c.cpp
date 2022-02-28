@@ -1505,13 +1505,6 @@ void goto_check_ct::bounds_check(const exprt &expr, const guardt &guard)
   if(!enable_bounds_check)
     return;
 
-  if(
-    expr.find(ID_C_bounds_check).is_not_nil() &&
-    !expr.get_bool(ID_C_bounds_check))
-  {
-    return;
-  }
-
   if(expr.id() == ID_index)
     bounds_check_index(to_index_expr(expr), guard);
   else if(
