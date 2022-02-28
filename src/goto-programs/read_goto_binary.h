@@ -27,7 +27,7 @@ bool is_goto_binary(const std::string &filename, message_handlert &);
 
 /// Reads object files and updates the config if any files were read.
 /// \param file_names: file names of goto binaries; if empty, just returns false
-/// \param dest: goto model to update
+/// \param [out] dest: GOTO model to update.
 /// \param message_handler: for diagnostics
 /// \return True on error, false otherwise
 bool read_objects_and_link(
