@@ -9,9 +9,9 @@ main.c
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$
-^\[main.assigns.\d+] line 23 Check that s is assignable: SUCCESS$
-^\[main.assigns.\d+] line 24 Check that a is assignable: SUCCESS$
-^\[main.assigns.\d+] line 27 Check that s is assignable: SUCCESS$
+^\[main.assigns.\d+] .* line 23 Check that s is assignable: SUCCESS$
+^\[main.assigns.\d+] .* line 24 Check that a is assignable: SUCCESS$
+^\[main.assigns.\d+] .* line 27 Check that s is assignable: SUCCESS$
 ^\[main\.assertion.\d+\] .* assertion s == n: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --

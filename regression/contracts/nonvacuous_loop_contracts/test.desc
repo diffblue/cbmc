@@ -1,0 +1,25 @@
+CORE
+main.c
+--apply-loop-contracts _ --signed-overflow-check --unsigned-overflow-check
+\[main.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
+\[main.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
+\[main.assigns.\d+\] line \d+ Check that end is valid: SUCCESS$
+\[main.assigns.\d+\] line \d+ Check that end is assignable: SUCCESS$
+\[main.assertion.\d+\] line \d+ assertion end == start: SUCCESS$
+\[main.assertion.\d+\] line \d+ assertion start <= end && end <= size: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test demonstrates a simplification that is now possible on loop contracts.
+
+Prior to this commit, loop contracts were unconditionally applied on loops,
+and thus had to also consider the case when the loop doesn't run even once.
+
+The contracts that were previously necessary were:
+  __CPROVER_loop_invariant(
+    (start > size && end == start) || (start <= end && end <= size)
+  )
+  __CPROVER_decreases(
+    max(start, size) - end
+  )

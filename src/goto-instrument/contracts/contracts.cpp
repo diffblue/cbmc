@@ -145,13 +145,17 @@ void code_contractst::check_apply_loop_contracts(
 {
   PRECONDITION(!loop.empty());
 
+  const auto loop_head_location = loop_head->source_location();
+
   // find the last back edge
   goto_programt::targett loop_end = loop_head;
   for(const auto &t : loop)
+  {
     if(
       t->is_goto() && t->get_target() == loop_head &&
       t->location_number > loop_end->location_number)
       loop_end = t;
+  }
 
   // check for assigns, invariant, and decreases clauses
   auto assigns_clause = static_cast<const exprt &>(
@@ -164,22 +168,32 @@ void code_contractst::check_apply_loop_contracts(
   if(invariant.is_nil())
   {
     if(decreases_clause.is_nil() && assigns_clause.is_nil())
+    {
+      // no contracts to enforce, so return
       return;
+    }
     else
     {
       invariant = true_exprt();
-      log.warning()
-        << "The loop at " << loop_head->source_location().as_string()
-        << " does not have an invariant, but has other clauses"
-        << " specified in its contract.\n"
-        << "Hence, a default invariant ('true') is being used to prove those."
-        << messaget::eom;
+      // assigns clause is missing; we will try to automatic inference
+      log.warning() << "The loop at " << loop_head_location.as_string()
+                    << " does not have an invariant in its contract.\n"
+                    << "Hence, a default invariant ('true') is being used.\n"
+                    << "This choice is sound, but verification may fail"
+                    << " if it is be too weak to prove the desired properties."
+                    << messaget::eom;
     }
   }
   else
   {
-    // form the conjunction
     invariant = conjunction(invariant.operands());
+    if(decreases_clause.is_nil())
+    {
+      log.warning() << "The loop at " << loop_head_location.as_string()
+                    << " does not have a decreases clause in its contract.\n"
+                    << "Termination of this loop will not be verified."
+                    << messaget::eom;
+    }
   }
 
   // Vector representing a (possibly multidimensional) decreases clause
@@ -187,76 +201,126 @@ void code_contractst::check_apply_loop_contracts(
 
   // Temporary variables for storing the multidimensional decreases clause
   // at the start of and end of a loop body
-  std::vector<symbol_exprt> old_decreases_vars;
-  std::vector<symbol_exprt> new_decreases_vars;
+  std::vector<symbol_exprt> old_decreases_vars, new_decreases_vars;
 
-  // change
-  //   H: loop;
-  //   E: ...
+  replace_symbolt replace;
+  code_contractst::add_quantified_variable(invariant, replace, mode);
+  replace(invariant);
+
+  // instrument
+  //
+  //   ... preamble ...
+  // HEAD:
+  //   ... eval guard ...
+  //   if (!guard)
+  //     goto EXIT;
+  //   ... loop body ...
+  //   goto HEAD;
+  // EXIT:
+  //   ... postamble ...
+  //
   // to
-  //   initialize loop_entry variables;
-  //   H: assert(invariant);
-  //   snapshot(write_set);
-  //   havoc;
-  //   assume(invariant);
-  //   if(guard) goto E:
-  //   old_decreases_value = decreases_clause_expr;
-  //   loop with optional write_set inclusion checks;
-  //   new_decreases_value = decreases_clause_expr;
-  //   assert(invariant);
-  //   assert(new_decreases_value < old_decreases_value);
-  //   assume(false);
-  //   E: ...
+  //
+  //                               ... preamble ...
+  //                        ,-     initialize loop_entry history vars;
+  //                        |      entered_loop = false
+  // loop assigns check     |      initial_invariant_val = invariant_expr;
+  //  - unchecked, temps    |      in_base_case = true;
+  // func assigns check     |      snapshot (write_set);
+  //  - disabled via pragma |      goto HEAD;
+  //                        |    STEP:
+  //                  --.   |      assert (initial_invariant_val);
+  // loop assigns check |   |      in_base_case = false;
+  //  - not applicable   >=======  havoc (assigns_set);
+  // func assigns check |   |      assume (invariant_expr);
+  //  + deferred        |   `-     old_variant_val = decreases_clause_expr;
+  //                  --'      * HEAD:
+  // loop assigns check     ,-     ... eval guard ...
+  //  + assertions added    |      if (!guard)
+  // func assigns check     |        goto EXIT;
+  //  - disabled via pragma `-     ... loop body ...
+  //                        ,-     entered_loop = true
+  //                        |      if (in_base_case)
+  //                        |        goto STEP;
+  // loop assigns check     |      assert (invariant_expr);
+  //  - unchecked, temps    |      new_variant_val = decreases_clause_expr;
+  // func assigns check     |      assert (new_variant_val < old_variant_val);
+  //  - disabled via pragma |      dead old_variant_val, new_variant_val;
+  //                        |  *   assume (false);
+  //                        |  * EXIT:
+  // To be inserted at  ,~~~|~~~~  assert (entered_loop ==> !in_base_case);
+  // every unique EXIT  |   |      dead loop_entry history vars, in_base_case;
+  // (break, goto etc.) `~~~`- ~~  dead initial_invariant_val, entered_loop;
+  //                               ... postamble ..
+  //
+  // Asterisks (*) denote anchor points (goto targets) for instrumentations.
+  // We insert generated code above and/below these targets.
+  //
+  // Assertions for assigns clause checking are inserted in the loop body.
 
   // an intermediate goto_program to store generated instructions
-  goto_programt generated_code;
+  // to be inserted before the loop head
+  goto_programt pre_loop_head_instrs;
 
-  // process quantified variables correctly (introduce a fresh temporary)
-  // and return a copy of the invariant
-  const auto &invariant_expr = [&]() {
-    auto invariant_copy = invariant;
-    replace_symbolt replace;
-    code_contractst::add_quantified_variable(invariant_copy, replace, mode);
-    replace(invariant_copy);
-    return invariant_copy;
-  };
-
-  // Process "loop_entry" history variables
-  // Find and replace "loop_entry" expression in the "invariant" expression.
-  std::map<exprt, exprt> parameter2history;
+  // Process "loop_entry" history variables.
+  // We find and replace all "__CPROVER_loop_entry" subexpressions in invariant.
+  std::map<exprt, exprt> history_var_map;
   replace_history_parameter(
     invariant,
-    parameter2history,
-    loop_head->source_location(),
+    history_var_map,
+    loop_head_location,
     mode,
-    generated_code,
+    pre_loop_head_instrs,
     ID_loop_entry);
 
-  // Generate: assert(invariant) just before the loop
-  // We use a block scope to create a temporary assertion,
-  // and immediately convert it to goto instructions.
+  // Create a temporary to track if we entered the loop,
+  // i.e., the loop guard was satisfied.
+  const auto entered_loop =
+    new_tmp_symbol(
+      bool_typet(), loop_head_location, mode, symbol_table, "__entered_loop")
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(entered_loop, loop_head_location));
+  pre_loop_head_instrs.add(
+    goto_programt::make_assignment(entered_loop, false_exprt{}));
+
+  // Create a snapshot of the invariant so that we can check the base case,
+  // if the loop is not vacuous and must be abstracted with contracts.
+  const auto initial_invariant_val =
+    new_tmp_symbol(
+      bool_typet(), loop_head_location, mode, symbol_table, "__init_invariant")
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(initial_invariant_val, loop_head_location));
   {
-    code_assertt assertion{invariant_expr()};
-    assertion.add_source_location() = loop_head->source_location();
-    converter.goto_convert(assertion, generated_code, mode);
-    generated_code.instructions.back().source_location_nonconst().set_comment(
-      "Check loop invariant before entry");
+    // Although the invariant at this point will not have side effects,
+    // it is still a C expression, and needs to be "goto_convert"ed.
+    // Note that this conversion may emit many GOTO instructions.
+    code_assignt initial_invariant_value_assignment{
+      initial_invariant_val, invariant};
+    initial_invariant_value_assignment.add_source_location() =
+      loop_head_location;
+    converter.goto_convert(
+      initial_invariant_value_assignment, pre_loop_head_instrs, mode);
   }
 
-  // Add 'loop_entry' history variables and base case assertion.
-  // These variables are local and thus
-  // need not be checked against the enclosing scope's write set.
-  insert_before_swap_and_advance(
-    goto_function.body,
-    loop_head,
-    add_pragma_disable_assigns_check(generated_code));
+  // Create a temporary variable to track base case vs inductive case
+  // instrumentation of the loop.
+  const auto in_base_case =
+    new_tmp_symbol(
+      bool_typet(), loop_head_location, mode, symbol_table, "__in_base_case")
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(in_base_case, loop_head_location));
+  pre_loop_head_instrs.add(
+    goto_programt::make_assignment(in_base_case, true_exprt{}));
 
-  instrument_spec_assignst instrument_spec_assigns(
-    function_name, goto_functions, symbol_table, log.get_message_handler());
-
-  // assigns clause snapshots
+  // CAR snapshot instructions for checking assigns clause
   goto_programt snapshot_instructions;
 
+  // track static local symbols
+  instrument_spec_assignst instrument_spec_assigns(
+    function_name, goto_functions, symbol_table, log.get_message_handler());
   instrument_spec_assigns.track_static_locals_between(
     loop_head, loop_end, snapshot_instructions);
 
@@ -273,7 +337,8 @@ void code_contractst::check_apply_loop_contracts(
       get_assigns(local_may_alias, loop, to_havoc);
       // TODO: if the set contains pairs (i, a[i]),
       // we must at least widen them to (i, pointer_object(a))
-      log.debug() << "No loop assigns clause provided. Inferred targets {";
+
+      log.debug() << "No loop assigns clause provided. Inferred targets: {";
       // Add inferred targets to the loop assigns clause.
       bool ran_once = false;
       for(const auto &target : to_havoc)
@@ -285,14 +350,15 @@ void code_contractst::check_apply_loop_contracts(
         instrument_spec_assigns.track_spec_target(
           target, snapshot_instructions);
       }
-      log.debug()
-        << "}. Please specify an assigns clause if verification fails."
-        << messaget::eom;
+      log.debug() << "}" << messaget::eom;
+
+      instrument_spec_assigns.get_static_locals(
+        std::inserter(to_havoc, to_havoc.end()));
     }
     catch(const analysis_exceptiont &exc)
     {
       log.error() << "Failed to infer variables being modified by the loop at "
-                  << loop_head->source_location()
+                  << loop_head_location
                   << ".\nPlease specify an assigns clause.\nReason:"
                   << messaget::eom;
       throw exc;
@@ -311,9 +377,117 @@ void code_contractst::check_apply_loop_contracts(
 
   // Insert instrumentation
   // This must be done before havocing the write set.
-  // ^^^ FIXME this is not true ^^^
-  insert_before_swap_and_advance(
-    goto_function.body, loop_head, snapshot_instructions);
+  // FIXME: this is not true for write set targets that
+  // might depend on other write set targets.
+  pre_loop_head_instrs.destructive_append(snapshot_instructions);
+
+  // Insert a jump to the loop head
+  // (skipping over the step case initialization code below)
+  pre_loop_head_instrs.add(
+    goto_programt::make_goto(loop_head, true_exprt{}, loop_head_location));
+
+  // The STEP case instructions follow.
+  // We skip past it initially, because of the unconditional jump above,
+  // but jump back here if we get past the loop guard while in_base_case.
+
+  const auto step_case_target =
+    pre_loop_head_instrs.add(goto_programt::make_assignment(
+      in_base_case, false_exprt{}, loop_head_location));
+
+  // If we jump here, then the loop runs at least once,
+  // so add the base case assertion:
+  //   assert(initial_invariant_val)
+  // We use a block scope for assertion, since it's immediately goto converted,
+  // and doesn't need to be kept around.
+  {
+    code_assertt assertion{initial_invariant_val};
+    assertion.add_source_location() = loop_head_location;
+    converter.goto_convert(assertion, pre_loop_head_instrs, mode);
+    pre_loop_head_instrs.instructions.back()
+      .source_location_nonconst()
+      .set_comment("Check loop invariant before entry");
+  }
+
+  // Insert the first block of pre_loop_head_instrs,
+  // with a pragma to disable assigns clause checking.
+  // All of the initialization code so far introduces local temporaries,
+  // which need not be checked against the enclosing scope's assigns clause.
+  goto_function.body.destructive_insert(
+    loop_head, add_pragma_disable_assigns_check(pre_loop_head_instrs));
+
+  // Generate havocing code for assignment targets.
+  havoc_assigns_targetst havoc_gen(to_havoc, ns);
+  havoc_gen.append_full_havoc_code(loop_head_location, pre_loop_head_instrs);
+
+  // Insert the second block of pre_loop_head_instrs: the havocing code.
+  // We do not `add_pragma_disable_assigns_check`,
+  // so that the enclosing scope's assigns clause instrumentation
+  // would pick these havocs up for inclusion (subset) checks.
+  goto_function.body.destructive_insert(loop_head, pre_loop_head_instrs);
+
+  // Generate: assume(invariant) just after havocing
+  // We use a block scope for assumption, since it's immediately goto converted,
+  // and doesn't need to be kept around.
+  {
+    code_assumet assumption{invariant};
+    assumption.add_source_location() = loop_head_location;
+    converter.goto_convert(assumption, pre_loop_head_instrs, mode);
+  }
+
+  // Create fresh temporary variables that store the multidimensional
+  // decreases clause's value before and after the loop
+  for(const auto &clause : decreases_clause.operands())
+  {
+    const auto old_decreases_var =
+      new_tmp_symbol(clause.type(), loop_head_location, mode, symbol_table)
+        .symbol_expr();
+    pre_loop_head_instrs.add(
+      goto_programt::make_decl(old_decreases_var, loop_head_location));
+    old_decreases_vars.push_back(old_decreases_var);
+
+    const auto new_decreases_var =
+      new_tmp_symbol(clause.type(), loop_head_location, mode, symbol_table)
+        .symbol_expr();
+    pre_loop_head_instrs.add(
+      goto_programt::make_decl(new_decreases_var, loop_head_location));
+    new_decreases_vars.push_back(new_decreases_var);
+  }
+
+  // TODO: Fix loop contract handling for do/while loops.
+  if(loop_end->is_goto() && !loop_end->get_condition().is_true())
+  {
+    log.error() << "Loop contracts are unsupported on do/while loops: "
+                << loop_head_location << messaget::eom;
+    throw 0;
+
+    // non-deterministically skip the loop if it is a do-while loop.
+    // pre_loop_head_instrs.add(goto_programt::make_goto(
+    //   loop_end, side_effect_expr_nondett(bool_typet(), loop_head_location)));
+  }
+
+  // Generate: assignments to store the multidimensional decreases clause's
+  // value just before the loop_head
+  if(!decreases_clause.is_nil())
+  {
+    for(size_t i = 0; i < old_decreases_vars.size(); i++)
+    {
+      code_assignt old_decreases_assignment{
+        old_decreases_vars[i], decreases_clause_exprs[i]};
+      old_decreases_assignment.add_source_location() = loop_head_location;
+      converter.goto_convert(
+        old_decreases_assignment, pre_loop_head_instrs, mode);
+    }
+
+    goto_function.body.destructive_insert(
+      loop_head, add_pragma_disable_assigns_check(pre_loop_head_instrs));
+  }
+
+  // Insert the third and final block of pre_loop_head_instrs,
+  // with a pragma to disable assigns clause checking.
+  // The variables to store old variant value are local temporaries,
+  // which need not be checked against the enclosing scope's assigns clause.
+  goto_function.body.destructive_insert(
+    loop_head, add_pragma_disable_assigns_check(pre_loop_head_instrs));
 
   optionalt<cfg_infot> cfg_empty_info;
 
@@ -326,122 +500,34 @@ void code_contractst::check_apply_loop_contracts(
     // do not use CFG info for now
     cfg_empty_info);
 
-  // insert havocing code
-  havoc_assigns_targetst havoc_gen(to_havoc, ns);
-  havoc_gen.append_full_havoc_code(
-    loop_head->source_location(), generated_code);
+  // Now we begin instrumenting at the loop_end.
+  // `pre_loop_end_instrs` are to be inserted before `loop_end`.
+  goto_programt pre_loop_end_instrs;
 
-  // Add the havocing code, but only check against the enclosing scope's
-  // write set if it was manually specified.
-  if(assigns_clause.is_nil())
-    insert_before_swap_and_advance(
-      goto_function.body,
-      loop_head,
-      add_pragma_disable_assigns_check(generated_code));
-  else
-    insert_before_swap_and_advance(
-      goto_function.body, loop_head, generated_code);
+  // Record that we entered the loop.
+  pre_loop_end_instrs.add(
+    goto_programt::make_assignment(entered_loop, true_exprt{}));
 
-  // ^^^ FIXME ^^^
-  // comment by delmasrd: I did not reactivate this behaviour
-  // because I think we always want to check the loop assignments against
-  // the surrounding clause
+  // Jump back to the step case to havoc the write set, assume the invariant,
+  // and execute an arbitrary iteration.
+  pre_loop_end_instrs.add(goto_programt::make_goto(
+    step_case_target, in_base_case, loop_head_location));
 
-  insert_before_swap_and_advance(goto_function.body, loop_head, generated_code);
+  // The following code is only reachable in the step case,
+  // i.e., when in_base_case == false,
+  // because of the unconditional jump above.
 
-  // Generate: assume(invariant) just after havocing
-  // We use a block scope to create a temporary assumption,
-  // and immediately convert it to goto instructions.
+  // Generate the inductiveness check:
+  //   assert(invariant)
+  // We use a block scope for assertion, since it's immediately goto converted,
+  // and doesn't need to be kept around.
   {
-    code_assumet assumption{invariant_expr()};
-    assumption.add_source_location() = loop_head->source_location();
-    converter.goto_convert(assumption, generated_code, mode);
-  }
-
-  // Create fresh temporary variables that store the multidimensional
-  // decreases clause's value before and after the loop
-  for(const auto &clause : decreases_clause.operands())
-  {
-    const auto old_decreases_var =
-      new_tmp_symbol(
-        clause.type(), loop_head->source_location(), mode, symbol_table)
-        .symbol_expr();
-    generated_code.add(goto_programt::make_decl(
-      old_decreases_var, loop_head->source_location()));
-    old_decreases_vars.push_back(old_decreases_var);
-
-    const auto new_decreases_var =
-      new_tmp_symbol(
-        clause.type(), loop_head->source_location(), mode, symbol_table)
-        .symbol_expr();
-    generated_code.add(goto_programt::make_decl(
-      new_decreases_var, loop_head->source_location()));
-    new_decreases_vars.push_back(new_decreases_var);
-  }
-
-  // TODO: Fix loop contract handling for do/while loops.
-  if(loop_end->is_goto() && !loop_end->get_condition().is_true())
-  {
-    log.error() << "Loop contracts are unsupported on do/while loops: "
-                << loop_head->source_location() << messaget::eom;
-    throw 0;
-
-    // non-deterministically skip the loop if it is a do-while loop.
-    generated_code.add(goto_programt::make_goto(
-      loop_end,
-      side_effect_expr_nondett(bool_typet(), loop_head->source_location())));
-  }
-
-  // Assume invariant & decl the variant temporaries (just before loop guard).
-  // Use insert_before_swap to preserve jumps to loop head.
-  insert_before_swap_and_advance(
-    goto_function.body,
-    loop_head,
-    add_pragma_disable_assigns_check(generated_code));
-
-  // Forward the loop_head iterator until the start of the body.
-  // This is necessary because complex C loop_head conditions could be
-  // converted to multiple GOTO instructions (e.g. temporaries are introduced).
-  // If the loop_head location shifts to a different function,
-  // assume that it's an inlined function and keep skipping.
-  // FIXME: This simple approach wouldn't work when
-  // the loop guard in the source file is split across multiple lines.
-  const auto head_loc = loop_head->source_location();
-  while(loop_head->source_location() == head_loc ||
-        loop_head->source_location().get_function() != head_loc.get_function())
-    loop_head++;
-
-  // At this point, we are just past the loop head,
-  // so at the beginning of the loop body.
-  auto loop_body = loop_head;
-  loop_head--;
-
-  // Generate: assignments to store the multidimensional decreases clause's
-  // value just before the loop body (but just after the loop guard)
-  if(!decreases_clause.is_nil())
-  {
-    for(size_t i = 0; i < old_decreases_vars.size(); i++)
-    {
-      code_assignt old_decreases_assignment{old_decreases_vars[i],
-                                            decreases_clause_exprs[i]};
-      old_decreases_assignment.add_source_location() =
-        loop_head->source_location();
-      converter.goto_convert(old_decreases_assignment, generated_code, mode);
-    }
-
-    goto_function.body.destructive_insert(
-      loop_body, add_pragma_disable_assigns_check(generated_code));
-  }
-
-  // Generate: assert(invariant) just after the loop exits
-  // We use a block scope to create a temporary assertion,
-  // and immediately convert it to goto instructions.
-  {
-    code_assertt assertion{invariant_expr()};
-    assertion.add_source_location() = loop_end->source_location();
-    converter.goto_convert(assertion, generated_code, mode);
-    generated_code.instructions.back().source_location_nonconst().set_comment(
-      "Check that loop invariant is preserved");
+    code_assertt assertion{invariant};
+    assertion.add_source_location() = loop_head_location;
+    converter.goto_convert(assertion, pre_loop_end_instrs, mode);
+    pre_loop_end_instrs.instructions.back()
+      .source_location_nonconst()
+      .set_comment("Check that loop invariant is preserved");
   }
 
   // Generate: assignments to store the multidimensional decreases clause's
@@ -450,44 +536,82 @@ void code_contractst::check_apply_loop_contracts(
   {
     for(size_t i = 0; i < new_decreases_vars.size(); i++)
     {
-      code_assignt new_decreases_assignment{new_decreases_vars[i],
-                                            decreases_clause_exprs[i]};
-      new_decreases_assignment.add_source_location() =
-        loop_head->source_location();
-      converter.goto_convert(new_decreases_assignment, generated_code, mode);
+      code_assignt new_decreases_assignment{
+        new_decreases_vars[i], decreases_clause_exprs[i]};
+      new_decreases_assignment.add_source_location() = loop_head_location;
+      converter.goto_convert(
+        new_decreases_assignment, pre_loop_end_instrs, mode);
     }
 
     // Generate: assertion that the multidimensional decreases clause's value
-    // after the loop is smaller than the value before the loop.
-    // Here, we use the lexicographic order.
+    // after the loop is lexicographically smaller than its initial value.
     code_assertt monotonic_decreasing_assertion{
       generate_lexicographic_less_than_check(
         new_decreases_vars, old_decreases_vars)};
-    monotonic_decreasing_assertion.add_source_location() =
-      loop_head->source_location();
+    monotonic_decreasing_assertion.add_source_location() = loop_head_location;
     converter.goto_convert(
-      monotonic_decreasing_assertion, generated_code, mode);
-    generated_code.instructions.back().source_location_nonconst().set_comment(
-      "Check decreases clause on loop iteration");
+      monotonic_decreasing_assertion, pre_loop_end_instrs, mode);
+    pre_loop_end_instrs.instructions.back()
+      .source_location_nonconst()
+      .set_comment("Check decreases clause on loop iteration");
 
     // Discard the temporary variables that store decreases clause's value
     for(size_t i = 0; i < old_decreases_vars.size(); i++)
     {
-      generated_code.add(goto_programt::make_dead(
-        old_decreases_vars[i], loop_head->source_location()));
-      generated_code.add(goto_programt::make_dead(
-        new_decreases_vars[i], loop_head->source_location()));
+      pre_loop_end_instrs.add(
+        goto_programt::make_dead(old_decreases_vars[i], loop_head_location));
+      pre_loop_end_instrs.add(
+        goto_programt::make_dead(new_decreases_vars[i], loop_head_location));
     }
   }
 
   insert_before_swap_and_advance(
     goto_function.body,
     loop_end,
-    add_pragma_disable_assigns_check(generated_code));
+    add_pragma_disable_assigns_check(pre_loop_end_instrs));
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->turn_into_assume();
   loop_end->set_condition(boolean_negate(loop_end->get_condition()));
+
+  std::set<goto_programt::targett> seen_targets;
+  // Find all exit points of the loop, make temporary variables `DEAD`,
+  // and check that step case was checked for non-vacuous loops.
+  for(const auto &t : loop)
+  {
+    if(!t->is_goto())
+      continue;
+
+    auto exit_target = t->get_target();
+    if(
+      loop.contains(exit_target) ||
+      seen_targets.find(exit_target) != seen_targets.end())
+      continue;
+
+    seen_targets.insert(exit_target);
+
+    goto_programt pre_loop_exit_instrs;
+    // Assertion to check that step case was checked if we entered the loop.
+    pre_loop_exit_instrs.add(goto_programt::make_assertion(
+      or_exprt{not_exprt{entered_loop}, not_exprt{in_base_case}},
+      loop_head_location));
+    pre_loop_exit_instrs.instructions.back()
+      .source_location_nonconst()
+      .set_comment("Check that loop instrumentation was not truncated");
+    // Instructions to make all the temporaries go dead.
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(in_base_case, loop_head_location));
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(initial_invariant_val, loop_head_location));
+    for(const auto &v : history_var_map)
+    {
+      pre_loop_exit_instrs.add(
+        goto_programt::make_dead(to_symbol_expr(v.second), loop_head_location));
+    }
+    // Insert these instructions, preserving the loop end target.
+    insert_before_swap_and_advance(
+      goto_function.body, exit_target, pre_loop_exit_instrs);
+  }
 }
 
 void code_contractst::add_quantified_variable(
@@ -922,7 +1046,7 @@ void code_contractst::apply_loop_contract(
 
       if(loop_nesting_graph[outer].loop.contains(
            loop_nesting_graph[inner].target))
-        loop_nesting_graph.add_edge(outer, inner);
+        loop_nesting_graph.add_edge(inner, outer);
     }
   }
 
