@@ -43,7 +43,9 @@ int main()
       [((unsigned)((u & -u) * 0x077CB531U)) >> 27] == __builtin_ctz(u));
 
   // a failing assertion should be generated as __builtin_ctz is undefined for 0
-  __builtin_ctz(0U);
+  int r = __builtin_ctz(0U);
+  __CPROVER_assert(
+    r == sizeof(unsigned) * 8, "count trailing zeros of 0 is bit width");
 
   return 0;
 }

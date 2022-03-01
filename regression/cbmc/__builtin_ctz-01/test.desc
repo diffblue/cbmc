@@ -2,6 +2,7 @@ CORE
 main.c
 --bounds-check
 ^\[main.bit_count.\d+\] line 46 count trailing zeros is undefined for value zero in __builtin_ctz\(0u\): FAILURE$
+^\[main.assertion.2\] line 47 count trailing zeros of 0 is bit width: SUCCESS$
 ^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$

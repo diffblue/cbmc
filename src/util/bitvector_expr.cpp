@@ -129,18 +129,14 @@ exprt count_leading_zeros_exprt::lower() const
 exprt count_trailing_zeros_exprt::lower() const
 {
   exprt x = op();
-  const auto int_width = to_bitvector_type(x.type()).get_width();
-  CHECK_RETURN(int_width >= 1);
 
-  // popcount(x ^ ((unsigned)x - 1)) - 1
-  const unsignedbv_typet ut{int_width};
-  minus_exprt minus_one{typecast_exprt::conditional_cast(x, ut),
-                        from_integer(1, ut)};
-  popcount_exprt popcount{
-    bitxor_exprt{x, typecast_exprt::conditional_cast(minus_one, x.type())}};
-  minus_exprt result{popcount.lower(), from_integer(1, x.type())};
+  // popcount(~(x | (~x + 1)))
+  // compute -x using two's complement
+  plus_exprt minus_x{bitnot_exprt{x}, from_integer(1, x.type())};
+  bitor_exprt x_or_minus_x{x, std::move(minus_x)};
+  popcount_exprt popcount{bitnot_exprt{std::move(x_or_minus_x)}};
 
-  return typecast_exprt::conditional_cast(result, type());
+  return typecast_exprt::conditional_cast(popcount.lower(), type());
 }
 
 exprt bitreverse_exprt::lower() const
