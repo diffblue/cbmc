@@ -834,7 +834,6 @@ void goto_convertt::convert_assert(
 
   goto_programt::targett t =
     dest.add(goto_programt::make_assertion(cond, code.source_location()));
-  t->source_location_nonconst().set(ID_property, ID_assertion);
   t->source_location_nonconst().set("user-provided", true);
 }
 
