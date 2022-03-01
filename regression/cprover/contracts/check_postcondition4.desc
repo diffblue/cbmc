@@ -1,0 +1,8 @@
+CORE
+check_postcondition4.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[my_function\.postcondition\.2\] line \d+ postcondition x == 10: SUCCESS$
+^\[my_function\.postcondition\.1\] line \d+ postcondition y == 20: REFUTED$
+--

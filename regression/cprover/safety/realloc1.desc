@@ -1,0 +1,10 @@
+CORE
+realloc1.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.realloc\.1\] line \d+ realloc argument must be valid dynamic object: SUCCESS$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
+^\[main\.free\.1\] line \d+ free argument must be valid dynamic object: SUCCESS$
+--

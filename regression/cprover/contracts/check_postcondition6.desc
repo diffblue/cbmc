@@ -1,0 +1,7 @@
+KNOWNBUG
+check_postcondition6.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[my_function\.postcondition\.1\] line \d+ postcondition: SUCCESS$
+--

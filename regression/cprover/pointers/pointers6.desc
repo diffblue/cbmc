@@ -1,0 +1,11 @@
+CORE
+pointers6.c
+--text --solve --inline --no-safety
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ S23\(ς\[❝main::1::p❞:=❝x❞\]\)$
+^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ S24\(ς\[ς\(❝main::1::p❞\):=10\]\)$
+^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ S25\(ς\[❝main::1::q❞:=❝x❞\]\)$
+^\(\d+\) ∀ ς : state \. S25\(ς\) ⇒ \(ς\(ς\(❝main::1::q❞\)\) = 10\)$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

@@ -1,0 +1,9 @@
+CORE
+trace_struct1.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^Trace for main\.assertion\.1:$
+^  10 main::1::p := ❝x❞\.❝c❞$
+^  11 x\.c := 789$
+--

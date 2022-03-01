@@ -1,0 +1,24 @@
+CORE
+branching1.c
+--text --solve --inline
+^EXIT=10$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. \(S20\(ς\) ∧ ¬\(ς\(❝main::1::x❞\) ≥ 5\)\) ⇒ S21T\(\ς\)$
+^\(\d+\) ∀ ς : state \. \(S20\(ς\) ∧ ς\(❝main::1::x❞\) ≥ 5\) ⇒ S21\(ς\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ \(ς\(❝main::1::x❞\) ≥ 5\)$
+^\(\d+\) S22 = S21$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(0 ≠ 0\)$
+^\(\d+\) S23 = S22$
+^\(\d+\) S24 = S23$
+^\(\d+\) ∀ ς : state \. S21T\(ς\) ⇒ \(ς\(❝main::1::x❞\) < 5\)$
+^\(\d+\) S25 = S21T$
+^\(\d+\) ∀ ς : state \. S25\(ς\) ⇒ \(0 ≠ 0\)$
+^\(\d+\) S26 = S25$
+^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ S27in\(ς\)$
+^\(\d+\) ∀ ς : state \. S26\(ς\) ⇒ S27in\(ς\)$
+^\(\d+\) S27 = S27in$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ property 2: REFUTED$
+^\[main\.assertion\.3\] line \d+ property 3: SUCCESS$
+^\[main\.assertion\.4\] line \d+ property 4: REFUTED$
+--

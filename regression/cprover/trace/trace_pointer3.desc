@@ -1,0 +1,9 @@
+CORE
+trace_pointer3.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^Trace for main\.assertion\.1:$
+^   8 main::1::p := ❝x❞$
+^   9 x\.b := 123$
+--

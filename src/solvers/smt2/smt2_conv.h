@@ -85,11 +85,19 @@ public:
 
   static std::string convert_identifier(const irep_idt &identifier);
 
+  void set_converter(irep_idt id, std::function<void(const exprt &)> converter)
+  {
+    converters[id] = std::move(converter);
+  }
+
 protected:
   const namespacet &ns;
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
+  using converterst = std::
+    unordered_map<irep_idt, std::function<void(const exprt &)>, irep_id_hash>;
+  converterst converters;
 
   std::vector<exprt> assumptions;
   boolbv_widtht boolbv_width;
@@ -138,11 +146,12 @@ protected:
   void convert_member(const member_exprt &expr);
 
   void convert_with(const with_exprt &expr);
-  void convert_update(const exprt &expr);
+  void convert_update(const update_exprt &);
 
   void convert_expr(const exprt &);
   void convert_type(const typet &);
   void convert_literal(const literalt);
+  void convert_string_literal(const std::string &);
 
   literalt convert(const exprt &expr);
   tvt l_get(literalt l) const;
@@ -184,6 +193,10 @@ protected:
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted
+
+  // conversion for ID_evaluate, ID_update_state,
+  // ID_object_address, ID_field_address, ID_element_address
+  std::set<irep_idt> state_fkt_declared;
 
   class smt2_symbolt : public nullary_exprt
   {

@@ -635,6 +635,11 @@ public:
   /// The index is expected to have an integer type.
   element_address_exprt(const exprt &base, exprt index);
 
+  /// constructor for element addresses.
+  /// The base address must be a pointer to an element.
+  /// The index is expected to have an integer type.
+  element_address_exprt(exprt base, exprt index, pointer_typet);
+
   const pointer_typet &type() const
   {
     return static_cast<const pointer_typet &>(exprt::type());

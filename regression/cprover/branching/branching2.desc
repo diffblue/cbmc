@@ -1,0 +1,16 @@
+CORE
+branching2.c
+--text --solve --inline
+^EXIT=10$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. \(S21\(ς\) ∧ ¬\(ς\(❝main::1::a❞\) ≥ 5\)\) ⇒ S22T\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S21\(ς\) ∧ ς\(❝main::1::a❞\) ≥ 5\) ⇒ S22\(ς\)$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ S23\(ς\[❝main::1::b❞:=1\]\)$
+^\(\d+\) S24 = S23$
+^\(\d+\) ∀ ς : state \. S22T\(ς\) ⇒ S25\(ς\[❝main::1::b❞:=0\]\)$
+^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ S26in\(ς\)$
+^\(\d+\) ∀ ς : state \. S25\(ς\) ⇒ S26in\(ς\)$
+^\(\d+\) S26 = S26in$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ property 2: REFUTED$
+--

@@ -156,13 +156,24 @@ field_address_exprt::field_address_exprt(
 }
 
 element_address_exprt::element_address_exprt(const exprt &base, exprt index)
-  : binary_exprt(
+  : element_address_exprt(
       base,
-      ID_element_address,
       std::move(index),
       pointer_typet(
         to_pointer_type(base.type()).base_type(),
         to_pointer_type(base.type()).get_width()))
+{
+}
+
+element_address_exprt::element_address_exprt(
+  exprt base,
+  exprt index,
+  pointer_typet type)
+  : binary_exprt(
+      std::move(base),
+      ID_element_address,
+      std::move(index),
+      std::move(type))
 {
 }
 

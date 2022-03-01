@@ -1,0 +1,6 @@
+KNOWNBUG
+aws_hash_table_foreach_contract.c
+-I aws-c-common/include aws-c-common/source/hash_table.c
+^EXIT=0$
+^SIGNAL=0$
+--

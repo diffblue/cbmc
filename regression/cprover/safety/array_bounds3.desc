@@ -1,0 +1,7 @@
+CORE
+array_bounds3.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.pointer\.1\] line \d+ pointer .* safe: SUCCESS$
+--
