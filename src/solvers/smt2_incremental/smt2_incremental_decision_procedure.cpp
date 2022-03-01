@@ -159,7 +159,9 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
 {
-  log.debug() << "`handle`  -\n  " << expr.pretty(2, 0) << messaget::eom;
+  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
+    debug << "`handle`  -\n  " << expr.pretty(2, 0) << messaget::eom;
+  });
   ensure_handle_for_expr_defined(expr);
   return expr;
 }
@@ -182,7 +184,9 @@ static optionalt<smt_termt> get_identifier(
 
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
-  log.debug() << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
+  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
+    debug << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
+  });
   optionalt<smt_termt> descriptor =
     get_identifier(expr, expression_handle_identifiers, expression_identifiers);
   if(!descriptor)
@@ -251,8 +255,10 @@ smt2_incremental_decision_proceduret::get_number_of_solver_calls() const
 void smt2_incremental_decision_proceduret::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(can_cast_type<bool_typet>(expr.type()));
-  log.debug() << "`set_to` (" << std::string{value ? "true" : "false"}
-              << ") -\n  " << expr.pretty(2, 0) << messaget::eom;
+  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
+    debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
+          << expr.pretty(2, 0) << messaget::eom;
+  });
 
   define_dependent_functions(expr);
   auto converted_term = [&]() -> smt_termt {
