@@ -450,7 +450,7 @@ inline bool can_cast_expr<object_address_exprt>(const exprt &base)
 
 inline void validate_expr(const object_address_exprt &value)
 {
-  validate_operands(value, 1, "object_address must have one operand");
+  validate_operands(value, 0, "object_address must have zero operands");
 }
 
 /// \brief Cast an exprt to an \ref object_address_exprt
