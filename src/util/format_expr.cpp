@@ -456,6 +456,12 @@ void format_expr_configt::setup()
   expr_map[ID_array] = compound;
   expr_map[ID_struct] = compound;
 
+  expr_map[ID_array_of] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &array_of_expr = to_array_of_expr(expr);
+    return os << "array_of(" << format(array_of_expr.what()) << ')';
+  };
+
   expr_map[ID_if] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &if_expr = to_if_expr(expr);
     return os << '(' << format(if_expr.cond()) << " ? "
