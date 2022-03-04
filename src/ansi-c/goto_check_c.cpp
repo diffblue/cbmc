@@ -1508,7 +1508,10 @@ void goto_check_ct::bounds_check(const exprt &expr, const guardt &guard)
   if(expr.id() == ID_index)
     bounds_check_index(to_index_expr(expr), guard);
   else if(
-    expr.id() == ID_count_leading_zeros || expr.id() == ID_count_trailing_zeros)
+    (expr.id() == ID_count_leading_zeros &&
+     !to_count_leading_zeros_expr(expr).zero_permitted()) ||
+    (expr.id() == ID_count_trailing_zeros &&
+     !to_count_trailing_zeros_expr(expr).zero_permitted()))
   {
     bounds_check_bit_count(to_unary_expr(expr), guard);
   }
