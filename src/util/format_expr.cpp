@@ -304,6 +304,12 @@ void format_expr_configt::setup()
     return format_rec(os, to_constant_expr(expr));
   };
 
+  expr_map[ID_address_of] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &address_of = to_address_of_expr(expr);
+    return os << "address_of(" << format(address_of.object()) << ')';
+  };
+
   expr_map[ID_annotated_pointer_constant] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &annotated_pointer = to_annotated_pointer_constant_expr(expr);
