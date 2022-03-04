@@ -20,7 +20,7 @@ void __builtin_ia32_vp2intersect_d_128(__gcc_v4si, __gcc_v4si, unsigned char *, 
 
 __gcc_v16qi __builtin_ia32_selectb_128(unsigned short, __gcc_v16qi, __gcc_v16qi);
 __gcc_v32qi __builtin_ia32_selectb_256(unsigned int, __gcc_v32qi, __gcc_v32qi);
-__gcc_v64qi __builtin_ia32_selectb_512(unsigned long, __gcc_v64qi, __gcc_v64qi);
+__gcc_v64qi __builtin_ia32_selectb_512(unsigned long int, __gcc_v64qi, __gcc_v64qi);
 __gcc_v8hi __builtin_ia32_selectw_128(unsigned char, __gcc_v8hi, __gcc_v8hi);
 __gcc_v16hi __builtin_ia32_selectw_256(unsigned short, __gcc_v16hi, __gcc_v16hi);
 __gcc_v32hi __builtin_ia32_selectw_512(unsigned int, __gcc_v32hi, __gcc_v32hi);
@@ -70,7 +70,7 @@ void __builtin_ia32_tdpbsud(__tile, __tile, __tile);
 void __builtin_ia32_tdpbusd(__tile, __tile, __tile);
 void __builtin_ia32_tdpbuud(__tile, __tile, __tile);
 void __builtin_ia32_tdpbf16ps(__tile, __tile, __tile);
-void __builtin_ia32_ptwrite64(unsigned long long);
+void __builtin_ia32_ptwrite64(unsigned long long int);
 
 void __builtin_nontemporal_store();
 void __builtin_nontemporal_load();
