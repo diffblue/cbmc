@@ -1,5 +1,5 @@
 // clang-format off
-void __builtin_ia32_emms();
+void __builtin_ia32_emms(void);
 __gcc_v2si __builtin_ia32_pmaddwd(__gcc_v4hi, __gcc_v4hi);
 __gcc_v2si __builtin_ia32_vec_init_v2si(int, int);
 __gcc_v4hi __builtin_ia32_vec_init_v4hi(short, short, short, short);
@@ -33,7 +33,7 @@ __gcc_v16qi __builtin_ia32_vec_set_v16qi(__gcc_v16qi, char, int);
 __gcc_v4si __builtin_ia32_vec_set_v4si(__gcc_v4si, int, int);
 __gcc_v2di __builtin_ia32_vec_set_v2di(__gcc_v2di, __gcc_di, int);
 
-unsigned long long __builtin_ia32_rdtsc();
+unsigned long long __builtin_ia32_rdtsc(void);
 unsigned long long __builtin_ia32_rdtscp(unsigned*);
 void __builtin_ia32_fnstenv(void*);
 void __builtin_ia32_fldenv(const void*);
@@ -106,15 +106,15 @@ void __builtin_ia32_movdqa32store512_mask(__gcc_v16si*, __gcc_v16si, unsigned sh
 void __builtin_ia32_storeapd512_mask(__gcc_v8df*, __gcc_v8df, unsigned char);
 void __builtin_ia32_movdqa64store512_mask(__gcc_v8di*, __gcc_v8di, unsigned char);
 void __builtin_ia32_llwpcb(void*);
-void* __builtin_ia32_slwpcb();
+void* __builtin_ia32_slwpcb(void);
 void __builtin_ia32_wrfsbase32(unsigned);
 void __builtin_ia32_wrfsbase64(unsigned long long);
 void __builtin_ia32_wrgsbase32(unsigned);
 void __builtin_ia32_wrgsbase64(unsigned long long);
-unsigned __builtin_ia32_xbegin();
-void __builtin_ia32_xend();
+unsigned __builtin_ia32_xbegin(void);
+void __builtin_ia32_xend(void);
 void __builtin_ia32_xabort(unsigned);
-int __builtin_ia32_xtest();
+int __builtin_ia32_xtest(void);
 int __builtin_ia32_bsrsi(int);
 long long __builtin_ia32_bsrdi(long long);
 unsigned long long __builtin_ia32_rdpmc(int);

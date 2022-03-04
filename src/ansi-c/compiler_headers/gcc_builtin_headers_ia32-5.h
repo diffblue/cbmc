@@ -264,12 +264,12 @@ unsigned __builtin_ia32_rdsspd();
 unsigned long long __builtin_ia32_rdsspq();
 void __builtin_ia32_incsspd(unsigned);
 void __builtin_ia32_incsspq(unsigned long long);
-void __builtin_ia32_saveprevssp();
+void __builtin_ia32_saveprevssp(void);
 void __builtin_ia32_rstorssp(void*);
 void __builtin_ia32_wrssd(unsigned, void*);
 void __builtin_ia32_wrssq(unsigned long long, void*);
 void __builtin_ia32_wrussd(unsigned, void*);
 void __builtin_ia32_wrussq(unsigned long long, void*);
-void __builtin_ia32_setssbsy();
+void __builtin_ia32_setssbsy(void);
 void __builtin_ia32_clrssbsy(void*);
 // clang-format on
