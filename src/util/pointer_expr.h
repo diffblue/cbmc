@@ -569,7 +569,7 @@ public:
   /// constructor for element addresses.
   /// The base address must be a pointer to an element.
   /// The index is expected to have an integer type.
-  element_address_exprt(exprt base, exprt index);
+  element_address_exprt(const exprt &base, exprt index);
 
   const pointer_typet &type() const
   {

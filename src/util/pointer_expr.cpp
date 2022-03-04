@@ -147,13 +147,13 @@ field_address_exprt::field_address_exprt(
   set(ID_component_name, component_name);
 }
 
-element_address_exprt::element_address_exprt(exprt base, exprt index)
+element_address_exprt::element_address_exprt(const exprt &base, exprt index)
   : binary_exprt(
-      std::move(base),
+      base,
       ID_element_address,
       std::move(index),
       pointer_typet(
-        to_array_type(base.type()).element_type(),
+        to_pointer_type(base.type()).base_type(),
         to_pointer_type(base.type()).get_width()))
 {
 }
