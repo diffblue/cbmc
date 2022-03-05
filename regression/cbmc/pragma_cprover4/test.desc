@@ -1,0 +1,13 @@
+CORE
+main.c
+--signed-overflow-check
+^\[main.overflow.1\] line 9 arithmetic overflow on signed \+ in a \+ a \+ b: FAILURE$
+^\[main.overflow.2\] line 19 arithmetic overflow on signed \+ in temp \+ a: FAILURE$
+^\[main.assertion.1\] line 20 assertion foo > 2: FAILURE$
+^\*\* 3 of 3 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+No assertions other than the above three are expected.

@@ -1,0 +1,13 @@
+CORE
+main.c
+--nan-check _ --signed-overflow-check --unsigned-overflow-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test doesn't actually use contracts, but rather demonstrates the workflow
+of having goto-instrument expand __CPROVER_r_ok (but really doing nothing else)
+before CBMC when may add (overflow) checks. Doing so must not result in failing
+assertions that would not have failed on the original input.

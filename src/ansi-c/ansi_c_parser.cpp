@@ -203,6 +203,9 @@ void ansi_c_parsert::pragma_cprover_add_check(
 
 bool ansi_c_parsert::pragma_cprover_clash(const irep_idt &name, bool enabled)
 {
+  if(pragma_cprover_stack.empty())
+    return false;
+
   auto top = pragma_cprover_stack.back();
   auto found = top.find(name);
   return found != top.end() && found->second != enabled;
