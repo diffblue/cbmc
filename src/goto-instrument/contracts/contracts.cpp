@@ -140,61 +140,14 @@ void code_contractst::check_apply_loop_contracts(
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
   goto_programt::targett loop_head,
+  goto_programt::targett loop_end,
   const loopt &loop,
+  exprt assigns_clause,
+  exprt invariant,
+  exprt decreases_clause,
   const irep_idt &mode)
 {
-  PRECONDITION(!loop.empty());
-
   const auto loop_head_location = loop_head->source_location();
-
-  // find the last back edge
-  goto_programt::targett loop_end = loop_head;
-  for(const auto &t : loop)
-  {
-    if(
-      t->is_goto() && t->get_target() == loop_head &&
-      t->location_number > loop_end->location_number)
-      loop_end = t;
-  }
-
-  // check for assigns, invariant, and decreases clauses
-  auto assigns_clause = static_cast<const exprt &>(
-    loop_end->get_condition().find(ID_C_spec_assigns));
-  auto invariant = static_cast<const exprt &>(
-    loop_end->get_condition().find(ID_C_spec_loop_invariant));
-  auto decreases_clause = static_cast<const exprt &>(
-    loop_end->get_condition().find(ID_C_spec_decreases));
-
-  if(invariant.is_nil())
-  {
-    if(decreases_clause.is_nil() && assigns_clause.is_nil())
-    {
-      // no contracts to enforce, so return
-      return;
-    }
-    else
-    {
-      invariant = true_exprt();
-      // assigns clause is missing; we will try to automatic inference
-      log.warning() << "The loop at " << loop_head_location.as_string()
-                    << " does not have an invariant in its contract.\n"
-                    << "Hence, a default invariant ('true') is being used.\n"
-                    << "This choice is sound, but verification may fail"
-                    << " if it is be too weak to prove the desired properties."
-                    << messaget::eom;
-    }
-  }
-  else
-  {
-    invariant = conjunction(invariant.operands());
-    if(decreases_clause.is_nil())
-    {
-      log.warning() << "The loop at " << loop_head_location.as_string()
-                    << " does not have a decreases clause in its contract.\n"
-                    << "Termination of this loop will not be verified."
-                    << messaget::eom;
-    }
-  }
 
   // Vector representing a (possibly multidimensional) decreases clause
   const auto &decreases_clause_exprs = decreases_clause.operands();
@@ -1022,20 +975,171 @@ void code_contractst::apply_loop_contract(
 
   struct loop_graph_nodet : public graph_nodet<empty_edget>
   {
-    typedef const goto_programt::targett &targett;
-    typedef const typename natural_loops_mutablet::loopt &loopt;
+    const typename natural_loops_mutablet::loopt &content;
+    const goto_programt::targett head_target, end_target;
+    exprt assigns_clause, invariant, decreases_clause;
 
-    targett target;
-    loopt loop;
-
-    loop_graph_nodet(targett t, loopt l) : target(t), loop(l)
+    loop_graph_nodet(
+      const typename natural_loops_mutablet::loopt &loop,
+      const goto_programt::targett head,
+      const goto_programt::targett end,
+      const exprt &assigns,
+      const exprt &inv,
+      const exprt &decreases)
+      : content(loop),
+        head_target(head),
+        end_target(end),
+        assigns_clause(assigns),
+        invariant(inv),
+        decreases_clause(decreases)
     {
     }
   };
   grapht<loop_graph_nodet> loop_nesting_graph;
 
-  for(const auto &loop : natural_loops.loop_map)
-    loop_nesting_graph.add_node(loop.first, loop.second);
+  std::list<size_t> to_check_contracts_on_children;
+
+  for(const auto &loop_head_and_content : natural_loops.loop_map)
+  {
+    const auto &loop_content = loop_head_and_content.second;
+    if(loop_content.empty())
+      continue;
+
+    auto loop_head = loop_head_and_content.first;
+    auto loop_end = loop_head;
+
+    // Find the last back edge to `loop_head`
+    for(const auto &t : loop_content)
+    {
+      if(
+        t->is_goto() && t->get_target() == loop_head &&
+        t->location_number > loop_end->location_number)
+        loop_end = t;
+    }
+
+    if(loop_end == loop_head)
+    {
+      log.error() << "Could not find end of the loop starting at: "
+                  << loop_head->source_location() << messaget::eom;
+      throw 0;
+    }
+
+    exprt assigns_clause =
+      static_cast<const exprt &>(loop_end->condition().find(ID_C_spec_assigns));
+    exprt invariant = static_cast<const exprt &>(
+      loop_end->get_condition().find(ID_C_spec_loop_invariant));
+    exprt decreases_clause = static_cast<const exprt &>(
+      loop_end->get_condition().find(ID_C_spec_decreases));
+
+    if(invariant.is_nil())
+    {
+      if(decreases_clause.is_not_nil() || assigns_clause.is_not_nil())
+      {
+        invariant = true_exprt{};
+        // assigns clause is missing; we will try to automatic inference
+        log.warning()
+          << "The loop at " << loop_head->source_location().as_string()
+          << " does not have an invariant in its contract.\n"
+          << "Hence, a default invariant ('true') is being used.\n"
+          << "This choice is sound, but verification may fail"
+          << " if it is be too weak to prove the desired properties."
+          << messaget::eom;
+      }
+    }
+    else
+    {
+      invariant = conjunction(invariant.operands());
+      if(decreases_clause.is_nil())
+      {
+        log.warning() << "The loop at "
+                      << loop_head->source_location().as_string()
+                      << " does not have a decreases clause in its contract.\n"
+                      << "Termination of this loop will not be verified."
+                      << messaget::eom;
+      }
+    }
+
+    const auto idx = loop_nesting_graph.add_node(
+      loop_content,
+      loop_head,
+      loop_end,
+      assigns_clause,
+      invariant,
+      decreases_clause);
+
+    if(
+      assigns_clause.is_nil() && invariant.is_nil() &&
+      decreases_clause.is_nil())
+      continue;
+
+    to_check_contracts_on_children.push_back(idx);
+
+    // By definition the `loop_content` is a set of instructions computed
+    // by `natural_loops` based on the CFG.
+    // Since we perform assigns clause instrumentation by sequentially
+    // traversing instructions from `loop_head` to `loop_end`, here check that:
+    // 1. All instructions in `loop_content` are contained within the
+    //    [loop_head, loop_end] iterator range
+    // 2. All instructions in the [loop_head, loop_end] range are contained
+    //    in the `loop_content` set, except for the exceptions explained below.
+
+    // Check 1. (i \in loop_content) ==> loop_head <= i <= loop_end
+    for(const auto &i : loop_content)
+    {
+      if(std::distance(loop_head, i) < 0 || std::distance(i, loop_end) < 0)
+      {
+        log.error() << "Computed loop at " << loop_head->source_location()
+                    << "contains an instruction beyond [loop_head, loop_end]:"
+                    << messaget::eom;
+        goto_function.body.output_instruction(
+          ns, function_name, log.error(), *i);
+        throw 0;
+      }
+    }
+
+    // Check 2. (loop_head <= i <= loop_end) ==> (i \in loop_content)
+    //
+    // We allow the following exceptions in this check:
+    // - `SKIP` or `LOCATION` instructions which are no-op
+    // - `ASSUME(false)` instructions which are introduced by function pointer
+    //    or nested loop transformations, and have no successor instructions
+    // - `SET_RETURN_VALUE` instructions followed by an uninterrupted sequence
+    //    of `DEAD` instructions and a `GOTO` jump out of the loop,
+    //    which model C `return` statements.
+    // - `GOTO` jumps out of the loops, which model C `break` statements.
+    // These instructions are allowed to be missing from `loop_content`,
+    // and may be safely ignored for the purpose of our instrumentation.
+    for(auto i = loop_head; i < loop_end; ++i)
+    {
+      if(loop_content.contains(i))
+        continue;
+
+      if(i->is_skip() || i->is_location())
+        continue;
+
+      if(i->is_goto() && !loop_content.contains(i->get_target()))
+        continue;
+
+      if(i->is_assume() && i->get_condition().is_false())
+        continue;
+
+      if(i->is_set_return_value())
+      {
+        do
+          i++;
+        while(i->is_dead());
+
+        // because we increment `i` in the outer `for` loop
+        i--;
+        continue;
+      }
+
+      log.error() << "Computed loop at: " << loop_head->source_location()
+                  << "is missing an instruction:" << messaget::eom;
+      goto_function.body.output_instruction(ns, function_name, log.error(), *i);
+      throw 0;
+    }
+  }
 
   for(size_t outer = 0; outer < loop_nesting_graph.size(); ++outer)
   {
@@ -1044,10 +1148,47 @@ void code_contractst::apply_loop_contract(
       if(inner == outer)
         continue;
 
-      if(loop_nesting_graph[outer].loop.contains(
-           loop_nesting_graph[inner].target))
+      if(loop_nesting_graph[outer].content.contains(
+           loop_nesting_graph[inner].head_target))
+      {
+        if(!loop_nesting_graph[outer].content.contains(
+             loop_nesting_graph[inner].end_target))
+        {
+          log.error()
+            << "Overlapping loops at:\n"
+            << loop_nesting_graph[outer].head_target->source_location()
+            << "\nand\n"
+            << loop_nesting_graph[inner].head_target->source_location()
+            << "\nLoops must be nested or sequential for contracts to be "
+               "enforced."
+            << messaget::eom;
+        }
         loop_nesting_graph.add_edge(inner, outer);
+      }
     }
+  }
+
+  // make sure all children of a contractified loop also have contracts
+  while(!to_check_contracts_on_children.empty())
+  {
+    const auto loop_idx = to_check_contracts_on_children.front();
+    to_check_contracts_on_children.pop_front();
+
+    const auto &loop_node = loop_nesting_graph[loop_idx];
+    if(
+      loop_node.assigns_clause.is_nil() && loop_node.invariant.is_nil() &&
+      loop_node.decreases_clause.is_nil())
+    {
+      log.error()
+        << "Inner loop at: " << loop_node.head_target->source_location()
+        << " does not have contracts, but an enclosing loop does.\n"
+        << "Please provide contracts for this loop, or unwind it first."
+        << messaget::eom;
+      throw 0;
+    }
+
+    for(const auto child_idx : loop_nesting_graph.get_predecessors(loop_idx))
+      to_check_contracts_on_children.push_back(child_idx);
   }
 
   // Iterate over the (natural) loops in the function, in topo-sorted order,
@@ -1055,12 +1196,21 @@ void code_contractst::apply_loop_contract(
   for(const auto &idx : loop_nesting_graph.topsort())
   {
     const auto &loop_node = loop_nesting_graph[idx];
+    if(
+      loop_node.assigns_clause.is_nil() && loop_node.invariant.is_nil() &&
+      loop_node.decreases_clause.is_nil())
+      continue;
+
     check_apply_loop_contracts(
       function_name,
       goto_function,
       local_may_alias,
-      loop_node.target,
-      loop_node.loop,
+      loop_node.head_target,
+      loop_node.end_target,
+      loop_node.content,
+      loop_node.assigns_clause,
+      loop_node.invariant,
+      loop_node.decreases_clause,
       symbol_table.lookup_ref(function_name).mode);
   }
 }

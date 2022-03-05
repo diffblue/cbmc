@@ -102,7 +102,11 @@ public:
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,
     goto_programt::targett loop_head,
+    goto_programt::targett loop_end,
     const loopt &loop,
+    exprt assigns_clause,
+    exprt invariant,
+    exprt decreases_clause,
     const irep_idt &mode);
 
   // for "helper" classes to update symbol table.
