@@ -188,6 +188,24 @@ void dep_graph_domaint::data_dependencies(
 
     dep_graph.reaching_definitions()[to].clear_cache(read_object_entry.first);
   }
+
+  if(to->is_set_return_value())
+  {
+    auto entry = dep_graph.end_function_map.find(function_to);
+    CHECK_RETURN(entry != dep_graph.end_function_map.end());
+
+    goto_programt::const_targett end_function = entry->second;
+
+    dep_graph_domaint *s =
+      dynamic_cast<dep_graph_domaint *>(&(dep_graph.get_state(end_function)));
+    CHECK_RETURN(s != nullptr);
+
+    if(s->is_bottom())
+      s->has_values = tvt::unknown();
+
+    if(s->data_deps.insert(to).second)
+      s->has_changed = true;
+  }
 }
 
 void dep_graph_domaint::transform(

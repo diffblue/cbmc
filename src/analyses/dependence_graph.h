@@ -224,6 +224,16 @@ public:
   {
     ait<dep_graph_domaint>::initialize(goto_functions);
     rd(goto_functions, ns);
+
+    for(const auto &entry : goto_functions.function_map)
+    {
+      const goto_programt &goto_program = entry.second.body;
+      if(!goto_program.empty())
+      {
+        end_function_map.emplace(
+          entry.first, std::prev(goto_program.instructions.end()));
+      }
+    }
   }
 
   void initialize(const irep_idt &function, const goto_programt &goto_program)
@@ -238,6 +248,9 @@ public:
     {
       cfg_post_dominatorst &pd = post_dominators[function];
       pd(goto_program);
+
+      end_function_map.emplace(
+        function, std::prev(goto_program.instructions.end()));
     }
   }
 
@@ -273,6 +286,7 @@ protected:
 
   post_dominators_mapt post_dominators;
   reaching_definitions_analysist rd;
+  std::map<irep_idt, goto_programt::const_targett> end_function_map;
 };
 
 #endif // CPROVER_ANALYSES_DEPENDENCE_GRAPH_H

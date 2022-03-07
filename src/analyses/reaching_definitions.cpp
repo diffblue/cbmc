@@ -126,41 +126,6 @@ void rd_range_domaint::transform(
   // initial (non-deterministic) value
   else if(from->is_decl())
     transform_assign(ns, from, function_from, from, *rd);
-
-#if 0
-  // handle return values
-  if(to->is_function_call())
-  {
-    const code_function_callt &code=to_code_function_call(to->code);
-
-    if(code.lhs().is_not_nil())
-    {
-      rw_range_set_value_sett rw_set(ns, rd->get_value_sets());
-      goto_rw(to, rw_set);
-      const bool is_must_alias=rw_set.get_w_set().size()==1;
-
-      for(const auto &written_object_entry : rw_set.get_w_set())
-      {
-        const irep_idt &identifier = written_object_entry.first;
-        // ignore symex::invalid_object
-        const symbolt *symbol_ptr;
-        if(ns.lookup(identifier, symbol_ptr))
-          continue;
-        assert(symbol_ptr!=0);
-
-        const range_domaint &ranges =
-          rw_set.get_ranges(written_object_entry.second);
-
-        if(is_must_alias &&
-           (!rd->get_is_threaded()(from) ||
-            (!symbol_ptr->is_shared() &&
-             !rd->get_is_dirty()(identifier))))
-          for(const auto &range : ranges)
-            kill(identifier, range.first, range.second);
-      }
-    }
-  }
-#endif
 }
 
 /// Computes an instance obtained from a `*this` by transformation over `DEAD v`
@@ -322,12 +287,6 @@ void rd_range_domaint::transform_end_function(
   // handle return values
   if(call->call_lhs().is_not_nil())
   {
-#if 0
-    rd_range_domaint *rd_state=
-      dynamic_cast<rd_range_domaint*>(&(rd.get_state(call)));
-    assert(rd_state!=0);
-    rd_state->
-#endif
     transform_assign(ns, from, function_to, call, rd);
   }
 }
