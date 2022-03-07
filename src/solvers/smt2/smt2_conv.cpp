@@ -2138,6 +2138,26 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_expr(simplify_expr(to_bitreverse_expr(expr).lower(), ns));
   }
+  else if(expr.id() == ID_function_application)
+  {
+    const auto &function_application_expr = to_function_application_expr(expr);
+    // do not use parentheses if there function is a constant
+    if(function_application_expr.arguments().empty())
+    {
+      convert_expr(function_application_expr.function());
+    }
+    else
+    {
+      out << '(';
+      convert_expr(function_application_expr.function());
+      for(auto &op : function_application_expr.arguments())
+      {
+        out << ' ';
+        convert_expr(op);
+      }
+      out << ')';
+    }
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
@@ -4468,13 +4488,49 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         smt2_identifiers.insert(smt2_identifier);
 
         out << "; set_to true (equal)\n";
-        out << "(define-fun |" << smt2_identifier << "| () ";
+        out << "(define-fun |" << smt2_identifier << '|';
 
-        convert_type(equal_expr.lhs().type());
-        out << " ";
-        convert_expr(prepared_rhs);
+        if(equal_expr.lhs().type().id() == ID_mathematical_function)
+        {
+          auto &mathematical_function_type =
+            to_mathematical_function_type(equal_expr.lhs().type());
+          out << " (";
+          bool first = true;
 
-        out << ")" << "\n";
+          for(std::size_t p_nr = 0;
+              p_nr < mathematical_function_type.domain().size();
+              p_nr++)
+          {
+            if(first)
+              first = false;
+            else
+              out << ' ';
+
+            out << '(' << 'p' << (p_nr + 1) << ' ';
+            convert_type(mathematical_function_type.domain()[p_nr]);
+            out << ')';
+          }
+
+          out << ") ";
+          convert_type(mathematical_function_type.codomain());
+
+          out << ' ' << '(';
+          convert_expr(prepared_rhs);
+          for(std::size_t p_nr = 0;
+              p_nr < mathematical_function_type.domain().size();
+              p_nr++)
+            out << ' ' << 'p' << (p_nr + 1);
+          out << ')';
+        }
+        else
+        {
+          out << " () ";
+          convert_type(equal_expr.lhs().type());
+          out << ' ';
+          convert_expr(prepared_rhs);
+        }
+
+        out << ')' << '\n';
         return; // done
       }
     }
@@ -4616,10 +4672,33 @@ void smt2_convt::find_symbols(const exprt &expr)
       smt2_identifiers.insert(smt2_identifier);
 
       out << "; find_symbols\n";
-      out << "(declare-fun |"
-          << smt2_identifier
-          << "| () ";
-      convert_type(expr.type());
+      out << "(declare-fun |" << smt2_identifier << '|';
+
+      if(expr.type().id() == ID_mathematical_function)
+      {
+        auto &mathematical_function_type =
+          to_mathematical_function_type(expr.type());
+        out << " (";
+        bool first = true;
+
+        for(auto &type : mathematical_function_type.domain())
+        {
+          if(first)
+            first = false;
+          else
+            out << ' ';
+          convert_type(type);
+        }
+
+        out << ") ";
+        convert_type(mathematical_function_type.codomain());
+      }
+      else
+      {
+        out << " () ";
+        convert_type(expr.type());
+      }
+
       out << ")" << "\n";
     }
   }
@@ -5217,6 +5296,15 @@ void smt2_convt::find_symbols_rec(
       recstack.insert(id);
       find_symbols_rec(ns.follow_tag(union_tag), recstack);
     }
+  }
+  else if(type.id() == ID_mathematical_function)
+  {
+    const auto &mathematical_function_type =
+      to_mathematical_function_type(type);
+    for(auto &d_type : mathematical_function_type.domain())
+      find_symbols_rec(d_type, recstack);
+
+    find_symbols_rec(mathematical_function_type.codomain(), recstack);
   }
 }
 
