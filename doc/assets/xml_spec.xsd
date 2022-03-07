@@ -11,6 +11,7 @@
   <xs:complexType>
     <xs:attribute name="file" type="xs:string" use="optional"/>
     <xs:attribute name="line" type="xs:int" use="optional"/>
+    <xs:attribute name="column" type="xs:int" use="optional"/>
     <xs:attribute name="working-directory" type="xs:string"
                   use="optional"/>
     <xs:attribute name="function" type="xs:string" use="optional"/>
@@ -164,6 +165,7 @@
   <xs:element name="result">
     <xs:complexType>
       <xs:sequence>
+        <xs:element ref="location" minOccurs="0"/>
         <xs:element ref="goto_trace" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="property" type="xs:string"/>
