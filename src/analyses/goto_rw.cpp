@@ -621,6 +621,17 @@ void rw_range_sett::get_objects_rec(const typet &type)
   }
 }
 
+void rw_range_sett::get_array_objects(
+  const irep_idt &,
+  goto_programt::const_targett,
+  get_modet mode,
+  const exprt &pointer)
+{
+  object_descriptor_exprt ode;
+  ode.build(dereference_exprt{skip_typecast(pointer)}, ns);
+  get_objects_rec(mode, ode.root_object(), -1, -1);
+}
+
 void rw_range_set_value_sett::get_objects_dereference(
   get_modet mode,
   const dereference_exprt &deref,
@@ -737,6 +748,50 @@ static void goto_rw_assign(
   rw_set.get_objects_rec(function, target, rw_range_sett::get_modet::READ, rhs);
 }
 
+static void goto_rw_other(
+  const irep_idt &function,
+  goto_programt::const_targett target,
+  const codet &code,
+  rw_range_sett &rw_set)
+{
+  const irep_idt &statement = code.get_statement();
+
+  if(statement == ID_printf)
+  {
+    // if it's printf, mark the operands as read here
+    for(const auto &op : code.operands())
+    {
+      rw_set.get_objects_rec(
+        function, target, rw_range_sett::get_modet::READ, op);
+    }
+  }
+  else if(statement == ID_array_equal)
+  {
+    // mark the dereferenced operands as being read
+    for(const auto &op : code.operands())
+    {
+      rw_set.get_array_objects(
+        function, target, rw_range_sett::get_modet::READ, op);
+    }
+  }
+  else if(statement == ID_array_set)
+  {
+    PRECONDITION(code.operands().size() == 2);
+    rw_set.get_array_objects(
+      function, target, rw_range_sett::get_modet::LHS_W, code.op0());
+    rw_set.get_objects_rec(
+      function, target, rw_range_sett::get_modet::READ, code.op1());
+  }
+  else if(statement == ID_array_copy || statement == ID_array_replace)
+  {
+    PRECONDITION(code.operands().size() == 2);
+    rw_set.get_array_objects(
+      function, target, rw_range_sett::get_modet::LHS_W, code.op0());
+    rw_set.get_array_objects(
+      function, target, rw_range_sett::get_modet::READ, code.op1());
+  }
+}
+
 static void goto_rw(
   const irep_idt &function,
   goto_programt::const_targett target,
@@ -787,13 +842,7 @@ void goto_rw(
     break;
 
   case OTHER:
-    // if it's printf, mark the operands as read here
-    if(target->get_other().get_statement() == ID_printf)
-    {
-      for(const auto &op : target->get_other().operands())
-        rw_set.get_objects_rec(
-          function, target, rw_range_sett::get_modet::READ, op);
-    }
+    goto_rw_other(function, target, target->get_other(), rw_set);
     break;
 
   case SKIP:

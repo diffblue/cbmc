@@ -148,6 +148,12 @@ public:
     get_objects_rec(type);
   }
 
+  virtual void get_array_objects(
+    const irep_idt &,
+    goto_programt::const_targett,
+    get_modet,
+    const exprt &);
+
   void output(std::ostream &out) const;
 
 protected:
@@ -286,6 +292,18 @@ public:
     target = _target;
 
     rw_range_sett::get_objects_rec(type);
+  }
+
+  void get_array_objects(
+    const irep_idt &_function,
+    goto_programt::const_targett _target,
+    get_modet mode,
+    const exprt &pointer) override
+  {
+    function = _function;
+    target = _target;
+
+    rw_range_sett::get_array_objects(_function, _target, mode, pointer);
   }
 
 protected:
