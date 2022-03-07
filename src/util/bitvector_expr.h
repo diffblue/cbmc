@@ -705,10 +705,7 @@ class binary_overflow_exprt : public binary_predicate_exprt
 {
 public:
   binary_overflow_exprt(exprt _lhs, const irep_idt &kind, exprt _rhs)
-    : binary_predicate_exprt(
-        std::move(_lhs),
-        "overflow-" + id2string(kind),
-        std::move(_rhs))
+    : binary_predicate_exprt(std::move(_lhs), make_id(kind), std::move(_rhs))
   {
   }
 
@@ -735,13 +732,28 @@ public:
   {
     check(expr, vm);
   }
+
+  /// Returns true iff \p id is a valid identifier of a `binary_overflow_exprt`.
+  static bool valid_id(const irep_idt &id)
+  {
+    return id == ID_overflow_plus || id == ID_overflow_mult ||
+           id == ID_overflow_minus || id == ID_overflow_shl;
+  }
+
+private:
+  static irep_idt make_id(const irep_idt &kind)
+  {
+    if(valid_id(kind))
+      return kind;
+    else
+      return "overflow-" + id2string(kind);
+  }
 };
 
 template <>
 inline bool can_cast_expr<binary_overflow_exprt>(const exprt &base)
 {
-  return base.id() == ID_overflow_plus || base.id() == ID_overflow_mult ||
-         base.id() == ID_overflow_minus || base.id() == ID_overflow_shl;
+  return binary_overflow_exprt::valid_id(base.id());
 }
 
 inline void validate_expr(const binary_overflow_exprt &value)
@@ -776,6 +788,66 @@ inline binary_overflow_exprt &to_binary_overflow_expr(exprt &expr)
   binary_overflow_exprt &ret = static_cast<binary_overflow_exprt &>(expr);
   validate_expr(ret);
   return ret;
+}
+
+class plus_overflow_exprt : public binary_overflow_exprt
+{
+public:
+  plus_overflow_exprt(exprt _lhs, exprt _rhs)
+    : binary_overflow_exprt(std::move(_lhs), ID_overflow_plus, std::move(_rhs))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<plus_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_plus;
+}
+
+class minus_overflow_exprt : public binary_overflow_exprt
+{
+public:
+  minus_overflow_exprt(exprt _lhs, exprt _rhs)
+    : binary_overflow_exprt(std::move(_lhs), ID_overflow_minus, std::move(_rhs))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<minus_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_minus;
+}
+
+class mult_overflow_exprt : public binary_overflow_exprt
+{
+public:
+  mult_overflow_exprt(exprt _lhs, exprt _rhs)
+    : binary_overflow_exprt(std::move(_lhs), ID_overflow_mult, std::move(_rhs))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<mult_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_mult;
+}
+
+class shl_overflow_exprt : public binary_overflow_exprt
+{
+public:
+  shl_overflow_exprt(exprt _lhs, exprt _rhs)
+    : binary_overflow_exprt(std::move(_lhs), ID_overflow_shl, std::move(_rhs))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<shl_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_shl;
 }
 
 /// \brief A Boolean expression returning true, iff operation \c kind would
