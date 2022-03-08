@@ -71,7 +71,7 @@ CMakeLists.txt @diffblue/diffblue-opensource
 /jbmc/unit/
 /jbmc/regression/
 
-/scripts/ @diffblue/devops
+/scripts/ @diffblue/diffblue-opensource
 /scripts/expected_doxygen_warnings.txt
 
 # CI pipeline is the responsibility of the Open Source maintenance team at Diffblue.
