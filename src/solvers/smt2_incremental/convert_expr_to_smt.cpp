@@ -878,6 +878,29 @@ static smt_termt convert_expr_to_smt(const plus_overflow_exprt &plus_overflow)
 
 static smt_termt convert_expr_to_smt(const minus_overflow_exprt &minus_overflow)
 {
+  const smt_termt left = convert_expr_to_smt(minus_overflow.lhs());
+  const smt_termt right = convert_expr_to_smt(minus_overflow.rhs());
+  if(operands_are_of_type<unsignedbv_typet>(minus_overflow))
+  {
+    return smt_bit_vector_theoryt::unsigned_less_than(left, right);
+  }
+  if(operands_are_of_type<signedbv_typet>(minus_overflow))
+  {
+    // Overflow has occurred if the operands have the opposing signs and
+    // subtracting them gives a result having the same signedness as the
+    // right-hand operand. For example the following would be overflow for cases
+    // for 8 bit wide bit vectors -
+    //   -128 - 1 == 127
+    //   127 - (-1) == -128
+    const smt_termt msb_left = most_significant_bit_is_set(left);
+    const smt_termt msb_right = most_significant_bit_is_set(right);
+    return smt_core_theoryt::make_and(
+      smt_core_theoryt::distinct(msb_left, msb_right),
+      smt_core_theoryt::equal(
+        msb_right,
+        most_significant_bit_is_set(
+          smt_bit_vector_theoryt::subtract(left, right))));
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for minus overflow expression: " +
     minus_overflow.pretty());
