@@ -126,6 +126,9 @@ void unwindsett::parse_unwindset_one_loop(
               loop_nr_label) != instruction.labels.end())
           {
             location = instruction.source_location();
+            // the label may be attached to the DECL part of an initializing
+            // declaration, which we may have marked as hidden
+            location->remove(ID_hide);
           }
           if(
             location.has_value() && instruction.is_backwards_goto() &&

@@ -3,7 +3,6 @@ trace-char.c
 --trace --smt2 --z3
 ^EXIT=10$
 ^SIGNAL=0$
-arr=\{ arr
 arr=\{ '0', '1', '2', '3', '4', '5', '6', '7' \}
 --
 arr=(assignment removed)
