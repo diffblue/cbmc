@@ -833,8 +833,44 @@ static smt_termt convert_expr_to_smt(const isnormal_exprt &is_normal_expr)
     is_normal_expr.pretty());
 }
 
+/// \brief
+/// Constructs a term which is true if the most significant bit of \p input
+/// is set.
+static smt_termt most_significant_bit_is_set(const smt_termt &input)
+{
+  const auto bit_vector_sort = input.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    bit_vector_sort,
+    "Most significant bit can only be extracted from bit vector terms.");
+  const size_t most_significant_bit_index = bit_vector_sort->bit_width() - 1;
+  const auto extract_most_significant_bit = smt_bit_vector_theoryt::extract(
+    most_significant_bit_index, most_significant_bit_index);
+  return smt_core_theoryt::equal(
+    extract_most_significant_bit(input), smt_bit_vector_constant_termt{1, 1});
+}
+
 static smt_termt convert_expr_to_smt(const plus_overflow_exprt &plus_overflow)
 {
+  const smt_termt left = convert_expr_to_smt(plus_overflow.lhs());
+  const smt_termt right = convert_expr_to_smt(plus_overflow.rhs());
+  if(operands_are_of_type<unsignedbv_typet>(plus_overflow))
+  {
+    const auto add_carry_bit = smt_bit_vector_theoryt::zero_extend(1);
+    return most_significant_bit_is_set(
+      smt_bit_vector_theoryt::add(add_carry_bit(left), add_carry_bit(right)));
+  }
+  if(operands_are_of_type<signedbv_typet>(plus_overflow))
+  {
+    // Overflow has occurred if the operands have the same sign and adding them
+    // gives a result of the opposite sign.
+    const smt_termt msb_left = most_significant_bit_is_set(left);
+    const smt_termt msb_right = most_significant_bit_is_set(right);
+    return smt_core_theoryt::make_and(
+      smt_core_theoryt::equal(msb_left, msb_right),
+      smt_core_theoryt::distinct(
+        msb_left,
+        most_significant_bit_is_set(smt_bit_vector_theoryt::add(left, right))));
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for plus overflow expression: " +
     plus_overflow.pretty());
