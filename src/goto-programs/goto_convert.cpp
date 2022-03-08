@@ -626,7 +626,6 @@ void goto_convertt::convert_frontend_decl(
   }
   else
   {
-    // this is expected to go away
     exprt initializer = code.op1();
 
     codet tmp=code;
