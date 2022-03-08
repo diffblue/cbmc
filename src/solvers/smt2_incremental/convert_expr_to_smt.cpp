@@ -833,6 +833,34 @@ static smt_termt convert_expr_to_smt(const isnormal_exprt &is_normal_expr)
     is_normal_expr.pretty());
 }
 
+static smt_termt convert_expr_to_smt(const plus_overflow_exprt &plus_overflow)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for plus overflow expression: " +
+    plus_overflow.pretty());
+}
+
+static smt_termt convert_expr_to_smt(const minus_overflow_exprt &minus_overflow)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for minus overflow expression: " +
+    minus_overflow.pretty());
+}
+
+static smt_termt convert_expr_to_smt(const mult_overflow_exprt &mult_overflow)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for multiply overflow expression: " +
+    mult_overflow.pretty());
+}
+
+static smt_termt convert_expr_to_smt(const shl_overflow_exprt &shl_overflow)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for shift left overflow expression: " +
+    shl_overflow.pretty());
+}
+
 static smt_termt convert_expr_to_smt(const array_exprt &array_construction)
 {
   UNIMPLEMENTED_FEATURE(
@@ -1143,6 +1171,26 @@ smt_termt convert_expr_to_smt(const exprt &expr)
   if(const auto is_normal_expr = expr_try_dynamic_cast<isnormal_exprt>(expr))
   {
     return convert_expr_to_smt(*is_normal_expr);
+  }
+  if(
+    const auto plus_overflow = expr_try_dynamic_cast<plus_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*plus_overflow);
+  }
+  if(
+    const auto minus_overflow =
+      expr_try_dynamic_cast<minus_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*minus_overflow);
+  }
+  if(
+    const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*mult_overflow);
+  }
+  if(const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*shl_overflow);
   }
   if(const auto array_construction = expr_try_dynamic_cast<array_exprt>(expr))
   {
