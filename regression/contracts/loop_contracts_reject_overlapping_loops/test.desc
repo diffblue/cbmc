@@ -1,0 +1,11 @@
+CORE
+main.c
+--apply-loop-contracts
+activate-multi-line-match
+Inner loop at: file main.c line 12 function main does not have contracts, but an enclosing loop does.\nPlease provide contracts for this loop, or unwind it first.
+^EXIT=(6|10)$
+^SIGNAL=0$
+--
+--
+This test checks that our instrumentation routines verify that inner loops
+either have contracts or are unwound, if any enclosing loop has contracts.

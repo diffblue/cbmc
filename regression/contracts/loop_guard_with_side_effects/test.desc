@@ -1,0 +1,26 @@
+CORE
+main.c
+--apply-loop-contracts _ --unsigned-overflow-check
+\[check.assigns\.\d+\] line \d+ Check that \*j is assignable: SUCCESS$
+\[check.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in \*j \+ 1u: SUCCESS
+\[check.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in \*j \+ 1u: SUCCESS
+\[check.assigns\.\d+\] line \d+ Check that return_value_check is assignable: SUCCESS$
+\[main\.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
+\[main\.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that j is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that k is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that i is valid: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that j is valid: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
+\[main.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in i \+ 1u: SUCCESS
+\[main.assertion\.\d+\] line \d+ assertion i == k: SUCCESS$
+\[main.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in k \+ \(unsigned int\)1: SUCCESS
+\[main.assertion\.\d+\] line \d+ assertion j == k \+ 1: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test demonstrates a case where the loop guard has side effects.
+The loop contracts must specify the state of all modified variables,
+including those in the loop guard.

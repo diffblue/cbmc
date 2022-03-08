@@ -451,6 +451,20 @@ public:
     skip_function_paramst skip_function_params,
     optionalt<cfg_infot> &cfg_info_opt);
 
+  /// Inserts the detected static local symbols into a target container.
+  /// \tparam C The type of the target container
+  /// \param inserter An insert_iterator on the target container
+  template <typename C>
+  void get_static_locals(std::insert_iterator<C> inserter) const
+  {
+    std::transform(
+      from_static_local.cbegin(),
+      from_static_local.cend(),
+      inserter,
+      // can use `const auto &` below once we switch to C++14
+      [](const symbol_exprt_to_car_mapt::value_type &s) { return s.first; });
+  }
+
 protected:
   /// Name of the instrumented function
   const irep_idt &function_id;

@@ -1,0 +1,20 @@
+CORE
+main.c
+--apply-loop-contracts _ --unsigned-overflow-check
+\[check.assigns\.\d+\] line \d+ Check that \*j is assignable: FAILURE$
+\[check.assigns\.\d+\] line \d+ Check that return_value_check is assignable: SUCCESS$
+\[main\.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
+\[main\.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that j is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that k is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that i is valid: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
+\[main.assertion\.\d+\] line \d+ assertion i == k: SUCCESS$
+^EXIT=(6|10)$
+^SIGNAL=0$
+--
+--
+This test demonstrates a case where the loop guard has side effects.
+The writes performed in the guard must also be specified
+in the assigns clause of the loop.
