@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 #define CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 
-#include <ansi-c/ansi_c_language.h>
-
 #include <util/config.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
@@ -27,13 +25,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/goto_check.h>
-#include <analyses/goto_check_c.h>
-
+#include <ansi-c/ansi_c_language.h>
+#include <ansi-c/goto_check_c.h>
 #include <pointer-analysis/goto_program_dereference.h>
 
 #include "aggressive_slicer.h"
-#include "contracts/contracts.h"
 #include "count_eloc.h"
 #include "document_properties.h"
 #include "dump_c.h"
@@ -43,6 +39,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "replace_calls.h"
 #include "uninitialized.h"
 #include "unwindset.h"
+
+#include "contracts/contracts.h"
 #include "wmm/weak_memory.h"
 
 // clang-format off

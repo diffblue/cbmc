@@ -17,6 +17,7 @@ Author: Peter Schrammel
 #include <util/version.h>
 
 #include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/goto_check.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/loop_ids.h>
@@ -28,7 +29,6 @@ Author: Peter Schrammel
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/goto_check.h>
 #include <goto-diff/change_impact.h>
 #include <goto-diff/unified_diff.h>
 #include <goto-instrument/cover.h>

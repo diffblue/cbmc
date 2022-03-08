@@ -94,14 +94,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/validation_interface.h>
 
-#include <langapi/language.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <analyses/goto_check_c.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
+#include <ansi-c/goto_check_c.h>
+#include <langapi/language.h>
 
 class optionst;
 

@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_check_c.h"
 
-#include <algorithm>
-#include <optional>
-
 #include <util/arith_tools.h>
 #include <util/array_name.h>
 #include <util/bitvector_expr.h>
@@ -37,13 +34,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
-#include <langapi/language.h>
-#include <langapi/mode.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include "local_bitvector_analysis.h"
+#include <analyses/local_bitvector_analysis.h>
+#include <langapi/language.h>
+#include <langapi/mode.h>
+
+#include <algorithm>
+#include <optional>
 
 class goto_check_ct
 {
@@ -986,11 +985,12 @@ void goto_check_ct::integer_overflow_check(
       // a shift of zero isn't overflow;
       // else check the top bits
       add_guarded_property(
-        disjunction({neg_value_shift,
-                     neg_dist_shift,
-                     dist_too_large,
-                     op_zero,
-                     top_bits_zero}),
+        disjunction(
+          {neg_value_shift,
+           neg_dist_shift,
+           dist_too_large,
+           op_zero,
+           top_bits_zero}),
         "arithmetic overflow on signed shl",
         "overflow",
         expr.find_source_location(),
@@ -1554,9 +1554,10 @@ void goto_check_ct::bounds_check_index(
           exprt p_offset =
             pointer_offset(to_dereference_expr(ode.root_object()).pointer());
 
-          effective_offset = plus_exprt{p_offset,
-                                        typecast_exprt::conditional_cast(
-                                          effective_offset, p_offset.type())};
+          effective_offset = plus_exprt{
+            p_offset,
+            typecast_exprt::conditional_cast(
+              effective_offset, p_offset.type())};
         }
 
         exprt zero = from_integer(0, ode.offset().type());
@@ -1825,9 +1826,10 @@ bool goto_check_ct::check_rec_member(
       deref.pointer(), pointer_type(char_type()));
 
     const exprt new_address_casted = typecast_exprt::conditional_cast(
-      plus_exprt{char_pointer,
-                 typecast_exprt::conditional_cast(
-                   member_offset_opt.value(), pointer_diff_type())},
+      plus_exprt{
+        char_pointer,
+        typecast_exprt::conditional_cast(
+          member_offset_opt.value(), pointer_diff_type())},
       new_pointer_type);
 
     dereference_exprt new_deref{new_address_casted};
@@ -2368,8 +2370,9 @@ goto_check_ct::get_pointer_is_null_condition(
   if(flags.is_unknown() || flags.is_uninitialized() || flags.is_null())
   {
     return {conditiont{
-      or_exprt{is_in_bounds_of_some_explicit_allocation(address, size),
-               not_exprt(null_pointer(address))},
+      or_exprt{
+        is_in_bounds_of_some_explicit_allocation(address, size),
+        not_exprt(null_pointer(address))},
       "pointer NULL"}};
   }
 

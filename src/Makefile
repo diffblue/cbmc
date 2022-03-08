@@ -59,6 +59,8 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 .PHONY: languages
 .PHONY: clean
 
+ansi-c.dir: analyses.dir
+
 cpp.dir: ansi-c.dir linking.dir
 
 crangler.dir: util.dir json.dir

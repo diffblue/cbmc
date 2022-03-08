@@ -8,7 +8,6 @@ add_library(jbmc-lib ${sources})
 generic_includes(jbmc-lib)
 
 target_link_libraries(jbmc-lib
-    analyses
     ansi-c
     big-int
     cbmc-lib

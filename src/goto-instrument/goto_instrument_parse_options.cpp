@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/ensure_one_backedge_per_target.h>
+#include <goto-programs/goto_check.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/interpreter.h>
 #include <goto-programs/label_function_pointer_call_sites.h>
@@ -50,10 +51,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/write_goto_binary.h>
 
-#include <pointer-analysis/add_failed_symbols.h>
-#include <pointer-analysis/show_value_sets.h>
-#include <pointer-analysis/value_set_analysis.h>
-
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/custom_bitvector_analysis.h>
@@ -69,16 +66,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/natural_loops.h>
 #include <analyses/reaching_definitions.h>
 #include <analyses/sese_regions.h>
-
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
-
 #include <assembler/remove_asm.h>
-
 #include <cpp/cprover_library.h>
+#include <pointer-analysis/add_failed_symbols.h>
+#include <pointer-analysis/show_value_sets.h>
+#include <pointer-analysis/value_set_analysis.h>
 
-#include "accelerate/accelerate.h"
 #include "alignment_checks.h"
 #include "branch.h"
 #include "call_sequences.h"
@@ -108,6 +104,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "unwind.h"
 #include "value_set_fi_fp_removal.h"
+
+#include "accelerate/accelerate.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()

@@ -12,15 +12,14 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 
-#include <analyses/goto_check_c.h>
-
-#include <util/ui_message.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
+#include <util/ui_message.h>
 
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
+#include <ansi-c/goto_check_c.h>
 #include <goto-instrument/cover.h>
 
 class goto_modelt;

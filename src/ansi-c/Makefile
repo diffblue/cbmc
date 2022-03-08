@@ -31,6 +31,7 @@ SRC = anonymous_member.cpp \
       expr2c.cpp \
       gcc_types.cpp \
       gcc_version.cpp \
+      goto_check_c.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_integer_literal.cpp \
