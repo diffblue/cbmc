@@ -245,6 +245,7 @@ public:
     static smt_sortt return_sort(const smt_termt &operand);
     static void validate(const smt_termt &operand);
   };
+  /// \brief Arithmetic negation in two's complement.
   static const smt_function_application_termt::factoryt<negatet> negate;
 
   // Shift operations
