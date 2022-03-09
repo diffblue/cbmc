@@ -3,7 +3,6 @@ trace-values.c
 --trace
 ^EXIT=10$
 ^SIGNAL=0$
-^  local_var=0 .*$
 ^  global_var=1 .*$
 ^  static_var=2 .*$
 ^  local_var=3 .*$
@@ -16,6 +15,7 @@ trace-values.c
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
+^  local_var=[^3]+ .*$
 --
 Note the assignment to "null" is not included because an assignment direct to
 a certainly-null pointer goes to symex::invalid_object, not null$object, and is

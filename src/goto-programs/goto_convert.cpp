@@ -626,12 +626,12 @@ void goto_convertt::convert_frontend_decl(
   }
   else
   {
-    // this is expected to go away
-    exprt initializer;
+    exprt initializer = code.op1();
 
     codet tmp=code;
-    initializer=code.op1();
     tmp.operands().resize(1);
+    // hide this declaration-without-initializer step in the goto trace
+    tmp.add_source_location().set_hide();
 
     // Break up into decl and assignment.
     // Decl must be visible before initializer.
@@ -642,7 +642,7 @@ void goto_convertt::convert_frontend_decl(
     if(initializer.is_not_nil())
     {
       code_assignt assign(code.op0(), initializer);
-      assign.add_source_location() = tmp.source_location();
+      assign.add_source_location() = initializer.find_source_location();
 
       convert_assign(assign, dest, mode);
     }
