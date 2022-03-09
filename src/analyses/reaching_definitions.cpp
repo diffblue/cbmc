@@ -126,6 +126,9 @@ void rd_range_domaint::transform(
   // initial (non-deterministic) value
   else if(from->is_decl())
     transform_assign(ns, from, function_from, from, *rd);
+  // array_set, array_copy, array_replace have side effects
+  else if(from->is_other())
+    transform_assign(ns, from, function_from, from, *rd);
 }
 
 /// Computes an instance obtained from a `*this` by transformation over `DEAD v`
