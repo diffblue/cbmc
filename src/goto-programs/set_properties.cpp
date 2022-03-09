@@ -129,21 +129,3 @@ void label_properties(goto_functionst &goto_functions)
       it++)
     label_properties(it->second.body, property_counters);
 }
-
-void make_assertions_false(goto_modelt &goto_model)
-{
-  make_assertions_false(goto_model.goto_functions);
-}
-
-void make_assertions_false(
-  goto_functionst &goto_functions)
-{
-  for(auto &f : goto_functions.function_map)
-  {
-    for(auto &i : f.second.body.instructions)
-    {
-      if(i.is_assert())
-        i.set_condition(false_exprt());
-    }
-  }
-}
