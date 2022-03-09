@@ -908,6 +908,40 @@ static smt_termt convert_expr_to_smt(const minus_overflow_exprt &minus_overflow)
 
 static smt_termt convert_expr_to_smt(const mult_overflow_exprt &mult_overflow)
 {
+  PRECONDITION(mult_overflow.lhs().type() == mult_overflow.rhs().type());
+  const auto &operand_type = mult_overflow.lhs().type();
+  const smt_termt left = convert_expr_to_smt(mult_overflow.lhs());
+  const smt_termt right = convert_expr_to_smt(mult_overflow.rhs());
+  if(
+    const auto unsigned_type =
+      type_try_dynamic_cast<unsignedbv_typet>(operand_type))
+  {
+    const std::size_t width = unsigned_type->get_width();
+    const auto extend = smt_bit_vector_theoryt::zero_extend(width);
+    return smt_bit_vector_theoryt::unsigned_greater_than_or_equal(
+      smt_bit_vector_theoryt::multiply(extend(left), extend(right)),
+      smt_bit_vector_constant_termt{power(2, width), width * 2});
+  }
+  if(
+    const auto signed_type =
+      type_try_dynamic_cast<signedbv_typet>(operand_type))
+  {
+    const smt_termt msb_left = most_significant_bit_is_set(left);
+    const smt_termt msb_right = most_significant_bit_is_set(right);
+    const std::size_t width = signed_type->get_width();
+    const auto extend = smt_bit_vector_theoryt::sign_extend(width);
+    const auto multiplication =
+      smt_bit_vector_theoryt::multiply(extend(left), extend(right));
+    const auto too_large = smt_bit_vector_theoryt::signed_greater_than_or_equal(
+      multiplication,
+      smt_bit_vector_constant_termt{power(2, width - 1), width * 2});
+    const auto too_small = smt_bit_vector_theoryt::signed_less_than(
+      multiplication,
+      smt_bit_vector_theoryt::negate(
+        smt_bit_vector_constant_termt{power(2, width - 1), width * 2}));
+    return smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(msb_left, msb_right), too_large, too_small);
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for multiply overflow expression: " +
     mult_overflow.pretty());
