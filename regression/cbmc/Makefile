@@ -29,6 +29,11 @@ test-paths-lifo:
 					  -X thorough-paths -X smt-backend -X paths-lifo-expected-failure \
 					  -s paths-lifo $(GCC_ONLY)
 
+test-new-smt-backend:
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'z3 --smt2 -in' --slice-formula" \
+					  -I new-smt-backend \
+					  -s new-smt-backend $(GCC_ONLY)
+
 tests.log: ../test.pl test
 
 clean:
