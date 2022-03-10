@@ -121,6 +121,16 @@ static smt_termt convert_c_bool_cast(
     smt_bit_vector_constant_termt{0, c_bool_width});
 }
 
+static std::function<std::function<smt_termt(smt_termt)>(std::size_t)>
+extension_for_type(const typet &type)
+{
+  if(can_cast_type<signedbv_typet>(type))
+    return smt_bit_vector_theoryt::sign_extend;
+  if(can_cast_type<unsignedbv_typet>(type))
+    return smt_bit_vector_theoryt::zero_extend;
+  UNREACHABLE;
+}
+
 static smt_termt make_bitvector_resize_cast(
   const smt_termt &from_term,
   const bitvector_typet &from_type,
@@ -147,10 +157,7 @@ static smt_termt make_bitvector_resize_cast(
   if(to_width < from_width)
     return smt_bit_vector_theoryt::extract(to_width - 1, 0)(from_term);
   const std::size_t extension_size = to_width - from_width;
-  if(can_cast_type<signedbv_typet>(from_type))
-    return smt_bit_vector_theoryt::sign_extend(extension_size)(from_term);
-  else
-    return smt_bit_vector_theoryt::zero_extend(extension_size)(from_term);
+  return extension_for_type(from_type)(extension_size)(from_term);
 }
 
 struct sort_based_cast_to_bit_vector_convertert final
@@ -658,7 +665,33 @@ convert_to_smt_shift(const factoryt &factory, const shiftt &shift)
 {
   const smt_termt first_operand = convert_expr_to_smt(shift.op0());
   const smt_termt second_operand = convert_expr_to_smt(shift.op1());
-  return factory(first_operand, second_operand);
+  const auto first_bit_vector_sort =
+    first_operand.get_sort().cast<smt_bit_vector_sortt>();
+  const auto second_bit_vector_sort =
+    second_operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    first_bit_vector_sort && second_bit_vector_sort,
+    "Shift expressions are expected to have bit vector operands.");
+  const std::size_t first_width = first_bit_vector_sort->bit_width();
+  const std::size_t second_width = second_bit_vector_sort->bit_width();
+  if(first_width > second_width)
+  {
+    return factory(
+      first_operand,
+      extension_for_type(shift.op1().type())(first_width - second_width)(
+        second_operand));
+  }
+  else if(first_width < second_width)
+  {
+    return factory(
+      extension_for_type(shift.op0().type())(second_width - first_width)(
+        first_operand),
+      second_operand);
+  }
+  else
+  {
+    return factory(first_operand, second_operand);
+  }
 }
 
 static smt_termt convert_expr_to_smt(const shift_exprt &shift)
