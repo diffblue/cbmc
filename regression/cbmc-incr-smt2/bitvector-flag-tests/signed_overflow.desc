@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 signed_overflow.c
 --incremental-smt2-solver 'z3 --smt2 -in' --signed-overflow-check --trace
 ^VERIFICATION FAILED$

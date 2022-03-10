@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --property inc.overflow.1 --property inc.overflow.2 --slice-formula --signed-overflow-check --conversion-check
 ^EXIT=10$
