@@ -539,6 +539,51 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     return SUB::convert_byte_update(to_byte_update_expr(expr));
   }
+  else if(expr.id() == ID_field_address)
+  {
+    const auto &field_address_expr = to_field_address_expr(expr);
+    const typet &compound_type = ns.follow(field_address_expr.compound_type());
+
+    // recursive call
+    auto bv = convert_bitvector(field_address_expr.base());
+
+    if(compound_type.id() == ID_struct)
+    {
+      auto offset = member_offset(
+        to_struct_type(compound_type), field_address_expr.component_name(), ns);
+      CHECK_RETURN(offset.has_value());
+
+      // add offset
+      bv = offset_arithmetic(field_address_expr.type(), bv, *offset);
+    }
+    else if(compound_type.id() == ID_union)
+    {
+      // nothing to do, all fields have offset 0
+    }
+    else
+    {
+      INVARIANT(false, "field address expressions operate on struct or union");
+    }
+
+    return bv;
+  }
+  else if(expr.id() == ID_element_address)
+  {
+    const auto &element_address_expr = to_element_address_expr(expr);
+
+    // recursive call
+    auto bv = convert_bitvector(element_address_expr.base());
+
+    // get element size
+    auto size = pointer_offset_size(element_address_expr.element_type(), ns);
+    CHECK_RETURN(size.has_value() && *size >= 0);
+
+    // add offset
+    bv = offset_arithmetic(
+      element_address_expr.type(), bv, *size, element_address_expr.index());
+
+    return bv;
+  }
 
   return conversion_failed(expr);
 }
@@ -701,51 +746,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   {
     const auto &object_address_expr = to_object_address_expr(expr);
     return add_addr(object_address_expr.object_expr());
-  }
-  else if(expr.id() == ID_field_address)
-  {
-    const auto &field_address_expr = to_field_address_expr(expr);
-    const typet &compound_type = ns.follow(field_address_expr.compound_type());
-
-    // recursive call
-    auto bv = convert_bitvector(field_address_expr.base());
-
-    if(compound_type.id() == ID_struct)
-    {
-      auto offset = member_offset(
-        to_struct_type(compound_type), field_address_expr.component_name(), ns);
-      CHECK_RETURN(offset.has_value());
-
-      // add offset
-      bv = offset_arithmetic(field_address_expr.type(), bv, *offset);
-    }
-    else if(compound_type.id() == ID_union)
-    {
-      // nothing to do, all fields have offset 0
-    }
-    else
-    {
-      INVARIANT(false, "field address expressions operate on struct or union");
-    }
-
-    return bv;
-  }
-  else if(expr.id() == ID_element_address)
-  {
-    const auto &element_address_expr = to_element_address_expr(expr);
-
-    // recursive call
-    auto bv = convert_bitvector(element_address_expr.base());
-
-    // get element size
-    auto size = pointer_offset_size(element_address_expr.element_type(), ns);
-    CHECK_RETURN(size.has_value() && *size >= 0);
-
-    // add offset
-    bv = offset_arithmetic(
-      element_address_expr.type(), bv, *size, element_address_expr.index());
-
-    return bv;
   }
 
   return SUB::convert_bitvector(expr);

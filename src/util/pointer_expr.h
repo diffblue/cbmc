@@ -450,7 +450,7 @@ inline bool can_cast_expr<object_address_exprt>(const exprt &base)
 
 inline void validate_expr(const object_address_exprt &value)
 {
-  validate_operands(value, 1, "object_address must have one operand");
+  validate_operands(value, 0, "object_address must have zero operands");
 }
 
 /// \brief Cast an exprt to an \ref object_address_exprt
@@ -569,7 +569,7 @@ public:
   /// constructor for element addresses.
   /// The base address must be a pointer to an element.
   /// The index is expected to have an integer type.
-  element_address_exprt(exprt base, exprt index);
+  element_address_exprt(const exprt &base, exprt index);
 
   const pointer_typet &type() const
   {

@@ -138,22 +138,22 @@ field_address_exprt::field_address_exprt(
   pointer_typet _type)
   : unary_exprt(ID_field_address, std::move(compound_ptr), std::move(_type))
 {
-  const auto &compound_ptr_type = compound_ptr.type();
-  PRECONDITION(compound_ptr_type.id() == ID_pointer);
-  const auto &compound_type = to_pointer_type(compound_ptr_type).base_type();
+  const auto &base_type = field_address_exprt::base().type();
+  PRECONDITION(base_type.id() == ID_pointer);
+  const auto &compound_type = to_pointer_type(base_type).base_type();
   PRECONDITION(
     compound_type.id() == ID_struct || compound_type.id() == ID_struct_tag ||
     compound_type.id() == ID_union || compound_type.id() == ID_union_tag);
   set(ID_component_name, component_name);
 }
 
-element_address_exprt::element_address_exprt(exprt base, exprt index)
+element_address_exprt::element_address_exprt(const exprt &base, exprt index)
   : binary_exprt(
-      std::move(base),
+      base,
       ID_element_address,
       std::move(index),
       pointer_typet(
-        to_array_type(base.type()).element_type(),
+        to_pointer_type(base.type()).base_type(),
         to_pointer_type(base.type()).get_width()))
 {
 }
