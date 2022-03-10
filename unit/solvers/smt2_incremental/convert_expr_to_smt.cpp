@@ -819,6 +819,27 @@ SCENARIO(
   }
 }
 
+TEST_CASE(
+  "expr to smt conversion for extract bits expressions",
+  "[core][smt2_incremental]")
+{
+  const typet operand_type = unsignedbv_typet{8};
+  const exprt input = extractbits_exprt{
+    symbol_exprt{"foo", operand_type},
+    from_integer(4, operand_type),
+    from_integer(2, operand_type),
+    unsignedbv_typet{3}};
+  const smt_termt expected_result = smt_bit_vector_theoryt::extract(4, 2)(
+    smt_identifier_termt{"foo", smt_bit_vector_sortt{8}});
+  CHECK(convert_expr_to_smt(input) == expected_result);
+  const cbmc_invariants_should_throwt invariants_throw;
+  CHECK_THROWS(convert_expr_to_smt(extractbits_exprt{
+    symbol_exprt{"foo", operand_type},
+    symbol_exprt{"bar", operand_type},
+    symbol_exprt{"bar", operand_type},
+    unsignedbv_typet{3}}));
+}
+
 TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
 {
   const symbol_exprt bool_expr{"foo", bool_typet{}};

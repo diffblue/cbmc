@@ -733,6 +733,11 @@ static smt_termt convert_expr_to_smt(const extractbit_exprt &extract_bit)
 
 static smt_termt convert_expr_to_smt(const extractbits_exprt &extract_bits)
 {
+  const smt_termt from = convert_expr_to_smt(extract_bits.src());
+  const auto upper_value = numeric_cast<std::size_t>(extract_bits.upper());
+  const auto lower_value = numeric_cast<std::size_t>(extract_bits.lower());
+  if(upper_value && lower_value)
+    return smt_bit_vector_theoryt::extract(*upper_value, *lower_value)(from);
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for extract bits expression: " +
     extract_bits.pretty());
