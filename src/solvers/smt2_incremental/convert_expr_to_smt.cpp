@@ -652,34 +652,35 @@ static smt_termt convert_expr_to_smt(const index_exprt &index)
     "Generation of SMT formula for index expression: " + index.pretty());
 }
 
+template <typename factoryt, typename shiftt>
+static smt_termt
+convert_to_smt_shift(const factoryt &factory, const shiftt &shift)
+{
+  const smt_termt first_operand = convert_expr_to_smt(shift.op0());
+  const smt_termt second_operand = convert_expr_to_smt(shift.op1());
+  return factory(first_operand, second_operand);
+}
+
 static smt_termt convert_expr_to_smt(const shift_exprt &shift)
 {
-  // TODO: Dispatch into different types of shifting
-  const auto &first_operand = shift.op0();
-  const auto &second_operand = shift.op1();
-
+  // TODO: Dispatch for rotation expressions. A `shift_exprt` can be a rotation.
   if(const auto left_shift = expr_try_dynamic_cast<shl_exprt>(shift))
   {
-    return smt_bit_vector_theoryt::shift_left(
-      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+    return convert_to_smt_shift(
+      smt_bit_vector_theoryt::shift_left, *left_shift);
   }
-  else if(
-    const auto right_logical_shift = expr_try_dynamic_cast<lshr_exprt>(shift))
+  if(const auto right_logical_shift = expr_try_dynamic_cast<lshr_exprt>(shift))
   {
-    return smt_bit_vector_theoryt::logical_shift_right(
-      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+    return convert_to_smt_shift(
+      smt_bit_vector_theoryt::logical_shift_right, *right_logical_shift);
   }
-  else if(
-    const auto right_arith_shift = expr_try_dynamic_cast<ashr_exprt>(shift))
+  if(const auto right_arith_shift = expr_try_dynamic_cast<ashr_exprt>(shift))
   {
-    return smt_bit_vector_theoryt::arithmetic_shift_right(
-      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+    return convert_to_smt_shift(
+      smt_bit_vector_theoryt::arithmetic_shift_right, *right_arith_shift);
   }
-  else
-  {
-    UNIMPLEMENTED_FEATURE(
-      "Generation of SMT formula for shift expression: " + shift.pretty());
-  }
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for shift expression: " + shift.pretty());
 }
 
 static smt_termt convert_expr_to_smt(const with_exprt &with)
