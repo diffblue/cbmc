@@ -1,0 +1,17 @@
+CORE
+leftshift_overflow.c
+--signed-overflow-check --c99 --full-slice
+^EXIT=10$
+^SIGNAL=0$
+^\[.*\] line 8 arithmetic overflow on signed shl in .*: FAILURE$
+^\[.*\] line 11 arithmetic overflow on signed shl in .*: SUCCESS$
+^\[.*\] line 17 arithmetic overflow on signed shl in .*: SUCCESS$
+^\[.*\] line 20 arithmetic overflow on signed shl in .*: FAILURE$
+^\[.*\] line 26 arithmetic overflow on signed shl in .*: FAILURE$
+^\[.*\] line 30 arithmetic overflow on signed shl in .*: FAILURE$
+^\*\* 4 of 7 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\[.*\] line 14 arithmetic overflow on signed shl in .*: .*
+^\[.*\] line 23 arithmetic overflow on signed shl in .*: .*
