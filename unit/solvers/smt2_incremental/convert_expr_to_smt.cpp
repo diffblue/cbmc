@@ -819,6 +819,105 @@ SCENARIO(
   }
 }
 
+TEST_CASE(
+  "expr to smt conversion for shifts of mismatched operands.",
+  "[core][smt2_incremental]")
+{
+  using make_typet = std::function<typet(std::size_t)>;
+  const make_typet make_unsigned = constructor_oft<unsignedbv_typet>{};
+  const make_typet make_signed = constructor_oft<signedbv_typet>{};
+  using make_extensiont =
+    std::function<std::function<smt_termt(smt_termt)>(std::size_t)>;
+  const make_extensiont zero_extend = smt_bit_vector_theoryt::zero_extend;
+  const make_extensiont sign_extend = smt_bit_vector_theoryt::sign_extend;
+  std::string type_description;
+  make_typet make_type;
+  make_extensiont make_extension;
+  using type_rowt = std::tuple<std::string, make_typet, make_extensiont>;
+  std::tie(type_description, make_type, make_extension) = GENERATE_REF(
+    type_rowt{"Unsigned operands.", make_unsigned, zero_extend},
+    type_rowt{"Signed operands.", make_signed, sign_extend});
+  SECTION(type_description)
+  {
+    using make_shift_exprt = std::function<exprt(exprt, exprt)>;
+    const make_shift_exprt left_shift_expr = constructor_of<shl_exprt>();
+    const make_shift_exprt arithmetic_right_shift_expr =
+      constructor_of<ashr_exprt>();
+    const make_shift_exprt logical_right_shift_expr =
+      constructor_of<lshr_exprt>();
+    using make_shift_termt = std::function<smt_termt(smt_termt, smt_termt)>;
+    const make_shift_termt left_shift_term = smt_bit_vector_theoryt::shift_left;
+    const make_shift_termt arithmetic_right_shift_term =
+      smt_bit_vector_theoryt::arithmetic_shift_right;
+    const make_shift_termt logical_right_shift_term =
+      smt_bit_vector_theoryt::logical_shift_right;
+    std::string shift_description;
+    make_shift_exprt make_shift_expr;
+    make_shift_termt make_shift_term;
+    using shift_rowt =
+      std::tuple<std::string, make_shift_exprt, make_shift_termt>;
+    std::tie(shift_description, make_shift_expr, make_shift_term) =
+      GENERATE_REF(
+        shift_rowt{"Left shift.", left_shift_expr, left_shift_term},
+        shift_rowt{
+          "Arithmetic right shift.",
+          arithmetic_right_shift_expr,
+          arithmetic_right_shift_term},
+        shift_rowt{
+          "Logical right shift.",
+          logical_right_shift_expr,
+          logical_right_shift_term});
+    SECTION(shift_description)
+    {
+      SECTION("Wider left hand side")
+      {
+        const exprt input = make_shift_expr(
+          symbol_exprt{"foo", make_type(32)},
+          symbol_exprt{"bar", make_type(8)});
+        INFO("Input expr: " + input.pretty(2, 0));
+        const smt_termt expected_result = make_shift_term(
+          smt_identifier_termt{"foo", smt_bit_vector_sortt{32}},
+          make_extension(24)(
+            smt_identifier_termt{"bar", smt_bit_vector_sortt{8}}));
+        CHECK(convert_expr_to_smt(input) == expected_result);
+      }
+      SECTION("Wider right hand side")
+      {
+        const exprt input = make_shift_expr(
+          symbol_exprt{"foo", make_type(8)},
+          symbol_exprt{"bar", make_type(32)});
+        INFO("Input expr: " + input.pretty(2, 0));
+        const smt_termt expected_result = make_shift_term(
+          make_extension(24)(
+            smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
+          smt_identifier_termt{"bar", smt_bit_vector_sortt{32}});
+        CHECK(convert_expr_to_smt(input) == expected_result);
+      }
+    }
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for extract bits expressions",
+  "[core][smt2_incremental]")
+{
+  const typet operand_type = unsignedbv_typet{8};
+  const exprt input = extractbits_exprt{
+    symbol_exprt{"foo", operand_type},
+    from_integer(4, operand_type),
+    from_integer(2, operand_type),
+    unsignedbv_typet{3}};
+  const smt_termt expected_result = smt_bit_vector_theoryt::extract(4, 2)(
+    smt_identifier_termt{"foo", smt_bit_vector_sortt{8}});
+  CHECK(convert_expr_to_smt(input) == expected_result);
+  const cbmc_invariants_should_throwt invariants_throw;
+  CHECK_THROWS(convert_expr_to_smt(extractbits_exprt{
+    symbol_exprt{"foo", operand_type},
+    symbol_exprt{"bar", operand_type},
+    symbol_exprt{"bar", operand_type},
+    unsignedbv_typet{3}}));
+}
+
 TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
 {
   const symbol_exprt bool_expr{"foo", bool_typet{}};

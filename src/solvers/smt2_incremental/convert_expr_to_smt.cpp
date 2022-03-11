@@ -121,6 +121,16 @@ static smt_termt convert_c_bool_cast(
     smt_bit_vector_constant_termt{0, c_bool_width});
 }
 
+static std::function<std::function<smt_termt(smt_termt)>(std::size_t)>
+extension_for_type(const typet &type)
+{
+  if(can_cast_type<signedbv_typet>(type))
+    return smt_bit_vector_theoryt::sign_extend;
+  if(can_cast_type<unsignedbv_typet>(type))
+    return smt_bit_vector_theoryt::zero_extend;
+  UNREACHABLE;
+}
+
 static smt_termt make_bitvector_resize_cast(
   const smt_termt &from_term,
   const bitvector_typet &from_type,
@@ -147,10 +157,7 @@ static smt_termt make_bitvector_resize_cast(
   if(to_width < from_width)
     return smt_bit_vector_theoryt::extract(to_width - 1, 0)(from_term);
   const std::size_t extension_size = to_width - from_width;
-  if(can_cast_type<signedbv_typet>(from_type))
-    return smt_bit_vector_theoryt::sign_extend(extension_size)(from_term);
-  else
-    return smt_bit_vector_theoryt::zero_extend(extension_size)(from_term);
+  return extension_for_type(from_type)(extension_size)(from_term);
 }
 
 struct sort_based_cast_to_bit_vector_convertert final
@@ -652,34 +659,61 @@ static smt_termt convert_expr_to_smt(const index_exprt &index)
     "Generation of SMT formula for index expression: " + index.pretty());
 }
 
-static smt_termt convert_expr_to_smt(const shift_exprt &shift)
+template <typename factoryt, typename shiftt>
+static smt_termt
+convert_to_smt_shift(const factoryt &factory, const shiftt &shift)
 {
-  // TODO: Dispatch into different types of shifting
-  const auto &first_operand = shift.op0();
-  const auto &second_operand = shift.op1();
-
-  if(const auto left_shift = expr_try_dynamic_cast<shl_exprt>(shift))
+  const smt_termt first_operand = convert_expr_to_smt(shift.op0());
+  const smt_termt second_operand = convert_expr_to_smt(shift.op1());
+  const auto first_bit_vector_sort =
+    first_operand.get_sort().cast<smt_bit_vector_sortt>();
+  const auto second_bit_vector_sort =
+    second_operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    first_bit_vector_sort && second_bit_vector_sort,
+    "Shift expressions are expected to have bit vector operands.");
+  const std::size_t first_width = first_bit_vector_sort->bit_width();
+  const std::size_t second_width = second_bit_vector_sort->bit_width();
+  if(first_width > second_width)
   {
-    return smt_bit_vector_theoryt::shift_left(
-      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+    return factory(
+      first_operand,
+      extension_for_type(shift.op1().type())(first_width - second_width)(
+        second_operand));
   }
-  else if(
-    const auto right_logical_shift = expr_try_dynamic_cast<lshr_exprt>(shift))
+  else if(first_width < second_width)
   {
-    return smt_bit_vector_theoryt::logical_shift_right(
-      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
-  }
-  else if(
-    const auto right_arith_shift = expr_try_dynamic_cast<ashr_exprt>(shift))
-  {
-    return smt_bit_vector_theoryt::arithmetic_shift_right(
-      convert_expr_to_smt(first_operand), convert_expr_to_smt(second_operand));
+    return factory(
+      extension_for_type(shift.op0().type())(second_width - first_width)(
+        first_operand),
+      second_operand);
   }
   else
   {
-    UNIMPLEMENTED_FEATURE(
-      "Generation of SMT formula for shift expression: " + shift.pretty());
+    return factory(first_operand, second_operand);
   }
+}
+
+static smt_termt convert_expr_to_smt(const shift_exprt &shift)
+{
+  // TODO: Dispatch for rotation expressions. A `shift_exprt` can be a rotation.
+  if(const auto left_shift = expr_try_dynamic_cast<shl_exprt>(shift))
+  {
+    return convert_to_smt_shift(
+      smt_bit_vector_theoryt::shift_left, *left_shift);
+  }
+  if(const auto right_logical_shift = expr_try_dynamic_cast<lshr_exprt>(shift))
+  {
+    return convert_to_smt_shift(
+      smt_bit_vector_theoryt::logical_shift_right, *right_logical_shift);
+  }
+  if(const auto right_arith_shift = expr_try_dynamic_cast<ashr_exprt>(shift))
+  {
+    return convert_to_smt_shift(
+      smt_bit_vector_theoryt::arithmetic_shift_right, *right_arith_shift);
+  }
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for shift expression: " + shift.pretty());
 }
 
 static smt_termt convert_expr_to_smt(const with_exprt &with)
@@ -733,6 +767,11 @@ static smt_termt convert_expr_to_smt(const extractbit_exprt &extract_bit)
 
 static smt_termt convert_expr_to_smt(const extractbits_exprt &extract_bits)
 {
+  const smt_termt from = convert_expr_to_smt(extract_bits.src());
+  const auto upper_value = numeric_cast<std::size_t>(extract_bits.upper());
+  const auto lower_value = numeric_cast<std::size_t>(extract_bits.lower());
+  if(upper_value && lower_value)
+    return smt_bit_vector_theoryt::extract(*upper_value, *lower_value)(from);
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for extract bits expression: " +
     extract_bits.pretty());
