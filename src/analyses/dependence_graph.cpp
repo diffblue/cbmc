@@ -224,55 +224,38 @@ void dep_graph_domaint::transform(
 
   // We do not propagate control dependencies on function calls, i.e., only the
   // entry point of a function should have a control dependency on the call
-  if(!control_deps.empty())
-  {
-    const goto_programt::const_targett &dep = *control_deps.begin();
-    if(dep->is_function_call())
-    {
-      INVARIANT(
-        std::all_of(
-          std::next(control_deps.begin()),
-          control_deps.end(),
-          [](const goto_programt::const_targett &d) {
-            return d->is_function_call();
-          }),
-        "All entries must be function calls");
-
-      control_deps.clear();
-    }
-  }
+  depst filtered_control_deps;
+  std::copy_if(
+    control_deps.begin(),
+    control_deps.end(),
+    std::inserter(filtered_control_deps, filtered_control_deps.end()),
+    [](goto_programt::const_targett dep) { return !dep->is_function_call(); });
+  control_deps = std::move(filtered_control_deps);
 
   // propagate control dependencies across function calls
-  if(from->is_function_call())
+  if(from->is_function_call() && function_from != function_to)
   {
-    if(function_from == function_to)
+    // edge to function entry point
+    const goto_programt::const_targett next = std::next(from);
+
+    dep_graph_domaint *s =
+      dynamic_cast<dep_graph_domaint *>(&(dep_graph->get_state(next)));
+    CHECK_RETURN(s != nullptr);
+
+    if(s->is_bottom())
     {
-      control_dependencies(function_from, from, to, *dep_graph);
+      s->has_values = tvt::unknown();
+      s->has_changed = true;
     }
-    else
-    {
-      // edge to function entry point
-      const goto_programt::const_targett next = std::next(from);
 
-      dep_graph_domaint *s=
-        dynamic_cast<dep_graph_domaint*>(&(dep_graph->get_state(next)));
-      assert(s!=nullptr);
+    s->has_changed |= util_inplace_set_union(s->control_deps, control_deps);
+    s->has_changed |=
+      util_inplace_set_union(s->control_dep_candidates, control_dep_candidates);
 
-      if(s->is_bottom())
-      {
-        s->has_values = tvt::unknown();
-        s->has_changed = true;
-      }
+    control_deps.clear();
+    control_deps.insert(from);
 
-      s->has_changed |= util_inplace_set_union(s->control_deps, control_deps);
-      s->has_changed |= util_inplace_set_union(
-        s->control_dep_candidates, control_dep_candidates);
-
-      control_deps.clear();
-      control_deps.insert(from);
-
-      control_dep_candidates.clear();
-    }
+    control_dep_candidates.clear();
   }
   else
     control_dependencies(function_from, from, to, *dep_graph);
