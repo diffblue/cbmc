@@ -69,7 +69,36 @@ public:
 
   const exprt &op3() const = delete;
   exprt &op3() = delete;
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 3,
+      "ternary expression must have three operands");
+  }
 };
+
+/// \brief Cast an exprt to a \ref ternary_exprt
+///
+/// \a expr must be known to be \ref ternary_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref ternary_exprt
+inline const ternary_exprt &to_ternary_expr(const exprt &expr)
+{
+  ternary_exprt::check(expr);
+  return static_cast<const ternary_exprt &>(expr);
+}
+
+/// \copydoc to_ternary_expr(const exprt &)
+inline ternary_exprt &to_ternary_expr(exprt &expr)
+{
+  ternary_exprt::check(expr);
+  return static_cast<ternary_exprt &>(expr);
+}
 
 /// Expression to hold a symbol (variable)
 class symbol_exprt : public nullary_exprt
