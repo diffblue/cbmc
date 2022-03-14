@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bitvector_expr.h"
 #include "byte_operators.h"
 #include "expr_util.h"
+#include "floatbv_expr.h"
 #include "format_type.h"
 #include "ieee_float.h"
 #include "mathematical_expr.h"
@@ -158,6 +159,14 @@ static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
     return os << format(src.op());
 }
 
+/// This formats a ternary expression
+static std::ostream &format_rec(std::ostream &os, const ternary_exprt &src)
+{
+  os << src.id() << '(' << format(src.op0()) << ", " << format(src.op1())
+     << ", " << format(src.op2()) << ')';
+  return os;
+}
+
 /// This formats a constant
 static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
 {
@@ -186,7 +195,9 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
   {
     if(is_null_pointer(src))
       return os << ID_NULL;
-    else if(has_prefix(id2string(src.get_value()), "INVALID-"))
+    else if(
+      src.get_value() == "INVALID" ||
+      has_prefix(id2string(src.get_value()), "INVALID-"))
     {
       return os << "INVALID-POINTER";
     }
@@ -276,19 +287,30 @@ void format_expr_configt::setup()
   expr_map[ID_or] = multi_ary_expr;
   expr_map[ID_xor] = multi_ary_expr;
 
-  auto binary_expr = [](std::ostream &os, const exprt &expr) -> std::ostream & {
+  auto binary_infix_expr =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_binary_expr(expr));
   };
 
-  expr_map[ID_lt] = binary_expr;
-  expr_map[ID_gt] = binary_expr;
-  expr_map[ID_ge] = binary_expr;
-  expr_map[ID_le] = binary_expr;
-  expr_map[ID_div] = binary_expr;
-  expr_map[ID_minus] = binary_expr;
-  expr_map[ID_implies] = binary_expr;
-  expr_map[ID_equal] = binary_expr;
-  expr_map[ID_notequal] = binary_expr;
+  expr_map[ID_lt] = binary_infix_expr;
+  expr_map[ID_gt] = binary_infix_expr;
+  expr_map[ID_ge] = binary_infix_expr;
+  expr_map[ID_le] = binary_infix_expr;
+  expr_map[ID_div] = binary_infix_expr;
+  expr_map[ID_minus] = binary_infix_expr;
+  expr_map[ID_implies] = binary_infix_expr;
+  expr_map[ID_equal] = binary_infix_expr;
+  expr_map[ID_notequal] = binary_infix_expr;
+
+  auto binary_prefix_expr =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    os << expr.id() << '(' << format(to_binary_expr(expr).op0()) << ", "
+       << format(to_binary_expr(expr).op1()) << ')';
+    return os;
+  };
+
+  expr_map[ID_ieee_float_equal] = binary_prefix_expr;
+  expr_map[ID_ieee_float_notequal] = binary_prefix_expr;
 
   auto unary_expr = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_unary_expr(expr));
@@ -297,9 +319,36 @@ void format_expr_configt::setup()
   expr_map[ID_not] = unary_expr;
   expr_map[ID_unary_minus] = unary_expr;
 
+  auto unary_with_parentheses_expr =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << expr.id() << '(' << format(to_unary_expr(expr).op()) << ')';
+  };
+
+  expr_map[ID_isnan] = unary_with_parentheses_expr;
+  expr_map[ID_isinf] = unary_with_parentheses_expr;
+  expr_map[ID_isfinite] = unary_with_parentheses_expr;
+  expr_map[ID_isnormal] = unary_with_parentheses_expr;
+
+  auto ternary_expr =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return format_rec(os, to_ternary_expr(expr));
+  };
+
+  expr_map[ID_floatbv_plus] = ternary_expr;
+  expr_map[ID_floatbv_minus] = ternary_expr;
+  expr_map[ID_floatbv_mult] = ternary_expr;
+  expr_map[ID_floatbv_div] = ternary_expr;
+  expr_map[ID_floatbv_mod] = ternary_expr;
+
   expr_map[ID_constant] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return format_rec(os, to_constant_expr(expr));
+  };
+
+  expr_map[ID_address_of] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &address_of = to_address_of_expr(expr);
+    return os << "address_of(" << format(address_of.object()) << ')';
   };
 
   expr_map[ID_annotated_pointer_constant] =
@@ -312,6 +361,14 @@ void format_expr_configt::setup()
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     return os << "cast(" << format(to_typecast_expr(expr).op()) << ", "
               << format(expr.type()) << ')';
+  };
+
+  expr_map[ID_floatbv_typecast] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &floatbv_typecast_expr = to_floatbv_typecast_expr(expr);
+    return os << "floatbv_typecast(" << format(floatbv_typecast_expr.op())
+              << ", " << format(floatbv_typecast_expr.type()) << ", "
+              << format(floatbv_typecast_expr.rounding_mode()) << ')';
   };
 
   auto byte_extract =
@@ -453,6 +510,12 @@ void format_expr_configt::setup()
 
   expr_map[ID_array] = compound;
   expr_map[ID_struct] = compound;
+
+  expr_map[ID_array_of] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &array_of_expr = to_array_of_expr(expr);
+    return os << "array_of(" << format(array_of_expr.what()) << ')';
+  };
 
   expr_map[ID_if] = [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &if_expr = to_if_expr(expr);
