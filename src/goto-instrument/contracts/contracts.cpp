@@ -1225,69 +1225,6 @@ goto_functionst &code_contractst::get_goto_functions()
   return goto_functions;
 }
 
-bool code_contractst::check_for_looped_mallocs(const goto_programt &program)
-{
-  // Collect all GOTOs and mallocs
-  std::vector<goto_programt::instructiont> back_gotos;
-  std::vector<goto_programt::instructiont> malloc_calls;
-
-  int index = 0;
-  for(goto_programt::instructiont instruction : program.instructions)
-  {
-    if(instruction.is_backwards_goto())
-    {
-      back_gotos.push_back(instruction);
-    }
-    if(instruction.is_function_call())
-    {
-      irep_idt called_name;
-      if(instruction.call_function().id() == ID_dereference)
-      {
-        called_name =
-          to_symbol_expr(
-            to_dereference_expr(instruction.call_function()).pointer())
-            .get_identifier();
-      }
-      else
-      {
-        called_name =
-          to_symbol_expr(instruction.call_function()).get_identifier();
-      }
-
-      if(called_name == "malloc")
-      {
-        malloc_calls.push_back(instruction);
-      }
-    }
-    index++;
-  }
-  // Make sure there are no gotos that go back such that a malloc
-  // is between the goto and its destination (possible loop).
-  for(auto goto_entry : back_gotos)
-  {
-    for(const auto &target : goto_entry.targets)
-    {
-      for(auto malloc_entry : malloc_calls)
-      {
-        if(
-          malloc_entry.location_number >= target->location_number &&
-          malloc_entry.location_number < goto_entry.location_number)
-        {
-          log.error() << "Call to malloc at location "
-                      << malloc_entry.location_number << " falls between goto "
-                      << "source location " << goto_entry.location_number
-                      << " and it's destination at location "
-                      << target->location_number << ". "
-                      << "Unable to complete instrumentation, as this malloc "
-                      << "may be in a loop." << messaget::eom;
-          throw 0;
-        }
-      }
-    }
-  }
-  return false;
-}
-
 bool code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
