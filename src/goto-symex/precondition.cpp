@@ -113,14 +113,19 @@ void preconditiont::compute_rec(exprt &dest)
 
     // aliasing may happen here
 
-    const std::vector<exprt> expr_set = value_sets.get_values(
-      SSA_step.source.function_id, target, deref_expr.pointer());
-    const std::unordered_set<irep_idt> symbols =
-      find_symbols_or_nexts(expr_set.begin(), expr_set.end());
-
-    if(symbols.find(lhs_identifier)!=symbols.end())
+    bool may_alias = false;
+    for(const exprt &e : value_sets.get_values(
+          SSA_step.source.function_id, target, deref_expr.pointer()))
     {
-      // may alias!
+      if(has_symbol(e, lhs_identifier, kindt::F_BOTH))
+      {
+        may_alias = true;
+        break;
+      }
+    }
+
+    if(may_alias)
+    {
       exprt tmp;
       tmp.swap(deref_expr.pointer());
       dereference(SSA_step.source.function_id, target, tmp, ns, value_sets);

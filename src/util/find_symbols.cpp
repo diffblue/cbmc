@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "range.h"
 #include "std_expr.h"
 
-enum class kindt { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH };
-
 void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest)
 {
   find_symbols(src, dest, true, true);
@@ -171,6 +169,13 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
   {
     dest.insert(to_union_tag_type(src).get_identifier());
   }
+}
+
+bool has_symbol(const exprt &src, const irep_idt &identifier, kindt kind)
+{
+  find_symbols_sett tmp_dest;
+  find_symbols(kind, src, tmp_dest);
+  return tmp_dest.find(identifier) != tmp_dest.end();
 }
 
 void find_type_symbols(const exprt &src, find_symbols_sett &dest)
