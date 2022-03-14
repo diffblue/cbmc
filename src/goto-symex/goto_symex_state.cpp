@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
-#include <util/find_symbols.h>
 #include <util/invariant.h>
 #include <util/std_expr.h>
 
@@ -837,13 +836,15 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
 
   // L2 renaming
   const exprt fields = field_sensitivity.get_fields(ns, *this, ssa);
-  for(const auto &l1_symbol : find_symbols(fields))
-  {
-    const ssa_exprt &field_ssa = to_ssa_expr(l1_symbol);
-    const std::size_t field_generation = level2.increase_generation(
-      l1_symbol.get_identifier(), field_ssa, fresh_l2_name_provider);
-    CHECK_RETURN(field_generation == 1);
-  }
+  fields.visit_pre([this](const exprt &e) {
+    if(auto l1_symbol = expr_try_dynamic_cast<symbol_exprt>(e))
+    {
+      const ssa_exprt &field_ssa = to_ssa_expr(*l1_symbol);
+      const std::size_t field_generation = level2.increase_generation(
+        l1_symbol->get_identifier(), field_ssa, fresh_l2_name_provider);
+      CHECK_RETURN(field_generation == 1);
+    }
+  });
 
   record_events.push(false);
   exprt expr_l2 = rename(std::move(ssa), ns).get();
