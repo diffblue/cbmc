@@ -30,7 +30,6 @@ protected:
   symbol_sett depends;
 
   void get_symbols(const exprt &expr);
-  void get_symbols(const typet &type);
 
   void slice(SSA_stept &SSA_step);
   void slice_assignment(SSA_stept &SSA_step);

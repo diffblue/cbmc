@@ -1,0 +1,7 @@
+CORE broken-smt-backend
+main.c
+--pointer-check --slice-formula
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
