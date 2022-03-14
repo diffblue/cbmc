@@ -130,10 +130,6 @@ protected:
   /// Instrument functions to check frame conditions.
   bool check_frame_conditions_function(const irep_idt &function);
 
-  /// Check if there are any malloc statements which may be repeated because of
-  /// a goto statement that jumps back.
-  bool check_for_looped_mallocs(const goto_programt &program);
-
   /// Apply loop contracts, whenever available, to all loops in `function`.
   /// Loop invariants, loop variants, and loop assigns clauses.
   void apply_loop_contract(
