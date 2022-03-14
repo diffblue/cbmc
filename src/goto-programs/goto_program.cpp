@@ -760,8 +760,7 @@ void goto_programt::instructiont::validate(
 
   auto expr_symbol_finder = [&](const exprt &e) {
     find_symbols_sett typetags;
-    find_type_symbols(e.type(), typetags);
-    find_symbols_or_nexts(e, typetags);
+    find_type_and_expr_symbols(e, typetags);
     const symbolt *symbol;
     for(const auto &identifier : typetags)
     {
@@ -873,7 +872,7 @@ void goto_programt::instructiont::validate(
       "assert instruction should not have a target",
       source_location());
 
-    std::for_each(guard.depth_begin(), guard.depth_end(), expr_symbol_finder);
+    expr_symbol_finder(guard);
     std::for_each(guard.depth_begin(), guard.depth_end(), type_finder);
     break;
   case OTHER:
@@ -940,7 +939,7 @@ void goto_programt::instructiont::validate(
       "function call instruction should contain a call statement",
       source_location());
 
-    std::for_each(_code.depth_begin(), _code.depth_end(), expr_symbol_finder);
+    expr_symbol_finder(_code);
     std::for_each(_code.depth_begin(), _code.depth_end(), type_finder);
     break;
   case THROW:

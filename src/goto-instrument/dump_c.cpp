@@ -913,9 +913,7 @@ void dump_ct::convert_global_variable(
 
   code_frontend_declt d(symbol.symbol_expr());
 
-  find_symbols_sett syms;
-  if(symbol.value.is_not_nil())
-    find_symbols_or_nexts(symbol.value, syms);
+  find_symbols_sett syms = find_symbol_identifiers(symbol.value);
 
   // add a tentative declaration to cater for symbols in the initializer
   // relying on it this symbol

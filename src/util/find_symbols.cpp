@@ -13,25 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "range.h"
 #include "std_expr.h"
 
-void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest)
-{
-  find_symbols(src, dest, true, true);
-}
-
-void find_symbols(
-  const exprt &src,
-  find_symbols_sett &dest,
-  bool current,
-  bool next)
-{
-  src.visit_pre([&dest, current, next](const exprt &e) {
-    if(e.id() == ID_symbol && current)
-      dest.insert(to_symbol_expr(e).get_identifier());
-    else if(e.id() == ID_next_symbol && next)
-      dest.insert(e.get(ID_identifier));
-  });
-}
-
 bool has_symbol(
   const exprt &src,
   const find_symbols_sett &symbols,
@@ -214,4 +195,26 @@ void find_type_and_expr_symbols(const exprt &src, find_symbols_sett &dest)
 void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 {
   find_symbols(kindt::F_ALL, src, dest);
+}
+
+void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest)
+{
+  find_symbols(kindt::F_EXPR_BOTH, src, dest);
+}
+
+void find_symbols(
+  const exprt &src,
+  find_symbols_sett &dest,
+  bool current,
+  bool next)
+{
+  if(current)
+  {
+    if(next)
+      find_symbols(kindt::F_EXPR_BOTH, src, dest);
+    else
+      find_symbols(kindt::F_EXPR_CURRENT, src, dest);
+  }
+  else if(next)
+    find_symbols(kindt::F_EXPR_NEXT, src, dest);
 }
