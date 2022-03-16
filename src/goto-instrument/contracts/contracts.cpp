@@ -30,6 +30,7 @@ Date: February 2016
 #include <langapi/language_util.h>
 
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/format_expr.h>
@@ -729,7 +730,7 @@ code_contractst::create_ensures_instruction(
   return std::make_pair(std::move(ensures_program), std::move(history));
 }
 
-bool code_contractst::apply_function_contract(
+void code_contractst::apply_function_contract(
   const irep_idt &function,
   const source_locationt &location,
   goto_programt &function_body,
@@ -932,7 +933,6 @@ bool code_contractst::apply_function_contract(
 
   // Add this function to the set of replaced functions.
   summarized.insert(target_function);
-  return false;
 }
 
 void code_contractst::apply_loop_contract(
@@ -1225,17 +1225,14 @@ goto_functionst &code_contractst::get_goto_functions()
   return goto_functions;
 }
 
-bool code_contractst::check_frame_conditions_function(const irep_idt &function)
+void code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
   auto function_obj = goto_functions.function_map.find(function);
-  if(function_obj == goto_functions.function_map.end())
-  {
-    log.error() << "Could not find function '" << function
-                << "' in goto-program; not enforcing contracts."
-                << messaget::eom;
-    return true;
-  }
+
+  INVARIANT(
+    function_obj != goto_functions.function_map.end(),
+    "Function '" + id2string(function) + "'must exist in the goto program");
 
   const auto &goto_function = function_obj->second;
   auto &function_body = function_obj->second.body;
@@ -1316,11 +1313,9 @@ bool code_contractst::check_frame_conditions_function(const irep_idt &function)
     function_body.instructions.end(),
     skip_function_paramst::YES,
     cfg_info_opt);
-
-  return false;
 }
 
-bool code_contractst::enforce_contract(const irep_idt &function)
+void code_contractst::enforce_contract(const irep_idt &function)
 {
   // Add statements to the source function
   // to ensure assigns clause is respected.
@@ -1333,13 +1328,9 @@ bool code_contractst::enforce_contract(const irep_idt &function)
   const irep_idt original(function);
 
   auto old_function = goto_functions.function_map.find(original);
-  if(old_function == goto_functions.function_map.end())
-  {
-    log.error() << "Could not find function '" << function
-                << "' in goto-program; not enforcing contracts."
-                << messaget::eom;
-    return true;
-  }
+  INVARIANT(
+    old_function != goto_functions.function_map.end(),
+    "Function to replace must exist in the program.");
 
   std::swap(goto_functions.function_map[mangled], old_function->second);
   goto_functions.function_map.erase(old_function);
@@ -1379,8 +1370,6 @@ bool code_contractst::enforce_contract(const irep_idt &function)
   wrapper.parameter_identifiers = mangled_fun->second.parameter_identifiers;
   wrapper.body.add(goto_programt::make_end_function(sl));
   add_contract_check(original, mangled, wrapper.body);
-
-  return false;
 }
 
 void code_contractst::add_contract_check(
@@ -1536,12 +1525,29 @@ void code_contractst::add_contract_check(
   dest.destructive_insert(dest.instructions.begin(), check);
 }
 
-bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
+void code_contractst::check_all_functions_found(
+  const std::set<std::string> &functions) const
+{
+  for(const auto &function : functions)
+  {
+    if(
+      goto_functions.function_map.find(function) ==
+      goto_functions.function_map.end())
+    {
+      throw invalid_input_exceptiont(
+        "Function '" + function + "' was not found in the GOTO program.");
+    }
+  }
+}
+
+void code_contractst::replace_calls(const std::set<std::string> &to_replace)
 {
   if(to_replace.empty())
-    return false;
+    return;
 
-  bool fail = false;
+  log.status() << "Replacing function calls with contracts" << messaget::eom;
+
+  check_all_functions_found(to_replace);
 
   for(auto &goto_function : goto_functions.function_map)
   {
@@ -1559,7 +1565,7 @@ bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
         if(found == to_replace.end())
           continue;
 
-        fail |= apply_function_contract(
+        apply_function_contract(
           goto_function.first,
           ins->source_location(),
           goto_function.second.body,
@@ -1568,15 +1574,10 @@ bool code_contractst::replace_calls(const std::set<std::string> &to_replace)
     }
   }
 
-  if(fail)
-    return true;
-
   for(auto &goto_function : goto_functions.function_map)
     remove_skip(goto_function.second.body);
 
   goto_functions.update();
-
-  return false;
 }
 
 void code_contractst::apply_loop_contracts()
@@ -1585,27 +1586,15 @@ void code_contractst::apply_loop_contracts()
     apply_loop_contract(goto_function.first, goto_function.second);
 }
 
-bool code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
+void code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
 {
   if(to_enforce.empty())
-    return false;
+    return;
 
-  bool fail = false;
+  log.status() << "Enforcing contracts" << messaget ::eom;
+
+  check_all_functions_found(to_enforce);
 
   for(const auto &function : to_enforce)
-  {
-    auto goto_function = goto_functions.function_map.find(function);
-    if(goto_function == goto_functions.function_map.end())
-    {
-      fail = true;
-      log.error() << "Could not find function '" << function
-                  << "' in goto-program; not enforcing contracts."
-                  << messaget::eom;
-      continue;
-    }
-
-    if(!fail)
-      fail = enforce_contract(function);
-  }
-  return fail;
+    enforce_contract(function);
 }

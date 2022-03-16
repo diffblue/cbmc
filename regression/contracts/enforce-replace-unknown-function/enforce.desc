@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract goo
+^Function 'goo' was not found in the GOTO program.$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+Checks that attempting to enforce the contract of an unknown function creates
+an error.
