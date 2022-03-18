@@ -13,22 +13,6 @@ Date: February 2016
 
 #include "contracts.h"
 
-#include <algorithm>
-#include <map>
-
-#include <analyses/local_bitvector_analysis.h>
-#include <analyses/local_may_alias.h>
-
-#include <ansi-c/c_expr.h>
-
-#include <goto-instrument/havoc_utils.h>
-
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/goto_program.h>
-#include <goto-programs/remove_skip.h>
-
-#include <langapi/language_util.h>
-
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
@@ -44,10 +28,23 @@ Date: February 2016
 #include <util/replace_symbol.h>
 #include <util/std_code.h>
 
+#include <goto-programs/goto_inline.h>
+#include <goto-programs/goto_program.h>
+#include <goto-programs/remove_skip.h>
+
+#include <analyses/local_bitvector_analysis.h>
+#include <analyses/local_may_alias.h>
+#include <ansi-c/c_expr.h>
+#include <goto-instrument/havoc_utils.h>
+#include <langapi/language_util.h>
+
 #include "havoc_assigns_clause_targets.h"
 #include "instrument_spec_assigns.h"
 #include "memory_predicates.h"
 #include "utils.h"
+
+#include <algorithm>
+#include <map>
 
 /// Decorator for \ref message_handlert that keeps track of warnings
 /// occuring when inlining a function.
