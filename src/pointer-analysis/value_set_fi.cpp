@@ -1399,6 +1399,9 @@ void value_set_fit::apply_code(const codet &code, const namespacet &ns)
   {
     // doesn't do anything
   }
+  else if(statement == ID_havoc_object)
+  {
+  }
   else
     throw
       code.pretty()+"\n"+
