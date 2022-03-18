@@ -1613,8 +1613,7 @@ void value_sett::apply_code_rec(
   {
     // can be ignored, we don't expect side effects here
   }
-  else if(statement=="cpp_delete" ||
-          statement=="cpp_delete[]")
+  else if(statement == ID_cpp_delete || statement == ID_cpp_delete_array)
   {
     // does nothing
   }
@@ -1649,6 +1648,9 @@ void value_sett::apply_code_rec(
   {
   }
   else if(statement==ID_array_replace)
+  {
+  }
+  else if(statement == ID_array_equal)
   {
   }
   else if(statement==ID_assume)
