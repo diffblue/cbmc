@@ -39,11 +39,11 @@ static optionalt<exprt> substitute_symbols_rec(
     auto op_result =
       substitute_symbols_rec(new_substitutions, binding_expr.where());
     if(op_result.has_value())
-      return binding_exprt(
-        src.id(),
-        binding_expr.variables(),
-        op_result.value(),
-        binding_expr.type());
+    {
+      auto new_binding_expr = binding_expr; // copy
+      new_binding_expr.where() = std::move(op_result.value());
+      return std::move(new_binding_expr);
+    }
     else
       return {};
   }
