@@ -2,6 +2,8 @@ name: Build and Test CBMC
 on:
   pull_request:
     branches: [ develop ]
+env:
+  cvc5-version: "0.0.7"
 
 jobs:
   check-ubuntu-20_04-make-gcc:
@@ -20,6 +22,12 @@ jobs:
           sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -82,6 +90,12 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -145,6 +159,12 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -180,6 +200,12 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -309,6 +335,12 @@ jobs:
         run: brew install maven flex bison parallel ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc5 binary and make sure it can be deployed
+        run: |
+          curl -L https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS --output cvc5
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -353,6 +385,12 @@ jobs:
         run: brew install cmake ninja maven flex bison ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc5 binary and make sure it can be deployed
+        run: |
+          curl -L https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS --output cvc5
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
