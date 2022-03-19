@@ -13,7 +13,9 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Prepare ccache
