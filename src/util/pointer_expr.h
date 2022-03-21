@@ -329,7 +329,7 @@ public:
 template <>
 inline bool can_cast_expr<is_dynamic_object_exprt>(const exprt &base)
 {
-  return base.id() == ID_is_invalid_pointer;
+  return base.id() == ID_is_dynamic_object;
 }
 
 inline void validate_expr(const is_dynamic_object_exprt &value)
