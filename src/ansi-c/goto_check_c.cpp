@@ -2188,28 +2188,6 @@ void goto_check_ct::goto_check(
               std::move(lhs), std::move(rhs), i.source_location()));
           t->code_nonconst().add_source_location() = i.source_location();
         }
-
-        if(
-          variable.type().id() == ID_pointer &&
-          function_identifier != "alloca" &&
-          (ns.lookup(variable.get_identifier()).base_name ==
-             "return_value___builtin_alloca" ||
-           ns.lookup(variable.get_identifier()).base_name ==
-             "return_value_alloca"))
-        {
-          // mark pointer to alloca result as dead
-          exprt lhs = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-          exprt alloca_result =
-            typecast_exprt::conditional_cast(variable, lhs.type());
-          if_exprt rhs(
-            side_effect_expr_nondett(bool_typet(), i.source_location()),
-            std::move(alloca_result),
-            lhs);
-          goto_programt::targett t =
-            new_code.add(goto_programt::make_assignment(
-              std::move(lhs), std::move(rhs), i.source_location()));
-          t->code_nonconst().add_source_location() = i.source_location();
-        }
       }
     }
     else if(i.is_end_function())
