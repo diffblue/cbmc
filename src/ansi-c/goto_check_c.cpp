@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string_utils.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
@@ -43,6 +44,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <optional>
+
+#include "literals/convert_integer_literal.h"
 
 class goto_check_ct
 {
@@ -76,6 +79,8 @@ public:
     error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
+
+    parse_mmio_regions(_options.get_option("mmio-regions"));
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -327,6 +332,8 @@ protected:
   /// \returns a pair (name, status) if the match succeeds
   /// and the name is known, nothing otherwise.
   named_check_statust match_named_check(const irep_idt &named_check) const;
+
+  void parse_mmio_regions(const std::string &regions);
 };
 
 /// Allows to:
@@ -449,6 +456,22 @@ void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
         "arguments of allocated_memory must have same type");
       allocations.push_back({args[0], args[1]});
     }
+  }
+}
+
+void goto_check_ct::parse_mmio_regions(const std::string &regions)
+{
+  for(const std::string &range : split_string(regions, ',', true, true))
+  {
+    const auto sep = range.find(':');
+    if(sep == std::string::npos || sep + 1 == range.size())
+      continue;
+
+    const std::string start = range.substr(0, sep);
+    const std::string size = range.substr(sep + 1);
+
+    allocations.push_back(
+      {convert_integer_literal(start), convert_integer_literal(size)});
   }
 }
 

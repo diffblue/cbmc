@@ -44,6 +44,7 @@ void goto_check_c(
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"                  \
   "(pointer-primitive-check)"                                                  \
+  "(mmio-regions):"                                                            \
   "(retain-trivial-checks)"                                                    \
   "(error-label):"                                                             \
   "(no-assertions)(no-assumptions)"                                            \
@@ -64,6 +65,8 @@ void goto_check_c(
   " --nan-check                  check floating-point for NaN\n" \
   " --enum-range-check           checks that all enum type expressions have values in the enum range\n" /* NOLINT(whitespace/line_length) */ \
   " --pointer-primitive-check    checks that all pointers in pointer primitives are valid or null\n" /* NOLINT(whitespace/line_length) */ \
+  " --mmio-regions addr:sz,...   list of start-address:size address ranges\n" \
+  "                              permitted for read/write access\n" \
   " --retain-trivial-checks      include checks that are trivially true\n" \
   " --error-label label          check that label is unreachable\n" \
   " --no-built-in-assertions     ignore assertions in built-in library\n" \
@@ -86,6 +89,8 @@ void goto_check_c(
   options.set_option("nan-check", cmdline.isset("nan-check")); \
   options.set_option("built-in-assertions", !cmdline.isset("no-built-in-assertions")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("pointer-primitive-check", cmdline.isset("pointer-primitive-check")); /* NOLINT(whitespace/line_length) */ \
+  if(cmdline.isset("mmio-regions")) \
+    options.set_option("mmio-regions", cmdline.get_values("mmio-regions")); \
   options.set_option("retain-trivial-checks", \
                      cmdline.isset("retain-trivial-checks")); \
   options.set_option("assertions", !cmdline.isset("no-assertions")); /* NOLINT(whitespace/line_length) */ \
