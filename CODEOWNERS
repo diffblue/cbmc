@@ -30,7 +30,7 @@
 
 # These files change frequently and changes are high-risk
 
-/src/cbmc/ @kroening @tautschnig @peterschrammel
+/src/cbmc/ @kroening @tautschnig @peterschrammel @NlightNFotis @thomasspriggs
 /src/goto-programs/ @kroening @tautschnig @peterschrammel
 /src/util/ @kroening @tautschnig @peterschrammel
 /src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
@@ -71,7 +71,7 @@ CMakeLists.txt @diffblue/diffblue-opensource
 /jbmc/unit/
 /jbmc/regression/
 
-/scripts/ @diffblue/devops
+/scripts/ @diffblue/diffblue-opensource
 /scripts/expected_doxygen_warnings.txt
 
 # CI pipeline is the responsibility of the Open Source maintenance team at Diffblue.
