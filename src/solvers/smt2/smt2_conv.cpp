@@ -1856,8 +1856,9 @@ void smt2_convt::convert_expr(const exprt &expr)
     else
       UNREACHABLE;
   }
-  else if(expr.id()==ID_overflow_plus ||
-          expr.id()==ID_overflow_minus)
+  else if(
+    can_cast_expr<plus_overflow_exprt>(expr) ||
+    can_cast_expr<minus_overflow_exprt>(expr))
   {
     const auto &op0 = to_binary_expr(expr).op0();
     const auto &op1 = to_binary_expr(expr).op1();
@@ -1866,7 +1867,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       expr.type().id() == ID_bool,
       "overflow plus and overflow minus expressions shall be of Boolean type");
 
-    bool subtract=expr.id()==ID_overflow_minus;
+    bool subtract = can_cast_expr<minus_overflow_exprt>(expr);
     const typet &op_type = op0.type();
     std::size_t width=boolbv_width(op_type);
 
