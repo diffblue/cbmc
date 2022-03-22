@@ -1,6 +1,6 @@
 CORE
 shift_right.c
---incremental-smt2-solver 'z3 --smt2 -in' --slice-formula --trace
+--slice-formula --trace
 \[main\.assertion\.1\] line \d+ Right shifting a uint with leftmost bit set is a logical shift: FAILURE
 \[main\.assertion\.2\] line \d+ Right shifting a positive number has a lower bound of 0: SUCCESS
 \[main\.assertion\.3\] line \d+ Right shifting a negative number has a lower bound value of -1: SUCCESS

@@ -1,6 +1,6 @@
 CORE
 unsigned_behaviour.c
---incremental-smt2-solver 'z3 --smt2 -in' --trace
+--trace
 \[main\.assertion\.1\] line \d+ a plus b should be more than 27: FAILURE
 \[main\.assertion\.2\] line \d+ a plus b should be more than 27: FAILURE
 \[main\.assertion\.3\] line \d+ c plus d should be more than 27: FAILURE

@@ -1,6 +1,6 @@
 CORE
 simple_equation.c
---incremental-smt2-solver 'z3 --smt2 -in' --trace --verbosity 10
+--trace --verbosity 10
 \[main\.assertion\.1\] line \d+ a plus a always equals two times a: SUCCESS
 \[main\.assertion\.2\] line \d+ a minus a always equals 0: SUCCESS
 \[main\.assertion\.3\] line \d+ a plus its additive inverse equals 0: SUCCESS

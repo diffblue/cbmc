@@ -1,6 +1,6 @@
 CORE
 shift_left.c
---incremental-smt2-solver 'z3 --smt2 -in' --slice-formula
+--slice-formula
 \[main\.assertion\.1\] line \d Shifted result should be greater than one: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$
