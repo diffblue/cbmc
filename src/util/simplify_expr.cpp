@@ -2547,10 +2547,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
     r = simplify_complex(to_unary_expr(expr));
   }
   else if(
-    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_minus ||
-    expr.id() == ID_overflow_mult || expr.id() == ID_overflow_shl)
+    const auto binary_overflow =
+      expr_try_dynamic_cast<binary_overflow_exprt>(expr))
   {
-    r = simplify_overflow_binary(to_binary_overflow_expr(expr));
+    r = simplify_overflow_binary(*binary_overflow);
   }
   else if(expr.id() == ID_overflow_unary_minus)
   {
