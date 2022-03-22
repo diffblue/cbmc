@@ -6,9 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
+#include <util/bitvector_expr.h>
 #include <util/invariant.h>
+
+#include "boolbv.h"
 
 literalt boolbvt::convert_overflow(const exprt &expr)
 {
@@ -32,25 +33,24 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       bv_utils.overflow_sub(bv0, bv1, rep):
       bv_utils.overflow_add(bv0, bv1, rep);
   }
-  else if(expr.id()==ID_overflow_mult)
+  else if(
+    const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_binary_expr(expr);
-
     if(
-      overflow_expr.lhs().type().id() != ID_unsignedbv &&
-      overflow_expr.lhs().type().id() != ID_signedbv)
+      mult_overflow->lhs().type().id() != ID_unsignedbv &&
+      mult_overflow->lhs().type().id() != ID_signedbv)
       return SUB::convert_rest(expr);
 
-    bvt bv0 = convert_bv(overflow_expr.lhs());
-    bvt bv1 = convert_bv(overflow_expr.rhs(), bv0.size());
+    bvt bv0 = convert_bv(mult_overflow->lhs());
+    bvt bv1 = convert_bv(mult_overflow->rhs(), bv0.size());
 
     bv_utilst::representationt rep =
-      overflow_expr.lhs().type().id() == ID_signedbv
+      mult_overflow->lhs().type().id() == ID_signedbv
         ? bv_utilst::representationt::SIGNED
         : bv_utilst::representationt::UNSIGNED;
 
     DATA_INVARIANT(
-      overflow_expr.lhs().type() == overflow_expr.rhs().type(),
+      mult_overflow->lhs().type() == mult_overflow->rhs().type(),
       "operands of overflow_mult expression shall have same type");
 
     std::size_t old_size=bv0.size();
