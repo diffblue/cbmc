@@ -418,7 +418,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     return convert_onehot(to_unary_expr(expr));
   else if(
     can_cast_expr<binary_overflow_exprt>(expr) ||
-    expr.id() == ID_overflow_unary_minus)
+    can_cast_expr<unary_minus_overflow_exprt>(expr))
   {
     return convert_overflow(expr);
   }

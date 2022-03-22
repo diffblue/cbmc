@@ -2278,7 +2278,7 @@ simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
     return unchanged(expr);
 
   mp_integer no_overflow_result;
-  if(expr.id() == ID_overflow_unary_minus)
+  if(can_cast_expr<unary_minus_overflow_exprt>(expr))
     no_overflow_result = -*op_value;
   else
     UNREACHABLE;
@@ -2552,9 +2552,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   {
     r = simplify_overflow_binary(*binary_overflow);
   }
-  else if(expr.id() == ID_overflow_unary_minus)
+  else if(
+    const auto unary_overflow =
+      expr_try_dynamic_cast<unary_overflow_exprt>(expr))
   {
-    r = simplify_overflow_unary(to_unary_overflow_expr(expr));
+    r = simplify_overflow_unary(*unary_overflow);
   }
   else if(expr.id() == ID_bitreverse)
   {

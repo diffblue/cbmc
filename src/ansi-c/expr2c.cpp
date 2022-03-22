@@ -3921,7 +3921,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_cond(src, precedence);
 
   else if(
-    src.id() == ID_overflow_unary_minus ||
+    can_cast_expr<unary_minus_overflow_exprt>(src) ||
     can_cast_expr<binary_overflow_exprt>(src))
   {
     return convert_overflow(src, precedence);

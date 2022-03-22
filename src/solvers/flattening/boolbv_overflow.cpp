@@ -161,11 +161,11 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     return
       prop.land(!neg_shift, prop.lselect(undef, prop.lor(bv0), overflow));
   }
-  else if(expr.id()==ID_overflow_unary_minus)
+  else if(
+    const auto unary_minus_overflow =
+      expr_try_dynamic_cast<unary_minus_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_unary_expr(expr);
-
-    const bvt &bv = convert_bv(overflow_expr.op());
+    const bvt &bv = convert_bv(unary_minus_overflow->op());
 
     return bv_utils.overflow_negate(bv);
   }

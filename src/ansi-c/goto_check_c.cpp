@@ -1052,7 +1052,7 @@ void goto_check_ct::integer_overflow_check(
     std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
 
     add_guarded_property(
-      not_exprt{unary_overflow_exprt{expr.id(), to_unary_expr(expr).op()}},
+      not_exprt{unary_minus_overflow_exprt{to_unary_expr(expr).op()}},
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
       expr.find_source_location(),
