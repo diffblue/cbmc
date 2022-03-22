@@ -13,13 +13,17 @@
 
 #include <functional>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <stack>
 #include <string>
 
 static std::string escape_identifier(const irep_idt &identifier)
 {
-  return std::string{"|"} + smt2_convt::convert_identifier(identifier) + "|";
+  const std::string &quoted_identifier = smt2_convt::convert_identifier(identifier);
+  if (std::regex_match(quoted_identifier, std::regex("(\\w+)|\\+-/\\*=%?!\\.\\$_~&\\^<>@")))
+    return quoted_identifier;
+  return std::string{"|"} + quoted_identifier + "|";
 }
 
 class smt_index_output_visitort : public smt_index_const_downcast_visitort
