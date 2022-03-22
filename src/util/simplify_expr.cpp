@@ -2182,7 +2182,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   // zero.
   if(
     expr.op1().is_zero() ||
-    (expr.op0().is_zero() && expr.id() != ID_overflow_minus))
+    (expr.op0().is_zero() && !can_cast_expr<minus_overflow_exprt>(expr)))
   {
     return false_exprt{};
   }
@@ -2208,7 +2208,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     return false_exprt{};
   }
 
-  if(op_type_id == ID_natural && expr.id() != ID_overflow_minus)
+  if(op_type_id == ID_natural && !can_cast_expr<minus_overflow_exprt>(expr))
     return false_exprt{};
 
   // we only handle constants over signedbv/unsignedbv for the remaining cases
@@ -2226,7 +2226,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   mp_integer no_overflow_result;
   if(expr.id() == ID_overflow_plus)
     no_overflow_result = *op0_value + *op1_value;
-  else if(expr.id() == ID_overflow_minus)
+  else if(can_cast_expr<minus_overflow_exprt>(expr))
     no_overflow_result = *op0_value - *op1_value;
   else if(expr.id() == ID_overflow_mult)
     no_overflow_result = *op0_value * *op1_value;
