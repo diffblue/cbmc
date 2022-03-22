@@ -20,10 +20,14 @@
 
 static std::string escape_identifier(const irep_idt &identifier)
 {
-  const std::string &quoted_identifier = smt2_convt::convert_identifier(identifier);
-  if (std::regex_match(quoted_identifier, std::regex("(\\w+)|\\+-/\\*=%?!\\.\\$_~&\\^<>@")))
-    return quoted_identifier;
-  return std::string{"|"} + quoted_identifier + "|";
+  // This matches the definition of a `simple_symbol` according to the SMTLIB
+  // specification, version 2.6.
+  const std::regex simple_symbol_regex(
+    "[a-zA-Z\\+-\\/\\*=%?!\\.\\$_~&\\^<>@][\\w\\+-\\/\\*=%?!\\.\\$_~&\\^<>@]*");
+  if(std::regex_match(id2string(identifier), simple_symbol_regex))
+    return id2string(identifier);
+
+  return std::string{"|"} + smt2_convt::convert_identifier(identifier) + "|";
 }
 
 class smt_index_output_visitort : public smt_index_const_downcast_visitort
