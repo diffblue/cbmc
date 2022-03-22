@@ -89,18 +89,17 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       return !prop.lor(all_one, all_zero);
     }
   }
-  else if(expr.id() == ID_overflow_shl)
+  else if(
+    const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_binary_expr(expr);
-
-    const bvt &bv0 = convert_bv(overflow_expr.lhs());
-    const bvt &bv1 = convert_bv(overflow_expr.rhs());
+    const bvt &bv0 = convert_bv(shl_overflow->lhs());
+    const bvt &bv1 = convert_bv(shl_overflow->rhs());
 
     std::size_t old_size = bv0.size();
     std::size_t new_size = old_size * 2;
 
     bv_utilst::representationt rep =
-      overflow_expr.lhs().type().id() == ID_signedbv
+      shl_overflow->lhs().type().id() == ID_signedbv
         ? bv_utilst::representationt::SIGNED
         : bv_utilst::representationt::UNSIGNED;
 
@@ -109,7 +108,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     bvt result=bv_utils.shift(bv_ext, bv_utilst::shiftt::SHIFT_LEFT, bv1);
 
     // a negative shift is undefined; yet this isn't an overflow
-    literalt neg_shift = overflow_expr.lhs().type().id() == ID_unsignedbv
+    literalt neg_shift = shl_overflow->lhs().type().id() == ID_unsignedbv
                            ? const_literal(false)
                            : bv1.back(); // sign bit
 
