@@ -410,6 +410,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     CHECK_RETURN(bv_opt->size() == bits);
     return *bv_opt;
   }
+  else if(expr.id() == ID_object_address)
+  {
+    const auto &object_address_expr = to_object_address_expr(expr);
+    return add_addr(object_address_expr.object_expr());
+  }
   else if(expr.id()==ID_constant)
   {
     const constant_exprt &c = to_constant_expr(expr);
@@ -733,11 +738,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     std::size_t width=boolbv_width(expr.type());
 
     return bv_utils.zero_extension(op0, width);
-  }
-  else if(expr.id() == ID_object_address)
-  {
-    const auto &object_address_expr = to_object_address_expr(expr);
-    return add_addr(object_address_expr.object_expr());
   }
 
   return SUB::convert_bitvector(expr);
