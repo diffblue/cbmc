@@ -892,6 +892,44 @@ inline void validate_expr(const unary_overflow_exprt &value)
     value, 1, "unary overflow expression must have one operand");
 }
 
+/// \brief A Boolean expression returning true, iff negation would result in an
+/// overflow when applied to the (single) operand.
+class unary_minus_overflow_exprt : public unary_overflow_exprt
+{
+public:
+  explicit unary_minus_overflow_exprt(exprt _op)
+    : unary_overflow_exprt(ID_unary_minus, std::move(_op))
+  {
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    unary_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+};
+
+template <>
+inline bool can_cast_expr<unary_minus_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_unary_minus;
+}
+
+inline void validate_expr(const unary_minus_overflow_exprt &value)
+{
+  validate_operands(
+    value, 1, "unary minus overflow expression must have one operand");
+}
+
 /// \brief Cast an exprt to a \ref unary_overflow_exprt
 ///
 /// \a expr must be known to be \ref unary_overflow_exprt.
