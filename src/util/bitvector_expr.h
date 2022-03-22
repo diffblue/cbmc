@@ -707,6 +707,10 @@ public:
   binary_overflow_exprt(exprt _lhs, const irep_idt &kind, exprt _rhs)
     : binary_predicate_exprt(std::move(_lhs), make_id(kind), std::move(_rhs))
   {
+    INVARIANT(
+      valid_id(id()),
+      "The kind used to construct binary_overflow_exprt should be in the set "
+      "of expected valid kinds.");
   }
 
   static void check(
