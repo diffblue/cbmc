@@ -2230,7 +2230,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     no_overflow_result = *op0_value - *op1_value;
   else if(can_cast_expr<mult_overflow_exprt>(expr))
     no_overflow_result = *op0_value * *op1_value;
-  else if(expr.id() == ID_overflow_shl)
+  else if(can_cast_expr<shl_overflow_exprt>(expr))
     no_overflow_result = *op0_value << *op1_value;
   else
     UNREACHABLE;
