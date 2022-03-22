@@ -1908,13 +1908,14 @@ void smt2_convt::convert_expr(const exprt &expr)
         "overflow check should not be performed on unsupported type",
         op_type.id_string());
   }
-  else if(expr.id()==ID_overflow_mult)
+  else if(
+    const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
   {
-    const auto &op0 = to_binary_expr(expr).op0();
-    const auto &op1 = to_binary_expr(expr).op1();
+    const auto &op0 = mult_overflow->op0();
+    const auto &op1 = mult_overflow->op1();
 
     DATA_INVARIANT(
-      expr.type().id() == ID_bool,
+      mult_overflow->type().id() == ID_bool,
       "overflow mult expression shall be of Boolean type");
 
     // No better idea than to multiply with double the bits and then compare
