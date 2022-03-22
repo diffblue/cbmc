@@ -1,6 +1,6 @@
 CORE
 bitwise_ops.c
---incremental-smt2-solver 'z3 --smt2 -in' --slice-formula
+--slice-formula
 \[main\.assertion\.1\] line \d+ This is going to fail for bit-opposites: FAILURE
 \[main\.assertion\.2\] line \d+ This is going to hold for all values != 0: SUCCESS
 \[main\.assertion\.3\] line \d+ This is going to fail for the same value in A and B: FAILURE

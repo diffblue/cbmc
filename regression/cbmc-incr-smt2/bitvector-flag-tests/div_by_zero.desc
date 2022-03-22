@@ -1,6 +1,6 @@
 CORE
 div_by_zero.c
---incremental-smt2-solver 'z3 --smt2 -in' --div-by-zero-check --trace
+--div-by-zero-check --trace
 \[main\.division-by-zero\.1\] line \d division by zero in x / y: FAILURE
 \[main\.division-by-zero\.2\] line \d+ division by zero in x / z: SUCCESS
 y=0

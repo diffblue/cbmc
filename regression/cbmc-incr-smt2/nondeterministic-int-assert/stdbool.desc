@@ -1,6 +1,6 @@
 CORE
 stdbool_example.c
---incremental-smt2-solver 'z3 --smt2 -in' --trace
+--trace
 Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
 VERIFICATION FAILED
 equal=FALSE\s*\([0 ]+\)
