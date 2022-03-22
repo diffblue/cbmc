@@ -2224,7 +2224,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     return unchanged(expr);
 
   mp_integer no_overflow_result;
-  if(expr.id() == ID_overflow_plus)
+  if(can_cast_expr<plus_overflow_exprt>(expr))
     no_overflow_result = *op0_value + *op1_value;
   else if(can_cast_expr<minus_overflow_exprt>(expr))
     no_overflow_result = *op0_value - *op1_value;
