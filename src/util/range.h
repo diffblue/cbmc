@@ -14,11 +14,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_UTIL_RANGE_H
 #define CPROVER_UTIL_RANGE_H
 
-#include <functional>
-#include <type_traits>
-
 #include <util/invariant.h>
-#include <util/make_unique.h>
+
+#include <functional>
+#include <memory>
+#include <type_traits>
 
 /// Iterator which applies some given function \c f after each increment and
 /// returns its result on dereference.
@@ -349,7 +349,7 @@ public:
       !same_size ||
       ((first_begin == first_end) == (second_begin == second_end)));
     if(first_begin != first_end)
-      current = util_make_unique<value_type>(*first_begin, *second_begin);
+      current = std::make_unique<value_type>(*first_begin, *second_begin);
   }
 
 private:

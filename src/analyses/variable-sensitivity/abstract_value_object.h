@@ -229,7 +229,7 @@ public:
   }
   value_range_implementation_ptrt reset() const override
   {
-    return util_make_unique<empty_value_ranget>();
+    return std::make_unique<empty_value_ranget>();
   }
 
 private:

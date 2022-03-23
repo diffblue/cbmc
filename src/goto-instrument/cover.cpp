@@ -14,7 +14,6 @@ Date: May 2016
 #include "cover.h"
 
 #include <util/message.h>
-#include <util/make_unique.h>
 #include <util/cmdline.h>
 #include <util/options.h>
 
@@ -65,44 +64,40 @@ void cover_instrumenterst::add_from_criterion(
   switch(criterion)
   {
   case coverage_criteriont::LOCATION:
-    instrumenters.push_back(
-      util_make_unique<cover_location_instrumentert>(
-        symbol_table, goal_filters));
+    instrumenters.push_back(std::make_unique<cover_location_instrumentert>(
+      symbol_table, goal_filters));
     break;
   case coverage_criteriont::BRANCH:
     instrumenters.push_back(
-      util_make_unique<cover_branch_instrumentert>(symbol_table, goal_filters));
+      std::make_unique<cover_branch_instrumentert>(symbol_table, goal_filters));
     break;
   case coverage_criteriont::DECISION:
-    instrumenters.push_back(
-      util_make_unique<cover_decision_instrumentert>(
-        symbol_table, goal_filters));
+    instrumenters.push_back(std::make_unique<cover_decision_instrumentert>(
+      symbol_table, goal_filters));
     break;
   case coverage_criteriont::CONDITION:
-    instrumenters.push_back(
-      util_make_unique<cover_condition_instrumentert>(
-        symbol_table, goal_filters));
+    instrumenters.push_back(std::make_unique<cover_condition_instrumentert>(
+      symbol_table, goal_filters));
     break;
   case coverage_criteriont::PATH:
     instrumenters.push_back(
-      util_make_unique<cover_path_instrumentert>(symbol_table, goal_filters));
+      std::make_unique<cover_path_instrumentert>(symbol_table, goal_filters));
     break;
   case coverage_criteriont::MCDC:
     instrumenters.push_back(
-      util_make_unique<cover_mcdc_instrumentert>(symbol_table, goal_filters));
+      std::make_unique<cover_mcdc_instrumentert>(symbol_table, goal_filters));
     break;
   case coverage_criteriont::ASSERTION:
-    instrumenters.push_back(
-      util_make_unique<cover_assertion_instrumentert>(
-        symbol_table, goal_filters));
+    instrumenters.push_back(std::make_unique<cover_assertion_instrumentert>(
+      symbol_table, goal_filters));
     break;
   case coverage_criteriont::COVER:
     instrumenters.push_back(
-      util_make_unique<cover_cover_instrumentert>(symbol_table, goal_filters));
+      std::make_unique<cover_cover_instrumentert>(symbol_table, goal_filters));
     break;
   case coverage_criteriont::ASSUME:
     instrumenters.push_back(
-      util_make_unique<cover_assume_instrumentert>(symbol_table, goal_filters));
+      std::make_unique<cover_assume_instrumentert>(symbol_table, goal_filters));
   }
 }
 
@@ -194,9 +189,9 @@ cover_configt get_cover_config(
   std::unique_ptr<goal_filterst> &goal_filters = cover_config.goal_filters;
   cover_instrumenterst &instrumenters = cover_config.cover_instrumenters;
 
-  function_filters.add(util_make_unique<internal_functions_filtert>());
+  function_filters.add(std::make_unique<internal_functions_filtert>());
 
-  goal_filters->add(util_make_unique<internal_goals_filtert>());
+  goal_filters->add(std::make_unique<internal_goals_filtert>());
 
   optionst::value_listt criteria_strings = options.get_list_option("cover");
 
@@ -227,11 +222,11 @@ cover_configt get_cover_config(
   if(!cover_include_pattern.empty())
   {
     function_filters.add(
-      util_make_unique<include_pattern_filtert>(cover_include_pattern));
+      std::make_unique<include_pattern_filtert>(cover_include_pattern));
   }
 
   if(options.get_bool_option("no-trivial-tests"))
-    function_filters.add(util_make_unique<trivial_functions_filtert>());
+    function_filters.add(std::make_unique<trivial_functions_filtert>());
 
   cover_config.traces_must_terminate =
     options.get_bool_option("cover-traces-must-terminate");
@@ -265,13 +260,13 @@ cover_configt get_cover_config(
   {
     const symbolt &main_symbol = symbol_table.lookup_ref(main_function_id);
     cover_config.function_filters.add(
-      util_make_unique<single_function_filtert>(main_symbol.name));
+      std::make_unique<single_function_filtert>(main_symbol.name));
   }
   else if(cover_only == "file")
   {
     const symbolt &main_symbol = symbol_table.lookup_ref(main_function_id);
     cover_config.function_filters.add(
-      util_make_unique<file_filtert>(main_symbol.location.get_file()));
+      std::make_unique<file_filtert>(main_symbol.location.get_file()));
   }
   else if(!cover_only.empty())
   {

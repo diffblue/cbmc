@@ -50,7 +50,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/deprecate.h>
 #include <util/json.h>
-#include <util/make_unique.h>
 #include <util/message.h>
 #include <util/xml.h>
 
@@ -565,20 +564,20 @@ public:
   // constructor
   ait()
     : ai_recursive_interproceduralt(
-        util_make_unique<
+        std::make_unique<
           ai_history_factory_default_constructort<ahistoricalt>>(),
-        util_make_unique<ai_domain_factory_default_constructort<domainT>>(),
-        util_make_unique<location_sensitive_storaget>(),
+        std::make_unique<ai_domain_factory_default_constructort<domainT>>(),
+        std::make_unique<location_sensitive_storaget>(),
         no_logging)
   {
   }
 
   explicit ait(std::unique_ptr<ai_domain_factory_baset> &&df)
     : ai_recursive_interproceduralt(
-        util_make_unique<
+        std::make_unique<
           ai_history_factory_default_constructort<ahistoricalt>>(),
         std::move(df),
-        util_make_unique<location_sensitive_storaget>(),
+        std::make_unique<location_sensitive_storaget>(),
         no_logging)
   {
   }

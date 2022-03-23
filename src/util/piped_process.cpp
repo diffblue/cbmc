@@ -79,7 +79,6 @@
 #  include "run.h"     // for Windows arg quoting
 #  include "unicode.h" // for widen function
 #  include <tchar.h>   // library for _tcscpy function
-#  include <util/make_unique.h>
 #  include <windows.h>
 #else
 #  include <fcntl.h>  // library for fcntl function
@@ -213,7 +212,7 @@ piped_processt::piped_processt(
   }
   // Create the child process
   STARTUPINFOW start_info;
-  proc_info = util_make_unique<PROCESS_INFORMATION>();
+  proc_info = std::make_unique<PROCESS_INFORMATION>();
   ZeroMemory(proc_info.get(), sizeof(PROCESS_INFORMATION));
   ZeroMemory(&start_info, sizeof(STARTUPINFOW));
   start_info.cb = sizeof(STARTUPINFOW);

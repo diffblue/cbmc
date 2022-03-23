@@ -45,17 +45,17 @@ std::unique_ptr<ai_baset> build_analyzer(
     std::unique_ptr<ai_history_factory_baset> hf = nullptr;
     if(options.get_bool_option("ahistorical"))
     {
-      hf = util_make_unique<
+      hf = std::make_unique<
         ai_history_factory_default_constructort<ahistoricalt>>();
     }
     else if(options.get_bool_option("call-stack"))
     {
-      hf = util_make_unique<call_stack_history_factoryt>(
+      hf = std::make_unique<call_stack_history_factoryt>(
         options.get_unsigned_int_option("call-stack-recursion-limit"));
     }
     else if(options.get_bool_option("local-control-flow-history"))
     {
-      hf = util_make_unique<local_control_flow_history_factoryt>(
+      hf = std::make_unique<local_control_flow_history_factoryt>(
         options.get_bool_option("local-control-flow-history-forward"),
         options.get_bool_option("local-control-flow-history-backward"),
         options.get_unsigned_int_option("local-control-flow-history-limit"));
@@ -65,17 +65,17 @@ std::unique_ptr<ai_baset> build_analyzer(
     std::unique_ptr<ai_domain_factory_baset> df = nullptr;
     if(options.get_bool_option("constants"))
     {
-      df = util_make_unique<
+      df = std::make_unique<
         ai_domain_factory_default_constructort<constant_propagator_domaint>>();
     }
     else if(options.get_bool_option("intervals"))
     {
-      df = util_make_unique<
+      df = std::make_unique<
         ai_domain_factory_default_constructort<interval_domaint>>();
     }
     else if(options.get_bool_option("vsd"))
     {
-      df = util_make_unique<variable_sensitivity_domain_factoryt>(
+      df = std::make_unique<variable_sensitivity_domain_factoryt>(
         vs_object_factory, vsd_config);
     }
     // non-null is not fully supported, despite the historical options
@@ -86,11 +86,11 @@ std::unique_ptr<ai_baset> build_analyzer(
     std::unique_ptr<ai_storage_baset> st = nullptr;
     if(options.get_bool_option("one-domain-per-history"))
     {
-      st = util_make_unique<history_sensitive_storaget>();
+      st = std::make_unique<history_sensitive_storaget>();
     }
     else if(options.get_bool_option("one-domain-per-location"))
     {
-      st = util_make_unique<location_sensitive_storaget>();
+      st = std::make_unique<location_sensitive_storaget>();
     }
 
     // Only try to build the abstract interpreter if all the parts have been
@@ -99,7 +99,7 @@ std::unique_ptr<ai_baset> build_analyzer(
     {
       if(options.get_bool_option("recursive-interprocedural"))
       {
-        return util_make_unique<ai_recursive_interproceduralt>(
+        return std::make_unique<ai_recursive_interproceduralt>(
           std::move(hf), std::move(df), std::move(st), mh);
       }
       else if(options.get_bool_option("three-way-merge"))
@@ -107,7 +107,7 @@ std::unique_ptr<ai_baset> build_analyzer(
         // Only works with VSD
         if(options.get_bool_option("vsd"))
         {
-          return util_make_unique<ai_three_way_merget>(
+          return std::make_unique<ai_three_way_merget>(
             std::move(hf), std::move(df), std::move(st), mh);
         }
       }
@@ -118,33 +118,33 @@ std::unique_ptr<ai_baset> build_analyzer(
     if(options.get_bool_option("constants"))
     {
       // constant_propagator_ait derives from ait<constant_propagator_domaint>
-      return util_make_unique<constant_propagator_ait>(
+      return std::make_unique<constant_propagator_ait>(
         goto_model.goto_functions);
     }
     else if(options.get_bool_option("dependence-graph"))
     {
-      return util_make_unique<dependence_grapht>(ns);
+      return std::make_unique<dependence_grapht>(ns);
     }
     else if(options.get_bool_option("dependence-graph-vs"))
     {
-      return util_make_unique<variable_sensitivity_dependence_grapht>(
+      return std::make_unique<variable_sensitivity_dependence_grapht>(
         goto_model.goto_functions, ns, vs_object_factory, vsd_config, mh);
     }
     else if(options.get_bool_option("vsd"))
     {
-      auto df = util_make_unique<variable_sensitivity_domain_factoryt>(
+      auto df = std::make_unique<variable_sensitivity_domain_factoryt>(
         vs_object_factory, vsd_config);
-      return util_make_unique<ait<variable_sensitivity_domaint>>(std::move(df));
+      return std::make_unique<ait<variable_sensitivity_domaint>>(std::move(df));
     }
     else if(options.get_bool_option("intervals"))
     {
-      return util_make_unique<ait<interval_domaint>>();
+      return std::make_unique<ait<interval_domaint>>();
     }
 #if 0
     // Not actually implemented, despite the option...
     else if(options.get_bool_option("non-null"))
     {
-      return util_make_unique<ait<non_null_domaint> >();
+      return std::make_unique<ait<non_null_domaint> >();
     }
 #endif
   }
@@ -156,7 +156,7 @@ std::unique_ptr<ai_baset> build_analyzer(
     // 'non-revertable' and it has merge shared
     if(options.get_bool_option("dependence-graph"))
     {
-      return util_make_unique<dependence_grapht>(ns);
+      return std::make_unique<dependence_grapht>(ns);
     }
 #endif
   }

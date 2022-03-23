@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <limits>
 
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/threeval.h>
 
 #include <minisat/core/Solver.h>
@@ -325,7 +324,7 @@ template <typename T>
 satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
   message_handlert &message_handler)
   : cnf_solvert(message_handler),
-    solver(util_make_unique<T>()),
+    solver(std::make_unique<T>()),
     time_limit_seconds(0)
 {
 }

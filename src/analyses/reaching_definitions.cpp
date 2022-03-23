@@ -16,7 +16,6 @@ Date: February 2013
 #include "reaching_definitions.h"
 
 #include <util/base_exceptions.h> // IWYU pragma: keep
-#include <util/make_unique.h>
 #include <util/pointer_offset_size.h>
 
 #include <pointer-analysis/value_set_analysis_fi.h>
@@ -41,7 +40,7 @@ public:
 
   std::unique_ptr<statet> make(locationt) const override
   {
-    auto p = util_make_unique<rd_range_domaint>(bv_container);
+    auto p = std::make_unique<rd_range_domaint>(bv_container);
     CHECK_RETURN(p->is_bottom());
     return std::unique_ptr<statet>(p.release());
   }
@@ -53,7 +52,7 @@ private:
 reaching_definitions_analysist::reaching_definitions_analysist(
   const namespacet &_ns)
   : concurrency_aware_ait<rd_range_domaint>(
-      util_make_unique<rd_range_domain_factoryt>(this)),
+      std::make_unique<rd_range_domain_factoryt>(this)),
     ns(_ns)
 {
 }
@@ -734,13 +733,13 @@ const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
 void reaching_definitions_analysist::initialize(
   const goto_functionst &goto_functions)
 {
-  auto value_sets_=util_make_unique<value_set_analysis_fit>(ns);
+  auto value_sets_ = std::make_unique<value_set_analysis_fit>(ns);
   (*value_sets_)(goto_functions);
   value_sets=std::move(value_sets_);
 
-  is_threaded=util_make_unique<is_threadedt>(goto_functions);
+  is_threaded = std::make_unique<is_threadedt>(goto_functions);
 
-  is_dirty=util_make_unique<dirtyt>(goto_functions);
+  is_dirty = std::make_unique<dirtyt>(goto_functions);
 
   concurrency_aware_ait<rd_range_domaint>::initialize(goto_functions);
 }

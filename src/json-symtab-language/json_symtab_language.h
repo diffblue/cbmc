@@ -12,7 +12,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #define CPROVER_JSON_SYMTAB_LANGUAGE_JSON_SYMTAB_LANGUAGE_H
 
 #include <util/json.h>
-#include <util/make_unique.h>
 #include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_functions.h>
@@ -55,7 +54,7 @@ public:
 
   std::unique_ptr<languaget> new_language() override
   {
-    return util_make_unique<json_symtab_languaget>();
+    return std::make_unique<json_symtab_languaget>();
   }
 
   bool generate_support_functions(symbol_table_baset &symbol_table) override
@@ -75,7 +74,7 @@ protected:
 
 inline std::unique_ptr<languaget> new_json_symtab_language()
 {
-  return util_make_unique<json_symtab_languaget>();
+  return std::make_unique<json_symtab_languaget>();
 }
 
 #endif

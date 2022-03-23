@@ -12,7 +12,6 @@ Author: Diffblue Ltd.
 #include <unordered_set>
 #include <util/expr_iterator.h>
 #include <util/graph.h>
-#include <util/make_unique.h>
 #include <util/ssa_expr.h>
 
 /// Applies `f` on all strings contained in `e` that are not if-expressions.
@@ -34,38 +33,38 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
   const irep_idt &id = name.get_identifier();
 
   if(id == ID_cprover_string_insert_func)
-    return util_make_unique<string_insertion_builtin_functiont>(
+    return std::make_unique<string_insertion_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_func)
-    return util_make_unique<string_concatenation_builtin_functiont>(
+    return std::make_unique<string_concatenation_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_concat_char_func)
-    return util_make_unique<string_concat_char_builtin_functiont>(
+    return std::make_unique<string_concat_char_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_format_func)
-    return util_make_unique<string_format_builtin_functiont>(
+    return std::make_unique<string_format_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_of_int_func)
-    return util_make_unique<string_of_int_builtin_functiont>(
+    return std::make_unique<string_of_int_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_char_set_func)
-    return util_make_unique<string_set_char_builtin_functiont>(
+    return std::make_unique<string_set_char_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_to_lower_case_func)
-    return util_make_unique<string_to_lower_case_builtin_functiont>(
+    return std::make_unique<string_to_lower_case_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_to_upper_case_func)
-    return util_make_unique<string_to_upper_case_builtin_functiont>(
+    return std::make_unique<string_to_upper_case_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
-  return util_make_unique<string_builtin_function_with_no_evalt>(
+  return std::make_unique<string_builtin_function_with_no_evalt>(
     return_code, fun_app, array_pool);
 }
 
@@ -85,7 +84,7 @@ string_dependenciest::node_at(const array_string_exprt &e) const
 {
   const auto &it = node_index_pool.find(e);
   if(it != node_index_pool.end())
-    return util_make_unique<const string_nodet>(string_nodes.at(it->second));
+    return std::make_unique<const string_nodet>(string_nodes.at(it->second));
   return {};
 }
 

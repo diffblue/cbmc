@@ -14,8 +14,6 @@ Author: Matt Lewis
 
 #include <memory>
 
-#include <util/make_unique.h>
-
 #include <goto-programs/goto_program.h>
 
 #include <analyses/natural_loops.h>
@@ -49,7 +47,7 @@ public:
         goto_functions,
         guard_manager),
       path_limit(_path_limit),
-      path_enumerator(util_make_unique<sat_path_enumeratort>(
+      path_enumerator(std::make_unique<sat_path_enumeratort>(
         message_handler,
         symbol_table,
         goto_functions,

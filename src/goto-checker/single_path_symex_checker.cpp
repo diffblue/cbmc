@@ -62,7 +62,7 @@ operator()(propertiest &properties)
     {
       update_properties(properties, result.updated_properties, path.equation);
 
-      property_decider = util_make_unique<goto_symex_property_decidert>(
+      property_decider = std::make_unique<goto_symex_property_decidert>(
         options, ui_message_handler, path.equation, ns);
 
       const auto solver_runtime =

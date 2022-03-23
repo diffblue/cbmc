@@ -349,7 +349,7 @@ public:
   {
     auto node_id = dg.add_node();
     dg.nodes[node_id].PC = l;
-    auto p = util_make_unique<dep_graph_domaint>(node_id);
+    auto p = std::make_unique<dep_graph_domaint>(node_id);
     CHECK_RETURN(p->is_bottom());
 
     return std::unique_ptr<statet>(p.release());
@@ -360,7 +360,7 @@ private:
 };
 
 dependence_grapht::dependence_grapht(const namespacet &_ns)
-  : ait<dep_graph_domaint>(util_make_unique<dep_graph_domain_factoryt>(*this)),
+  : ait<dep_graph_domaint>(std::make_unique<dep_graph_domain_factoryt>(*this)),
     ns(_ns),
     rd(ns)
 {

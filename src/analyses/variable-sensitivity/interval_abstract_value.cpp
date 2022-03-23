@@ -12,7 +12,6 @@
 #include <util/bitvector_types.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/simplify_expr.h>
 
 #include "abstract_environment.h"
@@ -72,7 +71,7 @@ static index_range_implementation_ptrt make_interval_index_range(
   const constant_interval_exprt &interval,
   const namespacet &n)
 {
-  return util_make_unique<interval_index_ranget>(interval, n);
+  return std::make_unique<interval_index_ranget>(interval, n);
 }
 
 static inline bool

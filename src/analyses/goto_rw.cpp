@@ -15,7 +15,6 @@ Date: April 2010
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
 #include <util/expr_util.h>
-#include <util/make_unique.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -528,7 +527,7 @@ void rw_range_sett::add(
        .first;
 
   if(entry->second==nullptr)
-    entry->second=util_make_unique<range_domaint>();
+    entry->second = std::make_unique<range_domaint>();
 
   static_cast<range_domaint&>(*entry->second).push_back(
     {range_start, range_end});
@@ -766,7 +765,7 @@ void rw_guarded_range_set_value_sett::add(
       .first;
 
   if(entry->second==nullptr)
-    entry->second=util_make_unique<guarded_range_domaint>();
+    entry->second = std::make_unique<guarded_range_domaint>();
 
   static_cast<guarded_range_domaint&>(*entry->second).insert(
     {range_start, {range_end, guard.as_expr()}});

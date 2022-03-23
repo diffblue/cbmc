@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_qualifiers.h"
 
-#include <util/make_unique.h>
 #include <util/type.h>
 
 c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
@@ -26,7 +25,7 @@ c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
 
 std::unique_ptr<qualifierst> c_qualifierst::clone() const
 {
-  auto other = util_make_unique<c_qualifierst>();
+  auto other = std::make_unique<c_qualifierst>();
   *other = *this;
   return std::move(other);
 }

@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/c_object_factory_parameters.h>
 
-#include <util/make_unique.h> // unique_ptr
-
 #include <langapi/language.h>
 
 #include "cpp_parse_tree.h"
@@ -81,7 +79,9 @@ public:
     const namespacet &ns) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<cpp_languaget>(); }
+  {
+    return std::make_unique<cpp_languaget>();
+  }
 
   std::string id() const override { return "cpp"; }
   std::string description() const override { return "C++"; }
