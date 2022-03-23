@@ -579,7 +579,7 @@ void custom_bitvector_domaint::output(
     for(unsigned i=0; b!=0; i++, b>>=1)
       if(b&1)
       {
-        assert(i<cba.bits.size());
+        INVARIANT(i < cba.bits.size(), "inconsistent bit widths");
         out << ' '
             << cba.bits[i];
       }
@@ -595,7 +595,7 @@ void custom_bitvector_domaint::output(
     for(unsigned i=0; b!=0; i++, b>>=1)
       if(b&1)
       {
-        assert(i<cba.bits.size());
+        INVARIANT(i < cba.bits.size(), "inconsistent bit widths");
         out << ' '
             << cba.bits[i];
       }

@@ -49,7 +49,7 @@ code_function_callt function_to_call(
     symbol_table.insert(std::move(new_symbol));
 
     s_it=symbol_table.symbols.find(id);
-    assert(s_it!=symbol_table.symbols.end());
+    DATA_INVARIANT(s_it != symbol_table.symbols.end(), "symbol not found");
 #endif
   }
 
@@ -141,7 +141,7 @@ void function_exit(
     // exiting without return
     goto_programt::targett last=body.instructions.end();
     last--;
-    assert(last->is_end_function());
+    DATA_INVARIANT(last->is_end_function(), "must be end of function");
 
     // is there already a return?
     bool has_set_return_value = false;

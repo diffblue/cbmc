@@ -40,9 +40,9 @@ void full_slicert::add_function_calls(
 {
   goto_functionst::function_mapt::const_iterator f_it =
     goto_functions.function_map.find(node.function_id);
-  assert(f_it!=goto_functions.function_map.end());
+  CHECK_RETURN(f_it != goto_functions.function_map.end());
 
-  assert(!f_it->second.body.instructions.empty());
+  CHECK_RETURN(!f_it->second.body.instructions.empty());
   goto_programt::const_targett begin_function=
     f_it->second.body.instructions.begin();
 

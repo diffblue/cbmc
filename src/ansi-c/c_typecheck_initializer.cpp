@@ -359,18 +359,18 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
   // copy the value, we may need to adjust it
   exprt value=*init_it;
 
-  assert(!designator.empty());
+  PRECONDITION(!designator.empty());
 
   if(value.id()==ID_designated_initializer)
   {
-    assert(value.operands().size()==1);
+    PRECONDITION(value.operands().size() == 1);
 
     designator=
       make_designator(
         designator.front().type,
         static_cast<const exprt &>(value.find(ID_designator)));
 
-    assert(!designator.empty());
+    CHECK_RETURN(!designator.empty());
 
     // discard the return value
     do_designated_initializer(
@@ -593,7 +593,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       else
         *dest=do_initializer_rec(value, type, force_constant);
 
-      assert(full_type==follow(dest->type()));
+      DATA_INVARIANT(full_type == follow(dest->type()), "matching types");
 
       return ++init_it; // done
     }
@@ -661,10 +661,10 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       }
     }
 
-    assert(full_type.id()==ID_struct ||
-           full_type.id()==ID_union ||
-           full_type.id()==ID_array ||
-           full_type.id()==ID_vector);
+    DATA_INVARIANT(
+      full_type.id() == ID_struct || full_type.id() == ID_union ||
+        full_type.id() == ID_array || full_type.id() == ID_vector,
+      "full type must be composite");
 
     // we are initializing a compound type, and enter it!
     // this may change the type, full_type might not be valid any more
@@ -715,7 +715,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
 void c_typecheck_baset::increment_designator(designatort &designator)
 {
-  assert(!designator.empty());
+  PRECONDITION(!designator.empty());
 
   while(true)
   {
@@ -736,7 +736,8 @@ void c_typecheck_baset::increment_designator(designatort &designator)
         to_struct_type(full_type);
       const struct_typet::componentst &components=
         struct_type.components();
-      assert(components.size()==entry.size);
+      DATA_INVARIANT(
+        components.size() == entry.size, "matching component numbers");
 
       // we skip over any padding or code
       // we also skip over anonymous members
@@ -762,7 +763,7 @@ void c_typecheck_baset::increment_designator(designatort &designator)
     // pop entry
     designator.pop_entry();
 
-    assert(!designator.empty());
+    INVARIANT(!designator.empty(), "designator had more than one entry");
   }
 }
 
@@ -770,7 +771,7 @@ designatort c_typecheck_baset::make_designator(
   const typet &src_type,
   const exprt &src)
 {
-  assert(!src.operands().empty());
+  PRECONDITION(!src.operands().empty());
 
   typet type=src_type;
   designatort designator;
@@ -909,7 +910,7 @@ designatort c_typecheck_baset::make_designator(
     designator.push_entry(entry);
   }
 
-  assert(!designator.empty());
+  INVARIANT(!designator.empty(), "expected an entry to be added");
 
   return designator;
 }
@@ -919,7 +920,7 @@ exprt c_typecheck_baset::do_initializer_list(
   const typet &type,
   bool force_constant)
 {
-  assert(value.id()==ID_initializer_list);
+  PRECONDITION(value.id() == ID_initializer_list);
 
   const typet &full_type=follow(type);
 

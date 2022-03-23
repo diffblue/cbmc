@@ -117,7 +117,9 @@ std::string expr2javat::convert_struct(
   const struct_typet::componentst &components=
     struct_type.components();
 
-  assert(components.size()==src.operands().size());
+  DATA_INVARIANT(
+    components.size() == src.operands().size(),
+    "inconsistent number of components");
 
   exprt::operandst::const_iterator o_it=src.operands().begin();
 

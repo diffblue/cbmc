@@ -38,7 +38,7 @@ public:
 
   void pop(jsont &dest)
   {
-    assert(!stack.empty());
+    PRECONDITION(!stack.empty());
     dest.swap(stack.top());
     stack.pop();
   }

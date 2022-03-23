@@ -111,7 +111,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
      !function_scope.is_static_member)
   {
     code_typet::parameterst &parameters=function_type.parameters();
-    assert(parameters.size()>=1);
+    DATA_INVARIANT(parameters.size() >= 1, "parameters expected");
     code_typet::parametert &this_parameter_expr=parameters.front();
     function_scope.this_expr = symbol_exprt{
       this_parameter_expr.get_identifier(), this_parameter_expr.type()};

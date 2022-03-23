@@ -158,7 +158,7 @@ void value_set_fit::flatten_rec(
   #endif
 
   std::string identifier = id2string(e.identifier);
-  assert(seen.find(identifier + e.suffix)==seen.end());
+  CHECK_RETURN(seen.find(identifier + e.suffix) == seen.end());
 
   bool generalize_index = false;
 
@@ -303,7 +303,7 @@ value_set_fit::get_value_set(const exprt &expr, const namespacet &ns) const
     const exprt &object = object_numbering[object_entry.first];
     if(object.type().id()=="#REF#")
     {
-      assert(object.id()==ID_symbol);
+      DATA_INVARIANT(object.id() == ID_symbol, "reference to symbol required");
 
       const irep_idt &ident = object.get(ID_identifier);
       valuest::const_iterator v_it = values.find(ident);
@@ -630,7 +630,7 @@ void value_set_fit::get_value_set_rec(
             statement==ID_cpp_new_array)
     {
       PRECONDITION(suffix.empty());
-      assert(expr.type().id()==ID_pointer);
+      PRECONDITION(expr.type().id() == ID_pointer);
 
       dynamic_object_exprt dynamic_object(
         to_pointer_type(expr.type()).base_type());
@@ -690,7 +690,7 @@ void value_set_fit::dereference_rec(
   // remove pointer typecasts
   if(src.id()==ID_typecast)
   {
-    assert(src.type().id()==ID_pointer);
+    PRECONDITION(src.type().id() == ID_pointer);
 
     dereference_rec(to_typecast_expr(src).op(), dest);
   }
@@ -1018,7 +1018,8 @@ void value_set_fit::assign(
         if(rhs.id()==ID_struct ||
            rhs.id()==ID_constant)
         {
-          assert(no<rhs.operands().size());
+          DATA_INVARIANT(
+            no < rhs.operands().size(), "component index must be in bounds");
           rhs_member=rhs.operands()[no];
         }
         else if(rhs.id()==ID_with)

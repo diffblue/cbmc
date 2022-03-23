@@ -168,7 +168,7 @@ void _rw_set_loct::read_write_rec(
   }
   else if(expr.id()==ID_address_of)
   {
-    assert(expr.operands().size()==1);
+    PRECONDITION(expr.operands().size() == 1);
   }
   else if(expr.id()==ID_if)
   {

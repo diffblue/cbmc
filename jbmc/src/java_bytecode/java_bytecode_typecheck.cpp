@@ -25,7 +25,7 @@ std::string java_bytecode_typecheckt::to_string(const typet &type)
 
 void java_bytecode_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
-  assert(!symbol.is_type);
+  PRECONDITION(!symbol.is_type);
   typecheck_type(symbol.type);
   typecheck_expr(symbol.value);
 }

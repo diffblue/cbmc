@@ -61,7 +61,7 @@ void havoc_loopst::havoc_loop(
   const goto_programt::targett loop_head,
   const loopt &loop)
 {
-  assert(!loop.empty());
+  PRECONDITION(!loop.empty());
 
   // first find out what can get changed in the loop
   assignst assigns;

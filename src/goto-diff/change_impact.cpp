@@ -363,17 +363,17 @@ void change_impactt::change_impact(
     switch(d.second)
     {
       case unified_difft::differencet::SAME:
-        assert(o_it!=old_goto_program.instructions.end());
-        assert(n_it!=new_goto_program.instructions.end());
+        INVARIANT(o_it != old_goto_program.instructions.end(), "within range");
+        INVARIANT(n_it != new_goto_program.instructions.end(), "within range");
         old_impact[o_it]|=SAME;
         ++o_it;
-        assert(n_it==d.first);
+        INVARIANT(n_it == d.first, "start of hunk");
         new_impact[n_it]|=SAME;
         ++n_it;
         break;
       case unified_difft::differencet::DELETED:
-        assert(o_it!=old_goto_program.instructions.end());
-        assert(o_it==d.first);
+        INVARIANT(o_it != old_goto_program.instructions.end(), "within range");
+        INVARIANT(o_it == d.first, "start of hunk");
         {
           const dependence_grapht::nodet &d_node=
             old_dep_graph[old_dep_graph[o_it].get_node_id()];
@@ -391,8 +391,8 @@ void change_impactt::change_impact(
         ++o_it;
         break;
       case unified_difft::differencet::NEW:
-        assert(n_it!=new_goto_program.instructions.end());
-        assert(n_it==d.first);
+        INVARIANT(n_it != new_goto_program.instructions.end(), "within range");
+        INVARIANT(n_it == d.first, "start of hunk");
         {
           const dependence_grapht::nodet &d_node=
             new_dep_graph[new_dep_graph[n_it].get_node_id()];
@@ -548,7 +548,7 @@ void change_impactt::operator()()
         ns_new);
     else
     {
-      assert(oc_it->first==nc_it->first);
+      INVARIANT(oc_it->first == nc_it->first, "same instruction");
 
       output_change_impact(
         nc_it->first,
@@ -572,7 +572,7 @@ void change_impactt::output_change_impact(
 {
   goto_functionst::function_mapt::const_iterator f_it =
     goto_functions.function_map.find(function_id);
-  assert(f_it!=goto_functions.function_map.end());
+  CHECK_RETURN(f_it != goto_functions.function_map.end());
   const goto_programt &goto_program=f_it->second.body;
 
   if(!compact_output)
@@ -620,12 +620,12 @@ void change_impactt::output_change_impact(
 {
   goto_functionst::function_mapt::const_iterator o_f_it =
     o_goto_functions.function_map.find(function_id);
-  assert(o_f_it!=o_goto_functions.function_map.end());
+  CHECK_RETURN(o_f_it != o_goto_functions.function_map.end());
   const goto_programt &old_goto_program=o_f_it->second.body;
 
   goto_functionst::function_mapt::const_iterator f_it =
     n_goto_functions.function_map.find(function_id);
-  assert(f_it!=n_goto_functions.function_map.end());
+  CHECK_RETURN(f_it != n_goto_functions.function_map.end());
   const goto_programt &goto_program=f_it->second.body;
 
   if(!compact_output)
@@ -678,18 +678,20 @@ void change_impactt::output_change_impact(
     {
       prefix='D';
 
-      assert(old_mod_flags==SAME ||
-             old_mod_flags&DEL_DATA_DEP ||
-             old_mod_flags&DEL_CTRL_DEP);
+      DATA_INVARIANT(
+        old_mod_flags == SAME || old_mod_flags & DEL_DATA_DEP ||
+          old_mod_flags & DEL_CTRL_DEP,
+        "expected kind of flag");
       ++o_target;
     }
     else if(mod_flags&NEW_CTRL_DEP)
     {
       prefix='C';
 
-      assert(old_mod_flags==SAME ||
-             old_mod_flags&DEL_DATA_DEP ||
-             old_mod_flags&DEL_CTRL_DEP);
+      DATA_INVARIANT(
+        old_mod_flags == SAME || old_mod_flags & DEL_DATA_DEP ||
+          old_mod_flags & DEL_CTRL_DEP,
+        "expected kind of flag");
       ++o_target;
     }
     else

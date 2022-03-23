@@ -80,13 +80,13 @@ flow_insensitive_analysis_baset::locationt
 flow_insensitive_analysis_baset::get_next(
   working_sett &working_set)
 {
-  assert(!working_set.empty());
+  PRECONDITION(!working_set.empty());
 
-//  working_sett::iterator i=working_set.begin();
-//  locationt l=i->second;
-//  working_set.erase(i);
+  //  working_sett::iterator i=working_set.begin();
+  //  locationt l=i->second;
+  //  working_set.erase(i);
 
-//  pop_heap(working_set.begin(), working_set.end());
+  //  pop_heap(working_set.begin(), working_set.end());
   locationt l=working_set.top();
   working_set.pop();
 
@@ -223,7 +223,8 @@ bool flow_insensitive_analysis_baset::do_function_call(
     return new_data;
   }
 
-  assert(!goto_function.body.instructions.empty());
+  DATA_INVARIANT(
+    !goto_function.body.instructions.empty(), "body must be present");
 
   bool new_data=false;
 
@@ -256,7 +257,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
     // get location at end of procedure
     locationt l_end=--goto_function.body.instructions.end();
 
-    assert(l_end->is_end_function());
+    DATA_INVARIANT(l_end->is_end_function(), "must be end of function");
 
     // do edge from end of function to instruction after call
     locationt l_next=l_call;

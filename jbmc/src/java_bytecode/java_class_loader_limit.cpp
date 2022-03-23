@@ -62,7 +62,7 @@ void java_class_loader_limitt::setup_class_load_limit(
   }
   else
   {
-    assert(java_cp_include_files.length()>1);
+    PRECONDITION(java_cp_include_files.length() > 1);
     jsont json_cp_config;
     if(parse_json(
          java_cp_include_files.substr(1),
@@ -76,7 +76,7 @@ void java_class_loader_limitt::setup_class_load_limit(
       throw "the JSON file has a wrong format";
     for(const jsont &file_entry : to_json_array(include_files))
     {
-      assert(file_entry.is_string());
+      PRECONDITION(file_entry.is_string());
       set_matcher.insert(file_entry.value);
     }
   }

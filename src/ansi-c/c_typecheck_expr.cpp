@@ -245,7 +245,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     expr.type()=bool_typet();
     auto &subtypes =
       (static_cast<type_with_subtypest &>(expr.add(ID_type_arg))).subtypes();
-    assert(subtypes.size()==2);
+    PRECONDITION(subtypes.size() == 2);
     typecheck_type(subtypes[0]);
     typecheck_type(subtypes[1]);
     source_locationt source_location=expr.source_location();
@@ -607,7 +607,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
       while(!found)
       {
-        assert(type.id()==ID_union || type.id()==ID_struct);
+        PRECONDITION(type.id() == ID_union || type.id() == ID_struct);
 
         const struct_union_typet &struct_union_type=
           to_struct_union_type(type);
@@ -671,7 +671,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
                 typet tmp = follow(c.type());
                 type=tmp;
-                assert(type.id()==ID_union || type.id()==ID_struct);
+                CHECK_RETURN(type.id() == ID_union || type.id() == ID_struct);
                 found2=true;
                 break; // we run into another iteration of the outer loop
               }
@@ -922,7 +922,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
   if(last_statement==ID_expression)
   {
-    assert(last.operands().size()==1);
+    PRECONDITION(last.operands().size() == 1);
     exprt &op=last.op0();
 
     // arrays here turn into pointers (array decay)
@@ -1571,7 +1571,7 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
 
-  assert(operands.size()==3);
+  PRECONDITION(operands.size() == 3);
 
   // copy (save) original types
   const typet o_type0=operands[0].type();
@@ -1788,7 +1788,7 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
     expr.id(ID_index);
     expr.type() = to_array_type(op_type).element_type();
     expr.copy_to_operands(from_integer(0, c_index_type()));
-    assert(expr.operands().size()==2);
+    CHECK_RETURN(expr.operands().size() == 2);
   }
   else if(op_type.id()==ID_pointer)
   {
@@ -4029,7 +4029,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 {
-  assert(expr.id()==ID_shl || expr.id()==ID_shr);
+  PRECONDITION(expr.id() == ID_shl || expr.id() == ID_shr);
 
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();

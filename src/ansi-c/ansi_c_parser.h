@@ -102,7 +102,7 @@ public:
 
   scopet &current_scope()
   {
-    assert(!scopes.empty());
+    PRECONDITION(!scopes.empty());
     return scopes.back();
   }
 
@@ -116,7 +116,7 @@ public:
 
   void copy_item(const ansi_c_declarationt &declaration)
   {
-    assert(declaration.id()==ID_declaration);
+    PRECONDITION(declaration.id() == ID_declaration);
     parse_tree.items.push_back(declaration);
   }
 

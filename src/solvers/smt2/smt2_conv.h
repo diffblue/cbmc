@@ -213,7 +213,7 @@ protected:
 
   const smt2_symbolt &to_smt2_symbol(const exprt &expr)
   {
-    assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
+    PRECONDITION(expr.id() == ID_smt2_symbol && !expr.has_operands());
     return static_cast<const smt2_symbolt&>(expr);
   }
 

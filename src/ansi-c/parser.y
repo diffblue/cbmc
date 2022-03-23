@@ -2919,7 +2919,9 @@ function_definition:
           ansi_c_declarationt &ansi_c_declaration=
             to_ansi_c_declaration(parser_stack($$));
             
-          assert(ansi_c_declaration.declarators().size()==1);
+          INVARIANT(
+            ansi_c_declaration.declarators().size()==1,
+            "exactly one declarator");
           ansi_c_declaration.add_initializer(parser_stack($2));
           
           // Kill the scope that 'function_head' creates.

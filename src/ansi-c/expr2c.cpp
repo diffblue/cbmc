@@ -668,7 +668,8 @@ std::string expr2ct::convert_struct_type(
   // Either we are including the body (in which case it makes sense to include
   // or exclude the parameters) or there is no body so therefore we definitely
   // shouldn't be including the parameters
-  assert(inc_struct_body || !inc_padding_components);
+  INVARIANT(
+    inc_struct_body || !inc_padding_components, "inconsistent configuration");
 
   const struct_typet &struct_type=to_struct_type(src);
 
@@ -896,8 +897,7 @@ std::string expr2ct::convert_with(
 
       const struct_union_typet::componentt &comp_expr=
         struct_union_type.get_component(component_name);
-
-      assert(comp_expr.is_not_nil());
+      CHECK_RETURN(comp_expr.is_not_nil());
 
       irep_idt display_component_name;
 
@@ -1642,7 +1642,7 @@ std::string expr2ct::convert_symbol(const exprt &src)
       get_shorthands(src);
 
       entry=shorthands.find(id);
-      assert(entry!=shorthands.end());
+      CHECK_RETURN(entry != shorthands.end());
     }
 
     dest=id2string(entry->second);

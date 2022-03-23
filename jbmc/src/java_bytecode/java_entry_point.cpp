@@ -621,7 +621,7 @@ bool java_entry_point(
     return true;
   symbolt symbol=res.main_function;
 
-  assert(symbol.type.id()==ID_code);
+  DATA_INVARIANT(symbol.type.id() == ID_code, "expected code-typed symbol");
 
   return generate_java_start_function(
     symbol,

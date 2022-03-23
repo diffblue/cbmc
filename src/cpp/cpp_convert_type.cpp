@@ -179,8 +179,9 @@ void cpp_convert_typet::read_function_type(const typet &type)
 
       cpp_convert_plain_type(declaration.type(), message_handler);
 
-      // there should be only one declarator
-      assert(declaration.declarators().size()==1);
+      DATA_INVARIANT(
+        declaration.declarators().size() == 1,
+        "there should be only one declarator");
 
       cpp_declaratort &declarator=
         declaration.declarators().front();
@@ -212,7 +213,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
         else if(cpp_name.is_simple_name())
         {
           irep_idt base_name=cpp_name.get_base_name();
-          assert(!base_name.empty());
+          CHECK_RETURN(!base_name.empty());
           new_parameter.set_identifier(base_name);
           new_parameter.set_base_name(base_name);
           new_parameter.add_source_location()=cpp_name.source_location();

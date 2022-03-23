@@ -119,7 +119,7 @@ public:
 
     goto_functionst::function_mapt::const_iterator f_it2=
       goto_functions->function_map.find(fkt);
-    assert(f_it2!=goto_functions->function_map.end());
+    CHECK_RETURN(f_it2 != goto_functions->function_map.end());
     return *(fkt_map[fkt]=util_make_unique<local_may_aliast>(f_it2->second));
   }
 
@@ -127,7 +127,7 @@ public:
   {
     target_mapt::const_iterator t_it=
       target_map.find(t);
-    assert(t_it!=target_map.end());
+    CHECK_RETURN(t_it != target_map.end());
     return operator()(t_it->second);
   }
 

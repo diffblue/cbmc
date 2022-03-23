@@ -1714,7 +1714,7 @@ bool Parser::rOtherDeclaration(
     std::cout << std::string(__indent, ' ') << "Parser::rOtherDeclaration 4\n";
 #endif
 
-    assert(!type_name.get_sub().empty());
+    DATA_INVARIANT(!type_name.get_sub().empty(), "type name details expected");
 
     for(std::size_t i=0; i < type_name.get_sub().size(); i++)
     {
@@ -1752,7 +1752,7 @@ bool Parser::rOtherDeclaration(
     std::cout << std::string(__indent, ' ') << "Parser::rOtherDeclaration 6\n";
 #endif
 
-    assert(!type_name.get_sub().empty());
+    DATA_INVARIANT(!type_name.get_sub().empty(), "type name details expected");
 
     bool is_destructor=false;
     for(const auto &irep : type_name.get_sub())
@@ -3363,7 +3363,7 @@ bool Parser::optPtrOperator(typet &ptrs)
     }
     else
     {
-      assert(it->is_not_nil());
+      DATA_INVARIANT(it->is_not_nil(), "must not be nil");
       it->add_subtype().swap(ptrs);
     }
 
@@ -3725,7 +3725,7 @@ bool Parser::rOperatorName(irept &name)
     return rCastOperatorName(name);
   }
 
-  assert(!operator_id.empty());
+  DATA_INVARIANT(!operator_id.empty(), "operator id missing");
   lex.get_token(tk);
   name=irept(operator_id);
   set_location(name, tk);
@@ -4000,8 +4000,8 @@ bool Parser::rTemplateArgs(irept &template_args)
       tk2.text='>';
       lex.Replace(tk2);
       lex.Insert(tk2);
-      assert(lex.LookAhead(0)=='>');
-      assert(lex.LookAhead(1)=='>');
+      DATA_INVARIANT(lex.LookAhead(0) == '>', "should be >");
+      DATA_INVARIANT(lex.LookAhead(1) == '>', "should be >");
       return true;
 
     default:
@@ -7787,7 +7787,8 @@ optionalt<codet> Parser::rTryStatement()
         return {};
 
       // No name in the declarator? Make one.
-      assert(declaration.declarators().size()==1);
+      DATA_INVARIANT(
+        declaration.declarators().size() == 1, "exactly one declarator");
 
       if(declaration.declarators().front().name().is_nil())
         declaration.declarators().front().name() = cpp_namet("#anon");

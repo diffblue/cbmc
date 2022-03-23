@@ -79,7 +79,7 @@ bool cpp_typecheck_fargst::match(
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
 
-    assert(it!=ops.end());
+    DATA_INVARIANT(it != ops.end(), "arguments and parameters must match");
     const exprt &operand=*it;
     typet type=parameter.type();
 
