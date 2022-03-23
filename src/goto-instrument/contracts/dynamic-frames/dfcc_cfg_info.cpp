@@ -138,7 +138,7 @@ dfcc_loop_infot::find_head(goto_programt &goto_program) const
 optionalt<goto_programt::targett>
 dfcc_loop_infot::find_latch(goto_programt &goto_program) const
 {
-  optionalt<goto_programt::targett> result = nullopt;
+  optionalt<goto_programt::targett> result = std::nullopt;
   for(auto target = goto_program.instructions.begin();
       target != goto_program.instructions.end();
       target++)
@@ -728,7 +728,7 @@ dfcc_cfg_infot::get_outer_loop_identifier(const std::size_t loop_id) const
     }
   }
   // return nullopt for loops that are not nested in other loops
-  return nullopt;
+  return std::nullopt;
 }
 
 bool dfcc_cfg_infot::is_valid_loop_or_top_level_id(const std::size_t id) const

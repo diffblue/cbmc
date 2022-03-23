@@ -32,7 +32,7 @@ public:
   {
     const auto &entry_opt = get_entry(type);
     if(!entry_opt.has_value())
-      return {};
+      return std::nullopt;
     return entry_opt->total_width;
   }
 

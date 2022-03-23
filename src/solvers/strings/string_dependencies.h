@@ -164,8 +164,7 @@ private:
   // NOLINTNEXTLINE(readability/identifiers)
   struct node_hash
   {
-    size_t
-    operator()(const string_dependenciest::nodet &node) const optional_noexcept
+    size_t operator()(const string_dependenciest::nodet &node) const
     {
       return 2 * node.index +
              (node.kind == string_dependenciest::nodet::STRING ? 0 : 1);

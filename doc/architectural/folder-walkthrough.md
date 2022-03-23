@@ -51,7 +51,6 @@ containing the code for a different part of the system.
   * \ref xmllang
   * \ref util
   * \ref miniz
-  * \ref nonstd
 
 In the top level of `src` there are only a few files:
 
@@ -167,7 +166,6 @@ digraph directory_dependencies {
     big_int [label = "big-int", URL = "\ref big-int"];
     miniz [URL = "\ref miniz"];
     util [URL = "\ref util"];
-    nonstd [URL = "\ref nonstd"];
     json [URL = "\ref json"];
     xmllang [URL = "\ref xmllang"];
     assembler [URL = "\ref assembler"];
@@ -203,6 +201,5 @@ digraph directory_dependencies {
   xmllang -> util;
   assembler -> util;
   util -> big_int;
-  util -> nonstd;
 }
 \enddot
