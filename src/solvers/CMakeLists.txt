@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 #   We may use one of several different solver libraries.
@@ -109,7 +109,7 @@ elseif("${sat_impl}" STREQUAL "cadical")
     download_project(PROJ cadical
         URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
-        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++14
+        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++17
         URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 
@@ -139,7 +139,7 @@ elseif("${sat_impl}" STREQUAL "ipasir-cadical")
     download_project(PROJ cadical
         URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
-        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++14
+        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++17
         URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 
