@@ -170,7 +170,6 @@ SRC += analyses/ai/ai.cpp \
        util/lower_byte_operators.cpp \
        util/memory_info.cpp \
        util/message.cpp \
-       util/optional.cpp \
        util/optional_utils.cpp \
        util/parse_options.cpp \
        util/piped_process.cpp \

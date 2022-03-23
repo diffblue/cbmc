@@ -217,7 +217,7 @@ void finalize_linking(
         {
           instruction.transform([&object_type_updates](exprt expr) {
             const bool changed = !object_type_updates.replace(expr);
-            return changed ? optionalt<exprt>{expr} : nullopt;
+            return changed ? optionalt<exprt>{expr} : std::nullopt;
           });
         }
       }

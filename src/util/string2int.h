@@ -94,11 +94,11 @@ auto wrap_string_conversion(do_conversiont do_conversion)
   }
   catch(const std::invalid_argument &)
   {
-    return nullopt;
+    return std::nullopt;
   }
   catch(const std::out_of_range &)
   {
-    return nullopt;
+    return std::nullopt;
   }
 }
 

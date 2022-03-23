@@ -331,7 +331,7 @@ void dfcc_lift_memory_predicatest::lift_parameters_and_update_body(
     // rewrite all occurrences of lifted parameters
     instruction.transform([&replace_lifted_params](exprt expr) {
       const bool changed = !replace_lifted_params.replace(expr);
-      return changed ? optionalt<exprt>{expr} : nullopt;
+      return changed ? optionalt<exprt>{expr} : std::nullopt;
     });
 
     // add address-of to all arguments expressions passed in lifted position to

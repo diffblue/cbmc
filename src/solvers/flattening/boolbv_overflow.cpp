@@ -118,7 +118,7 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
     expr.rhs(),
     can_cast_expr<mult_overflow_exprt>(expr)
       ? optionalt<std::size_t>{bv0.size()}
-      : nullopt);
+      : std::nullopt);
 
   const bv_utilst::representationt rep =
     can_cast_type<signedbv_typet>(expr.lhs().type())

@@ -745,7 +745,13 @@ static get_or_create_reference_resultt get_or_create_reference(
   if(id_it == info.references.end())
   {
     code_with_references_listt code;
+// Work around spurious GCC 13 warning about references being uninitialised.
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     object_creation_referencet reference;
+#pragma GCC diagnostic pop
     if(is_java_array_type(expr.type()))
     {
       reference.expr = info.allocate_objects.allocate_automatic_local_object(
