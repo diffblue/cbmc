@@ -18,14 +18,185 @@
 #include <stack>
 #include <string>
 
+static bool is_simple_identifier(const std::string &identifier)
+{
+  PRECONDITION(!identifier.empty());
+  auto iterator = identifier.begin();
+  switch(*iterator)
+  {
+    case 'A':
+    case 'a':
+    case 'B':
+    case 'b':
+    case 'C':
+    case 'c':
+    case 'D':
+    case 'd':
+    case 'E':
+    case 'e':
+    case 'F':
+    case 'f':
+    case 'G':
+    case 'g':
+    case 'H':
+    case 'h':
+    case 'I':
+    case 'i':
+    case 'J':
+    case 'j':
+    case 'K':
+    case 'k':
+    case 'L':
+    case 'l':
+    case 'M':
+    case 'm':
+    case 'N':
+    case 'n':
+    case 'O':
+    case 'o':
+    case 'P':
+    case 'p':
+    case 'Q':
+    case 'q':
+    case 'R':
+    case 'r':
+    case 'S':
+    case 's':
+    case 'T':
+    case 't':
+    case 'U':
+    case 'u':
+    case 'V':
+    case 'v':
+    case 'W':
+    case 'w':
+    case 'X':
+    case 'x':
+    case 'Y':
+    case 'y':
+    case 'Z':
+    case 'z':
+    case '~':
+    case '!':
+    case '@':
+    case '$':
+    case '%':
+    case '^':
+    case '&':
+    case '*':
+    case '_':
+    case '-':
+    case '+':
+    case '=':
+    case '<':
+    case '>':
+    case '.':
+    case '?':
+    case '/':
+      ++iterator;
+      for(; iterator != identifier.cend(); ++iterator)
+      {
+        switch(*iterator)
+        {
+          case 'A':
+          case 'a':
+          case 'B':
+          case 'b':
+          case 'C':
+          case 'c':
+          case 'D':
+          case 'd':
+          case 'E':
+          case 'e':
+          case 'F':
+          case 'f':
+          case 'G':
+          case 'g':
+          case 'H':
+          case 'h':
+          case 'I':
+          case 'i':
+          case 'J':
+          case 'j':
+          case 'K':
+          case 'k':
+          case 'L':
+          case 'l':
+          case 'M':
+          case 'm':
+          case 'N':
+          case 'n':
+          case 'O':
+          case 'o':
+          case 'P':
+          case 'p':
+          case 'Q':
+          case 'q':
+          case 'R':
+          case 'r':
+          case 'S':
+          case 's':
+          case 'T':
+          case 't':
+          case 'U':
+          case 'u':
+          case 'V':
+          case 'v':
+          case 'W':
+          case 'w':
+          case 'X':
+          case 'x':
+          case 'Y':
+          case 'y':
+          case 'Z':
+          case 'z':
+          case '~':
+          case '!':
+          case '@':
+          case '$':
+          case '%':
+          case '^':
+          case '&':
+          case '*':
+          case '_':
+          case '-':
+          case '+':
+          case '=':
+          case '<':
+          case '>':
+          case '.':
+          case '?':
+          case '/':
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+            continue;
+            // ok;
+          default:
+            return false;
+        }
+      }
+      break;
+    default:
+      return false;
+  }
+  return true;
+}
+
 static std::string escape_identifier(const irep_idt &identifier)
 {
   // This matches the definition of a `simple_symbol` according to the SMTLIB
   // specification, version 2.6.
-  const std::regex simple_symbol_regex(
-    "[a-zA-Z\\+-\\/\\*=%?!\\.\\$_~&\\^<>@][\\w\\+-\\/\\*=%?!\\.\\$_~&\\^<>@]*");
-  if(std::regex_match(id2string(identifier), simple_symbol_regex))
-    return id2string(identifier);
+  const auto &id_string = id2string(identifier);
+  if(is_simple_identifier(id_string))
+    return id_string;
 
   return std::string{"|"} + smt2_convt::convert_identifier(identifier) + "|";
 }
