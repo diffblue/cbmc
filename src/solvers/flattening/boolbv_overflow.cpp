@@ -26,26 +26,20 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
       ? bv_utilst::representationt::SIGNED
       : bv_utilst::representationt::UNSIGNED;
 
-  const auto plus_or_minus_conversion =
-    [&](
-      const binary_overflow_exprt &overflow_expr,
-      const std::function<literalt(
-        bv_utilst *, const bvt &, const bvt &, bv_utilst::representationt)>
-        &bv_util_overflow) {
-
-      if(bv0.size() != bv1.size())
-        return SUB::convert_rest(expr);
-
-      return bv_util_overflow(&bv_utils, bv0, bv1, rep);
-    };
   if(
     const auto plus_overflow = expr_try_dynamic_cast<plus_overflow_exprt>(expr))
   {
-    return plus_or_minus_conversion(*plus_overflow, &bv_utilst::overflow_add);
+    if(bv0.size() != bv1.size())
+      return SUB::convert_rest(expr);
+
+    return bv_utils.overflow_add(bv0, bv1, rep);
   }
   if(const auto minus = expr_try_dynamic_cast<minus_overflow_exprt>(expr))
   {
-    return plus_or_minus_conversion(*minus, &bv_utilst::overflow_sub);
+    if(bv0.size() != bv1.size())
+      return SUB::convert_rest(expr);
+
+    return bv_utils.overflow_sub(bv0, bv1, rep);
   }
   else if(
     const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
