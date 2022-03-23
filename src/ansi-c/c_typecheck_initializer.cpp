@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 #include "type2name.h"
 
+#include <cassert>
+
 void c_typecheck_baset::do_initializer(
   exprt &initializer,
   const typet &type,

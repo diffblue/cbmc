@@ -15,6 +15,8 @@ Date: 2012
 
 #include <util/message.h>
 
+#include <cassert>
+
 /// after the collection, eliminates the executions forbidden by an indirect
 /// thin-air
 void event_grapht::graph_explorert::filter_thin_air(

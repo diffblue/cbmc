@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program2code.h"
 
+#include <cassert>
 #include <sstream>
 
 #include <util/arith_tools.h>

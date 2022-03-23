@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 
+#include <cassert>
+
 void cpp_typecheckt::typecheck_code(codet &code)
 {
   const irep_idt &statement=code.get_statement();

@@ -13,6 +13,7 @@ Date: April 2016
 
 #include "change_impact.h"
 
+#include <cassert>
 #include <iostream>
 
 #include <goto-programs/goto_model.h>

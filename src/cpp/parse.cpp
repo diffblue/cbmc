@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_parser.h"
 
+#include <cassert>
 #include <map>
 
 #include <util/c_types.h>

@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 #include "cpp_typecheck_fargs.h"
 
+#include <cassert>
+
 void cpp_typecheckt::typecheck_type(typet &type)
 {
   assert(!type.id().empty());

@@ -23,6 +23,8 @@ Author:
 
 #include "cpp_util.h"
 
+#include <cassert>
+
 /// Lvalue-to-rvalue conversion
 ///
 ///  An lvalue (3.10) of a non-function, non-array type T can be

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <cassert>
 #include <unordered_set>
 
 #include <goto-programs/goto_instruction_code.h>

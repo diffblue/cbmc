@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 #include <algorithm>
+#include <cassert>
 
 #include <util/pointer_expr.h>
 #include <util/source_location.h>

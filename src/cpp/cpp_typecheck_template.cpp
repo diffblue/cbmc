@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 #include "cpp_template_args.h"
 
+#include <cassert>
+
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
   template_typet &new_type)

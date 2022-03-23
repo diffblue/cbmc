@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
+#include <cassert>
+
 /// Generate code to copy the parent.
 /// \param source_location: location for generated code
 /// \param parent_base_name: base name of typechecked parent

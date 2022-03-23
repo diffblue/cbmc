@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <cassert>
+
 #include <util/expr_util.h>
 #include <util/std_expr.h>
 

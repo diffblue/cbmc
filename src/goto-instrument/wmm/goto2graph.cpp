@@ -13,6 +13,7 @@ Date: 2012
 
 #include "goto2graph.h"
 
+#include <cassert>
 #include <vector>
 #include <string>
 #include <fstream>

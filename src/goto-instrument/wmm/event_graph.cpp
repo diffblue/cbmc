@@ -15,6 +15,7 @@ Date: 2012
 
 #include <util/message.h>
 
+#include <cassert>
 #include <fstream>
 
 

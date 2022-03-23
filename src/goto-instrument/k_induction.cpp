@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "loop_utils.h"
 #include "unwind.h"
 
+#include <cassert>
+
 class k_inductiont
 {
 public:

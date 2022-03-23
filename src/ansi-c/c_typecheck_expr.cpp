@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <cassert>
 #include <sstream>
 
 #include <util/arith_tools.h>
