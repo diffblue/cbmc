@@ -69,5 +69,5 @@ levenshtein_automatont::get_edit_distance(const std::string &string) const
       return distance;
     }
   }
-  return nullopt;
+  return {};
 }

@@ -104,7 +104,7 @@ static optionalt<std::string>
 file_name_string_opt(const source_locationt &source_location)
 {
   if(source_location.get_file().empty())
-    return nullopt;
+    return {};
 
   return concat_dir_file(
     id2string(source_location.get_working_directory()),
@@ -255,7 +255,7 @@ line_string_opt(const source_locationt &source_location)
   const irep_idt &line = source_location.get_line();
 
   if(line.empty())
-    return nullopt;
+    return {};
   else
     return id2string(line);
 }
