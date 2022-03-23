@@ -9,20 +9,19 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Parsing
 
-#include "cpp_parser.h"
-
-#include <cassert>
-#include <map>
-
 #include <util/c_types.h>
 #include <util/std_code.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
 #include <ansi-c/merged_type.h>
 
-#include "cpp_token_buffer.h"
-#include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
+#include "cpp_member_spec.h"
+#include "cpp_parser.h"
+#include "cpp_token_buffer.h"
+
+#include <cassert>
+#include <map>
 
 #ifdef DEBUG
 #include <iostream>

@@ -9,13 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C++ Language Type Checking
 
-#include "c_typecheck_base.h"
-
-#include <cassert>
-#include <unordered_set>
-
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -25,13 +18,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include "ansi_c_convert_type.h"
 #include "ansi_c_declaration.h"
 #include "c_qualifiers.h"
+#include "c_typecheck_base.h"
 #include "gcc_types.h"
 #include "padding.h"
 #include "type2name.h"
 #include "typedef_type.h"
+
+#include <cassert>
+#include <unordered_set>
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {

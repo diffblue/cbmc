@@ -9,8 +9,6 @@ Author:
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -21,6 +19,7 @@ Author:
 
 #include <ansi-c/c_qualifiers.h>
 
+#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
 #include <cassert>

@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "k_induction.h"
 
-#include <analyses/natural_loops.h>
-#include <analyses/local_may_alias.h>
-
 #include <goto-programs/remove_skip.h>
+
+#include <analyses/local_may_alias.h>
+#include <analyses/natural_loops.h>
 
 #include "havoc_utils.h"
 #include "loop_utils.h"

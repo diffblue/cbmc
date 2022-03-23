@@ -13,19 +13,18 @@ Date: 2012
 
 #include "goto2graph.h"
 
-#include <cassert>
-#include <vector>
-#include <string>
-#include <fstream>
-
 #include <util/options.h>
 #include <util/prefix.h>
 
+#include <goto-instrument/rw_set.h>
 #include <linking/static_lifetime_init.h>
 
-#include <goto-instrument/rw_set.h>
-
 #include "fence.h"
+
+#include <cassert>
+#include <fstream>
+#include <string>
+#include <vector>
 
 // #define PRINT_UNSAFES
 

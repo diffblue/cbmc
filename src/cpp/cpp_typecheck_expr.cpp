@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -32,6 +30,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
+
+#include <cassert>
 
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,

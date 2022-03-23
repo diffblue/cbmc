@@ -15,12 +15,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h>
 
 #include "cpp_type2name.h"
+
+#include <cassert>
 
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)

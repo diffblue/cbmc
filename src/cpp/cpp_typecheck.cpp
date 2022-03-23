@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <algorithm>
-#include <cassert>
-
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
 #include <util/symbol.h>
@@ -23,6 +20,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_declarator.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
+
+#include <algorithm>
+#include <cassert>
 
 void cpp_typecheckt::convert(cpp_itemt &item)
 {

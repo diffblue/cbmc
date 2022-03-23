@@ -11,9 +11,9 @@ Date: 2012
 /// \file
 /// collection of cycles in graph of abstract events
 
-#include "event_graph.h"
-
 #include <util/message.h>
+
+#include "event_graph.h"
 
 #include <cassert>
 

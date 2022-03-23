@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
+
+#include <goto-programs/goto_instruction_code.h>
+
+#include "cpp_typecheck.h"
 
 #include <cassert>
 

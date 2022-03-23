@@ -13,14 +13,14 @@ Date: April 2016
 
 #include "change_impact.h"
 
-#include <cassert>
-#include <iostream>
-
 #include <goto-programs/goto_model.h>
 
 #include <analyses/dependence_graph.h>
 
 #include "unified_diff.h"
+
+#include <cassert>
+#include <iostream>
 
 #if 0
   struct cfg_nodet
