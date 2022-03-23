@@ -1389,6 +1389,46 @@ void goto_convertt::do_function_call_symbol(
 
     copy(function_call, FUNCTION_CALL, dest);
   }
+  else if(
+    (identifier == "alloca" || identifier == "__builtin_alloca") &&
+    function.source_location().get_function() != "alloca")
+  {
+    const source_locationt &source_location = function.source_location();
+    exprt new_lhs = lhs;
+
+    if(lhs.is_nil())
+    {
+      new_lhs = new_tmp_symbol(
+                  to_code_type(function.type()).return_type(),
+                  "alloca",
+                  dest,
+                  source_location,
+                  mode)
+                  .symbol_expr();
+    }
+
+    code_function_callt function_call(new_lhs, function, arguments);
+    function_call.add_source_location() = source_location;
+    copy(function_call, FUNCTION_CALL, dest);
+
+    // create a backup copy to ensure that no assignments to the pointer affect
+    // the destructor code that will execute eventually
+    if(!lhs.is_nil())
+      make_temp_symbol(new_lhs, "alloca", dest, mode);
+
+    // mark pointer to alloca result as dead
+    symbol_exprt dead_object_sym =
+      ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+    exprt alloca_result =
+      typecast_exprt::conditional_cast(new_lhs, dead_object_sym.type());
+    if_exprt rhs{
+      side_effect_expr_nondett{bool_typet(), source_location},
+      std::move(alloca_result),
+      dead_object_sym};
+    code_assignt assign{
+      std::move(dead_object_sym), std::move(rhs), source_location};
+    targets.destructor_stack.add(assign);
+  }
   else
   {
     do_function_call_symbol(*symbol);
