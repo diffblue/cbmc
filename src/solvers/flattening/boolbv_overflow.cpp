@@ -20,6 +20,11 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
       ? optionalt<std::size_t>{bv0.size()}
       : nullopt);
 
+  const bv_utilst::representationt rep =
+    expr.lhs().type().id() == ID_signedbv
+      ? bv_utilst::representationt::SIGNED
+      : bv_utilst::representationt::UNSIGNED;
+
   const auto plus_or_minus_conversion =
     [&](
       const binary_overflow_exprt &overflow_expr,
@@ -29,11 +34,6 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
 
       if(bv0.size() != bv1.size())
         return SUB::convert_rest(expr);
-
-      bv_utilst::representationt rep =
-        overflow_expr.lhs().type().id() == ID_signedbv
-          ? bv_utilst::representationt::SIGNED
-          : bv_utilst::representationt::UNSIGNED;
 
       return bv_util_overflow(&bv_utils, bv0, bv1, rep);
     };
@@ -53,11 +53,6 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
       mult_overflow->lhs().type().id() != ID_unsignedbv &&
       mult_overflow->lhs().type().id() != ID_signedbv)
       return SUB::convert_rest(expr);
-
-    bv_utilst::representationt rep =
-      mult_overflow->lhs().type().id() == ID_signedbv
-        ? bv_utilst::representationt::SIGNED
-        : bv_utilst::representationt::UNSIGNED;
 
     DATA_INVARIANT(
       mult_overflow->lhs().type() == mult_overflow->rhs().type(),
@@ -104,11 +99,6 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
   {
     std::size_t old_size = bv0.size();
     std::size_t new_size = old_size * 2;
-
-    bv_utilst::representationt rep =
-      shl_overflow->lhs().type().id() == ID_signedbv
-        ? bv_utilst::representationt::SIGNED
-        : bv_utilst::representationt::UNSIGNED;
 
     bvt bv_ext=bv_utils.extension(bv0, new_size, rep);
 
