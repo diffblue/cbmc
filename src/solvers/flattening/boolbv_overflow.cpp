@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/invariant.h>
 
 #include "boolbv.h"
@@ -21,7 +22,7 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
       : nullopt);
 
   const bv_utilst::representationt rep =
-    expr.lhs().type().id() == ID_signedbv
+    can_cast_type<signedbv_typet>(expr.lhs().type())
       ? bv_utilst::representationt::SIGNED
       : bv_utilst::representationt::UNSIGNED;
 
@@ -50,9 +51,11 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
     const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
   {
     if(
-      mult_overflow->lhs().type().id() != ID_unsignedbv &&
-      mult_overflow->lhs().type().id() != ID_signedbv)
+      !can_cast_type<unsignedbv_typet>(expr.lhs().type()) &&
+      !can_cast_type<signedbv_typet>(expr.lhs().type()))
+    {
       return SUB::convert_rest(expr);
+    }
 
     DATA_INVARIANT(
       mult_overflow->lhs().type() == mult_overflow->rhs().type(),
@@ -105,7 +108,7 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
     bvt result=bv_utils.shift(bv_ext, bv_utilst::shiftt::SHIFT_LEFT, bv1);
 
     // a negative shift is undefined; yet this isn't an overflow
-    literalt neg_shift = shl_overflow->lhs().type().id() == ID_unsignedbv
+    literalt neg_shift = rep == bv_utilst::representationt::UNSIGNED
                            ? const_literal(false)
                            : bv1.back(); // sign bit
 
