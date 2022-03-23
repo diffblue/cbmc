@@ -3161,7 +3161,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_expr_unary_arithmetic(tmp);
 
-    unary_overflow_exprt overflow{ID_unary_minus, tmp.operands().front()};
+    unary_minus_overflow_exprt overflow{tmp.operands().front()};
     overflow.add_source_location() = tmp.source_location();
     return std::move(overflow);
   }

@@ -2182,14 +2182,14 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   // zero.
   if(
     expr.op1().is_zero() ||
-    (expr.op0().is_zero() && expr.id() != ID_overflow_minus))
+    (expr.op0().is_zero() && !can_cast_expr<minus_overflow_exprt>(expr)))
   {
     return false_exprt{};
   }
 
   // One is neutral element for multiplication
   if(
-    expr.id() == ID_overflow_mult &&
+    can_cast_expr<mult_overflow_exprt>(expr) &&
     (expr.op0().is_one() || expr.op1().is_one()))
   {
     return false_exprt{};
@@ -2208,7 +2208,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     return false_exprt{};
   }
 
-  if(op_type_id == ID_natural && expr.id() != ID_overflow_minus)
+  if(op_type_id == ID_natural && !can_cast_expr<minus_overflow_exprt>(expr))
     return false_exprt{};
 
   // we only handle constants over signedbv/unsignedbv for the remaining cases
@@ -2224,13 +2224,13 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     return unchanged(expr);
 
   mp_integer no_overflow_result;
-  if(expr.id() == ID_overflow_plus)
+  if(can_cast_expr<plus_overflow_exprt>(expr))
     no_overflow_result = *op0_value + *op1_value;
-  else if(expr.id() == ID_overflow_minus)
+  else if(can_cast_expr<minus_overflow_exprt>(expr))
     no_overflow_result = *op0_value - *op1_value;
-  else if(expr.id() == ID_overflow_mult)
+  else if(can_cast_expr<mult_overflow_exprt>(expr))
     no_overflow_result = *op0_value * *op1_value;
-  else if(expr.id() == ID_overflow_shl)
+  else if(can_cast_expr<shl_overflow_exprt>(expr))
     no_overflow_result = *op0_value << *op1_value;
   else
     UNREACHABLE;
@@ -2278,7 +2278,7 @@ simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
     return unchanged(expr);
 
   mp_integer no_overflow_result;
-  if(expr.id() == ID_overflow_unary_minus)
+  if(can_cast_expr<unary_minus_overflow_exprt>(expr))
     no_overflow_result = -*op_value;
   else
     UNREACHABLE;
@@ -2547,14 +2547,16 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
     r = simplify_complex(to_unary_expr(expr));
   }
   else if(
-    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_minus ||
-    expr.id() == ID_overflow_mult || expr.id() == ID_overflow_shl)
+    const auto binary_overflow =
+      expr_try_dynamic_cast<binary_overflow_exprt>(expr))
   {
-    r = simplify_overflow_binary(to_binary_overflow_expr(expr));
+    r = simplify_overflow_binary(*binary_overflow);
   }
-  else if(expr.id() == ID_overflow_unary_minus)
+  else if(
+    const auto unary_overflow =
+      expr_try_dynamic_cast<unary_overflow_exprt>(expr))
   {
-    r = simplify_overflow_unary(to_unary_overflow_expr(expr));
+    r = simplify_overflow_unary(*unary_overflow);
   }
   else if(expr.id() == ID_bitreverse)
   {

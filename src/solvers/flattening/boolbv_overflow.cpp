@@ -6,51 +6,59 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
+#include <util/bitvector_expr.h>
 #include <util/invariant.h>
+
+#include "boolbv.h"
 
 literalt boolbvt::convert_overflow(const exprt &expr)
 {
-  if(expr.id()==ID_overflow_plus ||
-     expr.id()==ID_overflow_minus)
+  const auto plus_or_minus_conversion =
+    [&](
+      const binary_overflow_exprt &overflow_expr,
+      const std::function<literalt(
+        bv_utilst *, const bvt &, const bvt &, bv_utilst::representationt)>
+        &bv_util_overflow) {
+      const bvt &bv0 = convert_bv(overflow_expr.lhs());
+      const bvt &bv1 = convert_bv(overflow_expr.rhs());
+
+      if(bv0.size() != bv1.size())
+        return SUB::convert_rest(expr);
+
+      bv_utilst::representationt rep =
+        overflow_expr.lhs().type().id() == ID_signedbv
+          ? bv_utilst::representationt::SIGNED
+          : bv_utilst::representationt::UNSIGNED;
+
+      return bv_util_overflow(&bv_utils, bv0, bv1, rep);
+    };
+  if(
+    const auto plus_overflow = expr_try_dynamic_cast<plus_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_binary_expr(expr);
-
-    const bvt &bv0 = convert_bv(overflow_expr.lhs());
-    const bvt &bv1 = convert_bv(overflow_expr.rhs());
-
-    if(bv0.size()!=bv1.size())
-      return SUB::convert_rest(expr);
-
-    bv_utilst::representationt rep =
-      overflow_expr.lhs().type().id() == ID_signedbv
-        ? bv_utilst::representationt::SIGNED
-        : bv_utilst::representationt::UNSIGNED;
-
-    return expr.id()==ID_overflow_minus?
-      bv_utils.overflow_sub(bv0, bv1, rep):
-      bv_utils.overflow_add(bv0, bv1, rep);
+    return plus_or_minus_conversion(*plus_overflow, &bv_utilst::overflow_add);
   }
-  else if(expr.id()==ID_overflow_mult)
+  if(const auto minus = expr_try_dynamic_cast<minus_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_binary_expr(expr);
-
+    return plus_or_minus_conversion(*minus, &bv_utilst::overflow_sub);
+  }
+  else if(
+    const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
+  {
     if(
-      overflow_expr.lhs().type().id() != ID_unsignedbv &&
-      overflow_expr.lhs().type().id() != ID_signedbv)
+      mult_overflow->lhs().type().id() != ID_unsignedbv &&
+      mult_overflow->lhs().type().id() != ID_signedbv)
       return SUB::convert_rest(expr);
 
-    bvt bv0 = convert_bv(overflow_expr.lhs());
-    bvt bv1 = convert_bv(overflow_expr.rhs(), bv0.size());
+    bvt bv0 = convert_bv(mult_overflow->lhs());
+    bvt bv1 = convert_bv(mult_overflow->rhs(), bv0.size());
 
     bv_utilst::representationt rep =
-      overflow_expr.lhs().type().id() == ID_signedbv
+      mult_overflow->lhs().type().id() == ID_signedbv
         ? bv_utilst::representationt::SIGNED
         : bv_utilst::representationt::UNSIGNED;
 
     DATA_INVARIANT(
-      overflow_expr.lhs().type() == overflow_expr.rhs().type(),
+      mult_overflow->lhs().type() == mult_overflow->rhs().type(),
       "operands of overflow_mult expression shall have same type");
 
     std::size_t old_size=bv0.size();
@@ -89,18 +97,17 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       return !prop.lor(all_one, all_zero);
     }
   }
-  else if(expr.id() == ID_overflow_shl)
+  else if(
+    const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_binary_expr(expr);
-
-    const bvt &bv0 = convert_bv(overflow_expr.lhs());
-    const bvt &bv1 = convert_bv(overflow_expr.rhs());
+    const bvt &bv0 = convert_bv(shl_overflow->lhs());
+    const bvt &bv1 = convert_bv(shl_overflow->rhs());
 
     std::size_t old_size = bv0.size();
     std::size_t new_size = old_size * 2;
 
     bv_utilst::representationt rep =
-      overflow_expr.lhs().type().id() == ID_signedbv
+      shl_overflow->lhs().type().id() == ID_signedbv
         ? bv_utilst::representationt::SIGNED
         : bv_utilst::representationt::UNSIGNED;
 
@@ -109,7 +116,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     bvt result=bv_utils.shift(bv_ext, bv_utilst::shiftt::SHIFT_LEFT, bv1);
 
     // a negative shift is undefined; yet this isn't an overflow
-    literalt neg_shift = overflow_expr.lhs().type().id() == ID_unsignedbv
+    literalt neg_shift = shl_overflow->lhs().type().id() == ID_unsignedbv
                            ? const_literal(false)
                            : bv1.back(); // sign bit
 
@@ -154,11 +161,11 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     return
       prop.land(!neg_shift, prop.lselect(undef, prop.lor(bv0), overflow));
   }
-  else if(expr.id()==ID_overflow_unary_minus)
+  else if(
+    const auto unary_minus_overflow =
+      expr_try_dynamic_cast<unary_minus_overflow_exprt>(expr))
   {
-    const auto &overflow_expr = to_unary_expr(expr);
-
-    const bvt &bv = convert_bv(overflow_expr.op());
+    const bvt &bv = convert_bv(unary_minus_overflow->op());
 
     return bv_utils.overflow_negate(bv);
   }
