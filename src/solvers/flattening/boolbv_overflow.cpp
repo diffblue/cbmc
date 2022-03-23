@@ -13,14 +13,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
 {
+  const bvt &bv0 = convert_bv(expr.lhs());
+  const bvt &bv1 = convert_bv(
+    expr.rhs(),
+    can_cast_expr<mult_overflow_exprt>(expr)
+      ? optionalt<std::size_t>{bv0.size()}
+      : nullopt);
+
   const auto plus_or_minus_conversion =
     [&](
       const binary_overflow_exprt &overflow_expr,
       const std::function<literalt(
         bv_utilst *, const bvt &, const bvt &, bv_utilst::representationt)>
         &bv_util_overflow) {
-      const bvt &bv0 = convert_bv(overflow_expr.lhs());
-      const bvt &bv1 = convert_bv(overflow_expr.rhs());
 
       if(bv0.size() != bv1.size())
         return SUB::convert_rest(expr);
@@ -49,9 +54,6 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
       mult_overflow->lhs().type().id() != ID_signedbv)
       return SUB::convert_rest(expr);
 
-    bvt bv0 = convert_bv(mult_overflow->lhs());
-    bvt bv1 = convert_bv(mult_overflow->rhs(), bv0.size());
-
     bv_utilst::representationt rep =
       mult_overflow->lhs().type().id() == ID_signedbv
         ? bv_utilst::representationt::SIGNED
@@ -65,10 +67,10 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
     std::size_t new_size=old_size*2;
 
     // sign/zero extension
-    bv0=bv_utils.extension(bv0, new_size, rep);
-    bv1=bv_utils.extension(bv1, new_size, rep);
+    const bvt &bv0_extended = bv_utils.extension(bv0, new_size, rep);
+    const bvt &bv1_extended = bv_utils.extension(bv1, new_size, rep);
 
-    bvt result=bv_utils.multiplier(bv0, bv1, rep);
+    bvt result = bv_utils.multiplier(bv0_extended, bv1_extended, rep);
 
     if(rep==bv_utilst::representationt::UNSIGNED)
     {
@@ -100,9 +102,6 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
   else if(
     const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
   {
-    const bvt &bv0 = convert_bv(shl_overflow->lhs());
-    const bvt &bv1 = convert_bv(shl_overflow->rhs());
-
     std::size_t old_size = bv0.size();
     std::size_t new_size = old_size * 2;
 
