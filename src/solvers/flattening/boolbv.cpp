@@ -417,10 +417,16 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_onehot || expr.id()==ID_onehot0)
     return convert_onehot(to_unary_expr(expr));
   else if(
-    can_cast_expr<binary_overflow_exprt>(expr) ||
-    can_cast_expr<unary_minus_overflow_exprt>(expr))
+    const auto binary_overflow =
+      expr_try_dynamic_cast<binary_overflow_exprt>(expr))
   {
-    return convert_overflow(expr);
+    return convert_binary_overflow(*binary_overflow);
+  }
+  else if(
+    const auto unary_overflow =
+      expr_try_dynamic_cast<unary_overflow_exprt>(expr))
+  {
+    return convert_unary_overflow(*unary_overflow);
   }
   else if(expr.id()==ID_isnan)
   {

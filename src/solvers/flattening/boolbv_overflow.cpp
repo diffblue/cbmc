@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-literalt boolbvt::convert_overflow(const exprt &expr)
+literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
 {
   const auto plus_or_minus_conversion =
     [&](
@@ -161,7 +161,13 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     return
       prop.land(!neg_shift, prop.lselect(undef, prop.lor(bv0), overflow));
   }
-  else if(
+
+  return SUB::convert_rest(expr);
+}
+
+literalt boolbvt::convert_unary_overflow(const unary_overflow_exprt &expr)
+{
+  if(
     const auto unary_minus_overflow =
       expr_try_dynamic_cast<unary_minus_overflow_exprt>(expr))
   {
