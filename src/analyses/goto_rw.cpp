@@ -148,15 +148,20 @@ void rw_range_sett::get_objects_byte_extract(
   const range_spect &range_start,
   const range_spect &size)
 {
+  auto object_size_bits_opt = pointer_offset_bits(be.op().type(), ns);
   const exprt simp_offset=simplify_expr(be.offset(), ns);
 
   auto index = numeric_cast<mp_integer>(simp_offset);
-  if(range_start == -1 || !index.has_value())
+  if(
+    range_start == -1 || !index.has_value() ||
+    !object_size_bits_opt.has_value())
+  {
     get_objects_rec(mode, be.op(), -1, size);
+  }
   else
   {
     *index *= 8;
-    if(*index >= *pointer_offset_bits(be.op().type(), ns))
+    if(*index >= *object_size_bits_opt)
       return;
 
     endianness_mapt map(
