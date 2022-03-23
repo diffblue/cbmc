@@ -8,7 +8,6 @@
 
 #include <util/exit_codes.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 
 #include <goto-checker/properties.h>
 
@@ -61,7 +60,7 @@ verification_resultt::verification_result_implt::get_properties()
 // Verification_result
 
 verification_resultt::verification_resultt()
-  : _impl(util_make_unique<verification_resultt::verification_result_implt>())
+  : _impl(std::make_unique<verification_resultt::verification_result_implt>())
 {
 }
 
@@ -70,7 +69,7 @@ verification_resultt::~verification_resultt()
 }
 
 verification_resultt::verification_resultt(const verification_resultt &other)
-  : _impl(util_make_unique<verification_result_implt>(*other._impl))
+  : _impl(std::make_unique<verification_result_implt>(*other._impl))
 {
 }
 

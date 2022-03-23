@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
 #include <util/json.h>
-#include <util/make_unique.h>
 #include <util/prefix_filter.h>
 #include <util/symbol.h> // IWYU pragma: keep
 
@@ -319,7 +318,9 @@ public:
     const namespacet &ns) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<java_bytecode_languaget>(); }
+  {
+    return std::make_unique<java_bytecode_languaget>();
+  }
 
   std::string id() const override { return "java"; }
   std::string description() const override { return "Java Bytecode"; }

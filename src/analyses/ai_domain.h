@@ -41,7 +41,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_AI_DOMAIN_H
 
 #include <util/json.h>
-#include <util/make_unique.h>
 #include <util/xml.h>
 
 #include "ai_history.h"
@@ -206,7 +205,7 @@ public:
 
   std::unique_ptr<statet> copy(const statet &s) const override
   {
-    return util_make_unique<domainT>(static_cast<const domainT &>(s));
+    return std::make_unique<domainT>(static_cast<const domainT &>(s));
   }
 
   bool merge(statet &dest, const statet &src, trace_ptrt from, trace_ptrt to)
@@ -229,7 +228,7 @@ public:
 
   std::unique_ptr<statet> make(locationt l) const override
   {
-    auto d = util_make_unique<domainT>();
+    auto d = std::make_unique<domainT>();
     CHECK_RETURN(d->is_bottom());
     return std::unique_ptr<statet>(d.release());
   }
@@ -246,7 +245,7 @@ public:
 
   std::unique_ptr<statet> make(locationt l) const override
   {
-    auto d = util_make_unique<domainT>(l);
+    auto d = std::make_unique<domainT>(l);
     CHECK_RETURN(d->is_bottom());
     return std::unique_ptr<statet>(d.release());
   }

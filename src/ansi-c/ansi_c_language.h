@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <memory>
 
-#include <util/make_unique.h>
-
 #include <langapi/language.h>
 
 #include "ansi_c_parse_tree.h"
@@ -101,7 +99,9 @@ public:
     const namespacet &ns) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<ansi_c_languaget>(); }
+  {
+    return std::make_unique<ansi_c_languaget>();
+  }
 
   std::string id() const override { return "C"; }
   std::string description() const override { return "ANSI-C 99"; }

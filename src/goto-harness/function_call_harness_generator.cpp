@@ -11,7 +11,6 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
-#include <util/make_unique.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/string_utils.h>
@@ -95,7 +94,7 @@ struct function_call_harness_generatort::implt
 
 function_call_harness_generatort::function_call_harness_generatort(
   ui_message_handlert &message_handler)
-  : goto_harness_generatort{}, p_impl(util_make_unique<implt>())
+  : goto_harness_generatort{}, p_impl(std::make_unique<implt>())
 {
   p_impl->message_handler = &message_handler;
 }
@@ -254,7 +253,7 @@ void function_call_harness_generatort::implt::generate(
     map_function_parameters_to_function_argument_names();
   recursive_initialization_config.pointers_to_treat_as_cstrings =
     function_arguments_to_treat_as_cstrings;
-  recursive_initialization = util_make_unique<recursive_initializationt>(
+  recursive_initialization = std::make_unique<recursive_initializationt>(
     recursive_initialization_config, goto_model);
 
   generate_nondet_globals(function_body);

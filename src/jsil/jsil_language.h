@@ -14,8 +14,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <memory>
 
-#include <util/make_unique.h>
-
 #include <langapi/language.h>
 
 #include "jsil_parse_tree.h"
@@ -53,7 +51,9 @@ public:
     const namespacet &ns) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<jsil_languaget>(); }
+  {
+    return std::make_unique<jsil_languaget>();
+  }
 
   std::string id() const override
   {

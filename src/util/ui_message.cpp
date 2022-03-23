@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "json.h"
 #include "json_irep.h"
 #include "json_stream.h"
-#include "make_unique.h"
 #include "structured_data.h"
 #include "xml.h"
 #include "xml_irep.h"
@@ -86,7 +85,7 @@ ui_message_handlert::ui_message_handlert(
   if(get_ui() == uit::PLAIN)
   {
     console_message_handler =
-      util_make_unique<console_message_handlert>(always_flush);
+      std::make_unique<console_message_handlert>(always_flush);
     message_handler = &*console_message_handler;
   }
 }

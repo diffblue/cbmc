@@ -8,8 +8,6 @@
 #include <sstream>
 #include <iterator>
 
-#include <util/make_unique.h>
-
 #include "expr2java.h"
 
 java_qualifierst &java_qualifierst::operator=(const java_qualifierst &other)
@@ -24,7 +22,7 @@ java_qualifierst &java_qualifierst::operator=(const java_qualifierst &other)
 
 std::unique_ptr<qualifierst> java_qualifierst::clone() const
 {
-  auto other = util_make_unique<java_qualifierst>(ns);
+  auto other = std::make_unique<java_qualifierst>(ns);
   *other = *this;
   return std::move(other);
 }

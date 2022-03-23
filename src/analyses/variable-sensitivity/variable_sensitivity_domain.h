@@ -264,7 +264,7 @@ public:
 
   std::unique_ptr<statet> make(locationt l) const override
   {
-    auto d = util_make_unique<variable_sensitivity_domaint>(
+    auto d = std::make_unique<variable_sensitivity_domaint>(
       object_factory, configuration);
     CHECK_RETURN(d->is_bottom());
     return std::unique_ptr<statet>(d.release());

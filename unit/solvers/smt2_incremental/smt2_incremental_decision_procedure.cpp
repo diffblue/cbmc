@@ -5,7 +5,6 @@
 #include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
-#include <util/make_unique.h>
 #include <util/namespace.h>
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
@@ -120,7 +119,7 @@ struct decision_procedure_test_environmentt final
   smt_is_dynamic_objectt is_dynamic_object_function;
   smt2_incremental_decision_proceduret procedure{
     ns,
-    util_make_unique<smt_mock_solver_processt>(
+    std::make_unique<smt_mock_solver_processt>(
       [&](const smt_commandt &smt_command) { this->send(smt_command); },
       [&]() { return this->receive_response(); }),
     message_handler};

@@ -396,7 +396,7 @@ int janalyzer_parse_optionst::doit()
   lazy_goto_model.initialize(cmdline.args, options);
 
   class_hierarchy =
-    util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
+    std::make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
 
   log.status() << "Generating GOTO Program" << messaget::eom;
   lazy_goto_model.load_all_functions();

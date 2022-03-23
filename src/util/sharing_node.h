@@ -35,7 +35,6 @@ Author: Daniel Poetzl
 
 #include "as_const.h"
 #include "invariant.h"
-#include "make_unique.h"
 #include "small_shared_n_way_ptr.h"
 #include "small_shared_ptr.h"
 
