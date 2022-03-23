@@ -89,13 +89,6 @@ public:
     const irep_idt &function_identifier,
     goto_functiont &goto_function);
 
-  /// Fill the list of allocations \ref allocationst with <address, size> for
-  ///   every allocation instruction. Also check that each allocation is
-  ///   well-formed.
-  /// \param goto_functions: goto functions from which the allocations are to be
-  ///   collected
-  void collect_allocations(const goto_functionst &goto_functions);
-
 protected:
   const namespacet &ns;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
@@ -424,38 +417,6 @@ static exprt implication(exprt lhs, exprt rhs)
   else
   {
     return implies_exprt(std::move(lhs), std::move(rhs));
-  }
-}
-
-void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
-{
-  for(const auto &gf_entry : goto_functions.function_map)
-  {
-    for(const auto &instruction : gf_entry.second.body.instructions)
-    {
-      if(!instruction.is_function_call())
-        continue;
-
-      const auto &function = instruction.call_function();
-      if(
-        function.id() != ID_symbol ||
-        to_symbol_expr(function).get_identifier() != CPROVER_PREFIX
-          "allocated_memory")
-        continue;
-
-      const code_function_callt::argumentst &args =
-        instruction.call_arguments();
-      if(
-        args.size() != 2 || args[0].type().id() != ID_unsignedbv ||
-        args[1].type().id() != ID_unsignedbv)
-        throw "expected two unsigned arguments to " CPROVER_PREFIX
-              "allocated_memory";
-
-      DATA_INVARIANT(
-        args[0].type() == args[1].type(),
-        "arguments of allocated_memory must have same type");
-      allocations.push_back({args[0], args[1]});
-    }
   }
 }
 
@@ -2424,8 +2385,6 @@ void goto_check_c(
   message_handlert &message_handler)
 {
   goto_check_ct goto_check(ns, options, message_handler);
-
-  goto_check.collect_allocations(goto_functions);
 
   for(auto &gf_entry : goto_functions.function_map)
   {
