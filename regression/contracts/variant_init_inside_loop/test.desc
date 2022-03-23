@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --apply-loop-contracts _ --unsigned-overflow-check
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$

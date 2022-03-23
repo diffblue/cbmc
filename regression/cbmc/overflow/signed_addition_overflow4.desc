@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 signed_addition_overflow4.c
 --signed-overflow-check --conversion-check
 ^EXIT=10$

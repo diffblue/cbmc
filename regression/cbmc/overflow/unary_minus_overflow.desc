@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 unary_minus_overflow.c
 --signed-overflow-check --unsigned-overflow-check
 ^EXIT=10$

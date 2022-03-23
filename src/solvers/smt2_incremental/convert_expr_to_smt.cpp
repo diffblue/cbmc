@@ -833,6 +833,127 @@ static smt_termt convert_expr_to_smt(const isnormal_exprt &is_normal_expr)
     is_normal_expr.pretty());
 }
 
+/// \brief
+/// Constructs a term which is true if the most significant bit of \p input
+/// is set.
+static smt_termt most_significant_bit_is_set(const smt_termt &input)
+{
+  const auto bit_vector_sort = input.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    bit_vector_sort,
+    "Most significant bit can only be extracted from bit vector terms.");
+  const size_t most_significant_bit_index = bit_vector_sort->bit_width() - 1;
+  const auto extract_most_significant_bit = smt_bit_vector_theoryt::extract(
+    most_significant_bit_index, most_significant_bit_index);
+  return smt_core_theoryt::equal(
+    extract_most_significant_bit(input), smt_bit_vector_constant_termt{1, 1});
+}
+
+static smt_termt convert_expr_to_smt(const plus_overflow_exprt &plus_overflow)
+{
+  const smt_termt left = convert_expr_to_smt(plus_overflow.lhs());
+  const smt_termt right = convert_expr_to_smt(plus_overflow.rhs());
+  if(operands_are_of_type<unsignedbv_typet>(plus_overflow))
+  {
+    const auto add_carry_bit = smt_bit_vector_theoryt::zero_extend(1);
+    return most_significant_bit_is_set(
+      smt_bit_vector_theoryt::add(add_carry_bit(left), add_carry_bit(right)));
+  }
+  if(operands_are_of_type<signedbv_typet>(plus_overflow))
+  {
+    // Overflow has occurred if the operands have the same sign and adding them
+    // gives a result of the opposite sign.
+    const smt_termt msb_left = most_significant_bit_is_set(left);
+    const smt_termt msb_right = most_significant_bit_is_set(right);
+    return smt_core_theoryt::make_and(
+      smt_core_theoryt::equal(msb_left, msb_right),
+      smt_core_theoryt::distinct(
+        msb_left,
+        most_significant_bit_is_set(smt_bit_vector_theoryt::add(left, right))));
+  }
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for plus overflow expression: " +
+    plus_overflow.pretty());
+}
+
+static smt_termt convert_expr_to_smt(const minus_overflow_exprt &minus_overflow)
+{
+  const smt_termt left = convert_expr_to_smt(minus_overflow.lhs());
+  const smt_termt right = convert_expr_to_smt(minus_overflow.rhs());
+  if(operands_are_of_type<unsignedbv_typet>(minus_overflow))
+  {
+    return smt_bit_vector_theoryt::unsigned_less_than(left, right);
+  }
+  if(operands_are_of_type<signedbv_typet>(minus_overflow))
+  {
+    // Overflow has occurred if the operands have the opposing signs and
+    // subtracting them gives a result having the same signedness as the
+    // right-hand operand. For example the following would be overflow for cases
+    // for 8 bit wide bit vectors -
+    //   -128 - 1 == 127
+    //   127 - (-1) == -128
+    const smt_termt msb_left = most_significant_bit_is_set(left);
+    const smt_termt msb_right = most_significant_bit_is_set(right);
+    return smt_core_theoryt::make_and(
+      smt_core_theoryt::distinct(msb_left, msb_right),
+      smt_core_theoryt::equal(
+        msb_right,
+        most_significant_bit_is_set(
+          smt_bit_vector_theoryt::subtract(left, right))));
+  }
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for minus overflow expression: " +
+    minus_overflow.pretty());
+}
+
+static smt_termt convert_expr_to_smt(const mult_overflow_exprt &mult_overflow)
+{
+  PRECONDITION(mult_overflow.lhs().type() == mult_overflow.rhs().type());
+  const auto &operand_type = mult_overflow.lhs().type();
+  const smt_termt left = convert_expr_to_smt(mult_overflow.lhs());
+  const smt_termt right = convert_expr_to_smt(mult_overflow.rhs());
+  if(
+    const auto unsigned_type =
+      type_try_dynamic_cast<unsignedbv_typet>(operand_type))
+  {
+    const std::size_t width = unsigned_type->get_width();
+    const auto extend = smt_bit_vector_theoryt::zero_extend(width);
+    return smt_bit_vector_theoryt::unsigned_greater_than_or_equal(
+      smt_bit_vector_theoryt::multiply(extend(left), extend(right)),
+      smt_bit_vector_constant_termt{power(2, width), width * 2});
+  }
+  if(
+    const auto signed_type =
+      type_try_dynamic_cast<signedbv_typet>(operand_type))
+  {
+    const smt_termt msb_left = most_significant_bit_is_set(left);
+    const smt_termt msb_right = most_significant_bit_is_set(right);
+    const std::size_t width = signed_type->get_width();
+    const auto extend = smt_bit_vector_theoryt::sign_extend(width);
+    const auto multiplication =
+      smt_bit_vector_theoryt::multiply(extend(left), extend(right));
+    const auto too_large = smt_bit_vector_theoryt::signed_greater_than_or_equal(
+      multiplication,
+      smt_bit_vector_constant_termt{power(2, width - 1), width * 2});
+    const auto too_small = smt_bit_vector_theoryt::signed_less_than(
+      multiplication,
+      smt_bit_vector_theoryt::negate(
+        smt_bit_vector_constant_termt{power(2, width - 1), width * 2}));
+    return smt_core_theoryt::if_then_else(
+      smt_core_theoryt::equal(msb_left, msb_right), too_large, too_small);
+  }
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for multiply overflow expression: " +
+    mult_overflow.pretty());
+}
+
+static smt_termt convert_expr_to_smt(const shl_overflow_exprt &shl_overflow)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for shift left overflow expression: " +
+    shl_overflow.pretty());
+}
+
 static smt_termt convert_expr_to_smt(const array_exprt &array_construction)
 {
   UNIMPLEMENTED_FEATURE(
@@ -1143,6 +1264,26 @@ smt_termt convert_expr_to_smt(const exprt &expr)
   if(const auto is_normal_expr = expr_try_dynamic_cast<isnormal_exprt>(expr))
   {
     return convert_expr_to_smt(*is_normal_expr);
+  }
+  if(
+    const auto plus_overflow = expr_try_dynamic_cast<plus_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*plus_overflow);
+  }
+  if(
+    const auto minus_overflow =
+      expr_try_dynamic_cast<minus_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*minus_overflow);
+  }
+  if(
+    const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*mult_overflow);
+  }
+  if(const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
+  {
+    return convert_expr_to_smt(*shl_overflow);
   }
   if(const auto array_construction = expr_try_dynamic_cast<array_exprt>(expr))
   {
