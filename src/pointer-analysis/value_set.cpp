@@ -564,7 +564,9 @@ void value_sett::get_value_set_rec(
     if(is_null_pointer(to_constant_expr(expr)))
     {
       insert(
-        dest, exprt(ID_null_object, to_pointer_type(expr_type).base_type()), 0);
+        dest,
+        exprt(ID_null_object, to_pointer_type(expr_type).base_type()),
+        mp_integer{0});
     }
     else if(expr_type.id()==ID_unsignedbv ||
             expr_type.id()==ID_signedbv)
@@ -593,7 +595,7 @@ void value_sett::get_value_set_rec(
       // integer-to-pointer
 
       if(op.is_zero())
-        insert(dest, exprt(ID_null_object, expr_type.subtype()), 0);
+        insert(dest, exprt(ID_null_object, expr_type.subtype()), mp_integer{0});
       else
       {
         // see if we have something for the integer
@@ -778,7 +780,7 @@ void value_sett::get_value_set_rec(
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, 0);
+      insert(dest, dynamic_object, mp_integer{0});
     }
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
@@ -791,7 +793,7 @@ void value_sett::get_value_set_rec(
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, 0);
+      insert(dest, dynamic_object, mp_integer{0});
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
@@ -1092,7 +1094,7 @@ void value_sett::get_reference_set_rec(
       to_array_type(expr.type()).element_type().id() == ID_array)
       insert(dest, expr);
     else
-      insert(dest, expr, 0);
+      insert(dest, expr, mp_integer{0});
 
     return;
   }
