@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arrays.h"
 
 class array_comprehension_exprt;
+class binary_overflow_exprt;
 class bitreverse_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
@@ -38,6 +39,7 @@ class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class member_exprt;
 class replication_exprt;
+class unary_overflow_exprt;
 class union_typet;
 
 class boolbvt:public arrayst
@@ -140,7 +142,8 @@ protected:
   virtual literalt convert_reduction(const unary_exprt &expr);
   virtual literalt convert_onehot(const unary_exprt &expr);
   virtual literalt convert_extractbit(const extractbit_exprt &expr);
-  virtual literalt convert_overflow(const exprt &expr);
+  virtual literalt convert_binary_overflow(const binary_overflow_exprt &expr);
+  virtual literalt convert_unary_overflow(const unary_overflow_exprt &expr);
   virtual literalt convert_equality(const equal_exprt &expr);
   virtual literalt convert_verilog_case_equality(
     const binary_relation_exprt &expr);
