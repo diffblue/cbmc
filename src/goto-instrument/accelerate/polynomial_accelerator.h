@@ -103,10 +103,6 @@ protected:
   bool check_inductive(
     std::map<exprt, polynomialt> polynomials,
     goto_programt::instructionst &body);
-  void stash_variables(
-    scratch_programt &program,
-    expr_sett modified,
-    substitutiont &substitution);
   void stash_polynomials(
     scratch_programt &program,
     std::map<exprt, polynomialt> &polynomials,
