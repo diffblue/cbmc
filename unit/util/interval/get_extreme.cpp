@@ -3,8 +3,6 @@
  Author: DiffBlue Limited
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/interval.h>
@@ -12,6 +10,10 @@
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
+
+#include <testing-utils/use_catch.h>
+
+#include <random>
 
 #define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
 #define V_(X) (bvrep2integer(X.c_str(), 32, true))
@@ -147,7 +149,9 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
     WHEN("All from [-100:100] are shuffled and selected")
     {
-      std::random_shuffle(ve.begin(), ve.end());
+      std::random_device rd;
+      std::mt19937 g(rd());
+      std::shuffle(ve.begin(), ve.end(), g);
 
       exprt min = constant_interval_exprt::get_extreme(ve, true);
       exprt max = constant_interval_exprt::get_extreme(ve, false);
