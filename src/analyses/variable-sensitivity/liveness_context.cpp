@@ -15,7 +15,7 @@ bool liveness_contextt::has_location() const
 
 abstract_objectt::locationt liveness_contextt::get_location() const
 {
-  return assign_location.value();
+  return *assign_location;
 }
 
 /**

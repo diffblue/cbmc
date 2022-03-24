@@ -187,7 +187,7 @@ void output_var_declaration(
   if(declaration.default_value)
   {
     const constant_exprt &constant =
-      to_constant_expr(declaration.default_value.value());
+      to_constant_expr(*declaration.default_value);
     output_constant(os, constant);
   }
   else

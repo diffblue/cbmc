@@ -665,7 +665,7 @@ simplify_exprt::simplify_object_size(const unary_exprt &expr)
       if(size_opt.has_value())
       {
         const typet &expr_type = expr.type();
-        exprt size = size_opt.value();
+        exprt size = *size_opt;
 
         if(size.type() != expr_type)
           size = simplify_typecast(typecast_exprt(size, expr_type));

@@ -119,7 +119,7 @@ int goto_harness_parse_optionst::doit()
     throw deserialization_exceptiont{"failed to read goto program from file '" +
                                      got_harness_config.in_file + "'"};
   }
-  auto goto_model = std::move(read_goto_binary_result.value());
+  auto goto_model = std::move(*read_goto_binary_result);
   auto const goto_model_without_harness_symbols =
     get_symbol_names_from_goto_model(goto_model);
 

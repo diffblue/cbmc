@@ -69,9 +69,9 @@ void gcc_message_handlert::print(
     if(file_name.has_value() && !line.empty())
     {
 #ifdef _MSC_VER
-      std::ifstream in(widen(file_name.value()));
+      std::ifstream in(widen(*file_name));
 #else
-      std::ifstream in(file_name.value());
+      std::ifstream in(*file_name);
 #endif
       if(in)
       {

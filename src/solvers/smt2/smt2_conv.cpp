@@ -492,7 +492,7 @@ exprt smt2_convt::parse_array(
   auto maybe_size = numeric_cast<std::int64_t>(type.size());
   if(maybe_size.has_value())
   {
-    while(i < maybe_size.value())
+    while(i < *maybe_size)
     {
       auto found_op = operands_map.find(i);
       if(found_op != operands_map.end())
@@ -1532,7 +1532,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       if(distance_int_op.has_value())
       {
-        out << distance_int_op.value();
+        out << *distance_int_op;
       }
       else
         UNEXPECTEDCASE(
@@ -4212,8 +4212,8 @@ void smt2_convt::convert_member(const member_exprt &expr)
       CHECK_RETURN_WITH_DIAGNOSTICS(
         member_offset.has_value(), "failed to get struct member offset");
 
-      out << "((_ extract " << (member_offset.value() + member_width - 1) << " "
-          << member_offset.value() << ") ";
+      out << "((_ extract " << (*member_offset + member_width - 1) << " "
+          << *member_offset << ") ";
       convert_expr(struct_op);
       out << ")";
     }

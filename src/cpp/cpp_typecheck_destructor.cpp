@@ -124,7 +124,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
     disable_access_control = disabled_access_control;
 
     if(dtor_code.has_value())
-      block.add(dtor_code.value());
+      block.add(*dtor_code);
   }
 
   if(symbol.type.id() == ID_union)
@@ -149,7 +149,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
     disable_access_control = disabled_access_control;
 
     if(dtor_code.has_value())
-      block.add(dtor_code.value());
+      block.add(*dtor_code);
   }
 
   return std::move(block);

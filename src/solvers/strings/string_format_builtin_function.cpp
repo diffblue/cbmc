@@ -519,7 +519,7 @@ optionalt<exprt> string_format_builtin_functiont::eval(
     return {};
 
   const std::vector<format_elementt> format_strings =
-    parse_format_string(format_string.value());
+    parse_format_string(*format_string);
   std::vector<mp_integer> result_vector;
   std::size_t arg_count = 0;
 
@@ -593,7 +593,7 @@ string_constraintst string_format_builtin_functiont::constraints(
   auto result_constraint_pair = add_axioms_for_format(
     generator,
     result,
-    format_string.value(),
+    *format_string,
     inputs,
     // TODO: get rid of this argument
     messaget{message_handler});
@@ -771,7 +771,7 @@ exprt string_format_builtin_functiont::length_constraint() const
 
   exprt::operandst constraints;
   const std::vector<format_elementt> format_strings =
-    parse_format_string(format_string.value());
+    parse_format_string(*format_string);
   std::vector<exprt> intermediary_string_lengths;
   std::size_t arg_count = 0;
   const typet &index_type = result.length_type();

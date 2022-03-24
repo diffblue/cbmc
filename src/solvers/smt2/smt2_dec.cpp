@@ -148,7 +148,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
     if(!parsed_opt.has_value())
       break;
 
-    const auto &parsed = parsed_opt.value();
+    const auto &parsed = *parsed_opt;
 
     if(parsed.id()=="sat")
       res=resultt::D_SATISFIABLE;

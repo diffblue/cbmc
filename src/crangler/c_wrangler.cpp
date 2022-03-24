@@ -371,7 +371,7 @@ static void mangle_function(
   if(function_config.stub.has_value())
   {
     // replace by stub
-    out << function_config.stub.value();
+    out << *function_config.stub;
   }
   else
   {

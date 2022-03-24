@@ -632,8 +632,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
             }
 
             result = plus_exprt(
-              result,
-              typecast_exprt::conditional_cast(o_opt.value(), size_type()));
+              result, typecast_exprt::conditional_cast(*o_opt, size_type()));
           }
 
           type=struct_union_type.get_component(component_name).type();
@@ -666,8 +665,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
                   result = plus_exprt(
                     result,
-                    typecast_exprt::conditional_cast(
-                      o_opt.value(), size_type()));
+                    typecast_exprt::conditional_cast(*o_opt, size_type()));
                 }
 
                 typet tmp = follow(c.type());
@@ -716,7 +714,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
       index = typecast_exprt::conditional_cast(index, size_type());
 
-      result = plus_exprt(result, mult_exprt(element_size_opt.value(), index));
+      result = plus_exprt(result, mult_exprt(*element_size_opt, index));
 
       typet tmp=type.subtype();
       type=tmp;
@@ -1012,7 +1010,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       throw 0;
     }
 
-    new_expr = size_of_opt.value();
+    new_expr = *size_of_opt;
   }
 
   new_expr.swap(expr);
@@ -2710,7 +2708,7 @@ exprt c_typecheck_baset::do_special_functions(
         throw 0;
       }
 
-      size_expr = std::move(size_expr_opt.value());
+      size_expr = std::move(*size_expr_opt);
     }
 
     irep_idt id = identifier == CPROVER_PREFIX "r_ok"

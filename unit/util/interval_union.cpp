@@ -35,7 +35,7 @@ TEST_CASE("interval_union", "[core][test-gen-util][interval_union]")
 
   REQUIRE_FALSE(first.is_empty());
   REQUIRE(first.maximum().has_value());
-  REQUIRE(first.maximum().value() == 10);
+  REQUIRE(*first.maximum() == 10);
   REQUIRE_FALSE(first.minimum().has_value());
 
   REQUIRE_FALSE(second.is_empty());
@@ -45,7 +45,7 @@ TEST_CASE("interval_union", "[core][test-gen-util][interval_union]")
   REQUIRE_FALSE(third.is_empty());
   REQUIRE_FALSE(third.maximum().has_value());
   REQUIRE(third.minimum().has_value());
-  REQUIRE(third.minimum().value() == 12);
+  REQUIRE(*third.minimum() == 12);
 
   REQUIRE(first.make_union(second).to_string() == "[:-10][-8:2][4:]");
   REQUIRE(first.make_intersection(second).to_string() == "[:-15][5:5][8:10]");

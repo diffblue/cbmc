@@ -382,17 +382,17 @@ bool taint_analysist::operator()(
 
     if(use_json)
     {
-      std::ofstream json_out(json_file_name.value());
+      std::ofstream json_out(*json_file_name);
 
       if(!json_out)
       {
-        log.error() << "Failed to open json output '" << json_file_name.value()
-                    << "'" << messaget::eom;
+        log.error() << "Failed to open json output '" << *json_file_name << "'"
+                    << messaget::eom;
         return true;
       }
 
-      log.status() << "Analysis result is written to '"
-                   << json_file_name.value() << "'" << messaget::eom;
+      log.status() << "Analysis result is written to '" << *json_file_name
+                   << "'" << messaget::eom;
 
       json_out << json_result << '\n';
     }

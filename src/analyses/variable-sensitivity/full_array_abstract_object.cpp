@@ -334,8 +334,7 @@ abstract_object_pointert full_array_abstract_objectt::write_leaf_element(
       {
         result->map.replace(
           index.value,
-          abstract_objectt::merge(old_value.value(), value, widen_modet::no)
-            .object);
+          abstract_objectt::merge(*old_value, value, widen_modet::no).object);
       }
 
       DATA_INVARIANT(result->verify(), "Structural invariants maintained");
@@ -371,8 +370,7 @@ void full_array_abstract_objectt::map_put(
     // if we're over the max_index, merge with existing value
     auto replacement_value =
       overrun
-        ? abstract_objectt::merge(old_value.value(), value, widen_modet::no)
-            .object
+        ? abstract_objectt::merge(*old_value, value, widen_modet::no).object
         : value;
 
     map.replace(index_value, replacement_value);
@@ -386,7 +384,7 @@ abstract_object_pointert full_array_abstract_objectt::map_find_or_top(
 {
   auto value = map.find(index_value);
   if(value.has_value())
-    return value.value();
+    return *value;
   return get_top_entry(env, ns);
 }
 

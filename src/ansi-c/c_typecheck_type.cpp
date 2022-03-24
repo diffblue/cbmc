@@ -710,9 +710,9 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
     throw 0;
   }
 
-  simplify(sub_size_expr_opt.value(), *this);
+  simplify(*sub_size_expr_opt, *this);
 
-  const auto sub_size = numeric_cast<mp_integer>(sub_size_expr_opt.value());
+  const auto sub_size = numeric_cast<mp_integer>(*sub_size_expr_opt);
 
   if(!sub_size.has_value())
   {

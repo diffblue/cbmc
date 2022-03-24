@@ -255,7 +255,7 @@ java_method_typet member_type_lazy(
     try
     {
       auto member_type_from_signature =
-        java_type_from_string(signature.value(), class_name);
+        java_type_from_string(*signature, class_name);
       INVARIANT(
         member_type_from_signature.has_value() &&
           member_type_from_signature->id() == ID_code,
@@ -269,7 +269,7 @@ java_method_typet member_type_lazy(
       else
       {
         message.debug() << "Method: " << class_name << "." << method_name
-                        << "\n signature: " << signature.value()
+                        << "\n signature: " << *signature
                         << "\n descriptor: " << descriptor
                         << "\n different number of parameters, reverting to "
                            "descriptor"
@@ -279,8 +279,8 @@ java_method_typet member_type_lazy(
     catch(const unsupported_java_class_signature_exceptiont &e)
     {
       message.debug() << "Method: " << class_name << "." << method_name
-                      << "\n could not parse signature: " << signature.value()
-                      << "\n " << e.what() << "\n"
+                      << "\n could not parse signature: " << *signature << "\n "
+                      << e.what() << "\n"
                       << " reverting to descriptor: " << descriptor
                       << message.eom;
     }

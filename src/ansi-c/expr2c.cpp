@@ -1905,7 +1905,7 @@ std::string expr2ct::convert_constant(
         if(sizeof_expr_opt.has_value())
         {
           ++sizeof_nesting;
-          dest = convert(sizeof_expr_opt.value()) + " /*" + dest + "*/ ";
+          dest = convert(*sizeof_expr_opt) + " /*" + dest + "*/ ";
           --sizeof_nesting;
         }
       }

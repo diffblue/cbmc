@@ -625,17 +625,16 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       auto subexpr = get_subexpression_at_offset(
         root_object_subexpression, o.offset(), dereference_type, ns);
       if(subexpr.has_value())
-        simplify(subexpr.value(), ns);
+        simplify(*subexpr, ns);
       if(
-        subexpr.has_value() &&
-        subexpr.value().id() != ID_byte_extract_little_endian &&
-        subexpr.value().id() != ID_byte_extract_big_endian)
+        subexpr.has_value() && subexpr->id() != ID_byte_extract_little_endian &&
+        subexpr->id() != ID_byte_extract_big_endian)
       {
         // Successfully found a member, array index, or combination thereof
         // that matches the desired type and offset:
-        result.value = subexpr.value();
+        result.value = *subexpr;
         result.pointer = typecast_exprt::conditional_cast(
-          address_of_exprt{skip_typecast(subexpr.value())}, pointer_type);
+          address_of_exprt{skip_typecast(*subexpr)}, pointer_type);
         return result;
       }
 

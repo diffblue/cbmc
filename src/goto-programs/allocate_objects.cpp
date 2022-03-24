@@ -156,7 +156,7 @@ exprt allocate_objectst::allocate_dynamic_object_symbol(
   add_created_symbol(malloc_sym);
 
   code_frontend_assignt assign =
-    make_allocate_code(malloc_sym.symbol_expr(), object_size.value());
+    make_allocate_code(malloc_sym.symbol_expr(), *object_size);
   output_code.add(assign);
 
   exprt malloc_symbol_expr = typecast_exprt::conditional_cast(

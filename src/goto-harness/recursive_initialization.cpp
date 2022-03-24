@@ -39,7 +39,7 @@ bool recursive_initialization_configt::handle_option(
       string2optional<std::size_t>(value, 10);
     if(user_min_null_tree_depth.has_value())
     {
-      min_null_tree_depth = user_min_null_tree_depth.value();
+      min_null_tree_depth = *user_min_null_tree_depth;
     }
     else
     {
@@ -57,7 +57,7 @@ bool recursive_initialization_configt::handle_option(
       string2optional<std::size_t>(value, 10);
     if(user_max_nondet_tree_depth.has_value())
     {
-      max_nondet_tree_depth = user_max_nondet_tree_depth.value();
+      max_nondet_tree_depth = *user_max_nondet_tree_depth;
     }
     else
     {
@@ -203,7 +203,7 @@ void recursive_initializationt::initialize(
       if(size_var.has_value())
       {
         const symbol_exprt &size_symbol =
-          goto_model.symbol_table.lookup_ref(size_var.value()).symbol_expr();
+          goto_model.symbol_table.lookup_ref(*size_var).symbol_expr();
         body.add(code_function_callt{
           fun_symbol.symbol_expr(),
           {depth, address_of_exprt{lhs}, address_of_exprt{size_symbol}}});
@@ -303,8 +303,8 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
   if(expr.id() == ID_symbol)
   {
     expr_name = to_symbol_expr(expr).get_identifier();
-    is_nullable = initialization_config.potential_null_function_pointers.count(
-      expr_name.value());
+    is_nullable =
+      initialization_config.potential_null_function_pointers.count(*expr_name);
     if(should_be_treated_as_array(*expr_name))
     {
       size_var = get_associated_size_variable(*expr_name);

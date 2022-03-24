@@ -70,7 +70,7 @@ linear_functiont::linear_functiont(const exprt &f)
     to_process.pop_back();
     if(auto integer = numeric_cast<mp_integer>(cur))
     {
-      constant_coefficient += positive ? integer.value() : -integer.value();
+      constant_coefficient += positive ? *integer : -*integer;
     }
     else if(cur.id() == ID_plus)
     {

@@ -54,7 +54,7 @@ bool model_argc_argv(
   }
 
   const symbolt &main_symbol =
-    ns.lookup(config.main.has_value() ? config.main.value() : ID_main);
+    ns.lookup(config.main.has_value() ? *config.main : ID_main);
 
   if(main_symbol.mode!=ID_C)
   {

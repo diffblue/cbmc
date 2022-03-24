@@ -55,7 +55,7 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
       auto negated_val =
         numeric_cast<mp_integer>(five.eval(ID_unary_minus).get_lower());
       REQUIRE(negated_val.has_value());
-      REQUIRE(negated_val.value() == -5);
+      REQUIRE(*negated_val == -5);
 
       // TODO: unary minus does not work on intervals that contain extremes
       // ADA-535
@@ -68,7 +68,7 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
       auto bitwise_negated_val =
         numeric_cast<mp_integer>(five.eval(ID_bitnot).get_lower());
       REQUIRE(bitwise_negated_val.has_value());
-      REQUIRE(bitwise_negated_val.value() == (~5));
+      REQUIRE(*bitwise_negated_val == (~5));
     }
   }
   WHEN("Unary operations to an single element interval")

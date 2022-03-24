@@ -97,7 +97,7 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
 
     if(value.has_value())
     {
-      return value.value();
+      return *value;
     }
     else
     {
@@ -144,8 +144,7 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
     else
     {
       result->map.replace(
-        c,
-        environment.write(old_value.value(), value, stack, ns, merging_write));
+        c, environment.write(*old_value, value, stack, ns, merging_write));
     }
 
     result->set_not_top();
@@ -178,9 +177,7 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
       }
 
       result->map.replace(
-        c,
-        abstract_objectt::merge(old_value.value(), value, widen_modet::no)
-          .object);
+        c, abstract_objectt::merge(*old_value, value, widen_modet::no).object);
     }
     else
     {
@@ -225,8 +222,8 @@ void full_struct_abstract_objectt::output(
         out << ", ";
       }
       out << '.' << field.get_name() << '=';
-      static_cast<const abstract_object_pointert &>(value.value())
-        ->output(out, ai, ns);
+      static_cast<const abstract_object_pointert &>(*value)->output(
+        out, ai, ns);
       first = false;
     }
   }

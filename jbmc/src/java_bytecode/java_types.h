@@ -1145,7 +1145,7 @@ inline optionalt<typet> java_type_from_string_with_exception(
 {
   try
   {
-    return java_type_from_string(signature.value(), class_name);
+    return java_type_from_string(*signature, class_name);
   }
   catch(unsupported_java_class_signature_exceptiont &)
   {

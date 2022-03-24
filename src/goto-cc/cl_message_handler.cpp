@@ -43,9 +43,9 @@ void cl_message_handlert::print(
   if(full_path.has_value() && !line.empty())
   {
 #ifdef _MSC_VER
-    std::ifstream in(widen(full_path.value()));
+    std::ifstream in(widen(*full_path));
 #else
-    std::ifstream in(full_path.value());
+    std::ifstream in(*full_path);
 #endif
     if(in)
     {

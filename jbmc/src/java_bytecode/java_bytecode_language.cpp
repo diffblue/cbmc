@@ -338,10 +338,10 @@ void java_bytecode_languaget::parse_from_main_class()
         throwMainClassLoadingError(id2string(main_class));
         return;
       }
-      status() << "Trying to load Java main class: " << maybe_class_name.value()
+      status() << "Trying to load Java main class: " << *maybe_class_name
                << eom;
       if(!java_class_loader.can_load_class(
-           maybe_class_name.value(), get_message_handler()))
+           *maybe_class_name, get_message_handler()))
       {
         throwMainClassLoadingError(id2string(main_class));
         return;
@@ -349,7 +349,7 @@ void java_bytecode_languaget::parse_from_main_class()
       // Everything went well. We have a loadable main class.
       // The entry point ('main') will be checked later.
       config.main = id2string(main_class);
-      main_class = maybe_class_name.value();
+      main_class = *maybe_class_name;
     }
     status() << "Found Java main class: " << main_class << eom;
     // Now really load it.
@@ -403,7 +403,7 @@ bool java_bytecode_languaget::parse(
       // If we have an entry method, we can derive a main class.
       if(config.main.has_value())
       {
-        const std::string &entry_method = config.main.value();
+        const std::string &entry_method = *config.main;
         const auto last_dot_position = entry_method.find_last_of('.');
         main_class = entry_method.substr(0, last_dot_position);
       }

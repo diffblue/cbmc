@@ -190,16 +190,15 @@ extract_generic_superclass_reference(const optionalt<std::string> &signature)
   {
     // skip the (potential) list of generic parameters at the beginning of the
     // signature
-    const size_t start =
-      signature.value().front() == '<'
-        ? find_closing_delimiter(signature.value(), 0, '<', '>') + 1
-        : 0;
+    const size_t start = signature->front() == '<'
+                           ? find_closing_delimiter(*signature, 0, '<', '>') + 1
+                           : 0;
 
     // extract the superclass reference
     const size_t end =
-      find_closing_semi_colon_for_reference_type(signature.value(), start);
+      find_closing_semi_colon_for_reference_type(*signature, start);
     const std::string superclass_ref =
-      signature.value().substr(start, (end - start) + 1);
+      signature->substr(start, (end - start) + 1);
 
     // if the superclass is generic then the reference is of form
     // `Lsuperclass-name<generic-types;>;` if it is implicitly generic, then the
@@ -231,15 +230,13 @@ static optionalt<std::string> extract_generic_interface_reference(
   {
     // skip the (potential) list of generic parameters at the beginning of the
     // signature
-    size_t start =
-      signature.value().front() == '<'
-        ? find_closing_delimiter(signature.value(), 0, '<', '>') + 1
-        : 0;
+    size_t start = signature->front() == '<'
+                     ? find_closing_delimiter(*signature, 0, '<', '>') + 1
+                     : 0;
 
     // skip the superclass reference (if there is at least one interface
     // reference in the signature, then there is a superclass reference)
-    start =
-      find_closing_semi_colon_for_reference_type(signature.value(), start) + 1;
+    start = find_closing_semi_colon_for_reference_type(*signature, start) + 1;
 
     // if the interface name includes package name, convert dots to slashes
     std::string interface_name_slash_to_dot = interface_name;
@@ -249,13 +246,12 @@ static optionalt<std::string> extract_generic_interface_reference(
       '.',
       '/');
 
-    start =
-      signature.value().find("L" + interface_name_slash_to_dot + "<", start);
+    start = signature->find("L" + interface_name_slash_to_dot + "<", start);
     if(start != std::string::npos)
     {
       const size_t &end =
-        find_closing_semi_colon_for_reference_type(signature.value(), start);
-      return signature.value().substr(start, (end - start) + 1);
+        find_closing_semi_colon_for_reference_type(*signature, start);
+      return signature->substr(start, (end - start) + 1);
     }
   }
   return {};
@@ -277,20 +273,17 @@ void java_bytecode_convert_classt::convert(
   }
 
   java_class_typet class_type;
-  if(c.signature.has_value() && c.signature.value()[0]=='<')
+  if(c.signature.has_value() && (*c.signature)[0] == '<')
   {
     java_generic_class_typet generic_class_type;
 #ifdef DEBUG
-    std::cout << "INFO: found generic class signature "
-              << c.signature.value()
-              << " in parsed class "
-              << c.name << "\n";
+    std::cout << "INFO: found generic class signature " << *c.signature
+              << " in parsed class " << c.name << "\n";
 #endif
     try
     {
-      const std::vector<typet> &generic_types=java_generic_type_from_string(
-        id2string(c.name),
-        c.signature.value());
+      const std::vector<typet> &generic_types =
+        java_generic_type_from_string(id2string(c.name), *c.signature);
       for(const typet &t : generic_types)
       {
         generic_class_type.generic_types()
@@ -301,9 +294,9 @@ void java_bytecode_convert_classt::convert(
     catch(const unsupported_java_class_signature_exceptiont &e)
     {
       log.debug() << "Class: " << c.name
-                  << "\n could not parse signature: " << c.signature.value()
-                  << "\n " << e.what()
-                  << "\n ignoring that the class is generic" << messaget::eom;
+                  << "\n could not parse signature: " << *c.signature << "\n "
+                  << e.what() << "\n ignoring that the class is generic"
+                  << messaget::eom;
     }
   }
 
@@ -359,15 +352,15 @@ void java_bytecode_convert_classt::convert(
       try
       {
         const java_generic_struct_tag_typet generic_base(
-          base, superclass_ref.value(), qualified_classname);
+          base, *superclass_ref, qualified_classname);
         class_type.add_base(generic_base);
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
         log.debug() << "Superclass: " << c.super_class
                     << " of class: " << c.name
-                    << "\n could not parse signature: "
-                    << superclass_ref.value() << "\n " << e.what()
+                    << "\n could not parse signature: " << *superclass_ref
+                    << "\n " << e.what()
                     << "\n ignoring that the superclass is generic"
                     << messaget::eom;
         class_type.add_base(base);
@@ -401,13 +394,13 @@ void java_bytecode_convert_classt::convert(
       try
       {
         const java_generic_struct_tag_typet generic_base(
-          base, interface_ref.value(), qualified_classname);
+          base, *interface_ref, qualified_classname);
         class_type.add_base(generic_base);
       }
       catch(const unsupported_java_class_signature_exceptiont &e)
       {
         log.debug() << "Interface: " << interface << " of class: " << c.name
-                    << "\n could not parse signature: " << interface_ref.value()
+                    << "\n could not parse signature: " << *interface_ref
                     << "\n " << e.what()
                     << "\n ignoring that the interface is generic"
                     << messaget::eom;

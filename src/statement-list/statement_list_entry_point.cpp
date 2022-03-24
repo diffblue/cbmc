@@ -209,10 +209,9 @@ bool statement_list_entry_point(
   // Find main symbol given by the user.
   if(config.main.has_value())
   {
-    if(is_main_symbol_invalid(
-         symbol_table, message_handler, config.main.value()))
+    if(is_main_symbol_invalid(symbol_table, message_handler, *config.main))
       return true;
-    main_symbol_name = config.main.value();
+    main_symbol_name = *config.main;
   }
   // Fallback: Search for block with TIA main standard name.
   // TODO: Support the standard entry point of STL (organisation blocks).

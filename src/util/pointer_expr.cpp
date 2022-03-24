@@ -44,7 +44,7 @@ static void build_object_descriptor_rec(
       dest.offset(),
       mult_exprt(
         typecast_exprt::conditional_cast(index.index(), c_index_type()),
-        typecast_exprt::conditional_cast(sub_size.value(), c_index_type())));
+        typecast_exprt::conditional_cast(*sub_size, c_index_type())));
   }
   else if(expr.id() == ID_member)
   {
@@ -57,8 +57,7 @@ static void build_object_descriptor_rec(
     CHECK_RETURN(offset.has_value());
 
     dest.offset() = plus_exprt(
-      dest.offset(),
-      typecast_exprt::conditional_cast(offset.value(), c_index_type()));
+      dest.offset(), typecast_exprt::conditional_cast(*offset, c_index_type()));
   }
   else if(
     expr.id() == ID_byte_extract_little_endian ||

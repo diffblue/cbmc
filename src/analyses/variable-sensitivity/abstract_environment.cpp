@@ -140,7 +140,7 @@ abstract_object_pointert abstract_environmentt::resolve_symbol(
   const auto symbol_entry = map.find(symbol.get_identifier());
 
   if(symbol_entry.has_value())
-    return symbol_entry.value();
+    return *symbol_entry;
   return abstract_object_factory(expr.type(), ns, true, false);
 }
 
@@ -490,7 +490,7 @@ abstract_environmentt::modified_symbols(
     const auto &second_entry = second.map.find(entry.first);
     if(second_entry.has_value())
     {
-      if(second_entry.value().get()->has_been_modified(entry.second))
+      if(second_entry->get()->has_been_modified(entry.second))
       {
         CHECK_RETURN(!entry.first.empty());
         symbols_diff.push_back(entry.first);

@@ -270,7 +270,7 @@ optionalt<exprt> member_offset_expr(
       auto sub_size = size_of_expr(subtype, ns);
       if(!sub_size.has_value())
         return {}; // give up
-      result = plus_exprt(result, sub_size.value());
+      result = plus_exprt(result, *sub_size);
     }
   }
 
@@ -302,9 +302,9 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       return {};
 
     const auto size_casted =
-      typecast_exprt::conditional_cast(size, sub.value().type());
+      typecast_exprt::conditional_cast(size, sub->type());
 
-    return simplify_expr(mult_exprt{size_casted, sub.value()}, ns);
+    return simplify_expr(mult_exprt{size_casted, *sub}, ns);
   }
   else if(type.id()==ID_vector)
   {
@@ -329,9 +329,9 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       return {};
 
     const auto size_casted =
-      typecast_exprt::conditional_cast(size, sub.value().type());
+      typecast_exprt::conditional_cast(size, sub->type());
 
-    return simplify_expr(mult_exprt{size_casted, sub.value()}, ns);
+    return simplify_expr(mult_exprt{size_casted, *sub}, ns);
   }
   else if(type.id()==ID_complex)
   {
@@ -339,8 +339,8 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(!sub.has_value())
       return {};
 
-    exprt size = from_integer(2, sub.value().type());
-    return simplify_expr(mult_exprt{std::move(size), sub.value()}, ns);
+    exprt size = from_integer(2, sub->type());
+    return simplify_expr(mult_exprt{std::move(size), *sub}, ns);
   }
   else if(type.id()==ID_struct)
   {
@@ -382,7 +382,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         if(!sub_size_opt.has_value())
           return {};
 
-        result = plus_exprt(result, sub_size_opt.value());
+        result = plus_exprt(result, *sub_size_opt);
       }
     }
 
@@ -411,7 +411,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
         auto sub_size_opt = size_of_expr(subtype, ns);
         if(!sub_size_opt.has_value())
           return {};
-        sub_size = sub_size_opt.value();
+        sub_size = *sub_size_opt;
       }
       else
       {

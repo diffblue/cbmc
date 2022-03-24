@@ -493,8 +493,8 @@ void add_padding(union_typet &type, const namespacet &ns)
       if(c.type().id() == ID_c_bit_field)
       {
         auto w = underlying_width(to_c_bit_field_type(c.type()), ns);
-        if(w.has_value() && w.value() > max_alignment_bits)
-          max_alignment_bits = w.value();
+        if(w.has_value() && *w > max_alignment_bits)
+          max_alignment_bits = *w;
       }
   }
 

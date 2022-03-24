@@ -964,7 +964,7 @@ static optionalt<exprt> get_valid_array_size(
   exprt size_val;
   if(size_from_pool.has_value())
   {
-    const exprt size = size_from_pool.value();
+    const exprt size = *size_from_pool;
     size_val = simplify_expr(super_get(size), ns);
     if(size_val.id() != ID_constant)
     {
@@ -1011,7 +1011,7 @@ static optionalt<exprt> get_array(
     return {};
   }
 
-  const size_t n = numeric_cast<std::size_t>(size.value()).value();
+  const size_t n = *numeric_cast<std::size_t>(*size);
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
@@ -1032,7 +1032,7 @@ static optionalt<exprt> get_array(
 
   const exprt arr_val = simplify_expr(super_get(arr), ns);
   const typet char_type = to_array_type(arr.type()).subtype();
-  const typet &index_type = size.value().type();
+  const typet &index_type = size->type();
 
   if(
     const auto &array = interval_sparse_arrayt::of_expr(
@@ -1879,7 +1879,7 @@ exprt string_refinementt::get(const exprt &expr) const
       const auto &length_from_pool =
         generator.array_pool.get_length_if_exists(arr))
     {
-      const exprt length = super_get(length_from_pool.value());
+      const exprt length = super_get(*length_from_pool);
 
       if(const auto n = numeric_cast<std::size_t>(length))
       {

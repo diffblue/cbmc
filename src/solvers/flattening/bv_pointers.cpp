@@ -952,8 +952,8 @@ void bv_pointerst::do_postponed(
       if(!size_expr.has_value())
         continue;
 
-      const exprt object_size = typecast_exprt::conditional_cast(
-        size_expr.value(), postponed.expr.type());
+      const exprt object_size =
+        typecast_exprt::conditional_cast(*size_expr, postponed.expr.type());
 
       // only compare object part
       pointer_typet pt = pointer_type(expr.type());

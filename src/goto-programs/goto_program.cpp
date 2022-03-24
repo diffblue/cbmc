@@ -983,9 +983,9 @@ void goto_programt::instructiont::transform(
     auto new_assign_lhs = f(assign_lhs());
     auto new_assign_rhs = f(assign_rhs());
     if(new_assign_lhs.has_value())
-      assign_lhs_nonconst() = new_assign_lhs.value();
+      assign_lhs_nonconst() = *new_assign_lhs;
     if(new_assign_rhs.has_value())
-      assign_rhs_nonconst() = new_assign_rhs.value();
+      assign_rhs_nonconst() = *new_assign_rhs;
   }
   break;
 
@@ -1051,7 +1051,7 @@ void goto_programt::instructiont::transform(
     {
       auto new_condition = f(get_condition());
       if(new_condition.has_value())
-        set_condition(new_condition.value());
+        set_condition(*new_condition);
     }
   }
 }

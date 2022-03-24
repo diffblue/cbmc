@@ -1146,9 +1146,9 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   {
     upper_bound_opt = simplify_expr(
       plus_exprt(
-        upper_bound_opt.value(),
+        *upper_bound_opt,
         typecast_exprt::conditional_cast(
-          src.offset(), upper_bound_opt.value().type())),
+          src.offset(), upper_bound_opt->type())),
       ns);
   }
   else if(src.type().id() == ID_empty)
@@ -1220,7 +1220,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       plus_exprt new_offset(
         unpacked.offset(),
         typecast_exprt::conditional_cast(
-          member_offset_opt.value(), unpacked.offset().type()));
+          *member_offset_opt, unpacked.offset().type()));
 
       byte_extract_exprt tmp(unpacked);
       tmp.type()=comp.type();
@@ -1603,8 +1603,7 @@ static exprt lower_byte_update_array_vector_non_const(
   CHECK_RETURN(subtype_size_opt.has_value());
 
   const exprt subtype_size = simplify_expr(
-    typecast_exprt::conditional_cast(
-      subtype_size_opt.value(), src.offset().type()),
+    typecast_exprt::conditional_cast(*subtype_size_opt, src.offset().type()),
     ns);
 
   // compute the index of the first element of the array/vector that may be
@@ -1903,7 +1902,7 @@ static exprt lower_byte_update_struct(
         extract_opcode,
         src.op(),
         from_integer(0, src.offset().type()),
-        array_typet{bv_typet{8}, src_size_opt.value()}};
+        array_typet{bv_typet{8}, *src_size_opt}};
 
       byte_update_exprt bu = src;
       bu.set_op(lower_byte_extract(byte_extract_expr, ns));
@@ -2299,9 +2298,9 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
   exprt update_value = src.value();
   auto update_size_expr_opt = size_of_expr(update_value.type(), ns);
   CHECK_RETURN(update_size_expr_opt.has_value());
-  simplify(update_size_expr_opt.value(), ns);
+  simplify(*update_size_expr_opt, ns);
 
-  if(!update_size_expr_opt.value().is_constant())
+  if(!update_size_expr_opt->is_constant())
     non_const_update_bound = *update_size_expr_opt;
   else
   {

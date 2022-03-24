@@ -990,7 +990,7 @@ void goto_instrument_parse_optionst::get_goto_program()
   if(!result.has_value())
     throw 0;
 
-  goto_model = std::move(result.value());
+  goto_model = std::move(*result);
 
   config.set_from_symbol_table(goto_model.symbol_table);
 }

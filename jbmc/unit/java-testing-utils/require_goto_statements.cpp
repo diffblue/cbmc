@@ -102,7 +102,7 @@ require_goto_statements::find_struct_component_assignments(
             const member_exprt &superclass_expr =
               to_member_expr(member_expr.compound());
             const irep_idt supercomponent_name =
-              "@" + id2string(superclass_name.value());
+              "@" + id2string(*superclass_name);
 
             object_descriptor_exprt ode;
             const namespacet ns(symbol_table);

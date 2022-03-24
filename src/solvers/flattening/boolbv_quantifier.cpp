@@ -195,8 +195,8 @@ static optionalt<exprt> eager_quantifier_instantiation(
   if(!min_i.has_value() || !max_i.has_value())
     return nullopt;
 
-  mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
-  mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
+  mp_integer lb = numeric_cast_v<mp_integer>(*min_i);
+  mp_integer ub = numeric_cast_v<mp_integer>(*max_i);
 
   if(lb > ub)
     return nullopt;

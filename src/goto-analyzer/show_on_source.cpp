@@ -45,7 +45,7 @@ get_source_files(const goto_modelt &goto_model, const ai_baset &ai)
     {
       const auto file = show_location(ai, i_it);
       if(file.has_value())
-        files.insert(file.value());
+        files.insert(*file);
     }
   }
 
@@ -98,7 +98,7 @@ void show_on_source(
     forall_goto_program_instructions(i_it, f.second.body)
     {
       const auto file = show_location(ai, i_it);
-      if(file.has_value() && file.value() == source_file)
+      if(file.has_value() && *file == source_file)
       {
         const std::size_t line_no =
           stoull(id2string(i_it->source_location().get_line()));

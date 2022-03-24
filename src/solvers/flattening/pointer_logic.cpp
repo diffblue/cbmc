@@ -116,7 +116,7 @@ exprt pointer_logict::pointer_expr(
   auto deep_object_opt =
     get_subexpression_at_offset(object_expr, pointer.offset, subtype, ns);
   CHECK_RETURN(deep_object_opt.has_value());
-  exprt deep_object = deep_object_opt.value();
+  exprt deep_object = *deep_object_opt;
   simplify(deep_object, ns);
   if(
     deep_object.id() != ID_byte_extract_little_endian &&

@@ -34,9 +34,9 @@ SCENARIO("generic_type_index", "[core][java_types]")
       THEN("X has index 0, Y index 1 and Z is not found")
       {
         REQUIRE(indexX.has_value());
-        REQUIRE(indexX.value() == 0);
+        REQUIRE(*indexX == 0);
         REQUIRE(index_value.has_value());
-        REQUIRE(index_value.value() == 1);
+        REQUIRE(*index_value == 1);
         REQUIRE_FALSE(indexZ.has_value());
       }
     }
@@ -66,9 +66,9 @@ SCENARIO("generic_type_index", "[core][java_types]")
       THEN("K has index 0, V index 1 and T is not found")
       {
         REQUIRE(index_param0.has_value());
-        REQUIRE(index_param0.value() == 0);
+        REQUIRE(*index_param0 == 0);
         REQUIRE(index_param1.has_value());
-        REQUIRE(index_param1.value() == 1);
+        REQUIRE(*index_param1 == 1);
         REQUIRE_FALSE(index_param2.has_value());
       }
     }

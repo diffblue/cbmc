@@ -1699,7 +1699,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     if(!const_bits_opt.has_value())
       return unchanged(expr);
 
-    std::string const_bits=const_bits_opt.value();
+    std::string const_bits = *const_bits_opt;
 
     DATA_INVARIANT(!const_bits.empty(), "bit representation must be non-empty");
 
@@ -1760,7 +1760,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     !struct_has_flexible_array_member)
   {
     std::string bits_cut = std::string(
-      bits.value(),
+      *bits,
       numeric_cast_v<std::size_t>(*offset * 8),
       numeric_cast_v<std::size_t>(*el_size));
 
@@ -1806,10 +1806,10 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
           break;
         }
 
-        exprt new_offset = simplify_rec(
-          plus_exprt{expr.offset(),
-                     typecast_exprt::conditional_cast(
-                       member_offset_opt.value(), expr.offset().type())});
+        exprt new_offset = simplify_rec(plus_exprt{
+          expr.offset(),
+          typecast_exprt::conditional_cast(
+            *member_offset_opt, expr.offset().type())});
 
         byte_extract_exprt tmp = expr;
         tmp.type() = comp.type();
@@ -1839,10 +1839,10 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   // try to refine it down to extracting from a member or an index in an array
   auto subexpr =
     get_subexpression_at_offset(expr.op(), *offset, expr.type(), ns);
-  if(!subexpr.has_value() || subexpr.value() == expr)
+  if(!subexpr.has_value() || *subexpr == expr)
     return unchanged(expr);
 
-  return changed(simplify_rec(subexpr.value())); // recursive call
+  return changed(simplify_rec(*subexpr)); // recursive call
 }
 
 simplify_exprt::resultt<>

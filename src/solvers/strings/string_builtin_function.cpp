@@ -87,11 +87,10 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
       "character valuation should only contain constants and unknown");
     return mp_integer(CHARACTER_FOR_UNKNOWN);
   }();
-  input_opt.value().push_back(char_val);
-  const auto length =
-    from_integer(input_opt.value().size(), result.length_type());
+  input_opt->push_back(char_val);
+  const auto length = from_integer(input_opt->size(), result.length_type());
   const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
-  return make_string(input_opt.value(), type);
+  return make_string(*input_opt, type);
 }
 
 /// Set of constraints enforcing that `result` is the concatenation
@@ -133,12 +132,11 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
   const auto position_opt = numeric_cast<mp_integer>(get_value(position));
   if(!input_opt || !char_opt || !position_opt)
     return {};
-  if(0 <= *position_opt && *position_opt < input_opt.value().size())
-    input_opt.value()[numeric_cast_v<std::size_t>(*position_opt)] = *char_opt;
-  const auto length =
-    from_integer(input_opt.value().size(), result.length_type());
+  if(0 <= *position_opt && *position_opt < input_opt->size())
+    (*input_opt)[numeric_cast_v<std::size_t>(*position_opt)] = *char_opt;
+  const auto length = from_integer(input_opt->size(), result.length_type());
   const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
-  return make_string(input_opt.value(), type);
+  return make_string(*input_opt, type);
 }
 
 /// Set of constraints ensuring that `result` is similar to `input`
@@ -219,15 +217,14 @@ optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
   auto input_opt = eval_string(input, get_value);
   if(!input_opt)
     return {};
-  for(mp_integer &c : input_opt.value())
+  for(mp_integer &c : *input_opt)
   {
     if(eval_is_upper_case(c))
       c += 0x20;
   }
-  const auto length =
-    from_integer(input_opt.value().size(), result.length_type());
+  const auto length = from_integer(input_opt->size(), result.length_type());
   const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
-  return make_string(input_opt.value(), type);
+  return make_string(*input_opt, type);
 }
 
 /// Expression which is true for uppercase characters of the Basic Latin and
@@ -313,15 +310,14 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
   auto input_opt = eval_string(input, get_value);
   if(!input_opt)
     return {};
-  for(mp_integer &c : input_opt.value())
+  for(mp_integer &c : *input_opt)
   {
     if(eval_is_upper_case(c - 0x20))
       c -= 0x20;
   }
-  const auto length =
-    from_integer(input_opt.value().size(), result.length_type());
+  const auto length = from_integer(input_opt->size(), result.length_type());
   const array_typet type(to_type_with_subtype(result.type()).subtype(), length);
-  return make_string(input_opt.value(), type);
+  return make_string(*input_opt, type);
 }
 
 /// Set of constraints ensuring `result` corresponds to `input` in which
@@ -418,7 +414,7 @@ exprt string_of_int_builtin_functiont::length_constraint() const
 {
   const typet &type = result.length_type();
   const auto radix_opt = numeric_cast<std::size_t>(radix);
-  const auto radix_value = radix_opt.has_value() ? radix_opt.value() : 2;
+  const auto radix_value = radix_opt.value_or(2);
   const std::size_t upper_bound =
     max_printed_string_length(arg.type(), radix_value);
   const exprt negative_arg =

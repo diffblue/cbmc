@@ -182,7 +182,7 @@ void cpp_typecheckt::convert_non_template_declaration(
         declarator.init_args().operands());
 
       if(constructor.has_value())
-        symbol.value = constructor.value();
+        symbol.value = *constructor;
       else
         symbol.value = nil_exprt();
     }

@@ -187,7 +187,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
 
     if(constructor.has_value())
-      symbol.value = constructor.value();
+      symbol.value = *constructor;
     else
       symbol.value = nil_exprt();
   }

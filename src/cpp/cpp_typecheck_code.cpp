@@ -374,7 +374,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           cpp_constructor(code.source_location(), symbol_expr, code.operands());
 
         if(call.has_value())
-          code.swap(call.value());
+          code.swap(*call);
         else
         {
           auto source_location = code.source_location();
@@ -491,7 +491,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         symbol.location, object_expr, declarator.init_args().operands());
 
       if(constructor_call.has_value())
-        new_code.add_to_operands(std::move(constructor_call.value()));
+        new_code.add_to_operands(std::move(*constructor_call));
     }
   }
 

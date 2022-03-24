@@ -181,7 +181,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
     if(target_size.has_value())
     {
-      mp_integer target_bits = target_size.value() * 8;
+      mp_integer target_bits = *target_size * 8;
       const auto bits = expr2bits(op, true, ns);
 
       if(bits.has_value() &&
@@ -227,10 +227,10 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         // optimisation.
         if(
           equivalent_member.has_value() &&
-          equivalent_member.value().id() != ID_byte_extract_little_endian &&
-          equivalent_member.value().id() != ID_byte_extract_big_endian)
+          equivalent_member->id() != ID_byte_extract_little_endian &&
+          equivalent_member->id() != ID_byte_extract_big_endian)
         {
-          auto tmp = equivalent_member.value();
+          auto tmp = *equivalent_member;
           return changed(simplify_rec(tmp));
         }
       }

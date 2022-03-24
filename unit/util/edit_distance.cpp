@@ -11,7 +11,7 @@ TEST_CASE("edit distance 0", "[core][util][edit_distance]")
 
   // Distance 0
   REQUIRE(hello.matches("hello"));
-  REQUIRE(hello.get_edit_distance("hello").value() == 0);
+  REQUIRE(*hello.get_edit_distance("hello") == 0);
 
   // Distance 1
   REQUIRE_FALSE(hello.matches("hallo"));
@@ -39,17 +39,17 @@ TEST_CASE("edit distance 1", "[core][util][edit_distance]")
 
   // Distance 0
   REQUIRE(hello.matches("hello"));
-  REQUIRE(hello.get_edit_distance("hello").value() == 0);
+  REQUIRE(*hello.get_edit_distance("hello") == 0);
 
   // Distance 1
   REQUIRE(hello.matches("hallo"));
-  REQUIRE(hello.get_edit_distance("hallo").value() == 1);
+  REQUIRE(*hello.get_edit_distance("hallo") == 1);
   REQUIRE(hello.matches("hell"));
-  REQUIRE(hello.get_edit_distance("hell").value() == 1);
+  REQUIRE(*hello.get_edit_distance("hell") == 1);
   REQUIRE(hello.matches("helloo"));
-  REQUIRE(hello.get_edit_distance("helloo").value() == 1);
+  REQUIRE(*hello.get_edit_distance("helloo") == 1);
   REQUIRE(hello.matches("chello"));
-  REQUIRE(hello.get_edit_distance("chello").value() == 1);
+  REQUIRE(*hello.get_edit_distance("chello") == 1);
 
   // Distance 2
   REQUIRE_FALSE(hello.matches("helol"));
@@ -71,25 +71,25 @@ TEST_CASE("edit distance 2", "[core][util][edit_distance]")
 
   // Distance 0
   REQUIRE(hello.matches("hello"));
-  REQUIRE(hello.get_edit_distance("hello").value() == 0);
+  REQUIRE(*hello.get_edit_distance("hello") == 0);
 
   // Distance 1
   REQUIRE(hello.matches("hallo"));
-  REQUIRE(hello.get_edit_distance("hallo").value() == 1);
+  REQUIRE(*hello.get_edit_distance("hallo") == 1);
   REQUIRE(hello.matches("hell"));
-  REQUIRE(hello.get_edit_distance("hell").value() == 1);
+  REQUIRE(*hello.get_edit_distance("hell") == 1);
   REQUIRE(hello.matches("helloo"));
-  REQUIRE(hello.get_edit_distance("helloo").value() == 1);
+  REQUIRE(*hello.get_edit_distance("helloo") == 1);
   REQUIRE(hello.matches("chello"));
-  REQUIRE(hello.get_edit_distance("chello").value() == 1);
+  REQUIRE(*hello.get_edit_distance("chello") == 1);
 
   // Distance 2
   REQUIRE(hello.matches("helol"));
-  REQUIRE(hello.get_edit_distance("helol").value() == 2);
+  REQUIRE(*hello.get_edit_distance("helol") == 2);
   REQUIRE(hello.matches("help"));
-  REQUIRE(hello.get_edit_distance("help").value() == 2);
+  REQUIRE(*hello.get_edit_distance("help") == 2);
   REQUIRE(hello.matches("yohello"));
-  REQUIRE(hello.get_edit_distance("yohello").value() == 2);
+  REQUIRE(*hello.get_edit_distance("yohello") == 2);
 
   // Distance 3
   REQUIRE_FALSE(hello.matches("kelp"));
@@ -106,33 +106,33 @@ TEST_CASE("edit distance 3", "[core][util][edit_distance]")
 
   // Distance 0
   REQUIRE(hello.matches("hello"));
-  REQUIRE(hello.get_edit_distance("hello").value() == 0);
+  REQUIRE(*hello.get_edit_distance("hello") == 0);
 
   // Distance 1
   REQUIRE(hello.matches("hallo"));
-  REQUIRE(hello.get_edit_distance("hallo").value() == 1);
+  REQUIRE(*hello.get_edit_distance("hallo") == 1);
   REQUIRE(hello.matches("hell"));
-  REQUIRE(hello.get_edit_distance("hell").value() == 1);
+  REQUIRE(*hello.get_edit_distance("hell") == 1);
   REQUIRE(hello.matches("helloo"));
-  REQUIRE(hello.get_edit_distance("helloo").value() == 1);
+  REQUIRE(*hello.get_edit_distance("helloo") == 1);
   REQUIRE(hello.matches("chello"));
-  REQUIRE(hello.get_edit_distance("chello").value() == 1);
+  REQUIRE(*hello.get_edit_distance("chello") == 1);
 
   // Distance 2
   REQUIRE(hello.matches("helol"));
-  REQUIRE(hello.get_edit_distance("helol").value() == 2);
+  REQUIRE(*hello.get_edit_distance("helol") == 2);
   REQUIRE(hello.matches("help"));
-  REQUIRE(hello.get_edit_distance("help").value() == 2);
+  REQUIRE(*hello.get_edit_distance("help") == 2);
   REQUIRE(hello.matches("yohello"));
-  REQUIRE(hello.get_edit_distance("yohello").value() == 2);
+  REQUIRE(*hello.get_edit_distance("yohello") == 2);
 
   // Distance 3
   REQUIRE(hello.matches("kelp"));
-  REQUIRE(hello.get_edit_distance("kelp").value() == 3);
+  REQUIRE(*hello.get_edit_distance("kelp") == 3);
   REQUIRE(hello.matches("hilt"));
-  REQUIRE(hello.get_edit_distance("hilt").value() == 3);
+  REQUIRE(*hello.get_edit_distance("hilt") == 3);
   REQUIRE(hello.matches("wallow"));
-  REQUIRE(hello.get_edit_distance("wallow").value() == 3);
+  REQUIRE(*hello.get_edit_distance("wallow") == 3);
 
   // Distance > 3
   REQUIRE_FALSE(hello.matches("unrelated"));

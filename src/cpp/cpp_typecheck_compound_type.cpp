@@ -760,7 +760,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         auto defcode = cpp_constructor(source_locationt(), symexpr, ops);
         CHECK_RETURN(defcode.has_value());
 
-        new_symbol->value.swap(defcode.value());
+        new_symbol->value.swap(*defcode);
       }
     }
   }

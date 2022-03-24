@@ -188,7 +188,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       auto call = cpp_constructor(symbol.location, symbol_expr, ops);
 
       if(call.has_value())
-        init_block.add(call.value());
+        init_block.add(*call);
     }
   }
 

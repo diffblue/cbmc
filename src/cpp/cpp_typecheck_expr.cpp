@@ -810,7 +810,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     expr.find_source_location(), object_expr, initializer.operands());
 
   if(code.has_value())
-    expr.add(ID_initializer).swap(code.value());
+    expr.add(ID_initializer).swap(*code);
   else
     expr.add(ID_initializer) = nil_exprt();
 
@@ -821,7 +821,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   if(size_of_opt.has_value())
   {
     auto &sizeof_expr = static_cast<exprt &>(expr.add(ID_sizeof));
-    sizeof_expr = size_of_opt.value();
+    sizeof_expr = *size_of_opt;
     sizeof_expr.add(ID_C_c_sizeof_type) = expr.type().subtype();
   }
 }
@@ -1041,8 +1041,8 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   if(destructor_code.has_value())
   {
     // this isn't typechecked yet
-    typecheck_code(destructor_code.value());
-    expr.set(ID_destructor, destructor_code.value());
+    typecheck_code(*destructor_code);
+    expr.set(ID_destructor, *destructor_code);
   }
   else
     expr.set(ID_destructor, nil_exprt());

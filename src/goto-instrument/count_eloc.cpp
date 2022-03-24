@@ -200,8 +200,8 @@ void print_global_state_size(const goto_modelt &goto_model)
     }
 
     const auto bits = pointer_offset_bits(symbol.type, ns);
-    if(bits.has_value() && bits.value() > 0)
-      total_size += bits.value();
+    if(bits.has_value() && *bits > 0)
+      total_size += *bits;
   }
 
   std::cout << "Total size of global objects: " << total_size << " bits\n";

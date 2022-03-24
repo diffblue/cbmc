@@ -323,7 +323,7 @@ void instrument_spec_assignst::instrument_instructions(
     {
       instruction_it++;
       if(cfg_info_opt.has_value())
-        cfg_info_opt.value().step();
+        cfg_info_opt->step();
       continue;
     }
 
@@ -398,7 +398,7 @@ void instrument_spec_assignst::instrument_instructions(
     // Move to the next instruction
     instruction_it++;
     if(cfg_info_opt.has_value())
-      cfg_info_opt.value().step();
+      cfg_info_opt->step();
   }
 }
 
@@ -488,14 +488,15 @@ car_exprt instrument_spec_assignst::create_car_expr(
       size.has_value(),
       "no definite size for lvalue target:\n" + target.pretty());
 
-    return {condition,
-            target,
-            typecast_exprt::conditional_cast(
-              address_of_exprt{target}, pointer_type(char_type())),
-            typecast_exprt::conditional_cast(size.value(), signed_size_type()),
-            valid_var,
-            lower_bound_var,
-            upper_bound_var};
+    return {
+      condition,
+      target,
+      typecast_exprt::conditional_cast(
+        address_of_exprt{target}, pointer_type(char_type())),
+      typecast_exprt::conditional_cast(*size, signed_size_type()),
+      valid_var,
+      lower_bound_var,
+      upper_bound_var};
   };
 
   UNREACHABLE;
@@ -677,9 +678,7 @@ exprt instrument_spec_assignst::inclusion_check_full(
     for(const auto &pair : from_stack_alloc)
     {
       // skip dead targets
-      if(
-        cfg_info_opt.has_value() &&
-        !cfg_info_opt.value().is_maybe_alive(pair.first))
+      if(cfg_info_opt.has_value() && !cfg_info_opt->is_maybe_alive(pair.first))
         continue;
 
       disjuncts.push_back(inclusion_check_single(car, pair.second));
@@ -818,7 +817,7 @@ bool instrument_spec_assignst::must_check_assign(
     }
 
     if(cfg_info_opt.has_value())
-      return !cfg_info_opt.value().is_local(symbol_expr->get_identifier());
+      return !cfg_info_opt->is_local(symbol_expr->get_identifier());
   }
 
   return true;
@@ -839,7 +838,7 @@ bool instrument_spec_assignst::must_track_decl(
 {
   if(cfg_info_opt.has_value())
   {
-    return cfg_info_opt.value().is_not_local_or_dirty_local(
+    return cfg_info_opt->is_not_local_or_dirty_local(
       target->decl_symbol().get_identifier());
   }
   // Unless proved non-dirty by the CFG analysis we assume it is dirty.
@@ -856,7 +855,7 @@ bool instrument_spec_assignst::must_track_dead(
   if(!cfg_info_opt.has_value())
     return true;
 
-  return cfg_info_opt.value().is_not_local_or_dirty_local(
+  return cfg_info_opt->is_not_local_or_dirty_local(
     target->dead_symbol().get_identifier());
 }
 

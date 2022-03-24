@@ -451,8 +451,8 @@ void goto_symext::symex_end_of_function(statet &state)
       return_value_symbol.has_value(),
       "must have return value symbol when assigning call lhs");
     // the type of the call lhs and the return type might not match
-    auto casted_return_value = typecast_exprt::conditional_cast(
-      return_value_symbol.value(), call_lhs.type());
+    auto casted_return_value =
+      typecast_exprt::conditional_cast(*return_value_symbol, call_lhs.type());
     symex_assign(state, call_lhs, casted_return_value);
   }
 }

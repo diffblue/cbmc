@@ -21,6 +21,6 @@ void goto_symext::symex_set_return_value(
   framet &frame = state.call_stack().top();
   if(frame.return_value_symbol.has_value())
   {
-    symex_assign(state, frame.return_value_symbol.value(), return_value);
+    symex_assign(state, *frame.return_value_symbol, return_value);
   }
 }

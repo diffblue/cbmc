@@ -113,7 +113,7 @@ int memory_analyzer_parse_optionst::doit()
       "cannot read goto binary '" + binary + "'");
   }
 
-  const goto_modelt goto_model(std::move(opt.value()));
+  const goto_modelt goto_model(std::move(*opt));
 
   gdb_value_extractort gdb_value_extractor(
     goto_model.symbol_table, cmdline.args);

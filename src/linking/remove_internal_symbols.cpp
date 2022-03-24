@@ -169,9 +169,8 @@ void remove_internal_symbols(
     {
       // body? not local (i.e., "static")?
       if(
-        has_body &&
-        (!is_file_local ||
-         (config.main.has_value() && symbol.base_name == config.main.value())))
+        has_body && (!is_file_local || (config.main.has_value() &&
+                                        symbol.base_name == *config.main)))
       {
         get_symbols(ns, symbol, exported);
       }

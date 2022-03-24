@@ -889,7 +889,7 @@ void code_contractst::apply_function_contract(
   // ... for the return value
   if(call_ret_opt.has_value())
   {
-    auto &call_ret = call_ret_opt.value();
+    auto &call_ret = *call_ret_opt;
     auto &loc = call_ret.source_location();
     auto &type = call_ret.type();
 
@@ -920,7 +920,7 @@ void code_contractst::apply_function_contract(
   {
     function_body.output_instruction(ns, "", log.warning(), *target);
     auto dead_inst =
-      goto_programt::make_dead(to_symbol_expr(call_ret_opt.value()), location);
+      goto_programt::make_dead(to_symbol_expr(*call_ret_opt), location);
     function_body.insert_before_swap(target, dead_inst);
     ++target;
   }
@@ -1514,7 +1514,7 @@ void code_contractst::add_contract_check(
   if(code_type.return_type() != empty_typet())
   {
     check.add(goto_programt::make_set_return_value(
-      return_stmt.value().return_value(), skip->source_location()));
+      return_stmt->return_value(), skip->source_location()));
   }
 
   // prepend the new code to dest

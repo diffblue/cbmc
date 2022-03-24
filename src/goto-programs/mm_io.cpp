@@ -75,8 +75,7 @@ void mm_io(
           auto call = goto_programt::make_function_call(
             mm_io_r_value,
             mm_io_r,
-            {typecast_exprt(d.pointer(), pt),
-             typecast_exprt(size_opt.value(), st)},
+            {typecast_exprt(d.pointer(), pt), typecast_exprt(*size_opt, st)},
             source_location);
           goto_function.body.insert_before_swap(it, call);
           it++;
@@ -98,7 +97,7 @@ void mm_io(
           const code_function_callt fc(
             mm_io_w,
             {typecast_exprt(d.pointer(), pt),
-             typecast_exprt(size_opt.value(), st),
+             typecast_exprt(*size_opt, st),
              typecast_exprt(a_rhs, vt)});
           goto_function.body.insert_before_swap(it);
           *it = goto_programt::make_function_call(fc, source_location);

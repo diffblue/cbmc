@@ -39,8 +39,7 @@ SCENARIO(
         THEN("length expression is " << oracle)
         {
           const int actual_int =
-            numeric_cast<int>(to_constant_expr(simplify_expr(actual, ns)))
-              .value();
+            *numeric_cast<int>(to_constant_expr(simplify_expr(actual, ns)));
           REQUIRE(actual_int == oracle);
         }
       }

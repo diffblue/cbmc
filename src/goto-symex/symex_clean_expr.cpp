@@ -90,11 +90,11 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
         auto array_size = size_of_expr(expr.type(), ns);
         CHECK_RETURN(array_size.has_value());
         if(do_simplify)
-          simplify(array_size.value(), ns);
+          simplify(*array_size, ns);
         expr = make_byte_extract(
           expr,
           from_integer(0, c_index_type()),
-          array_typet(char_type(), array_size.value()));
+          array_typet(char_type(), *array_size));
       }
 
       // given an array type T[N], i.e., an array of N elements of type T, and a
@@ -108,8 +108,8 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
         typecast_exprt::conditional_cast(ode.offset(), array_size_type);
       auto subtype_size_opt = size_of_expr(subtype, ns);
       CHECK_RETURN(subtype_size_opt.has_value());
-      exprt subtype_size = typecast_exprt::conditional_cast(
-        subtype_size_opt.value(), array_size_type);
+      exprt subtype_size =
+        typecast_exprt::conditional_cast(*subtype_size_opt, array_size_type);
       new_offset = div_exprt(new_offset, subtype_size);
       minus_exprt subtraction{prev_array_type.size(), new_offset};
       if_exprt new_size{

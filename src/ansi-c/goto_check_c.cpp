@@ -1342,7 +1342,7 @@ void goto_check_ct::pointer_overflow_check(
   {
     auto size_of_expr_opt = size_of_expr(object_type, ns);
     CHECK_RETURN(size_of_expr_opt.has_value());
-    exprt object_size = size_of_expr_opt.value();
+    exprt object_size = *size_of_expr_opt;
 
     const binary_exprt &binary_expr = to_binary_expr(expr);
     exprt offset_operand = binary_expr.lhs().type().id() == ID_pointer
@@ -1401,7 +1401,7 @@ void goto_check_ct::pointer_validity_check(
   {
     auto size_of_expr_opt = size_of_expr(expr.type(), ns);
     CHECK_RETURN(size_of_expr_opt.has_value());
-    size = size_of_expr_opt.value();
+    size = *size_of_expr_opt;
   }
 
   auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
@@ -1448,7 +1448,7 @@ void goto_check_ct::pointer_primitive_check(
 
   const exprt size = !size_of_expr_opt.has_value()
                        ? from_integer(1, size_type())
-                       : size_of_expr_opt.value();
+                       : *size_of_expr_opt;
 
   const conditionst &conditions =
     get_pointer_points_to_valid_memory_conditions(pointer, size);
@@ -1642,10 +1642,9 @@ void goto_check_ct::bounds_check_index(
     CHECK_RETURN(type_size_opt.has_value());
 
     binary_relation_exprt inequality(
-      typecast_exprt::conditional_cast(
-        ode.offset(), type_size_opt.value().type()),
+      typecast_exprt::conditional_cast(ode.offset(), type_size_opt->type()),
       ID_lt,
-      type_size_opt.value());
+      *type_size_opt);
 
     add_guarded_property(
       inequality,
@@ -1832,7 +1831,7 @@ bool goto_check_ct::check_rec_member(
       plus_exprt{
         char_pointer,
         typecast_exprt::conditional_cast(
-          member_offset_opt.value(), pointer_diff_type())},
+          *member_offset_opt, pointer_diff_type())},
       new_pointer_type);
 
     dereference_exprt new_deref{new_address_casted};
@@ -2053,7 +2052,7 @@ void goto_check_ct::goto_check(
       auto matched = match_named_check(d.first);
       if(matched.has_value())
       {
-        auto named_check = matched.value();
+        auto named_check = *matched;
         auto name = named_check.first;
         auto status = named_check.second;
         bool *flag = name_to_flag.find(name)->second;

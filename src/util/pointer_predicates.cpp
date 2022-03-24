@@ -79,7 +79,7 @@ exprt good_pointer_def(
 
   const and_exprt good_bounds{
     not_exprt{object_lower_bound(pointer, nil_exprt())},
-    not_exprt{object_upper_bound(pointer, size_of_expr_opt.value())}};
+    not_exprt{object_upper_bound(pointer, *size_of_expr_opt)}};
 
   return and_exprt(not_null, not_invalid, good_dynamic, good_bounds);
 }

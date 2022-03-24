@@ -232,7 +232,7 @@ cmdlinet::get_argument_suggestions(const std::string &unknown_argument)
       const auto long_name = "--" + option.optstring;
       if(auto distance = argument_matcher.get_edit_distance(long_name))
       {
-        argument_suggestions.push_back({distance.value(), long_name});
+        argument_suggestions.push_back({*distance, long_name});
       }
     }
     if(!option.islong)
@@ -240,7 +240,7 @@ cmdlinet::get_argument_suggestions(const std::string &unknown_argument)
       const auto short_name = std::string{"-"} + option.optchar;
       if(auto distance = argument_matcher.get_edit_distance(short_name))
       {
-        argument_suggestions.push_back({distance.value(), short_name});
+        argument_suggestions.push_back({*distance, short_name});
       }
     }
   }

@@ -100,7 +100,7 @@ void aggressive_slicert::doit()
     auto property_loc = find_property(p, goto_model.goto_functions);
     if(!property_loc.has_value())
       throw "unable to find property in call graph";
-    note_functions_to_keep(property_loc.value().get_function());
+    note_functions_to_keep(property_loc->get_function());
   }
 
   // Add functions within distance of shortest path functions

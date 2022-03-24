@@ -261,7 +261,7 @@ bool interpretert::memory_offset_to_byte_offset(
         const auto member_offset_result =
           member_offset(st, comp.get_name(), ns);
         CHECK_RETURN(member_offset_result.has_value());
-        result = member_offset_result.value() + subtype_result;
+        result = *member_offset_result + subtype_result;
         return ret;
       }
       else

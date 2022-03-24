@@ -471,7 +471,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
       auto tmp = expr2bits(*it, little_endian, ns);
       if(!tmp.has_value())
         return {}; // failed
-      result += tmp.value();
+      result += *tmp;
     }
 
     return result;

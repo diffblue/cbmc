@@ -164,10 +164,7 @@ static optionalt<exprt> substitute_symbols_rec(
       substitute_symbols_rec(new_substitutions, binding_expr.where());
     if(op_result.has_value())
       return binding_exprt(
-        src.id(),
-        binding_expr.variables(),
-        op_result.value(),
-        binding_expr.type());
+        src.id(), binding_expr.variables(), *op_result, binding_expr.type());
     else
       return {};
   }
@@ -190,7 +187,7 @@ static optionalt<exprt> substitute_symbols_rec(
 
       if(op_result.has_value())
       {
-        op = op_result.value();
+        op = *op_result;
         op_changed = true;
       }
     }
@@ -199,7 +196,7 @@ static optionalt<exprt> substitute_symbols_rec(
       substitute_symbols_rec(new_substitutions, binding_expr.where());
     if(op_result.has_value())
     {
-      new_let_expr.where() = op_result.value();
+      new_let_expr.where() = *op_result;
       op_changed = true;
     }
 
@@ -220,7 +217,7 @@ static optionalt<exprt> substitute_symbols_rec(
 
     if(op_result.has_value())
     {
-      op = op_result.value();
+      op = *op_result;
       op_changed = true;
     }
   }
@@ -256,7 +253,7 @@ exprt binding_exprt::instantiate(const operandst &values) const
   auto substitute_result = substitute_symbols_rec(substitutions, where());
 
   if(substitute_result.has_value())
-    return substitute_result.value();
+    return *substitute_result;
   else
     return where(); // trivial case, variables not used
 }

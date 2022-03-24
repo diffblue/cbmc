@@ -65,7 +65,7 @@ bool jsil_entry_point(
     std::list<irep_idt> matches;
 
     for(const auto &symbol_name_entry :
-        equal_range(symbol_table.symbol_base_map, config.main.value()))
+        equal_range(symbol_table.symbol_base_map, *config.main))
     {
       // look it up
       symbol_tablet::symbolst::const_iterator s_it =
@@ -81,7 +81,7 @@ bool jsil_entry_point(
     if(matches.empty())
     {
       messaget message(message_handler);
-      message.error() << "main symbol '" << config.main.value() << "' not found"
+      message.error() << "main symbol '" << *config.main << "' not found"
                       << messaget::eom;
       return true; // give up
     }
@@ -89,8 +89,8 @@ bool jsil_entry_point(
     if(matches.size()>=2)
     {
       messaget message(message_handler);
-      message.error() << "main symbol '" << config.main.value()
-                      << "' is ambiguous" << messaget::eom;
+      message.error() << "main symbol '" << *config.main << "' is ambiguous"
+                      << messaget::eom;
       return true;
     }
 

@@ -113,7 +113,7 @@ SCENARIO(
       REQUIRE(result.is_single_value_interval());
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
       REQUIRE(maybe_lower.has_value());
-      REQUIRE(maybe_lower.value() == 7);
+      REQUIRE(*maybe_lower == 7);
     }
   }
 
@@ -128,7 +128,7 @@ SCENARIO(
       REQUIRE(result.is_single_value_interval());
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
       REQUIRE(maybe_lower.has_value());
-      REQUIRE(maybe_lower.value() == 10);
+      REQUIRE(*maybe_lower == 10);
     }
   }
 
@@ -141,10 +141,10 @@ SCENARIO(
       auto result = constant_interval_exprt::minus(lhs, rhs);
       auto maybe_lower = numeric_cast<mp_integer>(result.get_lower());
       REQUIRE(maybe_lower.has_value());
-      REQUIRE(maybe_lower.value() == 9);
+      REQUIRE(*maybe_lower == 9);
       auto maybe_upper = numeric_cast<mp_integer>(result.get_upper());
       REQUIRE(maybe_upper.has_value());
-      REQUIRE(maybe_upper.value() == 10);
+      REQUIRE(*maybe_upper == 10);
     }
   }
 }

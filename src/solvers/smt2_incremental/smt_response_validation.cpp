@@ -46,7 +46,7 @@ const smtt *response_or_errort<smtt>::get_if_valid() const
     smt.has_value() == messages.empty(),
     "The response_or_errort class must be in the valid state or error state, "
     "exclusively.");
-  return smt.has_value() ? &smt.value() : nullptr;
+  return smt.has_value() ? &(*smt) : nullptr;
 }
 
 template <class smtt>

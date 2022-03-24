@@ -23,10 +23,10 @@ void do_optional_lookup_test(map_like_collectiont &map)
   map.insert({"pwd", "/home"});
   auto const hello_result = optional_lookup(map, "hello");
   REQUIRE(hello_result.has_value());
-  REQUIRE(hello_result.value() == "world");
+  REQUIRE(*hello_result == "world");
   auto const pwd_result = optional_lookup(map, "pwd");
   REQUIRE(pwd_result.has_value());
-  REQUIRE(pwd_result.value() == "/home");
+  REQUIRE(*pwd_result == "/home");
   REQUIRE_FALSE(optional_lookup(map, "does not exit").has_value());
 }
 } // namespace

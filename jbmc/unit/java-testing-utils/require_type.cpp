@@ -23,7 +23,7 @@ pointer_typet require_type::require_pointer(
   const pointer_typet &pointer = to_pointer_type(type);
 
   if(subtype)
-    REQUIRE(pointer.subtype() == subtype.value());
+    REQUIRE(pointer.subtype() == *subtype);
 
   return pointer;
 }
@@ -248,7 +248,7 @@ const typet &require_type::require_java_non_generic_type(
   REQUIRE(!is_java_generic_parameter(type));
   REQUIRE(!is_java_generic_type(type));
   if(expect_subtype)
-    REQUIRE(type.subtype() == expect_subtype.value());
+    REQUIRE(type.subtype() == *expect_subtype);
   return type;
 }
 

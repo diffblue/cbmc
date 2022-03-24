@@ -188,11 +188,11 @@ void goto_symext::symex_other(
     {
       auto array_size = size_of_expr(array_expr.type(), ns);
       CHECK_RETURN(array_size.has_value());
-      do_simplify(array_size.value());
+      do_simplify(*array_size);
       array_expr = make_byte_extract(
         array_expr,
         from_integer(0, c_index_type()),
-        array_typet(char_type(), array_size.value()));
+        array_typet(char_type(), *array_size));
     }
 
     const array_typet &array_type = to_array_type(array_expr.type());

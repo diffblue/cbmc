@@ -97,7 +97,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       auto maybe_index_value = numeric_cast<mp_integer>(index);
       if(maybe_index_value.has_value())
       {
-        return convert_index(array, maybe_index_value.value());
+        return convert_index(array, *maybe_index_value);
       }
     }
 

@@ -28,8 +28,8 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
   if(!maybe_upper_as_int.has_value() || !maybe_lower_as_int.has_value())
     return conversion_failed(expr);
 
-  auto upper_as_int = maybe_upper_as_int.value();
-  auto lower_as_int = maybe_lower_as_int.value();
+  auto upper_as_int = *maybe_upper_as_int;
+  auto lower_as_int = *maybe_lower_as_int;
 
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     upper_as_int >= 0 && upper_as_int < src_bv.size(),

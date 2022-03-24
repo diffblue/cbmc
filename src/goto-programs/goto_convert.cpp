@@ -1800,8 +1800,8 @@ bool goto_convertt::get_string_constant(
           if(!i.has_value())
             return true;
 
-          if(i.value() != 0) // to skip terminating 0
-            result += static_cast<char>(i.value());
+          if(*i != 0) // to skip terminating 0
+            result += static_cast<char>(*i);
         }
 
       return value=result, false;

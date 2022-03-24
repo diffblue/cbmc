@@ -46,7 +46,7 @@ std::size_t require_one_size_value(
   auto value = string2optional<std::size_t>(string_value, 10);
   if(value.has_value())
   {
-    return value.value();
+    return *value;
   }
   else
   {
