@@ -21,7 +21,6 @@ Author: Michael Tautschnig
 
 #include <util/cmdline.h>
 #include <util/config.h>
-#include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
 #include <util/tempdir.h>
@@ -31,6 +30,7 @@ Author: Michael Tautschnig
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
 
+#include <filesystem>
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 
@@ -303,9 +303,9 @@ int as_modet::as_hybrid_binary(const compilet &compiler)
   std::string saved = output_file + ".goto-cc-saved";
   try
   {
-    file_rename(output_file, saved);
+    std::filesystem::rename(output_file, saved);
   }
-  catch(const cprover_exception_baset &e)
+  catch(const std::filesystem::filesystem_error &e)
   {
     log.error() << "Rename failed: " << e.what() << messaget::eom;
     return 1;

@@ -8,15 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_class_loader_base.h"
 
-#include "jar_file.h"
-#include "java_bytecode_parse_tree.h"
-#include "java_bytecode_parser.h"
-
-#include <util/file_util.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/suffix.h>
 
+#include "jar_file.h"
+#include "java_bytecode_parse_tree.h"
+#include "java_bytecode_parser.h"
+
+#include <filesystem>
 #include <fstream>
 
 void java_class_loader_baset::add_classpath_entry(
@@ -40,7 +40,7 @@ void java_class_loader_baset::add_classpath_entry(
   }
   else
   {
-    if(is_directory(path))
+    if(std::filesystem::is_directory(path))
     {
       classpath_entries.push_back(
         classpath_entryt(classpath_entryt::DIRECTORY, path));
@@ -197,7 +197,8 @@ java_class_loader_baset::get_class_from_directory(
 {
   // Look in the given directory
   const std::string class_file = class_name_to_os_file(class_name);
-  const std::string full_path = concat_dir_file(path, class_file);
+  const std::string full_path =
+    std::filesystem::path(path).append(class_file).string();
 
   if(std::ifstream(full_path))
   {

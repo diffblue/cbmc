@@ -12,13 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_PARSER_H
 #define CPROVER_UTIL_PARSER_H
 
+#include "expr.h"
+#include "message.h"
+
+#include <filesystem>
 #include <iosfwd>
 #include <string>
 #include <vector>
-
-#include "expr.h"
-#include "message.h"
-#include "file_util.h"
 
 class parsert
 {
@@ -86,7 +86,7 @@ public:
   {
     source_location.set_file(file);
     source_location.set_working_directory(
-      get_current_working_directory());
+      std::filesystem::current_path().string());
   }
 
   irep_idt get_file() const

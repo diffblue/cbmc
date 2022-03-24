@@ -19,13 +19,8 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-
 #include <util/cmdline.h>
 #include <util/config.h>
-#include <util/file_util.h>
 #include <util/invariant.h>
 #include <util/run.h>
 
@@ -33,6 +28,11 @@ Author: CM Wintersteiger, 2006
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
 #include "linker_script_merge.h"
+
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 
 static std::string
 linker_name(const cmdlinet &cmdline, const std::string &base_name)
@@ -183,9 +183,9 @@ int ld_modet::ld_hybrid_binary(
 
   try
   {
-    file_rename(output_file, goto_binary);
+    std::filesystem::rename(output_file, goto_binary);
   }
-  catch(const cprover_exception_baset &e)
+  catch(const std::filesystem::filesystem_error &e)
   {
     log.error() << "Rename failed: " << e.what() << messaget::eom;
     return 1;
