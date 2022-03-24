@@ -217,9 +217,8 @@ void rw_range_sett::get_objects_shift(
       if(sh_range_start>=0 && sh_range_start<src_size)
         get_objects_rec(mode, shift.op(), sh_range_start, sh_size);
     }
-    else
+    if(src_size - dist_r >= 0)
     {
-      assert(src_size-dist_r>=0);
       range_spect sh_size=std::min(size, src_size-dist_r);
 
       get_objects_rec(mode, shift.op(), range_start, sh_size);
