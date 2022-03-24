@@ -8,19 +8,18 @@ Author: Diffblue Ltd.
 
 #include "load_java_class.h"
 
-#include <iostream>
-#include <testing-utils/free_form_cmdline.h>
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
-
 #include <util/config.h>
 #include <util/options.h>
 #include <util/suffix.h>
 
-#include <java_bytecode/lazy_goto_model.h>
-
 #include <java_bytecode/java_bytecode_language.h>
-#include <util/file_util.h>
+#include <java_bytecode/lazy_goto_model.h>
+#include <testing-utils/free_form_cmdline.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
+
+#include <filesystem>
+#include <iostream>
 
 /// Go through the process of loading, type-checking and finalising loading a
 /// specific class file to build the symbol table. The functions are converted
@@ -149,7 +148,7 @@ goto_modelt load_goto_model_from_java_class(
   // Log the working directory to help people identify the common error
   // of wrong working directory (should be the `unit` directory when running
   // the unit tests).
-  std::string path = get_current_working_directory();
+  std::string path = std::filesystem::current_path().string();
   INFO("Working directory: " << path);
 
   // if this fails it indicates the class was not loaded

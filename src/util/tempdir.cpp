@@ -8,34 +8,23 @@ Author: CM Wintersteiger
 
 #include "tempdir.h"
 
-#ifdef _WIN32
-#include <util/pragma_push.def>
-#ifdef _MSC_VER
-#pragma warning(disable:4668)
-  // using #if/#elif on undefined macro
-#pragma warning(disable : 5039)
-// pointer or reference to potentially throwing function passed to extern C
-#endif
-#include <windows.h>
-#include <io.h>
-#include <direct.h>
-#include <util/pragma_pop.def>
-#endif
-
-#include <cstdlib>
-#include <cstring>
-#include <vector>
+#include <filesystem>
 
 // clang-format off
+#ifndef _WIN32
 #if defined(__FreeBSD_kernel__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
 #endif
+
+#include <cstdlib>
+#include <cstring>
+#include <vector>
+#endif
 // clang-format on
 
 #include "exception_utils.h"
-#include "file_util.h"
 
 std::string get_temporary_directory(const std::string &name_template)
 {
@@ -43,36 +32,14 @@ std::string get_temporary_directory(const std::string &name_template)
 
 #ifdef _WIN32
   (void)name_template; // unused parameter
-  DWORD dwBufSize = MAX_PATH + 1;
-  char lpPathBuffer[MAX_PATH + 1];
-  DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
-
-  if(dwRetVal > dwBufSize || (dwRetVal == 0))
+  try
   {
-    throw system_exceptiont("Couldn't get temporary path");
+    result = std::filesystem::temp_directory_path().string();
   }
-
-  // GetTempFileNameA produces <path>\<pre><uuuu>.TMP
-  // where <pre> = "TLO"
-  // Thus, we must make the buffer 1+3+4+1+3=12 characters longer.
-
-  char t[MAX_PATH];
-  UINT uRetVal = GetTempFileNameA(lpPathBuffer, "TLO", 0, t);
-  if(uRetVal == 0)
+  catch(const std::filesystem::filesystem_error &)
   {
-    throw system_exceptiont(
-      std::string("Couldn't get new temporary file name in directory") +
-      lpPathBuffer);
+    throw system_exceptiont("Failed to create temporary directory");
   }
-
-  unlink(t);
-  if(_mkdir(t) != 0)
-  {
-    throw system_exceptiont(
-      std::string("Couldn't create temporary directory at ") + t);
-  }
-  result = std::string(t);
-
 #else
   std::string prefixed_name_template = "/tmp/";
   const char *TMPDIR_env = getenv("TMPDIR");
@@ -110,12 +77,12 @@ temp_dirt::temp_dirt(const std::string &name_template)
 
 std::string temp_dirt::operator()(const std::string &file)
 {
-  return concat_dir_file(path, file);
+  return std::filesystem::path(path).append(file).string();
 }
 
 void temp_dirt::clear()
 {
-  delete_directory(path);
+  std::filesystem::remove_all(path);
 }
 
 temp_dirt::~temp_dirt()

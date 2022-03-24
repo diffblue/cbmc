@@ -33,9 +33,9 @@ Author: Daniel Kroening
 
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 
 #include "exception_utils.h"
-#include "file_util.h"
 
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
@@ -145,5 +145,5 @@ std::string get_temporary_file(
 temporary_filet::~temporary_filet()
 {
   if(!name.empty())
-    file_remove(name);
+    std::filesystem::remove(name);
 }
