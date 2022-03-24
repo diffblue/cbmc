@@ -183,8 +183,10 @@ simplify_exprt::simplify_index(const index_exprt &expr)
         return unchanged(expr);
 
       // add offset to index
-      exprt offset = simplify_mult(mult_exprt{
-        from_integer(*sub_size, byte_extract_expr.offset().type()), index});
+      exprt offset = simplify_rec(mult_exprt{
+        from_integer(*sub_size, byte_extract_expr.offset().type()),
+        typecast_exprt::conditional_cast(
+          index, byte_extract_expr.offset().type())});
       exprt final_offset =
         simplify_plus(plus_exprt(byte_extract_expr.offset(), offset));
 
