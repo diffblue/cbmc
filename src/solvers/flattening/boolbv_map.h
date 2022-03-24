@@ -10,11 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 
-#include <iosfwd>
-
 #include <util/type.h>
 
 #include <solvers/prop/literal.h>
+
+#include <functional>
+#include <iosfwd>
 
 class propt;
 

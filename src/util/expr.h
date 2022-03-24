@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "validate_types.h"
 #include "validation_mode.h"
 
+#include <functional>
+
 #define forall_operands(it, expr)                                              \
   for(exprt::operandst::const_iterator                                         \
         it = as_const(expr).operands().begin(),                                \
