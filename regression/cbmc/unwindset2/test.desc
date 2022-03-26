@@ -1,0 +1,9 @@
+CORE
+main.c
+--unwindset main.for_loop:2 --unwinding-assertions
+^loop identifier main.for_loop provided with unwindset is ambiguous$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
