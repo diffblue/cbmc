@@ -16,6 +16,8 @@ Author: Diffblue Ltd.
 #include <util/irep.h>
 #include <util/optional.h>
 
+#include <functional>
+
 class symbolt;
 class symbol_tablet;
 
