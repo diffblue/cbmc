@@ -28,8 +28,8 @@ fi
 # update benchmarks
 cd /mnt/sv-benchmarks
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-git fetch origin master
-git checkout -b master origin/master
+git fetch origin main
+git reset --hard origin/main
 
 # update benchexec
 cd /mnt/benchexec
@@ -45,7 +45,7 @@ cd ..
 mkdir -p run
 cd run
 wget -O cbmc.xml \
-  'https://gitlab.com/sosy-lab/sv-comp/bench-defs/-/raw/master/benchmark-defs/cbmc.xml?inline=false'
+  'https://gitlab.com/sosy-lab/sv-comp/bench-defs/-/raw/main/benchmark-defs/cbmc.xml?inline=false'
 sed -i 's/witness.graphml/${logfile_path_abs}${taskdef_name}-witness.graphml/' cbmc.xml
 cd ..
 mkdir -p tmp
@@ -59,12 +59,12 @@ then
 
   cd ../run
   for def in \
-    cpa-seq-validate-correctness-witnesses \
-    cpa-seq-validate-violation-witnesses \
+    cpachecker-validate-correctness-witnesses \
+    cpachecker-validate-violation-witnesses \
     fshell-witness2test-validate-violation-witnesses
   do
     wget -O $def.xml \
-      "https://gitlab.com/sosy-lab/sv-comp/bench-defs/-/raw/master/benchmark-defs/$def.xml?inline=false"
+      "https://gitlab.com/sosy-lab/sv-comp/bench-defs/-/raw/main/benchmark-defs/$def.xml?inline=false"
     sed -i 's#[\./]*/results-verified/LOGDIR/\${rundefinition_name}.\${taskdef_name}/witness.graphml#witnesses/${rundefinition_name}.${taskdef_name}-witness.graphml#' $def.xml
   done
 
@@ -75,8 +75,8 @@ then
   git pull
   wget https://codeload.github.com/eliben/pycparser/zip/master -O pycparser-master.zip
   unzip pycparser-master.zip
-  wget https://codeload.github.com/inducer/pycparserext/zip/master -O pycparserext-master.zip
-  unzip pycparserext-master.zip
+  wget https://codeload.github.com/inducer/pycparserext/zip/main -O pycparserext-main.zip
+  unzip pycparserext-main.zip
   cd ../run
   cp -a ../fshell-w2t/* .
 fi
@@ -113,12 +113,12 @@ do
         perf-test-sqs-:PERFTESTID:
       aws --region :AWSREGION: cloudformation delete-stack --stack-name \
         perf-test-exec-:PERFTESTID:
-      poweroff
     fi
 
     # the queue is gone, or other host will be turning
     # off the lights
     poweroff
+    sleep 10
   fi
 
   retry=1

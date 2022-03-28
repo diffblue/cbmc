@@ -8,6 +8,9 @@ Parameters:
     AvailabilityZone:
         Type: String
 
+    Subnet:
+        Type: String
+
     SSHKeyName:
         Type: String
 
@@ -22,7 +25,7 @@ Resources:
             KeyName:
                 !If [UseKey, !Ref SSHKeyName, !Ref "AWS::NoValue"]
             ImageId: !Ref Ami
-            AvailabilityZone: !Ref AvailabilityZone
+            SubnetId: !Ref Subnet
             Volumes:
                 - Device: "/dev/sdf"
                   VolumeId: !Ref BaseVolume
@@ -43,8 +46,8 @@ Resources:
                 apt-get -y update
                 apt-get install git
                 cd /mnt
-                git clone --depth 1 --branch svcomp20 \
-                        https://github.com/sosy-lab/sv-benchmarks.git
+                git clone --depth 1 --branch main \
+                        https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks.git
                 git clone --depth 1 \
                         https://github.com/sosy-lab/benchexec.git
                 git clone --depth 1 --branch trunk \

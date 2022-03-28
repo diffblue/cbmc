@@ -66,7 +66,7 @@ Resources:
               - DeviceName: /dev/xvda
                 Ebs:
                   VolumeType: gp2
-                  VolumeSize: '30'
+                  VolumeSize: '50'
                   DeleteOnTermination: 'true'
             SubnetId: !Ref Subnet
             UserData:
@@ -106,7 +106,7 @@ Resources:
                     git log HEAD^..HEAD >> COMMIT_INFO
                     make -C src minisat2-download glucose-download cadical-download
                     export CCACHE_NOHASHDIR=1
-                    make -C src CXX="ccache g++" -j8
+                    make -C src cbmc.dir goto-cc.dir CXX="ccache g++" -j8
                     ccache -s
 
                     aws s3 cp src/cbmc/cbmc s3://${S3Bucket}/${PerfTestId}/release/cbmc
@@ -126,7 +126,7 @@ Resources:
               - DeviceName: /dev/xvda
                 Ebs:
                   VolumeType: gp2
-                  VolumeSize: '30'
+                  VolumeSize: '50'
                   DeleteOnTermination: 'true'
             SubnetId: !Ref Subnet
             UserData:
@@ -168,9 +168,9 @@ Resources:
                     export CCACHE_NOHASHDIR=1
                     if [ x${UsePerf} = xTrue ]
                     then
-                      make -C src CXX="ccache g++" -j8 CXXFLAGS="-O2 -g -Wno-deprecated -fno-omit-frame-pointer"
+                      make -C src cbmc.dir goto-cc.dir CXX="ccache g++" -j8 CXXFLAGS="-O2 -g -Wno-deprecated -fno-omit-frame-pointer"
                     else
-                      make -C src CXX="ccache g++" -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4 -Wno-deprecated" LINKFLAGS="-pg"
+                      make -C src cbmc.dir goto-cc.dir CXX="ccache g++" -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4 -Wno-deprecated" LINKFLAGS="-pg"
                     fi
                     ccache -s
 

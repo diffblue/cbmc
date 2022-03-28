@@ -310,33 +310,35 @@ def select_region(session, mode, region, instance_type):
             min_region, min_az, min_price))
 
     # https://cloud-images.ubuntu.com/locator/ec2/
-    # 20201120 - Ubuntu 20.04 LTS (focal) - hvm:ebs-ssd
+    # 20211103 - Ubuntu 20.04 LTS (focal) - hvm:ebs-ssd
     AMI_ids = {
         "Mappings": {
             "RegionMap": {
-		"af-south-1": { "64": "ami-0196a23f828d6e619" },
-		"ap-east-1": { "64": "ami-f6511c87" },
-		"ap-northeast-1": { "64": "ami-0e40a27db137d33cb" },
-		"ap-northeast-2": { "64": "ami-01ff1255cee8004b8" },
-		"ap-northeast-3": { "64": "ami-0b58a665b8d0d720c" },
-		"ap-south-1": { "64": "ami-0cecfffd8cae9481c" },
-		"ap-southeast-1": { "64": "ami-0dbb8181cd0ce9cff" },
-		"ap-southeast-2": { "64": "ami-0f150e4544fb95045" },
-		"ca-central-1": { "64": "ami-03060448f5c8f2199" },
-		"cn-north-1": { "64": "ami-00cc446c1f9e0b72a" },
-		"cn-northwest-1": { "64": "ami-05b363127143238ba" },
-		"eu-central-1": { "64": "ami-09f14afb2e15caab5" },
-		"eu-north-1": { "64": "ami-01450210d4ebb3bab" },
-		"eu-south-1": { "64": "ami-0e3c0649c89ccddc9" },
-		"eu-west-1": { "64": "ami-048309a44dad514df" },
-		"eu-west-2": { "64": "ami-099ae17a6a688b1cc" },
-		"eu-west-3": { "64": "ami-098efdd0afb686fd5" },
-		"me-south-1": { "64": "ami-098b94183f8e74ecc" },
-		"sa-east-1": { "64": "ami-0cc03bf224d6eb2fc" },
-		"us-east-1": { "64": "ami-08306577a6694f5e7" },
-		"us-east-2": { "64": "ami-0be9fcdb56a1f1226" },
-		"us-west-1": { "64": "ami-04d12df4da18327bd" },
-		"us-west-2": { "64": "ami-082e4f383a98efbe9" },
+				"af-south-1": {"64": "ami-0ff86122fd4ad7208" },
+				"ap-east-1": {"64": "ami-0a9c1cc3697104990" },
+				"ap-northeast-1": {"64": "ami-036d0684fc96830ca" },
+				"ap-northeast-2": {"64": "ami-0f8b8babb98cc66d0" },
+				"ap-northeast-3": {"64": "ami-0c3904e7363bbc4bc" },
+				"ap-south-1": {"64": "ami-0567e0d2b4b2169ae" },
+				"ap-southeast-1": {"64": "ami-0fed77069cd5a6d6c" },
+				"ap-southeast-2": {"64": "ami-0bf8b986de7e3c7ce" },
+				"ca-central-1": {"64": "ami-0bb84e7329f4fa1f7" },
+				"cn-north-1": {"64": "ami-0741e7b8b4fb0001c" },
+				"cn-northwest-1": {"64": "ami-0883e8062ff31f727" },
+				"eu-central-1": {"64": "ami-0a49b025fffbbdac6" },
+				"eu-north-1": {"64": "ami-0bd9c26722573e69b" },
+				"eu-south-1": {"64": "ami-0f8ce9c417115413d" },
+				"eu-west-1": {"64": "ami-08edbb0e85d6a0a07" },
+				"eu-west-2": {"64": "ami-0fdf70ed5c34c5f52" },
+				"eu-west-3": {"64": "ami-06d79c60d7454e2af" },
+				"me-south-1": {"64": "ami-0b4946d7420c44be4" },
+				"sa-east-1": {"64": "ami-0e66f5495b4efdd0f" },
+				"us-east-1": {"64": "ami-083654bd07b5da81d" },
+				"us-east-2": {"64": "ami-0629230e074c580f2" },
+				"us-gov-east-1": {"64": "ami-0fe6338c47e61cd5d" },
+				"us-gov-west-1": {"64": "ami-087ee83c8de303181" },
+				"us-west-1": {"64": "ami-053ac55bdcfe96e85" },
+				"us-west-2": {"64": "ami-036d46416a34a611c" },
             }
         }
     }
@@ -346,7 +348,7 @@ def select_region(session, mode, region, instance_type):
     return (min_region, min_az, min_price, ami)
 
 
-def prepare_ebs(session, region, az, ami, ssh_key_name):
+def prepare_ebs(session, region, az, subnet, ami, ssh_key_name):
     # create an ebs volume that contains the benchmark sources
     logger = logging.getLogger('perf_test')
     ec2 = session.client('ec2', region_name=region)
@@ -377,6 +379,10 @@ def prepare_ebs(session, region, az, ami, ssh_key_name):
                     {
                         'ParameterKey': 'AvailabilityZone',
                         'ParameterValue': az
+                    },
+                    {
+                        'ParameterKey': 'Subnet',
+                        'ParameterValue': subnet
                     },
                     {
                         'ParameterKey': 'SSHKeyName',
@@ -761,7 +767,7 @@ def main():
                 args.build, args.use_perf)
         session2 = boto3.session.Session()
         ebs_future = e.submit(
-                prepare_ebs, session2, region, az, ami,
+                prepare_ebs, session2, region, az, subnet_for_az, ami,
                 args.ssh_key_name)
         session3 = boto3.session.Session()
         sqs_future = e.submit(
