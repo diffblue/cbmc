@@ -268,6 +268,9 @@ protected:
     symbolt &old_symbol, symbolt &new_symbol);
   void typecheck_function_body(symbolt &symbol);
 
+  /// Create symbols for parameter of the code-typed symbol \p symbol.
+  void add_parameters_to_symbol_table(symbolt &symbol);
+
   virtual void do_initializer(symbolt &symbol);
 
   static bool is_numeric_type(const typet &src)
