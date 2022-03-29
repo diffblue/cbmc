@@ -153,6 +153,12 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
     {
       typecheck_function_body(symbol);
     }
+    else if(
+      symbol.value.is_nil() && !symbol.is_macro &&
+      to_code_with_contract_type(symbol.type).has_contract())
+    {
+      add_parameters_to_symbol_table(symbol);
+    }
     else
     {
       // we don't need the identifiers
