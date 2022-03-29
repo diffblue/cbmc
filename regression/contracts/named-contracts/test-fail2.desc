@@ -1,0 +1,11 @@
+CORE
+main-fail2.c
+--replace-call-with-contract foo
+function 'foo' was already declared as a pure contract
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that programs with function redeclarations 
+where one declaration is a pure contract are rejected.

@@ -403,8 +403,17 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       if(new_symbol.is_macro)
         old_symbol.is_macro=true;
       else
+      {
+        // old symbol had no body but might have had a contract
+        if(to_code_with_contract_type(old_symbol.type).has_contract())
+        {
+          error().source_location = new_symbol.location;
+          error() << "function '" << new_symbol.display_name()
+                  << "' was already declared as a pure contract" << eom;
+          throw 0;
+        }
         typecheck_function_body(new_symbol);
-
+      }
       // overwrite location
       old_symbol.location=new_symbol.location;
 
@@ -414,7 +423,17 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       // overwrite type (because of parameter names)
       old_symbol.type=new_symbol.type;
     }
-
+    else
+    {
+      // new symbol has no body but might have a contract
+      if(to_code_with_contract_type(new_symbol.type).has_contract())
+      {
+        error().source_location = new_symbol.location;
+        error() << "function '" << new_symbol.display_name()
+                << "' cannot be redeclared as a pure contract" << eom;
+        throw 0;
+      }
+    }
     return;
   }
 

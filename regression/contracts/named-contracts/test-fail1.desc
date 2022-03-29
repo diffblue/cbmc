@@ -1,0 +1,11 @@
+CORE
+main-fail1.c
+--replace-call-with-contract
+error: function 'foo' cannot be redeclared as a pure contract
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that we cannot have a first declaration without contract 
+and a body followed by a redeclaration with a contract and without body.
