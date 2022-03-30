@@ -715,13 +715,13 @@ void arrayst::add_array_constraints_array_constant(
       // We have a constant index - just pick the element at that index from the
       // array constant.
 
-      const std::size_t i =
-        numeric_cast_v<std::size_t>(to_constant_expr(index));
+      const optionalt<std::size_t> i =
+        numeric_cast<std::size_t>(to_constant_expr(index));
       // if the access is out of bounds, we leave it unconstrained
-      if(i >= operands.size())
+      if(!i.has_value() || *i >= operands.size())
         continue;
 
-      const exprt v = operands[i];
+      const exprt v = operands[*i];
       DATA_INVARIANT(
         index_expr.type() == v.type(),
         "array operand type should match array element type");

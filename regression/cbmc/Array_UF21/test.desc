@@ -1,0 +1,9 @@
+CORE
+main.c
+--arrays-uf-always --bounds-check
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed
