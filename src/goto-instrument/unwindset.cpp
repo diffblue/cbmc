@@ -134,8 +134,14 @@ void unwindsett::parse_unwindset_one_loop(
             location.has_value() && instruction.is_backwards_goto() &&
             instruction.source_location() == *location)
           {
+            if(nr.has_value())
+            {
+              messaget log{message_handler};
+              log.warning()
+                << "loop identifier " << id
+                << " provided with unwindset is ambiguous" << messaget::eom;
+            }
             nr = instruction.loop_number;
-            break;
           }
         }
         if(!nr.has_value())
