@@ -1,0 +1,15 @@
+CORE
+main.c
+--replace-pure-contracts --enforce-contract bar
+^\[foo.pure_contract.\d+\] line \d+ all calls replaced: (UNREACHABLE|SUCCESS)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test demonstrates that calls to functions tagged as pure contracts
+replaced by the contract when the command line switch --replace-pure-contracts
+is used. foo is a pure contract, bar has the same contract and calls foo.
+foo gets replaced in bar, and bar satisfies its contract.
+The assertion `foo.pure_contract` is UNREACHABLE or SUCCESS when
+all calls to foo have actually been replaced by foo's contract.

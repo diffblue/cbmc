@@ -1133,7 +1133,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(
     cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
-    cmdline.isset(FLAG_ENFORCE_CONTRACT))
+    cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
+    cmdline.isset(FLAG_REPLACE_PURE_CONTRACTS))
   {
     do_indirect_call_and_rtti_removal();
     code_contractst contracts(goto_model, log);
@@ -1150,6 +1151,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     // first replacement then enforcement. We rely on contract replacement
     // and inlining of sub-function calls to properly annotate all
     // assignments.
+
+    if(cmdline.isset(FLAG_REPLACE_PURE_CONTRACTS))
+      contracts.replace_pure_contracts();
+
     contracts.replace_calls(to_replace);
     contracts.enforce_contracts(to_enforce);
 
@@ -1844,6 +1849,7 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
     HELP_REPLACE_CALL
+    HELP_REPLACE_PURE_CONTRACTS
     HELP_ENFORCE_CONTRACT
     "\n"
     "Other options:\n"

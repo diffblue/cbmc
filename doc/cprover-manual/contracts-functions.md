@@ -143,6 +143,27 @@ instruments the code to use the function contract in place of the function
 implementation wherever is invoked, and the third one runs CBMC to check the
 program using contracts.
 
+## Pure contracts
+
+A pure contract is a function definition equipped with a contract and
+for which the body consists of a single call to the function
+`__CPROVER_pure_contract`:
+
+```C
+ret_t foo(param_t params)
+__CPROVER_requires(R)
+__CPROVER_assigns(A)
+__CPROVER_ensures(E)
+{
+  __CPROVER_pure_contract();
+}
+```
+Using `__CPROVER_pure_contract();` in any other way results in a failed
+assertion.
+
+Calls to pure contracts are globally replaced by goto-instrument when the
+flag `--replace-pure-contracts` is specified on the command line.
+
 ## Additional Resources
 
 - [Requires \& Ensures Clauses](contracts-requires-and-ensures.md)

@@ -96,6 +96,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(horn)(skip-loops):(model-argc-argv):" \
   "(" FLAG_LOOP_CONTRACTS ")" \
   "(" FLAG_REPLACE_CALL "):" \
+  "(" FLAG_REPLACE_PURE_CONTRACTS ")" \
   "(" FLAG_ENFORCE_CONTRACT "):" \
   "(show-threaded)(list-calls-args)" \
   "(undefined-function-is-assume-false)" \

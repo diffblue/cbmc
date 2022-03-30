@@ -1,0 +1,11 @@
+CORE
+main-fail.c
+--replace-pure-contracts --enforce-contract bar
+^main-fail.c.* error: incorrect use of __CPROVER_pure_contract, function contains other instructions$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test demonstrates that an improper use of __CPROVER_pure_contract 
+is detected and causes a conversion error.

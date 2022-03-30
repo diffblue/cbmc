@@ -133,6 +133,18 @@ public:
   }
 };
 
+bool code_contractst::is_pure_contract(const irep_idt &function_id)
+{
+  for(const auto &pragma : ns.lookup(function_id).location.get_pragmas())
+  {
+    const auto s = id2string(pragma.first);
+    if(!s.compare(0, 13, "pure_contract"))
+      return true;
+  }
+
+  return false;
+}
+
 void code_contractst::check_apply_loop_contracts(
   const irep_idt &function_name,
   goto_functionst::goto_functiont &goto_function,
@@ -1535,6 +1547,17 @@ void code_contractst::check_all_functions_found(
         "Function '" + function + "' was not found in the GOTO program.");
     }
   }
+}
+
+void code_contractst::replace_pure_contracts()
+{
+  std::set<std::string> to_replace;
+  for(const auto &it : goto_functions.function_map)
+  {
+    if(is_pure_contract(it.first))
+      to_replace.insert(id2string(it.first));
+  }
+  replace_calls(to_replace);
 }
 
 void code_contractst::replace_calls(const std::set<std::string> &to_replace)

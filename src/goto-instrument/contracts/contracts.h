@@ -36,6 +36,12 @@ Date: February 2016
   " --apply-loop-contracts\n"                                                  \
   "                              check and use loop contracts when provided\n"
 
+#define FLAG_REPLACE_PURE_CONTRACTS "replace-pure-contracts"
+#define HELP_REPLACE_PURE_CONTRACTS                                            \
+  " --replace-pure-contracts\n"                                                \
+  "                              replace calls to all functions defined as "   \
+  "                              pure contracts with their contracts\n"
+
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
   " --replace-call-with-contract <fun>\n"                                      \
@@ -61,6 +67,10 @@ public:
       converter(symbol_table, log.get_message_handler())
   {
   }
+
+  /// \brief Replace all calls to functions defined pure contracts by their
+  /// contracts
+  void replace_pure_contracts();
 
   /// Throws an exception if some function `functions` is found in the program.
   void check_all_functions_found(const std::set<std::string> &functions) const;
@@ -127,6 +137,10 @@ protected:
   goto_convertt converter;
 
   std::unordered_set<irep_idt> summarized;
+
+  /// \brief Returns true iff a function is a pure contract and must
+  /// automatically be replaced by its contract
+  bool is_pure_contract(const irep_idt &function_id);
 
   /// \brief Enforce contract of a single function
   void enforce_contract(const irep_idt &function);
