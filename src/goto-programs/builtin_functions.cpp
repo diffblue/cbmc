@@ -767,7 +767,16 @@ void goto_convertt::do_function_call_symbol(
     return;
   }
 
-  if(identifier == CPROVER_PREFIX "havoc_slice")
+  if(identifier == CPROVER_PREFIX "pure_contract")
+  {
+    const auto &loc = function.find_source_location();
+    goto_programt::targett t =
+      dest.add(goto_programt::make_assertion(false_exprt(), loc));
+    t->source_location_nonconst().set("user-provided", false);
+    t->source_location_nonconst().set_property_class(ID_pure_contract);
+    t->source_location_nonconst().set_comment("all calls replaced");
+  }
+  else if(identifier == CPROVER_PREFIX "havoc_slice")
   {
     do_havoc_slice(lhs, function, arguments, dest, mode);
   }

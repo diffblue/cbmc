@@ -499,6 +499,48 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   // mismatch.
 }
 
+/// Tries to match `symbol.value` as a code block containing a
+/// single call to `__CPROVER_pure_contract`.
+/// Adds a pragma "pure_contract" to the symbol and the
+/// `__CPROVER_pure_contract` call when successfull.
+void c_typecheck_baset::typecheck_pure_contract(symbolt &symbol)
+{
+  codet &code = to_code(symbol.value);
+  if(!can_cast_expr<code_blockt>(code))
+    return;
+
+  auto &statements = to_code_block(code).statements();
+
+  if(statements.size() != 1)
+    return;
+
+  auto &statement = statements.front();
+
+  if(!can_cast_expr<code_expressiont>(statement))
+    return;
+
+  auto &statement_expr = to_code_expression(statement).expression();
+
+  if(!can_cast_expr<side_effect_expr_function_callt>(statement_expr))
+    return;
+
+  auto &call_expr = to_side_effect_expr_function_call(statement_expr);
+
+  if(call_expr.arguments().size() != 0)
+    return;
+
+  auto &function = call_expr.function();
+
+  if(!can_cast_expr<symbol_exprt>(function))
+    return;
+  auto &symbol_expr = to_symbol_expr(function);
+  if(symbol_expr.get_identifier() == CPROVER_PREFIX "pure_contract")
+  {
+    symbol.location.add_pragma("pure_contract");
+    symbol_expr.add_source_location().add_pragma("pure_contract");
+  }
+}
+
 void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 {
   if(symbol.value.id() != ID_code)
@@ -550,7 +592,8 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     move_symbol(p_symbol, new_p_symbol);
   }
 
-  // typecheck the body code
+  typecheck_pure_contract(symbol);
+
   typecheck_code(to_code(symbol.value));
 
   // check the labels

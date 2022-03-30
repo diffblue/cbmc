@@ -1940,6 +1940,28 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     if(entry!=asm_label_map.end())
       identifier=entry->second;
 
+    if(identifier == CPROVER_PREFIX "pure_contract")
+    {
+      const auto &loc = f_op.find_source_location();
+      bool usage_ok = false;
+
+      for(const auto &pragma : loc.get_pragmas())
+      {
+        const auto s = id2string(pragma.first);
+        if(!s.compare(0, 13, "pure_contract"))
+          usage_ok = true;
+      }
+
+      if(!usage_ok)
+      {
+        // throw an error otherwise
+        error().source_location = loc;
+        error() << "incorrect use of " << identifier
+                << ", function contains other instructions" << eom;
+        throw 0;
+      }
+    }
+
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
       // This is an undeclared function.

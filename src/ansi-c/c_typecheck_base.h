@@ -268,6 +268,8 @@ protected:
     symbolt &old_symbol, symbolt &new_symbol);
   void typecheck_function_body(symbolt &symbol);
 
+  void typecheck_pure_contract(symbolt &symbol);
+
   virtual void do_initializer(symbolt &symbol);
 
   static bool is_numeric_type(const typet &src)
