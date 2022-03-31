@@ -76,7 +76,7 @@ endif
 OSX_IDENTITY="Developer ID Application: Daniel Kroening"
 
 # Detailed version information
-CBMC_VERSION = 5.53.1
+CBMC_VERSION = 5.54.0
 
 # Use the CUDD library for BDDs, can be installed using `make -C src cudd-download`
 # CUDD = ../../cudd-3.0.0
