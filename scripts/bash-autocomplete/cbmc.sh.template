@@ -19,14 +19,30 @@ _cbmc_autocomplete()
      COMPREPLY=( $( compgen -W "sc tso pso" -- $cur ) )
      return 0
      ;;
-   --arch) #for architecture we list the options explicitly
-     COMPREPLY=( $( compgen -W "i386 x86_64" -- $cur ) )
+   --arch) #for architecture we list the options explicitly; this list is populated using
+     # `grep -w 'arch[[:space:]]*==' src/util/config.cpp | cut # -f2 -d'"' | sort`
+     COMPREPLY=( $( compgen -W "alpha arm arm64 armel armhf hppa i386 ia64 mips mips64 mips64el mipsel mipsn32 mipsn32el none powerpc ppc64 ppc64le riscv64 s390 s390x sh4 sparc sparc64 v850 x32 x86_64" -- $cur ) )
      return 0
      ;;
-   -I|--classpath|-cp|--outfile|--existing-coverage|--graphml-cex)
+   --os) #for architecture we list the options explicitly
+     COMPREPLY=( $( compgen -W "freebsd linux macos solaris windows" -- $cur ) )
+     return 0
+     ;;
+   --timestamp) #for timestamp we list the options explicitly
+     COMPREPLY=( $( compgen -W "monotonic wall" -- $cur ) )
+     return 0
+     ;;
+   --paths) #for paths we list the options explicitly
+     COMPREPLY=( $( compgen -W "fifo lifo" -- $cur ) )
+     return 0
+     ;;
+   -I|--classpath|-cp) # a directory
+     _filedir -d
+     return 0
+     ;;
+   --external-sat-solver|--incremental-smt2-solver)
      #a switch that takes a file parameter of which we don't know an extension
-     #TODO probably we can do more for -I, --classpath, -cp
-     COMPREPLY=( $(compgen -f -- $cur) )
+     _filedir -f
      return 0
      ;;
   esac
