@@ -259,7 +259,6 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
 {
   no_beautification();
-  no_incremental_check();
 
   std::string external_sat_solver = options.get_option("external-sat-solver");
   auto prop =
