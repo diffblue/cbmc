@@ -570,7 +570,8 @@ int run(
     while((ch=fgetc(stream))!=EOF)
       std_output << (unsigned char)ch;
 
-    return pclose(stream);
+    int result = pclose(stream);
+    return WEXITSTATUS(result);
   }
   else
     return -1;
