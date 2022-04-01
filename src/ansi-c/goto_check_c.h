@@ -39,8 +39,8 @@ void goto_check_c(
 
 #define OPT_GOTO_CHECK                                                         \
   "(bounds-check)(pointer-check)(memory-leak-check)"                           \
-  "(div-by-zero-check)(enum-range-check)(signed-overflow-check)(unsigned-"     \
-  "overflow-check)"                                                            \
+  "(div-by-zero-check)(enum-range-check)"                                      \
+  "(signed-overflow-check)(unsigned-overflow-check)"                           \
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"                  \
   "(pointer-primitive-check)"                                                  \
