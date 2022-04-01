@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  cvc5-version: "0.0.7"
+  cvc5-version: "0.0.9"
 
 jobs:
   check-ubuntu-20_04-make-gcc:
