@@ -436,8 +436,13 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
+          New-Item -ItemType directory "C:\tools\cvc5"
+          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe -OutFile c:\tools\cvc5\cvc5.exe
+          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Confirm cvc5 solver is available and log the version installed
+        run: cvc5 --version
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Prepare ccache
@@ -485,8 +490,13 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
+          New-Item -ItemType directory "C:\tools\cvc5"
+          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe -OutFile c:\tools\cvc5\cvc5.exe
+          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Confirm cvc5 solver is available and log the version installed
+        run: cvc5 --version
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Initialise Developer Command Line
