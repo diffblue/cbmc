@@ -1,7 +1,7 @@
 CORE
 valid_unsat.c
---incremental-smt2-solver 'z3 --smt2 -in' --verbosity 10
-Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+--verbosity 10
+Passing problem to incremental SMT2 solving via
 Sending command to SMT2 solver - \(check-sat\)
 Solver response - unsat
 VERIFICATION SUCCESSFUL

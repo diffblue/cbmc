@@ -10,6 +10,10 @@ int main()
 {
   int first;
   uint8_t second;
+  // This assumption is here in order to constrain the value the solver
+  // can produce to just 128 so that we don't get test failures for different
+  // values returned by different SMT solvers.
+  __CPROVER_assume((second & 1) == 0);
 
   int place;
   __CPROVER_assume(place >= 1);

@@ -644,6 +644,12 @@ jobs:
           sudo apt-get install -y --allow-downgrades --reinstall gcc g++ libgcc-s1- libstdc++6=$target liblsan0=$target libtsan0=$target libcc1-0=$target libgcc1=1:$target gdb=8.1.1-0ubuntu1
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
