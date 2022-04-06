@@ -327,10 +327,11 @@ data_dependency_contextt::abstract_object_merge_internal(
  *
  * \return set of data dependencies
  */
-std::set<goto_programt::const_targett>
+std::set<goto_programt::const_targett, goto_programt::target_less_than>
 data_dependency_contextt::get_data_dependencies() const
 {
-  std::set<goto_programt::const_targett> result;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than>
+    result;
   for(const auto &d : data_deps)
     result.insert(d);
   return result;
@@ -341,10 +342,11 @@ data_dependency_contextt::get_data_dependencies() const
  *
  * \return set of data dominators
  */
-std::set<goto_programt::const_targett>
+std::set<goto_programt::const_targett, goto_programt::target_less_than>
 data_dependency_contextt::get_data_dominators() const
 {
-  std::set<goto_programt::const_targett> result;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than>
+    result;
   for(const auto &d : data_dominators)
     result.insert(d);
   return result;

@@ -26,7 +26,11 @@ struct framet
 
   // function calls
   irep_idt function_identifier;
-  std::map<goto_programt::const_targett, goto_state_listt> goto_state_map;
+  std::map<
+    goto_programt::const_targett,
+    goto_state_listt,
+    goto_programt::target_less_than>
+    goto_state_map;
   symex_targett::sourcet calling_location;
   std::vector<irep_idt> parameter_names;
   guardt guard_at_function_start;

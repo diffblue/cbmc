@@ -60,10 +60,11 @@ Author: Diffblue Ltd
 ///   * [function] is_backwards_goto() returning a bool.
 ///   * [function] get_target() which returns an object that needs:
 ///     * [field] location_number which is an unsigned int.
-template <class P, class T>
-class lexical_loops_templatet : public loop_analysist<T>
+/// \tparam C: comparison to use over `T` typed elements
+template <class P, class T, typename C>
+class lexical_loops_templatet : public loop_analysist<T, C>
 {
-  typedef loop_analysist<T> parentt;
+  typedef loop_analysist<T, C> parentt;
 
 public:
   typedef typename parentt::loopt lexical_loopt;
@@ -103,7 +104,8 @@ protected:
 
 typedef lexical_loops_templatet<
   const goto_programt,
-  goto_programt::const_targett>
+  goto_programt::const_targett,
+  goto_programt::target_less_than>
   lexical_loopst;
 
 #ifdef DEBUG
@@ -111,8 +113,8 @@ typedef lexical_loops_templatet<
 #endif
 
 /// Finds all back-edges and computes the lexical loops
-template <class P, class T>
-void lexical_loops_templatet<P, T>::compute(P &program)
+template <class P, class T, typename C>
+void lexical_loops_templatet<P, T, C>::compute(P &program)
 {
   all_in_lexical_loop_form = true;
 
@@ -142,8 +144,8 @@ void lexical_loops_templatet<P, T>::compute(P &program)
 /// the tail, abandoning the candidate loop if we stray outside the bounds of
 /// the lexical region bounded by the head and tail, otherwise recording all
 /// instructions that can reach the backedge as falling within the loop.
-template <class P, class T>
-bool lexical_loops_templatet<P, T>::compute_lexical_loop(
+template <class P, class T, typename C>
+bool lexical_loops_templatet<P, T, C>::compute_lexical_loop(
   T loop_tail,
   T loop_head)
 {
@@ -152,7 +154,7 @@ bool lexical_loops_templatet<P, T>::compute_lexical_loop(
     "loop header should come lexically before the tail");
 
   std::stack<T> stack;
-  std::set<T> loop_instructions;
+  std::set<T, C> loop_instructions;
 
   loop_instructions.insert(loop_head);
   loop_instructions.insert(loop_tail);

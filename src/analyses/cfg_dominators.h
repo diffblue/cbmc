@@ -36,7 +36,7 @@ template <class P, class T, bool post_dom>
 class cfg_dominators_templatet
 {
 public:
-  typedef std::set<T> target_sett;
+  typedef std::set<T, typename P::target_less_than> target_sett;
 
   struct nodet
   {
@@ -218,12 +218,12 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
       {
         if(*n_it==current)
           ++n_it;
-        else if(*n_it<*o_it)
+        else if(typename P::target_less_than()(*n_it, *o_it))
         {
           changed=true;
           node.dominators.erase(n_it++);
         }
-        else if(*o_it<*n_it)
+        else if(typename P::target_less_than()(*o_it, *n_it))
           ++o_it;
         else
         {

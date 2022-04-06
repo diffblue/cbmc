@@ -79,7 +79,8 @@ void functions_in_scope_visitort::operator()(const goto_programt &prog)
   }
 }
 
-std::set<goto_programt::targett> &find_is_fresh_calls_visitort::is_fresh_calls()
+std::set<goto_programt::targett, goto_programt::target_less_than> &
+find_is_fresh_calls_visitort::is_fresh_calls()
 {
   return function_set;
 }

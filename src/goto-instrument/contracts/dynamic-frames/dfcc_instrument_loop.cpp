@@ -579,7 +579,8 @@ void dfcc_instrument_loopt::add_exit_instructions(
   const std::vector<symbol_exprt> &new_decreases_vars)
 {
   // Collect all exit targets of the loop.
-  std::set<goto_programt::targett> exit_targets;
+  std::set<goto_programt::targett, goto_programt::target_less_than>
+    exit_targets;
 
   for(goto_programt::instructiont::targett target =
         goto_function.body.instructions.begin();

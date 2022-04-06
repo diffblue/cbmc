@@ -103,7 +103,11 @@ public:
   void output(std::ostream &out) const override;
 
 private:
-  typedef std::map<goto_programt::const_targett, std::size_t> block_mapt;
+  typedef std::map<
+    goto_programt::const_targett,
+    std::size_t,
+    goto_programt::target_less_than>
+    block_mapt;
 
   struct block_infot
   {

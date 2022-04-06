@@ -105,12 +105,14 @@ public:
 
   // \brief return the set of functions invoked by
   // the call graph of this program.
-  std::set<goto_programt::targett> &is_fresh_calls();
+  std::set<goto_programt::targett, goto_programt::target_less_than> &
+  is_fresh_calls();
   void clear_set();
   void operator()(goto_programt &prog);
 
 protected:
-  std::set<goto_programt::targett> function_set;
+  std::set<goto_programt::targett, goto_programt::target_less_than>
+    function_set;
 };
 
 /// Predicate to be used with the exprt::visit() function. The function

@@ -21,7 +21,11 @@ class namespacet;
 
 struct fault_location_infot
 {
-  typedef std::map<goto_programt::const_targett, std::size_t> score_mapt;
+  typedef std::map<
+    goto_programt::const_targett,
+    std::size_t,
+    goto_programt::target_less_than>
+    score_mapt;
   score_mapt scores;
 };
 

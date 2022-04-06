@@ -16,7 +16,9 @@ Author: Qinheping Hu
 
 goto_programt::const_targett get_loop_end_from_loop_head_and_content(
   const goto_programt::const_targett &loop_head,
-  const loop_templatet<goto_programt::const_targett> &loop)
+  const loop_templatet<
+    goto_programt::const_targett,
+    goto_programt::target_less_than> &loop)
 {
   goto_programt::const_targett loop_end = loop_head;
   for(const auto &t : loop)
@@ -38,7 +40,8 @@ goto_programt::const_targett get_loop_end_from_loop_head_and_content(
 
 goto_programt::targett get_loop_end_from_loop_head_and_content_mutable(
   const goto_programt::targett &loop_head,
-  const loop_templatet<goto_programt::targett> &loop)
+  const loop_templatet<goto_programt::targett, goto_programt::target_less_than>
+    &loop)
 {
   goto_programt::targett loop_end = loop_head;
   for(const auto &t : loop)

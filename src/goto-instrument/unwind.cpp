@@ -32,7 +32,9 @@ void goto_unwindt::copy_segment(
   PRECONDITION(goto_program.empty());
 
   // build map for branch targets inside the loop
-  typedef std::map<goto_programt::const_targett, unsigned> target_mapt;
+  typedef std::
+    map<goto_programt::const_targett, unsigned, goto_programt::target_less_than>
+      target_mapt;
   target_mapt target_map;
 
   unsigned i=0;

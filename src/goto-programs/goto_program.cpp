@@ -701,7 +701,7 @@ void goto_programt::compute_target_numbers()
 void goto_programt::copy_from(const goto_programt &src)
 {
   // Definitions for mapping between the two programs
-  typedef std::map<const_targett, targett> targets_mappingt;
+  typedef std::map<const_targett, targett, target_less_than> targets_mappingt;
   targets_mappingt targets_mapping;
 
   clear();

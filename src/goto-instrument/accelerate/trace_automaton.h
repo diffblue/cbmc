@@ -74,7 +74,9 @@ class automatont
   static const statet no_state;
 
 // protected:
-  typedef std::multimap<goto_programt::targett, statet> transitionst;
+  typedef std::
+    multimap<goto_programt::targett, statet, goto_programt::target_less_than>
+      transitionst;
   typedef std::pair<transitionst::iterator, transitionst::iterator>
     transition_ranget;
   typedef std::vector<transitionst> transition_tablet;
@@ -113,7 +115,11 @@ class trace_automatont
   }
 
   typedef std::pair<statet, statet> state_pairt;
-  typedef std::multimap<goto_programt::targett, state_pairt> sym_mapt;
+  typedef std::multimap<
+    goto_programt::targett,
+    state_pairt,
+    goto_programt::target_less_than>
+    sym_mapt;
   typedef std::pair<sym_mapt::iterator, sym_mapt::iterator> sym_range_pairt;
 
   void get_transitions(sym_mapt &transitions);
@@ -123,7 +129,8 @@ class trace_automatont
     return dta.num_states;
   }
 
-  typedef std::set<goto_programt::targett> alphabett;
+  typedef std::set<goto_programt::targett, goto_programt::target_less_than>
+    alphabett;
   alphabett alphabet;
 
  protected:

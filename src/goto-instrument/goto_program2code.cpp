@@ -656,7 +656,8 @@ goto_programt::const_targett goto_program2codet::get_cases(
   goto_programt::const_targett &default_target)
 {
   goto_programt::const_targett last_target=goto_program.instructions.end();
-  std::set<goto_programt::const_targett> unique_targets;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than>
+    unique_targets;
 
   goto_programt::const_targett cases_it=target;
   for( ;
@@ -755,7 +756,8 @@ bool goto_program2codet::set_block_end_points(
   cases_listt &cases,
   std::set<unsigned> &processed_locations)
 {
-  std::set<goto_programt::const_targett> targets_done;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than>
+    targets_done;
 
   for(cases_listt::iterator it=cases.begin();
       it!=cases.end();
@@ -936,7 +938,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
        it->case_last->location_number > max_target->location_number)
       max_target=it->case_last;
 
-  std::map<goto_programt::const_targett, unsigned> targets_done;
+  std::
+    map<goto_programt::const_targett, unsigned, goto_programt::target_less_than>
+      targets_done;
   loop_last_stack.push_back(std::make_pair(max_target, false));
 
   // iterate over all <branch conditions, branch instruction, branch target>

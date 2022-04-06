@@ -382,6 +382,33 @@ public:
     typedef std::list<targett> targetst;
     typedef std::list<const_targett> const_targetst;
 
+    /// A total order over `targett` and `const_targett`. Note that the specific
+    /// ordering may vary from execution to execution for it uses comparison on
+    /// virtual memory locations. If a consistent ordering is required,
+    /// implement a comparison on some aspect of `instructiont` that is stable
+    /// at the particular call site.
+    struct target_less_than // NOLINT(readability/identifiers)
+    {
+      static inline bool
+      order_const_target(const const_targett i1, const const_targett i2)
+      {
+        const instructiont &_i1 = *i1;
+        const instructiont &_i2 = *i2;
+        return &_i1 < &_i2;
+      }
+
+      inline bool
+      operator()(const const_targett &i1, const const_targett &i2) const
+      {
+        return order_const_target(i1, i2);
+      }
+
+      inline bool operator()(const targett &i1, const targett &i2) const
+      {
+        return &(*i1) < &(*i2);
+      }
+    };
+
     /// The list of successor instructions
     targetst targets;
 
@@ -419,7 +446,7 @@ public:
     labelst labels;
 
     // will go away
-    std::set<targett> incoming_edges;
+    std::set<targett, target_less_than> incoming_edges;
 
     /// Is this node a branch target?
     bool is_target() const
@@ -587,6 +614,8 @@ public:
   typedef instructionst::const_iterator const_targett;
   typedef std::list<targett> targetst;
   typedef std::list<const_targett> const_targetst;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef instructiont::target_less_than target_less_than;
 
   /// The list of instructions in the goto program
   instructionst instructions;
@@ -1150,15 +1179,6 @@ std::list<Target> goto_programt::get_successors(
   return std::list<Target>();
 }
 
-inline bool order_const_target(
-  const goto_programt::const_targett i1,
-  const goto_programt::const_targett i2)
-{
-  const goto_programt::instructiont &_i1=*i1;
-  const goto_programt::instructiont &_i2=*i2;
-  return &_i1<&_i2;
-}
-
 // NOLINTNEXTLINE(readability/identifiers)
 struct const_target_hash
 {
@@ -1214,20 +1234,6 @@ void for_each_instruction(GotoFunctionT &&goto_function, HandlerT handler)
   for(goto_programt::instructionst::iterator \
       it=(program).instructions.begin(); \
       it!=(program).instructions.end(); it++)
-
-inline bool operator<(
-  const goto_programt::const_targett &i1,
-  const goto_programt::const_targett &i2)
-{
-  return order_const_target(i1, i2);
-}
-
-inline bool operator<(
-  const goto_programt::targett &i1,
-  const goto_programt::targett &i2)
-{
-  return &(*i1)<&(*i2);
-}
 
 std::list<exprt> objects_read(const goto_programt::instructiont &);
 std::list<exprt> objects_written(const goto_programt::instructiont &);

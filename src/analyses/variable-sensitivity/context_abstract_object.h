@@ -124,7 +124,7 @@ protected:
 
   exprt to_predicate_internal(const exprt &name) const override;
 
-  typedef std::set<locationt> locationst;
+  typedef std::set<locationt, goto_programt::target_less_than> locationst;
 
   virtual context_abstract_object_ptrt
   update_location_context_internal(const locationst &locations) const = 0;

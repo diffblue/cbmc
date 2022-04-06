@@ -117,7 +117,10 @@ protected:
   subsumed_pathst subsumed;
   acceleration_utilst utils;
 
-  typedef std::map<goto_programt::targett, goto_programt::targetst>
+  typedef std::map<
+    goto_programt::targett,
+    goto_programt::targetst,
+    goto_programt::target_less_than>
     overflow_mapt;
   overflow_mapt overflow_locs;
 

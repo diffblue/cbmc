@@ -15,17 +15,17 @@ Author: Diffblue Ltd
 
 #include <goto-programs/goto_model.h>
 
-template <class T>
+template <class T, typename C>
 class loop_analysist;
 
 /// A loop, specified as a set of instructions
-template <class T>
+template <class T, typename C>
 class loop_templatet
 {
-  typedef std::set<T> loop_instructionst;
+  typedef std::set<T, C> loop_instructionst;
   loop_instructionst loop_instructions;
 
-  friend loop_analysist<T>;
+  friend loop_analysist<T, C>;
 
 public:
   loop_templatet() = default;
@@ -77,13 +77,13 @@ public:
   }
 };
 
-template <class T>
+template <class T, typename C>
 class loop_analysist
 {
 public:
-  typedef loop_templatet<T> loopt;
+  typedef loop_templatet<T, C> loopt;
   // map loop headers to loops
-  typedef std::map<T, loopt> loop_mapt;
+  typedef std::map<T, loopt, C> loop_mapt;
 
   loop_mapt loop_map;
 
@@ -98,10 +98,10 @@ public:
   loop_analysist() = default;
 };
 
-template <typename T>
-class loop_with_parent_analysis_templatet : loop_templatet<T>
+template <typename T, typename C>
+class loop_with_parent_analysis_templatet : loop_templatet<T, C>
 {
-  typedef loop_analysist<T> parent_analysist;
+  typedef loop_analysist<T, C> parent_analysist;
 
 public:
   explicit loop_with_parent_analysis_templatet(parent_analysist &loop_analysis)
@@ -113,14 +113,14 @@ public:
   explicit loop_with_parent_analysis_templatet(
     parent_analysist &loop_analysis,
     InstructionSet &&instructions)
-    : loop_templatet<T>(std::forward<InstructionSet>(instructions)),
+    : loop_templatet<T, C>(std::forward<InstructionSet>(instructions)),
       loop_analysis(loop_analysis)
   {
   }
 
   /// Returns true if \p instruction is in \p loop
   bool loop_contains(
-    const typename loop_analysist<T>::loopt &loop,
+    const typename loop_analysist<T, C>::loopt &loop,
     const T instruction) const
   {
     return loop.loop_instructions.count(instruction);
@@ -141,15 +141,15 @@ private:
   parent_analysist &loop_analysis;
 };
 
-template <class T>
-class linked_loop_analysist : loop_analysist<T>
+template <class T, typename C>
+class linked_loop_analysist : loop_analysist<T, C>
 {
 public:
   linked_loop_analysist() = default;
 
   /// Returns true if \p instruction is in \p loop
   bool loop_contains(
-    const typename loop_analysist<T>::loopt &loop,
+    const typename loop_analysist<T, C>::loopt &loop,
     const T instruction) const
   {
     return loop.loop_instructions.count(instruction);
@@ -166,8 +166,8 @@ public:
 };
 
 /// Print all natural loops that were found
-template <class T>
-void loop_analysist<T>::output(std::ostream &out) const
+template <class T, typename C>
+void loop_analysist<T, C>::output(std::ostream &out) const
 {
   for(const auto &loop : loop_map)
   {

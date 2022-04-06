@@ -34,12 +34,12 @@ bool util_inplace_set_union(
 
   for(const auto &s : source)
   {
-    while(it != target.end() && *it < s)
+    while(it != target.end() && Compare()(*it, s))
     {
       ++it;
     }
 
-    if(it == target.end() || s < *it)
+    if(it == target.end() || Compare()(s, *it))
     {
       // Insertion hint should point at element that will follow the new element
       target.insert(it, s);

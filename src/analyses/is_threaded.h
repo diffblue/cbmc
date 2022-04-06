@@ -44,7 +44,9 @@ public:
   }
 
 protected:
-  typedef std::set<goto_programt::const_targett> is_threaded_sett;
+  typedef std::
+    set<goto_programt::const_targett, goto_programt::target_less_than>
+      is_threaded_sett;
   is_threaded_sett is_threaded_set;
 
   void compute(

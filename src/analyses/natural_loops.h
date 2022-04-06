@@ -43,10 +43,11 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 ///   * [function] is_backwards_goto() returning a bool.
 ///   * [function] get_target() which returns an object that needs:
 ///     * [field] location_number which is an unsigned int.
-template <class P, class T>
-class natural_loops_templatet : public loop_analysist<T>
+/// \tparam C: comparison to use over `T` typed elements
+template <class P, class T, typename C>
+class natural_loops_templatet : public loop_analysist<T, C>
 {
-  typedef loop_analysist<T> parentt;
+  typedef loop_analysist<T, C> parentt;
 
 public:
   typedef typename parentt::loopt natural_loopt;
@@ -80,14 +81,18 @@ protected:
 
 /// A concretized version of
 /// \ref natural_loops_templatet<const goto_programt, goto_programt::const_targett>
-class natural_loopst:
-    public natural_loops_templatet<const goto_programt,
-                                   goto_programt::const_targett>
+class natural_loopst : public natural_loops_templatet<
+                         const goto_programt,
+                         goto_programt::const_targett,
+                         goto_programt::target_less_than>
 {
 };
 
-typedef natural_loops_templatet<goto_programt, goto_programt::targett>
-    natural_loops_mutablet;
+typedef natural_loops_templatet<
+  goto_programt,
+  goto_programt::targett,
+  goto_programt::target_less_than>
+  natural_loops_mutablet;
 
 inline void show_natural_loops(const goto_modelt &goto_model, std::ostream &out)
 {
@@ -99,8 +104,8 @@ inline void show_natural_loops(const goto_modelt &goto_model, std::ostream &out)
 #endif
 
 /// Finds all back-edges and computes the natural loops
-template<class P, class T>
-void natural_loops_templatet<P, T>::compute(P &program)
+template <class P, class T, typename C>
+void natural_loops_templatet<P, T, C>::compute(P &program)
 {
   cfg_dominators(program);
 
@@ -133,8 +138,8 @@ void natural_loops_templatet<P, T>::compute(P &program)
 }
 
 /// Computes the natural loop for a given back-edge (see Muchnick section 7.4)
-template<class P, class T>
-void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
+template <class P, class T, typename C>
+void natural_loops_templatet<P, T, C>::compute_natural_loop(T m, T n)
 {
   PRECONDITION(n->location_number <= m->location_number);
 

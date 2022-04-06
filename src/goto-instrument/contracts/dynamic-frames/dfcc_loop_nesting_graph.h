@@ -29,7 +29,9 @@ public:
   dfcc_loop_nesting_graph_nodet(
     const goto_programt::targett &head,
     const goto_programt::targett &latch,
-    const loop_templatet<goto_programt::targett> &instructions);
+    const loop_templatet<
+      goto_programt::targett,
+      goto_programt::target_less_than> &instructions);
 
   /// Loop head instruction
   goto_programt::targett head;
@@ -38,7 +40,8 @@ public:
   goto_programt::targett latch;
 
   /// Set of loop instructions
-  loop_templatet<goto_programt::targett> instructions;
+  loop_templatet<goto_programt::targett, goto_programt::target_less_than>
+    instructions;
 };
 
 typedef grapht<dfcc_loop_nesting_graph_nodet> dfcc_loop_nesting_grapht;

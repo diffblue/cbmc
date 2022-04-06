@@ -317,7 +317,7 @@ public:
   }
 
 protected:
-  typedef std::map<locationt, T> state_mapt;
+  typedef std::map<locationt, T, goto_programt::target_less_than> state_mapt;
   state_mapt state_map;
 
   virtual statet &get_state(locationt l)

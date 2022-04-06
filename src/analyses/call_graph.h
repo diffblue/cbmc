@@ -98,7 +98,7 @@ public:
   typedef goto_programt::const_targett locationt;
 
   /// Type of a set of callsites
-  typedef std::set<locationt> locationst;
+  typedef std::set<locationt, goto_programt::target_less_than> locationst;
 
   /// Type mapping from call-graph edges onto the set of call instructions
   /// that make that call.

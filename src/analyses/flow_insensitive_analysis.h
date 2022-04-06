@@ -93,9 +93,9 @@ public:
   typedef flow_insensitive_abstract_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  std::set<locationt> seen_locations;
+  std::set<locationt, goto_programt::target_less_than> seen_locations;
 
-  std::map<locationt, unsigned> statistics;
+  std::map<locationt, unsigned, goto_programt::target_less_than> statistics;
 
   bool seen(const locationt &l)
   {
@@ -155,7 +155,11 @@ public:
 protected:
   const namespacet &ns;
 
-  typedef std::priority_queue<locationt> working_sett;
+  typedef std::priority_queue<
+    locationt,
+    std::vector<locationt>,
+    goto_programt::target_less_than>
+    working_sett;
 
   locationt get_next(working_sett &working_set);
 

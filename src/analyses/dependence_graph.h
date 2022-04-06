@@ -172,7 +172,9 @@ private:
   node_indext node_id;
   bool has_changed;
 
-  typedef std::set<goto_programt::const_targett> depst;
+  typedef std::
+    set<goto_programt::const_targett, goto_programt::target_less_than>
+      depst;
 
   // Set of locations with control instructions on which the instruction at this
   // location has a control dependency on

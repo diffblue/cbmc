@@ -104,7 +104,11 @@ public:
       INVARIANT(r.second, "target already exists");
     }
 
-    typedef std::map<goto_programt::const_targett, unsigned> location_mapt;
+    typedef std::map<
+      goto_programt::const_targett,
+      unsigned,
+      goto_programt::target_less_than>
+      location_mapt;
     location_mapt location_map;
   };
 

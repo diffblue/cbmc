@@ -32,7 +32,7 @@ void show_call_sequences(
   // dfs on code blocks using stack
   std::cout << "# " << caller << '\n';
   std::stack<goto_programt::const_targett> stack;
-  std::set<goto_programt::const_targett> seen;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than> seen;
   const goto_programt::const_targett start=goto_program.instructions.begin();
 
   if(start!=goto_program.instructions.end())

@@ -20,14 +20,14 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <goto-programs/goto_convert_functions.h>
 #include <langapi/mode.h>
 
-const std::set<goto_programt::const_targett>&
-    dependence_graph_test_get_control_deps(const dep_graph_domaint &domain)
+const std::set<goto_programt::const_targett, goto_programt::target_less_than> &
+dependence_graph_test_get_control_deps(const dep_graph_domaint &domain)
 {
   return domain.control_deps;
 }
 
-const std::set<goto_programt::const_targett>&
-    dependence_graph_test_get_data_deps(const dep_graph_domaint &domain)
+const std::set<goto_programt::const_targett, goto_programt::target_less_than> &
+dependence_graph_test_get_data_deps(const dep_graph_domaint &domain)
 {
   return domain.data_deps;
 }
@@ -112,9 +112,13 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
         {
           const dep_nodet &node = dep_graph[node_idx];
           const dep_graph_domaint &node_domain = dep_graph[node.PC];
-          const std::set<goto_programt::const_targett> &control_deps =
+          const std::set<
+            goto_programt::const_targett,
+            goto_programt::target_less_than> &control_deps =
             dependence_graph_test_get_control_deps(node_domain);
-          const std::set<goto_programt::const_targett> &data_deps =
+          const std::set<
+            goto_programt::const_targett,
+            goto_programt::target_less_than> &data_deps =
             dependence_graph_test_get_data_deps(node_domain);
 
           std::size_t domain_dep_count =
