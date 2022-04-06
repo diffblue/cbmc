@@ -180,6 +180,7 @@ bool generate_statement_list_start_function(
   // Add the start symbol.
   symbolt start_symbol;
   start_symbol.name = goto_functionst::entry_point();
+  start_symbol.base_name = goto_functionst::entry_point();
   start_symbol.type = code_typet({}, empty_typet{});
   start_symbol.value.swap(start_function_body);
   start_symbol.mode = main.mode;
