@@ -13,6 +13,7 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
+#include "bitvector_expr.h"
 #include "pointer_expr.h"
 #include "ssa_expr.h"
 
@@ -45,6 +46,22 @@ void call_on_expr(const exprt &expr, Args &&... args)
   else if(expr.id() == ID_constant)
   {
     CALL_ON_EXPR(constant_exprt);
+  }
+  else if(expr.id() == ID_if)
+  {
+    CALL_ON_EXPR(if_exprt);
+  }
+  else if(expr.id() == ID_update)
+  {
+    CALL_ON_EXPR(update_exprt);
+  }
+  else if(expr.id() == ID_overflow_unary_minus)
+  {
+    CALL_ON_EXPR(unary_minus_overflow_exprt);
+  }
+  else if(expr.id() == ID_count_leading_zeros)
+  {
+    CALL_ON_EXPR(count_leading_zeros_exprt);
   }
   else
   {
