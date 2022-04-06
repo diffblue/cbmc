@@ -1106,7 +1106,7 @@ void code_contractst::apply_loop_contract(
     // - `GOTO` jumps out of the loops, which model C `break` statements.
     // These instructions are allowed to be missing from `loop_content`,
     // and may be safely ignored for the purpose of our instrumentation.
-    for(auto i = loop_head; i < loop_end; ++i)
+    for(auto i = loop_head; i != loop_end; ++i)
     {
       if(loop_content.contains(i))
         continue;
@@ -1124,7 +1124,7 @@ void code_contractst::apply_loop_contract(
       {
         do
           i++;
-        while(i->is_dead());
+        while(i != loop_end && i->is_dead());
 
         // because we increment `i` in the outer `for` loop
         i--;
