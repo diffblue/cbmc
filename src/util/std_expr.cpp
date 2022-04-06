@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 
 #include "namespace.h"
+#include "pointer_expr.h"
 #include "range.h"
 
 #include <map>
@@ -17,6 +18,33 @@ bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
+}
+
+void constant_exprt::check(const exprt &expr, const validation_modet vm)
+{
+  DATA_CHECK(
+    vm, !expr.has_operands(), "constant expression must not have operands");
+
+  DATA_CHECK(
+    vm,
+    !can_cast_type<bitvector_typet>(expr.type()) ||
+      !id2string(to_constant_expr(expr).get_value()).empty(),
+    "bitvector constant must have a non-empty value");
+
+  DATA_CHECK(
+    vm,
+    !can_cast_type<bitvector_typet>(expr.type()) ||
+      can_cast_type<pointer_typet>(expr.type()) ||
+      id2string(to_constant_expr(expr).get_value())
+          .find_first_not_of("0123456789ABCDEF") == std::string::npos,
+    "negative bitvector constant must use two's complement");
+
+  DATA_CHECK(
+    vm,
+    !can_cast_type<bitvector_typet>(expr.type()) ||
+      to_constant_expr(expr).get_value() == ID_0 ||
+      id2string(to_constant_expr(expr).get_value())[0] != '0',
+    "bitvector constant must not have leading zeros");
 }
 
 exprt disjunction(const exprt::operandst &op)

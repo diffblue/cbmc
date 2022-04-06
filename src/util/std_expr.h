@@ -2848,6 +2848,18 @@ public:
   }
 
   bool value_is_zero_string() const;
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT);
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
 };
 
 template <>
