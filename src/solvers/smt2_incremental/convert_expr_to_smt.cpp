@@ -278,6 +278,15 @@ static smt_termt convert_expr_to_smt(const constant_exprt &constant_literal)
     const auto address = 0;
     return smt_bit_vector_constant_termt{address, bit_width};
   }
+  if(constant_literal.type() == integer_typet{})
+  {
+    // This is converting integer constants into bit vectors for use with
+    // bit vector based smt logics. As bit vector widths are not specified for
+    // non bit vector types, this chooses a width based on the minimum needed
+    // to hold the integer constant value.
+    const auto value = numeric_cast_v<mp_integer>(constant_literal);
+    return smt_bit_vector_constant_termt{value, address_bits(value + 1)};
+  }
   const auto sort = convert_type_to_smt_sort(constant_literal.type());
   sort_based_literal_convertert converter(constant_literal);
   sort.accept(converter);
