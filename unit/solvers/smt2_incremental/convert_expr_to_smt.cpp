@@ -66,6 +66,24 @@ TEST_CASE(
       convert_expr_to_smt(from_integer({-1}, signedbv_typet{16})) ==
       smt_bit_vector_constant_termt{65535, 16});
   }
+  SECTION("Null pointer")
+  {
+    // These config lines are necessary because pointer widths depend on the
+    // configuration.
+    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+    config.ansi_c.set_arch_spec_i386();
+    const smt_termt null_pointer_term =
+      smt_bit_vector_constant_termt{0, config.ansi_c.pointer_width};
+    CHECK(
+      convert_expr_to_smt(null_pointer_exprt{pointer_type(void_type())}) ==
+      null_pointer_term);
+    CHECK(
+      convert_expr_to_smt(null_pointer_exprt{
+        pointer_type(unsignedbv_typet{100})}) == null_pointer_term);
+    CHECK(
+      convert_expr_to_smt(null_pointer_exprt{
+        pointer_type(pointer_type(void_type()))}) == null_pointer_term);
+  }
 }
 
 TEST_CASE(
