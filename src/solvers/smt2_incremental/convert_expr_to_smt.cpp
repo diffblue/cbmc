@@ -4,6 +4,7 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr.h>
 #include <util/expr_cast.h>
 #include <util/expr_util.h>
@@ -732,10 +733,53 @@ static smt_termt convert_expr_to_smt(
   }
 }
 
+#ifndef CPROVER_INVARIANT_DO_NOT_CHECK
+static mp_integer power2(unsigned exponent)
+{
+  mp_integer result;
+  result.setPower2(exponent);
+  return result;
+}
+#endif
+
+/// \details
+/// This conversion constructs a bit vector representation of the memory
+/// address. This address is composed of 2 concatenated bit vector components.
+/// The first part is the base object's unique identifier. The second is the
+/// offset into that object. For address of symbols the offset will be 0. The
+/// offset may be non-zero for cases such as the address of a member field of a
+/// struct or a the address of a non-zero index into an array.
 static smt_termt convert_expr_to_smt(
   const address_of_exprt &address_of,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const smt_object_mapt &object_map)
 {
+  const auto type = type_try_dynamic_cast<pointer_typet>(address_of.type());
+  INVARIANT(
+    type, "Result of the address_of operator should have pointer type.");
+  const auto base = find_object_base_expression(address_of);
+  const auto object = object_map.find(base);
+  INVARIANT(
+    object != object_map.end(),
+    "Objects should be tracked before converting their address to SMT terms");
+  const std::size_t object_id = object->second.unique_id;
+  INVARIANT(
+    object_id < power2(config.bv_encoding.object_bits),
+    "There should be sufficient bits to encode unique object identifier.");
+  const smt_termt object_bit_vector =
+    smt_bit_vector_constant_termt{object_id, config.bv_encoding.object_bits};
+  INVARIANT(
+    type->get_width() > config.bv_encoding.object_bits,
+    "Pointer should be wider than object_bits in order to allow for offset "
+    "encoding.");
+  const size_t offset_bits = type->get_width() - config.bv_encoding.object_bits;
+  if(
+    const auto symbol =
+      expr_try_dynamic_cast<symbol_exprt>(address_of.object()))
+  {
+    const smt_bit_vector_constant_termt offset{0, offset_bits};
+    return smt_bit_vector_theoryt::concat(object_bit_vector, offset);
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for address of expression: " +
     address_of.pretty());
@@ -1193,7 +1237,8 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt dispatch_expr_to_smt_conversion(
   const exprt &expr,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const smt_object_mapt &object_map)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
   {
@@ -1347,7 +1392,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
 #endif
   if(const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr))
   {
-    return convert_expr_to_smt(*address_of, converted);
+    return convert_expr_to_smt(*address_of, converted, object_map);
   }
   if(const auto array_of = expr_try_dynamic_cast<array_of_exprt>(expr))
   {
@@ -1547,7 +1592,8 @@ at_scope_exitt<functiont> at_scope_exit(functiont exit_function)
 }
 #endif
 
-smt_termt convert_expr_to_smt(const exprt &expr)
+smt_termt
+convert_expr_to_smt(const exprt &expr, const smt_object_mapt &object_map)
 {
 #ifndef CPROVER_INVARIANT_DO_NOT_CHECK
   static bool in_conversion = false;
@@ -1564,7 +1610,8 @@ smt_termt convert_expr_to_smt(const exprt &expr)
     const auto find_result = sub_expression_map.find(expr);
     if(find_result != sub_expression_map.cend())
       return;
-    smt_termt term = dispatch_expr_to_smt_conversion(expr, sub_expression_map);
+    smt_termt term =
+      dispatch_expr_to_smt_conversion(expr, sub_expression_map, object_map);
     sub_expression_map.emplace_hint(find_result, expr, std::move(term));
   });
   return std::move(sub_expression_map.at(expr));

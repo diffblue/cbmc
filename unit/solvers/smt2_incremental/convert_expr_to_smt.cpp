@@ -7,13 +7,17 @@
 #include <util/config.h>
 #include <util/constructor_of.h>
 #include <util/format.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
+#include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
@@ -36,6 +40,11 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
     const cbmc_invariants_should_throwt invariants_throw;
     CHECK_THROWS(convert_type_to_smt_sort(empty_typet{}));
   }
+}
+
+smt_termt convert_expr_to_smt(const exprt &expression)
+{
+  return convert_expr_to_smt(expression, initial_smt_object_map());
 }
 
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
@@ -1070,5 +1079,110 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
           smt_bit_vector_constant_termt{1, width},
           smt_bit_vector_constant_termt{0, width}));
     }
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for address of operator",
+  "[core][smt2_incremental]")
+{
+  // The config lines are necessary to ensure that pointer width in configured.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+  smt_object_mapt object_map = initial_smt_object_map();
+  const symbol_exprt foo{"foo", unsignedbv_typet{32}};
+  const symbol_exprt bar{"bar", unsignedbv_typet{32}};
+  SECTION("Address of symbol")
+  {
+    const address_of_exprt address_of_foo{foo};
+    track_expression_objects(address_of_foo, ns, object_map);
+    INFO("Expression " + address_of_foo.pretty(1, 0));
+    SECTION("8 object bits")
+    {
+      config.bv_encoding.object_bits = 8;
+      const auto converted = convert_expr_to_smt(address_of_foo, object_map);
+      CHECK(object_map.at(foo).unique_id == 1);
+      CHECK(
+        converted == smt_bit_vector_theoryt::concat(
+                       smt_bit_vector_constant_termt{1, 8},
+                       smt_bit_vector_constant_termt{0, 56}));
+    }
+    SECTION("16 object bits")
+    {
+      config.bv_encoding.object_bits = 16;
+      const auto converted = convert_expr_to_smt(address_of_foo, object_map);
+      CHECK(object_map.at(foo).unique_id == 1);
+      CHECK(
+        converted == smt_bit_vector_theoryt::concat(
+                       smt_bit_vector_constant_termt{1, 16},
+                       smt_bit_vector_constant_termt{0, 48}));
+    }
+  }
+  SECTION("Invariant checks")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    SECTION("Address of should result in a pointer")
+    {
+      exprt address_of = address_of_exprt{foo};
+      address_of.type() = bool_typet{};
+      REQUIRE_THROWS_MATCHES(
+        convert_expr_to_smt(address_of, object_map),
+        invariant_failedt,
+        invariant_failure_containing(
+          "Result of the address_of operator should have pointer type."));
+    }
+    SECTION("Objects should already be tracked")
+    {
+      REQUIRE_THROWS_MATCHES(
+        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        invariant_failedt,
+        invariant_failure_containing("Objects should be tracked before "
+                                     "converting their address to SMT terms"));
+    }
+    SECTION("There should be enough bits for object id")
+    {
+      config.bv_encoding.object_bits = 8;
+      const address_of_exprt address_of_foo{foo};
+      track_expression_objects(address_of_foo, ns, object_map);
+      object_map.at(foo).unique_id = 256;
+      REQUIRE_THROWS_MATCHES(
+        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        invariant_failedt,
+        invariant_failure_containing("There should be sufficient bits to "
+                                     "encode unique object identifier."));
+    }
+    SECTION("Pointer should be wide enough to encode offset")
+    {
+      config.bv_encoding.object_bits = 64;
+      const address_of_exprt address_of_foo{foo};
+      track_expression_objects(address_of_foo, ns, object_map);
+      object_map.at(foo).unique_id = 256;
+      REQUIRE_THROWS_MATCHES(
+        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        invariant_failedt,
+        invariant_failure_containing("Pointer should be wider than object_bits "
+                                     "in order to allow for offset encoding."));
+    }
+  }
+  SECTION("Comparison of address of operations.")
+  {
+    config.bv_encoding.object_bits = 8;
+    const exprt comparison =
+      notequal_exprt{address_of_exprt{foo}, address_of_exprt{bar}};
+    track_expression_objects(comparison, ns, object_map);
+    INFO("Expression " + comparison.pretty(1, 0));
+    const auto converted = convert_expr_to_smt(comparison, object_map);
+    CHECK(object_map.at(foo).unique_id == 2);
+    CHECK(object_map.at(bar).unique_id == 1);
+    CHECK(
+      converted == smt_core_theoryt::distinct(
+                     smt_bit_vector_theoryt::concat(
+                       smt_bit_vector_constant_termt{2, 8},
+                       smt_bit_vector_constant_termt{0, 56}),
+                     smt_bit_vector_theoryt::concat(
+                       smt_bit_vector_constant_termt{1, 8},
+                       smt_bit_vector_constant_termt{0, 56})));
   }
 }
