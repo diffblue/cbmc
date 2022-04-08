@@ -2,7 +2,7 @@ on:
   release:
     types: [created]
 env:
-  cvc5-version: "0.0.9"
+  cvc5-version: "1.0.0"
 
 name: Upload additional release assets
 jobs:
