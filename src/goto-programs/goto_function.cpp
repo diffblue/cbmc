@@ -40,10 +40,12 @@ void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
 {
   for(const auto &identifier : parameter_identifiers)
   {
-    DATA_CHECK(
+    DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       identifier.empty() || ns.lookup(identifier).is_parameter,
-      "parameter should be marked 'is_parameter' in the symbol table");
+      "parameter should be marked 'is_parameter' in the symbol table",
+      "affected parameter: ",
+      identifier);
   }
 
   // function body must end with an END_FUNCTION instruction
