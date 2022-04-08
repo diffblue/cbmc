@@ -11,16 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_analyzer_parse_options.h"
 
-#include <cstdlib> // exit()
-#include <fstream>
-#include <iostream>
-#include <memory>
-
-#include <ansi-c/cprover_library.h>
-
-#include <assembler/remove_asm.h>
-
-#include <cpp/cprover_library.h>
+#include <util/config.h>
+#include <util/exception_utils.h>
+#include <util/exit_codes.h>
+#include <util/options.h>
+#include <util/version.h>
 
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
@@ -32,12 +27,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/ai.h>
 #include <analyses/local_may_alias.h>
-
-#include <util/config.h>
-#include <util/exception_utils.h>
-#include <util/exit_codes.h>
-#include <util/options.h>
-#include <util/version.h>
+#include <ansi-c/cprover_library.h>
+#include <ansi-c/gcc_version.h>
+#include <assembler/remove_asm.h>
+#include <cpp/cprover_library.h>
 
 #include "build_analyzer.h"
 #include "show_on_source.h"
@@ -46,6 +39,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "static_verifier.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
+
+#include <cstdlib> // exit()
+#include <fstream>
+#include <iostream>
+#include <memory>
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
@@ -382,6 +380,14 @@ int goto_analyzer_parse_optionst::doit()
   log_version_and_architecture("GOTO-ANALYZER");
 
   register_languages();
+
+  // configure gcc, if required
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    configure_gcc(gcc_version);
+  }
 
   goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
