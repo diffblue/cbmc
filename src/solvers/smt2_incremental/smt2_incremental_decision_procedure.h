@@ -6,10 +6,12 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 
-#include <solvers/smt2_incremental/smt_terms.h>
-#include <solvers/stack_decision_procedure.h>
 #include <util/message.h>
 #include <util/std_expr.h>
+
+#include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/stack_decision_procedure.h>
 
 #include <memory>
 #include <unordered_map>
@@ -55,6 +57,9 @@ protected:
   ///   been defined, along with their dependencies in turn.
   void define_dependent_functions(const exprt &expr);
   void ensure_handle_for_expr_defined(const exprt &expr);
+  /// \brief Add objects in \p expr to object_map if needed and convert to smt.
+  /// \note This function is non-const because it mutates the object_map.
+  smt_termt convert_expr_to_smt(const exprt &expr);
 
   const namespacet &ns;
 
@@ -78,6 +83,7 @@ protected:
     expression_handle_identifiers;
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
+  smt_object_mapt object_map;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H

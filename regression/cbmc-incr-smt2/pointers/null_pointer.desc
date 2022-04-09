@@ -1,0 +1,17 @@
+CORE
+null_pointer.c
+--trace
+Passing problem to incremental SMT2 solving
+line 14 assertion \(\(uint64_t\)ptr\) > 1: SUCCESS
+line 20 assertion \(\(uint64_t\)ptr\) != 0: FAILURE
+notdet_bool=FALSE \(0+\)
+^EXIT=10$
+^SIGNAL=0$
+--
+notdet_bool=TRUE
+--
+Tests for null related functionality.
+ * Assignment of the value NULL to a pointer.
+ * Comparison of NULL pointer value against 0.
+ * Check that the address of a non-null pointer is not an offset into the NULL
+   object.

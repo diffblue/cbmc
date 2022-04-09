@@ -132,7 +132,8 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
   : ns{_ns},
     number_of_solver_calls{0},
     solver_process(std::move(_solver_process)),
-    log{message_handler}
+    log{message_handler},
+    object_map{initial_smt_object_map()}
 {
   solver_process->send(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
@@ -155,6 +156,13 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
     "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
   expression_handle_identifiers.emplace(expr, function.identifier());
   solver_process->send(function);
+}
+
+smt_termt
+smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
+{
+  track_expression_objects(expr, ns, object_map);
+  return ::convert_expr_to_smt(expr, object_map);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -193,7 +201,11 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   {
     if(gather_dependent_expressions(expr).empty())
     {
-      descriptor = convert_expr_to_smt(expr);
+      INVARIANT(
+        objects_are_already_tracked(expr, object_map),
+        "Objects in expressions being read should already be tracked from "
+        "point of being set/handled.");
+      descriptor = ::convert_expr_to_smt(expr, object_map);
     }
     else
     {
