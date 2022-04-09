@@ -1057,7 +1057,7 @@ bool acceleration_utilst::assign_array(
   {
     if(idx.id()==ID_pointer_offset)
     {
-      poly.from_expr(to_unary_expr(idx).op());
+      poly.from_expr(to_pointer_offset_expr(idx).pointer());
     }
     else
     {

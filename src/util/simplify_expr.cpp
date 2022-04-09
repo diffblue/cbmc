@@ -2483,7 +2483,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   }
   else if(expr.id()==ID_pointer_offset)
   {
-    r = simplify_pointer_offset(to_unary_expr(expr));
+    r = simplify_pointer_offset(to_pointer_offset_expr(expr));
   }
   else if(expr.id()==ID_extractbit)
   {

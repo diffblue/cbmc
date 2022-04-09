@@ -59,6 +59,7 @@ class mult_exprt;
 class namespacet;
 class not_exprt;
 class plus_exprt;
+class pointer_offset_exprt;
 class popcount_exprt;
 class refined_string_exprt;
 class shift_exprt;
@@ -180,7 +181,7 @@ public:
   NODISCARD resultt<> simplify_unary_plus(const unary_plus_exprt &);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
   NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
-  NODISCARD resultt<> simplify_pointer_offset(const unary_exprt &);
+  NODISCARD resultt<> simplify_pointer_offset(const pointer_offset_exprt &);
   NODISCARD resultt<> simplify_bswap(const bswap_exprt &);
   NODISCARD resultt<> simplify_isinf(const unary_exprt &);
   NODISCARD resultt<> simplify_isnan(const unary_exprt &);
