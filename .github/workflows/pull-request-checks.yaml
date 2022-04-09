@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  cvc5-version: "0.0.9"
+  cvc5-version: "1.0.0"
 
 jobs:
   check-ubuntu-20_04-make-gcc:
@@ -734,6 +734,12 @@ jobs:
           sudo apt-get install --no-install-recommends -y g++ gcc gdb binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
