@@ -468,7 +468,7 @@ car_exprt instrument_spec_assignst::create_car_expr(
 
   if(target.id() == ID_pointer_object)
   {
-    const auto &arg = to_unary_expr(target).op();
+    const auto &arg = to_pointer_object_expr(target).pointer();
     return {
       condition,
       target,

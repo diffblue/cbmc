@@ -481,7 +481,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
   forall_operands(it, expr)
   {
     PRECONDITION(it->id() == ID_pointer_object);
-    const exprt &op = to_unary_expr(*it).op();
+    const exprt &op = to_pointer_object_expr(*it).pointer();
 
     if(op.id()==ID_address_of)
     {
@@ -516,9 +516,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_pointer_object(const unary_exprt &expr)
+simplify_exprt::simplify_pointer_object(const pointer_object_exprt &expr)
 {
-  const exprt &op = expr.op();
+  const exprt &op = expr.pointer();
 
   auto op_result = simplify_object(op);
 

@@ -59,6 +59,7 @@ class mult_exprt;
 class namespacet;
 class not_exprt;
 class plus_exprt;
+class pointer_object_exprt;
 class pointer_offset_exprt;
 class popcount_exprt;
 class refined_string_exprt;
@@ -171,7 +172,7 @@ public:
   NODISCARD resultt<> simplify_member(const member_exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
-  NODISCARD resultt<> simplify_pointer_object(const unary_exprt &);
+  NODISCARD resultt<> simplify_pointer_object(const pointer_object_exprt &);
   NODISCARD resultt<> simplify_object_size(const unary_exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const unary_exprt &);
   NODISCARD resultt<> simplify_is_invalid_pointer(const unary_exprt &);

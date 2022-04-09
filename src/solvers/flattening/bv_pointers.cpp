@@ -713,17 +713,18 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   }
   else if(
     expr.id() == ID_pointer_object &&
-    to_unary_expr(expr).op().type().id() == ID_pointer)
+    to_pointer_object_expr(expr).pointer().type().id() == ID_pointer)
   {
     std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       return conversion_failed(expr);
 
-    const exprt &op0 = to_unary_expr(expr).op();
-    const bvt &op0_bv = convert_bv(op0);
+    const exprt &pointer = to_pointer_object_expr(expr).pointer();
+    const bvt &pointer_bv = convert_bv(pointer);
 
-    bvt object_bv = object_literals(op0_bv, to_pointer_type(op0.type()));
+    bvt object_bv =
+      object_literals(pointer_bv, to_pointer_type(pointer.type()));
 
     return bv_utils.zero_extension(object_bv, width);
   }

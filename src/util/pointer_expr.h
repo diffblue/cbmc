@@ -931,4 +931,62 @@ inline pointer_offset_exprt &to_pointer_offset_expr(exprt &expr)
   return ret;
 }
 
+/// A numerical identifier for the object a pointer points to
+class pointer_object_exprt : public unary_exprt
+{
+public:
+  explicit pointer_object_exprt(exprt pointer, typet type)
+    : unary_exprt(ID_pointer_object, std::move(pointer), std::move(type))
+  {
+  }
+
+  exprt &pointer()
+  {
+    return op0();
+  }
+
+  const exprt &pointer() const
+  {
+    return op0();
+  }
+};
+
+template <>
+inline bool can_cast_expr<pointer_object_exprt>(const exprt &base)
+{
+  return base.id() == ID_pointer_object;
+}
+
+inline void validate_expr(const pointer_object_exprt &value)
+{
+  validate_operands(value, 1, "pointer_object must have one operand");
+  DATA_INVARIANT(
+    value.pointer().type().id() == ID_pointer,
+    "pointer_object must have pointer-typed operand");
+}
+
+/// \brief Cast an exprt to a \ref pointer_object_exprt
+///
+/// \a expr must be known to be \ref pointer_object_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref pointer_object_exprt
+inline const pointer_object_exprt &to_pointer_object_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_pointer_object);
+  const pointer_object_exprt &ret =
+    static_cast<const pointer_object_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_pointer_object_expr(const exprt &)
+inline pointer_object_exprt &to_pointer_object_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_pointer_object);
+  pointer_object_exprt &ret = static_cast<pointer_object_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H

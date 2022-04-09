@@ -2388,7 +2388,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   }
   else if(expr.id()==ID_pointer_object)
   {
-    r = simplify_pointer_object(to_unary_expr(expr));
+    r = simplify_pointer_object(to_pointer_object_expr(expr));
   }
   else if(expr.id() == ID_is_dynamic_object)
   {

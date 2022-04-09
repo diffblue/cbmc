@@ -1589,7 +1589,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_pointer_object)
   {
-    const auto &op = to_unary_expr(expr).op();
+    const auto &op = to_pointer_object_expr(expr).pointer();
 
     DATA_INVARIANT(
       op.type().id() == ID_pointer,
