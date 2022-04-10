@@ -11,7 +11,7 @@ This tests the -mthumb flag that should activate ARM-32 mode. The object
 file 'object.intel' was compiled from 'source.c' with goto-cc on a
 64-bit platform:
 
-  goto-cc -c source.c
+  goto-cc -c source.c -o object.intel
 
 preproc.i is already pre-processed so that it can be linked in without
 needing to invoke a pre-processor from a cross-compile toolchain on your
