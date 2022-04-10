@@ -699,12 +699,6 @@ static exprt simplifying_not(exprt src)
     return not_exprt(src);
 }
 
-static bool has_contract(const code_with_contract_typet &contract)
-{
-  return !contract.assigns().empty() || !contract.requires().empty() ||
-         !contract.ensures().empty();
-}
-
 void state_encodingt::function_call_symbol(
   goto_programt::const_targett loc,
   encoding_targett &dest)
@@ -1007,7 +1001,7 @@ void state_encoding(
       const auto &symbol = ns.lookup(f->first);
       if(
         f->first == goto_functionst::entry_point() ||
-        has_contract(to_code_with_contract_type(symbol.type)))
+        to_code_with_contract_type(symbol.type).has_contract())
       {
         dest.annotation("");
         dest.annotation("function " + id2string(f->first));

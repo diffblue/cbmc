@@ -740,6 +740,29 @@ code_contractst::create_ensures_instruction(
   return std::make_pair(std::move(ensures_program), std::move(history));
 }
 
+static const code_with_contract_typet &
+get_contract(const irep_idt &function, const namespacet &ns)
+{
+  const std::string &function_str = id2string(function);
+  const auto &function_symbol = ns.lookup(function);
+
+  const symbolt *contract_sym;
+  if(ns.lookup("contract::" + function_str, contract_sym))
+  {
+    // no contract provided in the source or just an empty assigns clause
+    return to_code_with_contract_type(function_symbol.type);
+  }
+
+  const auto &type = to_code_with_contract_type(contract_sym->type);
+  if(type != function_symbol.type)
+  {
+    throw invalid_input_exceptiont(
+      "Contract of '" + function_str + "' has different signature.");
+  }
+
+  return type;
+}
+
 void code_contractst::apply_function_contract(
   const irep_idt &function,
   const source_locationt &location,
@@ -752,14 +775,13 @@ void code_contractst::apply_function_contract(
   // function pointers.
   PRECONDITION(const_target->call_function().id() == ID_symbol);
 
-  // Retrieve the function type, which is needed to extract the contract
-  // components.
   const irep_idt &target_function =
     to_symbol_expr(const_target->call_function()).get_identifier();
   const symbolt &function_symbol = ns.lookup(target_function);
-  const auto &type = to_code_with_contract_type(function_symbol.type);
+  const code_typet &function_type = to_code_type(function_symbol.type);
 
   // Isolate each component of the contract.
+  const auto &type = get_contract(target_function, ns);
   auto assigns_clause = type.assigns();
   auto requires = conjunction(type.requires());
   auto ensures = conjunction(type.ensures());
@@ -777,7 +799,7 @@ void code_contractst::apply_function_contract(
   // if true, the call return variable variable was created during replacement
   bool call_ret_is_fresh_var = false;
 
-  if(type.return_type() != empty_typet())
+  if(function_type.return_type() != empty_typet())
   {
     // Check whether the function's return value is not disregarded.
     if(target->call_lhs().is_not_nil())
@@ -804,14 +826,15 @@ void code_contractst::apply_function_contract(
         // fresh variable to replace __CPROVER_return_value with.
         call_ret_is_fresh_var = true;
         const symbolt &fresh = get_fresh_aux_symbol(
-          type.return_type(),
+          function_type.return_type(),
           id2string(target_function),
           "ignored_return_value",
           const_target->source_location(),
           symbol_table.lookup_ref(target_function).mode,
           ns,
           symbol_table);
-        symbol_exprt ret_val(CPROVER_PREFIX "return_value", type.return_type());
+        symbol_exprt ret_val(
+          CPROVER_PREFIX "return_value", function_type.return_type());
         auto fresh_sym_expr = fresh.symbol_expr();
         common_replace.insert(ret_val, fresh_sym_expr);
         call_ret_opt = fresh_sym_expr;
@@ -1249,11 +1272,6 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
   const auto &goto_function = function_obj->second;
   auto &function_body = function_obj->second.body;
 
-  // Get assigns clause for function
-  const symbolt &function_symbol = ns.lookup(function);
-  const auto &function_with_contract =
-    to_code_with_contract_type(function_symbol.type);
-
   function_cfg_infot cfg_info(goto_function);
 
   instrument_spec_assignst instrument_spec_assigns(
@@ -1296,8 +1314,8 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
   insert_before_swap_and_advance(
     function_body, instruction_it, snapshot_static_locals);
 
-  // Track targets mentionned in the specification
-  for(auto &target : function_with_contract.assigns())
+  // Track targets mentioned in the specification
+  for(auto &target : get_contract(function, ns).assigns())
   {
     goto_programt payload;
     instrument_spec_assigns.track_spec_target(target, payload);
@@ -1306,6 +1324,7 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
 
   // Track formal parameters
   goto_programt snapshot_function_parameters;
+  const symbolt &function_symbol = ns.lookup(function);
   for(const auto &param : to_code_type(function_symbol.type).parameters())
   {
     goto_programt payload;
@@ -1429,9 +1448,7 @@ void code_contractst::add_contract_check(
 {
   PRECONDITION(!dest.instructions.empty());
 
-  const symbolt &function_symbol = ns.lookup(mangled_function);
-  const auto &code_type = to_code_with_contract_type(function_symbol.type);
-
+  const auto &code_type = get_contract(wrapper_function, ns);
   auto assigns = code_type.assigns();
   auto requires = conjunction(code_type.requires());
   auto ensures = conjunction(code_type.ensures());
@@ -1455,6 +1472,7 @@ void code_contractst::add_contract_check(
   goto_programt check;
 
   // prepare function call including all declarations
+  const symbolt &function_symbol = ns.lookup(mangled_function);
   code_function_callt call(function_symbol.symbol_expr());
 
   // Create a replace_symbolt object, for replacing expressions in the callee

@@ -1,0 +1,10 @@
+CORE
+main-contract-incomplete.c
+
+error: code contract on incomplete function re-declaration
+CONVERSION ERROR
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that contracts on incomplete re-declarations are rejected.
