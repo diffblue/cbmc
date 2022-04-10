@@ -817,7 +817,7 @@ void code_contractst::apply_function_contract(
     }
   }
 
-  const auto &mode = symbol_table.lookup_ref(target_function).mode;
+  const auto &mode = function_symbol.mode;
 
   is_fresh_replacet is_fresh(*this, log, target_function);
   is_fresh.create_declarations();
@@ -830,10 +830,7 @@ void code_contractst::apply_function_contract(
     replace(requires);
 
     goto_programt assertion;
-    converter.goto_convert(
-      code_assertt(requires),
-      assertion,
-      symbol_table.lookup_ref(target_function).mode);
+    converter.goto_convert(code_assertt(requires), assertion, mode);
     assertion.instructions.back().source_location_nonconst() =
       requires.source_location();
     assertion.instructions.back().source_location_nonconst().set_comment(
@@ -854,10 +851,8 @@ void code_contractst::apply_function_contract(
     replace(ensures);
 
     auto assumption = code_assumet(ensures);
-    ensures_pair = create_ensures_instruction(
-      assumption,
-      ensures.source_location(),
-      symbol_table.lookup_ref(target_function).mode);
+    ensures_pair =
+      create_ensures_instruction(assumption, ensures.source_location(), mode);
 
     // add all the history variable initialization instructions
     // to the goto program
