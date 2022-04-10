@@ -780,9 +780,10 @@ void code_contractst::apply_function_contract(
     {
       // If the function does return a value, but the return value is
       // disregarded, check if the postcondition includes the return value.
-      return_value_visitort v;
-      ensures.visit(v);
-      if(v.found_return_value())
+      if(has_subexpr(ensures, [](const exprt &e) {
+           return e.id() == ID_symbol && to_symbol_expr(e).get_identifier() ==
+                                           CPROVER_PREFIX "return_value";
+         }))
       {
         // The postcondition does mention __CPROVER_return_value, so mint a
         // fresh variable to replace __CPROVER_return_value with.

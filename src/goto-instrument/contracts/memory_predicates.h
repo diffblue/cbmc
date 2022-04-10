@@ -104,25 +104,6 @@ protected:
 /// Predicate to be used with the exprt::visit() function. The function
 /// found_return_value() will return `true` iff this predicate is called on an
 /// expr that contains `__CPROVER_return_value`.
-class return_value_visitort : public const_expr_visitort
-{
-public:
-  return_value_visitort() : const_expr_visitort(), found(false)
-  {
-  }
-
-  // \brief Has this object been passed to exprt::visit() on an exprt whose
-  //        descendants contain __CPROVER_return_value?
-  bool found_return_value();
-  void operator()(const exprt &exp) override;
-
-protected:
-  bool found;
-};
-
-/// Predicate to be used with the exprt::visit() function. The function
-/// found_return_value() will return `true` iff this predicate is called on an
-/// expr that contains `__CPROVER_return_value`.
 class functions_in_scope_visitort
 {
 public:

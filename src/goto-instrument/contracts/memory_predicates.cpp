@@ -23,19 +23,6 @@ Date: July 2021
 #include <util/config.h>
 #include <util/prefix.h>
 
-bool return_value_visitort::found_return_value()
-{
-  return found;
-}
-
-void return_value_visitort::operator()(const exprt &exp)
-{
-  if(exp.id() != ID_symbol)
-    return;
-  const symbol_exprt &sym = to_symbol_expr(exp);
-  found |= sym.get_identifier() == CPROVER_PREFIX "return_value";
-}
-
 std::set<irep_idt> &functions_in_scope_visitort::function_calls()
 {
   return function_set;
