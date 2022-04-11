@@ -243,21 +243,6 @@ public:
     assert(!declarators().empty());
     declarators().back().value().swap(value);
   }
-
-  const exprt &spec_assigns() const
-  {
-    return static_cast<const exprt &>(find(ID_C_spec_assigns));
-  }
-
-  const exprt &spec_requires() const
-  {
-    return static_cast<const exprt &>(find(ID_C_spec_requires));
-  }
-
-  const exprt &spec_ensures() const
-  {
-    return static_cast<const exprt &>(find(ID_C_spec_ensures));
-  }
 };
 
 inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
