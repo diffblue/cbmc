@@ -79,6 +79,14 @@ public:
       expr.operands().size() == 3,
       "ternary expression must have three operands");
   }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
 };
 
 /// \brief Cast an exprt to a \ref ternary_exprt
@@ -2294,6 +2302,21 @@ public:
   {
     return op2();
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    ternary_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    ternary_exprt::validate(expr, ns, vm);
+  }
 };
 
 template <>
@@ -2562,6 +2585,21 @@ public:
   const exprt &new_value() const
   {
     return op2();
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    ternary_exprt::check(expr, vm);
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    ternary_exprt::validate(expr, ns, vm);
   }
 };
 
@@ -2848,6 +2886,18 @@ public:
   }
 
   bool value_is_zero_string() const;
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT);
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
 };
 
 template <>
