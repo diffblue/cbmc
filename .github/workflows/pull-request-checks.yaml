@@ -765,7 +765,7 @@ jobs:
           echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
           cmake --build build --target coverage -- -j2
       - name: Upload coverage statistics to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3.0.0
         with:
           files: build/html/coverage.info
           fail_ci_if_error: true
