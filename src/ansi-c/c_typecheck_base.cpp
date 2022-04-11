@@ -521,34 +521,8 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   // set return type
   return_type=code_type.return_type();
 
-  unsigned anon_counter=0;
-
-  // Add the parameter declarations into the symbol table.
-  for(auto &p : code_type.parameters())
-  {
-    // may be anonymous
-    if(p.get_base_name().empty())
-    {
-      irep_idt base_name="#anon"+std::to_string(anon_counter++);
-      p.set_base_name(base_name);
-    }
-
-    // produce identifier
-    irep_idt base_name = p.get_base_name();
-    irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
-
-    p.set_identifier(identifier);
-
-    parameter_symbolt p_symbol;
-
-    p_symbol.type = p.type();
-    p_symbol.name=identifier;
-    p_symbol.base_name=base_name;
-    p_symbol.location = p.source_location();
-
-    symbolt *new_p_symbol;
-    move_symbol(p_symbol, new_p_symbol);
-  }
+  // Add the parameter declarations into the symbol table
+  add_parameters_to_symbol_table(symbol);
 
   // typecheck the body code
   typecheck_code(to_code(symbol.value));
@@ -772,5 +746,41 @@ void c_typecheck_baset::typecheck_declaration(
         }
       }
     }
+  }
+}
+
+void c_typecheck_baset::add_parameters_to_symbol_table(symbolt &symbol)
+{
+  PRECONDITION(can_cast_type<code_typet>(symbol.type));
+
+  code_typet &code_type = to_code_type(symbol.type);
+
+  unsigned anon_counter = 0;
+
+  // Add the parameter declarations into the symbol table.
+  for(auto &p : code_type.parameters())
+  {
+    // may be anonymous
+    if(p.get_base_name().empty())
+    {
+      irep_idt base_name = "#anon" + std::to_string(anon_counter++);
+      p.set_base_name(base_name);
+    }
+
+    // produce identifier
+    irep_idt base_name = p.get_base_name();
+    irep_idt identifier = id2string(symbol.name) + "::" + id2string(base_name);
+
+    p.set_identifier(identifier);
+
+    parameter_symbolt p_symbol;
+
+    p_symbol.type = p.type();
+    p_symbol.name = identifier;
+    p_symbol.base_name = base_name;
+    p_symbol.location = p.source_location();
+
+    symbolt *new_p_symbol;
+    move_symbol(p_symbol, new_p_symbol);
   }
 }
