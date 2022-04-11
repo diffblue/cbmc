@@ -11,14 +11,15 @@ Author: Daniel Kroening
 
 #include "remove_internal_symbols.h"
 
-#include <goto-programs/adjust_float_expressions.h>
-
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/find_symbols.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/adjust_float_expressions.h>
 
 #include "static_lifetime_init.h"
 
@@ -62,14 +63,16 @@ static void get_symbols(
       }
 
       // check for contract definitions
-      const exprt ensures =
-        static_cast<const exprt &>(code_type.find(ID_C_spec_ensures));
-      const exprt requires =
-        static_cast<const exprt &>(code_type.find(ID_C_spec_requires));
+      const code_with_contract_typet &maybe_contract =
+        to_code_with_contract_type(code_type);
 
       find_symbols_sett new_symbols;
-      find_type_and_expr_symbols(ensures, new_symbols);
-      find_type_and_expr_symbols(requires, new_symbols);
+      for(const exprt &e : maybe_contract.ensures())
+        find_type_and_expr_symbols(e, new_symbols);
+      for(const exprt &r : maybe_contract.requires())
+        find_type_and_expr_symbols(r, new_symbols);
+      for(const exprt &a : maybe_contract.assigns())
+        find_type_and_expr_symbols(a, new_symbols);
 
       for(const auto &s : new_symbols)
       {
