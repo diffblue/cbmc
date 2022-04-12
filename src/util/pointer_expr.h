@@ -989,4 +989,39 @@ inline pointer_object_exprt &to_pointer_object_expr(exprt &expr)
   return ret;
 }
 
+/// Expression for finding the size (in bytes) of the object a pointer points
+/// to.
+class object_size_exprt : public unary_exprt
+{
+public:
+  explicit object_size_exprt(exprt pointer, typet type)
+    : unary_exprt(ID_object_size, std::move(pointer), std::move(type))
+  {
+  }
+
+  exprt &pointer()
+  {
+    return op();
+  }
+
+  const exprt &pointer() const
+  {
+    return op();
+  }
+};
+
+template <>
+inline bool can_cast_expr<object_size_exprt>(const exprt &base)
+{
+  return base.id() == ID_object_size;
+}
+
+inline void validate_expr(const object_size_exprt &value)
+{
+  validate_operands(value, 1, "Object size expression must have one operand.");
+  DATA_INVARIANT(
+    can_cast_type<pointer_typet>(value.pointer().type()),
+    "Object size expression must have pointer typed operand.");
+}
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H
