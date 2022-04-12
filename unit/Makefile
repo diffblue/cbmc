@@ -161,6 +161,7 @@ SRC += analyses/ai/ai.cpp \
        util/optional_utils.cpp \
        util/parse_options.cpp \
        util/piped_process.cpp \
+       util/pointer_expr.cpp \
        util/pointer_offset_size.cpp \
        util/prefix_filter.cpp \
        util/range.cpp \
