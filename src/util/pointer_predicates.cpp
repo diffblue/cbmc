@@ -32,7 +32,7 @@ exprt same_object(const exprt &p1, const exprt &p2)
 
 exprt object_size(const exprt &pointer)
 {
-  return unary_exprt(ID_object_size, pointer, size_type());
+  return object_size_exprt(pointer, size_type());
 }
 
 exprt pointer_offset(const exprt &pointer)

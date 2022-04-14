@@ -2363,8 +2363,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
-    unary_exprt object_size_expr(
-      ID_object_size, expr.arguments()[0], size_type());
+    object_size_exprt object_size_expr(expr.arguments()[0], size_type());
     object_size_expr.add_source_location() = source_location;
 
     return std::move(object_size_expr);

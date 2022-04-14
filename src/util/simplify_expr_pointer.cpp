@@ -640,11 +640,11 @@ simplify_exprt::simplify_is_invalid_pointer(const unary_exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_object_size(const unary_exprt &expr)
+simplify_exprt::simplify_object_size(const object_size_exprt &expr)
 {
   auto new_expr = expr;
   bool no_change = true;
-  exprt &op = new_expr.op();
+  exprt &op = new_expr.pointer();
   auto op_result = simplify_object(op);
 
   if(op_result.has_changed())

@@ -700,14 +700,15 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     return bv_utils.sign_extension(offset_bv, width);
   }
   else if(
-    expr.id() == ID_object_size &&
-    to_unary_expr(expr).op().type().id() == ID_pointer)
+    const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
     // we postpone until we know the objects
-    std::size_t width=boolbv_width(expr.type());
+    std::size_t width = boolbv_width(object_size->type());
 
     postponed_list.emplace_back(
-      prop.new_variables(width), convert_bv(to_unary_expr(expr).op()), expr);
+      prop.new_variables(width),
+      convert_bv(object_size->pointer()),
+      *object_size);
 
     return postponed_list.back().bv;
   }
@@ -935,10 +936,11 @@ void bv_pointerst::do_postponed(
       prop.l_set_to_true(prop.limplies(l1, l2));
     }
   }
-  else if(postponed.expr.id()==ID_object_size)
+  else if(
+    const auto postponed_object_size =
+      expr_try_dynamic_cast<object_size_exprt>(postponed.expr))
   {
-    const auto &type =
-      to_pointer_type(to_unary_expr(postponed.expr).op().type());
+    const auto &type = to_pointer_type(postponed_object_size->pointer().type());
     const auto &objects = pointer_logic.objects;
     std::size_t number=0;
 
@@ -955,7 +957,7 @@ void bv_pointerst::do_postponed(
         continue;
 
       const exprt object_size = typecast_exprt::conditional_cast(
-        size_expr.value(), postponed.expr.type());
+        size_expr.value(), postponed_object_size->type());
 
       // only compare object part
       pointer_typet pt = pointer_type(expr.type());

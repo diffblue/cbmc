@@ -10,12 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 #define CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 
+#include <util/pointer_expr.h>
+#include <util/std_expr.h>
+#include <util/threeval.h>
+
 #include <map>
 #include <set>
 #include <sstream>
-
-#include <util/std_expr.h>
-#include <util/threeval.h>
 
 #if !HASH_CODE
 #  include <util/irep_hash_container.h>
@@ -216,7 +217,7 @@ protected:
   void convert_address_of_rec(
     const exprt &expr, const pointer_typet &result_type);
 
-  void define_object_size(const irep_idt &id, const exprt &expr);
+  void define_object_size(const irep_idt &id, const object_size_exprt &expr);
 
   // keeps track of all non-Boolean symbols and their value
   struct identifiert
@@ -256,7 +257,7 @@ protected:
   /// smt2 formula.
   std::unordered_map<irep_idt, bool> set_values;
 
-  defined_expressionst object_sizes;
+  std::map<object_size_exprt, irep_idt> object_sizes;
 
   typedef std::set<std::string> smt2_identifierst;
   smt2_identifierst smt2_identifiers;

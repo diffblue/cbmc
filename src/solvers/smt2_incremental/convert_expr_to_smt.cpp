@@ -1192,6 +1192,15 @@ static smt_termt convert_expr_to_smt(
     "Generation of SMT formula for vector expression: " + vector.pretty());
 }
 
+static smt_termt convert_expr_to_smt(
+  const object_size_exprt &object_size,
+  const sub_expression_mapt &converted)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for object_size expression: " +
+    object_size.pretty());
+}
+
 static smt_termt
 convert_expr_to_smt(const let_exprt &let, const sub_expression_mapt &converted)
 {
@@ -1530,12 +1539,10 @@ static smt_termt dispatch_expr_to_smt_conversion(
   {
     return convert_expr_to_smt(*vector, converted);
   }
-#if 0
-  else if(expr.id()==ID_object_size)
+  if(const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
-    out << "|" << object_sizes[expr] << "|";
+    return convert_expr_to_smt(*object_size, converted);
   }
-#endif
   if(const auto let = expr_try_dynamic_cast<let_exprt>(expr))
   {
     return convert_expr_to_smt(*let, converted);
