@@ -779,13 +779,10 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
   }
   else if(expr.id()==ID_pointer_offset)
   {
-    if(expr.operands().size()!=1)
-      throw "pointer_offset expects one operand";
-
-    if(to_unary_expr(expr).op().type().id() != ID_pointer)
+    if(to_pointer_offset_expr(expr).op().type().id() != ID_pointer)
       throw "pointer_offset expects a pointer operand";
 
-    mp_vectort result = evaluate(to_unary_expr(expr).op());
+    mp_vectort result = evaluate(to_pointer_offset_expr(expr).op());
 
     if(result.size()==1)
     {

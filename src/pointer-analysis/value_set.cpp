@@ -309,7 +309,7 @@ bool value_sett::eval_pointer_offset(
   if(expr.id()==ID_pointer_offset)
   {
     const object_mapt reference_set =
-      get_value_set(to_unary_expr(expr).op(), ns, true);
+      get_value_set(to_pointer_offset_expr(expr).pointer(), ns, true);
 
     exprt new_expr;
     mp_integer previous_offset=0;

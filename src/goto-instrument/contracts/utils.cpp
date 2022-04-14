@@ -69,7 +69,8 @@ void havoc_assigns_targetst::append_havoc_code_for_expr(
 {
   if(expr.id() == ID_pointer_object)
   {
-    append_object_havoc_code_for_expr(location, expr.operands().front(), dest);
+    append_object_havoc_code_for_expr(
+      location, to_pointer_object_expr(expr).pointer(), dest);
     return;
   }
 

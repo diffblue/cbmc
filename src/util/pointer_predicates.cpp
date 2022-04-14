@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt pointer_object(const exprt &p)
 {
-  return unary_exprt(ID_pointer_object, p, size_type());
+  return pointer_object_exprt(p, size_type());
 }
 
 exprt same_object(const exprt &p1, const exprt &p2)
@@ -37,7 +37,7 @@ exprt object_size(const exprt &pointer)
 
 exprt pointer_offset(const exprt &pointer)
 {
-  return unary_exprt(ID_pointer_offset, pointer, signed_size_type());
+  return pointer_offset_exprt(pointer, signed_size_type());
 }
 
 exprt deallocated(const exprt &pointer, const namespacet &ns)

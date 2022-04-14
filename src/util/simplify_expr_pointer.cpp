@@ -245,17 +245,17 @@ simplify_exprt::simplify_address_of(const address_of_exprt &expr)
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
+simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
 {
-  const exprt &ptr = expr.op();
+  const exprt &ptr = expr.pointer();
 
   if(ptr.id()==ID_if && ptr.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
     if_expr.true_case() =
-      simplify_pointer_offset(to_unary_expr(if_expr.true_case()));
+      simplify_pointer_offset(to_pointer_offset_expr(if_expr.true_case()));
     if_expr.false_case() =
-      simplify_pointer_offset(to_unary_expr(if_expr.false_case()));
+      simplify_pointer_offset(to_pointer_offset_expr(if_expr.false_case()));
     return changed(simplify_if(if_expr));
   }
 
@@ -358,8 +358,8 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
       return unchanged(expr);
 
     // this might change the type of the pointer!
-    exprt pointer_offset_expr =
-      simplify_pointer_offset(to_unary_expr(pointer_offset(ptr_expr.front())));
+    exprt pointer_offset_expr = simplify_pointer_offset(
+      to_pointer_offset_expr(pointer_offset(ptr_expr.front())));
 
     exprt sum;
 
@@ -481,7 +481,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
   forall_operands(it, expr)
   {
     PRECONDITION(it->id() == ID_pointer_object);
-    const exprt &op = to_unary_expr(*it).op();
+    const exprt &op = to_pointer_object_expr(*it).pointer();
 
     if(op.id()==ID_address_of)
     {
@@ -516,9 +516,9 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
 }
 
 simplify_exprt::resultt<>
-simplify_exprt::simplify_pointer_object(const unary_exprt &expr)
+simplify_exprt::simplify_pointer_object(const pointer_object_exprt &expr)
 {
-  const exprt &op = expr.op();
+  const exprt &op = expr.pointer();
 
   auto op_result = simplify_object(op);
 
