@@ -185,6 +185,11 @@ public:
     : multi_ary_exprt(ID_tuple, std::move(operands), typet())
   {
   }
+
+  tuple_exprt(exprt::operandst operands, typet type)
+    : multi_ary_exprt(ID_tuple, std::move(operands), std::move(type))
+  {
+  }
 };
 
 /// \brief Application of (mathematical) function
