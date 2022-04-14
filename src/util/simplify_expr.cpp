@@ -2398,9 +2398,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   {
     r = simplify_is_invalid_pointer(to_unary_expr(expr));
   }
-  else if(expr.id()==ID_object_size)
+  else if(
+    const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
-    r = simplify_object_size(to_unary_expr(expr));
+    r = simplify_object_size(*object_size);
   }
   else if(expr.id()==ID_good_pointer)
   {

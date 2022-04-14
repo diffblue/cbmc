@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/namespace.h>
-#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
@@ -233,10 +232,9 @@ void smt2_convt::write_footer()
 
 void smt2_convt::define_object_size(
   const irep_idt &id,
-  const exprt &expr)
+  const object_size_exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_object_size);
-  const exprt &ptr = to_unary_expr(expr).op();
+  const exprt &ptr = expr.pointer();
   std::size_t size_width = boolbv_width(expr.type());
   std::size_t pointer_width = boolbv_width(ptr.type());
   std::size_t number = 0;
@@ -2018,9 +2016,10 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     out << ")"; // mk-... or concat
   }
-  else if(expr.id()==ID_object_size)
+  else if(
+    const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
-    out << "|" << object_sizes[expr] << "|";
+    out << "|" << object_sizes[*object_size] << "|";
   }
   else if(expr.id()==ID_let)
   {
@@ -4848,22 +4847,18 @@ void smt2_convt::find_symbols(const exprt &expr)
       defined_expressions[expr]=id;
     }
   }
-  else if(expr.id() == ID_object_size)
+  else if(
+    const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
-    const exprt &op = to_unary_expr(expr).op();
-
-    if(op.type().id()==ID_pointer)
+    if(object_sizes.find(*object_size) == object_sizes.end())
     {
-      if(object_sizes.find(expr)==object_sizes.end())
-      {
-        const irep_idt id =
-          "object_size." + std::to_string(object_sizes.size());
-        out << "(declare-fun |" << id << "| () ";
-        convert_type(expr.type());
-        out << ")" << "\n";
+      const irep_idt id = "object_size." + std::to_string(object_sizes.size());
+      out << "(declare-fun |" << id << "| () ";
+      convert_type(object_size->type());
+      out << ")"
+          << "\n";
 
-        object_sizes[expr]=id;
-      }
+      object_sizes[*object_size] = id;
     }
   }
   // clang-format off

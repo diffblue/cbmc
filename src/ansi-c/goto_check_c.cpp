@@ -1476,7 +1476,7 @@ bool goto_check_ct::requires_pointer_primitive_check(const exprt &expr)
   // pointer_object and pointer_offset just extract a subset of bits from the
   // pointer. If that pointer was unconstrained (non-deterministic), the result
   // will equally be non-deterministic.
-  return expr.id() == ID_object_size || expr.id() == ID_r_ok ||
+  return can_cast_expr<object_size_exprt>(expr) || expr.id() == ID_r_ok ||
          expr.id() == ID_w_ok || expr.id() == ID_rw_ok ||
          expr.id() == ID_is_dynamic_object;
 }
