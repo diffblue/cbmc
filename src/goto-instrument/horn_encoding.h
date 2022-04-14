@@ -2,7 +2,7 @@
 
 Module: Horn-clause Encoding
 
-Author:
+Author: Daniel Kroening
 
 \*******************************************************************/
 

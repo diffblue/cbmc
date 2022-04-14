@@ -1,0 +1,8 @@
+CORE
+nondet1.c
+--horn
+^EXIT=0$
+^SIGNAL=0$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|main::1::x| \(_ BitVec 32\)\) \(|main::1::y| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \) \(=> \(|S30Entry| |__CPROVER_rounding_mode| |main::1::x| |main::1::y| |return_value|\) \(|S30\.2| |__CPROVER_rounding_mode| |nondet::S30\.2| |main::1::y| |return_value|\)\)\)\)$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|main::1::x| \(_ BitVec 32\)\) \(|main::1::y| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \) \(=> \(|S30\.2| |__CPROVER_rounding_mode| |main::1::x| |main::1::y| |return_value|\) \(= |main::1::x| \(_ bv20 32\)\)\)\)\)$
+--

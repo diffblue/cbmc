@@ -1,0 +1,9 @@
+CORE
+basic5.c
+--horn
+^EXIT=0$
+^SIGNAL=0$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|main::1::c1| Bool\) \(|main::1::c2| Bool\) \(|main::1::x| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \) \(=> \(|S31.24| |__CPROVER_rounding_mode| |main::1::c1| |main::1::c2| |main::1::x| |return_value|\) \(|S32Entry| |__CPROVER_rounding_mode| |main::1::c1| |main::1::c2| |main::1::x| |return_value|\)\)\)\)$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|main::1::c1| Bool\) \(|main::1::c2| Bool\) \(|main::1::x| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \) \(=> \(|S32Entry| |__CPROVER_rounding_mode| |main::1::c1| |main::1::c2| |main::1::x| |return_value|\) \(|S32.2| |__CPROVER_rounding_mode| \(bvsge |main::1::x| \(_ bv10 32\)\) |main::1::c2| |main::1::x| |return_value|\)\)\)\)$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|main::1::c1| Bool\) \(|main::1::c2| Bool\) \(|main::1::x| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \) \(=> \(|S32.2| |__CPROVER_rounding_mode| |main::1::c1| |main::1::c2| |main::1::x| |return_value|\) \(|S32.4| |__CPROVER_rounding_mode| |main::1::c1| \(bvsge |main::1::x| \(_ bv5 32\)\) |main::1::x| |return_value|\)\)\)\)$
+--

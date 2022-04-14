@@ -15,6 +15,7 @@ DIRS = cbmc \
        cbmc-incr \
        cbmc-with-incr \
        array-refinement-with-incr \
+       goto-instrument-chc \
        goto-instrument-json \
        goto-instrument-wmm-core \
        goto-instrument-typedef \
