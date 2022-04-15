@@ -229,11 +229,12 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   else if(expr.id()==ID_symbol)
   {
     const auto &type = as_const(expr).type();
+    const irep_idt &id = to_symbol_expr(expr).get_identifier();
 
     // we never rename function symbols
-    if(type.id() == ID_code || type.id() == ID_mathematical_function)
+    if(type.id() == ID_code || type.id() == ID_mathematical_function || bound_variables.find(id) != bound_variables.end())
     {
-      rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
+      rename<level>(expr.type(), id, ns);
       return renamedt<exprt, level>{std::move(expr)};
     }
     else
@@ -249,6 +250,19 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   else if(expr.is_nil())
   {
+    return renamedt<exprt, level>{std::move(expr)};
+  }
+  else if(auto binding_expr = expr_try_dynamic_cast<binding_exprt>(expr))
+  {
+    rename<level>(expr.type(), irep_idt(), ns);
+
+    push_bound_variables(as_const(*binding_expr).variables());
+    binding_expr->where() = rename<level>(binding_expr->where(), ns).get();
+    pop_bound_variables(as_const(*binding_expr).variables());
+
+    if(level == L2)
+      expr = field_sensitivity.apply(ns, *this, std::move(expr), false);
+
     return renamedt<exprt, level>{std::move(expr)};
   }
   else
@@ -561,6 +575,9 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
   }
   else if(expr.id()==ID_symbol)
   {
+    DATA_INVARIANT(
+      bound_variables.find(to_symbol_expr(expr).get_identifier()) == bound_variables.end(),
+      "cannot take the address of a bound variable");
     expr=ssa_exprt(expr);
     rename_address<level>(expr, ns);
   }

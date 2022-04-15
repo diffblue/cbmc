@@ -414,25 +414,39 @@ void goto_symext::dereference_rec(
   }
   else
   {
-    bool is_binding_expression = can_cast_expr<binding_exprt>(expr);
+    auto binding_expr = expr_try_dynamic_cast<binding_exprt>(expr);
+    if(binding_expr)
+      state.push_bound_variables(as_const(*binding_expr).variables());
+
     Forall_operands(it, expr)
     {
-      dereference_rec(*it, state, write, is_in_binding_expression || is_binding_expression);
+      dereference_rec(*it, state, write, is_in_binding_expression || binding_expr);
     }
+
+    if(binding_expr)
+      state.pop_bound_variables(as_const(*binding_expr).variables());
   }
 }
 
 static exprt
-apply_to_objects_in_dereference(exprt e, const std::function<exprt(exprt)> &f)
+apply_to_objects_in_dereference(goto_symex_statet &state, exprt e, const std::function<exprt(exprt)> &f)
 {
   if(auto deref = expr_try_dynamic_cast<dereference_exprt>(e))
   {
     deref->op() = f(std::move(deref->op()));
     return *deref;
   }
+  else if(auto binding_expr = expr_try_dynamic_cast<binding_exprt>(e))
+  {
+    state.push_bound_variables(as_const(*binding_expr).variables());
+  }
 
   for(auto &sub : e.operands())
-    sub = apply_to_objects_in_dereference(std::move(sub), f);
+    sub = apply_to_objects_in_dereference(state, std::move(sub), f);
+
+  if(auto binding_expr = expr_try_dynamic_cast<binding_exprt>(e))
+    state.pop_bound_variables(as_const(*binding_expr).variables());
+
   return e;
 }
 
@@ -480,7 +494,7 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
   // Symbols whose address is taken need to be renamed to level 1
   // in order to distinguish addresses of local variables
   // from different frames.
-  expr = apply_to_objects_in_dereference(std::move(expr), [&](exprt e) {
+  expr = apply_to_objects_in_dereference(state, std::move(expr), [&](exprt e) {
     return state.field_sensitivity.apply(
       ns, state, state.rename<L1>(std::move(e), ns).get(), false);
   });
