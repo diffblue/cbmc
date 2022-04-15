@@ -8,11 +8,8 @@ main.c
 \[main\.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
 \[main\.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
 \[main.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
-\[main.assigns\.\d+\] line \d+ Check that j is assignable: SUCCESS$
-\[main.assigns\.\d+\] line \d+ Check that k is assignable: SUCCESS$
 \[main.assigns\.\d+\] line \d+ Check that i is valid: SUCCESS$
 \[main.assigns\.\d+\] line \d+ Check that j is valid: SUCCESS$
-\[main.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
 \[main.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in i \+ 1u: SUCCESS
 \[main.assertion\.\d+\] line \d+ assertion i == k: SUCCESS$
 \[main.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in k \+ \(unsigned int\)1: SUCCESS
