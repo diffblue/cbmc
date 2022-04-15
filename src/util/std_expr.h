@@ -3075,6 +3075,12 @@ public:
   exprt instantiate(const variablest &) const;
 };
 
+template <>
+inline bool can_cast_expr<binding_exprt>(const exprt &base)
+{
+  return base.id() == ID_forall || base.id() == ID_exists || base.id() == ID_lambda || base.id() == ID_array_comprehension;
+}
+
 inline void validate_expr(const binding_exprt &binding_expr)
 {
   validate_operands(
@@ -3090,7 +3096,7 @@ inline void validate_expr(const binding_exprt &binding_expr)
 inline const binding_exprt &to_binding_expr(const exprt &expr)
 {
   PRECONDITION(
-    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda);
+    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda || expr.id() == ID_array_comprehension);
   const binding_exprt &ret = static_cast<const binding_exprt &>(expr);
   validate_expr(ret);
   return ret;

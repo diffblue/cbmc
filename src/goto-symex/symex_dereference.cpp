@@ -249,16 +249,16 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
 /// goto_symext::address_arithmetic) and certain common expression patterns
 /// such as `&struct.flexible_array[0]` (see inline comments in code).
 /// Note that \p write is used to alter behaviour when this function is
-/// operating on the LHS of an assignment. Similarly \p is_in_quantifier
-/// indicates when the dereference is inside a quantifier (related to scoping
-/// when dereference caching is enabled).
+/// operating on the LHS of an assignment. Similarly \p is_in_binding_expression
+/// indicates when the dereference is inside a binding expression (related to
+/// scoping when dereference caching is enabled).
 /// For full details of this method's pointer replacement and potential side-
 /// effects see \ref goto_symext::dereference
 void goto_symext::dereference_rec(
   exprt &expr,
   statet &state,
   bool write,
-  bool is_in_quantifier)
+  bool is_in_binding_expression)
 {
   if(expr.id()==ID_dereference)
   {
@@ -281,7 +281,7 @@ void goto_symext::dereference_rec(
     tmp1.swap(to_dereference_expr(expr).pointer());
 
     // first make sure there are no dereferences in there
-    dereference_rec(tmp1, state, false, is_in_quantifier);
+    dereference_rec(tmp1, state, false, is_in_binding_expression);
 
     // Depending on the nature of the pointer expression, the recursive deref
     // operation might have introduced a construct such as
@@ -345,7 +345,7 @@ void goto_symext::dereference_rec(
     //     (p == &something ? something : ...))
     // Otherwise we should just return it unchanged.
     if(
-      symex_config.cache_dereferences && !write && !is_in_quantifier &&
+      symex_config.cache_dereferences && !write && !is_in_binding_expression &&
       (tmp2.id() == ID_if || tmp2.id() == ID_let))
     {
       expr = cache_dereference(tmp2, state);
@@ -372,7 +372,7 @@ void goto_symext::dereference_rec(
     tmp.add_source_location()=expr.source_location();
 
     // recursive call
-    dereference_rec(tmp, state, write, is_in_quantifier);
+    dereference_rec(tmp, state, write, is_in_binding_expression);
 
     expr.swap(tmp);
   }
@@ -405,18 +405,20 @@ void goto_symext::dereference_rec(
       expr = address_of_exprt(index_exprt(
         to_address_of_expr(tc_op).object(), from_integer(0, c_index_type())));
 
-      dereference_rec(expr, state, write, is_in_quantifier);
+      dereference_rec(expr, state, write, is_in_binding_expression);
     }
     else
     {
-      dereference_rec(tc_op, state, write, is_in_quantifier);
+      dereference_rec(tc_op, state, write, is_in_binding_expression);
     }
   }
   else
   {
-    bool is_quantifier = expr.id() == ID_forall || expr.id() == ID_exists;
+    bool is_binding_expression = can_cast_expr<binding_exprt>(expr);
     Forall_operands(it, expr)
-      dereference_rec(*it, state, write, is_in_quantifier || is_quantifier);
+    {
+      dereference_rec(*it, state, write, is_in_binding_expression || is_binding_expression);
+    }
   }
 }
 

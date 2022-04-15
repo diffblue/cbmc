@@ -212,7 +212,7 @@ void goto_symext::lift_lets(statet &state, exprt &rhs)
 
       it.next_sibling_or_parent();
     }
-    else if(it->id() == ID_exists || it->id() == ID_forall)
+    else if(can_cast_expr<binding_exprt>(*it))
     {
       // expressions within exists/forall may depend on bound variables, we
       // cannot safely lift let expressions out of those, just skip
