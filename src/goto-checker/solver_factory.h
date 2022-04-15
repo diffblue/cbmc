@@ -47,6 +47,10 @@ public:
       std::unique_ptr<stack_decision_proceduret> p1,
       std::unique_ptr<std::ofstream> p2);
     solvert(std::unique_ptr<boolbvt> p1, std::unique_ptr<propt> p2);
+    solvert(
+      std::unique_ptr<boolbvt> p1,
+      std::unique_ptr<propt> p2,
+      std::unique_ptr<std::ofstream> p3);
 
     stack_decision_proceduret &decision_procedure() const;
     boolbvt &boolbv_decision_procedure() const;

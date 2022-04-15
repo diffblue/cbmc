@@ -13,37 +13,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/dimacs_cnf.h>
 
-#include <fstream> // IWYU pragma: keep
-#include <iostream>
-
 bv_dimacst::bv_dimacst(
   const namespacet &_ns,
   dimacs_cnft &_prop,
   message_handlert &message_handler,
-  const std::string &_filename)
-  : bv_pointerst(_ns, _prop, message_handler),
-    filename(_filename),
-    dimacs_cnf_prop(_prop)
+  std::ostream &_out)
+  : bv_pointerst(_ns, _prop, message_handler), out(_out), dimacs_cnf_prop(_prop)
 {
 }
 
-bool bv_dimacst::write_dimacs()
-{
-  if(filename.empty() || filename == "-")
-    return write_dimacs(std::cout);
-
-  std::ofstream out(filename);
-
-  if(!out)
-  {
-    log.error() << "failed to open " << filename << messaget::eom;
-    return false;
-  }
-
-  return write_dimacs(out);
-}
-
-bool bv_dimacst::write_dimacs(std::ostream &out)
+void bv_dimacst::write_dimacs()
 {
   dimacs_cnf_prop.write_dimacs_cnf(out);
 
@@ -79,6 +58,4 @@ bool bv_dimacst::write_dimacs(std::ostream &out)
 
     out << "\n";
   }
-
-  return false;
 }
