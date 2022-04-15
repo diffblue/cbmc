@@ -820,8 +820,12 @@ void code_contractst::apply_function_contract(
 
   const auto &mode = function_symbol.mode;
 
+  // new program where all contract-derived instructions are added
+  goto_programt new_program;
+
   is_fresh_replacet is_fresh(*this, log, target_function);
   is_fresh.create_declarations();
+  is_fresh.add_memory_map_decl(new_program);
 
   // Insert assertion of the precondition immediately before the call site.
   if(!requires.is_true())
@@ -839,7 +843,7 @@ void code_contractst::apply_function_contract(
     assertion.instructions.back().source_location_nonconst().set_property_class(
       ID_precondition);
     is_fresh.update_requires(assertion);
-    insert_before_swap_and_advance(function_body, target, assertion);
+    new_program.destructive_append(assertion);
   }
 
   // Gather all the instructions required to handle history variables
@@ -856,8 +860,7 @@ void code_contractst::apply_function_contract(
       create_ensures_instruction(assumption, ensures.source_location(), mode);
 
     // add all the history variable initialization instructions
-    // to the goto program
-    insert_before_swap_and_advance(function_body, target, ensures_pair.second);
+    new_program.destructive_append(ensures_pair.second);
   }
 
   // ASSIGNS clause should not refer to any quantified variables,
@@ -901,14 +904,14 @@ void code_contractst::apply_function_contract(
   }
 
   // Insert havoc instructions immediately before the call site.
-  insert_before_swap_and_advance(function_body, target, havoc_instructions);
+  new_program.destructive_append(havoc_instructions);
 
   // To remove the function call, insert statements related to the assumption.
   // Then, replace the function call with a SKIP statement.
   if(!ensures.is_false())
   {
     is_fresh.update_ensures(ensures_pair.first);
-    insert_before_swap_and_advance(function_body, target, ensures_pair.first);
+    new_program.destructive_append(ensures_pair.first);
   }
 
   // Kill return value variable if fresh
@@ -921,11 +924,19 @@ void code_contractst::apply_function_contract(
     ++target;
   }
 
+  is_fresh.add_memory_map_dead(new_program);
+
   // Erase original function call
   *target = goto_programt::make_skip();
 
+  // insert contract replacement instructions
+  insert_before_swap_and_advance(function_body, target, new_program);
+
   // Add this function to the set of replaced functions.
   summarized.insert(target_function);
+
+  // restore global goto_program consistency
+  goto_functions.update();
 }
 
 void code_contractst::apply_loop_contract(
@@ -1450,7 +1461,7 @@ void code_contractst::add_contract_check(
 
   is_fresh_enforcet visitor(*this, log, wrapper_function);
   visitor.create_declarations();
-
+  visitor.add_memory_map_decl(check);
   // Generate: assume(requires)
   if(!requires.is_false())
   {
@@ -1513,9 +1524,17 @@ void code_contractst::add_contract_check(
       return_stmt.value().return_value(), skip->source_location()));
   }
 
-  // prepend the new code to dest
+  // kill the is_fresh memory map
+  visitor.add_memory_map_dead(check);
+
+  // add final instruction
   check.destructive_append(tmp_skip);
+
+  // prepend the new code to dest
   dest.destructive_insert(dest.instructions.begin(), check);
+
+  // restore global goto_program consistency
+  goto_functions.update();
 }
 
 void code_contractst::check_all_functions_found(
