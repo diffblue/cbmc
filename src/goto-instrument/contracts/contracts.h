@@ -156,15 +156,6 @@ protected:
     const irep_idt &mangled_function,
     goto_programt &dest);
 
-  /// This function recursively searches the expression to find nested or
-  /// non-nested quantified expressions. When a quantified expression is found,
-  /// the quantified variable is added to the symbol table
-  /// and to the expression map.
-  void add_quantified_variable(
-    const exprt &expression,
-    replace_symbolt &replace,
-    const irep_idt &mode);
-
   /// This function recursively identifies the "old" expressions within expr
   /// and replaces them with correspoding history variables.
   void replace_history_parameter(
