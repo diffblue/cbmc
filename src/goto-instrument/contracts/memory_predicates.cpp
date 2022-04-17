@@ -13,15 +13,20 @@ Date: July 2021
 
 #include "memory_predicates.h"
 
-#include <ansi-c/ansi_c_language.h>
-#include <ansi-c/expr2c.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/config.h>
+#include <util/fresh_symbol.h>
+#include <util/prefix.h>
 
 #include <goto-programs/goto_convert_functions.h>
 
+#include <ansi-c/ansi_c_language.h>
+#include <ansi-c/expr2c.h>
 #include <linking/static_lifetime_init.h>
 
-#include <util/config.h>
-#include <util/prefix.h>
+#include "instrument_spec_assigns.h"
+#include "utils.h"
 
 std::set<irep_idt> &functions_in_scope_visitort::function_calls()
 {
@@ -130,6 +135,32 @@ void is_fresh_baset::update_ensures(goto_programt &ensures)
 //
 //
 
+array_typet is_fresh_baset::get_memmap_type()
+{
+  return array_typet(c_bool_typet(8), infinity_exprt(size_type()));
+}
+
+void is_fresh_baset::add_memory_map_decl(goto_programt &program)
+{
+  source_locationt source_location;
+  add_pragma_disable_assigns_check(source_location);
+  auto memmap_type = get_memmap_type();
+  program.add(
+    goto_programt::make_decl(memmap_symbol.symbol_expr(), source_location));
+  program.add(goto_programt::make_assignment(
+    memmap_symbol.symbol_expr(),
+    array_of_exprt(from_integer(0, c_bool_typet(8)), get_memmap_type()),
+    source_location));
+}
+
+void is_fresh_baset::add_memory_map_dead(goto_programt &program)
+{
+  source_locationt source_location;
+  add_pragma_disable_assigns_check(source_location);
+  program.add(
+    goto_programt::make_dead(memmap_symbol.symbol_expr(), source_location));
+}
+
 void is_fresh_baset::add_declarations(const std::string &decl_string)
 {
   log.debug() << "Creating declarations: \n" << decl_string << "\n";
@@ -207,6 +238,10 @@ void is_fresh_baset::update_fn_call(
 
   // fixing the function name.
   to_symbol_expr(ins->call_function()).set_identifier(fn_name);
+
+  // pass the memory mmap
+  ins->call_arguments().push_back(address_of_exprt(
+    index_exprt(memmap_symbol.symbol_expr(), from_integer(0, c_index_type()))));
 }
 
 /* Declarations for contract enforcement */
@@ -218,41 +253,63 @@ is_fresh_enforcet::is_fresh_enforcet(
   : is_fresh_baset(_parent, _log, _fun_id)
 {
   std::stringstream ssreq, ssensure, ssmemmap;
-  ssreq << CPROVER_PREFIX << fun_id << "_requires_is_fresh";
+  ssreq << CPROVER_PREFIX "enforce_requires_is_fresh";
   this->requires_fn_name = ssreq.str();
 
-  ssensure << CPROVER_PREFIX << fun_id << "_ensures_is_fresh";
+  ssensure << CPROVER_PREFIX "enforce_ensures_is_fresh";
   this->ensures_fn_name = ssensure.str();
 
-  ssmemmap << CPROVER_PREFIX << fun_id << "_memory_map";
+  ssmemmap << CPROVER_PREFIX "is_fresh_memory_map_" << fun_id;
   this->memmap_name = ssmemmap.str();
+
+  const auto &mode = parent.get_symbol_table().lookup_ref(_fun_id).mode;
+  this->memmap_symbol = new_tmp_symbol(
+    get_memmap_type(),
+    source_locationt(),
+    mode,
+    parent.get_symbol_table(),
+    this->memmap_name,
+    true);
 }
 
 void is_fresh_enforcet::create_declarations()
 {
+  // Check if symbols are already declared
+  if(parent.get_symbol_table().lookup(requires_fn_name) != nullptr)
+    return;
+
   std::ostringstream oss;
   std::string cprover_prefix(CPROVER_PREFIX);
-  oss << "static _Bool " << memmap_name
-      << "[" + cprover_prefix + "constant_infinity_uint]; \n"
-      << "\n"
-      << "_Bool " << requires_fn_name
-      << "(void **elem, " + cprover_prefix + "size_t size) { \n"
+  oss << "_Bool " << requires_fn_name
+      << "(void **elem, " + cprover_prefix + "size_t size, _Bool *mmap) { \n"
+      << "#pragma CPROVER check push\n"
+      << "#pragma CPROVER check disable \"pointer\"\n"
+      << "#pragma CPROVER check disable \"pointer-primitive\"\n"
+      << "#pragma CPROVER check disable \"pointer-overflow\"\n"
+      << "#pragma CPROVER check disable \"signed-overflow\"\n"
+      << "#pragma CPROVER check disable \"unsigned-overflow\"\n"
+      << "#pragma CPROVER check disable \"conversion\"\n"
       << "   *elem = malloc(size); \n"
-      << "   if (!*elem || " << memmap_name
-      << "[" + cprover_prefix + "POINTER_OBJECT(*elem)]) return 0; \n"
-      << "   " << memmap_name << "[" + cprover_prefix
-      << "POINTER_OBJECT(*elem)] = 1; \n"
+      << "   if (!*elem) return 0; \n"
+      << "   mmap[" + cprover_prefix + "POINTER_OBJECT(*elem)] = 1; \n"
       << "   return 1; \n"
+      << "#pragma CPROVER check pop\n"
       << "} \n"
       << "\n"
       << "_Bool " << ensures_fn_name
-      << "(void *elem, " + cprover_prefix + "size_t size) { \n"
-      << "   _Bool ok = (!" << memmap_name
-      << "[" + cprover_prefix + "POINTER_OBJECT(elem)] && "
+      << "(void *elem, " + cprover_prefix + "size_t size, _Bool *mmap) { \n"
+      << "#pragma CPROVER check push\n"
+      << "#pragma CPROVER check disable \"pointer\"\n"
+      << "#pragma CPROVER check disable \"pointer-primitive\"\n"
+      << "#pragma CPROVER check disable \"pointer-overflow\"\n"
+      << "#pragma CPROVER check disable \"signed-overflow\"\n"
+      << "#pragma CPROVER check disable \"unsigned-overflow\"\n"
+      << "#pragma CPROVER check disable \"conversion\"\n"
+      << "   _Bool ok = (!mmap[" + cprover_prefix + "POINTER_OBJECT(elem)] && "
       << cprover_prefix + "r_ok(elem, size)); \n"
-      << "   " << memmap_name << "[" + cprover_prefix
-      << "POINTER_OBJECT(elem)] = 1; \n"
+      << "   mmap[" + cprover_prefix << "POINTER_OBJECT(elem)] = 1; \n"
       << "   return ok; \n"
+      << "#pragma CPROVER check pop\n"
       << "}";
 
   add_declarations(oss.str());
@@ -268,17 +325,6 @@ void is_fresh_enforcet::create_ensures_fn_call(goto_programt::targett &ins)
   update_fn_call(ins, ensures_fn_name, false);
 }
 
-/* Declarations for contract replacement: note that there may be several
-   instances of the same function called in a particular context, so care must be taken
-   that the 'call' functions and global data structure are unique for each instance.
-   This is why we check that the symbols are unique for each such declaration.  */
-
-std::string unique_symbol(const symbol_tablet &tbl, const std::string &original)
-{
-  auto size = tbl.next_unused_suffix(original);
-  return original + std::to_string(size);
-}
-
 is_fresh_replacet::is_fresh_replacet(
   code_contractst &_parent,
   messaget _log,
@@ -286,40 +332,61 @@ is_fresh_replacet::is_fresh_replacet(
   : is_fresh_baset(_parent, _log, _fun_id)
 {
   std::stringstream ssreq, ssensure, ssmemmap;
-  ssreq /* << CPROVER_PREFIX */ << fun_id << "_call_requires_is_fresh";
-  this->requires_fn_name =
-    unique_symbol(parent.get_symbol_table(), ssreq.str());
+  ssreq << CPROVER_PREFIX "replace_requires_is_fresh";
+  this->requires_fn_name = ssreq.str();
 
-  ssensure /* << CPROVER_PREFIX */ << fun_id << "_call_ensures_is_fresh";
-  this->ensures_fn_name =
-    unique_symbol(parent.get_symbol_table(), ssensure.str());
+  ssensure << CPROVER_PREFIX "replace_ensures_is_fresh";
+  this->ensures_fn_name = ssensure.str();
 
-  ssmemmap /* << CPROVER_PREFIX */ << fun_id << "_memory_map";
-  this->memmap_name = unique_symbol(parent.get_symbol_table(), ssmemmap.str());
+  ssmemmap << CPROVER_PREFIX "is_fresh_memory_map_" << fun_id;
+  this->memmap_name = ssmemmap.str();
+
+  const auto &mode = parent.get_symbol_table().lookup_ref(_fun_id).mode;
+  this->memmap_symbol = new_tmp_symbol(
+    get_memmap_type(),
+    source_locationt(),
+    mode,
+    parent.get_symbol_table(),
+    this->memmap_name,
+    true);
 }
 
 void is_fresh_replacet::create_declarations()
 {
+  // Check if symbols are already declared
+  if(parent.get_symbol_table().lookup(requires_fn_name) != nullptr)
+    return;
   std::ostringstream oss;
   std::string cprover_prefix(CPROVER_PREFIX);
-  oss << "static _Bool " << memmap_name
-      << "[" + cprover_prefix + "constant_infinity_uint]; \n"
-      << "\n"
-      << "static _Bool " << requires_fn_name
-      << "(void *elem, " + cprover_prefix + "size_t size) { \n"
+  oss << "static _Bool " << requires_fn_name
+      << "(void *elem, " + cprover_prefix + "size_t size, _Bool *mmap) { \n"
+      << "#pragma CPROVER check push\n"
+      << "#pragma CPROVER check disable \"pointer\"\n"
+      << "#pragma CPROVER check disable \"pointer-primitive\"\n"
+      << "#pragma CPROVER check disable \"pointer-overflow\"\n"
+      << "#pragma CPROVER check disable \"signed-overflow\"\n"
+      << "#pragma CPROVER check disable \"unsigned-overflow\"\n"
+      << "#pragma CPROVER check disable \"conversion\"\n"
       << "  _Bool r_ok = " + cprover_prefix + "r_ok(elem, size); \n"
-      << "  if (" << memmap_name
-      << "[" + cprover_prefix + "POINTER_OBJECT(elem)]"
+      << "  if (mmap[" + cprover_prefix + "POINTER_OBJECT(elem)]"
       << " != 0 || !r_ok)  return 0; \n"
-      << "  " << memmap_name << "["
-      << cprover_prefix + "POINTER_OBJECT(elem)] = 1; \n"
+      << "  mmap[" << cprover_prefix + "POINTER_OBJECT(elem)] = 1; \n"
       << "  return 1; \n"
+      << "#pragma CPROVER check pop\n"
       << "} \n"
       << " \n"
       << "_Bool " << ensures_fn_name
-      << "(void **elem, " + cprover_prefix + "size_t size) { \n"
+      << "(void **elem, " + cprover_prefix + "size_t size, _Bool *mmap) { \n"
+      << "#pragma CPROVER check push\n"
+      << "#pragma CPROVER check disable \"pointer\"\n"
+      << "#pragma CPROVER check disable \"pointer-primitive\"\n"
+      << "#pragma CPROVER check disable \"pointer-overflow\"\n"
+      << "#pragma CPROVER check disable \"signed-overflow\"\n"
+      << "#pragma CPROVER check disable \"unsigned-overflow\"\n"
+      << "#pragma CPROVER check disable \"conversion\"\n"
       << "  *elem = malloc(size); \n"
       << "  return (*elem != 0); \n"
+      << "#pragma CPROVER check pop\n"
       << "} \n";
 
   add_declarations(oss.str());

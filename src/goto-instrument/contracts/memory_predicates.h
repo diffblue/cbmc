@@ -32,6 +32,9 @@ public:
 
   virtual void create_declarations() = 0;
 
+  void add_memory_map_decl(goto_programt &program);
+  void add_memory_map_dead(goto_programt &program);
+
 protected:
   void add_declarations(const std::string &decl_string);
   void update_fn_call(
@@ -50,6 +53,9 @@ protected:
   std::string memmap_name;
   std::string requires_fn_name;
   std::string ensures_fn_name;
+  symbolt memmap_symbol;
+
+  array_typet get_memmap_type();
 };
 
 class is_fresh_enforcet : public is_fresh_baset

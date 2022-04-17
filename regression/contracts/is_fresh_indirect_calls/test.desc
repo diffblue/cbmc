@@ -1,0 +1,24 @@
+CORE
+main.c
+--replace-call-with-contract foo
+^\[foo.assigns.\d+\].*Check that a\[.*0\] is valid: SUCCESS$
+^\[main.assertion.\d+\].*c is rw_ok: SUCCESS$
+^\[main.assertion.\d+\].*c and a are distinct: SUCCESS$
+^\[main.assertion.\d+\].*c and b are distinct: SUCCESS$
+^\[main.assertion.\d+\].*d is rw_ok: SUCCESS$
+^\[main.assertion.\d+\].*d and a are distinct: SUCCESS$
+^\[main.assertion.\d+\].*d and b are distinct: SUCCESS$
+^\[main.assertion.\d+\].*d and c distinct: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that the interpretation of is_fresh predicates is 
+local to a call. `bar` is called twice with the same arguments.
+`bar` calls `foo` so `foo` also gets called twice with the same arguments.
+The is_fresh preconditions of `foo` are checked and satisfied independently
+for each call.
+This shows that the memory_map which keeps track of objects seen by the 
+is_fresh predicates and the input and output of a function call is local to
+that function call.
