@@ -3,8 +3,7 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: assigns clause target must be an lvalue or __CPROVER_POINTER_OBJECT expression$
-^.*error: side-effects not allowed in assigns clause targets$
+^.*error: function calls in assigns clause targets must be to __CPROVER_object_from, __CPROVER_object_slice$
 ^CONVERSION ERROR$
 --
 --

@@ -1,0 +1,32 @@
+CORE
+main-enforce.c
+--enforce-contract foo
+^\[foo.assigns.\d+\].* Check that __CPROVER_object_slice\(\(void \*\)s->arr1, \(.*\)5\) is valid: SUCCESS$
+^\[foo.assigns.\d+\].* Check that __CPROVER_object_from\(\(void \*\)\(s->arr2 \+ \(.*\)5\)\) is valid: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)0\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)1\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)2\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)3\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)4\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)5\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)6\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)7\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)8\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)9\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)1\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)2\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)3\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)4\] is assignable: FAILURE$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)5\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)6\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)7\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)8\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)9\] is assignable: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that assigns clause checking of slice expressions works as expected when 
+enforcing a contract.

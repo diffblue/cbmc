@@ -86,6 +86,16 @@ private:
   /// DEAD __car_ub
   /// ```
   ///
+  /// Generates these instructions for an object slice target:
+  /// ```
+  /// IF !__car_writable GOTO skip_target
+  /// __CPROVER_havoc_slize(__car_lb, car.target_size)
+  /// skip_target: SKIP
+  /// DEAD __car_writable
+  /// DEAD __car_lb
+  /// DEAD __car_ub
+  /// ```
+  ///
   /// And generate these instructions otherwise:
   ///
   /// ```

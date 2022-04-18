@@ -478,10 +478,51 @@ car_exprt instrument_spec_assignst::create_car_expr(
       minus_exprt(
         typecast_exprt::conditional_cast(arg, pointer_type(char_type())),
         pointer_offset(arg)),
-      typecast_exprt::conditional_cast(object_size(arg), signed_size_type()),
+      typecast_exprt::conditional_cast(object_size(arg), size_type()),
       valid_var,
       lower_bound_var,
-      upper_bound_var};
+      upper_bound_var,
+      car_havoc_methodt::HAVOC_OBJECT};
+  }
+  else if(can_cast_expr<side_effect_expr_function_callt>(target))
+  {
+    const auto &funcall = to_side_effect_expr_function_call(target);
+    if(can_cast_expr<symbol_exprt>(funcall.function()))
+    {
+      const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
+      if(ident == CPROVER_PREFIX "object_from")
+      {
+        const auto &ptr = funcall.arguments().at(0);
+        return {
+          condition,
+          target,
+          typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+          typecast_exprt::conditional_cast(
+            minus_exprt{
+              typecast_exprt::conditional_cast(
+                object_size(ptr), signed_size_type()),
+              pointer_offset(ptr)},
+            size_type()),
+          valid_var,
+          lower_bound_var,
+          upper_bound_var,
+          car_havoc_methodt::HAVOC_SLICE};
+      }
+      if(ident == CPROVER_PREFIX "object_slice")
+      {
+        const auto &ptr = funcall.arguments().at(0);
+        const auto &size = funcall.arguments().at(1);
+        return {
+          condition,
+          target,
+          typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+          typecast_exprt::conditional_cast(size, size_type()),
+          valid_var,
+          lower_bound_var,
+          upper_bound_var,
+          car_havoc_methodt::HAVOC_SLICE};
+      }
+    }
   }
   else if(is_assignable(target))
   {
@@ -491,15 +532,17 @@ car_exprt instrument_spec_assignst::create_car_expr(
       size.has_value(),
       "no definite size for lvalue target:\n" + target.pretty());
 
-    return {condition,
-            target,
-            typecast_exprt::conditional_cast(
-              address_of_exprt{target}, pointer_type(char_type())),
-            typecast_exprt::conditional_cast(size.value(), signed_size_type()),
-            valid_var,
-            lower_bound_var,
-            upper_bound_var};
-  };
+    return {
+      condition,
+      target,
+      typecast_exprt::conditional_cast(
+        address_of_exprt{target}, pointer_type(char_type())),
+      typecast_exprt::conditional_cast(size.value(), size_type()),
+      valid_var,
+      lower_bound_var,
+      upper_bound_var,
+      car_havoc_methodt::NONDET_ASSIGN};
+  }
 
   UNREACHABLE;
 }

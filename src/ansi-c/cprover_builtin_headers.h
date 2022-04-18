@@ -122,4 +122,8 @@ __CPROVER_bool __CPROVER_overflow_unary_minus();
 
 // enumerations
 __CPROVER_bool __CPROVER_enum_is_in_range();
+
+// contracts
+__CPROVER_size_t __CPROVER_object_from(void *); 
+__CPROVER_size_t __CPROVER_object_slice(void *, __CPROVER_size_t);
 // clang-format on

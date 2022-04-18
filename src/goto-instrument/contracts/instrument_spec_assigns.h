@@ -57,6 +57,14 @@ public:
   }
 };
 
+/// method to use to havoc a target
+enum class car_havoc_methodt
+{
+  HAVOC_OBJECT,
+  HAVOC_SLICE,
+  NONDET_ASSIGN
+};
+
 /// Class that represents a normalized conditional address range, with:
 /// - condition expression
 /// - target expression
@@ -73,7 +81,8 @@ public:
     const exprt &_target_size,
     const symbol_exprt &_validity_var,
     const symbol_exprt &_lower_bound_var,
-    const symbol_exprt &_upper_bound_var)
+    const symbol_exprt &_upper_bound_var,
+    const car_havoc_methodt _havoc_method)
     : exprt(
         irep_idt{},
         typet{},
@@ -83,10 +92,14 @@ public:
          _target_size,
          _validity_var,
          _lower_bound_var,
-         _upper_bound_var})
+         _upper_bound_var}),
+      havoc_method(_havoc_method)
   {
     add_source_location() = _target.source_location();
   }
+
+  /// Method to use to havod the target
+  const car_havoc_methodt havoc_method;
 
   /// Condition expression. When this condition holds the target is allowed
   const exprt &condition() const

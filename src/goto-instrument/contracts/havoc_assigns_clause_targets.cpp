@@ -79,7 +79,7 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
   dest.add(goto_programt::make_goto(
     skip_target, not_exprt{car.valid_var()}, source_location_no_checks));
 
-  if(car.target().id() == ID_pointer_object)
+  if(car.havoc_method == car_havoc_methodt::HAVOC_OBJECT)
   {
     // OTHER __CPROVER_havoc_object(target_snapshot_var)
     codet code(ID_havoc_object, {car.lower_bound_var()});
@@ -87,8 +87,22 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
       dest.add(goto_programt::make_other(code, source_location));
     inst->source_location_nonconst().set_comment(tracking_comment);
   }
-  else
+  else if(car.havoc_method == car_havoc_methodt::HAVOC_SLICE)
   {
+    // This is a slice target. We use goto convert's do_havoc_slice()
+    // code generation, provided by cleanert.
+    cleanert cleaner(st, log.get_message_handler());
+    const auto &mode = st.lookup_ref(function_id).mode;
+    const auto &funcall = to_side_effect_expr_function_call(car.target());
+    const auto &function = to_symbol_expr(funcall.function());
+    exprt::operandst arguments;
+    arguments.push_back(car.lower_bound_var());
+    arguments.push_back(car.target_size());
+    cleaner.do_havoc_slice(function, arguments, dest, mode);
+  }
+  else if(car.havoc_method == car_havoc_methodt::NONDET_ASSIGN)
+  {
+    // a target where the size is derived from the type of the target
     // ASSIGN *(target.type() *)__car_lb = nondet(car.target().type())
     const auto &target_type = car.target().type();
     side_effect_expr_nondett nondet(target_type, source_location);
@@ -98,6 +112,10 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
       nondet,
       source_location));
     inst->source_location_nonconst().set_comment(tracking_comment);
+  }
+  else
+  {
+    UNREACHABLE;
   }
 
   dest.destructive_append(skip_program);

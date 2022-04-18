@@ -1,0 +1,34 @@
+CORE
+main-replace.c
+--replace-call-with-contract foo
+^\[main.assertion.\d+\].*assertion s.a == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)0\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)1\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)2\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)3\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)4\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)5\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)6\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)7\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)8\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)9\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion s.b == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)0\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)1\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)2\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)3\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)4\] == 0: SUCCESS$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)5\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)6\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)7\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)8\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion \(.*\)s.arr2\[\(.*\)9\] == 0: FAILURE$
+^\[main.assertion.\d+\].*assertion s.c == 0: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that havocking of slice expressions works as expected when 
+replacing a call by a contract. We manually express frame conditions as 
+assertions in the main function.
