@@ -5,6 +5,8 @@ int foo()
 
 int bar();
 
+static void foobar2();
+
 static void foobar1()
 {
 }

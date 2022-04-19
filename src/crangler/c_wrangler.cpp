@@ -368,7 +368,7 @@ static void mangle_function(
   const c_wranglert::functiont &function_config,
   std::ostream &out)
 {
-  if(function_config.stub.has_value())
+  if(function_config.stub.has_value() && declaration.has_body())
   {
     // replace by stub
     out << function_config.stub.value();
@@ -398,6 +398,13 @@ static void mangle_function(
       out << t.text;
     for(auto &t : declaration.post_declarator)
       out << t.text;
+
+    if(!declaration.has_body())
+    {
+      for(auto &t : declaration.initializer)
+        out << t.text;
+      return;
+    }
 
     for(const auto &entry : function_config.contract)
       out << ' ' << CPROVER_PREFIX << entry.clause << '('
@@ -498,8 +505,7 @@ static void mangle(
   std::ostream &out)
 {
   auto name_opt = declaration.declared_identifier();
-  if(
-    declaration.is_function() && name_opt.has_value() && declaration.has_body())
+  if(declaration.is_function() && name_opt.has_value())
   {
     for(const auto &entry : config.functions)
     {

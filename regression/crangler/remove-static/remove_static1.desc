@@ -6,3 +6,4 @@ remove_static1.json
 ^EXIT=0$
 ^SIGNAL=0$
 --
+static\s+(void\s+)?foobar[12]\(\)$
