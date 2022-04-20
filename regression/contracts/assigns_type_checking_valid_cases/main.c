@@ -41,6 +41,8 @@ void foo4(int a, int *b, int *c) __CPROVER_requires(c != NULL)
 
 void foo5(struct buf buffer) __CPROVER_assigns()
 {
+  // these are assignments to the function parameter which is a local symbol
+  // and should not generate checks
   buffer.data = NULL;
   buffer.len = 0;
 }

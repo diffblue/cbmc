@@ -11,6 +11,7 @@ Date: September 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 
+// clang-format off
 #include <vector>
 
 #include <analyses/dirty.h>
@@ -22,7 +23,9 @@ Date: September 2021
 #include <goto-programs/goto_model.h>
 
 #include <util/expr_cast.h>
+#include <util/byte_operators.h>
 #include <util/message.h>
+// clang-format on
 
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
@@ -188,6 +191,65 @@ public:
   {
     const auto &symbol = ns.lookup(ident);
     return locals.is_local(ident) || symbol.is_parameter;
+  }
+
+  /// Returns true iff `expr` is an access to a locally declared symbol
+  /// or parameter symbol, without any dereference/address_of operations.
+  bool is_local_composite_access(const exprt &expr) const
+  {
+    // case-splitting on the lhs structure copied from symex_assignt::assign_rec
+    if(expr.id() == ID_symbol)
+    {
+      return is_local(to_symbol_expr(expr).get_identifier());
+    }
+    else if(expr.id() == ID_index)
+    {
+      return is_local_composite_access(to_index_expr(expr).array());
+    }
+    else if(expr.id() == ID_member)
+    {
+      const typet &type = to_member_expr(expr).struct_op().type();
+      if(
+        type.id() == ID_struct || type.id() == ID_struct_tag ||
+        type.id() == ID_union || type.id() == ID_union_tag)
+      {
+        return is_local_composite_access(to_member_expr(expr).compound());
+      }
+      else
+      {
+        throw unsupported_operation_exceptiont(
+          "is_local_composite_access: unexpected assignment to member of '" +
+          type.id_string() + "'");
+      }
+    }
+    else if(expr.id() == ID_if)
+    {
+      return is_local_composite_access(to_if_expr(expr).true_case()) &&
+             is_local_composite_access(to_if_expr(expr).false_case());
+    }
+    else if(expr.id() == ID_typecast)
+    {
+      return is_local_composite_access(to_typecast_expr(expr).op());
+    }
+    else if(
+      expr.id() == ID_byte_extract_little_endian ||
+      expr.id() == ID_byte_extract_big_endian)
+    {
+      return is_local_composite_access(to_byte_extract_expr(expr).op());
+    }
+    else if(expr.id() == ID_complex_real)
+    {
+      return is_local_composite_access(to_complex_real_expr(expr).op());
+    }
+    else if(expr.id() == ID_complex_imag)
+    {
+      return is_local_composite_access(to_complex_imag_expr(expr).op());
+    }
+    else
+    {
+      // matches ID_address_of, ID_dereference, etc.
+      return false;
+    }
   }
 
   /// returns the current target instruction

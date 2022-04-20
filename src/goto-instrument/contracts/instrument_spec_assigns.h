@@ -574,23 +574,29 @@ protected:
     const car_exprt &freed_car,
     goto_programt &dest) const;
 
-  /// Returns true iff a `DECL x` must be added to the local write set.
-  ///
-  /// A variable is called 'dirty' if its address gets taken at some point in
-  /// the program.
-  ///
-  /// Assuming the goto program is obtained from a structured C program that
-  /// passed C compiler checks, non-dirty variables can only be assigned to
-  /// directly by name, cannot escape their lexical scope, and are always safe
-  /// to assign. Hence, we only track dirty variables in the write set.
+  /// Returns true iff a `DECL x` must be explicitly added to the write set.
+  /// @see must_track_decl_or_dead.
   bool must_track_decl(
     const goto_programt::const_targett &target,
     const optionalt<cfg_infot> &cfg_info_opt) const;
 
-  /// Returns true iff a `DEAD x` must be processed to update the local write
-  /// set. The conditions are the same than for tracking a `DECL x` instruction.
+  /// Returns true iff a `DEAD x` must be processed to update the write set.
+  /// @see must_track_decl_or_dead.
   bool must_track_dead(
     const goto_programt::const_targett &target,
+    const optionalt<cfg_infot> &cfg_info_opt) const;
+
+  /// \brief Returns true iff a function-local symbol must be tracked.
+  ///
+  /// A local is called 'dirty' if its address gets taken at some point in
+  /// the program.
+  ///
+  /// Assuming the goto program is obtained from a structured C program that
+  /// passed C compiler checks, non-dirty locals can only be assigned to
+  /// directly by name, cannot escape their lexical scope, and are always safe
+  /// to assign. Hence, we only track dirty locals in the write set.
+  bool must_track_decl_or_dead(
+    const irep_idt &ident,
     const optionalt<cfg_infot> &cfg_info_opt) const;
 
   /// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.

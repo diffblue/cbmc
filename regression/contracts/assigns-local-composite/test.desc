@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that assigns clause checking explicitly checks assignments to locally 
+declared symbols with composite types, when they are dirty.
+Out of bounds accesses to locally declared arrays, structs, etc. 
+will be detected by assigns clause checking.
