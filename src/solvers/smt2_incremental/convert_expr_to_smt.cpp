@@ -1166,6 +1166,27 @@ static smt_termt convert_expr_to_smt(
 }
 
 static smt_termt convert_expr_to_smt(
+  const pointer_offset_exprt &pointer_offset,
+  const sub_expression_mapt &converted)
+{
+  const auto type =
+    type_try_dynamic_cast<bitvector_typet>(pointer_offset.type());
+  INVARIANT(type, "Pointer offset should have a bitvector-based type.");
+  const auto converted_expr = converted.at(pointer_offset.pointer());
+  const std::size_t width = type->get_width();
+  std::size_t offset_bits = width - config.bv_encoding.object_bits;
+  if(offset_bits > width)
+    offset_bits = width;
+  const auto extract_op =
+    smt_bit_vector_theoryt::extract(offset_bits - 1, 0)(converted_expr);
+  if(width > offset_bits)
+  {
+    return smt_bit_vector_theoryt::zero_extend(width - offset_bits)(extract_op);
+  }
+  return extract_op;
+}
+
+static smt_termt convert_expr_to_smt(
   const shl_overflow_exprt &shl_overflow,
   const sub_expression_mapt &converted)
 {
@@ -1456,11 +1477,12 @@ static smt_termt dispatch_expr_to_smt_conversion(
   {
     return convert_expr_to_smt(*member_extraction, converted);
   }
-#if 0
-  else if(expr.id()==ID_pointer_offset)
+  else if(
+    const auto pointer_offset =
+      expr_try_dynamic_cast<pointer_offset_exprt>(expr))
   {
+    return convert_expr_to_smt(*pointer_offset, converted);
   }
-#endif
   else if(
     const auto pointer_object =
       expr_try_dynamic_cast<pointer_object_exprt>(expr))
