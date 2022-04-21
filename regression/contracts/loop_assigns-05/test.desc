@@ -7,7 +7,6 @@ main.c
 ^\[body_2.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
 ^\[body_3.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
 ^\[incr.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
-^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
 ^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main.assertion.\d+\] .* assertion j == 9: SUCCESS$

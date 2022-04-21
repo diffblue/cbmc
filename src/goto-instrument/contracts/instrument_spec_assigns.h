@@ -444,12 +444,25 @@ public:
     optionalt<cfg_infot> &cfg_info_opt,
     goto_programt &dest);
 
+  /// Instruments a sequence of instructions with inclusion checks.
+  ///   If `pred` is not provided,
+  ///     then all instructions are instrumented.
+  ///   If `pred` is provided,
+  ///     then only the instructions that satisfy pred are instrumented.
+  ///
+  /// \param body goto program containing the instructions
+  /// \param instruction_it target to the first instruction of the sequence
+  /// \param instruction_end target to the last instruction of the sequence
+  /// \param skip_function_params the argument to the free operator
+  /// \param cfg_info_opt allows target set pruning if available
+  /// \param pred a predicate on targets to check if they should be instrumented
   void instrument_instructions(
     goto_programt &body,
     goto_programt::targett instruction_it,
     const goto_programt::targett &instruction_end,
     skip_function_paramst skip_function_params,
-    optionalt<cfg_infot> &cfg_info_opt);
+    optionalt<cfg_infot> &cfg_info_opt,
+    const std::function<bool(const goto_programt::targett &)> &pred = {});
 
   /// Inserts the detected static local symbols into a target container.
   /// \tparam C The type of the target container

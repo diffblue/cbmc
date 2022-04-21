@@ -1,0 +1,25 @@
+CORE
+main.c
+--apply-loop-contracts
+^\[main\.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] line \d+ Check that loop instrumentation was not truncated: SUCCESS$
+^\[main\.assigns\.\d+\] line \d+ Check that i is valid: SUCCESS$
+^\[main\.assigns\.\d+\] line \d+ Check that i is assignable: SUCCESS$
+^\[main\.assigns\.\d+\] line \d+ Check that sum_to_k is valid: SUCCESS$
+^\[main\.assigns\.\d+\] line \d+ Check that sum_to_k is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+^\[main\.assigns\.\d+\] line \d+ Check that flag is assignable: .*$
+--
+This test checks that we only instrument instructions contained within
+the computed natural loops. In a previous commit, an exception was added to
+ensure this and it was triggered whenever an instruction within [head,end]
+of a loop was not contained within the computed natural loop's "contents".
+In this commit, we remove the exception and instead mask out such instructions.
+
+The statement
+  flag = true;
+in main.c generates such an assignment instruction.
+We have added a negative regex to ensure that this instruction is not instrumented.

@@ -314,12 +314,15 @@ void instrument_spec_assignst::instrument_instructions(
   goto_programt::targett instruction_it,
   const goto_programt::targett &instruction_end,
   skip_function_paramst skip_function_params,
-  optionalt<cfg_infot> &cfg_info_opt)
+  optionalt<cfg_infot> &cfg_info_opt,
+  const std::function<bool(const goto_programt::targett &)> &pred)
 {
   while(instruction_it != instruction_end)
   {
     // Skip instructions marked as disabled for assigns clause checking
-    if(has_disable_assigns_check_pragma(instruction_it))
+    if(
+      has_disable_assigns_check_pragma(instruction_it) ||
+      (pred && !pred(instruction_it)))
     {
       instruction_it++;
       if(cfg_info_opt.has_value())
@@ -541,7 +544,7 @@ exprt instrument_spec_assignst::target_validity_expr(
   // the target's `start_address` pointer satisfies w_ok with the expected size
   // (or is NULL if we allow it explicitly).
   // This assertion will be falsified whenever `start_address` is invalid or
-  // not of the right size (or is NULL if we dot not allow it expliclitly).
+  // not of the right size (or is NULL if we do not allow it explicitly).
   auto result =
     or_exprt{not_exprt{car.condition()},
              w_ok_exprt{car.target_start_address(), car.target_size()}};

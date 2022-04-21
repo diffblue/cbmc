@@ -449,7 +449,8 @@ void code_contractst::check_apply_loop_contracts(
     loop_end,
     skip_function_paramst::NO,
     // do not use CFG info for now
-    cfg_empty_info);
+    cfg_empty_info,
+    [&loop](const goto_programt::targett &t) { return loop.contains(t); });
 
   // Now we begin instrumenting at the loop_end.
   // `pre_loop_end_instrs` are to be inserted before `loop_end`.
@@ -1081,11 +1082,9 @@ void code_contractst::apply_loop_contract(
     // By definition the `loop_content` is a set of instructions computed
     // by `natural_loops` based on the CFG.
     // Since we perform assigns clause instrumentation by sequentially
-    // traversing instructions from `loop_head` to `loop_end`, here check that:
-    // 1. All instructions in `loop_content` are contained within the
-    //    [loop_head, loop_end] iterator range
-    // 2. All instructions in the [loop_head, loop_end] range are contained
-    //    in the `loop_content` set, except for the exceptions explained below.
+    // traversing instructions from `loop_head` to `loop_end`,
+    // here we ensure that all instructions in `loop_content` belong within
+    // the [loop_head, loop_end] target range
 
     // Check 1. (i \in loop_content) ==> loop_head <= i <= loop_end
     for(const auto &i : loop_content)
@@ -1099,49 +1098,6 @@ void code_contractst::apply_loop_contract(
           ns, function_name, log.error(), *i);
         throw 0;
       }
-    }
-
-    // Check 2. (loop_head <= i <= loop_end) ==> (i \in loop_content)
-    //
-    // We allow the following exceptions in this check:
-    // - `SKIP` or `LOCATION` instructions which are no-op
-    // - `ASSUME(false)` instructions which are introduced by function pointer
-    //    or nested loop transformations, and have no successor instructions
-    // - `SET_RETURN_VALUE` instructions followed by an uninterrupted sequence
-    //    of `DEAD` instructions and a `GOTO` jump out of the loop,
-    //    which model C `return` statements.
-    // - `GOTO` jumps out of the loops, which model C `break` statements.
-    // These instructions are allowed to be missing from `loop_content`,
-    // and may be safely ignored for the purpose of our instrumentation.
-    for(auto i = loop_head; i != loop_end; ++i)
-    {
-      if(loop_content.contains(i))
-        continue;
-
-      if(i->is_skip() || i->is_location())
-        continue;
-
-      if(i->is_goto() && !loop_content.contains(i->get_target()))
-        continue;
-
-      if(i->is_assume() && i->get_condition().is_false())
-        continue;
-
-      if(i->is_set_return_value())
-      {
-        do
-          i++;
-        while(i != loop_end && i->is_dead());
-
-        // because we increment `i` in the outer `for` loop
-        i--;
-        continue;
-      }
-
-      log.error() << "Computed loop at: " << loop_head->source_location()
-                  << "is missing an instruction:" << messaget::eom;
-      goto_function.body.output_instruction(ns, function_name, log.error(), *i);
-      throw 0;
     }
   }
 
@@ -1205,13 +1161,22 @@ void code_contractst::apply_loop_contract(
       loop_node.decreases_clause.is_nil())
       continue;
 
+    // Computed loop "contents" needs to be refreshed to include any newly
+    // introduced instrumentation, e.g. havoc instructions for assigns clause,
+    // on inner loops in to the outer loop's contents.
+    // Else, during the outer loop instrumentation these instructions will be
+    // "masked" just as any other instruction not within its "contents."
+
+    goto_functions.update();
+    natural_loops_mutablet updated_loops(goto_function.body);
+
     check_apply_loop_contracts(
       function_name,
       goto_function,
       local_may_alias,
       loop_node.head_target,
       loop_node.end_target,
-      loop_node.content,
+      updated_loops.loop_map[loop_node.head_target],
       loop_node.assigns_clause,
       loop_node.invariant,
       loop_node.decreases_clause,
