@@ -302,6 +302,7 @@ bool generate_ansi_c_start_function(
       }
 
       const symbolt &argv_symbol=ns.lookup("argv'");
+      const array_typet &argv_array_type = to_array_type(argv_symbol.type);
 
       {
         // Assume argc is at least zero. Note that we don't assume it's
@@ -405,10 +406,12 @@ bool generate_ansi_c_start_function(
       {
         // assign argv[argc] to NULL
         const null_pointer_exprt null(
-          to_pointer_type(to_array_type(argv_symbol.type).element_type()));
+          to_pointer_type(argv_array_type.element_type()));
 
         index_exprt index_expr(
-          argv_symbol.symbol_expr(), argc_symbol.symbol_expr());
+          argv_symbol.symbol_expr(),
+          typecast_exprt::conditional_cast(
+            argc_symbol.symbol_expr(), argv_array_type.index_type()));
 
         init_code.add(code_frontend_assignt(index_expr, null));
         // disable bounds check on that one
@@ -419,14 +422,17 @@ bool generate_ansi_c_start_function(
       if(parameters.size()==3)
       {
         const symbolt &envp_symbol=ns.lookup("envp'");
+        const array_typet &envp_array_type = to_array_type(envp_symbol.type);
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp[envp_size] is NULL
         null_pointer_exprt null(
-          to_pointer_type(to_array_type(envp_symbol.type).element_type()));
+          to_pointer_type(envp_array_type.element_type()));
 
         index_exprt index_expr(
-          envp_symbol.symbol_expr(), envp_size_symbol.symbol_expr());
+          envp_symbol.symbol_expr(),
+          typecast_exprt::conditional_cast(
+            envp_size_symbol.symbol_expr(), envp_array_type.index_type()));
 
         equal_exprt is_null(std::move(index_expr), std::move(null));
 
@@ -452,7 +458,8 @@ bool generate_ansi_c_start_function(
 
         {
           index_exprt index_expr(
-            argv_symbol.symbol_expr(), from_integer(0, c_index_type()));
+            argv_symbol.symbol_expr(),
+            from_integer(0, argv_array_type.index_type()));
           // disable bounds check on that one
           index_expr.add_source_location().add_pragma("disable:bounds-check");
 
@@ -467,9 +474,11 @@ bool generate_ansi_c_start_function(
         if(parameters.size()==3)
         {
           const symbolt &envp_symbol=ns.lookup("envp'");
+          const array_typet &envp_array_type = to_array_type(envp_symbol.type);
 
           index_exprt index_expr(
-            envp_symbol.symbol_expr(), from_integer(0, c_index_type()));
+            envp_symbol.symbol_expr(),
+            from_integer(0, envp_array_type.index_type()));
 
           const pointer_typet &pointer_type =
             to_pointer_type(parameters[2].type());
