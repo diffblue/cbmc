@@ -1,11 +1,12 @@
-*.cpp text
-*.c text
-*.h text
+*.cpp text diff=cpp
+*.c text diff=cpp
+*.h text diff=cpp
 *.y text
 *.tex text
 *.shtml text
 *.html text
 *.css text
 *.inc text
-test.desc text
+*.desc text
+*.md text
 Makefile text
