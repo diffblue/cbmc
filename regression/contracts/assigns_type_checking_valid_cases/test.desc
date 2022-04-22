@@ -8,8 +8,6 @@ main.c
 ^\[foo3.assigns.\d+\] line \d+ Check that y is assignable: SUCCESS$
 ^\[foo4.assigns.\d+\] line \d+ Check that \*c is assignable: SUCCESS$
 ^\[foo4.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[foo5.assigns.\d+\] line \d+ Check that buffer.data is assignable: SUCCESS$
-^\[foo5.assigns.\d+\] line \d+ Check that buffer.len is assignable: SUCCESS$
 ^\[foo6.assigns.\d+\] line \d+ Check that \*buffer->data is assignable: SUCCESS$
 ^\[foo6.assigns.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
 ^\[foo7.assigns.\d+\] line \d+ Check that \*buffer->data is assignable: SUCCESS$

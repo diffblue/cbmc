@@ -25,6 +25,9 @@ Date: January 2022
 
 #include "utils.h"
 
+/// header for log messages
+static const char LOG_HEADER[] = "assigns clause checking: ";
+
 /// Pragma used to mark assignments to static locals that need to be propagated
 static const char PROPAGATE_STATIC_LOCAL_PRAGMA[] =
   "contracts:propagate-static-local";
@@ -694,8 +697,9 @@ exprt instrument_spec_assignst::inclusion_check_full(
   }
 
   if(allow_null_lhs)
-    return or_exprt{null_pointer(car.target_start_address()),
-                    and_exprt{car.valid_var(), disjunction(disjuncts)}};
+    return or_exprt{
+      null_pointer(car.target_start_address()),
+      and_exprt{car.valid_var(), disjunction(disjuncts)}};
   else
     return and_exprt{car.valid_var(), disjunction(disjuncts)};
 }
@@ -716,6 +720,8 @@ const car_exprt &instrument_spec_assignst::create_car_from_spec_assigns(
   }
   else
   {
+    log.debug() << LOG_HEADER << "creating CAR for assigns clause target "
+                << format(condition) << ": " << format(target) << messaget::eom;
     from_spec_assigns.insert({key, create_car_expr(condition, target)});
     return from_spec_assigns.find(key)->second;
   }
@@ -734,6 +740,8 @@ const car_exprt &instrument_spec_assignst::create_car_from_stack_alloc(
   }
   else
   {
+    log.debug() << LOG_HEADER << "creating CAR for stack-allocated target "
+                << format(target) << messaget::eom;
     from_stack_alloc.insert({target, create_car_expr(true_exprt{}, target)});
     return from_stack_alloc.find(target)->second;
   }
@@ -752,6 +760,8 @@ instrument_spec_assignst::create_car_from_heap_alloc(const exprt &target)
   }
   else
   {
+    log.debug() << LOG_HEADER << "creating CAR for heap-allocated target "
+                << format(target) << messaget::eom;
     from_heap_alloc.insert({target, create_car_expr(true_exprt{}, target)});
     return from_heap_alloc.find(target)->second;
   }
@@ -770,6 +780,8 @@ const car_exprt &instrument_spec_assignst::create_car_from_static_local(
   }
   else
   {
+    log.debug() << LOG_HEADER << "creating CAR for static local target "
+                << format(target) << messaget::eom;
     from_static_local.insert({target, create_car_expr(true_exprt{}, target)});
     return from_static_local.find(target)->second;
   }
@@ -809,44 +821,107 @@ bool instrument_spec_assignst::must_check_assign(
   skip_function_paramst skip_function_params,
   const optionalt<cfg_infot> cfg_info_opt)
 {
-  if(
-    const auto &symbol_expr =
-      expr_try_dynamic_cast<symbol_exprt>(target->assign_lhs()))
+  log.debug().source_location = target->source_location();
+
+  if(can_cast_expr<symbol_exprt>(target->assign_lhs()))
   {
+    const auto &symbol_expr = to_symbol_expr(target->assign_lhs());
     if(
       skip_function_params == skip_function_paramst::NO &&
-      ns.lookup(symbol_expr->get_identifier()).is_parameter)
+      ns.lookup(symbol_expr.get_identifier()).is_parameter)
     {
+      log.debug() << LOG_HEADER << "checking assignment to function parameter "
+                  << format(symbol_expr) << messaget::eom;
       return true;
     }
 
     if(cfg_info_opt.has_value())
-      return !cfg_info_opt.value().is_local(symbol_expr->get_identifier());
+    {
+      if(cfg_info_opt.value().is_local(symbol_expr.get_identifier()))
+      {
+        log.debug() << LOG_HEADER
+                    << "skipping checking on assignment to local symbol "
+                    << format(symbol_expr) << messaget::eom;
+        return false;
+      }
+      else
+      {
+        log.debug() << LOG_HEADER << "checking assignment to non-local symbol "
+                    << format(symbol_expr) << messaget::eom;
+        return true;
+      }
+    }
+    log.debug() << LOG_HEADER << "checking assignment to symbol "
+                << format(symbol_expr) << messaget::eom;
+    return true;
   }
-
-  return true;
+  else
+  {
+    // This is not a mere symbol.
+    // Since non-dirty locals are not tracked explicitly in the write set,
+    // we need to skip the check if we can verify that the expression describes
+    // an access to a non-dirty local symbol or an input parameter,
+    // otherwise the check will fail.
+    // In addition, the expression shall not contain address_of or dereference
+    // operators, regardless of the base symbol/object on which they apply.
+    // If the expression contains an address_of operation, the assignment gets
+    // checked. If the base object is a local or a parameter, it will also be
+    // flagged as dirty and will be tracked explicitly, and the check will pass.
+    // If the expression contains a dereference operation, the assignment gets
+    // checked. If the dereferenced address was computed from a local object,
+    // from a function parameter or returned by a local malloc,
+    // then the object will be tracked explicitly and the check will pass.
+    // In all other cases (address of a non-local object, or dereference of
+    // a non-locally computed address) the location must be given explicitly
+    // in the assigns clause to be tracked and we must check the assignment.
+    if(
+      cfg_info_opt.has_value() &&
+      cfg_info_opt.value().is_local_composite_access(target->assign_lhs()))
+    {
+      log.debug()
+        << LOG_HEADER
+        << "skipping check on assignment to local composite member expression "
+        << format(target->assign_lhs()) << messaget::eom;
+      return false;
+    }
+    log.debug() << LOG_HEADER << "checking assignment to expression "
+                << format(target->assign_lhs()) << messaget::eom;
+    return true;
+  }
 }
 
-/// Returns true iff a `DECL x` must be added to the local write set.
-///
-/// A variable is called 'dirty' if its address gets taken at some point in
-/// the program.
-///
-/// Assuming the goto program is obtained from a structured C program that
-/// passed C compiler checks, non-dirty variables can only be assigned to
-/// directly by name, cannot escape their lexical scope, and are always safe
-/// to assign. Hence, we only track dirty variables in the write set.
+/// Track the symbol iff we have no cfg_infot, or we have a cfg_infot and the
+/// symbol is not a local or is a dirty local.
+bool instrument_spec_assignst::must_track_decl_or_dead(
+  const irep_idt &ident,
+  const optionalt<cfg_infot> &cfg_info_opt) const
+{
+  return !cfg_info_opt.has_value() ||
+         (cfg_info_opt.has_value() &&
+          cfg_info_opt.value().is_not_local_or_dirty_local(ident));
+}
+
+/// Returns true iff a `DECL x` must be explicitly tracked in the write set.
 bool instrument_spec_assignst::must_track_decl(
   const goto_programt::const_targett &target,
   const optionalt<cfg_infot> &cfg_info_opt) const
 {
-  if(cfg_info_opt.has_value())
+  log.debug().source_location = target->source_location();
+  if(must_track_decl_or_dead(
+       target->decl_symbol().get_identifier(), cfg_info_opt))
   {
-    return cfg_info_opt.value().is_not_local_or_dirty_local(
-      target->decl_symbol().get_identifier());
+    log.debug() << LOG_HEADER << "explicitly tracking "
+                << format(target->decl_symbol()) << " as assignable"
+                << messaget::eom;
+    return true;
   }
-  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
-  return true;
+  else
+  {
+    log.debug() << LOG_HEADER << "implicitly tracking "
+                << format(target->decl_symbol())
+                << " as assignable (non-dirty local)" << messaget::eom;
+    return false;
+  }
 }
 
 /// Returns true iff a `DEAD x` must be processed to upate the local write set.
@@ -855,12 +930,8 @@ bool instrument_spec_assignst::must_track_dead(
   const goto_programt::const_targett &target,
   const optionalt<cfg_infot> &cfg_info_opt) const
 {
-  // Unless proved non-dirty by the CFG analysis we assume it is dirty.
-  if(!cfg_info_opt.has_value())
-    return true;
-
-  return cfg_info_opt.value().is_not_local_or_dirty_local(
-    target->dead_symbol().get_identifier());
+  return must_track_decl_or_dead(
+    target->dead_symbol().get_identifier(), cfg_info_opt);
 }
 
 void instrument_spec_assignst::instrument_assign_statement(
