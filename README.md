@@ -1,5 +1,3 @@
-[![Build Status][codebuild_img]][codebuild]
-[![Build Status][codebuild_windows_img]][codebuild_windows]
 [![Build Status][coverity_img]][coverity]
 [![Build Status][codecov_img]][codecov]
 
