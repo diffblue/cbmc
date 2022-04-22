@@ -117,9 +117,30 @@ public:
     bool record_value,
     bool allow_pointer_unsoundness = false);
 
+  /// Mark \p vars as variables belonging to a binding expression.
+  void push_bound_variables(const std::vector<symbol_exprt> &vars)
+  {
+    for(const auto &var : vars)
+    {
+      bool inserted = bound_variables.insert(var.get_identifier()).second;
+      CHECK_RETURN(inserted);
+    }
+  }
+  /// Remove \p vars from the collection of variables belonging to some binding
+  /// expression.
+  void pop_bound_variables(const std::vector<symbol_exprt> &vars)
+  {
+    for(const auto &var : vars)
+      bound_variables.erase(var.get_identifier());
+  }
+
   field_sensitivityt field_sensitivity;
 
 protected:
+  // This set hold information while (recursively) processing expressions, it is
+  // _not_ copied when copying goto_statet.
+  std::set<irep_idt> bound_variables;
+
   template <levelt>
   void rename_address(exprt &expr, const namespacet &ns);
 

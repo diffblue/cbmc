@@ -750,6 +750,10 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
     // These introduce new symbols, which need to be added to the symbol table
     // before the second operand is typechecked.
 
+    // TODO: we shouldn't actually need full declarations here, and it should be
+    // safe to remove the bound variables from the symbol table after
+    // typechecking the second operand.
+
     auto &binary_expr = to_binary_expr(expr);
     auto &bindings = binary_expr.op0().operands();
 

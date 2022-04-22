@@ -154,10 +154,6 @@ void code_contractst::check_apply_loop_contracts(
   // at the start of and end of a loop body
   std::vector<symbol_exprt> old_decreases_vars, new_decreases_vars;
 
-  replace_symbolt replace;
-  code_contractst::add_quantified_variable(invariant, replace, mode);
-  replace(invariant);
-
   // instrument
   //
   //   ... preamble ...
@@ -566,72 +562,6 @@ void code_contractst::check_apply_loop_contracts(
   }
 }
 
-void code_contractst::add_quantified_variable(
-  const exprt &expression,
-  replace_symbolt &replace,
-  const irep_idt &mode)
-{
-  if(expression.id() == ID_not || expression.id() == ID_typecast)
-  {
-    // For unary connectives, recursively check for
-    // nested quantified formulae in the term
-    const auto &unary_expression = to_unary_expr(expression);
-    add_quantified_variable(unary_expression.op(), replace, mode);
-  }
-  if(expression.id() == ID_notequal || expression.id() == ID_implies)
-  {
-    // For binary connectives, recursively check for
-    // nested quantified formulae in the left and right terms
-    const auto &binary_expression = to_binary_expr(expression);
-    add_quantified_variable(binary_expression.lhs(), replace, mode);
-    add_quantified_variable(binary_expression.rhs(), replace, mode);
-  }
-  if(expression.id() == ID_if)
-  {
-    // For ternary connectives, recursively check for
-    // nested quantified formulae in all three terms
-    const auto &if_expression = to_if_expr(expression);
-    add_quantified_variable(if_expression.cond(), replace, mode);
-    add_quantified_variable(if_expression.true_case(), replace, mode);
-    add_quantified_variable(if_expression.false_case(), replace, mode);
-  }
-  if(expression.id() == ID_and || expression.id() == ID_or)
-  {
-    // For multi-ary connectives, recursively check for
-    // nested quantified formulae in all terms
-    const auto &multi_ary_expression = to_multi_ary_expr(expression);
-    for(const auto &operand : multi_ary_expression.operands())
-    {
-      add_quantified_variable(operand, replace, mode);
-    }
-  }
-  else if(expression.id() == ID_exists || expression.id() == ID_forall)
-  {
-    // When a quantifier expression is found,
-    // for each quantified variable ...
-    const auto &quantifier_expression = to_quantifier_expr(expression);
-    for(const auto &quantified_variable : quantifier_expression.variables())
-    {
-      const auto &quantified_symbol = to_symbol_expr(quantified_variable);
-
-      // 1. create fresh symbol
-      symbolt new_symbol = new_tmp_symbol(
-        quantified_symbol.type(),
-        quantified_symbol.source_location(),
-        mode,
-        symbol_table);
-
-      // 2. add created fresh symbol to expression map
-      symbol_exprt q(
-        quantified_symbol.get_identifier(), quantified_symbol.type());
-      replace.insert(q, new_symbol.symbol_expr());
-
-      // 3. recursively check for nested quantified formulae
-      add_quantified_variable(quantifier_expression.where(), replace, mode);
-    }
-  }
-}
-
 void code_contractst::replace_history_parameter(
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
@@ -831,9 +761,7 @@ void code_contractst::apply_function_contract(
   // Insert assertion of the precondition immediately before the call site.
   if(!requires.is_true())
   {
-    replace_symbolt replace(common_replace);
-    code_contractst::add_quantified_variable(requires, replace, mode);
-    replace(requires);
+    common_replace(requires);
 
     goto_programt assertion;
     converter.goto_convert(code_assertt(requires), assertion, mode);
@@ -852,9 +780,7 @@ void code_contractst::apply_function_contract(
   std::pair<goto_programt, goto_programt> ensures_pair;
   if(!ensures.is_false())
   {
-    replace_symbolt replace(common_replace);
-    code_contractst::add_quantified_variable(ensures, replace, mode);
-    replace(ensures);
+    common_replace(ensures);
 
     auto assumption = code_assumet(ensures);
     ensures_pair =
@@ -1430,12 +1356,7 @@ void code_contractst::add_contract_check(
   // Generate: assume(requires)
   if(!requires.is_false())
   {
-    // extend common_replace with quantified variables in REQUIRES,
-    // and then do the replacement
-    replace_symbolt replace(common_replace);
-    code_contractst::add_quantified_variable(
-      requires, replace, function_symbol.mode);
-    replace(requires);
+    common_replace(requires);
 
     goto_programt assumption;
     converter.goto_convert(
@@ -1450,12 +1371,7 @@ void code_contractst::add_contract_check(
   // Generate: copies for history variables
   if(!ensures.is_true())
   {
-    // extend common_replace with quantified variables in ENSURES,
-    // and then do the replacement
-    replace_symbolt replace(common_replace);
-    code_contractst::add_quantified_variable(
-      ensures, replace, function_symbol.mode);
-    replace(ensures);
+    common_replace(ensures);
 
     // get all the relevant instructions related to history variables
     auto assertion = code_assertt(ensures);

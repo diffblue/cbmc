@@ -259,17 +259,12 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
     (is_assert && expr.id() == ID_forall) ||
     (!is_assert && expr.id() == ID_exists))
   {
-    // for assertions e can rewrite "forall X. P" to "P", and
-    // for assumptions we can rewrite "exists X. P" to "P"
-    // we keep the quantified variable unique by means of L2 renaming
+    // for assertions we can rewrite "forall X. P" to "lambda X. P", and
+    // for assumptions we can rewrite "exists X. P" to "lambda X. P"
     auto &quant_expr = to_quantifier_expr(expr);
-    symbol_exprt tmp0 =
-      to_symbol_expr(to_ssa_expr(quant_expr.symbol()).get_original_expr());
-    symex_decl(state, tmp0);
-    instruction_local_symbols.push_back(tmp0);
-    exprt tmp = quant_expr.where();
-    rewrite_quantifiers(tmp, state);
-    quant_expr.swap(tmp);
+    rewrite_quantifiers(quant_expr.where(), state);
+    lambda_exprt lambda{quant_expr.variables(), quant_expr.where()};
+    expr.swap(lambda);
   }
   else if(expr.id() == ID_or || expr.id() == ID_and)
   {
