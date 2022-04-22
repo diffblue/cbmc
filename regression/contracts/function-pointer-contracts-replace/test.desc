@@ -1,0 +1,14 @@
+CORE
+main.c
+--replace-call-with-contract foo
+^\[precondition.\d+] Assert function pointer 'infun' obeys contract 'contract': SUCCESS$
+^\[main.assertion.\d+].* assertion outfun1 == contract: SUCCESS$
+^\[main.assertion.\d+].* assertion outfun2 == contract: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that, when replacing a call by its contract,
+requires_contract clauses are translated to equality checks
+and that ensures_contract are translated to assignments.
