@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/floatbv_expr.h>
 #include <util/magic.h>
 #include <util/mp_arith.h>
-#include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -258,8 +257,7 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
   {
     exprt counter=from_integer(i, counter_type);
 
-    exprt body = expr.body();
-    replace_expr(expr.arg(), counter, body);
+    exprt body = expr.instantiate({counter});
 
     const bvt &tmp = convert_bv(body);
 
