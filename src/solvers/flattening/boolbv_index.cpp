@@ -36,9 +36,6 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
     std::size_t width=boolbv_width(expr.type());
 
-    if(width==0)
-      return conversion_failed(expr);
-
     // see if the array size is constant
 
     if(is_unbounded_array(array_type))
@@ -289,9 +286,6 @@ bvt boolbvt::convert_index(
   const array_typet &array_type = to_array_type(array.type());
 
   std::size_t width = boolbv_width(array_type.element_type());
-
-  if(width==0)
-    return conversion_failed(array);
 
   // TODO: If the underlying array can use one of the
   // improvements given above then it may be better to use
