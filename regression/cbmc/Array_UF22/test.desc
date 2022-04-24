@@ -1,0 +1,10 @@
+KNOWNBUG broken-smt-backend
+main.c
+--arrays-uf-always --no-propagation
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test demonstrates the need for implementing the extensionality rule.
