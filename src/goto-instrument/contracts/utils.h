@@ -281,6 +281,15 @@ public:
   {
     goto_convertt::clean_expr(guard, dest, mode, true);
   }
+
+  void do_havoc_slice(
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode)
+  {
+    goto_convertt::do_havoc_slice(nil_exprt{}, function, arguments, dest, mode);
+  }
 };
 
 /// Returns an \ref irep_idt that essentially says that

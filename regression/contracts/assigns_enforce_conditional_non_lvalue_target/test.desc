@@ -1,7 +1,7 @@
 CORE
 main.c
 --enforce-contract foo
-^.*error: assigns clause target must be an lvalue or __CPROVER_POINTER_OBJECT expression$
+^.*error: assigns clause target must be an lvalue or a __CPROVER_POINTER_OBJECT, __CPROVER_object_from, __CPROVER_object_slice expression$
 ^CONVERSION ERROR
 ^EXIT=(1|64)$
 ^SIGNAL=0$

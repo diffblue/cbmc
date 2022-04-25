@@ -909,44 +909,80 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
   typecheck_expr(target);
 
   // fatal errors
-  bool must_throw = false;
   if(target.type().id() == ID_empty)
   {
-    must_throw = true;
     error().source_location = target.source_location();
     error() << "void-typed expressions not allowed as assigns clause targets"
             << eom;
-  }
-
-  if(!target.get_bool(ID_C_lvalue) && target.id() != ID_pointer_object)
-  {
-    must_throw = true;
-    error().source_location = target.source_location();
-    error() << "assigns clause target must be an lvalue or " CPROVER_PREFIX
-               "POINTER_OBJECT expression"
-            << eom;
-  }
-
-  // Remark: an expression can be an lvalue and still contain side effects
-  // or ternary expressions. We detect them in a second step.
-  if(has_subexpr(target, ID_side_effect))
-  {
-    must_throw = true;
-    error().source_location = target.source_location();
-    error() << "side-effects not allowed in assigns clause targets" << eom;
-  }
-
-  if(has_subexpr(target, ID_if))
-  {
-    must_throw = true;
-    error().source_location = target.source_location();
-    error() << "ternary expressions not allowed in assigns "
-               "clause targets"
-            << eom;
-  }
-
-  if(must_throw)
     throw 0;
+  }
+
+  // throws exception if expr contains side effect or ternary expr
+  auto throw_on_side_effects = [&](const exprt &expr) {
+    if(has_subexpr(expr, ID_side_effect))
+    {
+      error().source_location = expr.source_location();
+      error() << "side-effects not allowed in assigns clause targets"
+              << messaget::eom;
+      throw 0;
+    }
+    if(has_subexpr(expr, ID_if))
+    {
+      error().source_location = expr.source_location();
+      error() << "ternary expressions not allowed in assigns "
+                 "clause targets"
+              << messaget::eom;
+      throw 0;
+    }
+  };
+
+  if(target.get_bool(ID_C_lvalue))
+  {
+    throw_on_side_effects(target);
+  }
+  else if(target.id() == ID_pointer_object)
+  {
+    throw_on_side_effects(target);
+  }
+  else if(can_cast_expr<side_effect_expr_function_callt>(target))
+  {
+    const auto &funcall = to_side_effect_expr_function_call(target);
+    if(can_cast_expr<symbol_exprt>(funcall.function()))
+    {
+      const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
+      if(
+        ident == CPROVER_PREFIX "object_from" || ident == CPROVER_PREFIX
+                                                   "object_slice")
+      {
+        for(const auto &argument : funcall.arguments())
+          throw_on_side_effects(argument);
+      }
+      else
+      {
+        error().source_location = target.source_location();
+        error() << "function calls in assigns clause targets must be "
+                   "to " CPROVER_PREFIX "object_from, " CPROVER_PREFIX
+                   "object_slice"
+                << eom;
+        throw 0;
+      }
+    }
+    else
+    {
+      error().source_location = target.source_location();
+      error() << "function pointer calls not allowed in assigns targets" << eom;
+      throw 0;
+    }
+  }
+  else
+  {
+    error().source_location = target.source_location();
+    error() << "assigns clause target must be an lvalue or a " CPROVER_PREFIX
+               "POINTER_OBJECT, " CPROVER_PREFIX "object_from, " CPROVER_PREFIX
+               "object_slice expression"
+            << eom;
+    throw 0;
+  }
 }
 
 void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)

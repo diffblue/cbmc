@@ -13,6 +13,30 @@ design is based on the former. This means that memory not captured by an
 _assigns_ clause must not be written within the given function, even if the
 value(s) therein are not modified.
 
+### Object slice expressions
+
+The following functions can be used in assigns clause to specify ranges of 
+assignable addresses.
+
+Given a pointer `ptr` pointing into some object `o`, `__CPROVER_object_from(ptr)` 
+specifies that all bytes starting from the given pointer and until the end of 
+the object are assignable:
+```c
+__CPROVER_size_t __CPROVER_object_from(void *ptr); 
+```
+
+Given a pointer `ptr` pointing into some object `o`, `__CPROVER_object_from(ptr, size)` 
+specifies that `size` bytes starting from the given pointer and until the end of the object are assignable.
+The `size` value must such that `size <= __CPROVER_object_size(ptr) - __CPROVER_pointer_offset(ptr)` holds:
+
+```c
+__CPROVER_size_t __CPROVER_object_slice(void *ptr, __CPROVER_size_t size);
+```
+
+Caveats and limitations: The slices in question must *not*
+be interpreted as pointers by the program. During call-by-contract replacement, 
+`__CPROVER_havoc_slice(ptr, size)` is used to havoc these targets, 
+and `__CPROVER_havoc_slice` does not support havocing pointers. 
 ### Parameters
 
 An _assigns_ clause currently supports simple variable types and their pointers,
