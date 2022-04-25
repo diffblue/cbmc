@@ -65,6 +65,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(isr):" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
+  "(nondet-static-matching):" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
