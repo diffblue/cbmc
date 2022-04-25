@@ -17,10 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 
+#include <set>
 #include <unordered_map>
 
-/// Replace expression or type symbols by an expression or type, respectively.
-/// The resolved type of the symbol must match the type of the replacement.
+/// Replace a symbol expression by a given expression.
+/// The type of the symbol must match the type of the replacement.
+/// This class is aware of symbol hiding caused by bindings
+/// such as forall, exists, and the like.
 class replace_symbolt
 {
 public:
@@ -88,6 +91,7 @@ public:
 
 protected:
   expr_mapt expr_map;
+  mutable std::set<irep_idt> bindings;
 
   virtual bool replace_symbol_expr(symbol_exprt &dest) const;
 

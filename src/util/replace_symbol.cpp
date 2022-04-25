@@ -101,6 +101,41 @@ bool replace_symbolt::replace(exprt &dest) const
     if(!replace_symbol_expr(to_symbol_expr(dest)))
       return false;
   }
+  else if(dest.id() == ID_let)
+  {
+    auto &let_expr = to_let_expr(dest);
+
+    // first replace the assigned value expressions
+    for(auto &op : let_expr.values())
+      if(replace(op))
+        result = false;
+
+    // now set up the binding
+    auto old_bindings = bindings;
+    for(auto &variable : let_expr.variables())
+      bindings.insert(variable.get_identifier());
+
+    // now replace in the 'where' expression
+    if(!replace(let_expr.where()))
+      result = false;
+
+    bindings = std::move(old_bindings);
+  }
+  else if(
+    dest.id() == ID_array_comprehension || dest.id() == ID_exists ||
+    dest.id() == ID_forall || dest.id() == ID_lambda)
+  {
+    auto &binding_expr = to_binding_expr(dest);
+
+    auto old_bindings = bindings;
+    for(auto &binding : binding_expr.variables())
+      bindings.insert(binding.get_identifier());
+
+    if(!replace(binding_expr.where()))
+      result = false;
+
+    bindings = std::move(old_bindings);
+  }
   else
   {
     Forall_operands(it, dest)
@@ -136,7 +171,10 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
   if(dest.id()==ID_symbol)
   {
     const irep_idt &identifier = to_symbol_expr(dest).get_identifier();
-    return replaces_symbol(identifier);
+    if(bindings.find(identifier) != bindings.end())
+      return false;
+    else
+      return replaces_symbol(identifier);
   }
 
   forall_operands(it, dest)

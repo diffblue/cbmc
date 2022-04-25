@@ -3090,8 +3090,25 @@ inline void validate_expr(const binding_exprt &binding_expr)
 inline const binding_exprt &to_binding_expr(const exprt &expr)
 {
   PRECONDITION(
-    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda);
+    expr.id() == ID_forall || expr.id() == ID_exists ||
+    expr.id() == ID_lambda || expr.id() == ID_array_comprehension);
   const binding_exprt &ret = static_cast<const binding_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief Cast an exprt to a \ref binding_exprt
+///
+/// \a expr must be known to be \ref binding_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref binding_exprt
+inline binding_exprt &to_binding_expr(exprt &expr)
+{
+  PRECONDITION(
+    expr.id() == ID_forall || expr.id() == ID_exists ||
+    expr.id() == ID_lambda || expr.id() == ID_array_comprehension);
+  binding_exprt &ret = static_cast<binding_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }
