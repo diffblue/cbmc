@@ -1909,7 +1909,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
-    " --nondet-static-matching r   add nondeterministic initialization of variables\n"
+    " --nondet-static-matching r   add nondeterministic initialization of variables\n" // NOLINT(*)
     "                              with static lifetime matching regex r\n"
     " --function-enter <f>, --function-exit <f>, --branch <f>\n"
     "                              instruments a call to <f> at the beginning,\n" // NOLINT(*)
