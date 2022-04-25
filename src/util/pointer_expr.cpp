@@ -122,7 +122,14 @@ address_of_exprt::address_of_exprt(const exprt &_op)
 }
 
 object_address_exprt::object_address_exprt(const symbol_exprt &object)
-  : nullary_exprt(ID_object_address, pointer_type(object.type()))
+  : object_address_exprt(object, pointer_type(object.type()))
+{
+}
+
+object_address_exprt::object_address_exprt(
+  const symbol_exprt &object,
+  pointer_typet type)
+  : nullary_exprt(ID_object_address, std::move(type))
 {
   set(ID_identifier, object.get_identifier());
 }

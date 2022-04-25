@@ -1,0 +1,8 @@
+CORE
+basic6.c
+--horn
+^EXIT=0$
+^SIGNAL=0$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \(|x| \(_ BitVec 32\)\) \) \(=> \(|S11Entry| |__CPROVER_rounding_mode| |return_value| |x|\) \(|S11\.0| |__CPROVER_rounding_mode| |return_value| \(_ bv1 32\)\)\)\)\)$
+^\(assert \(forall \( \(|__CPROVER_rounding_mode| \(_ BitVec 32\)\) \(|return_value| \(_ BitVec 32\)\) \(|x| \(_ BitVec 32\)\) \) \(=> \(|S11\.0| |__CPROVER_rounding_mode| |return_value| |x|\) \(|S11\.1| |__CPROVER_rounding_mode| |return_value| \(bvadd |x| \(_ bv1 32\)\)\)\)\)\)$
+--

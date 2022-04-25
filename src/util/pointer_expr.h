@@ -418,6 +418,8 @@ class object_address_exprt : public nullary_exprt
 public:
   explicit object_address_exprt(const symbol_exprt &);
 
+  object_address_exprt(const symbol_exprt &, pointer_typet);
+
   irep_idt object_identifier() const
   {
     return get(ID_identifier);
