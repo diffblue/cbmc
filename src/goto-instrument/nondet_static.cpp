@@ -26,6 +26,8 @@ Date: November 2011
 
 #include <linking/static_lifetime_init.h>
 
+#include <regex>
+
 /// See the return.
 /// \param symbol_expr: The symbol expression to analyze.
 /// \param ns: Namespace for resolving type information
@@ -198,5 +200,33 @@ void nondet_static(
     }
   }
 
+  nondet_static(ns, goto_model.goto_functions, INITIALIZE_FUNCTION);
+}
+
+/// Nondeterministically initializes global scope variables that
+/// match the given regex.
+/// \param [out] goto_model: Existing goto-model to be updated.
+/// \param regex: regex for matching variables in the format
+///   "filename:variable" (same format as those of except_values in
+///   nondet_static(goto_model, except_values) variant above).
+void nondet_static_matching(goto_modelt &goto_model, const std::string &regex)
+{
+  const auto regex_matcher = std::regex(regex);
+  symbol_tablet &symbol_table = goto_model.symbol_table;
+
+  for(symbol_tablet::iteratort symbol_it = symbol_table.begin();
+      symbol_it != symbol_table.end();
+      symbol_it++)
+  {
+    symbolt &symbol = symbol_it.get_writeable_symbol();
+    std::string qualified_name = id2string(symbol.location.get_file()) + ":" +
+                                 id2string(symbol.display_name());
+    if(!std::regex_match(qualified_name, regex_matcher))
+    {
+      symbol.value.set(ID_C_no_nondet_initialization, 1);
+    }
+  }
+
+  const namespacet ns(goto_model.symbol_table);
   nondet_static(ns, goto_model.goto_functions, INITIALIZE_FUNCTION);
 }
