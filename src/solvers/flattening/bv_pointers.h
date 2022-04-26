@@ -26,31 +26,15 @@ public:
 
   void finish_eager_conversion() override;
 
-  std::size_t boolbv_width(const typet &type) const override
-  {
-    return bv_pointers_width(type);
-  }
-
   endianness_mapt
   endianness_map(const typet &type, bool little_endian) const override;
 
 protected:
   pointer_logict pointer_logic;
 
-  class bv_pointers_widtht : public boolbv_widtht
-  {
-  public:
-    explicit bv_pointers_widtht(const namespacet &_ns) : boolbv_widtht(_ns)
-    {
-    }
-
-    std::size_t operator()(const typet &type) const override;
-
-    std::size_t get_object_width(const pointer_typet &type) const;
-    std::size_t get_offset_width(const pointer_typet &type) const;
-    std::size_t get_address_width(const pointer_typet &type) const;
-  };
-  bv_pointers_widtht bv_pointers_width;
+  std::size_t get_object_width(const pointer_typet &type) const;
+  std::size_t get_offset_width(const pointer_typet &type) const;
+  std::size_t get_address_width(const pointer_typet &type) const;
 
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
