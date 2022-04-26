@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stddef.h>
 
-int x = 0;
+int x;
 
 struct fptr_t
 {
@@ -26,7 +26,7 @@ void bar(struct fptr_t *s, void (**f)()) __CPROVER_assigns(s->f, *f)
 
 int main()
 {
-  assert(x == 0);
+  x = 0;
   struct fptr_t s;
   void (*f)();
   bar(&s, &f);

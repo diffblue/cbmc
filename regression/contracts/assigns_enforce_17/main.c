@@ -1,6 +1,6 @@
 #include <assert.h>
 
-int x = 0;
+int x;
 
 void pure() __CPROVER_assigns()
 {
@@ -10,6 +10,7 @@ void pure() __CPROVER_assigns()
 
 int main()
 {
+  x = 0;
   pure();
   assert(x == 0);
   return 0;

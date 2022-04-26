@@ -9,6 +9,11 @@ These clauses formally describe an abstraction of a loop for the purpose of a pr
 CBMC also provides a series of built-in constructs
 to aid writing loop contracts (e.g., _history variables_ and _quantifiers_).
 
+When a function contract is checked, the tool automatically havocs all static variables
+of the program (to start the analysis in an arbitrary state), in the same way
+as using `--nondet-static` would do. If one wishes not to havoc some static variables,
+then `--nondet-static-exclude name-of-variable` can be used.
+
 ## Overview
 
 Consider an implementation of the [binary search algorithm] below.

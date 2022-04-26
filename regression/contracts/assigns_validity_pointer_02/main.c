@@ -3,17 +3,18 @@
 
 int *z;
 
-void bar(int *x, int *y) __CPROVER_assigns(*x, *y) __CPROVER_requires(*x > 0)
-  __CPROVER_ensures(*x == 3 && (y == NULL || *y == 5))
+void bar(int *x, int *y)
 {
   *x = 3;
   if(y != NULL)
     *y = 5;
 }
 
-void baz() __CPROVER_assigns(*z) __CPROVER_ensures(z == NULL || *z == 7)
+void baz(int c)
 {
-  if(z != NULL)
+  // does a side effect on a global, but
+  // in the calling context of foo the branch is dead
+  if(c)
     *z = 7;
 }
 
@@ -22,15 +23,13 @@ void foo(int *x) __CPROVER_assigns(*x) __CPROVER_requires(*x > 0)
 {
   bar(x, NULL);
   *x = 3;
-  z == NULL;
-  baz();
+  baz(0);
 }
 
 int main()
 {
   int n;
   foo(&n);
-
   assert(n == 3);
   return 0;
 }

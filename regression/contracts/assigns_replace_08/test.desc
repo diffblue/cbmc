@@ -11,4 +11,4 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 Checks whether CBMC properly evaluates subset relationship on assigns
-during replacement.
+during replacement when the targets are global variables.

@@ -36,6 +36,7 @@ Date: February 2016
 #include <analyses/local_may_alias.h>
 #include <ansi-c/c_expr.h>
 #include <goto-instrument/havoc_utils.h>
+#include <goto-instrument/nondet_static.h>
 #include <langapi/language_util.h>
 
 #include "havoc_assigns_clause_targets.h"
@@ -1643,13 +1644,21 @@ void code_contractst::replace_calls(const std::set<std::string> &to_replace)
   goto_functions.update();
 }
 
-void code_contractst::apply_loop_contracts()
+void code_contractst::apply_loop_contracts(
+  const std::set<std::string> &to_exclude_from_nondet_init)
 {
   for(auto &goto_function : goto_functions.function_map)
     apply_loop_contract(goto_function.first, goto_function.second);
+
+  log.status() << "Adding nondeterministic initialization "
+                  "of static/global variables."
+               << messaget::eom;
+  nondet_static(goto_model, to_exclude_from_nondet_init);
 }
 
-void code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
+void code_contractst::enforce_contracts(
+  const std::set<std::string> &to_enforce,
+  const std::set<std::string> &to_exclude_from_nondet_init)
 {
   if(to_enforce.empty())
     return;
@@ -1660,4 +1669,9 @@ void code_contractst::enforce_contracts(const std::set<std::string> &to_enforce)
 
   for(const auto &function : to_enforce)
     enforce_contract(function);
+
+  log.status() << "Adding nondeterministic initialization "
+                  "of static/global variables."
+               << messaget::eom;
+  nondet_static(goto_model, to_exclude_from_nondet_init);
 }

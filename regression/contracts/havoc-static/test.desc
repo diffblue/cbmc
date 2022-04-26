@@ -1,0 +1,13 @@
+CORE
+main.c
+--enforce-contract foo
+^\[foo.assertion.\d+\].* guarded by a: FAILURE$
+^\[foo.assertion.\d+\].* guarded by b: SUCCESS$
+^\[foo.assertion.\d+\].* guarded by c: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Checks that statics are havoced when using contracts, 
+unless they are marked const.

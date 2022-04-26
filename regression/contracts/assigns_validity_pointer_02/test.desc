@@ -13,8 +13,7 @@ main.c
 ^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: FAILURE$
 ^\[foo.\d+\] line \d+ Check that \*x is assignable: FAILURE$
 --
-Verification:
-This test checks support for a NULL pointer that is assigned to by
-a function (bar and baz). The calling function foo is being checked
-(by enforcing it's function contracts). As for bar and baz, their
-function contracts are ot being considered for this test.
+This test checks that assigns clause checking 
+is control-flow sensitive. The assignment to the global *z
+in baz is inhibited in the calling context of foo, so it does
+not violate the assigns clause of foo.

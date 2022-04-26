@@ -145,7 +145,7 @@ void nondet_static(goto_modelt &goto_model)
 /// \param except_values: list of symbol names that should not be updated.
 void nondet_static(
   goto_modelt &goto_model,
-  const optionst::value_listt &except_values)
+  const std::set<std::string> &except_values)
 {
   const namespacet ns(goto_model.symbol_table);
   std::set<std::string> to_exclude;

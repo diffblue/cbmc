@@ -7,5 +7,5 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-Checks whether verification correctly distincts local variables
+Checks whether verification correctly distinguishes local variables
 and global variables with same name when checking frame conditions.
