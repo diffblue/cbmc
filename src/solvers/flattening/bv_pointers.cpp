@@ -68,40 +68,16 @@ void bv_endianness_mapt::build_big_endian(const typet &src)
 endianness_mapt
 bv_pointerst::endianness_map(const typet &type, bool little_endian) const
 {
-  return bv_endianness_mapt{type, little_endian, ns, bv_pointers_width};
+  return bv_endianness_mapt{type, little_endian, ns, bv_width};
 }
 
-std::size_t bv_pointerst::bv_pointers_widtht::
-operator()(const typet &type) const
-{
-  if(type.id() != ID_pointer)
-    return boolbv_widtht::operator()(type);
-
-  // check or update the cache, just like boolbv_widtht does
-  std::pair<cachet::iterator, bool> cache_result =
-    cache.insert(std::pair<typet, entryt>(type, entryt()));
-
-  if(cache_result.second)
-  {
-    std::size_t &total_width = cache_result.first->second.total_width;
-
-    total_width = get_address_width(to_pointer_type(type));
-    DATA_INVARIANT(total_width > 0, "pointer width shall be greater than zero");
-  }
-
-  return cache_result.first->second.total_width;
-}
-
-std::size_t bv_pointerst::bv_pointers_widtht::get_object_width(
-  const pointer_typet &type) const
+std::size_t bv_pointerst::get_object_width(const pointer_typet &) const
 {
   // not actually type-dependent for now
-  (void)type;
   return config.bv_encoding.object_bits;
 }
 
-std::size_t bv_pointerst::bv_pointers_widtht::get_offset_width(
-  const pointer_typet &type) const
+std::size_t bv_pointerst::get_offset_width(const pointer_typet &type) const
 {
   const std::size_t pointer_width = type.get_width();
   const std::size_t object_width = get_object_width(type);
@@ -109,10 +85,39 @@ std::size_t bv_pointerst::bv_pointers_widtht::get_offset_width(
   return pointer_width - object_width;
 }
 
-std::size_t bv_pointerst::bv_pointers_widtht::get_address_width(
-  const pointer_typet &type) const
+std::size_t bv_pointerst::get_address_width(const pointer_typet &type) const
 {
   return type.get_width();
+}
+
+bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
+  const
+{
+  const std::size_t offset_width = get_offset_width(type);
+  const std::size_t object_width = get_object_width(type);
+  PRECONDITION(bv.size() >= offset_width + object_width);
+
+  return bvt(
+    bv.begin() + offset_width, bv.begin() + offset_width + object_width);
+}
+
+bvt bv_pointerst::offset_literals(const bvt &bv, const pointer_typet &type)
+  const
+{
+  const std::size_t offset_width = get_offset_width(type);
+  PRECONDITION(bv.size() >= offset_width);
+
+  return bvt(bv.begin(), bv.begin() + offset_width);
+}
+
+bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
+{
+  bvt result;
+  result.reserve(offset.size() + object.size());
+  result.insert(result.end(), offset.begin(), offset.end());
+  result.insert(result.end(), object.begin(), object.end());
+
+  return result;
 }
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
@@ -136,8 +141,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
         bvt invalid_bv = object_literals(
           encode(pointer_logic.get_invalid_object(), type), type);
 
-        const std::size_t object_bits =
-          bv_pointers_width.get_object_width(type);
+        const std::size_t object_bits = get_object_width(type);
 
         bvt equal_invalid_bv;
         equal_invalid_bv.reserve(object_bits);
@@ -210,8 +214,7 @@ bv_pointerst::bv_pointerst(
   message_handlert &message_handler,
   bool get_array_constraints)
   : boolbvt(_ns, _prop, message_handler, get_array_constraints),
-    pointer_logic(_ns),
-    bv_pointers_width(_ns)
+    pointer_logic(_ns)
 {
 }
 
@@ -460,7 +463,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       count == 1,
       "there should be exactly one pointer-type operand in a pointer-type sum");
 
-    const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
+    const std::size_t offset_bits = get_offset_width(type);
     bvt sum = bv_utils.build_constant(0, offset_bits);
 
     forall_operands(it, plus_expr)
@@ -815,8 +818,8 @@ exprt bv_pointerst::bv_get_rec(
 
 bvt bv_pointerst::encode(std::size_t addr, const pointer_typet &type) const
 {
-  const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
-  const std::size_t object_bits = bv_pointers_width.get_object_width(type);
+  const std::size_t offset_bits = get_offset_width(type);
+  const std::size_t object_bits = get_object_width(type);
 
   bvt zero_offset(offset_bits, const_literal(false));
 
@@ -834,7 +837,7 @@ bvt bv_pointerst::offset_arithmetic(
   const bvt &bv,
   const mp_integer &x)
 {
-  const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
+  const std::size_t offset_bits = get_offset_width(type);
 
   return offset_arithmetic(
     type, bv, 1, bv_utils.build_constant(x, offset_bits));
@@ -852,7 +855,7 @@ bvt bv_pointerst::offset_arithmetic(
     index.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
                                    bv_utilst::representationt::UNSIGNED;
 
-  const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
+  const std::size_t offset_bits = get_offset_width(type);
   bv_index=bv_utils.extension(bv_index, offset_bits, rep);
 
   return offset_arithmetic(type, bv, factor, bv_index);
@@ -874,7 +877,7 @@ bvt bv_pointerst::offset_arithmetic(
     bv_index = bv_utils.signed_multiplier(index, bv_factor);
   }
 
-  const std::size_t offset_bits = bv_pointers_width.get_offset_width(type);
+  const std::size_t offset_bits = get_offset_width(type);
   bv_index = bv_utils.sign_extension(bv_index, offset_bits);
 
   bvt offset_bv = offset_literals(bv, type);
@@ -889,7 +892,7 @@ bvt bv_pointerst::add_addr(const exprt &expr)
   std::size_t a=pointer_logic.add_object(expr);
 
   const pointer_typet type = pointer_type(expr.type());
-  const std::size_t object_bits = bv_pointers_width.get_object_width(type);
+  const std::size_t object_bits = get_object_width(type);
   const std::size_t max_objects=std::size_t(1)<<object_bits;
 
   if(a==max_objects)
