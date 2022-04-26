@@ -62,17 +62,33 @@ For different linux environments, you have these choices:
 
 ### macOS
 
-For macOS there is a [Homebrew](https://brew.sh) package
-[available](https://formulae.brew.sh/formula/cbmc). Once you have installed
-Homebrew, simply run
+For macOS there is a package available in [Homebrew/core](https://formulae.brew.sh/formula/cbmc).
+Assuming you have homebrew installed, you can run
 
-    brew install cbmc
+```sh
+$ brew install cbmc
+```
 
-to install cbmc, or if you already have it installed via homebrew
+to install CBMC, or if you already have it installed via homebrew
 
-    brew upgrade cbmc
+```sh
+$ brew upgrade cbmc
+```
 
 to get an up-to-date version.
+
+Homebrew will always update formulas to their latest version available, so you may
+periodically see an upgraded version of CBMC being downloaded regardless of whether
+you explicitly requested that or not. If you would rather this didn't happen, you
+can pin the CBMC version with:
+
+```sh
+$ brew pin cbmc
+```
+
+If instead of the latest version, you would want to install a historic version, you
+can do so with a [homebrew tap](https://github.com/diffblue/homebrew-cbmc) that we
+maintain. Instructions for that are available in the [documentation](doc/ADR/homebrew_tap.md)
 
 Report bugs
 ===========
