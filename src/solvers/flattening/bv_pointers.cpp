@@ -115,6 +115,36 @@ std::size_t bv_pointerst::bv_pointers_widtht::get_address_width(
   return type.get_width();
 }
 
+bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
+  const
+{
+  const std::size_t offset_width = bv_pointers_width.get_offset_width(type);
+  const std::size_t object_width = bv_pointers_width.get_object_width(type);
+  PRECONDITION(bv.size() >= offset_width + object_width);
+
+  return bvt(
+    bv.begin() + offset_width, bv.begin() + offset_width + object_width);
+}
+
+bvt bv_pointerst::offset_literals(const bvt &bv, const pointer_typet &type)
+  const
+{
+  const std::size_t offset_width = bv_pointers_width.get_offset_width(type);
+  PRECONDITION(bv.size() >= offset_width);
+
+  return bvt(bv.begin(), bv.begin() + offset_width);
+}
+
+bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
+{
+  bvt result;
+  result.reserve(offset.size() + object.size());
+  result.insert(result.end(), offset.begin(), offset.end());
+  result.insert(result.end(), object.begin(), object.end());
+
+  return result;
+}
+
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);
