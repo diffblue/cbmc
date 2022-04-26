@@ -32,10 +32,6 @@ public:
 protected:
   pointer_logict pointer_logic;
 
-  std::size_t get_object_width(const pointer_typet &) const;
-  std::size_t get_offset_width(const pointer_typet &) const;
-  std::size_t get_address_width(const pointer_typet &) const;
-
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
 
@@ -94,21 +90,28 @@ protected:
   /// \param bv: Encoded pointer
   /// \param type: Type of the encoded pointer
   /// \return Vector of literals identifying the object part of \p bv
-  bvt object_literals(const bvt &bv, const pointer_typet &type) const;
+  bvt object_literals(const bvt &bv, const pointer_typet &type);
 
   /// Given a pointer encoded in \p bv, extract the literals representing the
   /// offset into an object that the pointer points to.
   /// \param bv: Encoded pointer
   /// \param type: Type of the encoded pointer
   /// \return Vector of literals identifying the offset part of \p bv
-  bvt offset_literals(const bvt &bv, const pointer_typet &type) const;
+  bvt offset_literals(const bvt &bv, const pointer_typet &type);
 
   /// Construct a pointer encoding from given encodings of \p object and \p
   /// offset.
   /// \param object: Encoded object
   /// \param offset: Encoded offset
+  /// \param type: Type of the encoded pointer
   /// \return Pointer encoding
-  static bvt object_offset_encoding(const bvt &object, const bvt &offset);
+  bvt object_offset_encoding(
+    const bvt &object,
+    const bvt &offset,
+    const pointer_typet &type);
+
+  /// Table that maps a 'pointer number' to its object/offset pair
+  std::vector<std::pair<bvt, bvt>> numbered_pointers;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
