@@ -259,6 +259,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       static_cast<const exprt &>(static_cast<const irept &>(type));
     requires.push_back(to_unary_expr(as_expr).op());
   }
+  else if(type.id() == ID_C_spec_requires_contract)
+  {
+    const exprt &as_expr =
+      static_cast<const exprt &>(static_cast<const irept &>(type));
+    requires_contract.push_back(to_unary_expr(as_expr).op());
+  }
   else if(type.id() == ID_C_spec_assigns)
   {
     const exprt &as_expr =
@@ -272,6 +278,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
     ensures.push_back(to_unary_expr(as_expr).op());
+  }
+  else if(type.id() == ID_C_spec_ensures_contract)
+  {
+    const exprt &as_expr =
+      static_cast<const exprt &>(static_cast<const irept &>(type));
+    ensures_contract.push_back(to_unary_expr(as_expr).op());
   }
   else
     other.push_back(type);
@@ -322,11 +334,19 @@ void ansi_c_convert_typet::write(typet &type)
     if(!requires.empty())
       to_code_with_contract_type(type).requires() = std::move(requires);
 
+    if(!requires_contract.empty())
+      to_code_with_contract_type(type).requires_contract() =
+        std::move(requires_contract);
+
     if(!assigns.empty())
       to_code_with_contract_type(type).assigns() = std::move(assigns);
 
     if(!ensures.empty())
       to_code_with_contract_type(type).ensures() = std::move(ensures);
+
+    if(!ensures_contract.empty())
+      to_code_with_contract_type(type).ensures_contract() =
+        std::move(ensures_contract);
 
     if(constructor || destructor)
     {

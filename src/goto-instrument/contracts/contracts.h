@@ -49,6 +49,7 @@ class local_may_aliast;
 class replace_symbolt;
 class instrument_spec_assignst;
 class cfg_infot;
+class function_pointer_obeys_contract_exprt;
 
 class code_contractst
 {
@@ -127,6 +128,38 @@ protected:
   goto_convertt converter;
 
   std::unordered_set<irep_idt> summarized;
+
+  /// Translates a function_pointer_obeys_contract_exprt into an assertion
+  /// ```
+  /// ASSERT function_pointer == contract;
+  /// ```
+  /// \param expr expression to translate
+  /// \param property_class property class to use for the generated assertions
+  /// \param replace symbol substitution to use in the context where the
+  ///                expression is translated
+  /// \param mode language mode to use for goto_conversion and prints
+  /// \param dest goto_program where generated instructions are appended
+  void assert_function_pointer_obeys_contract(
+    const function_pointer_obeys_contract_exprt &expr,
+    const irep_idt &property_class,
+    const replace_symbolt &replace,
+    const irep_idt &mode,
+    goto_programt &dest);
+
+  /// Translates a function_pointer_obeys_contract_exprt into an assignment
+  /// ```
+  /// ASSIGN function_pointer = contract;
+  /// ```
+  /// \param expr expression to translate
+  /// \param replace symbol substitution to use in the context where the
+  ///                expression is translated
+  /// \param mode language mode to use for goto_conversion and prints
+  /// \param dest goto_program where generated instructions are appended
+  void assume_function_pointer_obeys_contract(
+    const function_pointer_obeys_contract_exprt &expr,
+    const replace_symbolt &replace,
+    const irep_idt &mode,
+    goto_programt &dest);
 
   /// \brief Enforce contract of a single function
   void enforce_contract(const irep_idt &function);

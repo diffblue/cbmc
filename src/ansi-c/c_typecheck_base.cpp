@@ -699,6 +699,15 @@ void c_typecheck_baset::typecheck_declaration(
 
       typecheck_symbol(symbol);
 
+      auto check_history_expr = [&](const exprt expr) {
+        disallow_subexpr_by_id(
+          expr, ID_old, CPROVER_PREFIX "old is not allowed in preconditions.");
+        disallow_subexpr_by_id(
+          expr,
+          ID_loop_entry,
+          CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
+      };
+
       // check the contract, if any
       symbolt &new_symbol = symbol_table.get_writeable_ref(identifier);
       if(new_symbol.type.id() == ID_code)
@@ -708,29 +717,36 @@ void c_typecheck_baset::typecheck_declaration(
         // available
         auto &code_type = to_code_with_contract_type(new_symbol.type);
 
+        for(auto &expr : code_type.requires_contract())
+        {
+          typecheck_spec_function_pointer_obeys_contract(expr);
+          check_history_expr(expr);
+        }
+
         for(auto &requires : code_type.requires())
         {
           typecheck_expr(requires);
           implicit_typecast_bool(requires);
-          disallow_subexpr_by_id(
-            requires,
-            ID_old,
-            CPROVER_PREFIX "old is not allowed in preconditions.");
-          disallow_subexpr_by_id(
-            requires,
-            ID_loop_entry,
-            CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
+          check_history_expr(requires);
         }
 
         typecheck_spec_assigns(code_type.assigns());
 
+        const auto &return_type = code_type.return_type();
+        if(return_type.id() != ID_empty)
+          parameter_map[CPROVER_PREFIX "return_value"] = return_type;
+
+        for(auto &expr : code_type.ensures_contract())
+        {
+          typecheck_spec_function_pointer_obeys_contract(expr);
+          disallow_subexpr_by_id(
+            expr,
+            ID_loop_entry,
+            CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
+        }
+
         if(!as_const(code_type).ensures().empty())
         {
-          const auto &return_type = code_type.return_type();
-
-          if(return_type.id() != ID_empty)
-            parameter_map[CPROVER_PREFIX "return_value"] = return_type;
-
           for(auto &ensures : code_type.ensures())
           {
             typecheck_expr(ensures);
@@ -740,10 +756,10 @@ void c_typecheck_baset::typecheck_declaration(
               ID_loop_entry,
               CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
           }
-
-          if(return_type.id() != ID_empty)
-            parameter_map.erase(CPROVER_PREFIX "return_value");
         }
+
+        if(return_type.id() != ID_empty)
+          parameter_map.erase(CPROVER_PREFIX "return_value");
       }
     }
   }

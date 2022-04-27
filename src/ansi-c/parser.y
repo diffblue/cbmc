@@ -204,7 +204,9 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_ID  "__CPROVER_ID"
 %token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
 %token TOK_CPROVER_DECREASES "__CPROVER_decreases"
+%token TOK_CPROVER_REQUIRES_CONTRACT "__CPROVER_requires_contract"
 %token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
+%token TOK_CPROVER_ENSURES_CONTRACT "__CPROVER_ensures_contract"
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
 %token TOK_IMPLIES     "==>"
@@ -3293,6 +3295,24 @@ cprover_function_contract:
           $$=$1;
           set($$, ID_C_spec_requires);
           mto($$, $3);
+        }
+        | TOK_CPROVER_ENSURES_CONTRACT '(' unary_expression ',' unary_expression ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_ensures_contract);
+          exprt tmp(ID_function_pointer_obeys_contract);
+          tmp.add_to_operands(std::move(parser_stack($3)));
+          tmp.add_to_operands(std::move(parser_stack($5)));
+          parser_stack($$).add_to_operands(std::move(tmp));
+        }
+        | TOK_CPROVER_REQUIRES_CONTRACT '(' unary_expression ',' unary_expression ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_requires_contract);
+          exprt tmp(ID_function_pointer_obeys_contract);
+          tmp.add_to_operands(std::move(parser_stack($3)));
+          tmp.add_to_operands(std::move(parser_stack($5)));
+          parser_stack($$).add_to_operands(std::move(tmp));
         }
         | cprover_contract_assigns
         ;

@@ -8,14 +8,32 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "language_util.h"
 
-#include <memory>
-
-#include <util/symbol_table.h>
+#include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include "language.h"
 #include "mode.h"
+
+#include <memory>
+
+std::string from_expr_using_mode(
+  const namespacet &ns,
+  const irep_idt &mode,
+  const exprt &expr)
+{
+  std::unique_ptr<languaget> language = (mode == ID_unknown)
+                                          ? get_default_language()
+                                          : get_language_from_mode(mode);
+  INVARIANT(
+    language, "could not retrieve language for mode '" + id2string(mode) + "'");
+
+  std::string result;
+  language->from_expr(expr, result, ns);
+
+  return result;
+}
 
 std::string from_expr(
   const namespacet &ns,

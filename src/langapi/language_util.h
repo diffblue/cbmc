@@ -16,6 +16,13 @@ class exprt;
 class namespacet;
 class typet;
 
+/// Formats an expression using the given namespace,
+/// using the given mode to retrieve the language printer.
+std::string from_expr_using_mode(
+  const namespacet &ns,
+  const irep_idt &mode,
+  const exprt &expr);
+
 std::string from_expr(
   const namespacet &ns,
   const irep_idt &identifier,

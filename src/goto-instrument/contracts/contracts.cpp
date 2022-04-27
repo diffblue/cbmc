@@ -756,6 +756,8 @@ void code_contractst::apply_function_contract(
   auto assigns_clause = type.assigns();
   auto requires = conjunction(type.requires());
   auto ensures = conjunction(type.ensures());
+  auto requires_contract = type.requires_contract();
+  auto ensures_contract = type.ensures_contract();
 
   // Create a replace_symbolt object, for replacing expressions in the callee
   // with expressions from the call site (e.g. the return value).
@@ -852,6 +854,17 @@ void code_contractst::apply_function_contract(
     new_program.destructive_append(assertion);
   }
 
+  // Translate requires_contract(ptr, contract) clauses to assertions
+  for(auto &expr : requires_contract)
+  {
+    assert_function_pointer_obeys_contract(
+      to_function_pointer_obeys_contract_expr(expr),
+      ID_precondition,
+      common_replace,
+      mode,
+      new_program);
+  }
+
   // Gather all the instructions required to handle history variables
   // as well as the ensures clause
   std::pair<goto_programt, goto_programt> ensures_pair;
@@ -918,6 +931,16 @@ void code_contractst::apply_function_contract(
   {
     is_fresh.update_ensures(ensures_pair.first);
     new_program.destructive_append(ensures_pair.first);
+  }
+
+  // Translate ensures_contract(ptr, contract) clauses to assumptions
+  for(auto &expr : ensures_contract)
+  {
+    assume_function_pointer_obeys_contract(
+      to_function_pointer_obeys_contract_expr(expr),
+      common_replace,
+      mode,
+      new_program);
   }
 
   // Kill return value variable if fresh
@@ -1346,6 +1369,49 @@ void code_contractst::enforce_contract(const irep_idt &function)
   add_contract_check(original, mangled, wrapper.body);
 }
 
+void code_contractst::assert_function_pointer_obeys_contract(
+  const function_pointer_obeys_contract_exprt &expr,
+  const irep_idt &property_class,
+  const replace_symbolt &replace,
+  const irep_idt &mode,
+  goto_programt &dest)
+{
+  source_locationt loc(expr.source_location());
+  loc.set_property_class(property_class);
+  std::stringstream comment;
+  comment << "Assert function pointer '"
+          << from_expr_using_mode(ns, mode, expr.function_pointer())
+          << "' obeys contract '"
+          << from_expr_using_mode(ns, mode, expr.contract()) << "'";
+  loc.set_comment(comment.str());
+  exprt function_pointer(expr.function_pointer());
+  replace(function_pointer);
+  code_assertt assert_expr(equal_exprt{function_pointer, expr.contract()});
+  assert_expr.add_source_location() = loc;
+  goto_programt instructions;
+  converter.goto_convert(assert_expr, instructions, mode);
+  dest.destructive_append(instructions);
+}
+
+void code_contractst::assume_function_pointer_obeys_contract(
+  const function_pointer_obeys_contract_exprt &expr,
+  const replace_symbolt &replace,
+  const irep_idt &mode,
+  goto_programt &dest)
+{
+  source_locationt loc(expr.source_location());
+  std::stringstream comment;
+  comment << "Assume function pointer '"
+          << from_expr_using_mode(ns, mode, expr.function_pointer())
+          << "' obeys contract '"
+          << from_expr_using_mode(ns, mode, expr.contract()) << "'";
+  loc.set_comment(comment.str());
+  exprt function_pointer(expr.function_pointer());
+  replace(function_pointer);
+  dest.add(
+    goto_programt::make_assignment(function_pointer, expr.contract(), loc));
+}
+
 void code_contractst::add_contract_check(
   const irep_idt &wrapper_function,
   const irep_idt &mangled_function,
@@ -1359,7 +1425,8 @@ void code_contractst::add_contract_check(
   auto assigns = code_type.assigns();
   auto requires = conjunction(code_type.requires());
   auto ensures = conjunction(code_type.ensures());
-
+  auto requires_contract = code_type.requires_contract();
+  auto ensures_contract = code_type.ensures_contract();
   // build:
   // if(nondet)
   //   decl ret
@@ -1473,6 +1540,16 @@ void code_contractst::add_contract_check(
     check.destructive_append(ensures_pair.second);
   }
 
+  // Translate requires_contract(ptr, contract) clauses to assumptions
+  for(auto &expr : requires_contract)
+  {
+    assume_function_pointer_obeys_contract(
+      to_function_pointer_obeys_contract_expr(expr),
+      common_replace,
+      function_symbol.mode,
+      check);
+  }
+
   // ret=mangled_function(parameter1, ...)
   check.add(goto_programt::make_function_call(call, skip->source_location()));
 
@@ -1482,6 +1559,16 @@ void code_contractst::add_contract_check(
     check.destructive_append(ensures_pair.first);
   }
 
+  // Translate ensures_contract(ptr, contract) clauses to assertions
+  for(auto &expr : ensures_contract)
+  {
+    assert_function_pointer_obeys_contract(
+      to_function_pointer_obeys_contract_expr(expr),
+      ID_postcondition,
+      common_replace,
+      function_symbol.mode,
+      check);
+  }
   if(code_type.return_type() != empty_typet())
   {
     check.add(goto_programt::make_set_return_value(

@@ -320,4 +320,96 @@ to_conditional_target_group_expr(exprt &expr)
   return ret;
 }
 
+/// \brief A class for expressions representing a
+/// `requires_contract(fptr, contract)` clause
+/// or an `ensures_contract(fptr, contract)` clause
+/// in a function contract.
+class function_pointer_obeys_contract_exprt : public exprt
+{
+public:
+  explicit function_pointer_obeys_contract_exprt(
+    exprt _function_pointer,
+    exprt _contract)
+    : exprt(ID_function_pointer_obeys_contract, empty_typet{})
+  {
+    add_to_operands(std::move(_function_pointer));
+    add_to_operands(std::move(_contract));
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 2,
+      "function pointer obeys contract expression must have two operands");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
+  const exprt &function_pointer() const
+  {
+    return op0();
+  }
+
+  exprt &function_pointer()
+  {
+    return op0();
+  }
+
+  const exprt &contract() const
+  {
+    return op1();
+  }
+
+  exprt &contract()
+  {
+    return op1();
+  }
+};
+
+inline void validate_expr(const function_pointer_obeys_contract_exprt &value)
+{
+  function_pointer_obeys_contract_exprt::check(value);
+}
+
+template <>
+inline bool
+can_cast_expr<function_pointer_obeys_contract_exprt>(const exprt &base)
+{
+  return base.id() == ID_function_pointer_obeys_contract;
+}
+
+/// \brief Cast an exprt to a \ref function_pointer_obeys_contract_exprt
+///
+/// \a expr must be known to be \ref function_pointer_obeys_contract_exprt
+///
+/// \param expr: Source expression
+/// \return Object of type \ref function_pointer_obeys_contract_exprt
+inline const function_pointer_obeys_contract_exprt &
+to_function_pointer_obeys_contract_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_function_pointer_obeys_contract);
+  auto &ret = static_cast<const function_pointer_obeys_contract_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_function_pointer_obeys_contract_expr(const exprt &expr)
+inline function_pointer_obeys_contract_exprt &
+to_function_pointer_obeys_contract_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_function_pointer_obeys_contract);
+  auto &ret = static_cast<function_pointer_obeys_contract_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_ANSI_C_C_EXPR_H

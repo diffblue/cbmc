@@ -985,6 +985,88 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
   }
 }
 
+void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
+  exprt &expr)
+{
+  if(!can_cast_expr<function_pointer_obeys_contract_exprt>(expr))
+  {
+    error().source_location = expr.source_location();
+    error() << "expected ID_function_pointer_obeys_contract expression in "
+               "requires_contract/ensures_contract clause, found "
+            << expr.id() << eom;
+    throw 0;
+  }
+
+  auto &obeys_expr = to_function_pointer_obeys_contract_expr(expr);
+
+  validate_expr(obeys_expr);
+
+  // the first parameter must be a function pointer typed assignable path
+  // expression, without side effects or ternary operator
+  auto &function_pointer = obeys_expr.function_pointer();
+  typecheck_expr(function_pointer);
+
+  if(
+    function_pointer.type().id() != ID_pointer ||
+    to_pointer_type(function_pointer.type()).subtype().id() != ID_code)
+  {
+    error().source_location = expr.source_location();
+    error() << "the first parameter of the clause must be a function pointer "
+               "expression"
+            << eom;
+    throw 0;
+  }
+
+  if(!function_pointer.get_bool(ID_C_lvalue))
+  {
+    error().source_location = function_pointer.source_location();
+    error() << "first parameter of the clause must be an lvalue" << eom;
+    throw 0;
+  }
+
+  if(has_subexpr(function_pointer, ID_side_effect))
+  {
+    error().source_location = function_pointer.source_location();
+    error() << "first parameter of the clause must have no side-effects" << eom;
+    throw 0;
+  }
+
+  if(has_subexpr(function_pointer, ID_if))
+  {
+    error().source_location = function_pointer.source_location();
+    error() << "first parameter of the clause must have no ternary operator"
+            << eom;
+    throw 0;
+  }
+
+  // second parameter must be the address of a function symbol
+  auto &contract = obeys_expr.contract();
+  typecheck_expr(contract);
+
+  if(
+    contract.id() != ID_address_of ||
+    to_address_of_expr(contract).object().id() != ID_symbol ||
+    contract.type().id() != ID_pointer ||
+    to_pointer_type(contract.type()).subtype().id() != ID_code)
+  {
+    error().source_location = expr.source_location();
+    error() << "the second parameter of the requires_contract/ensures_contract "
+               "clause must be a function symbol"
+            << eom;
+    throw 0;
+  }
+
+  if(function_pointer.type() != contract.type())
+  {
+    error().source_location = expr.source_location();
+    error() << "the first and second parameter of the "
+               "requires_contract/ensures_contract clause must have the same "
+               "function pointer type "
+            << eom;
+    throw 0;
+  }
+}
+
 void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
 {
   exprt::operandst tmp;
