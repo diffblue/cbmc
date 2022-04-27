@@ -242,6 +242,15 @@ std::string trace_numeric_value(
       }
     }
   }
+  else if(expr.id() == ID_annotated_pointer_constant)
+  {
+    const auto &annotated_pointer_constant =
+      to_annotated_pointer_constant_expr(expr);
+    auto width = to_pointer_type(expr.type()).get_width();
+    auto &value = annotated_pointer_constant.get_value();
+    auto c = constant_exprt(value, unsignedbv_typet(width));
+    return numeric_representation(c, ns, options);
+  }
   else if(expr.id()==ID_array)
   {
     std::string result;
