@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 BoxingLambda
 --function BoxingLambda.testInteger --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 \[java::BoxingLambda\.testInteger:\(\)V\.assertion\.1\] line 138 assertion at file BoxingLambda\.java line 138 function java::BoxingLambda\.testInteger:\(\)V bytecode-index 26: SUCCESS

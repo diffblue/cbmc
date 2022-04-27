@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 test
 filter.jq --json-ui --trace
 ^EXIT=0$

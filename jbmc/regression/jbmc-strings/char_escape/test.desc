@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 Test
 --function Test.test --trace --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --json-ui
 ^EXIT=10$
