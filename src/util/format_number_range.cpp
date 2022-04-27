@@ -22,21 +22,20 @@ Author: Daniel Kroening, kroening@kroening.com
 /// create shorter representation for output
 /// \param input_numbers: vector of numbers
 /// \return string of compressed number range representation
-std::string format_number_range(const std::vector<unsigned> &input_numbers)
+std::string format_number_range(const std::vector<mp_integer> &input_numbers)
 {
   PRECONDITION(!input_numbers.empty());
 
-  std::vector<unsigned> numbers(input_numbers);
+  std::vector<mp_integer> numbers(input_numbers);
   std::sort(numbers.begin(), numbers.end());
-  unsigned end_number=numbers.back();
-  if(numbers.front()==end_number)
-    return std::to_string(end_number); // only single number
+  if(numbers.front() == numbers.back())
+    return integer2string(numbers.back()); // only single number
 
   std::stringstream number_range;
 
   auto start_number = numbers.front();
 
-  for(std::vector<unsigned>::const_iterator it = numbers.begin();
+  for(std::vector<mp_integer>::const_iterator it = numbers.begin();
       it != numbers.end();
       ++it)
   {
@@ -75,14 +74,14 @@ std::string format_number_range(const std::vector<unsigned> &input_numbers)
 /// Appends \p number resp. numbers \p begin_range ... \p number to \p numbers
 static void append_numbers(
   const std::string &number_range,
-  std::vector<unsigned> &numbers,
+  std::vector<mp_integer> &numbers,
   bool last_number_is_set,
   bool is_range)
 {
   if(!last_number_is_set && is_range)
   {
     throw deserialization_exceptiont(
-      "unterminated number range '" + std::to_string(*(++numbers.rbegin())) +
+      "unterminated number range '" + integer2string(*(++numbers.rbegin())) +
       "-'");
   }
 
@@ -94,17 +93,17 @@ static void append_numbers(
 
   if(is_range)
   {
-    unsigned end_range = numbers.back();
+    mp_integer end_range = numbers.back();
     numbers.pop_back();
-    unsigned begin_range = numbers.back();
+    mp_integer begin_range = numbers.back();
     numbers.pop_back();
     if(begin_range > end_range)
     {
       throw deserialization_exceptiont(
         "lower bound must not be larger than upper bound '" +
-        std::to_string(begin_range) + "-" + std::to_string(end_range) + "'");
+        integer2string(begin_range) + "-" + integer2string(end_range) + "'");
     }
-    for(unsigned i = begin_range; i < end_range; ++i)
+    for(mp_integer i = begin_range; i < end_range; ++i)
       numbers.push_back(i);
     // add upper bound separately to avoid
     // potential overflow issues in the loop above
@@ -112,9 +111,9 @@ static void append_numbers(
   }
 }
 
-std::vector<unsigned> parse_number_range(const std::string &number_range)
+std::vector<mp_integer> parse_number_range(const std::string &number_range)
 {
-  std::vector<unsigned> numbers(1, 0);
+  std::vector<mp_integer> numbers(1, 0);
   bool last_number_is_set = false;
   bool is_range = false;
 

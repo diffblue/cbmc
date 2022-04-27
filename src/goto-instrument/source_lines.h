@@ -21,6 +21,7 @@ Author: Mark R. Tuttle
 #define CPROVER_GOTO_INSTRUMENT_SOURCE_LINES_H
 
 #include <util/irep.h>
+#include <util/mp_arith.h>
 
 #include <map>
 #include <set>
@@ -45,10 +46,10 @@ public:
   /// Construct a string representing the set of lines
   ///
   /// \return The set of lines represented as string of the form
-  ///   set1;set2;set3 where each seti is a string of the form
+  ///   set1;set2;set3 where each set is a string of the form
   ///   file:function:n1,n2,n3,n4 where n1, n2, n3, n4 are line
-  ///   numbers from the given function in the given file listed in
-  ///   ascending order.
+  ///   numbers (or ranges thereof) from the given function in the given file
+  ///   listed in ascending order.
   std::string to_string() const;
 
   /// Construct an irept representing the set of lines
@@ -60,7 +61,7 @@ public:
 
 private:
   /// A set of lines from a single function
-  typedef std::set<std::size_t> linest;
+  using linest = std::set<mp_integer>;
   /// A set of lines from multiple function
   using function_linest = std::map<std::string, linest>;
   /// A set of lines from multiple files
