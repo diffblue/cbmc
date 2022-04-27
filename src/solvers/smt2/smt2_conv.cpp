@@ -3151,7 +3151,7 @@ void smt2_convt::convert_mod(const mod_exprt &expr)
 
 void smt2_convt::convert_is_dynamic_object(const unary_exprt &expr)
 {
-  std::vector<std::size_t> dynamic_objects;
+  std::vector<mp_integer> dynamic_objects;
   pointer_logic.get_dynamic_objects(dynamic_objects);
 
   if(dynamic_objects.empty())

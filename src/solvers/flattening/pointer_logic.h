@@ -27,14 +27,14 @@ public:
 
   struct pointert
   {
-    std::size_t object;
-    mp_integer offset;
+    mp_integer object, offset;
 
     pointert()
     {
     }
 
-    pointert(std::size_t _obj, mp_integer _off):object(_obj), offset(_off)
+    pointert(mp_integer _obj, mp_integer _off)
+      : object(std::move(_obj)), offset(std::move(_off))
     {
     }
   };
@@ -45,34 +45,32 @@ public:
     const pointer_typet &type) const;
 
   /// Convert an (object,0) pair to an expression
-  exprt pointer_expr(
-    std::size_t object,
-    const pointer_typet &type) const;
+  exprt pointer_expr(const mp_integer &object, const pointer_typet &type) const;
 
   ~pointer_logict();
   explicit pointer_logict(const namespacet &_ns);
 
-  std::size_t add_object(const exprt &expr);
+  mp_integer add_object(const exprt &expr);
 
   /// \return number of NULL object
-  std::size_t get_null_object() const
+  const mp_integer &get_null_object() const
   {
     return null_object;
   }
 
   /// \return number of INVALID object
-  std::size_t get_invalid_object() const
+  const mp_integer &get_invalid_object() const
   {
     return invalid_object;
   }
 
   bool is_dynamic_object(const exprt &expr) const;
 
-  void get_dynamic_objects(std::vector<std::size_t> &objects) const;
+  void get_dynamic_objects(std::vector<mp_integer> &objects) const;
 
 protected:
   const namespacet &ns;
-  std::size_t null_object, invalid_object;
+  mp_integer null_object, invalid_object;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
