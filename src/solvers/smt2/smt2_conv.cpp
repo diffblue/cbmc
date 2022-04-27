@@ -662,7 +662,9 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
     pointer_logict::pointert ptr;
     ptr.object = numeric_cast_v<std::size_t>(v / pow);
     ptr.offset=v%pow;
-    return pointer_logic.pointer_expr(ptr, to_pointer_type(type));
+    return annotated_pointer_constant_exprt(
+      bv_expr.get_value(),
+      pointer_logic.pointer_expr(ptr, to_pointer_type(type)));
   }
   else if(type.id()==ID_struct)
   {
