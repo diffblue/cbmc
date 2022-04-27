@@ -1,0 +1,12 @@
+CORE
+pointer_values.c
+--trace
+\[main\.assertion\.1\] line \d+ should fail because a can be any pointer val, including NULL: FAILURE
+\[main\.assertion\.2\] line \d+ should fail because a and c can point to same object: FAILURE
+a=\(\(signed int \*\)NULL\)
+c=\(signed int \*\)1
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test printing of NULL pointer values in trace.

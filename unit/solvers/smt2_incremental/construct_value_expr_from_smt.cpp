@@ -68,6 +68,16 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     rowt{smt_bool_literal_termt{false}, false_exprt{}},
     rowt{smt_bit_vector_constant_termt{0, 8}, from_integer(0, c_bool_typet(8))},
     rowt{smt_bit_vector_constant_termt{1, 8}, from_integer(1, c_bool_typet(8))},
+    rowt{
+      smt_bit_vector_constant_termt{0, 64},
+      from_integer(0, pointer_typet(void_type(), 64 /* bits */))},
+    // The reason for the more intricate elaboration of a pointer with a value
+    // of 12 is a limitation in the design of from_integer, which only handles
+    // pointers with value 0 (null pointers).
+    rowt{
+      smt_bit_vector_constant_termt{12, 64},
+      constant_exprt(
+        integer2bvrep(12, 64), pointer_typet(void_type(), 64 /* bits */))},
     UNSIGNED_BIT_VECTOR_TESTS(8),
     SIGNED_BIT_VECTOR_TESTS(8),
     UNSIGNED_BIT_VECTOR_TESTS(16),
@@ -96,23 +106,31 @@ TEST_CASE(
 
   using rowt = std::tuple<smt_termt, typet, std::string>;
   std::tie(input_term, input_type, invariant_reason) = GENERATE(
-    rowt{smt_bool_literal_termt{true},
-         unsignedbv_typet{16},
-         "Bool terms may only be used to construct bool typed expressions."},
-    rowt{smt_identifier_termt{"foo", smt_bit_vector_sortt{16}},
-         unsignedbv_typet{16},
-         "Unexpected conversion of identifier to value expression."},
+    rowt{
+      smt_bool_literal_termt{true},
+      unsignedbv_typet{16},
+      "Bool terms may only be used to construct bool typed expressions."},
+    rowt{
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{16}},
+      unsignedbv_typet{16},
+      "Unexpected conversion of identifier to value expression."},
     rowt{
       smt_bit_vector_constant_termt{0, 8},
       unsignedbv_typet{16},
       "Width of smt bit vector term must match the width of bit vector type."},
-    rowt{smt_bit_vector_constant_termt{0, 8},
-         empty_typet{},
-         "construct_value_expr_from_smt for bit vector should not be applied "
-         "to unsupported type empty"},
-    rowt{smt_core_theoryt::make_not(smt_bool_literal_termt{true}),
-         unsignedbv_typet{16},
-         "Unexpected conversion of function application to value expression."});
+    rowt{
+      smt_bit_vector_constant_termt{0, 8},
+      empty_typet{},
+      "construct_value_expr_from_smt for bit vector should not be applied "
+      "to unsupported type empty"},
+    rowt{
+      smt_core_theoryt::make_not(smt_bool_literal_termt{true}),
+      unsignedbv_typet{16},
+      "Unexpected conversion of function application to value expression."},
+    rowt{
+      smt_bit_vector_constant_termt{0, 16},
+      pointer_typet{unsigned_int_type(), 0},
+      "Width of smt bit vector term must match the width of pointer type"});
   SECTION(invariant_reason)
   {
     const cbmc_invariants_should_throwt invariants_throw;

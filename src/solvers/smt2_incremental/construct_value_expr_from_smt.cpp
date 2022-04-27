@@ -1,14 +1,14 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
-
-#include <solvers/smt2_incremental/smt_terms.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/type.h>
+
+#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
+#include <solvers/smt2_incremental/smt_terms.h>
 
 class value_expr_from_smt_factoryt : public smt_term_const_downcast_visitort
 {
@@ -37,13 +37,35 @@ private:
 
   void visit(const smt_bit_vector_constant_termt &bit_vector_constant) override
   {
+    const auto sort_width = bit_vector_constant.get_sort().bit_width();
+    if(
+      const auto pointer_type =
+        type_try_dynamic_cast<pointer_typet>(type_to_construct))
+    {
+      INVARIANT(
+        pointer_type->get_width() == sort_width,
+        "Width of smt bit vector term must match the width of pointer type.");
+      if(bit_vector_constant.value() == 0)
+      {
+        result = null_pointer_exprt{*pointer_type};
+      }
+      else
+      {
+        // The reason we are manually constructing a constant_exprt here is a
+        // limitation in the design of `from_integer`, which only allows it to
+        // be used with pointer values of 0 (null pointers).
+        result = constant_exprt{
+          integer2bvrep(bit_vector_constant.value(), sort_width),
+          *pointer_type};
+      }
+      return;
+    }
     if(
       const auto bitvector_type =
         type_try_dynamic_cast<bitvector_typet>(type_to_construct))
     {
       INVARIANT(
-        bitvector_type->get_width() ==
-          bit_vector_constant.get_sort().bit_width(),
+        bitvector_type->get_width() == sort_width,
         "Width of smt bit vector term must match the width of bit vector "
         "type.");
       result = from_integer(bit_vector_constant.value(), type_to_construct);
