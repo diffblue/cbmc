@@ -2,6 +2,7 @@
 
 #include "object_tracking.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_code.h>
@@ -42,6 +43,7 @@ static decision_procedure_objectt make_null_object()
   decision_procedure_objectt null_object;
   null_object.unique_id = 0;
   null_object.base_expression = null_pointer_exprt{pointer_type(void_type())};
+  null_object.size = from_integer(0, size_type());
   return null_object;
 }
 
