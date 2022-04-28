@@ -61,6 +61,8 @@ protected:
   /// \brief Add objects in \p expr to object_map if needed and convert to smt.
   /// \note This function is non-const because it mutates the object_map.
   smt_termt convert_expr_to_smt(const exprt &expr);
+  /// Sends the solver the definitions of the object sizes.
+  void define_object_sizes();
 
   const namespacet &ns;
 
@@ -85,6 +87,7 @@ protected:
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
   smt_object_mapt object_map;
+  std::vector<bool> object_size_defined;
   smt_object_sizet object_size_function;
 };
 

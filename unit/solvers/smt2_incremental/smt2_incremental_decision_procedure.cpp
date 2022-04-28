@@ -1,6 +1,12 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
+#include <util/config.h>
+#include <util/exception_utils.h>
+#include <util/make_unique.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_commands.h>
@@ -10,12 +16,7 @@
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <testing-utils/invariant.h>
-#include <util/arith_tools.h>
-#include <util/bitvector_types.h>
-#include <util/exception_utils.h>
-#include <util/make_unique.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
+#include <testing-utils/use_catch.h>
 
 // Used by catch framework for printing in the case of test failures. This
 // means that we get error messages showing the smt formula expressed as SMT2
@@ -104,12 +105,26 @@ struct decision_procedure_test_environmentt final
   std::deque<smt_responset> mock_responses;
   std::vector<smt_commandt> sent_commands;
   null_message_handlert message_handler;
+  smt_object_sizet object_size_function;
   smt2_incremental_decision_proceduret procedure{
     ns,
     util_make_unique<smt_mock_solver_processt>(
       [&](const smt_commandt &smt_command) { this->send(smt_command); },
       [&]() { return this->receive_response(); }),
     message_handler};
+  static decision_procedure_test_environmentt make()
+  {
+    // These config lines are necessary before construction because pointer
+    // widths and object bit width encodings depend on the global configuration.
+    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+    config.ansi_c.set_arch_spec_i386();
+    return {};
+  }
+
+private:
+  // This is private to ensure the above make() function is used to make
+  // correctly configured instances.
+  decision_procedure_test_environmentt() = default;
 };
 
 void decision_procedure_test_environmentt::send(const smt_commandt &smt_command)
@@ -147,17 +162,16 @@ TEST_CASE(
   "smt2_incremental_decision_proceduret commands sent",
   "[core][smt2_incremental]")
 {
-  decision_procedure_test_environmentt test{};
+  auto test = decision_procedure_test_environmentt::make();
   SECTION("Construction / solver initialisation.")
   {
-    smt_object_sizet object_size_function;
     REQUIRE(
       test.sent_commands ==
       std::vector<smt_commandt>{
         smt_set_option_commandt{smt_option_produce_modelst{true}},
         smt_set_logic_commandt{
           smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}},
-        object_size_function.declaration});
+        test.object_size_function.declaration});
     test.sent_commands.clear();
     SECTION("Set symbol to true.")
     {
@@ -296,7 +310,7 @@ TEST_CASE(
   "smt2_incremental_decision_proceduret number of solver calls.",
   "[core][smt2_incremental]")
 {
-  decision_procedure_test_environmentt test{};
+  auto test = decision_procedure_test_environmentt::make();
   REQUIRE(test.procedure.get_number_of_solver_calls() == 0);
   test.mock_responses.push_back(smt_check_sat_responset{smt_unsat_responset{}});
   test.procedure();
@@ -311,7 +325,7 @@ TEST_CASE(
   "internal decision_proceduret::resultt",
   "[core][smt2_incremental]")
 {
-  decision_procedure_test_environmentt test{};
+  auto test = decision_procedure_test_environmentt::make();
   SECTION("sat")
   {
     test.mock_responses = {smt_check_sat_responset{smt_sat_responset{}}};
@@ -334,7 +348,7 @@ TEST_CASE(
   "response.",
   "[core][smt2_incremental]")
 {
-  decision_procedure_test_environmentt test{};
+  auto test = decision_procedure_test_environmentt::make();
   SECTION("Expected success response.")
   {
     test.mock_responses = {smt_success_responset{},
@@ -359,7 +373,7 @@ TEST_CASE(
   "check-sat.",
   "[core][smt2_incremental]")
 {
-  decision_procedure_test_environmentt test{};
+  auto test = decision_procedure_test_environmentt::make();
   SECTION("get-value response")
   {
     test.mock_responses = {
@@ -394,7 +408,10 @@ TEST_CASE(
   "smt2_incremental_decision_proceduret getting values back from solver.",
   "[core][smt2_incremental]")
 {
-  decision_procedure_test_environmentt test{};
+  auto test = decision_procedure_test_environmentt::make();
+  const auto null_object_size_definition =
+    test.object_size_function.make_definition(
+      0, smt_bit_vector_constant_termt{0, 32});
   const symbolt foo = make_test_symbol("foo", signedbv_typet{16});
   const smt_identifier_termt foo_term{"foo", smt_bit_vector_sortt{16}};
   const exprt expr_42 = from_integer({42}, signedbv_typet{16});
@@ -411,6 +428,7 @@ TEST_CASE(
       std::vector<smt_commandt>{
         smt_declare_function_commandt{foo_term, {}},
         smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
+        null_object_size_definition,
         smt_check_sat_commandt{}});
     SECTION("Get \"foo\" value back")
     {

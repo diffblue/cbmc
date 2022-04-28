@@ -323,9 +323,26 @@ static decision_proceduret::resultt lookup_decision_procedure_result(
   UNREACHABLE;
 }
 
+void smt2_incremental_decision_proceduret::define_object_sizes()
+{
+  object_size_defined.resize(object_map.size());
+  for(const auto &key_value : object_map)
+  {
+    const decision_procedure_objectt &object = key_value.second;
+    if(object_size_defined[object.unique_id])
+      continue;
+    else
+      object_size_defined[object.unique_id] = true;
+    define_dependent_functions(object.size);
+    solver_process->send(object_size_function.make_definition(
+      object.unique_id, convert_expr_to_smt(object.size)));
+  }
+}
+
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
+  define_object_sizes();
   const smt_responset result =
     get_response_to_command(*solver_process, smt_check_sat_commandt{});
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
