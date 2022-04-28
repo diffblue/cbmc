@@ -1,0 +1,16 @@
+CORE
+pointer_offset.c
+--trace
+\[main\.assertion\.1\] line \d+ expected failure because offsets should be the same: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that the pointer offset bits of two pointers pointing to
+the same object are equal.
+
+The test also contains a fragment of the test which doesn't work
+for now, but would be good to be added as soon as we get pointer
+arithmetic to work, so we can make sure that pointer offset fails
+appropriately.
