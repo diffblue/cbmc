@@ -1,5 +1,33 @@
 // Author: Diffblue Ltd.
 
+/// \file
+/// Data structures and algorithms used by smt2_incremental_decision_proceduret
+/// to track data about the objects which pointers point to. An object here
+/// is the whole of an allocated block of memory. Objects in this sense have
+/// no sub objects; only offsets. Valid examples of objects include -
+///  * Primitives stored on the stack such as `int foo;`.
+///  * Pointer primitives stored on the stack such as `int *sam;`.
+///  * The entirety of a struct stored on the stack such as -
+///    `struct bart{int eggs, int ham} bar;`
+///  * The entirety of an array stored on the stack such as `int green[20];`
+///  * The memory allocated by a malloc call - `malloc(20)`.
+/// Examples of things / expressions which are not objects -
+///  * A pointer to a primitive stored on the stack, such as `&foo` or `&sam`.
+///    The value of these pointers encodes the combination of the unique object
+///    identifier of `foo` / `sam` objects and a (zero) offset, but these
+///    pointer values / memory addresses are not in themselves objects, although
+///    the values may be stored in another object. This is a distinction between
+///    values and the objects which contain them.
+///  * A field within a struct, such as `bar.ham` from the previous example. A
+///    pointer to this field is an offset into the base `bar` object.
+///  * A pointer to element within an array, such as `&(green[5])`. A pointer to
+///    an element in this example is an offset into the base `int green[20]`
+///    object.
+/// \note
+/// The functionality in this file is intended to cover tracking objects and
+/// their sizes only. It does not track anything to do with the offsets into
+/// objects or the SMT encodings of objects / offsets / pointers.
+
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_OBJECT_TRACKING_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_OBJECT_TRACKING_H
 
