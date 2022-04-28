@@ -1316,3 +1316,28 @@ TEST_CASE("pointer_offset_exprt to SMT conversion", "[core][smt2_incremental]")
     }
   }
 }
+
+TEST_CASE(
+  "expr to smt conversion for object size expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+  const symbol_exprt foo{"foo", unsignedbv_typet{32}};
+  const object_size_exprt object_size{
+    address_of_exprt{foo}, unsignedbv_typet{64}};
+  track_expression_objects(object_size, ns, test.object_map);
+  const auto foo_id = 1;
+  CHECK(test.object_map.at(foo).unique_id == foo_id);
+  const auto object_bits = config.bv_encoding.object_bits;
+  const auto object = smt_bit_vector_constant_termt{foo_id, object_bits};
+  const auto offset = smt_bit_vector_constant_termt{0, 64 - object_bits};
+  INFO("Expression " + object_size.pretty(1, 0));
+  CHECK(
+    test.convert(object_size) ==
+    test.object_size_function.make_application(std::vector<smt_termt>{
+      smt_bit_vector_theoryt::extract(63, 64 - object_bits)(
+        smt_bit_vector_theoryt::concat(object, offset))}));
+}
