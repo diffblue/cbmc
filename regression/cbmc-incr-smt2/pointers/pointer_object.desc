@@ -1,0 +1,10 @@
+CORE
+pointer_object.c
+--trace --verbosity 10
+\[main\.assertion\.1\] line \d+ expected fail as c can be null: FAILURE
+\[main\.assertion\.2\] line \d+ expected success because d is &a: SUCCESS
+\[main\.assertion\.3\] line \d+ expected fail as e can be null: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--

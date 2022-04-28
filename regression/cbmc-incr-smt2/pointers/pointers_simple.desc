@@ -1,0 +1,12 @@
+CORE
+pointers_simple.c
+--trace
+Passing problem to incremental SMT2 solving
+\[main\.assertion.\d\] line \d a should be different than b: FAILURE
+\[main\.assertion.\d\] line \d+ a should not be different than b: SUCCESS
+\[main\.assertion.\d\] line \d+ c can get assigned a value that makes it the same what b points to: FAILURE
+c=12
+^EXIT=10$
+^SIGNAL=0$
+--
+--

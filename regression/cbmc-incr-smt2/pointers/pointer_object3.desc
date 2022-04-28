@@ -1,0 +1,13 @@
+CORE
+pointer_object3.c
+
+\[main\.assertion\.1] line \d+ expected to fail with object ID == 0: FAILURE
+\[main\.assertion\.2] line \d+ expected to fail with object ID == 1: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that the assignment of object IDs to objects is deterministic:
+* 0 for the NULL object, and
+* 1 for the single object which is the result of an address of operation

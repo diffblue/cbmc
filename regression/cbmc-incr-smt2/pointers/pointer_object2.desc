@@ -1,0 +1,17 @@
+CORE
+pointer_object2.c
+--trace --verbosity 10
+\[main\.assertion\.1\] line 13 Can be violated.: FAILURE
+nondet1=FALSE
+nondet2=TRUE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Ensure that two variables which can get assigned the address of the
+same object satisfy the __CPROVER_same_object predicate. In the code
+under test, we negate the predicate to be able to get a failure and a
+trace which we can then match against expected values which guide
+through the path that leads to the two variables getting assigned the
+same object. 

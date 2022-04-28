@@ -8,6 +8,7 @@
 #include <util/constructor_of.h>
 #include <util/format.h>
 #include <util/namespace.h>
+#include <util/pointer_predicates.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -1184,5 +1185,96 @@ TEST_CASE(
                      smt_bit_vector_theoryt::concat(
                        smt_bit_vector_constant_termt{1, 8},
                        smt_bit_vector_constant_termt{0, 56})));
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for pointer object expression",
+  "[core][smt2_incremental]")
+{
+  // The config lines are necessary to ensure that pointer width in configured.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  config.bv_encoding.object_bits = 8;
+
+  const auto pointer_type = pointer_typet(unsigned_int_type(), 64 /* bits */);
+  const pointer_object_exprt foo{
+    symbol_exprt{"foo", pointer_type}, pointer_type};
+  const pointer_object_exprt foobar{
+    symbol_exprt{"foobar", pointer_type}, pointer_type};
+
+  SECTION("Pointer object expression")
+  {
+    const auto converted = convert_expr_to_smt(foo);
+    const auto expected =
+      smt_bit_vector_theoryt::zero_extend(56)(smt_bit_vector_theoryt::extract(
+        63, 56)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
+    CHECK(converted == expected);
+  }
+
+  SECTION("Invariant checks")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    SECTION("Pointer object's operand type should be a bitvector type")
+    {
+      auto copy_of_foo = foo;
+      copy_of_foo.type() = bool_typet{};
+      REQUIRE_THROWS_MATCHES(
+        convert_expr_to_smt(copy_of_foo),
+        invariant_failedt,
+        invariant_failure_containing(
+          "Pointer object should have a bitvector-based type."));
+    }
+  }
+
+  SECTION("Comparison of pointer objects.")
+  {
+    const exprt comparison = notequal_exprt{foobar, foo};
+    INFO("Expression " + comparison.pretty(1, 0));
+    const auto converted = convert_expr_to_smt(comparison);
+    const auto bv1 =
+      smt_bit_vector_theoryt::zero_extend(56)(smt_bit_vector_theoryt::extract(
+        63, 56)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
+    const auto bv2 =
+      smt_bit_vector_theoryt::zero_extend(56)(smt_bit_vector_theoryt::extract(
+        63, 56)(smt_identifier_termt("foobar", smt_bit_vector_sortt(64))));
+    const auto expected = smt_core_theoryt::distinct(bv2, bv1);
+    CHECK(converted == expected);
+  }
+}
+
+TEST_CASE("pointer_offset_exprt to SMT conversion", "[core][smt2_incremental]")
+{
+  // The config lines are necessary to ensure that pointer width in configured.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  config.bv_encoding.object_bits = 8;
+
+  const auto pointer_type = pointer_typet(unsigned_int_type(), 64 /* bits */);
+  const pointer_offset_exprt pointer_offset{
+    symbol_exprt{"foo", pointer_type}, pointer_type};
+
+  SECTION("simple pointer_offset_exprt conversion")
+  {
+    const auto converted = convert_expr_to_smt(pointer_offset);
+    const auto expected =
+      smt_bit_vector_theoryt::zero_extend(8)(smt_bit_vector_theoryt::extract(
+        55, 0)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
+    CHECK(converted == expected);
+  }
+
+  SECTION("Invariant checks")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+    SECTION("pointer_offset_exprt's operand type should be a bitvector type")
+    {
+      auto pointer_offset_copy = pointer_offset;
+      pointer_offset_copy.type() = bool_typet{};
+      REQUIRE_THROWS_MATCHES(
+        convert_expr_to_smt(pointer_offset_copy),
+        invariant_failedt,
+        invariant_failure_containing(
+          "Pointer offset should have a bitvector-based type."));
+    }
   }
 }
