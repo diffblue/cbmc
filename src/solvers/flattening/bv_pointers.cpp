@@ -76,7 +76,7 @@ bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
   PRECONDITION(width == bv.size());
 
   const auto result = prop.new_variables(width);
-  bvt match_found;
+  bvt match_found_disjuncts;
 
   for(std::size_t i = 0; i < numbered_pointers.size(); i++)
   {
@@ -84,21 +84,21 @@ bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
       bv,
       bv_utilst::concatenate(
         bv_utilst::build_constant(i, width - 1), {const_literal(true)}));
-    match_found.push_back(cond);
+    match_found_disjuncts.push_back(cond);
     bv_utils.cond_implies_equal(
       cond,
       bv_utilst::zero_extension(numbered_pointers[i].first, width),
       result);
   }
 
-  auto within_bounds = prop.lor(match_found);
+  auto match_found = prop.lor(match_found_disjuncts);
 
   // The top bit distinguishes 'object only' vs. 'table encoded'.
   // When outside of the table, return an invalid object.
   return bv_utils.select(
     bv.back(),
     bv_utils.select(
-      within_bounds,
+      match_found,
       result,
       bv_utilst::build_constant(pointer_logic.get_invalid_object(), width)),
     bv);
@@ -110,6 +110,7 @@ bvt bv_pointerst::offset_literals(const bvt &bv, const pointer_typet &type)
   PRECONDITION(width == bv.size());
 
   const auto result = prop.new_variables(width);
+  bvt match_found_disjuncts;
 
   for(std::size_t i = 0; i < numbered_pointers.size(); i++)
   {
@@ -117,14 +118,20 @@ bvt bv_pointerst::offset_literals(const bvt &bv, const pointer_typet &type)
       bv,
       bv_utilst::concatenate(
         bv_utilst::build_constant(i, width - 1), {const_literal(true)}));
+    match_found_disjuncts.push_back(cond);
     bv_utils.cond_implies_equal(
       cond,
       bv_utilst::sign_extension(numbered_pointers[i].second, width),
       result);
   }
 
+  auto match_found = prop.lor(match_found_disjuncts);
+
   // the top bit distinguishes 'object only' vs. 'table encoded'
-  return bv_utils.select(bv.back(), result, bv_utilst::zeros(width));
+  return bv_utils.select(
+    bv.back(),
+    bv_utils.select(match_found, result, bv_utilst::zeros(width)),
+    bv_utilst::zeros(width));
 }
 
 bvt bv_pointerst::object_offset_encoding(
@@ -436,11 +443,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       op_type.id() == ID_c_enum || op_type.id() == ID_c_enum_tag)
     {
       // Cast from a bitvector type to pointer.
-      // We just do a zero extension.
-
+      // We interpret as NULL + offset, where the offset is
+      // derived from the bitvector by zero extension.
       const bvt &op_bv=convert_bv(op);
-
-      return bv_utils.zero_extension(op_bv, bits);
+      return object_offset_encoding(
+        bv_utilst::zeros(bits), bv_utilst::zero_extension(op_bv, bits), type);
     }
   }
   else if(expr.id()==ID_if)

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --pointer-check --no-simplify --no-propagation
 ^EXIT=0$
