@@ -181,7 +181,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     CHECK_RETURN(entry.total_width > 0);
   }
   else if(type_id==ID_pointer)
-    entry.total_width = type_checked_cast<pointer_typet>(type).get_width();
+  {
+    // encode pointers using twice the number of bits
+    entry.total_width = 2 * type_checked_cast<pointer_typet>(type).get_width();
+  }
   else if(type_id==ID_struct_tag)
     entry.total_width = operator()(ns.follow_tag(to_struct_tag_type(type)));
   else if(type_id==ID_union_tag)

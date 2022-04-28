@@ -34,7 +34,6 @@ protected:
 
   std::size_t get_object_width(const pointer_typet &) const;
   std::size_t get_offset_width(const pointer_typet &) const;
-  std::size_t get_address_width(const pointer_typet &) const;
 
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
@@ -109,6 +108,10 @@ protected:
   /// \param offset: Encoded offset
   /// \return Pointer encoding
   static bvt object_offset_encoding(const bvt &object, const bvt &offset);
+
+  /// Table that maps a 'pointer number' to its full-width bit-vector.
+  /// Used for conversion of pointers to integers.
+  std::vector<bvt> numbered_pointers;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H

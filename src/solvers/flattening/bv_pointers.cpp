@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
@@ -71,23 +70,17 @@ bv_pointerst::endianness_map(const typet &type, bool little_endian) const
   return bv_endianness_mapt{type, little_endian, ns, bv_width};
 }
 
-std::size_t bv_pointerst::get_object_width(const pointer_typet &) const
+std::size_t bv_pointerst::get_object_width(const pointer_typet &type) const
 {
-  // not actually type-dependent for now
-  return config.bv_encoding.object_bits;
+  return type.get_width();
 }
 
 std::size_t bv_pointerst::get_offset_width(const pointer_typet &type) const
 {
-  const std::size_t pointer_width = type.get_width();
+  const std::size_t pointer_width = 2 * type.get_width();
   const std::size_t object_width = get_object_width(type);
   PRECONDITION(pointer_width >= object_width);
   return pointer_width - object_width;
-}
-
-std::size_t bv_pointerst::get_address_width(const pointer_typet &type) const
-{
-  return type.get_width();
 }
 
 bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
@@ -380,12 +373,31 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       can_cast_type<bitvector_typet>(op_type) || op_type.id() == ID_bool ||
       op_type.id() == ID_c_enum || op_type.id() == ID_c_enum_tag)
     {
-      // Cast from a bitvector type to pointer.
-      // We just do a zero extension.
-
+      // Cast from a bitvector type 'i' to pointer.
+      // 1) top bit not set: NULL + i, zero extended
+      // 2) top bit set: numbered pointer
       const bvt &op_bv=convert_bv(op);
+      auto top_bit = op_bv.back();
+      const auto numbered_pointer_bv = prop.new_variables(bits);
 
-      return bv_utils.zero_extension(op_bv, bits);
+      for(std::size_t i = 1; i < numbered_pointers.size(); i++)
+      {
+        auto cond = bv_utils.equal(
+          op_bv,
+          bv_utilst::concatenate(
+            bv_utilst::build_constant(i, op_bv.size() - 1), {const_literal(true)}));
+        bv_utils.cond_implies_equal(
+          cond,
+          bv_utilst::zero_extension(numbered_pointers[i], bits),
+          numbered_pointer_bv);
+      }
+
+      auto null_object_bv = object_offset_encoding(
+        bv_utilst::build_constant(pointer_logic.get_null_object(), get_object_width(type)),
+        bv_utilst::concatenate(
+          bv_utilst::zero_extension(op_bv, get_offset_width(type) - 1), {const_literal(false)}));
+
+      return bv_utils.select(top_bit, numbered_pointer_bv, null_object_bv);
     }
   }
   else if(expr.id()==ID_if)
@@ -736,17 +748,30 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     expr.id() == ID_typecast &&
     to_typecast_expr(expr).op().type().id() == ID_pointer)
   {
-    // pointer to int
-    bvt op0 = convert_pointer_type(to_typecast_expr(expr).op());
+    // Pointer to int.
+    // We special-case NULL, which should always yield 0.
+    // Otherwise, we 'number' these, which are indicated by setting
+    // the top bit.
+    const auto &pointer_expr = to_typecast_expr(expr).op();
+    const bvt pointer_bv = convert_pointer_type(pointer_expr);
+    const auto is_null = bv_utils.is_zero(pointer_bv);
+    const auto target_width = boolbv_width(expr.type());
 
-    // squeeze it in!
-
-    std::size_t width=boolbv_width(expr.type());
-
-    if(width==0)
+    if(target_width == 0)
       return conversion_failed(expr);
 
-    return bv_utils.zero_extension(op0, width);
+    if(numbered_pointers.empty())
+      numbered_pointers.emplace_back(bvt{});
+
+    const auto number = numbered_pointers.size();
+
+    numbered_pointers.push_back(pointer_bv);
+
+    return bv_utils.select(
+      is_null,
+      bv_utils.zeros(target_width),
+      bv_utilst::concatenate(
+        bv_utils.build_constant(number, target_width - 1), {const_literal(true)}));
   }
   else if(expr.id() == ID_object_address)
   {
