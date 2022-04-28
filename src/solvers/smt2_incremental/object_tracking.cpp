@@ -64,10 +64,12 @@ void track_expression_objects(
       const auto find_result = object_map.find(object_base);
       if(find_result != object_map.cend())
         return;
+      const auto size = size_of_expr(object_base.type(), ns);
+      INVARIANT(size, "Objects are expected to have well defined size");
       decision_procedure_objectt object;
       object.base_expression = object_base;
       object.unique_id = object_map.size();
-      object.size = size_of_expr(object_base.type(), ns);
+      object.size = *size;
       object_map.emplace_hint(find_result, object_base, std::move(object));
     });
 }

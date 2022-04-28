@@ -17,7 +17,7 @@ struct decision_procedure_objectt
   /// Number which uniquely identifies this particular object.
   std::size_t unique_id;
   /// Expression which evaluates to the size of the object in bytes.
-  optionalt<exprt> size;
+  exprt size;
 };
 
 /// The model of addresses we use consists of a unique object identifier and an
