@@ -150,12 +150,14 @@ TEST_CASE(
   decision_procedure_test_environmentt test{};
   SECTION("Construction / solver initialisation.")
   {
+    smt_object_sizet object_size_function;
     REQUIRE(
       test.sent_commands ==
       std::vector<smt_commandt>{
         smt_set_option_commandt{smt_option_produce_modelst{true}},
         smt_set_logic_commandt{
-          smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}}});
+          smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}},
+        object_size_function.declaration});
     test.sent_commands.clear();
     SECTION("Set symbol to true.")
     {

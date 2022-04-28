@@ -10,6 +10,7 @@
 #include <util/std_expr.h>
 
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/smt_object_size.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/stack_decision_procedure.h>
 
@@ -84,6 +85,7 @@ protected:
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
   smt_object_mapt object_map;
+  smt_object_sizet object_size_function;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
