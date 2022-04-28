@@ -1,0 +1,17 @@
+CORE
+object_size.c
+--trace
+line 12 Expected int sizes\.: SUCCESS
+line 13 Size is always 2\. \(Can be disproved\.\): FAILURE
+line 14 Size is always 4\. \(Can be disproved\.\): FAILURE
+line 16 Size of NULL\.: FAILURE
+size=2ul
+size=4ul
+null_size=0ul
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that the model of object_size can take only the expected values in the case
+where the pointer it is given may point to one of two objects. Test that the
+size of the null object is zero.
