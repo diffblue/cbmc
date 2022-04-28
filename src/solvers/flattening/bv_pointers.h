@@ -40,7 +40,7 @@ protected:
   typedef boolbvt SUB;
 
   NODISCARD
-  bvt encode(std::size_t object, const pointer_typet &) const;
+  bvt encode(const mp_integer &object, const pointer_typet &) const;
 
   virtual bvt convert_pointer_type(const exprt &);
 

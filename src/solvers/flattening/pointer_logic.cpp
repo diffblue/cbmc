@@ -31,17 +31,17 @@ bool pointer_logict::is_dynamic_object(const exprt &expr) const
             SYMEX_DYNAMIC_PREFIX));
 }
 
-void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
+void pointer_logict::get_dynamic_objects(std::vector<mp_integer> &o) const
 {
   o.clear();
-  std::size_t nr=0;
+  mp_integer nr = 0;
 
   for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++nr)
     if(is_dynamic_object(*it))
       o.push_back(nr);
 }
 
-std::size_t pointer_logict::add_object(const exprt &expr)
+mp_integer pointer_logict::add_object(const exprt &expr)
 {
   // remove any index/member
 
@@ -58,11 +58,10 @@ std::size_t pointer_logict::add_object(const exprt &expr)
 }
 
 exprt pointer_logict::pointer_expr(
-  std::size_t object,
+  const mp_integer &object,
   const pointer_typet &type) const
 {
-  pointert pointer(object, 0);
-  return pointer_expr(pointer, type);
+  return pointer_expr({object, 0}, type);
 }
 
 exprt pointer_logict::pointer_expr(
@@ -89,10 +88,11 @@ exprt pointer_logict::pointer_expr(
 
   if(pointer.object>=objects.size())
   {
-    return constant_exprt("INVALID-" + std::to_string(pointer.object), type);
+    return constant_exprt("INVALID-" + integer2string(pointer.object), type);
   }
 
-  const exprt &object_expr=objects[pointer.object];
+  const exprt &object_expr =
+    objects[numeric_cast_v<std::size_t>(pointer.object)];
 
   typet subtype = type.base_type();
   // This is a gcc extension.

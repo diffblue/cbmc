@@ -816,18 +816,14 @@ exprt bv_pointerst::bv_get_rec(
     bvrep, pointer_logic.pointer_expr(pointer, pt)};
 }
 
-bvt bv_pointerst::encode(std::size_t addr, const pointer_typet &type) const
+bvt bv_pointerst::encode(const mp_integer &addr, const pointer_typet &type)
+  const
 {
   const std::size_t offset_bits = get_offset_width(type);
   const std::size_t object_bits = get_object_width(type);
 
   bvt zero_offset(offset_bits, const_literal(false));
-
-  // set variable part
-  bvt object;
-  object.reserve(object_bits);
-  for(std::size_t i=0; i<object_bits; i++)
-    object.push_back(const_literal((addr & (std::size_t(1) << i)) != 0));
+  bvt object = bv_utils.build_constant(addr, object_bits);
 
   return object_offset_encoding(object, zero_offset);
 }
@@ -889,7 +885,7 @@ bvt bv_pointerst::offset_arithmetic(
 
 bvt bv_pointerst::add_addr(const exprt &expr)
 {
-  std::size_t a=pointer_logic.add_object(expr);
+  const auto a = pointer_logic.add_object(expr);
 
   const pointer_typet type = pointer_type(expr.type());
   const std::size_t object_bits = get_object_width(type);
