@@ -1291,7 +1291,8 @@ static smt_termt convert_expr_to_smt(
 static smt_termt dispatch_expr_to_smt_conversion(
   const exprt &expr,
   const sub_expression_mapt &converted,
-  const smt_object_mapt &object_map)
+  const smt_object_mapt &object_map,
+  const smt_object_sizet::make_applicationt &object_size)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
   {
@@ -1647,8 +1648,10 @@ at_scope_exitt<functiont> at_scope_exit(functiont exit_function)
 }
 #endif
 
-smt_termt
-convert_expr_to_smt(const exprt &expr, const smt_object_mapt &object_map)
+smt_termt convert_expr_to_smt(
+  const exprt &expr,
+  const smt_object_mapt &object_map,
+  const smt_object_sizet::make_applicationt &object_size)
 {
 #ifndef CPROVER_INVARIANT_DO_NOT_CHECK
   static bool in_conversion = false;
@@ -1665,8 +1668,8 @@ convert_expr_to_smt(const exprt &expr, const smt_object_mapt &object_map)
     const auto find_result = sub_expression_map.find(expr);
     if(find_result != sub_expression_map.cend())
       return;
-    smt_termt term =
-      dispatch_expr_to_smt_conversion(expr, sub_expression_map, object_map);
+    smt_termt term = dispatch_expr_to_smt_conversion(
+      expr, sub_expression_map, object_map, object_size);
     sub_expression_map.emplace_hint(find_result, expr, std::move(term));
   });
   return std::move(sub_expression_map.at(expr));

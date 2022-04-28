@@ -45,7 +45,8 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
 
 smt_termt convert_expr_to_smt(const exprt &expression)
 {
-  return convert_expr_to_smt(expression, initial_smt_object_map());
+  return convert_expr_to_smt(
+    expression, initial_smt_object_map(), smt_object_sizet{}.make_application);
 }
 
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
@@ -1092,6 +1093,7 @@ TEST_CASE(
   config.ansi_c.set_arch_spec_x86_64();
   const symbol_tablet symbol_table;
   const namespacet ns{symbol_table};
+  const smt_object_sizet object_size;
   smt_object_mapt object_map = initial_smt_object_map();
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const symbol_exprt bar{"bar", unsignedbv_typet{32}};
@@ -1103,7 +1105,8 @@ TEST_CASE(
     SECTION("8 object bits")
     {
       config.bv_encoding.object_bits = 8;
-      const auto converted = convert_expr_to_smt(address_of_foo, object_map);
+      const auto converted = convert_expr_to_smt(
+        address_of_foo, object_map, object_size.make_application);
       CHECK(object_map.at(foo).unique_id == 1);
       CHECK(
         converted == smt_bit_vector_theoryt::concat(
@@ -1113,7 +1116,8 @@ TEST_CASE(
     SECTION("16 object bits")
     {
       config.bv_encoding.object_bits = 16;
-      const auto converted = convert_expr_to_smt(address_of_foo, object_map);
+      const auto converted = convert_expr_to_smt(
+        address_of_foo, object_map, object_size.make_application);
       CHECK(object_map.at(foo).unique_id == 1);
       CHECK(
         converted == smt_bit_vector_theoryt::concat(
@@ -1129,7 +1133,8 @@ TEST_CASE(
       exprt address_of = address_of_exprt{foo};
       address_of.type() = bool_typet{};
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of, object_map),
+        convert_expr_to_smt(
+          address_of, object_map, object_size.make_application),
         invariant_failedt,
         invariant_failure_containing(
           "Result of the address_of operator should have pointer type."));
@@ -1137,7 +1142,8 @@ TEST_CASE(
     SECTION("Objects should already be tracked")
     {
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        convert_expr_to_smt(
+          address_of_exprt{foo}, object_map, object_size.make_application),
         invariant_failedt,
         invariant_failure_containing("Objects should be tracked before "
                                      "converting their address to SMT terms"));
@@ -1149,7 +1155,8 @@ TEST_CASE(
       track_expression_objects(address_of_foo, ns, object_map);
       object_map.at(foo).unique_id = 256;
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        convert_expr_to_smt(
+          address_of_exprt{foo}, object_map, object_size.make_application),
         invariant_failedt,
         invariant_failure_containing("There should be sufficient bits to "
                                      "encode unique object identifier."));
@@ -1161,7 +1168,8 @@ TEST_CASE(
       track_expression_objects(address_of_foo, ns, object_map);
       object_map.at(foo).unique_id = 256;
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        convert_expr_to_smt(
+          address_of_exprt{foo}, object_map, object_size.make_application),
         invariant_failedt,
         invariant_failure_containing("Pointer should be wider than object_bits "
                                      "in order to allow for offset encoding."));
@@ -1174,7 +1182,8 @@ TEST_CASE(
       notequal_exprt{address_of_exprt{foo}, address_of_exprt{bar}};
     track_expression_objects(comparison, ns, object_map);
     INFO("Expression " + comparison.pretty(1, 0));
-    const auto converted = convert_expr_to_smt(comparison, object_map);
+    const auto converted =
+      convert_expr_to_smt(comparison, object_map, object_size.make_application);
     CHECK(object_map.at(foo).unique_id == 2);
     CHECK(object_map.at(bar).unique_id == 1);
     CHECK(

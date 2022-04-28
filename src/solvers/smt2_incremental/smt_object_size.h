@@ -17,9 +17,10 @@ struct smt_object_sizet final
   /// The command for declaring the object size function. The defined function
   /// takes a bit vector encoded unique object identifier and returns
   smt_declare_function_commandt declaration;
-  /// Function which makes applications of the function.
-  smt_function_application_termt::factoryt<smt_command_functiont>
-    make_application;
+  /// Function which makes applications of the smt function.
+  using make_applicationt =
+    smt_function_application_termt::factoryt<smt_command_functiont>;
+  make_applicationt make_application;
   /// Makes the command to define the resulting \p size of calling the object
   /// size function with \p unique_id.
   smt_commandt make_definition(std::size_t unique_id, smt_termt size) const;

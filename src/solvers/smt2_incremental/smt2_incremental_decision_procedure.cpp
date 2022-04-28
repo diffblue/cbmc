@@ -163,7 +163,8 @@ smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
   track_expression_objects(expr, ns, object_map);
-  return ::convert_expr_to_smt(expr, object_map);
+  return ::convert_expr_to_smt(
+    expr, object_map, object_size_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -206,7 +207,8 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         objects_are_already_tracked(expr, object_map),
         "Objects in expressions being read should already be tracked from "
         "point of being set/handled.");
-      descriptor = ::convert_expr_to_smt(expr, object_map);
+      descriptor = ::convert_expr_to_smt(
+        expr, object_map, object_size_function.make_application);
     }
     else
     {
