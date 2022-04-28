@@ -45,6 +45,10 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
 
 smt_termt convert_expr_to_smt(const exprt &expression)
 {
+  // These config lines are necessary before conversion because pointer
+  // widths and object bit width encodings depend on the global configuration.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_i386();
   return convert_expr_to_smt(
     expression, initial_smt_object_map(), smt_object_sizet{}.make_application);
 }

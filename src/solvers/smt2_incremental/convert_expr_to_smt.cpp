@@ -1238,11 +1238,18 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt convert_expr_to_smt(
   const object_size_exprt &object_size,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const smt_object_sizet::make_applicationt &call_object_size)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for object_size expression: " +
-    object_size.pretty());
+  const smt_termt &pointer = converted.at(object_size.pointer());
+  const auto pointer_sort = pointer.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    pointer_sort, "Pointers should be encoded as bit vector sorted terms.");
+  const std::size_t pointer_width = pointer_sort->bit_width();
+  return call_object_size(
+    std::vector<smt_termt>{smt_bit_vector_theoryt::extract(
+      pointer_width - 1,
+      pointer_width - config.bv_encoding.object_bits)(pointer)});
 }
 
 static smt_termt
@@ -1292,7 +1299,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   const exprt &expr,
   const sub_expression_mapt &converted,
   const smt_object_mapt &object_map,
-  const smt_object_sizet::make_applicationt &object_size)
+  const smt_object_sizet::make_applicationt &call_object_size)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
   {
@@ -1590,7 +1597,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   }
   if(const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
-    return convert_expr_to_smt(*object_size, converted);
+    return convert_expr_to_smt(*object_size, converted, call_object_size);
   }
   if(const auto let = expr_try_dynamic_cast<let_exprt>(expr))
   {
