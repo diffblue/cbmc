@@ -385,7 +385,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         auto cond = bv_utils.equal(
           op_bv,
           bv_utilst::concatenate(
-            bv_utilst::build_constant(i, op_bv.size() - 1), {const_literal(true)}));
+            bv_utilst::build_constant(i, op_bv.size() - 1),
+            {const_literal(true)}));
         bv_utils.cond_implies_equal(
           cond,
           bv_utilst::zero_extension(numbered_pointers[i], bits),
@@ -393,9 +394,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       }
 
       auto null_object_bv = object_offset_encoding(
-        bv_utilst::build_constant(pointer_logic.get_null_object(), get_object_width(type)),
+        bv_utilst::build_constant(
+          pointer_logic.get_null_object(), get_object_width(type)),
         bv_utilst::concatenate(
-          bv_utilst::zero_extension(op_bv, get_offset_width(type) - 1), {const_literal(false)}));
+          bv_utilst::zero_extension(op_bv, get_offset_width(type) - 1),
+          {const_literal(false)}));
 
       return bv_utils.select(top_bit, numbered_pointer_bv, null_object_bv);
     }
@@ -771,7 +774,8 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       is_null,
       bv_utils.zeros(target_width),
       bv_utilst::concatenate(
-        bv_utils.build_constant(number, target_width - 1), {const_literal(true)}));
+        bv_utils.build_constant(number, target_width - 1),
+        {const_literal(true)}));
   }
   else if(expr.id() == ID_object_address)
   {
