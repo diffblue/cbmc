@@ -90,6 +90,69 @@ point into another memory object (such as could happen when running on a real
 machine). To verify that pointers stay within the bounds of their pointees, the
 CBMC option `--pointer-overflow-check` can be used.
 
+### Malloc modelling
+
+CBMC ships a model of `malloc` that seeks to emulate the behaviour of the C
+standard library. This model is configurable to suit the assumptions the
+software under scrutiny may be making. One common assumption, matched by CBMC's
+default configuration, is that dynamic memory allocation always succeeds and
+`malloc` never returns a `NULL` pointer. Code making such an assumption will
+look as follows:
+
+```C
+int *p = malloc(sizeof(int));
+*p = 42; // unconditional dereference, no check for p being NULL
+```
+
+This extends to the case of `malloc(0)`, and CBMC returns a valid pointer to an
+object. The size of that object is zero, implying that any attempt to read from
+or write to this object will result in an out-of-bounds access. The ensuing
+undefined behaviour can be detected by running CBMC with `--pointer-check`.
+
+In an actual execution, however, memory allocation may fail for a number of
+reasons and `malloc` would return a NULL pointer. CBMC's model can, therefore,
+also be configured to fail allocating memory when the requested allocation size
+is larger than representable under CBMC's object-offset model (as described in
+[Memory and pointers in CBMC](#memory-and-pointers-in-cbmc)), or even
+non-deterministically fail (for any size). Any such failure can either result in
+calls to `malloc` returning `NULL`, or reporting such a call as a failed
+property. The following command line options facilitate the above failure
+configurations:
+
+|Flag                    |  Check                                            |
+|------------------------|---------------------------------------------------|
+| `--malloc-fail-null`   |  return NULL when emulating an allocation failure |
+| `--malloc-fail-assert` |  report a failed property upon allocation failure |
+| `--malloc-may-fail`    |  non-deterministically fail to allocate           |
+
+Note that the use of `--malloc-may-fail` also requires one of
+`--malloc-fail-null` or `--malloc-fail-assert` to be given. The following code
+example demonstrates the effect of these options:
+
+```C
+int error = 0;
+int *p = malloc(sizeof(int));
+if(p != NULL)
+  *p = 42;
+else
+  error = 1;
+```
+
+Under CBMC's default model of `malloc`, the `else` branch is unreachable.
+When running CBMC with `--malloc-fail-null --malloc-may-fail`, `p` would
+non-deterministically be set to `NULL`, making all branches in the above code
+reachable.
+
+When running CBMC with `--malloc-fail-assert --malloc-may-fail`, CBMC reports a
+failed property instead of returning `NULL`. The `else` branch remains
+unreachable.
+
+These malloc failure options need to be set when the C library model is added to
+the program. Typically this is upon invoking CBMC, but if the user has chosen to
+do so via \ref goto-instrument (using `goto-instrument --add-library`), then the
+malloc failure mode needs to be specified with that `goto-instrument`
+invocation, i.e., as an option to `goto-instrument`.
+
 ## Uninitialized pointers
 
 In verification tools, uninitialized variables are typically treated as having a
