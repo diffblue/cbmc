@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --harness-type call-function --function test_ptr_array --treat-pointer-as-array input_array
 \[test_ptr_array\.assertion\.1\] line \d+ assertion input_array\[0\] == 0: SUCCESS

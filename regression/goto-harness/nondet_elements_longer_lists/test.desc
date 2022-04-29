@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --harness-type call-function --max-nondet-tree-depth 4 --min-null-tree-depth 1 --function test_function
 \[test_function.assertion.\d+\] line \d+ assertion list_walker->datum == \+\+i: SUCCESS
