@@ -39,7 +39,7 @@ void cover_location_instrumentert::instrument(
       const auto &source_lines = basic_blocks.source_lines_of(block_nr);
       const std::string comment =
         "block " + b + " (lines " + source_lines.to_string() + ")";
-      source_location.set_basic_block_source_lines(source_lines.to_string());
+      source_location.set_basic_block_source_lines(source_lines.to_irep());
       goto_program.insert_before_swap(i_it);
       *i_it = make_assertion(false_exprt(), source_location);
       initialize_source_location(i_it, comment, function_id);

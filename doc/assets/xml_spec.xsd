@@ -173,6 +173,37 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="line">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="file" type="xs:string"/>
+          <xs:attribute name="function" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="basic_block_lines">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="line" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="goal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="location" minOccurs="0"/>
+        <xs:element ref="basic_block_lines" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="description" type="xs:string"/>
+      <xs:attribute name="id" type="xs:string"/>
+      <xs:attribute name="status" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="message">
     <xs:complexType>
       <xs:sequence>
@@ -217,6 +248,7 @@
         <xs:element ref="result"/>
         <xs:element ref="refinement-iteration"/>
         <xs:element ref="fault-localization"/>
+        <xs:element ref="goal"/>
        </xs:choice>
       <xs:element ref="cprover-status" minOccurs="0"/>
       </xs:sequence>

@@ -20,6 +20,8 @@ Author: Mark R. Tuttle
 #ifndef CPROVER_GOTO_INSTRUMENT_SOURCE_LINES_H
 #define CPROVER_GOTO_INSTRUMENT_SOURCE_LINES_H
 
+#include <util/irep.h>
+
 #include <map>
 #include <set>
 #include <string>
@@ -49,11 +51,20 @@ public:
   ///   ascending order.
   std::string to_string() const;
 
+  /// Construct an irept representing the set of lines
+  ///
+  /// \return The set of lines represented as an irept where each file is a
+  ///   is a named_sub, each function is a named_sub therein, and line numbers
+  ///   (or ranges thereof) are the string value.
+  irept to_irep() const;
+
 private:
-  /// A set of lines from a single file
+  /// A set of lines from a single function
   typedef std::set<std::size_t> linest;
+  /// A set of lines from multiple function
+  using function_linest = std::map<std::string, linest>;
   /// A set of lines from multiple files
-  typedef std::map<std::string, linest> block_linest;
+  using block_linest = std::map<std::string, function_linest>;
 
   block_linest block_lines;
 };
