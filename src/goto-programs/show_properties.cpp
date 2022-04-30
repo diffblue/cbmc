@@ -133,9 +133,9 @@ void convert_properties_json(
       {"expression",
        json_stringt(from_expr(ns, identifier, ins.get_condition()))}};
 
-    if(!source_location.get_basic_block_covered_lines().empty())
+    if(!source_location.get_basic_block_source_lines().empty())
       json_property["coveredLines"] =
-        json_stringt(source_location.get_basic_block_covered_lines());
+        json_stringt(source_location.get_basic_block_source_lines());
 
     json_properties.push_back(std::move(json_property));
   }
