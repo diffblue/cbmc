@@ -48,8 +48,8 @@ void havoc_assigns_clause_targetst::get_instructions(goto_programt &dest)
   for(const auto &pair : from_stack_alloc)
     havoc_if_valid(pair.second, havoc_program);
 
-  for(const auto &pair : from_heap_alloc)
-    havoc_if_valid(pair.second, havoc_program);
+  for(const auto &car : from_heap_alloc)
+    havoc_if_valid(car, havoc_program);
 
   for(const auto &pair : from_static_local)
   {
