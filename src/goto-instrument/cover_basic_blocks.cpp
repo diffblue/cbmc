@@ -11,9 +11,7 @@ Author: Peter Schrammel
 
 #include "cover_basic_blocks.h"
 
-#include <util/format_number_range.h>
 #include <util/message.h>
-#include <util/string2int.h>
 
 optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
   const goto_programt::const_targett &instruction,
@@ -80,12 +78,6 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
       it->is_goto() || it->is_function_call();
 #endif
   }
-
-  for(auto &block_info : block_infos)
-  {
-    update_covered_lines(block_info);
-    update_source_lines(block_info);
-  }
 }
 
 std::size_t cover_basic_blockst::block_of(goto_programt::const_targett t) const
@@ -107,6 +99,13 @@ cover_basic_blockst::source_location_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
   return block_infos[block_nr].source_location;
+}
+
+const source_linest &
+cover_basic_blockst::source_lines_of(const std::size_t block_nr) const
+{
+  INVARIANT(block_nr < block_infos.size(), "block number out of range");
+  return block_infos[block_nr].source_lines;
 }
 
 void cover_basic_blockst::report_block_anomalies(
@@ -158,7 +157,6 @@ void cover_basic_blockst::add_block_lines(
     const irep_idt &line = location.get_line();
     if(!line.empty())
     {
-      block.lines.insert(unsafe_string2unsigned(id2string(line)));
       block.source_lines.insert(location);
     }
   };
@@ -167,35 +165,9 @@ void cover_basic_blockst::add_block_lines(
     [&](const exprt &expr) { add_location(expr.source_location()); });
 }
 
-void cover_basic_blockst::update_covered_lines(block_infot &block_info)
-{
-  if(block_info.source_location.is_nil())
-    return;
-
-  const auto &cover_set = block_info.lines;
-  INVARIANT(!cover_set.empty(), "covered lines set must not be empty");
-  std::vector<unsigned> line_list(cover_set.begin(), cover_set.end());
-
-  std::string covered_lines = format_number_range(line_list);
-  block_info.source_location.set_basic_block_covered_lines(covered_lines);
-}
-
-void cover_basic_blockst::update_source_lines(block_infot &block_info)
-{
-  if(block_info.source_location.is_nil())
-    return;
-
-  const auto &source_lines = block_info.source_lines;
-  std::string str = source_lines.to_string();
-  INVARIANT(!str.empty(), "source lines set must not be empty");
-  block_info.source_location.set_basic_block_source_lines(str);
-}
-
 cover_basic_blocks_javat::cover_basic_blocks_javat(
   const goto_programt &_goto_program)
 {
-  std::set<std::size_t> source_lines_requiring_update;
-
   forall_goto_program_instructions(it, _goto_program)
   {
     const auto &location = it->source_location();
@@ -205,21 +177,12 @@ cover_basic_blocks_javat::cover_basic_blocks_javat(
     {
       block_infos.push_back(it);
       block_locations.push_back(location);
-      block_locations.back().set_basic_block_covered_lines(location.get_line());
       block_source_lines.emplace_back(location);
-      source_lines_requiring_update.insert(entry.first->second);
     }
     else
     {
       block_source_lines[entry.first->second].insert(location);
-      source_lines_requiring_update.insert(entry.first->second);
     }
-  }
-
-  for(std::size_t i : source_lines_requiring_update)
-  {
-    block_locations.at(i).set_basic_block_source_lines(
-      block_source_lines.at(i).to_string());
   }
 }
 
@@ -244,6 +207,13 @@ cover_basic_blocks_javat::source_location_of(const std::size_t block_nr) const
 {
   PRECONDITION(block_nr < block_locations.size());
   return block_locations[block_nr];
+}
+
+const source_linest &
+cover_basic_blocks_javat::source_lines_of(const std::size_t block_nr) const
+{
+  PRECONDITION(block_nr < block_locations.size());
+  return block_source_lines[block_nr];
 }
 
 void cover_basic_blocks_javat::output(std::ostream &out) const

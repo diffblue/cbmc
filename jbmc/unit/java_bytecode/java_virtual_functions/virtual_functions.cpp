@@ -159,12 +159,12 @@ SCENARIO(
               // instruction with a new bytecode index begins with ASSERT
               REQUIRE(it->type() == goto_program_instruction_typet::ASSERT);
               // the assertion corresponds to a line coverage goal
-              REQUIRE_FALSE(loc.get_basic_block_covered_lines().empty());
+              REQUIRE_FALSE(loc.get_basic_block_source_lines().is_nil());
             }
             else
             {
               // there is no line coverage goal in the middle of a block
-              REQUIRE(loc.get_basic_block_covered_lines().empty());
+              REQUIRE(loc.get_basic_block_source_lines().is_nil());
             }
 
             ++it;

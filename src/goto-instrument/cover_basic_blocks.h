@@ -43,6 +43,10 @@ public:
   virtual const source_locationt &
   source_location_of(std::size_t block_nr) const = 0;
 
+  /// \param block_nr: a block number
+  /// \return the source lines of the given block
+  virtual const source_linest &source_lines_of(std::size_t block_nr) const = 0;
+
   /// Outputs the list of blocks
   virtual void output(std::ostream &out) const = 0;
 
@@ -84,6 +88,10 @@ public:
   const source_locationt &
   source_location_of(std::size_t block_nr) const override;
 
+  /// \param block_nr: a block number
+  /// \return the source lines of the given block
+  const source_linest &source_lines_of(std::size_t block_nr) const override;
+
   /// Output warnings about ignored blocks
   /// \param function_id: name of \p goto_program
   /// \param goto_program: The goto program
@@ -109,9 +117,6 @@ private:
     ///  the line number ranges to them)
     source_locationt source_location;
 
-    /// the set of lines belonging to this block
-    std::unordered_set<std::size_t> lines;
-
     /// the set of source code lines belonging to this block
     source_linest source_lines;
   };
@@ -125,14 +130,6 @@ private:
   static void add_block_lines(
     cover_basic_blockst::block_infot &block,
     const goto_programt::instructiont &instruction);
-
-  /// create list of covered lines as CSV string and set as property of source
-  /// location of basic block, compress to ranges if applicable
-  static void update_covered_lines(block_infot &block_info);
-
-  /// create a string representing source lines and set as a property of source
-  /// location of basic block
-  static void update_source_lines(block_infot &block_info);
 
   /// If this block is a continuation of a previous block through unconditional
   /// forward gotos, return this blocks number.
@@ -169,6 +166,10 @@ public:
   /// \return source location corresponding to the given block
   const source_locationt &
   source_location_of(std::size_t block_number) const override;
+
+  /// \param block_number: a block number
+  /// \return the source lines of the given block
+  const source_linest &source_lines_of(std::size_t block_number) const override;
 
   /// Outputs the list of blocks
   void output(std::ostream &out) const override;

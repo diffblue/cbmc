@@ -80,6 +80,25 @@ void show_properties(
         xml_property.new_element("expression").data =
           from_expr(ns, identifier, ins.get_condition());
 
+        const irept &basic_block_lines =
+          source_location.get_basic_block_source_lines();
+        if(basic_block_lines.is_not_nil())
+        {
+          xmlt basic_block_lines_xml{"basic_block_lines"};
+          for(const auto &file_entry : basic_block_lines.get_named_sub())
+          {
+            for(const auto &lines_entry : file_entry.second.get_named_sub())
+            {
+              xmlt line{"line"};
+              line.set_attribute("file", id2string(file_entry.first));
+              line.set_attribute("function", id2string(lines_entry.first));
+              line.data = id2string(lines_entry.second.id());
+              basic_block_lines_xml.new_element(line);
+            }
+          }
+          xml_property.new_element(basic_block_lines_xml);
+        }
+
         msg.result() << xml_property;
       }
       break;
@@ -133,9 +152,23 @@ void convert_properties_json(
       {"expression",
        json_stringt(from_expr(ns, identifier, ins.get_condition()))}};
 
-    if(!source_location.get_basic_block_covered_lines().empty())
-      json_property["coveredLines"] =
-        json_stringt(source_location.get_basic_block_covered_lines());
+    const irept &basic_block_lines =
+      source_location.get_basic_block_source_lines();
+    if(basic_block_lines.is_not_nil())
+    {
+      json_objectt basic_block_lines_json;
+      for(const auto &file_entry : basic_block_lines.get_named_sub())
+      {
+        json_objectt file_lines_json;
+        for(const auto &lines_entry : file_entry.second.get_named_sub())
+        {
+          file_lines_json[id2string(lines_entry.first)] =
+            json_stringt{lines_entry.second.id()};
+        }
+        basic_block_lines_json[id2string(file_entry.first)] = file_lines_json;
+      }
+      json_property["basicBlockLines"] = basic_block_lines_json;
+    }
 
     json_properties.push_back(std::move(json_property));
   }
