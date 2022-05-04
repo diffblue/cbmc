@@ -109,6 +109,30 @@ void remove_internal_symbols(
   message_handlert &mh,
   const bool keep_file_local)
 {
+  remove_internal_symbols(symbol_table, mh, keep_file_local, {});
+}
+
+/// Removes internal symbols from a symbol table
+/// A symbol is EXPORTED if it is a
+/// * non-static function with body that is not extern inline
+/// * symbol used in an EXPORTED symbol
+/// * type used in an EXPORTED symbol
+///
+///          Read
+///          http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
+///          on "extern inline"
+/// \param symbol_table: symbol table to clean up
+/// \param mh: log handler
+/// \param keep_file_local: keep file-local functions with bodies even if we
+///                         would otherwise remove them
+/// \param keep: set of symbol names to keep in the symbol table regardless
+///              of usage or kind
+void remove_internal_symbols(
+  symbol_tablet &symbol_table,
+  message_handlert &mh,
+  const bool keep_file_local,
+  const std::set<irep_idt> &keep)
+{
   namespacet ns(symbol_table);
   find_symbols_sett exported;
   messaget log(mh);
@@ -130,6 +154,8 @@ void remove_internal_symbols(
   special.insert("__placement_new_array");
   special.insert("__delete");
   special.insert("__delete_array");
+  // plus any extra symbols we wish to keep
+  special.insert(keep.begin(), keep.end());
 
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();

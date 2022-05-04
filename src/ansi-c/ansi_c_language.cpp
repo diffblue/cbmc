@@ -105,6 +105,15 @@ bool ansi_c_languaget::typecheck(
   const std::string &module,
   const bool keep_file_local)
 {
+  return typecheck(symbol_table, module, keep_file_local, {});
+}
+
+bool ansi_c_languaget::typecheck(
+  symbol_tablet &symbol_table,
+  const std::string &module,
+  const bool keep_file_local,
+  const std::set<irep_idt> &keep)
+{
   symbol_tablet new_symbol_table;
 
   if(ansi_c_typecheck(
@@ -117,7 +126,7 @@ bool ansi_c_languaget::typecheck(
   }
 
   remove_internal_symbols(
-    new_symbol_table, this->get_message_handler(), keep_file_local);
+    new_symbol_table, this->get_message_handler(), keep_file_local, keep);
 
   if(linking(symbol_table, new_symbol_table, get_message_handler()))
     return true;

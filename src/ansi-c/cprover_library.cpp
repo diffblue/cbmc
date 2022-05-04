@@ -17,7 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 static std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
-  const symbol_tablet &symbol_table)
+  const symbol_tablet &symbol_table,
+  const bool force_load)
 {
   std::ostringstream library_text;
 
@@ -52,14 +53,15 @@ static std::string get_cprover_library_text(
   /// \endcond
 
   return get_cprover_library_text(
-    functions, symbol_table, cprover_library, library_text.str());
+    functions, symbol_table, cprover_library, library_text.str(), force_load);
 }
 
 std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
   const symbol_tablet &symbol_table,
   const struct cprover_library_entryt cprover_library[],
-  const std::string &prologue)
+  const std::string &prologue,
+  const bool force_load)
 {
   // the default mode is ios_base::out which means subsequent write to the
   // stream will overwrite the original content
@@ -77,8 +79,9 @@ std::string get_cprover_library_text(
       symbol_tablet::symbolst::const_iterator old=
         symbol_table.symbols.find(id);
 
-      if(old!=symbol_table.symbols.end() &&
-         old->second.value.is_nil())
+      if(
+        force_load ||
+        (old != symbol_table.symbols.end() && old->second.value.is_nil()))
       {
         count++;
         library_text << e->model << '\n';
@@ -100,9 +103,8 @@ void cprover_c_library_factory(
   if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
     return;
 
-  std::string library_text;
-
-  library_text=get_cprover_library_text(functions, symbol_table);
+  std::string library_text =
+    get_cprover_library_text(functions, symbol_table, false);
 
   add_library(library_text, symbol_table, message_handler);
 }
@@ -110,7 +112,8 @@ void cprover_c_library_factory(
 void add_library(
   const std::string &src,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const std::set<irep_idt> &keep)
 {
   if(src.empty())
     return;
@@ -121,5 +124,15 @@ void add_library(
   ansi_c_language.set_message_handler(message_handler);
   ansi_c_language.parse(in, "");
 
-  ansi_c_language.typecheck(symbol_table, "<built-in-library>");
+  ansi_c_language.typecheck(symbol_table, "<built-in-library>", true, keep);
+}
+
+void cprover_c_library_factory_force_load(
+  const std::set<irep_idt> &functions,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  std::string library_text =
+    get_cprover_library_text(functions, symbol_table, true);
+  add_library(library_text, symbol_table, message_handler, functions);
 }
