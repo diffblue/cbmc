@@ -59,7 +59,6 @@ public:
   ~smt2_convt() override = default;
 
   bool use_FPA_theory;
-  bool use_array_of_bool;
   bool use_as_const;
   bool use_check_sat_assuming;
   bool use_datatypes;
