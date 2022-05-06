@@ -146,7 +146,8 @@ bool rename_symbolt::rename(typet &dest) const
   else if(dest.id()==ID_code)
   {
     code_typet &code_type=to_code_type(dest);
-    rename(code_type.return_type());
+    if(!rename(code_type.return_type()))
+      result = false;
 
     for(auto &p : code_type.parameters())
     {
