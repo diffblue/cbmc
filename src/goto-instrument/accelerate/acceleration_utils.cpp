@@ -475,7 +475,7 @@ void acceleration_utilst::ensure_no_overflows(scratch_programt &program)
 
   // goto_functionst::goto_functiont fn;
   // fn.body.instructions.swap(program.instructions);
-  // goto_check(ns, checker_options, fn);
+  // goto_check_c(ns, checker_options, fn);
   // fn.body.instructions.swap(program.instructions);
 
 #ifdef DEBUG
