@@ -139,6 +139,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
   solver_process->send(smt_set_logic_commandt{
     smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}});
+  solver_process->send(object_size_function.declaration);
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
@@ -162,7 +163,8 @@ smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
   track_expression_objects(expr, ns, object_map);
-  return ::convert_expr_to_smt(expr, object_map);
+  return ::convert_expr_to_smt(
+    expr, object_map, object_size_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -205,7 +207,8 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         objects_are_already_tracked(expr, object_map),
         "Objects in expressions being read should already be tracked from "
         "point of being set/handled.");
-      descriptor = ::convert_expr_to_smt(expr, object_map);
+      descriptor = ::convert_expr_to_smt(
+        expr, object_map, object_size_function.make_application);
     }
     else
     {
@@ -320,9 +323,26 @@ static decision_proceduret::resultt lookup_decision_procedure_result(
   UNREACHABLE;
 }
 
+void smt2_incremental_decision_proceduret::define_object_sizes()
+{
+  object_size_defined.resize(object_map.size());
+  for(const auto &key_value : object_map)
+  {
+    const decision_procedure_objectt &object = key_value.second;
+    if(object_size_defined[object.unique_id])
+      continue;
+    else
+      object_size_defined[object.unique_id] = true;
+    define_dependent_functions(object.size);
+    solver_process->send(object_size_function.make_definition(
+      object.unique_id, convert_expr_to_smt(object.size)));
+  }
+}
+
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
+  define_object_sizes();
   const smt_responset result =
     get_response_to_command(*solver_process, smt_check_sat_commandt{});
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())

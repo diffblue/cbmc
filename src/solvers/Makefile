@@ -201,6 +201,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2_incremental/smt_core_theory.cpp \
       smt2_incremental/smt_index.cpp \
       smt2_incremental/smt_logics.cpp \
+      smt2_incremental/smt_object_size.cpp \
       smt2_incremental/smt_options.cpp \
       smt2_incremental/smt_response_validation.cpp \
       smt2_incremental/smt_responses.cpp \

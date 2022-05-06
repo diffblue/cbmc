@@ -43,15 +43,59 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
   }
 }
 
-smt_termt convert_expr_to_smt(const exprt &expression)
+enum class test_archt
 {
-  return convert_expr_to_smt(expression, initial_smt_object_map());
+  i386,
+  x86_64
+};
+
+/// \brief Data structures and their initialisation shared between tests.
+struct expr_to_smt_conversion_test_environmentt
+{
+  static expr_to_smt_conversion_test_environmentt make(test_archt arch);
+  smt_termt convert(const exprt &expression) const;
+
+  smt_object_mapt object_map;
+  smt_object_sizet object_size_function;
+
+private:
+  // This is private to ensure the above make() function is used to make
+  // correctly configured instances.
+  expr_to_smt_conversion_test_environmentt() = default;
+};
+
+expr_to_smt_conversion_test_environmentt
+expr_to_smt_conversion_test_environmentt::make(test_archt arch)
+{
+  // Configuration needs to be performed before conversion because pointer
+  // widths and object bit width encodings depend on the global configuration.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  switch(arch)
+  {
+  case test_archt::i386:
+    config.ansi_c.set_arch_spec_i386();
+    break;
+  case test_archt::x86_64:
+    config.ansi_c.set_arch_spec_x86_64();
+    break;
+  default:
+    UNREACHABLE;
+  }
+  return {initial_smt_object_map(), smt_object_sizet{}};
+}
+
+smt_termt
+expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
+{
+  return convert_expr_to_smt(
+    expression, object_map, object_size_function.make_application);
 }
 
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   CHECK(
-    convert_expr_to_smt(symbol_exprt{"foo", bool_typet{}}) ==
+    test.convert(symbol_exprt{"foo", bool_typet{}}) ==
     smt_identifier_termt("foo", smt_bool_sortt{}));
 }
 
@@ -59,39 +103,36 @@ TEST_CASE(
   "\"exprt\" to smt term conversion for constants/literals",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   SECTION("Boolean constants")
   {
-    CHECK(convert_expr_to_smt(true_exprt{}) == smt_bool_literal_termt{true});
-    CHECK(convert_expr_to_smt(false_exprt{}) == smt_bool_literal_termt{false});
+    CHECK(test.convert(true_exprt{}) == smt_bool_literal_termt{true});
+    CHECK(test.convert(false_exprt{}) == smt_bool_literal_termt{false});
   }
   SECTION("Bit vector literals")
   {
     CHECK(
-      convert_expr_to_smt(from_integer({12}, signedbv_typet{8})) ==
+      test.convert(from_integer({12}, signedbv_typet{8})) ==
       smt_bit_vector_constant_termt{12, 8});
     CHECK(
-      convert_expr_to_smt(from_integer({24}, unsignedbv_typet{8})) ==
+      test.convert(from_integer({24}, unsignedbv_typet{8})) ==
       smt_bit_vector_constant_termt{24, 8});
     CHECK(
-      convert_expr_to_smt(from_integer({-1}, signedbv_typet{16})) ==
+      test.convert(from_integer({-1}, signedbv_typet{16})) ==
       smt_bit_vector_constant_termt{65535, 16});
   }
   SECTION("Null pointer")
   {
-    // These config lines are necessary because pointer widths depend on the
-    // configuration.
-    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
-    config.ansi_c.set_arch_spec_i386();
     const smt_termt null_pointer_term =
       smt_bit_vector_constant_termt{0, config.ansi_c.pointer_width};
     CHECK(
-      convert_expr_to_smt(null_pointer_exprt{pointer_type(void_type())}) ==
+      test.convert(null_pointer_exprt{pointer_type(void_type())}) ==
       null_pointer_term);
     CHECK(
-      convert_expr_to_smt(null_pointer_exprt{
-        pointer_type(unsignedbv_typet{100})}) == null_pointer_term);
+      test.convert(null_pointer_exprt{pointer_type(unsignedbv_typet{100})}) ==
+      null_pointer_term);
     CHECK(
-      convert_expr_to_smt(null_pointer_exprt{
+      test.convert(null_pointer_exprt{
         pointer_type(pointer_type(void_type()))}) == null_pointer_term);
   }
 }
@@ -100,19 +141,20 @@ TEST_CASE(
   "expr to smt conversion for \"if then else\"",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const auto true_term = smt_bool_literal_termt{true};
   const auto false_term = smt_bool_literal_termt{false};
   CHECK(
-    convert_expr_to_smt(if_exprt{true_exprt{}, false_exprt{}, true_exprt{}}) ==
+    test.convert(if_exprt{true_exprt{}, false_exprt{}, true_exprt{}}) ==
     smt_core_theoryt::if_then_else(true_term, false_term, true_term));
   CHECK(
-    convert_expr_to_smt(if_exprt{true_exprt{}, true_exprt{}, false_exprt{}}) ==
+    test.convert(if_exprt{true_exprt{}, true_exprt{}, false_exprt{}}) ==
     smt_core_theoryt::if_then_else(true_term, true_term, false_term));
   CHECK(
-    convert_expr_to_smt(if_exprt{false_exprt{}, false_exprt{}, true_exprt{}}) ==
+    test.convert(if_exprt{false_exprt{}, false_exprt{}, true_exprt{}}) ==
     smt_core_theoryt::if_then_else(false_term, false_term, true_term));
   CHECK(
-    convert_expr_to_smt(if_exprt{false_exprt{}, true_exprt{}, false_exprt{}}) ==
+    test.convert(if_exprt{false_exprt{}, true_exprt{}, false_exprt{}}) ==
     smt_core_theoryt::if_then_else(false_term, true_term, false_term));
 }
 
@@ -120,51 +162,54 @@ TEST_CASE(
   "expr to smt conversion for \"and\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const and_exprt binary_and{true_exprt{}, false_exprt{}};
   REQUIRE(
-    convert_expr_to_smt(binary_and) ==
+    test.convert(binary_and) ==
     smt_core_theoryt::make_and(
       smt_bool_literal_termt{true}, smt_bool_literal_termt{false}));
   const and_exprt multiary_and{true_exprt{}, true_exprt{}, false_exprt{}};
   REQUIRE(
-    convert_expr_to_smt(multiary_and) ==
+    test.convert(multiary_and) ==
     smt_core_theoryt::make_and(
       smt_core_theoryt::make_and(
         smt_bool_literal_termt{true}, smt_bool_literal_termt{true}),
       smt_bool_literal_termt{false}));
   const cbmc_invariants_should_throwt invariants_throw;
-  REQUIRE_THROWS(convert_expr_to_smt(and_exprt{{}}));
-  REQUIRE_THROWS(convert_expr_to_smt(and_exprt{{true_exprt{}}}));
+  REQUIRE_THROWS(test.convert(and_exprt{{}}));
+  REQUIRE_THROWS(test.convert(and_exprt{{true_exprt{}}}));
 }
 
 TEST_CASE(
   "expr to smt conversion for \"or\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const or_exprt binary_or{true_exprt{}, false_exprt{}};
   REQUIRE(
-    convert_expr_to_smt(binary_or) ==
+    test.convert(binary_or) ==
     smt_core_theoryt::make_or(
       smt_bool_literal_termt{true}, smt_bool_literal_termt{false}));
   const or_exprt multiary_or{true_exprt{}, true_exprt{}, false_exprt{}};
   REQUIRE(
-    convert_expr_to_smt(multiary_or) ==
+    test.convert(multiary_or) ==
     smt_core_theoryt::make_or(
       smt_core_theoryt::make_or(
         smt_bool_literal_termt{true}, smt_bool_literal_termt{true}),
       smt_bool_literal_termt{false}));
   const cbmc_invariants_should_throwt invariants_throw;
-  REQUIRE_THROWS(convert_expr_to_smt(or_exprt{{}}));
-  REQUIRE_THROWS(convert_expr_to_smt(or_exprt{{true_exprt{}}}));
+  REQUIRE_THROWS(test.convert(or_exprt{{}}));
+  REQUIRE_THROWS(test.convert(or_exprt{{true_exprt{}}}));
 }
 
 TEST_CASE(
   "expr to smt conversion for \"xor\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const xor_exprt binary_xor{true_exprt{}, false_exprt{}};
   REQUIRE(
-    convert_expr_to_smt(binary_xor) ==
+    test.convert(binary_xor) ==
     smt_core_theoryt::make_xor(
       smt_bool_literal_termt{true}, smt_bool_literal_termt{false}));
   // Note at the time of writing this test the constructors of xor_exprt only
@@ -176,8 +221,9 @@ TEST_CASE(
   "expr to smt conversion for \"implies\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   REQUIRE(
-    convert_expr_to_smt(implies_exprt{false_exprt{}, true_exprt{}}) ==
+    test.convert(implies_exprt{false_exprt{}, true_exprt{}}) ==
     smt_core_theoryt::implies(
       smt_bool_literal_termt{false}, smt_bool_literal_termt{true}));
 }
@@ -186,8 +232,9 @@ TEST_CASE(
   "expr to smt conversion for \"equals\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   REQUIRE(
-    convert_expr_to_smt(equal_exprt{false_exprt{}, true_exprt{}}) ==
+    test.convert(equal_exprt{false_exprt{}, true_exprt{}}) ==
     smt_core_theoryt::equal(
       smt_bool_literal_termt{false}, smt_bool_literal_termt{true}));
 }
@@ -196,8 +243,9 @@ TEST_CASE(
   "expr to smt conversion for \"not equals\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   REQUIRE(
-    convert_expr_to_smt(notequal_exprt{false_exprt{}, true_exprt{}}) ==
+    test.convert(notequal_exprt{false_exprt{}, true_exprt{}}) ==
     smt_core_theoryt::distinct(
       smt_bool_literal_termt{false}, smt_bool_literal_termt{true}));
 }
@@ -206,8 +254,9 @@ TEST_CASE(
   "expr to smt conversion for \"not\" operator",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   REQUIRE(
-    convert_expr_to_smt(not_exprt{true_exprt{}}) ==
+    test.convert(not_exprt{true_exprt{}}) ==
     smt_core_theoryt::make_not(smt_bool_literal_termt{true}));
 }
 
@@ -215,59 +264,60 @@ TEST_CASE(
   "expr to smt conversion for relational operators",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const smt_termt one_term = smt_bit_vector_constant_termt{1, 8};
   const smt_termt two_term = smt_bit_vector_constant_termt{2, 8};
   SECTION("Greater than")
   {
     CHECK(
-      convert_expr_to_smt(
-        greater_than_exprt{from_integer({1}, signedbv_typet{8}),
-                           from_integer({2}, signedbv_typet{8})}) ==
+      test.convert(greater_than_exprt{
+        from_integer({1}, signedbv_typet{8}),
+        from_integer({2}, signedbv_typet{8})}) ==
       smt_bit_vector_theoryt::signed_greater_than(one_term, two_term));
     CHECK(
-      convert_expr_to_smt(
-        greater_than_exprt{from_integer({1}, unsignedbv_typet{8}),
-                           from_integer({2}, unsignedbv_typet{8})}) ==
+      test.convert(greater_than_exprt{
+        from_integer({1}, unsignedbv_typet{8}),
+        from_integer({2}, unsignedbv_typet{8})}) ==
       smt_bit_vector_theoryt::unsigned_greater_than(one_term, two_term));
   }
   SECTION("Greater than or equal")
   {
     CHECK(
-      convert_expr_to_smt(
-        greater_than_or_equal_exprt{from_integer({1}, signedbv_typet{8}),
-                                    from_integer({2}, signedbv_typet{8})}) ==
+      test.convert(greater_than_or_equal_exprt{
+        from_integer({1}, signedbv_typet{8}),
+        from_integer({2}, signedbv_typet{8})}) ==
       smt_bit_vector_theoryt::signed_greater_than_or_equal(one_term, two_term));
     CHECK(
-      convert_expr_to_smt(
-        greater_than_or_equal_exprt{from_integer({1}, unsignedbv_typet{8}),
-                                    from_integer({2}, unsignedbv_typet{8})}) ==
+      test.convert(greater_than_or_equal_exprt{
+        from_integer({1}, unsignedbv_typet{8}),
+        from_integer({2}, unsignedbv_typet{8})}) ==
       smt_bit_vector_theoryt::unsigned_greater_than_or_equal(
         one_term, two_term));
   }
   SECTION("Less than")
   {
     CHECK(
-      convert_expr_to_smt(
-        less_than_exprt{from_integer({1}, signedbv_typet{8}),
-                        from_integer({2}, signedbv_typet{8})}) ==
+      test.convert(less_than_exprt{
+        from_integer({1}, signedbv_typet{8}),
+        from_integer({2}, signedbv_typet{8})}) ==
       smt_bit_vector_theoryt::signed_less_than(one_term, two_term));
     CHECK(
-      convert_expr_to_smt(
-        less_than_exprt{from_integer({1}, unsignedbv_typet{8}),
-                        from_integer({2}, unsignedbv_typet{8})}) ==
+      test.convert(less_than_exprt{
+        from_integer({1}, unsignedbv_typet{8}),
+        from_integer({2}, unsignedbv_typet{8})}) ==
       smt_bit_vector_theoryt::unsigned_less_than(one_term, two_term));
   }
   SECTION("Less than or equal")
   {
     CHECK(
-      convert_expr_to_smt(
-        less_than_or_equal_exprt{from_integer({1}, signedbv_typet{8}),
-                                 from_integer({2}, signedbv_typet{8})}) ==
+      test.convert(less_than_or_equal_exprt{
+        from_integer({1}, signedbv_typet{8}),
+        from_integer({2}, signedbv_typet{8})}) ==
       smt_bit_vector_theoryt::signed_less_than_or_equal(one_term, two_term));
     CHECK(
-      convert_expr_to_smt(
-        less_than_or_equal_exprt{from_integer({1}, unsignedbv_typet{8}),
-                                 from_integer({2}, unsignedbv_typet{8})}) ==
+      test.convert(less_than_or_equal_exprt{
+        from_integer({1}, unsignedbv_typet{8}),
+        from_integer({2}, unsignedbv_typet{8})}) ==
       smt_bit_vector_theoryt::unsigned_less_than_or_equal(one_term, two_term));
   }
 }
@@ -276,6 +326,7 @@ TEST_CASE(
   "expr to smt conversion for arithmetic operators",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
   const smt_termt smt_term_two = smt_bit_vector_constant_termt{2, 8};
 
@@ -288,7 +339,7 @@ TEST_CASE(
   SECTION("Addition of two constant size bit-vectors")
   {
     const auto constructed_term =
-      convert_expr_to_smt(plus_exprt{one_bvint, two_bvint});
+      test.convert(plus_exprt{one_bvint, two_bvint});
     const auto expected_term =
       smt_bit_vector_theoryt::add(smt_term_one, smt_term_two);
     CHECK(constructed_term == expected_term);
@@ -307,7 +358,7 @@ TEST_CASE(
     const exprt::operandst plus_operands{
       one_bvint, two_bvint, three_bv_int, four_bv_int};
     const auto constructed_term =
-      convert_expr_to_smt(plus_exprt{plus_operands, signedbv_typet{8}});
+      test.convert(plus_exprt{plus_operands, signedbv_typet{8}});
     const auto expected_term = smt_bit_vector_theoryt::add(
       smt_bit_vector_theoryt::add(
         smt_bit_vector_theoryt::add(smt_term_one, smt_term_two),
@@ -322,8 +373,7 @@ TEST_CASE(
     "bit-vector based")
   {
     const cbmc_invariants_should_throwt invariants_throw;
-    REQUIRE_THROWS(
-      convert_expr_to_smt(plus_exprt{true_exprt{}, false_exprt{}}));
+    REQUIRE_THROWS(test.convert(plus_exprt{true_exprt{}, false_exprt{}}));
   }
 
   SECTION(
@@ -333,20 +383,18 @@ TEST_CASE(
     const cbmc_invariants_should_throwt invariants_throw;
     // No operands to expression
     exprt::operandst zero_operands;
-    REQUIRE_THROWS(
-      convert_expr_to_smt(plus_exprt{zero_operands, signedbv_typet{8}}));
+    REQUIRE_THROWS(test.convert(plus_exprt{zero_operands, signedbv_typet{8}}));
 
     // One operand to expression
     const auto four_bv_int = from_integer({4}, signedbv_typet{8});
     exprt::operandst one_operand{four_bv_int};
-    REQUIRE_THROWS(
-      convert_expr_to_smt(plus_exprt{one_operand, signedbv_typet{8}}));
+    REQUIRE_THROWS(test.convert(plus_exprt{one_operand, signedbv_typet{8}}));
   }
 
   SECTION("Subtraction of two constant size bit-vectors")
   {
     const auto constructed_term =
-      convert_expr_to_smt(minus_exprt{two_bvint, one_bvint});
+      test.convert(minus_exprt{two_bvint, one_bvint});
     const auto expected_term =
       smt_bit_vector_theoryt::subtract(smt_term_two, smt_term_one);
     CHECK(constructed_term == expected_term);
@@ -357,14 +405,13 @@ TEST_CASE(
     "bit-vector based")
   {
     const cbmc_invariants_should_throwt invariants_throw;
-    REQUIRE_THROWS(
-      convert_expr_to_smt(minus_exprt{true_exprt{}, false_exprt{}}));
+    REQUIRE_THROWS(test.convert(minus_exprt{true_exprt{}, false_exprt{}}));
   }
 
   SECTION("Multiplication of two constant size bit-vectors")
   {
     const auto constructed_term =
-      convert_expr_to_smt(mult_exprt{one_bvint, two_bvint});
+      test.convert(mult_exprt{one_bvint, two_bvint});
     const auto expected_term =
       smt_bit_vector_theoryt::multiply(smt_term_one, smt_term_two);
     CHECK(constructed_term == expected_term);
@@ -375,7 +422,7 @@ TEST_CASE(
     "bit-vector based")
   {
     const cbmc_invariants_should_throwt invariants_throw;
-    REQUIRE_THROWS(convert_expr_to_smt(mult_exprt{one_bvint, false_exprt{}}));
+    REQUIRE_THROWS(test.convert(mult_exprt{one_bvint, false_exprt{}}));
   }
 
   // Division is defined over unsigned numbers only (theory notes say it
@@ -384,14 +431,14 @@ TEST_CASE(
   {
     // Check of division expression with unsigned operands
     const auto constructed_term =
-      convert_expr_to_smt(div_exprt{one_bvint_unsigned, two_bvint_unsigned});
+      test.convert(div_exprt{one_bvint_unsigned, two_bvint_unsigned});
     const auto expected_term =
       smt_bit_vector_theoryt::unsigned_divide(smt_term_one, smt_term_two);
     CHECK(constructed_term == expected_term);
 
     // Check of division expression with signed operands
     const auto constructed_term_signed =
-      convert_expr_to_smt(div_exprt{one_bvint, two_bvint});
+      test.convert(div_exprt{one_bvint, two_bvint});
     const auto expected_term_signed =
       smt_bit_vector_theoryt::signed_divide(smt_term_one, smt_term_two);
     CHECK(constructed_term_signed == expected_term_signed);
@@ -402,7 +449,7 @@ TEST_CASE(
     "bit-vector based")
   {
     const cbmc_invariants_should_throwt invariants_throw;
-    REQUIRE_THROWS(convert_expr_to_smt(div_exprt{one_bvint, false_exprt{}}));
+    REQUIRE_THROWS(test.convert(div_exprt{one_bvint, false_exprt{}}));
   }
 
   SECTION(
@@ -411,14 +458,14 @@ TEST_CASE(
   {
     // Remainder expression with unsigned operands.
     const auto constructed_term =
-      convert_expr_to_smt(mod_exprt{one_bvint_unsigned, two_bvint_unsigned});
+      test.convert(mod_exprt{one_bvint_unsigned, two_bvint_unsigned});
     const auto expected_term =
       smt_bit_vector_theoryt::unsigned_remainder(smt_term_one, smt_term_two);
     CHECK(constructed_term == expected_term);
 
     // Remainder expression with signed operands
     const auto constructed_term_signed =
-      convert_expr_to_smt(mod_exprt{one_bvint, two_bvint});
+      test.convert(mod_exprt{one_bvint, two_bvint});
     const auto expected_term_signed =
       smt_bit_vector_theoryt::signed_remainder(smt_term_one, smt_term_two);
     CHECK(constructed_term_signed == expected_term_signed);
@@ -429,13 +476,12 @@ TEST_CASE(
     "operands are not bit-vector based")
   {
     const cbmc_invariants_should_throwt invariants_throw;
-    REQUIRE_THROWS(convert_expr_to_smt(mod_exprt{one_bvint, false_exprt{}}));
+    REQUIRE_THROWS(test.convert(mod_exprt{one_bvint, false_exprt{}}));
   }
 
   SECTION("Unary minus of constant size bit-vector")
   {
-    const auto constructed_term =
-      convert_expr_to_smt(unary_minus_exprt{one_bvint});
+    const auto constructed_term = test.convert(unary_minus_exprt{one_bvint});
     const auto expected_term = smt_bit_vector_theoryt::negate(smt_term_one);
     CHECK(constructed_term == expected_term);
   }
@@ -445,7 +491,7 @@ TEST_CASE(
     "bit-vector")
   {
     const cbmc_invariants_should_throwt invariants_throw;
-    REQUIRE_THROWS(convert_expr_to_smt(unary_minus_exprt{true_exprt{}}));
+    REQUIRE_THROWS(test.convert(unary_minus_exprt{true_exprt{}}));
   }
 }
 
@@ -453,6 +499,7 @@ SCENARIO(
   "Bitwise \"AND\" expressions are converted to SMT terms",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("three integer bitvectors and their smt-term equivalents")
   {
     const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
@@ -466,7 +513,7 @@ SCENARIO(
     WHEN("a bitand_exprt with two of them as arguments is converted")
     {
       const auto constructed_term =
-        convert_expr_to_smt(bitand_exprt{one_bvint, three_bvint});
+        test.convert(bitand_exprt{one_bvint, three_bvint});
 
       THEN(
         "it should be equivalent to a \"bvand\" term with the operands "
@@ -491,7 +538,7 @@ SCENARIO(
         ID_bitand, and_operands, signedbv_typet{8}};
       const auto bitand_expr = to_bitand_expr(first_step);
 
-      const auto constructed_term = convert_expr_to_smt(bitand_expr);
+      const auto constructed_term = test.convert(bitand_expr);
 
       THEN(
         "it should be converted to an appropriate number of nested binary "
@@ -515,8 +562,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception because bvand requires"
         "operands of the same sort")
       {
-        CHECK_THROWS(
-          convert_expr_to_smt(bitand_exprt{one_bvint, true_exprt{}}));
+        CHECK_THROWS(test.convert(bitand_exprt{one_bvint, true_exprt{}}));
       }
     }
   }
@@ -526,6 +572,7 @@ SCENARIO(
   "Bitwise \"OR\" expressions are converted to SMT terms",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("three integer bitvectors and their smt-term equivalents")
   {
     const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
@@ -539,7 +586,7 @@ SCENARIO(
     WHEN("a bitor_exprt with two of them as arguments is converted")
     {
       const auto constructed_term =
-        convert_expr_to_smt(bitor_exprt{one_bvint, three_bvint});
+        test.convert(bitor_exprt{one_bvint, three_bvint});
 
       THEN(
         "it should be equivalent to a \"bvor\" term with the operands "
@@ -565,7 +612,7 @@ SCENARIO(
         ID_bitor, or_operands, signedbv_typet{8}};
       const auto bitor_expr = to_bitor_expr(first_step);
 
-      const auto constructed_term = convert_expr_to_smt(bitor_expr);
+      const auto constructed_term = test.convert(bitor_expr);
 
       THEN(
         "it should be converted to an appropriate number of nested binary "
@@ -592,7 +639,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception because bvor requires"
         "operands of the same sort")
       {
-        CHECK_THROWS(convert_expr_to_smt(bitor_exprt{one_bvint, true_exprt{}}));
+        CHECK_THROWS(test.convert(bitor_exprt{one_bvint, true_exprt{}}));
       }
     }
   }
@@ -602,6 +649,7 @@ SCENARIO(
   "Bitwise \"XOR\" expressions are converted to SMT terms",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("three integer bitvectors and their smt-term equivalents")
   {
     const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
@@ -615,7 +663,7 @@ SCENARIO(
     WHEN("a bitxor_exprt with two of them as arguments is converted")
     {
       const auto constructed_term =
-        convert_expr_to_smt(bitxor_exprt{one_bvint, three_bvint});
+        test.convert(bitxor_exprt{one_bvint, three_bvint});
 
       THEN(
         "it should be equivalent to a \"bvxor\" term with the operands "
@@ -637,7 +685,7 @@ SCENARIO(
         ID_bitxor, xor_operands, signedbv_typet{8}};
       const auto bitxor_expr = to_bitxor_expr(first_step);
 
-      const auto constructed_term = convert_expr_to_smt(bitxor_expr);
+      const auto constructed_term = test.convert(bitxor_expr);
 
       THEN(
         "it should be converted to an appropriate number of nested binary "
@@ -663,8 +711,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception because bvxor requires"
         "operands of the same sort")
       {
-        CHECK_THROWS(
-          convert_expr_to_smt(bitxor_exprt{one_bvint, true_exprt{}}));
+        CHECK_THROWS(test.convert(bitxor_exprt{one_bvint, true_exprt{}}));
       }
     }
   }
@@ -674,14 +721,14 @@ SCENARIO(
   "Bitwise \"NOT\" expressions are converted to SMT terms (1's complement)",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("An integer bitvector")
   {
     const auto one_bvint = from_integer(1, signedbv_typet{8});
 
     WHEN("A bitnot_exprt is constructed and converted to an SMT term")
     {
-      const auto constructed_term =
-        convert_expr_to_smt(bitnot_exprt{one_bvint});
+      const auto constructed_term = test.convert(bitnot_exprt{one_bvint});
       THEN("it should be converted to bvnot smt term")
       {
         const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
@@ -699,7 +746,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception and not allow "
         "construction")
       {
-        REQUIRE_THROWS(convert_expr_to_smt(bitnot_exprt{false_exprt{}}));
+        REQUIRE_THROWS(test.convert(bitnot_exprt{false_exprt{}}));
       }
     }
   }
@@ -709,6 +756,7 @@ SCENARIO(
   "Left-shift expressions are converted to SMT terms",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("An integer bitvector and the number of places we're going to shift")
   {
     // This is going to act as both the value to be shifted, and a value
@@ -718,7 +766,7 @@ SCENARIO(
     WHEN("We construct a shl_exprt and convert it to an SMT term")
     {
       const auto shift_expr = shl_exprt{one_bvint, one_bvint};
-      const auto constructed_term = convert_expr_to_smt(shift_expr);
+      const auto constructed_term = test.convert(shift_expr);
 
       THEN("It should be equivalent to a bvshl term")
       {
@@ -740,8 +788,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception because of validation "
         "failure")
       {
-        REQUIRE_THROWS(
-          convert_expr_to_smt(shl_exprt{one_bvint, false_exprt{}}));
+        REQUIRE_THROWS(test.convert(shl_exprt{one_bvint, false_exprt{}}));
       }
     }
   }
@@ -751,6 +798,7 @@ SCENARIO(
   "Logical Right-shift expressions are converted to SMT terms",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("Two integer bitvectors, one for the value and one for the places")
   {
     const auto to_be_shifted = from_integer(1, signedbv_typet{8});
@@ -759,7 +807,7 @@ SCENARIO(
     WHEN("We construct a lshr_exprt and convert it to an SMT term")
     {
       const auto shift_expr = lshr_exprt{to_be_shifted, places};
-      const auto constructed_term = convert_expr_to_smt(shift_expr);
+      const auto constructed_term = test.convert(shift_expr);
 
       THEN("We should get an logical shift right SMT term")
       {
@@ -780,8 +828,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception because of validation "
         "failure")
       {
-        REQUIRE_THROWS(
-          convert_expr_to_smt(lshr_exprt{to_be_shifted, false_exprt{}}));
+        REQUIRE_THROWS(test.convert(lshr_exprt{to_be_shifted, false_exprt{}}));
       }
     }
   }
@@ -791,6 +838,7 @@ SCENARIO(
   "Arithmetic Right-shift expressions are converted to SMT terms",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   GIVEN("Two integer bitvectors, one for the value and one for the places")
   {
     const auto to_be_shifted = from_integer(1, signedbv_typet{8});
@@ -799,7 +847,7 @@ SCENARIO(
     WHEN("We construct a ashr_exprt and convert it to an SMT term")
     {
       const auto shift_expr = ashr_exprt{to_be_shifted, places};
-      const auto constructed_term = convert_expr_to_smt(shift_expr);
+      const auto constructed_term = test.convert(shift_expr);
 
       THEN("We should get an arithmetic shift-right SMT term")
       {
@@ -816,7 +864,7 @@ SCENARIO(
     {
       const auto zero_places = from_integer(0, signedbv_typet{8});
       const auto shift_expr = ashr_exprt{to_be_shifted, zero_places};
-      const auto constructed_term = convert_expr_to_smt(shift_expr);
+      const auto constructed_term = test.convert(shift_expr);
 
       THEN(
         "When we convert it, we should be getting an arithmetic shift-right "
@@ -840,8 +888,7 @@ SCENARIO(
         "convert_expr_to_smt should throw an exception because of validation "
         "failure")
       {
-        REQUIRE_THROWS(
-          convert_expr_to_smt(ashr_exprt{to_be_shifted, false_exprt{}}));
+        REQUIRE_THROWS(test.convert(ashr_exprt{to_be_shifted, false_exprt{}}));
       }
     }
   }
@@ -851,6 +898,7 @@ TEST_CASE(
   "expr to smt conversion for shifts of mismatched operands.",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   using make_typet = std::function<typet(std::size_t)>;
   const make_typet make_unsigned = constructor_oft<unsignedbv_typet>{};
   const make_typet make_signed = constructor_oft<signedbv_typet>{};
@@ -907,7 +955,7 @@ TEST_CASE(
           smt_identifier_termt{"foo", smt_bit_vector_sortt{32}},
           make_extension(24)(
             smt_identifier_termt{"bar", smt_bit_vector_sortt{8}}));
-        CHECK(convert_expr_to_smt(input) == expected_result);
+        CHECK(test.convert(input) == expected_result);
       }
       SECTION("Wider right hand side")
       {
@@ -919,7 +967,7 @@ TEST_CASE(
           make_extension(24)(
             smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
           smt_identifier_termt{"bar", smt_bit_vector_sortt{32}});
-        CHECK(convert_expr_to_smt(input) == expected_result);
+        CHECK(test.convert(input) == expected_result);
       }
     }
   }
@@ -929,6 +977,7 @@ TEST_CASE(
   "expr to smt conversion for extract bits expressions",
   "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const typet operand_type = unsignedbv_typet{8};
   std::string description;
   exprt input;
@@ -950,9 +999,9 @@ TEST_CASE(
   SECTION(description)
   {
     INFO("Input expression - " + input.pretty(1, 0));
-    CHECK(convert_expr_to_smt(input) == expected_result);
+    CHECK(test.convert(input) == expected_result);
     const cbmc_invariants_should_throwt invariants_throw;
-    CHECK_THROWS(convert_expr_to_smt(extractbits_exprt{
+    CHECK_THROWS(test.convert(extractbits_exprt{
       symbol_exprt{"foo", operand_type},
       symbol_exprt{"bar", operand_type},
       symbol_exprt{"bar", operand_type},
@@ -962,6 +1011,7 @@ TEST_CASE(
 
 TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
 {
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const symbol_exprt bool_expr{"foo", bool_typet{}};
   const smt_termt bool_term = smt_identifier_termt{"foo", smt_bool_sortt{}};
   const symbol_exprt bv_expr{"bar", signedbv_typet(12)};
@@ -969,27 +1019,21 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
     smt_identifier_termt{"bar", smt_bit_vector_sortt{12}};
   SECTION("Casts to bool")
   {
+    CHECK(test.convert(typecast_exprt{bool_expr, bool_typet{}}) == bool_term);
     CHECK(
-      convert_expr_to_smt(typecast_exprt{bool_expr, bool_typet{}}) ==
-      bool_term);
-    CHECK(
-      convert_expr_to_smt(typecast_exprt{bv_expr, bool_typet{}}) ==
+      test.convert(typecast_exprt{bv_expr, bool_typet{}}) ==
       smt_core_theoryt::distinct(
         bv_term, smt_bit_vector_constant_termt{0, 12}));
   }
   SECTION("Casts to C bool")
   {
-    // The config lines are necessary because when we do casting to C bool the
-    // bit width depends on the configuration.
-    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
-    config.ansi_c.set_arch_spec_i386();
     const std::size_t c_bool_width = config.ansi_c.bool_width;
     const smt_bit_vector_constant_termt c_true{1, c_bool_width};
     const smt_bit_vector_constant_termt c_false{0, c_bool_width};
     SECTION("from bool")
     {
       const auto cast_bool =
-        convert_expr_to_smt(typecast_exprt{bool_expr, c_bool_type()});
+        test.convert(typecast_exprt{bool_expr, c_bool_type()});
       const auto expected_bool_conversion =
         smt_core_theoryt::if_then_else(bool_term, c_true, c_false);
       CHECK(cast_bool == expected_bool_conversion);
@@ -997,7 +1041,7 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
     SECTION("from bit vector")
     {
       const auto cast_bit_vector =
-        convert_expr_to_smt(typecast_exprt{bv_expr, c_bool_type()});
+        test.convert(typecast_exprt{bv_expr, c_bool_type()});
       const auto expected_bit_vector_conversion =
         smt_core_theoryt::if_then_else(
           smt_core_theoryt::distinct(
@@ -1018,17 +1062,16 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
         rowt{unsignedbv_typet{8}, signedbv_typet{8}},
         rowt{signedbv_typet{8}, unsignedbv_typet{8}});
       CHECK(
-        convert_expr_to_smt(
-          typecast_exprt{from_integer(1, from_type), to_type}) ==
+        test.convert(typecast_exprt{from_integer(1, from_type), to_type}) ==
         smt_bit_vector_constant_termt{1, 8});
     }
     SECTION("Narrowing casts")
     {
       CHECK(
-        convert_expr_to_smt(typecast_exprt{bv_expr, signedbv_typet{8}}) ==
+        test.convert(typecast_exprt{bv_expr, signedbv_typet{8}}) ==
         smt_bit_vector_theoryt::extract(7, 0)(bv_term));
       CHECK(
-        convert_expr_to_smt(typecast_exprt{
+        test.convert(typecast_exprt{
           from_integer(42, unsignedbv_typet{32}), unsignedbv_typet{16}}) ==
         smt_bit_vector_theoryt::extract(15, 0)(
           smt_bit_vector_constant_termt{42, 32}));
@@ -1062,7 +1105,7 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
         make_destination_type(to_width)};
       const smt_termt expected_term = make_extension(extension_width)(
         smt_bit_vector_constant_termt{42, from_width});
-      CHECK(convert_expr_to_smt(cast) == expected_term);
+      CHECK(test.convert(cast) == expected_term);
     }
     SECTION("from bool")
     {
@@ -1070,15 +1113,14 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
         exprt{symbol_exprt{"baz", bool_typet{}}},
         exprt{true_exprt{}},
         exprt{false_exprt{}});
-      const smt_termt from_term = convert_expr_to_smt(from_expr);
+      const smt_termt from_term = test.convert(from_expr);
       const std::size_t width = GENERATE(1, 8, 16, 32, 64);
       const typecast_exprt cast{from_expr, bitvector_typet{ID_bv, width}};
       CHECK(
-        convert_expr_to_smt(cast) ==
-        smt_core_theoryt::if_then_else(
-          from_term,
-          smt_bit_vector_constant_termt{1, width},
-          smt_bit_vector_constant_termt{0, width}));
+        test.convert(cast) == smt_core_theoryt::if_then_else(
+                                from_term,
+                                smt_bit_vector_constant_termt{1, width},
+                                smt_bit_vector_constant_termt{0, width}));
     }
   }
 }
@@ -1087,24 +1129,22 @@ TEST_CASE(
   "expr to smt conversion for address of operator",
   "[core][smt2_incremental]")
 {
-  // The config lines are necessary to ensure that pointer width in configured.
-  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
-  config.ansi_c.set_arch_spec_x86_64();
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
   const symbol_tablet symbol_table;
   const namespacet ns{symbol_table};
-  smt_object_mapt object_map = initial_smt_object_map();
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const symbol_exprt bar{"bar", unsignedbv_typet{32}};
   SECTION("Address of symbol")
   {
     const address_of_exprt address_of_foo{foo};
-    track_expression_objects(address_of_foo, ns, object_map);
+    track_expression_objects(address_of_foo, ns, test.object_map);
     INFO("Expression " + address_of_foo.pretty(1, 0));
     SECTION("8 object bits")
     {
       config.bv_encoding.object_bits = 8;
-      const auto converted = convert_expr_to_smt(address_of_foo, object_map);
-      CHECK(object_map.at(foo).unique_id == 1);
+      const auto converted = test.convert(address_of_foo);
+      CHECK(test.object_map.at(foo).unique_id == 1);
       CHECK(
         converted == smt_bit_vector_theoryt::concat(
                        smt_bit_vector_constant_termt{1, 8},
@@ -1113,8 +1153,8 @@ TEST_CASE(
     SECTION("16 object bits")
     {
       config.bv_encoding.object_bits = 16;
-      const auto converted = convert_expr_to_smt(address_of_foo, object_map);
-      CHECK(object_map.at(foo).unique_id == 1);
+      const auto converted = test.convert(address_of_foo);
+      CHECK(test.object_map.at(foo).unique_id == 1);
       CHECK(
         converted == smt_bit_vector_theoryt::concat(
                        smt_bit_vector_constant_termt{1, 16},
@@ -1129,7 +1169,7 @@ TEST_CASE(
       exprt address_of = address_of_exprt{foo};
       address_of.type() = bool_typet{};
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of, object_map),
+        test.convert(address_of),
         invariant_failedt,
         invariant_failure_containing(
           "Result of the address_of operator should have pointer type."));
@@ -1137,7 +1177,7 @@ TEST_CASE(
     SECTION("Objects should already be tracked")
     {
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        test.convert(address_of_exprt{foo}),
         invariant_failedt,
         invariant_failure_containing("Objects should be tracked before "
                                      "converting their address to SMT terms"));
@@ -1146,10 +1186,10 @@ TEST_CASE(
     {
       config.bv_encoding.object_bits = 8;
       const address_of_exprt address_of_foo{foo};
-      track_expression_objects(address_of_foo, ns, object_map);
-      object_map.at(foo).unique_id = 256;
+      track_expression_objects(address_of_foo, ns, test.object_map);
+      test.object_map.at(foo).unique_id = 256;
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        test.convert(address_of_exprt{foo}),
         invariant_failedt,
         invariant_failure_containing("There should be sufficient bits to "
                                      "encode unique object identifier."));
@@ -1158,10 +1198,10 @@ TEST_CASE(
     {
       config.bv_encoding.object_bits = 64;
       const address_of_exprt address_of_foo{foo};
-      track_expression_objects(address_of_foo, ns, object_map);
-      object_map.at(foo).unique_id = 256;
+      track_expression_objects(address_of_foo, ns, test.object_map);
+      test.object_map.at(foo).unique_id = 256;
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(address_of_exprt{foo}, object_map),
+        test.convert(address_of_exprt{foo}),
         invariant_failedt,
         invariant_failure_containing("Pointer should be wider than object_bits "
                                      "in order to allow for offset encoding."));
@@ -1172,11 +1212,11 @@ TEST_CASE(
     config.bv_encoding.object_bits = 8;
     const exprt comparison =
       notequal_exprt{address_of_exprt{foo}, address_of_exprt{bar}};
-    track_expression_objects(comparison, ns, object_map);
+    track_expression_objects(comparison, ns, test.object_map);
     INFO("Expression " + comparison.pretty(1, 0));
-    const auto converted = convert_expr_to_smt(comparison, object_map);
-    CHECK(object_map.at(foo).unique_id == 2);
-    CHECK(object_map.at(bar).unique_id == 1);
+    const auto converted = test.convert(comparison);
+    CHECK(test.object_map.at(foo).unique_id == 2);
+    CHECK(test.object_map.at(bar).unique_id == 1);
     CHECK(
       converted == smt_core_theoryt::distinct(
                      smt_bit_vector_theoryt::concat(
@@ -1192,10 +1232,9 @@ TEST_CASE(
   "expr to smt conversion for pointer object expression",
   "[core][smt2_incremental]")
 {
-  // The config lines are necessary to ensure that pointer width in configured.
-  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
-  config.ansi_c.set_arch_spec_x86_64();
-  config.bv_encoding.object_bits = 8;
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  CHECK(config.bv_encoding.object_bits == 8);
 
   const auto pointer_type = pointer_typet(unsigned_int_type(), 64 /* bits */);
   const pointer_object_exprt foo{
@@ -1205,7 +1244,7 @@ TEST_CASE(
 
   SECTION("Pointer object expression")
   {
-    const auto converted = convert_expr_to_smt(foo);
+    const auto converted = test.convert(foo);
     const auto expected =
       smt_bit_vector_theoryt::zero_extend(56)(smt_bit_vector_theoryt::extract(
         63, 56)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
@@ -1220,7 +1259,7 @@ TEST_CASE(
       auto copy_of_foo = foo;
       copy_of_foo.type() = bool_typet{};
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(copy_of_foo),
+        test.convert(copy_of_foo),
         invariant_failedt,
         invariant_failure_containing(
           "Pointer object should have a bitvector-based type."));
@@ -1231,7 +1270,7 @@ TEST_CASE(
   {
     const exprt comparison = notequal_exprt{foobar, foo};
     INFO("Expression " + comparison.pretty(1, 0));
-    const auto converted = convert_expr_to_smt(comparison);
+    const auto converted = test.convert(comparison);
     const auto bv1 =
       smt_bit_vector_theoryt::zero_extend(56)(smt_bit_vector_theoryt::extract(
         63, 56)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
@@ -1245,10 +1284,9 @@ TEST_CASE(
 
 TEST_CASE("pointer_offset_exprt to SMT conversion", "[core][smt2_incremental]")
 {
-  // The config lines are necessary to ensure that pointer width in configured.
-  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
-  config.ansi_c.set_arch_spec_x86_64();
-  config.bv_encoding.object_bits = 8;
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  CHECK(config.bv_encoding.object_bits == 8);
 
   const auto pointer_type = pointer_typet(unsigned_int_type(), 64 /* bits */);
   const pointer_offset_exprt pointer_offset{
@@ -1256,7 +1294,7 @@ TEST_CASE("pointer_offset_exprt to SMT conversion", "[core][smt2_incremental]")
 
   SECTION("simple pointer_offset_exprt conversion")
   {
-    const auto converted = convert_expr_to_smt(pointer_offset);
+    const auto converted = test.convert(pointer_offset);
     const auto expected =
       smt_bit_vector_theoryt::zero_extend(8)(smt_bit_vector_theoryt::extract(
         55, 0)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
@@ -1271,10 +1309,35 @@ TEST_CASE("pointer_offset_exprt to SMT conversion", "[core][smt2_incremental]")
       auto pointer_offset_copy = pointer_offset;
       pointer_offset_copy.type() = bool_typet{};
       REQUIRE_THROWS_MATCHES(
-        convert_expr_to_smt(pointer_offset_copy),
+        test.convert(pointer_offset_copy),
         invariant_failedt,
         invariant_failure_containing(
           "Pointer offset should have a bitvector-based type."));
     }
   }
+}
+
+TEST_CASE(
+  "expr to smt conversion for object size expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+  const symbol_exprt foo{"foo", unsignedbv_typet{32}};
+  const object_size_exprt object_size{
+    address_of_exprt{foo}, unsignedbv_typet{64}};
+  track_expression_objects(object_size, ns, test.object_map);
+  const auto foo_id = 1;
+  CHECK(test.object_map.at(foo).unique_id == foo_id);
+  const auto object_bits = config.bv_encoding.object_bits;
+  const auto object = smt_bit_vector_constant_termt{foo_id, object_bits};
+  const auto offset = smt_bit_vector_constant_termt{0, 64 - object_bits};
+  INFO("Expression " + object_size.pretty(1, 0));
+  CHECK(
+    test.convert(object_size) ==
+    test.object_size_function.make_application(std::vector<smt_termt>{
+      smt_bit_vector_theoryt::extract(63, 64 - object_bits)(
+        smt_bit_vector_theoryt::concat(object, offset))}));
 }
