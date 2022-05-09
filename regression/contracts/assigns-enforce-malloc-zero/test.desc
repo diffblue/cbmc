@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --enforce-contract foo _ --malloc-may-fail --malloc-fail-null
 ^\[foo.assigns.\d+\] line 9 Check that POINTER_OBJECT\(\(const void \*\)a\) is valid when a != \(\(char \*\)NULL\): SUCCESS$

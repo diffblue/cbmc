@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
@@ -71,53 +70,100 @@ bv_pointerst::endianness_map(const typet &type, bool little_endian) const
   return bv_endianness_mapt{type, little_endian, ns, bv_width};
 }
 
-std::size_t bv_pointerst::get_object_width(const pointer_typet &) const
-{
-  // not actually type-dependent for now
-  return config.bv_encoding.object_bits;
-}
-
-std::size_t bv_pointerst::get_offset_width(const pointer_typet &type) const
-{
-  const std::size_t pointer_width = type.get_width();
-  const std::size_t object_width = get_object_width(type);
-  PRECONDITION(pointer_width >= object_width);
-  return pointer_width - object_width;
-}
-
-std::size_t bv_pointerst::get_address_width(const pointer_typet &type) const
-{
-  return type.get_width();
-}
-
 bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
-  const
 {
-  const std::size_t offset_width = get_offset_width(type);
-  const std::size_t object_width = get_object_width(type);
-  PRECONDITION(bv.size() >= offset_width + object_width);
+  const auto width = type.get_width();
+  PRECONDITION(width == bv.size());
 
-  return bvt(
-    bv.begin() + offset_width, bv.begin() + offset_width + object_width);
+  const auto result = prop.new_variables(width);
+  bvt match_found_disjuncts;
+
+  for(std::size_t i = 0; i < numbered_pointers.size(); i++)
+  {
+    auto cond = bv_utils.equal(
+      bv,
+      bv_utilst::concatenate(
+        bv_utilst::build_constant(i, width - 1), {const_literal(true)}));
+    match_found_disjuncts.push_back(cond);
+    bv_utils.cond_implies_equal(
+      cond,
+      bv_utilst::zero_extension(numbered_pointers[i].first, width),
+      result);
+  }
+
+  auto match_found = prop.lor(match_found_disjuncts);
+
+  // The top bit distinguishes 'object only' vs. 'table encoded'.
+  // When outside of the table, return an invalid object.
+  return bv_utils.select(
+    bv.back(),
+    bv_utils.select(
+      match_found,
+      result,
+      bv_utilst::build_constant(pointer_logic.get_invalid_object(), width)),
+    bv);
 }
 
 bvt bv_pointerst::offset_literals(const bvt &bv, const pointer_typet &type)
-  const
 {
-  const std::size_t offset_width = get_offset_width(type);
-  PRECONDITION(bv.size() >= offset_width);
+  const auto width = type.get_width();
+  PRECONDITION(width == bv.size());
 
-  return bvt(bv.begin(), bv.begin() + offset_width);
+  const auto result = prop.new_variables(width);
+  bvt match_found_disjuncts;
+
+  for(std::size_t i = 0; i < numbered_pointers.size(); i++)
+  {
+    auto cond = bv_utils.equal(
+      bv,
+      bv_utilst::concatenate(
+        bv_utilst::build_constant(i, width - 1), {const_literal(true)}));
+    match_found_disjuncts.push_back(cond);
+    bv_utils.cond_implies_equal(
+      cond,
+      bv_utilst::sign_extension(numbered_pointers[i].second, width),
+      result);
+  }
+
+  auto match_found = prop.lor(match_found_disjuncts);
+
+  // the top bit distinguishes 'object only' vs. 'table encoded'
+  return bv_utils.select(
+    bv.back(),
+    bv_utils.select(match_found, result, bv_utilst::zeros(width)),
+    bv_utilst::zeros(width));
 }
 
-bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
+bvt bv_pointerst::object_offset_encoding(
+  const bvt &object_bv,
+  const bvt &offset_bv,
+  const pointer_typet &type)
 {
-  bvt result;
-  result.reserve(offset.size() + object.size());
-  result.insert(result.end(), offset.begin(), offset.end());
-  result.insert(result.end(), object.begin(), object.end());
+  const auto width = type.get_width();
+  PRECONDITION(object_bv.size() == width);
+  PRECONDITION(offset_bv.size() == width);
 
-  return result;
+  // is the offset zero?
+  if(std::find_if_not(offset_bv.begin(), offset_bv.end(), [](literalt l) {
+       return l == const_literal(false);
+     }) != offset_bv.end())
+  {
+    // offset is not zero, add to the pointer table
+    auto number = numbered_pointers.size();
+    numbered_pointers.emplace_back(object_bv, offset_bv);
+
+    // Encode the table index.
+    // Also set top bit to distinguish from object-only pointers.
+    return bv_utilst::concatenate(
+      bv_utilst::build_constant(number, width - 1), {const_literal(true)});
+  }
+  else
+  {
+    // Offset is zero, just zero-extend object number.
+    // Top bit is zero to indicate object-only pointer.
+    return bv_utilst::concatenate(
+      bv_utilst::zero_extension(object_bv, width - 1), {const_literal(false)});
+  }
 }
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
@@ -141,17 +187,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
         bvt invalid_bv = object_literals(
           encode(pointer_logic.get_invalid_object(), type), type);
 
-        const std::size_t object_bits = get_object_width(type);
-
-        bvt equal_invalid_bv;
-        equal_invalid_bv.reserve(object_bits);
-
-        for(std::size_t i=0; i<object_bits; i++)
-        {
-          equal_invalid_bv.push_back(prop.lequal(object_bv[i], invalid_bv[i]));
-        }
-
-        return prop.land(equal_invalid_bv);
+        return bv_utils.equal(object_bv, invalid_bv);
       }
     }
   }
@@ -166,6 +202,32 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       postponed_list.emplace_back(bvt{1, l}, convert_bv(operands[0]), expr);
 
       return l;
+    }
+  }
+  else if(expr.id() == ID_equal || expr.id() == ID_notequal)
+  {
+    if(
+      operands.size() == 2 && operands[0].type().id() == ID_pointer &&
+      operands[1].type().id() == ID_pointer)
+    {
+      // bit-wise comparison doesn't work because of numbered pointers
+      const bvt &bv0 = convert_bv(operands[0]);
+      const bvt &bv1 = convert_bv(operands[1]);
+
+      const pointer_typet &type0 = to_pointer_type(operands[0].type());
+      bvt object_bv0 = object_literals(bv0, type0);
+      bvt offset_bv0 = offset_literals(bv0, type0);
+
+      const pointer_typet &type1 = to_pointer_type(operands[1].type());
+      bvt object_bv1 = object_literals(bv1, type1);
+      bvt offset_bv1 = offset_literals(bv1, type1);
+
+      // object and offset need to match
+      auto equal = prop.land(
+        bv_utils.equal(object_bv0, object_bv1),
+        bv_utils.equal(offset_bv0, offset_bv1));
+
+      return expr.id() == ID_equal ? equal : !equal;
     }
   }
   else if(expr.id()==ID_lt || expr.id()==ID_le ||
@@ -381,11 +443,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       op_type.id() == ID_c_enum || op_type.id() == ID_c_enum_tag)
     {
       // Cast from a bitvector type to pointer.
-      // We just do a zero extension.
-
+      // We interpret as NULL + offset, where the offset is
+      // derived from the bitvector by zero extension.
       const bvt &op_bv=convert_bv(op);
-
-      return bv_utils.zero_extension(op_bv, bits);
+      return object_offset_encoding(
+        bv_utilst::zeros(bits), bv_utilst::zero_extension(op_bv, bits), type);
     }
   }
   else if(expr.id()==ID_if)
@@ -463,8 +525,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       count == 1,
       "there should be exactly one pointer-type operand in a pointer-type sum");
 
-    const std::size_t offset_bits = get_offset_width(type);
-    bvt sum = bv_utils.build_constant(0, offset_bits);
+    bvt sum = bv_utils.build_constant(0, bits);
 
     forall_operands(it, plus_expr)
     {
@@ -484,7 +545,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       bvt op=convert_bv(*it);
       CHECK_RETURN(!op.empty());
 
-      op = bv_utils.extension(op, offset_bits, rep);
+      op = bv_utils.extension(op, bits, rep);
+      CHECK_RETURN(op.size() == sum.size());
 
       sum=bv_utils.add(sum, op);
     }
@@ -794,13 +856,8 @@ exprt bv_pointerst::bv_get_rec(
   bvt value_bv(bv.begin() + offset, bv.begin() + offset + bits);
 
   std::string value = bits_to_string(prop, value_bv);
-  std::string value_addr = bits_to_string(prop, object_literals(value_bv, pt));
-  std::string value_offset =
-    bits_to_string(prop, offset_literals(value_bv, pt));
-
   // we treat these like bit-vector constants, but with
   // some additional annotation
-
   const irep_idt bvrep = make_bvrep(bits, [&value](std::size_t i) {
     return value[value.size() - 1 - i] == '1';
   });
@@ -808,24 +865,49 @@ exprt bv_pointerst::bv_get_rec(
   constant_exprt result(bvrep, type);
 
   pointer_logict::pointert pointer;
-  pointer.object =
-    numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
-  pointer.offset=binary2integer(value_offset, true);
+
+  // Top bit set?
+  if(value.front() == '1')
+  {
+    // It's a pointer into the table. Turn bits into number, but
+    // first strip top bit.
+    auto index = binary2integer(value.substr(1, std::string::npos), false);
+
+    if(index >= 0 && index < numbered_pointers.size())
+    {
+      // copy from table
+      const auto &entry = numbered_pointers[numeric_cast_v<std::size_t>(index)];
+      pointer.object = binary2integer(bits_to_string(prop, entry.first), false);
+      pointer.offset = binary2integer(bits_to_string(prop, entry.second), true);
+    }
+    else
+    {
+      // out of bounds, we'll make it an 'invalid pointer'
+      pointer.object = pointer_logic.get_invalid_object();
+      pointer.offset = 0;
+    }
+  }
+  else
+  {
+    // It's an object only, offset is zero.
+    pointer.object = binary2integer(value, false);
+    pointer.offset = 0;
+  }
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};
 }
 
-bvt bv_pointerst::encode(const mp_integer &addr, const pointer_typet &type)
+bvt bv_pointerst::encode(const mp_integer &object, const pointer_typet &type)
   const
 {
-  const std::size_t offset_bits = get_offset_width(type);
-  const std::size_t object_bits = get_object_width(type);
+  const auto width = type.get_width();
 
-  bvt zero_offset(offset_bits, const_literal(false));
-  bvt object = bv_utils.build_constant(addr, object_bits);
+  auto object_bv = bv_utilst::build_constant(object, width - 1);
 
-  return object_offset_encoding(object, zero_offset);
+  // Offset is zero, just zero-extend object number.
+  // Top bit is zero to indicate object-only pointer.
+  return bv_utilst::concatenate(object_bv, {const_literal(false)});
 }
 
 bvt bv_pointerst::offset_arithmetic(
@@ -833,7 +915,7 @@ bvt bv_pointerst::offset_arithmetic(
   const bvt &bv,
   const mp_integer &x)
 {
-  const std::size_t offset_bits = get_offset_width(type);
+  const std::size_t offset_bits = type.get_width();
 
   return offset_arithmetic(
     type, bv, 1, bv_utils.build_constant(x, offset_bits));
@@ -851,36 +933,45 @@ bvt bv_pointerst::offset_arithmetic(
     index.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
                                    bv_utilst::representationt::UNSIGNED;
 
-  const std::size_t offset_bits = get_offset_width(type);
-  bv_index=bv_utils.extension(bv_index, offset_bits, rep);
+  PRECONDITION(bv.size() == type.get_width());
+
+  bv_index = bv_utils.extension(bv_index, bv.size(), rep);
 
   return offset_arithmetic(type, bv, factor, bv_index);
 }
 
 bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
-  const bvt &bv,
+  const bvt &pointer_bv,
   const mp_integer &factor,
-  const bvt &index)
+  const bvt &index_bv)
 {
-  bvt bv_index;
+  PRECONDITION(pointer_bv.size() == type.get_width());
+  PRECONDITION(index_bv.size() == type.get_width());
+
+  bvt index_scaled_bv;
 
   if(factor==1)
-    bv_index=index;
+  {
+    index_scaled_bv = index_bv;
+  }
   else
   {
-    bvt bv_factor=bv_utils.build_constant(factor, index.size());
-    bv_index = bv_utils.signed_multiplier(index, bv_factor);
+    bvt factor_bv = bv_utils.build_constant(factor, pointer_bv.size());
+    index_scaled_bv = bv_utils.signed_multiplier(
+      bv_utils.sign_extension(index_bv, pointer_bv.size()), factor_bv);
   }
 
-  const std::size_t offset_bits = get_offset_width(type);
-  bv_index = bv_utils.sign_extension(bv_index, offset_bits);
+  bvt offset_bv = offset_literals(pointer_bv, type);
+  CHECK_RETURN(offset_bv.size() == pointer_bv.size());
 
-  bvt offset_bv = offset_literals(bv, type);
+  DATA_INVARIANT(
+    offset_bv.size() == index_scaled_bv.size(),
+    "pointer offset bitvector width");
 
-  bvt bv_tmp = bv_utils.add(offset_bv, bv_index);
+  bvt sum = bv_utils.add(offset_bv, index_scaled_bv);
 
-  return object_offset_encoding(object_literals(bv, type), bv_tmp);
+  return object_offset_encoding(object_literals(pointer_bv, type), sum, type);
 }
 
 bvt bv_pointerst::add_addr(const exprt &expr)
@@ -888,15 +979,14 @@ bvt bv_pointerst::add_addr(const exprt &expr)
   const auto a = pointer_logic.add_object(expr);
 
   const pointer_typet type = pointer_type(expr.type());
-  const std::size_t object_bits = get_object_width(type);
-  const std::size_t max_objects=std::size_t(1)<<object_bits;
+  const mp_integer object_bits = type.get_width();
+  const mp_integer max_objects = mp_integer(1) << object_bits;
 
   if(a==max_objects)
     throw analysis_exceptiont(
-      "too many addressed objects: maximum number of objects is set to 2^n=" +
-      std::to_string(max_objects) + " (with n=" + std::to_string(object_bits) +
-      "); " +
-      "use the `--object-bits n` option to increase the maximum number");
+      "too many addressed objects: maximum number of objects is 2^n=" +
+      integer2string(max_objects) + " (with n=" + integer2string(object_bits) +
+      ")");
 
   return encode(a, type);
 }

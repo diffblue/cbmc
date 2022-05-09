@@ -10,8 +10,7 @@ int main()
     return 0;
 
   if(
-    (unsigned long)p >
-    42) // unsoundly evaluates to true due to pointer encoding
+    (unsigned long)p > 1) // unsoundly evaluates to true due to pointer encoding
   {
     return 0;
   }
