@@ -95,11 +95,19 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
 
   find_symbols(kind, src.type(), dest);
 
-  if(kind==kindt::F_BOTH || kind==kindt::F_EXPR)
+  if(
+    kind == kindt::F_ALL || kind == kindt::F_EXPR_CURRENT ||
+    kind == kindt::F_EXPR_BOTH)
   {
     if(src.id() == ID_symbol)
       dest.insert(to_symbol_expr(src).get_identifier());
-    else if(src.id() == ID_next_symbol)
+  }
+
+  if(
+    kind == kindt::F_ALL || kind == kindt::F_EXPR_NEXT ||
+    kind == kindt::F_EXPR_BOTH)
+  {
+    if(src.id() == ID_next_symbol)
       dest.insert(src.get(ID_identifier));
   }
 
@@ -146,10 +154,6 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     for(const auto &p : code_type.parameters())
     {
       find_symbols(kind, p, dest);
-
-      // irep_idt identifier=it->get_identifier();
-      // if(!identifier.empty() && (kind==F_TYPE || kind==F_BOTH))
-      //  dest.insert(identifier);
     }
   }
   else if(src.id()==ID_array)
@@ -204,10 +208,10 @@ void find_non_pointer_type_symbols(
 
 void find_type_and_expr_symbols(const exprt &src, find_symbols_sett &dest)
 {
-  find_symbols(kindt::F_BOTH, src, dest);
+  find_symbols(kindt::F_ALL, src, dest);
 }
 
 void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 {
-  find_symbols(kindt::F_BOTH, src, dest);
+  find_symbols(kindt::F_ALL, src, dest);
 }

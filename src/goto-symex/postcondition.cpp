@@ -167,7 +167,7 @@ bool postconditiont::is_used(
     for(const exprt &e :
         value_set.get_value_set(to_dereference_expr(expr).pointer(), ns))
     {
-      if(has_symbol(get_original_name(e), identifier, kindt::F_BOTH))
+      if(has_symbol(get_original_name(e), identifier, kindt::F_EXPR_BOTH))
       {
         return true;
       }

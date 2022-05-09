@@ -32,9 +32,13 @@ enum class kindt
   /// pointer.
   F_TYPE_NON_PTR,
   /// Symbol expressions.
-  F_EXPR,
+  F_EXPR_CURRENT,
+  /// Next-state symbol expressions.
+  F_EXPR_NEXT,
   /// Current or next-state symbol expressions.
-  F_BOTH,
+  F_EXPR_BOTH,
+  /// All of the above.
+  F_ALL
 };
 
 /// Returns true if one of the symbols in \p src with identifier \p identifier
