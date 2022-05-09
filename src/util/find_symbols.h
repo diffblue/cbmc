@@ -24,7 +24,7 @@ class typet;
 typedef std::unordered_set<irep_idt> find_symbols_sett;
 
 /// Kinds of symbols to be considered by \ref has_symbol or \ref find_symbols.
-enum class kindt
+enum class symbol_kindt
 {
   /// Struct, union, or enum tag symbols.
   F_TYPE,
@@ -39,7 +39,10 @@ enum class kindt
 
 /// Returns true if one of the symbols in \p src with identifier \p identifier
 /// is of kind \p kind.
-bool has_symbol(const exprt &src, const irep_idt &identifier, kindt kind);
+bool has_symbol(
+  const exprt &src,
+  const irep_idt &identifier,
+  symbol_kindt kind);
 
 DEPRECATED(SINCE(2022, 3, 14, "use find_symbols"))
 /// Add to the set \p dest the sub-expressions of \p src with id ID_symbol or
