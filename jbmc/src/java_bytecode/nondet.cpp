@@ -49,7 +49,7 @@ symbol_exprt generate_nondet_int(
   // Declare a symbol for the non deterministic integer.
   const symbol_exprt &nondet_symbol =
     alocate_local_symbol(int_type, basename_prefix);
-  instructions.add(code_declt(nondet_symbol));
+  instructions.add(code_frontend_declt(nondet_symbol));
 
   // Assign the symbol any non deterministic integer value.
   //   int_type name_prefix::nondet_int = NONDET(int_type)

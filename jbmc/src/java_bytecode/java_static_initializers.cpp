@@ -8,21 +8,22 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "java_static_initializers.h"
 
-#include "assignments_from_json.h"
-#include "ci_lazy_methods_needed.h"
-#include "java_object_factory.h"
-#include "java_object_factory_parameters.h"
-#include "java_types.h"
-#include "java_utils.h"
-
-#include <goto-programs/class_hierarchy.h>
-
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/json.h>
 #include <util/std_code.h>
 #include <util/suffix.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/class_hierarchy.h>
+#include <goto-programs/goto_instruction_code.h>
+
+#include "assignments_from_json.h"
+#include "ci_lazy_methods_needed.h"
+#include "java_object_factory.h"
+#include "java_object_factory_parameters.h"
+#include "java_types.h"
+#include "java_utils.h"
 
 /// The three states in which a `<clinit>` method for a class can be before,
 /// after, and during static class initialization. These states are only used
@@ -580,7 +581,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 
   // bool init_complete;
   {
-    code_declt decl(init_complete.symbol_expr());
+    code_frontend_declt decl(init_complete.symbol_expr());
     function_body.add(decl);
   }
 

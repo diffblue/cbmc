@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/symbol.h>
 
+#include "goto_instruction_code.h"
+
 /// Allocates a new object, either by creating a local variable with automatic
 /// lifetime, a global variable with static lifetime, or by dynamically
 /// allocating memory via ALLOCATE(). Code is added to `assignments` which
@@ -233,7 +235,7 @@ void allocate_objectst::declare_created_symbols(code_blockt &init_code)
     const symbolt &symbol = ns.lookup(symbol_id);
     if(!symbol.is_static_lifetime)
     {
-      code_declt decl{symbol.symbol_expr()};
+      code_frontend_declt decl{symbol.symbol_expr()};
       decl.add_source_location() = source_location;
       init_code.add(decl);
     }
