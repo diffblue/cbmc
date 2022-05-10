@@ -92,10 +92,20 @@ struct reaching_definitiont
   /// The two integers below define a range of bits (i.e. the begin and end bit
   /// indices) which represent the value of the variable. So, the integers
   /// represents the half-open interval `[bit_begin, bit_end)` of bits.
-  /// However, `bit_end` can also be set a special value `-1`, which means
-  /// infinite/unknown index.
   range_spect bit_begin;
   range_spect bit_end;
+
+  reaching_definitiont(
+    const irep_idt &identifier,
+    const ai_domain_baset::locationt &definition_at,
+    const range_spect &bit_begin,
+    const range_spect &bit_end)
+    : identifier(identifier),
+      definition_at(definition_at),
+      bit_begin(bit_begin),
+      bit_end(bit_end)
+  {
+  }
 };
 
 /// In order to use instances of this structure as keys in ordered containers,
@@ -109,15 +119,27 @@ inline bool operator<(
   if(b.definition_at<a.definition_at)
     return false;
 
-  if(a.bit_begin<b.bit_begin)
-    return true;
-  if(b.bit_begin<a.bit_begin)
-    return false;
+  if(a.bit_begin.is_unknown() != b.bit_begin.is_unknown())
+    return a.bit_begin.is_unknown();
 
-  if(a.bit_end<b.bit_end)
-    return true;
-  if(b.bit_end<a.bit_end)
-    return false;
+  if(!a.bit_begin.is_unknown())
+  {
+    if(a.bit_begin < b.bit_begin)
+      return true;
+    if(b.bit_begin < a.bit_begin)
+      return false;
+  }
+
+  if(a.bit_end.is_unknown() != b.bit_end.is_unknown())
+    return a.bit_end.is_unknown();
+
+  if(!a.bit_end.is_unknown())
+  {
+    if(a.bit_end < b.bit_end)
+      return true;
+    if(b.bit_end < a.bit_end)
+      return false;
+  }
 
   // we do not expect comparison of unrelated definitions
   // as this operator< is only used in sparse_bitvector_analysist

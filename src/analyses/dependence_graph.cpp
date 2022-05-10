@@ -125,22 +125,28 @@ void dep_graph_domaint::control_dependencies(
 }
 
 static bool may_be_def_use_pair(
-  const mp_integer &w_start,
-  const mp_integer &w_end,
-  const mp_integer &r_start,
-  const mp_integer &r_end)
+  const range_spect &w_start,
+  const range_spect &w_end,
+  const range_spect &r_start,
+  const range_spect &r_end)
 {
-  assert(w_start>=0);
-  assert(r_start>=0);
+  PRECONDITION(w_start >= range_spect{0});
+  PRECONDITION(r_start >= range_spect{0});
 
-  if((w_end!=-1 && w_end <= r_start) || // we < rs
-     (r_end!=-1 && w_start >= r_end)) // re < we
+  if(
+    (!w_end.is_unknown() && w_end <= r_start) || // we < rs
+    (!r_end.is_unknown() && w_start >= r_end))   // re < we
+  {
     return false;
+  }
   else if(w_start >= r_start) // rs <= ws < we,re
     return true;
-  else if(w_end==-1 ||
-          (r_end!=-1 && w_end > r_start)) // ws <= rs < we,re
+  else if(
+    w_end.is_unknown() ||
+    (!r_end.is_unknown() && w_end > r_start)) // ws <= rs < we,re
+  {
     return true;
+  }
   else
     return false;
 }
