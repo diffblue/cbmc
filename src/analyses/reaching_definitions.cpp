@@ -181,7 +181,8 @@ void rd_range_domaint::transform_function_call(
   reaching_definitions_analysist &rd)
 {
   // only if there is an actual call, i.e., we have a body
-  if(function_from != function_to)
+  const symbol_exprt &fn_symbol_expr = to_symbol_expr(from->call_function());
+  if(function_to == fn_symbol_expr.get_identifier())
   {
     for(valuest::iterator it=values.begin();
         it!=values.end();
@@ -206,7 +207,6 @@ void rd_range_domaint::transform_function_call(
         ++it;
     }
 
-    const symbol_exprt &fn_symbol_expr = to_symbol_expr(from->call_function());
     const code_typet &code_type=
       to_code_type(ns.lookup(fn_symbol_expr.get_identifier()).type);
 
