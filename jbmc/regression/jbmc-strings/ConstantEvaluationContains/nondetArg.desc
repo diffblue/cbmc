@@ -1,6 +1,6 @@
 CORE
 Main
---function Main.nondetArg --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+--function Main.nondetArg --max-nondet-string-length 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^Generated [1-9]\d* VCC\(s\), [1-9]\d* remaining after simplification$
 ^EXIT=10$
 ^SIGNAL=0$
