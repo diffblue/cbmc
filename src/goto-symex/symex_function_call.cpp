@@ -245,15 +245,10 @@ void goto_symext::symex_function_call_post_clean(
   // see if it's too much
   if(stop_recursing)
   {
-    if(symex_config.partial_loops)
+    if(symex_config.unwinding_assertions)
+      vcc(false_exprt(), "recursion unwinding assertion", state);
+    if(!symex_config.partial_loops)
     {
-      // it's ok, ignore
-    }
-    else
-    {
-      if(symex_config.unwinding_assertions)
-        vcc(false_exprt(), "recursion unwinding assertion", state);
-
       // Rule out this path:
       symex_assume_l2(state, false_exprt());
     }

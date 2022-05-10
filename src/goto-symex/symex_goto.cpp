@@ -932,25 +932,19 @@ void goto_symext::loop_bound_exceeded(
   else
     negated_cond=not_exprt(guard);
 
+  if(symex_config.unwinding_assertions)
+  {
+    // Generate VCC for unwinding assertion.
+    vcc(
+      negated_cond,
+      "unwinding assertion loop " + std::to_string(loop_number),
+      state);
+  }
+
   if(!symex_config.partial_loops)
   {
-    if(symex_config.unwinding_assertions)
-    {
-      // Generate VCC for unwinding assertion.
-      vcc(
-        negated_cond,
-        "unwinding assertion loop " + std::to_string(loop_number),
-        state);
-    }
-
     // generate unwinding assumption, unless we permit partial loops
     symex_assume_l2(state, negated_cond);
-
-    if(symex_config.unwinding_assertions)
-    {
-      // add to state guard to prevent further assignments
-      state.guard.add(negated_cond);
-    }
   }
 }
 

@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 1 --partial-loops --depth 100
+--unwind 1 --partial-loops --unwinding-assertions --depth 100
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

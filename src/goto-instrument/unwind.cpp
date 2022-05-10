@@ -130,6 +130,7 @@ void goto_unwindt::unwind(
   {
     PRECONDITION(
       unwind_strategy == unwind_strategyt::ASSERT_ASSUME ||
+      unwind_strategy == unwind_strategyt::ASSERT_PARTIAL ||
       unwind_strategy == unwind_strategyt::ASSUME);
 
     goto_programt::const_targett t=loop_exit;
@@ -148,7 +149,9 @@ void goto_unwindt::unwind(
         exit_cond = loop_head->get_condition();
     }
 
-    if(unwind_strategy == unwind_strategyt::ASSERT_ASSUME)
+    if(
+      unwind_strategy == unwind_strategyt::ASSERT_ASSUME ||
+      unwind_strategy == unwind_strategyt::ASSERT_PARTIAL)
     {
       goto_programt::targett assertion = rest_program.add(
         goto_programt::make_assertion(exit_cond, loop_head->source_location()));

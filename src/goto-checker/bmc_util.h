@@ -234,7 +234,7 @@ void run_property_decider(
   " --show-vcc                   show the verification conditions\n" \
   " --slice-formula              remove assignments unrelated to property\n" \
   " --unwinding-assertions       generate unwinding assertions (cannot be\n" \
-  "                              used with --cover or --partial-loops)\n" \
+  "                              used with --cover)\n" \
   " --partial-loops              permit paths with partial loops\n" \
   " --no-self-loops-to-assumptions\n" \
   "                              do not simplify while(1){} to assume(0)\n" \

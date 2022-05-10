@@ -182,17 +182,26 @@ int goto_instrument_parse_optionst::doit()
         bool unwinding_assertions=cmdline.isset("unwinding-assertions");
         bool partial_loops=cmdline.isset("partial-loops");
         bool continue_as_loops=cmdline.isset("continue-as-loops");
-
-        if(unwinding_assertions+partial_loops+continue_as_loops>1)
-          throw "more than one of --unwinding-assertions,--partial-loops,"
-                "--continue-as-loops selected";
+        if(continue_as_loops)
+        {
+          if(unwinding_assertions)
+          {
+            throw "unwinding assertions cannot be used with "
+              "--continue-as-loops";
+          }
+          else if(partial_loops)
+            throw "partial loops cannot be used with --continue-as-loops";
+        }
 
         goto_unwindt::unwind_strategyt unwind_strategy=
           goto_unwindt::unwind_strategyt::ASSUME;
 
         if(unwinding_assertions)
         {
-          unwind_strategy = goto_unwindt::unwind_strategyt::ASSERT_ASSUME;
+          if(partial_loops)
+            unwind_strategy = goto_unwindt::unwind_strategyt::ASSERT_PARTIAL;
+          else
+            unwind_strategy = goto_unwindt::unwind_strategyt::ASSERT_ASSUME;
         }
         else if(partial_loops)
         {

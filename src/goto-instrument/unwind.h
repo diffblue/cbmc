@@ -26,6 +26,7 @@ public:
     CONTINUE,
     PARTIAL,
     ASSERT_ASSUME,
+    ASSERT_PARTIAL,
     ASSUME
   };
 

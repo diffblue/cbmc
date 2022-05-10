@@ -162,6 +162,9 @@ This option will allow paths that execute loops only partially, enabling
 a counterexample for the assertion above even for small unwinding
 bounds. The disadvantage of using this option is that the resulting path
 may be spurious, that is, it may not exist in the original program.
+If `--unwinding-assertions` is also used, and the particular counterexample
+trace does not include a report of a violated unwinding assertion, then that
+counterexample is not impacted by insufficient loop unwinding.
 
 ### Depth-based Unwinding
 
