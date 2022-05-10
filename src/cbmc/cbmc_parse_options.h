@@ -38,7 +38,7 @@ class optionst;
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \
-  "(debug-level):(no-propagation)(no-simplify-if)" \
+  "(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(test-preprocessor)" \
   "(show-array-constraints)"  \
   OPT_CONFIG_C_CPP \

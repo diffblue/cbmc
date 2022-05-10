@@ -36,8 +36,6 @@ struct symex_configt final
 
   bool havoc_undefined_functions;
 
-  mp_integer debug_level;
-
   /// \brief Should the additional validation checks be run?
   /// If this flag is set the checks for renaming (both level1 and level2) are
   /// executed in the goto_symex_statet (in the assignment method).
