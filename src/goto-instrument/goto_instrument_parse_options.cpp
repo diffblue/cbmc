@@ -1337,7 +1337,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   }
 
   // add generic checks, if needed
-  goto_check(options, goto_model, ui_message_handler);
+  goto_check_c(options, goto_model, ui_message_handler);
   transform_assertions_assumptions(options, goto_model);
 
   // check for uninitalized local variables
