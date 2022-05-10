@@ -79,7 +79,8 @@ abstract_object_pointert full_struct_abstract_objectt::read_component(
   const namespacet &ns) const
 {
 #ifdef DEBUG
-  std::cout << "Reading component " << member_expr.get_component_name() << '\n';
+  std::cout << "Reading component " << to_member_expr(expr).get_component_name()
+            << '\n';
 #endif
 
   if(is_top())
@@ -115,10 +116,10 @@ abstract_object_pointert full_struct_abstract_objectt::write_component(
   const abstract_object_pointert &value,
   bool merging_write) const
 {
+  const member_exprt member_expr = to_member_expr(expr);
 #ifdef DEBUG
   std::cout << "Writing component " << member_expr.get_component_name() << '\n';
 #endif
-  const member_exprt member_expr = to_member_expr(expr);
 
   if(is_bottom())
   {

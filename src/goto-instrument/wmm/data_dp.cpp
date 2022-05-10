@@ -17,6 +17,10 @@ Date: 2012
 
 #include "abstract_event.h"
 
+#ifdef DEBUG
+#  include <util/message.h>
+#endif
+
 /// insertion
 void data_dpt::dp_analysis(
   const datat &read,

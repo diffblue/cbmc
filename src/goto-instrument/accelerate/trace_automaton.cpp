@@ -83,7 +83,7 @@ void trace_automatont::add_path(patht &path)
 
 #ifdef DEBUG
     std::cout << ", " << l->location_number << ':'
-              << l->source_location.as_string();
+              << l->source_location().as_string();
 #endif
 
     if(in_alphabet(l))

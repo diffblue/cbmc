@@ -30,6 +30,10 @@ Author: Matt Lewis
 #include "scratch_program.h"
 #include "util.h"
 
+#ifdef DEBUG
+#  include <util/format_expr.h>
+#endif
+
 goto_programt::targett acceleratet::find_back_jump(
   goto_programt::targett loop_header)
 {
@@ -332,8 +336,8 @@ void acceleratet::set_dirty_vars(path_acceleratort &accelerator)
     }
 
 #ifdef DEBUG
-    std::cout << "Setting dirty flag " << expr2c(dirty_var, ns)
-      << " for " << expr2c(*it, ns) << '\n';
+    std::cout << "Setting dirty flag " << format(dirty_var) << " for "
+              << format(*it) << '\n';
 #endif
 
     accelerator.pure_accelerator.add(
@@ -426,7 +430,7 @@ bool acceleratet::is_underapproximate(path_acceleratort &accelerator)
     }
 
 #ifdef DEBUG
-    std::cout << "Underapproximate variable: " << expr2c(*it, ns) << '\n';
+    std::cout << "Underapproximate variable: " << format(*it) << '\n';
 #endif
     return true;
   }
