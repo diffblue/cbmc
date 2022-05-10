@@ -356,7 +356,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
         it++)
     {
       exprt index=from_integer(it->first, size.type());
-      result.copy_to_operands(index, it->second);
+      result.add_to_operands(std::move(index), exprt{it->second});
     }
   }
   else

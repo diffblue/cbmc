@@ -1035,8 +1035,8 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     // It is not obvious whether the type or 'e' should be evaluated
     // first.
 
-    exprt comma_expr(ID_comma, expr.type());
-    comma_expr.copy_to_operands(side_effect_expr, expr);
+    binary_exprt comma_expr{
+      std::move(side_effect_expr), ID_comma, expr, expr.type()};
     expr.swap(comma_expr);
   }
 }
@@ -1085,8 +1085,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // It is not obvious whether the type or 'e' should be evaluated
     // first.
 
-    exprt comma_expr(ID_comma, op.type());
-    comma_expr.copy_to_operands(side_effect_expr, op);
+    binary_exprt comma_expr{
+      std::move(side_effect_expr), ID_comma, op, op.type()};
     op.swap(comma_expr);
   }
 

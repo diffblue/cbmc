@@ -2025,9 +2025,9 @@ public:
     return to_code(operands()[2*i+2]);
   }
 
-  void add_catch(const code_frontend_declt &to_catch, const codet &code_catch)
+  void add_catch(code_frontend_declt &&to_catch, codet &&code_catch)
   {
-    add_to_operands(to_catch, code_catch);
+    add_to_operands(std::move(to_catch), std::move(code_catch));
   }
 
 protected:
