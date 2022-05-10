@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^\[foo.assigns.\d+\].* Check that \*loc1 is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that \*loc2 is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Checks that multiple malloc'd objects are tracked by assigns clause checking.

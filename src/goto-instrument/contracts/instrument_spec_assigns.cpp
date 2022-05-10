@@ -131,7 +131,14 @@ void instrument_spec_assignst::track_heap_allocated(
   const exprt &expr,
   goto_programt &dest)
 {
-  create_snapshot(create_car_from_heap_alloc(expr), dest);
+  // insert in tracking set
+  const auto &car = create_car_from_heap_alloc(expr);
+
+  // generate target validity check for this target.
+  target_validity_assertion(car, true, dest);
+
+  // generate snapshot instructions for this target.
+  create_snapshot(car, dest);
 }
 
 void instrument_spec_assignst::check_inclusion_assignment(
@@ -416,7 +423,7 @@ void instrument_spec_assignst::track_spec_target_group(
   cleanert cleaner(st, log.get_message_handler());
   exprt condition(group.condition());
   if(has_subexpr(condition, ID_side_effect))
-    cleaner.clean(condition, dest, st.lookup_ref(function_id).mode);
+    cleaner.clean(condition, dest, mode);
 
   // create conditional address ranges by distributing the condition
   for(const auto &target : group.targets())
@@ -451,8 +458,7 @@ const symbolt instrument_spec_assignst::create_fresh_symbol(
   const typet &type,
   const source_locationt &location) const
 {
-  return new_tmp_symbol(
-    type, location, st.lookup_ref(function_id).mode, st, suffix);
+  return new_tmp_symbol(type, location, mode, st, suffix);
 }
 
 car_exprt instrument_spec_assignst::create_car_expr(
@@ -714,12 +720,25 @@ exprt instrument_spec_assignst::inclusion_check_full(
 
   // Build a disjunction over all tracked locations
   exprt::operandst disjuncts;
+  log.debug() << LOG_HEADER << " inclusion check: \n"
+              << from_expr_using_mode(ns, mode, car.target()) << " in {"
+              << messaget::eom;
 
   for(const auto &pair : from_spec_assigns)
+  {
     disjuncts.push_back(inclusion_check_single(car, pair.second));
+    log.debug() << "\t(spec) "
+                << from_expr_using_mode(ns, mode, pair.second.target())
+                << messaget::eom;
+  }
 
-  for(const auto &pair : from_heap_alloc)
-    disjuncts.push_back(inclusion_check_single(car, pair.second));
+  for(const auto &heap_car : from_heap_alloc)
+  {
+    disjuncts.push_back(inclusion_check_single(car, heap_car));
+    log.debug() << "\t(heap) "
+                << from_expr_using_mode(ns, mode, heap_car.target())
+                << messaget::eom;
+  }
 
   if(include_stack_allocated)
   {
@@ -732,12 +751,21 @@ exprt instrument_spec_assignst::inclusion_check_full(
         continue;
 
       disjuncts.push_back(inclusion_check_single(car, pair.second));
+      log.debug() << "\t(stack) "
+                  << from_expr_using_mode(ns, mode, pair.second.target())
+                  << messaget::eom;
     }
 
     // static locals are stack allocated and can never be DEAD
     for(const auto &pair : from_static_local)
+    {
       disjuncts.push_back(inclusion_check_single(car, pair.second));
+      log.debug() << "\t(static) "
+                  << from_expr_using_mode(ns, mode, pair.second.target())
+                  << messaget::eom;
+    }
   }
+  log.debug() << "}" << messaget::eom;
 
   if(allow_null_lhs)
     return or_exprt{
@@ -793,21 +821,10 @@ const car_exprt &instrument_spec_assignst::create_car_from_stack_alloc(
 const car_exprt &
 instrument_spec_assignst::create_car_from_heap_alloc(const exprt &target)
 {
-  const auto &found = from_heap_alloc.find(target);
-  if(found != from_heap_alloc.end())
-  {
-    log.warning() << "Ignored duplicate heap-allocated target '"
-                  << from_expr(ns, target.id(), target) << "' at "
-                  << target.source_location().as_string() << messaget::eom;
-    return found->second;
-  }
-  else
-  {
-    log.debug() << LOG_HEADER << "creating CAR for heap-allocated target "
-                << format(target) << messaget::eom;
-    from_heap_alloc.insert({target, create_car_expr(true_exprt{}, target)});
-    return from_heap_alloc.find(target)->second;
-  }
+  log.debug() << LOG_HEADER << "creating CAR for heap-allocated target "
+              << format(target) << messaget::eom;
+  from_heap_alloc.emplace_back(create_car_expr(true_exprt{}, target));
+  return from_heap_alloc.back();
 }
 
 const car_exprt &instrument_spec_assignst::create_car_from_static_local(
@@ -854,8 +871,8 @@ void instrument_spec_assignst::invalidate_heap_and_spec_aliases(
   for(const auto &pair : from_spec_assigns)
     invalidate_car(pair.second, freed_car, dest);
 
-  for(const auto &pair : from_heap_alloc)
-    invalidate_car(pair.second, freed_car, dest);
+  for(const auto &car : from_heap_alloc)
+    invalidate_car(car, freed_car, dest);
 }
 
 /// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.

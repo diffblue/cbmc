@@ -209,7 +209,8 @@ public:
       functions(_functions),
       st(_st),
       ns(_st),
-      log(_message_handler)
+      log(_message_handler),
+      mode(st.lookup_ref(function_id).mode)
   {
   }
 
@@ -507,6 +508,9 @@ protected:
   /// Logger
   messaget log;
 
+  /// Language mode
+  const irep_idt &mode;
+
   /// Track and generate snaphsot instructions and target validity
   /// checking assertions for a conditional target group from an assigns clause
   void track_spec_target_group(
@@ -655,8 +659,9 @@ protected:
   using exprt_to_car_mapt =
     std::unordered_map<const exprt, const car_exprt, irep_hash>;
 
-  /// Map from malloc'd symbols to corresponding conditional address ranges.
-  exprt_to_car_mapt from_heap_alloc;
+  /// List of malloc'd conditional address ranges.
+  using car_expr_listt = std::list<car_exprt>;
+  car_expr_listt from_heap_alloc;
 
   const car_exprt &create_car_from_heap_alloc(const exprt &target);
 
