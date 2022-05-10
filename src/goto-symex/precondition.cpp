@@ -117,7 +117,7 @@ void preconditiont::compute_rec(exprt &dest)
     for(const exprt &e : value_sets.get_values(
           SSA_step.source.function_id, target, deref_expr.pointer()))
     {
-      if(has_symbol_expr(e, lhs_identifier))
+      if(has_symbol_expr(e, lhs_identifier, false))
       {
         may_alias = true;
         break;

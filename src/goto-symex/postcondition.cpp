@@ -167,7 +167,7 @@ bool postconditiont::is_used(
     for(const exprt &e :
         value_set.get_value_set(to_dereference_expr(expr).pointer(), ns))
     {
-      if(has_symbol_expr(get_original_name(e), identifier))
+      if(has_symbol_expr(get_original_name(e), identifier, false))
         return true;
     }
 

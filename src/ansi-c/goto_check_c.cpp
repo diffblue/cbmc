@@ -466,7 +466,7 @@ void goto_check_ct::invalidate(const exprt &lhs)
     for(auto it = assertions.begin(); it != assertions.end();)
     {
       if(
-        has_symbol_expr(it->second, lhs_id) ||
+        has_symbol_expr(it->second, lhs_id, false) ||
         has_subexpr(it->second, ID_dereference))
       {
         it = assertions.erase(it);
