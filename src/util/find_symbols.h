@@ -69,10 +69,20 @@ void find_symbols(
   std::set<symbol_exprt> &dest);
 
 /// Find sub expressions with id ID_symbol
-std::set<symbol_exprt> find_symbols(const exprt &src);
+inline std::set<symbol_exprt> find_symbols(const exprt &src)
+{
+  std::set<symbol_exprt> syms;
+  find_symbols(src, syms);
+  return syms;
+}
 
 /// Find identifiers of the sub expressions with id ID_symbol
-std::unordered_set<irep_idt> find_symbol_identifiers(const exprt &src);
+inline find_symbols_sett find_symbol_identifiers(const exprt &src)
+{
+  find_symbols_sett identifiers;
+  find_symbols(src, identifiers);
+  return identifiers;
+}
 
 DEPRECATED(SINCE(2022, 3, 14, "use has_symbol(exprt, irep_idt, symbol_kindt)"))
 /// \return true if one of the symbols in \p src is present in \p symbols
