@@ -64,7 +64,7 @@ void slice_global_inits(
     for(const auto &i : it->second.body.instructions)
     {
       i.apply([&symbols_to_keep](const exprt &expr) {
-        find_symbols(expr, symbols_to_keep, true, false);
+        find_symbols(expr, symbols_to_keep);
       });
     }
   }
@@ -103,7 +103,7 @@ void slice_global_inits(
           symbols_to_keep.find(id) != symbols_to_keep.end())
         {
           fixed_point_reached = false;
-          find_symbols(instruction.assign_rhs(), symbols_to_keep, true, false);
+          find_symbols(instruction.assign_rhs(), symbols_to_keep);
           *seen_it = true;
         }
       }

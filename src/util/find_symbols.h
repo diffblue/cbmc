@@ -32,11 +32,7 @@ enum class kindt
   /// pointer.
   F_TYPE_NON_PTR,
   /// Symbol expressions.
-  F_EXPR_CURRENT,
-  /// Next-state symbol expressions.
-  F_EXPR_NEXT,
-  /// Current or next-state symbol expressions.
-  F_EXPR_BOTH,
+  F_EXPR,
   /// All of the above.
   F_ALL
 };
@@ -50,13 +46,8 @@ DEPRECATED(SINCE(2022, 3, 14, "use find_symbols"))
 /// ID_next_symbol
 void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest);
 
-/// Add to the set \p dest the sub-expressions of \p src with id ID_symbol if
-/// \p current is true, and ID_next_symbol if \p next is true
-void find_symbols(
-  const exprt &src,
-  find_symbols_sett &dest,
-  bool current = true,
-  bool next = true);
+/// Add to the set \p dest the sub-expressions of \p src with id ID_symbol.
+void find_symbols(const exprt &src, find_symbols_sett &dest);
 
 /// \return set of sub-expressions of the expressions contained in the range
 ///   defined by \p begin and \p end which have id ID_symbol or ID_next_symbol
@@ -71,14 +62,6 @@ find_symbols_sett find_symbols_or_nexts(iteratort begin, iteratort end)
   std::for_each(begin, end, [&](const exprt &e) { find_symbols(e, result); });
   return result;
 }
-
-/// Add to the set \p dest the sub-expressions of \p src with id ID_symbol if
-/// \p current is true, and ID_next_symbol if \p next is true
-void find_symbols(
-  const exprt &src,
-  find_symbols_sett &dest,
-  bool current,
-  bool next);
 
 /// Find sub expressions with id ID_symbol
 void find_symbols(

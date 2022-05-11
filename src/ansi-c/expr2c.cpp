@@ -1663,9 +1663,6 @@ std::string expr2ct::convert_symbol(const exprt &src)
     #endif
   }
 
-  if(src.id()==ID_next_symbol)
-    dest="NEXT("+dest+")";
-
   return dest;
 }
 
@@ -3848,9 +3845,6 @@ std::string expr2ct::convert_with_precedence(
     return precedence=16, convert_index_designator(src);
 
   else if(src.id()==ID_symbol)
-    return convert_symbol(src);
-
-  else if(src.id()==ID_next_symbol)
     return convert_symbol(src);
 
   else if(src.id()==ID_nondet_symbol)

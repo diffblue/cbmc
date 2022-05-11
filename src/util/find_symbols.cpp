@@ -13,31 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "range.h"
 #include "std_expr.h"
 
-bool has_symbol(
-  const exprt &src,
-  const find_symbols_sett &symbols,
-  bool current,
-  bool next)
+bool has_symbol(const exprt &src, const find_symbols_sett &symbols)
 {
-  if(src.id() == ID_symbol && current)
+  if(src.id() == ID_symbol)
     return symbols.count(to_symbol_expr(src).get_identifier()) != 0;
-  else if(src.id() == ID_next_symbol && next)
-    return symbols.count(src.get(ID_identifier))!=0;
   else
   {
     forall_operands(it, src)
-      if(has_symbol(*it, symbols, current, next))
+      if(has_symbol(*it, symbols))
         return true;
   }
 
   return false;
-}
-
-bool has_symbol(
-  const exprt &src,
-  const find_symbols_sett &symbols)
-{
-  return has_symbol(src, symbols, true, true);
 }
 
 void find_symbols(
@@ -76,20 +63,10 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
 
   find_symbols(kind, src.type(), dest);
 
-  if(
-    kind == kindt::F_ALL || kind == kindt::F_EXPR_CURRENT ||
-    kind == kindt::F_EXPR_BOTH)
+  if(kind == kindt::F_ALL || kind == kindt::F_EXPR)
   {
     if(src.id() == ID_symbol)
       dest.insert(to_symbol_expr(src).get_identifier());
-  }
-
-  if(
-    kind == kindt::F_ALL || kind == kindt::F_EXPR_NEXT ||
-    kind == kindt::F_EXPR_BOTH)
-  {
-    if(src.id() == ID_next_symbol)
-      dest.insert(src.get(ID_identifier));
   }
 
   const irept &c_sizeof_type=src.find(ID_C_c_sizeof_type);
@@ -199,22 +176,10 @@ void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 
 void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest)
 {
-  find_symbols(kindt::F_EXPR_BOTH, src, dest);
+  find_symbols(kindt::F_EXPR, src, dest);
 }
 
-void find_symbols(
-  const exprt &src,
-  find_symbols_sett &dest,
-  bool current,
-  bool next)
+void find_symbols(const exprt &src, find_symbols_sett &dest)
 {
-  if(current)
-  {
-    if(next)
-      find_symbols(kindt::F_EXPR_BOTH, src, dest);
-    else
-      find_symbols(kindt::F_EXPR_CURRENT, src, dest);
-  }
-  else if(next)
-    find_symbols(kindt::F_EXPR_NEXT, src, dest);
+  find_symbols(kindt::F_EXPR, src, dest);
 }
