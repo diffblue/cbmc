@@ -13,6 +13,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "range.h"
 #include "std_expr.h"
 
+/// Kinds of symbols to be considered by \ref has_symbol or \ref find_symbols.
+enum class symbol_kindt
+{
+  /// Struct, union, or enum tag symbols.
+  F_TYPE,
+  /// Struct, union, or enum tag symbols when the expression using them is not a
+  /// pointer.
+  F_TYPE_NON_PTR,
+  /// Symbol expressions.
+  F_EXPR,
+  /// Symbol expressions, but excluding bindings.
+  F_EXPR_NOT_BOUND,
+  /// All of the above.
+  F_ALL
+};
+
 bool has_symbol(const exprt &src, const find_symbols_sett &symbols)
 {
   if(src.id() == ID_symbol)
@@ -164,9 +180,9 @@ void find_symbols(const exprt &src, std::set<symbol_exprt> &dest)
   });
 }
 
-bool has_symbol(const exprt &src, const irep_idt &identifier, symbol_kindt kind)
+bool has_symbol_expr(const exprt &src, const irep_idt &identifier)
 {
-  return !find_symbols(kind, src, [&identifier](const symbol_exprt &e) {
+  return !find_symbols(symbol_kindt::F_EXPR, src, [&identifier](const symbol_exprt &e) {
     return e.get_identifier() != identifier;
   });
 }
