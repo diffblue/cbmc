@@ -91,4 +91,6 @@ unsigned char __builtin_rotateright8(unsigned char, unsigned char);
 unsigned short __builtin_rotateright16(unsigned short, unsigned short);
 unsigned int __builtin_rotateright32(unsigned int, unsigned int);
 unsigned long long __builtin_rotateright64(unsigned long long, unsigned long long);
+
+void __builtin_assume(__CPROVER_bool);
 // clang-format on
