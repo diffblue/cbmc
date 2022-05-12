@@ -92,7 +92,7 @@ void value_set_domain_templatet<VST>::transform(
     break;
 
   case ASSUME:
-    value_set.guard(from_l->get_condition(), ns);
+    value_set.guard(from_l->condition(), ns);
     break;
 
   case FUNCTION_CALL:

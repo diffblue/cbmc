@@ -88,11 +88,11 @@ void introduce_temporaries(
       symbol_exprt symbol_expr=new_symbol.symbol_expr();
 
       goto_programt::instructiont new_i = goto_programt::make_assignment(
-        code_assignt(symbol_expr, instruction.get_condition()),
+        code_assignt(symbol_expr, instruction.condition()),
         instruction.source_location());
 
       // replace guard
-      instruction.set_condition(symbol_expr);
+      instruction.condition_nonconst() = symbol_expr;
       goto_program.insert_before_swap(i_it, new_i);
 
       i_it++; // step forward

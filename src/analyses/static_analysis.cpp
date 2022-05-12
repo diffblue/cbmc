@@ -27,9 +27,9 @@ exprt static_analysis_baset::get_guard(
   if(!from->is_goto())
     return true_exprt();
   else if(std::next(from) == to)
-    return boolean_negate(from->get_condition());
+    return boolean_negate(from->condition());
   else
-    return from->get_condition();
+    return from->condition();
 }
 
 exprt static_analysis_baset::get_return_lhs(locationt to)

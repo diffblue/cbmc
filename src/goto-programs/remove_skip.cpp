@@ -37,7 +37,7 @@ bool is_skip(
 
   if(it->is_goto())
   {
-    if(it->get_condition().is_false())
+    if(it->condition().is_false())
       return true;
 
     goto_programt::const_targett next_it = it;
@@ -48,7 +48,7 @@ bool is_skip(
 
     // A branch to the next instruction is a skip
     // We also require the guard to be 'true'
-    return it->get_condition().is_true() && it->get_target() == next_it;
+    return it->condition().is_true() && it->get_target() == next_it;
   }
 
   if(it->is_other())

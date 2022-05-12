@@ -127,7 +127,7 @@ void instrument_preconditions(
         for(const auto &p : preconditions)
         {
           goto_program.insert_before_swap(it);
-          exprt instance = p->get_condition();
+          exprt instance = p->condition();
           r(instance);
           *it = goto_programt::make_assertion(instance, source_location);
           it->source_location_nonconst().set_property_class(

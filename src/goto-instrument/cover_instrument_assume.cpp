@@ -25,7 +25,7 @@ void cover_assume_instrumentert::instrument(
   {
     const auto location = i_it->source_location();
     const auto assume_condition =
-      expr2c(i_it->get_condition(), namespacet{symbol_tablet()});
+      expr2c(i_it->condition(), namespacet{symbol_tablet()});
     const auto comment_before =
       "assert(false) before assume(" + assume_condition + ")";
     const auto comment_after =

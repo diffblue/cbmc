@@ -37,11 +37,7 @@ static void rename_symbols_in_function(
     rename_symbol(instruction.code_nonconst());
 
     if(instruction.has_condition())
-    {
-      exprt c = instruction.get_condition();
-      rename_symbol(c);
-      instruction.set_condition(c);
-    }
+      rename_symbol(instruction.condition_nonconst());
   }
 }
 

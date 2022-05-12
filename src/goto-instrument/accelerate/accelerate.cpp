@@ -40,7 +40,7 @@ goto_programt::targett acceleratet::find_back_jump(
   for(const auto &t : loop)
   {
     if(
-      t->is_goto() && t->get_condition().is_true() && t->targets.size() == 1 &&
+      t->is_goto() && t->condition().is_true() && t->targets.size() == 1 &&
       t->targets.front() == loop_header &&
       t->location_number > back_jump->location_number)
     {
@@ -382,7 +382,7 @@ void acceleratet::add_dirty_checks()
     find_symbols_sett read;
 
     if(it->has_condition())
-      find_symbols_or_nexts(it->get_condition(), read);
+      find_symbols_or_nexts(it->condition(), read);
 
     if(it->is_assign())
     {

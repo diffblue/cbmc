@@ -102,11 +102,7 @@ void rewrite_union(goto_functionst::goto_functiont &goto_function)
     rewrite_union(instruction.code_nonconst());
 
     if(instruction.has_condition())
-    {
-      exprt c = instruction.get_condition();
-      rewrite_union(c);
-      instruction.set_condition(c);
-    }
+      rewrite_union(instruction.condition_nonconst());
   }
 }
 

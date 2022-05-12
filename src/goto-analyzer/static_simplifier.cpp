@@ -65,7 +65,7 @@ bool static_simplifier(
 
       if(i_it->is_assert())
       {
-        exprt cond = i_it->get_condition();
+        exprt cond = i_it->condition();
 
         bool unchanged = ai.abstract_state_before(i_it)->ai_simplify(cond, ns);
 
@@ -74,12 +74,12 @@ bool static_simplifier(
         else
         {
           simplified.asserts++;
-          i_it->set_condition(cond);
+          i_it->condition_nonconst() = cond;
         }
       }
       else if(i_it->is_assume())
       {
-        exprt cond = i_it->get_condition();
+        exprt cond = i_it->condition();
 
         bool unchanged = ai.abstract_state_before(i_it)->ai_simplify(cond, ns);
 
@@ -88,12 +88,12 @@ bool static_simplifier(
         else
         {
           simplified.assumes++;
-          i_it->set_condition(cond);
+          i_it->condition_nonconst() = cond;
         }
       }
       else if(i_it->is_goto())
       {
-        exprt cond = i_it->get_condition();
+        exprt cond = i_it->condition();
 
         bool unchanged = ai.abstract_state_before(i_it)->ai_simplify(cond, ns);
 
@@ -102,7 +102,7 @@ bool static_simplifier(
         else
         {
           simplified.gotos++;
-          i_it->set_condition(cond);
+          i_it->condition_nonconst() = cond;
         }
       }
       else if(i_it->is_assign())

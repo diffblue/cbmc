@@ -25,7 +25,7 @@ TEST_CASE("cover_intrument_end_of_function", "[core]")
   REQUIRE(goto_program.instructions.size() == 4);
   const auto newly_inserted = std::next(goto_program.instructions.begin(), 2);
   REQUIRE(newly_inserted->is_assert());
-  REQUIRE(newly_inserted->get_condition() == false_exprt{});
+  REQUIRE(newly_inserted->condition() == false_exprt{});
   REQUIRE(newly_inserted->source_location().get_function() == "foo");
 }
 
@@ -48,6 +48,6 @@ TEST_CASE("cover_instrument_end_of_function with custom expression", "[core]")
   REQUIRE(goto_program.instructions.size() == 4);
   const auto newly_inserted = std::next(goto_program.instructions.begin(), 2);
   REQUIRE(newly_inserted->is_assert());
-  REQUIRE(newly_inserted->get_condition() == true_exprt{});
+  REQUIRE(newly_inserted->condition() == true_exprt{});
   REQUIRE(newly_inserted->source_location().get_function() == "foo");
 }

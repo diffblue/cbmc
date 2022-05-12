@@ -474,12 +474,9 @@ goto_programt::targett string_abstractiont::abstract(
   case GOTO:
   case ASSERT:
   case ASSUME:
-    if(has_string_macros(it->get_condition()))
-    {
-      exprt tmp = it->get_condition();
-      replace_string_macros(tmp, false, it->source_location());
-      it->set_condition(tmp);
-    }
+    if(has_string_macros(it->condition()))
+      replace_string_macros(
+        it->condition_nonconst(), false, it->source_location());
     break;
 
   case FUNCTION_CALL:

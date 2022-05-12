@@ -53,7 +53,7 @@ void _rw_set_loct::compute()
           target->is_assume() ||
           target->is_assert())
   {
-    read(target->get_condition());
+    read(target->condition());
   }
   else if(target->is_function_call())
   {

@@ -2085,7 +2085,7 @@ void goto_check_ct::goto_check(
 
     if(i.has_condition())
     {
-      check(i.get_condition());
+      check(i.condition());
     }
 
     // magic ERROR label?

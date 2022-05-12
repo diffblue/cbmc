@@ -333,8 +333,7 @@ bool taint_analysist::operator()(
         if(!i_it->is_assert())
           continue;
 
-        if(!custom_bitvector_domaint::has_get_must_or_may(
-             i_it->get_condition()))
+        if(!custom_bitvector_domaint::has_get_must_or_may(i_it->condition()))
         {
           continue;
         }
@@ -342,8 +341,7 @@ bool taint_analysist::operator()(
         if(custom_bitvector_analysis[i_it].has_values.is_false())
           continue;
 
-        exprt result =
-          custom_bitvector_analysis.eval(i_it->get_condition(), i_it);
+        exprt result = custom_bitvector_analysis.eval(i_it->condition(), i_it);
         if(simplify_expr(std::move(result), ns).is_true())
           continue;
 

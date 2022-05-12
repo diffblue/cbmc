@@ -253,9 +253,8 @@ void nondet_volatilet::nondet_volatile(
     else if(instruction.has_condition())
     {
       // do condition
-      exprt cond = instruction.get_condition();
-      nondet_volatile_rhs(symbol_table, cond, pre, post);
-      instruction.set_condition(cond);
+      nondet_volatile_rhs(
+        symbol_table, instruction.condition_nonconst(), pre, post);
     }
 
     const auto pre_size = pre.instructions.size();
