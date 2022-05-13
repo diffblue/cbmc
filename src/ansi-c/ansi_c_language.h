@@ -56,6 +56,12 @@ public:
     const std::string &module,
     const bool keep_file_local) override;
 
+  bool typecheck(
+    symbol_tablet &symbol_table,
+    const std::string &module,
+    const bool keep_file_local,
+    const std::set<irep_idt> &keep);
+
   bool can_keep_file_local() override
   {
     return true;
