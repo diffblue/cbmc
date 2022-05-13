@@ -13,25 +13,30 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/std_code_base.h>
 #include <util/std_expr.h>
 
-/// A \ref codet representing an assignment in the program.
+using goto_instruction_codet = codet;
+
+/// A \ref goto_instruction_codet representing an assignment in the program.
 /// For example, if an expression `e1` is represented as an \ref exprt `expr1`
 /// and an expression `e2` is represented as an \ref exprt `expr2`, the
 /// assignment `e1 = e2;` can be represented as `code_assignt(expr1, expr2)`.
-class code_assignt : public codet
+class code_assignt : public goto_instruction_codet
 {
 public:
-  code_assignt() : codet(ID_assign)
+  code_assignt() : goto_instruction_codet(ID_assign)
   {
     operands().resize(2);
   }
 
   code_assignt(exprt lhs, exprt rhs)
-    : codet(ID_assign, {std::move(lhs), std::move(rhs)})
+    : goto_instruction_codet(ID_assign, {std::move(lhs), std::move(rhs)})
   {
   }
 
   code_assignt(exprt lhs, exprt rhs, source_locationt loc)
-    : codet(ID_assign, {std::move(lhs), std::move(rhs)}, std::move(loc))
+    : goto_instruction_codet(
+        ID_assign,
+        {std::move(lhs), std::move(rhs)},
+        std::move(loc))
   {
   }
 
@@ -56,7 +61,7 @@ public:
   }
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
@@ -64,7 +69,7 @@ public:
   }
 
   static void validate(
-    const codet &code,
+    const goto_instruction_codet &code,
     const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
@@ -77,7 +82,7 @@ public:
   }
 
   static void validate_full(
-    const codet &code,
+    const goto_instruction_codet &code,
     const namespacet &ns,
     const validation_modet vm = validation_modet::INVARIANT)
   {
@@ -90,10 +95,10 @@ public:
   }
 
 protected:
-  using codet::op0;
-  using codet::op1;
-  using codet::op2;
-  using codet::op3;
+  using goto_instruction_codet::op0;
+  using goto_instruction_codet::op1;
+  using goto_instruction_codet::op2;
+  using goto_instruction_codet::op3;
 };
 
 template <>
@@ -107,26 +112,27 @@ inline void validate_expr(const code_assignt &x)
   code_assignt::check(x);
 }
 
-inline const code_assignt &to_code_assign(const codet &code)
+inline const code_assignt &to_code_assign(const goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assign);
   code_assignt::check(code);
   return static_cast<const code_assignt &>(code);
 }
 
-inline code_assignt &to_code_assign(codet &code)
+inline code_assignt &to_code_assign(goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assign);
   code_assignt::check(code);
   return static_cast<code_assignt &>(code);
 }
 
-/// A \ref codet representing the removal of a local variable going out of
-/// scope.
-class code_deadt : public codet
+/// A \ref goto_instruction_codet representing the removal of
+/// a local variable going out of scope.
+class code_deadt : public goto_instruction_codet
 {
 public:
-  explicit code_deadt(symbol_exprt symbol) : codet(ID_dead, {std::move(symbol)})
+  explicit code_deadt(symbol_exprt symbol)
+    : goto_instruction_codet(ID_dead, {std::move(symbol)})
   {
   }
 
@@ -146,7 +152,7 @@ public:
   }
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
@@ -160,10 +166,10 @@ public:
   }
 
 protected:
-  using codet::op0;
-  using codet::op1;
-  using codet::op2;
-  using codet::op3;
+  using goto_instruction_codet::op0;
+  using goto_instruction_codet::op1;
+  using goto_instruction_codet::op2;
+  using goto_instruction_codet::op3;
 };
 
 template <>
@@ -177,28 +183,29 @@ inline void validate_expr(const code_deadt &x)
   code_deadt::check(x);
 }
 
-inline const code_deadt &to_code_dead(const codet &code)
+inline const code_deadt &to_code_dead(const goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dead);
   code_deadt::check(code);
   return static_cast<const code_deadt &>(code);
 }
 
-inline code_deadt &to_code_dead(codet &code)
+inline code_deadt &to_code_dead(goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dead);
   code_deadt::check(code);
   return static_cast<code_deadt &>(code);
 }
 
-/// A `codet` representing the declaration of a local variable.
+/// A `goto_instruction_codet` representing the declaration of a local variable.
 /// For example, if a variable (symbol) `x` is represented as a
 /// \ref symbol_exprt `sym`, then the declaration of this variable can be
 /// represented as `code_declt(sym)`.
-class code_declt : public codet
+class code_declt : public goto_instruction_codet
 {
 public:
-  explicit code_declt(symbol_exprt symbol) : codet(ID_decl, {std::move(symbol)})
+  explicit code_declt(symbol_exprt symbol)
+    : goto_instruction_codet(ID_decl, {std::move(symbol)})
   {
   }
 
@@ -218,7 +225,7 @@ public:
   }
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
@@ -242,30 +249,30 @@ inline void validate_expr(const code_declt &x)
   code_declt::check(x);
 }
 
-inline const code_declt &to_code_decl(const codet &code)
+inline const code_declt &to_code_decl(const goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_decl);
   code_declt::check(code);
   return static_cast<const code_declt &>(code);
 }
 
-inline code_declt &to_code_decl(codet &code)
+inline code_declt &to_code_decl(goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_decl);
   code_declt::check(code);
   return static_cast<code_declt &>(code);
 }
 
-/// \ref codet representation of a function call statement.
+/// \ref goto_instruction_codet representation of a function call statement.
 /// The function call statement has three operands.
 /// The first is the expression that is used to store the return value.
 /// The second is the function called.
 /// The third is a vector of argument values.
-class code_function_callt : public codet
+class code_function_callt : public goto_instruction_codet
 {
 public:
   explicit code_function_callt(exprt _function)
-    : codet(
+    : goto_instruction_codet(
         ID_function_call,
         {nil_exprt(), std::move(_function), exprt(ID_arguments)})
   {
@@ -274,7 +281,7 @@ public:
   typedef exprt::operandst argumentst;
 
   code_function_callt(exprt _lhs, exprt _function, argumentst _arguments)
-    : codet(
+    : goto_instruction_codet(
         ID_function_call,
         {std::move(_lhs), std::move(_function), exprt(ID_arguments)})
   {
@@ -318,7 +325,7 @@ public:
   }
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
@@ -330,7 +337,7 @@ public:
   }
 
   static void validate(
-    const codet &code,
+    const goto_instruction_codet &code,
     const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
@@ -344,7 +351,7 @@ public:
   }
 
   static void validate_full(
-    const codet &code,
+    const goto_instruction_codet &code,
     const namespacet &ns,
     const validation_modet vm = validation_modet::INVARIANT)
   {
@@ -357,10 +364,10 @@ public:
   }
 
 protected:
-  using codet::op0;
-  using codet::op1;
-  using codet::op2;
-  using codet::op3;
+  using goto_instruction_codet::op0;
+  using goto_instruction_codet::op1;
+  using goto_instruction_codet::op2;
+  using goto_instruction_codet::op3;
 };
 
 template <>
@@ -374,29 +381,30 @@ inline void validate_expr(const code_function_callt &x)
   code_function_callt::check(x);
 }
 
-inline const code_function_callt &to_code_function_call(const codet &code)
+inline const code_function_callt &
+to_code_function_call(const goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_function_call);
   code_function_callt::check(code);
   return static_cast<const code_function_callt &>(code);
 }
 
-inline code_function_callt &to_code_function_call(codet &code)
+inline code_function_callt &to_code_function_call(goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_function_call);
   code_function_callt::check(code);
   return static_cast<code_function_callt &>(code);
 }
 
-/// A `codet` representing the declaration that an input of a particular
-/// description has a value which corresponds to the value of a given expression
-/// (or expressions).
+/// A `goto_instruction_codet` representing the declaration that an input of
+/// a particular description has a value which corresponds to the value of a
+/// given expression (or expressions).
 /// When working with the C front end, calls to the `__CPROVER_input` intrinsic
 /// can be added to the input code in order add instructions of this type to the
 /// goto program.
 /// The first argument is expected to be a C string denoting the input
 /// identifier. The second argument is the expression for the input value.
-class code_inputt : public codet
+class code_inputt : public goto_instruction_codet
 {
 public:
   /// This constructor is for support of calls to `__CPROVER_input` in user
@@ -420,7 +428,7 @@ public:
     optionalt<source_locationt> location = {});
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT);
 };
 
@@ -435,15 +443,15 @@ inline void validate_expr(const code_inputt &input)
   code_inputt::check(input);
 }
 
-/// A `codet` representing the declaration that an output of a particular
-/// description has a value which corresponds to the value of a given expression
-/// (or expressions).
+/// A `goto_instruction_codet` representing the declaration that an output of
+/// a particular description has a value which corresponds to the value of a
+/// given expression (or expressions).
 /// When working with the C front end, calls to the `__CPROVER_output` intrinsic
 /// can be added to the input code in order add instructions of this type to the
 /// goto program.
 /// The first argument is expected to be a C string denoting the output
 /// identifier. The second argument is the expression for the output value.
-class code_outputt : public codet
+class code_outputt : public goto_instruction_codet
 {
 public:
   /// This constructor is for support of calls to `__CPROVER_output` in user
@@ -466,7 +474,7 @@ public:
     optionalt<source_locationt> location = {});
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT);
 };
 
@@ -481,11 +489,13 @@ inline void validate_expr(const code_outputt &output)
   code_outputt::check(output);
 }
 
-/// \ref codet representation of a "return from a function" statement.
-class code_returnt : public codet
+/// \ref goto_instruction_codet representation of a "return from a
+/// function" statement.
+class code_returnt : public goto_instruction_codet
 {
 public:
-  explicit code_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
+  explicit code_returnt(exprt _op)
+    : goto_instruction_codet(ID_return, {std::move(_op)})
   {
   }
 
@@ -500,17 +510,17 @@ public:
   }
 
   static void check(
-    const codet &code,
+    const goto_instruction_codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(vm, code.operands().size() == 1, "return must have one operand");
   }
 
 protected:
-  using codet::op0;
-  using codet::op1;
-  using codet::op2;
-  using codet::op3;
+  using goto_instruction_codet::op0;
+  using goto_instruction_codet::op1;
+  using goto_instruction_codet::op2;
+  using goto_instruction_codet::op3;
 };
 
 template <>
@@ -524,14 +534,14 @@ inline void validate_expr(const code_returnt &x)
   code_returnt::check(x);
 }
 
-inline const code_returnt &to_code_return(const codet &code)
+inline const code_returnt &to_code_return(const goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
   code_returnt::check(code);
   return static_cast<const code_returnt &>(code);
 }
 
-inline code_returnt &to_code_return(codet &code)
+inline code_returnt &to_code_return(goto_instruction_codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
   code_returnt::check(code);
