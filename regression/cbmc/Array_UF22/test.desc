@@ -1,6 +1,6 @@
 KNOWNBUG broken-smt-backend
 main.c
---arrays-uf-always --no-propagation
+--arrays-uf-always --no-propagation --no-simplify
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

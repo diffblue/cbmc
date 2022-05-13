@@ -98,12 +98,15 @@ public:
   /// \param ns: a namespace to resolve type symbols/tag types
   /// \param state: symbolic execution state
   /// \param lhs: non-expanded symbol
+  /// \param rhs: right-hand-side value that was used in the preceding update of
+  ///   the full object
   /// \param target: symbolic execution equation store
   /// \param allow_pointer_unsoundness: allow pointer unsoundness
   void field_assignments(
     const namespacet &ns,
     goto_symex_statet &state,
     const ssa_exprt &lhs,
+    const exprt &rhs,
     symex_targett &target,
     bool allow_pointer_unsoundness);
 
@@ -165,7 +168,7 @@ private:
     const namespacet &ns,
     goto_symex_statet &state,
     const exprt &lhs_fs,
-    const exprt &lhs,
+    const exprt &ssa_rhs,
     symex_targett &target,
     bool allow_pointer_unsoundness);
 

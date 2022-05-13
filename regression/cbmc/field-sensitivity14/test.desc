@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^Generated \d+ VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+All properties in this example can be solved by combining field-sensitive
+constant propagation and simplification.

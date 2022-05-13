@@ -1,15 +1,15 @@
 CORE
 test.c
 --show-vcc
-symex_dynamic::dynamic_object1#2\[\[1\]\] = symex_dynamic::dynamic_object1#2\[1\]
-symex_dynamic::dynamic_object1#2\[\[2\]\] = symex_dynamic::dynamic_object1#2\[2\]
-symex_dynamic::dynamic_object1#2\[\[3\]\] = symex_dynamic::dynamic_object1#2\[3\]
-symex_dynamic::dynamic_object1#2\[\[4\]\] = symex_dynamic::dynamic_object1#2\[4\]
-symex_dynamic::dynamic_object1#2\[\[5\]\] = symex_dynamic::dynamic_object1#2\[5\]
-symex_dynamic::dynamic_object1#2\[\[6\]\] = symex_dynamic::dynamic_object1#2\[6\]
-symex_dynamic::dynamic_object1#2\[\[7\]\] = symex_dynamic::dynamic_object1#2\[7\]
-symex_dynamic::dynamic_object1#2\[\[8\]\] = symex_dynamic::dynamic_object1#2\[8\]
-symex_dynamic::dynamic_object1#2\[\[9\]\] = symex_dynamic::dynamic_object1#2\[9\]
+symex_dynamic::dynamic_object1#2\[\[1\]\] =
+symex_dynamic::dynamic_object1#2\[\[2\]\] =
+symex_dynamic::dynamic_object1#2\[\[3\]\] =
+symex_dynamic::dynamic_object1#2\[\[4\]\] =
+symex_dynamic::dynamic_object1#2\[\[5\]\] =
+symex_dynamic::dynamic_object1#2\[\[6\]\] =
+symex_dynamic::dynamic_object1#2\[\[7\]\] =
+symex_dynamic::dynamic_object1#2\[\[8\]\] =
+symex_dynamic::dynamic_object1#2\[\[9\]\] =
 symex_dynamic::dynamic_object1#3\[\[1\]\] =
 ^EXIT=0$
 ^SIGNAL=0$
