@@ -40,7 +40,7 @@ void cover_assertion_instrumentert::instrument(
   // turn into 'assert(false)' to avoid simplification
   if(is_non_cover_assertion(i_it))
   {
-    i_it->guard = false_exprt();
+    i_it->condition_nonconst() = false_exprt();
     initialize_source_location(
       i_it, id2string(i_it->source_location().get_comment()), function_id);
   }

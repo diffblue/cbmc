@@ -63,7 +63,7 @@ void k_inductiont::process_loop(
   assert(!loop.empty());
 
   // save the loop guard
-  const exprt loop_guard=loop_head->guard;
+  const exprt loop_guard = loop_head->condition();
 
   // compute the loop exit
   goto_programt::targett loop_exit=

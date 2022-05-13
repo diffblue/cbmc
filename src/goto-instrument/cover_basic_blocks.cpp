@@ -21,7 +21,9 @@ optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
     return {};
 
   const goto_programt::targett in_t = *instruction->incoming_edges.cbegin();
-  if(in_t->is_goto() && !in_t->is_backwards_goto() && in_t->guard.is_true())
+  if(
+    in_t->is_goto() && !in_t->is_backwards_goto() &&
+    in_t->condition().is_true())
     return block_map[in_t];
 
   return {};

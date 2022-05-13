@@ -71,11 +71,12 @@ SCENARIO(
             // branching for class C and one for class D or O.
             if(instruction.type() == goto_program_instruction_typet::GOTO)
             {
-              if(instruction.guard.id() == ID_equal)
+              if(instruction.condition().id() == ID_equal)
               {
                 THEN("Class C should call its specific method")
                 {
-                  const equal_exprt &eq_expr = to_equal_expr(instruction.guard);
+                  const equal_exprt &eq_expr =
+                    to_equal_expr(instruction.condition());
                   check_function_call(
                     eq_expr,
                     "java::C",
@@ -84,11 +85,12 @@ SCENARIO(
                 }
               }
 
-              else if(instruction.guard.id() == ID_or)
+              else if(instruction.condition().id() == ID_or)
               {
                 THEN("Classes D and O should both call O.toString()")
                 {
-                  const or_exprt &disjunction = to_or_expr(instruction.guard);
+                  const or_exprt &disjunction =
+                    to_or_expr(instruction.condition());
                   REQUIRE(
                     (disjunction.op0().id() == ID_equal &&
                      disjunction.op1().id() == ID_equal));

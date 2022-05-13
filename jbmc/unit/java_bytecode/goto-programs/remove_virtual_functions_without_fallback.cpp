@@ -71,7 +71,7 @@ static bool is_call_to(
 
 static bool is_assume_false(goto_programt::const_targett inst)
 {
-  return inst->is_assume() && inst->guard.is_false();
+  return inst->is_assume() && inst->condition().is_false();
 }
 
 /// Interpret `program`, resolving classid comparisons assuming any actual
@@ -90,7 +90,7 @@ static goto_programt::const_targett interpret_classid_comparison(
   {
     if(pc->type() == GOTO)
     {
-      exprt guard = pc->guard;
+      exprt guard = pc->condition();
       guard = resolve_classid_test(guard, actual_class_id, ns);
       if(guard.is_true())
       {

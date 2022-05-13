@@ -243,7 +243,8 @@ bool remove_instanceoft::lower_instanceof(
 {
   if(
     target->is_target() &&
-    (contains_instanceof(target->code()) || contains_instanceof(target->guard)))
+    (contains_instanceof(target->code()) ||
+     (target->has_condition() && contains_instanceof(target->condition()))))
   {
     // If this is a branch target, add a skip beforehand so we can splice new
     // GOTO programs before the target instruction without inserting into the
@@ -256,8 +257,12 @@ bool remove_instanceoft::lower_instanceof(
 
   return lower_instanceof(
            function_identifier, target->code_nonconst(), goto_program, target) |
-         lower_instanceof(
-           function_identifier, target->guard, goto_program, target);
+         (target->has_condition() ? lower_instanceof(
+                                      function_identifier,
+                                      target->condition_nonconst(),
+                                      goto_program,
+                                      target)
+                                  : false);
 }
 
 /// Replace every instanceof in the passed function body with an explicit

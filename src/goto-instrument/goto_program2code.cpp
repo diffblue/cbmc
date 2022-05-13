@@ -199,7 +199,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return target;
 
     case ASSUME:
-      dest.add(code_assumet(target->guard));
+      dest.add(code_assumet(target->condition()));
       return target;
 
     case GOTO:
@@ -514,7 +514,7 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
 {
   assert(loop_end->is_goto() && loop_end->is_backwards_goto());
 
-  code_dowhilet d(loop_end->guard, code_blockt());
+  code_dowhilet d(loop_end->condition(), code_blockt());
   simplify(d.cond(), ns);
 
   copy_source_location(loop_end->targets.front(), d);
@@ -547,7 +547,7 @@ goto_programt::const_targett goto_program2codet::convert_goto(
       (upper_bound==goto_program.instructions.end() ||
        upper_bound->location_number > loop_entry->second->location_number))
     return convert_goto_while(target, loop_entry->second, dest);
-  else if(!target->guard.is_true())
+  else if(!target->condition().is_true())
     return convert_goto_switch(target, upper_bound, dest);
   else if(!loop_last_stack.empty())
     return convert_goto_break_continue(target, upper_bound, dest);
@@ -574,10 +574,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
   if(target->get_target()==after_loop)
   {
-    w.cond()=not_exprt(target->guard);
+    w.cond() = not_exprt(target->condition());
     simplify(w.cond(), ns);
   }
-  else if(target->guard.is_true())
+  else if(target->condition().is_true())
   {
     target = convert_goto_goto(target, to_code_block(w.body()));
   }
@@ -594,13 +594,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   loop_last_stack.pop_back();
 
   convert_labels(loop_end, to_code_block(w.body()));
-  if(loop_end->guard.is_false())
+  if(loop_end->condition().is_false())
   {
     to_code_block(w.body()).add(code_breakt());
   }
-  else if(!loop_end->guard.is_true())
+  else if(!loop_end->condition().is_true())
   {
-    code_ifthenelset i(not_exprt(loop_end->guard), code_breakt());
+    code_ifthenelset i(not_exprt(loop_end->condition()), code_breakt());
     simplify(i.cond(), ns);
 
     copy_source_location(target, i);
@@ -661,9 +661,9 @@ goto_programt::const_targett goto_program2codet::get_cases(
       cases_it!=upper_bound && cases_it!=first_target;
       ++cases_it)
   {
-    if(cases_it->is_goto() &&
-       !cases_it->is_backwards_goto() &&
-       cases_it->guard.is_true())
+    if(
+      cases_it->is_goto() && !cases_it->is_backwards_goto() &&
+      cases_it->condition().is_true())
     {
       default_target=cases_it->get_target();
 
@@ -684,16 +684,16 @@ goto_programt::const_targett goto_program2codet::get_cases(
       ++cases_it;
       break;
     }
-    else if(cases_it->is_goto() &&
-            !cases_it->is_backwards_goto() &&
-            (cases_it->guard.id()==ID_equal ||
-             cases_it->guard.id()==ID_or))
+    else if(
+      cases_it->is_goto() && !cases_it->is_backwards_goto() &&
+      (cases_it->condition().id() == ID_equal ||
+       cases_it->condition().id() == ID_or))
     {
       exprt::operandst eqs;
-      if(cases_it->guard.id()==ID_equal)
-        eqs.push_back(cases_it->guard);
+      if(cases_it->condition().id() == ID_equal)
+        eqs.push_back(cases_it->condition());
       else
-        eqs=cases_it->guard.operands();
+        eqs = cases_it->condition().operands();
 
       // goto conversion builds disjunctions in reverse order
       // to ensure convergence, we turn this around again
@@ -839,9 +839,9 @@ bool goto_program2codet::remove_default(
     }
 
     // jumps to default are ok
-    if(it->case_last->is_goto() &&
-       it->case_last->guard.is_true() &&
-       it->case_last->get_target()==default_target)
+    if(
+      it->case_last->is_goto() && it->case_last->condition().is_true() &&
+      it->case_last->get_target() == default_target)
       continue;
 
     // fall-through is ok
@@ -860,7 +860,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   code_blockt &dest)
 {
   // try to figure out whether this was a switch/case
-  exprt eq_cand=target->guard;
+  exprt eq_cand = target->condition();
   if(eq_cand.id()==ID_or)
     eq_cand = to_or_expr(eq_cand).op0();
 
@@ -985,7 +985,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       {
         UNREACHABLE;
         goto_programt::instructiont i=*(it->case_selector);
-        i.guard=true_exprt();
+        i.condition_nonconst() = true_exprt();
         goto_programt tmp;
         tmp.insert_before_swap(tmp.insert_before(tmp.instructions.end()), i);
         convert_goto_goto(tmp.instructions.begin(), c);
@@ -1048,13 +1048,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return target;
     }
 
-    has_else=
+    has_else =
       before_else->is_goto() &&
       before_else->get_target()->location_number > end_if->location_number &&
-      before_else->guard.is_true() &&
-      (upper_bound==goto_program.instructions.end() ||
-       upper_bound->location_number>=
-       before_else->get_target()->location_number);
+      before_else->condition().is_true() &&
+      (upper_bound == goto_program.instructions.end() ||
+       upper_bound->location_number >=
+         before_else->get_target()->location_number);
 
     if(has_else)
       end_if=before_else->get_target();
@@ -1071,7 +1071,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return convert_goto_goto(target, dest);
   }
 
-  code_ifthenelset i(not_exprt(target->guard), code_blockt());
+  code_ifthenelset i(not_exprt(target->condition()), code_blockt());
   copy_source_location(target, i);
   simplify(i.cond(), ns);
 
@@ -1132,7 +1132,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   if(target->get_target()==loop_end &&
      loop_last_stack.back().second)
   {
-    code_ifthenelset i(target->guard, code_continuet());
+    code_ifthenelset i(target->condition(), code_continuet());
     simplify(i.cond(), ns);
 
     copy_source_location(target, i);
@@ -1156,7 +1156,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
 
   if(target->get_target()==after_loop)
   {
-    code_ifthenelset i(target->guard, code_breakt());
+    code_ifthenelset i(target->condition(), code_breakt());
     simplify(i.cond(), ns);
 
     copy_source_location(target, i);
@@ -1214,7 +1214,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
 
   code_gotot goto_code(label.str());
 
-  code_ifthenelset i(target->guard, std::move(goto_code));
+  code_ifthenelset i(target->condition(), std::move(goto_code));
   simplify(i.cond(), ns);
 
   copy_source_location(target, i);
@@ -1281,9 +1281,12 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   // END THREAD
   // 2: code in existing thread
   /* check the structure and compute the iterators */
-  assert(next->is_goto() && next->guard.is_true());
-  assert(!next->is_backwards_goto());
-  assert(thread_start->location_number < next->get_target()->location_number);
+  DATA_INVARIANT(
+    next->is_goto() && next->condition().is_true(), "START THREAD pattern");
+  DATA_INVARIANT(!next->is_backwards_goto(), "START THREAD pattern");
+  DATA_INVARIANT(
+    thread_start->location_number < next->get_target()->location_number,
+    "START THREAD pattern");
   goto_programt::const_targett after_thread_start=thread_start;
   ++after_thread_start;
 

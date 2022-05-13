@@ -358,12 +358,11 @@ public:
     // access method is provided.
     goto_program_instruction_typet _type;
 
-  public:
     /// Guard for gotos, assume, assert
     /// Use condition() method to access.
-    /// This member will eventually be protected.
     exprt guard;
 
+  public:
     /// Does this instruction have a condition?
     bool has_condition() const
     {

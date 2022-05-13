@@ -50,7 +50,7 @@ void instrument_intervals(
       {
         // we follow a branch, instrument
       }
-      else if(previous->is_function_call() && !previous->guard.is_true())
+      else if(previous->is_function_call())
       {
         // we follow a function call, instrument
       }
