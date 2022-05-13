@@ -155,9 +155,7 @@ void scratch_programt::fix_types()
     }
     else if(it->is_assume() || it->is_assert())
     {
-      exprt cond = it->get_condition();
-      ::fix_types(cond);
-      it->set_condition(cond);
+      ::fix_types(it->condition_nonconst());
     }
   }
 }
@@ -181,7 +179,7 @@ void scratch_programt::append_path(patht &path)
     }
     else if(it->loc->is_assert())
     {
-      add(goto_programt::make_assumption(it->loc->get_condition()));
+      add(goto_programt::make_assumption(it->loc->condition()));
     }
   }
 }

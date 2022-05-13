@@ -405,7 +405,7 @@ void code_contractst::check_apply_loop_contracts(
   }
 
   // TODO: Fix loop contract handling for do/while loops.
-  if(loop_end->is_goto() && !loop_end->get_condition().is_true())
+  if(loop_end->is_goto() && !loop_end->condition().is_true())
   {
     log.error() << "Loop contracts are unsupported on do/while loops: "
                 << loop_head_location << messaget::eom;
@@ -524,7 +524,7 @@ void code_contractst::check_apply_loop_contracts(
 
   // change the back edge into assume(false) or assume(guard)
   loop_end->turn_into_assume();
-  loop_end->set_condition(boolean_negate(loop_end->get_condition()));
+  loop_end->condition_nonconst() = boolean_negate(loop_end->condition());
 
   std::set<goto_programt::targett> seen_targets;
   // Find all exit points of the loop, make temporary variables `DEAD`,
@@ -1060,9 +1060,9 @@ void code_contractst::apply_loop_contract(
     exprt assigns_clause =
       static_cast<const exprt &>(loop_end->condition().find(ID_C_spec_assigns));
     exprt invariant = static_cast<const exprt &>(
-      loop_end->get_condition().find(ID_C_spec_loop_invariant));
+      loop_end->condition().find(ID_C_spec_loop_invariant));
     exprt decreases_clause = static_cast<const exprt &>(
-      loop_end->get_condition().find(ID_C_spec_decreases));
+      loop_end->condition().find(ID_C_spec_decreases));
 
     if(invariant.is_nil())
     {

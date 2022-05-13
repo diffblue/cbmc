@@ -106,11 +106,11 @@ void dott::write_dot_subgraph(
       std::stringstream tmp;
       if(it->is_goto())
       {
-        if(it->get_condition().is_true())
+        if(it->condition().is_true())
           tmp.str("Goto");
         else
         {
-          std::string t = from_expr(ns, function_id, it->get_condition());
+          std::string t = from_expr(ns, function_id, it->condition());
           while(t[ t.size()-1 ]=='\n')
             t = t.substr(0, t.size()-1);
           tmp << escape(t) << "?";
@@ -118,14 +118,14 @@ void dott::write_dot_subgraph(
       }
       else if(it->is_assume())
       {
-        std::string t = from_expr(ns, function_id, it->get_condition());
+        std::string t = from_expr(ns, function_id, it->condition());
         while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp << "Assume\\n(" << escape(t) << ")";
       }
       else if(it->is_assert())
       {
-        std::string t = from_expr(ns, function_id, it->get_condition());
+        std::string t = from_expr(ns, function_id, it->condition());
         while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp << "Assert\\n(" << escape(t) << ")";
@@ -178,7 +178,7 @@ void dott::write_dot_subgraph(
 
       out << "Node_" << subgraphscount << "_" << it->location_number;
       out << " [shape=";
-      if(it->is_goto() && !it->get_condition().is_constant())
+      if(it->is_goto() && !it->condition().is_constant())
         out << "diamond";
       else
         out <<"Mrecord";
@@ -314,13 +314,13 @@ void dott::find_next(
   std::set<goto_programt::const_targett> &tres,
   std::set<goto_programt::const_targett> &fres)
 {
-  if(it->is_goto() && !it->get_condition().is_false())
+  if(it->is_goto() && !it->condition().is_false())
   {
     for(const auto &target : it->targets)
       tres.insert(target);
   }
 
-  if(it->is_goto() && it->get_condition().is_true())
+  if(it->is_goto() && it->condition().is_true())
     return;
 
   goto_programt::const_targett next = it; next++;

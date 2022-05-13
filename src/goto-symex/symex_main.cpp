@@ -156,7 +156,7 @@ void goto_symext::symex_assert(
   const goto_programt::instructiont &instruction,
   statet &state)
 {
-  exprt condition = clean_expr(instruction.get_condition(), state, false);
+  exprt condition = clean_expr(instruction.condition(), state, false);
 
   // First, push negations in and perhaps convert existential quantifiers into
   // universals:
@@ -648,7 +648,7 @@ void goto_symext::execute_next_instruction(
 
   case ASSUME:
     if(state.reachable)
-      symex_assume(state, instruction.get_condition());
+      symex_assume(state, instruction.condition());
     symex_transition(state);
     break;
 

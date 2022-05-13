@@ -31,7 +31,7 @@ void invariant_set_domaint::transform(
     {
       // Comparing iterators is safe as the target must be within the same list
       // of instructions because this is a GOTO.
-      exprt tmp(from_l->get_condition());
+      exprt tmp(from_l->condition());
 
       if(std::next(from_l) == to_l)
         tmp = boolean_negate(tmp);
@@ -44,7 +44,7 @@ void invariant_set_domaint::transform(
   case ASSERT:
   case ASSUME:
     {
-      exprt tmp(from_l->get_condition());
+      exprt tmp(from_l->condition());
       simplify(tmp, ns);
       invariant_set.strengthen(tmp);
     }

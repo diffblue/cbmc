@@ -281,7 +281,7 @@ void full_slicert::operator()(
     else if(implicit(instruction))
       add_to_queue(queue, instruction_node_index, instruction);
     else if(
-      (instruction->is_goto() && instruction->get_condition().is_true()) ||
+      (instruction->is_goto() && instruction->condition().is_true()) ||
       instruction->is_throw())
       jumps.push_back(instruction_node_index);
     else if(instruction->is_decl())

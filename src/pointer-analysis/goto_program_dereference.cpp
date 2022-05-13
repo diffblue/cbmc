@@ -200,11 +200,7 @@ void goto_program_dereferencet::dereference_instruction(
   goto_programt::instructiont &i=*target;
 
   if(i.has_condition())
-  {
-    exprt c = i.get_condition();
-    dereference_expr(c, checks_only);
-    i.set_condition(c);
-  }
+    dereference_expr(i.condition_nonconst(), checks_only);
 
   if(i.is_assign())
   {

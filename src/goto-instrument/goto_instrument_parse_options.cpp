@@ -662,7 +662,7 @@ int goto_instrument_parse_optionst::doit()
             log.status() << ins.get_code().pretty() << messaget::eom;
           if(ins.has_condition())
           {
-            log.status() << "[guard] " << ins.get_condition().pretty()
+            log.status() << "[guard] " << ins.condition().pretty()
                          << messaget::eom;
           }
         }

@@ -164,7 +164,7 @@ static goto_programt analyse_checks_directly_preceding_function_call(
       break;
     }
 
-    exprt guard = instr_it->get_condition();
+    exprt guard = instr_it->condition();
 
     bool changed = false;
     for(auto expr_it = guard.depth_begin(); expr_it != guard.depth_end();

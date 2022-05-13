@@ -108,7 +108,7 @@ protected:
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->get_condition());
+                   << format(assert_instruction->condition());
     assert_instruction->source_location_nonconst().set_comment(
       comment_stream.str());
     assert_instruction->source_location_nonconst().set_property_class(
@@ -139,7 +139,7 @@ protected:
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->get_condition());
+                   << format(assert_instruction->condition());
     assert_instruction->source_location_nonconst().set_comment(
       comment_stream.str());
     assert_instruction->source_location_nonconst().set_property_class(

@@ -233,7 +233,7 @@ void goto_symext::symex_goto(statet &state)
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  exprt new_guard = clean_expr(instruction.get_condition(), state, false);
+  exprt new_guard = clean_expr(instruction.condition(), state, false);
 
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
   renamed_guard = try_evaluate_pointer_comparisons(
@@ -471,7 +471,7 @@ void goto_symext::symex_goto(statet &state)
         state,
         taken_state,
         not_taken_state,
-        instruction.get_condition(),
+        instruction.condition(),
         new_guard,
         ns);
     }
@@ -572,7 +572,7 @@ void goto_symext::symex_unreachable_goto(statet &state)
     goto_state_list.emplace_back(state.source, std::move(new_state));
   };
 
-  if(instruction.get_condition().is_true())
+  if(instruction.condition().is_true())
   {
     if(instruction.is_backwards_goto())
     {

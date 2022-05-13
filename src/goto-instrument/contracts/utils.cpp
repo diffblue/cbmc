@@ -165,7 +165,7 @@ void simplify_gotos(goto_programt &goto_program, namespacet &ns)
   {
     if(
       instruction.is_goto() &&
-      simplify_expr(instruction.get_condition(), ns).is_false())
+      simplify_expr(instruction.condition(), ns).is_false())
       instruction.turn_into_skip();
   }
 }

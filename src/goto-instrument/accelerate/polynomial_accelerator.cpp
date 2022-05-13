@@ -780,7 +780,7 @@ exprt polynomial_acceleratort::precondition(patht &path)
     }
     else if(t->is_assume() || t->is_assert())
     {
-      ret = implies_exprt(t->get_condition(), ret);
+      ret = implies_exprt(t->condition(), ret);
     }
     else
     {

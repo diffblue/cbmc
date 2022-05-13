@@ -244,9 +244,9 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
 
   case GOTO:
   case INCOMPLETE_GOTO:
-    if(!instruction.get_condition().is_true())
+    if(!instruction.condition().is_true())
     {
-      out << "IF " << format(instruction.get_condition()) << " THEN ";
+      out << "IF " << format(instruction.condition()) << " THEN ";
     }
 
     out << "GOTO ";
@@ -287,7 +287,7 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
     else
       out << "ASSERT ";
 
-    out << format(instruction.get_condition());
+    out << format(instruction.condition());
     break;
 
   case SKIP:

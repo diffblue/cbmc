@@ -115,7 +115,7 @@ static_verifier_resultt::static_verifier_resultt(
   const namespacet &ns)
 {
   PRECONDITION(assert_location->is_assert());
-  exprt e(assert_location->get_condition());
+  exprt e(assert_location->condition());
 
   // If there are multiple, distinct histories that reach the same location
   // we can get better results by checking with each individually rather

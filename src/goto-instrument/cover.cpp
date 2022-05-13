@@ -307,7 +307,7 @@ static void instrument_cover_goals(
           if(
             successor != function.body.instructions.end() &&
             successor->is_assume() &&
-            successor->get_condition() == i_it->get_condition())
+            successor->condition() == i_it->condition())
           {
             successor->turn_into_skip();
           }

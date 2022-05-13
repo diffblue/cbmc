@@ -128,7 +128,7 @@ void goto_trace_stept::output(
       if(!comment.empty())
         out << "  " << comment << '\n';
 
-      out << "  " << format(pc->get_condition()) << '\n';
+      out << "  " << format(pc->condition()) << '\n';
       out << '\n';
     }
   }
@@ -422,8 +422,7 @@ void show_compact_goto_trace(
 
         if(step.pc->is_assert())
         {
-          out << "  "
-              << from_expr(ns, step.function_id, step.pc->get_condition())
+          out << "  " << from_expr(ns, step.function_id, step.pc->condition())
               << '\n';
         }
 
@@ -550,8 +549,7 @@ void show_full_goto_trace(
 
         if(step.pc->is_assert())
         {
-          out << "  "
-              << from_expr(ns, step.function_id, step.pc->get_condition())
+          out << "  " << from_expr(ns, step.function_id, step.pc->condition())
               << '\n';
         }
 
@@ -568,7 +566,7 @@ void show_full_goto_trace(
         if(!step.pc->source_location().is_nil())
           out << "  " << step.pc->source_location() << '\n';
 
-        out << "  " << from_expr(ns, step.function_id, step.pc->get_condition())
+        out << "  " << from_expr(ns, step.function_id, step.pc->condition())
             << '\n';
       }
       break;

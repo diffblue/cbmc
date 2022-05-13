@@ -363,22 +363,6 @@ public:
     }
 
     /// Get the condition of gotos, assume, assert
-    DEPRECATED(SINCE(2021, 10, 12, "Use condition() instead"))
-    const exprt &get_condition() const
-    {
-      PRECONDITION(has_condition());
-      return guard;
-    }
-
-    /// Set the condition of gotos, assume, assert
-    DEPRECATED(SINCE(2021, 10, 12, "Use condition_nonconst() instead"))
-    void set_condition(exprt c)
-    {
-      PRECONDITION(has_condition());
-      guard = std::move(c);
-    }
-
-    /// Get the condition of gotos, assume, assert
     const exprt &condition() const
     {
       PRECONDITION(has_condition());
@@ -1122,7 +1106,7 @@ std::list<Target> goto_programt::get_successors(
   {
     std::list<Target> successors(i.targets.begin(), i.targets.end());
 
-    if(!i.get_condition().is_true() && next != instructions.end())
+    if(!i.condition().is_true() && next != instructions.end())
       successors.push_back(next);
 
     return successors;
@@ -1152,7 +1136,7 @@ std::list<Target> goto_programt::get_successors(
 
   if(i.is_assume())
   {
-    return !i.get_condition().is_false() && next != instructions.end()
+    return !i.condition().is_false() && next != instructions.end()
              ? std::list<Target>{next}
              : std::list<Target>();
   }

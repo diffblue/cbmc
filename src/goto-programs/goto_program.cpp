@@ -91,9 +91,9 @@ std::ostream &goto_programt::output_instruction(
 
   case GOTO:
   case INCOMPLETE_GOTO:
-    if(!instruction.get_condition().is_true())
+    if(!instruction.condition().is_true())
     {
-      out << "IF " << format(instruction.get_condition()) << " THEN ";
+      out << "IF " << format(instruction.condition()) << " THEN ";
     }
 
     out << "GOTO ";
@@ -179,7 +179,7 @@ std::ostream &goto_programt::output_instruction(
       out << "ASSERT ";
 
     {
-      out << format(instruction.get_condition());
+      out << format(instruction.condition());
 
       const irep_idt &comment = instruction.source_location().get_comment();
       if(!comment.empty())
@@ -336,7 +336,7 @@ std::list<exprt> expressions_read(
   case ASSUME:
   case ASSERT:
   case GOTO:
-    dest.push_back(instruction.get_condition());
+    dest.push_back(instruction.condition());
     break;
 
   case SET_RETURN_VALUE:
@@ -492,9 +492,9 @@ std::string as_string(
     return "(NO INSTRUCTION TYPE)";
 
   case GOTO:
-    if(!i.get_condition().is_true())
+    if(!i.condition().is_true())
     {
-      result += "IF " + from_expr(ns, function, i.get_condition()) + " THEN ";
+      result += "IF " + from_expr(ns, function, i.condition()) + " THEN ";
     }
 
     result+="GOTO ";
@@ -525,7 +525,7 @@ std::string as_string(
     else
       result+="ASSERT ";
 
-    result += from_expr(ns, function, i.get_condition());
+    result += from_expr(ns, function, i.condition());
 
     {
       const irep_idt &comment = i.source_location().get_comment();
@@ -712,7 +712,7 @@ void goto_programt::copy_from(const goto_programt &src)
 bool goto_programt::has_assertion() const
 {
   for(const auto &i : instructions)
-    if(i.is_assert() && !i.get_condition().is_true())
+    if(i.is_assert() && !i.condition().is_true())
       return true;
 
   return false;
@@ -1049,9 +1049,9 @@ void goto_programt::instructiont::transform(
   case NO_INSTRUCTION_TYPE:
     if(has_condition())
     {
-      auto new_condition = f(get_condition());
+      auto new_condition = f(condition());
       if(new_condition.has_value())
-        set_condition(new_condition.value());
+        condition_nonconst() = new_condition.value();
     }
   }
 }
@@ -1104,7 +1104,7 @@ void goto_programt::instructiont::apply(
   case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:
     if(has_condition())
-      f(get_condition());
+      f(condition());
   }
 }
 
