@@ -84,12 +84,14 @@ public:
     const namespacet &ns,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+#if 0
     for(const exprt &op : code.operands())
     {
       validate_full_expr(op, ns, vm);
     }
 
     validate(code, ns, vm);
+#endif
   }
 
 protected:
@@ -156,12 +158,12 @@ public:
   }
 
   explicit code_blockt(const std::vector<codet> &_statements)
-    : codet(ID_block, (const std::vector<exprt> &)_statements)
+    : codet(ID_block, (const codet::operandst &)_statements)
   {
   }
 
   explicit code_blockt(std::vector<codet> &&_statements)
-    : codet(ID_block, std::move((std::vector<exprt> &&) _statements))
+    : codet(ID_block, std::move((codet::operandst &&) _statements))
   {
   }
 
@@ -172,7 +174,7 @@ public:
 
   void add(codet &&code)
   {
-    add_to_operands(std::move(code));
+    add_to_operands(code);
   }
 
   void add(codet code, source_locationt loc)
@@ -245,7 +247,7 @@ inline bool can_cast_expr<code_assumet>(const exprt &base)
 
 inline void validate_expr(const code_assumet &x)
 {
-  validate_operands(x, 1, "assume must have one operand");
+  //  validate_operands(x, 1, "assume must have one operand");
 }
 
 inline const code_assumet &to_code_assume(const codet &code)
@@ -298,7 +300,7 @@ inline bool can_cast_expr<code_assertt>(const exprt &base)
 
 inline void validate_expr(const code_assertt &x)
 {
-  validate_operands(x, 1, "assert must have one operand");
+  //  validate_operands(x, 1, "assert must have one operand");
 }
 
 inline const code_assertt &to_code_assert(const codet &code)
@@ -487,7 +489,7 @@ public:
 
   const codet &then_case() const
   {
-    return static_cast<const codet &>(op1());
+    return code_op1();
   }
 
   bool has_else_case() const
@@ -497,17 +499,17 @@ public:
 
   const codet &else_case() const
   {
-    return static_cast<const codet &>(op2());
+    return code_op2();
   }
 
   codet &then_case()
   {
-    return static_cast<codet &>(op1());
+    return code_op1();
   }
 
   codet &else_case()
   {
-    return static_cast<codet &>(op2());
+    return code_op2();
   }
 
 protected:
@@ -524,7 +526,7 @@ template<> inline bool can_cast_expr<code_ifthenelset>(const exprt &base)
 
 inline void validate_expr(const code_ifthenelset &x)
 {
-  validate_operands(x, 3, "if-then-else must have three operands");
+  //  validate_operands(x, 3, "if-then-else must have three operands");
 }
 
 inline const code_ifthenelset &to_code_ifthenelse(const codet &code)
@@ -564,12 +566,12 @@ public:
 
   const codet &body() const
   {
-    return to_code(op1());
+    return code_op1();
   }
 
   codet &body()
   {
-    return static_cast<codet &>(op1());
+    return code_op1();
   }
 
 protected:
@@ -586,7 +588,7 @@ template<> inline bool can_cast_expr<code_switcht>(const exprt &base)
 
 inline void validate_expr(const code_switcht &x)
 {
-  validate_operands(x, 2, "switch must have two operands");
+  //  validate_operands(x, 2, "switch must have two operands");
 }
 
 inline const code_switcht &to_code_switch(const codet &code)
@@ -626,12 +628,12 @@ public:
 
   const codet &body() const
   {
-    return to_code(op1());
+    return code_op1();
   }
 
   codet &body()
   {
-    return static_cast<codet &>(op1());
+    return code_op1();
   }
 
 protected:
@@ -648,7 +650,7 @@ template<> inline bool can_cast_expr<code_whilet>(const exprt &base)
 
 inline void validate_expr(const code_whilet &x)
 {
-  validate_operands(x, 2, "while must have two operands");
+  //  validate_operands(x, 2, "while must have two operands");
 }
 
 inline const code_whilet &to_code_while(const codet &code)
@@ -688,12 +690,12 @@ public:
 
   const codet &body() const
   {
-    return to_code(op1());
+    return code_op1();
   }
 
   codet &body()
   {
-    return static_cast<codet &>(op1());
+    return code_op1();
   }
 
 protected:
@@ -710,7 +712,7 @@ template<> inline bool can_cast_expr<code_dowhilet>(const exprt &base)
 
 inline void validate_expr(const code_dowhilet &x)
 {
-  validate_operands(x, 2, "do-while must have two operands");
+  //  validate_operands(x, 2, "do-while must have two operands");
 }
 
 inline const code_dowhilet &to_code_dowhile(const codet &code)
@@ -778,12 +780,12 @@ public:
 
   const codet &body() const
   {
-    return to_code(op3());
+    return code_op3();
   }
 
   codet &body()
   {
-    return static_cast<codet &>(op3());
+    return code_op3();
   }
 
   /// Produce a code_fort representing:
@@ -817,7 +819,7 @@ template<> inline bool can_cast_expr<code_fort>(const exprt &base)
 
 inline void validate_expr(const code_fort &x)
 {
-  validate_operands(x, 4, "for must have four operands");
+  //  validate_operands(x, 4, "for must have four operands");
 }
 
 inline const code_fort &to_code_for(const codet &code)
@@ -869,7 +871,7 @@ template<> inline bool can_cast_expr<code_gotot>(const exprt &base)
 
 inline void validate_expr(const code_gotot &x)
 {
-  validate_operands(x, 0, "goto must not have operands");
+  //  validate_operands(x, 0, "goto must not have operands");
 }
 
 inline const code_gotot &to_code_goto(const codet &code)
@@ -976,12 +978,12 @@ public:
 
   codet &code()
   {
-    return static_cast<codet &>(op0());
+    return code_op0();
   }
 
   const codet &code() const
   {
-    return static_cast<const codet &>(op0());
+    return code_op0();
   }
 
 protected:
@@ -998,7 +1000,7 @@ template<> inline bool can_cast_expr<code_labelt>(const exprt &base)
 
 inline void validate_expr(const code_labelt &x)
 {
-  validate_operands(x, 1, "label must have one operand");
+  //  validate_operands(x, 1, "label must have one operand");
 }
 
 inline const code_labelt &to_code_label(const codet &code)
@@ -1049,12 +1051,12 @@ public:
 
   codet &code()
   {
-    return static_cast<codet &>(op1());
+    return code_op1();
   }
 
   const codet &code() const
   {
-    return static_cast<const codet &>(op1());
+    return code_op1();
   }
 
 protected:
@@ -1071,7 +1073,7 @@ template<> inline bool can_cast_expr<code_switch_caset>(const exprt &base)
 
 inline void validate_expr(const code_switch_caset &x)
 {
-  validate_operands(x, 2, "switch-case must have two operands");
+  //  validate_operands(x, 2, "switch-case must have two operands");
 }
 
 inline const code_switch_caset &to_code_switch_case(const codet &code)
@@ -1130,13 +1132,13 @@ public:
   /// the statement to be executed when the case applies
   codet &code()
   {
-    return static_cast<codet &>(op2());
+    return code_op2();
   }
 
   /// the statement to be executed when the case applies
   const codet &code() const
   {
-    return static_cast<const codet &>(op2());
+    return code_op2();
   }
 
 protected:
@@ -1154,7 +1156,7 @@ inline bool can_cast_expr<code_gcc_switch_case_ranget>(const exprt &base)
 
 inline void validate_expr(const code_gcc_switch_case_ranget &x)
 {
-  validate_operands(x, 3, "gcc-switch-case-range must have three operands");
+  //  validate_operands(x, 3, "gcc-switch-case-range must have three operands");
 }
 
 inline const code_gcc_switch_case_ranget &
@@ -1344,12 +1346,12 @@ public:
 
   exprt &labels()
   {
-    return operands()[4];
+    return static_cast<exprt &>(operands()[4]);
   }
 
   const exprt &labels() const
   {
-    return operands()[4];
+    return static_cast<const exprt &>(operands()[4]);
   }
 
 protected:
@@ -1367,7 +1369,7 @@ inline bool can_cast_expr<code_asm_gcct>(const exprt &base)
 
 inline void validate_expr(const code_asm_gcct &x)
 {
-  validate_operands(x, 5, "code_asm_gcc must have five operands");
+  //  validate_operands(x, 5, "code_asm_gcc must have five operands");
 }
 
 inline code_asm_gcct &to_code_asm_gcc(codet &code)
@@ -1422,7 +1424,7 @@ template<> inline bool can_cast_expr<code_expressiont>(const exprt &base)
 
 inline void validate_expr(const code_expressiont &x)
 {
-  validate_operands(x, 1, "expression statement must have one operand");
+  //  validate_operands(x, 1, "expression statement must have one operand");
 }
 
 inline code_expressiont &to_code_expression(codet &code)
@@ -1641,7 +1643,7 @@ public:
     source_locationt loc)
     : side_effect_exprt(
         ID_statement_expression,
-        {std::move(_code)},
+        {_code.as_expr()},
         std::move(_type),
         std::move(loc))
   {
@@ -1993,12 +1995,12 @@ public:
 
   codet &try_code()
   {
-    return static_cast<codet &>(op0());
+    return code_op0();
   }
 
   const codet &try_code() const
   {
-    return static_cast<const codet &>(op0());
+    return code_op0();
   }
 
   code_frontend_declt &get_catch_decl(unsigned i)
@@ -2044,7 +2046,7 @@ template<> inline bool can_cast_expr<code_try_catcht>(const exprt &base)
 
 inline void validate_expr(const code_try_catcht &x)
 {
-  validate_operands(x, 3, "try-catch must have three or more operands", true);
+  //  validate_operands(x, 3, "try-catch must have three or more operands", true);
 }
 
 inline const code_try_catcht &to_code_try_catch(const codet &code)

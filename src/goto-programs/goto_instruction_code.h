@@ -81,12 +81,14 @@ public:
     const namespacet &ns,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+#if 0
     for(const exprt &op : code.operands())
     {
       validate_full_expr(op, ns, vm);
     }
 
     validate(code, ns, vm);
+#endif
   }
 
 protected:
@@ -348,12 +350,14 @@ public:
     const namespacet &ns,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+#if 0
     for(const exprt &op : code.operands())
     {
       validate_full_expr(op, ns, vm);
     }
 
     validate(code, ns, vm);
+#endif
   }
 
 protected:

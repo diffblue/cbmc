@@ -25,21 +25,23 @@ Author: Daniel Kroening, kroening@kroening.com
 /// To distinguish a `codet` from other [exprts](\ref exprt), we set its
 /// [id()](\ref irept::id) to `ID_code`. To distinguish different types of
 /// `codet`, we use a named sub `ID_statement`.
-class codet : public exprt
+class codet : public irept
 {
 public:
+  using operandst = irept::subt;
+
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_frontend_assignt.
-  explicit codet(const irep_idt &statement) : exprt(ID_code, empty_typet())
+  explicit codet(const irep_idt &statement) : irept(ID_code)
   {
     set_statement(statement);
   }
 
-  codet(const irep_idt &statement, source_locationt loc)
-    : exprt(ID_code, empty_typet(), std::move(loc))
+  codet(const irep_idt &statement, source_locationt loc) : irept(ID_code)
   {
     set_statement(statement);
+    add_source_location() = std::move(loc);
   }
 
   /// \param statement: Specifies the type of the `codet` to be constructed,
@@ -72,20 +74,145 @@ public:
   codet &last_statement();
   const codet &last_statement() const;
 
-  using exprt::op0;
-  using exprt::op1;
-  using exprt::op2;
-  using exprt::op3;
+  operandst &operands()
+  {
+    return (operandst &)get_sub();
+  }
+
+  const operandst &operands() const
+  {
+    return (const operandst &)get_sub();
+  }
+
+  const source_locationt &find_source_location() const;
+
+  const source_locationt &source_location() const
+  {
+    return static_cast<const source_locationt &>(find(ID_C_source_location));
+  }
+
+  source_locationt &add_source_location()
+  {
+    return static_cast<source_locationt &>(add(ID_C_source_location));
+  }
+
+  exprt &op0()
+  {
+    return static_cast<exprt &>(operands().front());
+  }
+
+  exprt &op1()
+  {
+    return static_cast<exprt &>(operands()[1]);
+  }
+
+  exprt &op2()
+  {
+    return static_cast<exprt &>(operands()[2]);
+  }
+
+  exprt &op3()
+  {
+    return static_cast<exprt &>(operands()[3]);
+  }
+
+  const exprt &op0() const
+  {
+    return static_cast<const exprt &>(operands().front());
+  }
+
+  const exprt &op1() const
+  {
+    return static_cast<const exprt &>(operands()[1]);
+  }
+
+  const exprt &op2() const
+  {
+    return static_cast<const exprt &>(operands()[2]);
+  }
+
+  const exprt &op3() const
+  {
+    return static_cast<const exprt &>(operands()[3]);
+  }
+
+protected:
+  codet &code_op0()
+  {
+    return static_cast<codet &>(operands().front());
+  }
+
+  codet &code_op1()
+  {
+    return static_cast<codet &>(operands()[1]);
+  }
+
+  codet &code_op2()
+  {
+    return static_cast<codet &>(operands()[2]);
+  }
+
+  codet &code_op3()
+  {
+    return static_cast<codet &>(operands()[3]);
+  }
+
+  const codet &code_op0() const
+  {
+    return static_cast<const codet &>(operands().front());
+  }
+
+  const codet &code_op1() const
+  {
+    return static_cast<const codet &>(operands()[1]);
+  }
+
+  const codet &code_op2() const
+  {
+    return static_cast<const codet &>(operands()[2]);
+  }
+
+  const codet &code_op3() const
+  {
+    return static_cast<const codet &>(operands()[3]);
+  }
+
+public:
+  bool has_operands() const
+  {
+    return !operands().empty();
+  }
+
+  void add_to_operands(const codet &code)
+  {
+    operands().push_back(code);
+  }
+
+  void add_to_operands(const codet &code0, const codet &code1)
+  {
+    operands().push_back(code0);
+    operands().push_back(code1);
+  }
+
+  void add_to_operands(const exprt &expr)
+  {
+    operands().push_back(expr);
+  }
+
+  const exprt &as_expr() const
+  {
+    return static_cast<const exprt &>(static_cast<const irept &>(*this));
+  }
 };
 
 namespace detail // NOLINT
 {
 template <typename Tag>
-inline bool can_cast_code_impl(const exprt &expr, const Tag &tag)
+inline bool can_cast_code_impl(const irept &irep, const Tag &tag)
 {
-  if(const auto ptr = expr_try_dynamic_cast<codet>(expr))
+  if(irep.id() == ID_code)
   {
-    return ptr->get_statement() == tag;
+    return static_cast<const codet &>(irep).get_statement() == tag;
   }
   return false;
 }
@@ -101,16 +228,16 @@ inline bool can_cast_expr<codet>(const exprt &base)
 // to_code has no validation other than checking the id(), so no validate_expr
 // is provided for codet
 
-inline const codet &to_code(const exprt &expr)
+inline const codet &to_code(const irept &src)
 {
-  PRECONDITION(expr.id() == ID_code);
-  return static_cast<const codet &>(expr);
+  PRECONDITION(src.id() == ID_code);
+  return static_cast<const codet &>(src);
 }
 
-inline codet &to_code(exprt &expr)
+inline codet &to_code(irept &src)
 {
-  PRECONDITION(expr.id() == ID_code);
-  return static_cast<codet &>(expr);
+  PRECONDITION(src.id() == ID_code);
+  return static_cast<codet &>(src);
 }
 
 #endif // CPROVER_UTIL_STD_CODE_BASE_H
