@@ -1663,6 +1663,10 @@ std::string expr2ct::convert_symbol(const exprt &src)
     #endif
   }
 
+  // src is a tmp_post variable
+  if(src.find(ID_tmp_post_origin).is_not_nil())
+    dest=convert(static_cast<const exprt &>(src.find(ID_tmp_post_origin)));
+
   if(src.id()==ID_next_symbol)
     dest="NEXT("+dest+")";
 

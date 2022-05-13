@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
+#include <langapi/language_util.h>
+
 #include <ansi-c/c_expr.h>
 
 bool goto_convertt::has_function_call(const exprt &expr)
@@ -315,6 +317,7 @@ void goto_convertt::remove_post(
   {
     exprt tmp = op;
     make_temp_symbol(tmp, "post", dest, mode);
+    tmp.set(ID_tmp_post_origin, exprt(expr));
     expr.swap(tmp);
   }
   else

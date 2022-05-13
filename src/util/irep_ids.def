@@ -873,6 +873,7 @@ IREP_ID_TWO(C_flexible_array_member, #flexible_array_member)
 IREP_ID_ONE(state)
 IREP_ID_ONE(evaluate)
 IREP_ID_ONE(update_state)
+IREP_ID_ONE(tmp_post_origin)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

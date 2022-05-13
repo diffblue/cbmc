@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check --trace
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer_dereference\.5\] line 7 dereference failure: pointer outside object bounds in \*arr_ptr\[\(signed long int\)0\]\+\+: FAILURE$
+^  POINTER_OFFSET\(arr_ptr\[\(signed long int\)0\]\+\+\).*
+\*\* 1 of [0-9]* failed 
+^VERIFICATION FAILED$
+--
+^warning: ignoring

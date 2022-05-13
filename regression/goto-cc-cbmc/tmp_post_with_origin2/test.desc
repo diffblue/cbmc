@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check --trace
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer_dereference\.17\] line 8 dereference failure: pointer outside object bounds in \*\(\*pptr\+\+\)\+\+: FAILURE$
+^  POINTER_OFFSET\(\(\*pptr\+\+\)\+\+\) .*
+\*\* 1 of [0-9]* failed 
+^VERIFICATION FAILED$
+--
+^warning: ignoring
