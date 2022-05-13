@@ -79,8 +79,8 @@ SCENARIO(
               instrend = main_function.body.instructions.end();
             instrit != instrend; ++instrit)
         {
-          for(auto it = instrit->get_code().depth_begin(),
-                   itend = instrit->get_code().depth_end();
+          for(auto it = instrit->code().depth_begin(),
+                   itend = instrit->code().depth_end();
               it != itend;
               ++it)
           {

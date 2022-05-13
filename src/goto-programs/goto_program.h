@@ -180,55 +180,62 @@ public:
   class instructiont final
   {
   protected:
-    /// Do not read or modify directly -- use get_X() instead
-    goto_instruction_codet code;
+    /// Do not read or modify directly -- use code() and code_nonconst() instead
+    goto_instruction_codet _code;
 
   public:
     /// Get the code represented by this instruction
+    DEPRECATED(SINCE(2021, 10, 12, "Use code() instead"))
     const goto_instruction_codet &get_code() const
     {
-      return code;
+      return _code;
+    }
+
+    /// Get the code represented by this instruction
+    const goto_instruction_codet &code() const
+    {
+      return _code;
     }
 
     /// Set the code represented by this instruction
     goto_instruction_codet &code_nonconst()
     {
-      return code;
+      return _code;
     }
 
     /// Get the lhs of the assignment for ASSIGN
     const exprt &assign_lhs() const
     {
       PRECONDITION(is_assign());
-      return to_code_assign(code).lhs();
+      return to_code_assign(_code).lhs();
     }
 
     /// Get the lhs of the assignment for ASSIGN
     exprt &assign_lhs_nonconst()
     {
       PRECONDITION(is_assign());
-      return to_code_assign(code).lhs();
+      return to_code_assign(_code).lhs();
     }
 
     /// Get the rhs of the assignment for ASSIGN
     const exprt &assign_rhs() const
     {
       PRECONDITION(is_assign());
-      return to_code_assign(code).rhs();
+      return to_code_assign(_code).rhs();
     }
 
     /// Get the rhs of the assignment for ASSIGN
     exprt &assign_rhs_nonconst()
     {
       PRECONDITION(is_assign());
-      return to_code_assign(code).rhs();
+      return to_code_assign(_code).rhs();
     }
 
     /// Get the declared symbol for DECL
     const symbol_exprt &decl_symbol() const
     {
       PRECONDITION(is_decl());
-      auto &decl = expr_checked_cast<code_declt>(code);
+      auto &decl = expr_checked_cast<code_declt>(_code);
       return decl.symbol();
     }
 
@@ -236,7 +243,7 @@ public:
     symbol_exprt &decl_symbol()
     {
       PRECONDITION(is_decl());
-      auto &decl = expr_checked_cast<code_declt>(code);
+      auto &decl = expr_checked_cast<code_declt>(_code);
       return decl.symbol();
     }
 
@@ -244,84 +251,84 @@ public:
     const symbol_exprt &dead_symbol() const
     {
       PRECONDITION(is_dead());
-      return to_code_dead(code).symbol();
+      return to_code_dead(_code).symbol();
     }
 
     /// Get the symbol for DEAD
     symbol_exprt &dead_symbol()
     {
       PRECONDITION(is_dead());
-      return to_code_dead(code).symbol();
+      return to_code_dead(_code).symbol();
     }
 
     /// Get the return value of a SET_RETURN_VALUE instruction
     const exprt &return_value() const
     {
       PRECONDITION(is_set_return_value());
-      return to_code_return(code).return_value();
+      return to_code_return(_code).return_value();
     }
 
     /// Get the return value of a SET_RETURN_VALUE instruction
     exprt &return_value()
     {
       PRECONDITION(is_set_return_value());
-      return to_code_return(code).return_value();
+      return to_code_return(_code).return_value();
     }
 
     /// Get the function that is called for FUNCTION_CALL
     const exprt &call_function() const
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code).function();
+      return to_code_function_call(_code).function();
     }
 
     /// Get the function that is called for FUNCTION_CALL
     exprt &call_function()
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code).function();
+      return to_code_function_call(_code).function();
     }
 
     /// Get the lhs of a FUNCTION_CALL (may be nil)
     const exprt &call_lhs() const
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code).lhs();
+      return to_code_function_call(_code).lhs();
     }
 
     /// Get the lhs of a FUNCTION_CALL (may be nil)
     exprt &call_lhs()
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code).lhs();
+      return to_code_function_call(_code).lhs();
     }
 
     /// Get the arguments of a FUNCTION_CALL
     const exprt::operandst &call_arguments() const
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code).arguments();
+      return to_code_function_call(_code).arguments();
     }
 
     /// Get the arguments of a FUNCTION_CALL
     exprt::operandst &call_arguments()
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code).arguments();
+      return to_code_function_call(_code).arguments();
     }
 
     /// Get the statement for OTHER
     const goto_instruction_codet &get_other() const
     {
       PRECONDITION(is_other());
-      return code;
+      return _code;
     }
 
     /// Set the statement for OTHER
     void set_other(goto_instruction_codet &c)
     {
       PRECONDITION(is_other());
-      code = std::move(c);
+      _code = std::move(c);
     }
 
     /// The location of the instruction in the source file.
@@ -425,7 +432,7 @@ public:
       _type = __type;
       targets.clear();
       guard=true_exprt();
-      code.make_nil();
+      _code.make_nil();
     }
 
     /// Transforms an existing instruction into a skip,
@@ -442,13 +449,13 @@ public:
       PRECONDITION(_type == GOTO || _type == ASSERT);
       _type = ASSUME;
       targets.clear();
-      code.make_nil();
+      _code.make_nil();
     }
 
     void complete_goto(targett _target)
     {
       PRECONDITION(_type == INCOMPLETE_GOTO);
-      code.make_nil();
+      _code.make_nil();
       targets.push_back(_target);
       _type = GOTO;
     }
@@ -481,7 +488,7 @@ public:
     }
 
     explicit instructiont(goto_program_instruction_typet __type)
-      : code(static_cast<const goto_instruction_codet &>(get_nil_irep())),
+      : _code(static_cast<const goto_instruction_codet &>(get_nil_irep())),
         _source_location(source_locationt::nil()),
         _type(__type),
         guard(true_exprt())
@@ -490,12 +497,12 @@ public:
 
     /// Constructor that can set all members, passed by value
     instructiont(
-      goto_instruction_codet _code,
+      goto_instruction_codet __code,
       source_locationt __source_location,
       goto_program_instruction_typet __type,
       exprt _guard,
       targetst _targets)
-      : code(std::move(_code)),
+      : _code(std::move(__code)),
         _source_location(std::move(__source_location)),
         _type(__type),
         guard(std::move(_guard)),
@@ -507,7 +514,7 @@ public:
     void swap(instructiont &instruction)
     {
       using std::swap;
-      swap(instruction.code, code);
+      swap(instruction._code, _code);
       swap(instruction._source_location, _source_location);
       swap(instruction._type, _type);
       swap(instruction.guard, guard);

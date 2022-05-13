@@ -93,7 +93,7 @@ void validate_nondets_converted(
     exprt target_expression =
       (inst.is_assign()
          ? inst.assign_rhs()
-         : inst.is_set_return_value() ? inst.return_value() : inst.get_code());
+         : inst.is_set_return_value() ? inst.return_value() : inst.code());
 
     if(
       const auto side_effect =

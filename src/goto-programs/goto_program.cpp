@@ -206,33 +206,33 @@ std::ostream &goto_programt::output_instruction(
 
     {
       const irept::subt &exception_list =
-        instruction.get_code().find(ID_exception_list).get_sub();
+        instruction.code().find(ID_exception_list).get_sub();
 
       for(const auto &ex : exception_list)
         out << " " << ex.id();
     }
 
-    if(instruction.get_code().operands().size() == 1)
-      out << ": " << format(instruction.get_code().op0());
+    if(instruction.code().operands().size() == 1)
+      out << ": " << format(instruction.code().op0());
 
     out << '\n';
     break;
 
   case CATCH:
   {
-    if(instruction.get_code().get_statement() == ID_exception_landingpad)
+    if(instruction.code().get_statement() == ID_exception_landingpad)
     {
-      const auto &landingpad = to_code_landingpad(instruction.get_code());
+      const auto &landingpad = to_code_landingpad(instruction.code());
       out << "EXCEPTION LANDING PAD (" << format(landingpad.catch_expr().type())
           << ' ' << format(landingpad.catch_expr()) << ")";
     }
-    else if(instruction.get_code().get_statement() == ID_push_catch)
+    else if(instruction.code().get_statement() == ID_push_catch)
     {
       out << "CATCH-PUSH ";
 
       unsigned i=0;
       const irept::subt &exception_list =
-        instruction.get_code().find(ID_exception_list).get_sub();
+        instruction.code().find(ID_exception_list).get_sub();
       DATA_INVARIANT(
         instruction.targets.size() == exception_list.size(),
         "unexpected discrepancy between sizes of instruction"
@@ -248,7 +248,7 @@ std::ostream &goto_programt::output_instruction(
             << (*gt_it)->target_number;
       }
     }
-    else if(instruction.get_code().get_statement() == ID_pop_catch)
+    else if(instruction.code().get_statement() == ID_pop_catch)
     {
       out << "CATCH-POP";
     }
@@ -291,10 +291,10 @@ void goto_programt::get_decl_identifiers(
     if(instruction.is_decl())
     {
       DATA_INVARIANT(
-        instruction.get_code().get_statement() == ID_decl,
+        instruction.code().get_statement() == ID_decl,
         "expected statement to be declaration statement");
       DATA_INVARIANT(
-        instruction.get_code().operands().size() == 1,
+        instruction.code().operands().size() == 1,
         "declaration statement expects one operand");
       decl_identifiers.insert(instruction.decl_symbol().get_identifier());
     }
@@ -516,7 +516,7 @@ std::string as_string(
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    return from_expr(ns, function, i.get_code());
+    return from_expr(ns, function, i.code());
 
   case ASSUME:
   case ASSERT:
@@ -744,7 +744,7 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
   // clang-format off
   return
     _type == other._type &&
-    code == other.code &&
+    _code == other._code &&
     guard == other.guard &&
     targets.size() == other.targets.size() &&
     labels == other.labels;
@@ -755,7 +755,7 @@ void goto_programt::instructiont::validate(
   const namespacet &ns,
   const validation_modet vm) const
 {
-  validate_full_code(code, ns, vm);
+  validate_full_code(_code, ns, vm);
   validate_full_expr(guard, ns, vm);
 
   auto expr_symbol_finder = [&](const exprt &e) {
@@ -895,14 +895,14 @@ void goto_programt::instructiont::validate(
   case SET_RETURN_VALUE:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      code.get_statement() == ID_return,
+      _code.get_statement() == ID_return,
       "SET_RETURN_VALUE instruction should contain a return statement",
       source_location());
     break;
   case ASSIGN:
     DATA_CHECK(
       vm,
-      code.get_statement() == ID_assign,
+      _code.get_statement() == ID_assign,
       "assign instruction should contain an assign statement");
     DATA_CHECK(
       vm, targets.empty(), "assign instruction should not have a target");
@@ -910,7 +910,7 @@ void goto_programt::instructiont::validate(
   case DECL:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      code.get_statement() == ID_decl,
+      _code.get_statement() == ID_decl,
       "declaration instructions should contain a declaration statement",
       source_location());
     DATA_CHECK_WITH_DIAGNOSTICS(
@@ -923,7 +923,7 @@ void goto_programt::instructiont::validate(
   case DEAD:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      code.get_statement() == ID_dead,
+      _code.get_statement() == ID_dead,
       "dead instructions should contain a dead statement",
       source_location());
     DATA_CHECK_WITH_DIAGNOSTICS(
@@ -936,12 +936,12 @@ void goto_programt::instructiont::validate(
   case FUNCTION_CALL:
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      code.get_statement() == ID_function_call,
+      _code.get_statement() == ID_function_call,
       "function call instruction should contain a call statement",
       source_location());
 
-    std::for_each(code.depth_begin(), code.depth_end(), expr_symbol_finder);
-    std::for_each(code.depth_begin(), code.depth_end(), type_finder);
+    std::for_each(_code.depth_begin(), _code.depth_end(), expr_symbol_finder);
+    std::for_each(_code.depth_begin(), _code.depth_end(), type_finder);
     break;
   case THROW:
     break;

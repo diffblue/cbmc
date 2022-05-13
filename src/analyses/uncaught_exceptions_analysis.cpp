@@ -71,7 +71,7 @@ void uncaught_exceptions_domaint::transform(
   {
   case THROW:
   {
-    const exprt &exc_symbol = get_exception_symbol(instruction.get_code());
+    const exprt &exc_symbol = get_exception_symbol(instruction.code());
     // retrieve the static type of the thrown exception
     const irep_idt &type_id =
       get_exception_type(to_pointer_type(exc_symbol.type()));
@@ -85,7 +85,7 @@ void uncaught_exceptions_domaint::transform(
   }
   case CATCH:
   {
-    if(!instruction.get_code().has_operands())
+    if(!instruction.code().has_operands())
     {
       if(!instruction.targets.empty()) // push
       {
@@ -93,7 +93,7 @@ void uncaught_exceptions_domaint::transform(
         stack_caught.push_back(caught);
         std::set<irep_idt> &last_caught=stack_caught.back();
         const irept::subt &exception_list =
-          instruction.get_code().find(ID_exception_list).get_sub();
+          instruction.code().find(ID_exception_list).get_sub();
 
         for(const auto &exc : exception_list)
         {

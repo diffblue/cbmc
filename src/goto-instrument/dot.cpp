@@ -160,7 +160,7 @@ void dott::write_dot_subgraph(
         it->is_assign() || it->is_decl() || it->is_set_return_value() ||
         it->is_other())
       {
-        std::string t = from_expr(ns, function_id, it->get_code());
+        std::string t = from_expr(ns, function_id, it->code());
         while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp.str(escape(t));

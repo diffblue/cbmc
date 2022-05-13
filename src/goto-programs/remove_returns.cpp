@@ -119,7 +119,7 @@ void remove_returnst::replace_returns(
     if(instruction.is_set_return_value())
     {
       INVARIANT(
-        instruction.get_code().operands().size() == 1,
+        instruction.code().operands().size() == 1,
         "return instructions should have one operand");
 
       if(return_symbol.has_value())

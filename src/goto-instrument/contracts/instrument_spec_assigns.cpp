@@ -1021,8 +1021,7 @@ void instrument_spec_assignst::instrument_call_statement(
 
   if(callee_name == "malloc")
   {
-    const auto &function_call =
-      to_code_function_call(instruction_it->get_code());
+    const auto &function_call = to_code_function_call(instruction_it->code());
     if(function_call.lhs().is_not_nil())
     {
       // grab the returned pointer from malloc
