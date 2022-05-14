@@ -52,14 +52,14 @@ exprt field_sensitivityt::apply(
     !write && expr.id() == ID_member &&
     to_member_expr(expr).struct_op().id() == ID_struct)
   {
-    return simplify_expr(std::move(expr), ns);
+    return simplify_opt(std::move(expr), ns);
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     !write && expr.id() == ID_index &&
     to_index_expr(expr).array().id() == ID_array)
   {
-    return simplify_expr(std::move(expr), ns);
+    return simplify_opt(std::move(expr), ns);
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(expr.id() == ID_member)
@@ -95,7 +95,8 @@ exprt field_sensitivityt::apply(
     // encoding the index access into an array as an individual symbol rather
     // than only the full array
     index_exprt &index = to_index_expr(expr);
-    simplify(index.index(), ns);
+    if(should_simplify)
+      simplify(index.index(), ns);
 
     if(
       is_ssa_expr(index.array()) && index.array().type().id() == ID_array &&
@@ -105,7 +106,8 @@ exprt field_sensitivityt::apply(
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
       auto l2_index = state.rename(index.index(), ns);
-      l2_index.simplify(ns);
+      if(should_simplify)
+        l2_index.simplify(ns);
       bool was_l2 = !tmp.get_level_2().empty();
       exprt l2_size =
         state.rename(to_array_type(index.array().type()).size(), ns).get();
@@ -262,7 +264,8 @@ void field_sensitivityt::field_assignments_rec(
   else if(is_ssa_expr(lhs_fs))
   {
     exprt ssa_rhs = state.rename(lhs, ns).get();
-    simplify(ssa_rhs, ns);
+    if(should_simplify)
+      simplify(ssa_rhs, ns);
 
     const ssa_exprt ssa_lhs = state
                                 .assignment(
@@ -362,4 +365,12 @@ bool field_sensitivityt::is_divisible(const ssa_exprt &expr) const
 #endif
 
   return false;
+}
+
+exprt field_sensitivityt::simplify_opt(exprt e, const namespacet &ns) const
+{
+  if(!should_simplify)
+    return e;
+
+  return simplify_expr(std::move(e), ns);
 }

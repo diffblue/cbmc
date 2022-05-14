@@ -54,10 +54,12 @@ SCENARIO(
   guard_managert guard_manager;
   std::size_t count = 0;
   auto fresh_name = [&count](const irep_idt &) { return count++; };
-  goto_symex_statet state{source,
-                          DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
-                          guard_manager,
-                          fresh_name};
+  goto_symex_statet state{
+    source,
+    DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
+    true,
+    guard_manager,
+    fresh_name};
 
   GIVEN("A value set in which pointer symbol `ptr1` only points to `&value1`")
   {
@@ -249,7 +251,7 @@ SCENARIO(
     // struct_symbol..pointer_field <- &value1
     {
       field_sensitivityt field_sensitivity{
-        DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE};
+        DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, true};
       const exprt index_fs =
         field_sensitivity.apply(ns, state, member_l1.get(), true);
       value_set.assign(index_fs, address1_l1.get(), ns, false, false);

@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+KNOWNBUG broken-smt-backend
 main.c
 --no-simplify
 ^VERIFICATION SUCCESSFUL$
@@ -6,3 +6,5 @@ main.c
 ^SIGNAL=0$
 --
 ^warning: ignoring
+--
+See #6101 for a discussion as to whether this should be supported at all.

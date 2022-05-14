@@ -40,7 +40,11 @@ SCENARIO(
     return fresh_name_count++;
   };
   goto_symex_statet state{
-    source, DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, manager, fresh_name};
+    source,
+    DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
+    true,
+    manager,
+    fresh_name};
 
   // Initialize dirty field of state
   incremental_dirtyt dirty;
