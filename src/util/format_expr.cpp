@@ -223,7 +223,7 @@ std::ostream &fallback_format_rec(std::ostream &os, const exprt &expr)
   os << expr.id();
 
   for(const auto &s : expr.get_named_sub())
-    if(s.first != ID_type)
+    if(s.first != ID_type && s.first != ID_C_source_location)
       os << ' ' << s.first << "=\"" << s.second.id() << '"';
 
   if(expr.has_operands())
