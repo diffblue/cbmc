@@ -89,11 +89,11 @@ is_nondet_returning_object(const code_function_callt &function_call)
 static nondet_instruction_infot
 get_nondet_instruction_info(const goto_programt::const_targett &instr)
 {
-  if(!(instr->is_function_call() && instr->get_code().id() == ID_code))
+  if(!(instr->is_function_call() && instr->code().id() == ID_code))
   {
     return nondet_instruction_infot();
   }
-  const auto &code = instr->get_code();
+  const auto &code = instr->code();
   INVARIANT(
     code.get_statement() == ID_function_call,
     "function_call should have ID_function_call");

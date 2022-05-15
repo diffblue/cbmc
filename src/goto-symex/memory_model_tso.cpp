@@ -108,7 +108,7 @@ void memory_model_tsot::program_order(
 
         if((*e_it2)->is_memory_barrier())
         {
-          const codet &code = (*e_it2)->source.pc->get_code();
+          const codet &code = (*e_it2)->source.pc->code();
 
           if((*e_it)->is_shared_read() &&
              !code.get_bool(ID_RRfence) &&

@@ -60,7 +60,7 @@ static void finish_catch_push_targets(goto_programt &dest)
   {
     if(
       instruction.is_catch() &&
-      instruction.get_code().get_statement() == ID_push_catch)
+      instruction.code().get_statement() == ID_push_catch)
     {
       // Populate `targets` with a GOTO instruction target per
       // exception handler if it isn't already populated.
@@ -71,7 +71,7 @@ static void finish_catch_push_targets(goto_programt &dest)
       {
         bool handler_added=true;
         const code_push_catcht::exception_listt &handler_list =
-          to_code_push_catch(instruction.get_code()).exception_list();
+          to_code_push_catch(instruction.code()).exception_list();
 
         for(const auto &handler : handler_list)
         {
@@ -114,7 +114,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
 
     if(i.is_start_thread())
     {
-      const irep_idt &goto_label = i.get_code().get(ID_destination);
+      const irep_idt &goto_label = i.code().get(ID_destination);
 
       labelst::const_iterator l_it=
         targets.labels.find(goto_label);
@@ -123,14 +123,14 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
       {
         throw incorrect_goto_program_exceptiont(
           "goto label \'" + id2string(goto_label) + "\' not found",
-          i.get_code().find_source_location());
+          i.code().find_source_location());
       }
 
       i.targets.push_back(l_it->second.first);
     }
     else if(i.is_incomplete_goto())
     {
-      const irep_idt &goto_label = i.get_code().get(ID_destination);
+      const irep_idt &goto_label = i.code().get(ID_destination);
 
       labelst::const_iterator l_it=targets.labels.find(goto_label);
 
@@ -138,7 +138,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
       {
         throw incorrect_goto_program_exceptiont(
           "goto label \'" + id2string(goto_label) + "\' not found",
-          i.get_code().find_source_location());
+          i.code().find_source_location());
       }
 
       i.complete_goto(l_it->second.first);
@@ -204,7 +204,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
   for(auto &g_it : targets.computed_gotos)
   {
     goto_programt::instructiont &i=*g_it;
-    dereference_exprt destination = to_dereference_expr(i.get_code().op0());
+    dereference_exprt destination = to_dereference_expr(i.code().op0());
     const exprt pointer = destination.pointer();
 
     // remember the expression for later checks

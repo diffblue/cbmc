@@ -133,7 +133,7 @@ void validate_goto_modelt::check_called_functions()
       }
 
       // check functions of which the address is taken
-      const auto &src = static_cast<const exprt &>(instr.get_code());
+      const auto &src = static_cast<const exprt &>(instr.code());
       src.visit_pre(test_for_function_address);
     }
   }

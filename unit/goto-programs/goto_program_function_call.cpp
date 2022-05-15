@@ -55,8 +55,7 @@ SCENARIO(
     {
       code_function_callt function_call(var_a, fun_foo, {});
       instructions.back() = goto_programt::make_function_call(function_call);
-      REQUIRE(
-        instructions.back().get_code().get_statement() == ID_function_call);
+      REQUIRE(instructions.back().code().get_statement() == ID_function_call);
 
       THEN("The consistency check succeeds")
       {

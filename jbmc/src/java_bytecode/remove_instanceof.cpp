@@ -242,8 +242,8 @@ bool remove_instanceoft::lower_instanceof(
   goto_programt::targett target)
 {
   if(
-    target->is_target() && (contains_instanceof(target->get_code()) ||
-                            contains_instanceof(target->guard)))
+    target->is_target() &&
+    (contains_instanceof(target->code()) || contains_instanceof(target->guard)))
   {
     // If this is a branch target, add a skip beforehand so we can splice new
     // GOTO programs before the target instruction without inserting into the

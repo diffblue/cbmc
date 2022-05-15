@@ -172,7 +172,7 @@ static void update_internal_field(
     // "__CPROVER_*" function calls in __CPROVER_start are already marked as
     // internal. Don't mark any other function calls (i.e. "main"), function
     // arguments or any other parts of a code_function_callt as internal.
-    if(SSA_step.source.pc->get_code().get_statement() != ID_function_call)
+    if(SSA_step.source.pc->code().get_statement() != ID_function_call)
       goto_trace_step.internal=true;
   }
 }

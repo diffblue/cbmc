@@ -234,7 +234,7 @@ void remove_exceptionst::instrument_exception_handler(
   {
     // retrieve the exception variable
     const exprt &thrown_exception_local =
-      to_code_landingpad(instr_it->get_code()).catch_expr();
+      to_code_landingpad(instr_it->code()).catch_expr();
 
     const symbol_exprt thrown_global_symbol=
       get_inflight_exception_global();
@@ -407,7 +407,7 @@ bool remove_exceptionst::instrument_throw(
   PRECONDITION(instr_it->type() == THROW);
 
   const exprt &exc_expr =
-    uncaught_exceptions_domaint::get_exception_symbol(instr_it->get_code());
+    uncaught_exceptions_domaint::get_exception_symbol(instr_it->code());
 
   add_exception_dispatch_sequence(
     function_identifier, goto_program, instr_it, stack_catch, locals);
@@ -512,7 +512,7 @@ void remove_exceptionst::instrument_exceptions(
     // Is it a handler push/pop or catch landing-pad?
     else if(instr_it->type() == CATCH)
     {
-      const irep_idt &statement = instr_it->get_code().get_statement();
+      const irep_idt &statement = instr_it->code().get_statement();
       // Is it an exception landing pad (start of a catch block)?
       if(statement==ID_exception_landingpad)
       {
@@ -553,7 +553,7 @@ void remove_exceptionst::instrument_exceptions(
 
         // copy targets
         const code_push_catcht::exception_listt &exception_list =
-          to_code_push_catch(instr_it->get_code()).exception_list();
+          to_code_push_catch(instr_it->code()).exception_list();
 
         // The target list can be empty if `finish_catch_push_targets` found that
         // the targets were unreachable (in which case no exception can truly

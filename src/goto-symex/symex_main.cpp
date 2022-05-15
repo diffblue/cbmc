@@ -515,13 +515,13 @@ void goto_symext::print_symex_step(statet &state)
   if(
     !symex_config.show_symex_steps || !state.reachable ||
     state.source.pc->type() == DEAD ||
-    (state.source.pc->get_code().is_nil() &&
+    (state.source.pc->code().is_nil() &&
      state.source.pc->type() != END_FUNCTION))
   {
     return;
   }
 
-  if(state.source.pc->get_code().is_not_nil())
+  if(state.source.pc->code().is_not_nil())
   {
     auto guard_expression = state.guard.as_expr();
     std::size_t size = 0;
@@ -533,7 +533,7 @@ void goto_symext::print_symex_step(statet &state)
     }
 
     log.status() << "[Guard size: " << size << "] "
-                 << format(state.source.pc->get_code());
+                 << format(state.source.pc->code());
 
     if(
       state.source.pc->source_location().is_not_nil() &&

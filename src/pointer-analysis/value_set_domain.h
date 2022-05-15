@@ -88,7 +88,7 @@ void value_set_domain_templatet<VST>::transform(
   case ASSIGN:
   case DECL:
   case DEAD:
-    value_set.apply_code(from_l->get_code(), ns);
+    value_set.apply_code(from_l->code(), ns);
     break;
 
   case ASSUME:

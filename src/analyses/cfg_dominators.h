@@ -267,7 +267,7 @@ inline void dominators_pretty_print_node(
   const goto_programt::targett& target,
   std::ostream& out)
 {
-  out << target->get_code().pretty();
+  out << target->code().pretty();
 }
 
 /// Print the result of the dominator computation

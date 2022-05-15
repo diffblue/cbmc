@@ -60,15 +60,15 @@ void invariant_set_domaint::transform(
 
     case OTHER:
       if(from_l->get_other().is_not_nil())
-        invariant_set.apply_code(from_l->get_code());
+        invariant_set.apply_code(from_l->code());
       break;
 
     case DECL:
-      invariant_set.apply_code(from_l->get_code());
+      invariant_set.apply_code(from_l->code());
       break;
 
     case FUNCTION_CALL:
-      invariant_set.apply_code(from_l->get_code());
+      invariant_set.apply_code(from_l->code());
       break;
 
     case START_THREAD:

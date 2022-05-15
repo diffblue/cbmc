@@ -95,7 +95,7 @@ bool write_goto_binary(
 
       for(const auto &instruction : fct.second.body.instructions)
       {
-        irepconverter.reference_convert(instruction.get_code(), out);
+        irepconverter.reference_convert(instruction.code(), out);
         irepconverter.reference_convert(instruction.source_location(), out);
         write_gb_word(out, (long)instruction.type());
 
