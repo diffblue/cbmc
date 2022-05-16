@@ -49,6 +49,8 @@ void __CPROVER_old(const void *);
 void __CPROVER_loop_entry(const void *);
 
 // pointers
+__CPROVER_bool __CPROVER_LIVE_OBJECT(const void *);
+__CPROVER_bool __CPROVER_WRITEABLE_OBJECT(const void *);
 __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);
 __CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);
 __CPROVER_size_t __CPROVER_OBJECT_SIZE(const void *);
