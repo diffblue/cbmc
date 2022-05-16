@@ -112,8 +112,7 @@ int munmap(void *addr, __CPROVER_size_t length)
 {
   (void)length;
 
-  if(__VERIFIER_nondet___CPROVER_bool())
-    __CPROVER_deallocated = addr;
+  __CPROVER_deallocate(addr);
 
   return 0;
 }
@@ -126,8 +125,7 @@ int _munmap(void *addr, __CPROVER_size_t length)
 {
   (void)length;
 
-  if(__VERIFIER_nondet___CPROVER_bool())
-    __CPROVER_deallocated = addr;
+  __CPROVER_deallocate(addr);
 
   return 0;
 }
