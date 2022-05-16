@@ -10,9 +10,6 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   void *res;
   res = __CPROVER_allocate(malloc_size, 0);
 
-  // ensure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
-
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_new_object = record_malloc ? res : __CPROVER_new_object;
@@ -36,9 +33,6 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   __CPROVER_HIDE:;
   void *res;
   res = __CPROVER_allocate(size*count, 0);
-
-  // ensure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
