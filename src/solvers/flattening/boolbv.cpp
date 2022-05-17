@@ -121,8 +121,6 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_bv_typecast(to_typecast_expr(expr));
   else if(expr.id()==ID_symbol)
     return convert_symbol(to_symbol_expr(expr));
-  else if(expr.id()==ID_bv_literals)
-    return convert_bv_literals(expr);
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()=="no-overflow-plus" ||
           expr.id()=="no-overflow-minus")
@@ -271,27 +269,6 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
     for(std::size_t j=0; j<tmp.size(); j++)
       bv[offset+j]=tmp[j];
   }
-
-  return bv;
-}
-
-bvt boolbvt::convert_bv_literals(const exprt &expr)
-{
-  std::size_t width=boolbv_width(expr.type());
-
-  if(width==0)
-    return conversion_failed(expr);
-
-  bvt bv;
-  bv.resize(width);
-
-  const irept::subt &bv_sub=expr.find(ID_bv).get_sub();
-
-  if(bv_sub.size()!=width)
-    throw "bv_literals with wrong size";
-
-  for(std::size_t i=0; i<width; i++)
-    bv[i].set(unsafe_string2unsigned(id2string(bv_sub[i].id())));
 
   return bv;
 }
@@ -528,25 +505,6 @@ void boolbvt::set_to(const exprt &expr, bool value)
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;
   SUB::set_to(expr, value);
-}
-
-exprt boolbvt::make_bv_expr(const typet &type, const bvt &bv)
-{
-  exprt dest(ID_bv_literals, type);
-  irept::subt &bv_sub=dest.add(ID_bv).get_sub();
-  bv_sub.resize(bv.size());
-
-  for(std::size_t i=0; i<bv.size(); i++)
-    bv_sub[i].id(std::to_string(bv[i].get()));
-  return dest;
-}
-
-exprt boolbvt::make_free_bv_expr(const typet &type)
-{
-  const std::size_t width = boolbv_width(type);
-  PRECONDITION(width != 0);
-  bvt bv = prop.new_variables(width);
-  return make_bv_expr(type, bv);
 }
 
 bool boolbvt::is_unbounded_array(const typet &type) const
