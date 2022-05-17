@@ -23,6 +23,7 @@ __CPROVER_bool __CPROVER_is_cyclic_dll();
 __CPROVER_bool __CPROVER_is_sentinel_dll();
 __CPROVER_bool __CPROVER_is_cstring(const char *);
 __CPROVER_size_t __CPROVER_cstrlen(const char *);
+__CPROVER_bool __CPROVER_separate(const void *, const void *, ...);
 
 // bitvector analysis
 __CPROVER_bool __CPROVER_get_flag(const void *, const char *);

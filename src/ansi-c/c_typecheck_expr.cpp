@@ -2538,6 +2538,23 @@ exprt c_typecheck_baset::do_special_functions(
 
     return writeable_object_expr;
   }
+  else if(identifier == CPROVER_PREFIX "separate")
+  {
+    // experimental feature for CHC encodings -- do not use
+    if(expr.arguments().size() < 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "separate expects two or more arguments" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    exprt separate_expr = separate_exprt(expr.arguments());
+    separate_expr.add_source_location() = source_location;
+
+    return separate_expr;
+  }
   else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
   {
     if(expr.arguments().size()!=1)

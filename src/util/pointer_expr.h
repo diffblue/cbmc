@@ -1287,4 +1287,56 @@ inline writeable_object_exprt &to_writeable_object_expr(exprt &expr)
   return ret;
 }
 
+/// A predicate that indicates that the objects pointed to are distinct
+class separate_exprt : public multi_ary_exprt
+{
+public:
+  explicit separate_exprt(exprt::operandst __operands)
+    : multi_ary_exprt(ID_separate, std::move(__operands), bool_typet())
+  {
+  }
+
+  separate_exprt(exprt __op0, exprt __op1)
+    : multi_ary_exprt(
+        std::move(__op0),
+        ID_separate,
+        std::move(__op1),
+        bool_typet())
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<separate_exprt>(const exprt &base)
+{
+  return base.id() == ID_separate;
+}
+
+inline void validate_expr(const separate_exprt &value)
+{
+}
+
+/// \brief Cast an exprt to a \ref separate_exprt
+///
+/// \a expr must be known to be \ref separate_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref separate_exprt
+inline const separate_exprt &to_separate_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_separate);
+  const separate_exprt &ret = static_cast<const separate_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_separate_expr(const exprt &)
+inline separate_exprt &to_separate_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_separate);
+  separate_exprt &ret = static_cast<separate_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H
