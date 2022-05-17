@@ -1390,9 +1390,9 @@ void value_set_fit::apply_code(const codet &code, const namespacet &ns)
   else if(statement==ID_fence)
   {
   }
-  else if(statement==ID_array_copy ||
-          statement==ID_array_replace ||
-          statement==ID_array_set)
+  else if(
+    statement == ID_array_copy || statement == ID_array_replace ||
+    statement == ID_array_set || statement == ID_array_equal)
   {
   }
   else if(can_cast_expr<code_inputt>(code) || can_cast_expr<code_outputt>(code))

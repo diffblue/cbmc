@@ -805,11 +805,14 @@ static void goto_rw_other(
   else if(statement == ID_array_equal)
   {
     // mark the dereferenced operands as being read
-    for(const auto &op : code.operands())
-    {
-      rw_set.get_array_objects(
-        function, target, rw_range_sett::get_modet::READ, op);
-    }
+    PRECONDITION(code.operands().size() == 3);
+    rw_set.get_array_objects(
+      function, target, rw_range_sett::get_modet::READ, code.op0());
+    rw_set.get_array_objects(
+      function, target, rw_range_sett::get_modet::READ, code.op1());
+    // the third operand is the result
+    rw_set.get_objects_rec(
+      function, target, rw_range_sett::get_modet::LHS_W, code.op2());
   }
   else if(statement == ID_array_set)
   {
