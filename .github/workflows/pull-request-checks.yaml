@@ -241,6 +241,63 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j2
 
+  check-ubuntu-22_04-cmake-gcc:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3 python2
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-22.04-Release-${{ github.ref }}
+            ${{ runner.os }}-22.04-Release
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+      - name: Check that doc task works
+        run: |
+          cd build
+          ninja doc
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with Ninja
+        run: cd build; ninja -j2
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Check if package building works
+        run: |
+          cd build
+          ninja package
+          ls *.deb
+      - name: Run tests
+        run: cd build; ctest . -V -L CORE -j2
+
   check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-20.04
     steps:
