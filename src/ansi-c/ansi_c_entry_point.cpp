@@ -544,6 +544,7 @@ bool generate_ansi_c_start_function(
   symbolt new_symbol;
 
   new_symbol.name=goto_functionst::entry_point();
+  new_symbol.base_name = goto_functionst::entry_point();
   new_symbol.type = code_typet({}, void_type());
   new_symbol.value.swap(init_code);
   new_symbol.mode=symbol.mode;

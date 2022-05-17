@@ -767,6 +767,7 @@ bool generate_java_start_function(
   symbolt new_symbol;
 
   new_symbol.name=goto_functionst::entry_point();
+  new_symbol.base_name = goto_functionst::entry_point();
   new_symbol.type = java_method_typet({}, java_void_type());
   new_symbol.value.swap(init_code);
   new_symbol.mode=ID_java;

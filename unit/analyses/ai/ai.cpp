@@ -233,6 +233,7 @@ SCENARIO(
 
   symbolt start;
   start.name = goto_functionst::entry_point();
+  start.base_name = goto_functionst::entry_point();
   start.mode = ID_C;
   start.type = code_typet({}, empty_typet());
   start.value = make_void_call(f.symbol_expr());

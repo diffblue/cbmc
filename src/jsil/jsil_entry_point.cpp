@@ -152,6 +152,7 @@ bool jsil_entry_point(
   symbolt new_symbol;
 
   new_symbol.name=goto_functionst::entry_point();
+  new_symbol.base_name = goto_functionst::entry_point();
   new_symbol.type = code_typet({}, empty_typet());
   new_symbol.value.swap(init_code);
 
