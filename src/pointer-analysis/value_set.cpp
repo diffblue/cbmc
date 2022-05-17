@@ -1676,6 +1676,9 @@ void value_sett::apply_code_rec(
   {
     // Ignore by default; could prune the value set.
   }
+  else if(statement == ID_havoc_object)
+  {
+  }
   else
   {
     // std::cerr << code.pretty() << '\n';

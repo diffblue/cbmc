@@ -830,6 +830,14 @@ static void goto_rw_other(
     rw_set.get_array_objects(
       function, target, rw_range_sett::get_modet::READ, code.op1());
   }
+  else if(statement == ID_havoc_object)
+  {
+    PRECONDITION(code.operands().size() == 1);
+    // re-use get_array_objects as this havoc_object affects whatever is the
+    // object being the pointer that code.op0() is
+    rw_set.get_array_objects(
+      function, target, rw_range_sett::get_modet::LHS_W, code.op0());
+  }
 }
 
 static void goto_rw(
