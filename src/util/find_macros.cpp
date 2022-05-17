@@ -42,19 +42,6 @@ void find_macros(
           stack.push(&symbol.value);
       }
     }
-    else if(e.id() == ID_next_symbol)
-    {
-      const irep_idt &identifier=e.get(ID_identifier);
-
-      const symbolt &symbol=ns.lookup(identifier);
-
-      if(symbol.is_macro)
-      {
-        // inserted?
-        if(dest.insert(identifier).second)
-          stack.push(&symbol.value);
-      }
-    }
     else
     {
       forall_operands(it, e)

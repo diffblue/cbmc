@@ -461,12 +461,12 @@ void goto_check_ct::invalidate(const exprt &lhs)
   else if(lhs.id() == ID_symbol)
   {
     // clear all assertions about 'symbol'
-    find_symbols_sett find_symbols_set{to_symbol_expr(lhs).get_identifier()};
+    const irep_idt &lhs_id = to_symbol_expr(lhs).get_identifier();
 
     for(auto it = assertions.begin(); it != assertions.end();)
     {
       if(
-        has_symbol(it->second, find_symbols_set) ||
+        has_symbol_expr(it->second, lhs_id, false) ||
         has_subexpr(it->second, ID_dereference))
       {
         it = assertions.erase(it);
