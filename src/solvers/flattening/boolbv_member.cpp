@@ -11,52 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/namespace.h>
 
-static bvt convert_member_struct(
-  const member_exprt &expr,
-  const bvt &struct_bv,
-  const std::function<std::size_t(const typet &)> boolbv_width,
-  const namespacet &ns)
-{
-  const exprt &struct_op=expr.struct_op();
-  const typet &struct_op_type=ns.follow(struct_op.type());
-
-  const irep_idt &component_name = expr.get_component_name();
-  const struct_typet::componentst &components =
-    to_struct_type(struct_op_type).components();
-
-  std::size_t offset = 0;
-
-  for(const auto &c : components)
-  {
-    const typet &subtype = c.type();
-    const std::size_t sub_width = boolbv_width(subtype);
-
-    if(c.get_name() == component_name)
-    {
-      DATA_INVARIANT_WITH_DIAGNOSTICS(
-        subtype == expr.type(),
-        "component type shall match the member expression type",
-        subtype.pretty(),
-        expr.type().pretty());
-      INVARIANT(
-        offset + sub_width <= struct_bv.size(),
-        "bitvector part corresponding to element shall be contained within the "
-        "full aggregate bitvector");
-
-      return bvt(
-        struct_bv.begin() + offset, struct_bv.begin() + offset + sub_width);
-    }
-
-    offset += sub_width;
-  }
-
-  INVARIANT_WITH_DIAGNOSTICS(
-    false,
-    "struct type shall contain component accessed by member expression",
-    expr.find_source_location(),
-    id2string(component_name));
-}
-
 static bvt convert_member_union(
   const member_exprt &expr,
   const bvt &union_bv,
@@ -94,11 +48,22 @@ bvt boolbvt::convert_member(const member_exprt &expr)
   const bvt &compound_bv = convert_bv(expr.compound());
 
   if(expr.compound().type().id() == ID_struct_tag)
-    return convert_member_struct(
-      expr,
-      compound_bv,
-      [this](const typet &t) { return boolbv_width(t); },
-      ns);
+  {
+    const struct_typet &struct_op_type =
+      ns.follow_tag(to_struct_tag_type(expr.compound().type()));
+
+    const auto &member_bits =
+      bv_width.get_member(struct_op_type, expr.get_component_name());
+
+    INVARIANT(
+      member_bits.offset + member_bits.width <= compound_bv.size(),
+      "bitvector part corresponding to element shall be contained within the "
+      "full aggregate bitvector");
+
+    return bvt(
+      compound_bv.begin() + member_bits.offset,
+      compound_bv.begin() + member_bits.offset + member_bits.width);
+  }
   else
   {
     PRECONDITION(expr.compound().type().id() == ID_union_tag);
