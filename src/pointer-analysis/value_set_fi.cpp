@@ -181,7 +181,7 @@ void value_set_fit::flatten_rec(
       {
         // this is some static object, keep it in.
         const symbol_exprt se(o.get(ID_identifier), o.type().subtype());
-        insert(dest, se, 0);
+        insert(dest, se, mp_integer{0});
       }
       else
       {
@@ -461,7 +461,7 @@ void value_set_fit::get_value_set_rec(
 
     if(has_prefix(id2string(ident), alloc_adapter_prefix))
     {
-      insert(dest, expr, 0);
+      insert(dest, expr, mp_integer{0});
       return;
     }
     else if(v_it!=values.end())
@@ -469,7 +469,7 @@ void value_set_fit::get_value_set_rec(
       typet t("#REF#");
       t.subtype() = expr.type();
       symbol_exprt sym(ident, t);
-      insert(dest, sym, 0);
+      insert(dest, sym, mp_integer{0});
       return;
     }
   }
@@ -521,7 +521,7 @@ void value_set_fit::get_value_set_rec(
     // check if NULL
     if(is_null_pointer(to_constant_expr(expr)))
     {
-      insert(dest, exprt(ID_null_object, expr.type().subtype()), 0);
+      insert(dest, exprt(ID_null_object, expr.type().subtype()), mp_integer{0});
       return;
     }
   }
@@ -620,7 +620,7 @@ void value_set_fit::get_value_set_rec(
         (from_function << 16) | from_target_index);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, 0);
+      insert(dest, dynamic_object, mp_integer{0});
       return;
     }
     else if(statement==ID_cpp_new ||
@@ -634,14 +634,14 @@ void value_set_fit::get_value_set_rec(
         (from_function << 16) | from_target_index);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, 0);
+      insert(dest, dynamic_object, mp_integer{0});
       return;
     }
   }
   else if(expr.id()==ID_struct)
   {
     // this is like a static struct object
-    insert(dest, address_of_exprt(expr), 0);
+    insert(dest, address_of_exprt(expr), mp_integer{0});
     return;
   }
   else if(expr.id()==ID_with)
@@ -785,7 +785,7 @@ void value_set_fit::get_reference_set_sharing_rec(
        expr.type().subtype().id()==ID_array)
       insert(dest, expr);
     else
-      insert(dest, expr, 0);
+      insert(dest, expr, mp_integer{0});
 
     return;
   }
