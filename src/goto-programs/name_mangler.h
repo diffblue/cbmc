@@ -107,7 +107,8 @@ public:
       for(auto &ins : fun.second.body.instructions)
       {
         rename(ins.code_nonconst());
-        rename(ins.guard);
+        if(ins.has_condition())
+          rename(ins.condition_nonconst());
       }
     }
 

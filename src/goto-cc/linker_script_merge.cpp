@@ -258,8 +258,11 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     goto_programt &program=gf.second.body;
     for(auto &instruction : program.instructions)
     {
-      for(exprt *insts : std::list<exprt *>(
-            {&(instruction.code_nonconst()), &(instruction.guard)}))
+      std::list<exprt *> expressions = {&instruction.code_nonconst()};
+      if(instruction.has_condition())
+        expressions.push_back(&instruction.condition_nonconst());
+
+      for(exprt *insts : expressions)
       {
         std::list<symbol_exprt> to_pointerize;
         symbols_to_pointerize(linker_values, *insts, to_pointerize);

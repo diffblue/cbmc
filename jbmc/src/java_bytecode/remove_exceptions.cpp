@@ -368,7 +368,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
         struct_tag_typet type(stack_catch[i][j].first);
 
         java_instanceof_exprt check(exc_thrown, type);
-        t_exc->guard=check;
+        t_exc->condition_nonconst() = check;
 
         if(remove_added_instanceof)
         {

@@ -214,7 +214,7 @@ void goto_program_coverage_recordt::compute_coverage_lines(
       it->is_end_function())
       continue;
 
-    const bool is_branch = it->is_goto() && !it->guard.is_constant();
+    const bool is_branch = it->is_goto() && !it->condition().is_constant();
 
     unsigned l =
       safe_string2unsigned(id2string(it->source_location().get_line()));
