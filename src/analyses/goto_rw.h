@@ -78,10 +78,20 @@ public:
 
   static range_spect to_range_spect(const mp_integer &size)
   {
-    PRECONDITION(size.is_long());
+    // The size need not fit into the analysis platform's width of a signed long
+    // (as an example, it could be an unsigned size_t max, or perhaps the source
+    // platform has much wider types than the analysis platform.
+    if(!size.is_long())
+      return range_spect::unknown();
+
     mp_integer::llong_t ll = size.to_long();
-    CHECK_RETURN(ll <= std::numeric_limits<range_spect::value_type>::max());
-    CHECK_RETURN(ll >= std::numeric_limits<range_spect::value_type>::min());
+    if(
+      ll > std::numeric_limits<range_spect::value_type>::max() ||
+      ll < std::numeric_limits<range_spect::value_type>::min())
+    {
+      return range_spect::unknown();
+    }
+
     return range_spect{(value_type)ll};
   }
 
