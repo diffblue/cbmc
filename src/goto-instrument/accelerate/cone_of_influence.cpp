@@ -11,6 +11,12 @@ Author: Matt Lewis
 
 #include "cone_of_influence.h"
 
+#ifdef DEBUG
+#  include <util/format_expr.h>
+
+#  include <iostream>
+#endif
+
 void cone_of_influencet::cone_of_influence(
   const expr_sett &targets,
   expr_sett &cone)
@@ -46,12 +52,12 @@ void cone_of_influencet::cone_of_influence(
     std::cout << "Previous cone: \n";
 
     for(const auto &expr : curr)
-      std::cout << expr2c(expr, ns) << " ";
+      std::cout << format(expr) << " ";
 
     std::cout << "\nCurrent cone: \n";
 
     for(const auto &expr : next)
-      std::cout << expr2c(expr, ns) << " ";
+      std::cout << format(expr) << " ";
 
     std::cout << '\n';
 #endif

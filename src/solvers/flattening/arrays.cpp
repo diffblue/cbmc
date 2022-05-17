@@ -18,7 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/prop.h>
 
 #ifdef DEBUG
-#include <iostream>
+#  include <util/format_expr.h>
+
+#  include <iostream>
 #endif
 
 #include <unordered_set>
