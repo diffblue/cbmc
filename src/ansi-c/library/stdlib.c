@@ -271,9 +271,7 @@ inline void free(void *ptr)
 
   if(ptr!=0)
   {
-    // non-deterministically record as deallocated
-    __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
-    if(record) __CPROVER_deallocated=ptr;
+    __CPROVER_deallocate(ptr);
 
     // detect memory leaks
     if(__CPROVER_memory_leak==ptr)
@@ -589,4 +587,14 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   __CPROVER_assume(result >= 0);
   return result;
+}
+
+/* FUNCTION: __CPROVER_deallocate */
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
+void __CPROVER_deallocate(void *ptr)
+{
+  if(__VERIFIER_nondet___CPROVER_bool())
+    __CPROVER_deallocated = ptr;
 }

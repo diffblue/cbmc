@@ -88,9 +88,7 @@ inline void __delete(void *ptr)
   // This is a requirement by the standard, not generosity!
   if(ptr!=0)
   {
-    // non-deterministically record as deallocated
-    __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
-    __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
+    __CPROVER_deallocate(ptr);
 
     // detect memory leaks
     if(__CPROVER_memory_leak==ptr)
@@ -125,9 +123,7 @@ inline void __delete_array(void *ptr)
 
   if(ptr!=0)
   {
-    // non-deterministically record as deallocated
-    __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
-    __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
+    __CPROVER_deallocate(ptr);
 
     // detect memory leaks
     if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
