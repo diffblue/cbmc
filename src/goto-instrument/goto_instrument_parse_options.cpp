@@ -69,6 +69,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/gcc_version.h>
 #include <assembler/remove_asm.h>
 #include <cpp/cprover_library.h>
 #include <pointer-analysis/add_failed_symbols.h>
@@ -129,6 +130,14 @@ int goto_instrument_parse_optionst::doit()
     register_languages();
 
     get_goto_program();
+
+    // configure gcc, if required -- get_goto_program will have set the config
+    if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+    {
+      gcc_versiont gcc_version;
+      gcc_version.get("gcc");
+      configure_gcc(gcc_version);
+    }
 
     {
       const bool validate_only = cmdline.isset("validate-goto-binary");

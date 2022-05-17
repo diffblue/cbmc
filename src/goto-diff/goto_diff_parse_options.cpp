@@ -11,10 +11,6 @@ Author: Peter Schrammel
 
 #include "goto_diff_parse_options.h"
 
-#include <cstdlib> // exit()
-#include <fstream>
-#include <iostream>
-
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/options.h>
@@ -28,17 +24,19 @@ Author: Peter Schrammel
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 
+#include <ansi-c/cprover_library.h>
+#include <ansi-c/gcc_version.h>
+#include <assembler/remove_asm.h>
+#include <cpp/cprover_library.h>
 #include <goto-instrument/cover.h>
 
-#include <ansi-c/cprover_library.h>
-
-#include <assembler/remove_asm.h>
-
-#include <cpp/cprover_library.h>
-
+#include "change_impact.h"
 #include "syntactic_diff.h"
 #include "unified_diff.h"
-#include "change_impact.h"
+
+#include <cstdlib> // exit()
+#include <fstream>
+#include <iostream>
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(
@@ -99,6 +97,15 @@ int goto_diff_parse_optionst::doit()
 
   goto_modelt goto_model1 =
     initialize_goto_model({cmdline.args[0]}, ui_message_handler, options);
+
+  // configure gcc, if required -- initialize_goto_model will have set config
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    configure_gcc(gcc_version);
+  }
+
   if(process_goto_program(options, goto_model1))
     return CPROVER_EXIT_INTERNAL_ERROR;
   goto_modelt goto_model2 =
