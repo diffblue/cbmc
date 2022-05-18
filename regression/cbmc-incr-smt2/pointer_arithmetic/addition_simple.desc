@@ -1,0 +1,12 @@
+CORE
+addition_simple.c
+--trace
+\[main\.assertion\.1\] line \d+ expected false after pointer manipulation: FAILURE
+\[main\.assertion\.2\] line \d+ expected true: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This is testing basic pointer arithmetic by adding by incrementing a pointer's
+address and assigning that value to another pointer, then asserting that they
+don't point to the same thing.

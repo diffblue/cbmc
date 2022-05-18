@@ -1,0 +1,13 @@
+CORE
+addition_compound_expr.c
+--trace
+\[main\.assertion\.1\] line \d+ expected successful because of pointer arithmetic: SUCCESS
+\[main\.assertion\.2\] line \d+ expected failure because of pointer arithmetic: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This is testing the same thing as the test in addition_simple.desc, with the
+difference being that the addition expression here is compound, containing a
+more elaborate operand in the form of a multiplication containing a sizeof
+operator.
