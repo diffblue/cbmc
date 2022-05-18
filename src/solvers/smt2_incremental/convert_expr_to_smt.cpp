@@ -598,6 +598,43 @@ static smt_termt convert_expr_to_smt(
     return convert_multiary_operator_to_terms(
       plus, converted, smt_bit_vector_theoryt::add);
   }
+  else if(can_cast_type<pointer_typet>(plus.type()))
+  {
+    INVARIANT(
+      plus.operands().size() == 2,
+      "We are only handling a binary version of plus when it has a pointer "
+      "operand");
+
+    exprt pointer;
+    exprt scalar;
+    for(auto &operand : plus.operands())
+    {
+      if(can_cast_type<pointer_typet>(operand.type()))
+      {
+        pointer = operand;
+      }
+      else
+      {
+        scalar = operand;
+      }
+    }
+
+    // We need to ensure that we follow this code path only if the expression
+    // our assumptions about the structure of the addition expression hold.
+    INVARIANT(
+      !can_cast_type<pointer_typet>(scalar.type()),
+      "An addition expression with both operands being pointers when they are "
+      "not dereferenced is malformed");
+
+    const pointer_typet pointer_type =
+      *type_try_dynamic_cast<pointer_typet>(pointer.type());
+    const auto base_type = pointer_type.base_type();
+    const auto pointer_size = pointer_sizes.at(base_type);
+
+    return smt_bit_vector_theoryt::add(
+      converted.at(pointer),
+      smt_bit_vector_theoryt::multiply(converted.at(scalar), pointer_size));
+  }
   else
   {
     UNIMPLEMENTED_FEATURE(
