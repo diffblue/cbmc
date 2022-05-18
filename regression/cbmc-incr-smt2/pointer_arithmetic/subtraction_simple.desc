@@ -1,0 +1,11 @@
+CORE
+subtraction_simple.c
+--trace
+\[main\.assertion\.1\] line \d+ expected failure after pointer manipulation: FAILURE
+\[main\.assertion\.2\] line \d+ expected successful after pointer manipulation: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test is similar to the one in `addition_simple.desc`, but testing end-to-end
+the conversion of a subtraction case of pointer arithmetic.
