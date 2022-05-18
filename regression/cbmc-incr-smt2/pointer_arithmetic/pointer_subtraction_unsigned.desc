@@ -1,0 +1,11 @@
+CORE
+pointer_subtraction_unsigned.c
+--trace
+\[main\.assertion\.1\] line \d+ expected failure after pointer manipulation: FAILURE
+\[main\.assertion\.2\] line \d+ expected success after pointer manipulation: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+The test is similar to the one in `pointer_subtraction.desc`, but with different
+types in the subtraction operands.

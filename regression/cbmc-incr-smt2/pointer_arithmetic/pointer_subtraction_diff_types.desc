@@ -1,0 +1,10 @@
+CORE
+pointer_subtraction_diff_types.c
+--trace
+^Reason: only pointers of the same object type can be subtracted.
+^EXIT=(134|127)$
+^SIGNAL=0$
+--
+--
+This test is for making sure that we only subtract pointers with the
+same underlying (base) type.
