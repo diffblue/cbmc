@@ -14,6 +14,7 @@
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/pointer_size_mapping.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
@@ -57,6 +58,7 @@ struct expr_to_smt_conversion_test_environmentt
 
   smt_object_mapt object_map;
   smt_object_sizet object_size_function;
+  pointer_size_mapt pointer_sizes;
 
 private:
   // This is private to ensure the above make() function is used to make
@@ -88,7 +90,10 @@ smt_termt
 expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
 {
   return convert_expr_to_smt(
-    expression, object_map, object_size_function.make_application);
+    expression,
+    object_map,
+    pointer_sizes,
+    object_size_function.make_application);
 }
 
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")

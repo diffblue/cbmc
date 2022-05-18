@@ -2,13 +2,6 @@
 
 #include "smt2_incremental_decision_procedure.h"
 
-#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
-#include <solvers/smt2_incremental/convert_expr_to_smt.h>
-#include <solvers/smt2_incremental/smt_commands.h>
-#include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_responses.h>
-#include <solvers/smt2_incremental/smt_solver_process.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 #include <util/expr.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
@@ -16,6 +9,15 @@
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>
+
+#include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
+#include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/smt_commands.h>
+#include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/smt_responses.h>
+#include <solvers/smt2_incremental/smt_solver_process.h>
+#include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/type_size_mapping.h>
 
 #include <stack>
 
@@ -163,8 +165,14 @@ smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
   track_expression_objects(expr, ns, object_map);
+  associate_pointer_sizes(
+    expr,
+    ns,
+    pointer_sizes_map,
+    object_map,
+    object_size_function.make_application);
   return ::convert_expr_to_smt(
-    expr, object_map, object_size_function.make_application);
+    expr, object_map, pointer_sizes_map, object_size_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -208,7 +216,10 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         "Objects in expressions being read should already be tracked from "
         "point of being set/handled.");
       descriptor = ::convert_expr_to_smt(
-        expr, object_map, object_size_function.make_application);
+        expr,
+        object_map,
+        pointer_sizes_map,
+        object_size_function.make_application);
     }
     else
     {

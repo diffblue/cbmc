@@ -587,7 +587,8 @@ static optionalt<smt_termt> try_relational_conversion(
 
 static smt_termt convert_expr_to_smt(
   const plus_exprt &plus,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const type_size_mapt &pointer_sizes)
 {
   if(std::all_of(
        plus.operands().cbegin(), plus.operands().cend(), [](exprt operand) {
@@ -606,7 +607,8 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt convert_expr_to_smt(
   const minus_exprt &minus,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const type_size_mapt &pointer_sizes)
 {
   const bool both_operands_bitvector =
     can_cast_type<integer_bitvector_typet>(minus.lhs().type()) &&
@@ -1299,6 +1301,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   const exprt &expr,
   const sub_expression_mapt &converted,
   const smt_object_mapt &object_map,
+  const type_size_mapt &pointer_sizes,
   const smt_object_sizet::make_applicationt &call_object_size)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
@@ -1415,7 +1418,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   }
   if(const auto plus = expr_try_dynamic_cast<plus_exprt>(expr))
   {
-    return convert_expr_to_smt(*plus, converted);
+    return convert_expr_to_smt(*plus, converted, pointer_sizes);
   }
   if(const auto minus = expr_try_dynamic_cast<minus_exprt>(expr))
   {
@@ -1658,6 +1661,7 @@ at_scope_exitt<functiont> at_scope_exit(functiont exit_function)
 smt_termt convert_expr_to_smt(
   const exprt &expr,
   const smt_object_mapt &object_map,
+  const type_size_mapt &pointer_sizes,
   const smt_object_sizet::make_applicationt &object_size)
 {
 #ifndef CPROVER_INVARIANT_DO_NOT_CHECK
@@ -1676,7 +1680,7 @@ smt_termt convert_expr_to_smt(
     if(find_result != sub_expression_map.cend())
       return;
     smt_termt term = dispatch_expr_to_smt_conversion(
-      expr, sub_expression_map, object_map, object_size);
+      expr, sub_expression_map, object_map, pointer_sizes, object_size);
     sub_expression_map.emplace_hint(find_result, expr, std::move(term));
   });
   return std::move(sub_expression_map.at(expr));
