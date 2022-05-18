@@ -651,10 +651,43 @@ static smt_termt convert_expr_to_smt(
     can_cast_type<integer_bitvector_typet>(minus.lhs().type()) &&
     can_cast_type<integer_bitvector_typet>(minus.rhs().type());
 
+  const bool lhs_is_pointer = can_cast_type<pointer_typet>(minus.lhs().type());
+  const bool rhs_is_pointer = can_cast_type<pointer_typet>(minus.rhs().type());
+
+  const bool both_operands_pointers = lhs_is_pointer && rhs_is_pointer;
+
+  // We don't really handle this - we just compute this to fall
+  // into an if-else branch that gives proper error handling information.
+  const bool one_operand_pointer = lhs_is_pointer || rhs_is_pointer;
+
   if(both_operands_bitvector)
   {
     return smt_bit_vector_theoryt::subtract(
       converted.at(minus.lhs()), converted.at(minus.rhs()));
+  }
+  else if(both_operands_pointers)
+  {
+    const auto lhs_base_type = to_pointer_type(minus.lhs().type()).base_type();
+    const auto rhs_base_type = to_pointer_type(minus.rhs().type()).base_type();
+    INVARIANT(
+      lhs_base_type == rhs_base_type,
+      "only pointers of the same object type can be subtracted.");
+    return smt_bit_vector_theoryt::signed_divide(
+      smt_bit_vector_theoryt::subtract(
+        converted.at(minus.lhs()), converted.at(minus.rhs())),
+      pointer_sizes.at(lhs_base_type));
+  }
+  else if(one_operand_pointer)
+  {
+    UNIMPLEMENTED_FEATURE(
+      "convert_expr_to_smt::minus_exprt doesn't handle expressions where"
+      "only one operand is a pointer - this is because these expressions"
+      "are normally handled by convert_expr_to_smt::plus_exprt due to"
+      "transformations of the expressions by previous passes bringing"
+      "them into a form more suitably handled by that version of the function."
+      "If you are here, this is a mistake or something went wrong before."
+      "The expression that caused the problem is: " +
+      minus.pretty());
   }
   else
   {
@@ -1459,7 +1492,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   }
   if(const auto minus = expr_try_dynamic_cast<minus_exprt>(expr))
   {
-    return convert_expr_to_smt(*minus, converted);
+    return convert_expr_to_smt(*minus, converted, pointer_sizes);
   }
   if(const auto divide = expr_try_dynamic_cast<div_exprt>(expr))
   {
