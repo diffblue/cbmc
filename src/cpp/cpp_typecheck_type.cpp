@@ -276,6 +276,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     c_typecheck_baset::typecheck_type(type);
   }
+  else if(type.id() == ID_complex)
+  {
+    // already done
+  }
   else
   {
     error().source_location=type.source_location();
