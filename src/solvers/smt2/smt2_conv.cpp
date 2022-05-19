@@ -937,6 +937,13 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return "p" + std::to_string(to_pointer_type(type).get_width());
   }
+  else if(type.id() == ID_struct_tag)
+  {
+    if(use_datatypes)
+      return datatype_map.at(type);
+    else
+      return "S" + std::to_string(boolbv_width(type));
+  }
   else
   {
     UNREACHABLE;
