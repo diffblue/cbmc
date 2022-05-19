@@ -9,15 +9,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
-#include <util/source_location.h>
-#include <util/simplify_expr.h>
 #include <util/c_types.h>
+#include <util/simplify_expr.h>
+#include <util/source_location.h>
 
 #include <ansi-c/c_qualifiers.h>
+#include <ansi-c/merged_type.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
 void cpp_typecheckt::typecheck_type(typet &type)
@@ -274,6 +274,13 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id() == ID_gcc_attribute_mode)
   {
+    PRECONDITION(type.has_subtype());
+    merged_typet as_parsed;
+    as_parsed.move_to_subtypes(type.subtype());
+    type.get_sub().clear();
+    as_parsed.move_to_subtypes(type);
+    type.swap(as_parsed);
+
     c_typecheck_baset::typecheck_type(type);
   }
   else if(type.id() == ID_complex)

@@ -330,14 +330,9 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
     type.id() == ID_union || type.id() == ID_array || type.id() == ID_code ||
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
-    type.id() == ID_constructor || type.id() == ID_destructor)
+    type.id() == ID_constructor || type.id() == ID_destructor ||
+    type.id() == ID_c_enum)
   {
-  }
-  else if(type.id()==ID_c_enum)
-  {
-    // add width -- we use int, but the standard
-    // doesn't guarantee that
-    type.set(ID_width, config.ansi_c.int_width);
   }
   else if(type.id() == ID_c_bool)
   {
