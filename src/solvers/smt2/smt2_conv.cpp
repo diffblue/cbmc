@@ -3587,7 +3587,19 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id()==ID_pointer)
   {
-    SMT2_TODO("pointer subtraction");
+    if(
+      expr.op0().type().id() == ID_pointer &&
+      (expr.op1().type().id() == ID_unsignedbv ||
+       expr.op1().type().id() == ID_signedbv))
+    {
+      // rewrite p-o to p+(-o)
+      return convert_plus(
+        plus_exprt(expr.op0(), unary_minus_exprt(expr.op1())));
+    }
+    else
+      UNEXPECTEDCASE(
+        "unsupported operand types for -: " + expr.op0().type().id_string() +
+        " and " + expr.op1().type().id_string());
   }
   else if(expr.type().id()==ID_vector)
   {
