@@ -8,7 +8,6 @@ struct pair
 };
 
 int z = 5;
-int w[10] = {0};
 
 void foo(struct pair *p) __CPROVER_assigns(*(p->y), z)
   __CPROVER_ensures(*(p->y) == __CPROVER_old(*(p->y)) + __CPROVER_old(z))
@@ -34,6 +33,8 @@ void baz(struct pair p) __CPROVER_assigns()
 
 int main()
 {
+  z = 5;
+  int w[10] = {0};
   struct pair *p = malloc(sizeof(*p));
   p->y = malloc(sizeof(*(p->y)));
   p->x = 2;
@@ -45,6 +46,5 @@ int main()
   bar(p);
   assert(*(p->y) == -1);
   baz(*p);
-
   return 0;
 }

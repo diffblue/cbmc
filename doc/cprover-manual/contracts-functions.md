@@ -6,6 +6,10 @@ These clauses formally describe the specification of a function.
 CBMC also provides a series of built-in constructs to be used with functions
 contracts (e.g., _history variables_, _quantifiers_, and _memory predicates_).
 
+When a function contract is checked, the tool automatically havocs all static variables
+of the program (to start the analysis in an arbitrary state), in the same way
+as using `--nondet-static` would do. If one wishes not to havoc some static variables,
+then `--nondet-static-exclude name-of-variable` can be used.
 ## Overview
 
 Take a look at the example below.

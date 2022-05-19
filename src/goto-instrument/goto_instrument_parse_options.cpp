@@ -11,16 +11,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_instrument_parse_options.h"
 
-#include <fstream>
-#include <iostream>
-#include <memory>
-
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/json.h>
+#include <util/options.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/version.h>
+
+#include <fstream>
+#include <iostream>
+#include <memory>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>
@@ -1164,15 +1165,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
       cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
 
+    std::set<std::string> to_exclude_from_nondet_static(
+      cmdline.get_values("nondet-static-exclude").begin(),
+      cmdline.get_values("nondet-static-exclude").end());
+
     // It’s important to keep the order of contracts instrumentation, i.e.,
     // first replacement then enforcement. We rely on contract replacement
     // and inlining of sub-function calls to properly annotate all
     // assignments.
     contracts.replace_calls(to_replace);
-    contracts.enforce_contracts(to_enforce);
+    contracts.enforce_contracts(to_enforce, to_exclude_from_nondet_static);
 
     if(cmdline.isset(FLAG_LOOP_CONTRACTS))
-      contracts.apply_loop_contracts();
+      contracts.apply_loop_contracts(to_exclude_from_nondet_static);
   }
 
   if(cmdline.isset("value-set-fi-fp-removal"))
@@ -1375,8 +1380,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
                     "of static/global variables except for "
                     "the specified ones."
                  << messaget::eom;
-
-    nondet_static(goto_model, cmdline.get_values("nondet-static-exclude"));
+    std::set<std::string> to_exclude(
+      cmdline.get_values("nondet-static-exclude").begin(),
+      cmdline.get_values("nondet-static-exclude").end());
+    nondet_static(goto_model, to_exclude);
   }
   else if(cmdline.isset("nondet-static"))
   {

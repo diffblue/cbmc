@@ -14,22 +14,24 @@ Date: February 2016
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H
 
-#include <map>
-#include <set>
-#include <string>
-#include <unordered_set>
-
-#include <goto-instrument/loop_utils.h>
-
 #include <goto-programs/goto_convert_class.h>
-#include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/optional.h>
 #include <util/pointer_expr.h>
+
+#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/instrument_preconditions.h>
+
+#include <goto-instrument/loop_utils.h>
+
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+#include <unordered_set>
 
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
@@ -56,6 +58,7 @@ class code_contractst
 public:
   code_contractst(goto_modelt &goto_model, messaget &log)
     : ns(goto_model.symbol_table),
+      goto_model(goto_model),
       symbol_table(goto_model.symbol_table),
       goto_functions(goto_model.goto_functions),
       log(log),
@@ -93,14 +96,23 @@ public:
   /// execution does not need to explore F every time it is called, increasing
   /// scalability.
   ///
+  /// Static variables of the model are nondet-initialized, except for the ones
+  /// specified in to_exclude_from_nondet_init.
+  ///
   /// Implementation: mangle the name of each function F into a new name,
   /// `__CPROVER_contracts_original_F` (`CF` for short). Then mint a new
   /// function called `F` that assumes `CF`'s `requires` clause, calls `CF`, and
   /// then asserts `CF`'s `ensures` clause.
   ///
-  void enforce_contracts(const std::set<std::string> &to_enforce);
+  void enforce_contracts(
+    const std::set<std::string> &to_enforce,
+    const std::set<std::string> &to_exclude_from_nondet_init = {});
 
-  void apply_loop_contracts();
+  /// Applies loop contract transformations.
+  /// Static variables of the model are nondet-initialized, except for the ones
+  /// specified in to_exclude_from_nondet_init.
+  void apply_loop_contracts(
+    const std::set<std::string> &to_exclude_from_nondet_init = {});
 
   void check_apply_loop_contracts(
     const irep_idt &function_name,
@@ -121,6 +133,7 @@ public:
   namespacet ns;
 
 protected:
+  goto_modelt &goto_model;
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 

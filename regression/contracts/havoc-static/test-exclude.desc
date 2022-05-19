@@ -1,0 +1,12 @@
+CORE
+main.c
+--enforce-contract foo --nondet-static-exclude main.c:a --nondet-static-exclude main.c:c
+^\[foo.assertion.\d+\].* guarded by a: SUCCESS$
+^\[foo.assertion.\d+\].* guarded by b: SUCCESS$
+^\[foo.assertion.\d+\].* guarded by c: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that we can exclude some statics from havocing.

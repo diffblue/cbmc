@@ -10,4 +10,4 @@ main.c
 ^Condition: \!not\_found$
 --
 Checks whether CBMC properly evaluates subset relationship on assigns
-during replacement with static functions.
+during replacement with static functions when targets are global variables.

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stddef.h>
 
-int x = 0;
+int x;
 
 void foo(int *y)
 {
@@ -22,7 +22,7 @@ void bar(void (*fun_ptr)(), int *x) __CPROVER_requires(fun_ptr != NULL)
 
 int main()
 {
-  assert(x == 0);
+  x = 0;
   void (*fun_ptr)() = foo;
   bar(fun_ptr, &x);
   assert(x == 1);
