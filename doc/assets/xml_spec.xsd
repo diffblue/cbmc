@@ -39,7 +39,7 @@
   <xs:complexType>
     <xs:all>
       <xs:element ref="location" minOccurs="0"/>
-      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="full_lhs_type" type="xs:string" minOccurs="0"/>
       <xs:element name="full_lhs" type="xs:string"/>
       <xs:element name="full_lhs_value">
         <xs:complexType>
