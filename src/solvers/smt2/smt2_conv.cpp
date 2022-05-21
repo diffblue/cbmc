@@ -996,6 +996,10 @@ std::string smt2_convt::type2id(const typet &type) const
     else
       return "S" + std::to_string(boolbv_width(type));
   }
+  else if(type.id() == ID_array)
+  {
+    return "A" + type2id(to_array_type(type).element_type());
+  }
   else
   {
     UNREACHABLE;
