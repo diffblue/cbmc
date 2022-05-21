@@ -937,6 +937,13 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return "p" + std::to_string(to_pointer_type(type).get_width());
   }
+  else if(type.id() == ID_struct_tag)
+  {
+    if(use_datatypes)
+      return datatype_map.at(type);
+    else
+      return "S" + std::to_string(boolbv_width(type));
+  }
   else
   {
     UNREACHABLE;
@@ -3587,7 +3594,19 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id()==ID_pointer)
   {
-    SMT2_TODO("pointer subtraction");
+    if(
+      expr.op0().type().id() == ID_pointer &&
+      (expr.op1().type().id() == ID_unsignedbv ||
+       expr.op1().type().id() == ID_signedbv))
+    {
+      // rewrite p-o to p+(-o)
+      return convert_plus(
+        plus_exprt(expr.op0(), unary_minus_exprt(expr.op1())));
+    }
+    else
+      UNEXPECTEDCASE(
+        "unsupported operand types for -: " + expr.op0().type().id_string() +
+        " and " + expr.op1().type().id_string());
   }
   else if(expr.type().id()==ID_vector)
   {
@@ -4839,7 +4858,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       for(std::size_t i=0; i<tmp.operands().size(); i++)
       {
-        out << "(assert (= (select " << id;
+        out << "(assert (= (select " << id << ' ';
         convert_expr(from_integer(i, array_type.size().type()));
         out << ") "; // select
         convert_expr(tmp.operands()[i]);
