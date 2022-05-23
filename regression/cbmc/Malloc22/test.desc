@@ -1,7 +1,10 @@
-CORE
+KNOWNBUG
 main.c
 --unwind 2 --smt2 --outfile main.smt2
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^Invalid expression: failed to get width of byte_update
+--
+20220523: Marked as KNOWNBUG due to encoding into some solvers not being
+done correctly. This works for z3 and cvc4, but not other solvers.

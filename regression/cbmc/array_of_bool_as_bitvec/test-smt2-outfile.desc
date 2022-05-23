@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+KNOWNBUG broken-smt-backend
 main.c
 --smt2 --outfile -
 \(= \(select array_of\.2 i\) \(ite false #b1 #b0\)\)
@@ -11,6 +11,10 @@ main.c
 \(= \(select array\.3 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1 #b0\)
 \(= \(select array\.3 \(_ bv\d+ 64\)\) false\)
 --
+20220523: Marked as KNOWNBUG due to encoding into some solvers not being
+done correctly. This works for z3 and cvc4, but not other solvers. Old
+comments below.
+
 This test checks for correctness of BitVec-array encoding of Boolean arrays.
 
 Ideally, we shouldn't have to check the SMT output, but should run with backend
