@@ -3,6 +3,7 @@ trace-values.c
 --trace
 ^EXIT=10$
 ^SIGNAL=0$
+^  s=\{ \.f=-?\d+, \.array=\{ -?\d+, -?\d+, -?\d+ \} \} \(\{ [01 ]+, \{ [01 ]+, [01 ]+, [01 ]+ \} \}\)$
 ^  global_var=1 .*$
 ^  static_var=2 .*$
 ^  local_var=3 .*$
@@ -12,6 +13,7 @@ trace-values.c
 ^  dynamic_object1\[1.*\]=8 .*$
 ^  my_nested\[1.*\](=\{ )?.f=0[ ,]
 ^  my_nested\[1.*\](=\{ .f=0, )?.array=\{ 0, 4, 0 \}
+^  s\.f=42 \([0 ]+ 00101010\)$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

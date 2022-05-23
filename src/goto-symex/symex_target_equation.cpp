@@ -389,6 +389,8 @@ void symex_target_equationt::convert_decls(
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
       decision_procedure.handle(step.cond_expr);
+      decision_procedure.handle(
+        equal_exprt{step.ssa_full_lhs, step.ssa_full_lhs});
       step.converted = true;
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
