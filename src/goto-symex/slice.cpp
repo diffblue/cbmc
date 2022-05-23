@@ -10,25 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Slicer for symex traces
 
 #include "slice.h"
-
-#include <util/std_expr.h>
-
 #include "symex_slice_class.h"
+
+#include <util/find_symbols.h>
+#include <util/std_expr.h>
 
 void symex_slicet::get_symbols(const exprt &expr)
 {
-  get_symbols(expr.type());
-
-  forall_operands(it, expr)
-    get_symbols(*it);
-
-  if(expr.id()==ID_symbol)
-    depends.insert(to_symbol_expr(expr).get_identifier());
-}
-
-void symex_slicet::get_symbols(const typet &)
-{
-  // TODO
+  find_symbols(expr, depends);
 }
 
 void symex_slicet::slice(
@@ -44,17 +33,20 @@ void symex_slicet::slice(
 
 void symex_slicet::slice(symex_target_equationt &equation)
 {
+  simple_slice(equation);
+
   for(symex_target_equationt::SSA_stepst::reverse_iterator
       it=equation.SSA_steps.rbegin();
       it!=equation.SSA_steps.rend();
       it++)
-    slice(*it);
+  {
+    if(!it->ignore)
+      slice(*it);
+  }
 }
 
 void symex_slicet::slice(SSA_stept &SSA_step)
 {
-  get_symbols(SSA_step.guard);
-
   switch(SSA_step.type)
   {
   case goto_trace_stept::typet::ASSERT:
@@ -66,7 +58,7 @@ void symex_slicet::slice(SSA_stept &SSA_step)
     break;
 
   case goto_trace_stept::typet::GOTO:
-    get_symbols(SSA_step.cond_expr);
+    // ignore
     break;
 
   case goto_trace_stept::typet::LOCATION:
@@ -114,13 +106,18 @@ void symex_slicet::slice_assignment(SSA_stept &SSA_step)
   PRECONDITION(SSA_step.ssa_lhs.id() == ID_symbol);
   const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
 
-  if(depends.find(id)==depends.end())
+  auto entry = depends.find(id);
+  if(entry == depends.end())
   {
     // we don't really need it
     SSA_step.ignore=true;
   }
   else
+  {
+    // we have resolved this dependency
+    depends.erase(entry);
     get_symbols(SSA_step.ssa_rhs);
+  }
 }
 
 void symex_slicet::slice_decl(SSA_stept &SSA_step)
@@ -163,6 +160,10 @@ void symex_slicet::collect_open_variables(
       get_symbols(SSA_step.cond_expr);
       break;
 
+    case goto_trace_stept::typet::GOTO:
+      // ignore
+      break;
+
     case goto_trace_stept::typet::LOCATION:
       // ignore
       break;
@@ -175,7 +176,6 @@ void symex_slicet::collect_open_variables(
     case goto_trace_stept::typet::OUTPUT:
     case goto_trace_stept::typet::INPUT:
     case goto_trace_stept::typet::DEAD:
-    case goto_trace_stept::typet::NONE:
       break;
 
     case goto_trace_stept::typet::DECL:
@@ -191,7 +191,7 @@ void symex_slicet::collect_open_variables(
       // ignore for now
       break;
 
-    case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::NONE:
       UNREACHABLE;
     }
   }

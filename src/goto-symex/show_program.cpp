@@ -38,7 +38,10 @@ static void show_step(
   std::string string_value = (step.is_shared_read() || step.is_shared_write())
                                ? from_expr(ns, function_id, step.ssa_lhs)
                                : from_expr(ns, function_id, step.cond_expr);
-  std::cout << '(' << count << ") ";
+  if(step.ignore)
+    std::cout << "(sliced) ";
+  else
+    std::cout << '(' << count << ") ";
   if(annotation.empty())
     std::cout << string_value;
   else
