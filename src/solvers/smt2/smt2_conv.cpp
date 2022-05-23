@@ -4742,11 +4742,15 @@ void smt2_convt::find_symbols(const exprt &expr)
           }
           out << ")))\n";
         }
-        // else
-        // {
-        //   // This is where an alternate for other solvers that does not use
-        //   // quantifiers should go.
-        // }
+        else
+        {
+          // This is where an alternate for other solvers that does not use
+          // quantifiers should go.
+          INVARIANT(
+            false,
+            "Cannot substitute quantified expression for lambda in current "
+            "solver.");
+        }
 
         defined_expressions[expr] = id;
       }
