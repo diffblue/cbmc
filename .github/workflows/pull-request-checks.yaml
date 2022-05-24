@@ -417,6 +417,48 @@ jobs:
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
 
+  check-macos-12-cmake-clang:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: brew install cmake ninja maven flex bison ccache z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc5 binary and make sure it can be deployed
+        run: |
+          curl -L https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS --output cvc5
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
+      - name: Prepare ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-Release-${{ github.ref }}
+            ${{ runner.os }}-Release
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -Dsat_impl=glucose
+      - name: Build with Ninja
+        run: cd build; ninja -j3
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run CTest
+        run: cd build; ctest -V -L CORE . -j3
+
   check-vs-2019-cmake-build-and-test:
     runs-on: windows-2019
     env:
