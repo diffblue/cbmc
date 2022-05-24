@@ -1012,6 +1012,29 @@ public:
   }
 };
 
+/// \brief Cast an exprt to a \ref object_size_exprt
+///
+/// \a expr must be known to be \ref object_size_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref object_size_exprt
+inline const object_size_exprt &to_object_size_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_object_size);
+  const object_size_exprt &ret = static_cast<const object_size_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_object_size_expr(const exprt &)
+inline object_size_exprt &to_object_size_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_object_size);
+  object_size_exprt &ret = static_cast<object_size_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 template <>
 inline bool can_cast_expr<object_size_exprt>(const exprt &base)
 {

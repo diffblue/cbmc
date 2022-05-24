@@ -1,7 +1,7 @@
 CORE
 double_deref_with_pointer_arithmetic.c
 --show-vcc
-^\{-[0-9]+\} derefd_pointer::derefd_pointer!0#1 = \{ symex_dynamic::dynamic_object1#3\[\[0\]\], symex_dynamic::dynamic_object1#3\[\[1\]\] \}\[cast\(mod #source_location=""\(main::argc!0@1#1, 2\), signedbv\[64\]\)\]
+^\{-[0-9]+\} derefd_pointer::derefd_pointer!0#1 = \{ symex_dynamic::dynamic_object1#3\[\[0\]\], symex_dynamic::dynamic_object1#3\[\[1\]\] \}\[cast\(mod\(main::argc!0@1#1, 2\), signedbv\[64\]\)\]
 ^\{1\} \(derefd_pointer::derefd_pointer!0#1 = address_of\(symex_dynamic::dynamic_object[23]\) \? main::argc!0@1#1 = 2 : \(derefd_pointer::derefd_pointer!0#1 = address_of\(symex_dynamic::dynamic_object[23]\) \? main::argc!0@1#1 = 1 : symex::invalid_object!0#0 = main::argc!0@1#1\)\)
 ^EXIT=0$
 ^SIGNAL=0$

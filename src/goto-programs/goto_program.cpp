@@ -121,9 +121,54 @@ std::ostream &goto_programt::output_instruction(
     if(instruction.get_other().id() == ID_code)
     {
       const auto &code = instruction.get_other();
-      if(code.get_statement() == ID_havoc_object)
+      if(code.get_statement() == ID_array_copy)
+      {
+        out << "ARRAY_COPY " << format(code.op0()) << ' ' << format(code.op1())
+            << '\n';
+        break;
+      }
+      else if(code.get_statement() == ID_array_replace)
+      {
+        out << "ARRAY_REPLACE " << format(code.op0()) << ' '
+            << format(code.op1()) << '\n';
+        break;
+      }
+      else if(code.get_statement() == ID_array_set)
+      {
+        out << "ARRAY_SET " << format(code.op0()) << ' ' << format(code.op1())
+            << '\n';
+        break;
+      }
+      else if(code.get_statement() == ID_havoc_object)
       {
         out << "HAVOC_OBJECT " << format(code.op0()) << '\n';
+        break;
+      }
+      else if(code.get_statement() == ID_fence)
+      {
+        out << "FENCE";
+        if(code.get_bool(ID_WWfence))
+          out << " WW";
+        if(code.get_bool(ID_RRfence))
+          out << " RR";
+        if(code.get_bool(ID_RWfence))
+          out << " RW";
+        if(code.get_bool(ID_WRfence))
+          out << " WR";
+        out << '\n';
+        break;
+      }
+      else if(code.get_statement() == ID_input)
+      {
+        out << "INPUT";
+        for(const auto &op : code.operands())
+          out << ' ' << format(op);
+        out << '\n';
+        break;
+      }
+      else if(code.get_statement() == ID_output)
+      {
+        out << "OUTPUT " << format(code.op0()) << '\n';
         break;
       }
       // fallthrough

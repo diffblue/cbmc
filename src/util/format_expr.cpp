@@ -223,7 +223,7 @@ std::ostream &fallback_format_rec(std::ostream &os, const exprt &expr)
   os << expr.id();
 
   for(const auto &s : expr.get_named_sub())
-    if(s.first != ID_type)
+    if(s.first != ID_type && s.first != ID_C_source_location)
       os << ' ' << s.first << "=\"" << s.second.id() << '"';
 
   if(expr.has_operands())
@@ -569,6 +569,32 @@ void format_expr_configt::setup()
     const auto &saturating_plus = to_saturating_plus_expr(expr);
     return os << "saturating+(" << format(saturating_plus.lhs()) << ", "
               << format(saturating_plus.rhs()) << ')';
+  };
+
+  expr_map[ID_object_address] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &object_address_expr = to_object_address_expr(expr);
+    return os << u8"\u275d" << object_address_expr.object_identifier()
+              << u8"\u275e";
+  };
+
+  expr_map[ID_object_size] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &object_size_expr = to_object_size_expr(expr);
+    return os << "object_size(" << format(object_size_expr.op()) << ')';
+  };
+
+  expr_map[ID_pointer_offset] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &pointer_offset_expr = to_pointer_offset_expr(expr);
+    return os << "pointer_offset(" << format(pointer_offset_expr.op()) << ')';
+  };
+
+  expr_map[ID_field_address] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    const auto &field_address_expr = to_field_address_expr(expr);
+    return os << format(field_address_expr.base()) << u8".\u275d"
+              << field_address_expr.component_name() << u8"\u275e";
   };
 
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
