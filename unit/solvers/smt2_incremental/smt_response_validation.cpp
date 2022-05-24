@@ -137,6 +137,70 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
           smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
           smt_bit_vector_constant_termt{42, 8}}}});
     }
+    SECTION("Descriptors which are bit vector constants")
+    {
+      const response_or_errort<smt_responset> response_descriptor =
+        validate_smt_response(*smt2irep("(((_ bv255 8) #x2A))").parsed_output);
+      CHECK(
+        *response_descriptor.get_if_valid() ==
+        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+          smt_bit_vector_constant_termt{255, 8},
+          smt_bit_vector_constant_termt{42, 8}}}});
+      SECTION("Invalid bit vector constants")
+      {
+        SECTION("Value too large for width")
+        {
+          const response_or_errort<smt_responset> pair_value_response =
+            validate_smt_response(
+              *smt2irep("(((_ bv256 8) #xff))").parsed_output);
+          CHECK(
+            *pair_value_response.get_if_error() ==
+            std::vector<std::string>{
+              "Expected descriptor SMT term, found - \"\n"
+              "0: _\n"
+              "1: bv256\n"
+              "2: 8\"."});
+        }
+        SECTION("Value missing bv prefix.")
+        {
+          const response_or_errort<smt_responset> pair_value_response =
+            validate_smt_response(*smt2irep("(((_ 42 8) #xff))").parsed_output);
+          CHECK(
+            *pair_value_response.get_if_error() ==
+            std::vector<std::string>{
+              "Expected descriptor SMT term, found - \"\n"
+              "0: _\n"
+              "1: 42\n"
+              "2: 8\"."});
+        }
+        SECTION("Hex value.")
+        {
+          const response_or_errort<smt_responset> pair_value_response =
+            validate_smt_response(
+              *smt2irep("(((_ bv2A 8) #xff))").parsed_output);
+          CHECK(
+            *pair_value_response.get_if_error() ==
+            std::vector<std::string>{
+              "Expected descriptor SMT term, found - \"\n"
+              "0: _\n"
+              "1: bv2A\n"
+              "2: 8\"."});
+        }
+        SECTION("Zero width.")
+        {
+          const response_or_errort<smt_responset> pair_value_response =
+            validate_smt_response(
+              *smt2irep("(((_ bv0 0) #xff))").parsed_output);
+          CHECK(
+            *pair_value_response.get_if_error() ==
+            std::vector<std::string>{
+              "Expected descriptor SMT term, found - \"\n"
+              "0: _\n"
+              "1: bv0\n"
+              "2: 0\"."});
+        }
+      }
+    }
   }
   SECTION("Multiple valuation pairs.")
   {
@@ -180,12 +244,11 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
       validate_smt_response(*smt2irep("((() true))").parsed_output);
     CHECK(
       *empty_descriptor_response.get_if_error() ==
-      std::vector<std::string>{"Expected identifier, found - \"\"."});
+      std::vector<std::string>{"Expected descriptor SMT term, found - \"\"."});
     const response_or_errort<smt_responset> empty_pair =
       validate_smt_response(*smt2irep("((() ())))").parsed_output);
     CHECK(
       *empty_pair.get_if_error() ==
-      std::vector<std::string>{"Expected identifier, found - \"\".",
-                               "Unrecognised SMT term - \"\"."});
+      std::vector<std::string>{"Unrecognised SMT term - \"\"."});
   }
 }
