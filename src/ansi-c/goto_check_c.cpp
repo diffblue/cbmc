@@ -819,9 +819,6 @@ void goto_check_ct::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!enable_signed_overflow_check && !enable_unsigned_overflow_check)
-    return;
-
   // First, check type.
   const typet &type = expr.type();
 
@@ -829,6 +826,9 @@ void goto_check_ct::integer_overflow_check(
     return;
 
   if(type.id() == ID_unsignedbv && !enable_unsigned_overflow_check)
+    return;
+
+  if(type.id() == ID_pointer && !enable_pointer_overflow_check)
     return;
 
   // add overflow subgoal
@@ -1021,7 +1021,10 @@ void goto_check_ct::integer_overflow_check(
         tmp.operands().resize(i);
       }
 
-      std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
+      std::string kind =
+        type.id() == ID_pointer
+          ? "pointer"
+          : (type.id() == ID_unsignedbv ? "unsigned" : "signed");
 
       add_guarded_property(
         not_exprt{binary_overflow_exprt{tmp, expr.id(), expr.operands()[i]}},
@@ -1034,7 +1037,9 @@ void goto_check_ct::integer_overflow_check(
   }
   else if(expr.operands().size() == 2)
   {
-    std::string kind = type.id() == ID_unsignedbv ? "unsigned" : "signed";
+    std::string kind = type.id() == ID_pointer
+                         ? "pointer"
+                         : (type.id() == ID_unsignedbv ? "unsigned" : "signed");
 
     const binary_exprt &bexpr = to_binary_expr(expr);
     add_guarded_property(
@@ -1335,31 +1340,7 @@ void goto_check_ct::pointer_overflow_check(
     expr.operands().size() == 2,
     "pointer arithmetic expected to have exactly 2 operands");
 
-  // multiplying the offset by the object size must not result in arithmetic
-  // overflow
-  const typet &object_type = to_pointer_type(expr.type()).base_type();
-  if(object_type.id() != ID_empty)
-  {
-    auto size_of_expr_opt = size_of_expr(object_type, ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
-    exprt object_size = size_of_expr_opt.value();
-
-    const binary_exprt &binary_expr = to_binary_expr(expr);
-    exprt offset_operand = binary_expr.lhs().type().id() == ID_pointer
-                             ? binary_expr.rhs()
-                             : binary_expr.lhs();
-    mult_exprt mul{
-      offset_operand,
-      typecast_exprt::conditional_cast(object_size, offset_operand.type())};
-    mul.add_source_location() = offset_operand.source_location();
-
-    flag_overridet override_overflow(offset_operand.source_location());
-    override_overflow.set_flag(
-      enable_signed_overflow_check, true, "signed_overflow_check");
-    override_overflow.set_flag(
-      enable_unsigned_overflow_check, true, "unsigned_overflow_check");
-    integer_overflow_check(mul, guard);
-  }
+  integer_overflow_check(expr, guard);
 
   // the result must be within object bounds or one past the end
   const auto size = from_integer(0, size_type());

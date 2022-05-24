@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_pointers.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -203,6 +204,79 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
           offset_bv1,
           bv_utilst::representationt::SIGNED));
     }
+  }
+  else if(
+    (expr.id() == ID_overflow_plus || expr.id() == ID_overflow_minus) &&
+    operands.size() == 2 &&
+    (operands[0].type().id() == ID_pointer) !=
+      (operands[1].type().id() == ID_pointer))
+  {
+    // this has to be pointer plus/minus integer
+    const exprt &pointer_op =
+      operands[0].type().id() == ID_pointer ? operands[0] : operands[1];
+    const pointer_typet &pointer_type = to_pointer_type(pointer_op.type());
+    const typet &object_type = pointer_type.base_type();
+
+    const exprt &offset_op =
+      operands[0].type().id() == ID_pointer ? operands[1] : operands[0];
+    if(
+      offset_op.type().id() != ID_unsignedbv &&
+      offset_op.type().id() != ID_signedbv)
+    {
+      return SUB::convert_rest(expr);
+    }
+    exprt offset_bytes = offset_op;
+    literalt offset_overflow = const_literal(false);
+
+    // Arithmetic over void* is a gcc extension.
+    // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+    if(object_type.id() != ID_empty)
+    {
+      auto object_size_opt = size_of_expr(object_type, ns);
+      CHECK_RETURN(object_size_opt.has_value());
+
+      offset_bytes = mult_exprt{
+        offset_op,
+        typecast_exprt::conditional_cast(*object_size_opt, offset_op.type())};
+
+      // multiplying the offset by the object size may result in arithmetic
+      // overflow
+      mult_overflow_exprt of{
+        to_mult_expr(offset_bytes).op0(), to_mult_expr(offset_bytes).op1()};
+      offset_overflow = convert(of);
+    }
+
+    const std::size_t full_width = pointer_type.get_width();
+
+    bv_utilst::representationt rep = offset_bytes.type().id() == ID_signedbv
+                                       ? bv_utilst::representationt::SIGNED
+                                       : bv_utilst::representationt::UNSIGNED;
+    bvt offset_bv = convert_bv(offset_bytes);
+    CHECK_RETURN(!offset_bv.empty());
+    offset_bv = bv_utils.extension(offset_bv, full_width, rep);
+    if(expr.id() == ID_overflow_minus)
+      offset_bv = bv_utils.negate(offset_bv);
+
+    bvt pointer_offset_bv = bv_utils.sign_extension(
+      offset_literals(convert_bv(pointer_op), pointer_type), full_width);
+
+    // add and determine (signed) overflow of this addition
+    bvt offset_sum = bv_utils.add(pointer_offset_bv, offset_bv);
+    literalt addition_overflow = prop.land(
+      prop.lequal(
+        bv_utils.sign_bit(pointer_offset_bv), bv_utils.sign_bit(offset_bv)),
+      prop.lxor(
+        bv_utils.sign_bit(offset_sum), bv_utils.sign_bit(pointer_offset_bv)));
+
+    // there is an overflow iff any of [offset width - 1 .. full_width - 1] bits
+    // are non-zero or there was an overflow in the addition or the earlier
+    // multiplication
+    const std::size_t offset_bits = get_offset_width(pointer_type);
+    CHECK_RETURN(offset_bits > 0);
+    offset_sum.erase(offset_sum.begin(), offset_sum.begin() + offset_bits - 1);
+    offset_sum.push_back(addition_overflow);
+    offset_sum.push_back(offset_overflow);
+    return prop.lor(offset_sum);
   }
 
   return SUB::convert_rest(expr);
