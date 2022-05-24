@@ -3,7 +3,7 @@ example.c
 --cover location
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.2\] file example.c line 13 function main block 2 \(lines example.c:main:10,13,14\): SATISFIED$
+^\[main.coverage.2\] file example.c line 10 function main block 2 \(lines example.c:main:10,13,14\): SATISFIED$
 --
 ^warning: ignoring
 --
