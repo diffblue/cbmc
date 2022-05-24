@@ -882,10 +882,11 @@ void string_instrumentationt::invalidate_buffer(
   check->complete_goto(exit);
 
   const plus_exprt b_plus_i(bufp, cntr_sym.symbol_expr());
-  const dereference_exprt deref(b_plus_i, buf_type.subtype());
+  const dereference_exprt deref(
+    b_plus_i, to_type_with_subtype(buf_type).subtype());
 
   const side_effect_expr_nondett nondet(
-    buf_type.subtype(), target->source_location());
+    to_type_with_subtype(buf_type).subtype(), target->source_location());
 
   invalidate->code_nonconst() = code_assignt(deref, nondet);
 }

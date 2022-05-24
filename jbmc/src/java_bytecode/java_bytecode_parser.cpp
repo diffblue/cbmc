@@ -600,7 +600,7 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
       get_class_refs_rec(c.type());
   }
   else if(src.id()==ID_pointer)
-    get_class_refs_rec(src.subtype());
+    get_class_refs_rec(to_pointer_type(src).base_type());
 }
 
 /// For each of the given annotations, get a reference to its class and

@@ -174,7 +174,7 @@ void ci_lazy_methods_neededt::gather_field_types(
         gather_field_types(field.type(), ns);
       else if(field.type().id() == ID_pointer)
       {
-        if(field.type().subtype().id() == ID_struct_tag)
+        if(to_pointer_type(field.type()).base_type().id() == ID_struct_tag)
         {
           add_all_needed_classes(to_pointer_type(field.type()));
         }
@@ -186,7 +186,7 @@ void ci_lazy_methods_neededt::gather_field_types(
           // We should therefore only be skipping pointers such as the uint16t*
           // in our internal String representation.
           INVARIANT(
-            field.type().subtype().id() != ID_struct,
+            to_pointer_type(field.type()).base_type().id() != ID_struct,
             "struct types should be referred to by symbol at this stage");
         }
       }

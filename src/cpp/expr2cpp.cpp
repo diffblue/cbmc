@@ -258,7 +258,9 @@ std::string expr2cppt::convert_rec(
     dest += "> " + convert(to_template_type(src).subtype());
     return dest;
   }
-  else if(src.id()==ID_pointer && src.subtype().id()==ID_nullptr)
+  else if(
+    src.id() == ID_pointer &&
+    to_pointer_type(src).base_type().id() == ID_nullptr)
   {
     return "std::nullptr_t";
   }
@@ -270,9 +272,11 @@ std::string expr2cppt::convert_rec(
 
     std::string dest="("+convert_rec(member, c_qualifierst(), "")+":: *)";
 
-    if(src.subtype().id()==ID_code)
+    const auto &base_type = to_pointer_type(src).base_type();
+
+    if(base_type.id() == ID_code)
     {
-      const code_typet &code_type = to_code_type(src.subtype());
+      const code_typet &code_type = to_code_type(base_type);
       const typet &return_type = code_type.return_type();
       dest=convert_rec(return_type, c_qualifierst(), "")+" "+dest;
 
@@ -292,7 +296,7 @@ std::string expr2cppt::convert_rec(
       dest+=d;
     }
     else
-      dest=convert_rec(src.subtype(), c_qualifierst(), "")+" "+dest+d;
+      dest = convert_rec(base_type, c_qualifierst(), "") + " " + dest + d;
 
     return dest;
   }
@@ -375,13 +379,13 @@ std::string expr2cppt::convert_cpp_new(const exprt &src)
       convert(static_cast<const exprt &>(src.find(ID_size)));
 
     dest+=' ';
-    dest+=convert(src.type().subtype());
+    dest += convert(to_pointer_type(src.type()).base_type());
     dest+='[';
     dest+=tmp_size;
     dest+=']';
   }
   else
-    dest="new "+convert(src.type().subtype());
+    dest = "new " + convert(to_pointer_type(src.type()).base_type());
 
   return dest;
 }

@@ -99,7 +99,8 @@ void java_simple_method_stubst::create_method_stub_at(
 
   namespacet ns(symbol_table);
 
-  const auto &expected_base = ns.follow(expected_type.subtype());
+  const auto &expected_base =
+    ns.follow(to_pointer_type(expected_type).base_type());
   if(expected_base.id() != ID_struct)
     return;
 

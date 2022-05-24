@@ -586,7 +586,8 @@ static symbol_exprt instantiate_new_object(
     "REF_NewInvokeSpecial lambda must refer to a constructor");
   const auto &created_type = method_type.parameters().at(0).type();
   irep_idt created_class =
-    to_struct_tag_type(created_type.subtype()).get_identifier();
+    to_struct_tag_type(to_reference_type(created_type).base_type())
+      .get_identifier();
 
   // Call static init if it exists:
   irep_idt static_init_name = clinit_wrapper_name(created_class);
@@ -612,10 +613,11 @@ static symbol_exprt instantiate_new_object(
 
 /// If \p maybe_boxed_type is a boxed primitive return its unboxing method;
 /// otherwise return empty.
-static optionalt<irep_idt> get_unboxing_method(const typet &maybe_boxed_type)
+static optionalt<irep_idt>
+get_unboxing_method(const pointer_typet &maybe_boxed_type)
 {
   const irep_idt &boxed_type_id =
-    to_struct_tag_type(maybe_boxed_type.subtype()).get_identifier();
+    to_struct_tag_type(maybe_boxed_type.base_type()).get_identifier();
   const java_boxed_type_infot *boxed_type_info =
     get_boxed_type_info_by_name(boxed_type_id);
   return boxed_type_info ? boxed_type_info->unboxing_function_name
@@ -633,7 +635,8 @@ exprt make_function_expr(
   if(!method_type.has_this())
     return function_symbol.symbol_expr();
   const irep_idt &declared_on_class_id =
-    to_struct_tag_type(method_type.get_this()->type().subtype())
+    to_struct_tag_type(
+      to_pointer_type(method_type.get_this()->type()).base_type())
       .get_identifier();
   const auto &this_symbol = symbol_table.lookup_ref(declared_on_class_id);
   if(to_java_class_type(this_symbol.type).get_final())
@@ -717,7 +720,8 @@ exprt box_or_unbox_type_if_necessary(
 
   const irep_idt transform_function_id =
     original_is_pointer
-      ? get_unboxing_method(original_type) // Use static type if known
+      ? get_unboxing_method(
+          to_pointer_type(original_type)) // Use static type if known
           .value_or(primitive_type_info->unboxing_function_name)
       : primitive_type_info->boxed_type_factory_method;
 
