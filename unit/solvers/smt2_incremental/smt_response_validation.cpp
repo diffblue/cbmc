@@ -117,20 +117,26 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
   }
   SECTION("Bit vector sorted values.")
   {
-    const response_or_errort<smt_responset> response_255 =
-      validate_smt_response(*smt2irep("((a #xff))").parsed_output);
-    CHECK(
-      *response_255.get_if_valid() ==
-      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
-        smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
-        smt_bit_vector_constant_termt{255, 8}}}});
-    const response_or_errort<smt_responset> response_42 =
-      validate_smt_response(*smt2irep("((a #b00101010))").parsed_output);
-    CHECK(
-      *response_42.get_if_valid() ==
-      smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
-        smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
-        smt_bit_vector_constant_termt{42, 8}}}});
+    SECTION("Hex value")
+    {
+      const response_or_errort<smt_responset> response_255 =
+        validate_smt_response(*smt2irep("((a #xff))").parsed_output);
+      CHECK(
+        *response_255.get_if_valid() ==
+        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+          smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
+          smt_bit_vector_constant_termt{255, 8}}}});
+    }
+    SECTION("Binary value")
+    {
+      const response_or_errort<smt_responset> response_42 =
+        validate_smt_response(*smt2irep("((a #b00101010))").parsed_output);
+      CHECK(
+        *response_42.get_if_valid() ==
+        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+          smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
+          smt_bit_vector_constant_termt{42, 8}}}});
+    }
   }
   SECTION("Multiple valuation pairs.")
   {
