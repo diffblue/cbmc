@@ -88,7 +88,7 @@ goto_programt::targett remove_java_newt::lower_java_new(
   PRECONDITION(rhs.operands().empty());
   PRECONDITION(rhs.type().id() == ID_pointer);
   source_locationt location = rhs.source_location();
-  typet object_type = rhs.type().subtype();
+  typet object_type = to_pointer_type(rhs.type()).base_type();
 
   // build size expression
   const auto object_size = size_of_expr(object_type, ns);
@@ -141,7 +141,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   PRECONDITION(rhs.type().id() == ID_pointer);
 
   source_locationt location = rhs.source_location();
-  struct_tag_typet object_type = to_struct_tag_type(rhs.type().subtype());
+  struct_tag_typet object_type =
+    to_struct_tag_type(to_pointer_type(rhs.type()).base_type());
   PRECONDITION(ns.follow(object_type).id() == ID_struct);
 
   // build size expression
@@ -201,7 +202,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
       goto_programt::make_assignment(code_assignt(
         object_array_element_type,
         constant_exprt(
-          to_struct_tag_type(underlying_type_and_dimension.first.subtype())
+          to_struct_tag_type(
+            to_pointer_type(underlying_type_and_dimension.first).base_type())
             .get_identifier(),
           string_typet()),
         location)));
@@ -307,8 +309,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     sub_java_new.operands().erase(sub_java_new.operands().begin());
 
     // we already know that rhs has pointer type
-    typet sub_type =
-      static_cast<const typet &>(rhs.type().subtype().find(ID_element_type));
+    typet sub_type = static_cast<const typet &>(
+      to_pointer_type(rhs.type()).base_type().find(ID_element_type));
     CHECK_RETURN(sub_type.id() == ID_pointer);
     sub_java_new.type() = sub_type;
 

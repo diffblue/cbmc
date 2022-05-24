@@ -70,7 +70,7 @@ abstract_object_pointert value_set_pointer_abstract_objectt::read_dereference(
   if(is_top() || is_bottom())
   {
     return env.abstract_object_factory(
-      type().subtype(), ns, is_top(), !is_top());
+      to_pointer_type(type()).base_type(), ns, is_top(), !is_top());
   }
 
   abstract_object_sett results;

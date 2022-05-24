@@ -394,7 +394,8 @@ abstract_object_pointert full_array_abstract_objectt::get_top_entry(
   const abstract_environmentt &env,
   const namespacet &ns) const
 {
-  return env.abstract_object_factory(type().subtype(), ns, true, false);
+  return env.abstract_object_factory(
+    to_type_with_subtype(type()).subtype(), ns, true, false);
 }
 
 abstract_object_pointert full_array_abstract_objectt::write_location_context(

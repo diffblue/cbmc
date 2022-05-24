@@ -595,7 +595,12 @@ void value_sett::get_value_set_rec(
       // integer-to-pointer
 
       if(op.is_zero())
-        insert(dest, exprt(ID_null_object, expr_type.subtype()), mp_integer{0});
+      {
+        insert(
+          dest,
+          exprt(ID_null_object, to_type_with_subtype(expr_type).subtype()),
+          mp_integer{0});
+      }
       else
       {
         // see if we have something for the integer
@@ -674,11 +679,12 @@ void value_sett::get_value_set_rec(
 
       if(ptr_operand.has_value() && i.has_value())
       {
-        typet pointer_sub_type = ptr_operand->type().subtype();
-        if(pointer_sub_type.id()==ID_empty)
-          pointer_sub_type=char_type();
+        typet pointer_base_type =
+          to_pointer_type(ptr_operand->type()).base_type();
+        if(pointer_base_type.id() == ID_empty)
+          pointer_base_type = char_type();
 
-        auto size = pointer_offset_size(pointer_sub_type, ns);
+        auto size = pointer_offset_size(pointer_base_type, ns);
 
         if(!size.has_value() || (*size) == 0)
         {
