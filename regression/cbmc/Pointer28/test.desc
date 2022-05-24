@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --little-endian
+--pointer-check --little-endian --mmio-regions 4:4,8:8
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

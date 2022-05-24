@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string_utils.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
@@ -43,6 +44,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <optional>
+
+#include "literals/convert_integer_literal.h"
 
 class goto_check_ct
 {
@@ -76,6 +79,8 @@ public:
     error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
+
+    parse_mmio_regions(_options.get_option("mmio-regions"));
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -83,13 +88,6 @@ public:
   void goto_check(
     const irep_idt &function_identifier,
     goto_functiont &goto_function);
-
-  /// Fill the list of allocations \ref allocationst with <address, size> for
-  ///   every allocation instruction. Also check that each allocation is
-  ///   well-formed.
-  /// \param goto_functions: goto functions from which the allocations are to be
-  ///   collected
-  void collect_allocations(const goto_functionst &goto_functions);
 
 protected:
   const namespacet &ns;
@@ -327,6 +325,8 @@ protected:
   /// \returns a pair (name, status) if the match succeeds
   /// and the name is known, nothing otherwise.
   named_check_statust match_named_check(const irep_idt &named_check) const;
+
+  void parse_mmio_regions(const std::string &regions);
 };
 
 /// Allows to:
@@ -420,35 +420,19 @@ static exprt implication(exprt lhs, exprt rhs)
   }
 }
 
-void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
+void goto_check_ct::parse_mmio_regions(const std::string &regions)
 {
-  for(const auto &gf_entry : goto_functions.function_map)
+  for(const std::string &range : split_string(regions, ',', true, true))
   {
-    for(const auto &instruction : gf_entry.second.body.instructions)
-    {
-      if(!instruction.is_function_call())
-        continue;
+    const auto sep = range.find(':');
+    if(sep == std::string::npos || sep + 1 == range.size())
+      continue;
 
-      const auto &function = instruction.call_function();
-      if(
-        function.id() != ID_symbol ||
-        to_symbol_expr(function).get_identifier() != CPROVER_PREFIX
-          "allocated_memory")
-        continue;
+    const std::string start = range.substr(0, sep);
+    const std::string size = range.substr(sep + 1);
 
-      const code_function_callt::argumentst &args =
-        instruction.call_arguments();
-      if(
-        args.size() != 2 || args[0].type().id() != ID_unsignedbv ||
-        args[1].type().id() != ID_unsignedbv)
-        throw "expected two unsigned arguments to " CPROVER_PREFIX
-              "allocated_memory";
-
-      DATA_INVARIANT(
-        args[0].type() == args[1].type(),
-        "arguments of allocated_memory must have same type");
-      allocations.push_back({args[0], args[1]});
-    }
+    allocations.push_back(
+      {convert_integer_literal(start), convert_integer_literal(size)});
   }
 }
 
@@ -2401,8 +2385,6 @@ void goto_check_c(
   message_handlert &message_handler)
 {
   goto_check_ct goto_check(ns, options, message_handler);
-
-  goto_check.collect_allocations(goto_functions);
 
   for(auto &gf_entry : goto_functions.function_map)
   {

@@ -1,7 +1,6 @@
 int main()
 {
   int *p = (int *)4;
-  __CPROVER_allocated_memory(4, sizeof(int));
   int i;
   int **q;
   char *pp;
@@ -21,7 +20,6 @@ int main()
     __CPROVER_assert(p == 0, "i==0 => p==NULL");
 
   q = (int **)8;
-  __CPROVER_allocated_memory(8, sizeof(int *));
   *q = &i;
   **q = 0x01020304;
   __CPROVER_assert(i == 0x01020304, "**q");
