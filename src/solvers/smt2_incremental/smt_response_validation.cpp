@@ -229,7 +229,7 @@ static optionalt<smt_termt> valid_smt_hex(const std::string &text)
   if(!std::regex_match(text, hex_format))
     return {};
   const std::string hex{text.begin() + 2, text.end()};
-  // SMT-LIB 2 allows hex characters to be upper of lower case, but they should
+  // SMT-LIB 2 allows hex characters to be upper or lower case, but they should
   // be upper case for mp_integer.
   const mp_integer value =
     string2integer(make_range(hex).map<std::function<int(int)>>(toupper), 16);
