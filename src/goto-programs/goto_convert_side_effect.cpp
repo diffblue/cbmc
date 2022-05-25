@@ -314,7 +314,14 @@ void goto_convertt::remove_post(
   if(result_is_used)
   {
     exprt tmp = op;
-    make_temp_symbol(tmp, "post", dest, mode);
+    std::string suffix = "post";
+    if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(tmp))
+    {
+      const irep_idt &base_name = ns.lookup(*sym_expr).base_name;
+      suffix += "_" + id2string(base_name);
+    }
+
+    make_temp_symbol(tmp, suffix, dest, mode);
     expr.swap(tmp);
   }
   else
