@@ -15,8 +15,9 @@
 /// `response_or_errort` in the case where the parse tree is of that type or
 /// an empty optional otherwise.
 
-#include <solvers/smt2_incremental/smt_response_validation.h>
+#include "smt_response_validation.h"
 
+#include <util/arith_tools.h>
 #include <util/mp_arith.h>
 #include <util/range.h>
 
@@ -190,15 +191,33 @@ static bool all_subs_are_pairs(const irept &parse_tree)
     [](const irept &sub) { return sub.get_sub().size() == 2; });
 }
 
-static response_or_errort<irep_idt>
-validate_smt_identifier(const irept &parse_tree)
+/// Checks for valid bit vector constants of the form `(_ bv(value) (width))`
+/// for example - `(_ bv4 64)`.
+static optionalt<smt_termt>
+valid_smt_indexed_bit_vector(const irept &parse_tree)
 {
-  if(!parse_tree.get_sub().empty() || parse_tree.id().empty())
-  {
-    return response_or_errort<irep_idt>(
-      "Expected identifier, found - \"" + print_parse_tree(parse_tree) + "\".");
-  }
-  return response_or_errort<irep_idt>(parse_tree.id());
+  if(parse_tree.get_sub().size() != 3)
+    return {};
+  if(parse_tree.get_sub().at(0).id() != "_")
+    return {};
+  const auto value_string = id2string(parse_tree.get_sub().at(1).id());
+  std::smatch match_results;
+  static const std::regex bv_value_regex{R"(^bv(\d+)$)", std::regex::optimize};
+  if(!std::regex_search(value_string, match_results, bv_value_regex))
+    return {};
+  INVARIANT(
+    match_results.size() == 2,
+    "Match results should include digits sub-expression if regex is matched.");
+  const std::string value_digits = match_results[1];
+  const auto value = string2integer(value_digits);
+  const auto bit_width_string = id2string(parse_tree.get_sub().at(2).id());
+  const auto bit_width =
+    numeric_cast_v<std::size_t>(string2integer(bit_width_string));
+  if(bit_width == 0)
+    return {};
+  if(value >= power(mp_integer{2}, bit_width))
+    return {};
+  return smt_bit_vector_constant_termt{value, bit_width};
 }
 
 static optionalt<smt_termt> valid_smt_bool(const irept &parse_tree)
@@ -229,7 +248,7 @@ static optionalt<smt_termt> valid_smt_hex(const std::string &text)
   if(!std::regex_match(text, hex_format))
     return {};
   const std::string hex{text.begin() + 2, text.end()};
-  // SMT-LIB 2 allows hex characters to be upper of lower case, but they should
+  // SMT-LIB 2 allows hex characters to be upper or lower case, but they should
   // be upper case for mp_integer.
   const mp_integer value =
     string2integer(make_range(hex).map<std::function<int(int)>>(toupper), 16);
@@ -240,6 +259,8 @@ static optionalt<smt_termt> valid_smt_hex(const std::string &text)
 static optionalt<smt_termt>
 valid_smt_bit_vector_constant(const irept &parse_tree)
 {
+  if(const auto indexed = valid_smt_indexed_bit_vector(parse_tree))
+    return *indexed;
   if(!parse_tree.get_sub().empty() || parse_tree.id().empty())
     return {};
   const auto value_string = id2string(parse_tree.id());
@@ -250,14 +271,34 @@ valid_smt_bit_vector_constant(const irept &parse_tree)
   return {};
 }
 
-static response_or_errort<smt_termt> validate_term(const irept &parse_tree)
+static optionalt<smt_termt> valid_term(const irept &parse_tree)
 {
   if(const auto smt_bool = valid_smt_bool(parse_tree))
-    return response_or_errort<smt_termt>{*smt_bool};
+    return {*smt_bool};
   if(const auto bit_vector_constant = valid_smt_bit_vector_constant(parse_tree))
-    return response_or_errort<smt_termt>{*bit_vector_constant};
+    return {*bit_vector_constant};
+  return {};
+}
+
+static response_or_errort<smt_termt> validate_term(const irept &parse_tree)
+{
+  if(const auto term = valid_term(parse_tree))
+    return response_or_errort<smt_termt>{*term};
   return response_or_errort<smt_termt>{"Unrecognised SMT term - \"" +
                                        print_parse_tree(parse_tree) + "\"."};
+}
+
+static response_or_errort<smt_termt>
+validate_smt_descriptor(const irept &parse_tree, const smt_sortt &sort)
+{
+  if(const auto term = valid_term(parse_tree))
+    return response_or_errort<smt_termt>{*term};
+  const auto id = parse_tree.id();
+  if(!id.empty())
+    return response_or_errort<smt_termt>{smt_identifier_termt{id, sort}};
+  return response_or_errort<smt_termt>{
+    "Expected descriptor SMT term, found - \"" + print_parse_tree(parse_tree) +
+    "\"."};
 }
 
 static response_or_errort<smt_get_value_responset::valuation_pairt>
@@ -266,8 +307,16 @@ validate_valuation_pair(const irept &pair_parse_tree)
   PRECONDITION(pair_parse_tree.get_sub().size() == 2);
   const auto &descriptor = pair_parse_tree.get_sub()[0];
   const auto &value = pair_parse_tree.get_sub()[1];
+  const response_or_errort<smt_termt> value_validation = validate_term(value);
+  if(const auto value_errors = value_validation.get_if_error())
+  {
+    return response_or_errort<smt_get_value_responset::valuation_pairt>{
+      *value_errors};
+  }
+  const smt_termt value_term = *value_validation.get_if_valid();
   return validation_propagating<smt_get_value_responset::valuation_pairt>(
-    validate_smt_identifier(descriptor), validate_term(value));
+    validate_smt_descriptor(descriptor, value_term.get_sort()),
+    validate_term(value));
 }
 
 /// \returns: A response or error in the case where the parse tree appears to be
