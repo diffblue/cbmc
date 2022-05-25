@@ -179,6 +179,23 @@ index 2dba10f..7d2e83a 100644
          if (verbose){
              fprintf(stderr, "\n        %s\n", description);
              fprintf(stderr, "\n");
+diff --git a/minisat/utils/Options.cc b/minisat/utils/Options.cc
+index 83c40e8..15bfca1 100644
+--- a/minisat/utils/Options.cc
++++ b/minisat/utils/Options.cc
+@@ -43,10 +43,12 @@ void Minisat::parseOptions(int& argc, char** argv, bool strict)
+             }
+
+             if (!parsed_ok)
++            {
+                 if (strict && match(argv[i], "-"))
+                     fprintf(stderr, "ERROR! Unknown flag \"%s\". Use '--%shelp' for help.\n", argv[i], Option::getHelpPrefixString()), exit(1);
+                 else
+                     argv[j++] = argv[i];
++            }
+         }
+     }
+
 diff --git a/minisat/utils/ParseUtils.h b/minisat/utils/ParseUtils.h
 index d307164..7b46f09 100644
 --- a/minisat/utils/ParseUtils.h
