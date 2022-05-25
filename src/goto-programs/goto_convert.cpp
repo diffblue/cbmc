@@ -637,12 +637,13 @@ void goto_convertt::convert_frontend_decl(
     // Decl must be visible before initializer.
     copy(tmp, DECL, dest);
 
+    auto initializer_location = initializer.find_source_location();
     clean_expr(initializer, dest, mode);
 
     if(initializer.is_not_nil())
     {
       code_assignt assign(code.op0(), initializer);
-      assign.add_source_location() = initializer.find_source_location();
+      assign.add_source_location() = initializer_location;
 
       convert_assign(assign, dest, mode);
     }
