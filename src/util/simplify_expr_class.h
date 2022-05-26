@@ -239,7 +239,7 @@ public:
 
   // main recursion
   NODISCARD resultt<> simplify_node(exprt);
-  bool simplify_node_preorder(exprt &expr);
+  NODISCARD resultt<> simplify_node_preorder(exprt);
   NODISCARD resultt<> simplify_rec(const exprt &);
 
   virtual bool simplify(exprt &expr);

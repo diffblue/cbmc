@@ -2295,20 +2295,27 @@ simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
     return false_exprt{};
 }
 
-bool simplify_exprt::simplify_node_preorder(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_node_preorder(exprt expr)
 {
-  bool result=true;
-
   // The ifs below could one day be replaced by a switch()
 
   if(expr.id()==ID_address_of)
   {
     // the argument of this expression needs special treatment
+    return unchanged(expr);
   }
   else if(expr.id()==ID_if)
-    result=simplify_if_preorder(to_if_expr(expr));
+  {
+    bool no_change = simplify_if_preorder(to_if_expr(expr));
+    if(no_change)
+      return unchanged(expr);
+    else
+      return expr;
+  }
   else
   {
+    bool has_changed = false;
+
     if(expr.has_operands())
     {
       Forall_operands(it, expr)
@@ -2317,13 +2324,18 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
         if(r_it.has_changed())
         {
           *it = r_it.expr;
-          result=false;
+          has_changed = true;
         }
       }
     }
+
+    if(has_changed)
+      return expr;
+    else
+      return unchanged(expr);
   }
 
-  return result;
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
@@ -2604,17 +2616,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
   }
   #endif
 
-  // We work on a copy to prevent unnecessary destruction of sharing.
-  exprt tmp=expr;
-  bool no_change = simplify_node_preorder(tmp);
+  bool no_change = true;
 
-  auto simplify_node_result = simplify_node(tmp);
+  auto preorder_result = simplify_node_preorder(expr);
+
+  if(preorder_result.has_changed())
+    no_change = false;
+
+  auto simplify_node_result = simplify_node(preorder_result.expr);
 
   if(simplify_node_result.has_changed())
-  {
     no_change = false;
-    tmp = simplify_node_result.expr;
-  }
+
+  exprt tmp = simplify_node_result.expr;
 
 #ifdef USE_LOCAL_REPLACE_MAP
   #if 1
