@@ -679,6 +679,24 @@ protected:
     const exprt::operandst &arguments,
     goto_programt &dest,
     const irep_idt &mode);
+  void do_whole_object(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode);
+  void do_object_upto(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode);
+  void do_object_from(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode);
 
   exprt get_array_argument(const exprt &src);
 };

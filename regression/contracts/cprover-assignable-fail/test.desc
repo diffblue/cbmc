@@ -1,0 +1,26 @@
+CORE
+main.c
+
+^\[my_write_set.assertion.\d+\] .* target null or writable: FAILURE$
+^\[my_write_set.pointer_arithmetic.\d+\] .* pointer arithmetic: pointer NULL in \(char \*\)\(void \*\)arr - POINTER_OFFSET\(\(void \*\)arr\): FAILURE$
+^\[my_write_set.pointer_arithmetic.\d+\] .* pointer arithmetic: pointer invalid in \(char \*\)\(void \*\)arr - POINTER_OFFSET\(\(void \*\)arr\): FAILURE$
+^\[my_write_set.pointer_arithmetic.\d+\] .* pointer arithmetic: deallocated dynamic object in \(char \*\)\(void \*\)arr - POINTER_OFFSET\(\(void \*\)arr\): FAILURE$
+^\[my_write_set.pointer_arithmetic.\d+\] .* pointer arithmetic: dead object in \(char \*\)\(void \*\)arr - POINTER_OFFSET\(\(void \*\)arr\): FAILURE$
+^\[my_write_set.pointer_arithmetic.\d+\] .* pointer arithmetic: pointer outside object bounds in \(char \*\)\(void \*\)arr - POINTER_OFFSET\(\(void \*\)arr\): SUCCESS$
+^\[my_write_set.pointer_arithmetic.\d+\] .* pointer arithmetic: invalid integer address in \(char \*\)\(void \*\)arr - POINTER_OFFSET\(\(void \*\)arr\): SUCCESS$
+^\[my_write_set.overflow.\d+\] .* arithmetic overflow on unsigned - in OBJECT_SIZE\(\(void \*\)arr\) - POINTER_OFFSET\(\(void \*\)arr\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+CALL __CPROVER_whole_object
+CALL __CPROVER_object_upto
+CALL __CPROVER_object_from
+CALL __CPROVER_typed_target
+--
+This test checks that:
+- the built-in functions used to specify assignable memory locations are
+  supported;
+- that GOTO conversion rewrites calls to __CPROVER_assignable(...) calls;
+- checks for invalid pointers and of overflows in the computations of
+  interval bounds are in place.

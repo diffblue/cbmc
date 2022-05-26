@@ -909,7 +909,11 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
   typecheck_expr(target);
 
   // fatal errors
-  if(target.type().id() == ID_empty)
+  bool is_empty_type = target.type().id() == ID_empty;
+  bool is_assignable_typedef =
+    target.type().get(ID_C_typedef) == CPROVER_PREFIX "assignable_t";
+  // only allow void type if it is the typedef CPROVER_PREFIX "assignable_t"
+  if(target.type().id() == ID_empty && !is_assignable_typedef)
   {
     error().source_location = target.source_location();
     error() << "void-typed expressions not allowed as assigns clause targets"
@@ -950,37 +954,33 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
     if(can_cast_expr<symbol_exprt>(funcall.function()))
     {
       const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
-      if(
-        ident == CPROVER_PREFIX "object_from" || ident == CPROVER_PREFIX
-                                                   "object_slice")
-      {
-        for(const auto &argument : funcall.arguments())
-          throw_on_side_effects(argument);
-      }
-      else
+      if(!(is_empty_type && is_assignable_typedef))
       {
         error().source_location = target.source_location();
-        error() << "function calls in assigns clause targets must be "
-                   "to " CPROVER_PREFIX "object_from, " CPROVER_PREFIX
-                   "object_slice"
+        error() << "expecting " CPROVER_PREFIX
+                   "assignable_t return type for function " +
+                     id2string(ident) + " called in assigns clause"
                 << eom;
         throw 0;
       }
+      for(const auto &argument : funcall.arguments())
+        throw_on_side_effects(argument);
     }
     else
     {
       error().source_location = target.source_location();
-      error() << "function pointer calls not allowed in assigns targets" << eom;
+      error() << "function pointer calls not allowed in assigns clauses" << eom;
       throw 0;
     }
   }
   else
   {
     error().source_location = target.source_location();
-    error() << "assigns clause target must be an lvalue or a " CPROVER_PREFIX
-               "POINTER_OBJECT, " CPROVER_PREFIX "object_from, " CPROVER_PREFIX
-               "object_slice expression"
-            << eom;
+    error()
+      << "assigns clause target must be an lvalue or a call to " CPROVER_PREFIX
+         "POINTER_OBJECT or to a function returning " CPROVER_PREFIX
+         "assignable_t"
+      << eom;
     throw 0;
   }
 }

@@ -124,6 +124,11 @@ __CPROVER_bool __CPROVER_overflow_unary_minus();
 __CPROVER_bool __CPROVER_enum_is_in_range();
 
 // contracts
-__CPROVER_size_t __CPROVER_object_from(void *); 
-__CPROVER_size_t __CPROVER_object_slice(void *, __CPROVER_size_t);
+__CPROVER_assignable_t __CPROVER_assignable(
+  void *ptr,
+  __CPROVER_size_t size,
+  __CPROVER_bool is_pointer_to_pointer);
+__CPROVER_assignable_t __CPROVER_whole_object(void *ptr);
+__CPROVER_assignable_t __CPROVER_object_from(void *ptr);
+__CPROVER_assignable_t __CPROVER_object_upto(void *ptr, __CPROVER_size_t size);
 // clang-format on

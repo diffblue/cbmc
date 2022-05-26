@@ -721,6 +721,101 @@ void goto_convertt::do_havoc_slice(
   dest.add(goto_programt::make_other(array_replace, source_location));
 }
 
+void goto_convertt::do_whole_object(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  // We enable overflow checks on pointer and size computation
+  auto source_location = function.find_source_location();
+  source_location.add_pragma("enable:pointer-check");
+  source_location.add_pragma("enable:pointer-overflow-check");
+  source_location.add_pragma("enable:signed-overflow-check");
+  source_location.add_pragma("enable:unsigned-overflow-check");
+  const auto &arg0 = arguments[0];
+
+  // Rewrite to a call to CPROVER_PREFIX "assignable"
+  exprt::operandst new_arguments;
+  // pointer
+  new_arguments.emplace_back(typecast_exprt::conditional_cast(
+    minus_exprt{
+      typecast_exprt::conditional_cast(arg0, pointer_type(char_type())),
+      pointer_offset_exprt{arg0, size_type()}},
+    pointer_type(empty_typet())));
+  // size
+  new_arguments.emplace_back(object_size_exprt{arg0, size_type()});
+  // is_pointer
+  new_arguments.emplace_back(false_exprt());
+
+  const auto &fun =
+    symbol_table.lookup_ref(CPROVER_PREFIX "assignable").symbol_expr();
+  code_function_callt function_call(std::move(fun), std::move(new_arguments));
+
+  dest.add(goto_programt::make_function_call(function_call, source_location));
+}
+
+void goto_convertt::do_object_from(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  // We enable overflow checks on pointer and size computation
+  auto source_location = function.find_source_location();
+  source_location.add_pragma("enable:pointer-check");
+  source_location.add_pragma("enable:pointer-overflow-check");
+  source_location.add_pragma("enable:signed-overflow-check");
+  source_location.add_pragma("enable:unsigned-overflow-check");
+  const auto &arg0 = arguments[0];
+
+  // Rewrite to a call to CPROVER_PREFIX "assignable"
+  exprt::operandst new_arguments;
+  // ptr
+  new_arguments.emplace_back(arg0);
+  // size
+  new_arguments.emplace_back(minus_exprt{
+    object_size_exprt{arg0, size_type()},
+    pointer_offset_exprt{arg0, size_type()}});
+  // is_pointer
+  new_arguments.emplace_back(false_exprt());
+
+  const auto &fun =
+    symbol_table.lookup_ref(CPROVER_PREFIX "assignable").symbol_expr();
+  code_function_callt function_call(std::move(fun), std::move(new_arguments));
+
+  dest.add(goto_programt::make_function_call(function_call, source_location));
+}
+
+void goto_convertt::do_object_upto(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  // We enable overflow checks on pointer and size computation
+  auto source_location = function.find_source_location();
+  const auto &arg0 = arguments[0];
+  const auto &arg1 = arguments[1];
+
+  // Rewrite to a call to CPROVER_PREFIX "assignable"
+  exprt::operandst new_arguments;
+  // pointer
+  new_arguments.emplace_back(arg0);
+  // size
+  new_arguments.emplace_back(arg1);
+  // is_pointer
+  new_arguments.emplace_back(false_exprt());
+  const auto &fun =
+    symbol_table.lookup_ref(CPROVER_PREFIX "assignable").symbol_expr();
+  code_function_callt function_call(std::move(fun), std::move(new_arguments));
+
+  dest.add(goto_programt::make_function_call(function_call, source_location));
+}
+
 /// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
@@ -767,7 +862,19 @@ void goto_convertt::do_function_call_symbol(
     return;
   }
 
-  if(identifier == CPROVER_PREFIX "havoc_slice")
+  if(identifier == CPROVER_PREFIX "object_from")
+  {
+    do_object_from(lhs, function, arguments, dest, mode);
+  }
+  else if(identifier == CPROVER_PREFIX "object_upto")
+  {
+    do_object_upto(lhs, function, arguments, dest, mode);
+  }
+  else if(identifier == CPROVER_PREFIX "whole_object")
+  {
+    do_whole_object(lhs, function, arguments, dest, mode);
+  }
+  else if(identifier == CPROVER_PREFIX "havoc_slice")
   {
     do_havoc_slice(lhs, function, arguments, dest, mode);
   }

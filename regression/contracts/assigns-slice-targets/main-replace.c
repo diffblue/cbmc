@@ -7,11 +7,14 @@ struct st
   int c;
 };
 
-void foo(struct st *s)
+void foo(struct st *s, struct st *ss)
   // clang-format off
   __CPROVER_requires(__CPROVER_is_fresh(s, sizeof(*s)))
-  __CPROVER_assigns(__CPROVER_object_slice(s->arr1, 5))
-  __CPROVER_assigns(__CPROVER_object_from(s->arr2 + 5))
+  __CPROVER_assigns(
+    __CPROVER_object_upto(s->arr1, 5);
+    __CPROVER_object_from(s->arr2 + 5);
+    __CPROVER_whole_object(ss);
+  )
 // clang-format on
 {
   s->arr1[0] = 0;
@@ -54,7 +57,32 @@ int main()
   s.arr2[9] = 0;
   s.c = 0;
 
-  foo(&s);
+  struct st ss;
+  ss.a = 0;
+  ss.arr1[0] = 0;
+  ss.arr1[1] = 0;
+  ss.arr1[2] = 0;
+  ss.arr1[3] = 0;
+  ss.arr1[4] = 0;
+  ss.arr1[5] = 0;
+  ss.arr1[6] = 0;
+  ss.arr1[7] = 0;
+  ss.arr1[8] = 0;
+  ss.arr1[9] = 0;
+
+  ss.arr2[0] = 0;
+  ss.arr2[1] = 0;
+  ss.arr2[2] = 0;
+  ss.arr2[3] = 0;
+  ss.arr2[4] = 0;
+  ss.arr2[5] = 0;
+  ss.arr2[6] = 0;
+  ss.arr2[7] = 0;
+  ss.arr2[8] = 0;
+  ss.arr2[9] = 0;
+  ss.c = 0;
+
+  foo(&s, &ss);
 
   // PASS
   assert(s.a == 0);
@@ -92,5 +120,31 @@ int main()
 
   // PASS
   assert(s.c == 0);
+
+  // FAIL
+  assert(ss.a == 0);
+  assert(ss.arr1[0] == 0);
+  assert(ss.arr1[1] == 0);
+  assert(ss.arr1[2] == 0);
+  assert(ss.arr1[3] == 0);
+  assert(ss.arr1[4] == 0);
+  assert(ss.arr1[5] == 0);
+  assert(ss.arr1[6] == 0);
+  assert(ss.arr1[7] == 0);
+  assert(ss.arr1[8] == 0);
+  assert(ss.arr1[9] == 0);
+  assert(ss.b == 0);
+  assert(ss.arr2[0] == 0);
+  assert(ss.arr2[1] == 0);
+  assert(ss.arr2[2] == 0);
+  assert(ss.arr2[3] == 0);
+  assert(ss.arr2[4] == 0);
+  assert(ss.arr2[5] == 0);
+  assert(ss.arr2[6] == 0);
+  assert(ss.arr2[7] == 0);
+  assert(ss.arr2[8] == 0);
+  assert(ss.arr2[9] == 0);
+  assert(ss.c == 0);
+
   return 0;
 }
