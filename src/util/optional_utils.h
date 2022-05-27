@@ -22,7 +22,7 @@ auto optional_lookup(const map_like_collectiont &map, const keyt &key)
   {
     return it->second;
   }
-  return nullopt;
+  return {};
 }
 
 #endif // CPROVER_UTIL_OPTIONAL_UTILS_H

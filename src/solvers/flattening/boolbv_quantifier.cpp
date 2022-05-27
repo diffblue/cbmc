@@ -193,13 +193,13 @@ static optionalt<exprt> eager_quantifier_instantiation(
     get_quantifier_var_max(var_expr, where_simplified);
 
   if(!min_i.has_value() || !max_i.has_value())
-    return nullopt;
+    return {};
 
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
   if(lb > ub)
-    return nullopt;
+    return {};
 
   auto expr_simplified =
     quantifier_exprt(expr.id(), expr.variables(), where_simplified);

@@ -61,7 +61,7 @@ public:
 
   virtual const bvt &convert_bv( // check cache
     const exprt &expr,
-    const optionalt<std::size_t> expected_width = nullopt);
+    const optionalt<std::size_t> expected_width = {});
 
   virtual bvt convert_bitvector(const exprt &expr); // no cache
 

@@ -22,8 +22,8 @@ TEST_CASE(
   "optionally converting invalid string to integer should return nullopt",
   "[core][util][string2int]")
 {
-  REQUIRE(string2optional_int("thirteen") == nullopt);
-  REQUIRE(string2optional_int("c0fefe") == nullopt);
+  REQUIRE(!string2optional_int("thirteen").has_value());
+  REQUIRE(!string2optional_int("c0fefe").has_value());
 }
 
 TEST_CASE(
@@ -31,8 +31,8 @@ TEST_CASE(
   "[core][util][string2int]")
 {
   REQUIRE(
-    string2optional_int("0xfffffffffffffffffffffffffffffffffffffffffff", 16) ==
-    nullopt);
+    !string2optional_int("0xfffffffffffffffffffffffffffffffffffffffffff", 16)
+       .has_value());
 }
 
 TEST_CASE(
@@ -47,18 +47,18 @@ TEST_CASE(
   "optionally converting invalid string to unsigned should return nullopt",
   "[core][util][string2int]")
 {
-  REQUIRE(string2optional_unsigned("thirteen") == nullopt);
-  REQUIRE(string2optional_unsigned("c0fefe") == nullopt);
+  REQUIRE(!string2optional_unsigned("thirteen").has_value());
+  REQUIRE(!string2optional_unsigned("c0fefe").has_value());
 }
 
 TEST_CASE(
   "optionally converting string out of range to unsigned should return nullopt",
   "[core][util][string2int]")
 {
-  REQUIRE(
-    string2optional_unsigned(
-      "0xfffffffffffffffffffffffffffffffffffffffffff", 16) == nullopt);
-  REQUIRE(string2optional_unsigned("-5") == nullopt);
+  REQUIRE(!string2optional_unsigned(
+             "0xfffffffffffffffffffffffffffffffffffffffffff", 16)
+             .has_value());
+  REQUIRE(!string2optional_unsigned("-5").has_value());
 }
 
 TEST_CASE(
@@ -73,8 +73,8 @@ TEST_CASE(
   "optionally converting invalid string to size_t should return nullopt",
   "[core][util][string2int]")
 {
-  REQUIRE(string2optional_size_t("thirteen") == nullopt);
-  REQUIRE(string2optional_size_t("c0fefe") == nullopt);
+  REQUIRE(!string2optional_size_t("thirteen").has_value());
+  REQUIRE(!string2optional_size_t("c0fefe").has_value());
 }
 
 TEST_CASE(
@@ -82,7 +82,7 @@ TEST_CASE(
   "[core][util][string2int]")
 {
   REQUIRE(
-    string2optional_size_t(
-      "0xfffffffffffffffffffffffffffffffffffffffffff", 16) == nullopt);
-  REQUIRE(string2optional_size_t("-5") == nullopt);
+    !string2optional_size_t("0xfffffffffffffffffffffffffffffffffffffffffff", 16)
+       .has_value());
+  REQUIRE(!string2optional_size_t("-5").has_value());
 }

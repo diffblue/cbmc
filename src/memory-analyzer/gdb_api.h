@@ -80,7 +80,7 @@ public:
       const std::string &address = "",
       const std::string &pointee = "",
       const std::string &character = "",
-      const optionalt<std::string> &string = nullopt,
+      const optionalt<std::string> &string = {},
       const bool valid = false)
       : address(address),
         pointee(pointee),

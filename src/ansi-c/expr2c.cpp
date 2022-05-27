@@ -4025,7 +4025,7 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
 
   const auto function_entry = function_names.find(src.id());
   if(function_entry == function_names.end())
-    return nullopt;
+    return {};
 
   return convert_function(src, function_entry->second);
 }

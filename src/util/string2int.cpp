@@ -16,14 +16,14 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 unsigned safe_string2unsigned(const std::string &str, int base)
 {
   auto converted = string2optional<unsigned>(str, base);
-  CHECK_RETURN(converted != nullopt);
+  CHECK_RETURN(converted.has_value());
   return *converted;
 }
 
 std::size_t safe_string2size_t(const std::string &str, int base)
 {
   auto converted = string2optional<std::size_t>(str, base);
-  CHECK_RETURN(converted != nullopt);
+  CHECK_RETURN(converted.has_value());
   return *converted;
 }
 
