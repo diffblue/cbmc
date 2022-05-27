@@ -126,7 +126,9 @@ std::string expr2javat::convert_struct(
 
   for(const auto &c : components)
   {
-    if(c.type().id() != ID_code)
+    DATA_INVARIANT(
+      c.type().id() != ID_code, "struct member must not be of code type");
+
     {
       std::string tmp=convert(*o_it);
       std::string sep;
