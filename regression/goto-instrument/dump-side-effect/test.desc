@@ -1,0 +1,12 @@
+CORE
+main.c
+--dump-c
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test must verify successfully also for the output generated using dump-c,
+which previously would fail to compile for it included a type cast on a
+left-hand side.
