@@ -1571,7 +1571,7 @@ void goto_check_ct::bounds_check_index(
               effective_offset, p_offset.type())};
         }
 
-        exprt zero = from_integer(0, ode.offset().type());
+        exprt zero = from_integer(0, effective_offset.type());
 
         // the final offset must not be negative
         binary_relation_exprt inequality(

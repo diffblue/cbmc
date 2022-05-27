@@ -1672,10 +1672,12 @@ static exprt lower_byte_update_array_vector_unbounded(
 
   // The size of a partial update at the end of the updated range, may be zero.
   mod_exprt tail_size{
-    minus_exprt{
-      typecast_exprt::conditional_cast(
-        non_const_update_bound, initial_bytes.type()),
-      initial_bytes},
+    typecast_exprt::conditional_cast(
+      minus_exprt{
+        typecast_exprt::conditional_cast(
+          non_const_update_bound, initial_bytes.type()),
+        initial_bytes},
+      subtype_size.type()),
     subtype_size};
 
   // The bound where updates end, which is conditional on the partial update

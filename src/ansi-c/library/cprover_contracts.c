@@ -786,7 +786,7 @@ __CPROVER_HIDE:;
     size < __CPROVER_max_malloc_size,
     "CAR size is less than __CPROVER_max_malloc_size");
 
-  __CPROVER_ssize_t offset = __CPROVER_POINTER_OFFSET(ptr);
+  __CPROVER_size_t offset = __CPROVER_POINTER_OFFSET(ptr);
 
   __CPROVER_assert(
     !(offset > 0) |

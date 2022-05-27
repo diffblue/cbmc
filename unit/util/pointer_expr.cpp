@@ -10,14 +10,14 @@
 TEST_CASE("pointer_offset_exprt", "[core][util]")
 {
   const exprt pointer = symbol_exprt{"foo", pointer_type(void_type())};
-  const pointer_offset_exprt pointer_offset{pointer, signed_size_type()};
+  const pointer_offset_exprt pointer_offset{pointer, size_type()};
   SECTION("Is equivalent to free function.")
   {
     CHECK(::pointer_offset(pointer) == pointer_offset);
   }
   SECTION("Result type")
   {
-    CHECK(pointer_offset.type() == signed_size_type());
+    CHECK(pointer_offset.type() == size_type());
   }
   SECTION("Pointer operand accessor")
   {

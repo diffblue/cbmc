@@ -194,13 +194,14 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       if(same_object_lit.is_false())
         return same_object_lit;
 
+      // The comparison is UNSIGNED, to match the type of pointer_offsett
       return prop.land(
         same_object_lit,
         bv_utils.rel(
           offset_bv0,
           expr.id(),
           offset_bv1,
-          bv_utilst::representationt::SIGNED));
+          bv_utilst::representationt::UNSIGNED));
     }
   }
 
@@ -615,12 +616,12 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
       const bvt &lhs = convert_bv(minus_expr.lhs());
       const bvt lhs_offset =
-        bv_utils.sign_extension(offset_literals(lhs, lhs_pt), width);
+        bv_utils.zero_extension(offset_literals(lhs, lhs_pt), width);
 
       const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
       const bvt &rhs = convert_bv(minus_expr.rhs());
       const bvt rhs_offset =
-        bv_utils.sign_extension(offset_literals(rhs, rhs_pt), width);
+        bv_utils.zero_extension(offset_literals(rhs, rhs_pt), width);
 
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
 
@@ -686,8 +687,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     bvt offset_bv =
       offset_literals(pointer_bv, to_pointer_type(pointer.type()));
 
-    // we do a sign extension to permit negative offsets
-    return bv_utils.sign_extension(offset_bv, width);
+    return bv_utils.zero_extension(offset_bv, width);
   }
   else if(
     const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
@@ -785,7 +785,7 @@ exprt bv_pointerst::bv_get_rec(
 
   pointer_logict::pointert pointer{
     numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
-    binary2integer(value_offset, true)};
+    binary2integer(value_offset, false)};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};
@@ -871,7 +871,7 @@ bvt bv_pointerst::offset_arithmetic(
   }
 
   const std::size_t offset_bits = get_offset_width(type);
-  bv_index = bv_utils.sign_extension(bv_index, offset_bits);
+  bv_index = bv_utils.zero_extension(bv_index, offset_bits);
 
   bvt offset_bv = offset_literals(bv, type);
 

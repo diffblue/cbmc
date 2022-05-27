@@ -517,7 +517,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
       const index_exprt index_expr(
         symbol_expr,
-        pointer_offset(pointer_expr),
+        typecast_exprt::conditional_cast(
+          pointer_offset(pointer_expr),
+          to_array_type(memory_symbol.type).index_type()),
         to_array_type(memory_symbol.type).element_type());
 
       valuet result;
@@ -532,7 +534,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     {
       const index_exprt index_expr(
         symbol_expr,
-        pointer_offset(pointer_expr),
+        typecast_exprt::conditional_cast(
+          pointer_offset(pointer_expr),
+          to_array_type(memory_symbol.type).index_type()),
         to_array_type(memory_symbol.type).element_type());
 
       valuet result;
@@ -768,7 +772,11 @@ bool value_set_dereferencet::memory_model_bytes(
   {
     // yes, can use 'index', but possibly need to convert
     result = typecast_exprt::conditional_cast(
-      index_exprt(value, offset, to_array_type(from_type).element_type()),
+      index_exprt(
+        value,
+        typecast_exprt::conditional_cast(
+          offset, to_array_type(from_type).index_type()),
+        to_array_type(from_type).element_type()),
       to_type);
   }
   else
