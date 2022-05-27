@@ -532,9 +532,10 @@ void dump_ct::convert_compound(
   {
     const typet &comp_type = comp.type();
 
-    if(comp_type.id()==ID_code ||
-       comp.get_bool(ID_from_base) ||
-       comp.get_is_padding())
+    DATA_INVARIANT(
+      comp_type.id() != ID_code, "struct member must not be of code type");
+
+    if(comp.get_bool(ID_from_base) || comp.get_is_padding())
       continue;
 
     const typet *non_array_type = &comp_type;

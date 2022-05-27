@@ -976,10 +976,9 @@ mp_integer interpretert::get_size(const typet &type)
 
     for(const auto &comp : components)
     {
-      const typet &sub_type=comp.type();
-
-      if(sub_type.id()!=ID_code)
-        sum+=get_size(sub_type);
+      DATA_INVARIANT(
+        comp.type().id() != ID_code, "struct member must not be of code type");
+      sum += get_size(comp.type());
     }
 
     return sum;
@@ -993,10 +992,9 @@ mp_integer interpretert::get_size(const typet &type)
 
     for(const auto &comp : components)
     {
-      const typet &sub_type=comp.type();
-
-      if(sub_type.id()!=ID_code)
-        max_size=std::max(max_size, get_size(sub_type));
+      DATA_INVARIANT(
+        comp.type().id() != ID_code, "union member must not be of code type");
+      max_size = std::max(max_size, get_size(comp.type()));
     }
 
     return max_size;
