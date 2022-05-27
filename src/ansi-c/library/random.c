@@ -1,6 +1,12 @@
 /* FUNCTION: getrandom */
 
-#ifdef __linux__
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#include <errno.h>
+#define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#if defined(__GLIBC__) &&                                                      \
+  (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 25))
 
 #  ifndef __CPROVER_SYS_RANDOM_H_INCLUDED
 #    include <sys/random.h>

@@ -1,7 +1,8 @@
-#ifdef __linux__
-#  include <sys/random.h>
-
 #  include <assert.h>
+
+#if defined(__GLIBC__) &&                                                      \
+  (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 25))
+#  include <sys/random.h>
 
 int main()
 {
