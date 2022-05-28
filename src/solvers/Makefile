@@ -196,6 +196,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2_incremental/construct_value_expr_from_smt.cpp \
       smt2_incremental/convert_expr_to_smt.cpp \
       smt2_incremental/object_tracking.cpp \
+      smt2_incremental/type_size_mapping.cpp \
       smt2_incremental/smt_bit_vector_theory.cpp \
       smt2_incremental/smt_commands.cpp \
       smt2_incremental/smt_core_theory.cpp \

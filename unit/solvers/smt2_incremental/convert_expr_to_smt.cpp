@@ -18,6 +18,7 @@
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
+#include <solvers/smt2_incremental/type_size_mapping.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 
@@ -57,6 +58,7 @@ struct expr_to_smt_conversion_test_environmentt
 
   smt_object_mapt object_map;
   smt_object_sizet object_size_function;
+  type_size_mapt pointer_sizes;
 
 private:
   // This is private to ensure the above make() function is used to make
@@ -88,7 +90,10 @@ smt_termt
 expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
 {
   return convert_expr_to_smt(
-    expression, object_map, object_size_function.make_application);
+    expression,
+    object_map,
+    pointer_sizes,
+    object_size_function.make_application);
 }
 
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
@@ -329,6 +334,7 @@ TEST_CASE(
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
   const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
   const smt_termt smt_term_two = smt_bit_vector_constant_termt{2, 8};
+  const auto two_bvint_32bit = from_integer({2}, signedbv_typet{32});
 
   // Just regular (bit-vector) integers, to be used for the comparison
   const auto one_bvint = from_integer({1}, signedbv_typet{8});
@@ -336,12 +342,49 @@ TEST_CASE(
   const auto one_bvint_unsigned = from_integer({1}, unsignedbv_typet{8});
   const auto two_bvint_unsigned = from_integer({2}, unsignedbv_typet{8});
 
+  // Pointer variables, used for comparisons
+  const std::size_t pointer_width = 32;
+  const auto pointer_type = pointer_typet(signedbv_typet{32}, pointer_width);
+  const symbol_exprt pointer_a("a", pointer_type);
+  const symbol_exprt pointer_b("b", pointer_type);
+  // SMT terms needed for pointer comparisons
+  const smt_termt smt_term_a =
+    smt_identifier_termt{"a", smt_bit_vector_sortt{pointer_width}};
+  const smt_termt smt_term_b =
+    smt_identifier_termt{"b", smt_bit_vector_sortt{pointer_width}};
+  const smt_termt smt_term_four_32bit = smt_bit_vector_constant_termt{4, 32};
+  const smt_termt smt_term_two_32bit = smt_bit_vector_constant_termt{2, 32};
+
   SECTION("Addition of two constant size bit-vectors")
   {
     const auto constructed_term =
       test.convert(plus_exprt{one_bvint, two_bvint});
     const auto expected_term =
       smt_bit_vector_theoryt::add(smt_term_one, smt_term_two);
+    CHECK(constructed_term == expected_term);
+  }
+
+  SECTION("Addition of a pointer and a constant")
+  {
+    // (int32_t *)a + 2
+    const auto pointer_arith_expr = plus_exprt{pointer_a, two_bvint_32bit};
+    const symbol_tablet symbol_table;
+    const namespacet ns{symbol_table};
+    track_expression_objects(pointer_arith_expr, ns, test.object_map);
+    associate_pointer_sizes(
+      pointer_arith_expr,
+      ns,
+      test.pointer_sizes,
+      test.object_map,
+      test.object_size_function.make_application);
+
+    INFO("Input expr: " + pointer_arith_expr.pretty(2, 0));
+    const auto constructed_term = test.convert(pointer_arith_expr);
+    const auto expected_term = smt_bit_vector_theoryt::add(
+      smt_term_a,
+      smt_bit_vector_theoryt::multiply(
+        smt_term_two_32bit, smt_term_four_32bit));
+
     CHECK(constructed_term == expected_term);
   }
 
@@ -389,6 +432,71 @@ TEST_CASE(
     const auto four_bv_int = from_integer({4}, signedbv_typet{8});
     exprt::operandst one_operand{four_bv_int};
     REQUIRE_THROWS(test.convert(plus_exprt{one_operand, signedbv_typet{8}}));
+  }
+
+  SECTION("Subtraction of constant value from pointer")
+  {
+    // (int32_t *)a - 2
+    const auto minus_two_bvint =
+      from_integer(-2, signedbv_typet{pointer_width});
+    // NOTE: not a mistake! An expression in source code of the form
+    // (int *)a - 2 is coming to us as (int *)a + (-2), so a design decision
+    // was made to handle only that form.
+    const auto pointer_arith_expr = plus_exprt{pointer_a, minus_two_bvint};
+    const symbol_tablet symbol_table;
+    const namespacet ns{symbol_table};
+    track_expression_objects(pointer_arith_expr, ns, test.object_map);
+    associate_pointer_sizes(
+      pointer_arith_expr,
+      ns,
+      test.pointer_sizes,
+      test.object_map,
+      test.object_size_function.make_application);
+
+    INFO("Input expr: " + pointer_arith_expr.pretty(2, 0));
+    const auto constructed_term = test.convert(pointer_arith_expr);
+    const auto expected_term = smt_bit_vector_theoryt::add(
+      smt_term_a,
+      smt_bit_vector_theoryt::multiply(
+        smt_bit_vector_theoryt::negate(smt_term_two_32bit),
+        smt_term_four_32bit));
+  }
+
+  SECTION(
+    "Ensure that conversion of a minus node with only one operand"
+    "being a pointer fails")
+  {
+    // (*int32_t)a - 2
+    const cbmc_invariants_should_throwt invariants_throw;
+    // We don't support that - look at the test above.
+    const auto pointer_arith_expr = minus_exprt{pointer_a, two_bvint};
+    REQUIRE_THROWS_MATCHES(
+      test.convert(pointer_arith_expr),
+      invariant_failedt,
+      invariant_failure_containing(
+        "convert_expr_to_smt::minus_exprt doesn't handle expressions where"
+        "only one operand is a pointer - this is because these expressions"));
+  }
+
+  SECTION("Subtraction of two pointer arguments")
+  {
+    // (int32_t *)a - (int32_t *)b
+    const auto pointer_subtraction = minus_exprt{pointer_b, pointer_a};
+    const symbol_tablet symbol_table;
+    const namespacet ns{symbol_table};
+    track_expression_objects(pointer_subtraction, ns, test.object_map);
+    associate_pointer_sizes(
+      pointer_subtraction,
+      ns,
+      test.pointer_sizes,
+      test.object_map,
+      test.object_size_function.make_application);
+    INFO("Input expr: " + pointer_subtraction.pretty(2, 0));
+    const auto constructed_term = test.convert(pointer_subtraction);
+    const auto expected_term = smt_bit_vector_theoryt::signed_divide(
+      smt_bit_vector_theoryt::subtract(smt_term_b, smt_term_a),
+      smt_term_four_32bit);
+    CHECK(constructed_term == expected_term);
   }
 
   SECTION("Subtraction of two constant size bit-vectors")

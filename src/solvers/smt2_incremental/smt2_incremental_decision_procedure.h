@@ -12,6 +12,7 @@
 #include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
 #include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/type_size_mapping.h>
 #include <solvers/stack_decision_procedure.h>
 
 #include <memory>
@@ -89,6 +90,7 @@ protected:
   smt_object_mapt object_map;
   std::vector<bool> object_size_defined;
   smt_object_sizet object_size_function;
+  type_size_mapt pointer_sizes_map;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H

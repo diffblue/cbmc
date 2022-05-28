@@ -587,7 +587,8 @@ static optionalt<smt_termt> try_relational_conversion(
 
 static smt_termt convert_expr_to_smt(
   const plus_exprt &plus,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const type_size_mapt &pointer_sizes)
 {
   if(std::all_of(
        plus.operands().cbegin(), plus.operands().cend(), [](exprt operand) {
@@ -596,6 +597,43 @@ static smt_termt convert_expr_to_smt(
   {
     return convert_multiary_operator_to_terms(
       plus, converted, smt_bit_vector_theoryt::add);
+  }
+  else if(can_cast_type<pointer_typet>(plus.type()))
+  {
+    INVARIANT(
+      plus.operands().size() == 2,
+      "We are only handling a binary version of plus when it has a pointer "
+      "operand");
+
+    exprt pointer;
+    exprt scalar;
+    for(auto &operand : plus.operands())
+    {
+      if(can_cast_type<pointer_typet>(operand.type()))
+      {
+        pointer = operand;
+      }
+      else
+      {
+        scalar = operand;
+      }
+    }
+
+    // We need to ensure that we follow this code path only if the expression
+    // our assumptions about the structure of the addition expression hold.
+    INVARIANT(
+      !can_cast_type<pointer_typet>(scalar.type()),
+      "An addition expression with both operands being pointers when they are "
+      "not dereferenced is malformed");
+
+    const pointer_typet pointer_type =
+      *type_try_dynamic_cast<pointer_typet>(pointer.type());
+    const auto base_type = pointer_type.base_type();
+    const auto pointer_size = pointer_sizes.at(base_type);
+
+    return smt_bit_vector_theoryt::add(
+      converted.at(pointer),
+      smt_bit_vector_theoryt::multiply(converted.at(scalar), pointer_size));
   }
   else
   {
@@ -606,16 +644,50 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt convert_expr_to_smt(
   const minus_exprt &minus,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const type_size_mapt &pointer_sizes)
 {
   const bool both_operands_bitvector =
     can_cast_type<integer_bitvector_typet>(minus.lhs().type()) &&
     can_cast_type<integer_bitvector_typet>(minus.rhs().type());
 
+  const bool lhs_is_pointer = can_cast_type<pointer_typet>(minus.lhs().type());
+  const bool rhs_is_pointer = can_cast_type<pointer_typet>(minus.rhs().type());
+
+  const bool both_operands_pointers = lhs_is_pointer && rhs_is_pointer;
+
+  // We don't really handle this - we just compute this to fall
+  // into an if-else branch that gives proper error handling information.
+  const bool one_operand_pointer = lhs_is_pointer || rhs_is_pointer;
+
   if(both_operands_bitvector)
   {
     return smt_bit_vector_theoryt::subtract(
       converted.at(minus.lhs()), converted.at(minus.rhs()));
+  }
+  else if(both_operands_pointers)
+  {
+    const auto lhs_base_type = to_pointer_type(minus.lhs().type()).base_type();
+    const auto rhs_base_type = to_pointer_type(minus.rhs().type()).base_type();
+    INVARIANT(
+      lhs_base_type == rhs_base_type,
+      "only pointers of the same object type can be subtracted.");
+    return smt_bit_vector_theoryt::signed_divide(
+      smt_bit_vector_theoryt::subtract(
+        converted.at(minus.lhs()), converted.at(minus.rhs())),
+      pointer_sizes.at(lhs_base_type));
+  }
+  else if(one_operand_pointer)
+  {
+    UNIMPLEMENTED_FEATURE(
+      "convert_expr_to_smt::minus_exprt doesn't handle expressions where"
+      "only one operand is a pointer - this is because these expressions"
+      "are normally handled by convert_expr_to_smt::plus_exprt due to"
+      "transformations of the expressions by previous passes bringing"
+      "them into a form more suitably handled by that version of the function."
+      "If you are here, this is a mistake or something went wrong before."
+      "The expression that caused the problem is: " +
+      minus.pretty());
   }
   else
   {
@@ -1299,6 +1371,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   const exprt &expr,
   const sub_expression_mapt &converted,
   const smt_object_mapt &object_map,
+  const type_size_mapt &pointer_sizes,
   const smt_object_sizet::make_applicationt &call_object_size)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
@@ -1415,11 +1488,11 @@ static smt_termt dispatch_expr_to_smt_conversion(
   }
   if(const auto plus = expr_try_dynamic_cast<plus_exprt>(expr))
   {
-    return convert_expr_to_smt(*plus, converted);
+    return convert_expr_to_smt(*plus, converted, pointer_sizes);
   }
   if(const auto minus = expr_try_dynamic_cast<minus_exprt>(expr))
   {
-    return convert_expr_to_smt(*minus, converted);
+    return convert_expr_to_smt(*minus, converted, pointer_sizes);
   }
   if(const auto divide = expr_try_dynamic_cast<div_exprt>(expr))
   {
@@ -1658,6 +1731,7 @@ at_scope_exitt<functiont> at_scope_exit(functiont exit_function)
 smt_termt convert_expr_to_smt(
   const exprt &expr,
   const smt_object_mapt &object_map,
+  const type_size_mapt &pointer_sizes,
   const smt_object_sizet::make_applicationt &object_size)
 {
 #ifndef CPROVER_INVARIANT_DO_NOT_CHECK
@@ -1676,7 +1750,7 @@ smt_termt convert_expr_to_smt(
     if(find_result != sub_expression_map.cend())
       return;
     smt_termt term = dispatch_expr_to_smt_conversion(
-      expr, sub_expression_map, object_map, object_size);
+      expr, sub_expression_map, object_map, pointer_sizes, object_size);
     sub_expression_map.emplace_hint(find_result, expr, std::move(term));
   });
   return std::move(sub_expression_map.at(expr));
