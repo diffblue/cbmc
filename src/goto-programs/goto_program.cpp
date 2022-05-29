@@ -29,11 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-std::ostream &goto_programt::output(std::ostream &out) const
-{
-  return output(namespacet(symbol_tablet()), irep_idt(), out);
-}
-
 goto_programt::instructiont goto_programt::make_incomplete_goto(
   const code_gotot &_code,
   const source_locationt &l)
@@ -48,42 +43,34 @@ goto_programt::instructiont goto_programt::make_incomplete_goto(
 ///   // Labels: {list-of-labels}
 ///   {representation of the instruction}
 /// ```
-/// \param ns: the namespace to resolve the expressions in
-/// \param identifier: the identifier used to find a symbol to identify the
-///   source language
 /// \param out: the stream to write the goto string to
-/// \param instruction: the instruction to convert
 /// \return Appends to out a two line representation of the instruction
-std::ostream &goto_programt::output_instruction(
-  const namespacet &ns,
-  const irep_idt &identifier,
-  std::ostream &out,
-  const instructiont &instruction) const
+std::ostream &goto_programt::instructiont::output(std::ostream &out) const
 {
-  out << "        // " << instruction.location_number << " ";
+  out << "        // " << location_number << " ";
 
-  if(!instruction.source_location().is_nil())
-    out << instruction.source_location().as_string();
+  if(!source_location().is_nil())
+    out << source_location().as_string();
   else
     out << "no location";
 
   out << "\n";
 
-  if(!instruction.labels.empty())
+  if(!labels.empty())
   {
     out << "        // Labels:";
-    for(const auto &label : instruction.labels)
+    for(const auto &label : labels)
       out << " " << label;
 
     out << '\n';
   }
 
-  if(instruction.is_target())
-    out << std::setw(6) << instruction.target_number << ": ";
+  if(is_target())
+    out << std::setw(6) << target_number << ": ";
   else
     out << "        ";
 
-  switch(instruction.type())
+  switch(type())
   {
   case NO_INSTRUCTION_TYPE:
     out << "NO INSTRUCTION TYPE SET" << '\n';
@@ -91,24 +78,22 @@ std::ostream &goto_programt::output_instruction(
 
   case GOTO:
   case INCOMPLETE_GOTO:
-    if(!instruction.condition().is_true())
+    if(!condition().is_true())
     {
-      out << "IF " << format(instruction.condition()) << " THEN ";
+      out << "IF " << format(condition()) << " THEN ";
     }
 
     out << "GOTO ";
 
-    if(instruction.is_incomplete_goto())
+    if(is_incomplete_goto())
     {
       out << "(incomplete)";
     }
     else
     {
-      for(auto gt_it = instruction.targets.begin();
-          gt_it != instruction.targets.end();
-          gt_it++)
+      for(auto gt_it = targets.begin(); gt_it != targets.end(); gt_it++)
       {
-        if(gt_it != instruction.targets.begin())
+        if(gt_it != targets.begin())
           out << ", ";
         out << (*gt_it)->target_number;
       }
@@ -118,9 +103,9 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case OTHER:
-    if(instruction.get_other().id() == ID_code)
+    if(get_other().id() == ID_code)
     {
-      const auto &code = instruction.get_other();
+      const auto &code = get_other();
       if(code.get_statement() == ID_array_copy)
       {
         out << "ARRAY_COPY " << format(code.op0()) << ' ' << format(code.op1())
@@ -174,31 +159,31 @@ std::ostream &goto_programt::output_instruction(
       // fallthrough
     }
 
-    out << "OTHER " << format(instruction.get_other()) << '\n';
+    out << "OTHER " << format(get_other()) << '\n';
     break;
 
   case SET_RETURN_VALUE:
-    out << "SET RETURN VALUE " << format(instruction.return_value()) << '\n';
+    out << "SET RETURN VALUE " << format(return_value()) << '\n';
     break;
 
   case DECL:
-    out << "DECL " << format(instruction.decl_symbol()) << " : "
-        << format(instruction.decl_symbol().type()) << '\n';
+    out << "DECL " << format(decl_symbol()) << " : "
+        << format(decl_symbol().type()) << '\n';
     break;
 
   case DEAD:
-    out << "DEAD " << format(instruction.dead_symbol()) << '\n';
+    out << "DEAD " << format(dead_symbol()) << '\n';
     break;
 
   case FUNCTION_CALL:
     out << "CALL ";
     {
-      if(instruction.call_lhs().is_not_nil())
-        out << format(instruction.call_lhs()) << " := ";
-      out << format(instruction.call_function());
+      if(call_lhs().is_not_nil())
+        out << format(call_lhs()) << " := ";
+      out << format(call_function());
       out << '(';
       bool first = true;
-      for(const auto &argument : instruction.call_arguments())
+      for(const auto &argument : call_arguments())
       {
         if(first)
           first = false;
@@ -212,21 +197,21 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case ASSIGN:
-    out << "ASSIGN " << format(instruction.assign_lhs())
-        << " := " << format(instruction.assign_rhs()) << '\n';
+    out << "ASSIGN " << format(assign_lhs()) << " := " << format(assign_rhs())
+        << '\n';
     break;
 
   case ASSUME:
   case ASSERT:
-    if(instruction.is_assume())
+    if(is_assume())
       out << "ASSUME ";
     else
       out << "ASSERT ";
 
     {
-      out << format(instruction.condition());
+      out << format(condition());
 
-      const irep_idt &comment = instruction.source_location().get_comment();
+      const irep_idt &comment = source_location().get_comment();
       if(!comment.empty())
         out << " // " << comment;
     }
@@ -251,49 +236,48 @@ std::ostream &goto_programt::output_instruction(
 
     {
       const irept::subt &exception_list =
-        instruction.code().find(ID_exception_list).get_sub();
+        code().find(ID_exception_list).get_sub();
 
       for(const auto &ex : exception_list)
         out << " " << ex.id();
     }
 
-    if(instruction.code().operands().size() == 1)
-      out << ": " << format(instruction.code().op0());
+    if(code().operands().size() == 1)
+      out << ": " << format(code().op0());
 
     out << '\n';
     break;
 
   case CATCH:
   {
-    if(instruction.code().get_statement() == ID_exception_landingpad)
+    if(code().get_statement() == ID_exception_landingpad)
     {
-      const auto &landingpad = to_code_landingpad(instruction.code());
+      const auto &landingpad = to_code_landingpad(code());
       out << "EXCEPTION LANDING PAD (" << format(landingpad.catch_expr().type())
           << ' ' << format(landingpad.catch_expr()) << ")";
     }
-    else if(instruction.code().get_statement() == ID_push_catch)
+    else if(code().get_statement() == ID_push_catch)
     {
       out << "CATCH-PUSH ";
 
       unsigned i=0;
       const irept::subt &exception_list =
-        instruction.code().find(ID_exception_list).get_sub();
+        code().find(ID_exception_list).get_sub();
       DATA_INVARIANT(
-        instruction.targets.size() == exception_list.size(),
+        targets.size() == exception_list.size(),
         "unexpected discrepancy between sizes of instruction"
         "targets and exception list");
-      for(instructiont::targetst::const_iterator
-            gt_it=instruction.targets.begin();
-          gt_it!=instruction.targets.end();
+      for(instructiont::targetst::const_iterator gt_it = targets.begin();
+          gt_it != targets.end();
           gt_it++, i++)
       {
-        if(gt_it!=instruction.targets.begin())
+        if(gt_it != targets.begin())
           out << ", ";
         out << exception_list[i].id() << "->"
             << (*gt_it)->target_number;
       }
     }
-    else if(instruction.code().get_statement() == ID_pop_catch)
+    else if(code().get_statement() == ID_pop_catch)
     {
       out << "CATCH-POP";
     }
@@ -315,9 +299,7 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case START_THREAD:
-    out << "START THREAD "
-        << instruction.get_target()->target_number
-        << '\n';
+    out << "START THREAD " << get_target()->target_number << '\n';
     break;
 
   case END_THREAD:
@@ -636,15 +618,12 @@ void goto_programt::update()
   compute_loop_numbers();
 }
 
-std::ostream &goto_programt::output(
-  const namespacet &ns,
-  const irep_idt &identifier,
-  std::ostream &out) const
+std::ostream &goto_programt::output(std::ostream &out) const
 {
-  // output program
+  // output the program
 
   for(const auto &instruction : instructions)
-    output_instruction(ns, identifier, out, instruction);
+    instruction.output(out);
 
   return out;
 }
