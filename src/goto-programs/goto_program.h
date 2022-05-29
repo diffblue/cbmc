@@ -575,6 +575,9 @@ public:
 
     /// Apply given function to all expressions
     void apply(std::function<void(const exprt &)>) const;
+
+    /// Output this instruction to the given stream
+    std::ostream &output(std::ostream &) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
@@ -724,20 +727,28 @@ public:
   }
 
   /// Output goto program to given stream
+  DEPRECATED(SINCE(2022, 5, 29, "Use output(out) instead"))
   std::ostream &output(
     const namespacet &ns,
     const irep_idt &identifier,
-    std::ostream &out) const;
+    std::ostream &out) const
+  {
+    return output(out);
+  }
 
-  /// Output goto-program to given stream, using an empty symbol table
+  /// Output goto-program to given stream
   std::ostream &output(std::ostream &out) const;
 
   /// Output a single instruction
+  DEPRECATED(SINCE(2022, 5, 29, "Use instruction.output(out) instead"))
   std::ostream &output_instruction(
     const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
-    const instructionst::value_type &instruction) const;
+    const instructionst::value_type &instruction) const
+  {
+    return instruction.output(out);
+  }
 
   /// Compute the target numbers
   void compute_target_numbers();
