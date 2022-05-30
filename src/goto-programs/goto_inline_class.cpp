@@ -311,7 +311,7 @@ void goto_inlinet::expand_function_call(
 
 #ifdef DEBUG
   std::cout << "Expanding call:\n";
-  dest.output_instruction(ns, irep_idt(), std::cout, *target);
+  target->output(std::cout);
 #endif
 
   exprt lhs;
@@ -691,15 +691,13 @@ void goto_inlinet::output_inline_map(
         goto_function.body_available(),
         "cannot inline function with empty body");
 
-      const goto_programt &goto_program=goto_function.body;
-
       for(const auto &call : call_list)
       {
         const goto_programt::const_targett target=call.first;
         bool transitive=call.second;
 
         out << "  Call:\n";
-        goto_program.output_instruction(ns, id, out, *target);
+        target->output(out);
         out << "  Transitive: " << transitive << "\n";
       }
     }

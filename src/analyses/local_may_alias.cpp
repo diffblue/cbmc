@@ -497,7 +497,7 @@ void local_may_aliast::output(
     }
 
     out << "\n";
-    goto_function.body.output_instruction(ns, irep_idt(), out, instruction);
+    instruction.output(out);
     out << "\n";
 
     l++;

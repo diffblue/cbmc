@@ -173,16 +173,16 @@ bool flow_insensitive_analysis_baset::visit(
 //  if (id2string(l->function).find("debug")!=std::string::npos)
 //    std::cout << l->function << '\n'; //=="messages::debug")
 
-//  {
-//    static unsigned state_cntr=0;
-//    std::string s("pastate"); s += std::to_string(state_cntr);
-//    std::ofstream f(s.c_str());
-//    goto_program.output_instruction(ns, "", f, l);
-//    f << '\n';
-//    get_state().output(ns, f);
-//    f.close();
-//    state_cntr++;
-//  }
+  //  {
+  //    static unsigned state_cntr=0;
+  //    std::string s("pastate"); s += std::to_string(state_cntr);
+  //    std::ofstream f(s.c_str());
+  //    l->output(f);
+  //    f << '\n';
+  //    get_state().output(ns, f);
+  //    f.close();
+  //    state_cntr++;
+  //  }
 
   return new_data;
 }

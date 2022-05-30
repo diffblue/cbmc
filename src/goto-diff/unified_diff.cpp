@@ -130,15 +130,15 @@ void unified_difft::output_diff(
     {
     case differencet::SAME:
       os << ' ';
-      new_goto_program.output_instruction(ns_new, identifier, os, *d.first);
+      d.first->output(os);
       break;
     case differencet::DELETED:
       os << '-';
-      old_goto_program.output_instruction(ns_old, identifier, os, *d.first);
+      d.first->output(os);
       break;
     case differencet::NEW:
       os << '+';
-      new_goto_program.output_instruction(ns_new, identifier, os, *d.first);
+      d.first->output(os);
       break;
     }
   }

@@ -51,9 +51,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       ++it)
   {
     if(loop.contains(it))
-    {
-      goto_program.output_instruction(ns, "scratch", std::cout, *it);
-    }
+      it->output(std::cout);
   }
 
   std::cout << "Modified:\n";

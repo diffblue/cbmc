@@ -204,16 +204,20 @@ bool is_loop_free(
     auto size = scc_size[scc_id];
     if(size > 1)
     {
-      log.error() << "Found CFG SCC with size " << size << messaget::eom;
-      for(const auto &node_id : node_to_scc)
-      {
-        if(node_to_scc[node_id] == scc_id)
-        {
-          const auto &pc = cfg[node_id].PC;
-          goto_program.output_instruction(ns, "", log.error(), *pc);
-          log.error() << messaget::eom;
-        }
-      }
+      log.conditional_output(
+        log.error(),
+        [&cfg, &node_to_scc, &scc_id, &size](messaget::mstreamt &mstream) {
+          mstream << "Found CFG SCC with size " << size << messaget::eom;
+          for(const auto &node_id : node_to_scc)
+          {
+            if(node_to_scc[node_id] == scc_id)
+            {
+              const auto &pc = cfg[node_id].PC;
+              pc->output(mstream);
+              mstream << messaget::eom;
+            }
+          }
+        });
       return false;
     }
   }

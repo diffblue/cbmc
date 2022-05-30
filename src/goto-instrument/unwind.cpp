@@ -282,10 +282,8 @@ void goto_unwindt::unwind(
       i_it!=goto_program.instructions.end();)
   {
 #ifdef DEBUG
-    symbol_tablet st;
-    namespacet ns(st);
     std::cout << "Instruction:\n";
-    goto_program.output_instruction(ns, function_id, std::cout, *i_it);
+    i_it->output(std::cout);
 #endif
 
     if(!i_it->is_backwards_goto())

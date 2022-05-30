@@ -15,13 +15,11 @@ Author: Thomas Kiley
 #include <util/xml.h>
 
 class goto_functionst;
-class namespacet;
 
 class show_goto_functions_xmlt
 {
 public:
   explicit show_goto_functions_xmlt(
-    const namespacet &_ns,
     bool _list_only = false);
 
   xmlt convert(const goto_functionst &goto_functions);
@@ -29,7 +27,6 @@ public:
     const goto_functionst &goto_functions, std::ostream &out, bool append=true);
 
 private:
-  const namespacet &ns;
   bool list_only;
 };
 

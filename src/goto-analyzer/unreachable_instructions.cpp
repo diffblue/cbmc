@@ -75,7 +75,7 @@ static void output_dead_plain(
   for(dead_mapt::const_iterator it=dead_map.begin();
       it!=dead_map.end();
       ++it)
-    goto_program.output_instruction(ns, function_identifier, os, *it->second);
+    it->second->output(os);
 }
 
 static void add_to_xml(
@@ -136,7 +136,7 @@ static void add_to_json(
       ++it)
   {
     std::ostringstream oss;
-    goto_program.output_instruction(ns, function_identifier, oss, *it->second);
+    it->second->output(oss);
     std::string s=oss.str();
 
     std::string::size_type n=s.find('\n');
