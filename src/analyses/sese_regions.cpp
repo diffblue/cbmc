@@ -221,7 +221,7 @@ static std::string brief_instruction_string(
     &program_relative_instruction_indices)
 {
   std::ostringstream ostr;
-  goto_program.output_instruction(ns, "", ostr, *instruction);
+  instruction->output(ostr);
   return instruction_ordinals(
            instruction, program_relative_instruction_indices) +
          " " + trimmed_last_line(ostr.str());

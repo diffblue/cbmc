@@ -56,7 +56,7 @@ public:
       out << "**** " << it->source_location << '\n';
       output(function_id, it, out);
       out << '\n';
-      goto_program.output_instruction(ns, function_id, out, *it);
+      it->output(out);
       out << '\n';
     }
   }

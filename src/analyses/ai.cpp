@@ -43,6 +43,8 @@ void ai_baset::output(
   const goto_programt &goto_program,
   std::ostream &out) const
 {
+  (void)function_id; // unused parameter
+
   forall_goto_program_instructions(i_it, goto_program)
   {
     out << "**** " << i_it->location_number << " " << i_it->source_location()
@@ -51,7 +53,7 @@ void ai_baset::output(
     abstract_state_before(i_it)->output(out, *this, ns);
     out << "\n";
     #if 1
-    goto_program.output_instruction(ns, function_id, out, *i_it);
+    i_it->output(out);
     out << "\n";
     #endif
   }
@@ -84,13 +86,15 @@ jsont ai_baset::output_json(
   const irep_idt &function_id,
   const goto_programt &goto_program) const
 {
+  (void)function_id; // unused parameter
+
   json_arrayt contents;
 
   forall_goto_program_instructions(i_it, goto_program)
   {
     // Ideally we need output_instruction_json
     std::ostringstream out;
-    goto_program.output_instruction(ns, function_id, out, *i_it);
+    i_it->output(out);
 
     json_objectt location{
       {"locationNumber", json_numbert(std::to_string(i_it->location_number))},
@@ -135,6 +139,8 @@ xmlt ai_baset::output_xml(
   const irep_idt &function_id,
   const goto_programt &goto_program) const
 {
+  (void)function_id; // unused parameter
+
   xmlt function_body;
 
   forall_goto_program_instructions(i_it, goto_program)
@@ -147,7 +153,7 @@ xmlt ai_baset::output_xml(
 
     // Ideally we need output_instruction_xml
     std::ostringstream out;
-    goto_program.output_instruction(ns, function_id, out, *i_it);
+    i_it->output(out);
     location.set_attribute("instruction", out.str());
 
     function_body.new_element(location);

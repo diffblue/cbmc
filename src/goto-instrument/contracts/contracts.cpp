@@ -947,7 +947,11 @@ void code_contractst::apply_function_contract(
   // Kill return value variable if fresh
   if(call_ret_is_fresh_var)
   {
-    function_body.output_instruction(ns, "", log.warning(), *target);
+    log.conditional_output(
+      log.warning(), [&target](messaget::mstreamt &mstream) {
+        target->output(mstream);
+        mstream << messaget::eom;
+      });
     auto dead_inst =
       goto_programt::make_dead(to_symbol_expr(call_ret_opt.value()), location);
     function_body.insert_before_swap(target, dead_inst);
@@ -1120,11 +1124,14 @@ void code_contractst::apply_loop_contract(
     {
       if(std::distance(loop_head, i) < 0 || std::distance(i, loop_end) < 0)
       {
-        log.error() << "Computed loop at " << loop_head->source_location()
+        log.conditional_output(
+          log.error(), [&i, &loop_head](messaget::mstreamt &mstream) {
+            mstream << "Computed loop at " << loop_head->source_location()
                     << "contains an instruction beyond [loop_head, loop_end]:"
                     << messaget::eom;
-        goto_function.body.output_instruction(
-          ns, function_name, log.error(), *i);
+            i->output(mstream);
+            mstream << messaget::eom;
+          });
         throw 0;
       }
     }

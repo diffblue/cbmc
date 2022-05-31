@@ -20,12 +20,9 @@ Author: Thomas Kiley
 #include "goto_functions.h"
 
 /// For outputting the GOTO program in a readable xml format.
-/// \param _ns: the namespace to use to resolve names with
 /// \param _list_only: output only list of functions, but not their bodies
-show_goto_functions_xmlt::show_goto_functions_xmlt(
-  const namespacet &_ns,
-  bool _list_only)
-  : ns(_ns), list_only(_list_only)
+show_goto_functions_xmlt::show_goto_functions_xmlt(bool _list_only)
+  : list_only(_list_only)
 {}
 
 /// Walks through all of the functions in the program and returns an xml object
@@ -81,8 +78,7 @@ xmlt show_goto_functions_xmlt::convert(
         }
 
         std::ostringstream instruction_builder;
-        function.body.output_instruction(
-          ns, function_name, instruction_builder, instruction);
+        instruction.output(instruction_builder);
 
         xmlt &instruction_value=
           instruction_entry.new_element("instruction_value");

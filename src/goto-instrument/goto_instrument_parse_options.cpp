@@ -273,7 +273,7 @@ int goto_instrument_parse_optionst::doit()
 
         forall_goto_program_instructions(i_it, goto_program)
         {
-          goto_program.output_instruction(ns, gf_entry.first, std::cout, *i_it);
+          i_it->output(std::cout);
           std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
                     << "\n\n";
         }

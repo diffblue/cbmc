@@ -120,8 +120,7 @@ void interpretert::show_state()
     output.status() << "End of function '" << function->first << "'\n";
   }
   else
-    function->second.body.output_instruction(
-      ns, function->first, output.status(), *pc);
+    pc->output(output.status());
 
   output.status() << messaget::eom;
 }

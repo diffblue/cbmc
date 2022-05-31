@@ -32,7 +32,7 @@ bool enumerating_loop_accelerationt::accelerate(
         it!=path.end();
         ++it)
     {
-      goto_program.output_instruction(ns, "OMG", std::cout, *it->loc);
+      it->loc->output(std::cout);
     }
 #endif
 

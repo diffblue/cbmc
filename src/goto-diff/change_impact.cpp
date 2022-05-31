@@ -284,7 +284,6 @@ protected:
     char prefix,
     const goto_programt &goto_program,
     const namespacet &ns,
-    const irep_idt &function_id,
     goto_programt::const_targett &target) const;
 };
 
@@ -606,7 +605,7 @@ void change_impactt::output_change_impact(
     else
       UNREACHABLE;
 
-    output_instruction(prefix, goto_program, ns, function_id, target);
+    output_instruction(prefix, goto_program, ns, target);
   }
 }
 
@@ -644,7 +643,7 @@ void change_impactt::output_change_impact(
 
     if(old_mod_flags&DELETED)
     {
-      output_instruction('-', goto_program, o_ns, function_id, o_target);
+      output_instruction('-', goto_program, o_ns, o_target);
       ++o_target;
       --target;
       continue;
@@ -696,7 +695,7 @@ void change_impactt::output_change_impact(
     else
       UNREACHABLE;
 
-    output_instruction(prefix, goto_program, n_ns, function_id, target);
+    output_instruction(prefix, goto_program, n_ns, target);
   }
   for( ;
       o_target!=old_goto_program.instructions.end();
@@ -724,7 +723,7 @@ void change_impactt::output_change_impact(
     else
       UNREACHABLE;
 
-    output_instruction(prefix, goto_program, o_ns, function_id, o_target);
+    output_instruction(prefix, goto_program, o_ns, o_target);
   }
 }
 
@@ -732,7 +731,6 @@ void change_impactt::output_instruction(
   char prefix,
   const goto_programt &goto_program,
   const namespacet &ns,
-  const irep_idt &function_id,
   goto_programt::const_targett &target) const
 {
   if(compact_output)
@@ -748,7 +746,7 @@ void change_impactt::output_instruction(
   else
   {
     std::cout << prefix;
-    goto_program.output_instruction(ns, function_id, std::cout, *target);
+    target->output(std::cout);
   }
 }
 
