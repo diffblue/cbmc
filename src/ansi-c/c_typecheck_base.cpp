@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/mathematical_expr.h>
 #include <util/std_types.h>
 
 #include "ansi_c_declaration.h"
@@ -787,7 +788,7 @@ void c_typecheck_baset::typecheck_declaration(
 
         // ensure parameter declarations are available for type checking to
         // succeed
-        std::vector<symbol_exprt> temporary_parameter_symbols;
+        binding_exprt::variablest temporary_parameter_symbols;
 
         const auto &return_type = code_type.return_type();
         if(return_type.id() != ID_empty)
@@ -822,6 +823,9 @@ void c_typecheck_baset::typecheck_declaration(
         {
           typecheck_spec_function_pointer_obeys_contract(expr);
           check_history_expr(expr);
+          lambda_exprt lambda{temporary_parameter_symbols, expr};
+          lambda.add_source_location() = expr.source_location();
+          expr.swap(lambda);
         }
 
         for(auto &requires : code_type.requires())
@@ -829,9 +833,18 @@ void c_typecheck_baset::typecheck_declaration(
           typecheck_expr(requires);
           implicit_typecast_bool(requires);
           check_history_expr(requires);
+          lambda_exprt lambda{temporary_parameter_symbols, requires};
+          lambda.add_source_location() = requires.source_location();
+          requires.swap(lambda);
         }
 
         typecheck_spec_assigns(code_type.assigns());
+        for(auto &assigns : code_type.assigns())
+        {
+          lambda_exprt lambda{temporary_parameter_symbols, assigns};
+          lambda.add_source_location() = assigns.source_location();
+          assigns.swap(lambda);
+        }
 
         for(auto &expr : code_type.ensures_contract())
         {
@@ -840,6 +853,9 @@ void c_typecheck_baset::typecheck_declaration(
             expr,
             ID_loop_entry,
             CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
+          lambda_exprt lambda{temporary_parameter_symbols, expr};
+          lambda.add_source_location() = expr.source_location();
+          expr.swap(lambda);
         }
 
         for(auto &ensures : code_type.ensures())
@@ -850,6 +866,9 @@ void c_typecheck_baset::typecheck_declaration(
             ensures,
             ID_loop_entry,
             CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
+          lambda_exprt lambda{temporary_parameter_symbols, ensures};
+          lambda.add_source_location() = ensures.source_location();
+          ensures.swap(lambda);
         }
 
         for(const auto &parameter_sym : temporary_parameter_symbols)

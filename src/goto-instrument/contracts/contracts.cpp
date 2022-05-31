@@ -25,7 +25,6 @@ Date: February 2016
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/replace_symbol.h>
 #include <util/std_code.h>
 
 #include <goto-programs/goto_inline.h>
@@ -783,15 +782,12 @@ void code_contractst::apply_function_contract(
   // Isolate each component of the contract.
   const auto &type = get_contract(target_function, ns);
   auto assigns_clause = type.assigns();
-  auto requires = conjunction(type.requires());
-  auto ensures = conjunction(type.ensures());
   auto requires_contract = type.requires_contract();
   auto ensures_contract = type.ensures_contract();
 
-  // Create a replace_symbolt object, for replacing expressions in the callee
+  // Prepare to instantiate expressions in the callee
   // with expressions from the call site (e.g. the return value).
-  // This object tracks replacements that are common to ENSURES and REQUIRES.
-  replace_symbolt common_replace;
+  exprt::operandst instantiation_values;
 
   // keep track of the call's return expression to make it nondet later
   optionalt<exprt> call_ret_opt = {};
@@ -810,17 +806,17 @@ void code_contractst::apply_function_contract(
       // x = foo() -> assume(__CPROVER_return_value > 5) -> assume(x > 5)
       auto &lhs_expr = const_target->call_lhs();
       call_ret_opt = lhs_expr;
-      symbol_exprt ret_val(CPROVER_PREFIX "return_value", lhs_expr.type());
-      common_replace.insert(ret_val, lhs_expr);
+      instantiation_values.push_back(lhs_expr);
     }
     else
     {
       // If the function does return a value, but the return value is
       // disregarded, check if the postcondition includes the return value.
-      if(has_subexpr(ensures, [](const exprt &e) {
-           return e.id() == ID_symbol && to_symbol_expr(e).get_identifier() ==
-                                           CPROVER_PREFIX "return_value";
-         }))
+      if(std::any_of(
+           type.ensures().begin(), type.ensures().end(), [](const exprt &e) {
+             return has_symbol_expr(
+               to_lambda_expr(e).where(), CPROVER_PREFIX "return_value", true);
+           }))
       {
         // The postcondition does mention __CPROVER_return_value, so mint a
         // fresh variable to replace __CPROVER_return_value with.
@@ -833,28 +829,23 @@ void code_contractst::apply_function_contract(
           symbol_table.lookup_ref(target_function).mode,
           ns,
           symbol_table);
-        symbol_exprt ret_val(
-          CPROVER_PREFIX "return_value", function_type.return_type());
         auto fresh_sym_expr = fresh.symbol_expr();
-        common_replace.insert(ret_val, fresh_sym_expr);
         call_ret_opt = fresh_sym_expr;
+        instantiation_values.push_back(fresh_sym_expr);
+      }
+      else
+      {
+        // unused, add a dummy with the right type
+        instantiation_values.push_back(
+          exprt{ID_nil, function_type.return_type()});
       }
     }
   }
 
   // Replace formal parameters
   const auto &arguments = const_target->call_arguments();
-  auto a_it = arguments.begin();
-  for(auto p_it = type.parameters().begin();
-      p_it != type.parameters().end() && a_it != arguments.end();
-      ++p_it, ++a_it)
-  {
-    if(!p_it->get_identifier().empty())
-    {
-      symbol_exprt p(p_it->get_identifier(), p_it->type());
-      common_replace.insert(p, *a_it);
-    }
-  }
+  instantiation_values.insert(
+    instantiation_values.end(), arguments.begin(), arguments.end());
 
   const auto &mode = function_symbol.mode;
 
@@ -866,11 +857,20 @@ void code_contractst::apply_function_contract(
   is_fresh.add_memory_map_decl(new_program);
 
   // Insert assertion of the precondition immediately before the call site.
+  exprt::operandst requires_conjuncts;
+  for(const auto &r : type.requires())
+  {
+    requires_conjuncts.push_back(
+      to_lambda_expr(r).application(instantiation_values));
+  }
+  auto requires = conjunction(requires_conjuncts);
+  requires.add_source_location() =
+    requires_conjuncts.empty() ? type.source_location()
+                               : type.requires().front().source_location();
   if(!requires.is_true())
   {
     if(has_subexpr(requires, ID_exists) || has_subexpr(requires, ID_forall))
       add_quantified_variable(requires, mode);
-    common_replace(requires);
 
     goto_programt assertion;
     converter.goto_convert(code_assertt(requires), assertion, mode);
@@ -888,21 +888,30 @@ void code_contractst::apply_function_contract(
   for(auto &expr : requires_contract)
   {
     assert_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(expr),
+      to_function_pointer_obeys_contract_expr(
+        to_lambda_expr(expr).application(instantiation_values)),
       ID_precondition,
-      common_replace,
       mode,
       new_program);
   }
 
   // Gather all the instructions required to handle history variables
   // as well as the ensures clause
+  exprt::operandst ensures_conjuncts;
+  for(const auto &r : type.ensures())
+  {
+    ensures_conjuncts.push_back(
+      to_lambda_expr(r).application(instantiation_values));
+  }
+  auto ensures = conjunction(ensures_conjuncts);
+  ensures.add_source_location() = ensures_conjuncts.empty()
+                                    ? type.source_location()
+                                    : type.ensures().front().source_location();
   std::pair<goto_programt, goto_programt> ensures_pair;
   if(!ensures.is_false())
   {
     if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
       add_quantified_variable(ensures, mode);
-    common_replace(ensures);
 
     auto assumption = code_assumet(ensures);
     ensures_pair =
@@ -914,10 +923,9 @@ void code_contractst::apply_function_contract(
 
   // ASSIGNS clause should not refer to any quantified variables,
   // and only refer to the common symbols to be replaced.
-  exprt targets;
+  exprt::operandst targets;
   for(auto &target : assigns_clause)
-    targets.add_to_operands(std::move(target));
-  common_replace(targets);
+    targets.push_back(to_lambda_expr(target).application(instantiation_values));
 
   // Create a sequence of non-deterministic assignments ...
 
@@ -926,7 +934,7 @@ void code_contractst::apply_function_contract(
   function_cfg_infot cfg_info({});
   havoc_assigns_clause_targetst havocker(
     target_function,
-    targets.operands(),
+    targets,
     goto_functions,
     cfg_info,
     location,
@@ -968,8 +976,8 @@ void code_contractst::apply_function_contract(
   for(auto &expr : ensures_contract)
   {
     assume_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(expr),
-      common_replace,
+      to_function_pointer_obeys_contract_expr(
+        to_lambda_expr(expr).application(instantiation_values)),
       mode,
       new_program);
   }
@@ -1315,17 +1323,29 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
     function_body, instruction_it, snapshot_static_locals);
 
   // Track targets mentioned in the specification
+  const symbolt &function_symbol = ns.lookup(function);
+  const code_typet &function_type = to_code_type(function_symbol.type);
+  exprt::operandst instantiation_values;
+  // assigns clauses cannot refer to the return value, but we still need an
+  // element in there to apply the lambda function consistently
+  if(function_type.return_type() != empty_typet())
+    instantiation_values.push_back(exprt{ID_nil, function_type.return_type()});
+  for(const auto &param : function_type.parameters())
+  {
+    instantiation_values.push_back(
+      ns.lookup(param.get_identifier()).symbol_expr());
+  }
   for(auto &target : get_contract(function, ns).assigns())
   {
     goto_programt payload;
-    instrument_spec_assigns.track_spec_target(target, payload);
+    instrument_spec_assigns.track_spec_target(
+      to_lambda_expr(target).application(instantiation_values), payload);
     insert_before_swap_and_advance(function_body, instruction_it, payload);
   }
 
   // Track formal parameters
   goto_programt snapshot_function_parameters;
-  const symbolt &function_symbol = ns.lookup(function);
-  for(const auto &param : to_code_type(function_symbol.type).parameters())
+  for(const auto &param : function_type.parameters())
   {
     goto_programt payload;
     instrument_spec_assigns.track_stack_allocated(
@@ -1401,7 +1421,6 @@ void code_contractst::enforce_contract(const irep_idt &function)
 void code_contractst::assert_function_pointer_obeys_contract(
   const function_pointer_obeys_contract_exprt &expr,
   const irep_idt &property_class,
-  const replace_symbolt &replace,
   const irep_idt &mode,
   goto_programt &dest)
 {
@@ -1413,9 +1432,8 @@ void code_contractst::assert_function_pointer_obeys_contract(
           << "' obeys contract '"
           << from_expr_using_mode(ns, mode, expr.contract()) << "'";
   loc.set_comment(comment.str());
-  exprt function_pointer(expr.function_pointer());
-  replace(function_pointer);
-  code_assertt assert_expr(equal_exprt{function_pointer, expr.contract()});
+  code_assertt assert_expr(
+    equal_exprt{expr.function_pointer(), expr.contract()});
   assert_expr.add_source_location() = loc;
   goto_programt instructions;
   converter.goto_convert(assert_expr, instructions, mode);
@@ -1424,7 +1442,6 @@ void code_contractst::assert_function_pointer_obeys_contract(
 
 void code_contractst::assume_function_pointer_obeys_contract(
   const function_pointer_obeys_contract_exprt &expr,
-  const replace_symbolt &replace,
   const irep_idt &mode,
   goto_programt &dest)
 {
@@ -1435,10 +1452,8 @@ void code_contractst::assume_function_pointer_obeys_contract(
           << "' obeys contract '"
           << from_expr_using_mode(ns, mode, expr.contract()) << "'";
   loc.set_comment(comment.str());
-  exprt function_pointer(expr.function_pointer());
-  replace(function_pointer);
-  dest.add(
-    goto_programt::make_assignment(function_pointer, expr.contract(), loc));
+  dest.add(goto_programt::make_assignment(
+    expr.function_pointer(), expr.contract(), loc));
 }
 
 void code_contractst::add_contract_check(
@@ -1450,8 +1465,6 @@ void code_contractst::add_contract_check(
 
   const auto &code_type = get_contract(wrapper_function, ns);
   auto assigns = code_type.assigns();
-  auto requires = conjunction(code_type.requires());
-  auto ensures = conjunction(code_type.ensures());
   auto requires_contract = code_type.requires_contract();
   auto ensures_contract = code_type.ensures_contract();
   // build:
@@ -1468,10 +1481,9 @@ void code_contractst::add_contract_check(
   const symbolt &function_symbol = ns.lookup(mangled_function);
   code_function_callt call(function_symbol.symbol_expr());
 
-  // Create a replace_symbolt object, for replacing expressions in the callee
+  // Prepare to instantiate expressions in the callee
   // with expressions from the call site (e.g. the return value).
-  // This object tracks replacements that are common to ENSURES and REQUIRES.
-  replace_symbolt common_replace;
+  exprt::operandst instantiation_values;
 
   const auto &source_location = function_symbol.location;
 
@@ -1490,8 +1502,7 @@ void code_contractst::add_contract_check(
     call.lhs() = r;
     return_stmt = code_returnt(r);
 
-    symbol_exprt ret_val(CPROVER_PREFIX "return_value", call.lhs().type());
-    common_replace.insert(ret_val, r);
+    instantiation_values.push_back(r);
   }
 
   // decl parameter1 ...
@@ -1516,18 +1527,27 @@ void code_contractst::add_contract_check(
 
     call.arguments().push_back(p);
 
-    common_replace.insert(parameter_symbol.symbol_expr(), p);
+    instantiation_values.push_back(p);
   }
 
   is_fresh_enforcet visitor(*this, log, wrapper_function);
   visitor.create_declarations();
   visitor.add_memory_map_decl(check);
   // Generate: assume(requires)
+  exprt::operandst requires_conjuncts;
+  for(const auto &r : code_type.requires())
+  {
+    requires_conjuncts.push_back(
+      to_lambda_expr(r).application(instantiation_values));
+  }
+  auto requires = conjunction(requires_conjuncts);
+  requires.add_source_location() =
+    requires_conjuncts.empty() ? code_type.source_location()
+                               : code_type.requires().front().source_location();
   if(!requires.is_false())
   {
     if(has_subexpr(requires, ID_exists) || has_subexpr(requires, ID_forall))
       add_quantified_variable(requires, function_symbol.mode);
-    common_replace(requires);
 
     goto_programt assumption;
     converter.goto_convert(
@@ -1540,11 +1560,20 @@ void code_contractst::add_contract_check(
   std::pair<goto_programt, goto_programt> ensures_pair;
 
   // Generate: copies for history variables
+  exprt::operandst ensures_conjuncts;
+  for(const auto &r : code_type.ensures())
+  {
+    ensures_conjuncts.push_back(
+      to_lambda_expr(r).application(instantiation_values));
+  }
+  auto ensures = conjunction(ensures_conjuncts);
+  ensures.add_source_location() =
+    ensures_conjuncts.empty() ? code_type.source_location()
+                              : code_type.ensures().front().source_location();
   if(!ensures.is_true())
   {
     if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
       add_quantified_variable(ensures, function_symbol.mode);
-    common_replace(ensures);
 
     // get all the relevant instructions related to history variables
     auto assertion = code_assertt(ensures);
@@ -1567,8 +1596,8 @@ void code_contractst::add_contract_check(
   for(auto &expr : requires_contract)
   {
     assume_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(expr),
-      common_replace,
+      to_function_pointer_obeys_contract_expr(
+        to_lambda_expr(expr).application(instantiation_values)),
       function_symbol.mode,
       check);
   }
@@ -1586,9 +1615,9 @@ void code_contractst::add_contract_check(
   for(auto &expr : ensures_contract)
   {
     assert_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(expr),
+      to_function_pointer_obeys_contract_expr(
+        to_lambda_expr(expr).application(instantiation_values)),
       ID_postcondition,
-      common_replace,
       function_symbol.mode,
       check);
   }
