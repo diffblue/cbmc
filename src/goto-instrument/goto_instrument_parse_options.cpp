@@ -1087,6 +1087,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         std::string(CPROVER_PREFIX) + "CUSTOM_BITVECTOR_ANALYSIS");
     }
 
+    // remove inline assembler as that may yield further library function calls
+    // that need to be resolved
+    remove_asm(goto_model);
+
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
                  << messaget::eom;
