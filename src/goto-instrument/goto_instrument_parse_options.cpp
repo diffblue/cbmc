@@ -1029,38 +1029,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
-  // unwind loops
-  if(cmdline.isset("unwind"))
-  {
-    log.status() << "Unwinding loops" << messaget::eom;
-    options.set_option("unwind", cmdline.get_value("unwind"));
-  }
-
-  {
-    parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
-
-    if(
-      options.is_set(RESTRICT_FUNCTION_POINTER_OPT) ||
-      options.is_set(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT) ||
-      options.is_set(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT))
-    {
-      label_function_pointer_call_sites(goto_model);
-
-      restrict_function_pointers(ui_message_handler, goto_model, options);
-    }
-  }
-
-  // skip over selected loops
-  if(cmdline.isset("skip-loops"))
-  {
-    log.status() << "Adding gotos to skip loops" << messaget::eom;
-    if(skip_loops(
-         goto_model, cmdline.get_value("skip-loops"), ui_message_handler))
-      throw 0;
-  }
-
-  namespacet ns(goto_model.symbol_table);
-
   // initialize argv with valid pointers
   if(cmdline.isset("model-argc-argv"))
   {
@@ -1096,12 +1064,41 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         std::string(CPROVER_PREFIX) + "CUSTOM_BITVECTOR_ANALYSIS");
     }
 
+    // remove inline assembler as that may yield further library function calls
+    // that need to be resolved
+    remove_asm(goto_model);
+
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
                  << messaget::eom;
     link_to_library(
       goto_model, ui_message_handler, cprover_cpp_library_factory);
     link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+  }
+
+  {
+    parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
+
+    if(
+      options.is_set(RESTRICT_FUNCTION_POINTER_OPT) ||
+      options.is_set(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT) ||
+      options.is_set(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT))
+    {
+      label_function_pointer_call_sites(goto_model);
+
+      restrict_function_pointers(ui_message_handler, goto_model, options);
+    }
+  }
+
+  // skip over selected loops
+  if(cmdline.isset("skip-loops"))
+  {
+    log.status() << "Adding gotos to skip loops" << messaget::eom;
+    if(skip_loops(
+         goto_model, cmdline.get_value("skip-loops"), ui_message_handler))
+    {
+      throw 0;
+    }
   }
 
   // now do full inlining, if requested
@@ -1420,6 +1417,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     log.status() << "Pointer Analysis" << messaget::eom;
+    const namespacet ns(goto_model.symbol_table);
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_model.goto_functions);
 
