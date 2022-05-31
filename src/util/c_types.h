@@ -484,6 +484,7 @@ signedbv_typet signed_size_type();
 signedbv_typet pointer_diff_type();
 pointer_typet pointer_type(const typet &);
 empty_typet void_type();
+signedbv_typet pointer_offset_type();
 
 // This is for Java and C++
 reference_typet reference_type(const typet &);

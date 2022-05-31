@@ -154,6 +154,9 @@ void ansi_c_internal_additions(std::string &code)
     "typedef __typeof__(sizeof(int)) " CPROVER_PREFIX "size_t;\n"
     "typedef "+c_type_as_string(signed_size_type().get(ID_C_c_type))+
       " " CPROVER_PREFIX "ssize_t;\n"
+    "typedef signed " CPROVER_PREFIX "_bitvector[" +
+      std::to_string(pointer_offset_type().get_width()) +
+      "] " CPROVER_PREFIX "pointer_offset_t;\n"
     "const unsigned " CPROVER_PREFIX "constant_infinity_uint;\n"
     "typedef void " CPROVER_PREFIX "integer;\n"
     "typedef void " CPROVER_PREFIX "rational;\n"
