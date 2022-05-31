@@ -105,12 +105,8 @@ protected:
     };
     auto assert_instruction =
       add_instruction(goto_programt::make_assertion(false_exprt()));
-    const namespacet ns(symbol_table);
-    std::ostringstream comment_stream;
-    comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->condition());
     assert_instruction->source_location_nonconst().set_comment(
-      comment_stream.str());
+      "undefined function should be unreachable");
     assert_instruction->source_location_nonconst().set_property_class(
       ID_assertion);
     add_instruction(goto_programt::make_end_function());
@@ -136,12 +132,8 @@ protected:
     };
     auto assert_instruction =
       add_instruction(goto_programt::make_assertion(false_exprt()));
-    const namespacet ns(symbol_table);
-    std::ostringstream comment_stream;
-    comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->condition());
     assert_instruction->source_location_nonconst().set_comment(
-      comment_stream.str());
+      "undefined function should be unreachable");
     assert_instruction->source_location_nonconst().set_property_class(
       ID_assertion);
     add_instruction(goto_programt::make_assumption(false_exprt()));

@@ -5,4 +5,4 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 ^\[main.assertion.1\] .* assertion 0: SUCCESS$
-^\[crashes_program.assertion.1\] .* assertion false: FAILURE$
+^\[crashes_program.assertion.1\] .* undefined function should be unreachable: FAILURE$
