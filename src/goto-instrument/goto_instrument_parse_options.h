@@ -68,7 +68,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-static-exclude):" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
-  /* OPT_SHOW_PROOF_CFG */                      \
+  "(show-goto-proof-cfg)"/* OPT_SHOW_PROOF_CFG */                      \
   OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(show-value-sets)" \

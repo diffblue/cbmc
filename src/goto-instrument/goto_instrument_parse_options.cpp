@@ -691,12 +691,12 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    //if(cmdline.isset("show-goto-proof-cfg"))
-    //{
+    if(cmdline.isset("show-goto-proof-cfg"))
+    {
       show_goto_proof_cfg(
         goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
-      //}
+    }
 
     if(cmdline.isset("list-undefined-functions"))
     {
