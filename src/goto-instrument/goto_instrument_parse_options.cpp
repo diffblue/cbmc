@@ -1029,29 +1029,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
-  {
-    parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
-
-    if(
-      options.is_set(RESTRICT_FUNCTION_POINTER_OPT) ||
-      options.is_set(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT) ||
-      options.is_set(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT))
-    {
-      label_function_pointer_call_sites(goto_model);
-
-      restrict_function_pointers(ui_message_handler, goto_model, options);
-    }
-  }
-
-  // skip over selected loops
-  if(cmdline.isset("skip-loops"))
-  {
-    log.status() << "Adding gotos to skip loops" << messaget::eom;
-    if(skip_loops(
-         goto_model, cmdline.get_value("skip-loops"), ui_message_handler))
-      throw 0;
-  }
-
   // initialize argv with valid pointers
   if(cmdline.isset("model-argc-argv"))
   {
@@ -1097,6 +1074,31 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     link_to_library(
       goto_model, ui_message_handler, cprover_cpp_library_factory);
     link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+  }
+
+  {
+    parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
+
+    if(
+      options.is_set(RESTRICT_FUNCTION_POINTER_OPT) ||
+      options.is_set(RESTRICT_FUNCTION_POINTER_BY_NAME_OPT) ||
+      options.is_set(RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT))
+    {
+      label_function_pointer_call_sites(goto_model);
+
+      restrict_function_pointers(ui_message_handler, goto_model, options);
+    }
+  }
+
+  // skip over selected loops
+  if(cmdline.isset("skip-loops"))
+  {
+    log.status() << "Adding gotos to skip loops" << messaget::eom;
+    if(skip_loops(
+         goto_model, cmdline.get_value("skip-loops"), ui_message_handler))
+    {
+      throw 0;
+    }
   }
 
   // now do full inlining, if requested
