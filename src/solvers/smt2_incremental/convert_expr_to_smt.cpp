@@ -530,13 +530,31 @@ static smt_termt convert_relational_to_smt(
   const auto &lhs = converted.at(binary_relation.lhs());
   const auto &rhs = converted.at(binary_relation.rhs());
   const typet operand_type = binary_relation.lhs().type();
-  if(lhs.get_sort().cast<smt_bit_vector_sortt>())
+  if(can_cast_type<pointer_typet>(operand_type))
+  {
+    // The code here is operating under the assumption that the comparison
+    // operands have types for which the comparison makes sense.
+
+    // We already know this is the case given that we have followed
+    // the if statement branch, but including the same check here
+    // for consistency (it's cheap).
+    const auto lhs_type_is_pointer =
+      can_cast_type<pointer_typet>(binary_relation.lhs().type());
+    const auto rhs_type_is_pointer =
+      can_cast_type<pointer_typet>(binary_relation.rhs().type());
+    INVARIANT(
+      lhs_type_is_pointer && rhs_type_is_pointer,
+      "pointer comparison requires that both operand types are pointers.");
+    return unsigned_factory(lhs, rhs);
+  }
+  else if(lhs.get_sort().cast<smt_bit_vector_sortt>())
   {
     if(can_cast_type<unsignedbv_typet>(operand_type))
       return unsigned_factory(lhs, rhs);
     if(can_cast_type<signedbv_typet>(operand_type))
       return signed_factory(lhs, rhs);
   }
+
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for relational expression: " +
     binary_relation.pretty());
