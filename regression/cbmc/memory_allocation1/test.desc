@@ -3,6 +3,7 @@ main.c
 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
+^\*\*\*\* WARNING: `__CPROVER_allocated_memory' in file main\.c line \d+ function main$
 ^\[main\.pointer_dereference\.2\] .* dereference failure: invalid integer address in \*p: SUCCESS$
 ^\[main\.assertion\.1\] .* assertion \*p==42: SUCCESS$
 ^\[main\.pointer_dereference\.[0-9]+\] .* dereference failure: invalid integer address in p\[.*1\]: FAILURE$

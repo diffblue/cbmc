@@ -436,6 +436,17 @@ void goto_check_ct::collect_allocations(const goto_functionst &goto_functions)
           "allocated_memory")
         continue;
 
+      const auto function_line = function.source_location().as_string();
+      log.warning() << "**** WARNING: `" CPROVER_PREFIX "allocated_memory' in "
+                    << function_line << messaget::eom;
+      log.warning() << "**** WARNING: `" CPROVER_PREFIX
+                       "allocated_memory' is "
+                       "deprecated and scheduled for deletion "
+                    << "in version 6 and upwards." << messaget::eom;
+      log.warning() << "Please avoid using this intrinsic. For more "
+                       "information, please check issue "
+                    << "cbmc#6872 in Github" << messaget::eom;
+
       const code_function_callt::argumentst &args =
         instruction.call_arguments();
       if(
