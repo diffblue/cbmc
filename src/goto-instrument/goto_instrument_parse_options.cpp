@@ -1059,8 +1059,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
-  namespacet ns(goto_model.symbol_table);
-
   // initialize argv with valid pointers
   if(cmdline.isset("model-argc-argv"))
   {
@@ -1420,6 +1418,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     log.status() << "Pointer Analysis" << messaget::eom;
+    const namespacet ns(goto_model.symbol_table);
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_model.goto_functions);
 
