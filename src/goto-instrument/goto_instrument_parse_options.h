@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_const_function_pointers.h>
 #include <goto-programs/restrict_function_pointers.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_goto_proof_cfg.h>
 #include <goto-programs/show_properties.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -67,6 +68,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-static-exclude):" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  /* OPT_SHOW_PROOF_CFG */                      \
   OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(show-value-sets)" \
