@@ -1029,13 +1029,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
-  // unwind loops
-  if(cmdline.isset("unwind"))
-  {
-    log.status() << "Unwinding loops" << messaget::eom;
-    options.set_option("unwind", cmdline.get_value("unwind"));
-  }
-
   {
     parse_function_pointer_restriction_options_from_cmdline(cmdline, options);
 
