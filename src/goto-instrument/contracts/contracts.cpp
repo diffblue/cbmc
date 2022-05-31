@@ -1455,19 +1455,12 @@ void code_contractst::add_contract_check(
   auto requires_contract = code_type.requires_contract();
   auto ensures_contract = code_type.ensures_contract();
   // build:
-  // if(nondet)
-  //   decl ret
-  //   decl parameter1 ...
-  //   decl history_parameter1 ... [optional]
-  //   assume(requires)  [optional]
-  //   ret=function(parameter1, ...)
-  //   assert(ensures)
-  // skip: ...
-
-  // build skip so that if(nondet) can refer to it
-  goto_programt tmp_skip;
-  goto_programt::targett skip =
-    tmp_skip.add(goto_programt::make_skip(ensures.source_location()));
+  // decl ret
+  // decl parameter1 ...
+  // decl history_parameter1 ... [optional]
+  // assume(requires)  [optional]
+  // ret=function(parameter1, ...)
+  // assert(ensures)
 
   goto_programt check;
 
@@ -1480,17 +1473,19 @@ void code_contractst::add_contract_check(
   // This object tracks replacements that are common to ENSURES and REQUIRES.
   replace_symbolt common_replace;
 
+  const auto &source_location = function_symbol.location;
+
   // decl ret
   optionalt<code_returnt> return_stmt;
   if(code_type.return_type() != empty_typet())
   {
     symbol_exprt r = new_tmp_symbol(
                        code_type.return_type(),
-                       skip->source_location(),
+                       source_location,
                        function_symbol.mode,
                        symbol_table)
                        .symbol_expr();
-    check.add(goto_programt::make_decl(r, skip->source_location()));
+    check.add(goto_programt::make_decl(r, source_location));
 
     call.lhs() = r;
     return_stmt = code_returnt(r);
@@ -1511,13 +1506,13 @@ void code_contractst::add_contract_check(
     const symbolt &parameter_symbol = ns.lookup(parameter);
     symbol_exprt p = new_tmp_symbol(
                        parameter_symbol.type,
-                       skip->source_location(),
+                       source_location,
                        parameter_symbol.mode,
                        symbol_table)
                        .symbol_expr();
-    check.add(goto_programt::make_decl(p, skip->source_location()));
+    check.add(goto_programt::make_decl(p, source_location));
     check.add(goto_programt::make_assignment(
-      p, parameter_symbol.symbol_expr(), skip->source_location()));
+      p, parameter_symbol.symbol_expr(), source_location));
 
     call.arguments().push_back(p);
 
@@ -1579,7 +1574,7 @@ void code_contractst::add_contract_check(
   }
 
   // ret=mangled_function(parameter1, ...)
-  check.add(goto_programt::make_function_call(call, skip->source_location()));
+  check.add(goto_programt::make_function_call(call, source_location));
 
   // Generate: assert(ensures)
   if(ensures.is_not_nil())
@@ -1600,14 +1595,11 @@ void code_contractst::add_contract_check(
   if(code_type.return_type() != empty_typet())
   {
     check.add(goto_programt::make_set_return_value(
-      return_stmt.value().return_value(), skip->source_location()));
+      return_stmt.value().return_value(), source_location));
   }
 
   // kill the is_fresh memory map
   visitor.add_memory_map_dead(check);
-
-  // add final instruction
-  check.destructive_append(tmp_skip);
 
   // prepend the new code to dest
   dest.destructive_insert(dest.instructions.begin(), check);
