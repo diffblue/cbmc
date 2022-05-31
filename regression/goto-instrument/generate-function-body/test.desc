@@ -5,4 +5,4 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 ^\[main.assertion.1\] .* assertion does_not_get_reached: SUCCESS$
-^\[should_be_generated.assertion.1\] .* assertion false: FAILURE$
+^\[should_be_generated.assertion.1\] .* undefined function should be unreachable: FAILURE$
