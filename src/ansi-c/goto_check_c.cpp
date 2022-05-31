@@ -1649,14 +1649,14 @@ void goto_check_ct::bounds_check_index(
     // that member, it behaves as if that member were replaced with the longest
     // array (with the same element type) that would not make the structure
     // larger than the object being accessed; [...]
-    const auto type_size_opt = size_of_expr(ode.root_object().type(), ns);
+    const auto type_size_opt =
+      pointer_offset_size(ode.root_object().type(), ns);
     CHECK_RETURN(type_size_opt.has_value());
 
     binary_relation_exprt inequality(
-      typecast_exprt::conditional_cast(
-        ode.offset(), type_size_opt.value().type()),
+      ode.offset(),
       ID_lt,
-      type_size_opt.value());
+      from_integer(type_size_opt.value(), ode.offset().type()));
 
     add_guarded_property(
       inequality,

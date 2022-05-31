@@ -262,6 +262,41 @@ void c_typecheck_baset::typecheck_redefinition_type(
   }
 }
 
+static bool is_instantiation_of_flexible_array(
+  const struct_typet &old_type,
+  const struct_typet &new_type)
+{
+  const struct_typet::componentst &old_components = old_type.components();
+  const struct_typet::componentst &new_components = new_type.components();
+
+  if(old_components.size() != new_components.size())
+    return false;
+
+  if(old_components.empty())
+    return false;
+
+  for(std::size_t i = 0; i < old_components.size() - 1; ++i)
+  {
+    if(old_components[i].type() != new_components[i].type())
+      return false;
+  }
+
+  if(
+    old_components.back().type().id() != ID_array ||
+    new_components.back().type().id() != ID_array)
+  {
+    return false;
+  }
+
+  const auto &old_array_type = to_array_type(old_components.back().type());
+  const auto &new_array_type = to_array_type(new_components.back().type());
+
+  return old_array_type.element_type() == new_array_type.element_type() &&
+         old_array_type.get_bool(ID_C_flexible_array_member) &&
+         new_array_type.get_bool(ID_C_flexible_array_member) &&
+         (old_array_type.size().is_nil() || old_array_type.size().is_zero());
+}
+
 void c_typecheck_baset::typecheck_redefinition_non_type(
   symbolt &old_symbol,
   symbolt &new_symbol)
@@ -445,6 +480,13 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       // to allow
       // int (*f) (int)=0;
       // int (*f) ();
+    }
+    else if(
+      final_old.id() == ID_struct && final_new.id() == ID_struct &&
+      is_instantiation_of_flexible_array(
+        to_struct_type(final_old), to_struct_type(final_new)))
+    {
+      old_symbol.type = new_symbol.type;
     }
     else
     {
