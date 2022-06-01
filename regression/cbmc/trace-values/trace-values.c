@@ -16,6 +16,7 @@ int main()
   int *q=&my_nested[1].f;
   int *null=0;
   int *junk;
+  struct S s;
 
   global_var=1;
   static_var=2;
@@ -33,6 +34,9 @@ int main()
 
   // assign entire struct
   my_nested[1]=my_nested[0];
+
+  // struct member
+  s.f = 42;
 
   // get a trace
   __CPROVER_assert(0, "");
