@@ -38,8 +38,7 @@ HANDLE CreateThread(
   LPTHREAD_START_ROUTINE lpStartAddress,
   LPVOID lpParameter,
   DWORD dwCreationFlags,
-  LPDWORD lpThreadId
-)
+  LPDWORD lpThreadId)
 {
   __CPROVER_HIDE:;
   DWORD thread_id;

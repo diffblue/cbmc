@@ -2,31 +2,49 @@
 
 #undef abs
 
-int abs(int i) { return __CPROVER_abs(i); }
+int abs(int i)
+{
+  return __CPROVER_abs(i);
+}
 
 /* FUNCTION: labs */
 
 #undef labs
 
-long int labs(long int i) { return __CPROVER_labs(i); }
+long int labs(long int i)
+{
+  return __CPROVER_labs(i);
+}
 
 /* FUNCTION: llabs */
 
 #undef llabs
 
-long long int llabs(long long int i) { return __CPROVER_llabs(i); }
+long long int llabs(long long int i)
+{
+  return __CPROVER_llabs(i);
+}
 
 /* FUNCTION: __builtin_abs */
 
-int __builtin_abs(int i) { return __CPROVER_abs(i); }
+int __builtin_abs(int i)
+{
+  return __CPROVER_abs(i);
+}
 
 /* FUNCTION: __builtin_labs */
 
-long int __builtin_labs(long int i) { return __CPROVER_labs(i); }
+long int __builtin_labs(long int i)
+{
+  return __CPROVER_labs(i);
+}
 
 /* FUNCTION: __builtin_llabs */
 
-long long int __builtin_llabs(long long int i) { return __CPROVER_llabs(i); }
+long long int __builtin_llabs(long long int i)
+{
+  return __CPROVER_llabs(i);
+}
 
 /* FUNCTION: exit */
 
@@ -523,8 +541,10 @@ void *valloc(__CPROVER_size_t malloc_size)
 #undef posix_memalign
 
 void *malloc(__CPROVER_size_t malloc_size);
-int
-posix_memalign(void **ptr, __CPROVER_size_t alignment, __CPROVER_size_t size)
+int posix_memalign(
+  void **ptr,
+  __CPROVER_size_t alignment,
+  __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
 

@@ -74,7 +74,8 @@ void pthread_mutex_cleanup(void *p)
 #endif
 
 int pthread_mutex_init(
-  pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
+  pthread_mutex_t *mutex,
+  const pthread_mutexattr_t *mutexattr)
 {
   __CPROVER_HIDE:;
   *((__CPROVER_mutex_t *)mutex)=0;
@@ -428,7 +429,8 @@ void pthread_rwlock_cleanup(void *p)
 }
 #endif
 
-int pthread_rwlock_init(pthread_rwlock_t *lock,
+int pthread_rwlock_init(
+  pthread_rwlock_t *lock,
   const pthread_rwlockattr_t *attr)
 {
   __CPROVER_HIDE:;
@@ -610,10 +612,10 @@ void __spawned_thread(
   void *arg);
 
 int pthread_create(
-  pthread_t *thread, // must not be null
-  const pthread_attr_t *attr, // may be null
-  void * (*start_routine)(void *), // must not be null
-  void *arg) // may be null
+  pthread_t *thread,              // must not be null
+  const pthread_attr_t *attr,     // may be null
+  void *(*start_routine)(void *), // must not be null
+  void *arg)                      // may be null
 {
   __CPROVER_HIDE:;
   unsigned long this_thread_id;
@@ -659,9 +661,7 @@ int pthread_create(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_cond_init(
-    pthread_cond_t *cond,
-    const pthread_condattr_t *attr)
+int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 { __CPROVER_HIDE:
   *((unsigned *)cond)=0;
   if(attr) (void)*attr;
@@ -675,8 +675,7 @@ int pthread_cond_init(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_cond_signal(
-  pthread_cond_t *cond)
+int pthread_cond_signal(pthread_cond_t *cond)
 { __CPROVER_HIDE:
   __CPROVER_atomic_begin();
   (*((unsigned *)cond))++;
@@ -691,8 +690,7 @@ int pthread_cond_signal(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_cond_broadcast(
-    pthread_cond_t *cond)
+int pthread_cond_broadcast(pthread_cond_t *cond)
 { __CPROVER_HIDE:
   __CPROVER_atomic_begin();
   *((unsigned *)cond)=(unsigned)-1;
@@ -707,9 +705,7 @@ int pthread_cond_broadcast(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_cond_wait(
-    pthread_cond_t *cond,
-    pthread_mutex_t *mutex)
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 { __CPROVER_HIDE:
 
   (void)*mutex;
@@ -827,7 +823,8 @@ int __VERIFIER_nondet_int();
 #if !defined(__APPLE__) && !defined(__OpenBSD__)
 int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
-  const pthread_barrierattr_t *restrict attr, unsigned count)
+  const pthread_barrierattr_t *restrict attr,
+  unsigned count)
 {
   __CPROVER_HIDE:;
   (void)barrier;

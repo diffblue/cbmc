@@ -101,7 +101,8 @@ long _InterlockedCompareExchange(long volatile *p, long v1, long v2)
 
 /* FUNCTION: _InterlockedCompareExchange64 */
 
-long long _InterlockedCompareExchange64(long long volatile *p, long long v1, long long v2)
+long long
+_InterlockedCompareExchange64(long long volatile *p, long long v1, long long v2)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();

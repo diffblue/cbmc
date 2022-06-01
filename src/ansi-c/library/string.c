@@ -211,7 +211,11 @@ __CPROVER_HIDE:;
 #define __CPROVER_STRING_H_INCLUDED
 #endif
 
-char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)
+char *__builtin___strncpy_chk(
+  char *dst,
+  const char *src,
+  size_t n,
+  size_t object_size)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION

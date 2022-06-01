@@ -5,7 +5,7 @@
 
 __CPROVER_thread_local int __CPROVER_errno;
 
-int * __error(void)
+int *__error(void)
 {
   return &__CPROVER_errno;
 }

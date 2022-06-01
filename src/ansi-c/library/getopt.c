@@ -11,8 +11,7 @@ extern int optind;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 size_t __VERIFIER_nondet_size_t();
 
-int getopt(
-  int argc, char * const argv[], const char *optstring)
+int getopt(int argc, char *const argv[], const char *optstring)
 {
   __CPROVER_HIDE:;
   int result=-1;
@@ -64,7 +63,7 @@ int getopt(
 
 int getopt_long(
   int argc,
-  char * const argv[],
+  char *const argv[],
   const char *optstring,
   const struct option *longopts,
   int *longindex)

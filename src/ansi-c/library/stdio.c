@@ -159,7 +159,7 @@ __CPROVER_HIDE:;
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-FILE* freopen(const char *filename, const char *mode, FILE *f)
+FILE *freopen(const char *filename, const char *mode, FILE *f)
 {
   __CPROVER_HIDE:;
   (void)*filename;
@@ -333,11 +333,7 @@ char *fgets(char *str, int size, FILE *stream)
 char __VERIFIER_nondet_char();
 size_t __VERIFIER_nondet_size_t();
 
-size_t fread(
-  void *ptr,
-  size_t size,
-  size_t nitems,
-  FILE *stream)
+size_t fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
   __CPROVER_HIDE:;
   size_t nread=__VERIFIER_nondet_size_t();
