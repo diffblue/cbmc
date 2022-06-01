@@ -122,12 +122,10 @@ configurations:
 |Flag                    |  Check                                            |
 |------------------------|---------------------------------------------------|
 | `--malloc-fail-null`   |  return NULL when emulating an allocation failure |
-| `--malloc-fail-assert` |  report a failed property upon allocation failure |
 | `--malloc-may-fail`    |  non-deterministically fail to allocate           |
 
-Note that the use of `--malloc-may-fail` also requires one of
-`--malloc-fail-null` or `--malloc-fail-assert` to be given. The following code
-example demonstrates the effect of these options:
+Note that the use of `--malloc-may-fail` also requires `--malloc-fail-null`. The
+following code example demonstrates the effect of these options:
 
 ```C
 int error = 0;
@@ -142,10 +140,6 @@ Under CBMC's default model of `malloc`, the `else` branch is unreachable.
 When running CBMC with `--malloc-fail-null --malloc-may-fail`, `p` would
 non-deterministically be set to `NULL`, making all branches in the above code
 reachable.
-
-When running CBMC with `--malloc-fail-assert --malloc-may-fail`, CBMC reports a
-failed property instead of returning `NULL`. The `else` branch remains
-unreachable.
 
 These malloc failure options need to be set when the C library model is added to
 the program. Typically this is upon invoking CBMC, but if the user has chosen to
