@@ -6,7 +6,7 @@
 #define __CPROVER_LOCALE_H_INCLUDED
 #endif
 
-inline char *setlocale(int category, const char *locale)
+char *setlocale(int category, const char *locale)
 {
   __CPROVER_HIDE:;
   (void)category;
@@ -29,7 +29,7 @@ inline char *setlocale(int category, const char *locale)
 #define __CPROVER_LOCALE_H_INCLUDED
 #endif
 
-inline struct lconv *localeconv(void)
+struct lconv *localeconv(void)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS

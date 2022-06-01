@@ -16,7 +16,7 @@ unsigned int sleep(unsigned int seconds)
 
 unsigned int sleep(unsigned int seconds);
 
-inline unsigned int _sleep(unsigned int seconds)
+unsigned int _sleep(unsigned int seconds)
 {
   __CPROVER_HIDE:;
   return sleep(seconds);
@@ -125,7 +125,7 @@ int close(int fildes)
 
 int close(int fildes);
 
-inline int _close(int fildes)
+int _close(int fildes)
 {
   __CPROVER_HIDE:;
   return close(fildes);
@@ -199,7 +199,7 @@ ret_type write(int fildes, const void *buf, size_type nbyte)
 
 ret_type write(int fildes, const void *buf, size_type nbyte);
 
-inline ret_type _write(int fildes, const void *buf, size_type nbyte)
+ret_type _write(int fildes, const void *buf, size_type nbyte)
 {
   __CPROVER_HIDE:;
   return write(fildes, buf, nbyte);
@@ -303,7 +303,7 @@ ret_type read(int fildes, void *buf, size_type nbyte)
 
 ret_type read(int fildes, void *buf, size_type nbyte);
 
-inline ret_type _read(int fildes, void *buf, size_type nbyte)
+ret_type _read(int fildes, void *buf, size_type nbyte)
 {
   __CPROVER_HIDE:;
   return read(fildes, buf, nbyte);

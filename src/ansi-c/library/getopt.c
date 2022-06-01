@@ -11,7 +11,7 @@ extern int optind;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 size_t __VERIFIER_nondet_size_t();
 
-inline int getopt(
+int getopt(
   int argc, char * const argv[], const char *optstring)
 {
   __CPROVER_HIDE:;
@@ -62,7 +62,7 @@ inline int getopt(
 #define __CPROVER_GETOPT_H_INCLUDED
 #endif
 
-inline int getopt_long(
+int getopt_long(
   int argc,
   char * const argv[],
   const char *optstring,

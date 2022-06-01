@@ -2,37 +2,37 @@
 
 #undef abs
 
-inline int abs(int i) { return __CPROVER_abs(i); }
+int abs(int i) { return __CPROVER_abs(i); }
 
 /* FUNCTION: labs */
 
 #undef labs
 
-inline long int labs(long int i) { return __CPROVER_labs(i); }
+long int labs(long int i) { return __CPROVER_labs(i); }
 
 /* FUNCTION: llabs */
 
 #undef llabs
 
-inline long long int llabs(long long int i) { return __CPROVER_llabs(i); }
+long long int llabs(long long int i) { return __CPROVER_llabs(i); }
 
 /* FUNCTION: __builtin_abs */
 
-inline int __builtin_abs(int i) { return __CPROVER_abs(i); }
+int __builtin_abs(int i) { return __CPROVER_abs(i); }
 
 /* FUNCTION: __builtin_labs */
 
-inline long int __builtin_labs(long int i) { return __CPROVER_labs(i); }
+long int __builtin_labs(long int i) { return __CPROVER_labs(i); }
 
 /* FUNCTION: __builtin_llabs */
 
-inline long long int __builtin_llabs(long long int i) { return __CPROVER_llabs(i); }
+long long int __builtin_llabs(long long int i) { return __CPROVER_llabs(i); }
 
 /* FUNCTION: exit */
 
 #undef exit
 
-inline void exit(int status)
+void exit(int status)
 {
   (void)status;
   __CPROVER_assume(0);
@@ -45,7 +45,7 @@ inline void exit(int status)
 
 #undef _Exit
 
-inline void _Exit(int status)
+void _Exit(int status)
 {
   (void)status;
   __CPROVER_assume(0);
@@ -58,7 +58,7 @@ inline void _Exit(int status)
 
 #undef abort
 
-inline void abort(void)
+void abort(void)
 {
   __CPROVER_assume(0);
 #ifdef LIBRARY_CHECK
@@ -75,7 +75,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 _Bool __builtin_mul_overflow();
 #endif
 
-inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
+void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
   __CPROVER_size_t alloc_size;
@@ -140,6 +140,8 @@ __CPROVER_HIDE:;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
+// malloc is marked "inline" for the benefit of goto-analyzer. Really,
+// goto-analyzer should take care of inlining as needed.
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
 // realistically, malloc may return NULL,
@@ -199,7 +201,7 @@ __CPROVER_HIDE:;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 extern void *__CPROVER_alloca_object;
 
-inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
+void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
   __CPROVER_HIDE:;
   void *res;
@@ -229,7 +231,7 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 
 void *__builtin_alloca(__CPROVER_size_t alloca_size);
 
-inline void *alloca(__CPROVER_size_t alloca_size)
+void *alloca(__CPROVER_size_t alloca_size)
 {
 __CPROVER_HIDE:;
   return __builtin_alloca(alloca_size);
@@ -242,7 +244,7 @@ __CPROVER_HIDE:;
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 extern void *__CPROVER_alloca_object;
 
-inline void free(void *ptr)
+void free(void *ptr)
 {
   __CPROVER_HIDE:;
   // If ptr is NULL, no operation is performed.
@@ -303,7 +305,7 @@ _Bool __builtin_add_overflow();
 _Bool __builtin_mul_overflow();
 #endif
 
-inline long strtol(const char *nptr, char **endptr, int base)
+long strtol(const char *nptr, char **endptr, int base)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -390,7 +392,7 @@ inline long strtol(const char *nptr, char **endptr, int base)
 
 long strtol(const char *nptr, char **endptr, int base);
 
-inline int atoi(const char *nptr)
+int atoi(const char *nptr)
 {
   __CPROVER_HIDE:;
   return (int)strtol(nptr, (char **)0, 10);
@@ -403,7 +405,7 @@ inline int atoi(const char *nptr)
 
 long strtol(const char *nptr, char **endptr, int base);
 
-inline long atol(const char *nptr)
+long atol(const char *nptr)
 {
   __CPROVER_HIDE:;
   return strtol(nptr, (char **)0, 10);
@@ -421,7 +423,7 @@ inline long atol(const char *nptr)
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 ptrdiff_t __VERIFIER_nondet_ptrdiff_t();
 
-inline char *getenv(const char *name)
+char *getenv(const char *name)
 {
   __CPROVER_HIDE:;
 
@@ -464,10 +466,10 @@ inline char *getenv(const char *name)
 
 /* FUNCTION: realloc */
 
-inline void *malloc(__CPROVER_size_t malloc_size);
-inline void free(void *ptr);
+void *malloc(__CPROVER_size_t malloc_size);
+void free(void *ptr);
 
-inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
+void *realloc(void *ptr, __CPROVER_size_t malloc_size)
 {
   __CPROVER_HIDE:;
 
@@ -500,9 +502,9 @@ inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
 
 /* FUNCTION: valloc */
 
-inline void *malloc(__CPROVER_size_t malloc_size);
+void *malloc(__CPROVER_size_t malloc_size);
 
-inline void *valloc(__CPROVER_size_t malloc_size)
+void *valloc(__CPROVER_size_t malloc_size)
 {
   // The allocated memory is aligned on a page
   // boundary, which we don't model.
@@ -520,8 +522,8 @@ inline void *valloc(__CPROVER_size_t malloc_size)
 
 #undef posix_memalign
 
-inline void *malloc(__CPROVER_size_t malloc_size);
-inline int
+void *malloc(__CPROVER_size_t malloc_size);
+int
 posix_memalign(void **ptr, __CPROVER_size_t alignment, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;

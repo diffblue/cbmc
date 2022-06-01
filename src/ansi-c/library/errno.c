@@ -5,7 +5,7 @@
 
 __CPROVER_thread_local int __CPROVER_errno;
 
-inline int * __error(void)
+int * __error(void)
 {
   return &__CPROVER_errno;
 }
@@ -17,7 +17,7 @@ inline int * __error(void)
 
 __CPROVER_thread_local int __CPROVER_errno;
 
-inline int *__errno_location(void)
+int *__errno_location(void)
 {
   return &__CPROVER_errno;
 }
@@ -29,7 +29,7 @@ inline int *__errno_location(void)
 
 __CPROVER_thread_local int __CPROVER_errno;
 
-inline int *_errno(void)
+int *_errno(void)
 {
   return &__CPROVER_errno;
 }

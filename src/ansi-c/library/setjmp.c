@@ -6,7 +6,7 @@
 #define __CPROVER_SETJMP_H_INCLUDED
 #endif
 
-inline void longjmp(jmp_buf env, int val)
+void longjmp(jmp_buf env, int val)
 {
   // does not return
   (void)env;
@@ -25,7 +25,7 @@ inline void longjmp(jmp_buf env, int val)
 #define __CPROVER_SETJMP_H_INCLUDED
 #endif
 
-inline void _longjmp(jmp_buf env, int val)
+void _longjmp(jmp_buf env, int val)
 {
   // does not return
   (void)env;
@@ -46,7 +46,7 @@ inline void _longjmp(jmp_buf env, int val)
 #define __CPROVER_SETJMP_H_INCLUDED
 #endif
 
-inline void siglongjmp(sigjmp_buf env, int val)
+void siglongjmp(sigjmp_buf env, int val)
 {
   // does not return
   (void)env;
@@ -69,7 +69,7 @@ inline void siglongjmp(sigjmp_buf env, int val)
 
 #undef setjmp
 
-inline int setjmp(jmp_buf env)
+int setjmp(jmp_buf env)
 {
   (void)env;
   // returns via longjmp require instrumentation; only such returns would
@@ -84,7 +84,7 @@ inline int setjmp(jmp_buf env)
 #define __CPROVER_SETJMP_H_INCLUDED
 #endif
 
-inline int _setjmp(jmp_buf env)
+int _setjmp(jmp_buf env)
 {
   (void)env;
   // returns via longjmp require instrumentation; only such returns would
@@ -103,7 +103,7 @@ inline int _setjmp(jmp_buf env)
 
 #undef sigsetjmp
 
-inline int sigsetjmp(sigjmp_buf env, int savesigs)
+int sigsetjmp(sigjmp_buf env, int savesigs)
 {
   (void)env;
   (void)savesigs;
@@ -123,7 +123,7 @@ inline int sigsetjmp(sigjmp_buf env, int savesigs)
 #  define __CPROVER_SETJMP_H_INCLUDED
 #endif
 
-inline int __sigsetjmp(sigjmp_buf env, int savesigs)
+int __sigsetjmp(sigjmp_buf env, int savesigs)
 {
   (void)env;
   (void)savesigs;
