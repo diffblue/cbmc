@@ -228,6 +228,12 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_bitreverse(to_bitreverse_expr(expr));
   else if(expr.id() == ID_saturating_minus || expr.id() == ID_saturating_plus)
     return convert_saturating_add_sub(to_binary_expr(expr));
+  else if(
+    const auto overflow_with_result =
+      expr_try_dynamic_cast<overflow_result_exprt>(expr))
+  {
+    return convert_overflow_result(*overflow_with_result);
+  }
 
   return conversion_failed(expr);
 }

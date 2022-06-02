@@ -38,6 +38,7 @@ class extractbits_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class member_exprt;
+class overflow_result_exprt;
 class replication_exprt;
 class unary_overflow_exprt;
 class union_typet;
@@ -197,6 +198,7 @@ protected:
     const function_application_exprt &expr);
   virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
   virtual bvt convert_saturating_add_sub(const binary_exprt &expr);
+  virtual bvt convert_overflow_result(const overflow_result_exprt &expr);
 
   void convert_with(
     const typet &type,

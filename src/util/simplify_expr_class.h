@@ -59,6 +59,7 @@ class mult_exprt;
 class namespacet;
 class not_exprt;
 class object_size_exprt;
+class overflow_result_exprt;
 class plus_exprt;
 class pointer_object_exprt;
 class pointer_offset_exprt;
@@ -202,6 +203,12 @@ public:
   /// Simplification will be possible when the operand is constants or the
   /// type of the operand has an infinite domain.
   NODISCARD resultt<> simplify_overflow_unary(const unary_overflow_exprt &);
+
+  /// Try to simplify overflow_result-+, overflow_result-*, overflow_result--,
+  /// overflow_result-shl, overflow_result-unary--.
+  /// Simplification will be possible when the operands are constants or the
+  /// types of the operands have infinite domains.
+  NODISCARD resultt<> simplify_overflow_result(const overflow_result_exprt &);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.

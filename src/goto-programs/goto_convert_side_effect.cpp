@@ -12,13 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_class.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
+#include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-
-#include <util/c_types.h>
 
 #include <ansi-c/c_expr.h>
 
@@ -589,91 +589,65 @@ void goto_convertt::remove_overflow(
   const exprt &rhs = expr.rhs();
   const exprt &result = expr.result();
 
-  // actual logic implementing the operators: perform operations on signed
-  // bitvector types of sufficiently large size to hold the result
-  auto const make_operation = [&statement](exprt lhs, exprt rhs) -> exprt {
-    std::size_t lhs_ssize = to_bitvector_type(lhs.type()).get_width();
-    if(lhs.type().id() == ID_unsignedbv)
-      ++lhs_ssize;
-    std::size_t rhs_ssize = to_bitvector_type(rhs.type()).get_width();
-    if(rhs.type().id() == ID_unsignedbv)
-      ++rhs_ssize;
+  if(result.type().id() != ID_pointer)
+  {
+    // result of the arithmetic operation is _not_ used, just evaluate side
+    // effects
+    exprt tmp = result;
+    clean_expr(tmp, dest, mode, false);
 
-    if(statement == ID_overflow_plus)
+    // the is-there-an-overflow result may be used
+    if(result_is_used)
     {
-      std::size_t ssize = std::max(lhs_ssize, rhs_ssize) + 1;
-      integer_bitvector_typet ssize_type{ID_signedbv, ssize};
-      return plus_exprt{typecast_exprt{lhs, ssize_type},
-                        typecast_exprt{rhs, ssize_type}};
-    }
-    else if(statement == ID_overflow_minus)
-    {
-      std::size_t ssize = std::max(lhs_ssize, rhs_ssize) + 1;
-      integer_bitvector_typet ssize_type{ID_signedbv, ssize};
-      return minus_exprt{typecast_exprt{lhs, ssize_type},
-                         typecast_exprt{rhs, ssize_type}};
+      binary_overflow_exprt overflow_check{
+        typecast_exprt::conditional_cast(lhs, result.type()),
+        statement,
+        typecast_exprt::conditional_cast(rhs, result.type())};
+      overflow_check.add_source_location() = expr.source_location();
+      expr.swap(overflow_check);
     }
     else
-    {
-      INVARIANT(
-        statement == ID_overflow_mult,
-        "the three overflow operations are add, sub and mul");
-      std::size_t ssize = lhs_ssize + rhs_ssize;
-      integer_bitvector_typet ssize_type{ID_signedbv, ssize};
-      return mult_exprt{typecast_exprt{lhs, ssize_type},
-                        typecast_exprt{rhs, ssize_type}};
-    }
-  };
-
-  // Generating the following sequence of statements:
-  // large_signedbv tmp = (large_signedbv)lhs OP (large_signedbv)rhs;
-  // *result = (result_type)tmp; // only if result is a pointer
-  // (large_signedbv)(result_type)tmp != tmp;
-  // This performs the operation (+, -, *) on a signed bitvector type of
-  // sufficiently large width to store the precise result, cast to result
-  // type, check if the cast result is not equivalent to the full-length
-  // result.
-  auto operation = make_operation(lhs, rhs);
-  // Disable overflow checks as the operation cannot overflow on the larger
-  // type
-  operation.add_source_location() = expr.source_location();
-  operation.add_source_location().add_pragma("disable:signed-overflow-check");
-
-  make_temp_symbol(operation, "large_bv", dest, mode);
-
-  optionalt<typet> result_type;
-  if(result.type().id() == ID_pointer)
+      expr.make_nil();
+  }
+  else
   {
-    result_type = to_pointer_type(result.type()).base_type();
-    code_assignt result_assignment{dereference_exprt{result},
-                                   typecast_exprt{operation, *result_type},
-                                   expr.source_location()};
+    const typet &arith_type = to_pointer_type(result.type()).base_type();
+    irep_idt arithmetic_operation =
+      statement == ID_overflow_plus
+        ? ID_plus
+        : statement == ID_overflow_minus
+            ? ID_minus
+            : statement == ID_overflow_mult ? ID_mult : ID_nil;
+    CHECK_RETURN(arithmetic_operation != ID_nil);
+    exprt overflow_with_result = overflow_result_exprt{
+      typecast_exprt::conditional_cast(lhs, arith_type),
+      arithmetic_operation,
+      typecast_exprt::conditional_cast(rhs, arith_type)};
+    overflow_with_result.add_source_location() = expr.source_location();
+
+    if(result_is_used)
+      make_temp_symbol(overflow_with_result, "overflow_result", dest, mode);
+
+    const struct_typet::componentst &result_comps =
+      to_struct_type(overflow_with_result.type()).components();
+    CHECK_RETURN(result_comps.size() == 2);
+    code_assignt result_assignment{
+      dereference_exprt{result},
+      typecast_exprt::conditional_cast(
+        member_exprt{overflow_with_result, result_comps[0]}, arith_type),
+      expr.source_location()};
     convert_assign(result_assignment, dest, mode);
-  }
-  else
-  {
-    result_type = result.type();
-    // evaluate side effects
-    exprt tmp = result;
-    clean_expr(tmp, dest, mode, false); // result _not_ used
-  }
 
-  if(result_is_used)
-  {
-    typecast_exprt inner_tc{operation, *result_type};
-    inner_tc.add_source_location() = expr.source_location();
-    inner_tc.add_source_location().add_pragma("disable:conversion-check");
-    typecast_exprt outer_tc{inner_tc, operation.type()};
-    outer_tc.add_source_location() = expr.source_location();
-    outer_tc.add_source_location().add_pragma("disable:conversion-check");
+    if(result_is_used)
+    {
+      member_exprt overflow_check{overflow_with_result, result_comps[1]};
+      overflow_check.add_source_location() = expr.source_location();
 
-    notequal_exprt overflow_check{outer_tc, operation};
-    overflow_check.add_source_location() = expr.source_location();
-
-    expr.swap(overflow_check);
+      expr.swap(overflow_check);
+    }
+    else
+      expr.make_nil();
   }
-  else
-    expr.make_nil();
 }
 
 void goto_convertt::remove_side_effect(

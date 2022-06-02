@@ -801,6 +801,10 @@ public:
     : binary_overflow_exprt(std::move(_lhs), ID_overflow_plus, std::move(_rhs))
   {
   }
+
+  /// Lower a plus_overflow_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
 };
 
 template <>
@@ -816,6 +820,10 @@ public:
     : binary_overflow_exprt(std::move(_lhs), ID_overflow_minus, std::move(_rhs))
   {
   }
+
+  /// Lower a minus_overflow_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
 };
 
 template <>
@@ -831,6 +839,10 @@ public:
     : binary_overflow_exprt(std::move(_lhs), ID_overflow_mult, std::move(_rhs))
   {
   }
+
+  /// Lower a mult_overflow_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
 };
 
 template <>
@@ -1283,6 +1295,134 @@ inline saturating_minus_exprt &to_saturating_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_saturating_minus);
   saturating_minus_exprt &ret = static_cast<saturating_minus_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief An expression returning both the result of the arithmetic operation
+/// under wrap-around semantics as well as a Boolean to signify overflow.
+class overflow_result_exprt : public expr_protectedt
+{
+public:
+  overflow_result_exprt(exprt _lhs, const irep_idt &kind, exprt _rhs)
+    : expr_protectedt(
+        make_id(kind),
+        struct_typet{
+          {{ID_value, _lhs.type()},
+           {"overflow-" + id2string(kind), bool_typet{}}}},
+        {_lhs, std::move(_rhs)})
+  {
+    INVARIANT(
+      valid_id(id()),
+      "The kind used to construct overflow_result_exprt should be in the set "
+      "of expected valid kinds.");
+  }
+
+  overflow_result_exprt(exprt _op, const irep_idt &kind)
+    : expr_protectedt(
+        make_id(kind),
+        struct_typet{
+          {{ID_value, _op.type()},
+           {"overflow-" + id2string(kind), bool_typet{}}}},
+        {_op})
+  {
+    INVARIANT(
+      valid_id(id()),
+      "The kind used to construct overflow_result_exprt should be in the set "
+      "of expected valid kinds.");
+  }
+
+  // make op0 and op1 public
+  using exprt::op0;
+  using exprt::op1;
+
+  const exprt &op2() const = delete;
+  exprt &op2() = delete;
+  const exprt &op3() const = delete;
+  exprt &op3() = delete;
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    if(expr.id() != ID_overflow_result_unary_minus)
+      binary_exprt::check(expr, vm);
+
+    if(
+      expr.id() != ID_overflow_result_unary_minus &&
+      expr.id() != ID_overflow_result_shl)
+    {
+      const binary_exprt &binary_expr = to_binary_expr(expr);
+      DATA_CHECK(
+        vm,
+        binary_expr.lhs().type() == binary_expr.rhs().type(),
+        "operand types must match");
+    }
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
+  /// Returns true iff \p id is a valid identifier of an `overflow_exprt`.
+  static bool valid_id(const irep_idt &id)
+  {
+    return id == ID_overflow_result_plus || id == ID_overflow_result_mult ||
+           id == ID_overflow_result_minus || id == ID_overflow_result_shl ||
+           id == ID_overflow_result_unary_minus;
+  }
+
+private:
+  static irep_idt make_id(const irep_idt &kind)
+  {
+    return "overflow_result-" + id2string(kind);
+  }
+};
+
+template <>
+inline bool can_cast_expr<overflow_result_exprt>(const exprt &base)
+{
+  return overflow_result_exprt::valid_id(base.id());
+}
+
+inline void validate_expr(const overflow_result_exprt &value)
+{
+  if(value.id() == ID_overflow_result_unary_minus)
+  {
+    validate_operands(
+      value, 1, "unary overflow expression must have two operands");
+  }
+  else
+  {
+    validate_operands(
+      value, 2, "binary overflow expression must have two operands");
+  }
+}
+
+/// \brief Cast an exprt to a \ref overflow_result_exprt
+///
+/// \a expr must be known to be \ref overflow_result_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref overflow_result_exprt
+inline const overflow_result_exprt &to_overflow_result_expr(const exprt &expr)
+{
+  PRECONDITION(overflow_result_exprt::valid_id(expr.id()));
+  const overflow_result_exprt &ret =
+    static_cast<const overflow_result_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_overflow_result_expr(const exprt &)
+inline overflow_result_exprt &to_overflow_result_expr(exprt &expr)
+{
+  PRECONDITION(overflow_result_exprt::valid_id(expr.id()));
+  overflow_result_exprt &ret = static_cast<overflow_result_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }

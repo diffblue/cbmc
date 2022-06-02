@@ -1865,16 +1865,21 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(
     can_cast_expr<plus_overflow_exprt>(expr) ||
-    can_cast_expr<minus_overflow_exprt>(expr))
+    can_cast_expr<minus_overflow_exprt>(expr) ||
+    expr.id() == ID_overflow_result_plus ||
+    expr.id() == ID_overflow_result_minus)
   {
+    const bool keep_result = can_cast_expr<overflow_result_exprt>(expr);
+
     const auto &op0 = to_binary_expr(expr).op0();
     const auto &op1 = to_binary_expr(expr).op1();
 
     DATA_INVARIANT(
-      expr.type().id() == ID_bool,
+      keep_result || expr.type().id() == ID_bool,
       "overflow plus and overflow minus expressions shall be of Boolean type");
 
-    bool subtract = can_cast_expr<minus_overflow_exprt>(expr);
+    bool subtract = can_cast_expr<minus_overflow_exprt>(expr) ||
+                    expr.id() == ID_overflow_result_minus;
     const typet &op_type = op0.type();
     std::size_t width=boolbv_width(op_type);
 
@@ -1888,26 +1893,67 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ")";
       out << " ((_ sign_extend 1) ";
       convert_expr(op1);
-      out << ")))) "; // sign_extend, bvadd/sub let2
+      out << ")))) "; // sign_extend, bvadd/sub
+      if(keep_result)
+      {
+        if(use_datatypes)
+        {
+          const std::string &smt_typename = datatype_map.at(expr.type());
+
+          // use the constructor for the Z3 datatype
+          out << "(mk-" << smt_typename;
+        }
+        else
+          out << "(concat";
+
+        out << " ((_ extract " << width - 1 << " 0) ?sum) ";
+        if(!use_datatypes)
+          out << "(ite ";
+      }
       out << "(not (= "
                    "((_ extract " << width << " " << width << ") ?sum) "
                    "((_ extract " << (width-1) << " " << (width-1) << ") ?sum)";
-      out << ")))"; // =, not, let
+      out << "))"; // =, not
+      if(keep_result)
+      {
+        if(!use_datatypes)
+          out << " #b1 #b0)";
+        out << ")"; // concat
+      }
+      out << ")"; // let
     }
     else if(op_type.id()==ID_unsignedbv ||
             op_type.id()==ID_pointer)
     {
       // overflow is simply carry-out
-      out << "(= ";
-      out << "((_ extract " << width << " " << width << ") ";
-      out << "(" << (subtract?"bvsub":"bvadd");
+      out << "(let ((?sum (" << (subtract ? "bvsub" : "bvadd");
       out << " ((_ zero_extend 1) ";
       convert_expr(op0);
       out << ")";
       out << " ((_ zero_extend 1) ";
       convert_expr(op1);
-      out << ")))"; // zero_extend, bvsub/bvadd, extract
-      out << " #b1)"; // =
+      out << "))))"; // zero_extend, bvsub/bvadd
+      if(keep_result && !use_datatypes)
+        out << " ?sum";
+      else
+      {
+        if(keep_result && use_datatypes)
+        {
+          const std::string &smt_typename = datatype_map.at(expr.type());
+
+          // use the constructor for the Z3 datatype
+          out << "(mk-" << smt_typename;
+          out << " ((_ extract " << width - 1 << " 0) ?sum) ";
+        }
+
+        out << "(= ";
+        out << "((_ extract " << width << " " << width << ") ?sum)";
+        out << "#b1)"; // =
+
+        if(keep_result && use_datatypes)
+          out << ")"; // mk
+      }
+      out << ")"; // let
     }
     else
       INVARIANT_WITH_DIAGNOSTICS(
@@ -1916,13 +1962,16 @@ void smt2_convt::convert_expr(const exprt &expr)
         op_type.id_string());
   }
   else if(
-    const auto mult_overflow = expr_try_dynamic_cast<mult_overflow_exprt>(expr))
+    can_cast_expr<mult_overflow_exprt>(expr) ||
+    expr.id() == ID_overflow_result_mult)
   {
-    const auto &op0 = mult_overflow->op0();
-    const auto &op1 = mult_overflow->op1();
+    const bool keep_result = can_cast_expr<overflow_result_exprt>(expr);
+
+    const auto &op0 = to_binary_expr(expr).op0();
+    const auto &op1 = to_binary_expr(expr).op1();
 
     DATA_INVARIANT(
-      mult_overflow->type().id() == ID_bool,
+      keep_result || expr.type().id() == ID_bool,
       "overflow mult expression shall be of Boolean type");
 
     // No better idea than to multiply with double the bits and then compare
@@ -1938,18 +1987,65 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ") ((_ sign_extend " << width << ") ";
       convert_expr(op1);
       out << ")) )) ";
+      if(keep_result)
+      {
+        if(use_datatypes)
+        {
+          const std::string &smt_typename = datatype_map.at(expr.type());
+
+          // use the constructor for the Z3 datatype
+          out << "(mk-" << smt_typename;
+        }
+        else
+          out << "(concat";
+
+        out << " ((_ extract " << width - 1 << " 0) prod) ";
+        if(!use_datatypes)
+          out << "(ite ";
+      }
       out << "(or (bvsge prod (_ bv" << power(2, width-1) << " "
           << width*2 << "))";
-      out << " (bvslt prod (bvneg (_ bv" << power(2, width-1) << " "
-          << width*2 << ")))))";
+      out << " (bvslt prod (bvneg (_ bv" << power(2, width - 1) << " "
+          << width * 2 << "))))";
+      if(keep_result)
+      {
+        if(!use_datatypes)
+          out << " #b1 #b0)";
+        out << ")"; // concat
+      }
+      out << ")";
     }
     else if(op_type.id()==ID_unsignedbv)
     {
-      out << "(bvuge (bvmul ((_ zero_extend " << width << ") ";
+      out << "(let ((prod (bvmul ((_ zero_extend " << width << ") ";
       convert_expr(op0);
       out << ") ((_ zero_extend " << width << ") ";
       convert_expr(op1);
-      out << ")) (_ bv" << power(2, width) << " " << width*2 << "))";
+      out << ")))) ";
+      if(keep_result)
+      {
+        if(use_datatypes)
+        {
+          const std::string &smt_typename = datatype_map.at(expr.type());
+
+          // use the constructor for the Z3 datatype
+          out << "(mk-" << smt_typename;
+        }
+        else
+          out << "(concat";
+
+        out << " ((_ extract " << width - 1 << " 0) prod) ";
+        if(!use_datatypes)
+          out << "(ite ";
+      }
+      out << "(bvuge prod (_ bv" << power(2, width) << " " << width * 2 << "))";
+      if(keep_result)
+      {
+        if(!use_datatypes)
+          out << " #b1 #b0)";
+        out << ")"; // concat
+      }
+      out << ")";
     }
     else
       INVARIANT_WITH_DIAGNOSTICS(
@@ -2901,6 +2997,8 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         // may need to flatten array-theory arrays in there
         if(op.type().id() == ID_array)
           flatten_array(op);
+        else if(op.type().id() == ID_bool)
+          flatten2bv(op);
         else
           convert_expr(op);
 
@@ -4228,10 +4326,14 @@ void smt2_convt::convert_member(const member_exprt &expr)
       // we extract
       const auto member_offset = boolbv_width.get_member(struct_type, name);
 
+      if(expr.type().id() == ID_bool)
+        out << "(= ";
       out << "((_ extract " << (member_offset.offset + member_offset.width - 1)
           << " " << member_offset.offset << ") ";
       convert_expr(struct_op);
       out << ")";
+      if(expr.type().id() == ID_bool)
+        out << " #b1)";
     }
   }
   else if(
