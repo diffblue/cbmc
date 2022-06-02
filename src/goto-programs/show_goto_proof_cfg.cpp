@@ -25,44 +25,27 @@ int number_function_calls (const goto_programt::instructionst& instructions) {
     {
       // we may want to do something for GOTOs later
     case GOTO:
-      break;
     case INCOMPLETE_GOTO:
       break;
     case FUNCTION_CALL:
       count = count + 1;
-
+      break;
     case NO_INSTRUCTION_TYPE:
-      break;
     case OTHER:
-      break;
     case SET_RETURN_VALUE:
-      break;
     case DECL:
-      break;
     case DEAD:
-      break;
     case ASSIGN:
-      break;
     case ASSUME:
-      break;
     case ASSERT:
-      break;
     case SKIP:
-      break;
     case END_FUNCTION:
-      break;
     case LOCATION:
-      break;
     case THROW:
-      break;
     case CATCH:
-      break;
     case ATOMIC_BEGIN:
-      break;
     case ATOMIC_END:
-      break;
     case START_THREAD:
-      break;
     case END_THREAD:
       break;
     }
@@ -96,7 +79,9 @@ void normalize_scores (std::map<irep_idt, int> &scores) {
 
 void compute_scores (const namespacet &ns, 
                      std::map<irep_idt, int> &scores, 
-                     const std::vector<goto_functionst::function_mapt::const_iterator> &funs) {
+                     const goto_functionst &goto_functions) {
+  const auto funs = goto_functions.sorted();
+
   for (const auto &fun : funs) {
     const symbolt &symbol = ns.lookup(fun->first);
     const irep_idt &name = symbol.name;
@@ -111,13 +96,104 @@ void compute_scores (const namespacet &ns,
   normalize_scores(scores);
 }
 
+bool is_used (const std::map<irep_idt, bool> &use, const irep_idt &name) {
+
+    const auto used = use.find (name);
+    return used != use.end() && used->second;
+}
+
+// simple depth first search
+void find_used (irep_idt root,
+                messaget &msg,
+                const namespacet &ns,
+                const goto_functionst &goto_functions,
+                std::map<irep_idt, bool> &use) {
+  if (use.find(root) == use.end()) {
+    use.insert({root, true});
+    const auto fun = goto_functions.function_map.find(root);
+    if (fun != goto_functions.function_map.end()) {
+      for (const auto &instruction : fun->second.body.instructions) {
+        switch (instruction.type())
+        {
+          // we may want to do something for GOTOs later
+        case GOTO:
+          break;
+        case FUNCTION_CALL: {
+          const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
+          find_used (call, msg, ns, goto_functions, use);
+          break;
+        }
+        case OTHER:
+        case SET_RETURN_VALUE:
+        case DECL:
+        case DEAD:
+        case ASSIGN:
+        case ASSUME:
+        case ASSERT:
+        case SKIP:
+        case END_FUNCTION:
+        case LOCATION:
+          // unused: 
+        case INCOMPLETE_GOTO:
+        case NO_INSTRUCTION_TYPE:
+        case THROW:
+        case CATCH:
+        case ATOMIC_BEGIN:
+        case ATOMIC_END:
+        case START_THREAD:
+        case END_THREAD:
+          break;
+        }
+
+      }
+    }
+  }
+}
+
+void remove_functions_no_body (const namespacet &ns,
+                               const goto_functionst &goto_functions,
+                               std::map<irep_idt, bool> &use) {
+  const auto sorted = goto_functions.sorted();
+
+  for(const auto &fun : sorted) {
+    const symbolt &symbol = ns.lookup(fun->first);
+    const bool has_body = fun->second.body_available();
+
+    if (!has_body) {
+      const auto find = use.find (symbol.name);
+      if (find == use.end()) {
+        use.insert ({symbol.name, false});
+      } else {
+        find->second = false;
+      }
+    }
+  }
+}
+
 void show_goto_proof_cfg(
   const namespacet &ns,
   ui_message_handlert &ui_message_handler,
+  const std::list<std::string> roots,
   const goto_functionst &goto_functions)
 {
+  //goto_functionst goto_functions;
+  //goto_functions.copy_from(goto_functions_);
+
   messaget msg(ui_message_handler);
-  
+
+  std::map<irep_idt, bool> use;
+   msg.status() << roots.size() << "\n";
+  if (roots.size() == 0) {
+    find_used (goto_functions.entry_point(), msg, ns, goto_functions, use);
+  }
+  for (const auto &root : roots) {
+    const irep_idt &iden = root;
+    find_used (iden, msg, ns, goto_functions, use);
+    // msg.status() << iden << "\n";
+  }
+
+  remove_functions_no_body(ns, goto_functions, use);
+
   // sort functions alphabetically
   const auto sorted = goto_functions.sorted();
 
@@ -125,99 +201,97 @@ void show_goto_proof_cfg(
 
   std::map<irep_idt, int> scores;
   // initialize scores
-  compute_scores (ns, scores, sorted);
+  compute_scores (ns, scores, goto_functions);
 
   for(const auto &fun : sorted)
   {
     const symbolt &symbol = ns.lookup(fun->first);
     const bool has_body = fun->second.body_available();
 
-    if(has_body)
-    {
-      msg.status() << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
-      msg.status() << messaget::bold << "//" << symbol.display_name()
-                   << messaget::reset << " /* " << symbol.name << " */\n";
+    // msg.status() << "// " << symbol.name << " " << is_used (use, symbol.name) << "\n";
 
-      const auto &instructions = fun->second.body.instructions;
-      int s = scores.find (symbol.name)->second;
-      // negate s so that higher original score => more red.
-      s = 255 - s;
+    if (is_used (use, symbol.name)) {
 
-      std::stringstream stream;
-      // Red
-      stream << std::hex << 255;
-      // Green
-      if (s < 16) { stream << 0 << s; } else { stream << s; }
-      // Blue
-      if (s < 16) { stream << 0 << s; } else { stream << s; }
-      std::string color( stream.str() );
+      if(has_body)
+      {
+        msg.status() << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
+        msg.status() << messaget::bold << "//" << symbol.display_name()
+                     << messaget::reset << " /* " << symbol.name << " */\n";
 
-      msg.status() << symbol.name 
-                   << " [" 
-                   << "style=filled,"
-                   << "fillcolor=" << "\"#" << color << "\""
-                   << "];\n";
+        const auto &instructions = fun->second.body.instructions;
+        int s = scores.find (symbol.name)->second;
+        // negate s so that higher original score => more red.
+        s = 255 - s;
 
-      for (const auto &instruction : instructions) {
-        switch (instruction.type())
-        {
-          // we may want to do something for GOTOs later
-        case GOTO:
-          break;
-        case INCOMPLETE_GOTO:
-          break;
-        case FUNCTION_CALL:
-          // overapproximate by adding duplicate calls
-          msg.status() << symbol.name << " -> " << format(instruction.call_function()) << ";\n";
+        std::stringstream stream;
+        // Red
+        stream << std::hex << 255;
+        // Green
+        if (s < 16) { stream << 0 << s; } else { stream << s; }
+        // Blue
+        if (s < 16) { stream << 0 << s; } else { stream << s; }
+        std::string color( stream.str() );
 
-        case NO_INSTRUCTION_TYPE:
-          break;
-        case OTHER:
-          break;
-        case SET_RETURN_VALUE:
-          break;
-        case DECL:
-          break;
-        case DEAD:
-          break;
-        case ASSIGN:
-          break;
-        case ASSUME:
-          break;
-        case ASSERT:
-          break;
-        case SKIP:
-          break;
-        case END_FUNCTION:
-          break;
-        case LOCATION:
-          break;
-        case THROW:
-          break;
-        case CATCH:
-          break;
-        case ATOMIC_BEGIN:
-          break;
-        case ATOMIC_END:
-          break;
-        case START_THREAD:
-          break;
-        case END_THREAD:
-          break;
+        msg.status() << symbol.name 
+                     << " [" 
+                     << "style=filled,"
+                     << "fillcolor=" << "\"#" << color << "\""
+                     << "];\n";
+
+        std::set<irep_idt> calls;
+        for (const auto &instruction : instructions) {
+          switch (instruction.type())
+          {
+            // we may want to do something for GOTOs later
+          case GOTO:
+            break;
+          case FUNCTION_CALL: {
+            // overapproximate by adding duplicate calls
+            const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
+            if (is_used (use, call)) {
+              calls.insert (call);
+              //msg.status() << symbol.name << " -> " << format(instruction.call_function()) << ";\n";
+            }
+            break;
+          }
+          case OTHER:
+          case SET_RETURN_VALUE:
+          case DECL:
+          case DEAD:
+          case ASSIGN:
+          case ASSUME:
+          case ASSERT:
+          case SKIP:
+          case END_FUNCTION:
+          case LOCATION:
+            // unused: 
+          case INCOMPLETE_GOTO:
+          case NO_INSTRUCTION_TYPE:
+          case THROW:
+          case CATCH:
+          case ATOMIC_BEGIN:
+          case ATOMIC_END:
+          case START_THREAD:
+          case END_THREAD:
+            break;
+          }
+
+        }
+        for (const auto &call : calls) {
+          msg.status() << symbol.name << " -> " << call << ";\n";
         }
 
+        // fun->second.body.output(ns, symbol.name, msg.status());
+        // msg.status() << messaget::eom;
       }
+      else
+      {
+        msg.status() << symbol.name 
+                     << " [" 
+                     << "shape=Mdiamond"
+                     << "];\n";
 
-      // fun->second.body.output(ns, symbol.name, msg.status());
-      // msg.status() << messaget::eom;
-    }
-    else
-    {
-      msg.status() << symbol.name 
-                   << " [" 
-                   << "shape=Mdiamond"
-                   << "];\n";
-
+      }
     }
   }
 
@@ -230,9 +304,10 @@ void show_goto_proof_cfg(
 
 void show_goto_proof_cfg(
   const goto_modelt &goto_model,
+  const std::list<std::string> roots,
   ui_message_handlert &ui_message_handler)
 {
   const namespacet ns(goto_model.symbol_table);
   show_goto_proof_cfg(
-    ns, ui_message_handler, goto_model.goto_functions);
+    ns, ui_message_handler, roots, goto_model.goto_functions);
 }

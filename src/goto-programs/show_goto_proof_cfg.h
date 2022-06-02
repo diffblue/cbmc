@@ -13,6 +13,9 @@ Author: Benjamin Quiring
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_GOTO_PROOF_CFG_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_GOTO_PROOF_CFG_H
 
+#include <list>
+#include <string>
+
 class namespacet;
 class goto_modelt;
 class goto_functionst;
@@ -20,6 +23,7 @@ class ui_message_handlert;
 
 // clang-format off
 #define OPT_SHOW_GOTO_PROOF_CFG \
+  "(show-goto-proof-cfg):" \
   "(show-goto-proof-cfg)"
 
 #define HELP_SHOW_GOTO_PROOF_CFG \
@@ -29,10 +33,12 @@ class ui_message_handlert;
 void show_goto_proof_cfg(
   const namespacet &ns,
   ui_message_handlert &ui_message_handler,
+  const std::list<std::string> roots,
   const goto_functionst &goto_functions);
 
 void show_goto_proof_cfg(
   const goto_modelt &, 
+  const std::list<std::string> roots,
   ui_message_handlert &ui_message_handler);
 
 
