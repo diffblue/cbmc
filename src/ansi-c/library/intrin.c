@@ -533,7 +533,7 @@ inline __m128i _mm_subs_epi16(__m128i a, __m128i b)
 }
 #endif
 
-/* FUNCTION: _mm_subs_epi16 */
+/* FUNCTION: _mm_adds_epu16 */
 
 #ifdef _MSC_VER
 #  ifndef __CPROVER_INTRIN_H_INCLUDED
@@ -541,18 +541,18 @@ inline __m128i _mm_subs_epi16(__m128i a, __m128i b)
 #    define __CPROVER_INTRIN_H_INCLUDED
 #  endif
 
-inline __m128i _mm_subs_epi16(__m128i a, __m128i b)
+inline __m128i _mm_adds_epu16(__m128i a, __m128i b)
 {
   return (__m128i){
     .m128i_i16 = {
-      __CPROVER_saturating_minus(a.m128i_i16[0], b.m128i_i16[0]),
-      __CPROVER_saturating_minus(a.m128i_i16[1], b.m128i_i16[1]),
-      __CPROVER_saturating_minus(a.m128i_i16[2], b.m128i_i16[2]),
-      __CPROVER_saturating_minus(a.m128i_i16[3], b.m128i_i16[3]),
-      __CPROVER_saturating_minus(a.m128i_i16[4], b.m128i_i16[4]),
-      __CPROVER_saturating_minus(a.m128i_i16[5], b.m128i_i16[5]),
-      __CPROVER_saturating_minus(a.m128i_i16[6], b.m128i_i16[6]),
-      __CPROVER_saturating_minus(a.m128i_i16[7], b.m128i_i16[7]),
+      __CPROVER_saturating_plus(a.m128i_u16[0], b.m128i_u16[0]),
+      __CPROVER_saturating_plus(a.m128i_u16[1], b.m128i_u16[1]),
+      __CPROVER_saturating_plus(a.m128i_u16[2], b.m128i_u16[2]),
+      __CPROVER_saturating_plus(a.m128i_u16[3], b.m128i_u16[3]),
+      __CPROVER_saturating_plus(a.m128i_u16[4], b.m128i_u16[4]),
+      __CPROVER_saturating_plus(a.m128i_u16[5], b.m128i_u16[5]),
+      __CPROVER_saturating_plus(a.m128i_u16[6], b.m128i_u16[6]),
+      __CPROVER_saturating_plus(a.m128i_u16[7], b.m128i_u16[7]),
     }};
 }
 #endif
