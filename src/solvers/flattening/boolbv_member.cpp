@@ -47,10 +47,14 @@ bvt boolbvt::convert_member(const member_exprt &expr)
 {
   const bvt &compound_bv = convert_bv(expr.compound());
 
-  if(expr.compound().type().id() == ID_struct_tag)
+  const typet &compound_type = expr.compound().type();
+
+  if(compound_type.id() == ID_struct_tag || compound_type.id() == ID_struct)
   {
     const struct_typet &struct_op_type =
-      ns.follow_tag(to_struct_tag_type(expr.compound().type()));
+      compound_type.id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(compound_type))
+        : to_struct_type(compound_type);
 
     const auto &member_bits =
       bv_width.get_member(struct_op_type, expr.get_component_name());
@@ -66,7 +70,8 @@ bvt boolbvt::convert_member(const member_exprt &expr)
   }
   else
   {
-    PRECONDITION(expr.compound().type().id() == ID_union_tag);
+    PRECONDITION(
+      compound_type.id() == ID_union_tag || compound_type.id() == ID_union);
     return convert_member_union(expr, compound_bv, *this, ns);
   }
 }
