@@ -955,7 +955,7 @@ long double sqrtl(long double d)
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
 double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
 
-/* FUNCTION : fmaxf */
+/* FUNCTION: fmaxf */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
@@ -965,8 +965,7 @@ double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
 float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
 
-
-/* FUNCTION : fmaxl */
+/* FUNCTION: fmaxl */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
