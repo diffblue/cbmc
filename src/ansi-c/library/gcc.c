@@ -1,27 +1,27 @@
 /* FUNCTION: __builtin_ia32_sfence */
 
-inline void __builtin_ia32_sfence(void)
+void __builtin_ia32_sfence(void)
 {
   __asm("sfence");
 }
 
 /* FUNCTION: __builtin_ia32_lfence */
 
-inline void __builtin_ia32_lfence(void)
+void __builtin_ia32_lfence(void)
 {
   __asm("lfence");
 }
 
 /* FUNCTION: __builtin_ia32_mfence */
 
-inline void __builtin_ia32_mfence(void)
+void __builtin_ia32_mfence(void)
 {
   __asm("mfence");
 }
 
 /* FUNCTION: __sync_synchronize */
 
-inline void __sync_synchronize(void)
+void __sync_synchronize(void)
 {
   // WARNING: this was a NOP before gcc 4.3.1,
   // but is now believed to be the strongest possible barrier.
@@ -37,7 +37,7 @@ inline void __sync_synchronize(void)
 
 int __builtin_clz(unsigned int x);
 
-inline int __builtin_ffs(int x)
+int __builtin_ffs(int x)
 {
   if(x == 0)
     return 0;
@@ -54,7 +54,7 @@ inline int __builtin_ffs(int x)
 
 int __builtin_clzl(unsigned long x);
 
-inline int __builtin_ffsl(long x)
+int __builtin_ffsl(long x)
 {
   if(x == 0)
     return 0;
@@ -71,7 +71,7 @@ inline int __builtin_ffsl(long x)
 
 int __builtin_clzll(unsigned long long x);
 
-inline int __builtin_ffsll(long long x)
+int __builtin_ffsll(long long x)
 {
   if(x == 0)
     return 0;
@@ -88,7 +88,7 @@ inline int __builtin_ffsll(long long x)
 
 void __atomic_thread_fence(int memorder);
 
-inline _Bool __atomic_test_and_set(void *ptr, int memorder)
+_Bool __atomic_test_and_set(void *ptr, int memorder)
 {
 __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -103,7 +103,7 @@ __CPROVER_HIDE:;
 
 void __atomic_thread_fence(int memorder);
 
-inline void __atomic_clear(_Bool *ptr, int memorder)
+void __atomic_clear(_Bool *ptr, int memorder)
 {
 __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -145,7 +145,7 @@ __CPROVER_HIDE:;
 #  define __ATOMIC_SEQ_CST 5
 #endif
 
-inline void __atomic_thread_fence(int memorder)
+void __atomic_thread_fence(int memorder)
 {
 __CPROVER_HIDE:;
   if(memorder == __ATOMIC_CONSUME || memorder == __ATOMIC_ACQUIRE)
@@ -168,7 +168,7 @@ __CPROVER_HIDE:;
 
 void __atomic_thread_fence(int memorder);
 
-inline void __atomic_signal_fence(int memorder)
+void __atomic_signal_fence(int memorder)
 {
 __CPROVER_HIDE:;
   __atomic_thread_fence(memorder);
@@ -176,7 +176,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __atomic_always_lock_free */
 
-inline _Bool __atomic_always_lock_free(__CPROVER_size_t size, void *ptr)
+_Bool __atomic_always_lock_free(__CPROVER_size_t size, void *ptr)
 {
 __CPROVER_HIDE:;
   (void)ptr;
@@ -185,7 +185,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __atomic_is_lock_free */
 
-inline _Bool __atomic_is_lock_free(__CPROVER_size_t size, void *ptr)
+_Bool __atomic_is_lock_free(__CPROVER_size_t size, void *ptr)
 {
 __CPROVER_HIDE:;
   (void)ptr;

@@ -1,6 +1,6 @@
 /* FUNCTION: __builtin___strcpy_chk */
 
-inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t s)
+char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t s)
 {
 __CPROVER_HIDE:;
 
@@ -136,7 +136,7 @@ __CPROVER_HIDE:;
 
 #undef strcpy
 
-inline char *strcpy(char *dst, const char *src)
+char *strcpy(char *dst, const char *src)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -173,7 +173,7 @@ __CPROVER_HIDE:;
 
 #undef strncpy
 
-inline char *strncpy(char *dst, const char *src, size_t n)
+char *strncpy(char *dst, const char *src, size_t n)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -211,7 +211,11 @@ __CPROVER_HIDE:;
 #define __CPROVER_STRING_H_INCLUDED
 #endif
 
-inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)
+char *__builtin___strncpy_chk(
+  char *dst,
+  const char *src,
+  size_t n,
+  size_t object_size)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -255,7 +259,7 @@ __CPROVER_HIDE:;
 
 #undef strcat
 
-inline char *strcat(char *dst, const char *src)
+char *strcat(char *dst, const char *src)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -301,7 +305,7 @@ __CPROVER_HIDE:;
 
 #undef strncat
 
-inline char *strncat(char *dst, const char *src, size_t n)
+char *strncat(char *dst, const char *src, size_t n)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -356,7 +360,7 @@ __CPROVER_HIDE:;
 
 #undef strcmp
 
-inline int strcmp(const char *s1, const char *s2)
+int strcmp(const char *s1, const char *s2)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -405,7 +409,7 @@ __CPROVER_HIDE:;
 
 #undef strcasecmp
 
-inline int strcasecmp(const char *s1, const char *s2)
+int strcasecmp(const char *s1, const char *s2)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -457,7 +461,7 @@ __CPROVER_HIDE:;
 
 #undef strncmp
 
-inline int strncmp(const char *s1, const char *s2, size_t n)
+int strncmp(const char *s1, const char *s2, size_t n)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -504,7 +508,7 @@ __CPROVER_HIDE:;
 
 #undef strncasecmp
 
-inline int strncasecmp(const char *s1, const char *s2, size_t n)
+int strncasecmp(const char *s1, const char *s2, size_t n)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_STRING_ABSTRACTION
@@ -554,7 +558,7 @@ __CPROVER_HIDE:;
 
 #undef strlen
 
-inline size_t strlen(const char *s)
+size_t strlen(const char *s)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -583,7 +587,7 @@ inline size_t strlen(const char *s)
 #undef strdup
 #undef strcpy
 
-inline char *strdup(const char *str)
+char *strdup(const char *str)
 {
   __CPROVER_HIDE:;
   __CPROVER_size_t bufsz;
@@ -916,7 +920,7 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
 
 #undef memcmp
 
-inline int memcmp(const void *s1, const void *s2, size_t n)
+int memcmp(const void *s1, const void *s2, size_t n)
 {
   __CPROVER_HIDE:;
   int res=0;
@@ -951,7 +955,7 @@ inline int memcmp(const void *s1, const void *s2, size_t n)
 
 #undef strchr
 
-inline char *strchr(const char *src, int c)
+char *strchr(const char *src, int c)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -980,7 +984,7 @@ inline char *strchr(const char *src, int c)
 
 #undef strchr
 
-inline char *strrchr(const char *src, int c)
+char *strrchr(const char *src, int c)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION

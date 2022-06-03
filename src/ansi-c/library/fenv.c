@@ -4,7 +4,7 @@
 
 extern int __CPROVER_rounding_mode;
 
-inline int fegetround(void)
+int fegetround(void)
 {
 __CPROVER_HIDE:;
   // CPROVER uses the x86 numbering of the rounding modes
@@ -24,7 +24,7 @@ __CPROVER_HIDE:;
 
 #include <fenv.h>
 
-inline int fesetround(int rounding_mode)
+int fesetround(int rounding_mode)
 {
 __CPROVER_HIDE:;
   // CPROVER uses the x86 numbering of the rounding modes

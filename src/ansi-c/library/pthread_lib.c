@@ -7,7 +7,7 @@
 
 int __VERIFIER_nondet_int();
 
-inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
+int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 {
   __CPROVER_HIDE:;
 
@@ -32,7 +32,7 @@ inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 
 int __VERIFIER_nondet_int();
 
-inline int pthread_cancel(pthread_t thread)
+int pthread_cancel(pthread_t thread)
 {
   __CPROVER_HIDE:;
 
@@ -64,7 +64,7 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-inline void pthread_mutex_cleanup(void *p)
+void pthread_mutex_cleanup(void *p)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(
@@ -73,8 +73,9 @@ inline void pthread_mutex_cleanup(void *p)
 }
 #endif
 
-inline int pthread_mutex_init(
-  pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
+int pthread_mutex_init(
+  pthread_mutex_t *mutex,
+  const pthread_mutexattr_t *mutexattr)
 {
   __CPROVER_HIDE:;
   *((__CPROVER_mutex_t *)mutex)=0;
@@ -108,7 +109,7 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
-inline int pthread_mutex_lock(pthread_mutex_t *mutex)
+int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
@@ -157,7 +158,7 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
-inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
+int pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   int return_value;
@@ -208,7 +209,7 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
-inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
+int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
 
@@ -256,7 +257,7 @@ typedef signed char __CPROVER_mutex_t;
 #endif
 #endif
 
-inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
+int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
 
@@ -297,7 +298,7 @@ extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
 extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
 
-inline void pthread_exit(void *value_ptr)
+void pthread_exit(void *value_ptr)
 {
   __CPROVER_HIDE:;
   if(value_ptr!=0) (void)*(char*)value_ptr;
@@ -335,7 +336,7 @@ extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
-inline int pthread_join(pthread_t thread, void **value_ptr)
+int pthread_join(pthread_t thread, void **value_ptr)
 {
 __CPROVER_HIDE:;
 
@@ -372,7 +373,7 @@ extern __CPROVER_bool __CPROVER_threads_exited[];
 extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
-inline int _pthread_join(pthread_t thread, void **value_ptr)
+int _pthread_join(pthread_t thread, void **value_ptr)
 {
 __CPROVER_HIDE:;
 
@@ -398,7 +399,7 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
+int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(*((signed char *)lock)==0,
@@ -420,7 +421,7 @@ inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 #endif
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-inline void pthread_rwlock_cleanup(void *p)
+void pthread_rwlock_cleanup(void *p)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_get_must(p, "rwlock_destroyed"),
@@ -428,7 +429,8 @@ inline void pthread_rwlock_cleanup(void *p)
 }
 #endif
 
-inline int pthread_rwlock_init(pthread_rwlock_t *lock,
+int pthread_rwlock_init(
+  pthread_rwlock_t *lock,
   const pthread_rwlockattr_t *attr)
 {
   __CPROVER_HIDE:;
@@ -449,7 +451,7 @@ inline int pthread_rwlock_init(pthread_rwlock_t *lock,
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
+int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -468,7 +470,7 @@ inline int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -485,7 +487,7 @@ inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
+int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -502,7 +504,7 @@ inline int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_rwlock_unlock(pthread_rwlock_t *lock)
+int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_assert(*((signed char *)lock)==1,
@@ -519,7 +521,7 @@ inline int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
+int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -540,7 +542,7 @@ extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
 extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
 
-inline void __spawned_thread(
+void __spawned_thread(
   unsigned long this_thread_id,
 #if 0
   // Destructor support is disabled as it is too expensive due to its extensive
@@ -609,11 +611,11 @@ void __spawned_thread(
   void *(*start_routine)(void *),
   void *arg);
 
-inline int pthread_create(
-  pthread_t *thread, // must not be null
-  const pthread_attr_t *attr, // may be null
-  void * (*start_routine)(void *), // must not be null
-  void *arg) // may be null
+int pthread_create(
+  pthread_t *thread,              // must not be null
+  const pthread_attr_t *attr,     // may be null
+  void *(*start_routine)(void *), // must not be null
+  void *arg)                      // may be null
 {
   __CPROVER_HIDE:;
   unsigned long this_thread_id;
@@ -659,9 +661,7 @@ inline int pthread_create(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_cond_init(
-    pthread_cond_t *cond,
-    const pthread_condattr_t *attr)
+int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 { __CPROVER_HIDE:
   *((unsigned *)cond)=0;
   if(attr) (void)*attr;
@@ -675,8 +675,7 @@ inline int pthread_cond_init(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_cond_signal(
-  pthread_cond_t *cond)
+int pthread_cond_signal(pthread_cond_t *cond)
 { __CPROVER_HIDE:
   __CPROVER_atomic_begin();
   (*((unsigned *)cond))++;
@@ -691,8 +690,7 @@ inline int pthread_cond_signal(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_cond_broadcast(
-    pthread_cond_t *cond)
+int pthread_cond_broadcast(pthread_cond_t *cond)
 { __CPROVER_HIDE:
   __CPROVER_atomic_begin();
   *((unsigned *)cond)=(unsigned)-1;
@@ -707,9 +705,7 @@ inline int pthread_cond_broadcast(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-inline int pthread_cond_wait(
-    pthread_cond_t *cond,
-    pthread_mutex_t *mutex)
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
 { __CPROVER_HIDE:
 
   (void)*mutex;
@@ -825,9 +821,10 @@ int __VERIFIER_nondet_int();
 // no pthread_barrier_t on the Mac
 // slightly different declaration on OpenBSD
 #if !defined(__APPLE__) && !defined(__OpenBSD__)
-inline int pthread_barrier_init(
+int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
-  const pthread_barrierattr_t *restrict attr, unsigned count)
+  const pthread_barrierattr_t *restrict attr,
+  unsigned count)
 {
   __CPROVER_HIDE:;
   (void)barrier;
@@ -846,7 +843,7 @@ inline int pthread_barrier_init(
 
 // pthread_barrier_init has a slightly different decl on OpenBSD
 #if defined(__OpenBSD__)
-inline int pthread_barrier_init(
+int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
   pthread_barrierattr_t *restrict attr,
   unsigned count)
@@ -877,7 +874,7 @@ int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__
-inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
+int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
 
@@ -907,7 +904,7 @@ int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__
-inline int pthread_barrier_wait(pthread_barrier_t *barrier)
+int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   __CPROVER_HIDE:;
 
@@ -936,7 +933,7 @@ extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 extern __CPROVER_thread_local void (*__CPROVER_thread_key_dtors[])(void *);
 extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
 
-inline int pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
+int pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 {
 __CPROVER_HIDE:;
   __CPROVER_thread_keys[__CPROVER_next_thread_key] = 0;
@@ -960,7 +957,7 @@ __CPROVER_HIDE:;
 
 extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 
-inline int pthread_key_delete(pthread_key_t key)
+int pthread_key_delete(pthread_key_t key)
 {
 __CPROVER_HIDE:;
   __CPROVER_thread_keys[key] = 0;
@@ -976,7 +973,7 @@ __CPROVER_HIDE:;
 
 extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 
-inline void *pthread_getspecific(pthread_key_t key)
+void *pthread_getspecific(pthread_key_t key)
 {
 __CPROVER_HIDE:;
   return (void *)__CPROVER_thread_keys[key];
@@ -991,7 +988,7 @@ __CPROVER_HIDE:;
 
 extern __CPROVER_thread_local const void *__CPROVER_thread_keys[];
 
-inline int pthread_setspecific(pthread_key_t key, const void *value)
+int pthread_setspecific(pthread_key_t key, const void *value)
 {
 __CPROVER_HIDE:;
   __CPROVER_thread_keys[key] = value;
