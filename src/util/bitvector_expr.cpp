@@ -152,3 +152,60 @@ exprt bitreverse_exprt::lower() const
 
   return let_exprt{to_reverse, op(), concatenation_exprt{result_bits, type()}};
 }
+
+exprt plus_overflow_exprt::lower() const
+{
+  std::size_t lhs_ssize = to_bitvector_type(lhs().type()).get_width();
+  if(lhs().type().id() == ID_unsignedbv)
+    ++lhs_ssize;
+  std::size_t rhs_ssize = to_bitvector_type(rhs().type()).get_width();
+  if(rhs().type().id() == ID_unsignedbv)
+    ++rhs_ssize;
+
+  std::size_t ssize = std::max(lhs_ssize, rhs_ssize) + 1;
+  signedbv_typet ssize_type{ssize};
+  plus_exprt exact_result{
+    typecast_exprt{lhs(), ssize_type}, typecast_exprt{rhs(), ssize_type}};
+
+  return notequal_exprt{
+    typecast_exprt{typecast_exprt{exact_result, lhs().type()}, ssize_type},
+    exact_result};
+}
+
+exprt minus_overflow_exprt::lower() const
+{
+  std::size_t lhs_ssize = to_bitvector_type(lhs().type()).get_width();
+  if(lhs().type().id() == ID_unsignedbv)
+    ++lhs_ssize;
+  std::size_t rhs_ssize = to_bitvector_type(rhs().type()).get_width();
+  if(rhs().type().id() == ID_unsignedbv)
+    ++rhs_ssize;
+
+  std::size_t ssize = std::max(lhs_ssize, rhs_ssize) + 1;
+  signedbv_typet ssize_type{ssize};
+  minus_exprt exact_result{
+    typecast_exprt{lhs(), ssize_type}, typecast_exprt{rhs(), ssize_type}};
+
+  return notequal_exprt{
+    typecast_exprt{typecast_exprt{exact_result, lhs().type()}, ssize_type},
+    exact_result};
+}
+
+exprt mult_overflow_exprt::lower() const
+{
+  std::size_t lhs_ssize = to_bitvector_type(lhs().type()).get_width();
+  if(lhs().type().id() == ID_unsignedbv)
+    ++lhs_ssize;
+  std::size_t rhs_ssize = to_bitvector_type(rhs().type()).get_width();
+  if(rhs().type().id() == ID_unsignedbv)
+    ++rhs_ssize;
+
+  std::size_t ssize = lhs_ssize + rhs_ssize;
+  signedbv_typet ssize_type{ssize};
+  mult_exprt exact_result{
+    typecast_exprt{lhs(), ssize_type}, typecast_exprt{rhs(), ssize_type}};
+
+  return notequal_exprt{
+    typecast_exprt{typecast_exprt{exact_result, lhs().type()}, ssize_type},
+    exact_result};
+}
