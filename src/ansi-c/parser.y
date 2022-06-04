@@ -3303,6 +3303,7 @@ cprover_function_contract:
           exprt tmp(ID_function_pointer_obeys_contract);
           tmp.add_to_operands(std::move(parser_stack($3)));
           tmp.add_to_operands(std::move(parser_stack($5)));
+          tmp.add_source_location()=parser_stack($$).source_location();
           parser_stack($$).add_to_operands(std::move(tmp));
         }
         | TOK_CPROVER_REQUIRES_CONTRACT '(' unary_expression ',' unary_expression ')'
@@ -3312,6 +3313,7 @@ cprover_function_contract:
           exprt tmp(ID_function_pointer_obeys_contract);
           tmp.add_to_operands(std::move(parser_stack($3)));
           tmp.add_to_operands(std::move(parser_stack($5)));
+          tmp.add_source_location()=parser_stack($$).source_location();
           parser_stack($$).add_to_operands(std::move(tmp));
         }
         | cprover_contract_assigns
