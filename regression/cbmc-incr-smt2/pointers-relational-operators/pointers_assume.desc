@@ -1,0 +1,14 @@
+CORE
+pointers_assume.c
+--trace
+\[main\.assertion\.1\] line \d+ x != y: expected successful: SUCCESS
+\[main\.assertion\.2\] line \d+ x == y: expected failure: FAILURE
+\[main\.assertion\.3\] line \d+ z >= x: expected successful: SUCCESS
+\[main\.assertion\.4\] line \d+ z <= y: expected successful: SUCCESS
+\[main\.assertion\.5\] line \d+ z <= x: expected failure: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This is testing basic pointer relational operator support for three objects
+defined in the function's stack frame.
