@@ -17,8 +17,90 @@ Author: Benjamin Quiring
 
 #include "goto_model.h"
 #include "goto_program.h"
+#include "pointer_expr.h"
 
-int number_function_calls (const goto_programt::instructionst& instructions) {
+// TODO
+/*
+  goto_programt::targett target;
+  Forall_goto_program_instructions(target, goto_program)
+    if(target->is_function_call())
+    {
+      if(target->call_function().id() == ID_dereference)
+      {
+        remove_function_pointer(goto_program, function_id, target);
+        did_something=true;
+      }
+    }
+*/
+
+
+bool is_private (const irep_idt &name) {
+  // "__CPROVER_file_local_{filename}_c_{name}";
+
+  const std::string str (name.c_str(), name.size());
+  
+  return (str.find ("__CPROVER_file_local_") != std::string::npos);
+}
+
+std::string normalize_name (const irep_idt &name) {
+  // "__CPROVER_file_local_{filename}_c_{name}";
+
+  const std::string str (name.c_str(), name.size());
+  
+  if (str.find ("__CPROVER_file_local_") != std::string::npos) {
+    return str.substr (str.find ("_c_") + 3);
+
+  }
+
+  return str;
+}
+
+int number_loops (const goto_programt::instructionst &instructions) {
+  // number of loops = number of backward jumps
+  std::set<int> seen;
+  int num_loops = 0;
+
+  for (const auto &instruction : instructions) {
+    if (instruction.is_target()) {
+      seen.insert (instruction.target_number);
+    }
+
+    switch (instruction.type())
+    {
+    case GOTO:
+      for (auto gt_it = instruction.targets.begin(); gt_it != instruction.targets.end(); gt_it++) {
+        if (seen.find ((*gt_it)->target_number) != seen.end()) {
+          num_loops = num_loops + 1;
+        }
+      }
+      break;
+    case INCOMPLETE_GOTO:
+    case FUNCTION_CALL:
+    case NO_INSTRUCTION_TYPE:
+    case OTHER:
+    case SET_RETURN_VALUE:
+    case DECL:
+    case DEAD:
+    case ASSIGN:
+    case ASSUME:
+    case ASSERT:
+    case SKIP:
+    case END_FUNCTION:
+    case LOCATION:
+    case THROW:
+    case CATCH:
+    case ATOMIC_BEGIN:
+    case ATOMIC_END:
+    case START_THREAD:
+    case END_THREAD:
+      break;
+    }
+  }
+
+  return num_loops;
+}
+
+int outdegree (const goto_programt::instructionst& instructions) {
   int count = 0;
   for (const auto &instruction : instructions) {
     switch (instruction.type())
@@ -54,10 +136,67 @@ int number_function_calls (const goto_programt::instructionst& instructions) {
   return count;
 }
 
+// TODO inefficient to traverse graph for every function
+int indegree (const symbolt &symbol, 
+              const namespacet &ns, 
+              const goto_functionst &goto_functions) {
+  int indegree = 0;
+
+  const auto funs = goto_functions.sorted();
+
+  for (const auto &fun : funs) {
+    const bool has_body = fun->second.body_available();
+    if (has_body) {
+      const auto &instructions = fun->second.body.instructions;
+      for (const auto &instruction : instructions) {
+        switch (instruction.type())
+        {
+        case FUNCTION_CALL: {
+          // only look at real function calls, not function pointer calls
+          if (instruction.call_function().id() != ID_dereference) {
+            const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
+            if (call == symbol.name) {
+              indegree = indegree + 1;
+            }
+          }
+          break;
+        }
+        case GOTO:
+        case INCOMPLETE_GOTO:
+        case NO_INSTRUCTION_TYPE:
+        case OTHER:
+        case SET_RETURN_VALUE:
+        case DECL:
+        case DEAD:
+        case ASSIGN:
+        case ASSUME:
+        case ASSERT:
+        case SKIP:
+        case END_FUNCTION:
+        case LOCATION:
+        case THROW:
+        case CATCH:
+        case ATOMIC_BEGIN:
+        case ATOMIC_END:
+        case START_THREAD:
+        case END_THREAD:
+          break;
+        }
+        
+      }
+    }
+  }
+
+  return indegree;
+}
+
 // the score metric associated with the function.
 // a large score means the associated proof should be more difficult.
-int score (const symbolt &symbol, const goto_programt::instructionst& instructions) {
-  return number_function_calls (instructions);
+int score (const symbolt &symbol, 
+           const goto_programt::instructionst& instructions, 
+           const namespacet &ns, 
+           const goto_functionst &goto_functions) {
+  return number_loops (instructions) + outdegree (instructions) + indegree (symbol, ns, goto_functions);
 }
 
 void normalize_scores (std::map<irep_idt, int> &scores) {
@@ -89,7 +228,7 @@ void compute_scores (const namespacet &ns,
     const bool has_body = fun->second.body_available();
     if (has_body) {
       const auto &instructions = fun->second.body.instructions;
-      sc = score (symbol, instructions);
+      sc = score (symbol, instructions, ns, goto_functions);
     }
     scores.insert ({name, sc});
   }
@@ -119,8 +258,11 @@ void find_used (irep_idt root,
         case GOTO:
           break;
         case FUNCTION_CALL: {
-          const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
-          find_used (call, msg, ns, goto_functions, use);
+          // only look at real function calls, not function pointer calls
+          if (instruction.call_function().id() != ID_dereference) {
+            const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
+            find_used (call, msg, ns, goto_functions, use);
+          }
           break;
         }
         case OTHER:
@@ -198,6 +340,7 @@ void show_goto_proof_cfg(
   const auto sorted = goto_functions.sorted();
 
   msg.status() << "digraph G {\n\n";
+  msg.status() << "rankdir=\"LR\";\n";
 
   std::map<irep_idt, int> scores;
   // initialize scores
@@ -232,13 +375,17 @@ void show_goto_proof_cfg(
         if (s < 16) { stream << 0 << s; } else { stream << s; }
         std::string color( stream.str() );
 
-        msg.status() << symbol.name 
+        std::string shape = is_private (symbol.name) ? "ellipse" : "rect";
+        msg.status() << normalize_name (symbol.name)
                      << " [" 
+                     << "shape=" << shape << ","
                      << "style=filled,"
-                     << "fillcolor=" << "\"#" << color << "\""
+                     << "fillcolor=" << "\"#" << color << "\","
+                     << "fontsize=" << (8 + (255-s) / 16) 
                      << "];\n";
 
         std::set<irep_idt> calls;
+        std::set<std::string> func_ptrs;
         for (const auto &instruction : instructions) {
           switch (instruction.type())
           {
@@ -247,10 +394,25 @@ void show_goto_proof_cfg(
             break;
           case FUNCTION_CALL: {
             // overapproximate by adding duplicate calls
-            const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
-            if (is_used (use, call)) {
-              calls.insert (call);
-              //msg.status() << symbol.name << " -> " << format(instruction.call_function()) << ";\n";
+            
+            if (instruction.call_function().id() != ID_dereference) {
+              const irep_idt call = ns.lookup(to_symbol_expr(instruction.call_function())).name;
+              if (is_used (use, call)) {
+                calls.insert (call);
+              }
+
+            } else {
+              const exprt &pointer = to_dereference_expr(instruction.call_function()).pointer();
+              // TODO: idk what else it could be
+              std::stringstream stream;
+              stream << "\"" << format(pointer) << "\"";
+
+              std::string rhs = stream.str();
+              func_ptrs.insert (rhs);
+              //if (pointer.id() == ID_symbol) {
+              //  const irep_idt func_ptr = ns.lookup(to_symbol_expr(pointer)).name;
+              //  func_ptrs.insert (func_ptr);
+              //}
             }
             break;
           }
@@ -277,8 +439,23 @@ void show_goto_proof_cfg(
           }
 
         }
+
+        for (const auto &func_ptr : func_ptrs) {
+          msg.status() << func_ptr
+                       << " [" 
+                       << "shape=" << "rarrow" << ","
+                       << "style=filled,"
+                       << "fillcolor=" << "\"#" << "ffffff" << "\","
+                       << "fontsize=" << 8
+                       << "];\n";
+        }
+
         for (const auto &call : calls) {
-          msg.status() << symbol.name << " -> " << call << ";\n";
+          msg.status() << normalize_name(symbol.name) << " -> " << normalize_name(call) << ";\n";
+        }
+
+        for (const auto &func_ptr : func_ptrs) {
+          msg.status() << normalize_name(symbol.name) << " -> " << func_ptr << ";\n";
         }
 
         // fun->second.body.output(ns, symbol.name, msg.status());
@@ -286,7 +463,7 @@ void show_goto_proof_cfg(
       }
       else
       {
-        msg.status() << symbol.name 
+        msg.status() << normalize_name (symbol.name)
                      << " [" 
                      << "shape=Mdiamond"
                      << "];\n";
