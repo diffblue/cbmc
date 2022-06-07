@@ -3051,12 +3051,8 @@ void smt2_convt::convert_union(const union_exprt &expr)
   const exprt &op=expr.op();
 
   std::size_t total_width=boolbv_width(union_type);
-  CHECK_RETURN_WITH_DIAGNOSTICS(
-    total_width != 0, "failed to get union width for union");
 
   std::size_t member_width=boolbv_width(op.type());
-  CHECK_RETURN_WITH_DIAGNOSTICS(
-    member_width != 0, "failed to get union member width for union");
 
   if(total_width==member_width)
   {
@@ -4057,7 +4053,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       std::size_t struct_width=boolbv_width(struct_type);
 
       // figure out the offset and width of the member
-      boolbv_widtht::membert m=
+      const boolbv_widtht::membert &m =
         boolbv_width.get_member(struct_type, component_name);
 
       out << "(let ((?withop ";
@@ -4107,12 +4103,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
     const exprt &value = expr.new_value();
 
     std::size_t total_width=boolbv_width(union_type);
-    CHECK_RETURN_WITH_DIAGNOSTICS(
-      total_width != 0, "failed to get union width for with");
 
     std::size_t member_width=boolbv_width(value.type());
-    CHECK_RETURN_WITH_DIAGNOSTICS(
-      member_width != 0, "failed to get union member width for with");
 
     if(total_width==member_width)
     {
@@ -4140,24 +4132,19 @@ void smt2_convt::convert_with(const with_exprt &expr)
           expr_type.id()==ID_signedbv)
   {
     // Update bits in a bit-vector. We will use masking and shifts.
+    // TODO: SMT2-ify
+    SMT2_TODO("SMT2-ify");
 
+#if 0
     std::size_t total_width=boolbv_width(expr_type);
-    CHECK_RETURN_WITH_DIAGNOSTICS(
-      total_width != 0, "failed to get total width");
 
     const exprt &index=expr.operands()[1];
     const exprt &value=expr.operands()[2];
 
     std::size_t value_width=boolbv_width(value.type());
-    CHECK_RETURN_WITH_DIAGNOSTICS(
-      value_width != 0, "failed to get value width");
 
     typecast_exprt index_tc(index, expr_type);
 
-    // TODO: SMT2-ify
-    SMT2_TODO("SMT2-ify");
-
-#if 0
     out << "(bvor ";
     out << "(band ";
 
@@ -4232,7 +4219,6 @@ void smt2_convt::convert_index(const index_exprt &expr)
     {
       // fixed size
       std::size_t array_width=boolbv_width(array_type);
-      CHECK_RETURN(array_width != 0);
 
       unflatten(wheret::BEGIN, array_type.element_type());
 
@@ -4324,7 +4310,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
     else
     {
       // we extract
-      const auto member_offset = boolbv_width.get_member(struct_type, name);
+      const auto &member_offset = boolbv_width.get_member(struct_type, name);
 
       if(expr.type().id() == ID_bool)
         out << "(= ";
@@ -5099,8 +5085,6 @@ void smt2_convt::convert_type(const typet &type)
     else
     {
       std::size_t width=boolbv_width(type);
-      CHECK_RETURN_WITH_DIAGNOSTICS(
-        width != 0, "failed to get width of struct");
 
       out << "(_ BitVec " << width << ")";
     }
@@ -5114,8 +5098,6 @@ void smt2_convt::convert_type(const typet &type)
     else
     {
       std::size_t width=boolbv_width(type);
-      CHECK_RETURN_WITH_DIAGNOSTICS(
-        width != 0, "failed to get width of vector");
 
       out << "(_ BitVec " << width << ")";
     }
@@ -5187,8 +5169,6 @@ void smt2_convt::convert_type(const typet &type)
     else
     {
       std::size_t width=boolbv_width(type);
-      CHECK_RETURN_WITH_DIAGNOSTICS(
-        width != 0, "failed to get width of complex");
 
       out << "(_ BitVec " << width << ")";
     }

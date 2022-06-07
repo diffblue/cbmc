@@ -45,12 +45,11 @@ protected:
 
 void bv_endianness_mapt::build_little_endian(const typet &src)
 {
-  const std::size_t width = boolbv_width(src);
-
-  if(width == 0)
+  const auto &width_opt = boolbv_width.get_width_opt(src);
+  if(!width_opt.has_value())
     return;
 
-  const std::size_t new_size = map.size() + width;
+  const std::size_t new_size = map.size() + *width_opt;
   map.reserve(new_size);
 
   for(std::size_t i = map.size(); i < new_size; ++i)
@@ -611,9 +610,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   {
     std::size_t width=boolbv_width(expr.type());
 
-    if(width==0)
-      return conversion_failed(expr);
-
     // pointer minus pointer is subtraction over the offset divided by element
     // size, iff the pointers point to the same object
     const auto &minus_expr = to_minus_expr(expr);
@@ -690,9 +686,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   {
     std::size_t width=boolbv_width(expr.type());
 
-    if(width==0)
-      return conversion_failed(expr);
-
     const exprt &pointer = to_pointer_offset_expr(expr).pointer();
     const bvt &pointer_bv = convert_bv(pointer);
 
@@ -721,9 +714,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   {
     std::size_t width=boolbv_width(expr.type());
 
-    if(width==0)
-      return conversion_failed(expr);
-
     const exprt &pointer = to_pointer_object_expr(expr).pointer();
     const bvt &pointer_bv = convert_bv(pointer);
 
@@ -740,11 +730,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     bvt op0 = convert_pointer_type(to_typecast_expr(expr).op());
 
     // squeeze it in!
-
     std::size_t width=boolbv_width(expr.type());
-
-    if(width==0)
-      return conversion_failed(expr);
 
     return bv_utils.zero_extension(op0, width);
   }

@@ -18,9 +18,6 @@ bvt boolbvt::convert_update(const update_exprt &expr)
 
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   bvt bv=convert_bv(ops[0]);
 
   if(bv.size()!=width)

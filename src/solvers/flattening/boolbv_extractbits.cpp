@@ -15,9 +15,6 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 {
   const std::size_t bv_width = boolbv_width(expr.type());
 
-  if(bv_width == 0)
-    return conversion_failed(expr);
-
   auto const &src_bv = convert_bv(expr.src());
 
   auto const maybe_upper_as_int = numeric_cast<mp_integer>(expr.upper());

@@ -15,9 +15,6 @@ bvt boolbvt::convert_power(const binary_exprt &expr)
 
   std::size_t width=boolbv_width(type);
 
-  if(width==0)
-    return conversion_failed(expr);
-
   if(type.id()==ID_unsignedbv ||
      type.id()==ID_signedbv)
   {

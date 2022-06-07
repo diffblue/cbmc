@@ -38,7 +38,12 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   converted_values.reserve(variables.size());
 
   for(auto &value : values)
-    converted_values.push_back(convert_bv(value));
+  {
+    if(!bv_width.get_width_opt(value.type()).has_value())
+      converted_values.emplace_back();
+    else
+      converted_values.push_back(convert_bv(value));
+  }
 
   // get fresh bound symbols
   auto fresh_variables = fresh_binding(expr.binding());

@@ -32,9 +32,6 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   std::size_t width=boolbv_width(type);
 
-  if(width==0)
-    return conversion_failed(expr);
-
   const exprt::operandst &operands=expr.operands();
 
   DATA_INVARIANT(
@@ -159,9 +156,6 @@ bvt boolbvt::convert_saturating_add_sub(const binary_exprt &expr)
   }
 
   std::size_t width = boolbv_width(type);
-
-  if(width == 0)
-    return conversion_failed(expr);
 
   DATA_INVARIANT(
     expr.lhs().type() == type && expr.rhs().type() == type,

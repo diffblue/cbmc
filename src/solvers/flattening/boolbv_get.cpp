@@ -48,12 +48,9 @@ exprt boolbvt::bv_get_rec(
   std::size_t offset,
   const typet &type) const
 {
-  std::size_t width=boolbv_width(type);
-
-  assert(bv.size()>=offset+width);
-
   if(type.id()==ID_bool)
   {
+    PRECONDITION(bv.size() > offset);
     // clang-format off
     switch(prop.l_get(bv[offset]).get_value())
     {
@@ -76,10 +73,14 @@ exprt boolbvt::bv_get_rec(
         return bv_get_unbounded_array(expr);
 
       const typet &subtype = array_type.element_type();
-      std::size_t sub_width=boolbv_width(subtype);
+      const auto &sub_width_opt = bv_width.get_width_opt(subtype);
 
-      if(sub_width!=0)
+      if(sub_width_opt.has_value() && *sub_width_opt > 0)
       {
+        const std::size_t width = boolbv_width(type);
+
+        std::size_t sub_width = *sub_width_opt;
+
         exprt::operandst op;
         op.reserve(width/sub_width);
 
@@ -131,9 +132,7 @@ exprt boolbvt::bv_get_rec(
         const member_exprt member{expr, c.get_name(), subtype};
         op.push_back(bv_get_rec(member, bv, offset + new_offset, subtype));
 
-        std::size_t sub_width = boolbv_width(subtype);
-        if(sub_width!=0)
-          new_offset+=sub_width;
+        new_offset += boolbv_width(subtype);
       }
 
       return struct_exprt(std::move(op), type);
@@ -160,9 +159,12 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_vector)
     {
+      const std::size_t width = boolbv_width(type);
+
       const auto &vector_type = to_vector_type(type);
       const typet &element_type = vector_type.element_type();
       std::size_t element_width = boolbv_width(element_type);
+      CHECK_RETURN(element_width > 0);
 
       if(element_width != 0 && width % element_width == 0)
       {
@@ -183,20 +185,24 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_complex)
     {
+      const std::size_t width = boolbv_width(type);
+
       const typet &subtype = to_complex_type(type).subtype();
-      std::size_t sub_width=boolbv_width(subtype);
+      const std::size_t sub_width = boolbv_width(subtype);
+      CHECK_RETURN(sub_width > 0);
+      DATA_INVARIANT(
+        width == sub_width * 2,
+        "complex type has two elements of equal bit width");
 
-      if(sub_width!=0 && width==sub_width*2)
-      {
-        const complex_exprt value(
-          bv_get_rec(complex_real_exprt{expr}, bv, 0 * sub_width, subtype),
-          bv_get_rec(complex_imag_exprt{expr}, bv, 1 * sub_width, subtype),
-          to_complex_type(type));
-
-        return value;
-      }
+      return complex_exprt{
+        bv_get_rec(complex_real_exprt{expr}, bv, 0 * sub_width, subtype),
+        bv_get_rec(complex_imag_exprt{expr}, bv, 1 * sub_width, subtype),
+        to_complex_type(type)};
     }
   }
+
+  const std::size_t width = boolbv_width(type);
+  PRECONDITION(bv.size() >= offset + width);
 
   // most significant bit first
   std::string value;

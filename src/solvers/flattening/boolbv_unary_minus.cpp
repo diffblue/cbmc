@@ -23,9 +23,6 @@ bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
 
   std::size_t width=boolbv_width(type);
 
-  if(width==0)
-    return conversion_failed(expr);
-
   const exprt &op = expr.op();
 
   const bvt &op_bv = convert_bv(op, width);
