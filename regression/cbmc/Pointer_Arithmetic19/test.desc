@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --program-only
 ASSERT\(\{ 42, 43 \}\[POINTER_OFFSET\(p!0@1#2\) / \d+l*\] == 43\)$

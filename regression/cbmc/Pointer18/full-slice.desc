@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --unwind 1 --no-unwinding-assertions --pointer-check --full-slice
 ^EXIT=0$
