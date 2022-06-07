@@ -16,9 +16,6 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
 
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   bvt bv;
 
   DATA_INVARIANT(operands.size() >= 2, "cond must have at least two operands");

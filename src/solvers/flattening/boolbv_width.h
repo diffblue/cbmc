@@ -23,7 +23,17 @@ public:
 
   virtual std::size_t operator()(const typet &type) const
   {
-    return get_entry(type).total_width;
+    const auto &entry_opt = get_entry(type);
+    CHECK_RETURN(entry_opt.has_value());
+    return entry_opt->total_width;
+  }
+
+  virtual optionalt<std::size_t> get_width_opt(const typet &type) const
+  {
+    const auto &entry_opt = get_entry(type);
+    if(!entry_opt.has_value())
+      return {};
+    return entry_opt->total_width;
   }
 
   struct membert
@@ -31,18 +41,22 @@ public:
     std::size_t offset, width;
   };
 
-  const membert &get_member(
-    const struct_typet &type,
-    const irep_idt &member) const;
+  const membert &
+  get_member(const struct_typet &type, const irep_idt &member) const;
 
 protected:
   const namespacet &ns;
 
-  struct entryt
+  struct defined_entryt
   {
+    explicit defined_entryt(std::size_t total_width) : total_width(total_width)
+    {
+    }
+
     std::size_t total_width;
     std::vector<membert> members;
   };
+  using entryt = optionalt<defined_entryt>;
 
   typedef std::unordered_map<typet, entryt, irep_hash> cachet;
 

@@ -14,9 +14,6 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   bvt bv;
   bv.resize(width);
 

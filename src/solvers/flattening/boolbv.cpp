@@ -242,22 +242,16 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   const exprt &array_size = expr.type().size();
 
-  const auto size = numeric_cast<mp_integer>(array_size);
-
-  if(!size.has_value())
-    return conversion_failed(expr);
+  const auto size = numeric_cast_v<mp_integer>(to_constant_expr(array_size));
 
   typet counter_type = expr.arg().type();
 
   bvt bv;
   bv.resize(width);
 
-  for(mp_integer i = 0; i < *size; ++i)
+  for(mp_integer i = 0; i < size; ++i)
   {
     exprt counter=from_integer(i, counter_type);
 
@@ -266,7 +260,7 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
     const bvt &tmp = convert_bv(body);
 
     INVARIANT(
-      *size * tmp.size() == width,
+      size * tmp.size() == width,
       "total bitvector width shall equal the number of operands times the size "
       "per operand");
 
@@ -521,12 +515,12 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
-  const std::size_t size = boolbv_width(type);
-  if(size == 0)
+  const auto &size_opt = bv_width.get_width_opt(type);
+  if(!size_opt.has_value())
     return true;
 
   if(unbounded_array==unbounded_arrayt::U_AUTO)
-    if(size > MAX_FLATTENED_ARRAY_SIZE)
+    if(*size_opt > MAX_FLATTENED_ARRAY_SIZE)
       return true;
 
   return false;

@@ -34,11 +34,6 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     const array_typet &array_type=
       to_array_type(array_op_type);
 
-    std::size_t width=boolbv_width(expr.type());
-
-    if(width==0)
-      return conversion_failed(expr);
-
     // see if the array size is constant
 
     if(is_unbounded_array(array_type))
@@ -57,9 +52,11 @@ bvt boolbvt::convert_index(const index_exprt &expr)
         if(
           final_array.id() == ID_symbol || final_array.id() == ID_nondet_symbol)
         {
-          std::size_t width = boolbv_width(array_type);
+          const auto &array_width_opt = bv_width.get_width_opt(array_type);
           (void)map.get_literals(
-            final_array.get(ID_identifier), array_type, width);
+            final_array.get(ID_identifier),
+            array_type,
+            array_width_opt.value_or(0));
         }
 
         // make sure we have the index in the cache
@@ -68,15 +65,16 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       else
       {
         // free variables
-        bv = prop.new_variables(width);
+        bv = prop.new_variables(boolbv_width(expr.type()));
 
         record_array_index(expr);
 
         // record type if array is a symbol
         if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
         {
-          std::size_t width = boolbv_width(array_type);
-          (void)map.get_literals(array.get(ID_identifier), array_type, width);
+          const auto &array_width_opt = bv_width.get_width_opt(array_type);
+          (void)map.get_literals(
+            array.get(ID_identifier), array_type, array_width_opt.value_or(0));
         }
 
         // make sure we have the index in the cache
@@ -208,6 +206,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     // one or more of the above encoding strategies.
 
     // get literals for the whole array
+    const std::size_t width = boolbv_width(expr.type());
 
     const bvt &array_bv =
       convert_bv(array, numeric_cast_v<std::size_t>(array_size * width));
@@ -289,9 +288,6 @@ bvt boolbvt::convert_index(
   const array_typet &array_type = to_array_type(array.type());
 
   std::size_t width = boolbv_width(array_type.element_type());
-
-  if(width==0)
-    return conversion_failed(array);
 
   // TODO: If the underlying array can use one of the
   // improvements given above then it may be better to use

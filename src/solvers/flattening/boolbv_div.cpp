@@ -19,9 +19,6 @@ bvt boolbvt::convert_div(const div_exprt &expr)
 
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   if(expr.op0().type().id()!=expr.type().id() ||
      expr.op1().type().id()!=expr.type().id())
     return conversion_failed(expr);

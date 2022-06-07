@@ -15,9 +15,6 @@ bvt boolbvt::convert_replication(const replication_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   mp_integer times = numeric_cast_v<mp_integer>(expr.times());
 
   bvt bv;

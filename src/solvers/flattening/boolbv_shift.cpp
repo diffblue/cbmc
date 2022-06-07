@@ -27,9 +27,6 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
 
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   const bvt &op = convert_bv(expr.op0(), width);
 
   bv_utilst::shiftt shift;

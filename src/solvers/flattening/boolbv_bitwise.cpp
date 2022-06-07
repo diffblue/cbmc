@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 bvt boolbvt::convert_bitwise(const exprt &expr)
 {
   const std::size_t width = boolbv_width(expr.type());
-  if(width==0)
-    return conversion_failed(expr);
 
   if(expr.id()==ID_bitnot)
   {

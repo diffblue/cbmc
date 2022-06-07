@@ -18,9 +18,6 @@ bvt boolbvt::convert_case(const exprt &expr)
 
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   // make it free variables
   bvt bv = prop.new_variables(width);
 

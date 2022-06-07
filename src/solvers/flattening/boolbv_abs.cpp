@@ -16,11 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_abs(const abs_exprt &expr)
 {
-  const std::size_t width = boolbv_width(expr.type());
-
-  if(width==0)
-    return conversion_failed(expr);
-
   const bvt &op_bv=convert_bv(expr.op());
 
   if(expr.op().type()!=expr.type())

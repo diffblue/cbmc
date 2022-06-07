@@ -24,28 +24,17 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
     return conversion_failed(expr);
 
   std::size_t width=boolbv_width(array_type);
-
-  if(width==0)
-  {
-    // A zero-length array is acceptable;
-    // an element with unknown size is not.
-    if(boolbv_width(array_type.element_type()) == 0)
-      return conversion_failed(expr);
-    else
-      return bvt();
-  }
+  if(width == 0)
+    return bvt{};
 
   const exprt &array_size=array_type.size();
 
-  const auto size = numeric_cast<mp_integer>(array_size);
-
-  if(!size.has_value())
-    return conversion_failed(expr);
+  const auto size = numeric_cast_v<mp_integer>(to_constant_expr(array_size));
 
   const bvt &tmp = convert_bv(expr.what());
 
   INVARIANT(
-    *size * tmp.size() == width,
+    size * tmp.size() == width,
     "total array bit width shall equal the number of elements times the "
     "element bit with");
 

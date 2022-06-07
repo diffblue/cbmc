@@ -24,9 +24,6 @@ bvt boolbvt::convert_mod(const mod_exprt &expr)
 
   std::size_t width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr);
-
   DATA_INVARIANT(
     expr.op0().type().id() == expr.type().id(),
     "type of the first operand of a modulo operation shall equal the "
