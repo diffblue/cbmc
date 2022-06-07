@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 #define CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 
+#include <util/irep.h>
+
 #include <list>
-#include <string>
 
 class goto_functionst;
 class goto_modelt;
@@ -28,7 +29,7 @@ void set_properties(
   const std::list<std::string> &properties);
 
 void label_properties(goto_functionst &);
-void label_properties(goto_programt &);
+void label_properties(irep_idt function_identifier, goto_programt &);
 void label_properties(goto_modelt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H

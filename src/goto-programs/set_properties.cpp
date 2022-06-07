@@ -48,6 +48,7 @@ void label_properties(goto_modelt &goto_model)
 }
 
 void label_properties(
+  const irep_idt function_identifier,
   goto_programt &goto_program,
   std::map<irep_idt, std::size_t> &property_counters)
 {
@@ -58,6 +59,13 @@ void label_properties(
   {
     if(!it->is_assert())
       continue;
+
+    // No source location? Create one.
+    if(it->source_location().is_nil())
+    {
+      it->source_location_nonconst() = source_locationt{};
+      it->source_location_nonconst().set_function(function_identifier);
+    }
 
     irep_idt function = it->source_location().get_function();
 
@@ -89,10 +97,10 @@ void label_properties(
   }
 }
 
-void label_properties(goto_programt &goto_program)
+void label_properties(irep_idt function_identifier, goto_programt &goto_program)
 {
   std::map<irep_idt, std::size_t> property_counters;
-  label_properties(goto_program, property_counters);
+  label_properties(function_identifier, goto_program, property_counters);
 }
 
 void set_properties(
@@ -127,5 +135,5 @@ void label_properties(goto_functionst &goto_functions)
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-    label_properties(it->second.body, property_counters);
+    label_properties(it->first, it->second.body, property_counters);
 }
