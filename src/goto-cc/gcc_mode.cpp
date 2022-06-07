@@ -509,6 +509,13 @@ int gcc_modet::doit()
         }
   }
 
+  // clang supports -target <arch-quadruple> and --target=<arch-quadruple>
+  if(cmdline.isset("target"))
+  {
+    std::string arch_quadruple = cmdline.get_value("target");
+    config.set_arch(arch_quadruple.substr(0, arch_quadruple.find('-')));
+  }
+
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
   {
