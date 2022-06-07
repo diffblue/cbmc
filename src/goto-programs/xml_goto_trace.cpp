@@ -140,7 +140,8 @@ void convert(
           lhs_object.has_value() &&
           !ns.lookup(lhs_object->get_identifier(), symbol))
         {
-          std::string type_string = from_type(ns, symbol->name, symbol->type);
+          std::string type_string =
+            from_type(ns, symbol->name, step.full_lhs.type());
 
           xml_assignment.set_attribute("mode", id2string(symbol->mode));
           xml_assignment.set_attribute("identifier", id2string(symbol->name));
@@ -148,7 +149,7 @@ void convert(
             "base_name", id2string(symbol->base_name));
           xml_assignment.set_attribute(
             "display_name", id2string(symbol->display_name()));
-          xml_assignment.new_element("type").data = type_string;
+          xml_assignment.new_element("full_lhs_type").data = type_string;
         }
       }
 
