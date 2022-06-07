@@ -26,30 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <util/unicode.h>
 #endif
 
-#include <langapi/language.h>
-
-#include <ansi-c/c_preprocess.h>
-#include <ansi-c/cprover_library.h>
-#include <ansi-c/gcc_version.h>
-
-#include <assembler/remove_asm.h>
-
-#include <cpp/cprover_library.h>
-
-#include <goto-checker/all_properties_verifier.h>
-#include <goto-checker/all_properties_verifier_with_fault_localization.h>
-#include <goto-checker/all_properties_verifier_with_trace_storage.h>
-#include <goto-checker/bmc_util.h>
-#include <goto-checker/cover_goals_verifier_with_trace_storage.h>
-#include <goto-checker/multi_path_symex_checker.h>
-#include <goto-checker/multi_path_symex_only_checker.h>
-#include <goto-checker/properties.h>
-#include <goto-checker/single_loop_incremental_symex_checker.h>
-#include <goto-checker/single_path_symex_checker.h>
-#include <goto-checker/single_path_symex_only_checker.h>
-#include <goto-checker/stop_on_fail_verifier.h>
-#include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
-
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
@@ -62,16 +38,33 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
 
+#include <ansi-c/c_preprocess.h>
+#include <ansi-c/cprover_library.h>
+#include <ansi-c/gcc_version.h>
+#include <assembler/remove_asm.h>
+#include <cpp/cprover_library.h>
+#include <goto-checker/all_properties_verifier.h>
+#include <goto-checker/all_properties_verifier_with_fault_localization.h>
+#include <goto-checker/all_properties_verifier_with_trace_storage.h>
+#include <goto-checker/bmc_util.h>
+#include <goto-checker/cover_goals_verifier_with_trace_storage.h>
+#include <goto-checker/eager_multi_path_symex_checker.h>
+#include <goto-checker/multi_path_symex_checker.h>
+#include <goto-checker/multi_path_symex_only_checker.h>
+#include <goto-checker/properties.h>
+#include <goto-checker/single_loop_incremental_symex_checker.h>
+#include <goto-checker/single_path_symex_checker.h>
+#include <goto-checker/single_path_symex_only_checker.h>
+#include <goto-checker/stop_on_fail_verifier.h>
+#include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 #include <goto-instrument/cover.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
-
 #include <goto-symex/path_storage.h>
-
-#include <pointer-analysis/add_failed_symbols.h>
-
+#include <langapi/language.h>
 #include <langapi/mode.h>
+#include <pointer-analysis/add_failed_symbols.h>
 
 #include "c_test_input_generator.h"
 
@@ -229,6 +222,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
      cmdline.isset("dimacs") ||
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
+
+  if(cmdline.isset("eager-solving"))
+    options.set_option("eager-solving", true);
 
   if(
     cmdline.isset("trace") || cmdline.isset("compact-trace") ||
@@ -620,6 +616,12 @@ int cbmc_parse_optionst::doit()
       all_properties_verifier_with_trace_storaget<single_path_symex_checkert>>(
       options, ui_message_handler, goto_model);
   }
+  else if(options.get_bool_option("eager-solving"))
+  {
+    verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+      eager_multi_path_symex_checkert>>(
+      options, ui_message_handler, goto_model);
+  }
   else if(
     !options.get_bool_option("stop-on-fail") &&
     !options.get_bool_option("paths"))
@@ -878,6 +880,7 @@ void cbmc_parse_optionst::help()
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     "                              (implies --trace)\n"
+    " --eager-solving              check a property as soon as symbolic execution reaches it\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
     "\n"
     "C/C++ frontend options:\n"

@@ -51,7 +51,7 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
     prop_conv_solver->set_all_frozen();
 }
 
-void output_incremental_status(
+static void output_incremental_status(
   const propertiest &properties,
   messaget &message_hander)
 {

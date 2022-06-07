@@ -1,6 +1,7 @@
 SRC = bmc_util.cpp \
       counterexample_beautification.cpp \
       cover_goals_report_util.cpp \
+      eager_multi_path_symex_checker.cpp \
       incremental_goto_checker.cpp \
       goto_symex_fault_localizer.cpp \
       goto_symex_property_decider.cpp \
@@ -17,6 +18,7 @@ SRC = bmc_util.cpp \
       symex_coverage.cpp \
       symex_bmc.cpp \
       symex_bmc_incremental_one_loop.cpp \
+      symex_bmc_incremental_properties.cpp \
       # Empty last line
 
 INCLUDES= -I ..
