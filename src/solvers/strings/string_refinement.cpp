@@ -1912,7 +1912,7 @@ static optionalt<exprt> find_counter_example(
   message_handlert &message_handler)
 {
   satcheck_no_simplifiert sat_check(message_handler);
-  boolbvt solver(ns, sat_check, message_handler);
+  bv_pointerst solver(ns, sat_check, message_handler);
   solver << axiom;
 
   if(solver() == decision_proceduret::resultt::D_SATISFIABLE)

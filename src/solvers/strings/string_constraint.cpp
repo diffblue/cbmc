@@ -11,7 +11,7 @@ Author: Diffblue Ltd.
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
-#include <solvers/flattening/boolbv.h>
+#include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
 
 /// Runs a solver instance to verify whether an expression can only be
@@ -24,7 +24,7 @@ static bool cannot_be_neg(const exprt &expr, message_handlert &message_handler)
   satcheck_no_simplifiert sat_check(message_handler);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
-  boolbvt solver{ns, sat_check, message_handler};
+  bv_pointerst solver{ns, sat_check, message_handler};
   const exprt zero = from_integer(0, expr.type());
   const binary_relation_exprt non_neg(expr, ID_lt, zero);
   solver << non_neg;
