@@ -245,6 +245,12 @@ void smt2_convt::define_object_size(
   {
     const typet &type = o.type();
     auto size_expr = size_of_expr(type, ns);
+    if(
+      size_expr.has_value() && size_expr->id() == ID_infinity &&
+      can_cast_type<integer_bitvector_typet>(expr.type()))
+    {
+      size_expr = to_integer_bitvector_type(expr.type()).largest_expr();
+    }
     const auto object_size =
       numeric_cast<mp_integer>(size_expr.value_or(nil_exprt()));
 
@@ -4962,6 +4968,12 @@ void smt2_convt::find_symbols(const exprt &expr)
       convert_type(object_size->type());
       out << ")"
           << "\n";
+      out << "(declare-fun |op_" << id << "| () ";
+      convert_type(object_size->op().type());
+      out << ")\n";
+      out << "(assert (= |op_" << id << "| ";
+      convert_expr(object_size->op());
+      out << "))\n";
 
       object_sizes[*object_size] = id;
     }

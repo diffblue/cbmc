@@ -1263,6 +1263,29 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
     return simplify_inequality_pointer_object(expr);
   }
 
+  if(tmp0.id() == ID_infinity)
+  {
+    if(expr.id() == ID_ge)
+      return true_exprt{};
+    else if(expr.id() == ID_gt)
+      return changed(simplify_inequality(notequal_exprt{tmp0, tmp1}));
+    else if(expr.id() == ID_le)
+      return changed(simplify_inequality(equal_exprt{tmp0, tmp1}));
+    else if(expr.id() == ID_lt)
+      return false_exprt{};
+  }
+  else if(tmp1.id() == ID_infinity)
+  {
+    if(expr.id() == ID_ge)
+      return changed(simplify_inequality(equal_exprt{tmp0, tmp1}));
+    else if(expr.id() == ID_gt)
+      return false_exprt{};
+    else if(expr.id() == ID_le)
+      return true_exprt{};
+    else if(expr.id() == ID_lt)
+      return changed(simplify_inequality(notequal_exprt{tmp0, tmp1}));
+  }
+
   if(tmp0.type().id()==ID_c_enum_tag)
     tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
 
@@ -1566,6 +1589,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
     if_expr.false_case() =
       simplify_inequality(to_binary_relation_expr(if_expr.false_case()));
     return changed(simplify_if(if_expr));
+  }
+
+  if(expr.op0().id() == ID_infinity)
+  {
+    if(expr.id() == ID_equal)
+      return false_exprt{};
+    else if(expr.id() == ID_notequal)
+      return true_exprt{};
   }
 
   // do we deal with pointers?

@@ -941,8 +941,16 @@ void bv_pointerst::do_postponed(
       if(!size_expr.has_value())
         continue;
 
-      const exprt object_size = typecast_exprt::conditional_cast(
+      exprt object_size = typecast_exprt::conditional_cast(
         size_expr.value(), postponed_object_size->type());
+
+      if(
+        size_expr->id() == ID_infinity &&
+        can_cast_type<integer_bitvector_typet>(object_size.type()))
+      {
+        object_size = to_integer_bitvector_type(postponed_object_size->type())
+                        .largest_expr();
+      }
 
       // only compare object part
       pointer_typet pt = pointer_type(expr.type());

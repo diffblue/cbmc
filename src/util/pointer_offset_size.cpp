@@ -300,6 +300,8 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
 
     if(size.is_nil())
       return {};
+    else if(size.id() == ID_infinity)
+      return infinity_exprt{sub.value().type()};
 
     const auto size_casted =
       typecast_exprt::conditional_cast(size, sub.value().type());
