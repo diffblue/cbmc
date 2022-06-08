@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 test_set_length
 --function test_set_length.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=10$
@@ -8,3 +8,4 @@ test_set_length
 ^\[.*assertion.3\].* line 11.* FAILURE$
 --
 non equal types
+^warning: ignoring

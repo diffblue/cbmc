@@ -87,7 +87,8 @@ optionalt<exprt> string_insertion_builtin_functiont::eval(
 }
 
 string_constraintst string_insertion_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   PRECONDITION(args.size() == 1);
   const exprt &offset = args[0];
@@ -105,7 +106,8 @@ string_constraintst string_insertion_builtin_functiont::constraints(
   // Axiom 2.
   constraints.universal.push_back([&] { // NOLINT
     const symbol_exprt i = generator.fresh_symbol("QA_insert1", index_type);
-    return string_constraintt(i, offset1, equal_exprt(result[i], input1[i]));
+    return string_constraintt(
+      i, offset1, equal_exprt(result[i], input1[i]), message_handler);
   }());
 
   // Axiom 3.
@@ -114,7 +116,8 @@ string_constraintst string_insertion_builtin_functiont::constraints(
     return string_constraintt(
       i,
       zero_if_negative(array_pool.get_or_create_length(input2)),
-      equal_exprt(result[plus_exprt(i, offset1)], input2[i]));
+      equal_exprt(result[plus_exprt(i, offset1)], input2[i]),
+      message_handler);
   }());
 
   // Axiom 4.
@@ -126,7 +129,8 @@ string_constraintst string_insertion_builtin_functiont::constraints(
       zero_if_negative(array_pool.get_or_create_length(input1)),
       equal_exprt(
         result[plus_exprt(i, array_pool.get_or_create_length(input2))],
-        input1[i]));
+        input1[i]),
+      message_handler);
   }());
 
   // return_code = 0

@@ -461,8 +461,8 @@ This is described in more detail \link string_builtin_functiont here. \endlink
     \copybrief string_constraint_generatort::add_axioms_for_delete(const function_application_exprt &f)
     \link string_constraint_generatort::add_axioms_for_delete(const function_application_exprt &f) More... \endlink
   * `cprover_string_insert` :
-    \copybrief string_insertion_builtin_functiont::constraints(string_constraint_generatort &generator) const
-    \link string_insertion_builtin_functiont::constraints(string_constraint_generatort &generator) const More... \endlink
+    \copybrief string_insertion_builtin_functiont::constraints(string_constraint_generatort &generator, message_handlert &message_handler) const
+    \link string_insertion_builtin_functiont::constraints(string_constraint_generatort &generator, message_handlert &message_handler) const More... \endlink
   * `cprover_string_replace` :
     \copybrief string_constraint_generatort::add_axioms_for_replace(const function_application_exprt &f)
     \link string_constraint_generatort::add_axioms_for_replace(const function_application_exprt &f) More... \endlink

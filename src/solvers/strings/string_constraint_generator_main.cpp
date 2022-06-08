@@ -30,8 +30,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
 
-string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
-  : array_pool(fresh_symbol), ns(ns)
+string_constraint_generatort::string_constraint_generatort(
+  const namespacet &ns,
+  message_handlert &message_handler)
+  : array_pool(fresh_symbol), ns(ns), message_handler(message_handler)
 {
 }
 
@@ -142,7 +144,8 @@ string_constraintst string_constraint_generatort::add_constraint_on_characters(
     qvar,
     zero_if_negative(start),
     zero_if_negative(end),
-    interval_constraint(chr, char_range));
+    interval_constraint(chr, char_range),
+    message_handler);
   return {{}, {sc}, {}};
 }
 

@@ -39,8 +39,9 @@ public:
     return "concat";
   }
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   exprt length_constraint() const override;
 };

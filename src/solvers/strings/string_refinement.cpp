@@ -158,7 +158,7 @@ string_refinementt::string_refinementt(const infot &info, bool)
   : supert(info),
     config_(info),
     loop_bound_(info.refinement_bound),
-    generator(*info.ns)
+    generator(*info.ns, *info.message_handler)
 {
 }
 
@@ -704,7 +704,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
   log.debug() << "dec_solve: add constraints" << messaget::eom;
-  merge(constraints, dependencies.add_constraints(generator));
+  merge(
+    constraints,
+    dependencies.add_constraints(generator, log.get_message_handler()));
 
 #ifdef DEBUG
   output_equations(log.debug(), equations);
@@ -1387,7 +1389,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       axiom.univ_var,
       get(axiom.lower_bound),
       get(axiom.upper_bound),
-      get(axiom.body));
+      get(axiom.body),
+      stream.message.get_message_handler());
 
     exprt negaxiom = axiom_in_model.negation();
     negaxiom = simplify_expr(negaxiom, ns);

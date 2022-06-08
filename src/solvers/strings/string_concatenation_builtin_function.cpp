@@ -73,7 +73,8 @@ string_constraint_generatort::add_axioms_for_concat_substr(
     return string_constraintt(
       idx,
       zero_if_negative(array_pool.get_or_create_length(s1)),
-      equal_exprt(s1[idx], res[idx]));
+      equal_exprt(s1[idx], res[idx]),
+      message_handler);
   }());
 
   // Axiom 3.
@@ -86,7 +87,8 @@ string_constraint_generatort::add_axioms_for_concat_substr(
     const minus_exprt upper_bound(
       array_pool.get_or_create_length(res),
       array_pool.get_or_create_length(s1));
-    return string_constraintt(idx2, zero_if_negative(upper_bound), res_eq);
+    return string_constraintt(
+      idx2, zero_if_negative(upper_bound), res_eq, message_handler);
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -208,7 +210,8 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
 }
 
 string_constraintst string_concatenation_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 
 {
   auto pair = [&]() -> std::pair<exprt, string_constraintst> {

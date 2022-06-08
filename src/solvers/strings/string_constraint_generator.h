@@ -51,7 +51,9 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  explicit string_constraint_generatort(const namespacet &ns);
+  string_constraint_generatort(
+    const namespacet &ns,
+    message_handlert &message_handler);
 
   std::pair<exprt, string_constraintst>
   add_axioms_for_function_application(const function_application_exprt &expr);
@@ -70,6 +72,8 @@ public:
     const function_application_exprt &expr);
 
 private:
+  message_handlert &message_handler;
+
   exprt associate_array_to_pointer(
     const exprt &return_code,
     const function_application_exprt &f);

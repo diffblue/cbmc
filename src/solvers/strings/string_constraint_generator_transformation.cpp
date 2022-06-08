@@ -60,7 +60,8 @@ string_constraint_generatort::add_axioms_for_set_length(
   const string_constraintt a2(
     idx,
     zero_if_negative(minimum(array_pool.get_or_create_length(s1), k)),
-    equal_exprt(s1[idx], res[idx]));
+    equal_exprt(s1[idx], res[idx]),
+    message_handler);
   constraints.universal.push_back(a2);
 
   symbol_exprt idx2 = fresh_symbol("QA_index_set_length2", index_type);
@@ -68,7 +69,8 @@ string_constraint_generatort::add_axioms_for_set_length(
     idx2,
     zero_if_negative(array_pool.get_or_create_length(s1)),
     zero_if_negative(array_pool.get_or_create_length(res)),
-    equal_exprt(res[idx2], from_integer(0, char_type)));
+    equal_exprt(res[idx2], from_integer(0, char_type)),
+    message_handler);
   constraints.universal.push_back(a3);
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -144,7 +146,8 @@ string_constraint_generatort::add_axioms_for_substring(
     return string_constraintt(
       idx,
       zero_if_negative(array_pool.get_or_create_length(res)),
-      equal_exprt(res[idx], str[plus_exprt(start1, idx)]));
+      equal_exprt(res[idx], str[plus_exprt(start1, idx)]),
+      message_handler);
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -212,7 +215,7 @@ string_constraint_generatort::add_axioms_for_trim(
 
   symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
   binary_relation_exprt non_print(str[n], ID_le, space_char);
-  string_constraintt a6(n, zero_if_negative(idx), non_print);
+  string_constraintt a6(n, zero_if_negative(idx), non_print, message_handler);
   constraints.universal.push_back(a6);
 
   // Axiom 7.
@@ -226,13 +229,17 @@ string_constraint_generatort::add_axioms_for_trim(
         idx, plus_exprt(array_pool.get_or_create_length(res), n2))],
       ID_le,
       space_char);
-    return string_constraintt(n2, zero_if_negative(bound), eqn2);
+    return string_constraintt(
+      n2, zero_if_negative(bound), eqn2, message_handler);
   }());
 
   symbol_exprt n3 = fresh_symbol("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
   string_constraintt a8(
-    n3, zero_if_negative(array_pool.get_or_create_length(res)), eqn3);
+    n3,
+    zero_if_negative(array_pool.get_or_create_length(res)),
+    eqn3,
+    message_handler);
   constraints.universal.push_back(a8);
 
   // Axiom 9.
@@ -333,7 +340,8 @@ string_constraint_generatort::add_axioms_for_replace(
     string_constraintt a2(
       qvar,
       zero_if_negative(array_pool.get_or_create_length(res)),
-      and_exprt(case1, case2));
+      and_exprt(case1, case2),
+      message_handler);
     constraints.universal.push_back(a2);
     return {from_integer(0, f.type()), std::move(constraints)};
   }

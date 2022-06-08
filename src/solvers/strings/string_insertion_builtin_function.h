@@ -66,8 +66,9 @@ public:
   /// This is equivalent to
   /// `res=concat(substring(input1, 0, offset'),
   ///             concat(input2, substring(input1, offset')))`.
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   /// \return a constraint ensuring the length of \c result corresponds to that
   ///   of \c input1 where we inserted \c input2. That is:

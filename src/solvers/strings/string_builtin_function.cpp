@@ -101,7 +101,8 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
 ///   * result[input.length] = character
 ///   * return_code = 0
 string_constraintst string_concat_char_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
@@ -111,7 +112,7 @@ string_constraintst string_concat_char_builtin_functiont::constraints(
     const exprt upper_bound =
       zero_if_negative(array_pool.get_or_create_length(input));
     return string_constraintt(
-      idx, upper_bound, equal_exprt(input[idx], result[idx]));
+      idx, upper_bound, equal_exprt(input[idx], result[idx]), message_handler);
   }());
   constraints.existential.push_back(
     equal_exprt(result[array_pool.get_or_create_length(input)], character));
@@ -151,7 +152,8 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
 ///   3. forall 0 <= i < max(0, min(res.length, pos)). res[i] = str[i]
 ///   4. forall max(0, pos+1) <= i < res.length. res[i] = str[i]
 string_constraintst string_set_char_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
@@ -169,7 +171,8 @@ string_constraintst string_set_char_builtin_functiont::constraints(
       q,
       zero_if_negative(
         minimum(array_pool.get_or_create_length(result), position)),
-      a3_body);
+      a3_body,
+      message_handler);
   }());
   constraints.universal.push_back([&] {
     const symbol_exprt q2 =
@@ -179,7 +182,8 @@ string_constraintst string_set_char_builtin_functiont::constraints(
       q2,
       zero_if_negative(plus_exprt(position, from_integer(1, position.type()))),
       zero_if_negative(array_pool.get_or_create_length(result)),
-      a4_body);
+      a4_body,
+      message_handler);
   }());
   return constraints;
 }
@@ -279,7 +283,8 @@ static exprt is_lower_case(const exprt &character)
 /// characters: `diff = 'a'-'A' = 0x20` and `is_upper_case` is true for the
 /// upper case characters of Basic Latin and Latin-1 supplement of unicode.
 string_constraintst string_to_lower_case_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   // \todo for now, only characters in Basic Latin and Latin-1 supplement
   // are supported (up to 0x100), we should add others using case mapping
@@ -302,7 +307,8 @@ string_constraintst string_to_lower_case_builtin_functiont::constraints(
     return string_constraintt(
       idx,
       zero_if_negative(array_pool.get_or_create_length(result)),
-      conditional_convert);
+      conditional_convert,
+      message_handler);
   }());
   return constraints;
 }
@@ -332,9 +338,11 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
 ///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
 ///
 /// \param fresh_symbol: generator of fresh symbols
+/// \param message_handler: message handler
 /// \return set of constraints
 string_constraintst string_to_upper_case_builtin_functiont::constraints(
-  symbol_generatort &fresh_symbol) const
+  symbol_generatort &fresh_symbol,
+  message_handlert &message_handler) const
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
@@ -350,7 +358,8 @@ string_constraintst string_to_upper_case_builtin_functiont::constraints(
       zero_if_negative(array_pool.get_or_create_length(result)),
       equal_exprt(
         result[idx],
-        if_exprt(is_lower_case(input[idx]), converted, input[idx])));
+        if_exprt(is_lower_case(input[idx]), converted, input[idx])),
+      message_handler);
   }());
   return constraints;
 }
@@ -406,7 +415,8 @@ optionalt<exprt> string_of_int_builtin_functiont::eval(
 }
 
 string_constraintst string_of_int_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   auto pair =
     generator.add_axioms_for_string_of_int_with_radix(result, arg, radix, 0);
@@ -475,7 +485,8 @@ string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
 }
 
 string_constraintst string_builtin_function_with_no_evalt::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   auto pair =
     generator.add_axioms_for_function_application(function_application);

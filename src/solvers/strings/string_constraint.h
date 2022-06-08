@@ -24,6 +24,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/string_expr.h>
 #include <util/union_find_replace.h>
 
+class message_handlert;
+
 ///  ### Universally quantified string constraint
 ///
 ///  This represents a universally quantified string constraint as laid out in
@@ -60,21 +62,25 @@ public:
   exprt upper_bound;
   exprt body;
 
-  string_constraintt() = delete;
-
   string_constraintt(
     const symbol_exprt &_univ_var,
     const exprt &lower_bound,
     const exprt &upper_bound,
-    const exprt &body);
+    const exprt &body,
+    message_handlert &message_handler);
 
   // Default bound inferior is 0
-  string_constraintt(symbol_exprt univ_var, exprt upper_bound, exprt body)
+  string_constraintt(
+    symbol_exprt univ_var,
+    exprt upper_bound,
+    exprt body,
+    message_handlert &message_handler)
     : string_constraintt(
         univ_var,
         from_integer(0, univ_var.type()),
         upper_bound,
-        body)
+        body,
+        message_handler)
   {
   }
 

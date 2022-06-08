@@ -55,7 +55,8 @@ string_constraint_generatort::add_axioms_for_equals(
     return string_constraintt(
       qvar,
       zero_if_negative(array_pool.get_or_create_length(s1)),
-      implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
+      implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])),
+      message_handler);
   }());
 
   // Axiom 3.
@@ -160,7 +161,8 @@ string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const string_constraintt a2(
     qvar,
     zero_if_negative(array_pool.get_or_create_length(s1)),
-    implies_exprt(eq, constr2));
+    implies_exprt(eq, constr2),
+    message_handler);
   constraints.universal.push_back(a2);
 
   const symbol_exprt witness =
@@ -228,7 +230,8 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const string_constraintt a2(
     i,
     zero_if_negative(array_pool.get_or_create_length(s1)),
-    implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
+    implies_exprt(res_null, equal_exprt(s1[i], s2[i])),
+    message_handler);
   constraints.universal.push_back(a2);
 
   const symbol_exprt x = fresh_symbol("index_compare_to", index_type);
@@ -277,7 +280,8 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const string_constraintt a4(
     i2,
     zero_if_negative(x),
-    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
+    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])),
+    message_handler);
   constraints.universal.push_back(a4);
 
   return {res, std::move(constraints)};
