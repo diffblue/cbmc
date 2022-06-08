@@ -1,23 +1,35 @@
 /* FUNCTION: __builtin_ia32_sfence */
 
+#if defined(__i386__) || defined(__x86_64__)
+
 void __builtin_ia32_sfence(void)
 {
   __asm("sfence");
 }
 
+#endif
+
 /* FUNCTION: __builtin_ia32_lfence */
+
+#if defined(__i386__) || defined(__x86_64__)
 
 void __builtin_ia32_lfence(void)
 {
   __asm("lfence");
 }
 
+#endif
+
 /* FUNCTION: __builtin_ia32_mfence */
+
+#if defined(__i386__) || defined(__x86_64__)
 
 void __builtin_ia32_mfence(void)
 {
   __asm("mfence");
 }
+
+#endif
 
 /* FUNCTION: __sync_synchronize */
 
