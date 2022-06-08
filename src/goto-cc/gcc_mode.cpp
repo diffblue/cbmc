@@ -512,8 +512,55 @@ int gcc_modet::doit()
   // clang supports -target <arch-quadruple> and --target=<arch-quadruple>
   if(cmdline.isset("target"))
   {
+    // list of targets supported by LLVM 10.0, found using llc --version
+    static const std::map<std::string, std::string> target_map = {
+      {"aarch64", "arm64" /* AArch64 (little endian) */},
+      {"aarch64_32", "arm" /* AArch64 (little endian ILP32) */},
+      {"aarch64_be", "none" /* AArch64 (big endian) */},
+      {"amdgcn", "none" /* AMD GCN GPUs */},
+      {"arm", "arm" /* ARM */},
+      {"arm64", "arm64" /* ARM64 (little endian) */},
+      {"arm64_32", "arm" /* ARM64 (little endian ILP32) */},
+      {"armeb", "none" /* ARM (big endian) */},
+      {"avr", "none" /* Atmel AVR Microcontroller */},
+      {"bpf", "none" /* BPF (host endian) */},
+      {"bpfeb", "none" /* BPF (big endian) */},
+      {"bpfel", "none" /* BPF (little endian) */},
+      {"hexagon", "none" /* Hexagon */},
+      {"i386", "i386" /* (not in llc's list: 32-bit x86) */},
+      {"lanai", "none" /* Lanai */},
+      {"mips", "mips" /* MIPS (32-bit big endian) */},
+      {"mips64", "mips64" /* MIPS (64-bit big endian) */},
+      {"mips64el", "mips64el" /* MIPS (64-bit little endian) */},
+      {"mipsel", "mipsel" /* MIPS (32-bit little endian) */},
+      {"msp430", "none" /* MSP430 [experimental] */},
+      {"nvptx", "none" /* NVIDIA PTX 32-bit */},
+      {"nvptx64", "none" /* NVIDIA PTX 64-bit */},
+      {"ppc32", "powerpc" /* PowerPC 32 */},
+      {"ppc64", "ppc64" /* PowerPC 64 */},
+      {"ppc64le", "ppc64le" /* PowerPC 64 LE */},
+      {"r600", "none" /* AMD GPUs HD2XXX-HD6XXX */},
+      {"riscv32", "none" /* 32-bit RISC-V */},
+      {"riscv64", "riscv64" /* 64-bit RISC-V */},
+      {"sparc", "sparc" /* Sparc */},
+      {"sparcel", "none" /* Sparc LE */},
+      {"sparcv9", "sparc64" /* Sparc V9 */},
+      {"systemz", "none" /* SystemZ */},
+      {"thumb", "armhf" /* Thumb */},
+      {"thumbeb", "none" /* Thumb (big endian) */},
+      {"wasm32", "none" /* WebAssembly 32-bit */},
+      {"wasm64", "none" /* WebAssembly 64-bit */},
+      {"x86", "i386" /* 32-bit X86: Pentium-Pro and above */},
+      {"x86_64", "x86_64" /* 64-bit X86: EM64T and AMD64 */},
+      {"xcore", "none" /* XCore */},
+    };
     std::string arch_quadruple = cmdline.get_value("target");
-    config.set_arch(arch_quadruple.substr(0, arch_quadruple.find('-')));
+    auto it =
+      target_map.find(arch_quadruple.substr(0, arch_quadruple.find('-')));
+    if(it == target_map.end())
+      config.set_arch("none");
+    else
+      config.set_arch(it->second);
   }
 
   // -fshort-wchar makes wchar_t "short unsigned int"
