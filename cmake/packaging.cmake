@@ -24,8 +24,9 @@ set(CPACK_PACKAGE_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 # Automatically find dependencies for shared libraries
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
 
-# In addition, we depend on gcc for preprocessing
-set(CPACK_DEBIAN_PACKAGE_DEPENDS gcc)
+# In addition, we depend on gcc for preprocessing and bash-completion to make
+# CBMC's bash completion work
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "gcc, bash-completion")
 
 # Enable debug output so that we can see the dependencies being generated in the
 # logs

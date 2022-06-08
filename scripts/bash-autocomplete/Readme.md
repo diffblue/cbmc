@@ -23,6 +23,8 @@ Follow 1. 2. and 3. as above.
 
 4. Put the following at the end of your `~/.zshrc`, with the directories adapted to your directory structure:
     ```bash
+    autoload -Uz compinit
+    compinit
     autoload bashcompinit
     bashcompinit
     cbmcautocomplete=~/diffblue/cbmc/scripts/bash-autocomplete/cbmc.sh
