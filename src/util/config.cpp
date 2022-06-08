@@ -993,7 +993,7 @@ bool configt::set(const cmdlinet &cmdline)
 
     // long double is the same as double in Visual Studio,
     // but it's 16 bytes with GCC with the 64-bit target.
-    if(arch=="x64_64" && cmdline.isset("gcc"))
+    if(arch == "x86_64" && cmdline.isset("gcc"))
       ansi_c.long_double_width=16*8;
     else
       ansi_c.long_double_width=8*8;
