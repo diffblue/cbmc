@@ -1385,7 +1385,6 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
   goto_functionst this_interleaving;
   this_interleaving.function_map=std::move(map);
   optionst no_option;
-  null_message_handlert no_message;
 
   #if 0
   bmct bmc(no_option, symbol_table, no_message);
