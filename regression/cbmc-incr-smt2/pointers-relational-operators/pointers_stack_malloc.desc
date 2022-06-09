@@ -1,0 +1,13 @@
+CORE
+pointers_stack_malloc.c
+--trace
+\[main\.assertion\.1\] line \d+ \*\(a \+ i\) >= i: expected successful: SUCCESS
+\[main\.assertion\.2\] line \d+ \*\(a \+ i\) <= i: expected successful: SUCCESS
+\[main\.assertion\.3\] line \d+ \*\(a \+ i\) <= i: expected successful: SUCCESS
+\[main\.assertion\.4\] line \d+ \*\(a \+ i\) <= i: expected failure: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This is testing the support for relational operators as applied to pointer objects
+backed by a malloc and initialised to some values.

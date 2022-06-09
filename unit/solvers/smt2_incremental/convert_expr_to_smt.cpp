@@ -328,6 +328,51 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "expr to smt conversion for relational operators as applied to pointers",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  // Pointer variables, used for comparisons
+  const std::size_t pointer_width = 32;
+  const auto pointer_type = pointer_typet(signedbv_typet{32}, pointer_width);
+  const symbol_exprt pointer_a("a", pointer_type);
+  const symbol_exprt pointer_b("b", pointer_type);
+  // SMT terms needed for pointer comparisons
+  const smt_termt smt_term_a =
+    smt_identifier_termt{"a", smt_bit_vector_sortt{pointer_width}};
+  const smt_termt smt_term_b =
+    smt_identifier_termt{"b", smt_bit_vector_sortt{pointer_width}};
+
+  SECTION("Greater than on pointers")
+  {
+    CHECK(
+      test.convert(greater_than_exprt{pointer_a, pointer_b}) ==
+      smt_bit_vector_theoryt::unsigned_greater_than(smt_term_a, smt_term_b));
+  }
+
+  SECTION("Greater than or equal on pointer operands")
+  {
+    CHECK(
+      test.convert(greater_than_or_equal_exprt{pointer_a, pointer_b}) ==
+      smt_bit_vector_theoryt::unsigned_greater_than_or_equal(
+        smt_term_a, smt_term_b));
+  }
+  SECTION("Less than on pointer operands")
+  {
+    CHECK(
+      test.convert(less_than_exprt{pointer_a, pointer_b}) ==
+      smt_bit_vector_theoryt::unsigned_less_than(smt_term_a, smt_term_b));
+  }
+  SECTION("Less than or equal on pointer operands")
+  {
+    CHECK(
+      test.convert(less_than_or_equal_exprt{pointer_a, pointer_b}) ==
+      smt_bit_vector_theoryt::unsigned_less_than_or_equal(
+        smt_term_a, smt_term_b));
+  }
+}
+
+TEST_CASE(
   "expr to smt conversion for arithmetic operators",
   "[core][smt2_incremental]")
 {
