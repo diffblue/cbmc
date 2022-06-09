@@ -99,7 +99,6 @@ void jbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("refine-strings", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
-  options.set_option("simplify-if", true);
   options.set_option("show-goto-symex-steps", false);
 
   // Other default
@@ -241,10 +240,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   options.set_option(
     "slice-formula",
     cmdline.isset("slice-formula"));
-
-  // simplify if conditions and branches
-  if(cmdline.isset("no-simplify-if"))
-    options.set_option("simplify-if", false);
 
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");

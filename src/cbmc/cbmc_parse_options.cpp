@@ -107,7 +107,6 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("propagation", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
-  options.set_option("simplify-if", true);
   options.set_option("show-goto-symex-steps", false);
   options.set_option("show-points-to-sets", false);
   options.set_option("show-array-constraints", false);
@@ -283,10 +282,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // remove unused equations
   if(cmdline.isset("slice-formula"))
     options.set_option("slice-formula", true);
-
-  // simplify if conditions and branches
-  if(cmdline.isset("no-simplify-if"))
-    options.set_option("simplify-if", false);
 
   if(cmdline.isset("arrays-uf-always"))
     options.set_option("arrays-uf", "always");
