@@ -94,7 +94,6 @@ void jbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("assertions", true);
   options.set_option("assumptions", true);
   options.set_option("built-in-assertions", true);
-  options.set_option("lazy-methods", true);
   options.set_option("propagation", true);
   options.set_option("refine-strings", true);
   options.set_option("simple-slice", true);
@@ -303,9 +302,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     "symex-cache-dereferences", cmdline.isset("symex-cache-dereferences"));
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
-
-  if(cmdline.isset("no-lazy-methods"))
-    options.set_option("lazy-methods", false);
 
   if(cmdline.isset("symex-driven-lazy-loading"))
   {

@@ -170,7 +170,6 @@ symbol_tablet load_java_class(
 {
   free_form_cmdlinet command_line;
   command_line.add_flag("no-lazy-methods");
-  command_line.add_flag("no-refine-strings");
   return load_java_class(
     java_class_name, class_path, main, std::move(java_lang), command_line);
 }
@@ -203,9 +202,5 @@ goto_modelt load_goto_model_from_java_class(
   const std::string &main)
 {
   return load_goto_model_from_java_class(
-    java_class_name,
-    class_path,
-    {"no-lazy-methods", "no-refine-strings"},
-    {},
-    main);
+    java_class_name, class_path, {"no-lazy-methods"}, {}, main);
 }
