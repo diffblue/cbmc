@@ -55,6 +55,8 @@ jobs:
           make -C jbmc/unit -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
       - name: Print ccache stats
         run: ccache -s
+      - name: Checking completeness of help output
+        run: scripts/check_help.sh
       - name: Run unit tests
         run: |
           make -C unit test IPASIR=$PWD/riss.git/riss
@@ -233,6 +235,8 @@ jobs:
         run: cd build; ninja -j2
       - name: Print ccache stats
         run: ccache -s
+      - name: Checking completeness of help output
+        run: scripts/check_help.sh build/bin
       - name: Check if package building works
         run: |
           cd build
