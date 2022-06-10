@@ -1,0 +1,11 @@
+CORE
+pointer_round_trip.c
+--trace
+\[main\.assertion\.1\] line \d+ a == 5: expected success: SUCCESS
+\[main\.assertion\.2\] line \d+ a != 5: expected failure: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test is testing an integer value round trip (int -> pointer -> int) test.
