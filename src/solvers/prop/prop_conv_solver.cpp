@@ -300,6 +300,14 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
       return equal ? prop.lequal(tmp1, tmp2) : prop.lxor(tmp1, tmp2);
     }
   }
+  else if(expr.id() == ID_named_term)
+  {
+    const auto &named_term_expr = to_named_term_expr(expr);
+    literalt value_converted = convert(named_term_expr.value());
+    set_to_true(
+      equal_exprt(named_term_expr.symbol(), literal_exprt(value_converted)));
+    return value_converted;
+  }
 
   return convert_rest(expr);
 }

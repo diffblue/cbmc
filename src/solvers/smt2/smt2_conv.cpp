@@ -1607,6 +1607,14 @@ void smt2_convt::convert_expr(const exprt &expr)
         "unsupported type for " + shift_expr.id_string() + ": " +
         type.id_string());
   }
+  else if(expr.id() == ID_named_term)
+  {
+    const auto &named_term_expr = to_named_term_expr(expr);
+    out << "(! ";
+    convert(named_term_expr.value());
+    out << " :named "
+        << convert_identifier(named_term_expr.symbol().get_identifier()) << ')';
+  }
   else if(expr.id()==ID_with)
   {
     convert_with(to_with_expr(expr));
