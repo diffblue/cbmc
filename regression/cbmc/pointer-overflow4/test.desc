@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --pointer-overflow-check
 ^\[main.overflow.1\] line 10 arithmetic overflow on signed \* in (0x)?[0-9a-fA-F]+l* \* \(signed (long (long )?)?int\)4ul*: FAILURE$
