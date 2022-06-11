@@ -2534,6 +2534,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     function_application_exprt function_application(f_op, expr.arguments());
 
     function_application.add_source_location() = expr.source_location();
+    function_application.type() = mathematical_function_type.codomain();
 
     expr.swap(function_application);
     return;

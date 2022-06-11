@@ -1319,11 +1319,13 @@ __decltype          { if(PARSER.cpp98 &&
 {CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
 {CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }
 {CPROVER_PREFIX}"exists"       { loc(); return TOK_EXISTS; }
+{CPROVER_PREFIX}"lambda"       { loc(); return TOK_LAMBDA; }
 {CPROVER_PREFIX}"array_of"     { loc(); return TOK_ARRAY_OF; }
 {CPROVER_PREFIX}"thread_local" { loc(); return TOK_THREAD_LOCAL; }
 {CPROVER_PREFIX}"bitvector"    { loc(); return TOK_CPROVER_BITVECTOR; }
 {CPROVER_PREFIX}"floatbv"      { loc(); return TOK_CPROVER_FLOATBV; }
 {CPROVER_PREFIX}"fixedbv"      { loc(); return TOK_CPROVER_FIXEDBV; }
+{CPROVER_PREFIX}"map"          { loc(); return TOK_CPROVER_MAP; }
 {CPROVER_PREFIX}"bool"         { loc(); return TOK_CPROVER_BOOL; }
 {CPROVER_PREFIX}"throw"        { loc(); return TOK_CPROVER_THROW; }
 {CPROVER_PREFIX}"catch"        { loc(); return TOK_CPROVER_CATCH; }

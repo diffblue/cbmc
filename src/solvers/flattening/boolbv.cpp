@@ -506,6 +506,10 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
     if(is_unbounded_array(type))
       return true;
 
+    // see if it's a function
+    if(type.id() == ID_mathematical_function)
+      return true;
+
     const bvt &bv1=convert_bv(expr.rhs());
 
     const irep_idt &identifier=

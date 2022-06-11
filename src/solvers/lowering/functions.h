@@ -31,7 +31,8 @@ public:
   {
   }
 
-  void record(const function_application_exprt &function_application);
+  void record(const function_application_exprt &);
+  void record(const equal_exprt &);
 
   virtual void finish_eager_conversion()
   {

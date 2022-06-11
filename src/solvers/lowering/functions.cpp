@@ -18,6 +18,10 @@ void functionst::record(const function_application_exprt &function_application)
     function_application);
 }
 
+void functionst::record(const equal_exprt &function_equality)
+{
+}
+
 void functionst::add_function_constraints()
 {
   for(const auto &function : function_map)

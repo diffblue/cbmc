@@ -198,6 +198,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_CLRCALL     "__clrcall"
 %token TOK_FORALL      "forall"
 %token TOK_EXISTS      "exists"
+%token TOK_LAMBDA      "lambda"
 %token TOK_ACSL_FORALL "\\forall"
 %token TOK_ACSL_EXISTS "\\exists"
 %token TOK_ACSL_LAMBDA "\\lambda"
@@ -206,6 +207,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_FLOATBV "__CPROVER_floatbv"
 %token TOK_CPROVER_FIXEDBV "__CPROVER_fixedbv"
+%token TOK_CPROVER_MAP "__CPROVER_map"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
 %token TOK_CPROVER_THROW "__CPROVER_throw"
@@ -502,6 +504,14 @@ quantifier_expression:
         {
           $$=$1;
           set($$, ID_exists);
+          parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($4)) } ));
+          mto($$, $5);
+          PARSER.pop_scope();
+        }
+        | TOK_LAMBDA compound_scope '{' declaration comma_expression '}'
+        {
+          $$=$1;
+          set($$, ID_lambda);
           parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($4)) } ));
           mto($$, $5);
           PARSER.pop_scope();
@@ -1111,6 +1121,7 @@ type_specifier:
         | typedef_type_specifier
         | typeof_type_specifier
         | atomic_type_specifier
+        | map_type_specifier
         ;
 
 declaration_qualifier_list:
@@ -1552,6 +1563,18 @@ elaborated_type_name:
 array_of_construct:
           TOK_ARRAY_OF '<' type_name '>'
         { $$=$1; stack_type($$).add_subtype().swap(parser_stack($2)); }
+        ;
+
+map_type_specifier:
+          TOK_CPROVER_MAP '(' type_specifier ',' type_specifier ')'
+        {
+          $$=$1;
+          parser_stack($$).id(ID_mathematical_function);
+          irept domain{ID_tuple};
+          domain.move_to_sub(parser_stack($3));
+          parser_stack($$).move_to_sub(domain);
+          mts($$, $5);
+        }
         ;
 
 pragma_packed:

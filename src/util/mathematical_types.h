@@ -73,13 +73,21 @@ class mathematical_function_typet : public type_with_subtypest
 {
 public:
   // the domain of the function is composed of zero, one, or
-  // many variables, given by their type
+  // many arguments, given by their type
   using domaint = std::vector<typet>;
 
   mathematical_function_typet(const domaint &_domain, const typet &_codomain)
     : type_with_subtypest(
         ID_mathematical_function,
-        {type_with_subtypest(irep_idt(), _domain), _codomain})
+        {type_with_subtypest(irep_idt{ID_tuple}, _domain), _codomain})
+  {
+  }
+
+  // short-hand for the 1-tuple domain
+  mathematical_function_typet(const typet &_domain, const typet &_codomain)
+    : type_with_subtypest(
+        ID_mathematical_function,
+        {type_with_subtypest(irep_idt{ID_tuple}, {_domain}), _codomain})
   {
   }
 

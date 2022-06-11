@@ -234,7 +234,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     const auto &type = as_const(expr).type();
 
     // we never rename function symbols
-    if(type.id() == ID_code || type.id() == ID_mathematical_function)
+    if(type.id() == ID_code)
     {
       rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
       return renamedt<exprt, level>{std::move(expr)};
