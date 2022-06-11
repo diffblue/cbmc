@@ -1281,6 +1281,7 @@ __decltype          { if(PARSER.cpp98 &&
 {CPROVER_PREFIX}"bitvector"    { loc(); return TOK_CPROVER_BITVECTOR; }
 {CPROVER_PREFIX}"floatbv"      { loc(); return TOK_CPROVER_FLOATBV; }
 {CPROVER_PREFIX}"fixedbv"      { loc(); return TOK_CPROVER_FIXEDBV; }
+{CPROVER_PREFIX}"map"          { loc(); return TOK_CPROVER_MAP; }
 {CPROVER_PREFIX}"bool"         { loc(); return TOK_CPROVER_BOOL; }
 {CPROVER_PREFIX}"throw"        { loc(); return TOK_CPROVER_THROW; }
 {CPROVER_PREFIX}"catch"        { loc(); return TOK_CPROVER_CATCH; }

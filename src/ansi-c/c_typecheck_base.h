@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class ansi_c_declarationt;
 class c_bit_field_typet;
+class mathematical_function_typet;
 class shift_exprt;
 
 class c_typecheck_baset:
@@ -237,6 +238,7 @@ protected:
   virtual void typecheck_code_type(code_typet &type);
   virtual void typecheck_typedef_type(typet &type);
   virtual void typecheck_c_bit_field_type(c_bit_field_typet &type);
+  virtual void typecheck_map_type(mathematical_function_typet &);
   virtual void typecheck_typeof_type(typet &type);
   virtual void typecheck_array_type(array_typet &type);
   virtual void typecheck_vector_type(typet &type);
