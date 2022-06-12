@@ -2520,6 +2520,24 @@ exprt c_typecheck_baset::do_special_functions(
 
     return live_object_expr;
   }
+  else if(identifier == CPROVER_PREFIX "pointer_in_range")
+  {
+    // experimental feature for CHC encodings -- do not use
+    if(expr.arguments().size() != 3)
+    {
+      error().source_location = f_op.source_location();
+      error() << "pointer_in_range expects three arguments" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    exprt pointer_in_range_expr = pointer_in_range_exprt(
+      expr.arguments()[0], expr.arguments()[1], expr.arguments()[2]);
+    pointer_in_range_expr.add_source_location() = source_location;
+
+    return pointer_in_range_expr;
+  }
   else if(identifier == CPROVER_PREFIX "WRITEABLE_OBJECT")
   {
     if(expr.arguments().size() != 1)

@@ -56,6 +56,7 @@ __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);
 __CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);
 __CPROVER_size_t __CPROVER_OBJECT_SIZE(const void *);
 __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *);
+__CPROVER_bool __CPROVER_pointer_in_range(const void *, const void *, const void *);
 void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);
 
 // float stuff
