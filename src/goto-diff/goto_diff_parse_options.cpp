@@ -247,6 +247,7 @@ void goto_diff_parse_optionst::help()
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_FLUSH
+    " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";
   // clang-format on
