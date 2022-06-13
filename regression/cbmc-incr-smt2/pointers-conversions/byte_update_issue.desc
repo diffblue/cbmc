@@ -1,0 +1,10 @@
+KNOWNBUG
+byte_update_issue.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+--
+Reached unimplemented Generation of SMT formula for byte extract expression: byte_update_little_endian
+--
+This test is here to document our lack of support for byte_update_little_endian
+in the pointers support for the new SMT backend.
