@@ -71,7 +71,8 @@ string_constraint_generatort::add_axioms_for_index_of(
     n,
     lower_bound,
     zero_if_negative(index),
-    implies_exprt(contains, notequal_exprt(str[n], c)));
+    implies_exprt(contains, notequal_exprt(str[n], c)),
+    message_handler);
   constraints.universal.push_back(a4);
 
   symbol_exprt m = fresh_symbol("QA_index_of", index_type);
@@ -79,7 +80,8 @@ string_constraint_generatort::add_axioms_for_index_of(
     m,
     lower_bound,
     zero_if_negative(array_pool.get_or_create_length(str)),
-    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
+    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))),
+    message_handler);
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};
@@ -141,7 +143,8 @@ string_constraint_generatort::add_axioms_for_index_of_string(
     qvar,
     zero_if_negative(array_pool.get_or_create_length(needle)),
     implies_exprt(
-      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
+      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])),
+    message_handler);
   constraints.universal.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
@@ -242,7 +245,8 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
   const string_constraintt a3(
     qvar,
     zero_if_negative(array_pool.get_or_create_length(needle)),
-    implies_exprt(contains, constr3));
+    implies_exprt(contains, constr3),
+    message_handler);
   constraints.universal.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
@@ -392,14 +396,16 @@ string_constraint_generatort::add_axioms_for_last_index_of(
     n,
     zero_if_negative(plus_exprt(index, index1)),
     zero_if_negative(end_index),
-    implies_exprt(contains, notequal_exprt(str[n], c)));
+    implies_exprt(contains, notequal_exprt(str[n], c)),
+    message_handler);
   constraints.universal.push_back(a4);
 
   const symbol_exprt m = fresh_symbol("QA_last_index_of2", index_type);
   const string_constraintt a5(
     m,
     zero_if_negative(end_index),
-    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
+    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)),
+    message_handler);
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};

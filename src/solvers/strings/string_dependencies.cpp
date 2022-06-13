@@ -345,8 +345,9 @@ void string_dependenciest::output_dot(std::ostream &stream) const
   stream << '}' << std::endl;
 }
 
-string_constraintst
-string_dependenciest::add_constraints(string_constraint_generatort &generator)
+string_constraintst string_dependenciest::add_constraints(
+  string_constraint_generatort &generator,
+  message_handlert &message_handler)
 {
   std::unordered_set<nodet, node_hash> test_dependencies;
   for(const auto &builtin : builtin_function_nodes)
@@ -369,7 +370,7 @@ string_dependenciest::add_constraints(string_constraint_generatort &generator)
     if(test_dependencies.count(nodet(node)))
     {
       const auto &builtin = builtin_function_nodes[node.index];
-      merge(constraints, builtin.data->constraints(generator));
+      merge(constraints, builtin.data->constraints(generator, message_handler));
     }
     else
       constraints.existential.push_back(node.data->length_constraint());

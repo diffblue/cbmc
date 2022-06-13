@@ -19,6 +19,8 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 #include <util/graph.h>
 #include <util/xml.h>
 
+class message_handlert;
+
 struct xml_edget
 {
   xmlt xml_node;
@@ -68,11 +70,13 @@ public:
 bool read_graphml(
   std::istream &is,
   graphmlt &dest,
-  graphmlt::node_indext &entry);
+  graphmlt::node_indext &entry,
+  message_handlert &message_handler);
 bool read_graphml(
   const std::string &filename,
   graphmlt &dest,
-  graphmlt::node_indext &entry);
+  graphmlt::node_indext &entry,
+  message_handlert &message_handler);
 
 bool write_graphml(const graphmlt &src, std::ostream &os);
 

@@ -115,8 +115,9 @@ public:
   /// For all builtin call on which a test (or an unsupported buitin)
   /// result depends, add the corresponding constraints. For the other builtin
   /// only add constraints on the length.
-  NODISCARD string_constraintst
-  add_constraints(string_constraint_generatort &generatort);
+  NODISCARD string_constraintst add_constraints(
+    string_constraint_generatort &generatort,
+    message_handlert &message_handler);
 
   /// Clear the content of the dependency graph
   void clear();

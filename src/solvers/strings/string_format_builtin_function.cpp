@@ -112,7 +112,7 @@ static exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
 /// \param string_arg: format string from argument
 /// \param index_type: type for indexes in strings
 /// \param char_type: type of characters
-/// \param message: message handler for warnings
+/// \param message_handler: message handler for warnings
 /// \return String expression representing the output of String.format.
 static std::pair<array_string_exprt, string_constraintst>
 add_axioms_for_format_specifier(
@@ -121,7 +121,7 @@ add_axioms_for_format_specifier(
   const array_string_exprt &string_arg,
   const typet &index_type,
   const typet &char_type,
-  const messaget &message)
+  message_handlert &message_handler)
 {
   string_constraintst constraints;
   array_poolt &array_pool = generator.array_pool;
@@ -204,14 +204,14 @@ add_axioms_for_format_specifier(
     format_specifiert fs_lower = fs;
     fs_lower.conversion = tolower(fs.conversion);
     auto format_specifier_result = add_axioms_for_format_specifier(
-      generator, fs_lower, string_arg, index_type, char_type, message);
+      generator, fs_lower, string_arg, index_type, char_type, message_handler);
 
     const exprt return_code_upper_case =
       generator.fresh_symbol("return_code_upper_case", get_return_code_type());
     const string_to_upper_case_builtin_functiont upper_case_function(
       return_code_upper_case, res, format_specifier_result.first, array_pool);
     auto upper_case_constraints =
-      upper_case_function.constraints(generator.fresh_symbol);
+      upper_case_function.constraints(generator.fresh_symbol, message_handler);
     merge(upper_case_constraints, std::move(format_specifier_result.second));
     return {res, std::move(upper_case_constraints)};
   }
@@ -222,11 +222,14 @@ add_axioms_for_format_specifier(
   case format_specifiert::HEXADECIMAL_FLOAT:
     /// \todo Conversion of hexadecimal float is not implemented.
   case format_specifiert::DATE_TIME:
+  {
     /// \todo Conversion of date-time is not implemented
     // For all these unimplemented cases we return a non-deterministic string
+    messaget message{message_handler};
     message.warning() << "unimplemented format specifier: " << fs.conversion
                       << message.eom;
     return {array_pool.fresh_string(index_type, char_type), {}};
+  }
   }
 
   INVARIANT(false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
@@ -288,14 +291,14 @@ static exprt format_arg_from_string(
 /// \param res: string expression for the result of the format function
 /// \param s: a format string
 /// \param args: a vector of arguments
-/// \param message: message handler for warnings
+/// \param message_handler: message handler for warnings
 /// \return code, 0 on success
 static std::pair<exprt, string_constraintst> add_axioms_for_format(
   string_constraint_generatort &generator,
   const array_string_exprt &res,
   const std::string &s,
   const std::vector<array_string_exprt> &args,
-  const messaget &message)
+  message_handlert &message_handler)
 {
   string_constraintst constraints;
   array_poolt &array_pool = generator.array_pool;
@@ -336,7 +339,7 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
       }
 
       auto result = add_axioms_for_format_specifier(
-        generator, fs, string_arg, index_type, char_type, message);
+        generator, fs, string_arg, index_type, char_type, message_handler);
       merge(constraints, std::move(result.second));
       intermediary_strings.push_back(result.first);
     }
@@ -583,20 +586,15 @@ optionalt<exprt> string_format_builtin_functiont::eval(
 }
 
 string_constraintst string_format_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   // When `format_string` was not set, leave the result non-deterministic
   if(!format_string.has_value())
     return {};
 
-  null_message_handlert message_handler;
   auto result_constraint_pair = add_axioms_for_format(
-    generator,
-    result,
-    format_string.value(),
-    inputs,
-    // TODO: get rid of this argument
-    messaget{message_handler});
+    generator, result, format_string.value(), inputs, message_handler);
   INVARIANT(
     simplify_expr(result_constraint_pair.first, generator.ns).is_zero(),
     "add_axioms_for_format should return 0, meaning that formatting was"

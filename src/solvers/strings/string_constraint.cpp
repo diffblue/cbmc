@@ -11,21 +11,20 @@ Author: Diffblue Ltd.
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
-#include <solvers/flattening/boolbv.h>
+#include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
 
 /// Runs a solver instance to verify whether an expression can only be
 /// non-negative.
 /// \param expr: the expression to check for negativity
+/// \param message_handler: message handler
 /// \return true if `expr < 0` is unsatisfiable, false otherwise
-static bool cannot_be_neg(const exprt &expr)
+static bool cannot_be_neg(const exprt &expr, message_handlert &message_handler)
 {
-  // this is an internal check, no need for user visibility
-  null_message_handlert null_message_handler;
-  satcheck_no_simplifiert sat_check(null_message_handler);
+  satcheck_no_simplifiert sat_check(message_handler);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
-  boolbvt solver{ns, sat_check, null_message_handler};
+  bv_pointerst solver{ns, sat_check, message_handler};
   const exprt zero = from_integer(0, expr.type());
   const binary_relation_exprt non_neg(expr, ID_lt, zero);
   solver << non_neg;
@@ -36,18 +35,19 @@ string_constraintt::string_constraintt(
   const symbol_exprt &_univ_var,
   const exprt &lower_bound,
   const exprt &upper_bound,
-  const exprt &body)
+  const exprt &body,
+  message_handlert &message_handler)
   : univ_var(_univ_var),
     lower_bound(lower_bound),
     upper_bound(upper_bound),
     body(body)
 {
   INVARIANT(
-    cannot_be_neg(lower_bound),
+    cannot_be_neg(lower_bound, message_handler),
     "String constraints must have non-negative lower bound.\n" +
       lower_bound.pretty());
   INVARIANT(
-    cannot_be_neg(upper_bound),
+    cannot_be_neg(upper_bound, message_handler),
     "String constraints must have non-negative upper bound.\n" +
       upper_bound.pretty());
 }

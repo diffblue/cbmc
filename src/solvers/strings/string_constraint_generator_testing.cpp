@@ -64,7 +64,8 @@ string_constraint_generatort::add_axioms_for_is_prefix(
       qvar,
       maximum(
         from_integer(0, index_type), array_pool.get_or_create_length(prefix)),
-      body);
+      body,
+      message_handler);
   }());
 
   // Axiom 3.
@@ -200,7 +201,8 @@ string_constraint_generatort::add_axioms_for_is_suffix(
   string_constraintt a2(
     qvar,
     zero_if_negative(array_pool.get_or_create_length(s0)),
-    implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])));
+    implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])),
+    message_handler);
   constraints.universal.push_back(a2);
 
   symbol_exprt witness = fresh_symbol("witness_not_suffix", index_type);
@@ -280,7 +282,8 @@ string_constraint_generatort::add_axioms_for_contains(
   string_constraintt a4(
     qvar,
     zero_if_negative(array_pool.get_or_create_length(s1)),
-    implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])));
+    implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])),
+    message_handler);
   constraints.universal.push_back(a4);
 
   const string_not_contains_constraintt a5 = {

@@ -177,9 +177,9 @@ static bool build_graph(
 bool read_graphml(
   std::istream &is,
   graphmlt &dest,
-  graphmlt::node_indext &entry)
+  graphmlt::node_indext &entry,
+  message_handlert &message_handler)
 {
-  null_message_handlert message_handler;
   xmlt xml;
 
   if(parse_xml(is, "", message_handler, xml))
@@ -191,9 +191,9 @@ bool read_graphml(
 bool read_graphml(
   const std::string &filename,
   graphmlt &dest,
-  graphmlt::node_indext &entry)
+  graphmlt::node_indext &entry,
+  message_handlert &message_handler)
 {
-  null_message_handlert message_handler;
   xmlt xml;
 
   if(parse_xml(filename, message_handler, xml))
