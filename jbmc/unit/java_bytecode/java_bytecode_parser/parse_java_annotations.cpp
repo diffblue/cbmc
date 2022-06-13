@@ -173,7 +173,6 @@ SCENARIO(
     {
       free_form_cmdlinet command_line;
       command_line.add_flag("no-lazy-methods");
-      command_line.add_flag("no-refine-strings");
       test_java_bytecode_languaget language;
       language.set_message_handler(null_message_handler);
       optionst options;

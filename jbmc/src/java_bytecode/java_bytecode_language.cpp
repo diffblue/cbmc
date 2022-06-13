@@ -109,6 +109,8 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
   }
   options.set_option(
     "java-lift-clinit-calls", cmd.isset("java-lift-clinit-calls"));
+
+  options.set_option("lazy-methods", !cmd.isset("no-lazy-methods"));
 }
 
 prefix_filtert get_context(const optionst &options)

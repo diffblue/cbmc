@@ -58,11 +58,6 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
     exit(1);
   }
 
-  // TODO: improve this when language front ends have been
-  //   disentangled from command line parsing
-  // we always require these options
-  cmdline.set("no-lazy-methods");
-  cmdline.set("no-refine-strings");
   parse_java_language_options(cmdline, options);
 
   // check assertions
@@ -263,11 +258,10 @@ void jdiff_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     HELP_COVER
-    "Java Bytecode frontend options:\n"
-    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"
+    " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";
   // clang-format on
