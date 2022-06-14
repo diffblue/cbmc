@@ -1,6 +1,6 @@
 CORE clang-only
-main.c
--target i386-unknown-linux-gnu
+aarch64.c
+-target aarch64-linux-gnu
 ^EXIT=0$
 ^SIGNAL=0$
 --

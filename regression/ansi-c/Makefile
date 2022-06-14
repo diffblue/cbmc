@@ -10,7 +10,7 @@ else
 endif
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only -X clang-x86-only
+	excluded_tests = -X gcc-only -X clang-only
 else
 ifeq ($(BUILD_ENV_),OSX)
 	# In MacOS, a change in the assert.h header file
@@ -20,9 +20,6 @@ ifeq ($(BUILD_ENV_),OSX)
 	# <assert.h> or <cassert> headers.
   excluded_tests = -X macos-assert-broken
 endif
-ifeq ($(filter x86_64 i386,$(shell uname -m)),)
-  excluded_tests += -X clang-x86-only
-endif
 endif
 
 test:
@@ -31,10 +28,10 @@ test:
 	fi
 	if which gcc ; then \
 	  ../test.pl -e -p -c "$(exe) --native-compiler gcc" $(excluded_tests) \
-		  -X fake-gcc-version -X clang-x86-only && \
+		  -X fake-gcc-version -X clang-only && \
 	  ../test.pl -e -p -c $(exe) $(excluded_tests) -I fake-gcc-version ; \
 	elif ! which clang ; then \
-	  ../test.pl -e -p -c $(exe) $(excluded_tests) -X clang-x86-only ; \
+	  ../test.pl -e -p -c $(exe) $(excluded_tests) -X clang-only ; \
 	fi
 ifneq ($(BUILD_ENV_),MSVC)
 	@../test.pl -e -p -c "$(exe) -xc++ -D_Bool=bool" -I test-c++-front-end -s c++-front-end $(excluded_tests)
@@ -46,10 +43,10 @@ tests.log: ../test.pl
 	fi
 	if which gcc ; then \
 	  ../test.pl -e -p -c "$(exe) --native-compiler gcc" $(excluded_tests) \
-		  -X fake-gcc-version -X clang-x86-only && \
+		  -X fake-gcc-version -X clang-only && \
 	  ../test.pl -e -p -c $(exe) $(excluded_tests) -I fake-gcc-version ; \
 	elif ! which clang ; then \
-	  ../test.pl -e -p -c $(exe) $(excluded_tests) -X clang-x86-only ; \
+	  ../test.pl -e -p -c $(exe) $(excluded_tests) -X clang-only ; \
 	fi
 ifneq ($(BUILD_ENV_),MSVC)
 	@../test.pl -e -p -c "$(exe) -xc++ -D_Bool=bool" -I test-c++-front-end -s c++-front-end $(excluded_tests)
