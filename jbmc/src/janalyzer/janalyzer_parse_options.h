@@ -130,7 +130,7 @@ class optionst;
   "(no-assertions)(no-assumptions)" \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
-  "(show-reachable-properties)(property):" \
+  "(property):" \
   "(verbosity):(version)" \
   "(arch):" \
   "(taint):(show-taint)" \
