@@ -162,9 +162,8 @@ void symtab2gb_parse_optionst::help()
        "  [--out <outfile>]\n\n"
        "<json-symtab-file>                       a CBMC symbol table in\n"
        "                                         JSON format\n"
-       "--out <outfile>                          specify the filename of\n"
-       "                                         the resulting binary\n"
-       "                                         (default: a.out)\n"
-       " --verbosity #                verbosity level\n"
-    << messaget::eom;
+    << help_entry(
+         "--out <outfile>",
+         "specify the filename of the resulting binary (default: a.out)")
+    << help_entry("--verbosity #", "verbosity level") << messaget::eom;
 }

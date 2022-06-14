@@ -277,12 +277,13 @@ void show_goto_trace(
   "(stack-trace)"
 
 #define HELP_GOTO_TRACE                                                        \
-  " --trace-json-extended        add rawLhs property to trace\n"               \
-  " --trace-show-function-calls  show function calls in plain trace\n"         \
-  " --trace-show-code            show original code in plain trace\n"          \
-  " --trace-hex                  represent plain trace values in hex\n"        \
-  " --compact-trace              give a compact trace\n"                       \
-  " --stack-trace                give a stack trace only\n"
+  help_entry("--trace-json-extended", "add rawLhs property to trace")          \
+    << help_entry(                                                             \
+         "--trace-show-function-calls", "show function calls in plain trace")  \
+    << help_entry("--trace-show-code", "show original code in plain trace")    \
+    << help_entry("--trace-hex", "represent plain trace values in hex")        \
+    << help_entry("--compact-trace", "give a compact trace")                   \
+    << help_entry("--stack-trace", "give a stack trace only")
 
 #define PARSE_OPTIONS_GOTO_TRACE(cmdline, options)                             \
   if(cmdline.isset("trace-json-extended"))                                     \

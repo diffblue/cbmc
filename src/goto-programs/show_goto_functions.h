@@ -17,15 +17,13 @@ class goto_modelt;
 class goto_functionst;
 class ui_message_handlert;
 
-// clang-format off
 #define OPT_SHOW_GOTO_FUNCTIONS \
   "(show-goto-functions)" \
   "(list-goto-functions)"
 
-#define HELP_SHOW_GOTO_FUNCTIONS \
-  " --show-goto-functions        show loaded goto program\n" \
-  " --list-goto-functions        list loaded goto functions\n"
-// clang-format on
+#define HELP_SHOW_GOTO_FUNCTIONS                                               \
+  help_entry("--show-goto-functions", "show loaded goto program")              \
+    << help_entry("--list-goto-functions", "list loaded goto functions")
 
 void show_goto_functions(
   const namespacet &ns,

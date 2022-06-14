@@ -945,67 +945,81 @@ void cbmc_parse_optionst::help()
     " cbmc [options] file.c ...    perform bounded model checking\n"
     "\n"
     "Analysis options:\n"
-    HELP_SHOW_PROPERTIES
-    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
-    " --property id                only check one specific property\n"
-    " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
-    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
-    "                              (implies --trace)\n"
-    " --localize-faults            localize faults (experimental)\n"
-    "\n"
+    << HELP_SHOW_PROPERTIES
+    << help_entry(
+      "--symex-coverage-report f",
+      "generate a Cobertura XML coverage report in f")
+    << help_entry("--property id", "only check one specific property")
+    << help_entry(
+      "--trace",
+      "give a counterexample trace for failed properties")
+    << help_entry(
+      "--stop-on-fail",
+      "stop analysis once a failed property is detected (implies --trace)")
+    << help_entry("--localize-faults", "localize faults (experimental)")
+    << "\n"
     "C/C++ frontend options:\n"
-    " --preprocess                 stop after preprocessing\n"
-    " --test-preprocessor          stop after preprocessing, discard output\n"
-    HELP_CONFIG_C_CPP
-    HELP_ANSI_C_LANGUAGE
-    HELP_FUNCTIONS
-    "\n"
+    << help_entry("--preprocess", "stop after preprocessing")
+    << help_entry(
+      "--test-preprocessor", "stop after preprocessing, discard output")
+    << HELP_CONFIG_C_CPP
+    << HELP_ANSI_C_LANGUAGE
+    << HELP_FUNCTIONS
+    << "\n"
     "Platform options:\n"
-    HELP_CONFIG_PLATFORM
-    "\n"
+    << HELP_CONFIG_PLATFORM
+    << "\n"
     "Program representations:\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
-    HELP_SHOW_GOTO_FUNCTIONS
-    HELP_VALIDATE
-    " --export-symex-ready-goto f         serialise goto-program in symex-ready-goto form in f\n" // NOLINT(*)
-    "\n"
+    << help_entry("--show-parse-tree", "show parse tree")
+    << help_entry("--show-symbol-table", "show loaded symbol table")
+    << HELP_SHOW_GOTO_FUNCTIONS
+    << HELP_VALIDATE
+    << "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
-    HELP_COVER
-    " --mm MM                      memory consistency model for concurrent programs (default: sc)\n" // NOLINT(*)
-    HELP_CONFIG_LIBRARY
-    HELP_REACHABILITY_SLICER
-    " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
-    " --havoc-undefined-functions\n"
-    "                              for any function that has no body, assign non-deterministic values to\n" // NOLINT(*)
-    "                              any parameters passed as non-const pointers and the return value\n" // NOLINT(*)
-    "\n"
+    << HELP_GOTO_CHECK
+    << HELP_COVER
+    << help_entry(
+      "--mm MM",
+      "memory consistency model for concurrent programs (default: sc)")
+    << HELP_CONFIG_LIBRARY
+    << HELP_REACHABILITY_SLICER
+    << help_entry("--full-slice", "run full slicer (experimental)")
+    << help_entry(
+      "--drop-unused-functions",
+      "drop functions trivially unreachable from main function")
+    << help_entry(
+      "--havoc-undefined-functions",
+      "for any function that has no body, assign non-deterministic values to "
+      "any parameters passed as non-const pointers and the return value")
+    << "\n"
     "Semantic transformations:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
-    "\n"
+    << help_entry(
+      "--nondet-static",
+      "add nondeterministic initialization of variables with static lifetime")
+    << "\n"
     "BMC options:\n"
-    HELP_BMC
-    "\n"
+    << HELP_BMC
+    << "\n"
     "Backend options:\n"
-    HELP_CONFIG_BACKEND
-    HELP_SOLVER
-    HELP_STRING_REFINEMENT_CBMC
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
-    " --show-array-constraints     show array theory constraints added\n"
-    "                              during post processing.\n"
-    "                              Requires --json-ui.\n"
-    "\n"
+    << HELP_CONFIG_BACKEND
+    << HELP_SOLVER
+    << HELP_STRING_REFINEMENT_CBMC
+    << help_entry(
+      "--arrays-uf-never", "never turn arrays into uninterpreted functions")
+    << help_entry(
+      "--arrays-uf-always", "always turn arrays into uninterpreted functions")
+    << help_entry(
+      "--show-array-constraints",
+      "show array theory constraints added during post processing. Requires "
+      "--json-ui.")
+    << "\n"
     "User-interface options:\n"
-    HELP_XML_INTERFACE
-    HELP_JSON_INTERFACE
-    HELP_GOTO_TRACE
-    HELP_FLUSH
-    " --verbosity #                verbosity level\n"
-    HELP_TIMESTAMP
-    "\n";
+    << HELP_XML_INTERFACE
+    << HELP_JSON_INTERFACE
+    << HELP_GOTO_TRACE
+    << HELP_FLUSH
+    << help_entry("--verbosity #", "verbosity level")
+    << HELP_TIMESTAMP
+    << "\n";
   // clang-format on
 }

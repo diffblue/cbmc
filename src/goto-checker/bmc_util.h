@@ -169,83 +169,92 @@ void run_property_decider(
   std::chrono::duration<double> solver_runtime,
   bool set_pass = true);
 
-// clang-format off
-#define OPT_BMC \
-  "(program-only)" \
-  "(show-byte-ops)" \
-  "(show-vcc)" \
-  "(show-goto-symex-steps)" \
-  "(show-points-to-sets)" \
-  "(slice-formula)" \
-  "(unwinding-assertions)" \
-  "(no-unwinding-assertions)" \
-  "(no-self-loops-to-assumptions)" \
-  "(partial-loops)" \
-  "(paths):" \
-  "(show-symex-strategies)" \
-  "(depth):" \
-  "(max-field-sensitivity-array-size):" \
-  "(no-array-field-sensitivity)" \
-  "(graphml-witness):" \
-  "(symex-complexity-limit):" \
-  "(symex-complexity-failed-child-loops-limit):" \
-  "(incremental-loop):" \
-  "(unwind-min):" \
-  "(unwind-max):" \
-  "(ignore-properties-before-unwind-min)" \
-  "(symex-cache-dereferences)" \
-  OPT_UNWINDSET \
+#define OPT_BMC                                                                \
+  "(program-only)"                                                             \
+  "(show-byte-ops)"                                                            \
+  "(show-vcc)"                                                                 \
+  "(show-goto-symex-steps)"                                                    \
+  "(show-points-to-sets)"                                                      \
+  "(slice-formula)"                                                            \
+  "(unwinding-assertions)"                                                     \
+  "(no-unwinding-assertions)"                                                  \
+  "(no-self-loops-to-assumptions)"                                             \
+  "(partial-loops)"                                                            \
+  "(paths):"                                                                   \
+  "(show-symex-strategies)"                                                    \
+  "(depth):"                                                                   \
+  "(max-field-sensitivity-array-size):"                                        \
+  "(no-array-field-sensitivity)"                                               \
+  "(graphml-witness):"                                                         \
+  "(symex-complexity-limit):"                                                  \
+  "(symex-complexity-failed-child-loops-limit):"                               \
+  "(incremental-loop):"                                                        \
+  "(unwind-min):"                                                              \
+  "(unwind-max):"                                                              \
+  "(ignore-properties-before-unwind-min)"                                      \
+  "(symex-cache-dereferences)" OPT_UNWINDSET
 
-#define HELP_BMC \
-  " --paths [strategy]           explore paths one at a time\n" \
-  " --show-symex-strategies      list strategies for use with --paths\n" \
-  " --show-goto-symex-steps      show which steps symex travels, includes\n" \
-  "                              diagnostic information\n" \
-  " --show-points-to-sets        show points-to sets for\n" \
-  "                              pointer dereference. Requires --json-ui.\n" \
-  " --program-only               only show program expression\n" \
-  " --show-byte-ops              show all byte extracts and updates\n" \
-  " --depth nr                   limit search depth\n" \
-  " --max-field-sensitivity-array-size M\n" \
-  "                              maximum size M of arrays for which field\n" \
-  "                              sensitivity will be applied to array,\n" \
-  "                              the default is 64\n" \
-  " --no-array-field-sensitivity\n" \
-  "                              deactivate field sensitivity for arrays, " \
-  "this is\n" \
-  "                              equivalent to setting the maximum field \n" \
-  "                              sensitivity size for arrays to 0\n" \
-  HELP_UNWINDSET \
-  " --incremental-loop L         check properties after each unwinding\n" \
-  "                              of loop L\n" \
-  "                              (use --show-loops to get the loop IDs)\n" \
-  " --unwind-min nr              start incremental-loop after nr unwindings\n" \
-  "                              but before solving that iteration. If for\n" \
-  "                              example it is 1, then the loop will be\n" \
-  "                              unwound once, and immediately checked.\n" \
-  "                              Note: this means for min-unwind 1 or\n"\
-  "                              0 all properties are checked.\n" \
-  " --unwind-max nr              stop incremental-loop after nr unwindings\n" \
-  " --ignore-properties-before-unwind-min\n" \
-  "                              do not check properties before unwind-min\n" \
-  "                              when using incremental-loop\n" \
-  " --show-vcc                   show the verification conditions\n" \
-  " --slice-formula              remove assignments unrelated to property\n" \
-  " --unwinding-assertions       generate unwinding assertions (cannot be\n" \
-  "                              used with --cover)\n" \
-  " --partial-loops              permit paths with partial loops\n" \
-  " --no-self-loops-to-assumptions\n" \
-  "                              do not simplify while(1){} to assume(0)\n" \
-  " --symex-complexity-limit N   how complex (N) a path can become before\n" \
-  "                              symex abandons it. Currently uses guard\n" \
-  "                              size to calculate complexity. \n" \
-  " --symex-complexity-failed-child-loops-limit N\n" \
-  "                              how many child branches (N) in an\n" \
-  "                              iteration are allowed to fail due to\n" \
-  "                              complexity violations before the loop\n" \
-  "                              gets blacklisted\n" \
-  " --graphml-witness filename   write the witness in GraphML format to filename\n" /* NOLINT(*) */ \
-  " --symex-cache-dereferences   enable caching of repeated dereferences\n" \
-// clang-format on
+#define HELP_BMC                                                               \
+  help_entry("--paths [strategy]", "explore paths one at a time")              \
+    << help_entry(                                                             \
+         "--show-symex-strategies", "list strategies for use with --paths")    \
+    << help_entry(                                                             \
+         "--show-goto-symex-steps",                                            \
+         "show which steps symex travels, includes diagnostic information")    \
+    << help_entry(                                                             \
+         "--show-points-to-sets",                                              \
+         "show points-to sets for pointer dereference. Requires --json-ui.")   \
+    << help_entry("--program-only", "only show program expression")            \
+    << help_entry("--show-byte-ops", "show all byte extracts and updates")     \
+    << help_entry("--depth nr", "limit search depth")                          \
+    << help_entry(                                                             \
+         "--max-field-sensitivity-array-size M",                               \
+         "maximum size M of arrays for which field sensitivity will be "       \
+         "applied to array, the default is 64")                                \
+    << help_entry(                                                             \
+         "--no-array-field-sensitivity",                                       \
+         "deactivate field sensitivity for arrays, this is equivalent to "     \
+         "setting the maximum field  sensitivity size for arrays to 0")        \
+    << HELP_UNWINDSET                                                          \
+    << help_entry(                                                             \
+         "--incremental-loop L",                                               \
+         "check properties after each unwinding of loop L (use --show-loops "  \
+         "to get the loop IDs)")                                               \
+    << help_entry(                                                             \
+         "--unwind-min nr",                                                    \
+         "start incremental-loop after nr unwindings but before solving that " \
+         "iteration. If for example it is 1, then the loop will be unwound "   \
+         "once, and immediately checked. Note: this means for min-unwind 1 "   \
+         "or 0 all properties are checked.")                                   \
+    << help_entry(                                                             \
+         "--unwind-max nr", "stop incremental-loop after nr unwindings")       \
+    << help_entry(                                                             \
+         "--ignore-properties-before-unwind-min",                              \
+         "do not check properties before unwind-min when using "               \
+         "incremental-loop")                                                   \
+    << help_entry("--show-vcc", "show the verification conditions")            \
+    << help_entry(                                                             \
+         "--slice-formula", "remove assignments unrelated to property")        \
+    << help_entry(                                                             \
+         "--unwinding-assertions",                                             \
+         "generate unwinding assertions (cannot be used with --cover)")        \
+    << help_entry("--partial-loops", "permit paths with partial loops")        \
+    << help_entry(                                                             \
+         "--no-self-loops-to-assumptions",                                     \
+         "do not simplify while(1){} to assume(0)")                            \
+    << help_entry(                                                             \
+         "--symex-complexity-limit N",                                         \
+         "how complex (N) a path can become before symex abandons it. "        \
+         "Currently uses guard size to calculate complexity.")                 \
+    << help_entry(                                                             \
+         "--symex-complexity-failed-child-loops-limit N",                      \
+         "how many child branches (N) in an iteration are allowed to fail "    \
+         "due to complexity violations before the loop gets blacklisted")      \
+    << help_entry(                                                             \
+         "--graphml-witness_filename",                                         \
+         "write the witness in GraphML format to filename")                    \
+    << help_entry(                                                             \
+         "--symex-cache-dereferences",                                         \
+         "enable caching of repeated dereferences")
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H

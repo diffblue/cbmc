@@ -24,48 +24,51 @@ Author: Diffblue Ltd.
 #define FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT              \
   "treat-pointers-equal-maybe"
 
-// clang-format off
 #define FUNCTION_HARNESS_GENERATOR_OPTIONS                                     \
-  "(" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT "):"                             \
-  "(" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT ")"                        \
-  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT "):"               \
-  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT "):"                 \
-  "(" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT "):"                \
-  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING "):"                 \
-  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT ")"            \
-// FUNCTION_HARNESS_GENERATOR_OPTIONS
+  "(" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                                  \
+  "):"                                                                         \
+  "(" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                            \
+  ")"                                                                          \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                    \
+  "):"                                                                         \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                      \
+  "):"                                                                         \
+  "(" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                     \
+  "):"                                                                         \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                      \
+  "):"                                                                         \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT ")"
 
-// clang-format on
-
-// clang-format off
 #define FUNCTION_HARNESS_GENERATOR_HELP                                        \
-  "function harness generator (--harness-type call-function)\n\n"              \
-  "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                                 \
-  "                    the function the harness should call\n"                 \
-  "--" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                           \
-  "              set global variables to non-deterministic values\n"           \
-  "                              in harness\n"                                 \
-  COMMON_HARNESS_GENERATOR_HELP                                                \
-  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                   \
-  " p    treat the function parameter with the name `p' as\n"                  \
-  "                              an array\n"                                   \
-  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                     \
-  " p,q,r[;s,t]    treat the function parameters `q,r' equal\n"                \
-  "                              to parameter `p'; `s` to `t` and so on\n"     \
-  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT               \
-  "                function parameters equality is non-deterministic\n"        \
-  "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                    \
-  " array_name:size_name\n"                                                    \
-  "                              set the parameter <size_name> to the size"    \
-  " of\n                              the array <array_name>\n"                \
-  "                              (implies "                                    \
-  "-- " FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                  \
-  " <array_name>)\n"                                                           \
-  "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                     \
-  " p    treat the function parameter with the name `p' as\n"                  \
-  "                              a string of characters\n"                     \
-  // FUNCTION_HARNESS_GENERATOR_HELP
-
-// clang-format on
+  "function harness generator (--harness-type call-function):\n"               \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT " <function-name>",      \
+         "the function the harness should call")                               \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT,                   \
+         "set global variables to non-deterministic values in harness")        \
+    << COMMON_HARNESS_GENERATOR_HELP                                           \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT " p",      \
+         "treat the function parameter with the name `p' as an array")         \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT              \
+         " p,q,r[;s,t]",                                                       \
+         "treat the function parameters `q,r' equal to parameter `p'; `s` to " \
+         "`t` and so on")                                                      \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT,       \
+         "function parameters equality is non-deterministic")                  \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT             \
+         " array_name:size_name",                                              \
+         "set the parameter <size_name> to the size of the array "             \
+         "<array_name> (implies "                                              \
+         "-- " FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT           \
+         " <array_name>)")                                                     \
+    << help_entry(                                                             \
+         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING " p",        \
+         "treat the function parameter with the name `p' as a string of "      \
+         "characters")
 
 #endif // CPROVER_GOTO_HARNESS_FUNCTION_HARNESS_GENERATOR_OPTIONS_H

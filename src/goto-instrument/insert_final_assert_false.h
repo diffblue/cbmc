@@ -46,14 +46,12 @@ bool insert_final_assert_false(
   const std::string &function_to_instrument,
   message_handlert &message_handler);
 
-// clang-format off
 #define OPT_INSERT_FINAL_ASSERT_FALSE \
   "(insert-final-assert-false):"
 
-#define HELP_INSERT_FINAL_ASSERT_FALSE \
-  " --insert-final-assert-false <function>\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              generate assert(false) at end of function\n"
-// clang-format on
+#define HELP_INSERT_FINAL_ASSERT_FALSE                                         \
+  help_entry(                                                                  \
+    "--insert-final-assert-false <function>",                                  \
+    "generate assert(false) at end of function")
 
 #endif // CPROVER_GOTO_INSTRUMENT_INSERT_FINAL_ASSERT_FALSE_H

@@ -28,12 +28,14 @@ void print_global_state_size(const goto_modelt &);
   "(print-path-lengths)"
 
 #define HELP_GOTO_PROGRAM_STATS                                                \
-  " --count-eloc                 count effective lines of code\n"              \
-  " --list-eloc                  list full path names of lines "               \
-  "containing code\n"                                                          \
-  " --print-global-state-size    count the total number of bits of global "    \
-  "objects\n"                                                                  \
-  " --print-path-lengths         print statistics about control-flow graph "   \
-  "paths\n"
+  help_entry("--count-eloc", "count effective lines of code")                  \
+    << help_entry(                                                             \
+         "--list-eloc", "list full path names of lines containing code")       \
+    << help_entry(                                                             \
+         "--print-global-state-size",                                          \
+         "count the total number of bits of global objects")                   \
+    << help_entry(                                                             \
+         "--print-path-lengths",                                               \
+         "print statistics about control-flow graph paths")
 
 #endif // CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H

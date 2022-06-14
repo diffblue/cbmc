@@ -28,7 +28,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include "string_dependencies.h"
 #include "string_refinement_util.h"
 
-// clang-format off
 #define OPT_STRING_REFINEMENT \
   "(no-refine-strings)" \
   "(string-printable)" \
@@ -36,17 +35,22 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
   "(string-non-empty)" \
   "(max-nondet-string-length):"
 
-#define HELP_STRING_REFINEMENT \
-  " --no-refine-strings          turn off string refinement\n" \
-  " --string-printable           restrict to printable strings and characters\n" /* NOLINT(*) */ \
-  " --string-non-empty           restrict to non-empty strings (experimental)\n" /* NOLINT(*) */ \
-  " --string-input-value st      restrict non-null strings to a fixed value st;\n" /* NOLINT(*) */ \
-  "                              the switch can be used multiple times to give\n" /* NOLINT(*) */ \
-  "                              several strings\n" /* NOLINT(*) */ \
-  " --max-nondet-string-length n bound the length of nondet (e.g. input) strings.\n" /* NOLINT(*) */ \
-  "                              Default is " + std::to_string(MAX_CONCRETE_STRING_SIZE - 1) + "; note that\n" /* NOLINT(*) */ \
-  "                              setting the value higher than this does not work\n" /* NOLINT(*) */ \
-  "                              with --trace or --validate-trace.\n" /* NOLINT(*) */
+#define HELP_STRING_REFINEMENT                                                 \
+  help_entry("--no-refine-strings", "turn off string refinement")              \
+    << help_entry(                                                             \
+         "--string-printable", "restrict to printable strings and characters") \
+    << help_entry(                                                             \
+         "--string-non-empty", "restrict to non-empty strings (experimental)") \
+    << help_entry(                                                             \
+         "--string-input-value st",                                            \
+         "restrict non-null strings to a fixed value st; the switch can be "   \
+         "used multiple times to give several strings")                        \
+    << help_entry(                                                             \
+         "--max-nondet-string-length_n",                                       \
+         "bound the length of nondet (e.g. input) strings. Default is " +      \
+           std::to_string(MAX_CONCRETE_STRING_SIZE - 1) +                      \
+           "; note that setting the value higher than this does not work "     \
+           "with --trace or --validate-trace.")
 
 // The integration of the string solver into CBMC is incomplete. Therefore,
 // it is not turned on by default and not all options are available.
@@ -54,10 +58,10 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
   "(refine-strings)" \
   "(string-printable)"
 
-#define HELP_STRING_REFINEMENT_CBMC \
-  " --refine-strings             use string refinement (experimental)\n" \
-  " --string-printable           restrict to printable strings (experimental)\n" /* NOLINT(*) */
-// clang-format on
+#define HELP_STRING_REFINEMENT_CBMC                                            \
+  help_entry("--refine-strings", "use string refinement (experimental)")       \
+    << help_entry(                                                             \
+         "--string-printable", "restrict to printable strings (experimental)")
 
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 

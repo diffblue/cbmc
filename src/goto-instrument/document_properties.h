@@ -28,11 +28,11 @@ void document_properties_html(
   "(document-claims-latex)(document-claims-html)"                              \
   "(document-properties-latex)(document-properties-html)"
 
-// clang-format off
 #define HELP_DOCUMENT_PROPERTIES                                               \
-  " --document-properties-html   generate HTML property documentation\n"       \
-  " --document-properties-latex  generate Latex property documentation\n"
-
-// clang-format on
+  help_entry(                                                                  \
+    "--document-properties-html", "generate HTML property documentation")      \
+    << help_entry(                                                             \
+         "--document-properties-latex",                                        \
+         "generate Latex property documentation")
 
 #endif // CPROVER_GOTO_INSTRUMENT_DOCUMENT_PROPERTIES_H

@@ -27,9 +27,10 @@ class messaget;
   "(validate-trace)" \
 
 #define HELP_JAVA_TRACE_VALIDATION /*NOLINT*/ \
-    " --validate-trace             throw an error if the structure of the counterexample\n" /*NOLINT*/ \
-    "                              trace does not match certain assumptions\n" /*NOLINT*/ \
-    "                              (experimental, currently java only)\n" /*NOLINT*/ \
+  help_entry( \
+    "--validate-trace", \
+    "throw an error if the structure of the counterexample trace does not " \
+    "match certain assumptions (experimental, currently java only)")
 // clang-format on
 
 /// Checks that the structure of each step of the trace matches certain

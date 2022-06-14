@@ -37,8 +37,8 @@ void xml_interface(cmdlinet &, message_handlert &);
   "(xml-interface)"
 
 #define HELP_XML_INTERFACE \
-  " --xml-ui                     use XML-formatted output\n" \
-  " --xml-interface              bi-directional XML interface\n"
+  help_entry("--xml-ui", "use XML-formatted output") \
+  << help_entry("--xml-interface", "bi-directional XML interface")
 // clang-format on
 
 #endif // CPROVER_XMLLANG_XML_INTERFACE_H

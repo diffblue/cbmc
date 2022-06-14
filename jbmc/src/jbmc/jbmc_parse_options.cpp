@@ -966,82 +966,95 @@ void jbmc_parse_optionst::help()
     "\n"
     " jbmc [-?] [-h] [--help]      show help\n"
     " jbmc\n"
-    HELP_JAVA_METHOD_NAME
-    " jbmc\n"
-    HELP_JAVA_CLASS_NAME
-    " jbmc\n"
-    HELP_JAVA_JAR
-    " jbmc\n"
-    HELP_JAVA_GOTO_BINARY
-    "\n"
-    HELP_JAVA_CLASSPATH
-    HELP_FUNCTIONS
-    "\n"
+    << HELP_JAVA_METHOD_NAME
+    << " jbmc\n"
+    << HELP_JAVA_CLASS_NAME
+    << " jbmc\n"
+    << HELP_JAVA_JAR
+    << " jbmc\n"
+    << HELP_JAVA_GOTO_BINARY
+    << "\n"
+    << HELP_JAVA_CLASSPATH
+    << HELP_FUNCTIONS
+    << "\n"
     "Analysis options:\n"
-    HELP_SHOW_PROPERTIES
-    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
-    " --property id                only check one specific property\n"
-    " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
-    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
-    "                              (implies --trace)\n"
-    " --localize-faults            localize faults (experimental)\n"
-    HELP_JAVA_TRACE_VALIDATION
-    "\n"
+    << HELP_SHOW_PROPERTIES
+    << help_entry(
+      "--symex-coverage-report f",
+      "generate a Cobertura XML coverage report in f")
+    << help_entry("--property id", "only check one specific property")
+    << help_entry(
+      "--trace", "give a counterexample trace for failed properties")
+    << help_entry(
+      "--stop-on-fail",
+      "stop analysis once a failed property is detected (implies --trace)")
+    << help_entry("--localize-faults", "localize faults (experimental)")
+    << HELP_JAVA_TRACE_VALIDATION
+    << "\n"
     "Platform options:\n"
-    HELP_CONFIG_PLATFORM
-    "\n"
+    << HELP_CONFIG_PLATFORM
+    << "\n"
     "Program representations:\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
-    " --list-symbols               list symbols with type information\n"
-    HELP_SHOW_GOTO_FUNCTIONS
-    " --drop-unused-functions      drop functions trivially unreachable\n"
-    "                              from main function\n"
-    HELP_SHOW_CLASS_HIERARCHY
-    "\n"
+    << help_entry("--show-parse-tree", "show parse tree")
+    << help_entry("--show-symbol-table", "show loaded symbol table")
+    << help_entry("--list-symbols", "list symbols with type information")
+    << HELP_SHOW_GOTO_FUNCTIONS
+    << help_entry(
+      "--drop-unused-functions",
+      "drop functions trivially unreachable from main function")
+    << HELP_SHOW_CLASS_HIERARCHY
+    << "\n"
     "Program instrumentation options:\n"
-    " --no-assertions              ignore user assertions\n"
-    " --no-assumptions             ignore user assumptions\n"
-    " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
-    HELP_REACHABILITY_SLICER
-    " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
-    "\n"
+    << help_entry("--no-assertions", "ignore user assertions")
+    << help_entry("--no-assumptions", "ignore user assumptions")
+    << help_entry("--mm MM", "memory consistency model for concurrent programs")
+    << HELP_REACHABILITY_SLICER
+    << help_entry("--full-slice", "run full slicer (experimental)")
+    << "\n"
     "Java Bytecode frontend options:\n"
-    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    << JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
-    " --java-threading             enable java multi-threading support (experimental)\n" // NOLINT(*)
-    " --java-unwind-enum-static    unwind loops in static initialization of enums\n" // NOLINT(*)
+    << help_entry(
+      "--java-threading",
+      "enable java multi-threading support (experimental)")
+    << help_entry(
+      "--java-unwind-enum-static",
+      "unwind loops in static initialization of enums")
     // Currently only supported in the JBMC frontend:
-    " --symex-driven-lazy-loading  only load functions when first entered by symbolic\n" // NOLINT(*)
-    "                              execution. Note that --show-symbol-table,\n"
-    "                              --show-goto-functions/properties output\n"
-    "                              will be restricted to loaded methods in this case,\n" // NOLINT(*)
-    "                              and only output after the symex phase.\n"
-    "\n"
+    << help_entry(
+      "--symex-driven-lazy-loading",
+      "only load functions when first entered by symbolic execution. Note that "
+      "--show-symbol-table, --show-goto-functions/properties output will be "
+      "restricted to loaded methods in this case, and only output after the "
+      "symex phase.")
+    << "\n"
     "Semantic transformations:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
-    "\n"
+    << help_entry(
+      "--nondet-static",
+      "add nondeterministic initialization of variables with static lifetime")
+    << "\n"
     "BMC options:\n"
-    HELP_BMC
-    "\n"
+    << HELP_BMC
+    << "\n"
     "Backend options:\n"
-    HELP_CONFIG_BACKEND
-    HELP_SOLVER
-    HELP_STRING_REFINEMENT
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
-    "\n"
+    << HELP_CONFIG_BACKEND
+    << HELP_SOLVER
+    << HELP_STRING_REFINEMENT
+    << help_entry(
+      "--arrays-uf-never", "never turn arrays into uninterpreted functions")
+    << help_entry(
+      "--arrays-uf-always", "always turn arrays into uninterpreted functions")
+    << "\n"
     "Other options:\n"
-    " --version                    show version and exit\n"
-    HELP_XML_INTERFACE
-    HELP_JSON_INTERFACE
-    HELP_VALIDATE
-    HELP_GOTO_TRACE
-    HELP_FLUSH
-    " --verbosity #                verbosity level\n"
-    HELP_TIMESTAMP
-    "\n";
+    << help_entry("--version", "show version and exit")
+    << HELP_XML_INTERFACE
+    << HELP_JSON_INTERFACE
+    << HELP_VALIDATE
+    << HELP_GOTO_TRACE
+    << HELP_FLUSH
+    << help_entry("--verbosity #", "verbosity level")
+    << HELP_TIMESTAMP
+    << "\n";
   // clang-format on
 }

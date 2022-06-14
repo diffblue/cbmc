@@ -231,13 +231,13 @@ void goto_synthesizer_parse_optionst::help()
     " goto-synthesizer in out              synthesize and apply loop invariants.\n" // NOLINT(*)
     "\n"
     "Main options:\n"
-    HELP_DUMP_LOOP_CONTRACTS
-    HELP_LOOP_CONTRACTS_NO_UNWIND
-    "\n"
+    << HELP_DUMP_LOOP_CONTRACTS
+    << HELP_LOOP_CONTRACTS_NO_UNWIND
+    << "\n"
     "Backend options:\n"
-    HELP_CONFIG_BACKEND
-    HELP_SOLVER
-    "\n"
+    << HELP_CONFIG_BACKEND
+    << HELP_SOLVER
+    << "\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
     "Other options:\n"

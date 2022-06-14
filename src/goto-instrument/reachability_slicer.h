@@ -41,19 +41,23 @@ void reachability_slicer(
   const bool include_forward_reachability,
   message_handlert &);
 
-// clang-format off
 #define OPT_FP_REACHABILITY_SLICER "(fp-reachability-slice):"
 #define OPT_REACHABILITY_SLICER "(reachability-slice)(reachability-slice-fb)"
 
-#define HELP_FP_REACHABILITY_SLICER \
-  " --fp-reachability-slice f    remove instructions that cannot appear on\n" \
-  "                              trace that visits all given functions.\n" \
-  "                              The list of functions has to be given as a\n" \
-  "                              comma separated list f.\n"
-#define HELP_REACHABILITY_SLICER \
-  " --reachability-slice         remove instructions that cannot appear on\n" \
-  "                              a trace from entry point to a property\n" \
-  " --reachability-slice-fb      remove instructions that cannot appear on\n" \
-  "                              a trace from entry point through a property\n"
-// clang-format on
+#define HELP_FP_REACHABILITY_SLICER                                            \
+  help_entry(                                                                  \
+    "--fp-reachability-slice f",                                               \
+    "remove instructions that cannot appear on a trace that visits all given " \
+    "functions. The list of functions has to be given as a comma separated "   \
+    "list f.")                                                                 \
+    << help_entry(                                                             \
+         "--reachability-slice",                                               \
+         "remove instructions that cannot appear on a trace from entry point " \
+         "to a property")
+#define HELP_REACHABILITY_SLICER                                               \
+  help_entry(                                                                  \
+    "--reachability-slice-fb",                                                 \
+    "remove instructions that cannot appear on a trace from entry point "      \
+    "through a property")
+
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H

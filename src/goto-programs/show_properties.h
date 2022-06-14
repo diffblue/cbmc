@@ -23,13 +23,11 @@ class goto_functionst;
 class source_locationt;
 class ui_message_handlert;
 
-// clang-format off
 #define OPT_SHOW_PROPERTIES \
   "(show-properties)"
 
-#define HELP_SHOW_PROPERTIES \
-  " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
-// clang-format on
+#define HELP_SHOW_PROPERTIES                                                   \
+  help_entry("--show-properties", "show the properties, but don't run analysis")
 
 void show_properties(
   const goto_modelt &,

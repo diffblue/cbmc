@@ -179,11 +179,10 @@ void memory_analyzer_parse_optionst::help()
     << " memory-analyzer --symbols <symbol-list> <options> <binary> analyze"
     << " binary\n"
     << "\n"
-    << " --core-file <file>           analyze from core file\n"
-    << " --breakpoint <breakpoint>    analyze from breakpoint\n"
-    << " --symbols <symbol-list>      list of symbols to analyze\n"
-    << " --symtab-snapshot            output snapshot as symbol table\n"
-    << " --output-file <file>         write snapshot to file\n"
-    << " --json-ui                    output snapshot in JSON format\n"
-    << '\n';
+    << help_entry("--core-file <file>", "analyze from core file")
+    << help_entry("--breakpoint <breakpoint>", "analyze from breakpoint")
+    << help_entry("--symbols <symbol-list>", "list of symbols to analyze")
+    << help_entry("--symtab-snapshot", "output snapshot as symbol table")
+    << help_entry("--output-file <file>", "write snapshot to file")
+    << help_entry("--json-ui", "output snapshot in JSON format") << '\n';
 }

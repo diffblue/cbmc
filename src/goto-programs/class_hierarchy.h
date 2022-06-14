@@ -21,13 +21,11 @@ Date: April 2016
 #include <util/graph.h>
 #include <util/irep.h>
 
-// clang-format off
 #define OPT_SHOW_CLASS_HIERARCHY \
   "(show-class-hierarchy)"
 
-#define HELP_SHOW_CLASS_HIERARCHY \
-  " --show-class-hierarchy       show the class hierarchy\n"
-// clang-format on
+#define HELP_SHOW_CLASS_HIERARCHY                                              \
+  help_entry("--show-class-hierarchy", "show the class hierarchy")
 
 class symbol_table_baset;
 class json_stream_arrayt;

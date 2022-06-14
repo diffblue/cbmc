@@ -192,11 +192,14 @@ void goto_harness_parse_optionst::help()
        "has a .c suffix,\n"
        "                           else a goto binary including the harness is "
        "generated\n"
-    << "--harness-function-name    the name of the harness function to "
-       "generate\n"
-    << "--harness-type             one of the harness types listed below\n"
-    << "\n\n"
-    << FUNCTION_HARNESS_GENERATOR_HELP << "\n\n"
+    << help_entry(
+         "--harness-function-name <name>",
+         "the name of the harness function to "
+         "generate")
+    << help_entry(
+         "--harness-type <type>", "one of the harness types listed below")
+    << '\n'
+    << FUNCTION_HARNESS_GENERATOR_HELP << '\n'
     << MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP << '\n';
 }
 

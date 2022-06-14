@@ -116,36 +116,40 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(write-solver-stats-to):"
 
 #define HELP_SOLVER                                                            \
-  " --external-sat-solver cmd    command to invoke SAT solver process\n"       \
-  " --no-sat-preprocessor        disable the SAT solver's simplifier\n"        \
-  " --dimacs                     generate CNF in DIMACS format\n"              \
-  " --beautify                   beautify the counterexample\n"                \
-  "                              (greedy heuristic)\n"                         \
-  " --smt1                       use default SMT1 solver (obsolete)\n"         \
-  " --smt2                       use default SMT2 solver (Z3)\n"               \
-  " --bitwuzla                   use Bitwuzla\n"                               \
-  " --boolector                  use Boolector\n"                              \
-  " --sat-solver solver          use specified SAT solver\n"                   \
-  " --cprover-smt2               use CPROVER SMT2 solver\n"                    \
-  " --cvc3                       use CVC3\n"                                   \
-  " --cvc4                       use CVC4\n"                                   \
-  " --cvc5                       use CVC5\n"                                   \
-  " --mathsat                    use MathSAT\n"                                \
-  " --yices                      use Yices\n"                                  \
-  " --z3                         use Z3\n"                                     \
-  " --fpa                        use theory of floating-point arithmetic\n"    \
-  " --refine                     use refinement procedure (experimental)\n"    \
-  " --refine-arrays              use refinement for arrays only\n"             \
-  " --refine-arithmetic          refinement of arithmetic expressions only\n"  \
-  " --max-node-refinement        maximum refinement iterations for\n"          \
-  "                              arithmetic expressions\n"                     \
-  " --incremental-smt2-solver cmd\n"                                           \
-  "                              command to invoke external SMT solver for\n"  \
-  "                              incremental solving (experimental)\n"         \
-  " --outfile filename           output formula to given file\n"               \
-  " --dump-smt-formula filename  output smt incremental formula to the\n"      \
-  "                              given file\n"                                 \
-  " --write-solver-stats-to json-file\n"                                       \
-  "                              collect the solver query complexity\n"
+  help_entry("--sat-solver solver", "use specified SAT solver")                \
+    << help_entry(                                                             \
+         "--external-sat-solver cmd", "command to invoke SAT solver process")  \
+    << help_entry(                                                             \
+         "--no-sat-preprocessor", "disable the SAT solver's simplifier")       \
+    << help_entry("--dimacs", "generate CNF in DIMACS format")                 \
+    << help_entry(                                                             \
+         "--beautify", "beautify the counterexample (greedy heuristic)")       \
+    << help_entry("--smt1", "use default SMT1 solver (obsolete)")              \
+    << help_entry("--smt2", "use default SMT2 solver (Z3)")                    \
+    << help_entry("--bitwuzla", "use Bitwuzla")                                \
+    << help_entry("--boolector", "use Boolector")                              \
+    << help_entry("--cprover-smt2", "use CPROVER SMT2 solver")                 \
+    << help_entry("--cvc3", "use CVC3") << help_entry("--cvc4", "use CVC4")    \
+    << help_entry("--mathsat", "use MathSAT")                                  \
+    << help_entry("--yices", "use Yices") << help_entry("--z3", "use Z3")      \
+    << help_entry("--fpa", "use theory of floating-point arithmetic")          \
+    << help_entry("--refine", "use refinement procedure (experimental)")       \
+    << help_entry("--refine-arrays", "use refinement for arrays only")         \
+    << help_entry(                                                             \
+         "--refine-arithmetic", "refinement of arithmetic expressions only")   \
+    << help_entry(                                                             \
+         "--max-node-refinement",                                              \
+         "maximum refinement iterations for arithmetic expressions")           \
+    << help_entry(                                                             \
+         "--incremental-smt2-solver cmd",                                      \
+         "command to invoke external SMT solver for incremental solving "      \
+         "(experimental)")                                                     \
+    << help_entry("--outfile filename", "output formula to given file")        \
+    << help_entry(                                                             \
+         "--dump-smt-formula filename",                                        \
+         "output smt incremental formula to the given file")                   \
+    << help_entry(                                                             \
+         "--write-solver-stats-to json-file",                                  \
+         "collect the solver query complexity")
 
 #endif // CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H

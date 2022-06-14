@@ -694,107 +694,121 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer file.c ...     source file names\n"
     "\n"
     "Task options:\n"
-    " --show                       display the abstract states on the goto program\n" // NOLINT(*)
-    " --show-on-source             display the abstract states on the source\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --verify                     use the abstract domains to check assertions\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --simplify file_name         use the abstract domains to simplify the program\n"
-    " --no-simplify-slicing        do not remove instructions from which no\n"
-    "                              property can be reached (use with --simplify)\n" // NOLINT(*)
-    " --unreachable-instructions   list dead code\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --unreachable-functions      list functions unreachable from the entry point\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --reachable-functions        list functions reachable from the entry point\n"
-    "\n"
+    << help_entry("--show", "display the abstract states on the goto program")
+    << help_entry(
+      "--show-on-source", "display the abstract states on the source")
+    << help_entry("--verify", "use the abstract domains to check assertions")
+    << help_entry(
+      "--simplify file_name",
+      "use the abstract domains to simplify the program")
+    << help_entry(
+      "--no-simplify-slicing",
+      "do not remove instructions from which no property can be reached (use "
+      "with --simplify)")
+    << help_entry("--unreachable-instructions", "list dead code")
+    << help_entry(
+      "--unreachable-functions",
+      "list functions unreachable from the entry point")
+    << help_entry(
+      "--reachable-functions", "list functions reachable from the entry point")
+    << "\n"
     "Abstract interpreter options:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --legacy-ait                 recursion for function and one domain per location\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --recursive-interprocedural  use recursion to handle interprocedural reasoning\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --three-way-merge            use VSD's three-way merge on return from function call\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --legacy-concurrent          legacy-ait with an extended fixed-point for concurrency\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --location-sensitive         use location-sensitive abstract interpreter\n"
-    "\n"
+    << help_entry(
+      "--legacy-ait", "recursion for function and one domain per location")
+    << help_entry(
+      "--recursive-interprocedural",
+      "use recursion to handle interprocedural reasoning")
+    << help_entry(
+      "--three-way-merge",
+      "use VSD's three-way merge on return from function call")
+    << help_entry(
+      "--legacy-concurrent",
+      "legacy-ait with an extended fixed-point for concurrency")
+    << help_entry(
+      "--location-sensitive", "use location-sensitive abstract interpreter")
+    << "\n"
     "History options:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --ahistorical                the most basic history, tracks locations only\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --call-stack n               track the calling location stack for each function\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "                              limiting to at most n recursive loops, 0 to disable\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --loop-unwind n              track the number of loop iterations within a function\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "                              limited to n histories per location, 0 is unlimited\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --branching n                track the forwards jumps (if, switch, etc.) within a function\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "                              limited to n histories per location, 0 is unlimited\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --loop-unwind-and-branching n track all local control flow\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "                              limited to n histories per location, 0 is unlimited\n"
-    "\n"
+    << help_entry(
+      "--ahistorical", "the most basic history, tracks locations only")
+    << help_entry(
+      "--call-stack n",
+      "track the calling location stack for each function limiting to at most "
+      "n recursive loops, 0 to disable")
+    << help_entry(
+      "--loop-unwind n", "track the number of loop iterations within a "
+      "function limited to n histories per location, 0 is unlimited")
+    << help_entry(
+      "--branching n",
+      "track the forwards jumps (if, switch, etc.) within a function limited "
+      "to n histories per location, 0 is unlimited")
+    << help_entry(
+      "--loop-unwind-and-branching n",
+      "track all local control flow limited to n histories per location, 0 is "
+      "unlimited")
+    << "\n"
     "Domain options:\n"
-    " --constants                  a constant for each variable if possible\n"
-    " --intervals                  an interval for each variable\n"
-    " --non-null                   tracks which pointers are non-null\n"
-    " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
-    " --vsd, --variable-sensitivity\n"
-    "                              a configurable non-relational domain\n"
-    " --dependence-graph-vs        dependencies between instructions using VSD\n" // NOLINT(*)
-    "\n"
+    << help_entry("--constants", "a constant for each variable if possible")
+    << help_entry("--intervals", "an interval for each variable")
+    << help_entry("--non-null", "tracks which pointers are non-null")
+    << help_entry(
+      "--dependence-graph",
+      "data and control dependencies between instructions")
+    << help_entry(
+      "--vsd, --variable-sensitivity", "a configurable non-relational domain")
+    << help_entry(
+      "--dependence-graph-vs", "dependencies between instructions using VSD")
+    << "\n"
     "Variable sensitivity domain (VSD) options:\n"
-    HELP_VSD
-    "\n"
+    << HELP_VSD
+    << "\n"
     "Storage options:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --one-domain-per-location    stores a domain for each location reached (default)\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --one-domain-per-history     stores a domain for each history object created\n"
-    "\n"
+    << help_entry(
+      "--one-domain-per-location", "stores a domain for each location reached")
+    << help_entry(
+      "--one-domain-per-history",
+      "stores a domain for each history object created")
+    << "\n"
     "Output options:\n"
-    " --text file_name             output results in plain text to given file\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --json file_name             output results in JSON format to given file\n"
-    " --xml file_name              output results in XML format to given file\n"
-    " --dot file_name              output results in DOT format to given file\n"
-    "\n"
+    << help_entry(
+      "--text file_name", "output results in plain text to given file")
+    << help_entry(
+      "--json file_name", "output results in JSON format to given file")
+    << help_entry(
+      "--xml file_name", "output results in XML format to given file")
+    << help_entry(
+      "--dot file_name", "output results in DOT format to given file")
+    << "\n"
     "Specific analyses:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --taint file_name            perform taint analysis using rules in given file\n"
-    " --show-taint                 print taint analysis results on stdout\n"
-    " --show-local-may-alias       perform procedure-local may alias analysis\n"
-    "\n"
+    << help_entry(
+      "--taint file_name", "perform taint analysis using rules in given file")
+    << help_entry("--show-taint", "print taint analysis results on stdout")
+    << help_entry(
+      "--show-local-may-alias", "perform procedure-local may alias analysis")
+    << "\n"
     "C/C++ frontend options:\n"
-    HELP_CONFIG_C_CPP
-    HELP_FUNCTIONS
-    "\n"
+    << HELP_CONFIG_C_CPP
+    << HELP_FUNCTIONS
+    << "\n"
     "Platform options:\n"
-    HELP_CONFIG_PLATFORM
-    "\n"
+    << HELP_CONFIG_PLATFORM
+    << "\n"
     "Program representations:\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
-    HELP_SHOW_GOTO_FUNCTIONS
-    HELP_SHOW_PROPERTIES
-    "\n"
+    << help_entry("--show-parse-tree", "show parse tree")
+    << help_entry("--show-symbol-table", "show loaded symbol table")
+    << HELP_SHOW_GOTO_FUNCTIONS
+    << HELP_SHOW_PROPERTIES
+    << "\n"
     "Program instrumentation options:\n"
-    " --property id                enable selected properties only\n"
-    HELP_GOTO_CHECK
-    HELP_CONFIG_LIBRARY
-    "\n"
+    << help_entry("--property id", "enable selected properties only")
+    << HELP_GOTO_CHECK
+    << HELP_CONFIG_LIBRARY
+    << "\n"
     "Other options:\n"
-    HELP_VALIDATE
-    " --version                    show version and exit\n"
-    HELP_FLUSH
-    " --verbosity #                verbosity level\n"
-    HELP_TIMESTAMP
-    "\n";
+    << HELP_VALIDATE
+    << help_entry("--version", "show version and exit")
+    << HELP_FLUSH
+    << help_entry("--verbosity #", "verbosity level")
+    << HELP_TIMESTAMP
+    << "\n";
   // clang-format on
 }

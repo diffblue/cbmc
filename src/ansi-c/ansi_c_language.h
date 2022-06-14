@@ -25,10 +25,14 @@ Author: Daniel Kroening, kroening@kroening.com
   "(min-null-tree-depth):"
 
 #define HELP_ANSI_C_LANGUAGE \
-  " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */\
-  "                              at level N pointers are set to null\n" \
-  " --min-null-tree-depth N      minimum level at which a pointer can first be\n" /* NOLINT(*) */\
-  "                              NULL in a recursively nondet initialized struct\n" /* NOLINT(*) */
+  help_entry( \
+    "--max-nondet-tree-depth N", \
+    "limit size of nondet (e.g. input) object tree; at level N pointers are " \
+    "set to null") \
+  << help_entry( \
+    "--min-null-tree-depth N", \
+    "minimum level at which a pointer can first be NULL in a recursively " \
+    "nondet initialized struct") \
 // clang-format on
 
 class ansi_c_languaget:public languaget

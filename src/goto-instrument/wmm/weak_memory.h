@@ -54,7 +54,6 @@ void introduce_temporaries(
 #endif
   messaget &message);
 
-// clang-format off
 #define OPT_WMM_MEMORY_MODEL  "(mm):"
 
 #define OPT_WMM_INSTRUMENTATION_STRATEGIES                                     \
@@ -62,15 +61,15 @@ void introduce_temporaries(
   "(minimum-interference)"                                                     \
   "(read-first)"                                                               \
   "(write-first)"                                                              \
-  "(my-events)"                                                                \
+  "(my-events)"
 
 #define OPT_WMM_LIMITS                                                         \
   "(max-var):"                                                                 \
-  "(max-po-trans):"                                                            \
+  "(max-po-trans):"
 
 #define OPT_WMM_LOOPS                                                          \
   "(force-loop-duplication)"                                                   \
-  "(no-loop-duplication)"                                                      \
+  "(no-loop-duplication)"
 
 #define OPT_WMM_MISC                                                           \
   "(scc)"                                                                      \
@@ -81,40 +80,52 @@ void introduce_temporaries(
   "(render-cluster-function)"                                                  \
   "(cav11)"                                                                    \
   "(hide-internals)"                                                           \
-  "(ignore-arrays)"                                                            \
+  "(ignore-arrays)"
 
 #define OPT_WMM                                                                \
   OPT_WMM_MEMORY_MODEL                                                         \
   OPT_WMM_INSTRUMENTATION_STRATEGIES                                           \
   OPT_WMM_LIMITS                                                               \
   OPT_WMM_LOOPS                                                                \
-  OPT_WMM_MISC                                                                 \
-
+  OPT_WMM_MISC
 
 #define HELP_WMM_FULL                                                          \
-  " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"            \
-  " --scc                        detects critical cycles per SCC (one thread per SCC)\n" /* NOLINT(whitespace/line_length) */ \
-  " --one-event-per-cycle        only instruments one event per cycle\n"       \
-  " --minimum-interference       instruments an optimal number of events\n"    \
-  " --my-events                  only instruments events whose ids appear in inst.evt\n" /* NOLINT(whitespace/line_length) */ \
-  " --read-first|--write-first   only instrument cycles where a read or \n"    \
-  "                              write occurs as first event, respectively\n"  \
-  " --max-var N                  limit cycles to N variables read/written\n"   \
-  " --max-po-trans N             limit cycles to N program-order edges\n"      \
-  " --ignore-arrays              instrument arrays as a single object\n"       \
-  " --cav11                      always instrument shared variables, even\n"   \
-  "                              when they are not part of any cycle\n"        \
-  " --force-loop-duplication|--no-loop-duplication\n"                          \
-  "                              optional program transformation to\n"         \
-  "                              construct cycles in program loops\n"          \
-  " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" /* NOLINT(whitespace/line_length) */ \
-  " --no-dependencies            no dependency analysis\n"                     \
-  " --no-po-rendering            no representation of the threads in the dot\n"\
-  " --hide-internals             do not include thread-internal (Rfi)\n"       \
-  "                              events in dot output\n"                       \
-  " --render-cluster-file        clusterises the dot by files\n"               \
-  " --render-cluster-function    clusterises the dot by functions\n"
-
-// clang-format on
+  help_entry("--mm <tso,pso,rmo,power>", "instruments a weak memory model")    \
+    << help_entry(                                                             \
+         "--scc", "detects critical cycles per SCC (one thread per SCC)")      \
+    << help_entry(                                                             \
+         "--one-event-per-cycle", "only instruments one event per cycle")      \
+    << help_entry(                                                             \
+         "--minimum-interference", "instruments an optimal number of events")  \
+    << help_entry(                                                             \
+         "--my-events",                                                        \
+         "only instruments events whose ids appear in inst.evt")               \
+    << help_entry(                                                             \
+         "--read-first, --write-first",                                        \
+         "only instrument cycles where a read or  write occurs as first "      \
+         "event, respectively")                                                \
+    << help_entry("--max-var N", "limit cycles to N variables read/written")   \
+    << help_entry("--max-po-trans N", "limit cycles to N program-order edges") \
+    << help_entry("--ignore-arrays", "instrument arrays as a single object")   \
+    << help_entry(                                                             \
+         "--cav11",                                                            \
+         "always instrument shared variables, even when they are not part of " \
+         "any cycle")                                                          \
+    << help_entry(                                                             \
+         "--force-loop-duplication, --no-loop-duplication",                    \
+         "optional program transformation to construct cycles in program "     \
+         "loops")                                                              \
+    << help_entry(                                                             \
+         "--cfg-kill",                                                         \
+         "enables symbolic execution used to reduce spurious cycles")          \
+    << help_entry("--no-dependencies", "no dependency analysis")               \
+    << help_entry(                                                             \
+         "--no-po-rendering", "no representation of the threads in the dot")   \
+    << help_entry(                                                             \
+         "--hide-internals",                                                   \
+         "do not include thread-internal (Rfi) events in dot output")          \
+    << help_entry("--render-cluster-file", "clusterises the dot by files")     \
+    << help_entry(                                                             \
+         "--render-cluster-function", "clusterises the dot by functions")
 
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H

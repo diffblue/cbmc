@@ -109,10 +109,9 @@ void remove_pointers(
 
 #define OPT_REMOVE_POINTERS "(remove-pointers)"
 
-// clang-format off
 #define HELP_REMOVE_POINTERS                                                   \
-  " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" /* NOLINT(whitespace/line_length) */
-
-// clang-format on
+  help_entry(                                                                  \
+    "--remove-pointers",                                                       \
+    "converts pointer arithmetic to base+offset expressions")
 
 #endif // CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H

@@ -229,26 +229,25 @@ void goto_diff_parse_optionst::help()
     " goto_diff old new                 goto binaries to be compared\n"
     "\n"
     "Diff options:\n"
-    HELP_SHOW_GOTO_FUNCTIONS
-    HELP_SHOW_PROPERTIES
-    " --show-loops                 show the loops in the programs\n"
-    " -u | --unified               output unified diff\n"
-    " --change-impact | \n"
-    "  --forward-impact |\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "  --backward-impact           output unified diff with forward&backward/forward/backward dependencies\n"
-    " --compact-output             output dependencies in compact mode\n"
-    "\n"
+    << HELP_SHOW_GOTO_FUNCTIONS
+    << HELP_SHOW_PROPERTIES
+    << help_entry("--show-loops", "show the loops in the programs")
+    << help_entry("-u, --unified", "output unified diff")
+    << help_entry(
+      "--change-impact, --forward-impact, --backward-impact",
+      "output unified diff with forward&backward/forward/backward dependencies")
+    << help_entry("--compact-output", "output dependencies in compact mode")
+    << "\n"
     "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
-    HELP_COVER
-    "\n"
+    << HELP_GOTO_CHECK
+    << HELP_COVER
+    << "\n"
     "Other options:\n"
-    " --version                    show version and exit\n"
-    " --json-ui                    use JSON-formatted output\n"
-    HELP_FLUSH
-    " --verbosity #                verbosity level\n"
-    HELP_TIMESTAMP
-    "\n";
+    << help_entry("--version", "show version and exit")
+    << help_entry("--json-ui", "use JSON-formatted output")
+    << HELP_FLUSH
+    << help_entry("--verbosity #", "verbosity level")
+    << HELP_TIMESTAMP
+    << "\n";
   // clang-format on
 }

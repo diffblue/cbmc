@@ -31,19 +31,18 @@ class symbol_tablet;
   "(show-test-suite)"
 
 #define HELP_COVER                                                             \
-  " --cover CC                   create test-suite with coverage criterion "   \
-  "CC,\n"                                                                      \
-  "                              where CC is one of assertion[s], "            \
-  "assume[s],\n"                                                               \
-  "                              branch[es], condition[s], cover, "            \
-  "decision[s],\n"                                                             \
-  "                              location[s], or mcdc\n"                       \
-  " --cover-failed-assertions    do not stop coverage checking at failed "     \
-  "assertions\n"                                                               \
-  "                              (this is the default for --cover "            \
-  "assertions)\n"                                                              \
-  " --show-test-suite            print test suite for coverage criterion "     \
-  "(requires --cover)\n"
+  help_entry(                                                                  \
+    "--cover CC",                                                              \
+    "create test-suite with coverage criterion CC, where CC is one of "        \
+    "assertion[s], assume[s], branch[es], condition[s], cover, decision[s], "  \
+    "location[s], or mcdc")                                                    \
+    << help_entry(                                                             \
+         "--cover-failed-assertions",                                          \
+         "do not stop coverage checking at failed assertions (this is the "    \
+         "default for --cover assertions)")                                    \
+    << help_entry(                                                             \
+         "--show-test-suite",                                                  \
+         "print test suite for coverage criterion (requires --cover)")
 
 enum class coverage_criteriont
 {

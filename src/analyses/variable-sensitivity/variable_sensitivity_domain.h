@@ -80,26 +80,28 @@
   "(vsd-unions):"                                                              \
   "(vsd-flow-insensitive)"                                                     \
   "(vsd-data-dependencies)"                                                    \
-  "(vsd-liveness)"                                                             \
-                                                                               \
-    // clang-format off
-#define HELP_VSD                                                               \
-  " --vsd-values                 value tracking - "                            \
-  "constants|intervals|set-of-constants\n" /* NOLINT(whitespace/line_length) */\
-  " --vsd-structs                struct field sensitive analysis - "           \
-  "top-bottom|every-field\n" /* NOLINT(whitespace/line_length) */              \
-  " --vsd-arrays                 array entry sensitive analysis - "            \
-  "top-bottom|smash|up-to-n-elements|every-element\n" /* NOLINT(whitespace/line_length) */ \
-  " --vsd-array-max-elements     the n in --vsd-arrays up-to-n-elements - "    \
-  "defaults to 10 if not given\n" /* NOLINT(whitespace/line_length) */         \
-  " --vsd-pointers               pointer sensitive analysis - "                \
-  "top-bottom|constants|value-set\n" /* NOLINT(whitespace/line_length) */      \
-  " --vsd-unions                 union sensitive analysis - top-bottom\n"      \
-  " --vsd-data-dependencies      track data dependencies\n"                    \
-  " --vsd-liveness               track variable liveness\n"                    \
-  " --vsd-flow-insensitive       disables flow sensitivity\n"                  \
+  "(vsd-liveness)"
 
-// cland-format on
+#define HELP_VSD                                                               \
+  help_entry(                                                                  \
+    "--vsd-values [constants|intervals|set-of-constants]", "value tracking")   \
+    << help_entry(                                                             \
+         "--vsd-structs [top-bottom|every-field]",                             \
+         "struct field sensitive analysis")                                    \
+    << help_entry(                                                             \
+         "--vsd-arrays [top-bottom|smash|up-to-n-elements|every-element]",     \
+         "array entry sensitive analysis")                                     \
+    << help_entry(                                                             \
+         "--vsd-array-max-elements N",                                         \
+         "set the n in --vsd-arrays up-to-n-elements (defaults to 10 if not "  \
+         "given)")                                                             \
+    << help_entry(                                                             \
+         "--vsd-pointers [top-bottom|constants|value-set]",                    \
+         "pointer sensitive analysis")                                         \
+    << help_entry("--vsd-unions [top-bottom]", "union sensitive analysis")     \
+    << help_entry("--vsd-data-dependencies", "track data dependencies")        \
+    << help_entry("--vsd-liveness", "track variable liveness")                 \
+    << help_entry("--vsd-flow-insensitive", "disables flow sensitivity")
 
 #define PARSE_OPTIONS_VSD(cmdline, options)                                    \
   options.set_option("values", cmdline.get_value("vsd-values"));               \

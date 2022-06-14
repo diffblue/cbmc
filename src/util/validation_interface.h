@@ -14,11 +14,11 @@ Author: Daniel Poetzl
   "(validate-ssa-equation)"
 
 #define HELP_VALIDATE                                                          \
-  " --validate-goto-model        enable additional well-formedness checks on " \
-  "the\n"                                                                      \
-  "                              goto program\n"                               \
-  " --validate-ssa-equation      enable additional well-formedness checks on " \
-  "the\n"                                                                      \
-  "                              SSA representation\n"
+  help_entry(                                                                  \
+    "--validate-goto-model",                                                   \
+    "enable additional well-formedness checks on the goto program")            \
+    << help_entry(                                                             \
+         "--validate-ssa-equation",                                            \
+         "enable additional well-formedness checks on the SSA representation")
 
 #endif /* CPROVER_UTIL_VALIDATION_INTERFACE_H */

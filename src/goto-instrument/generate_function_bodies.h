@@ -84,29 +84,27 @@ void generate_function_bodies(
   goto_modelt &model,
   message_handlert &message_handler);
 
-// clang-format off
 #define OPT_REPLACE_FUNCTION_BODY \
   "(generate-function-body):" \
   "(generate-havocing-body):" \
   "(generate-function-body-options):"
 
-#define HELP_REPLACE_FUNCTION_BODY \
-  " --generate-function-body <regex>\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              Generate bodies for functions matching regex\n" \
-  " --generate-havocing-body <option>\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              <fun_name>,params:<p_n1;p_n2;..>\n" \
-  "                              or\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              <fun_name>[,<call-site-id>,params:<p_n1;p_n2;..>]+\n" \
-  " --generate-function-body-options <option>\n" \
-  "                              One of assert-false, assume-false,\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              nondet-return, assert-false-assume-false and\n" \
-  "                              havoc[,params:<regex>][,globals:<regex>]\n" \
-  "                                   [,params:<p_n1;p_n2;..>]\n" \
-  "                              (default: nondet-return)\n"
-// clang-format on
+#define HELP_REPLACE_FUNCTION_BODY                                             \
+  help_entry(                                                                  \
+    "--generate-function-body <regex>",                                        \
+    "generate bodies for functions matching regex")                            \
+    << help_entry(                                                             \
+         "--generate-havocing-body <option> <fun_name>,params:<p1;p2;..>",     \
+         "generate havocing body")                                             \
+    << help_entry(                                                             \
+         "--generate-havocing-body <option> "                                  \
+         "<fun_name>[,<call-site-id>,params:<p1;p2;..>]+",                     \
+         "generate havocing body")                                             \
+    << help_entry(                                                             \
+         "--generate-function-body-options <option>",                          \
+         "One of assert-false, assume-false, nondet-return, "                  \
+         "assert-false-assume-false and "                                      \
+         "havoc[,params:<regex>][,globals:<regex>][,params:<p1;p2;..>] "       \
+         "(default: nondet-return)")
 
 #endif // CPROVER_GOTO_PROGRAMS_GENERATE_FUNCTION_BODIES_H
