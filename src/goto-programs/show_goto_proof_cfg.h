@@ -15,11 +15,17 @@ Author: Benjamin Quiring
 
 #include <list>
 #include <string>
+#include <set>
+#include <map>
+#include "goto_program.h"
+#include "proof_cfg_metrics.h"
 
 class namespacet;
-class goto_modelt;
+class abstract_goto_modelt;
 class goto_functionst;
 class ui_message_handlert;
+
+#include <goto-symex/solver_hardness.h>
 
 // clang-format off
 #define OPT_SHOW_GOTO_PROOF_CFG \
@@ -30,16 +36,21 @@ class ui_message_handlert;
   " --show-goto-proof-cfg        show goto cfg with nodes colored with proof complexity\n"
 // clang-format on
 
+
 void show_goto_proof_cfg(
   const namespacet &ns,
   ui_message_handlert &ui_message_handler,
   const std::list<std::string> roots,
-  const goto_functionst &goto_functions);
+  const goto_functionst &goto_functions,
+  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
 void show_goto_proof_cfg(
-  const goto_modelt &, 
+  const abstract_goto_modelt &, 
   const std::list<std::string> roots,
-  ui_message_handlert &ui_message_handler);
+  ui_message_handlert &ui_message_handler,
+  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
+void compute_instruction_sat_hardness (std::map<goto_programt::const_targett, sat_infot> instr_sat_info,
+                                       const solver_hardnesst &solver_hardness);
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_GOTO_PROOF_CFG_H

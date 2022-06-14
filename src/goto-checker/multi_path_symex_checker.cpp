@@ -21,6 +21,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include "counterexample_beautification.h"
 #include "goto_symex_fault_localizer.h"
 
+#include "show_goto_proof_cfg.h"
+
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
@@ -29,6 +31,73 @@ multi_path_symex_checkert::multi_path_symex_checkert(
     equation_generated(false),
     property_decider(options, ui_message_handler, equation, ns)
 {
+}
+
+void generate_goto_dot (const abstract_goto_modelt &goto_model,
+                        const symex_bmct &symex,
+                        const optionst &options,
+                        ui_message_handlert &ui_message_handler,
+                        const bool symex_done,
+                        const goto_symex_property_decidert property_decider) {
+  const auto &goto_functions = goto_model.get_goto_functions();
+  const symex_coveraget &symex_coverage = symex.get_coverage();
+  std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
+
+  messaget msg(ui_message_handler);
+  const namespacet ns(goto_model.get_symbol_table());
+  const auto sorted = goto_functions.sorted();
+
+  // populate instr_num_symex_steps
+  if (symex_done) {
+    for(const auto &fun : sorted) {
+      const bool has_body = fun->second.body_available();
+
+      if (has_body) {
+        const goto_programt &body = fun->second.body;
+        forall_goto_program_instructions(from, body) {
+          const goto_programt::const_targetst to_list = symex_coverage.coverage_to (from);
+          int total_steps = 0;
+          double total_duration = 0.0;
+          for (goto_programt::const_targett to : to_list) {
+            int to_steps = symex_coverage.num_executions(from, to);
+            total_steps = total_steps + to_steps;
+            total_duration = total_duration + symex_coverage.duration(from, to);
+          }
+          
+          symex_infot info;
+          info.steps = total_steps;
+          info.duration = total_duration;
+          
+          instr_symex_info.insert ({from, info});
+        }
+      }
+    }
+  } else {
+    for(const auto &fun : sorted) {
+      const bool has_body = fun->second.body_available();
+
+      if (has_body) {
+        const goto_programt &body = fun->second.body;
+        forall_goto_program_instructions(from, body) {
+          symex_infot info;
+          info.steps = 1;
+          info.duration = 0.0;
+          instr_symex_info.insert ({from, info});
+        }
+      }
+    }
+  }
+  std::list<std::string> roots;
+  roots.push_back (options.get_option("goto-proof-cfg-roots"));
+  show_goto_proof_cfg(
+    goto_model, roots, ui_message_handler, instr_symex_info);
+  std::map<goto_programt::const_targett, sat_infot> instr_sat_info;
+
+  with_solver_hardness(
+    property_decider.get_decision_procedure(),
+    [&instr_sat_info](solver_hardnesst &solver_hardness) { compute_instruction_sat_hardness(instr_sat_info, solver_hardness);});
+
+  
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::
@@ -46,7 +115,13 @@ operator()(propertiest &properties)
   // we haven't got an equation yet
   if(!equation_generated)
   {
+    //bool symex_done = false;
+    //generate_goto_dot(goto_model, symex, options, ui_message_handler, symex_done, property_decider);
+
     generate_equation();
+    
+    //symex_done = true;
+    //generate_goto_dot(goto_model, symex, options, ui_message_handler, symex_done, property_decider);
 
     output_coverage_report(
       options.get_option("symex-coverage-report"),

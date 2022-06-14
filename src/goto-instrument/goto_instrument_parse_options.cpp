@@ -694,8 +694,26 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-goto-proof-cfg") ||
        cmdline.isset("show-goto-proof-cfg-roots"))
     {
+      std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
+      const namespacet ns(goto_model.get_symbol_table());
+      const auto &goto_functions = goto_model.get_goto_functions();
+      const auto sorted = goto_functions.sorted();
+      for(const auto &fun : sorted) {
+        const bool has_body = fun->second.body_available();
+
+        if (has_body) {
+          const goto_programt &body = fun->second.body;
+          forall_goto_program_instructions(from, body) {
+            symex_infot info;
+            info.steps = 1;
+            info.duration = 0.0;
+            instr_symex_info.insert ({from, info});
+          }
+        }
+      }
+
       show_goto_proof_cfg(
-        goto_model, cmdline.get_values("show-goto-proof-cfg-roots"), ui_message_handler);
+        goto_model, cmdline.get_values("show-goto-proof-cfg-roots"), ui_message_handler, instr_symex_info);
       return CPROVER_EXIT_SUCCESS;
     }
 

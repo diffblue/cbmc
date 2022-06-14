@@ -438,3 +438,51 @@ bool symex_coveraget::generate_report(
     return output_report(goto_functions, out);
   }
 }
+
+
+const goto_programt::const_targetst symex_coveraget::coverage_to (goto_programt::const_targett from) const
+{
+  std::list<goto_programt::const_targett> to_list;
+  const auto &inner = coverage.find(from);
+  if (inner != coverage.end()) 
+  {
+    const std::map<goto_programt::const_targett, coverage_infot> &to_map = inner->second;
+    for (auto it = to_map.begin(); it != to_map.end(); it++)
+    {
+      to_list.push_back (it->first);
+    }
+  }
+
+  return to_list;
+}
+
+
+const int symex_coveraget::num_executions (goto_programt::const_targett from, goto_programt::const_targett to) const
+{
+  const auto &inner = coverage.find(from);
+  if (inner != coverage.end()) 
+  {
+    const auto &inner_ = inner->second.find (to);
+    if (inner_ != inner->second.end())
+    {
+      const coverage_infot &info = inner_->second;
+      return info.num_executions;
+    }
+  }
+  return 0;
+}
+
+const double symex_coveraget::duration (goto_programt::const_targett from, goto_programt::const_targett to) const
+{
+  const auto &inner = coverage.find(from);
+  if (inner != coverage.end()) 
+  {
+    const auto &inner_ = inner->second.find (to);
+    if (inner_ != inner->second.end())
+    {
+      const coverage_infot &info = inner_->second;
+      return info.duration;
+    }
+  }
+  return 0;
+}

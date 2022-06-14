@@ -33,18 +33,24 @@ public:
   }
 
   void
-  covered(goto_programt::const_targett from, goto_programt::const_targett to)
+  covered(goto_programt::const_targett from, goto_programt::const_targett to, double duration)
   {
     std::pair<coverage_innert::iterator, bool> entry =
-      coverage[from].insert({to, coverage_infot(from, to, 1)});
+      coverage[from].insert({to, coverage_infot(from, to, 1, duration)});
 
-    if(!entry.second)
+    if(!entry.second) {
       ++(entry.first->second.num_executions);
+      entry.first->second.duration += duration;
+    }
   }
 
   bool generate_report(
     const goto_functionst &goto_functions,
     const std::string &path) const;
+
+  const goto_programt::const_targetst coverage_to (goto_programt::const_targett from) const;
+  const int num_executions (goto_programt::const_targett from, goto_programt::const_targett to) const;
+  const double duration (goto_programt::const_targett from, goto_programt::const_targett to) const;
 
 protected:
   const namespacet &ns;
@@ -54,14 +60,16 @@ protected:
     coverage_infot(
       goto_programt::const_targett _from,
       goto_programt::const_targett _to,
-      unsigned _num_executions)
-      : location(_from), num_executions(_num_executions), succ(_to)
+      unsigned _num_executions,
+      double _duration)
+      : location(_from), num_executions(_num_executions), succ(_to), duration(_duration)
     {
     }
 
     goto_programt::const_targett location;
     unsigned num_executions;
     goto_programt::const_targett succ;
+    double duration;
   };
 
   typedef std::map<goto_programt::const_targett, coverage_infot>

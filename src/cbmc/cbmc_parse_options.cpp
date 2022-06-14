@@ -635,12 +635,17 @@ int cbmc_parse_optionst::doit()
       verifier = util_make_unique<
         all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>(
         options, ui_message_handler, goto_model);
+      // TODO: this is the branch triggered by default
     }
   }
   else
   {
     UNREACHABLE;
   }
+
+  // options.set_option ("goto-proof-cfg-roots", cmdline.get_values("show-goto-proof-cfg-roots").front());
+  // FIXME
+  options.set_option ("goto-proof-cfg-roots", "s2n_record_writev");
 
   const resultt result = (*verifier)();
   verifier->report();

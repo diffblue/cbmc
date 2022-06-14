@@ -20,6 +20,8 @@ Author: Benjamin Quiring
 #include "goto_program.h"
 #include "pointer_expr.h"
 
+#include <goto-checker/symex_coverage.h>
+
 bool is_private (const irep_idt &name) {
   // "__CPROVER_file_local_{filename}_c_{name}";
 
@@ -41,12 +43,26 @@ std::string normalize_name (const irep_idt &name) {
   return str;
 }
 
+std::string color_of_score (int score) {
+  int s = 255 - score;
+  std::stringstream stream;
+  // Red
+  stream << std::hex << 255;
+  // Green
+  if (s < 16) { stream << 0 << s; } else { stream << s; }
+  // Blue
+  if (s < 16) { stream << 0 << s; } else { stream << s; }
+  std::string color( stream.str() );
+  return color;
+}
+
 // the score metric associated with the function.
 // a large score means the associated proof should be more difficult.
 void compute_metrics (const symbolt &symbol, 
                       const goto_programt &goto_program, 
                       const namespacet &ns, 
                       const goto_functionst &goto_functions,
+                      const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
                       func_metrics &metrics) {
   metrics.indegree = indegree (symbol, ns, goto_functions);
   metrics.outdegree = outdegree (goto_program);
@@ -54,11 +70,14 @@ void compute_metrics (const symbolt &symbol,
   metrics.function_size = function_size (goto_program);
   metrics.num_complex_ops = num_complex_ops (goto_program);
   metrics.num_loops = num_loops (goto_program);
+  metrics.symex_steps = symex_steps (goto_program, instr_symex_info);
+  metrics.symex_duration = symex_duration (goto_program, instr_symex_info);
 }
 
 void compute_metrics (const namespacet &ns, 
-                     std::map<irep_idt, func_metrics> &metrics,
-                     const goto_functionst &goto_functions) {
+                      std::map<irep_idt, func_metrics> &metrics,
+                      const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+                      const goto_functionst &goto_functions) {
   const auto funs = goto_functions.sorted();
 
   for (const auto &fun : funs) {
@@ -69,7 +88,7 @@ void compute_metrics (const namespacet &ns,
       const goto_programt &body = fun->second.body;
       
       func_metrics &m = metrics.find(name)->second;
-      compute_metrics (symbol, body, ns, goto_functions, m);
+      compute_metrics (symbol, body, ns, goto_functions, instr_symex_info, m);
     }
   }
 }
@@ -82,16 +101,18 @@ void compute_scores (std::map<irep_idt, func_metrics> &metrics,
   int w_function_size = 0;
   int w_num_complex_ops = 1;
   int w_num_loops = 1;
+  int w_avg_time_per_symex_step = 1;
 
   for (auto it = metrics.begin(); it != metrics.end(); it++) {
     const irep_idt &name = it->first;
-    const func_metrics &metrics = it->second;
-    int score = metrics.indegree * w_indegree
-              + metrics.outdegree * w_outdegree + 
-              + metrics.num_func_pointer_calls * w_num_func_pointer_calls + 
-              + metrics.function_size * w_function_size + 
-              + metrics.num_complex_ops * w_num_complex_ops + 
-              + metrics.num_loops * w_num_loops;
+    const func_metrics &m = it->second;
+    int score = w_indegree * m.indegree
+              + w_outdegree * m.outdegree
+              + w_num_func_pointer_calls * m.num_func_pointer_calls
+              + w_function_size * m.function_size
+              + w_num_complex_ops * m.num_complex_ops
+              + w_num_loops * m.num_loops
+      + w_avg_time_per_symex_step * (int)m.avg_time_per_symex_step()/10000;
     scores.find(name)->second = score;
   }
 
@@ -113,11 +134,11 @@ void compute_scores (std::map<irep_idt, func_metrics> &metrics,
 
 bool is_used (const std::map<irep_idt, bool> &use, const irep_idt &name) {
     const auto used = use.find (name);
-    return used != use.end() && used->second;
+    return (used != use.end() && used->second);
 }
 
 // simple depth first search
-void find_used (irep_idt root,
+void find_used_rec (irep_idt root,
                 messaget &msg,
                 const namespacet &ns,
                 const goto_functionst &goto_functions,
@@ -131,12 +152,21 @@ void find_used (irep_idt root,
           // only look at real function calls, not function pointer calls
           if (target->call_function().id() != ID_dereference) {
             const irep_idt call = ns.lookup(to_symbol_expr(target->call_function())).name;
-            find_used (call, msg, ns, goto_functions, use);
+            find_used_rec (call, msg, ns, goto_functions, use);
           }
         }
       }
     }
   }
+}
+
+void find_used (irep_idt root,
+                messaget &msg,
+                const namespacet &ns,
+                const goto_functionst &goto_functions,
+                std::map<irep_idt, bool> &use) {
+  find_used_rec (root, msg, ns, goto_functions, use);
+
 }
 
 void remove_functions_no_body (const namespacet &ns,
@@ -159,11 +189,134 @@ void remove_functions_no_body (const namespacet &ns,
   }
 }
 
+void dump_function_calls (const irep_idt &f,
+                          const goto_programt &body,
+                          messaget &msg, 
+                          const namespacet &ns,
+                          std::map<irep_idt, bool> &use,
+                          const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+
+  std::set<irep_idt> dont_use_calls;
+  std::set<irep_idt> calls;
+  std::set<std::string> func_ptrs;
+  forall_goto_program_instructions(target, body) {
+    if(target->is_function_call()) {
+      const auto &func = target->call_function();
+      if (func.id() != ID_dereference) {
+        const irep_idt call = ns.lookup(to_symbol_expr(func)).name;
+        if (is_used (use, call)) {
+          const auto &symex_info = instr_symex_info.find(target);
+          if (symex_info != instr_symex_info.end() && symex_info->second.steps != 0) {
+            calls.insert (call);
+          } else {
+            dont_use_calls.insert (call);
+          }
+        }
+
+      } else {
+        const exprt &pointer = to_dereference_expr(func).pointer();
+
+        std::stringstream stream;
+        stream << "\"" << format(pointer) << "\"";
+
+        std::string rhs = stream.str();
+        func_ptrs.insert (rhs);
+      }
+    }
+  }
+
+  for (const auto &func_ptr : func_ptrs) {
+    msg.status() << func_ptr
+                 << " [" 
+                 << "label=" << func_ptr << ","
+                 << "shape=" << "rarrow" << ","
+                 << "style=filled" << ","
+                 << "fillcolor=" << "\"#" << "ffffff" << "\"" << ","
+                 << "fontsize=" << 8
+                 << "];\n";
+  }
+
+  for (const auto &call : calls) {
+    msg.status() << normalize_name(f) << " -> " << normalize_name(call) << ";\n";
+  }
+
+  for (const auto &call : dont_use_calls) {
+    std::string color = "0000ff";
+    std::string opacity = "18";
+    msg.status() << normalize_name(f) << " -> " << normalize_name(call)
+                 << " ["
+                 << "color=" << "\"#" << color << opacity << "\""
+                 << "];\n";
+  }
+
+  for (const auto &func_ptr : func_ptrs) {
+    msg.status() << normalize_name(f) << " -> " << func_ptr << ";\n";
+  }
+}
+
+void dump_function (const irep_idt &f,
+                    const bool has_body,
+                    const goto_programt &body,
+                    messaget &msg, 
+                    const namespacet &ns,
+                    std::map<irep_idt, bool> &use,
+                    std::map<irep_idt, func_metrics> &metrics,
+                    std::map<irep_idt, int> &scores,
+                    const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+  if(has_body) {
+    std::string color = color_of_score (scores.find (f)->second);
+
+    int node_size = (8 + sqrt(metrics.find(f)->second.function_size));
+    std::string shape = is_private (f) ? "ellipse" : "rect";
+    func_metrics &m = metrics.find(f)->second;
+
+    // dump the high-symex nodes
+    forall_goto_program_instructions(target, body) {
+      auto symex_info = instr_symex_info.find (target);
+      if (symex_info != instr_symex_info.end()) {
+        // milliseconds
+        double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
+        if (avg_time_per_step > 0.1) {
+          msg.status() << "// HIGH SYMEX: num symex steps: " << avg_time_per_step << "\n";
+          msg.status() << "/* "; 
+          body.output_instruction(ns, f, msg.status(), *target);
+          msg.status() << "*/\n";
+        }
+      }
+    }
+
+    msg.status() << normalize_name (f)
+                 << " [" 
+                 << "label=" << "<" << normalize_name (f) << " <br/> ";
+
+    m.dump_html (msg);
+    msg.status() << ">" << ","
+                 << "shape=" << shape << ","
+                 << "style=filled,"
+                 << "fillcolor=" << "\"#" << color << "\","
+                 << "fontsize=" << node_size
+                 << "];\n";
+
+    dump_function_calls (f, body, msg, ns, use, instr_symex_info);
+
+    // fun->second.body.output(ns, f, msg.status());
+    // msg.status() << messaget::eom;
+  } else {
+    msg.status() << normalize_name (f)
+                 << " [" 
+                 << "label=" << normalize_name (f) << ","
+                 << "shape=Mdiamond"
+                 << "];\n";
+
+  }
+}
+
 void show_goto_proof_cfg(
   const namespacet &ns,
   ui_message_handlert &ui_message_handler,
   const std::list<std::string> roots,
-  const goto_functionst &goto_functions)
+  const goto_functionst &goto_functions,
+  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info)
 {
 
   //goto_functionst goto_functions;
@@ -172,159 +325,129 @@ void show_goto_proof_cfg(
   messaget msg(ui_message_handler);
 
   std::map<irep_idt, bool> use;
-   msg.status() << roots.size() << "\n";
   if (roots.size() == 0) {
     find_used (goto_functions.entry_point(), msg, ns, goto_functions, use);
   }
   for (const auto &root : roots) {
     const irep_idt &iden = root;
     find_used (iden, msg, ns, goto_functions, use);
-    // msg.status() << iden << "\n";
   }
 
-  remove_functions_no_body(ns, goto_functions, use);
-
-  // sort functions alphabetically
   const auto sorted = goto_functions.sorted();
 
+  // remove_functions_no_body(ns, goto_functions, use);
+
+  // FIXME: temp
+  for (const auto &fun : sorted) {
+    const auto &name = ns.lookup(fun->first).name;
+    const std::string str (name.c_str(), name.size());
+    if (str == "s2n_calculate_stacktrace"
+        || str == "s2n_result_is_ok") {
+      auto it = use.find (name);
+      if (it == use.end()) {
+        use.insert({name, false});
+      } else {
+        it->second = false;
+      }
+    }
+  }
+
   msg.status() << "digraph G {\n\n";
+  msg.status() << "// roots: [";
+  for (const auto &root : roots) {
+    const irep_idt &iden = root;
+    msg.status() << " " << iden;
+  }
+  msg.status() << "]\n";
   msg.status() << "rankdir=\"LR\";\n";
 
   std::map<irep_idt, int> scores;
   std::map<irep_idt, func_metrics> metrics;
   for (const auto &fun : sorted) {
     func_metrics m;
-    m.indegree = 0;
-    m.outdegree = 0;
-    m.num_func_pointer_calls = 0;
-    m.function_size = 0;
-    m.num_complex_ops = 0;
-    m.num_loops = 0;
     const auto &name = ns.lookup(fun->first).name;
     metrics.insert({name, m});
     scores.insert({name, 0});
   }
   // initialize scores
-  compute_metrics (ns, metrics, goto_functions);
+  compute_metrics (ns, metrics, instr_symex_info, goto_functions);
   compute_scores(metrics, scores);
+
+  // std::map<goto_programt::const_targett, int> test;
+  // test.insert ({target, 0})
+  
+  //for (const auto &target : instr_dont_use) {
+  //  if(target->is_function_call()) {
+  //    const auto &func = target->call_function();
+  //    if (func.id() != ID_dereference) {
+  //      const irep_idt call = ns.lookup(to_symbol_expr(func)).name;
+  //      msg.status() << "dont use: " << call << "\n";
+  //    } else {
+  //      msg.status() << "whoops" << "\n";
+  //    }
+  //  } else {
+  //    msg.status() << "whoops" << "\n";
+  //  }
+  //  
+  //}
 
   for(const auto &fun : sorted)
   {
-    const symbolt &symbol = ns.lookup(fun->first);
+    const symbolt &f_symbol = ns.lookup(fun->first);
     const bool has_body = fun->second.body_available();
-
-    // msg.status() << "// " << symbol.name << " " << is_used (use, symbol.name) << "\n";
-
-    if (is_used (use, symbol.name)) {
-
-      if(has_body)
-      {
-        msg.status() << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
-        msg.status() << messaget::bold << "//" << symbol.display_name()
-                     << messaget::reset << " /* " << symbol.name << " */\n";
-
-        int s = scores.find (symbol.name)->second;
-        // negate s so that higher original score => more red.
-        s = 255 - s;
-
-        std::stringstream stream;
-        // Red
-        stream << std::hex << 255;
-        // Green
-        if (s < 16) { stream << 0 << s; } else { stream << s; }
-        // Blue
-        if (s < 16) { stream << 0 << s; } else { stream << s; }
-        std::string color( stream.str() );
-
-        int node_size = (8 + sqrt(metrics.find(symbol.name)->second.function_size));
-        std::string shape = is_private (symbol.name) ? "ellipse" : "rect";
-        msg.status() << normalize_name (symbol.name)
-                     << " [" 
-                     << "shape=" << shape << ","
-                     << "style=filled,"
-                     << "fillcolor=" << "\"#" << color << "\","
-          // << "fontsize=" << (8 + (255-s) / 16) 
-                     << "fontsize=" << node_size
-                     << "];\n";
-
-        std::set<irep_idt> calls;
-        std::set<std::string> func_ptrs;
-        forall_goto_program_instructions(target, fun->second.body) {
-          if(target->is_function_call()) {
-            // overapproximate by adding duplicate calls
-            const auto &func = target->call_function();
-
-            // msg.status () << "//" << normalize_name (symbol.name) << target->source_location().get_comment() << "\n";
-            msg.status () << "// " << normalize_name (symbol.name) 
-                          << " " << target->source_location().as_string() << "\n";
-
-            if (func.id() != ID_dereference) {
-              const irep_idt call = ns.lookup(to_symbol_expr(func)).name;
-              if (is_used (use, call)) {
-                calls.insert (call);
-              }
-
-            } else {
-              const exprt &pointer = to_dereference_expr(func).pointer();
-              // TODO: idk what else it could be
-              std::stringstream stream;
-              stream << "\"" << format(pointer) << "\"";
-
-              std::string rhs = stream.str();
-              func_ptrs.insert (rhs);
-              //if (pointer.id() == ID_symbol) {
-              //  const irep_idt func_ptr = ns.lookup(to_symbol_expr(pointer)).name;
-              //  func_ptrs.insert (func_ptr);
-              //}
-            }
-          }
-        }
-
-        for (const auto &func_ptr : func_ptrs) {
-          msg.status() << func_ptr
-                       << " [" 
-                       << "shape=" << "rarrow" << ","
-                       << "style=filled,"
-                       << "fillcolor=" << "\"#" << "ffffff" << "\","
-                       << "fontsize=" << 8
-                       << "];\n";
-        }
-
-        for (const auto &call : calls) {
-          msg.status() << normalize_name(symbol.name) << " -> " << normalize_name(call) << ";\n";
-        }
-
-        for (const auto &func_ptr : func_ptrs) {
-          msg.status() << normalize_name(symbol.name) << " -> " << func_ptr << ";\n";
-        }
-
-        // fun->second.body.output(ns, symbol.name, msg.status());
-        // msg.status() << messaget::eom;
-      }
-      else
-      {
-        msg.status() << normalize_name (symbol.name)
-                     << " [" 
-                     << "shape=Mdiamond"
-                     << "];\n";
-
-      }
+    if (is_used (use, f_symbol.name)) {
+      msg.status() << "\n// ------------------------------------\n\n";
+      msg.status() << "//" << messaget::bold << f_symbol.display_name() << messaget::reset 
+                   << " ( " << f_symbol.name << " )\n";
+      dump_function (f_symbol.name, has_body, fun->second.body, msg, ns, use, metrics, scores, instr_symex_info);
     }
   }
 
-  // end digraph
-  msg.status() << "}";
+  msg.status() << "} // end digraph G";
   msg.status() << messaget::eom;
 
 }
 
 
 void show_goto_proof_cfg(
-  const goto_modelt &goto_model,
+  const abstract_goto_modelt &goto_model,
   const std::list<std::string> roots,
-  ui_message_handlert &ui_message_handler)
+  ui_message_handlert &ui_message_handler,
+  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info)
 {
-  const namespacet ns(goto_model.symbol_table);
+  const namespacet ns(goto_model.get_symbol_table());
   show_goto_proof_cfg(
-    ns, ui_message_handler, roots, goto_model.goto_functions);
+    ns, ui_message_handler, roots, goto_model.get_goto_functions(), instr_symex_info);
+}
+  
+  
+// source: solver_hardness.cpp solver_hardnesst::produce_report
+void compute_instruction_sat_hardness (std::map<goto_programt::const_targett, sat_infot> instr_sat_info,
+                                         const solver_hardnesst &solver_hardness) {
+  const std::vector<std::unordered_map<solver_hardnesst::hardness_ssa_keyt, solver_hardnesst::sat_hardnesst>> &hardness_stats = solver_hardness.get_hardness_stats();
+  for(std::size_t i = 0; i < hardness_stats.size(); i++) {
+    const auto &ssa_step_hardness = hardness_stats[i];
+    if(ssa_step_hardness.empty())
+      continue;
+
+    for(const auto &key_value_pair : ssa_step_hardness) {
+      auto const &ssa = key_value_pair.first;
+      auto const &hardness = key_value_pair.second;
+      const goto_programt::const_targett target = ssa.pc;
+
+      // TODO: we could also compute the number of SSA expressions associated with a GOTO, but it doesn't seem important.
+
+      auto ensure_exists = instr_sat_info.find (target);
+      if (ensure_exists == instr_sat_info.end()) {
+        sat_infot sat_info;
+        instr_sat_info.insert ({target, sat_info});
+      }
+
+      auto entry = instr_sat_info.find (target);
+      sat_infot &sat_info = entry->second;
+      sat_info.clauses += hardness.clauses;
+      sat_info.literals += hardness.literals;
+      sat_info.variables += hardness.variables.size();
+    }
+  }
 }

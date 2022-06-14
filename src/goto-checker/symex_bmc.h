@@ -84,6 +84,8 @@ public:
 
   unwindsett &unwindset;
 
+  const symex_coveraget get_coverage () const;
+
 protected:
   /// Callbacks that may provide an unwind/do-not-unwind decision for a loop
   std::vector<loop_unwind_handlert> loop_unwind_handlers;

@@ -129,6 +129,9 @@ struct solver_hardnesst : public clause_hardness_collectort
   solver_hardnesst &operator=(const solver_hardnesst &) = delete;
   solver_hardnesst &operator=(solver_hardnesst &&) = default;
 
+  const std::vector<std::unordered_map<hardness_ssa_keyt, sat_hardnesst>> get_hardness_stats() const;
+
+
 private:
   // A minor modification of \ref goto_programt::output_instruction
   static std::string goto_instruction2string(goto_programt::const_targett pc);

@@ -28,7 +28,7 @@ int num_loops (const goto_programt &goto_program) {
     if (target->is_target()) {
       seen.insert (target->target_number);
     }
-    if(target->is_function_call())
+    if(target->is_goto())
     {
       for (auto gt_it = target->targets.begin(); gt_it != target->targets.end(); gt_it++) {
         if (seen.find ((*gt_it)->target_number) != seen.end()) {
@@ -140,3 +140,41 @@ int num_complex_ops (const goto_programt &goto_program) {
   return count;
 }
 
+int symex_steps (const goto_programt &goto_program,
+                     const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+  int count = 0;
+  forall_goto_program_instructions(target, goto_program) {
+    auto symex_info = instr_symex_info.find (target);
+    if (symex_info != instr_symex_info.end()) {
+      count = count + symex_info->second.steps;
+    }
+  }
+  return count;
+}
+
+double symex_duration (const goto_programt &goto_program,
+                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+  double duration = 0;
+  forall_goto_program_instructions(target, goto_program) {
+    auto symex_info = instr_symex_info.find (target);
+    if (symex_info != instr_symex_info.end()) {
+      duration = duration + symex_info->second.duration;
+    }
+  }
+  return duration;
+}
+
+
+const double func_metrics::avg_time_per_symex_step () const {
+  return (symex_duration / (double)symex_steps);
+}
+
+const void func_metrics::dump_html (messaget &msg) const {
+  std::string endline = " <br/> ";
+  int avg_time_per_step = (int)avg_time_per_symex_step()/10000;
+  msg.status() << "complex ops: " << num_complex_ops << endline
+               << "loops: " << num_loops << endline
+               << "symex steps: " << symex_steps << endline
+               << "symex duration (ms): " << (int)(symex_duration / 1000000.0) << endline
+               << "symex avg time per step: " << avg_time_per_step;
+}

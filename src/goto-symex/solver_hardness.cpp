@@ -383,3 +383,8 @@ std::string solver_hardnesst::expr2string(const exprt expr)
   ss << format(expr);
   return ss.str();
 }
+
+
+const std::vector<std::unordered_map<solver_hardnesst::hardness_ssa_keyt, solver_hardnesst::sat_hardnesst>> solver_hardnesst::get_hardness_stats() const {
+  return hardness_stats;
+}
