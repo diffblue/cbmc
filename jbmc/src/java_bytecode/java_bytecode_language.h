@@ -78,6 +78,8 @@ Author: Daniel Kroening, kroening@kroening.com
   " --java-max-vla-length N      limit the length of user-code-created arrays\n" /* NOLINT(*) */ \
   " --java-cp-include-files r    regexp or JSON list of files to load\n" \
   "                              (with '@' prefix)\n" \
+  " --java-load-class CLASS      also load code from class CLASS\n" \
+  " --java-no-load-class CLASS   never load code from class CLASS\n" \
   " --ignore-manifest-main-class ignore Main-Class entries in JAR manifest files.\n" /* NOLINT(*) */ \
   "                              If this option is specified and the options\n" /* NOLINT(*) */ \
   "                              --function and --main-class are not, we can be\n" /* NOLINT(*) */ \
