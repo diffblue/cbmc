@@ -97,9 +97,21 @@ void introduce_temporaries(
   " --one-event-per-cycle        only instruments one event per cycle\n"       \
   " --minimum-interference       instruments an optimal number of events\n"    \
   " --my-events                  only instruments events whose ids appear in inst.evt\n" /* NOLINT(whitespace/line_length) */ \
+  " --read-first|--write-first   only instrument cycles where a read or \n"    \
+  "                              write occurs as first event, respectively\n"  \
+  " --max-var N                  limit cycles to N variables read/written\n"   \
+  " --max-po-trans N             limit cycles to N program-order edges\n"      \
+  " --ignore-arrays              instrument arrays as a single object\n"       \
+  " --cav11                      always instrument shared variables, even\n"   \
+  "                              when they are not part of any cycle\n"        \
+  " --force-loop-duplication|--no-loop-duplication\n"                          \
+  "                              optional program transformation to\n"         \
+  "                              construct cycles in program loops\n"          \
   " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" /* NOLINT(whitespace/line_length) */ \
   " --no-dependencies            no dependency analysis\n"                     \
   " --no-po-rendering            no representation of the threads in the dot\n"\
+  " --hide-internals             do not include thread-internal (Rfi)\n"       \
+  "                              events in dot output\n"                       \
   " --render-cluster-file        clusterises the dot by files\n"               \
   " --render-cluster-function    clusterises the dot by functions\n"
 

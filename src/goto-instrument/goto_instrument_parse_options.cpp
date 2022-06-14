@@ -1748,43 +1748,62 @@ void goto_instrument_parse_optionst::help()
     "Usage:                       Purpose:\n"
     "\n"
     " goto-instrument [-?] [-h] [--help]  show help\n"
-    " goto-instrument in out              perform instrumentation\n"
-    "\n"
-    "Main options:\n"
-    HELP_DOCUMENT_PROPERTIES
-    " --dot                        generate CFG graph in DOT format\n"
-    " --interpreter                do concrete execution\n"
+    " goto-instrument --version           show version and exit\n"
+    " goto-instrument [options] in [out]  perform analysis or instrumentation\n"
     "\n"
     "Dump Source:\n"
     HELP_DUMP_C
+    " --horn                       print program as constrained horn clauses\n"
     "\n"
     "Diagnosis:\n"
     HELP_SHOW_PROPERTIES
+    HELP_DOCUMENT_PROPERTIES
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_GOTO_PROGRAM_STATS
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    " --show-locations             show all source locations\n"
+    " --dot                        generate CFG graph in DOT format\n"
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
-    " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
-    " --show-natural-loops         show natural loop heads\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --list-calls-args            list all function calls with their arguments\n"
     " --call-graph                 show graph of function calls\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"
     HELP_SHOW_CLASS_HIERARCHY
+    HELP_VALIDATE
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --validate-goto-binary       check the well-formedness of the passed in goto\n"
+    "                              binary and then exit\n"
+    " --interpreter                do concrete execution\n"
+    "\n"
+    "Data-flow analyses:\n"
+    " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     // NOLINTNEXTLINE(whitespace/line_length)
     " --show-threaded              show instructions that may be executed by more than one thread\n"
     " --show-local-safe-pointers   show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     " --show-safe-dereferences     show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     "                              *and* used as a dereference operand\n" // NOLINT(*)
-    HELP_VALIDATE
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --validate-goto-binary       check the well-formedness of the passed in goto\n"
-    "                              binary and then exit\n"
+    " --show-value-sets            show points-to information (using value sets)\n" // NOLINT(*)
+    " --show-global-may-alias      show may-alias information over globals\n"
+    " --show-local-bitvector-analysis\n"
+    "                              show procedure-local pointer analysis\n"
+    " --escape-analysis            perform escape analysis\n"
+    " --show-escape-analysis       show results of escape analysis\n"
+    " --custom-bitvector-analysis  perform configurable bitvector analysis\n"
+    " --show-custom-bitvector-analysis\n"
+    "                              show results of configurable bitvector analysis\n" // NOLINT(*)
+    " --interval-analysis          perform interval analysis\n"
+    " --show-intervals             show results of interval analysis\n"
+    " --show-uninitialized         show maybe-uninitialized variables\n"
+    " --show-points-to             show points-to information\n"
+    " --show-rw-set                show read-write sets\n"
+    " --show-call-sequences        show function call sequences\n"
+    " --show-reaching-definitions  show reaching definitions\n"
+    " --show-dependence-graph      show program-dependence graph\n"
+    " --show-sese-regions          show single-entry-single-exit regions\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -1795,33 +1814,66 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Semantic transformations:\n"
     << HELP_NONDET_VOLATILE <<
-    HELP_UNWINDSET
-    " --unwindset-file <file>      read unwindset from file\n"
-    " --partial-loops              permit paths with partial loops\n"
-    " --unwinding-assertions       generate unwinding assertions\n"
-    " --continue-as-loops          add loop for remaining iterations after unwound part\n" // NOLINT(*)
     " --isr <function>             instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
-    HELP_REMOVE_POINTERS
+    " --function-enter <f>, --function-exit <f>, --branch <f>\n"
+    "                              instruments a call to <f> at the beginning,\n" // NOLINT(*)
+    "                              the exit, or a branch point, respectively\n"
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
+    " --check-call-sequence <seq>  instruments checks to assert that all call\n"
+    "                              sequences match <seq>\n"
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
     HELP_INSERT_FINAL_ASSERT_FALSE
     HELP_REPLACE_FUNCTION_BODY
+    HELP_RESTRICT_FUNCTION_POINTER
+    HELP_REMOVE_CALLS_NO_BODY
+    " --add-library                add models of C library functions\n"
+    HELP_CONFIG_LIBRARY
+    " --model-argc-argv <n>        model up to <n> command line arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
+    HELP_REPLACE_CALLS
     HELP_ANSI_C_LANGUAGE
     "\n"
-    "Loop transformations:\n"
+    "Semantics-preserving transformations:\n"
+    " --ensure-one-backedge-per-target\n"
+    "                              transform loop bodies such that there is a\n"
+    "                              single edge back to the loop head\n"
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    HELP_REMOVE_POINTERS
+    " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
+    " --inline                     perform full inlining\n"
+    " --partial-inline             perform partial inlining\n"
+    " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)
+    " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
+    " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
+    " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    HELP_REMOVE_CONST_FUNCTION_POINTERS
+    " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
+    "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
+    "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
+    "\n"
+    "Loop information and transformations:\n"
+    HELP_UNWINDSET
+    " --unwindset-file <file>      read unwindset from file\n"
+    " --partial-loops              permit paths with partial loops\n"
+    " --unwinding-assertions       generate unwinding assertions\n"
+    " --continue-as-loops          add loop for remaining iterations after unwound part\n" // NOLINT(*)
     " --k-induction <k>            check loops with k-induction\n"
     " --step-case                  k-induction: do step-case\n"
     " --base-case                  k-induction: do base-case\n"
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
+    " --z3                         use Z3 when computing loop accelerators\n"
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
+    " --show-lexical-loops         show single-entry-single-back-edge loops\n"
+    " --show-natural-loops         show natural loop heads\n"
     "\n"
     "Memory model instrumentations:\n"
     HELP_WMM_FULL
@@ -1838,43 +1890,22 @@ void goto_instrument_parse_optionst::help()
     "                              of the functions on the shortest path\n"
     " --aggressive-slice-preserve-function <f>\n"
     "                             force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
-    " --aggressive-slice-preserve-function containing <f>\n"
+    " --aggressive-slice-preserve-functions-containing <f>\n"
     "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
-    "--aggressive-slice-preserve-all-direct-paths \n"
+    " --aggressive-slice-preserve-all-direct-paths \n"
     "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
-    "\n"
-    "Further transformations:\n"
-    " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
-    " --inline                     perform full inlining\n"
-    " --partial-inline             perform partial inlining\n"
-    " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)
-    " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
-    " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
-    " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
-    " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
-    "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
-    "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
-    HELP_RESTRICT_FUNCTION_POINTER
-    HELP_REMOVE_CALLS_NO_BODY
-    HELP_REMOVE_CONST_FUNCTION_POINTERS
-    " --add-library                add models of C library functions\n"
-    HELP_CONFIG_LIBRARY
-    " --model-argc-argv <n>        model up to <n> command line arguments\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
-    HELP_REPLACE_CALLS
     "\n"
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     "\n"
-    "Other options:\n"
-    " --version                    show version and exit\n"
+    "User-interface options:\n"
     HELP_FLUSH
     " --xml                        output files in XML where supported\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
+    " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";
   // clang-format on
