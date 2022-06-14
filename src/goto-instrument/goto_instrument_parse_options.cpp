@@ -1753,6 +1753,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Dump Source:\n"
     HELP_DUMP_C
+    " --horn                       print program as constrained horn clauses\n"
     "\n"
     "Diagnosis:\n"
     HELP_SHOW_PROPERTIES
@@ -1761,6 +1762,7 @@ void goto_instrument_parse_optionst::help()
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_GOTO_PROGRAM_STATS
+    " --show-locations             show all source locations\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
@@ -1784,6 +1786,24 @@ void goto_instrument_parse_optionst::help()
     " --show-local-safe-pointers   show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     " --show-safe-dereferences     show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     "                              *and* used as a dereference operand\n" // NOLINT(*)
+    " --show-value-sets            show points-to information (using value sets)\n" // NOLINT(*)
+    " --show-global-may-alias      show may-alias information over globals\n"
+    " --show-local-bitvector-analysis\n"
+    "                              show procedure-local pointer analysis\n"
+    " --escape-analysis            perform escape analysis\n"
+    " --show-escape-analysis       show results of escape analysis\n"
+    " --custom-bitvector-analysis  perform configurable bitvector analysis\n"
+    " --show-custom-bitvector-analysis\n"
+    "                              show results of configurable bitvector analysis\n" // NOLINT(*)
+    " --interval-analysis          perform interval analysis\n"
+    " --show-intervals             show results of interval analysis\n"
+    " --show-uninitialized         show maybe-uninitialized variables\n"
+    " --show-points-to             show points-to information\n"
+    " --show-rw-set                show read-write sets\n"
+    " --show-call-sequences        show function call sequences\n"
+    " --show-reaching-definitions  show reaching definitions\n"
+    " --show-dependence-graph      show program-dependence graph\n"
+    " --show-sese-regions          show single-entry-single-exit regions\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -1800,7 +1820,12 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
+    " --function-enter <f>, --function-exit <f>, --branch <f>\n"
+    "                              instruments a call to <f> at the beginning,\n" // NOLINT(*)
+    "                              the exit, or a branch point, respectively\n"
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
+    " --check-call-sequence <seq>  instruments checks to assert that all call\n"
+    "                              sequences match <seq>\n"
     " --undefined-function-is-assume-false\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
@@ -1817,6 +1842,9 @@ void goto_instrument_parse_optionst::help()
     HELP_ANSI_C_LANGUAGE
     "\n"
     "Semantics-preserving transformations:\n"
+    " --ensure-one-backedge-per-target\n"
+    "                              transform loop bodies such that there is a\n"
+    "                              single edge back to the loop head\n"
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     HELP_REMOVE_POINTERS
     " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
@@ -1842,7 +1870,9 @@ void goto_instrument_parse_optionst::help()
     " --base-case                  k-induction: do base-case\n"
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
+    " --z3                         use Z3 when computing loop accelerators\n"
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
+    " --show-lexical-loops         show single-entry-single-back-edge loops\n"
     " --show-natural-loops         show natural loop heads\n"
     "\n"
     "Memory model instrumentations:\n"
@@ -1860,7 +1890,7 @@ void goto_instrument_parse_optionst::help()
     "                              of the functions on the shortest path\n"
     " --aggressive-slice-preserve-function <f>\n"
     "                             force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
-    " --aggressive-slice-preserve-function containing <f>\n"
+    " --aggressive-slice-preserve-functions-containing <f>\n"
     "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
     " --aggressive-slice-preserve-all-direct-paths \n"
     "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)

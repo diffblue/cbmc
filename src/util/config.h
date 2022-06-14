@@ -63,6 +63,7 @@ class symbol_tablet;
 " --malloc-may-fail            allow malloc calls to return a null pointer\n"  \
 " --malloc-fail-assert         set malloc failure mode to assert-then-assume\n"\
 " --malloc-fail-null           set malloc failure mode to return null\n"       \
+" --string-abstraction         track C string lengths and zero-termination\n"  \
 
 
 #define OPT_CONFIG_JAVA                                                        \

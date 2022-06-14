@@ -58,7 +58,13 @@ class optionst;
   " --" RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT                                \
   " <file_name>\n"                                                             \
   "                              add function pointer restrictions from "      \
-  "file\n"
+  "file\n"                                                                     \
+  " --" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT                                  \
+  " <symbol_name>/target[targets]*>\n"                                         \
+  "                              restrict a function pointer where "           \
+  " <symbol_name>\n"                                                           \
+  "                              is the unmangled name, before labelling "     \
+  "function pointers\n"
 
 void parse_function_pointer_restriction_options_from_cmdline(
   const cmdlinet &cmdline,
