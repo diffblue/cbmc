@@ -99,25 +99,26 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
 #define OPT_SOLVER                                                             \
   "(smt1)" /* rejected, will eventually disappear */                           \
   "(smt2)"                                                                     \
-  "(fpa)" /* undocumented */                                                   \
+  "(fpa)"                                                                      \
   "(cvc3)"                                                                     \
   "(cvc4)(boolector)(yices)(z3)"                                               \
   "(mathsat)"                                                                  \
   "(cprover-smt2)"                                                             \
   "(incremental-smt2-solver):"                                                 \
   "(external-sat-solver):"                                                     \
-  "(no-sat-preprocessor)" /* undocumented */                                   \
+  "(no-sat-preprocessor)"                                                      \
   "(beautify)"                                                                 \
   "(dimacs)"                                                                   \
   "(refine)"                                                                   \
-  "(max-node-refinement):" /* undocumented */                                  \
-  "(refine-arrays)"        /* undocumented */                                  \
-  "(refine-arithmetic)"    /* undocumented */                                  \
+  "(max-node-refinement):"                                                     \
+  "(refine-arrays)"                                                            \
+  "(refine-arithmetic)"                                                        \
   "(outfile):"                                                                 \
   "(write-solver-stats-to):"
 
 #define HELP_SOLVER                                                            \
   " --external-sat-solver cmd    command to invoke SAT solver process\n"       \
+  " --no-sat-preprocessor        disable the SAT solver's simplifier\n"        \
   " --dimacs                     generate CNF in DIMACS format\n"              \
   " --beautify                   beautify the counterexample\n"                \
   "                              (greedy heuristic)\n"                         \
@@ -130,7 +131,12 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " --mathsat                    use MathSAT\n"                                \
   " --yices                      use Yices\n"                                  \
   " --z3                         use Z3\n"                                     \
+  " --fpa                        use theory of floating-point arithmetic\n"    \
   " --refine                     use refinement procedure (experimental)\n"    \
+  " --refine-arrays              use refinement for arrays only\n"             \
+  " --refine-arithmetic          refinement of arithmetic expressions only\n"  \
+  " --max-node-refinement        maximum refinement iterations for\n"          \
+  "                              arithmetic expressions\n"                     \
   " --incremental-smt2-solver cmd\n"                                           \
   "                              command to invoke external SMT solver for\n"  \
   "                              incremental solving (experimental)\n"         \
