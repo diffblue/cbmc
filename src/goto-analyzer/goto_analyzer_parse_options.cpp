@@ -691,7 +691,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
-    " goto-analyzer [-h] [--help]  show help\n"
+    " goto-analyzer [-?|-h|--help] show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
     "Task options:\n"
@@ -701,6 +701,8 @@ void goto_analyzer_parse_optionst::help()
     " --verify                     use the abstract domains to check assertions\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --simplify file_name         use the abstract domains to simplify the program\n"
+    " --no-simplify-slicing        do not remove instructions from which no\n"
+    "                              property can be reached (use with --simplify)\n" // NOLINT(*)
     " --unreachable-instructions   list dead code\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --unreachable-functions      list functions unreachable from the entry point\n"
@@ -716,6 +718,8 @@ void goto_analyzer_parse_optionst::help()
     " --legacy-ait                 recursion for function and one domain per location\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --legacy-concurrent          legacy-ait with an extended fixed-point for concurrency\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --location-sensitive         use location-sensitive abstract interpreter\n"
     "\n"
     "History options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -739,10 +743,12 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Domain options:\n"
     " --constants                  a constant for each variable if possible\n"
-    " --intervals                  an interval for each variable\n"
-    " --non-null                   tracks which pointers are non-null\n"
+    " --intervals, --show-intervals\n"
+    "                              an interval for each variable\n"
+    " --non-null, --show-non-null  tracks which pointers are non-null\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
-    " --vsd                        a configurable non-relational domain\n" // NOLINT(*)
+    " --vsd, --variable-sensitivity\n"
+    "                              a configurable non-relational domain\n"
     " --dependence-graph-vs        dependencies between instructions using VSD\n" // NOLINT(*)
     "\n"
     "Variable sensitivity domain (VSD) options:\n"
@@ -763,6 +769,8 @@ void goto_analyzer_parse_optionst::help()
     "Specific analyses:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
+    " --show-taint                 print taint analysis results on stdout\n"
+    " --show-local-may-alias       perform procedure-local may alias analysis\n"
     "\n"
     "C/C++ frontend options:\n"
     HELP_CONFIG_C_CPP
@@ -778,6 +786,7 @@ void goto_analyzer_parse_optionst::help()
     HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
+    " --property id                enable selected properties only\n"
     HELP_GOTO_CHECK
     HELP_CONFIG_LIBRARY
     "\n"
@@ -785,6 +794,7 @@ void goto_analyzer_parse_optionst::help()
     HELP_VALIDATE
     " --version                    show version and exit\n"
     HELP_FLUSH
+    " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";
   // clang-format on

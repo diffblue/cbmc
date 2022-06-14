@@ -151,7 +151,6 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   OPT_GOTO_CHECK \
-  "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   "(property):" \
   "(verbosity):(version)" \

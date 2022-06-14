@@ -128,7 +128,6 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   "(no-assertions)(no-assumptions)" \
-  "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   "(property):" \
   "(verbosity):(version)" \
