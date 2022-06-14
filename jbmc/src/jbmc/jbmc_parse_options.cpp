@@ -944,7 +944,11 @@ void jbmc_parse_optionst::help()
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     "                              (implies --trace)\n"
+    " --localize-faults            localize faults (experimental)\n"
     HELP_JAVA_TRACE_VALIDATION
+    "\n"
+    "Platform options:\n"
+    HELP_CONFIG_PLATFORM
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -960,6 +964,7 @@ void jbmc_parse_optionst::help()
     " --no-assumptions             ignore user assumptions\n"
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     HELP_REACHABILITY_SLICER
+    HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     "\n"
     "Java Bytecode frontend options:\n"
