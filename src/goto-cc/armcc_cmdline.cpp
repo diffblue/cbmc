@@ -41,7 +41,6 @@ static const char *options_no_arg[]=
   "--i386-macos",
   "--i386-linux",
   "--i386-win32",
-  "--no-arch",
   "--no-library",
   "--string-abstraction",
 
