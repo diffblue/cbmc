@@ -865,7 +865,8 @@ void cbmc_parse_optionst::help()
     "Usage:                       Purpose:\n"
     "\n"
     " cbmc [-?] [-h] [--help]      show help\n"
-    " cbmc file.c ...              source file names\n"
+    " cbmc --version               show version and exit\n"
+    " cbmc [options] file.c ...    perform bounded model checking\n"
     "\n"
     "Analysis options:\n"
     HELP_SHOW_PROPERTIES
@@ -878,6 +879,7 @@ void cbmc_parse_optionst::help()
     "\n"
     "C/C++ frontend options:\n"
     " --preprocess                 stop after preprocessing\n"
+    " --test-preprocessor          stop after preprocessing, discard output\n"
     HELP_CONFIG_C_CPP
     HELP_ANSI_C_LANGUAGE
     HELP_FUNCTIONS
@@ -889,6 +891,7 @@ void cbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_VALIDATE
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
@@ -916,19 +919,17 @@ void cbmc_parse_optionst::help()
     HELP_STRING_REFINEMENT_CBMC
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
+    " --show-array-constraints     show array theory constraints added\n"
+    "                              during post processing.\n"
+    "                              Requires --json-ui.\n"
     "\n"
-    "Other options:\n"
-    " --version                    show version and exit\n"
+    "User-interface options:\n"
     HELP_XML_INTERFACE
     HELP_JSON_INTERFACE
-    HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH
     " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
-    " --show-array-constraints     show array theory constraints added\n"
-    "                              during post processing.\n"
-    "                              Requires --json-ui.\n"
     "\n";
   // clang-format on
 }
