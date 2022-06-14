@@ -744,6 +744,8 @@ void janalyzer_parse_optionst::help()
     " --verify                     use the abstract domains to check assertions\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --simplify file_name         use the abstract domains to simplify the program\n"
+    " --no-simplify-slicing        do not remove instructions from which no\n"
+    "                              property can be reached (use with --simplify)\n" // NOLINT(*)
     " --unreachable-instructions   list dead code\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --unreachable-functions      list functions unreachable from the entry point\n"
@@ -757,8 +759,9 @@ void janalyzer_parse_optionst::help()
     "\n"
     "Domain options:\n"
     " --constants                  constant domain\n"
-    " --intervals                  interval domain\n"
-    " --non-null                   non-null domain\n"
+    " --intervals, --show-intervals\n"
+    "                              interval domain\n"
+    " --non-null, --show-non-null  non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
     "\n"
     "Output options:\n"
@@ -771,9 +774,14 @@ void janalyzer_parse_optionst::help()
     "Specific analyses:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
+    " --show-taint                 print taint analysis results on stdout\n"
+    " --show-local-may-alias       perform procedure-local may alias analysis\n"
     "\n"
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    "\n"
+    "Platform options:\n"
+    HELP_CONFIG_PLATFORM
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -784,9 +792,11 @@ void janalyzer_parse_optionst::help()
     "Program instrumentation options:\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
+    " --property id                enable selected properties only\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
+    " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";
   // clang-format on

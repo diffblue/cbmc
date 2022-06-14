@@ -128,9 +128,8 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   "(no-assertions)(no-assumptions)" \
-  "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
-  "(show-reachable-properties)(property):" \
+  "(property):" \
   "(verbosity):(version)" \
   "(arch):" \
   "(taint):(show-taint)" \
