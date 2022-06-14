@@ -32,15 +32,16 @@ class symbol_tablet;
 
 #define HELP_CONFIG_C_CPP                                                      \
   " -I path                      set include path (C/C++)\n"                   \
+  " --include file               set include file (C/C++)\n"                   \
   " -D macro                     define preprocessor macro (C/C++)\n"          \
-  " --c89/99/11                  set C language standard (default: "           \
+  " --c89, --c99, --c11          set C language standard (default: "           \
                                  << (configt::ansi_ct::default_c_standard()==  \
                                      configt::ansi_ct::c_standardt::C89?"c89": \
                                      configt::ansi_ct::default_c_standard()==  \
                                      configt::ansi_ct::c_standardt::C99?"c99": \
                                      configt::ansi_ct::default_c_standard()==  \
                           configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"\
-  " --cpp98/03/11                set C++ language standard (default: "         \
+  " --cpp98, --cpp03, --cpp11    set C++ language standard (default: "         \
                                  << (configt::cppt::default_cpp_standard()==   \
                                    configt::cppt::cpp_standardt::CPP98?"cpp98":\
                                      configt::cppt::default_cpp_standard()==   \
@@ -48,7 +49,8 @@ class symbol_tablet;
                                      configt::cppt::default_cpp_standard()==   \
                        configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"\
   " --unsigned-char              make \"char\" unsigned by default\n"          \
-  " --round-to-nearest           rounding towards nearest even (default)\n"    \
+  " --round-to-nearest, --round-to-even\n"                                     \
+  "                              rounding towards nearest even (default)\n"    \
   " --round-to-plus-inf          rounding towards plus infinity\n"             \
   " --round-to-minus-inf         rounding towards minus infinity\n"            \
   " --round-to-zero              rounding towards zero\n"                      \
@@ -83,6 +85,8 @@ class symbol_tablet;
                                  << configt::this_architecture() << ")\n"      \
   " --os                         set operating system (default: "              \
                                  << configt::this_operating_system() << ")\n"  \
+  " --i386-linux, --i386-win32, --i386-macos, --ppc-macos\n"                   \
+  "   --win32, --winx64          set architecture and operating system\n"      \
   " --16, --32, --64             set width of int\n"                           \
   " --LP64, --ILP64, --LLP64,\n"                                               \
   "   --ILP32, --LP32            set width of int, long and pointers\n"        \
