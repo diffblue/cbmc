@@ -11,24 +11,25 @@ Author: Malte Mues <mail.mues@gmail.com>
 /// Commandline parser for the memory analyzer executing main work.
 
 #include "memory_analyzer_parse_options.h"
-#include "analyze_symbol.h"
-
-#include <algorithm>
-#include <fstream>
-
-#include <ansi-c/ansi_c_language.h>
-
-#include <goto-programs/goto_model.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/show_symbol_table.h>
-
-#include <langapi/mode.h>
 
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/message.h>
 #include <util/string_utils.h>
 #include <util/version.h>
+
+#include <goto-programs/goto_model.h>
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/show_symbol_table.h>
+
+#include <ansi-c/ansi_c_language.h>
+#include <langapi/mode.h>
+
+#include "analyze_symbol.h"
+
+#include <algorithm>
+#include <fstream>
+#include <iostream>
 
 memory_analyzer_parse_optionst::memory_analyzer_parse_optionst(
   int argc,
@@ -53,7 +54,7 @@ int memory_analyzer_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    message.status() << CBMC_VERSION << '\n';
+    std::cout << CBMC_VERSION << '\n';
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -172,7 +173,7 @@ int memory_analyzer_parse_optionst::doit()
 
 void memory_analyzer_parse_optionst::help()
 {
-  message.status()
+  std::cout
     << '\n'
     << banner_string("Memory-Analyzer", CBMC_VERSION) << '\n'
     << align_center_with_border("Copyright (C) 2019") << '\n'
@@ -193,5 +194,5 @@ void memory_analyzer_parse_optionst::help()
     << " --symtab-snapshot            output snapshot as symbol table\n"
     << " --output-file <file>         write snapshot to file\n"
     << " --json-ui                    output snapshot in JSON format\n"
-    << messaget::eom;
+    << '\n';
 }
