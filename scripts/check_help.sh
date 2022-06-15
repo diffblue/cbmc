@@ -62,30 +62,52 @@ for t in  \
     exit 1
   fi
   $tool_bin --help > help_string
+  grep '^\\fB\\-' ../doc/man/$tool_name.1 > man_page_opts
 
   # some options are intentionally undocumented
   case $tool_name in
     cbmc)
-      echo "-all-claims -all-properties -claim -show-claims" >> help_string
-      echo "-document-subgoals" >> help_string
-      echo "-no-propagation -no-simplify -no-simplify-if" >> help_string
-      echo "-floatbv -no-unwinding-assertions" >> help_string
-      echo "-slice-by-trace" >> help_string
+      for undoc in \
+        -all-claims -all-properties -claim -show-claims \
+        -document-subgoals \
+        -no-propagation -no-simplify -no-simplify-if \
+        -floatbv -no-unwinding-assertions \
+        -slice-by-trace ; do
+        echo "$undoc" >> help_string
+        echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
+      done
       ;;
     goto-analyzer)
-      echo "-show-intervals -show-non-null" >> help_string
+      for undoc in -show-intervals -show-non-null ; do
+        echo "$undoc" >> help_string
+        echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
+      done
       ;;
     goto-instrument)
-      echo "-document-claims-html -document-claims-latex -show-claims" >> help_string
-      echo "-no-simplify" >> help_string
+      for undoc in \
+        -document-claims-html -document-claims-latex -show-claims \
+        -no-simplify ; do
+        echo "$undoc" >> help_string
+        echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
+      done
       ;;
     janalyzer)
-      echo "-show-intervals -show-non-null" >> help_string
+      # -jar, -gb are documented, but in a different format
+      for undoc in -show-intervals -show-non-null -jar -gb ; do
+        echo "$undoc" >> help_string
+        echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
+      done
       ;;
     jbmc)
-      echo "-document-subgoals" >> help_string
-      echo "-no-propagation -no-simplify -no-simplify-if" >> help_string
-      echo "-no-unwinding-assertions" >> help_string
+      # -jar, -gb are documented, but in a different format
+      for undoc in \
+        -document-subgoals \
+        -no-propagation -no-simplify -no-simplify-if \
+        -no-unwinding-assertions \
+        -jar -gb ; do
+        echo "$undoc" >> help_string
+        echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
+      done
       ;;
   esac
 
@@ -94,8 +116,18 @@ for t in  \
       echo "Option $opt of $tool_name is undocumented"
       missing_options=1
     fi
+    case $opt in
+      -help|-h|-?) continue ;;
+      -version) continue ;;
+    esac
+    m_opt=$(echo $opt | sed 's/-/\\\\-/g')
+    if ! grep -q -- "$m_opt" man_page_opts ; then
+      echo "Option $opt of $tool_name is missing from its man page"
+      missing_options=1
+    fi
   done
   rm help_string
+  rm man_page_opts
 done
 
 if [ $missing_options -eq 1 ] ; then
