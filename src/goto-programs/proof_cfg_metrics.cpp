@@ -12,6 +12,7 @@ Author: Benjamin Quiring
 #include "proof_cfg_metrics.h"
 
 #include <math.h>
+#include <iostream>
 
 #include "goto_model.h"
 #include "goto_program.h"
@@ -140,32 +141,53 @@ int num_complex_ops (const goto_programt &goto_program) {
   return count;
 }
 
-int symex_steps (const goto_programt &goto_program,
-                     const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
-  int count = 0;
+symex_infot aggregate_symex_info (const goto_programt &goto_program,
+                                  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+  int total_steps = 0;
+  double total_duration = 0.0;
   forall_goto_program_instructions(target, goto_program) {
     auto symex_info = instr_symex_info.find (target);
     if (symex_info != instr_symex_info.end()) {
-      count = count + symex_info->second.steps;
+      total_steps += symex_info->second.steps;
+      total_duration += symex_info->second.duration;
     }
   }
-  return count;
+  symex_infot symex_info;
+  symex_info.steps = total_steps;
+  symex_info.duration = total_duration;
+  return symex_info;
 }
 
-double symex_duration (const goto_programt &goto_program,
-                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
-  double duration = 0;
+solver_infot aggregate_solver_info (const goto_programt &goto_program,
+                                    const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
+  int total_clauses=0;
+  int total_literals=0;
+  int total_variables=0;
+
   forall_goto_program_instructions(target, goto_program) {
-    auto symex_info = instr_symex_info.find (target);
-    if (symex_info != instr_symex_info.end()) {
-      duration = duration + symex_info->second.duration;
+    auto solver_info = instr_solver_info.find (target);
+    if (solver_info != instr_solver_info.end()) {
+      std::cout << "found entry: " << solver_info->second.clauses << " "
+                << solver_info->second.literals << " "
+                << solver_info->second.variables << "\n";
+      total_clauses += solver_info->second.clauses;
+      total_literals += solver_info->second.literals;
+      total_variables += solver_info->second.variables;
     }
   }
-  return duration;
+
+  solver_infot solver_info;
+  solver_info.clauses = total_clauses;
+  solver_info.literals = total_literals;
+  solver_info.variables = total_variables;
+  return solver_info;
 }
 
 
 const double func_metrics::avg_time_per_symex_step () const {
+  if (symex_steps == 0) {
+    return 0.0;
+  }
   return (symex_duration / (double)symex_steps);
 }
 
@@ -174,7 +196,12 @@ const void func_metrics::dump_html (messaget &msg) const {
   int avg_time_per_step = (int)avg_time_per_symex_step()/10000;
   msg.status() << "complex ops: " << num_complex_ops << endline
                << "loops: " << num_loops << endline
+
                << "symex steps: " << symex_steps << endline
                << "symex duration (ms): " << (int)(symex_duration / 1000000.0) << endline
-               << "symex avg time per step: " << avg_time_per_step;
+               << "symex avg time per step: " << avg_time_per_step << endline
+
+               << "solver clauses: " << solver_clauses << endline
+               << "solver literals: " << solver_literals << endline
+               << "solver variables: " << solver_variables;
 }

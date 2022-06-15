@@ -16,7 +16,7 @@ Author: Benjamin Quiring
 #include <util/ui_message.h>
 #include <map>
 
-class sat_infot {
+class solver_infot {
   public:
   int clauses;
   int literals;
@@ -55,6 +55,10 @@ class func_metrics {
   // duration of symex steps (in nanoseconds) for this function
   double symex_duration;
 
+  int solver_clauses;
+  int solver_literals;
+  int solver_variables;
+
   func_metrics () {
     indegree = 0;
     outdegree = 0;
@@ -62,8 +66,13 @@ class func_metrics {
     function_size = 0;
     num_complex_ops = 0;
     num_loops = 0;
+
     symex_steps = 0;
     symex_duration = 0.0;
+
+    solver_clauses=0;
+    solver_literals=0;
+    solver_variables=0;
   }
 
   const void dump_html (messaget &msg) const;
@@ -85,10 +94,10 @@ int function_size (const goto_programt &goto_program);
 
 int num_complex_ops (const goto_programt &goto_program);
 
-int symex_steps (const goto_programt &goto_program,
-                 const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
+symex_infot aggregate_symex_info (const goto_programt &goto_program,
+                                  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
-double symex_duration (const goto_programt &goto_program,
-                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
+solver_infot aggregate_solver_info (const goto_programt &goto_program,
+                                    const std::map<goto_programt::const_targett, solver_infot> &instr_symex_info);
 
 #endif // CPROVER_GOTO_PROGRAMS_PROOF_CFG_METRICS_H

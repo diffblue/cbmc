@@ -38,10 +38,11 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
                         const optionst &options,
                         ui_message_handlert &ui_message_handler,
                         const bool symex_done,
-                        const goto_symex_property_decidert property_decider) {
+                        const goto_symex_property_decidert &property_decider) {
   const auto &goto_functions = goto_model.get_goto_functions();
   const symex_coveraget &symex_coverage = symex.get_coverage();
   std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
+  std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
 
   messaget msg(ui_message_handler);
   const namespacet ns(goto_model.get_symbol_table());
@@ -72,6 +73,38 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
         }
       }
     }
+
+    with_solver_hardness(
+      property_decider.get_decision_procedure(),
+      [&instr_solver_info](solver_hardnesst &solver_hardness) {
+        // source: solver_hardness.cpp solver_hardnesst::produce_report
+        const std::vector<std::unordered_map<solver_hardnesst::hardness_ssa_keyt, solver_hardnesst::sat_hardnesst>> &hardness_stats = solver_hardness.get_hardness_stats();
+        for(std::size_t i = 0; i < hardness_stats.size(); i++) {
+          const auto &ssa_step_hardness = hardness_stats[i];
+          if(ssa_step_hardness.empty())
+            continue;
+
+          for(const auto &key_value_pair : ssa_step_hardness) {
+            auto const &ssa = key_value_pair.first;
+            auto const &hardness = key_value_pair.second;
+            const goto_programt::const_targett target = ssa.pc;
+
+            // TODO: we could also compute the number of SSA expressions associated with a GOTO, but it doesn't seem important.
+
+            auto ensure_exists = instr_solver_info.find (target);
+            if (ensure_exists == instr_solver_info.end()) {
+              solver_infot solver_info;
+              instr_solver_info.insert ({target, solver_info});
+            }
+
+            auto entry = instr_solver_info.find (target);
+            solver_infot &solver_info = entry->second;
+            solver_info.clauses += hardness.clauses;
+            solver_info.literals += hardness.literals;
+            solver_info.variables += hardness.variables.size();
+          }
+        }
+      });
   } else {
     for(const auto &fun : sorted) {
       const bool has_body = fun->second.body_available();
@@ -79,23 +112,21 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
       if (has_body) {
         const goto_programt &body = fun->second.body;
         forall_goto_program_instructions(from, body) {
-          symex_infot info;
-          info.steps = 1;
-          info.duration = 0.0;
-          instr_symex_info.insert ({from, info});
+          symex_infot symex_info;
+          symex_info.steps = 1;
+          symex_info.duration = 0.0;
+          instr_symex_info.insert ({from, symex_info});
+          solver_infot solver_info;
+          instr_solver_info.insert ({from, solver_info});
         }
       }
     }
   }
+
   std::list<std::string> roots;
   roots.push_back (options.get_option("goto-proof-cfg-roots"));
   show_goto_proof_cfg(
-    goto_model, roots, ui_message_handler, instr_symex_info);
-  std::map<goto_programt::const_targett, sat_infot> instr_sat_info;
-
-  with_solver_hardness(
-    property_decider.get_decision_procedure(),
-    [&instr_sat_info](solver_hardnesst &solver_hardness) { compute_instruction_sat_hardness(instr_sat_info, solver_hardness);});
+    goto_model, roots, ui_message_handler, instr_symex_info, instr_solver_info);
 
   
 }
@@ -115,8 +146,8 @@ operator()(propertiest &properties)
   // we haven't got an equation yet
   if(!equation_generated)
   {
-    //bool symex_done = false;
-    //generate_goto_dot(goto_model, symex, options, ui_message_handler, symex_done, property_decider);
+    bool symex_done = false;
+    generate_goto_dot(goto_model, symex, options, ui_message_handler, symex_done, property_decider);
 
     generate_equation();
     
@@ -141,6 +172,7 @@ operator()(propertiest &properties)
   }
 
   run_property_decider(result, properties, solver_runtime);
+  generate_goto_dot(goto_model, symex, options, ui_message_handler, true, property_decider);
 
   return result;
 }

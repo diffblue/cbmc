@@ -63,6 +63,7 @@ void compute_metrics (const symbolt &symbol,
                       const namespacet &ns, 
                       const goto_functionst &goto_functions,
                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+                      const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
                       func_metrics &metrics) {
   metrics.indegree = indegree (symbol, ns, goto_functions);
   metrics.outdegree = outdegree (goto_program);
@@ -70,13 +71,21 @@ void compute_metrics (const symbolt &symbol,
   metrics.function_size = function_size (goto_program);
   metrics.num_complex_ops = num_complex_ops (goto_program);
   metrics.num_loops = num_loops (goto_program);
-  metrics.symex_steps = symex_steps (goto_program, instr_symex_info);
-  metrics.symex_duration = symex_duration (goto_program, instr_symex_info);
+
+  const auto symex_info = aggregate_symex_info (goto_program, instr_symex_info);
+  metrics.symex_steps = symex_info.steps;
+  metrics.symex_duration = symex_info.duration;
+
+  const auto solver_info = aggregate_solver_info (goto_program, instr_solver_info);
+  metrics.solver_clauses = solver_info.clauses;
+  metrics.solver_literals = solver_info.literals;
+  metrics.solver_variables = solver_info.variables;
 }
 
 void compute_metrics (const namespacet &ns, 
                       std::map<irep_idt, func_metrics> &metrics,
                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+                      const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
                       const goto_functionst &goto_functions) {
   const auto funs = goto_functions.sorted();
 
@@ -88,7 +97,7 @@ void compute_metrics (const namespacet &ns,
       const goto_programt &body = fun->second.body;
       
       func_metrics &m = metrics.find(name)->second;
-      compute_metrics (symbol, body, ns, goto_functions, instr_symex_info, m);
+      compute_metrics (symbol, body, ns, goto_functions, instr_symex_info, instr_solver_info, m);
     }
   }
 }
@@ -112,7 +121,7 @@ void compute_scores (std::map<irep_idt, func_metrics> &metrics,
               + w_function_size * m.function_size
               + w_num_complex_ops * m.num_complex_ops
               + w_num_loops * m.num_loops
-      + w_avg_time_per_symex_step * (int)m.avg_time_per_symex_step()/10000;
+              + w_avg_time_per_symex_step * (int)m.avg_time_per_symex_step()/10000;
     scores.find(name)->second = score;
   }
 
@@ -316,7 +325,8 @@ void show_goto_proof_cfg(
   ui_message_handlert &ui_message_handler,
   const std::list<std::string> roots,
   const goto_functionst &goto_functions,
-  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info)
+  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+  const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
 
   //goto_functionst goto_functions;
@@ -370,7 +380,7 @@ void show_goto_proof_cfg(
     scores.insert({name, 0});
   }
   // initialize scores
-  compute_metrics (ns, metrics, instr_symex_info, goto_functions);
+  compute_metrics (ns, metrics, instr_symex_info, instr_solver_info, goto_functions);
   compute_scores(metrics, scores);
 
   // std::map<goto_programt::const_targett, int> test;
@@ -413,41 +423,16 @@ void show_goto_proof_cfg(
   const abstract_goto_modelt &goto_model,
   const std::list<std::string> roots,
   ui_message_handlert &ui_message_handler,
-  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info)
+  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+  const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
   const namespacet ns(goto_model.get_symbol_table());
   show_goto_proof_cfg(
-    ns, ui_message_handler, roots, goto_model.get_goto_functions(), instr_symex_info);
+    ns, ui_message_handler, 
+    roots, 
+    goto_model.get_goto_functions(), 
+    instr_symex_info,
+    instr_solver_info);
 }
   
   
-// source: solver_hardness.cpp solver_hardnesst::produce_report
-void compute_instruction_sat_hardness (std::map<goto_programt::const_targett, sat_infot> instr_sat_info,
-                                         const solver_hardnesst &solver_hardness) {
-  const std::vector<std::unordered_map<solver_hardnesst::hardness_ssa_keyt, solver_hardnesst::sat_hardnesst>> &hardness_stats = solver_hardness.get_hardness_stats();
-  for(std::size_t i = 0; i < hardness_stats.size(); i++) {
-    const auto &ssa_step_hardness = hardness_stats[i];
-    if(ssa_step_hardness.empty())
-      continue;
-
-    for(const auto &key_value_pair : ssa_step_hardness) {
-      auto const &ssa = key_value_pair.first;
-      auto const &hardness = key_value_pair.second;
-      const goto_programt::const_targett target = ssa.pc;
-
-      // TODO: we could also compute the number of SSA expressions associated with a GOTO, but it doesn't seem important.
-
-      auto ensure_exists = instr_sat_info.find (target);
-      if (ensure_exists == instr_sat_info.end()) {
-        sat_infot sat_info;
-        instr_sat_info.insert ({target, sat_info});
-      }
-
-      auto entry = instr_sat_info.find (target);
-      sat_infot &sat_info = entry->second;
-      sat_info.clauses += hardness.clauses;
-      sat_info.literals += hardness.literals;
-      sat_info.variables += hardness.variables.size();
-    }
-  }
-}
