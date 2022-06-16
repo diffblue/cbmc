@@ -218,7 +218,7 @@ void smt2_convt::write_footer()
   if(solver!=solvert::BOOLECTOR)
   {
     for(const auto &id : smt2_identifiers)
-      out << "(get-value (|" << id << "|))"
+      out << "(get-value (" << id << "))"
           << "\n";
   }
 
@@ -260,7 +260,7 @@ void smt2_convt::define_object_size(
         << "((_ extract " << h << " " << l << ") ";
     convert_expr(ptr);
     out << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
-        << "(= |" << id << "| (_ bv" << *object_size << " " << size_width
+        << "(= " << id << " (_ bv" << *object_size << " " << size_width
         << "))))\n";
 
     ++number;
@@ -837,16 +837,17 @@ literalt smt2_convt::convert(const exprt &expr)
     out << " () Bool)\n";
     out << "(assert (= ";
     convert_literal(l);
+    out << ' ';
     convert_expr(prepared_expr);
     out << "))\n";
   }
   else
   {
-    defined_expressions[expr] =
-      std::string{"|B"} + std::to_string(l.var_no()) + "|";
-    out << "(define-fun ";
-    convert_literal(l);
-    out << " () Bool ";
+    auto identifier =
+      convert_identifier(std::string{"B"} + std::to_string(l.var_no()));
+    defined_expressions[expr] = identifier;
+    smt2_identifiers.insert(identifier);
+    out << "(define-fun " << identifier << " () Bool ";
     convert_expr(prepared_expr);
     out << ")\n";
   }
@@ -874,12 +875,15 @@ void smt2_convt::convert_literal(const literalt l)
     if(l.sign())
       out << "(not ";
 
-    out << "|B" << l.var_no() << "|";
+    const auto identifier =
+      convert_identifier("B" + std::to_string(l.var_no()));
+
+    out << identifier;
 
     if(l.sign())
       out << ")";
 
-    smt2_identifiers.insert("B"+std::to_string(l.var_no()));
+    smt2_identifiers.insert(identifier);
   }
 }
 
@@ -906,7 +910,7 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   // Otherwise, for Common Lisp compatibility they would have to be treated
   // as escaping symbols.
 
-  std::string result;
+  std::string result = "|";
 
   for(std::size_t i=0; i<identifier.size(); i++)
   {
@@ -927,6 +931,8 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
       result+=ch;
     }
   }
+
+  result += '|';
 
   return result;
 }
@@ -989,7 +995,7 @@ void smt2_convt::convert_floatbv(const exprt &expr)
   if(expr.id()==ID_symbol)
   {
     const irep_idt &id = to_symbol_expr(expr).get_identifier();
-    out << '|' << convert_identifier(id) << '|';
+    out << convert_identifier(id);
     return;
   }
 
@@ -1003,9 +1009,9 @@ void smt2_convt::convert_floatbv(const exprt &expr)
   INVARIANT(
     !expr.operands().empty(), "non-symbol expressions shall have operands");
 
-  out << "(|float_bv." << expr.id()
-      << floatbv_suffix(expr)
-      << '|';
+  out << '('
+      << convert_identifier(
+           "float_bv." + expr.id_string() + floatbv_suffix(expr));
 
   forall_operands(it, expr)
   {
@@ -1023,13 +1029,13 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     const irep_idt &id = to_symbol_expr(expr).get_identifier();
     DATA_INVARIANT(!id.empty(), "symbol must have identifier");
-    out << '|' << convert_identifier(id) << '|';
+    out << convert_identifier(id);
   }
   else if(expr.id()==ID_nondet_symbol)
   {
     const irep_idt &id = to_nondet_symbol_expr(expr).get_identifier();
     DATA_INVARIANT(!id.empty(), "nondet symbol must have identifier");
-    out << '|' << convert_identifier("nondet_"+id2string(id)) << '|';
+    out << convert_identifier("nondet_" + id2string(id));
   }
   else if(expr.id()==ID_smt2_symbol)
   {
@@ -2149,7 +2155,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(
     const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
-    out << "|" << object_sizes[*object_size] << "|";
+    out << object_sizes[*object_size];
   }
   else if(expr.id()==ID_let)
   {
@@ -4619,7 +4625,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         smt2_identifiers.insert(smt2_identifier);
 
         out << "; set_to true (equal)\n";
-        out << "(define-fun |" << smt2_identifier << '|';
+        out << "(define-fun " << smt2_identifier;
 
         if(equal_expr.lhs().type().id() == ID_mathematical_function)
         {
@@ -4803,7 +4809,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       smt2_identifiers.insert(smt2_identifier);
 
       out << "; find_symbols\n";
-      out << "(declare-fun |" << smt2_identifier << '|';
+      out << "(declare-fun " << smt2_identifier;
 
       if(expr.type().id() == ID_mathematical_function)
       {
@@ -4982,8 +4988,9 @@ void smt2_convt::find_symbols(const exprt &expr)
   {
     if(object_sizes.find(*object_size) == object_sizes.end())
     {
-      const irep_idt id = "object_size." + std::to_string(object_sizes.size());
-      out << "(declare-fun |" << id << "| () ";
+      const irep_idt id = convert_identifier(
+        "object_size." + std::to_string(object_sizes.size()));
+      out << "(declare-fun " << id << " () ";
       convert_type(object_size->type());
       out << ")"
           << "\n";
@@ -5016,8 +5023,8 @@ void smt2_convt::find_symbols(const exprt &expr)
              to_multi_ary_expr(expr).op0().type().id() == ID_floatbv)))
   // clang-format on
   {
-    irep_idt function=
-      "|float_bv."+expr.id_string()+floatbv_suffix(expr)+"|";
+    irep_idt function =
+      convert_identifier("float_bv." + expr.id_string() + floatbv_suffix(expr));
 
     if(bvfp_set.insert(function).second)
     {
