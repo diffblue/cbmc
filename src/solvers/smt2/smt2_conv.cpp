@@ -789,6 +789,16 @@ void smt2_convt::convert_address_of_rec(
         expr.id_string());
 }
 
+static bool has_quantifier(const exprt &expr)
+{
+  bool result = false;
+  expr.visit_post([&result](const exprt &node) {
+    if(node.id() == ID_exists || node.id() == ID_forall)
+      result = true;
+  });
+  return result;
+}
+
 literalt smt2_convt::convert(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);
@@ -818,13 +828,28 @@ literalt smt2_convt::convert(const exprt &expr)
   // store and in future we use the literal instead of the whole expression
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
-  defined_expressions[expr] =
-    std::string{"|B"} + std::to_string(l.var_no()) + "|";
-  out << "(define-fun ";
-  convert_literal(l);
-  out << " () Bool ";
-  convert_expr(prepared_expr);
-  out << ")" << "\n";
+
+  // Z3 refuses get-value when a defined symbol contains a quantifier.
+  if(has_quantifier(prepared_expr))
+  {
+    out << "(declare-fun ";
+    convert_literal(l);
+    out << " () Bool)\n";
+    out << "(assert (= ";
+    convert_literal(l);
+    convert_expr(prepared_expr);
+    out << "))\n";
+  }
+  else
+  {
+    defined_expressions[expr] =
+      std::string{"|B"} + std::to_string(l.var_no()) + "|";
+    out << "(define-fun ";
+    convert_literal(l);
+    out << " () Bool ";
+    convert_expr(prepared_expr);
+    out << ")\n";
+  }
 
   return l;
 }

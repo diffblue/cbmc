@@ -184,24 +184,10 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       if(res != resultt::D_UNSATISFIABLE)
       {
         const auto &message = id2string(parsed.get_sub()[1].id());
-        // Special case error handling
-        if(
-          solver == solvert::Z3 &&
-          message.find("must not contain quantifiers") != std::string::npos)
-        {
-          // We tried to "(get-value |XXXX|)" where |XXXX| is determined to
-          // include a quantified expression
-          // Nothing to do, this should be caught and value assigned by the
-          // set_to defaults later.
-        }
-        // Unhandled error, log the error and report it back up to caller
-        else
-        {
-          messaget log{message_handler};
-          log.error() << "SMT2 solver returned error message:\n"
-                      << "\t\"" << message << "\"" << messaget::eom;
-          return decision_proceduret::resultt::D_ERROR;
-        }
+        messaget log{message_handler};
+        log.error() << "SMT2 solver returned error message:\n"
+                    << "\t\"" << message << "\"" << messaget::eom;
+        return decision_proceduret::resultt::D_ERROR;
       }
     }
   }
