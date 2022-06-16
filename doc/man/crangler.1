@@ -1,0 +1,72 @@
+.TH CRANGLER "1" "June 2022" "crangler-5.59.0" "User Commands"
+.SH NAME
+crangler \- C source transformation
+.SH SYNOPSIS
+.B crangler [\-?] [\-h] [\-\-help]
+
+.BI crangler \ file.json
+
+.SH DESCRIPTION
+.B crangler
+is a command-line utility that makes changes to a preprocessed C file
+that are prescribed in a JSON configuration file.
+
+The supported transformations are:
+.IP
+Add a contract (pre/post/assigns) to a named C function.
+.IP
+Add a loop invariant to a loop identified by the name of the function its in and
+a loop number.
+.IP
+Remove the
+.B static
+storage classifier from a function or a variable.
+.IP
+Replace a function call by a call to a stub.
+.PP
+The resulting source file is written to standard output or to a file specified
+in the JSON configuration.
+.SH EXAMPLE
+The following JSON configuration file makes
+.B crangler
+preprocess
+.IR remove_static1.c .
+While processing this file to produce a preprocessed result, no non-standard
+include paths or defines reqired.
+Transformations configured here are
+removing the
+.B static
+storage classifier from all functions matching the regular expression
+.BR foobar[12] ,
+and replacing calls to \fIbar\fR by calls to a function called \fIbar_stub\fR.
+No objects are listed that require transformation.
+The result is written to standard output.
+.EX
+{
+  "sources": [
+    "remove_static1.c"
+  ],
+  "includes": [],
+  "defines": [],
+  "functions": [
+    {
+      "foobar[12]": [
+        "remove static"
+      ],
+      "bar": [
+        "stub bar_stub"
+      ]
+    }
+  ],
+  "objects": [],
+  "output": "stdout"
+}
+.EE
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH COPYRIGHT
+2021, Daniel Kroening
