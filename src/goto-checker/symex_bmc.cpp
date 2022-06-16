@@ -33,7 +33,7 @@ symex_bmct::symex_bmct(
       options,
       path_storage,
       guard_manager),
-    record_coverage(!options.get_option("symex-coverage-report").empty()),
+    record_coverage(options.get_bool_option("symex-record-coverage")),
     havoc_bodyless_functions(
       options.get_bool_option("havoc-undefined-functions")),
     unwindset(unwindset),
