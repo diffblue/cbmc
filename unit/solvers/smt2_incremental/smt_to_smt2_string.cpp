@@ -13,7 +13,7 @@
 
 TEST_CASE("Test smt_indext to string conversion", "[core][smt2_incremental]")
 {
-  CHECK(smt_to_smt2_string(smt_symbol_indext{"green"}) == "|green|");
+  CHECK(smt_to_smt2_string(smt_symbol_indext{"green"}) == "green");
   CHECK(smt_to_smt2_string(smt_numeral_indext{42}) == "42");
 }
 
@@ -36,7 +36,7 @@ TEST_CASE(
 {
   CHECK(
     smt_to_smt2_string(smt_bit_vector_theoryt::extract(7, 3)(
-      smt_bit_vector_constant_termt{0, 8})) == "((_ |extract| 7 3) (_ bv0 8))");
+      smt_bit_vector_constant_termt{0, 8})) == "((_ extract 7 3) (_ bv0 8))");
 }
 
 TEST_CASE(
@@ -55,7 +55,7 @@ TEST_CASE(
   {
     CHECK(
       smt_to_smt2_string(smt_identifier_termt{"abc", smt_bool_sortt{}}) ==
-      "|abc|");
+      "abc");
     CHECK(
       smt_to_smt2_string(smt_identifier_termt{"\\", smt_bool_sortt{}}) ==
       "|&92;|");
@@ -67,7 +67,7 @@ TEST_CASE(
         "foo",
         smt_bool_sortt{},
         {smt_symbol_indext{"bar"}, smt_numeral_indext{42}}}) ==
-      "(_ |foo| |bar| 42)");
+      "(_ foo bar 42)");
   }
 }
 
@@ -78,8 +78,7 @@ TEST_CASE(
   CHECK(
     smt_to_smt2_string(smt_core_theoryt::equal(
       smt_identifier_termt{"foo", smt_bit_vector_sortt{32}},
-      smt_identifier_termt{"bar", smt_bit_vector_sortt{32}})) ==
-    "(|=| |foo| |bar|)");
+      smt_identifier_termt{"bar", smt_bit_vector_sortt{32}})) == "(= foo bar)");
 }
 
 TEST_CASE(
@@ -102,7 +101,7 @@ TEST_CASE(
 {
   CHECK(
     smt_to_smt2_string(smt_get_value_commandt{
-      smt_identifier_termt{"foo", smt_bool_sortt{}}}) == "(get-value (|foo|))");
+      smt_identifier_termt{"foo", smt_bool_sortt{}}}) == "(get-value (foo))");
 }
 
 TEST_CASE(
@@ -138,7 +137,7 @@ TEST_CASE(
     smt_to_smt2_string(smt_declare_function_commandt{
       smt_identifier_termt{"f", smt_bit_vector_sortt{31}},
       {smt_bit_vector_sortt{32}, smt_bit_vector_sortt{33}}}) ==
-    "(declare-fun |f| ((_ BitVec 32) (_ BitVec 33)) (_ BitVec 31))");
+    "(declare-fun f ((_ BitVec 32) (_ BitVec 33)) (_ BitVec 31))");
 }
 
 TEST_CASE(
@@ -151,8 +150,8 @@ TEST_CASE(
   CHECK(
     smt_to_smt2_string(smt_define_function_commandt{
       "f", {g, h}, smt_core_theoryt::equal(g, h)}) ==
-    "(define-fun |f| ((|g| (_ BitVec 32)) (|h| (_ BitVec 32))) Bool (|=| |g| "
-    "|h|))");
+    "(define-fun f ((g (_ BitVec 32)) (h (_ BitVec 32))) Bool (= g "
+    "h))");
 }
 
 TEST_CASE(

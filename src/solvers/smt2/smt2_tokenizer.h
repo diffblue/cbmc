@@ -120,7 +120,6 @@ private:
   tokent get_simple_symbol();
   tokent get_quoted_symbol();
   tokent get_string_literal();
-  static bool is_simple_symbol_character(char);
 
   /// read a token from the input stream and store it in 'token'
   void get_token_from_stream();
@@ -134,5 +133,7 @@ operator<<(smt2_tokenizert::smt2_errort &&e, const T &message)
   e.message_ostream() << message;
   return std::move(e);
 }
+
+bool is_smt2_simple_symbol_character(char);
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2_PARSER_H

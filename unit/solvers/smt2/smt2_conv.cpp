@@ -12,8 +12,8 @@ TEST_CASE(
     "abcdefghijklmnopqrstuvwxyz0123456789$";
   CHECK(
     smt2_convt::convert_identifier(no_escaping_characters) ==
-    "|" + no_escaping_characters + "|");
+    no_escaping_characters);
   CHECK(smt2_convt::convert_identifier("\\") == "|&92;|");
   CHECK(smt2_convt::convert_identifier("|") == "|&124;|");
-  CHECK(smt2_convt::convert_identifier("&") == "|&38;|");
+  CHECK(smt2_convt::convert_identifier("&") == "&");
 }

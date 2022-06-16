@@ -41,6 +41,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/lowering/expr_lowering.h>
 #include <solvers/prop/literal_expr.h>
 
+#include "smt2_tokenizer.h"
+
 // Mark different kinds of error conditions
 
 // Unexpected types and other combinations not implemented and not
@@ -904,18 +906,37 @@ void smt2_convt::pop()
   assumptions.clear();
 }
 
+static bool is_smt2_simple_identifier(const std::string &identifier)
+{
+  if(identifier.empty())
+    return false;
+
+  if(isdigit(identifier[0]))
+    return false;
+
+  for(auto ch : id2string(identifier))
+  {
+    if(!is_smt2_simple_symbol_character(ch))
+      return false;
+  }
+
+  return true;
+}
+
 std::string smt2_convt::convert_identifier(const irep_idt &identifier)
 {
+  // Is this a "simple identifier"?
+  if(is_smt2_simple_identifier(id2string(identifier)))
+    return id2string(identifier);
+
   // Backslashes are disallowed in quoted symbols just for simplicity.
   // Otherwise, for Common Lisp compatibility they would have to be treated
   // as escaping symbols.
 
   std::string result = "|";
 
-  for(std::size_t i=0; i<identifier.size(); i++)
+  for(auto ch : identifier)
   {
-    char ch=identifier[i];
-
     switch(ch)
     {
     case '|':

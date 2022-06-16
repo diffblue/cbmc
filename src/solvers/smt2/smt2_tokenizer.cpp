@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
-bool smt2_tokenizert::is_simple_symbol_character(char ch)
+bool is_smt2_simple_symbol_character(char ch)
 {
   // any non-empty sequence of letters, digits and the characters
   // ~ ! @ $ % ^ & * _ - + = < > . ? /
@@ -32,7 +32,7 @@ smt2_tokenizert::tokent smt2_tokenizert::get_simple_symbol()
   char ch;
   while(in->get(ch))
   {
-    if(is_simple_symbol_character(ch))
+    if(is_smt2_simple_symbol_character(ch))
     {
       buffer+=ch;
     }
@@ -294,7 +294,7 @@ void smt2_tokenizert::get_token_from_stream()
         token = get_decimal_numeral();
         return;
       }
-      else if(is_simple_symbol_character(ch))
+      else if(is_smt2_simple_symbol_character(ch))
       {
         in->unget();
         token = get_simple_symbol();
