@@ -62,9 +62,11 @@ void compute_metrics (const symbolt &symbol,
                       const goto_programt &goto_program, 
                       const namespacet &ns, 
                       const goto_functionst &goto_functions,
+                      const bool use_symex_info,
                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+                      const bool use_solver_info,
                       const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
-                      func_metrics &metrics) {
+                      func_metricst &metrics) {
   metrics.indegree = indegree (symbol, ns, goto_functions);
   metrics.outdegree = outdegree (goto_program);
   metrics.num_func_pointer_calls = 0;
@@ -72,19 +74,21 @@ void compute_metrics (const symbolt &symbol,
   metrics.num_complex_ops = num_complex_ops (goto_program);
   metrics.num_loops = num_loops (goto_program);
 
-  const auto symex_info = aggregate_symex_info (goto_program, instr_symex_info);
-  metrics.symex_steps = symex_info.steps;
-  metrics.symex_duration = symex_info.duration;
-
-  const auto solver_info = aggregate_solver_info (goto_program, instr_solver_info);
-  metrics.solver_clauses = solver_info.clauses;
-  metrics.solver_literals = solver_info.literals;
-  metrics.solver_variables = solver_info.variables;
+  if (use_symex_info) {
+    metrics.symex_info = aggregate_instr_info<symex_infot> (goto_program, instr_symex_info);
+  }
+  if (use_solver_info) {
+    metrics.solver_info = aggregate_instr_info<solver_infot> (goto_program, instr_solver_info);
+  }
+  metrics.use_symex_info = use_symex_info;
+  metrics.use_solver_info = use_solver_info;
 }
 
 void compute_metrics (const namespacet &ns, 
-                      std::map<irep_idt, func_metrics> &metrics,
+                      std::map<irep_idt, func_metricst> &metrics,
+                      const bool use_symex_info,
                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+                      const bool use_solver_info,
                       const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
                       const goto_functionst &goto_functions) {
   const auto funs = goto_functions.sorted();
@@ -96,25 +100,30 @@ void compute_metrics (const namespacet &ns,
     if (has_body) {
       const goto_programt &body = fun->second.body;
       
-      func_metrics &m = metrics.find(name)->second;
-      compute_metrics (symbol, body, ns, goto_functions, instr_symex_info, instr_solver_info, m);
+      func_metricst &m = metrics.find(name)->second;
+      compute_metrics (symbol, body, ns, goto_functions, 
+                       use_solver_info, instr_symex_info, 
+                       use_solver_info, instr_solver_info, 
+                       m);
     }
   }
 }
 
-void compute_scores (std::map<irep_idt, func_metrics> &metrics,
-                     std::map<irep_idt, int> &scores) {
+void compute_scores (std::map<irep_idt, func_metricst> &metrics,
+                     std::map<irep_idt, int> &scores,
+                     const bool use_symex_info,
+                     const bool use_solver_info) {
   int w_indegree = 0;
   int w_outdegree = 0;
   int w_num_func_pointer_calls = 0;
   int w_function_size = 0;
   int w_num_complex_ops = 1;
   int w_num_loops = 1;
-  int w_avg_time_per_symex_step = 1;
+  int w_avg_time_per_symex_step = 1 ? use_symex_info : 0;
 
   for (auto it = metrics.begin(); it != metrics.end(); it++) {
     const irep_idt &name = it->first;
-    const func_metrics &m = it->second;
+    const func_metricst &m = it->second;
     int score = w_indegree * m.indegree
               + w_outdegree * m.outdegree
               + w_num_func_pointer_calls * m.num_func_pointer_calls
@@ -203,6 +212,7 @@ void dump_function_calls (const irep_idt &f,
                           messaget &msg, 
                           const namespacet &ns,
                           std::map<irep_idt, bool> &use,
+                          const bool use_symex_info,
                           const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
 
   std::set<irep_idt> dont_use_calls;
@@ -214,12 +224,17 @@ void dump_function_calls (const irep_idt &f,
       if (func.id() != ID_dereference) {
         const irep_idt call = ns.lookup(to_symbol_expr(func)).name;
         if (is_used (use, call)) {
-          const auto &symex_info = instr_symex_info.find(target);
-          if (symex_info != instr_symex_info.end() && symex_info->second.steps != 0) {
-            calls.insert (call);
+          if (use_symex_info) {
+            const auto &symex_info = instr_symex_info.find(target);
+            if (symex_info != instr_symex_info.end() && symex_info->second.steps != 0) {
+              calls.insert (call);
+            } else {
+              dont_use_calls.insert (call);
+            }
           } else {
-            dont_use_calls.insert (call);
+            calls.insert (call);
           }
+          
         }
 
       } else {
@@ -269,27 +284,30 @@ void dump_function (const irep_idt &f,
                     messaget &msg, 
                     const namespacet &ns,
                     std::map<irep_idt, bool> &use,
-                    std::map<irep_idt, func_metrics> &metrics,
+                    std::map<irep_idt, func_metricst> &metrics,
                     std::map<irep_idt, int> &scores,
+                    const bool use_symex_info,
                     const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
   if(has_body) {
     std::string color = color_of_score (scores.find (f)->second);
 
     int node_size = (8 + sqrt(metrics.find(f)->second.function_size));
     std::string shape = is_private (f) ? "ellipse" : "rect";
-    func_metrics &m = metrics.find(f)->second;
+    func_metricst &m = metrics.find(f)->second;
 
     // dump the high-symex nodes
-    forall_goto_program_instructions(target, body) {
-      auto symex_info = instr_symex_info.find (target);
-      if (symex_info != instr_symex_info.end()) {
-        // milliseconds
-        double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
-        if (avg_time_per_step > 0.1) {
-          msg.status() << "// HIGH SYMEX: num symex steps: " << avg_time_per_step << "\n";
-          msg.status() << "/* "; 
-          body.output_instruction(ns, f, msg.status(), *target);
-          msg.status() << "*/\n";
+    if (use_symex_info) {
+      forall_goto_program_instructions(target, body) {
+        auto symex_info = instr_symex_info.find (target);
+        if (symex_info != instr_symex_info.end()) {
+          // milliseconds
+          double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
+          if (avg_time_per_step > 0.1) {
+            msg.status() << "// HIGH SYMEX: num symex steps: " << avg_time_per_step << "\n";
+            msg.status() << "/* "; 
+            body.output_instruction(ns, f, msg.status(), *target);
+            msg.status() << "*/\n";
+          }
         }
       }
     }
@@ -306,7 +324,7 @@ void dump_function (const irep_idt &f,
                  << "fontsize=" << node_size
                  << "];\n";
 
-    dump_function_calls (f, body, msg, ns, use, instr_symex_info);
+    dump_function_calls (f, body, msg, ns, use, use_symex_info, instr_symex_info);
 
     // fun->second.body.output(ns, f, msg.status());
     // msg.status() << messaget::eom;
@@ -325,7 +343,9 @@ void show_goto_proof_cfg(
   ui_message_handlert &ui_message_handler,
   const std::list<std::string> roots,
   const goto_functionst &goto_functions,
+  const bool use_symex_info,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+  const bool use_solver_info,
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
 
@@ -372,16 +392,19 @@ void show_goto_proof_cfg(
   msg.status() << "rankdir=\"LR\";\n";
 
   std::map<irep_idt, int> scores;
-  std::map<irep_idt, func_metrics> metrics;
+  std::map<irep_idt, func_metricst> metrics;
   for (const auto &fun : sorted) {
-    func_metrics m;
+    func_metricst m;
     const auto &name = ns.lookup(fun->first).name;
     metrics.insert({name, m});
     scores.insert({name, 0});
   }
   // initialize scores
-  compute_metrics (ns, metrics, instr_symex_info, instr_solver_info, goto_functions);
-  compute_scores(metrics, scores);
+  compute_metrics (ns, metrics, 
+                   use_symex_info, instr_symex_info, 
+                   use_solver_info, instr_solver_info, 
+                   goto_functions);
+  compute_scores(metrics, scores, use_symex_info, use_solver_info);
 
   // std::map<goto_programt::const_targett, int> test;
   // test.insert ({target, 0})
@@ -409,7 +432,7 @@ void show_goto_proof_cfg(
       msg.status() << "\n// ------------------------------------\n\n";
       msg.status() << "//" << messaget::bold << f_symbol.display_name() << messaget::reset 
                    << " ( " << f_symbol.name << " )\n";
-      dump_function (f_symbol.name, has_body, fun->second.body, msg, ns, use, metrics, scores, instr_symex_info);
+      dump_function (f_symbol.name, has_body, fun->second.body, msg, ns, use, metrics, scores, use_symex_info, instr_symex_info);
     }
   }
 
@@ -426,12 +449,40 @@ void show_goto_proof_cfg(
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
+  const bool use_symex_info = true;
+  const bool use_solver_info = true;
   const namespacet ns(goto_model.get_symbol_table());
   show_goto_proof_cfg(
     ns, ui_message_handler, 
     roots, 
     goto_model.get_goto_functions(), 
+    use_symex_info,
     instr_symex_info,
+    use_solver_info,
+    instr_solver_info);
+}
+  
+  
+
+
+void show_goto_proof_cfg(
+  const abstract_goto_modelt &goto_model,
+  const std::list<std::string> roots,
+  ui_message_handlert &ui_message_handler)
+{
+  const std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
+  const bool use_symex_info = false;
+  const std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
+  const bool use_solver_info = false;
+
+  const namespacet ns(goto_model.get_symbol_table());
+  show_goto_proof_cfg(
+    ns, ui_message_handler, 
+    roots, 
+    goto_model.get_goto_functions(), 
+    use_symex_info,
+    instr_symex_info,
+    use_solver_info,
     instr_solver_info);
 }
   

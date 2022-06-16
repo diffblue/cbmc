@@ -50,4 +50,9 @@ void show_goto_proof_cfg(
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info);
 
+void show_goto_proof_cfg(
+  const abstract_goto_modelt &, 
+  const std::list<std::string> roots,
+  ui_message_handlert &ui_message_handler);
+
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_GOTO_PROOF_CFG_H

@@ -645,8 +645,8 @@ int cbmc_parse_optionst::doit()
 
   // options.set_option ("goto-proof-cfg-roots", cmdline.get_values("show-goto-proof-cfg-roots").front());
   // FIXME
-  //options.set_option ("goto-proof-cfg-roots", "s2n_record_writev");
-  options.set_option ("goto-proof-cfg-roots", "s2n_stuffer_write");
+  options.set_option ("goto-proof-cfg-roots", "s2n_record_writev");
+  //options.set_option ("goto-proof-cfg-roots", "s2n_stuffer_write");
 
   const resultt result = (*verifier)();
   verifier->report();

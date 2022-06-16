@@ -184,6 +184,7 @@ void constant_propagator_domaint::transform(
     else
       g = not_exprt(from->condition());
     partial_evaluate(values, g, ns);
+    
     if(g.is_false())
      values.set_to_bottom();
     else
@@ -755,8 +756,15 @@ void constant_propagator_ait::replace(
         this->abstract_state_before(it));
     const constant_propagator_domaint &d = *current_domain_ptr;
 
+    /*
+    // This condition does not optimize away the second GOTO in the code
+    //         GOTO 32
+    //         IF 0 ≠ 0 THEN GOTO 6
+    // Perhaps instead of ignoring unreachable instructions, they can just be removed.
+
     if(d.is_bottom())
       continue;
+    */
 
     replace_types_rec(d.values.replace_const, it->code_nonconst());
 

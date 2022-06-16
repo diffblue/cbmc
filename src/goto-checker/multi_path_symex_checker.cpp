@@ -40,16 +40,20 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
                         const bool symex_done,
                         const goto_symex_property_decidert &property_decider) {
   const auto &goto_functions = goto_model.get_goto_functions();
-  const symex_coveraget &symex_coverage = symex.get_coverage();
-  std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
-  std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
 
   messaget msg(ui_message_handler);
   const namespacet ns(goto_model.get_symbol_table());
   const auto sorted = goto_functions.sorted();
 
-  // populate instr_num_symex_steps
+  std::list<std::string> roots;
+  roots.push_back (options.get_option("goto-proof-cfg-roots"));
+
   if (symex_done) {
+    const symex_coveraget &symex_coverage = symex.get_coverage();
+    std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
+    std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
+
+    // populate instr_symex_info
     for(const auto &fun : sorted) {
       const bool has_body = fun->second.body_available();
 
@@ -74,6 +78,7 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
       }
     }
 
+    // populate instr_solver_info
     with_solver_hardness(
       property_decider.get_decision_procedure(),
       [&instr_solver_info](solver_hardnesst &solver_hardness) {
@@ -105,30 +110,13 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
           }
         }
       });
+    show_goto_proof_cfg(
+      goto_model, roots, ui_message_handler, instr_symex_info, instr_solver_info);
+
   } else {
-    for(const auto &fun : sorted) {
-      const bool has_body = fun->second.body_available();
-
-      if (has_body) {
-        const goto_programt &body = fun->second.body;
-        forall_goto_program_instructions(from, body) {
-          symex_infot symex_info;
-          symex_info.steps = 1;
-          symex_info.duration = 0.0;
-          instr_symex_info.insert ({from, symex_info});
-          solver_infot solver_info;
-          instr_solver_info.insert ({from, solver_info});
-        }
-      }
-    }
+    show_goto_proof_cfg(
+      goto_model, roots, ui_message_handler);
   }
-
-  std::list<std::string> roots;
-  roots.push_back (options.get_option("goto-proof-cfg-roots"));
-  show_goto_proof_cfg(
-    goto_model, roots, ui_message_handler, instr_symex_info, instr_solver_info);
-
-  
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::

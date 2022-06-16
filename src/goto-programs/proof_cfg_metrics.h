@@ -16,64 +16,81 @@ Author: Benjamin Quiring
 #include <util/ui_message.h>
 #include <map>
 
+class namespacet;
+class goto_functionst;
+
+
+
 class solver_infot {
   public:
-  int clauses;
-  int literals;
-  int variables;
+  int clauses = 0;
+  int literals = 0;
+  int variables = 0;
+
+  solver_infot () = default;
+
+  solver_infot &operator+= (const solver_infot &other) {
+    clauses += other.clauses;
+    literals += other.literals;
+    variables += other.variables;
+    return *this;
+  }
+
+  solver_infot operator+(const solver_infot &other) {
+    solver_infot info (*this);
+    info += other;
+    return info;
+  }
 };
 
 class symex_infot {
   public:
-  int steps;
-  double duration;
+  // number of symex steps
+  int steps = 0;
+  // duration of symex steps (in nanoseconds) 
+  double duration = 0.0;
+
+  symex_infot () = default;
+
+  symex_infot &operator+= (const symex_infot &other) {
+    steps += other.steps;
+    duration += other.duration;
+    return *this;
+  }
+
+  symex_infot operator+(const symex_infot &other) {
+    symex_infot info(*this);
+    info += other;
+    return info;
+  }
+
 };
 
 
-class namespacet;
-class goto_functionst;
-
-class func_metrics {
+class func_metricst {
   
  public:
   // how many times is the function called
-  int indegree;
+  int indegree = 0;
   // how many function calls are in the function's body
-  int outdegree;
+  int outdegree = 0;
   // how many calls to function pointers are in the function's body
-  int num_func_pointer_calls;
+  int num_func_pointer_calls = 0;
   // sum of the sides of all right-hand sides in the function body
-  int function_size;
+  int function_size = 0;
   // number of high-complexity primitives in the function's body
   // e.g. TODO: memcpy, memmove, memcmp
   //      writes to pointers, arrays
-  int num_complex_ops;
+  int num_complex_ops = 0;
   // number of loops (backwards jumps) in the function's body
-  int num_loops;
-  // number of steps inside this function in symex
-  int symex_steps;
-  // duration of symex steps (in nanoseconds) for this function
-  double symex_duration;
+  int num_loops = 0;
 
-  int solver_clauses;
-  int solver_literals;
-  int solver_variables;
+  bool use_symex_info = false;
+  symex_infot symex_info;
+  bool use_solver_info = false;
+  solver_infot solver_info;
 
-  func_metrics () {
-    indegree = 0;
-    outdegree = 0;
-    num_func_pointer_calls = 0;
-    function_size = 0;
-    num_complex_ops = 0;
-    num_loops = 0;
-
-    symex_steps = 0;
-    symex_duration = 0.0;
-
-    solver_clauses=0;
-    solver_literals=0;
-    solver_variables=0;
-  }
+  func_metricst () = default;
 
   const void dump_html (messaget &msg) const;
 
@@ -99,5 +116,19 @@ symex_infot aggregate_symex_info (const goto_programt &goto_program,
 
 solver_infot aggregate_solver_info (const goto_programt &goto_program,
                                     const std::map<goto_programt::const_targett, solver_infot> &instr_symex_info);
+
+template<class T> T aggregate_instr_info
+  (const goto_programt &goto_program,
+   const std::map<goto_programt::const_targett, T> &instr_info) {
+  T total;
+  forall_goto_program_instructions(target, goto_program) {
+    auto info = instr_info.find (target);
+    if (info != instr_info.end()) {
+      const T &other = info->second;
+      total += other;
+    }
+  }
+  return total;
+}
 
 #endif // CPROVER_GOTO_PROGRAMS_PROOF_CFG_METRICS_H
