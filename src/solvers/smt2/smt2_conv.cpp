@@ -993,6 +993,14 @@ void smt2_convt::convert_floatbv(const exprt &expr)
 
 void smt2_convt::convert_expr(const exprt &expr)
 {
+  // try hash table first
+  auto converter_result = converters.find(expr.id());
+  if(converter_result != converters.end())
+  {
+    converter_result->second(expr);
+    return; // done
+  }
+
   // huge monster case split over expression id
   if(expr.id()==ID_symbol)
   {

@@ -85,11 +85,19 @@ public:
 
   static std::string convert_identifier(const irep_idt &identifier);
 
+  void set_converter(irep_idt id, std::function<void(const exprt &)> converter)
+  {
+    converters[id] = std::move(converter);
+  }
+
 protected:
   const namespacet &ns;
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
+  using converterst = std::
+    unordered_map<irep_idt, std::function<void(const exprt &)>, irep_id_hash>;
+  converterst converters;
 
   std::vector<exprt> assumptions;
   boolbv_widtht boolbv_width;
