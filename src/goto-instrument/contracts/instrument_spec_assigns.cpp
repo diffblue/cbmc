@@ -23,6 +23,7 @@ Date: January 2022
 
 #include <langapi/language_util.h>
 
+#include "cfg_info.h"
 #include "utils.h"
 
 /// header for log messages
@@ -143,13 +144,12 @@ void instrument_spec_assignst::track_heap_allocated(
 
 void instrument_spec_assignst::check_inclusion_assignment(
   const exprt &lhs,
-  optionalt<cfg_infot> &cfg_info_opt,
   goto_programt &dest) const
 {
   // create temporary car but do not track
   const auto car = create_car_expr(true_exprt{}, lhs);
   create_snapshot(car, dest);
-  inclusion_check_assertion(car, false, true, cfg_info_opt, dest);
+  inclusion_check_assertion(car, false, true, dest);
 }
 
 void instrument_spec_assignst::track_static_locals(goto_programt &dest)
@@ -303,7 +303,7 @@ void instrument_spec_assignst::collect_static_symbols(
 void instrument_spec_assignst::
   check_inclusion_heap_allocated_and_invalidate_aliases(
     const exprt &expr,
-    optionalt<cfg_infot> &cfg_info_opt,
+
     goto_programt &dest)
 {
   // create temporary car but do not track
@@ -313,7 +313,7 @@ void instrument_spec_assignst::
   create_snapshot(car, dest);
 
   // check inclusion, allowing null and not allowing stack allocated locals
-  inclusion_check_assertion(car, true, false, cfg_info_opt, dest);
+  inclusion_check_assertion(car, true, false, dest);
 
   // invalidate aliases of the freed object
   invalidate_heap_and_spec_aliases(car, dest);
@@ -323,8 +323,6 @@ void instrument_spec_assignst::instrument_instructions(
   goto_programt &body,
   goto_programt::targett instruction_it,
   const goto_programt::targett &instruction_end,
-  skip_function_paramst skip_function_params,
-  optionalt<cfg_infot> &cfg_info_opt,
   const std::function<bool(const goto_programt::targett &)> &pred)
 {
   while(instruction_it != instruction_end)
@@ -335,8 +333,6 @@ void instrument_spec_assignst::instrument_instructions(
       (pred && !pred(instruction_it)))
     {
       instruction_it++;
-      if(cfg_info_opt.has_value())
-        cfg_info_opt.value().step();
       continue;
     }
 
@@ -344,9 +340,7 @@ void instrument_spec_assignst::instrument_instructions(
     // since we are going to instrument it now below.
     add_pragma_disable_assigns_check(*instruction_it);
 
-    if(
-      instruction_it->is_decl() &&
-      must_track_decl(instruction_it, cfg_info_opt))
+    if(instruction_it->is_decl() && must_track_decl(instruction_it))
     {
       // grab the declared symbol
       const auto &decl_symbol = instruction_it->decl_symbol();
@@ -361,19 +355,15 @@ void instrument_spec_assignst::instrument_instructions(
       // care of the increment
       instruction_it--;
     }
-    else if(
-      instruction_it->is_assign() &&
-      must_check_assign(instruction_it, skip_function_params, cfg_info_opt))
+    else if(instruction_it->is_assign() && must_check_assign(instruction_it))
     {
-      instrument_assign_statement(instruction_it, body, cfg_info_opt);
+      instrument_assign_statement(instruction_it, body);
     }
     else if(instruction_it->is_function_call())
     {
-      instrument_call_statement(instruction_it, body, cfg_info_opt);
+      instrument_call_statement(instruction_it, body);
     }
-    else if(
-      instruction_it->is_dead() &&
-      must_track_dead(instruction_it, cfg_info_opt))
+    else if(instruction_it->is_dead() && must_track_dead(instruction_it))
     {
       const auto &symbol = instruction_it->dead_symbol();
       if(stack_allocated_is_tracked(symbol))
@@ -404,14 +394,12 @@ void instrument_spec_assignst::instrument_instructions(
       auto havoc_object = pointer_object(havoc_argument);
       havoc_object.add_source_location() = instruction_it->source_location();
       goto_programt payload;
-      check_inclusion_assignment(havoc_object, cfg_info_opt, payload);
+      check_inclusion_assignment(havoc_object, payload);
       insert_before_swap_and_advance(body, instruction_it, payload);
     }
 
     // Move to the next instruction
     instruction_it++;
-    if(cfg_info_opt.has_value())
-      cfg_info_opt.value().step();
   }
 }
 
@@ -642,7 +630,6 @@ void instrument_spec_assignst::inclusion_check_assertion(
   const car_exprt &car,
   bool allow_null_lhs,
   bool include_stack_allocated,
-  optionalt<cfg_infot> &cfg_info_opt,
   goto_programt &dest) const
 {
   source_locationt source_location(car.source_location());
@@ -672,8 +659,7 @@ void instrument_spec_assignst::inclusion_check_assertion(
   source_location.set_comment(comment);
 
   dest.add(goto_programt::make_assertion(
-    inclusion_check_full(
-      car, allow_null_lhs, include_stack_allocated, cfg_info_opt),
+    inclusion_check_full(car, allow_null_lhs, include_stack_allocated),
     source_location));
 }
 
@@ -699,8 +685,7 @@ exprt instrument_spec_assignst::inclusion_check_single(
 exprt instrument_spec_assignst::inclusion_check_full(
   const car_exprt &car,
   bool allow_null_lhs,
-  bool include_stack_allocated,
-  optionalt<cfg_infot> &cfg_info_opt) const
+  bool include_stack_allocated) const
 {
   bool no_targets = from_spec_assigns.empty() && from_heap_alloc.empty() &&
                     (!include_stack_allocated ||
@@ -744,12 +729,6 @@ exprt instrument_spec_assignst::inclusion_check_full(
   {
     for(const auto &pair : from_stack_alloc)
     {
-      // skip dead targets
-      if(
-        cfg_info_opt.has_value() &&
-        !cfg_info_opt.value().is_maybe_alive(pair.first))
-        continue;
-
       disjuncts.push_back(inclusion_check_single(car, pair.second));
       log.debug() << "\t(stack) "
                   << from_expr_using_mode(ns, mode, pair.second.target())
@@ -877,40 +856,28 @@ void instrument_spec_assignst::invalidate_heap_and_spec_aliases(
 
 /// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.
 bool instrument_spec_assignst::must_check_assign(
-  const goto_programt::const_targett &target,
-  skip_function_paramst skip_function_params,
-  const optionalt<cfg_infot> cfg_info_opt)
+  const goto_programt::const_targett &target)
 {
   log.debug().source_location = target->source_location();
 
   if(can_cast_expr<symbol_exprt>(target->assign_lhs()))
   {
     const auto &symbol_expr = to_symbol_expr(target->assign_lhs());
-    if(
-      skip_function_params == skip_function_paramst::NO &&
-      ns.lookup(symbol_expr.get_identifier()).is_parameter)
+
+    if(cfg_info.is_local(symbol_expr.get_identifier()))
     {
-      log.debug() << LOG_HEADER << "checking assignment to function parameter "
+      log.debug() << LOG_HEADER
+                  << "skipping checking on assignment to local symbol "
+                  << format(symbol_expr) << messaget::eom;
+      return false;
+    }
+    else
+    {
+      log.debug() << LOG_HEADER << "checking assignment to non-local symbol "
                   << format(symbol_expr) << messaget::eom;
       return true;
     }
 
-    if(cfg_info_opt.has_value())
-    {
-      if(cfg_info_opt.value().is_local(symbol_expr.get_identifier()))
-      {
-        log.debug() << LOG_HEADER
-                    << "skipping checking on assignment to local symbol "
-                    << format(symbol_expr) << messaget::eom;
-        return false;
-      }
-      else
-      {
-        log.debug() << LOG_HEADER << "checking assignment to non-local symbol "
-                    << format(symbol_expr) << messaget::eom;
-        return true;
-      }
-    }
     log.debug() << LOG_HEADER << "checking assignment to symbol "
                 << format(symbol_expr) << messaget::eom;
     return true;
@@ -934,9 +901,7 @@ bool instrument_spec_assignst::must_check_assign(
     // In all other cases (address of a non-local object, or dereference of
     // a non-locally computed address) the location must be given explicitly
     // in the assigns clause to be tracked and we must check the assignment.
-    if(
-      cfg_info_opt.has_value() &&
-      cfg_info_opt.value().is_local_composite_access(target->assign_lhs()))
+    if(cfg_info.is_local_composite_access(target->assign_lhs()))
     {
       log.debug()
         << LOG_HEADER
@@ -950,25 +915,19 @@ bool instrument_spec_assignst::must_check_assign(
   }
 }
 
-/// Track the symbol iff we have no cfg_infot, or we have a cfg_infot and the
-/// symbol is not a local or is a dirty local.
+/// Track the symbol is not a local or is a dirty local.
 bool instrument_spec_assignst::must_track_decl_or_dead(
-  const irep_idt &ident,
-  const optionalt<cfg_infot> &cfg_info_opt) const
+  const irep_idt &ident) const
 {
-  return !cfg_info_opt.has_value() ||
-         (cfg_info_opt.has_value() &&
-          cfg_info_opt.value().is_not_local_or_dirty_local(ident));
+  return cfg_info.is_not_local_or_dirty_local(ident);
 }
 
 /// Returns true iff a `DECL x` must be explicitly tracked in the write set.
 bool instrument_spec_assignst::must_track_decl(
-  const goto_programt::const_targett &target,
-  const optionalt<cfg_infot> &cfg_info_opt) const
+  const goto_programt::const_targett &target) const
 {
   log.debug().source_location = target->source_location();
-  if(must_track_decl_or_dead(
-       target->decl_symbol().get_identifier(), cfg_info_opt))
+  if(must_track_decl_or_dead(target->decl_symbol().get_identifier()))
   {
     log.debug() << LOG_HEADER << "explicitly tracking "
                 << format(target->decl_symbol()) << " as assignable"
@@ -987,29 +946,25 @@ bool instrument_spec_assignst::must_track_decl(
 /// Returns true iff a `DEAD x` must be processed to upate the local write set.
 /// The conditions are the same than for tracking a `DECL x` instruction.
 bool instrument_spec_assignst::must_track_dead(
-  const goto_programt::const_targett &target,
-  const optionalt<cfg_infot> &cfg_info_opt) const
+  const goto_programt::const_targett &target) const
 {
-  return must_track_decl_or_dead(
-    target->dead_symbol().get_identifier(), cfg_info_opt);
+  return must_track_decl_or_dead(target->dead_symbol().get_identifier());
 }
 
 void instrument_spec_assignst::instrument_assign_statement(
   goto_programt::targett &instruction_it,
-  goto_programt &program,
-  optionalt<cfg_infot> &cfg_info_opt) const
+  goto_programt &program) const
 {
   auto lhs = instruction_it->assign_lhs();
   lhs.add_source_location() = instruction_it->source_location();
   goto_programt payload;
-  check_inclusion_assignment(lhs, cfg_info_opt, payload);
+  check_inclusion_assignment(lhs, payload);
   insert_before_swap_and_advance(program, instruction_it, payload);
 }
 
 void instrument_spec_assignst::instrument_call_statement(
   goto_programt::targett &instruction_it,
-  goto_programt &body,
-  optionalt<cfg_infot> &cfg_info_opt)
+  goto_programt &body)
 {
   PRECONDITION_WITH_DIAGNOSTICS(
     instruction_it->is_function_call(),
@@ -1044,8 +999,7 @@ void instrument_spec_assignst::instrument_call_statement(
     auto object = pointer_object(ptr);
     object.add_source_location() = instruction_it->source_location();
     goto_programt payload;
-    check_inclusion_heap_allocated_and_invalidate_aliases(
-      object, cfg_info_opt, payload);
+    check_inclusion_heap_allocated_and_invalidate_aliases(object, payload);
     insert_before_swap_and_advance(body, instruction_it, payload);
   }
 }
