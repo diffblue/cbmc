@@ -1,0 +1,29 @@
+.TH SYMTAB2GB "1" "June 2022" "symtab2gb-5.59.0" "User Commands"
+.SH NAME
+symtab2gb \- Compile JSON symbol tables to a goto binary
+.SH SYNOPSIS
+.TP
+.B symtab2gb [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B symtab2gb \fIjson\-symtab\-file\fR+ [\fB\-\-out \fIoutfile\fR]
+compile symbol tables in JSON format
+to a single goto binary
+.SH DESCRIPTION
+This utility is to compile a \fBcbmc\fR(1) symbols table (in JSON format) into a goto binary.
+This is to support integration of external language frontends, such as Ada
+(using GNAT2GOTO: https://github.com/diffblue/gnat2goto) or Rust (using Kani:
+https://github.com/model-checking/kani).
+.SH OPTIONS
+\fB\-\-out\fR \fIoutfile\fR
+Specify the filename of the resulting binary (default: a.out)
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1)
+.SH COPYRIGHT
+2019, Diffblue
