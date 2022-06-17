@@ -644,6 +644,7 @@ int cbmc_parse_optionst::doit()
     UNREACHABLE;
   }
 
+  options.set_option("symex-record-coverage", cmdline.get_values ("symex-record-coverage"));
   options.set_option ("show-complexity-graph", cmdline.get_values ("show-complexity-graph"));
   options.set_option ("show-complexity-graph-with-symex", cmdline.get_values ("show-complexity-graph-with-symex"));
   options.set_option ("show-complexity-graph-with-solver", cmdline.get_values ("show-complexity-graph-with-solver"));

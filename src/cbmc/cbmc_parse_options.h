@@ -51,11 +51,12 @@ class optionst;
   OPT_SOLVER \
   OPT_STRING_REFINEMENT_CBMC \
   OPT_SHOW_GOTO_FUNCTIONS \
-  "(show-complexity-graph)" \
-  "(complexity-graph-roots)" \
   "(disable-solver)" \
-  "(show-complexity-graph-with-symex)" \
-  "(show-complexity-graph-with-solver)" \
+  "(symex-record-coverage)" \
+  "(complexity-graph-roots):" \
+  "(show-complexity-graph):" \
+  "(show-complexity-graph-with-symex):" \
+  "(show-complexity-graph-with-solver):" \
   OPT_SHOW_PROPERTIES \
   "(show-symbol-table)(show-parse-tree)" \
   "(drop-unused-functions)" \

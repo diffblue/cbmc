@@ -21,7 +21,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "counterexample_beautification.h"
 #include "goto_symex_fault_localizer.h"
 
-#include <complexity-graph/show_complexity_graph.h>
+#include <goto-programs/show_complexity_graph.h>
 
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,

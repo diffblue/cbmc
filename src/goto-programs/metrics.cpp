@@ -14,8 +14,8 @@ Author: Benjamin Quiring
 #include <math.h>
 #include <iostream>
 
-#include "goto_model.h"
-#include "pointer_expr.h"
+#include <goto_model.h>
+#include <pointer_expr.h>
 
 int num_loops (const goto_programt &goto_program) {
   // number of loops = number of backward jumps
@@ -147,22 +147,22 @@ const double func_metricst::avg_time_per_symex_step () const {
   return (symex_info.duration / (double)symex_info.steps);
 }
 
-const void func_metricst::dump_html (messaget &msg) const {
+const void func_metricst::dump_html (std::ostream &out) const {
   std::string endline = " <br/> ";
   int avg_time_per_step = (int)avg_time_per_symex_step()/10000;
-  msg.status() << "complex ops: " << num_complex_ops << endline
-               << "loops: " << num_loops;
+  out << "complex ops: " << num_complex_ops << endline
+      << "loops: " << num_loops;
 
   if (use_symex_info) {
-    msg.status() << endline
-                 << "symex steps: " << symex_info.steps << endline
-                 << "symex duration (ms): " << (int)(symex_info.duration / 1000000.0) << endline
-                 << "symex avg time per step: " << avg_time_per_step;
+    out << endline
+        << "symex steps: " << symex_info.steps << endline
+        << "symex duration (ms): " << (int)(symex_info.duration / 1000000.0) << endline
+        << "symex avg time per step: " << avg_time_per_step;
   }
   if (use_solver_info) {
-    msg.status() << endline
-                 << "solver clauses: " << solver_info.clauses / 1000 << "k" << endline
-                 << "solver literals: " << solver_info.literals / 1000 << "k" << endline
-                 << "solver variables: " << solver_info.variables / 1000 << "k";
+    out << endline
+        << "solver clauses: " << solver_info.clauses / 1000 << "k" << endline
+        << "solver literals: " << solver_info.literals / 1000 << "k" << endline
+        << "solver variables: " << solver_info.variables / 1000 << "k";
   }
 }

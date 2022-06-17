@@ -9,25 +9,20 @@ Author: Benjamin Quiring
 /// \file
 /// Compute metrics used for the CFG rendering
 
-#ifndef CPROVER_GOTO_PROGRAMS_PROOF_CFG_METRICS_H
-#define CPROVER_GOTO_PROGRAMS_PROOF_CFG_METRICS_H
+#ifndef CPROVER_COMPLEXITY_GRAPH_METRICS_H
+#define CPROVER_COMPLEXITY_GRAPH_METRICS_H
 
 #include <goto-programs/goto_program.h>
-#include <util/ui_message.h>
 #include <map>
 
 class namespacet;
 class goto_functionst;
-
-
 
 class solver_infot {
   public:
   int clauses = 0;
   int literals = 0;
   int variables = 0;
-
-  solver_infot () = default;
 
   solver_infot &operator+= (const solver_infot &other) {
     clauses += other.clauses;
@@ -49,8 +44,6 @@ class symex_infot {
   int steps = 0;
   // duration of symex steps (in nanoseconds) 
   double duration = 0.0;
-
-  symex_infot () = default;
 
   symex_infot &operator+= (const symex_infot &other) {
     steps += other.steps;
@@ -90,9 +83,7 @@ class func_metricst {
   bool use_solver_info = false;
   solver_infot solver_info;
 
-  func_metricst () = default;
-
-  const void dump_html (messaget &msg) const;
+  const void dump_html (std::ostream &out) const;
 
   // avg time in nanoseconds
   const double avg_time_per_symex_step () const;
@@ -122,7 +113,7 @@ template<class T> T aggregate_instr_info
    const std::map<goto_programt::const_targett, T> &instr_info) {
   T total;
   forall_goto_program_instructions(target, goto_program) {
-    auto info = instr_info.find (target);
+    const auto &info = instr_info.find (target);
     if (info != instr_info.end()) {
       const T &other = info->second;
       total += other;

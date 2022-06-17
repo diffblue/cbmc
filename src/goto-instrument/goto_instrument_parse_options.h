@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_const_function_pointers.h>
 #include <goto-programs/restrict_function_pointers.h>
 #include <goto-programs/show_goto_functions.h>
-#include <complexity-graph/show_complexity_graph.h>
 #include <goto-programs/show_properties.h>
 
 #include <ansi-c/ansi_c_language.h>

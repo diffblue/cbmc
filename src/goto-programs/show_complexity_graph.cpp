@@ -11,8 +11,12 @@ Author: Benjamin Quiring
 
 #include "show_complexity_graph.h"
 
+#include <iomanip>
+#include <fstream>
+
 #include <util/ui_message.h>
 #include <util/format_expr.h>
+#include <util/format_type.h>
 #include <math.h>
 
 #include "goto_model.h"
@@ -155,7 +159,7 @@ bool is_used (const std::map<irep_idt, bool> &use, const irep_idt &name) {
 
 // simple depth first search
 void find_used_rec (irep_idt root,
-                    ostream &out,
+                    std::ostream &out,
                 const namespacet &ns,
                 const goto_functionst &goto_functions,
                 std::map<irep_idt, bool> &use) {
@@ -177,7 +181,7 @@ void find_used_rec (irep_idt root,
 }
 
 void find_used (irep_idt root,
-                ostream &out,
+                std::ostream &out,
                 const namespacet &ns,
                 const goto_functionst &goto_functions,
                 std::map<irep_idt, bool> &use) {
@@ -208,7 +212,7 @@ void remove_functions_no_body (const namespacet &ns,
 void dump_function_call_edges 
   (const irep_idt &f,
    const goto_programt &body,
-   ostream &out, 
+   std::ostream &out, 
    const namespacet &ns,
    std::map<irep_idt, bool> &use,
    const bool use_symex_info,
@@ -297,14 +301,14 @@ void dump_instruction
       // milliseconds
       double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
 
-      int s = max(0, min (255, (int)(255 * avg_time_per_step)));
+      int s = std::max(0, std::min (255, (int)(255 * avg_time_per_step)));
       std::string color = color_of_score (s);
-      out << "fillcolor=" << "\"#" << color << "\","
+      out << "fillcolor=" << "\"#" << color << "\",";
     }
   }
 
-  out = "label=<";
-  const auto &instruction = *target;
+  out << "label=<";
+  const goto_programt::instructiont &instruction = *target;
   if(instruction.is_target())
     out << std::setw(6) << instruction.target_number << ": ";
   else
@@ -492,6 +496,7 @@ void dump_instruction
 
   case CATCH:
   {
+    /*
     if(instruction.code().get_statement() == ID_exception_landingpad)
     {
       const auto &landingpad = to_code_landingpad(instruction.code());
@@ -528,7 +533,8 @@ void dump_instruction
     {
       UNREACHABLE;
     }
-
+    */
+    out << "CATCH";
     out << '\n';
     break;
   }
@@ -551,254 +557,7 @@ void dump_instruction
     out << "END THREAD" << '\n';
     break;
   }
-}  if(instruction.is_target())
-    out << std::setw(6) << instruction.target_number << ": ";
-  else
-    out << "        ";
-
-  switch(instruction.type())
-  {
-  case NO_INSTRUCTION_TYPE:
-    out << "NO INSTRUCTION TYPE SET" << '\n';
-    break;
-
-  case GOTO:
-  case INCOMPLETE_GOTO:
-    if(!instruction.condition().is_true())
-    {
-      out << "IF " << format(instruction.condition()) << " THEN ";
-    }
-
-    out << "GOTO ";
-
-    if(instruction.is_incomplete_goto())
-    {
-      out << "(incomplete)";
-    }
-    else
-    {
-      for(auto gt_it = instruction.targets.begin();
-          gt_it != instruction.targets.end();
-          gt_it++)
-      {
-        if(gt_it != instruction.targets.begin())
-          out << ", ";
-        out << (*gt_it)->target_number;
-      }
-    }
-
-    out << '\n';
-    break;
-
-  case OTHER:
-    if(instruction.get_other().id() == ID_code)
-    {
-      const auto &code = instruction.get_other();
-      if(code.get_statement() == ID_array_copy)
-      {
-        out << "ARRAY_COPY " << format(code.op0()) << ' ' << format(code.op1())
-            << '\n';
-        break;
-      }
-      else if(code.get_statement() == ID_array_replace)
-      {
-        out << "ARRAY_REPLACE " << format(code.op0()) << ' '
-            << format(code.op1()) << '\n';
-        break;
-      }
-      else if(code.get_statement() == ID_array_set)
-      {
-        out << "ARRAY_SET " << format(code.op0()) << ' ' << format(code.op1())
-            << '\n';
-        break;
-      }
-      else if(code.get_statement() == ID_havoc_object)
-      {
-        out << "HAVOC_OBJECT " << format(code.op0()) << '\n';
-        break;
-      }
-      else if(code.get_statement() == ID_fence)
-      {
-        out << "FENCE";
-        if(code.get_bool(ID_WWfence))
-          out << " WW";
-        if(code.get_bool(ID_RRfence))
-          out << " RR";
-        if(code.get_bool(ID_RWfence))
-          out << " RW";
-        if(code.get_bool(ID_WRfence))
-          out << " WR";
-        out << '\n';
-        break;
-      }
-      else if(code.get_statement() == ID_input)
-      {
-        out << "INPUT";
-        for(const auto &op : code.operands())
-          out << ' ' << format(op);
-        out << '\n';
-        break;
-      }
-      else if(code.get_statement() == ID_output)
-      {
-        out << "OUTPUT " << format(code.op0()) << '\n';
-        break;
-      }
-      // fallthrough
-    }
-
-    out << "OTHER " << format(instruction.get_other()) << '\n';
-    break;
-
-  case SET_RETURN_VALUE:
-    out << "SET RETURN VALUE " << format(instruction.return_value()) << '\n';
-    break;
-
-  case DECL:
-    out << "DECL " << format(instruction.decl_symbol()) << " : "
-        << format(instruction.decl_symbol().type()) << '\n';
-    break;
-
-  case DEAD:
-    out << "DEAD " << format(instruction.dead_symbol()) << '\n';
-    break;
-
-  case FUNCTION_CALL:
-    out << "CALL ";
-    {
-      if(instruction.call_lhs().is_not_nil())
-        out << format(instruction.call_lhs()) << " := ";
-      out << format(instruction.call_function());
-      out << '(';
-      bool first = true;
-      for(const auto &argument : instruction.call_arguments())
-      {
-        if(first)
-          first = false;
-        else
-          out << ", ";
-        out << format(argument);
-      }
-      out << ')';
-      out << '\n';
-    }
-    break;
-
-  case ASSIGN:
-    out << "ASSIGN " << format(instruction.assign_lhs())
-        << " := " << format(instruction.assign_rhs()) << '\n';
-    break;
-
-  case ASSUME:
-  case ASSERT:
-    if(instruction.is_assume())
-      out << "ASSUME ";
-    else
-      out << "ASSERT ";
-
-    {
-      out << format(instruction.condition());
-
-      const irep_idt &comment = instruction.source_location().get_comment();
-      if(!comment.empty())
-        out << " // " << comment;
-    }
-
-    out << '\n';
-    break;
-
-  case SKIP:
-    out << "SKIP" << '\n';
-    break;
-
-  case END_FUNCTION:
-    out << "END_FUNCTION" << '\n';
-    break;
-
-  case LOCATION:
-    out << "LOCATION" << '\n';
-    break;
-
-  case THROW:
-    out << "THROW";
-
-    {
-      const irept::subt &exception_list =
-        instruction.code().find(ID_exception_list).get_sub();
-
-      for(const auto &ex : exception_list)
-        out << " " << ex.id();
-    }
-
-    if(instruction.code().operands().size() == 1)
-      out << ": " << format(instruction.code().op0());
-
-    out << '\n';
-    break;
-
-  case CATCH:
-  {
-    if(instruction.code().get_statement() == ID_exception_landingpad)
-    {
-      const auto &landingpad = to_code_landingpad(instruction.code());
-      out << "EXCEPTION LANDING PAD (" << format(landingpad.catch_expr().type())
-          << ' ' << format(landingpad.catch_expr()) << ")";
-    }
-    else if(instruction.code().get_statement() == ID_push_catch)
-    {
-      out << "CATCH-PUSH ";
-
-      unsigned i=0;
-      const irept::subt &exception_list =
-        instruction.code().find(ID_exception_list).get_sub();
-      DATA_INVARIANT(
-        instruction.targets.size() == exception_list.size(),
-        "unexpected discrepancy between sizes of instruction"
-        "targets and exception list");
-      for(instructiont::targetst::const_iterator
-            gt_it=instruction.targets.begin();
-          gt_it!=instruction.targets.end();
-          gt_it++, i++)
-      {
-        if(gt_it!=instruction.targets.begin())
-          out << ", ";
-        out << exception_list[i].id() << "->"
-            << (*gt_it)->target_number;
-      }
-    }
-    else if(instruction.code().get_statement() == ID_pop_catch)
-    {
-      out << "CATCH-POP";
-    }
-    else
-    {
-      UNREACHABLE;
-    }
-
-    out << '\n';
-    break;
-  }
-
-  case ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN" << '\n';
-    break;
-
-  case ATOMIC_END:
-    out << "ATOMIC_END" << '\n';
-    break;
-
-  case START_THREAD:
-    out << "START THREAD "
-        << instruction.get_target()->target_number
-        << '\n';
-    break;
-
-  case END_THREAD:
-    out << "END THREAD" << '\n';
-    break;
-  }
-
-out << ">]" << ";\n"
+  out << ">]" << ";\n";
 }
 
 void dump_instructions 
@@ -821,7 +580,7 @@ void dump_function
   (const irep_idt &f,
    const bool has_body,
    const goto_programt &body,
-   ostream &out, 
+   std::ostream &out, 
    const namespacet &ns,
    std::map<irep_idt, bool> &use,
    std::map<irep_idt, func_metricst> &metrics,
@@ -852,7 +611,7 @@ void dump_function
       }
     }
 
-    out << "{rank=same;\n"
+    out << "{rank=same;\n";
 
 
     out << normalize_name (f)
@@ -867,7 +626,7 @@ void dump_function
                  << "fontsize=" << node_size
                  << "];\n";
 
-    dump_instructions
+    dump_instructions(f, body, out, ns, use_symex_info, instr_symex_info);
     out << "}\n";
 
     dump_function_call_edges (f, body, out, ns, use, use_symex_info, instr_symex_info);
@@ -899,7 +658,8 @@ void dump_complexity_graph(
   //goto_functions.copy_from(goto_functions_);
 
   // ostream out(ui_message_handler);
-  std::ostream out (path.c_str()); 
+  std::ofstream outf (path.c_str()); 
+  std::ostream &out = outf;
 
   std::map<irep_idt, bool> use;
   if (roots.size() == 0) {
@@ -977,14 +737,13 @@ void dump_complexity_graph(
     const bool has_body = fun->second.body_available();
     if (is_used (use, f_symbol.name)) {
       out << "\n// ------------------------------------\n\n";
-      out << "//" << messaget::bold << f_symbol.display_name() << messaget::reset 
-                   << " ( " << f_symbol.name << " )\n";
+      out << "//" << f_symbol.display_name()
+          << " ( " << f_symbol.name << " )\n";
       dump_function (f_symbol.name, has_body, fun->second.body, out, ns, use, metrics, scores, use_symex_info, instr_symex_info);
     }
   }
 
-  out << "} // end digraph G";
-  out << messaget::eom;
+  out << "} // end digraph G\n";
 
 }
 
@@ -1001,7 +760,7 @@ void show_complexity_graph(
 
   const namespacet ns(goto_model.get_symbol_table());
   dump_complexity_graph(
-    ns, ui_message_handler, 
+    ns, path,
     roots, 
     goto_model.get_goto_functions(), 
     use_symex_info,
@@ -1021,7 +780,7 @@ void show_complexity_graph(
   const bool use_solver_info = false;
   const namespacet ns(goto_model.get_symbol_table());
   dump_complexity_graph(
-    ns, ui_message_handler, 
+    ns, path,
     roots, 
     goto_model.get_goto_functions(), 
     use_symex_info,
@@ -1041,7 +800,7 @@ void show_complexity_graph(
   const bool use_solver_info = true;
   const namespacet ns(goto_model.get_symbol_table());
   dump_complexity_graph(
-    ns, ui_message_handler, 
+    ns, path,
     roots, 
     goto_model.get_goto_functions(), 
     use_symex_info,
