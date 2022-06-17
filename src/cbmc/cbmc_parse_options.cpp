@@ -644,9 +644,13 @@ int cbmc_parse_optionst::doit()
     UNREACHABLE;
   }
 
-  // options.set_option ("goto-proof-cfg-roots", cmdline.get_values("show-goto-proof-cfg-roots").front());
+  options.set_option ("show-complexity-graph", cmdline.get_values ("show-complexity-graph"));
+  options.set_option ("show-complexity-graph-with-symex", cmdline.get_values ("show-complexity-graph-with-symex"));
+  options.set_option ("show-complexity-graph-with-solver", cmdline.get_values ("show-complexity-graph-with-solver"));
+  options.set_option ("disable-solver", true);
+  options.set_option ("complexity-graph-roots", cmdline.get_values("complexity-graph-roots").front());
   // FIXME
-  options.set_option ("goto-proof-cfg-roots", "s2n_record_writev");
+  // options.set_option ("complexity-graph-roots", "s2n_record_writev");
   //options.set_option ("goto-proof-cfg-roots", "s2n_stuffer_write");
 
   const resultt result = (*verifier)();

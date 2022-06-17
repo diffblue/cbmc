@@ -52,8 +52,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/write_goto_binary.h>
 
-#include <goto-programs/show_goto_proof_cfg.h>
-
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/custom_bitvector_analysis.h>
@@ -688,14 +686,6 @@ int goto_instrument_parse_optionst::doit()
     {
       show_goto_functions(
         goto_model, ui_message_handler, cmdline.isset("list-goto-functions"));
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    if(cmdline.isset("show-goto-proof-cfg") ||
-       cmdline.isset("show-goto-proof-cfg-roots"))
-    {
-      show_goto_proof_cfg(
-        goto_model, cmdline.get_values("show-goto-proof-cfg-roots"), ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -1781,7 +1771,6 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    HELP_SHOW_GOTO_PROOF_CFG
     HELP_GOTO_PROGRAM_STATS
     " --show-locations             show all source locations\n"
     " --dot                        generate CFG graph in DOT format\n"

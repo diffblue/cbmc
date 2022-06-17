@@ -9,13 +9,12 @@ Author: Benjamin Quiring
 /// \file
 /// Compute metrics for the CFG
 
-#include "proof_cfg_metrics.h"
+#include "metrics.h"
 
 #include <math.h>
 #include <iostream>
 
 #include "goto_model.h"
-#include "goto_program.h"
 #include "pointer_expr.h"
 
 int num_loops (const goto_programt &goto_program) {

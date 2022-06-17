@@ -12,7 +12,7 @@ Author: Benjamin Quiring
 #ifndef CPROVER_GOTO_PROGRAMS_PROOF_CFG_METRICS_H
 #define CPROVER_GOTO_PROGRAMS_PROOF_CFG_METRICS_H
 
-#include "goto_program.h"
+#include <goto-programs/goto_program.h>
 #include <util/ui_message.h>
 #include <map>
 

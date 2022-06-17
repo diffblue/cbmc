@@ -21,7 +21,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "counterexample_beautification.h"
 #include "goto_symex_fault_localizer.h"
 
-#include "show_goto_proof_cfg.h"
+#include <complexity-graph/show_complexity_graph.h>
 
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,
@@ -37,8 +37,8 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
                         const symex_bmct &symex,
                         const optionst &options,
                         ui_message_handlert &ui_message_handler,
-                        const bool symex_done,
-                        const goto_symex_property_decidert &property_decider) {
+                        const goto_symex_property_decidert &property_decider,
+                        const std::string path) {
   const auto &goto_functions = goto_model.get_goto_functions();
 
   messaget msg(ui_message_handler);
@@ -46,9 +46,8 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
   const auto sorted = goto_functions.sorted();
 
   std::list<std::string> roots;
-  roots.push_back (options.get_option("goto-proof-cfg-roots"));
+  roots.push_back (options.get_option("complexity-graph-roots"));
 
-  if (symex_done) {
     const symex_coveraget &symex_coverage = symex.get_coverage();
     std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
     std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
@@ -110,13 +109,17 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
           }
         }
       });
-    show_goto_proof_cfg(
-      goto_model, roots, ui_message_handler, instr_symex_info, instr_solver_info);
+    if (!options.get_option ("show-complexity-graph").empty()) {
+      show_complexity_graph(
+        goto_model, roots, path);
+    } else if (!options.get_option ("show-complexity-graph-with-symex").empty()) {
+      show_complexity_graph(
+        goto_model, roots, path, instr_symex_info);
+    } else if (!options.get_option ("show-complexity-graph-with-solver").empty()) {
+      show_complexity_graph(
+        goto_model, roots, path, instr_symex_info, instr_solver_info);
+    } 
 
-  } else {
-    show_goto_proof_cfg(
-      goto_model, roots, ui_message_handler);
-  }
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::
@@ -134,13 +137,18 @@ operator()(propertiest &properties)
   // we haven't got an equation yet
   if(!equation_generated)
   {
-    bool symex_done = false;
-    generate_goto_dot(goto_model, symex, options, ui_message_handler, symex_done, property_decider);
+
+    if (!options.get_option("show-complexity-graph").empty()) {
+      generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, options.get_option("show-complexity-graph"));
+    }
 
     generate_equation();
     
-    //symex_done = true;
-    //generate_goto_dot(goto_model, symex, options, ui_message_handler, symex_done, property_decider);
+    if (!options.get_option("show-complexity-graph-with-symex").empty()) {
+      generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, options.get_option("show-complexity-graph-with-symex"));
+
+    }
+
 
     output_coverage_report(
       options.get_option("symex-coverage-report"),
@@ -159,8 +167,12 @@ operator()(propertiest &properties)
     equation_generated = true;
   }
 
+    if (!options.get_option("show-complexity-graph-with-solver").empty()) {
+      generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, options.get_option("show-complexity-graph-with-solver"));
+
+    }
   run_property_decider(result, properties, solver_runtime);
-  generate_goto_dot(goto_model, symex, options, ui_message_handler, true, property_decider);
+  //generate_goto_dot(goto_model, symex, options, ui_message_handler, true, property_decider);
 
   return result;
 }
