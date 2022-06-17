@@ -1,1 +1,600 @@
-cbmc.1
+.TH GOTO-ANALYZER "1" "June 2022" "goto-analyzer-5.59.0" "User Commands"
+.SH NAME
+goto-analyzer \- Data-flow analysis for C programs and goto binaries
+.SH SYNOPSIS
+.B goto\-analyzer [\-?|\-h|\-\-help]
+
+.B goto\-analyzer \-\-version
+
+.B goto\-analyzer [options] file.c|file.gb
+
+.SH DESCRIPTION
+.B goto-analyzer
+is an abstract interpreter which uses the same
+front-end and GOTO binary representation as
+.BR cbmc (1).
+
+The key difference is that
+.BR cbmc (1)
+under-approximates the behavior of the program (execution traces that are too
+long or require too many loop unwindings are not considered) while
+.B goto-analyzer
+over-approximates the behavior of the program.
+.BR cbmc (1)
+can determine if a property is A. true for a bounded number of iterations or B.
+false and giving an error trace.  In contrast
+.B goto-analyzer
+can determine if a property is A. true for all iterations or B. possibly false.
+In this sense, each tool has its own strengths and weaknesses.
+
+To use
+.B goto-analyzer
+you need to give options for:
+.IP
+What
+.I task
+to perform after the abstract interpreter has run.
+.IP
+How to format the
+.IR output .
+.IP
+Which
+.I abstract interpreter
+is used.
+.IP
+Which
+.I domain
+is used to describe the state of the program at a point during execution.
+.IP
+How the
+.I history
+of the control flow of the program determines the number of points of execution.
+.IP
+The
+.I storage
+that links points of execution and domains.
+.SH OPTIONS
+.SS "Task options:"
+.B goto-analyzer
+first runs the abstract interpreter until it reaches a fix-point, then it will
+perform the task the user has chosen.
+.TP
+\fB\-\-show\fR
+Displays a domain for every instruction in the GOTO binary.  The
+format and information will depend on the \fIdomain\fR that has
+been selected.  If there are multiple domains corresponding to the
+same location (see \fIhistory\fR below) these will be merged
+before they are displayed.
+.TP
+\fB\-\-show\-on\-source\fR
+The source code of the program is displayed line-by-line with the abstract
+domains corresponding to each location displayed between them.  As the analysis
+is done at the level of instructions in the GOTO binary, some domains may not be
+displayed.  Also if parts of the GOTO binary have been generated or manipulated
+by other tools, these may not be displayed as there is no corresponding source.
+\fB\-\-show\-on\-source\fR is the more user-friendly output, but \fB\-\-show\fR
+gives a better picture of exactly what is computed.
+.TP
+\fB\-\-verify\fR
+Every property in the program is checked to see whether it is true
+(it always holds), unreachable, false if it is reachable (due to the
+over-approximate analysis, it is not clear if locations are reachable
+or if it is an overapproximation, so this is the best that can be
+achieved) or unknown.  If there are multiple points of execution that
+reach the same location, each will be checked and the answers
+combined, with unknown taking precedence.
+.TP
+\fB\-\-simplify\fR \fIfile_name\fR
+Writes a new version of the input program to \fIfile_name\fR in which the program has
+been simplified using information from the abstract interpreter.  The
+exact simplification will depend on the domain that is used but
+typically this might be replacing any expression that has a constant
+value.  If this makes instructions unreachable (for example if \fBGOTO\fR
+can be shown to never be taken) they will be removed.  Removal can be
+deactivated by passing \fB\-\-no\-simplify\-slicing\fR.  In the ideal world
+simplify would be idempotent (i.e. running it a second time would not
+simplify anything more than the first).  However there are edge cases
+which are difficult or prohibitively expensive to handle in the
+domain which can result in a second (or more) runs giving
+simplification.  Submitting bug reports for these is helpful but they
+may not be viable to fix.
+.TP
+\fB\-\-no\-simplify\-slicing\fR
+Do not remove instructions from which no
+property can be reached (use with \fB\-\-simplify\fR).
+.TP
+\fB\-\-unreachable\-instructions\fR
+Lists which instructions have a domain which is bottom
+(i.e. unreachable).  If \fB\-\-function\fR has been used to set the program
+entry point then this can flag things like the \fImain\fR function as
+unreachable.
+.TP
+\fB\-\-unreachable\-functions\fR
+Similar to \fB\-\-unreachable\-instructions\fR, but reports which functions are
+definitely unreachable rather than just instructions.
+.TP
+\fB\-\-reachable\-functions\fR
+The negation of \fB\-\-unreachable\-functions\fR, reports which functions may be
+reachable.  Note that because the analysis is over-approximate, it
+is possible this will mark functions as reachable when a more precise
+analysis (possibly using \fBcbmc\fR(1)) will show that there are no execution
+traces that reach them.
+.SS "Abstract interpreter options:"
+These options control which abstract interpreter is used and how
+the analysis is performed.  In principle this can significantly change
+the accuracy and performance of \fBgoto-analyzer\fR but the current
+options are reasonably similar.
+.PP
+If \fB\-\-verbosity\fR is set above \fB8\fR the abstract interpreter will log what
+it is doing.  This is intended to aid developers in understanding how
+the algorithms work, where time is being spent, etc.\ but can be
+generally quite instructive.
+.TP
+\fB\-\-legacy\-ait\fR
+This is the default option.  Abstract interpretation is performed
+eagerly from the start of the program until fixed-point is reached.
+Functions are analyzed as needed and in the order of that they are
+reached.  This option also fixes the \fIhistory\fR and \fIstorage\fR options to
+their defaults.
+.TP
+\fB\-\-recursive\-interprocedural\fR
+This extends \fB\-\-legacy\-ait\fR by allowing the \fIhistory\fR and
+\fIstorage\fR to
+be configured.  As the name implies, function calls are handled by
+recursion within the interpreter.  This is a good all-round choice and
+will likely become the default at some point in the future.
+.TP
+\fB\-\-three\-way\-merge\fR
+This extends \fB\-\-recursive\-interprocedural\fR by performing a
+"modification aware" merge after function calls.  At the time of
+writing only \fB\-\-vsd\fR supports the necessary differential reasoning.
+If you are using \fB\-\-vsd\fR this is recommended as it is more accurate
+with little extra cost.
+.TP
+\fB\-\-legacy\-concurrent\fR
+This extends \fB\-\-legacy\-ait\fR with very restricted and special purpose
+handling of threads.  This needs the domain to have certain unusual
+properties for it to give a correct answer.  At the time of writing
+only \fB\-\-dependence\-graph\fR is compatible with it.
+.TP
+\fB\-\-location\-sensitive\fR
+Use location\-sensitive abstract interpreter.
+.SS "History options:"
+To over-approximate what a program does, it is necessary to consider
+all of the paths of execution through the program.  As there are a
+potentially infinite set of traces (and they can be potentially
+infinitely long) it is necessary to merge some of them.  The common
+approach (the "collecting abstraction") is to merge all paths that
+reach the same instruction.  The abstract interpretation is then done
+between instructions without thinking about execution paths.  This
+ensures termination but means that it is not possible to distinguish
+different call sites, loop iterations or paths through a program.
+.PP
+Note that \fB\-\-legacy\-ait\fR, the default abstract interpreter fixes the
+history to \fB\-\-ahistorical\fR so you will need to choose another abstract
+interpreter to make use of these options.
+.TP
+\fB\-\-ahistorical\fR
+This is the default and the coarsest abstraction.  No history
+information is kept, so all traces that reach an instruction are
+merged.  This is the collecting abstraction that is used in most
+abstract interpreters.
+.TP
+\fB\-\-call\-stack\fR \fIn\fR
+This is an inter-procedural abstraction; it tracks the call stack and
+only merges traces that reach the same location and have the same call
+stack.  The effect of this is equivalent to inlining all functions and
+then using \fB\-\-ahistorical\fR.  In larger programs this can be very
+expensive in terms of both time and memory but can give much more
+accurate results.  Recursive functions create a challenge as the call
+stack will be different each time.  To prevent non-termination, the
+parameter \fIn\fR limits how many times a loop of recursive functions can
+be called.  When \fIn\fR is reached all later ones will be merged.
+Setting this to \fI0\fR will disable the limit.
+.TP
+\fB\-\-loop\-unwind\fR \fIn\fR
+This tracks the backwards jumps that are taken in the current function.  Traces
+that reach the same location are merged if their history of backwards jumps is
+the same.  At most \fIn\fR traces are kept for each location, after that they
+are merged regardless of whether their histories match. This gives a similar
+effect to unrolling the loops \fIn\fR times and then using
+\fB\-\-ahistorical\fR.  In the case of nested loops, the behavior can be a
+little different to unrolling as the limit is the number of times a location is
+reached, so a loop with \fIx\fR iterations containing a loop with \fIy\fR
+iterations will require \fIn\fR = \fIx*y\fR.  The time and memory taken by this
+option will rise (at worst) linearly in terms of \fIn\fR.  If \fIn\fR is \fB0\fR
+then there is no limit.  Be warned that if there are loops that can execute an
+unbounded number of iterations or if the domain is not sufficiently precise to
+identify the termination conditions then the analysis will not terminate.
+.TP
+\fB\-\-branching\fR n
+This works in a similar way to \fB\-\-loop\-unwind\fR but tracking forwards
+jumps (\fBif\fR, \fBswitch\fR, \fBgoto\fR, etc.) rather than backwards ones.  This
+gives per-path analysis but limiting the number of times each location
+is visited.  There is not a direct form of program transformation that
+matches this but it is similar to the per-path analysis that symbolic
+execution does.  The scalability and the risk of non-termination if
+\fIn\fR is \fB0\fR remain the same.  Note that the goto-programs generated by
+various language front-ends have a conditional forwards jump to exit the
+loop if the condition fails at the start and an unconditional backwards
+jump at the end.  This means that \fB\-\-branching\fR can wind up
+distinguishing different loop iterations \(em "has not exited for the
+last 3 iterations" rather than "has jumped back to the top 3 times".
+.TP
+\fB\-\-loop\-unwind\-and\-branching\fR \fIn\fR
+Again, this is similar to \fB\-\-loop\-unwind\fR but tracks both forwards
+and backwards jumps.  This is only a very small amount more expensive than
+\fB\-\-branching\fR and is probably the best option for detailed analysis of
+each function.
+.SS "Domain options:"
+These control how the possible states at a given execution point are represented
+and manipulated.
+.TP
+\fB\-\-dependence\-graph\fR
+Tracks data flow and information flow dependencies between
+instructions and produces a graph.  This includes doing points-to
+analysis and tracking reaching definitions (i.e. use-def chains).
+This is one of the most extensive, correct and feature complete domains.
+.TP
+\fB\-\-vsd\fR, \fB\-\-variable\-sensitivity\fR
+This is the Variable Sensitivity Domain (VSD).  It is a non-relational
+domain that stores an abstract object for each live variable.  Which
+kind of abstract objects are used depends on the type of the variable
+and the run-time configuration.  This means that sensitivity of the
+domain can be chosen \(em for example, do you want to track every
+element of an array independently, or just a few of them or simply
+ignore arrays all together.  A set of options to configure VSD are
+given below.  This domain is extensive and does not have any known
+architectural limits on correctness.  As such it is a good choice for
+many kinds of analysis.
+.TP
+\fB\-\-dependence\-graph\-vs\fR
+This is a variant of the dependence graph domain that uses VSD to do
+the foundational pointer and reaching definitions analysis.  This
+means it can be configured using the VSD options and give more precise
+analysis (for example, field aware) of the dependencies.
+.TP
+\fB\-\-constants\fR
+The default option, this stores one constant value per variable.  This means it
+is fast but will only find things that can be resolved by constant propagation.
+The domain has some handling of arrays but limited support for pointers which
+means that in can potentially give unsound behavior. \fB\-\-vsd\fR
+\fB\-\-vsd\-values\fR \fIconstants\fR is probably a better choice for this kind
+of analysis.
+.TP
+\fB\-\-intervals\fR
+A domain that stores an interval for each integer and float variable.  At the
+time of writing not all operations are supported so the results can be quite
+over-approximate at points.  It also has limitations in the handling of pointers
+so can give unsound results.  \fB\-\-vsd\fR \fB\-\-vsd\-values\fR
+\fIintervals\fR is probably a better choice for this kind of analysis.
+.TP
+\fB\-\-non\-null\fR
+This domain is intended to find which pointers are not null.  Its
+implementation is very limited and it is not recommended.
+.SS "Variable sensitivity domain (VSD) options:"
+VSD has a wide range of options that allow you to choose what kind of
+abstract objects (and thus abstractions) are used to represent
+variables of each type.
+.TP
+\fB\-\-vsd\-values\fR [\fBconstants\fR|\fBintervals\fR|\fBset\-of\-constants\fR]
+This controls the abstraction used for values, both \fBint\fR and
+\fBfloat\fR.  The default option is \fBconstants\fR which tracks if the
+variable has a constant value.  This is fast but not very precise so
+it may well be unable to prove very much.  \fBintervals\fR uses an
+interval that contains all of the possible values the variable can
+take.  It is more precise than \fBconstants\fR in all cases but a bit
+slower.  It is good for numerical code. \fBset-of-constants\fR uses a set
+of up to \fB10\fR (currently fixed) constants.  This is more general than
+using a single constant but can make analysis up to 10 times (or in
+rare cases 100 times) slower.  It is good for control code with flags
+and modes.
+.TP
+\fB\-\-vsd\-structs\fR [\fBtop\-bottom\fR|\fBevery\-field\fR]
+This controls how structures are handled.  The default is \fBtop-bottom\fR which
+uses an abstract object with just two states (top and bottom).  In effect writes
+to structures are ignored and reads from them will always return top (any
+value).  The other alternative is \fBevery-field\fR which stores an abstract
+object for each field.  Depending on how many structures are live at any one
+time and how many fields they have this may increase the amount of memory used
+by \fBgoto-analyzer\fR by a reasonable amount.  But this means that the analysis
+will be field-sensitive.
+.TP
+\fB\-\-vsd\-arrays\fR [\fBtop\-bottom\fR|\fBsmash\fR|\fBup\-to\-n\-elements\fR|\fBevery\-element\fR]
+This controls how arrays are handled.  As with structures, the default is
+\fBtop-bottom\fR which effectively ignores writes to the array and returns top
+on a read.  More precise than this is \fBsmash\fR which stores one abstract
+element for all of the values.  This is relatively cheap but a lot more precise,
+particularly if used with \fBintervals\fR or \fBset-of-constants\fR.
+\fBup-to-n-elements\fR generalizes \fBsmash\fR by storing abstract objects for
+the first \fIn\fR elements of each array (\fIn\R defaults to \fB10\fR and can be
+controlled by \fB\-\-vsd\-array\-max\-elements\fR) and then condensing all other
+elements down to a single abstract object.  This allows reasonably fine-grained
+control over the amount of memory used and can give much more precise results
+for small arrays. \fBevery-element\fR is the most precise, but most expensive
+option where an abstract element is stored for every entry in the array.
+.TP
+\fB\-\-vsd\-array\-max\-elements\fR
+Configures the value of \fBn\fR in \fB\-\-vsd\-arrays\fR
+\fBup\-to\-n\-elements\fR and defaults to 10 if not given.
+.TP
+\fB\-\-vsd\-pointers\fR [\fBtop\-bottom\fR|\fBconstants\fR|\fBvalue\-set\fR]
+This controls the handling of pointers.  The default, \fBtop-bottom\fR
+effectively ignores pointers, this is OK if they are just read (all reads return
+top) but if they are written then there is the problem that we know that a
+variable is changed but we don't know which one, so we have to set the whole
+domain to top.  \fBconstants\fR is somewhat misleadingly named as it uses an
+abstract object that tracks a pointer to a single variable.  This includes the
+offset within the variable; a stack of field names for structs and abstract
+objects for offsets in arrays.  Offsets are tracked even if the abstract object
+for the variable itself does not distinguish different fields or indexes.
+\fBvalue-set\fR is the most precise option; it stores a set of pointers to
+single variables as described above.
+.TP
+\fB\-\-vsd\-unions\fR \fBtop\-bottom\fR
+At the time of writing there is only one option for unions which is
+\fBtop-bottom\fR, discarding writes and returning top for all reads from a
+variable of union type.
+.TP
+\fB\-\-vsd\-data\-dependencies\fR
+Wraps each abstract object with a set of locations where the
+variable was last modified.  The set is reset when the variable is
+written and takes the union of the two sides' sets on merge.  This was
+originally intended for \fB\-\-dependence\-graph\-vs\fR but has proved useful
+for \fB\-\-vsd\fR as well.  This is not strictly necessary for
+\fB\-\-three\-way\-merge\fR as the mechanism it uses to work out which
+variables have changed is independent of this option.
+.TP
+\fB\-\-vsd\-liveness\fR
+Wraps each abstract object with the location of the last assignment or merge.
+This is more basic and limited than \fB\-\-vsd\-data\-dependencies\fR and is
+intended to track SSA-like regions of variable liveness.
+.TP
+\fB\-\-vsd\-flow\-insensitive\fR
+This does not alter the abstract objects used or their
+configuration.  It disables the reduction of the domain when a branch
+is taken or an assumption is reached.  This normally gives a small
+saving in time but at the cost of a large amount of precision.  This
+is why the default is to do the reduction.  It can be useful for
+debugging issues with the reduction.
+.SS "Storage options:"
+The histories described above are used to keep track of where in the
+computation needs to be explored.  The most precise option is to keep
+one domain for every history but in some cases, to save memory and
+time, it may be desirable to share domains between histories.  The
+storage options allow this kind of sharing.
+.TP
+\fB\-\-one\-domain\-per\-location\fR
+This is the default option.  All histories that reach the same location will use
+the same domain.  Setting this means that the results of other histories will be
+similar to setting \fB\-\-ahistorical\fR.  One difference is how and when
+widening occurs: \fB\-\-one\-domain\-per\-location\fR \fB\-\-loop\-unwind\fR
+\fIn\fR will wait until \fIn\fR iterations of a loop have been completed and
+then will start to widen.
+.TP
+\fB\-\-one\-domain\-per\-history\fR
+This is the best option to use if you are using a history other than
+\fB\-\-ahistorical\fR.  It stores one domain per history which can result in
+a significant increase in the amount of memory used.
+.SS "Output options:"
+These options control how the result of the task is output.  The
+default is text to the standard output.  In the case of tasks that
+produce goto-programs (\fB\-\-simplify\fR for example), the output options
+only affect the logging and not the final form of the program.
+.TP
+\fB\-\-text\fR \fIfile_name\fR
+Output results in plain text to given file.
+.TP
+\fB\-\-json\fR \fIfile_name\fR
+Writes the output as a JSON object to \fIfile_name\fR.
+.TP
+\fB\-\-xml\fR \fIfile_name\fR
+Output results in XML format to \fIfile_name\R.
+.TP
+\fB\-\-dot\fR \fIfile_name\fR
+Writes the output in \fBdot\fR(1) format to \fIfile_name\fR.  This is
+only supported by some domains and tasks (for example
+\fB\-\-show\fR \fB\-\-dependence-graph\fR).
+.SS "Specific analyses:"
+.TP
+\fB\-\-taint\fR file_name
+perform taint analysis using rules in given file
+.TP
+\fB\-\-show\-taint\fR
+print taint analysis results on stdout
+.TP
+\fB\-\-show\-local\-may\-alias\fR
+perform procedure\-local may alias analysis
+.SS "C/C++ frontend options:"
+.TP
+\fB\-I\fR path
+set include path (C/C++)
+.TP
+\fB\-\-include\fR file
+set include file (C/C++)
+.TP
+\fB\-D\fR macro
+define preprocessor macro (C/C++)
+.TP
+\fB\-\-c89\fR, \fB\-\-c99\fR, \fB\-\-c11\fR
+set C language standard (default: c11)
+.TP
+\fB\-\-cpp98\fR, \fB\-\-cpp03\fR, \fB\-\-cpp11\fR
+set C++ language standard (default: cpp98)
+.TP
+\fB\-\-unsigned\-char\fR
+make "char" unsigned by default
+.TP
+\fB\-\-round\-to\-nearest\fR, \fB\-\-round\-to\-even\fR
+rounding towards nearest even (default)
+.TP
+\fB\-\-round\-to\-plus\-inf\fR
+rounding towards plus infinity
+.TP
+\fB\-\-round\-to\-minus\-inf\fR
+rounding towards minus infinity
+.TP
+\fB\-\-round\-to\-zero\fR
+rounding towards zero
+.TP
+\fB\-\-no\-library\fR
+disable built\-in abstract C library
+.TP
+\fB\-\-function\fR name
+set main function name
+.SS "Platform options:"
+.TP
+\fB\-\-arch\fR \fIarch\fR
+Set analysis architecture, which defaults to the host architecture. Use one of:
+\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR, \fBi386\fR, \fBia64\fR,
+\fBmips\fR, \fBmips64\fR, \fBmips64el\fR, \fBmipsel\fR, \fBmipsn32\fR,
+\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR, \fBs390\fR,
+\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR, \fBx86_64\fR, or
+\fBnone\fR.
+.TP
+\fB\-\-os\fR \fIos\fR
+Set analysis operating system, which defaults to the host operating system. Use
+one of: \fBfreebsd\fR, \fBlinux\fR, \fBmacos\fR, \fBsolaris\fR, or
+\fBwindows\fR.
+.TP
+\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR, \fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
+Set analysis architecture and operating system.
+.TP
+\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR, \fB\-\-LP32\fR
+Set width of int, long and pointers, but don't override default architecture and
+operating system.
+.TP
+\fB\-\-16\fR, \fB\-\-32\fR, \fB\-\-64\fR
+Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
+\fB\-\-LLP64\fR).
+.TP
+\fB\-\-little\-endian\fR
+allow little\-endian word\-byte conversions
+.TP
+\fB\-\-big\-endian\fR
+allow big\-endian word\-byte conversions
+.TP
+\fB\-\-gcc\fR
+use GCC as preprocessor
+.SS "Program representations:"
+.TP
+\fB\-\-show\-parse\-tree\fR
+show parse tree
+.TP
+\fB\-\-show\-symbol\-table\fR
+show loaded symbol table
+.TP
+\fB\-\-show\-goto\-functions\fR
+show loaded goto program
+.TP
+\fB\-\-list\-goto\-functions\fR
+list loaded goto functions
+.TP
+\fB\-\-show\-properties\fR
+show the properties, but don't run analysis
+.SS "Program instrumentation options:"
+.TP
+\fB\-\-property\fR id
+enable selected properties only
+.TP
+\fB\-\-bounds\-check\fR
+enable array bounds checks
+.TP
+\fB\-\-pointer\-check\fR
+enable pointer checks
+.TP
+\fB\-\-memory\-leak\-check\fR
+enable memory leak checks
+.TP
+\fB\-\-div\-by\-zero\-check\fR
+enable division by zero checks
+.TP
+\fB\-\-signed\-overflow\-check\fR
+enable signed arithmetic over\- and underflow checks
+.TP
+\fB\-\-unsigned\-overflow\-check\fR
+enable arithmetic over\- and underflow checks
+.TP
+\fB\-\-pointer\-overflow\-check\fR
+enable pointer arithmetic over\- and underflow checks
+.TP
+\fB\-\-conversion\-check\fR
+check whether values can be represented after type cast
+.TP
+\fB\-\-undefined\-shift\-check\fR
+check shift greater than bit\-width
+.TP
+\fB\-\-float\-overflow\-check\fR
+check floating\-point for +/\-Inf
+.TP
+\fB\-\-nan\-check\fR
+check floating\-point for NaN
+.TP
+\fB\-\-enum\-range\-check\fR
+checks that all enum type expressions have values in the enum range
+.TP
+\fB\-\-pointer\-primitive\-check\fR
+checks that all pointers in pointer primitives are valid or null
+.TP
+\fB\-\-retain\-trivial\-checks\fR
+include checks that are trivially true
+.TP
+\fB\-\-error\-label\fR label
+check that label is unreachable
+.TP
+\fB\-\-no\-built\-in\-assertions\fR
+ignore assertions in built\-in library
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-no\-assumptions\fR
+ignore user assumptions
+.TP
+\fB\-\-assert\-to\-assume\fR
+convert user assertions to assumptions
+.TP
+\fB\-\-malloc\-may\-fail\fR
+allow malloc calls to return a null pointer
+.TP
+\fB\-\-malloc\-fail\-assert\fR
+set malloc failure mode to assert\-then\-assume
+.TP
+\fB\-\-malloc\-fail\-null\fR
+set malloc failure mode to return null
+.TP
+\fB\-\-string\-abstraction\fR
+track C string lengths and zero\-termination
+.SS "Other options:"
+.TP
+\fB\-\-validate\-goto\-model\fR
+enable additional well\-formedness checks on the
+goto program
+.TP
+\fB\-\-validate\-ssa\-equation\fR
+enable additional well\-formedness checks on the
+SSA representation
+.TP
+\fB\-\-version\fR
+show version and exit
+.TP
+\fB\-\-flush\fR
+flush every line of output
+.TP
+\fB\-\-verbosity\fR #
+verbosity level
+.TP
+\fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
+Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
+monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto-cc (1)
+.SH COPYRIGHT
+2017\-2018, Daniel Kroening, Diffblue
