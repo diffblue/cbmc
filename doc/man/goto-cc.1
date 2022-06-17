@@ -1,1 +1,119 @@
-cbmc.1
+.TH GOTO-CC "1" "June 2022" "goto-cc-5.59.0" "User Commands"
+.SH NAME
+goto\-cc \- C/C++ to goto compiler
+.SH SYNOPSIS
+.B goto-cc [options]
+
+.B goto-gcc [options]
+
+.B goto-ld [options]
+
+.B goto-as [options]
+
+.B goto-bcc [options]
+
+.B goto-armcc [options]
+
+.B goto-cw [options]
+
+.SH DESCRIPTION
+.B goto\-cc
+reads source code, and generates a goto-binary. Its
+command-line interface is designed to mimic that of
+.BR gcc (1).
+Note in particular that \fBgoto-cc\fR distinguishes between compiling
+and linking phases, just as \fBgcc\fR(1) does. \fBcbmc\fR(1) expects a goto-binary
+for which linking has been completed.
+.PP
+The basename of the file that is used to invoke \fBgoto-cc\fR controls which
+behavior will be emulated. This is typically accomplished by using symbolic
+links.
+.IP
+\fBgoto-cc\fR: invokes the default system compiler as preprocessor and just
+builds a goto-binary.
+.IP
+\fBgoto-gcc\fR: invokes \fBgcc\fR(1) as preprocessor and builds an \fBelf\fR(5)
+object file including an additional \fIgoto-cc\fR section that holds the goto
+binary.
+.IP
+\fBgoto-ld\fR: only performs linking, and also builds an \fBelf\fR(5) object as
+above.
+.IP
+\fBgoto-as\fR: invokes the system assembler \fBas\fR(1) and includes the
+original assembly source as a string in the output file.
+.IP
+\fBgoto-bcc\fR: invokes \fBbcc\fR(1) as preprocessor.
+.IP
+\fBgoto-armcc\fR: invokes \fBarmcc\fR as preprocessor and enables support for
+the ARM's C dialect and command-line options.
+.IP
+\fBgoto-cw\fR: invokes \fBmwcceppc\fR as preprocessor and enables support for
+CodeWarrior's C dialect and command-line options.
+.SH OPTIONS
+.B goto\-cc
+understands the options of \fBgcc\fR(1) plus the following.
+.TP
+\fB\-\-verbosity\fR \fIN\fR
+Set verbosity level to \fIN\fR, which defaults to 1 (only errors are printed). A
+verbosity of 0 disables all output. Using a verbosity of 2 or greater, or using
+\fB\-Wall\fR enables warnings. Verbosity levels 4, 6, 8, 9, or 10 add increasing
+amounts of debug information.
+.TP
+\fB\-\-function\fR \fIname\fR
+Set entry point to \fIname\fR.
+.TP
+\fB\-\-native\-compiler\fR \fIcmd\fR
+Invoke \fIcmd\fR as preprocessor or compiler.
+.TP
+\fB\-\-native\-linker\fR \fIcmd\fR
+Invoke \fIcmd\fR as linker.
+.TP
+\fB\-\-native\-assembler\fR \fIcmd\fR
+Invoke \fIcmd\fR as assembler (\fBgoto\-as\fR only).
+.TP
+\fB\-\-export\-file\-local\-symbols\fR
+Name-mangle and export file-local (aka \fBstatic\fR) functions. Name mangling
+prefixes each symbol name by \fB__CPROVER_file_local\fR and the basename of the
+file. For example,
+
+.EX
+.in +4n
+\fB// foo.c\fP
+\fBstatic\fP int \fBbar\fP();
+.in
+.EE
+
+yields a globally visible \fI__CPROVER_file_local_foo_c_bar\fR function.
+Note that this approach mangles all functions contained in a translation unit.
+We recommend using \fBcrangler\fR(1) as a more configurable alternative.
+.TP
+\fB\-\-mangle\-suffix \fIsuffix\fR
+Append \fIsuffix\fR to exported file-local symbols. Use this option together
+with \fB\-\-export\-file\-local\-symbols\fR when multiple files of the same base
+name contain a \fBstatic\fR function of the same name. If so, use a unique
+suffix in at least one of the \fBgoto\-cc\fR invocations used in compiling those
+files.
+.TP
+\fB\-\-print\-rejected\-preprocessed\-source\fR \fIfile\fR
+Copy failing (preprocessed) source to \fIfile\fR.
+.TP
+\fB\-\-object\-bits\fR \fIN\fR
+Configure the number of bits used for object numbering in CBMC's pointer encoding.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.B goto\-cc
+aims to accept all environment variables that \fBgcc\fR(1) does.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR as (1),
+.BR bcc (1),
+.BR cbmc (1),
+.BR crangler (1),
+.BR elf (5),
+.BR gcc (1),
+.BR ld (1)
+.SH COPYRIGHT
+2006\-2018, Daniel Kroening, Michael Tautschnig, Christoph Wintersteiger
