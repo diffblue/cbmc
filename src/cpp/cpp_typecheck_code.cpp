@@ -73,7 +73,8 @@ void cpp_typecheckt::typecheck_code(codet &code)
           shl_exprt shl{from_integer(1, array.type()),
                         to_index_expr(binary_expr.op0()).index()};
           exprt rhs = if_exprt{
-            equal_exprt{binary_expr.op1(), from_integer(0, array.type())},
+            equal_exprt{
+              binary_expr.op1(), from_integer(0, binary_expr.op1().type())},
             bitand_exprt{array, bitnot_exprt{shl}},
             bitor_exprt{array, shl}};
           binary_expr.op0() = to_index_expr(binary_expr.op0()).array();
