@@ -29,8 +29,7 @@ full_array_abstract_objectt::full_array_pointert build_array(
 {
   const typet type = signedbv_typet(32);
 
-  const array_typet array_type(
-    integer_typet(), from_integer(array.size(), type));
+  const array_typet array_type(type, from_integer(array.size(), type));
 
   exprt::operandst element_ops;
 
