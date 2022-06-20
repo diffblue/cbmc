@@ -40,8 +40,9 @@ static void output_constant(std::ostream &os, const constant_exprt &constant)
 /// Prints the assignment of a module parameter to the given output stream.
 /// \param [out] os: Stream that should receive the result.
 /// \param assignment: Assignment that shall be printed.
-static void
-output_parameter_assignment(std::ostream &os, const equal_exprt &assignment)
+static void output_parameter_assignment(
+  std::ostream &os,
+  const code_frontend_assignt &assignment)
 {
   os << assignment.lhs().get(ID_identifier) << " := ";
   const constant_exprt *const constant =
@@ -246,11 +247,10 @@ void output_instruction(
         output_constant(os, *constant);
         continue;
       }
-      const equal_exprt *const equal = expr_try_dynamic_cast<equal_exprt>(expr);
-      if(equal)
+      if(const auto assign = expr_try_dynamic_cast<code_frontend_assignt>(expr))
       {
         os << "\n\t";
-        output_parameter_assignment(os, *equal);
+        output_parameter_assignment(os, *assign);
         continue;
       }
       os << '\t' << expr.id();
