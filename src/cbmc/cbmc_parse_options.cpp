@@ -334,6 +334,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("trace", true);
   }
 
+  options.set_option("symex-record-coverage", cmdline.get_values ("symex-record-coverage"));
   if(cmdline.isset("symex-coverage-report"))
   {
     options.set_option("symex-record-coverage", true);
@@ -644,7 +645,6 @@ int cbmc_parse_optionst::doit()
     UNREACHABLE;
   }
 
-  options.set_option("symex-record-coverage", cmdline.get_values ("symex-record-coverage"));
   options.set_option ("show-complexity-graph", cmdline.get_values ("show-complexity-graph"));
   options.set_option ("show-complexity-graph-with-symex", cmdline.get_values ("show-complexity-graph-with-symex"));
   options.set_option ("show-complexity-graph-with-solver", cmdline.get_values ("show-complexity-graph-with-solver"));

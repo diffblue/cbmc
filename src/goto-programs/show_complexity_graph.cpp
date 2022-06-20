@@ -11,6 +11,7 @@ Author: Benjamin Quiring
 
 #include "show_complexity_graph.h"
 
+#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <math.h>
@@ -105,7 +106,7 @@ void compute_metrics (const namespacet &ns,
       
       func_metricst &m = metrics.find(name)->second;
       compute_metrics (symbol, body, ns, goto_functions, 
-                       use_solver_info, instr_symex_info, 
+                       use_symex_info, instr_symex_info, 
                        use_solver_info, instr_solver_info, 
                        m);
     }
@@ -414,7 +415,7 @@ std::string instruction_string (const goto_programt::instructiont instruction) {
 
   case ASSIGN:
     out << "ASSIGN " << format(instruction.assign_lhs())
-        << " := "; // FIXME << format(instruction.assign_rhs());
+        << " := " << format(instruction.assign_rhs());
     break;
 
   case ASSUME:
@@ -536,6 +537,7 @@ void replace_all_substrings (std::string& str, const std::string& from, const st
   }
 }
 
+double max = -1.0;
 
 void dump_instruction 
   (const irep_idt &name,
@@ -544,11 +546,11 @@ void dump_instruction
    std::ostream &out,
    const namespacet &ns,
    const bool use_symex_info,
-   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+   const bool use_solver_info,
+   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
 
-
-  out << name << "_" << index
-      << "[";
+  out << "<tr><td align=\"text\"";
 
   if (use_symex_info) {
     auto symex_info = instr_symex_info.find (target);
@@ -556,16 +558,16 @@ void dump_instruction
       // milliseconds
       double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
 
-      int s = std::max(0, std::min (255, (int)(255 * avg_time_per_step)));
+      int s = std::max(0, std::min (255, (int)(255.0 * avg_time_per_step)));
       std::string color = color_of_score (s);
-      out << "fillcolor=" << "\"#" << color << "\",";
+      //out << "fillcolor=" << "\"#" << color << "\",";
+
+      out << " bgcolor=\"#" << color << "\"";
+
     }
   }
-  out << "shape=plaintext,";
-  out << "label=<";
 
-  out << " <table border=\"0\">";
-  out << "<tr><td align=\"text\">"; // style=\"font-family:'Courier', monospace\">";
+  out << ">"; // style=\"font-family:'Courier', monospace\">";
   const goto_programt::instructiont &instruction = *target;
   std::string instr_str = instruction_string (instruction);
   replace_all_substrings (instr_str, "\"", "&quot;");
@@ -573,10 +575,8 @@ void dump_instruction
   replace_all_substrings (instr_str, "<", "&lt;");
   out << instr_str;
   out << "<br align=\"left\" /></td></tr>";
-  out << "</table> ";
 
 
-  out << ">]" << ";\n";
 }
 
 void dump_instructions 
@@ -585,13 +585,34 @@ void dump_instructions
    std::ostream &out,
    const namespacet &ns,
    const bool use_symex_info,
-   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+   const bool use_solver_info,
+   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
   int index = 0;
 
+  out << name << "_body"
+      << "[";
+
+  out << "shape=rectangle,"; //plaintext,";
+  out << "fontsize=" << 4 << ",";
+  out << "fontname=\"Courier\",";
+  out << "label=<";
+  out << " <table border=\"0\">";
+  out << "<tr><td align=\"text\">// body of " << normalize_name (name) << "<br align=\"left\" /></td></tr>";
   forall_goto_program_instructions(target, body) {
-    dump_instruction (name, target, index, out, ns, use_symex_info, instr_symex_info);
+    dump_instruction (name, target, index, out, ns, 
+                      use_symex_info, instr_symex_info, 
+                      use_solver_info, instr_solver_info);
     index++;
   }
+
+  out << "</table> ";
+  out << ">]" << ";\n";
+
+  out << name <<  " -> " << name << "_body"
+      << " ["
+      << "style=invis"
+      << "];\n";
 }
                     
 
@@ -605,7 +626,9 @@ void dump_function
    std::map<irep_idt, func_metricst> &metrics,
    std::map<irep_idt, int> &scores,
    const bool use_symex_info,
-   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+   const bool use_solver_info,
+   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
   if(has_body) {
     std::string color = color_of_score (scores.find (f)->second);
 
@@ -630,8 +653,7 @@ void dump_function
       }
     }
 
-    out << "subgraph {rank=same;color=lightgrey;\n";
-
+    out << "subgraph {rank=same;color=blue;\n";
 
     out << normalize_name (f)
                  << " [" 
@@ -645,10 +667,14 @@ void dump_function
                  << "fontsize=" << node_size
                  << "];\n";
 
-    //dump_instructions(f, body, out, ns, use_symex_info, instr_symex_info);
+    dump_instructions(f, body, out, ns, 
+                      use_symex_info, instr_symex_info, 
+                      use_solver_info, instr_solver_info);
+
     out << "}\n";
 
-    dump_function_call_edges (f, body, out, ns, use, use_symex_info, instr_symex_info);
+    dump_function_call_edges (f, body, out, ns, use, 
+                              use_symex_info, instr_symex_info);
 
     // fun->second.body.output(ns, f, out);
     // out << ostream::eom;
@@ -672,6 +698,8 @@ void dump_complexity_graph(
   const bool use_solver_info,
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
+
+  std::cout << "using: " << use_symex_info << " " << use_solver_info << "\n";
 
   //goto_functionst goto_functions;
   //goto_functions.copy_from(goto_functions_);
@@ -758,7 +786,9 @@ void dump_complexity_graph(
       out << "\n// ------------------------------------\n\n";
       out << "//" << f_symbol.display_name()
           << " ( " << f_symbol.name << " )\n";
-      dump_function (f_symbol.name, has_body, fun->second.body, out, ns, use, metrics, scores, use_symex_info, instr_symex_info);
+      dump_function (f_symbol.name, has_body, fun->second.body, out, ns, use, metrics, scores, 
+                     use_symex_info, instr_symex_info, 
+                     use_solver_info, instr_solver_info);
     }
   }
 

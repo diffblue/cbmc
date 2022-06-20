@@ -38,15 +38,18 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
                         const optionst &options,
                         ui_message_handlert &ui_message_handler,
                         const goto_symex_property_decidert &property_decider,
-                        const std::string path) {
-  const auto &goto_functions = goto_model.get_goto_functions();
+                        const std::string type) {
+  const std::string path = options.get_option(type);
+  if (!path.empty()) {
 
-  messaget msg(ui_message_handler);
-  const namespacet ns(goto_model.get_symbol_table());
-  const auto sorted = goto_functions.sorted();
+    const auto &goto_functions = goto_model.get_goto_functions();
 
-  std::list<std::string> roots;
-  roots.push_back (options.get_option("complexity-graph-roots"));
+    messaget msg(ui_message_handler);
+    const namespacet ns(goto_model.get_symbol_table());
+    const auto sorted = goto_functions.sorted();
+
+    std::list<std::string> roots;
+    roots.push_back (options.get_option("complexity-graph-roots"));
 
     const symex_coveraget &symex_coverage = symex.get_coverage();
     std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
@@ -63,9 +66,8 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
           int total_steps = 0;
           double total_duration = 0.0;
           for (goto_programt::const_targett to : to_list) {
-            int to_steps = symex_coverage.num_executions(from, to);
-            total_steps = total_steps + to_steps;
-            total_duration = total_duration + symex_coverage.duration(from, to);
+            total_steps += symex_coverage.num_executions(from, to);
+            total_duration += symex_coverage.duration(from, to);
           }
           
           symex_infot info;
@@ -109,17 +111,17 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
           }
         }
       });
-    if (!options.get_option ("show-complexity-graph").empty()) {
-      show_complexity_graph(
-        goto_model, roots, path);
-    } else if (!options.get_option ("show-complexity-graph-with-symex").empty()) {
-      show_complexity_graph(
-        goto_model, roots, path, instr_symex_info);
-    } else if (!options.get_option ("show-complexity-graph-with-solver").empty()) {
-      show_complexity_graph(
-        goto_model, roots, path, instr_symex_info, instr_solver_info);
-    } 
 
+    if (type == "show-complexity-graph") {
+      show_complexity_graph(goto_model, roots, path);
+    } else if (type == "show-complexity-graph-with-symex") {
+      show_complexity_graph(goto_model, roots, path, 
+                            instr_symex_info);
+    } else if (type == "show-complexity-graph-with-solver") {
+      show_complexity_graph(goto_model, roots, path, 
+                            instr_symex_info, instr_solver_info);
+    } 
+  }
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::
@@ -138,17 +140,11 @@ operator()(propertiest &properties)
   if(!equation_generated)
   {
 
-    if (!options.get_option("show-complexity-graph").empty()) {
-      generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, options.get_option("show-complexity-graph"));
-    }
+    generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, "show-complexity-graph");
 
     generate_equation();
     
-    if (!options.get_option("show-complexity-graph-with-symex").empty()) {
-      generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, options.get_option("show-complexity-graph-with-symex"));
-
-    }
-
+    generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, "show-complexity-graph-with-symex");
 
     output_coverage_report(
       options.get_option("symex-coverage-report"),
@@ -167,12 +163,9 @@ operator()(propertiest &properties)
     equation_generated = true;
   }
 
-    if (!options.get_option("show-complexity-graph-with-solver").empty()) {
-      generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, options.get_option("show-complexity-graph-with-solver"));
-
-    }
   run_property_decider(result, properties, solver_runtime);
-  //generate_goto_dot(goto_model, symex, options, ui_message_handler, true, property_decider);
+
+  generate_goto_dot(goto_model, symex, options, ui_message_handler, property_decider, "show-complexity-graph-with-solver");
 
   return result;
 }
