@@ -102,12 +102,12 @@ void write_stackt::construct_stack_to_pointer(
     if(!top_stack)
     {
       // check the symbol at the bottom of the stack
-      std::shared_ptr<const write_stack_entryt> entry = *stack.cbegin();
+      const auto access = stack.front()->get_access_expr();
       INVARIANT(
-        entry->get_access_expr().id() == ID_symbol,
+        !access.second && access.first.id() == ID_symbol,
         "The base should be an addressable location (i.e. symbol)");
 
-      if(entry->get_access_expr().type().id() != ID_array)
+      if(access.first.type().id() != ID_array)
       {
         top_stack = true;
       }
@@ -176,27 +176,15 @@ exprt write_stackt::to_expression() const
 {
   // A top stack is useless and its expression should not be evaluated
   PRECONDITION(!is_top_value());
-  exprt access_expr = nil_exprt();
-  for(const std::shared_ptr<write_stack_entryt> &entry : stack)
+  PRECONDITION(!stack.empty());
+  exprt access_expr = stack.front()->get_access_expr().first;
+  for(auto it = std::next(stack.begin()); it != stack.end(); ++it)
   {
-    exprt new_expr = entry->get_access_expr();
-    if(access_expr.id() == ID_nil)
-    {
-      access_expr = new_expr;
-    }
+    const auto access = (*it)->get_access_expr();
+    if(access.second)
+      access_expr = index_exprt{access_expr, access.first};
     else
-    {
-      if(new_expr.operands().size() == 0)
-      {
-        new_expr.operands().resize(1);
-      }
-      new_expr.operands()[0] = access_expr;
-
-      // If necessary, complete the type of the new access expression
-      entry->adjust_access_type(new_expr);
-
-      access_expr = new_expr;
-    }
+      access_expr = access.first;
   }
   address_of_exprt top_expr(access_expr);
   return std::move(top_expr);
@@ -210,19 +198,22 @@ size_t write_stackt::depth() const
 exprt write_stackt::target_expression(size_t depth) const
 {
   PRECONDITION(!is_top_value());
-  return stack[depth]->get_access_expr();
+  return stack[depth]->get_access_expr().first;
 }
 
 exprt write_stackt::offset_expression() const
 {
   PRECONDITION(!is_top_value());
-  auto const &access = stack.back()->get_access_expr();
+  auto const access = stack.back()->get_access_expr();
 
-  if(access.id() == ID_member || access.id() == ID_symbol)
-    return access;
+  if(access.second)
+    return access.first;
 
-  if(access.id() == ID_index)
-    return to_index_expr(access).index();
+  if(access.first.id() == ID_member || access.first.id() == ID_symbol)
+    return access.first;
+
+  if(access.first.id() == ID_index)
+    return to_index_expr(access.first).index();
 
   return from_integer(0, unsigned_long_int_type());
 }
