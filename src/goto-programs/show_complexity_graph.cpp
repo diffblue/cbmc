@@ -13,11 +13,12 @@ Author: Benjamin Quiring
 
 #include <iomanip>
 #include <fstream>
+#include <math.h>
 
 #include <util/ui_message.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
-#include <math.h>
+#include <util/std_code.h>
 
 #include "goto_model.h"
 #include "pointer_expr.h"
@@ -282,33 +283,8 @@ void dump_function_call_edges
 }
 
 
-void dump_instruction 
-  (const irep_idt &name,
-   const goto_programt::const_targett &target,
-   const int index,
-   std::ostream &out,
-   const namespacet &ns,
-   const bool use_symex_info,
-   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
-
-
-  out << name << "-" << index
-      << "[";
-
-  if (use_symex_info) {
-    auto symex_info = instr_symex_info.find (target);
-    if (symex_info != instr_symex_info.end()) {
-      // milliseconds
-      double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
-
-      int s = std::max(0, std::min (255, (int)(255 * avg_time_per_step)));
-      std::string color = color_of_score (s);
-      out << "fillcolor=" << "\"#" << color << "\",";
-    }
-  }
-
-  out << "label=<";
-  const goto_programt::instructiont &instruction = *target;
+std::string instruction_string (const goto_programt::instructiont instruction) {
+  std::stringstream out;
   if(instruction.is_target())
     out << std::setw(6) << instruction.target_number << ": ";
   else
@@ -317,7 +293,7 @@ void dump_instruction
   switch(instruction.type())
   {
   case NO_INSTRUCTION_TYPE:
-    out << "NO INSTRUCTION TYPE SET" << '\n';
+    out << "NO INSTRUCTION TYPE SET";
     break;
 
   case GOTO:
@@ -345,7 +321,6 @@ void dump_instruction
       }
     }
 
-    out << '\n';
     break;
 
   case OTHER:
@@ -354,25 +329,23 @@ void dump_instruction
       const auto &code = instruction.get_other();
       if(code.get_statement() == ID_array_copy)
       {
-        out << "ARRAY_COPY " << format(code.op0()) << ' ' << format(code.op1())
-            << '\n';
+        out << "ARRAY_COPY " << format(code.op0()) << ' ' << format(code.op1());
         break;
       }
       else if(code.get_statement() == ID_array_replace)
       {
         out << "ARRAY_REPLACE " << format(code.op0()) << ' '
-            << format(code.op1()) << '\n';
+            << format(code.op1());
         break;
       }
       else if(code.get_statement() == ID_array_set)
       {
-        out << "ARRAY_SET " << format(code.op0()) << ' ' << format(code.op1())
-            << '\n';
+        out << "ARRAY_SET " << format(code.op0()) << ' ' << format(code.op1());
         break;
       }
       else if(code.get_statement() == ID_havoc_object)
       {
-        out << "HAVOC_OBJECT " << format(code.op0()) << '\n';
+        out << "HAVOC_OBJECT " << format(code.op0());
         break;
       }
       else if(code.get_statement() == ID_fence)
@@ -386,7 +359,6 @@ void dump_instruction
           out << " RW";
         if(code.get_bool(ID_WRfence))
           out << " WR";
-        out << '\n';
         break;
       }
       else if(code.get_statement() == ID_input)
@@ -394,31 +366,30 @@ void dump_instruction
         out << "INPUT";
         for(const auto &op : code.operands())
           out << ' ' << format(op);
-        out << '\n';
         break;
       }
       else if(code.get_statement() == ID_output)
       {
-        out << "OUTPUT " << format(code.op0()) << '\n';
+        out << "OUTPUT " << format(code.op0());
         break;
       }
       // fallthrough
     }
 
-    out << "OTHER " << format(instruction.get_other()) << '\n';
+    out << "OTHER "; // FIXME << format(instruction.get_other());
     break;
 
   case SET_RETURN_VALUE:
-    out << "SET RETURN VALUE " << format(instruction.return_value()) << '\n';
+    out << "SET RETURN VALUE " << format(instruction.return_value());
     break;
 
   case DECL:
     out << "DECL " << format(instruction.decl_symbol()) << " : "
-        << format(instruction.decl_symbol().type()) << '\n';
+        << format(instruction.decl_symbol().type());
     break;
 
   case DEAD:
-    out << "DEAD " << format(instruction.dead_symbol()) << '\n';
+    out << "DEAD " << format(instruction.dead_symbol());
     break;
 
   case FUNCTION_CALL:
@@ -438,13 +409,12 @@ void dump_instruction
         out << format(argument);
       }
       out << ')';
-      out << '\n';
     }
     break;
 
   case ASSIGN:
     out << "ASSIGN " << format(instruction.assign_lhs())
-        << " := " << format(instruction.assign_rhs()) << '\n';
+        << " := "; // FIXME << format(instruction.assign_rhs());
     break;
 
   case ASSUME:
@@ -455,26 +425,27 @@ void dump_instruction
       out << "ASSERT ";
 
     {
+      /*
       out << format(instruction.condition());
 
       const irep_idt &comment = instruction.source_location().get_comment();
       if(!comment.empty())
         out << " // " << comment;
+      */
     }
 
-    out << '\n';
     break;
 
   case SKIP:
-    out << "SKIP" << '\n';
+    out << "SKIP";
     break;
 
   case END_FUNCTION:
-    out << "END_FUNCTION" << '\n';
+    out << "END_FUNCTION";
     break;
 
   case LOCATION:
-    out << "LOCATION" << '\n';
+    out << "LOCATION";
     break;
 
   case THROW:
@@ -490,13 +461,10 @@ void dump_instruction
 
     if(instruction.code().operands().size() == 1)
       out << ": " << format(instruction.code().op0());
-
-    out << '\n';
     break;
 
   case CATCH:
   {
-    /*
     if(instruction.code().get_statement() == ID_exception_landingpad)
     {
       const auto &landingpad = to_code_landingpad(instruction.code());
@@ -514,7 +482,7 @@ void dump_instruction
         instruction.targets.size() == exception_list.size(),
         "unexpected discrepancy between sizes of instruction"
         "targets and exception list");
-      for(instructiont::targetst::const_iterator
+      for(goto_programt::instructiont::targetst::const_iterator
             gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
           gt_it++, i++)
@@ -533,30 +501,81 @@ void dump_instruction
     {
       UNREACHABLE;
     }
-    */
     out << "CATCH";
-    out << '\n';
     break;
   }
 
   case ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN" << '\n';
+    out << "ATOMIC_BEGIN";
     break;
 
   case ATOMIC_END:
-    out << "ATOMIC_END" << '\n';
+    out << "ATOMIC_END";
     break;
 
   case START_THREAD:
     out << "START THREAD "
-        << instruction.get_target()->target_number
-        << '\n';
+        << instruction.get_target()->target_number;
     break;
 
   case END_THREAD:
-    out << "END THREAD" << '\n';
+    out << "END THREAD";
     break;
   }
+  return out.str();
+
+}
+
+void replace_all_substrings (std::string& str, const std::string& from, const std::string& to) {
+  int index = 0;
+  while (true) {
+     index = str.find(from, index);
+     if (index == std::string::npos) break;
+     str.replace(index, from.length(), to);
+     index += from.length();
+  }
+}
+
+
+void dump_instruction 
+  (const irep_idt &name,
+   const goto_programt::const_targett &target,
+   const int index,
+   std::ostream &out,
+   const namespacet &ns,
+   const bool use_symex_info,
+   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info) {
+
+
+  out << name << "_" << index
+      << "[";
+
+  if (use_symex_info) {
+    auto symex_info = instr_symex_info.find (target);
+    if (symex_info != instr_symex_info.end()) {
+      // milliseconds
+      double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
+
+      int s = std::max(0, std::min (255, (int)(255 * avg_time_per_step)));
+      std::string color = color_of_score (s);
+      out << "fillcolor=" << "\"#" << color << "\",";
+    }
+  }
+  out << "shape=plaintext,";
+  out << "label=<";
+
+  out << " <table border=\"0\">";
+  out << "<tr><td align=\"text\">"; // style=\"font-family:'Courier', monospace\">";
+  const goto_programt::instructiont &instruction = *target;
+  std::string instr_str = instruction_string (instruction);
+  replace_all_substrings (instr_str, "\"", "&quot;");
+  replace_all_substrings (instr_str, ">", "&gt;");
+  replace_all_substrings (instr_str, "<", "&lt;");
+  out << instr_str;
+  out << "<br align=\"left\" /></td></tr>";
+  out << "</table> ";
+
+
   out << ">]" << ";\n";
 }
 
@@ -611,7 +630,7 @@ void dump_function
       }
     }
 
-    out << "{rank=same;\n";
+    out << "subgraph {rank=same;color=lightgrey;\n";
 
 
     out << normalize_name (f)
@@ -626,7 +645,7 @@ void dump_function
                  << "fontsize=" << node_size
                  << "];\n";
 
-    dump_instructions(f, body, out, ns, use_symex_info, instr_symex_info);
+    //dump_instructions(f, body, out, ns, use_symex_info, instr_symex_info);
     out << "}\n";
 
     dump_function_call_edges (f, body, out, ns, use, use_symex_info, instr_symex_info);
