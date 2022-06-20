@@ -213,6 +213,13 @@ struct sort_based_cast_to_bit_vector_convertert final
         "Generation of SMT formula for type cast to bit vector from type: " +
         from_type.pretty());
   }
+
+  void visit(const smt_array_sortt &) override
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for type cast to bit vector from type: " +
+      from_type.pretty());
+  }
 };
 
 static smt_termt convert_bit_vector_cast(
@@ -293,6 +300,12 @@ struct sort_based_literal_convertert : public smt_sort_const_downcast_visitort
     // terms do not carry signedness.
     const auto value = bvrep2integer(member_input.get_value(), width, false);
     result = smt_bit_vector_constant_termt{value, bit_vector_sort};
+  }
+
+  void visit(const smt_array_sortt &array_sort) override
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Conversion of array SMT literal " + array_sort.pretty());
   }
 };
 

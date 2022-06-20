@@ -76,6 +76,11 @@ public:
   {
     os << "(_ BitVec " << bit_vec.bit_width() << ")";
   }
+
+  void visit(const smt_array_sortt &array) override
+  {
+    os << "(Array " << array.index_sort() << " " << array.element_sort() << ")";
+  }
 };
 
 std::ostream &operator<<(std::ostream &os, const smt_sortt &sort)

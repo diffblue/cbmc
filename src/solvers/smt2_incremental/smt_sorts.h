@@ -87,6 +87,16 @@ public:
   std::size_t bit_width() const;
 };
 
+class smt_array_sortt final : public smt_sortt
+{
+public:
+  explicit smt_array_sortt(
+    const smt_sortt &index_sort,
+    const smt_sortt &element_sort);
+  const smt_sortt &index_sort() const;
+  const smt_sortt &element_sort() const;
+};
+
 class smt_sort_const_downcast_visitort
 {
 public:

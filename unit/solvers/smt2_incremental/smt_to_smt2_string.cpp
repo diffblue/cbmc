@@ -21,6 +21,18 @@ TEST_CASE("Test smt_sortt to string conversion", "[core][smt2_incremental]")
 {
   CHECK(smt_to_smt2_string(smt_bool_sortt{}) == "Bool");
   CHECK(smt_to_smt2_string(smt_bit_vector_sortt{16}) == "(_ BitVec 16)");
+  CHECK(
+    smt_to_smt2_string(smt_array_sortt{smt_bool_sortt{}, smt_bool_sortt{}}) ==
+    "(Array Bool Bool)");
+  CHECK(
+    smt_to_smt2_string(
+      smt_array_sortt(smt_bit_vector_sortt{64}, smt_bit_vector_sortt{16})) ==
+    "(Array (_ BitVec 64) (_ BitVec 16))");
+  CHECK(
+    smt_to_smt2_string(smt_array_sortt(
+      smt_bit_vector_sortt{64},
+      smt_array_sortt(smt_bool_sortt{}, smt_bit_vector_sortt{16}))) ==
+    "(Array (_ BitVec 64) (Array Bool (_ BitVec 16)))");
 }
 
 TEST_CASE(
