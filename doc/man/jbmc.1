@@ -1,1 +1,538 @@
-cbmc.1
+.TH JBMC "1" "June 2022" "jbmc-5.59.0" "User Commands"
+.SH NAME
+jbmc \- Bounded model checking for Java bytecode
+.SH SYNOPSIS
+.TP
+.B jbmc [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B jbmc \fImethod\-name\fR
+Use the fully qualified name of a method as entry point, e.g.,
+\fI'mypackage.Myclass.foo:(I)Z'\fR
+.TP
+.B jbmc \fIclass\-name\fR
+The entry point is the method specified by
+\fB\-\-function\fR, or otherwise, the
+.B public static void main(String[])
+method of the given class \fIclass\-name\fR.
+.TP
+.B jbmc \-jar \fIjarfile\fR
+JAR file to be checked.
+The entry point is the method specified by
+\fB\-\-function\fR or otherwise, the
+.B public static void main(String[])
+method
+of the class specified by \fB\-\-main\-class\fR or the main
+class specified in the JAR manifest
+(checked in this order).
+.TP
+jbmc \-\-gb \fIgoto\-binary\fR
+GOTO binary file to be checked.
+The entry point is the method specified by
+\fB\-\-function\fR, or otherwise, the
+.B public static void main(String[])
+of the class specified by \fB\-\-main\-class\fR
+(checked in this order).
+.SH DESCRIPTION
+.SH OPTIONS
+.TP
+\fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars
+Set class search path of directories and jar files using a colon-separated list
+of directories and JAR archives to search for class files.
+.TP
+\fB\-\-main\-class\fR class\-name
+Set the name of the main class.
+.TP
+\fB\-\-function\fR name
+Set entry point function name.
+.SS "Analysis options:"
+.TP
+\fB\-\-show\-properties\fR
+show the properties, but don't run analysis
+.TP
+\fB\-\-symex\-coverage\-report\fR f
+generate a Cobertura XML coverage report in f
+.TP
+\fB\-\-property\fR id
+only check one specific property
+.TP
+\fB\-\-trace\fR
+give a counterexample trace for failed properties
+.TP
+\fB\-\-stop\-on\-fail\fR
+stop analysis once a failed property is detected
+(implies \fB\-\-trace\fR)
+.TP
+\fB\-\-localize\-faults\fR
+localize faults (experimental)
+.TP
+\fB\-\-validate\-trace\fR
+throw an error if the structure of the counterexample
+trace does not match certain assumptions
+(experimental, currently java only)
+.SS "Platform options:"
+.TP
+\fB\-\-arch\fR \fIarch\fR
+Set analysis architecture, which defaults to the host architecture. Use one of:
+\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR, \fBi386\fR, \fBia64\fR,
+\fBmips\fR, \fBmips64\fR, \fBmips64el\fR, \fBmipsel\fR, \fBmipsn32\fR,
+\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR, \fBs390\fR,
+\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR, \fBx86_64\fR, or
+\fBnone\fR.
+.TP
+\fB\-\-os\fR \fIos\fR
+Set analysis operating system, which defaults to the host operating system. Use
+one of: \fBfreebsd\fR, \fBlinux\fR, \fBmacos\fR, \fBsolaris\fR, or
+\fBwindows\fR.
+.TP
+\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR, \fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
+Set analysis architecture and operating system.
+.TP
+\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR, \fB\-\-LP32\fR
+Set width of int, long and pointers, but don't override default architecture and
+operating system.
+.TP
+\fB\-\-16\fR, \fB\-\-32\fR, \fB\-\-64\fR
+Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
+\fB\-\-LLP64\fR).
+.TP
+\fB\-\-little\-endian\fR
+allow little\-endian word\-byte conversions
+.TP
+\fB\-\-big\-endian\fR
+allow big\-endian word\-byte conversions
+.TP
+\fB\-\-gcc\fR
+use GCC as preprocessor
+.SS "Program representations:"
+.TP
+\fB\-\-show\-parse\-tree\fR
+show parse tree
+.TP
+\fB\-\-show\-symbol\-table\fR
+show loaded symbol table
+.TP
+\fB\-\-list\-symbols\fR
+list symbols with type information
+.TP
+\fB\-\-show\-goto\-functions\fR
+show loaded goto program
+.TP
+\fB\-\-list\-goto\-functions\fR
+list loaded goto functions
+.TP
+\fB\-\-drop\-unused\-functions\fR
+drop functions trivially unreachable
+from main function
+.TP
+\fB\-\-show\-class\-hierarchy\fR
+show the class hierarchy
+.SS "Program instrumentation options:"
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-no\-assumptions\fR
+ignore user assumptions
+.TP
+\fB\-\-mm\fR MM
+memory consistency model for concurrent programs
+.TP
+\fB\-\-fp\-reachability\-slice\fR f
+remove instructions that cannot appear on a trace
+that visits all given functions. The list of
+functions has to be given as a comma separated
+list f.
+.TP
+\fB\-\-reachability\-slice\fR
+remove instructions that cannot appear on a trace
+from entry point to a property
+.TP
+\fB\-\-reachability\-slice\-fb\fR
+remove instructions that cannot appear on a trace
+from entry point through a property
+.TP
+\fB\-\-full\-slice\fR
+run full slicer (experimental)
+.SS "Java Bytecode frontend options:"
+.TP
+\fB\-\-disable\-uncaught\-exception\-check\fR
+ignore uncaught exceptions and errors
+.TP
+\fB\-\-throw\-assertion\-error\fR
+Throw java.lang.AssertionError on violated
+\fBassert\fR statements instead of failing
+at the location of the \fBassert\fR statement.
+.TP
+\fB\-\-throw\-runtime\-exceptions\fR
+Make implicit runtime exceptions explicit.
+.TP
+\fB\-\-assert\-no\-exceptions\-thrown\fR
+Transform \fBthrow\fR instructions into \fBassert FALSE\fR
+followed by \fBassume FALSE\fR.
+.TP
+\fB\-\-max\-nondet\-array\-length\fR \fIN\fR
+Limit nondet (e.g. input) array size to at most \fIN\fR.
+.TP
+\fB\-\-max\-nondet\-tree\-depth\fR \fIN\fR
+Limit size of nondet (e.g. input) object tree;
+at level \fIN\fR references are set to \fBnull\fR.
+.TP
+\fB\-\-java\-assume\-inputs\-non\-null\fR
+Never initialize reference-typed parameter to the
+entry point with \fBnull\fR.
+.TP
+\fB\-\-java\-assume\-inputs\-interval\fR [\fIL\fR:\fIU\fR] or [\fIL\fR:] or [:\fIU\fR]
+Force numerical primitive-typed inputs (\fBbyte\fR, \fBshort\fR, \fBint\fR,
+\fBlong\fR, \fBfloat\fR, \fBdouble\fR) to be initialized within the given range;
+lower bound \fIL\fR and upper bound \fIU\fR must be integers; does not work for
+arrays.
+.TP
+\fB\-\-java\-assume\-inputs\-integral\fR
+Force float and double inputs to have integer values;
+does not work for arrays;
+.TP
+\fB\-\-java\-max\-vla\-length\fR \fIN\fR
+Limit the length of user\-code\-created arrays to \fIN\fR.
+.TP
+\fB\-\-java\-cp\-include\-files\fR \fIr\fR
+Regular expression or JSON list of files to load
+(with '@' prefix).
+.TP
+\fB\-\-java\-load\-class\fR \fICLASS\fR
+Also load code from class \fICLASS\fR.
+.TP
+\fB\-\-java\-no\-load\-class\fR \fICLASS\fR
+Never load code from class \fICLASS\fR.
+.TP
+\fB\-\-ignore\-manifest\-main\-class\fR
+Ignore Main\-Class entries in JAR manifest files.
+If this option is specified and the options
+\fB\-\-function\fR and \fB\-\-main\-class\fR are not, we can be
+certain that all classes in the JAR file are
+loaded.
+.TP
+\fB\-\-context\-include\fR \fIi\fR, \fB\-\-context\-exclude\fR \fIe\fR
+Only analyze code matching specification \fIi\fR that
+does not match specification \fIe\fR, if
+\fB\-\-context\-exclude\fR \fIe\fR is also used.
+All other methods are excluded, i.e., we load their
+signatures and meta\-information, but not their
+bodies.
+A specification is any prefix of a package, class
+or method name, e.g. "org.cprover." or
+"org.cprover.MyClass." or
+"org.cprover.MyClass.methodToStub:(I)Z".
+These options can be given multiple times.
+The default for context\-include is 'all
+included'; default for context\-exclude is
+\&'nothing excluded'.
+.TP
+\fB\-\-no\-lazy\-methods\fR
+Load and translate all methods given on
+the command line and in \fB\-\-classpath\fR
+Default is to load methods that appear to be
+reachable from the \fB\-\-function\fR entry point
+or main class.
+Note that \fB\-\-show\-symbol\-table\fR, \fB\-\-show\-goto\-functions\fR
+and \fB\-\-show\-properties\fR output are restricted to
+loaded methods by default.
+.TP
+\fB\-\-lazy\-methods\-extra\-entry\-point\fR \fIMETHODNAME\fR
+Treat \fIMETHODNAME\fR as a possible program entry
+point for the purpose of lazy method loading.
+\fIMETHODNAME\fR can be a regular expression that will be matched
+against all symbols. If missing, a \fBjava::\fR prefix
+will be added. If no descriptor is found, all
+overloads of a method will also be added.
+.TP
+\fB\-\-static\-values\fR \fIf\fR
+Load initial values of static fields from the given
+JSON file. We assign static fields to these values
+instead of calling the normal static initializer
+(clinit) method.
+The argument can be a relative or absolute path to
+the file.
+.TP
+\fB\-\-java\-lift\-clinit\-calls\fR
+Lifts clinit calls in function bodies to the top of the
+function. This may reduce the overall cost of static
+initialisation, but may be unsound if there are
+cyclic dependencies between static initializers due
+to potentially changing their order of execution,
+or if static initializers have side\-effects such as
+updating another class' static field.
+.TP
+\fB\-\-java\-threading\fR
+enable java multi\-threading support (experimental)
+.TP
+\fB\-\-java\-unwind\-enum\-static\fR
+unwind loops in static initialization of enums
+.TP
+\fB\-\-symex\-driven\-lazy\-loading\fR
+only load functions when first entered by symbolic
+execution. Note that \fB\-\-show\-symbol\-table\fR,
+\fB\-\-show\-goto\-functions\fR/properties output
+will be restricted to loaded methods in this case,
+and only output after the symex phase.
+.SS "Semantic transformations:"
+.TP
+\fB\-\-nondet\-static\fR
+add nondeterministic initialization of variables with static lifetime
+.SS "BMC options:"
+.TP
+\fB\-\-paths\fR [strategy]
+explore paths one at a time
+.TP
+\fB\-\-show\-symex\-strategies\fR
+list strategies for use with \fB\-\-paths\fR
+.TP
+\fB\-\-show\-goto\-symex\-steps\fR
+show which steps symex travels, includes
+diagnostic information
+.TP
+\fB\-\-show\-points\-to\-sets\fR
+show points\-to sets for
+pointer dereference. Requires \fB\-\-json\-ui\fR.
+.TP
+\fB\-\-program\-only\fR
+only show program expression
+.TP
+\fB\-\-show\-byte\-ops\fR
+show all byte extracts and updates
+.TP
+\fB\-\-depth\fR nr
+limit search depth
+.TP
+\fB\-\-max\-field\-sensitivity\-array\-size\fR M
+maximum size M of arrays for which field
+sensitivity will be applied to array,
+the default is 64
+.TP
+\fB\-\-no\-array\-field\-sensitivity\fR
+deactivate field sensitivity for arrays, this is
+equivalent to setting the maximum field
+sensitivity size for arrays to 0
+.TP
+\fB\-\-show\-loops\fR
+show the loops in the program
+.TP
+\fB\-\-unwind\fR nr
+unwind nr times
+.TP
+\fB\-\-unwindset\fR [T:]L:B,...
+unwind loop L with a bound of B
+(optionally restricted to thread T)
+(use \fB\-\-show\-loops\fR to get the loop IDs)
+.TP
+\fB\-\-incremental\-loop\fR L
+check properties after each unwinding
+of loop L
+(use \fB\-\-show\-loops\fR to get the loop IDs)
+.TP
+\fB\-\-unwind\-min\fR nr
+start incremental\-loop after nr unwindings
+but before solving that iteration. If for
+example it is 1, then the loop will be
+unwound once, and immediately checked.
+Note: this means for min\-unwind 1 or
+0 all properties are checked.
+.TP
+\fB\-\-unwind\-max\fR nr
+stop incremental\-loop after nr unwindings
+.TP
+\fB\-\-ignore\-properties\-before\-unwind\-min\fR
+do not check properties before unwind\-min
+when using incremental\-loop
+.TP
+\fB\-\-show\-vcc\fR
+show the verification conditions
+.TP
+\fB\-\-slice\-formula\fR
+remove assignments unrelated to property
+.TP
+\fB\-\-unwinding\-assertions\fR
+generate unwinding assertions (cannot be
+used with \fB\-\-cover\fR)
+.TP
+\fB\-\-partial\-loops\fR
+permit paths with partial loops
+.TP
+\fB\-\-no\-self\-loops\-to\-assumptions\fR
+do not simplify while(1){} to assume(0)
+.TP
+\fB\-\-symex\-complexity\-limit\fR \fIN\fR
+how complex (\fIN\fR) a path can become before
+symex abandons it. Currently uses guard
+size to calculate complexity.
+.TP
+\fB\-\-symex\-complexity\-failed\-child\-loops\-limit\fR \fIN\fR
+how many child branches (\fIN\fR) in an
+iteration are allowed to fail due to
+complexity violations before the loop
+gets blacklisted
+.TP
+\fB\-\-graphml\-witness\fR \fIfilename\fR
+write the witness in GraphML format to filename
+.TP
+\fB\-\-symex\-cache\-dereferences\fR
+enable caching of repeated dereferences
+.SS "Backend options:"
+.TP
+\fB\-\-object\-bits\fR n
+number of bits used for object addresses
+.TP
+\fB\-\-external\-sat\-solver\fR \fIcmd\fR
+command to invoke SAT solver process
+.TP
+\fB\-\-no\-sat\-preprocessor\fR
+disable the SAT solver's simplifier
+.TP
+\fB\-\-dimacs\fR
+generate CNF in DIMACS format
+.TP
+\fB\-\-beautify\fR
+beautify the counterexample
+(greedy heuristic)
+.TP
+\fB\-\-smt1\fR
+use default SMT1 solver (obsolete)
+.TP
+\fB\-\-smt2\fR
+use default SMT2 solver (Z3)
+.TP
+\fB\-\-boolector\fR
+use Boolector
+.TP
+\fB\-\-cprover\-smt2\fR
+use CPROVER SMT2 solver
+.TP
+\fB\-\-cvc3\fR
+use CVC3
+.TP
+\fB\-\-cvc4\fR
+use CVC4
+.TP
+\fB\-\-mathsat\fR
+use MathSAT
+.TP
+\fB\-\-yices\fR
+use Yices
+.TP
+\fB\-\-z3\fR
+use Z3
+.TP
+\fB\-\-fpa\fR
+use theory of floating\-point arithmetic
+.TP
+\fB\-\-refine\fR
+use refinement procedure (experimental)
+.TP
+\fB\-\-refine\-arrays\fR
+use refinement for arrays only
+.TP
+\fB\-\-refine\-arithmetic\fR
+refinement of arithmetic expressions only
+.TP
+\fB\-\-max\-node\-refinement\fR
+maximum refinement iterations for
+arithmetic expressions
+.TP
+\fB\-\-incremental\-smt2\-solver\fR \fIcmd\fR
+command to invoke external SMT solver for
+incremental solving (experimental)
+.TP
+\fB\-\-outfile\fR filename
+output formula to given file
+.TP
+\fB\-\-write\-solver\-stats\-to\fR \fIjson\-file\fR
+collect the solver query complexity
+.TP
+\fB\-\-no\-refine\-strings\fR
+turn off string refinement
+.TP
+\fB\-\-string\-printable\fR
+restrict to printable strings and characters
+.TP
+\fB\-\-string\-non\-empty\fR
+restrict to non\-empty strings (experimental)
+.TP
+\fB\-\-string\-input\-value\fR st
+restrict non\-null strings to a fixed value st;
+the switch can be used multiple times to give
+several strings
+.TP
+\fB\-\-max\-nondet\-string\-length\fR n bound the length of nondet (e.g. input) strings.
+Default is 67108863; note that
+setting the value higher than this does not work
+with \fB\-\-trace\fR or \fB\-\-validate\-trace\fR.
+.TP
+\fB\-\-arrays\-uf\-never\fR
+never turn arrays into uninterpreted functions
+.TP
+\fB\-\-arrays\-uf\-always\fR
+always turn arrays into uninterpreted functions
+.SS "Other options:"
+.TP
+\fB\-\-version\fR
+show version and exit
+.TP
+\fB\-\-xml\-ui\fR
+use XML\-formatted output
+.TP
+\fB\-\-xml\-interface\fR
+bi\-directional XML interface
+.TP
+\fB\-\-json\-ui\fR
+use JSON\-formatted output
+.TP
+\fB\-\-json\-interface\fR
+bi\-directional JSON interface
+.TP
+\fB\-\-validate\-goto\-model\fR
+enable additional well\-formedness checks on the
+goto program
+.TP
+\fB\-\-validate\-ssa\-equation\fR
+enable additional well\-formedness checks on the
+SSA representation
+.TP
+\fB\-\-trace\-json\-extended\fR
+add rawLhs property to trace
+.TP
+\fB\-\-trace\-show\-function\-calls\fR
+show function calls in plain trace
+.TP
+\fB\-\-trace\-show\-code\fR
+show original code in plain trace
+.TP
+\fB\-\-trace\-hex\fR
+represent plain trace values in hex
+.TP
+\fB\-\-compact\-trace\fR
+give a compact trace
+.TP
+\fB\-\-stack\-trace\fR
+give a stack trace only
+.TP
+\fB\-\-flush\fR
+flush every line of output
+.TP
+\fB\-\-verbosity\fR #
+verbosity level
+.TP
+\fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
+Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
+monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR janalyzer (1),
+.BR jdiff (1)
+.SH COPYRIGHT
+2001-2018, Daniel Kroening, Edmund Clarke
