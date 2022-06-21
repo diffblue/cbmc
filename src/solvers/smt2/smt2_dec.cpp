@@ -130,6 +130,14 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   return read_result(in);
 }
 
+static std::string drop_quotes(std::string src)
+{
+  if(src.size() >= 2 && src.front() == '|' && src.back() == '|')
+    return std::string(src, 1, src.size() - 2);
+  else
+    return src;
+}
+
 decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 {
   std::string line;
@@ -199,7 +207,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   for(auto &assignment : identifier_map)
   {
-    std::string conv_id = convert_identifier(assignment.first);
+    std::string conv_id = drop_quotes(convert_identifier(assignment.first));
     const irept &value = parsed_values[conv_id];
     assignment.second.value = parse_rec(value, assignment.second.type);
   }
@@ -207,14 +215,17 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   // Booleans
   for(unsigned v=0; v<no_boolean_variables; v++)
   {
-    const std::string boolean_identifier = "B" + std::to_string(v);
+    const std::string boolean_identifier =
+      convert_identifier("B" + std::to_string(v));
     boolean_assignment[v] = [&]() {
-      const auto found_parsed_value = parsed_values.find(boolean_identifier);
+      const auto found_parsed_value =
+        parsed_values.find(drop_quotes(boolean_identifier));
       if(found_parsed_value != parsed_values.end())
+      {
         return found_parsed_value->second.id() == ID_true;
+      }
       // Work out the value based on what set_to was called with.
-      const auto found_set_value =
-        set_values.find('|' + boolean_identifier + '|');
+      const auto found_set_value = set_values.find(boolean_identifier);
       if(found_set_value != set_values.end())
         return found_set_value->second;
       // Old code used the computation

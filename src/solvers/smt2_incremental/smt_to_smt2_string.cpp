@@ -19,7 +19,7 @@
 
 static std::string escape_identifier(const irep_idt &identifier)
 {
-  return std::string{"|"} + smt2_convt::convert_identifier(identifier) + "|";
+  return smt2_convt::convert_identifier(identifier);
 }
 
 class smt_index_output_visitort : public smt_index_const_downcast_visitort
