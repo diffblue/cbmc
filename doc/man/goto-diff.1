@@ -1,1 +1,137 @@
-cbmc.1
+.TH GOTO-DIFF "1" "June 2022" "jdiff-5.59.0" "User Commands"
+.SH NAME
+goto\-diff \- Syntactic diff of goto binaries
+.SH SYNOPSIS
+.TP
+.B goto\-diff [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B goto\-diff old new
+goto binaries to be compared
+.SH DESCRIPTION
+.SH OPTIONS
+.SS "Diff options:"
+.TP
+\fB\-\-show\-goto\-functions\fR
+show loaded goto program
+.TP
+\fB\-\-list\-goto\-functions\fR
+list loaded goto functions
+.TP
+\fB\-\-show\-properties\fR
+show the properties, but don't run analysis
+.TP
+\fB\-\-show\-loops\fR
+show the loops in the programs
+.TP
+\fB\-u\fR | \fB\-\-unified\fR
+output unified diff
+.HP
+\fB\-\-change\-impact\fR |
+.HP
+\fB\-\-forward\-impact\fR |
+.TP
+\fB\-\-backward\-impact\fR
+output unified diff with forward&backward/forward/backward dependencies
+.TP
+\fB\-\-compact\-output\fR
+output dependencies in compact mode
+.SS "Program instrumentation options:"
+.TP
+\fB\-\-bounds\-check\fR
+enable array bounds checks
+.TP
+\fB\-\-pointer\-check\fR
+enable pointer checks
+.TP
+\fB\-\-memory\-leak\-check\fR
+enable memory leak checks
+.TP
+\fB\-\-div\-by\-zero\-check\fR
+enable division by zero checks
+.TP
+\fB\-\-signed\-overflow\-check\fR
+enable signed arithmetic over\- and underflow checks
+.TP
+\fB\-\-unsigned\-overflow\-check\fR
+enable arithmetic over\- and underflow checks
+.TP
+\fB\-\-pointer\-overflow\-check\fR
+enable pointer arithmetic over\- and underflow checks
+.TP
+\fB\-\-conversion\-check\fR
+check whether values can be represented after type cast
+.TP
+\fB\-\-undefined\-shift\-check\fR
+check shift greater than bit\-width
+.TP
+\fB\-\-float\-overflow\-check\fR
+check floating\-point for +/\-Inf
+.TP
+\fB\-\-nan\-check\fR
+check floating\-point for NaN
+.TP
+\fB\-\-enum\-range\-check\fR
+checks that all enum type expressions have values in the enum range
+.TP
+\fB\-\-pointer\-primitive\-check\fR
+checks that all pointers in pointer primitives are valid or null
+.TP
+\fB\-\-retain\-trivial\-checks\fR
+include checks that are trivially true
+.TP
+\fB\-\-error\-label\fR label
+check that label is unreachable
+.TP
+\fB\-\-no\-built\-in\-assertions\fR
+ignore assertions in built\-in library
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-no\-assumptions\fR
+ignore user assumptions
+.TP
+\fB\-\-assert\-to\-assume\fR
+convert user assertions to assumptions
+.TP
+\fB\-\-cover\fR CC
+create test\-suite with coverage criterion CC,
+where CC is one of assertion[s], assume[s],
+branch[es], condition[s], cover, decision[s],
+location[s], or mcdc
+.TP
+\fB\-\-cover\-failed\-assertions\fR
+do not stop coverage checking at failed assertions
+(this is the default for \fB\-\-cover\fR assertions)
+.TP
+\fB\-\-show\-test\-suite\fR
+print test suite for coverage criterion (requires \fB\-\-cover\fR)
+.SS "Other options:"
+.TP
+\fB\-\-version\fR
+show version and exit
+.TP
+\fB\-\-json\-ui\fR
+use JSON\-formatted output
+.TP
+\fB\-\-flush\fR
+flush every line of output
+.TP
+\fB\-\-verbosity\fR \fIn\fR
+verbosity level
+.TP
+\fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
+Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
+monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto-analyzer (1)
+.SH COPYRIGHT
+2016, Daniel Kroening, Peter Schrammel
