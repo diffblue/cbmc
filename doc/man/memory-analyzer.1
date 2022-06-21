@@ -1,0 +1,123 @@
+.TH MEMORY-ANALYZER "1" "June 2022" "memory-analyzer-5.59.0" "User Commands"
+.SH NAME
+memory-analyzer \- Snapshot program state for symbolic analysis
+.SH SYNOPSIS
+.TP
+.B memory\-analyzer [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B memory\-analyzer \-\-version
+show version
+.TP
+.B memory\-analyzer \-\-symbols \fIsymbol_list\fR [options] \fIbinary\fR
+analyze binary
+.SH DESCRIPTION
+\fBmemory\-analyzer\fR is a front-end that runs and queries \fBgdb\fR(1) in
+order to obtain a snapshot of the state of an input program at a particular
+program location.  Such a snapshot could be useful on its own: to check the
+values of variables at a particular program location. Furthermore, since the
+snapshot is a state of a valid concrete execution, it can also be used for
+subsequent analyses.
+.PP
+In order to analyze a program with \fBmemory-analyzer\fR it needs to be compiled
+with \fBgoto-gcc\fR(1). This yields an \fBelf\fR(5) executable that also
+includes a \fIgoto-cc\fR section holding the goto model:
+.EX
+.IP
+goto\-gcc \-g input_program.c \-o input_program_exe
+.EE
+.PP
+\fBmemory\-analyzer\fR supports two ways of running \fBgdb\fR(1) on user code:
+either to run the code from a core-file or up to a break-point. If the user
+already has a core-file, they can specify it with the option
+\fB\-\-core\-file\fR \fIcf\fR. If the user knows the point of their program from
+where they want to run the analysis, they can specify it with the option
+\fB\-\-breakpoint\fR \fIbp\fR. Only one of core-file/break-point option can be
+used.
+.PP
+The tool also expects a comma-separated list of symbols to be analyzed via
+\fB\-\-symbols \fIs1\fR,\fIs2\fR,\fI...\fR.
+The tool invokes \fBgdb\fR(1) to obtain the snapshot which is why the \fB\-g\fR
+option is necessary when compiling for the program symbols to be visible.
+.PP
+Take for example the following program:
+.EX
+.IP
+// main.c
+void checkpoint() {}
+
+int array[] = {1, 2, 3};
+
+int main()
+{
+  array[1] = 4;
+  checkpoint();
+  return 0;
+}
+.EE
+.PP
+Say we are interested in the evaluation of \fIarray\fR at the call-site of
+\fIcheckpoint\fR. We compile the program with
+.EX
+.IP
+goto\-gcc \-g main.c \-o main_exe
+.EE
+.PP
+And then we call \fBmemory\-analyzer\fR with:
+.EE
+.IP
+memory-analyzer --breakpoint checkpoint --symbols array main_exe
+.PP
+to obtain as output the human readable list of values for each requested symbol:
+.EX
+.IP
+{
+  array = { 1, 4, 3 };
+}
+.EE
+.PP
+The above result is useful for the user and their preliminary analysis but does
+not contain enough information for further automated analyses. To that end,
+memory analyzer has an option for the snapshot to be represented in the format
+of a symbol table (with \fB\-\-symtab\-snapshot\fR). Finally, to obtain an output in
+JSON format, e.g., for further analyses by \fBgoto\-harness\fR(1) the additional option
+\fB\-\-json\-ui\fR needs to be passed to \fBmemory\-analyzer\fR:
+.EX
+.IP
+memory-analyzer \-\-symtab-snapshot \-\-json-ui \-\-breakpoint checkpoint
+  \-\-symbols array main_exe > snapshot.json
+.EE
+.SH OPTIONS
+.TP
+\fB\-\-core\-file\fR \fIfile_name\fR
+Analyze from core dump \fIfile_name\fR.
+.TP
+\fB\-\-breakpoint\fR \fIbreakpoint\fR
+Analyze from given breakpoint.
+.TP
+\fB\-\-symbols\fR \fIsymbol_list\fR
+List of symbols to analyze.
+.TP
+\fB\-\-symtab\-snapshot\fR
+Output snapshot as JSON symbol table that can be used with \fBsymtab2gb\fR(1).
+.TP
+\fB\-\-output\-file\fR \fIfile_name\fR
+Write snapshot to \fIfile_name\fR.
+.TP
+\fB\-\-json\-ui\fR
+Output snapshot in JSON format.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR elf (5),
+.BR gdb (1),
+.BR goto-gcc (1),
+.BR goto-harness (1),
+.BR symtab2gb (1)
+.SH COPYRIGHT
+2019, Malte Mues, Diffblue
