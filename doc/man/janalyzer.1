@@ -1,1 +1,350 @@
-cbmc.1
+.TH JANALYZER "1" "June 2022" "janalyzer-5.59.0" "User Commands"
+.SH NAME
+janalyzer \- Data-flow analysis for Java bytecode
+.SH SYNOPSIS
+.TP
+.B janalyzer [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B janalyzer \fImethod\-name\fR
+Use the fully qualified name of a method as entry point, e.g.,
+\fI'mypackage.Myclass.foo:(I)Z'\fR
+.TP
+.B janalyzer \fIclass\-name\fR
+The entry point is the method specified by
+\fB\-\-function\fR, or otherwise, the
+.B public static void main(String[])
+method of the given class \fIclass\-name\fR.
+.TP
+.B janalyzer \-jar \fIjarfile\fR
+JAR file to be checked.
+The entry point is the method specified by
+\fB\-\-function\fR or otherwise, the
+.B public static void main(String[])
+method
+of the class specified by \fB\-\-main\-class\fR or the main
+class specified in the JAR manifest
+(checked in this order).
+.TP
+.B janalyzer \-\-gb \fIgoto\-binary\fR
+GOTO binary file to be checked.
+The entry point is the method specified by
+\fB\-\-function\fR, or otherwise, the
+.B public static void main(String[])
+of the class specified by \fB\-\-main\-class\fR
+(checked in this order).
+.SH DESCRIPTION
+.SH OPTIONS
+.TP
+\fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars
+Set class search path of directories and jar files using a colon-separated list
+of directories and JAR archives to search for class files.
+.TP
+\fB\-\-main\-class\fR class\-name
+Set the name of the main class.
+.TP
+\fB\-\-function\fR name
+Set entry point function name.
+.SS "Task options:"
+.TP
+\fB\-\-show\fR
+Displays a domain for every instruction in the GOTO binary.  The
+format and information will depend on the \fIdomain\fR that has
+been selected.
+.TP
+\fB\-\-verify\fR
+Every property in the program is checked to see whether it is true
+(it always holds), unreachable, false if it is reachable (due to the
+over-approximate analysis, it is not clear if locations are reachable
+or if it is an overapproximation, so this is the best that can be
+achieved) or unknown.  If there are multiple points of execution that
+reach the same location, each will be checked and the answers
+combined, with unknown taking precedence.
+.TP
+\fB\-\-simplify\fR \fIfile_name\fR
+Writes a new version of the input program to \fIfile_name\fR in which the program has
+been simplified using information from the abstract interpreter.  The
+exact simplification will depend on the domain that is used but
+typically this might be replacing any expression that has a constant
+value.  If this makes instructions unreachable (for example if \fBGOTO\fR
+can be shown to never be taken) they will be removed.  Removal can be
+deactivated by passing \fB\-\-no\-simplify\-slicing\fR.  In the ideal world
+simplify would be idempotent (i.e. running it a second time would not
+simplify anything more than the first).  However there are edge cases
+which are difficult or prohibitively expensive to handle in the
+domain which can result in a second (or more) runs giving
+simplification.  Submitting bug reports for these is helpful but they
+may not be viable to fix.
+.TP
+\fB\-\-no\-simplify\-slicing\fR
+Do not remove instructions from which no
+property can be reached (use with \fB\-\-simplify\fR).
+.TP
+\fB\-\-unreachable\-instructions\fR
+Lists which instructions have a domain which is bottom
+(i.e. unreachable).  If \fB\-\-function\fR has been used to set the program
+entry point then this can flag things like the \fImain\fR function as
+unreachable.
+.TP
+\fB\-\-unreachable\-functions\fR
+Similar to \fB\-\-unreachable\-instructions\fR, but reports which functions are
+definitely unreachable rather than just instructions.
+.TP
+\fB\-\-reachable\-functions\fR
+The negation of \fB\-\-unreachable\-functions\fR, reports which functions may be
+reachable.  Note that because the analysis is over-approximate, it
+is possible this will mark functions as reachable when a more precise
+analysis (possibly using \fBjbmc\fR(1)) will show that there are no execution
+traces that reach them.
+.SS "Abstract interpreter options:"
+.TP
+\fB\-\-location\-sensitive\fR
+use location\-sensitive abstract interpreter
+.TP
+\fB\-\-concurrent\fR
+This extends abstract interpretation with very restricted and special purpose
+handling of threads.  This needs the domain to have certain unusual
+properties for it to give a correct answer.  At the time of writing
+only \fB\-\-dependence\-graph\fR is compatible with it.
+.SS "Domain options:"
+.TP
+\fB\-\-constants\fR
+The default option, this stores one constant value per variable.  This means it
+is fast but will only find things that can be resolved by constant propagation.
+The domain has some handling of arrays but limited support for pointers which
+means that in can potentially give unsound behavior.
+.TP
+\fB\-\-intervals\fR
+A domain that stores an interval for each integer and float variable.  At the
+time of writing not all operations are supported so the results can be quite
+over-approximate at points.  It also has limitations in the handling of pointers
+so can give unsound results.
+.TP
+\fB\-\-non\-null\fR
+This domain is intended to find which pointers are not null.  Its
+implementation is very limited and it is not recommended.
+.TP
+\fB\-\-dependence\-graph\fR
+Tracks data flow and information flow dependencies between
+instructions and produces a graph.  This includes doing points-to
+analysis and tracking reaching definitions (i.e. use-def chains).
+This is one of the most extensive, correct and feature complete domains.
+.SS "Output options:"
+These options control how the result of the task is output.  The
+default is text to the standard output.  In the case of tasks that
+produce goto-programs (\fB\-\-simplify\fR for example), the output options
+only affect the logging and not the final form of the program.
+.TP
+\fB\-\-text\fR \fIfile_name\fR
+Output results in plain text to given file.
+.TP
+\fB\-\-json\fR \fIfile_name\fR
+Writes the output as a JSON object to \fIfile_name\fR.
+.TP
+\fB\-\-xml\fR \fIfile_name\fR
+Output results in XML format to \fIfile_name\R.
+.TP
+\fB\-\-dot\fR \fIfile_name\fR
+Writes the output in \fBdot\fR(1) format to \fIfile_name\fR.  This is
+only supported by some domains and tasks (for example
+\fB\-\-show\fR \fB\-\-dependence-graph\fR).
+.SS "Specific analyses:"
+.TP
+\fB\-\-taint\fR file_name
+perform taint analysis using rules in given file
+.TP
+\fB\-\-show\-taint\fR
+print taint analysis results on stdout
+.TP
+\fB\-\-show\-local\-may\-alias\fR
+perform procedure\-local may alias analysis
+.SS "Java Bytecode frontend options:"
+.TP
+\fB\-\-disable\-uncaught\-exception\-check\fR
+ignore uncaught exceptions and errors
+.TP
+\fB\-\-throw\-assertion\-error\fR
+Throw java.lang.AssertionError on violated
+\fBassert\fR statements instead of failing
+at the location of the \fBassert\fR statement.
+.TP
+\fB\-\-throw\-runtime\-exceptions\fR
+Make implicit runtime exceptions explicit.
+.TP
+\fB\-\-assert\-no\-exceptions\-thrown\fR
+Transform \fBthrow\fR instructions into \fBassert FALSE\fR
+followed by \fBassume FALSE\fR.
+.TP
+\fB\-\-max\-nondet\-array\-length\fR \fIN\fR
+Limit nondet (e.g. input) array size to at most \fIN\fR.
+.TP
+\fB\-\-max\-nondet\-tree\-depth\fR \fIN\fR
+Limit size of nondet (e.g. input) object tree;
+at level \fIN\fR references are set to \fBnull\fR.
+.TP
+\fB\-\-java\-assume\-inputs\-non\-null\fR
+Never initialize reference-typed parameter to the
+entry point with \fBnull\fR.
+.TP
+\fB\-\-java\-assume\-inputs\-interval\fR [\fIL\fR:\fIU\fR] or [\fIL\fR:] or [:\fIU\fR]
+Force numerical primitive-typed inputs (\fBbyte\fR, \fBshort\fR, \fBint\fR,
+\fBlong\fR, \fBfloat\fR, \fBdouble\fR) to be initialized within the given range;
+lower bound \fIL\fR and upper bound \fIU\fR must be integers; does not work for
+arrays.
+.TP
+\fB\-\-java\-assume\-inputs\-integral\fR
+Force float and double inputs to have integer values;
+does not work for arrays;
+.TP
+\fB\-\-java\-max\-vla\-length\fR \fIN\fR
+Limit the length of user\-code\-created arrays to \fIN\fR.
+.TP
+\fB\-\-java\-cp\-include\-files\fR \fIr\fR
+Regular expression or JSON list of files to load
+(with '@' prefix).
+.TP
+\fB\-\-java\-load\-class\fR \fICLASS\fR
+Also load code from class \fICLASS\fR.
+.TP
+\fB\-\-java\-no\-load\-class\fR \fICLASS\fR
+Never load code from class \fICLASS\fR.
+.TP
+\fB\-\-ignore\-manifest\-main\-class\fR
+Ignore Main\-Class entries in JAR manifest files.
+If this option is specified and the options
+\fB\-\-function\fR and \fB\-\-main\-class\fR are not, we can be
+certain that all classes in the JAR file are
+loaded.
+.TP
+\fB\-\-context\-include\fR \fIi\fR, \fB\-\-context\-exclude\fR \fIe\fR
+Only analyze code matching specification \fIi\fR that
+does not match specification \fIe\fR, if
+\fB\-\-context\-exclude\fR \fIe\fR is also used.
+All other methods are excluded, i.e., we load their
+signatures and meta\-information, but not their
+bodies.
+A specification is any prefix of a package, class
+or method name, e.g. "org.cprover." or
+"org.cprover.MyClass." or
+"org.cprover.MyClass.methodToStub:(I)Z".
+These options can be given multiple times.
+The default for context\-include is 'all
+included'; default for context\-exclude is
+\&'nothing excluded'.
+.TP
+\fB\-\-no\-lazy\-methods\fR
+Load and translate all methods given on
+the command line and in \fB\-\-classpath\fR
+Default is to load methods that appear to be
+reachable from the \fB\-\-function\fR entry point
+or main class.
+Note that \fB\-\-show\-symbol\-table\fR, \fB\-\-show\-goto\-functions\fR
+and \fB\-\-show\-properties\fR output are restricted to
+loaded methods by default.
+.TP
+\fB\-\-lazy\-methods\-extra\-entry\-point\fR \fIMETHODNAME\fR
+Treat \fIMETHODNAME\fR as a possible program entry
+point for the purpose of lazy method loading.
+\fIMETHODNAME\fR can be a regular expression that will be matched
+against all symbols. If missing, a \fBjava::\fR prefix
+will be added. If no descriptor is found, all
+overloads of a method will also be added.
+.TP
+\fB\-\-static\-values\fR \fIf\fR
+Load initial values of static fields from the given
+JSON file. We assign static fields to these values
+instead of calling the normal static initializer
+(clinit) method.
+The argument can be a relative or absolute path to
+the file.
+.TP
+\fB\-\-java\-lift\-clinit\-calls\fR
+Lifts clinit calls in function bodies to the top of the
+function. This may reduce the overall cost of static
+initialisation, but may be unsound if there are
+cyclic dependencies between static initializers due
+to potentially changing their order of execution,
+or if static initializers have side\-effects such as
+updating another class' static field.
+.SS "Platform options:"
+.TP
+\fB\-\-arch\fR \fIarch\fR
+Set analysis architecture, which defaults to the host architecture. Use one of:
+\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR, \fBi386\fR, \fBia64\fR,
+\fBmips\fR, \fBmips64\fR, \fBmips64el\fR, \fBmipsel\fR, \fBmipsn32\fR,
+\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR, \fBs390\fR,
+\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR, \fBx86_64\fR, or
+\fBnone\fR.
+.TP
+\fB\-\-os\fR \fIos\fR
+Set analysis operating system, which defaults to the host operating system. Use
+one of: \fBfreebsd\fR, \fBlinux\fR, \fBmacos\fR, \fBsolaris\fR, or
+\fBwindows\fR.
+.TP
+\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR, \fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
+Set analysis architecture and operating system.
+.TP
+\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR, \fB\-\-LP32\fR
+Set width of int, long and pointers, but don't override default architecture and
+operating system.
+.TP
+\fB\-\-16\fR, \fB\-\-32\fR, \fB\-\-64\fR
+Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
+\fB\-\-LLP64\fR).
+.TP
+\fB\-\-little\-endian\fR
+allow little\-endian word\-byte conversions
+.TP
+\fB\-\-big\-endian\fR
+allow big\-endian word\-byte conversions
+.TP
+\fB\-\-gcc\fR
+use GCC as preprocessor
+.SS "Program representations:"
+.TP
+\fB\-\-show\-parse\-tree\fR
+show parse tree
+.TP
+\fB\-\-show\-symbol\-table\fR
+show loaded symbol table
+.TP
+\fB\-\-show\-goto\-functions\fR
+show loaded goto program
+.TP
+\fB\-\-list\-goto\-functions\fR
+list loaded goto functions
+.TP
+\fB\-\-show\-properties\fR
+show the properties, but don't run analysis
+.SS "Program instrumentation options:"
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-no\-assumptions\fR
+ignore user assumptions
+.TP
+\fB\-\-property\fR \fIid\fR
+enable selected properties only
+.SS "Other options:"
+.TP
+\fB\-\-version\fR
+show version and exit
+.TP
+\fB\-\-verbosity\fR \fIn\fR
+verbosity level
+.TP
+\fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
+Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
+monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR jbmc (1),
+.BR goto-analyzer (1)
+.SH COPYRIGHT
+2016\-2018, Daniel Kroening, Diffblue
