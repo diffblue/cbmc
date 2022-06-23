@@ -108,6 +108,7 @@ static struct_exprt bv_to_struct_expr(
       member_offset_bits,
       member_offset_bits + component_bits - 1);
     bitvector_typet type = adjust_width(bitvector_expr.type(), component_bits);
+    PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
     operands.push_back(bv_to_expr(
       extractbits_exprt{bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
       comp.type(),
@@ -158,6 +159,7 @@ static union_exprt bv_to_union_expr(
   const typet &component_type = widest_member.has_value()
                                   ? widest_member->first.type()
                                   : components.front().type();
+  PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
   return union_exprt{
     component_name,
     bv_to_expr(
@@ -205,6 +207,7 @@ static array_exprt bv_to_array_expr(
         endianness_map, i * subtype_bits_int, ((i + 1) * subtype_bits_int) - 1);
       bitvector_typet type =
         adjust_width(bitvector_expr.type(), subtype_bits_int);
+      PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
       operands.push_back(bv_to_expr(
         extractbits_exprt{
           bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
@@ -251,6 +254,7 @@ static vector_exprt bv_to_vector_expr(
         endianness_map, i * subtype_bits_int, ((i + 1) * subtype_bits_int) - 1);
       bitvector_typet type =
         adjust_width(bitvector_expr.type(), subtype_bits_int);
+      PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
       operands.push_back(bv_to_expr(
         extractbits_exprt{
           bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
@@ -297,6 +301,7 @@ static complex_exprt bv_to_complex_expr(
   const bitvector_typet type =
     adjust_width(bitvector_expr.type(), subtype_bits);
 
+  PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
   return complex_exprt{
     bv_to_expr(
       extractbits_exprt{bitvector_expr, bounds_real.ub, bounds_real.lb, type},
@@ -946,6 +951,8 @@ static exprt unpack_rec(
     exprt::operandst byte_operands;
     for(; bit_offset < last_bit; bit_offset += 8)
     {
+      PRECONDITION(
+        pointer_offset_bits(src_as_bitvector.type(), ns).has_value());
       extractbits_exprt extractbits(
         src_as_bitvector,
         from_integer(bit_offset + 7, c_index_type()),
@@ -2013,6 +2020,7 @@ static exprt lower_byte_update_struct(
       elements.push_back(updated_element);
     else
     {
+      PRECONDITION(pointer_offset_bits(updated_element.type(), ns).has_value());
       elements.push_back(typecast_exprt::conditional_cast(
         extractbits_exprt{updated_element,
                           element_bits_int - 1 + (little_endian ? shift : 0),
@@ -2255,6 +2263,7 @@ static exprt lower_byte_update(
         bitor_expr.type(), src.id() == ID_byte_update_little_endian, ns);
       const auto bounds = map_bounds(endianness_map, 0, type_bits - 1);
 
+      PRECONDITION(pointer_offset_bits(bitor_expr.type(), ns).has_value());
       return simplify_expr(
         typecast_exprt::conditional_cast(
           extractbits_exprt{
@@ -2301,6 +2310,10 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
   CHECK_RETURN(update_size_expr_opt.has_value());
   simplify(update_size_expr_opt.value(), ns);
 
+  const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
+                                    ? ID_byte_extract_little_endian
+                                    : ID_byte_extract_big_endian;
+
   if(!update_size_expr_opt.value().is_constant())
     non_const_update_bound = *update_size_expr_opt;
   else
@@ -2318,14 +2331,21 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
       DATA_INVARIANT(
         can_cast_type<bitvector_typet>(update_value.type()),
         "non-byte aligned type expected to be a bitvector type");
-      size_t n_extra_bits = 8 - update_bits_int % 8;
+      const byte_extract_exprt overlapping_byte_extract{
+        extract_opcode,
+        src.op(),
+        simplify_expr(
+          plus_exprt{
+            src.offset(),
+            from_integer(update_bits_int / 8, src.offset().type())},
+          ns),
+        bv_typet{8}};
+      const exprt overlapping_byte =
+        lower_byte_extract(overlapping_byte_extract, ns);
 
-      endianness_mapt endianness_map(
-        src.op().type(), src.id() == ID_byte_update_little_endian, ns);
-      const auto bounds = map_bounds(
-        endianness_map, update_bits_int, update_bits_int + n_extra_bits - 1);
+      size_t n_extra_bits = 8 - update_bits_int % 8;
       extractbits_exprt extra_bits{
-        src.op(), bounds.ub, bounds.lb, bv_typet{n_extra_bits}};
+        overlapping_byte, n_extra_bits - 1, 0, bv_typet{n_extra_bits}};
 
       update_value = concatenation_exprt{
         typecast_exprt::conditional_cast(
@@ -2339,10 +2359,6 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
         from_integer(update_bits_int / 8, update_size_expr_opt->type());
     }
   }
-
-  const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
-                                    ? ID_byte_extract_little_endian
-                                    : ID_byte_extract_big_endian;
 
   const byte_extract_exprt byte_extract_expr{
     extract_opcode,
