@@ -1,6 +1,7 @@
 # Release Process
 
-**Date**: 8-10-2020
+**Date**: 2020-10-08
+**Updated**: 2022-06-23
 **Author**: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 **Domain**: Release & Packaging
 
@@ -26,18 +27,41 @@ anything more, but the process is described below for reference:
 
 3. `.github/workflows/regular-release.yaml` gets triggered on the `push`
    of the tag, and creates a Github release of the version that was
-   described in thetag pushed (so, tag `cbmc-5.15.20` is going to
+   described in the tag pushed (so, tag `cbmc-5.15.20` is going to
    create the release titled `cbmc-5.15.20` on the release page).
 
 4. `.github/workflows/release-packages.yaml` gets triggered automatically
    at the creation of the release, and its job is to build packages for
    Windows, Ubuntu 18.04 and Ubuntu 20.04 (for now, we may support more
    specific Ubuntu versions later) and attaches them (after it has finished
-   building them) to the release page as release artifacts. 
+   building them) to the release page as release artifacts.
 
    It also makes a PR to the homebrew repository that updates the version
    of CBMC in homebrew. That's then approved and merged by the maintainers
    of homebrew.
+
+## Versioning
+
+We adopt an approach approximating SemVer. That is, our version numbers should
+be major.minor.patch. Regular releases (as of 2022-06-23: every other week)
+should normally increment the minor version number. This is also where we can
+deprecate undesired features, i.e., mark as deprecated, warn existing users.
+
+Patch version increments should not be done as part of the regular releases, and
+instead should be reserved for critical bugfixes and issues noticed in the
+process of doing a regular release. Don't make a patch release if you're not
+confident your release contains nothing but bugfixes.
+
+Major version increments should be reserved for changes which we expect will
+break downstream users scripts and/or workflows. This includes things like
+changing the goto binary format in such a way that old outputs can't be read by
+new version of our tools or vice versa, or removing deprecated functionality
+(removal of functionality should generally be preceded by deprecation!). Note
+that incrementing the major version every time a change technically could break
+a downstream users scripts would lead to a weak signal, as basically any
+detectable change including bugfixes can do that. Instead, major version
+increments should signal that we expect many users will have to review their
+workflows for potential breakages, not just any.
 
 ## Constraints
 
