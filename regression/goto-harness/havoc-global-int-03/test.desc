@@ -1,6 +1,6 @@
 CORE
 main.c
-harness.gb --harness-type initialise-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-int-x-1-snapshot.json --initial-source-location main.c:6 --havoc-variables x
+harness.gb --harness-type initialize-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-int-x-1-snapshot.json --initial-source-location main.c:6 --havoc-variables x
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.assertion.1\] line [0-9]+ assertion x == 1: SUCCESS

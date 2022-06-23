@@ -256,7 +256,7 @@ goto_harness_generator_factoryt goto_harness_parse_optionst::make_factory()
       ui_message_handler);
   });
 
-  factory.register_generator("initialise-with-memory-snapshot", [this]() {
+  factory.register_generator("initialize-with-memory-snapshot", [this]() {
     return util_make_unique<memory_snapshot_harness_generatort>(
       ui_message_handler);
   });
