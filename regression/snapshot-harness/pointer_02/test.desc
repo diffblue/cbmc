@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
-x,p1,p2,p3 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+x,p1,p2,p3 --harness-type initialize-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.assertion.1\] line [0-9]+ assertion \*p2 == x: SUCCESS

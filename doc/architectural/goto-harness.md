@@ -467,7 +467,7 @@ $ goto-cc -o main.gb main.c
 
 $ goto-harness \
   --harness-function-name harness \
-  --harness-type initialise-with-memory-snapshot \
+  --harness-type initialize-with-memory-snapshot \
   --memory-snapshot snapshot.json \
   --initial-source-location main.c:46 \
   --havoc-variables x \

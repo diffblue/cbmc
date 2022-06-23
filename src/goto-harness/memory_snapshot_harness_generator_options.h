@@ -33,7 +33,7 @@ Author: Diffblue Ltd.
 // clang-format off
 #define MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP                                 \
   "memory snapshot harness generator (--harness-type\n"                        \
-  "  initialise-with-memory-snapshot)\n\n"                                     \
+  "  initialize-with-memory-snapshot)\n\n"                                     \
   "--" MEMORY_SNAPSHOT_HARNESS_SNAPSHOT_OPT " <file>      initialise memory "  \
   "from JSON memory snapshot\n"                                                \
   "--" MEMORY_SNAPSHOT_HARNESS_INITIAL_GOTO_LOC_OPT " <func[:<n>]>\n"          \

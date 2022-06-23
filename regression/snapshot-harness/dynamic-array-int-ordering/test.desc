@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
-a,a1,iterator1,a2,a3,iterator2,a4,a5,iterator3,a6,a7,array2,a8 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+a,a1,iterator1,a2,a3,iterator2,a4,a5,iterator3,a6,a7,array2,a8 --harness-type initialize-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.assertion.1\] line [0-9]+ assertion \*iterator1 == 1: SUCCESS

@@ -111,7 +111,7 @@ void memory_snapshot_harness_generatort::validate_options(
   {
     throw invalid_command_line_argument_exceptiont(
       "option --memory_snapshot is required",
-      "--harness-type initialise-with-memory-snapshot");
+      "--harness-type initialize-with-memory-snapshot");
   }
 
   if(initial_source_location_line.empty() == initial_goto_location_line.empty())

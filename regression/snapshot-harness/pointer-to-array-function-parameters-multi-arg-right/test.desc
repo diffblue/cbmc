@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
-first,second,string_size,prefix --harness-type initialise-with-memory-snapshot --initial-goto-location main:4 --havoc-variables prefix --size-of-array prefix:prefix_size --max-array-size 5
+first,second,string_size,prefix --harness-type initialize-with-memory-snapshot --initial-goto-location main:4 --havoc-variables prefix --size-of-array prefix:prefix_size --max-array-size 5
 ^SIGNAL=0$
 ^EXIT=0$
 VERIFICATION SUCCESSFUL

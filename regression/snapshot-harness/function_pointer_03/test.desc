@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
-fun_array,fun_ptr1,fun_ptr2 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+fun_array,fun_ptr1,fun_ptr2 --harness-type initialize-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=0$
 ^SIGNAL=0$
 \[main.assertion.1\] line [0-9]+ assertion fun_ptr1 == \&plus: SUCCESS

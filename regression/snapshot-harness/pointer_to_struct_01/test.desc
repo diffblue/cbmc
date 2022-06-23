@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
-st,p,q --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+st,p,q --harness-type initialize-with-memory-snapshot --initial-goto-location main:4
 ^EXIT=0$
 ^SIGNAL=0$
 \[main.assertion.1\] line [0-9]+ assertion p == \&st: SUCCESS
