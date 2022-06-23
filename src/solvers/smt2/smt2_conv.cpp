@@ -1859,7 +1859,7 @@ void smt2_convt::convert_expr(const exprt &expr)
         convert_expr(isfinite_expr.op());
         out << "))";
 
-        out << "(not (fp.isInf ";
+        out << "(not (fp.isInfinite ";
         convert_expr(isfinite_expr.op());
         out << "))";
 
