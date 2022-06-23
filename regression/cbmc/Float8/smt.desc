@@ -1,6 +1,6 @@
-CORE
+CORE smt-backend
 main.c
---floatbv --no-simplify
+--smt2 --fpa
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

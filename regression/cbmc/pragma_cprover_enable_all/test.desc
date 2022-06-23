@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 main.c
 --object-bits 8 --bounds-check --pointer-check --pointer-primitive-check --div-by-zero-check --enum-range-check --unsigned-overflow-check --signed-overflow-check --pointer-overflow-check --float-overflow-check --conversion-check --undefined-shift-check --nan-check --pointer-primitive-check
 ^\[main\.pointer_primitives\.\d+\] line 77 pointer invalid in R_OK\(q, \(unsigned (long (long )?)?int\)1\): FAILURE$

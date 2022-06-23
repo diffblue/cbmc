@@ -1245,14 +1245,14 @@ void smt2_parsert::setup_expressions()
     return unary_predicate_exprt(ID_isnan, op[0]);
   };
 
-  expressions["fp.isInf"] = [this] {
+  expressions["fp.isInfinite"] = [this] {
     auto op = operands();
 
     if(op.size() != 1)
-      throw error("fp.isInf takes one operand");
+      throw error("fp.isInfinite takes one operand");
 
     if(op[0].type().id() != ID_floatbv)
-      throw error("fp.isInf takes FloatingPoint operand");
+      throw error("fp.isInfinite takes FloatingPoint operand");
 
     return unary_predicate_exprt(ID_isinf, op[0]);
   };
