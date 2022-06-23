@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "remove_function_pointers.h"
 
+#include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -195,8 +197,10 @@ static void fix_argument_types(code_function_callt &function_call)
     {
       if(call_arguments[i].type() != function_parameters[i].type())
       {
-        call_arguments[i] =
-          typecast_exprt(call_arguments[i], function_parameters[i].type());
+        call_arguments[i] = make_byte_extract(
+          call_arguments[i],
+          from_integer(0, c_index_type()),
+          function_parameters[i].type());
       }
     }
   }
@@ -235,8 +239,10 @@ static void fix_return_type(
   exprt old_lhs=function_call.lhs();
   function_call.lhs()=tmp_symbol_expr;
 
-  dest.add(goto_programt::make_assignment(
-    code_assignt(old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()))));
+  dest.add(goto_programt::make_assignment(code_assignt(
+    old_lhs,
+    make_byte_extract(
+      tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()))));
 }
 
 void remove_function_pointerst::remove_function_pointer(
