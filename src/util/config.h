@@ -82,15 +82,25 @@ class symbol_tablet;
   "(gcc)"                                                                      \
 
 #define HELP_CONFIG_PLATFORM \
-  " --arch                       set architecture (default: "                  \
+  " --arch <arch>                set architecture (default: "                  \
                                  << configt::this_architecture() << ")\n"      \
-  " --os                         set operating system (default: "              \
+  "                              to one of: alpha, arm, arm64, armel, armhf,\n"\
+  "                              hppa, i386, ia64, mips, mips64, mips64el,\n"  \
+  "                              mipsel, mipsn32, mipsn32el, powerpc, ppc64,\n"\
+  "                              ppc64le, riscv64, s390, s390x, sh4, sparc,\n" \
+  "                              sparc64, v850, x32, x86_64, or none\n"        \
+  " --os <os>                    set operating system (default: "              \
                                  << configt::this_operating_system() << ")\n"  \
+  "                              to one of: freebsd, linux, macos, solaris,\n" \
+  "                              or windows\n"                                 \
   " --i386-linux, --i386-win32, --i386-macos, --ppc-macos\n"                   \
   "   --win32, --winx64          set architecture and operating system\n"      \
-  " --16, --32, --64             set width of int\n"                           \
   " --LP64, --ILP64, --LLP64,\n"                                               \
-  "   --ILP32, --LP32            set width of int, long and pointers\n"        \
+  "   --ILP32, --LP32            set width of int, long and pointers, but\n"   \
+  "                              don't override default architecture and\n"    \
+  "                              operating system\n"                           \
+  " --16, --32, --64             equivalent to --LP32, --ILP32, --LP64 (on\n"  \
+  "                              Windows: --LLP64)\n"                          \
   " --little-endian              allow little-endian word-byte conversions\n"  \
   " --big-endian                 allow big-endian word-byte conversions\n"     \
   " --gcc                        use GCC as preprocessor\n"                    \
