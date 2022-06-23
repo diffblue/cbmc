@@ -1819,7 +1819,6 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
-    " --check-invariant function   instruments invariant checking function\n"
     " --function-enter <f>, --function-exit <f>, --branch <f>\n"
     "                              instruments a call to <f> at the beginning,\n" // NOLINT(*)
     "                              the exit, or a branch point, respectively\n"
