@@ -1,7 +1,9 @@
 CORE
 main.cpp
 
-^# Total errors found: 0$
-^EXIT=0$
+^regression/cpp-linter/operator-spacing2/main\.cpp:27:  Missing spaces around <<  \[whitespace/operators\] \[3\]
+^regression/cpp-linter/operator-spacing2/main\.cpp:31:  Missing spaces around <<  \[whitespace/operators\] \[3\]
+^# Total errors found: 2$
+^EXIT=1$
 ^SIGNAL=0$
 --
