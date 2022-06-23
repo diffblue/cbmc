@@ -759,9 +759,8 @@ void janalyzer_parse_optionst::help()
     "\n"
     "Domain options:\n"
     " --constants                  constant domain\n"
-    " --intervals, --show-intervals\n"
-    "                              interval domain\n"
-    " --non-null, --show-non-null  non-null domain\n"
+    " --intervals                  interval domain\n"
+    " --non-null                   non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
     "\n"
     "Output options:\n"
