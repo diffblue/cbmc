@@ -467,6 +467,12 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
   {
     return make_boolean_expr(expr.id() != ID_equal);
   }
+  else if(
+    tmp0_object.id() == ID_string_constant &&
+    tmp1_object.id() == ID_string_constant && tmp0_object == tmp1_object)
+  {
+    return make_boolean_expr(expr.id() == ID_equal);
+  }
 
   return unchanged(expr);
 }
