@@ -1,0 +1,10 @@
+CORE
+main.c
+--apply-loop-contracts
+^\[main.assigns.\d+\].*line 10 Check that i is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that loop local variables do not cause explicit checks 

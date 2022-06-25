@@ -47,6 +47,7 @@ public:
   /// \param _function_id Name of the replaced function
   /// \param _targets Assigns clause targets of the replaced function
   /// \param _functions Other functions forming the GOTO model
+  /// \param _cfg_info CFG-based information on function symbols (not used)
   /// \param _source_location Source location of the replaced function call
   ///        (added to all generated instructions)
   /// \param _st Symbol table of the model (new symbols will be added)
@@ -56,10 +57,16 @@ public:
     const irep_idt &_function_id,
     const std::vector<exprt> &_targets,
     const goto_functionst &_functions,
+    cfg_infot &_cfg_info,
     const source_locationt &_source_location,
     symbol_tablet &_st,
     message_handlert &_message_handler)
-    : instrument_spec_assignst(_function_id, _functions, _st, _message_handler),
+    : instrument_spec_assignst(
+        _function_id,
+        _functions,
+        _cfg_info,
+        _st,
+        _message_handler),
       targets(_targets),
       source_location(_source_location)
   {

@@ -1,0 +1,11 @@
+CORE
+main.c
+--apply-loop-contracts
+^\[bar.assigns.\d+\].*Check that i is assignable: SUCCESS$
+^\[foo.assigns.\d+\].*Check that i is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that loop local variables do not cause explicit checks 

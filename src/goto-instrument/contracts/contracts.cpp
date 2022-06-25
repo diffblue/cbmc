@@ -39,6 +39,7 @@ Date: February 2016
 #include <goto-instrument/nondet_static.h>
 #include <langapi/language_util.h>
 
+#include "cfg_info.h"
 #include "havoc_assigns_clause_targets.h"
 #include "instrument_spec_assigns.h"
 #include "memory_predicates.h"
@@ -270,9 +271,16 @@ void code_contractst::check_apply_loop_contracts(
   // CAR snapshot instructions for checking assigns clause
   goto_programt snapshot_instructions;
 
+  loop_cfg_infot cfg_info(goto_function, loop);
+
   // track static local symbols
   instrument_spec_assignst instrument_spec_assigns(
-    function_name, goto_functions, symbol_table, log.get_message_handler());
+    function_name,
+    goto_functions,
+    cfg_info,
+    symbol_table,
+    log.get_message_handler());
+
   instrument_spec_assigns.track_static_locals_between(
     loop_head, loop_end, snapshot_instructions);
 
@@ -289,6 +297,9 @@ void code_contractst::check_apply_loop_contracts(
       get_assigns(local_may_alias, loop, to_havoc);
       // TODO: if the set contains pairs (i, a[i]),
       // we must at least widen them to (i, pointer_object(a))
+
+      // remove loop-local symbols from the inferred set
+      cfg_info.erase_locals(to_havoc);
 
       log.debug() << "No loop assigns clause provided. Inferred targets: {";
       // Add inferred targets to the loop assigns clause.
@@ -441,16 +452,11 @@ void code_contractst::check_apply_loop_contracts(
   goto_function.body.destructive_insert(
     loop_head, add_pragma_disable_assigns_check(pre_loop_head_instrs));
 
-  optionalt<cfg_infot> cfg_empty_info;
-
   // Perform write set instrumentation on the entire loop.
   instrument_spec_assigns.instrument_instructions(
     goto_function.body,
     loop_head,
     loop_end,
-    skip_function_paramst::NO,
-    // do not use CFG info for now
-    cfg_empty_info,
     [&loop](const goto_programt::targett &t) { return loop.contains(t); });
 
   // Now we begin instrumenting at the loop_end.
@@ -894,11 +900,12 @@ void code_contractst::apply_function_contract(
 
   // ... for the assigns clause targets and static locals
   goto_programt havoc_instructions;
-
+  function_cfg_infot cfg_info({});
   havoc_assigns_clause_targetst havocker(
     target_function,
     targets.operands(),
     goto_functions,
+    cfg_info,
     location,
     symbol_table,
     log.get_message_handler());
@@ -1247,8 +1254,14 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
   const auto &function_with_contract =
     to_code_with_contract_type(function_symbol.type);
 
+  function_cfg_infot cfg_info(goto_function);
+
   instrument_spec_assignst instrument_spec_assigns(
-    function, goto_functions, symbol_table, log.get_message_handler());
+    function,
+    goto_functions,
+    cfg_info,
+    symbol_table,
+    log.get_message_handler());
 
   // Detect and track static local variables before inlining
   goto_programt snapshot_static_locals;
@@ -1275,13 +1288,6 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
     is_loop_free(function_body, ns, log),
     "Loops remain in function '" + id2string(function) +
       "', assigns clause checking instrumentation cannot be applied.");
-
-  // Create a deep copy of the inlined body before any instrumentation is added
-  // and compute static control flow graph information
-  goto_functiont goto_function_orig;
-  goto_function_orig.copy_from(goto_function);
-  cfg_infot cfg_info(ns, goto_function_orig);
-  optionalt<cfg_infot> cfg_info_opt{cfg_info};
 
   // Start instrumentation
   auto instruction_it = function_body.instructions.begin();
@@ -1313,11 +1319,7 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
 
   // Insert write set inclusion checks.
   instrument_spec_assigns.instrument_instructions(
-    function_body,
-    instruction_it,
-    function_body.instructions.end(),
-    skip_function_paramst::YES,
-    cfg_info_opt);
+    function_body, instruction_it, function_body.instructions.end());
 }
 
 void code_contractst::enforce_contract(const irep_idt &function)
