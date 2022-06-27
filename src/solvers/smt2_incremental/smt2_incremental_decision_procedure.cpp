@@ -140,7 +140,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
   solver_process->send(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
   solver_process->send(smt_set_logic_commandt{
-    smt_logic_quantifier_free_uninterpreted_functions_bit_vectorst{}});
+    smt_logic_quantifier_free_arrays_uninterpreted_functions_bit_vectorst{}});
   solver_process->send(object_size_function.declaration);
 }
 

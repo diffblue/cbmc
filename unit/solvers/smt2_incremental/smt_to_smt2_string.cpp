@@ -196,7 +196,7 @@ TEST_CASE(
   const auto qf_abv = smt_logic_quantifier_free_bit_vectors_arrayst{};
   CHECK(smt_to_smt2_string(qf_abv) == "QF_ABV");
   const auto qf_aufbv =
-    smt_logic_quantifier_free_uninterpreted_functions_bit_vectors_arrayst{};
+    smt_logic_quantifier_free_arrays_uninterpreted_functions_bit_vectorst{};
   CHECK(smt_to_smt2_string(qf_aufbv) == "QF_AUFBV");
   CHECK(smt_to_smt2_string(smt_logic_allt{}) == "ALL");
   CHECK(
