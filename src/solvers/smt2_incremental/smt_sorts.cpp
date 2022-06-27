@@ -62,6 +62,25 @@ std::size_t smt_bit_vector_sortt::bit_width() const
   return get_size_t(ID_width);
 }
 
+smt_array_sortt::smt_array_sortt(
+  const smt_sortt &index_sort,
+  const smt_sortt &element_sort)
+  : smt_sortt{ID_smt_array_sort}
+{
+  add(ID_index, index_sort);
+  add(ID_value, element_sort);
+}
+
+const smt_sortt &smt_array_sortt::index_sort() const
+{
+  return static_cast<const smt_sortt &>(find(ID_index));
+}
+
+const smt_sortt &smt_array_sortt::element_sort() const
+{
+  return static_cast<const smt_sortt &>(find(ID_value));
+}
+
 template <typename visitort>
 void accept(const smt_sortt &sort, const irep_idt &id, visitort &&visitor)
 {

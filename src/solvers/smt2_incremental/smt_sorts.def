@@ -8,3 +8,4 @@
 ///  * The type of sort checks required to implement `smt_sortt::accept`.
 SORT_ID(bool)
 SORT_ID(bit_vector)
+SORT_ID(array)
