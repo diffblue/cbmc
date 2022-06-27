@@ -96,6 +96,20 @@ expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
     object_size_function.make_application);
 }
 
+TEST_CASE("\"array_typet\" to smt sort conversion", "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+
+  const auto array_type =
+    array_typet{signedbv_typet{8}, from_integer(8, c_index_type())};
+  INFO("Type being converted: " + array_type.pretty(2, 0));
+  const auto conversion_result = convert_type_to_smt_sort(array_type);
+  CHECK(
+    conversion_result ==
+    smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{8}});
+}
+
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);

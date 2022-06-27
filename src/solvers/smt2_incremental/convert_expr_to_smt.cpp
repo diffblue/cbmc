@@ -89,6 +89,13 @@ static smt_sortt convert_type_to_smt_sort(const bitvector_typet &type)
   return smt_bit_vector_sortt{type.get_width()};
 }
 
+static smt_sortt convert_type_to_smt_sort(const array_typet &type)
+{
+  return smt_array_sortt{
+    convert_type_to_smt_sort(type.index_type()),
+    convert_type_to_smt_sort(type.element_type())};
+}
+
 smt_sortt convert_type_to_smt_sort(const typet &type)
 {
   if(const auto bool_type = type_try_dynamic_cast<bool_typet>(type))
@@ -98,6 +105,10 @@ smt_sortt convert_type_to_smt_sort(const typet &type)
   if(const auto bitvector_type = type_try_dynamic_cast<bitvector_typet>(type))
   {
     return convert_type_to_smt_sort(*bitvector_type);
+  }
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(type))
+  {
+    return convert_type_to_smt_sort(*array_type);
   }
   UNIMPLEMENTED_FEATURE("Generation of SMT formula for type: " + type.pretty());
 }
