@@ -1,0 +1,16 @@
+CORE
+pointer_to_int.c
+--trace
+\[main\.assertion\.1\] line \d+ expected result == -1: success: SUCCESS
+\[main\.assertion\.2\] line \d+ expected result == 1: success: SUCCESS
+\[main\.assertion\.3\] line \d+ expected result == 0: success: SUCCESS
+\[main\.assertion\.4\] line \d+ expected result == 1: failure: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test is covering basic conversion of casting of different pointer values,
+which are then dereferenced and used in the function. We are asserting against
+the result of the function, which cannot be right, unless the conversions
+work as they should.

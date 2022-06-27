@@ -1,0 +1,16 @@
+CORE
+pointer_from_int.c
+--trace
+\[main\.assertion\.1\] line \d+ p == 4: expected success: SUCCESS
+\[main\.assertion\.2\] line \d+ p != 0: expected success: SUCCESS
+\[main\.assertion\.3\] line \d+ p == 0x1020304: expected success: SUCCESS
+\[main\.assertion\.4\] line \d+ p != 0: expected success: SUCCESS
+\[main\.assertion\.5\] line \d+ p != 0: expected failure: FAILURE
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test is covering basic conversion of pointer values to integers.
+It contains two such conversions, one of an integer in decimal form,
+and one of an integer in a hexadecimal form.
