@@ -576,7 +576,6 @@ void dump_instruction
       /*
       int steps = symex_info->second.steps;
       s1 = std::max(0, std::min (255, (int) ((255 * steps) / max_symex_info.steps)));
-      std::cout << steps << "/" << max_symex_info.steps << "\n";
       */
     }
   }
@@ -655,6 +654,8 @@ void dump_instructions
   out << "</table> ";
   out << ">]" << ";\n";
 
+  // add an edge between the function node and the body node, so that
+  // the body gets placed beneath the function node.
   out << name <<  " -> " << name << "_body"
       << " ["
       << "style=invis"
@@ -754,8 +755,6 @@ void dump_complexity_graph(
   const bool use_solver_info,
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
-
-  std::cout << "using: " << use_symex_info << " " << use_solver_info << "\n";
 
   //goto_functionst goto_functions;
   //goto_functions.copy_from(goto_functions_);
