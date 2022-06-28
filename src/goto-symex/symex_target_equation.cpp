@@ -357,6 +357,7 @@ void symex_target_equationt::convert(decision_proceduret &decision_procedure)
                << messaget::eom;
 }
 
+// This step seems to cause non-termination on large examples.
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure)
 {
@@ -379,7 +380,7 @@ void symex_target_equationt::convert_assignments(
     if(step.is_assignment() && !step.ignore && !step.converted)
     {
       if (count % (total/100) == 0) {
-        log.status() << count << "/" << total << messaget::eom;
+        //log.status() << count << "/" << total << messaget::eom;
       }
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
         step.output(mstream);
