@@ -53,6 +53,7 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   "(disable-solver)" \
   "(symex-record-coverage)" \
+  "(complexity-graph-instructions)" \
   "(complexity-graph-roots):" \
   "(show-complexity-graph):" \
   "(show-complexity-graph-with-symex):" \

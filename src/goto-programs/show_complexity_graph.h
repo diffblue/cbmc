@@ -19,6 +19,7 @@ Author: Benjamin Quiring
 #include <map>
 #include <goto-programs/goto_program.h>
 #include "metrics.h"
+#include <util/options.h>
 
 class namespacet;
 class abstract_goto_modelt;
@@ -35,17 +36,20 @@ class ui_message_handlert;
 // clang-format on
 
 void show_complexity_graph(
+  const optionst &options,
   const abstract_goto_modelt &, 
   const std::list<std::string> roots,
   const std::string &path);
 
 void show_complexity_graph(
+  const optionst &options,
   const abstract_goto_modelt &, 
   const std::list<std::string> roots,
   const std::string &path,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
 void show_complexity_graph(
+  const optionst &options,
   const abstract_goto_modelt &, 
   const std::list<std::string> roots,
   const std::string &path,

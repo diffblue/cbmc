@@ -113,12 +113,12 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
       });
 
     if (type == "show-complexity-graph") {
-      show_complexity_graph(goto_model, roots, path);
+      show_complexity_graph(options, goto_model, roots, path);
     } else if (type == "show-complexity-graph-with-symex") {
-      show_complexity_graph(goto_model, roots, path, 
+      show_complexity_graph(options, goto_model, roots, path, 
                             instr_symex_info);
     } else if (type == "show-complexity-graph-with-solver") {
-      show_complexity_graph(goto_model, roots, path, 
+      show_complexity_graph(options, goto_model, roots, path, 
                             instr_symex_info, instr_solver_info);
     } 
   }

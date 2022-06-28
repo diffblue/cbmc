@@ -600,6 +600,8 @@ void dump_instruction
   out << ">"; // style=\"font-family:'Courier', monospace\">";
   const goto_programt::instructiont &instruction = *target;
   std::string instr_str = instruction_string (instruction);
+  replace_all_substrings (instr_str, "$", "&dollar;");
+  replace_all_substrings (instr_str, ":", "&colon;");
   replace_all_substrings (instr_str, "\"", "&quot;");
   replace_all_substrings (instr_str, ">", "&gt;");
   replace_all_substrings (instr_str, "<", "&lt;");
@@ -664,6 +666,7 @@ void dump_function
   (const irep_idt &f, 
    const goto_functiont &func,
    std::ostream &out, 
+   const optionst &options,
    const namespacet &ns,
    std::map<irep_idt, bool> &use,
    std::map<irep_idt, func_metricst> &metrics,
@@ -717,11 +720,12 @@ void dump_function
                  << "fontsize=" << node_size
                  << "];\n";
 
-    const goto_functiont::parameter_identifierst &params = func.parameter_identifiers;
-    dump_instructions(f, params, body, out, ns, 
-                      use_symex_info, instr_symex_info, max_symex_info,
-                      use_solver_info, instr_solver_info, max_solver_info);
-
+    if (options.get_bool_option ("complexity-graph-instructions")) {
+      const goto_functiont::parameter_identifierst &params = func.parameter_identifiers;
+      dump_instructions(f, params, body, out, ns, 
+                        use_symex_info, instr_symex_info, max_symex_info,
+                        use_solver_info, instr_solver_info, max_solver_info);
+    }
     out << "}\n";
 
     dump_function_call_edges (f, body, out, ns, use, 
@@ -740,6 +744,7 @@ void dump_function
 }
 
 void dump_complexity_graph(
+  const optionst &options,
   const namespacet &ns,
   const std::string &path,
   const std::list<std::string> roots,
@@ -863,7 +868,7 @@ void dump_complexity_graph(
       out << "\n// ------------------------------------\n\n";
       out << "//" << f_symbol.display_name()
           << " ( " << f_symbol.name << " )\n";
-      dump_function (f_symbol.name, fun->second, out, ns, use, metrics, scores, 
+      dump_function (f_symbol.name, fun->second, out, options, ns, use, metrics, scores, 
                      use_symex_info, instr_symex_info, max_symex_info,
                      use_solver_info, instr_solver_info, max_solver_info);
     }
@@ -875,6 +880,7 @@ void dump_complexity_graph(
 
 
 void show_complexity_graph(
+  const optionst &options,
   const abstract_goto_modelt &goto_model,
   const std::list<std::string> roots,
   const std::string &path)
@@ -886,6 +892,7 @@ void show_complexity_graph(
 
   const namespacet ns(goto_model.get_symbol_table());
   dump_complexity_graph(
+    options,
     ns, path,
     roots, 
     goto_model.get_goto_functions(), 
@@ -896,6 +903,7 @@ void show_complexity_graph(
 }
   
 void show_complexity_graph(
+  const optionst &options,
   const abstract_goto_modelt &goto_model,
   const std::list<std::string> roots,
   const std::string &path,
@@ -906,6 +914,7 @@ void show_complexity_graph(
   const bool use_solver_info = false;
   const namespacet ns(goto_model.get_symbol_table());
   dump_complexity_graph(
+    options,
     ns, path,
     roots, 
     goto_model.get_goto_functions(), 
@@ -916,6 +925,7 @@ void show_complexity_graph(
 }
   
 void show_complexity_graph(
+  const optionst &options,
   const abstract_goto_modelt &goto_model,
   const std::list<std::string> roots,
   const std::string &path,
@@ -926,6 +936,7 @@ void show_complexity_graph(
   const bool use_solver_info = true;
   const namespacet ns(goto_model.get_symbol_table());
   dump_complexity_graph(
+    options,
     ns, path,
     roots, 
     goto_model.get_goto_functions(), 
