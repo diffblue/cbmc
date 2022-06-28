@@ -1162,6 +1162,32 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "expr to smt conversion for with_exprt expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  SECTION("Array types")
+  {
+    const typet value_type = signedbv_typet{8};
+    const exprt array = symbol_exprt{
+      "my_array",
+      array_typet{value_type, from_integer(10, signed_size_type())}};
+    const exprt index = from_integer(42, unsignedbv_typet{64});
+    const exprt value = from_integer(12, value_type);
+    const with_exprt with{array, index, value};
+    INFO("Expression being converted: " + with.pretty(2, 0));
+    const smt_termt expected = smt_array_theoryt::store(
+      smt_identifier_termt{
+        "my_array",
+        smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{8}}},
+      smt_bit_vector_constant_termt{42, 64},
+      smt_bit_vector_constant_termt{12, 8});
+    CHECK(test.convert(with) == expected);
+  }
+}
+
+TEST_CASE(
   "expr to smt conversion for extract bits expressions",
   "[core][smt2_incremental]")
 {
