@@ -159,10 +159,16 @@ const void func_metricst::dump_html (std::ostream &out) const {
         << "symex duration (ms): " << (int)(symex_info.duration / 1000000.0) << endline
         << "symex avg time per step: " << avg_time_per_step;
   }
+  // if (use_solver_info) {
+  //   out << endline
+  //       << "solver clauses: " << solver_info.clauses / 1000 << "k" << endline
+  //       << "solver literals: " << solver_info.literals / 1000 << "k" << endline
+  //       << "solver variables: " << solver_info.variables / 1000 << "k";
+  // }
   if (use_solver_info) {
     out << endline
-        << "solver clauses: " << solver_info.clauses / 1000 << "k" << endline
-        << "solver literals: " << solver_info.literals / 1000 << "k" << endline
-        << "solver variables: " << solver_info.variables / 1000 << "k";
+        << "solver clauses: " << solver_info.clauses << endline
+        << "solver literals: " << solver_info.literals << endline
+        << "solver variables: " << solver_info.variables;
   }
 }

@@ -60,6 +60,20 @@ std::string color_of_score (int score) {
   return color;
 }
 
+std::string color_of_score (int score1, int score2) { 
+  int s1 = 255 - score1;
+  int s2 = 255 - score2;
+ std::stringstream stream;
+  // Red
+  stream << std::hex << 255;
+  // Green
+  if (s1 < 16) { stream << 0 << s1; } else { stream << s1; }
+  // Blue
+  if (s2 < 16) { stream << 0 << s2; } else { stream << s2; }
+  std::string color( stream.str() );
+  return color;
+}
+
 // the score metric associated with the function.
 // a large score means the associated proof should be more difficult.
 void compute_metrics (const symbolt &symbol, 
@@ -426,13 +440,12 @@ std::string instruction_string (const goto_programt::instructiont instruction) {
       out << "ASSERT ";
 
     {
-      /*
-      out << format(instruction.condition());
-
-      const irep_idt &comment = instruction.source_location().get_comment();
-      if(!comment.empty())
-        out << " // " << comment;
-      */
+      // FIXME
+      //out << format(instruction.condition());
+      //
+      //const irep_idt &comment = instruction.source_location().get_comment();
+      //if(!comment.empty())
+      //  out << " // " << comment;
     }
 
     break;
@@ -537,8 +550,6 @@ void replace_all_substrings (std::string& str, const std::string& from, const st
   }
 }
 
-double max = -1.0;
-
 void dump_instruction 
   (const irep_idt &name,
    const goto_programt::const_targett &target,
@@ -547,25 +558,44 @@ void dump_instruction
    const namespacet &ns,
    const bool use_symex_info,
    const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+   const symex_infot &max_symex_info,
    const bool use_solver_info,
-   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
+   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
+   const solver_infot &max_solver_info) {
 
   out << "<tr><td align=\"text\"";
 
+  int s1 = 0;
   if (use_symex_info) {
     auto symex_info = instr_symex_info.find (target);
     if (symex_info != instr_symex_info.end()) {
       // milliseconds
-      double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
-
-      int s = std::max(0, std::min (255, (int)(255.0 * avg_time_per_step)));
-      std::string color = color_of_score (s);
-      //out << "fillcolor=" << "\"#" << color << "\",";
-
-      out << " bgcolor=\"#" << color << "\"";
-
+      // double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
+      double duration = symex_info->second.duration;
+      s1 = std::max(0, std::min (255, (int) (255.0 * duration / max_symex_info.duration)));
+      /*
+      int steps = symex_info->second.steps;
+      s1 = std::max(0, std::min (255, (int) ((255 * steps) / max_symex_info.steps)));
+      std::cout << steps << "/" << max_symex_info.steps << "\n";
+      */
     }
   }
+
+
+  int s2 = 0;
+  if (use_solver_info) {
+    auto solver_info = instr_solver_info.find (target);
+    if (solver_info != instr_solver_info.end()) {
+      int clauses = solver_info->second.clauses;
+      s2 = std::max(0, std::min (255, 255 * clauses / max_solver_info.clauses));
+    }
+  }
+  std::string color = color_of_score (s1, s2);
+  //out << "fillcolor=" << "\"#" << color << "\",";
+    
+  out << " bgcolor=\"#" << color << "\"";
+
+
 
   out << ">"; // style=\"font-family:'Courier', monospace\">";
   const goto_programt::instructiont &instruction = *target;
@@ -581,13 +611,16 @@ void dump_instruction
 
 void dump_instructions 
   (const irep_idt &name,
+   const goto_functiont::parameter_identifierst &params,
    const goto_programt &body,
    std::ostream &out,
    const namespacet &ns,
    const bool use_symex_info,
    const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+   const symex_infot &max_symex_info,
    const bool use_solver_info,
-   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
+   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
+   const solver_infot &max_solver_info) {
   int index = 0;
 
   out << name << "_body"
@@ -598,11 +631,22 @@ void dump_instructions
   out << "fontname=\"Courier\",";
   out << "label=<";
   out << " <table border=\"0\">";
-  out << "<tr><td align=\"text\">// body of " << normalize_name (name) << "<br align=\"left\" /></td></tr>";
+  out << "<tr><td align=\"text\">" << normalize_name (name) << "(";
+  int param_index = 0;
+  for (const auto &param : params) {
+    if (param_index == 0) {
+      out << param;
+    } else {
+      out << ", " << param;
+    }
+    param_index++;
+  }
+  out << ")";
+  out << "<br align=\"left\" /></td></tr>";
   forall_goto_program_instructions(target, body) {
     dump_instruction (name, target, index, out, ns, 
-                      use_symex_info, instr_symex_info, 
-                      use_solver_info, instr_solver_info);
+                      use_symex_info, instr_symex_info, max_symex_info,
+                      use_solver_info, instr_solver_info, max_solver_info);
     index++;
   }
 
@@ -617,9 +661,8 @@ void dump_instructions
                     
 
 void dump_function
-  (const irep_idt &f,
-   const bool has_body,
-   const goto_programt &body,
+  (const irep_idt &f, 
+   const goto_functiont &func,
    std::ostream &out, 
    const namespacet &ns,
    std::map<irep_idt, bool> &use,
@@ -627,8 +670,15 @@ void dump_function
    std::map<irep_idt, int> &scores,
    const bool use_symex_info,
    const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
+   const symex_infot &max_symex_info,
    const bool use_solver_info,
-   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info) {
+   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
+   const solver_infot &max_solver_info) {
+
+
+  const bool has_body = func.body_available();
+  const goto_programt &body = func.body;
+
   if(has_body) {
     std::string color = color_of_score (scores.find (f)->second);
 
@@ -667,9 +717,10 @@ void dump_function
                  << "fontsize=" << node_size
                  << "];\n";
 
-    dump_instructions(f, body, out, ns, 
-                      use_symex_info, instr_symex_info, 
-                      use_solver_info, instr_solver_info);
+    const goto_functiont::parameter_identifierst &params = func.parameter_identifiers;
+    dump_instructions(f, params, body, out, ns, 
+                      use_symex_info, instr_symex_info, max_symex_info,
+                      use_solver_info, instr_solver_info, max_solver_info);
 
     out << "}\n";
 
@@ -763,6 +814,33 @@ void dump_complexity_graph(
   // std::map<goto_programt::const_targett, int> test;
   // test.insert ({target, 0})
   
+  symex_infot max_symex_info;
+  if (use_symex_info) {
+    for(const auto &fun : sorted) {
+      forall_goto_program_instructions(target, fun->second.body) {
+        const auto &symex_info = instr_symex_info.find (target);
+        if (symex_info != instr_symex_info.end()) {
+          max_symex_info.duration = std::max(max_symex_info.duration, symex_info->second.duration);
+          max_symex_info.steps = std::max(max_symex_info.steps, symex_info->second.steps);
+        }
+      }
+    }
+  }
+
+  solver_infot max_solver_info;
+  if (use_solver_info) {
+    for(const auto &fun : sorted) {
+      forall_goto_program_instructions(target, fun->second.body) {
+        const auto &solver_info = instr_solver_info.find (target);
+        if (solver_info != instr_solver_info.end()) {
+          max_solver_info.clauses = std::max(max_solver_info.clauses, solver_info->second.clauses);
+          max_solver_info.literals = std::max(max_solver_info.literals, solver_info->second.literals);
+          max_solver_info.variables = std::max(max_solver_info.variables, solver_info->second.variables);
+        }
+      }
+    }
+  }
+
   //for (const auto &target : instr_dont_use) {
   //  if(target->is_function_call()) {
   //    const auto &func = target->call_function();
@@ -781,14 +859,13 @@ void dump_complexity_graph(
   for(const auto &fun : sorted)
   {
     const symbolt &f_symbol = ns.lookup(fun->first);
-    const bool has_body = fun->second.body_available();
     if (is_used (use, f_symbol.name)) {
       out << "\n// ------------------------------------\n\n";
       out << "//" << f_symbol.display_name()
           << " ( " << f_symbol.name << " )\n";
-      dump_function (f_symbol.name, has_body, fun->second.body, out, ns, use, metrics, scores, 
-                     use_symex_info, instr_symex_info, 
-                     use_solver_info, instr_solver_info);
+      dump_function (f_symbol.name, fun->second, out, ns, use, metrics, scores, 
+                     use_symex_info, instr_symex_info, max_symex_info,
+                     use_solver_info, instr_solver_info, max_solver_info);
     }
   }
 
