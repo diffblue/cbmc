@@ -248,7 +248,16 @@ bool generate_ansi_c_start_function(
     {
       // ok
     }
-    else if(parameters.size()==2 || parameters.size()==3)
+    // The C standard (and any related architecture descriptions) enforces an
+    // order of parameters. The user, however, may supply arbitrary
+    // (syntactically valid) C code, even one that does not respect the calling
+    // conventions set out in the C standard. If the user does supply such code,
+    // then we can only tell them that they got it wrong, which is what we do
+    // via the error message in the else branch of this code.
+    else if(
+      parameters.size() >= 2 && parameters[1].type().id() == ID_pointer &&
+      (parameters.size() == 2 ||
+       (parameters.size() == 3 && parameters[2].type().id() == ID_pointer)))
     {
       namespacet ns(symbol_table);
 

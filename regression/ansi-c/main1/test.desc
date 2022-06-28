@@ -1,0 +1,11 @@
+CORE test-c++-front-end
+main.c
+
+'main' with signature 'signed int \(char \*argv, signed int arc\)' found
+^EXIT=(64|1)$
+^SIGNAL=0$
+--
+Invariant check failed
+--
+This test is to ensure that non-standard C entry points are handled gracefully
+and with a message to the user.
