@@ -29,3 +29,11 @@ add_if_library(goto-diff-lib jsil)
 add_executable(goto-diff goto_diff_main.cpp)
 target_link_libraries(goto-diff goto-diff-lib)
 install(TARGETS goto-diff DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Man page
+if(NOT WIN32)
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING PATTERN "goto-diff*")
+endif()

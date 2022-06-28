@@ -33,3 +33,11 @@ install(TARGETS jbmc DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # make sure java-models-library is built at least once
 add_dependencies(jbmc java-models-library)
+
+# Man page
+if(NOT WIN32)
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING PATTERN "jbmc*")
+endif()

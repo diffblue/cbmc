@@ -53,9 +53,7 @@ if(NOT WIN32)
   install(
     DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
-    FILES_MATCHING 
-    PATTERN "c*"
-    PATTERN "g*")
+    FILES_MATCHING PATTERN "cbmc*")
 endif()
 
 # bash completion
