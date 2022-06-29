@@ -137,13 +137,6 @@ possible output format.
     cbmc file1.c --bounds-check --pointer-check --trace --xml-ui
 ```
 
-The specification of the XML trace output can be found here: [XML
-Specification](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/assets/xml_spec.tex)
-and can be built by `pdflatex -shell-escape xml_spec.tex`. See the [README
-](https://github.com/diffblue/cbmc/blob/develop/doc/assets/README.md#xml_spectex) for details.
-
-Alternatively, you can view it in [Markdown](https://github.com/diffblue/cbmc/blob/develop/doc/assets/xml_spec.md).
-
 ### Verifying Modules
 
 In the example above, we used a program that starts with a `main`
