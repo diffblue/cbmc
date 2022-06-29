@@ -42,18 +42,18 @@ option is necessary when compiling for the program symbols to be visible.
 .PP
 Take for example the following program:
 .EX
-.IP
-// main.c
-void checkpoint() {}
+.in +4n
+\fB// main.c\fP
+void \fBcheckpoint\fP() {}
 
 int array[] = {1, 2, 3};
 
-int main()
-{
+int \fBmain\fP() {
   array[1] = 4;
-  checkpoint();
-  return 0;
+  \fBcheckpoint\fP();
+  \fBreturn\fP 0;
 }
+.in
 .EE
 .PP
 Say we are interested in the evaluation of \fIarray\fR at the call-site of
@@ -70,10 +70,11 @@ memory-analyzer --breakpoint checkpoint --symbols array main_exe
 .PP
 to obtain as output the human readable list of values for each requested symbol:
 .EX
-.IP
+.in +4n
 {
   array = { 1, 4, 3 };
 }
+.in
 .EE
 .PP
 The above result is useful for the user and their preliminary analysis but does
