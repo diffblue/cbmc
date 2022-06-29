@@ -138,11 +138,11 @@ possible output format.
 ```
 
 The specification of the XML trace output can be found here: [XML
-Specification](../assets/xml_spec.tex)
+Specification](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/assets/xml_spec.tex)
 and can be built by `pdflatex -shell-escape xml_spec.tex`. See the [README
-](../assets/README.md#xml_spec.tex) for details.
+](https://github.com/diffblue/cbmc/blob/develop/doc/assets/README.md#xml_spectex) for details.
 
-Alternatively, you can view it in [Markdown](../assets/xml_spec.md).
+Alternatively, you can view it in [Markdown](https://github.com/diffblue/cbmc/blob/develop/doc/assets/xml_spec.md).
 
 ### Verifying Modules
 

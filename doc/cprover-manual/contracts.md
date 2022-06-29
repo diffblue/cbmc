@@ -1,3 +1,5 @@
+[CPROVER Manual TOC](../)
+
 # Contracts
 
 Code contracts in CBMC provide way to safely abstract parts of a program,
@@ -13,5 +15,8 @@ Design](https://www.georgefairbanks.com/york-university-contract-based-design-20
 by George Fairbanks.
 
 CBMC currently supports contracts on functions and loops:
-- [Function Contracts](contracts-functions.md)
-- [Loop Contracts](contracts-loops.md)
+- [Function Contracts](../contracts/functions/)
+- [Loop Contracts](../contracts/loops/)
+
+For extra steps required to compositionally reason about file-local functions
+[see](static-functions/).

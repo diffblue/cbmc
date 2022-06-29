@@ -1,3 +1,5 @@
+[CPROVER Manual TOC](../../)
+
 # Function Contracts
 
 CBMC offers support for function contracts, which includes three basic clauses:
@@ -56,9 +58,9 @@ A function contract has three parts:
 In our example, the developer may require from the caller to properly allocate
 all arguments, thus, pointers must be valid. We can specify the preconditions of
 a function using `__CPROVER_requires` (see [Requires \& Ensures
-Clauses](contracts-requires-and-ensures.md) Section for details) and we can
+Clauses](../../contracts/requires-and-ensures/) for details) and we can
 specify an allocated object using a predicate called `__CPROVER_is_fresh` (see
-[Memory Predicate](contracts-memory-predicates.md) Section for details). Thus, for the `sum` function, the set
+[Memory Predicate](../../contracts/memory-predicates/) for details). Thus, for the `sum` function, the set
 of preconditions are
 
 ```c
@@ -67,7 +69,7 @@ __CPROVER_requires(__CPROVER_is_fresh(out, sizeof(*out)))
 ```
 
 We can use `__CPROVER_ensures` to specify postconditions (see [Requires \&
-Ensures Clauses](contracts-requires-and-ensures.md) Section for details).  In our
+Ensures Clauses](../../contracts/requires-and-ensures/) for details).  In our
 example, developers can use the built-in construct `__CPROVER_return_value`,
 which represents the return value of a function. As postconditions, one may list
 possible return values (in this case, either `SUCCESS` or `FAILURE`) as well as
@@ -75,7 +77,7 @@ describe the main property of this function: if the function returns `SUCCESS`,
 then `*out` stores the result of `a + b`.  We can also check that the value in
 `*out` will be preserved in case of failure by using `__CPROVER_old`, which
 refers to the value of a given object in the pre-state of a function (see
-[History Variables](contracts-history-variables.md) Section for details). Thus, for the `sum` function, the
+[History Variables](../../contracts/history-variables/) for details). Thus, for the `sum` function, the
 set of postconditions are
 
 
@@ -87,7 +89,7 @@ __CPROVER_ensures((__CPROVER_return_value == FAILURE) ==> (*out == __CPROVER_old
 ```
 
 Finally, the _assigns_ clause allows developers to define a frame condition (see
-[Assigns Clause](contracts-assigns.md) Section for details).
+[Assigns Clause](../../contracts/assigns/) for details).
 In general, systems for describing the frame condition of a function
 use either writes or modifies semantics; this design is based on the former.
 This means that memory not specified by the assigns clause must
@@ -149,8 +151,8 @@ program using contracts.
 
 ## Additional Resources
 
-- [Requires \& Ensures Clauses](contracts-requires-and-ensures.md)
-- [Assigns Clause](contracts-assigns.md)
-- [Memory Predicates](contracts-memory-predicates.md)
-- [History Variables](contracts-history-variables.md)
-- [Quantifiers](contracts-quantifiers.md)
+- [Requires \& Ensures Clauses](../../contracts/requires-and-ensures/)
+- [Assigns Clause](../../contracts/assigns/)
+- [Memory Predicates](../../contracts/memory-predicates/)
+- [History Variables](../../contracts/history-variables/)
+- [Quantifiers](../../contracts/quantifiers/)

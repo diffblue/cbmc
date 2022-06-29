@@ -1,3 +1,5 @@
+[CPROVER Manual TOC](../../)
+
 # Requires \& Ensures Clauses
 
 
@@ -20,8 +22,8 @@ An _ensures_ clause specifies a postcondition for a function, i.e., a property o
 
 A _requires_ clause takes a Boolean expression over the arguments of
 a function and/or global variables, including CBMC primitive functions (e.g.,
-[Memory Predicates](contracts-memory-predicates.md)). Similarly, _ensures_ clauses also accept Boolean
-expressions and CBMC primitives, but also [History Variables](contracts-history-variables.md) and `__CPROVER_return_value`.
+[Memory Predicates](../../contracts/memory-predicates/)). Similarly, _ensures_ clauses also accept Boolean
+expressions and CBMC primitives, but also [History Variables](../../contracts/history-variables/) and `__CPROVER_return_value`.
 
 **Important.** Developers may call functions inside _requires_ and _ensures_
 clauses to better write larger specifications (e.g., predicates). However, at
@@ -88,7 +90,7 @@ the function implementation as follows:
 1. Adds assertions for all preconditions specified in the `__CPROVER_requires`
    clauses; 
 2. Adds non-deterministic assignments for each symbol listed in the
-   `__CPROVER_assigns` clause (see [Assigns Clause](contracts-assigns.md) Section
+   `__CPROVER_assigns` clause (see [Assigns Clause](../../contracts/assigns/)
 for details);
 3. Assumes all postconditions described in the `__CPROVER_ensures` clauses;
 
