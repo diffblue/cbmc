@@ -1,0 +1,14 @@
+CORE
+main.c
+--cover location
+^EXIT=0$
+^SIGNAL=0$
+^\[main.coverage.1\] file main.c line 9 function main block 1 \(lines main.c:main:9,10\): SATISFIED$
+^\[main.coverage.2\] file main.c line 11 function main block 2 \(lines main.c:main:11\): SATISFIED$
+^\*\* 2 of 2 covered \(100.0%\)
+--
+^warning: ignoring
+main.c::5
+--
+Expressions outside a function should not end up listed as part of source code
+blocks.
