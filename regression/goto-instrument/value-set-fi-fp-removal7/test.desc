@@ -1,0 +1,11 @@
+CORE
+main.c
+--value-set-fi-fp-removal
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that the value-set-fi-based function pointer removal performs
+suitable type conversion when argument and parameter types do not match. Source
+file is a copy of cbmc/Function_Pointer19/main.c.
