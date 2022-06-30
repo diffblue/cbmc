@@ -67,5 +67,11 @@ bool ansi_c_typecheck(
     ansi_c_typecheck.error() << e << messaget::eom;
   }
 
+  catch(const invalid_source_file_exceptiont &e)
+  {
+    ansi_c_typecheck.error().source_location = e.get_source_location();
+    ansi_c_typecheck.error() << e.get_reason() << messaget::eom;
+  }
+
   return message_handler.get_message_count(messaget::M_ERROR)!=errors_before;
 }

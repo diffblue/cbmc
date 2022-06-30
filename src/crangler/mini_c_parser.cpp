@@ -236,8 +236,12 @@ mini_c_parsert::tokenst mini_c_parsert::parse_pre_declarator()
     else if(token == '(') // function type, part of declarator
       return result;
     else
+    {
+      source_locationt loc;
+      loc.set_line(token.line_number);
       throw invalid_source_file_exceptiont(
-        "expected a declaration but got '" + token.text + "'");
+        "expected a declaration but got '" + token.text + "'", loc);
+    }
   }
 }
 
@@ -263,7 +267,11 @@ mini_c_parsert::tokenst mini_c_parsert::parse_declarator()
     return {consume_token()};
   }
   else
-    throw invalid_source_file_exceptiont("expected an identifier");
+  {
+    source_locationt loc;
+    loc.set_line(peek().line_number);
+    throw invalid_source_file_exceptiont("expected an identifier", loc);
+  }
 }
 
 mini_c_parsert::tokenst mini_c_parsert::parse_post_declarator()

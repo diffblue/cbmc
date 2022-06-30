@@ -1,0 +1,11 @@
+CORE
+unsupported.c
+-DWIDE
+wide literals with 5 characters are not supported$
+^EXIT=70$
+^SIGNAL=0$
+--
+^warning: ignoring
+^Invariant check failed$
+--
+Test to confirm that an actionable error message is provided.

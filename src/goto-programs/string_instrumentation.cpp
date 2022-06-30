@@ -266,7 +266,7 @@ void string_instrumentationt::do_sprintf(
 {
   if(arguments.size()<2)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "sprintf expected to have two or more arguments",
       target->source_location());
   }
@@ -302,7 +302,7 @@ void string_instrumentationt::do_snprintf(
 {
   if(arguments.size()<3)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "snprintf expected to have three or more arguments",
       target->source_location());
   }
@@ -339,7 +339,7 @@ void string_instrumentationt::do_fscanf(
 {
   if(arguments.size()<2)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "fscanf expected to have two or more arguments",
       target->source_location());
   }
@@ -615,7 +615,7 @@ void string_instrumentationt::do_strchr(
 {
   if(arguments.size()!=2)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "strchr expected to have two arguments", target->source_location());
   }
 
@@ -639,7 +639,7 @@ void string_instrumentationt::do_strrchr(
 {
   if(arguments.size()!=2)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "strrchr expected to have two arguments", target->source_location());
   }
 
@@ -663,7 +663,7 @@ void string_instrumentationt::do_strstr(
 {
   if(arguments.size()!=2)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "strstr expected to have two arguments", target->source_location());
   }
 
@@ -693,7 +693,7 @@ void string_instrumentationt::do_strtok(
 {
   if(arguments.size()!=2)
   {
-    throw incorrect_source_program_exceptiont(
+    throw invalid_source_file_exceptiont(
       "strtok expected to have two arguments", target->source_location());
   }
 
