@@ -1,3 +1,5 @@
+[CPROVER Manual TOC](../../)
+
 # Loop Contracts
 
 CBMC offers support for loop contracts, which includes three basic clauses:
@@ -63,7 +65,7 @@ A developer might be interested in verifying two high-level properties on the lo
 2. the loop must eventually always terminate
 
 To prove the first (memory-safety) property,
-we may declare [_loop invariants_](contracts-invariant.md)
+we may declare [_loop invariants_](../../contracts/invariants/)
 that must be preserved across all loop iterations.
 In this case, two invariant clauses would together imply that `buf[mid]` lookup is always safe.
 The first invariant clause would establish that the bounds (`lb` and `ub`) are always valid:
@@ -80,7 +82,7 @@ __CPROVER_loop_invariant(mid == (lb + ub) / 2L)
 ```
 
 To prove the second (termination) property,
-we may declare a [_decreases clause_](contracts-decreases.md)
+we may declare a [_decreases clause_](../../contracts/decreases/)
 that indicates a bounded numeric measure
 which must monotonically decrease with each loop iteration.
 In this case, it is easy to see that `lb` and `ub` are approaching closer together with each iteration, since either `lb` must increase or `ub` must decrease in each iteration.
@@ -143,10 +145,10 @@ and finally we verify the instrumented GOTO binary with desired checks.
 
 ## Additional Resources
 
-- [Assigns Clause](contracts-assigns.md)
-- [Decreases Clause](contracts-decreases.md)
-- [History Variables](contracts-history-variables.md)
-- [Invariant Clause](contracts-invariant.md)
-- [Quantifiers](contracts-quantifiers.md)
+- [Assigns Clause](../../contracts/assigns/)
+- [Decreases Clause](../../contracts/decreases/)
+- [History Variables](../../contracts/history-variables/)
+- [Invariant Clause](../../contracts/invariants/)
+- [Quantifiers](../../contracts/quantifiers/)
 
 [binary search algorithm]: https://en.wikipedia.org/wiki/Binary_search_algorithm

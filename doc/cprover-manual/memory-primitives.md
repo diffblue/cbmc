@@ -1,5 +1,4 @@
-\ingroup module_hidden 
-\page memory-primitives Memory Primitives
+[CPROVER Manual TOC](../)
 
 This document describes the semantics and usage of memory-related and
 pointer-related primitives in CBMC.

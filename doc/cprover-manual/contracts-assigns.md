@@ -1,3 +1,5 @@
+[CPROVER Manual TOC](../../)
+
 # Assigns Clause
 
 ## In Function Contracts
@@ -135,8 +137,8 @@ where the left-hand-side is in the *free* set are not instrumented with the abov
 
 Assuming _assigns_ clauses are a sound abstraction of the write set for
 a given function, CBMC will use the function contract in place of the function
-implementation as described by [Requires \& Ensures
-Clauses](contracts-requires-and-ensures.md) - Replacement section, and it will add
+implementation as described by
+[Requires \& Ensures Clauses](../../contracts/requires-and-ensures/#replacement), and it will add
 non-deterministic assignments for each object listed in the `__CPROVER_assigns`
 clause. Since these objects might be modified by the function, CBMC uses
 non-deterministic assignments to havoc them and restrict their values only by

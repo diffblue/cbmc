@@ -1,3 +1,5 @@
+[CPROVER Manual TOC](../../)
+
 # Invariant Clauses
 
 An _invariant_ clause specifies a property that must be preserved
@@ -141,7 +143,7 @@ A few things to note here:
   using alias analysis of l-values appearing in the loop body.
   However, the analysis is incomplete and may fail to characterize the set for complex loops.
   In such cases, the user must manually annotate the set of modified variables
-  using an [_assigns clause_](contracts-assigns.md).
+  using an [_assigns clause_](../../contracts/assigns/).
 
 - At instrumented code point (6), when we _assume_ `false`,
   observe that this assumption only exists within the `lb <= ub` conditional.
@@ -149,6 +151,6 @@ A few things to note here:
   The code outside of the conditional block continues to be symbolically executed,
   and subsequent assertions do not become vacuously `true`.
 
-[history variables]: contracts-history-variables.md
+[history variables]: ../../contracts/history-variables/
 
 [binary search]: https://en.wikipedia.org/wiki/Binary_search_algorithm

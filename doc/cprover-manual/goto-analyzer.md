@@ -1,4 +1,4 @@
-[CPROVER Manual TOC](../../)
+[CPROVER Manual TOC](../)
 
 ## Goto Analyzer
 
@@ -59,7 +59,7 @@ goto-analyzer --show --dot depgraph.dot --dependence-graph-vs
 
 
 
-### Task {#task}
+### Task
 
 `goto-analyzer` first runs the abstract interpreter until it reaches a
 fix-point, then it will perform the task the user has chosen.
@@ -124,7 +124,7 @@ traces that reach them.
 
 
 
-### Output {#output}
+### Output
 
 These options control how the result of the task is output.  The
 default is text to the standard output.  In the case of tasks that
@@ -147,7 +147,7 @@ only supported by some domains and tasks (for example
 `--show --dependence-graph`).
 
 
-### Abstract Interpreter {#abstractinterpreter}
+### Abstract Interpreter
 
 These options control which abstract interpreter is used and how
 the analysis is performed.  In principle this can significantly change
@@ -186,7 +186,7 @@ If you are using `--vsd` this is recommended as it is more accurate
 with little extra cost.
 
 
-### Domain {#domain}
+### Domain
 
 One of the most important options; this controls how the possible
 states at a given execution point are represented and manipulated.
@@ -323,7 +323,7 @@ is why the default is to do the reduction.  It can be useful for
 debugging issues with the reduction.
 
 
-### History {#history}
+### History
 
 To over-approximate what a program does, it is necessary to consider
 all of the paths of execution through the program.  As there are a
@@ -398,7 +398,7 @@ each function.
 
 
 
-### Storage {#storage}
+### Storage
 
 The histories described above are used to keep track of where in the
 computation needs to be explored.  The most precise option is to keep

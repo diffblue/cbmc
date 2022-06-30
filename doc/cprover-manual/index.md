@@ -10,23 +10,25 @@
 [Loop Unwinding](cbmc/unwinding/),
 [Assertion Checking](cbmc/assertions/)
 
-## 4. [Goto-Analyzer &ndash; Abstract Interpretation](goto-analyzer/)
+## 4. [Compositional Reasoning using Code Contracts](contracts/)
 
-## 4. [Test Suite Generation](test-suite/)
+## 5. [Goto-Analyzer &ndash; Abstract Interpretation](goto-analyzer/)
 
-## 5. [Program Properties](properties/)
+## 6. [Test Suite Generation](test-suite/)
 
-## 6. Modeling
+## 7. [Program Properties](properties/)
+
+## 8. Modeling
 
 [Nondeterminism](modeling/nondeterminism/),
 [Assumptions](modeling/assumptions/),
 [Pointers](modeling/pointers/),
 [Floating Point](modeling/floating-point/)
+[Generating Environments](goto-harness/)
 
-## 7. Build Systems
+## 9. Build Systems
 
 [Integration into Build Systems with goto-cc](goto-cc/),
 [Integration with Visual Studio builds](visual-studio/)
 
-## 8. [The CPROVER API Reference](api/)
-
+## 10. [The CPROVER API Reference](api/)

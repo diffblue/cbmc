@@ -31,7 +31,7 @@ The functions **\_\_CPROVER\_input** and **\_\_CPROVER\_output** are
 used to report an input or output value. Note that they do not generate
 input or output values. The first argument is a string constant to
 distinguish multiple inputs and outputs (inputs are typically generated
-using nondeterminism, as described [here](./modeling-nondeterminism.md)). The
+using nondeterminism, as described [here](../modeling/nondeterminism/)). The
 string constant is followed by an arbitrary number of values of
 arbitrary types.
 
@@ -159,12 +159,12 @@ int main()
 
 #### Uninterpreted Functions
 
-Uninterpreted functions are documented [here](./modeling-nondeterminism.md)).
+Uninterpreted functions are documented [here](../modeling/nondeterminism/)).
 
 ### Memory-Related Functions
 
 The semantics of the primitives listed in this section is described in more detail in the
-document about [Memory Primitives](http://cprover.diffblue.com/memory-primitives.html).
+document about [Memory Primitives](../memory-primitives/).
 
 #### \_\_CPROVER\_POINTER\_OBJECT, \_\_CPROVER\_POINTER\_OFFSET, \_\_CPROVER\_same\_object
 
@@ -184,7 +184,7 @@ arguments point to the same object.
 
 The following primitives require a pointer that is null or valid in order to
 have well-defined semantics in all usage cases. See the document about
-[Memory Primitives](http://cprover.diffblue.com/memory-primitives.html)
+[Memory Primitives](../memory-primitives/)
 for more details. It also includes a description of the `--pointer-primitive-check`
 option to verify the preconditions of the primitives.
 
