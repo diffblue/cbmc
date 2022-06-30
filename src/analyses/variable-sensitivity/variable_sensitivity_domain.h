@@ -91,13 +91,13 @@
   " --vsd-arrays                 array entry sensitive analysis - "            \
   "top-bottom|smash|up-to-n-elements|every-element\n" /* NOLINT(whitespace/line_length) */ \
   " --vsd-array-max-elements     the n in --vsd-arrays up-to-n-elements - "    \
-  "defaults 10 if not given\n" /* NOLINT(whitespace/line_length) */            \
+  "defaults to 10 if not given\n" /* NOLINT(whitespace/line_length) */         \
   " --vsd-pointers               pointer sensitive analysis - "                \
   "top-bottom|constants|value-set\n" /* NOLINT(whitespace/line_length) */      \
   " --vsd-unions                 union sensitive analysis - top-bottom\n"      \
-  " --vsd-flow-insensitive       disables flow sensitivity\n"                  \
   " --vsd-data-dependencies      track data dependencies\n"                    \
   " --vsd-liveness               track variable liveness\n"                    \
+  " --vsd-flow-insensitive       disables flow sensitivity\n"                  \
 
 // cland-format on
 
