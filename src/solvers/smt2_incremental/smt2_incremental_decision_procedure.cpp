@@ -12,6 +12,7 @@
 
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/smt_array_theory.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_responses.h>
@@ -64,12 +65,40 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
 {
   std::vector<exprt> dependent_expressions;
   expr.visit_pre([&](const exprt &expr_node) {
-    if(can_cast_expr<symbol_exprt>(expr_node))
+    if(
+      can_cast_expr<symbol_exprt>(expr_node) ||
+      can_cast_expr<array_exprt>(expr_node))
     {
       dependent_expressions.push_back(expr_node);
     }
   });
   return dependent_expressions;
+}
+
+void smt2_incremental_decision_proceduret::define_array_function(
+  const array_exprt &array)
+{
+  const auto array_sort =
+    convert_type_to_smt_sort(array.type()).cast<smt_array_sortt>();
+  INVARIANT(
+    array_sort,
+    "Converting array typed expression to SMT should result in a term of array "
+    "sort.");
+  const smt_identifier_termt array_identifier = smt_identifier_termt{
+    "array_" + std::to_string(array_sequence()), *array_sort};
+  solver_process->send(smt_declare_function_commandt{array_identifier, {}});
+  const std::vector<exprt> &elements = array.operands();
+  const std::size_t index_width =
+    array_sort->index_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  for(std::size_t i = 0; i < elements.size(); ++i)
+  {
+    const smt_assert_commandt element_definition{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        array_identifier, smt_bit_vector_constant_termt{i, index_width}),
+      convert_expr_to_smt(elements.at(i)))};
+    solver_process->send(element_definition);
+  }
+  expression_identifiers.emplace(array, array_identifier);
 }
 
 /// \brief Defines any functions which \p expr depends on, which have not yet
@@ -123,8 +152,27 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         solver_process->send(function);
       }
     }
+    if(const auto array_expr = expr_try_dynamic_cast<array_exprt>(current))
+      define_array_function(*array_expr);
     to_be_defined.pop();
   }
+}
+
+/// Replaces the sub expressions of \p expr which have been defined as separate
+/// functions in the smt solver, using the \p expression_identifiers map.
+static exprt substitute_identifiers(
+  exprt expr,
+  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
+    &expression_identifiers)
+{
+  expr.visit_pre([&](exprt &node) -> void {
+    auto find_result = expression_identifiers.find(node);
+    if(find_result == expression_identifiers.cend())
+      return;
+    const auto type = find_result->first.type();
+    node = symbol_exprt{find_result->second.identifier(), type};
+  });
+  return expr;
 }
 
 smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
@@ -164,15 +212,20 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
 smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
-  track_expression_objects(expr, ns, object_map);
+  const exprt substituted =
+    substitute_identifiers(expr, expression_identifiers);
+  track_expression_objects(substituted, ns, object_map);
   associate_pointer_sizes(
-    expr,
+    substituted,
     ns,
     pointer_sizes_map,
     object_map,
     object_size_function.make_application);
   return ::convert_expr_to_smt(
-    expr, object_map, pointer_sizes_map, object_size_function.make_application);
+    substituted,
+    object_map,
+    pointer_sizes_map,
+    object_size_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)

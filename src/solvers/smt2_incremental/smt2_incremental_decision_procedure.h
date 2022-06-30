@@ -55,6 +55,11 @@ public:
 protected:
   // Implementation of protected decision_proceduret member function.
   resultt dec_solve() override;
+  /// \brief Defines a function of array sort and asserts the element values.
+  /// \details
+  ///   The new array function identifier is added to the
+  ///   `expression_identifiers` map.
+  void define_array_function(const array_exprt &array);
   /// \brief Defines any functions which \p expr depends on, which have not yet
   ///   been defined, along with their dependencies in turn.
   void define_dependent_functions(const exprt &expr);
@@ -81,7 +86,7 @@ protected:
     {
       return next_id++;
     }
-  } handle_sequence;
+  } handle_sequence, array_sequence;
 
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_handle_identifiers;
