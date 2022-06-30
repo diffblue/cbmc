@@ -52,14 +52,14 @@ exprt field_sensitivityt::apply(
     !write && expr.id() == ID_member &&
     to_member_expr(expr).struct_op().id() == ID_struct)
   {
-    return simplify_expr(std::move(expr), ns);
+    return simplify_opt(std::move(expr), ns);
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     !write && expr.id() == ID_index &&
     to_index_expr(expr).array().id() == ID_array)
   {
-    return simplify_expr(std::move(expr), ns);
+    return simplify_opt(std::move(expr), ns);
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(expr.id() == ID_member)
@@ -95,7 +95,8 @@ exprt field_sensitivityt::apply(
     // encoding the index access into an array as an individual symbol rather
     // than only the full array
     index_exprt &index = to_index_expr(expr);
-    simplify(index.index(), ns);
+    if(should_simplify)
+      simplify(index.index(), ns);
 
     if(
       is_ssa_expr(index.array()) && index.array().type().id() == ID_array &&
@@ -105,7 +106,8 @@ exprt field_sensitivityt::apply(
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
       auto l2_index = state.rename(index.index(), ns);
-      l2_index.simplify(ns);
+      if(should_simplify)
+        l2_index.simplify(ns);
       bool was_l2 = !tmp.get_level_2().empty();
       exprt l2_size =
         state.rename(to_array_type(index.array().type()).size(), ns).get();
@@ -227,16 +229,20 @@ void field_sensitivityt::field_assignments(
   const namespacet &ns,
   goto_symex_statet &state,
   const ssa_exprt &lhs,
+  const exprt &rhs,
   symex_targett &target,
   bool allow_pointer_unsoundness)
 {
   const exprt lhs_fs = apply(ns, state, lhs, false);
 
-  bool run_apply_bak = run_apply;
-  run_apply = false;
-  field_assignments_rec(
-    ns, state, lhs_fs, lhs, target, allow_pointer_unsoundness);
-  run_apply = run_apply_bak;
+  if(lhs != lhs_fs)
+  {
+    bool run_apply_bak = run_apply;
+    run_apply = false;
+    field_assignments_rec(
+      ns, state, lhs_fs, rhs, target, allow_pointer_unsoundness);
+    run_apply = run_apply_bak;
+  }
 }
 
 /// Assign to the individual fields \p lhs_fs of a non-expanded symbol \p lhs.
@@ -246,24 +252,19 @@ void field_sensitivityt::field_assignments(
 /// \param ns: a namespace to resolve type symbols/tag types
 /// \param state: symbolic execution state
 /// \param lhs_fs: expanded symbol
-/// \param lhs: non-expanded symbol
+/// \param ssa_rhs: right-hand-side value to assign
 /// \param target: symbolic execution equation store
 /// \param allow_pointer_unsoundness: allow pointer unsoundness
 void field_sensitivityt::field_assignments_rec(
   const namespacet &ns,
   goto_symex_statet &state,
   const exprt &lhs_fs,
-  const exprt &lhs,
+  const exprt &ssa_rhs,
   symex_targett &target,
   bool allow_pointer_unsoundness)
 {
-  if(lhs == lhs_fs)
-    return;
-  else if(is_ssa_expr(lhs_fs))
+  if(is_ssa_expr(lhs_fs))
   {
-    exprt ssa_rhs = state.rename(lhs, ns).get();
-    simplify(ssa_rhs, ns);
-
     const ssa_exprt ssa_lhs = state
                                 .assignment(
                                   to_ssa_expr(lhs_fs),
@@ -284,9 +285,10 @@ void field_sensitivityt::field_assignments_rec(
       state.source,
       symex_targett::assignment_typet::STATE);
   }
-  else if(lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag)
+  else if(
+    ssa_rhs.type().id() == ID_struct || ssa_rhs.type().id() == ID_struct_tag)
   {
-    const struct_typet &type = to_struct_type(ns.follow(lhs.type()));
+    const struct_typet &type = to_struct_type(ns.follow(ssa_rhs.type()));
     const struct_union_typet::componentst &components = type.components();
 
     PRECONDITION(
@@ -296,7 +298,8 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(const auto &comp : components)
     {
-      const member_exprt member_rhs(lhs, comp.get_name(), comp.type());
+      const exprt member_rhs =
+        simplify_opt(member_exprt{ssa_rhs, comp.get_name(), comp.type()}, ns);
       const exprt &member_lhs = *fs_it;
 
       field_assignments_rec(
@@ -305,7 +308,7 @@ void field_sensitivityt::field_assignments_rec(
     }
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
-  else if(const auto &type = type_try_dynamic_cast<array_typet>(lhs.type()))
+  else if(const auto &type = type_try_dynamic_cast<array_typet>(ssa_rhs.type()))
   {
     const std::size_t array_size =
       numeric_cast_v<std::size_t>(to_constant_expr(type->size()));
@@ -317,7 +320,8 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(std::size_t i = 0; i < array_size; ++i)
     {
-      const index_exprt index_rhs(lhs, from_integer(i, type->index_type()));
+      const exprt index_rhs = simplify_opt(
+        index_exprt{ssa_rhs, from_integer(i, type->index_type())}, ns);
       const exprt &index_lhs = *fs_it;
 
       field_assignments_rec(
@@ -329,10 +333,11 @@ void field_sensitivityt::field_assignments_rec(
   else if(lhs_fs.has_operands())
   {
     PRECONDITION(
-      lhs.has_operands() && lhs_fs.operands().size() == lhs.operands().size());
+      ssa_rhs.has_operands() &&
+      lhs_fs.operands().size() == ssa_rhs.operands().size());
 
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
-    for(const exprt &op : lhs.operands())
+    for(const exprt &op : ssa_rhs.operands())
     {
       field_assignments_rec(
         ns, state, *fs_it, op, target, allow_pointer_unsoundness);
@@ -362,4 +367,12 @@ bool field_sensitivityt::is_divisible(const ssa_exprt &expr) const
 #endif
 
   return false;
+}
+
+exprt field_sensitivityt::simplify_opt(exprt e, const namespacet &ns) const
+{
+  if(!should_simplify)
+    return e;
+
+  return simplify_expr(std::move(e), ns);
 }

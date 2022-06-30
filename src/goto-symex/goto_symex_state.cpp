@@ -31,13 +31,14 @@ static void get_l1_name(exprt &expr);
 goto_symex_statet::goto_symex_statet(
   const symex_targett::sourcet &_source,
   std::size_t max_field_sensitive_array_size,
+  bool should_simplify,
   guard_managert &manager,
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
   : goto_statet(manager),
     source(_source),
     guard_manager(manager),
     symex_target(nullptr),
-    field_sensitivity(max_field_sensitive_array_size),
+    field_sensitivity(max_field_sensitive_array_size, should_simplify),
     record_events({true}),
     fresh_l2_name_provider(fresh_l2_name_provider)
 {

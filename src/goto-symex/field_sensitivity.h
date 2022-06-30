@@ -84,8 +84,10 @@ class field_sensitivityt
 public:
   /// \param max_array_size: maximum size for which field sensitivity will be
   ///   applied to array cells
-  explicit field_sensitivityt(std::size_t max_array_size)
-    : max_field_sensitivity_array_size(max_array_size)
+  /// \param should_simplify: simplify expressions
+  field_sensitivityt(std::size_t max_array_size, bool should_simplify)
+    : max_field_sensitivity_array_size(max_array_size),
+      should_simplify(should_simplify)
   {
   }
 
@@ -96,12 +98,15 @@ public:
   /// \param ns: a namespace to resolve type symbols/tag types
   /// \param state: symbolic execution state
   /// \param lhs: non-expanded symbol
+  /// \param rhs: right-hand-side value that was used in the preceding update of
+  ///   the full object
   /// \param target: symbolic execution equation store
   /// \param allow_pointer_unsoundness: allow pointer unsoundness
   void field_assignments(
     const namespacet &ns,
     goto_symex_statet &state,
     const ssa_exprt &lhs,
+    const exprt &rhs,
     symex_targett &target,
     bool allow_pointer_unsoundness);
 
@@ -157,13 +162,17 @@ private:
 
   const std::size_t max_field_sensitivity_array_size;
 
+  const bool should_simplify;
+
   void field_assignments_rec(
     const namespacet &ns,
     goto_symex_statet &state,
     const exprt &lhs_fs,
-    const exprt &lhs,
+    const exprt &ssa_rhs,
     symex_targett &target,
     bool allow_pointer_unsoundness);
+
+  exprt simplify_opt(exprt e, const namespacet &ns) const;
 };
 
 #endif // CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H

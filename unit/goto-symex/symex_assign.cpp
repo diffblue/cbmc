@@ -51,7 +51,11 @@ SCENARIO(
     return fresh_name_count++;
   };
   goto_symex_statet state{
-    source, DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, manager, fresh_name};
+    source,
+    DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
+    true,
+    manager,
+    fresh_name};
 
   // Initialize dirty field of state
   incremental_dirtyt dirty;
@@ -273,14 +277,9 @@ SCENARIO(
           REQUIRE(as_symbol);
           REQUIRE(as_symbol->get_identifier() == "struct1!0#2..field1");
         }
-        THEN("Expand step RHS is struct1!0#1.field1")
+        THEN("Expand step RHS is 234")
         {
-          ssa_exprt struct1_v1{struct1_sym};
-          struct1_v1.set_level_0(0);
-          struct1_v1.set_level_2(1);
-          REQUIRE(
-            expand_step.ssa_rhs ==
-            member_exprt{struct1_v1, "field1", int_type});
+          REQUIRE(expand_step.ssa_rhs == from_integer(234, int_type));
         }
       }
     }

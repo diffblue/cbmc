@@ -44,10 +44,12 @@ SCENARIO(
   guard_managert guard_manager;
   std::size_t count = 0;
   auto fresh_name = [&count](const irep_idt &) { return count++; };
-  goto_symex_statet state{source,
-                          DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
-                          guard_manager,
-                          fresh_name};
+  goto_symex_statet state{
+    source,
+    DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
+    true,
+    guard_manager,
+    fresh_name};
 
   goto_statet goto_state{state};
   const exprt renamed_b = state.rename<L2>(b, ns).get();

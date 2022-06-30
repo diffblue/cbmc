@@ -1835,6 +1835,46 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       }
     }
   }
+  else if(expr.op().id() == ID_array)
+  {
+    const array_typet &array_type = to_array_type(expr.op().type());
+    const auto &element_bit_width =
+      pointer_offset_bits(array_type.element_type(), ns);
+    if(element_bit_width.has_value() && *element_bit_width > 0)
+    {
+      if(*offset > 0 && *offset * 8 % *element_bit_width == 0)
+      {
+        const auto elements_to_erase =
+          numeric_cast_v<std::size_t>((*offset * 8) / *element_bit_width);
+        array_exprt slice = to_array_expr(expr.op());
+        slice.operands().erase(
+          slice.operands().begin(),
+          slice.operands().begin() +
+            std::min(elements_to_erase, slice.operands().size()));
+        slice.type().size() =
+          from_integer(slice.operands().size(), slice.type().size().type());
+        byte_extract_exprt be = expr;
+        be.op() = slice;
+        be.offset() = from_integer(0, expr.offset().type());
+        return changed(simplify_byte_extract(be));
+      }
+      else if(*offset == 0 && *el_size % *element_bit_width == 0)
+      {
+        const auto elements_to_keep =
+          numeric_cast_v<std::size_t>(*el_size / *element_bit_width);
+        array_exprt slice = to_array_expr(expr.op());
+        if(slice.operands().size() > elements_to_keep)
+        {
+          slice.operands().resize(elements_to_keep);
+          slice.type().size() =
+            from_integer(slice.operands().size(), slice.type().size().type());
+          byte_extract_exprt be = expr;
+          be.op() = slice;
+          return changed(simplify_byte_extract(be));
+        }
+      }
+    }
+  }
 
   // try to refine it down to extracting from a member or an index in an array
   auto subexpr =

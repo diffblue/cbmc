@@ -422,6 +422,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   auto state = util_make_unique<statet>(
     symex_targett::sourcet(entry_point_id, start_function->body),
     symex_config.max_field_sensitivity_array_size,
+    symex_config.simplify_opt,
     guard_manager,
     [storage](const irep_idt &id) { return storage->get_unique_l2_index(id); });
 

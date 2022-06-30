@@ -1,16 +1,16 @@
 CORE
 Test
 --function Test.main --show-vcc --max-field-sensitivity-array-size 10
-symex_dynamic::dynamic_2_array#2\[\[0\]\] = symex_dynamic::dynamic_2_array#2\[0\]
-symex_dynamic::dynamic_2_array#2\[\[1\]\] = symex_dynamic::dynamic_2_array#2\[1\]
-symex_dynamic::dynamic_2_array#2\[\[2\]\] = symex_dynamic::dynamic_2_array#2\[2\]
-symex_dynamic::dynamic_2_array#2\[\[3\]\] = symex_dynamic::dynamic_2_array#2\[3\]
-symex_dynamic::dynamic_2_array#2\[\[4\]\] = symex_dynamic::dynamic_2_array#2\[4\]
-symex_dynamic::dynamic_2_array#2\[\[5\]\] = symex_dynamic::dynamic_2_array#2\[5\]
-symex_dynamic::dynamic_2_array#2\[\[6\]\] = symex_dynamic::dynamic_2_array#2\[6\]
-symex_dynamic::dynamic_2_array#2\[\[7\]\] = symex_dynamic::dynamic_2_array#2\[7\]
-symex_dynamic::dynamic_2_array#2\[\[8\]\] = symex_dynamic::dynamic_2_array#2\[8\]
-symex_dynamic::dynamic_2_array#2\[\[9\]\] = symex_dynamic::dynamic_2_array#2\[9\]
+symex_dynamic::dynamic_2_array#2\[\[0\]\] =
+symex_dynamic::dynamic_2_array#2\[\[1\]\] =
+symex_dynamic::dynamic_2_array#2\[\[2\]\] =
+symex_dynamic::dynamic_2_array#2\[\[3\]\] =
+symex_dynamic::dynamic_2_array#2\[\[4\]\] =
+symex_dynamic::dynamic_2_array#2\[\[5\]\] =
+symex_dynamic::dynamic_2_array#2\[\[6\]\] =
+symex_dynamic::dynamic_2_array#2\[\[7\]\] =
+symex_dynamic::dynamic_2_array#2\[\[8\]\] =
+symex_dynamic::dynamic_2_array#2\[\[9\]\] =
 symex_dynamic::dynamic_2_array#3\[\[1\]\] = java::Test.main:\(I\)V::unknown!0@1#1
 ^EXIT=0$
 ^SIGNAL=0$
