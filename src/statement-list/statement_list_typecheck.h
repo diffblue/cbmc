@@ -719,7 +719,7 @@ private:
   /// \param tia_element: Symbol representation of the TIA element.
   /// \return Expression including the assigned symbol's name and type.
   exprt typecheck_function_call_arguments(
-    const std::vector<equal_exprt> &assignments,
+    const std::vector<code_frontend_assignt> &assignments,
     const code_typet::parametert &param,
     const symbolt &tia_element);
 
@@ -740,7 +740,7 @@ private:
   /// \param tia_element: Symbol representation of the TIA element.
   /// \return Expression including the assigned symbol's name and type.
   exprt typecheck_return_value_assignment(
-    const std::vector<equal_exprt> &assignments,
+    const std::vector<code_frontend_assignt> &assignments,
     const typet &return_type,
     const symbolt &tia_element);
 

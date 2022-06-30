@@ -305,11 +305,13 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
 exprt full_struct_abstract_objectt::to_predicate_internal(
   const exprt &name) const
 {
+  const auto &compound_type = to_struct_union_type(name.type());
   auto all_predicates = exprt::operandst{};
 
   for(auto field : map.get_sorted_view())
   {
-    auto field_name = member_exprt(name, field.first, name.type());
+    auto field_name =
+      member_exprt(name, compound_type.get_component(field.first));
     auto field_expr = field.second->to_predicate(field_name);
 
     if(!field_expr.is_true())

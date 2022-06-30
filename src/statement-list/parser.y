@@ -1098,8 +1098,8 @@ Param_Assignment:
     Variable_Name TOK_ASSIGNMENT IL_Operand
     {
       newstack($$);
-      parser_stack($$) = equal_exprt{std::move(parser_stack($1)), 
-        std::move(parser_stack($3))};
+      parser_stack($$) = code_frontend_assignt(std::move(parser_stack($1)),
+        std::move(parser_stack($3)));
     }
     ;
 Opt_Data_Block:

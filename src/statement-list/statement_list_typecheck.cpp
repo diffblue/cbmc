@@ -1593,9 +1593,9 @@ void statement_list_typecheckt::typecheck_CPROVER_assert(
   const codet &op_code,
   symbolt &tia_element)
 {
-  const equal_exprt *const assignment =
-    expr_try_dynamic_cast<equal_exprt>(op_code.op1());
-  if(assignment)
+  if(
+    const auto assignment =
+      expr_try_dynamic_cast<code_frontend_assignt>(op_code.op1()))
   {
     const code_assertt assertion{
       typecheck_function_call_argument_rhs(tia_element, assignment->rhs())};
@@ -1612,9 +1612,9 @@ void statement_list_typecheckt::typecheck_CPROVER_assume(
   const codet &op_code,
   symbolt &tia_element)
 {
-  const equal_exprt *const assignment =
-    expr_try_dynamic_cast<equal_exprt>(op_code.op1());
-  if(assignment)
+  if(
+    const auto assignment =
+      expr_try_dynamic_cast<code_frontend_assignt>(op_code.op1()))
   {
     const code_assumet assumption{
       typecheck_function_call_argument_rhs(tia_element, assignment->rhs())};
@@ -1660,7 +1660,7 @@ void statement_list_typecheckt::typecheck_called_function(
   const code_typet &called_type{to_code_type(called_function_sym.type)};
 
   // Check if function name is followed by data block.
-  if(!can_cast_expr<equal_exprt>(op_code.op1()))
+  if(!can_cast_expr<code_frontend_assignt>(op_code.op1()))
   {
     error() << "Function calls should not address instance data blocks" << eom;
     throw TYPECHECK_ERROR;
@@ -1669,11 +1669,11 @@ void statement_list_typecheckt::typecheck_called_function(
   // Check if function interface matches the call and fill argument list.
   const code_typet::parameterst &params{called_type.parameters()};
   code_function_callt::argumentst args;
-  std::vector<equal_exprt> assignments;
+  std::vector<code_frontend_assignt> assignments;
   for(const auto &expr : op_code.operands())
   {
-    if(can_cast_expr<equal_exprt>(expr))
-      assignments.push_back(to_equal_expr(expr));
+    if(auto assign = expr_try_dynamic_cast<code_frontend_assignt>(expr))
+      assignments.push_back(*assign);
   }
 
   for(const code_typet::parametert &param : params)
@@ -1706,13 +1706,13 @@ void statement_list_typecheckt::typecheck_called_function_block(
 }
 
 exprt statement_list_typecheckt::typecheck_function_call_arguments(
-  const std::vector<equal_exprt> &assignments,
+  const std::vector<code_frontend_assignt> &assignments,
   const code_typet::parametert &param,
   const symbolt &tia_element)
 {
   const irep_idt &param_name = param.get_base_name();
   const typet &param_type = param.type();
-  for(const equal_exprt &assignment : assignments)
+  for(const auto &assignment : assignments)
   {
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
     if(param_name == lhs.get_identifier())
@@ -1752,11 +1752,11 @@ exprt statement_list_typecheckt::typecheck_function_call_argument_rhs(
 }
 
 exprt statement_list_typecheckt::typecheck_return_value_assignment(
-  const std::vector<equal_exprt> &assignments,
+  const std::vector<code_frontend_assignt> &assignments,
   const typet &return_type,
   const symbolt &tia_element)
 {
-  for(const equal_exprt &assignment : assignments)
+  for(const auto &assignment : assignments)
   {
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
     if(ID_statement_list_return_value_id == lhs.get_identifier())

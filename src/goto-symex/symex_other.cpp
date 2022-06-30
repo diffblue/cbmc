@@ -224,11 +224,13 @@ void goto_symext::symex_other(
     process_array_expr(state, array1);
     process_array_expr(state, array2);
 
-    exprt rhs = equal_exprt(array1, array2);
+    exprt rhs;
 
-    // check for size (or type) mismatch
+    // Types don't match? Make it 'false'.
     if(array1.type() != array2.type())
       rhs = false_exprt();
+    else
+      rhs = equal_exprt(array1, array2);
 
     symex_assign(state, code.op2(), rhs);
   }

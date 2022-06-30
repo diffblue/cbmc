@@ -949,6 +949,17 @@ bool linkingt::adjust_object_type_rec(
     }
     else
     {
+      if(new_size.type() != old_size.type())
+      {
+        link_error(
+          info.old_symbol,
+          info.new_symbol,
+          "conflicting array sizes for variable");
+
+        // error logged, continue typechecking other symbols
+        return true;
+      }
+
       equal_exprt eq(old_size, new_size);
 
       if(!simplify_expr(eq, ns).is_true())
