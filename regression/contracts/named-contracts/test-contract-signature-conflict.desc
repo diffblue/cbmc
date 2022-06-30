@@ -1,0 +1,10 @@
+CORE
+main-contract-signature-conflict.c
+--enforce-contract foo
+^Contract of 'foo' has different signature\.$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+This test checks that contracts on function declarations with a matching name
+but different type are rejected.

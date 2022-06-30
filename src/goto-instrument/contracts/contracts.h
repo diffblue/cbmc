@@ -48,7 +48,6 @@ Date: February 2016
   " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
 
 class local_may_aliast;
-class replace_symbolt;
 class instrument_spec_assignst;
 class cfg_infot;
 class function_pointer_obeys_contract_exprt;
@@ -148,14 +147,11 @@ protected:
   /// ```
   /// \param expr expression to translate
   /// \param property_class property class to use for the generated assertions
-  /// \param replace symbol substitution to use in the context where the
-  ///                expression is translated
   /// \param mode language mode to use for goto_conversion and prints
   /// \param dest goto_program where generated instructions are appended
   void assert_function_pointer_obeys_contract(
     const function_pointer_obeys_contract_exprt &expr,
     const irep_idt &property_class,
-    const replace_symbolt &replace,
     const irep_idt &mode,
     goto_programt &dest);
 
@@ -164,13 +160,10 @@ protected:
   /// ASSIGN function_pointer = contract;
   /// ```
   /// \param expr expression to translate
-  /// \param replace symbol substitution to use in the context where the
-  ///                expression is translated
   /// \param mode language mode to use for goto_conversion and prints
   /// \param dest goto_program where generated instructions are appended
   void assume_function_pointer_obeys_contract(
     const function_pointer_obeys_contract_exprt &expr,
-    const replace_symbolt &replace,
     const irep_idt &mode,
     goto_programt &dest);
 

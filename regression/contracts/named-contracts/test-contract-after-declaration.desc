@@ -1,0 +1,10 @@
+CORE
+main-contract-after-declaration.c
+--replace-call-with-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that we can have a function declaration with a contract after
+having seen an earlier declaration of that same function.

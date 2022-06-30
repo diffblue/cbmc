@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/mathematical_expr.h>
 #include <util/std_types.h>
 
 #include "ansi_c_declaration.h"
@@ -153,7 +154,9 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
     {
       typecheck_function_body(symbol);
     }
-    else
+    else if(
+      symbol.is_macro ||
+      !to_code_with_contract_type(symbol.type).has_contract())
     {
       // we don't need the identifiers
       for(auto &parameter : to_code_type(symbol.type).parameters())
@@ -370,7 +373,15 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(old_ct.has_ellipsis() && !new_ct.has_ellipsis())
       old_ct=new_ct;
     else if(!old_ct.has_ellipsis() && new_ct.has_ellipsis())
+    {
+      if(to_code_with_contract_type(new_ct).has_contract())
+      {
+        error().source_location = new_symbol.location;
+        error() << "code contract on incomplete function re-declaration" << eom;
+        throw 0;
+      }
       new_ct=old_ct;
+    }
 
     if(inlined)
     {
@@ -442,6 +453,22 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
       // overwrite type (because of parameter names)
       old_symbol.type=new_symbol.type;
+    }
+    else if(to_code_with_contract_type(new_ct).has_contract())
+    {
+      // overwrite type to add contract, but keep the old parameter identifiers
+      // (if any)
+      auto new_parameters_it = new_ct.parameters().begin();
+      for(auto &p : old_ct.parameters())
+      {
+        if(new_parameters_it != new_ct.parameters().end())
+        {
+          new_parameters_it->set_identifier(p.get_identifier());
+          ++new_parameters_it;
+        }
+      }
+
+      old_symbol.type = new_symbol.type;
     }
 
     return;
@@ -752,17 +779,53 @@ void c_typecheck_baset::typecheck_declaration(
 
       // check the contract, if any
       symbolt &new_symbol = symbol_table.get_writeable_ref(identifier);
-      if(new_symbol.type.id() == ID_code)
+      if(
+        new_symbol.type.id() == ID_code &&
+        to_code_with_contract_type(new_symbol.type).has_contract())
       {
-        // We typecheck this after the
-        // function body done above, so as to have parameter symbols
-        // available
-        auto &code_type = to_code_with_contract_type(new_symbol.type);
+        code_with_contract_typet code_type =
+          to_code_with_contract_type(new_symbol.type);
+
+        // ensure parameter declarations are available for type checking to
+        // succeed
+        binding_exprt::variablest temporary_parameter_symbols;
+
+        const auto &return_type = code_type.return_type();
+        if(return_type.id() != ID_empty)
+        {
+          parameter_map[CPROVER_PREFIX "return_value"] = return_type;
+          temporary_parameter_symbols.emplace_back(
+            CPROVER_PREFIX "return_value", return_type);
+        }
+
+        std::size_t anon_counter = 0;
+        for(auto &p : code_type.parameters())
+        {
+          // may be anonymous
+          if(p.get_base_name().empty())
+            p.set_base_name("#anon" + std::to_string(anon_counter++));
+
+          // produce identifier
+          const irep_idt &base_name = p.get_base_name();
+          irep_idt parameter_identifier =
+            id2string(identifier) + "::" + id2string(base_name);
+
+          p.set_identifier(parameter_identifier);
+
+          PRECONDITION(
+            parameter_map.find(parameter_identifier) == parameter_map.end());
+          parameter_map[parameter_identifier] = p.type();
+          temporary_parameter_symbols.emplace_back(
+            parameter_identifier, p.type());
+        }
 
         for(auto &expr : code_type.requires_contract())
         {
           typecheck_spec_function_pointer_obeys_contract(expr);
           check_history_expr(expr);
+          lambda_exprt lambda{temporary_parameter_symbols, expr};
+          lambda.add_source_location() = expr.source_location();
+          expr.swap(lambda);
         }
 
         for(auto &requires : code_type.requires())
@@ -770,13 +833,18 @@ void c_typecheck_baset::typecheck_declaration(
           typecheck_expr(requires);
           implicit_typecast_bool(requires);
           check_history_expr(requires);
+          lambda_exprt lambda{temporary_parameter_symbols, requires};
+          lambda.add_source_location() = requires.source_location();
+          requires.swap(lambda);
         }
 
         typecheck_spec_assigns(code_type.assigns());
-
-        const auto &return_type = code_type.return_type();
-        if(return_type.id() != ID_empty)
-          parameter_map[CPROVER_PREFIX "return_value"] = return_type;
+        for(auto &assigns : code_type.assigns())
+        {
+          lambda_exprt lambda{temporary_parameter_symbols, assigns};
+          lambda.add_source_location() = assigns.source_location();
+          assigns.swap(lambda);
+        }
 
         for(auto &expr : code_type.ensures_contract())
         {
@@ -785,23 +853,55 @@ void c_typecheck_baset::typecheck_declaration(
             expr,
             ID_loop_entry,
             CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
+          lambda_exprt lambda{temporary_parameter_symbols, expr};
+          lambda.add_source_location() = expr.source_location();
+          expr.swap(lambda);
         }
 
-        if(!as_const(code_type).ensures().empty())
+        for(auto &ensures : code_type.ensures())
         {
-          for(auto &ensures : code_type.ensures())
-          {
-            typecheck_expr(ensures);
-            implicit_typecast_bool(ensures);
-            disallow_subexpr_by_id(
-              ensures,
-              ID_loop_entry,
-              CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
-          }
+          typecheck_expr(ensures);
+          implicit_typecast_bool(ensures);
+          disallow_subexpr_by_id(
+            ensures,
+            ID_loop_entry,
+            CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
+          lambda_exprt lambda{temporary_parameter_symbols, ensures};
+          lambda.add_source_location() = ensures.source_location();
+          ensures.swap(lambda);
         }
 
-        if(return_type.id() != ID_empty)
-          parameter_map.erase(CPROVER_PREFIX "return_value");
+        for(const auto &parameter_sym : temporary_parameter_symbols)
+          parameter_map.erase(parameter_sym.get_identifier());
+
+        // create a contract symbol
+        symbolt contract;
+        contract.name = "contract::" + id2string(new_symbol.name);
+        contract.base_name = new_symbol.name;
+        contract.pretty_name = new_symbol.name;
+        contract.is_property = true;
+        contract.type = code_type;
+        contract.mode = new_symbol.mode;
+        contract.module = module;
+        contract.location = new_symbol.location;
+
+        auto entry = symbol_table.insert(std::move(contract));
+        if(!entry.second)
+        {
+          error().source_location = new_symbol.location;
+          error() << "contract '" << new_symbol.display_name()
+                  << "' already set at " << entry.first.location.as_string()
+                  << eom;
+          throw 0;
+        }
+
+        // Remove the contract from the original symbol as we have created a
+        // dedicated contract symbol.
+        new_symbol.type.remove(ID_C_spec_assigns);
+        new_symbol.type.remove(ID_C_spec_ensures);
+        new_symbol.type.remove(ID_C_spec_ensures_contract);
+        new_symbol.type.remove(ID_C_spec_requires);
+        new_symbol.type.remove(ID_C_spec_requires_contract);
       }
     }
   }

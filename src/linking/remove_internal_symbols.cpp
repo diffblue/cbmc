@@ -67,12 +67,16 @@ static void get_symbols(
         to_code_with_contract_type(code_type);
 
       find_symbols_sett new_symbols;
+      for(const exprt &a : maybe_contract.assigns())
+        find_type_and_expr_symbols(a, new_symbols);
       for(const exprt &e : maybe_contract.ensures())
+        find_type_and_expr_symbols(e, new_symbols);
+      for(const exprt &e : maybe_contract.ensures_contract())
         find_type_and_expr_symbols(e, new_symbols);
       for(const exprt &r : maybe_contract.requires())
         find_type_and_expr_symbols(r, new_symbols);
-      for(const exprt &a : maybe_contract.assigns())
-        find_type_and_expr_symbols(a, new_symbols);
+      for(const exprt &r : maybe_contract.requires_contract())
+        find_type_and_expr_symbols(r, new_symbols);
 
       for(const auto &s : new_symbols)
       {
@@ -180,6 +184,7 @@ void remove_internal_symbols(
     bool is_type=symbol.is_type;
     bool has_body=symbol.value.is_not_nil();
     bool has_initializer = symbol.value.is_not_nil();
+    bool is_contract = is_function && symbol.is_property;
 
     // __attribute__((constructor)), __attribute__((destructor))
     if(symbol.mode==ID_C && is_function && is_file_local)
@@ -208,6 +213,8 @@ void remove_internal_symbols(
       {
         get_symbols(ns, symbol, exported);
       }
+      else if(is_contract)
+        get_symbols(ns, symbol, exported);
     }
     else
     {

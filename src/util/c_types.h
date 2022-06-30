@@ -366,6 +366,13 @@ public:
   {
   }
 
+  bool has_contract() const
+  {
+    return !ensures().empty() || !ensures_contract().empty() ||
+           !requires().empty() || !requires_contract().empty() ||
+           !assigns().empty();
+  }
+
   const exprt::operandst &assigns() const
   {
     return static_cast<const exprt &>(find(ID_C_spec_assigns)).operands();
