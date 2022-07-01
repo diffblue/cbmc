@@ -36,21 +36,21 @@ class remove_function_pointerst
 public:
   remove_function_pointerst(
     message_handlert &_message_handler,
-    symbol_tablet &_symbol_table,
+    goto_modelt &goto_model,
     bool _add_safety_assertion,
-    bool only_resolve_const_fps,
-    const goto_functionst &goto_functions);
+    bool only_resolve_const_fps);
 
-  void operator()(goto_functionst &goto_functions);
+  void operator()();
 
-  bool remove_function_pointers(
+  NODISCARD
+  std::list<irep_idt> remove_function_pointers(
     goto_programt &goto_program,
     const irep_idt &function_id);
 
 protected:
   message_handlert &message_handler;
+  goto_modelt &goto_model;
   const namespacet ns;
-  symbol_tablet &symbol_table;
   bool add_safety_assertion;
 
   // We can optionally halt the FP removal if we aren't able to use
@@ -67,7 +67,9 @@ protected:
   /// \param goto_program: The goto program that contains target
   /// \param function_id: Name of function containing the target
   /// \param target: location with function call with function pointer
-  void remove_function_pointer(
+  /// \return Name of fall back function symbol, if any; this function must be
+  ///         added to GOTO functions by the caller.
+  optionalt<irep_idt> remove_function_pointer(
     goto_programt &goto_program,
     const irep_idt &function_id,
     goto_programt::targett target);
@@ -80,23 +82,22 @@ protected:
 
 remove_function_pointerst::remove_function_pointerst(
   message_handlert &_message_handler,
-  symbol_tablet &_symbol_table,
+  goto_modelt &goto_model,
   bool _add_safety_assertion,
-  bool only_resolve_const_fps,
-  const goto_functionst &goto_functions)
+  bool only_resolve_const_fps)
   : message_handler(_message_handler),
-    ns(_symbol_table),
-    symbol_table(_symbol_table),
+    goto_model(goto_model),
+    ns(goto_model.symbol_table),
     add_safety_assertion(_add_safety_assertion),
     only_resolve_const_fps(only_resolve_const_fps)
 {
-  for(const auto &s : symbol_table.symbols)
+  for(const auto &s : goto_model.symbol_table.symbols)
     compute_address_taken_functions(s.second.value, address_taken);
 
-  compute_address_taken_functions(goto_functions, address_taken);
+  compute_address_taken_functions(goto_model.goto_functions, address_taken);
 
   // build type map
-  for(const auto &gf_entry : goto_functions.function_map)
+  for(const auto &gf_entry : goto_model.goto_functions.function_map)
   {
     type_map.emplace(
       gf_entry.first, to_code_type(ns.lookup(gf_entry.first).type));
@@ -208,6 +209,7 @@ static void fix_argument_types(code_function_callt &function_call)
 
 static void fix_return_type(
   const irep_idt &in_function_id,
+  const source_locationt &source_location,
   code_function_callt &function_call,
   symbol_tablet &symbol_table,
   goto_programt &dest)
@@ -230,7 +232,7 @@ static void fix_return_type(
     code_type.return_type(),
     id2string(in_function_id),
     "tmp_return_val_" + id2string(function_symbol.base_name),
-    function_call.source_location(),
+    source_location,
     function_symbol.mode,
     symbol_table);
 
@@ -239,13 +241,14 @@ static void fix_return_type(
   exprt old_lhs=function_call.lhs();
   function_call.lhs()=tmp_symbol_expr;
 
-  dest.add(goto_programt::make_assignment(code_assignt(
+  dest.add(goto_programt::make_assignment(
     old_lhs,
     make_byte_extract(
-      tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()))));
+      tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()),
+    source_location));
 }
 
-void remove_function_pointerst::remove_function_pointer(
+optionalt<irep_idt> remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
   const irep_idt &function_id,
   goto_programt::targett target)
@@ -284,7 +287,7 @@ void remove_function_pointerst::remove_function_pointer(
   else
   {
     remove_const_function_pointerst fpr(
-      log.get_message_handler(), ns, symbol_table);
+      log.get_message_handler(), ns, goto_model.symbol_table);
 
     found_functions=fpr(pointer, functions);
 
@@ -297,7 +300,7 @@ void remove_function_pointerst::remove_function_pointer(
     if(functions.size()==1)
     {
       target->call_function() = *functions.cbegin();
-      return;
+      return {};
     }
   }
 
@@ -311,7 +314,7 @@ void remove_function_pointerst::remove_function_pointer(
       // Since we haven't found functions, we would now resort to
       // replacing the function pointer with any function with a valid signature
       // Since we don't want to do that, we abort.
-      return;
+      return {};
     }
 
     bool return_value_used = as_const(*target).call_lhs().is_not_nil();
@@ -337,9 +340,9 @@ void remove_function_pointerst::remove_function_pointer(
     }
   }
 
-  ::remove_function_pointer(
+  return ::remove_function_pointer(
     message_handler,
-    symbol_table,
+    goto_model.symbol_table,
     goto_program,
     function_id,
     target,
@@ -379,7 +382,7 @@ static std::string function_pointer_assertion_comment(
   return comment.str();
 }
 
-void remove_function_pointer(
+irep_idt remove_function_pointer(
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
@@ -388,13 +391,15 @@ void remove_function_pointer(
   const std::unordered_set<symbol_exprt, irep_hash> &functions,
   const bool add_safety_assertion)
 {
+  const auto &source_location = target->source_location();
   const exprt &function = target->call_function();
   const exprt &pointer = to_dereference_expr(function).pointer();
 
   // the final target is a skip
   goto_programt final_skip;
 
-  goto_programt::targett t_final = final_skip.add(goto_programt::make_skip());
+  goto_programt::targett t_final =
+    final_skip.add(goto_programt::make_skip(source_location));
 
   // build the calls and gotos
 
@@ -411,13 +416,15 @@ void remove_function_pointer(
     fix_argument_types(new_call);
 
     goto_programt tmp;
-    fix_return_type(function_id, new_call, symbol_table, tmp);
+    fix_return_type(function_id, source_location, new_call, symbol_table, tmp);
 
-    auto call = new_code_calls.add(goto_programt::make_function_call(new_call));
+    auto call = new_code_calls.add(
+      goto_programt::make_function_call(new_call, source_location));
     new_code_calls.destructive_append(tmp);
 
     // goto final
-    new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
+    new_code_calls.add(
+      goto_programt::make_goto(t_final, true_exprt(), source_location));
 
     // goto to call
     const address_of_exprt address_of(fun, pointer_type(fun.type()));
@@ -425,20 +432,50 @@ void remove_function_pointer(
     const auto casted_address =
       typecast_exprt::conditional_cast(address_of, pointer.type());
 
-    new_code_gotos.add(
-      goto_programt::make_goto(call, equal_exprt(pointer, casted_address)));
+    new_code_gotos.add(goto_programt::make_goto(
+      call, equal_exprt(pointer, casted_address), source_location));
   }
 
-  // fall-through
+  // fall-through -- create a fresh function (without body) that will be called;
+  // generate-function-body can be used to decide the behavior of this new
+  // function
   if(add_safety_assertion)
   {
-    goto_programt::targett t =
-      new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
+    goto_programt::targett t = new_code_gotos.add(
+      goto_programt::make_assertion(false_exprt(), source_location));
     t->source_location_nonconst().set_property_class("pointer dereference");
     t->source_location_nonconst().set_comment(
       function_pointer_assertion_comment(functions));
   }
-  new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
+  const irep_idt &mode = symbol_table.lookup_ref(function_id).mode;
+  symbolt &fall_back_fn_symbol = get_fresh_aux_symbol(
+    function.type(),
+    id2string(function_id),
+    "fptr_call",
+    source_location,
+    mode,
+    symbol_table);
+  fall_back_fn_symbol.is_file_local = true;
+  code_typet &code_type = to_code_type(fall_back_fn_symbol.type);
+  std::size_t param_ctr = 0;
+  for(auto &param : code_type.parameters())
+  {
+    symbolt &param_sym = get_fresh_aux_symbol(
+      param.type(),
+      id2string(fall_back_fn_symbol.name),
+      "p" + std::to_string(param_ctr++),
+      source_location,
+      mode,
+      symbol_table);
+    param_sym.is_parameter = true;
+    param_sym.is_lvalue = true;
+    param.set_identifier(param_sym.name);
+  }
+  new_code_gotos.add(goto_programt::make_function_call(
+    target->call_lhs(),
+    fall_back_fn_symbol.symbol_expr(),
+    target->call_arguments(),
+    source_location));
 
   goto_programt new_code;
 
@@ -447,35 +484,17 @@ void remove_function_pointer(
   new_code.destructive_append(new_code_calls);
   new_code.destructive_append(final_skip);
 
-  // set locations
-  for(auto &instruction : new_code.instructions)
-  {
-    source_locationt &source_location = instruction.source_location_nonconst();
-
-    irep_idt property_class = source_location.get_property_class();
-    irep_idt comment = source_location.get_comment();
-    source_location = target->source_location();
-    if(!property_class.empty())
-      source_location.set_property_class(property_class);
-    if(!comment.empty())
-      source_location.set_comment(comment);
-  }
-
-  goto_programt::targett next_target=target;
-  next_target++;
-
-  goto_program.destructive_insert(next_target, new_code);
+  goto_program.destructive_insert(std::next(target), new_code);
 
   // We preserve the original dereferencing to possibly catch
   // further pointer-related errors.
   code_expressiont code_expression(function);
   code_expression.add_source_location()=function.source_location();
-  *target =
-    goto_programt::make_other(code_expression, target->source_location());
+  *target = goto_programt::make_other(code_expression, source_location);
 
   // report statistics
   messaget log{message_handler};
-  log.statistics().source_location = target->source_location();
+  log.statistics().source_location = source_location;
   log.statistics() << "replacing function pointer by " << functions.size()
                    << " possible targets" << messaget::eom;
 
@@ -496,96 +515,65 @@ void remove_function_pointer(
 
       mstream << messaget::eom;
     });
+
+  return fall_back_fn_symbol.name;
 }
 
-bool remove_function_pointerst::remove_function_pointers(
+std::list<irep_idt> remove_function_pointerst::remove_function_pointers(
   goto_programt &goto_program,
   const irep_idt &function_id)
 {
-  bool did_something=false;
+  std::list<irep_idt> fall_back_fns;
 
   Forall_goto_program_instructions(target, goto_program)
     if(target->is_function_call())
     {
       if(target->call_function().id() == ID_dereference)
       {
-        remove_function_pointer(goto_program, function_id, target);
-        did_something=true;
+        auto fall_back =
+          remove_function_pointer(goto_program, function_id, target);
+        if(fall_back.has_value())
+          fall_back_fns.push_back(*fall_back);
       }
     }
 
-  if(did_something)
+  if(!fall_back_fns.empty())
     remove_skip(goto_program);
 
-  return did_something;
+  return fall_back_fns;
 }
 
-void remove_function_pointerst::operator()(goto_functionst &functions)
+void remove_function_pointerst::operator()()
 {
-  bool did_something=false;
+  std::list<irep_idt> fall_back_fns;
 
-  for(goto_functionst::function_mapt::iterator f_it=
-      functions.function_map.begin();
-      f_it!=functions.function_map.end();
-      f_it++)
+  for(auto &f_entry : goto_model.goto_functions.function_map)
   {
-    goto_programt &goto_program=f_it->second.body;
+    goto_programt &goto_program = f_entry.second.body;
 
-    if(remove_function_pointers(goto_program, f_it->first))
-      did_something=true;
+    fall_back_fns.splice(
+      fall_back_fns.end(),
+      remove_function_pointers(goto_program, f_entry.first));
   }
 
-  if(did_something)
-    functions.compute_location_numbers();
-}
+  for(const auto &id : fall_back_fns)
+  {
+    goto_model.goto_functions.function_map[id].set_parameter_identifiers(
+      to_code_type(goto_model.symbol_table.lookup_ref(id).type));
+  }
 
-bool remove_function_pointers(
-  message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
-  goto_programt &goto_program,
-  const irep_idt &function_id,
-  bool add_safety_assertion,
-  bool only_remove_const_fps)
-{
-  remove_function_pointerst
-    rfp(
-      _message_handler,
-      symbol_table,
-      add_safety_assertion,
-      only_remove_const_fps,
-      goto_functions);
-
-  return rfp.remove_function_pointers(goto_program, function_id);
+  if(!fall_back_fns.empty())
+    goto_model.goto_functions.update();
 }
 
 void remove_function_pointers(
   message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  bool add_safety_assertion,
-  bool only_remove_const_fps)
-{
-  remove_function_pointerst
-    rfp(
-      _message_handler,
-      symbol_table,
-      add_safety_assertion,
-      only_remove_const_fps,
-      goto_functions);
-
-  rfp(goto_functions);
-}
-
-void remove_function_pointers(message_handlert &_message_handler,
   goto_modelt &goto_model,
   bool add_safety_assertion,
   bool only_remove_const_fps)
 {
-  remove_function_pointers(
-    _message_handler,
-    goto_model.symbol_table,
-    goto_model.goto_functions,
-    add_safety_assertion,
-    only_remove_const_fps);
+  remove_function_pointerst rfp{
+    _message_handler, goto_model, add_safety_assertion, only_remove_const_fps};
+
+  rfp();
 }

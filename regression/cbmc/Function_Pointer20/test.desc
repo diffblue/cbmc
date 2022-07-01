@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^\*\*\*\* WARNING: no body for function indirect::fptr_call
+^\[indirect.assertion.1\] line 16 assertion 0: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring

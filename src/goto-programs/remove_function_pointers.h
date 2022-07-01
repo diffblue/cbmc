@@ -14,6 +14,8 @@ Date: June 2003
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 
+#include <util/nodiscard.h>
+
 #include "goto_program.h"
 
 #include <unordered_set>
@@ -31,22 +33,6 @@ void remove_function_pointers(
   bool add_safety_assertion,
   bool only_remove_const_fps=false);
 
-void remove_function_pointers(
-  message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  bool add_safety_assertion,
-  bool only_remove_const_fps=false);
-
-bool remove_function_pointers(
-  message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
-  goto_programt &goto_program,
-  const irep_idt &function_id,
-  bool add_safety_assertion,
-  bool only_remove_const_fps = false);
-
 /// Replace a call to a dynamic function at location
 /// target in the given goto-program by a case-split
 /// over a given set of functions
@@ -57,8 +43,10 @@ bool remove_function_pointers(
 /// \param target: location with function call with function pointer
 /// \param functions: The set of functions to consider
 /// \param add_safety_assertion: Iff true, include an assertion that the
-//         pointer matches one of the candidate functions
-void remove_function_pointer(
+///        pointer matches one of the candidate functions
+/// \return Name of fall back function symbol; this function must be added to
+///         GOTO functions by the caller.
+NODISCARD irep_idt remove_function_pointer(
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,

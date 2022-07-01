@@ -31,6 +31,7 @@ void value_set_fi_fp_removal(
   message.status() << "Instrumenting" << messaget::eom;
 
   // now replace aliases by addresses
+  std::list<irep_idt> fall_back_fns;
   for(auto &f : goto_model.goto_functions.function_map)
   {
     for(auto target = f.second.body.instructions.begin();
@@ -69,18 +70,26 @@ void value_set_fi_fp_removal(
 
           if(functions.size() > 0)
           {
-            remove_function_pointer(
+            fall_back_fns.push_back(remove_function_pointer(
               message_handler,
               goto_model.symbol_table,
               f.second.body,
               f.first,
               target,
               functions,
-              true);
+              true));
           }
         }
       }
     }
   }
-  goto_model.goto_functions.update();
+
+  for(const auto &id : fall_back_fns)
+  {
+    goto_model.goto_functions.function_map[id].set_parameter_identifiers(
+      to_code_type(ns.lookup(id).type));
+  }
+
+  if(!fall_back_fns.empty())
+    goto_model.goto_functions.update();
 }

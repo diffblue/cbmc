@@ -10,7 +10,7 @@ main.c
 ^main::1::fun1 \(\) -> value-set-begin: ptr ->\(f\) :value-set-end
 ^main::1::fun2_show \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
 ^main::1::fun3_show \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
-^fun_global_show \(\) -> value-set-begin: ptr ->\(f\), ptr ->\(g\) :value-set-end
+^fun_global_show \(\) -> value-set-begin: TOP :value-set-end
 ^EXIT=0$
 ^SIGNAL=0$
 --
