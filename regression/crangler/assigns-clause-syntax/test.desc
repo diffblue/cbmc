@@ -1,0 +1,9 @@
+CORE
+test.json
+
+__CPROVER_assigns
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Make sure the semicolon in assigns clauses does not trip up parsing.
