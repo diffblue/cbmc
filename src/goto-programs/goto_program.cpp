@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iomanip>
 
-#include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/find_symbols.h>
 #include <util/format_expr.h>
@@ -808,7 +807,7 @@ void goto_programt::instructiont::validate(
         if(!ns.lookup(goto_id, table_symbol))
         {
           bool symbol_expr_type_matches_symbol_table =
-            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns);
+            goto_symbol_expr.type() == table_symbol->type;
 
           if(
             !symbol_expr_type_matches_symbol_table &&
@@ -831,7 +830,7 @@ void goto_programt::instructiont::validate(
                 table_symbol_type.return_type();
 
               symbol_expr_type_matches_symbol_table =
-                base_type_eq(goto_symbol_expr_type, table_symbol_type, ns);
+                goto_symbol_expr_type == table_symbol_type;
             }
           }
 

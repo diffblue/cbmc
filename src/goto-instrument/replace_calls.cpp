@@ -13,7 +13,6 @@ Author: Daniel Poetzl
 
 #include "replace_calls.h"
 
-#include <util/base_type.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
@@ -161,8 +160,7 @@ void replace_callst::check_replacement_map(
     auto it1 = goto_functions.function_map.find(p.first);
     if(it1 != goto_functions.function_map.end())
     {
-      if(!base_type_eq(
-           ns.lookup(it1->first).type, ns.lookup(it2->first).type, ns))
+      if(ns.lookup(it1->first).type != ns.lookup(it2->first).type)
         throw invalid_command_line_argument_exceptiont(
           "functions " + id2string(p.first) + " and " + id2string(p.second) +
             " are not type-compatible",

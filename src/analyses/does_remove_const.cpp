@@ -13,7 +13,6 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_program.h>
 
-#include <util/base_type.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
@@ -69,11 +68,11 @@ bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
 {
   const typet &root_type=expr.type();
 
-  // Look in each child that has the same base type as the root
+  // Look in each child that has the same type as the root
   for(const exprt &op : expr.operands())
   {
     const typet &op_type=op.type();
-    if(base_type_eq(op_type, root_type, ns))
+    if(op_type == root_type)
     {
       // Is this child more const-qualified than the root
       if(!does_type_preserve_const_correctness(&root_type, &op_type))
