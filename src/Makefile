@@ -149,14 +149,15 @@ cudd-download:
 	@echo "Compiling Cudd 3.0.0"
 	@(cd ../cudd-3.0.0; ./configure; $(MAKE))
 
+glucose_rev = 0bb2afd3b9baace6981cbb8b4a1c7683c44968b7
 glucose-download:
 	@echo "Downloading glucose-syrup"
-	@$(DOWNLOADER) http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
-	@$(TAR) xfz glucose-syrup.tgz
+	@$(DOWNLOADER) https://github.com/BrunoDutertre/glucose-syrup/archive/$(glucose_rev).tar.gz
+	@$(TAR) xfz $(glucose_rev).tar.gz
 	@rm -Rf ../glucose-syrup
-	@mv glucose-syrup ../
+	@mv glucose-syrup-$(glucose_rev) ../glucose-syrup
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
-	@rm glucose-syrup.tgz
+	@$(RM) $(glucose_rev).tar.gz
 
 cadical_release = rel-1.4.1
 cadical-download:

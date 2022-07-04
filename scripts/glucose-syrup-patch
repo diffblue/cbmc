@@ -1,24 +1,3 @@
-diff -rupNw glucose-syrup/core/Solver.cc glucose-syrup-patched/core/Solver.cc
---- glucose-syrup/core/Solver.cc	2014-10-03 11:10:21.000000000 +0200
-+++ glucose-syrup-patched/core/Solver.cc	2018-04-21 16:58:22.950005391 +0200
-@@ -931,7 +931,6 @@ void Solver::uncheckedEnqueue(Lit p, CRe
- CRef Solver::propagate() {
-     CRef confl = CRef_Undef;
-     int num_props = 0;
--    int previousqhead = qhead;
-     watches.cleanAll();
-     watchesBin.cleanAll();
-     unaryWatches.cleanAll();
-@@ -1405,7 +1404,9 @@ lbool Solver::search(int nof_conflicts)
-                 decisions++;
-                 next = pickBranchLit();
-                 if (next == lit_Undef) {
-+#if 0
-                     printf("c last restart ## conflicts  :  %d %d \n", conflictC, decisionLevel());
-+#endif
-                     // Model found:
-                     return l_True;
-                 }
 diff -rupNw glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTypes.h
 --- glucose-syrup/core/SolverTypes.h	2014-10-03 11:10:22.000000000 +0200
 +++ glucose-syrup-patched/core/SolverTypes.h	2018-04-21 16:58:22.950005391 +0200
@@ -32,47 +11,6 @@ diff -rupNw glucose-syrup/core/SolverTypes.h glucose-syrup-patched/core/SolverTy
  
  #include "mtl/IntTypes.h"
  #include "mtl/Alg.h"
-@@ -170,7 +172,10 @@ class Clause {
-       unsigned lbd : BITS_LBD;
-     }  header;
- 
-+#include <util/pragma_push.def>
-+#include <util/pragma_wzero_length_array.def>
-     union { Lit lit; float act; uint32_t abs; CRef rel; } data[0];
-+#include <util/pragma_pop.def>
- 
-     friend class ClauseAllocator;
- 
-diff -rupNw glucose-syrup/mtl/Clone.h glucose-syrup-patched/mtl/Clone.h
---- glucose-syrup/mtl/Clone.h	2014-10-03 11:10:22.000000000 +0200
-+++ glucose-syrup-patched/mtl/Clone.h	2018-05-10 12:35:25.150491249 +0200
-@@ -8,6 +8,6 @@ namespace Glucose {
-         public:
-           virtual Clone* clone() const = 0;
-     };
--};
-+}
- 
- #endif
-\ No newline at end of file
-diff -rupNw glucose-syrup/mtl/Clone.h~ glucose-syrup-patched/mtl/Clone.h~
---- glucose-syrup/mtl/Clone.h~	1970-01-01 01:00:00.000000000 +0100
-+++ glucose-syrup-patched/mtl/Clone.h~	2018-04-21 16:58:22.950005391 +0200
-@@ -0,0 +1,13 @@
-+#ifndef Glucose_Clone_h
-+#define Glucose_Clone_h
-+
-+
-+namespace Glucose {
-+
-+    class Clone {
-+        public:
-+          virtual Clone* clone() const = 0;
-+    };
-+};
-+
-+#endif
-\ No newline at end of file
 diff -rupNw glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
 --- glucose-syrup/mtl/IntTypes.h	2014-10-03 11:10:22.000000000 +0200
 +++ glucose-syrup-patched/mtl/IntTypes.h	2018-04-21 16:58:22.950005391 +0200
@@ -87,21 +25,9 @@ diff -rupNw glucose-syrup/mtl/IntTypes.h glucose-syrup-patched/mtl/IntTypes.h
  #endif
  
 diff -rupNw glucose-syrup/mtl/Vec.h glucose-syrup-patched/mtl/Vec.h
---- glucose-syrup/mtl/Vec.h	2014-10-03 11:10:22.000000000 +0200
-+++ glucose-syrup-patched/mtl/Vec.h	2018-04-21 16:58:22.950005391 +0200
-@@ -103,7 +103,7 @@ template<class T>
- void vec<T>::capacity(int min_cap) {
-     if (cap >= min_cap) return;
-     int add = imax((min_cap - cap + 1) & ~1, ((cap >> 1) + 2) & ~1);   // NOTE: grow by approximately 3/2
--    if (add > INT_MAX - cap || ((data = (T*)::realloc(data, (cap += add) * sizeof(T))) == NULL) && errno == ENOMEM)
-+    if (add > INT_MAX - cap || (((data = (T*)::realloc(data, (cap += add) * sizeof(T))) == NULL) && errno == ENOMEM))
-         throw OutOfMemoryException();
-  }
- 
-diff -rupNw glucose-syrup/mtl/Vec.h glucose-syrup-patched/mtl/Vec.h
 --- glucose-syrup/mtl/Vec.h
 +++ glucose-syrup-patched/mtl/Vec.h
-@@ -103,8 +103,10 @@
+@@ -118,8 +118,10 @@
  void vec<T>::capacity(int min_cap) {
      if (cap >= min_cap) return;
      int add = imax((min_cap - cap + 1) & ~1, ((cap >> 1) + 2) & ~1);   // NOTE: grow by approximately 3/2
@@ -115,36 +41,9 @@ diff -rupNw glucose-syrup/mtl/Vec.h glucose-syrup-patched/mtl/Vec.h
  
  
 diff -rupNw glucose-syrup/simp/SimpSolver.cc glucose-syrup-patched/simp/SimpSolver.cc
---- glucose-syrup/simp/SimpSolver.cc	2014-10-03 11:10:22.000000000 +0200
-+++ glucose-syrup-patched/simp/SimpSolver.cc	2018-04-21 16:58:22.950005391 +0200
-@@ -319,10 +319,13 @@ bool SimpSolver::merge(const Clause& _ps
-         if (var(qs[i]) != v){
-             for (int j = 0; j < ps.size(); j++)
-                 if (var(ps[j]) == var(qs[i]))
-+                {
-                     if (ps[j] == ~qs[i])
-+
-                         return false;
-                     else
-                         goto next;
-+                }
-             out_clause.push(qs[i]);
-         }
-         next:;
-@@ -353,10 +356,12 @@ bool SimpSolver::merge(const Clause& _ps
-         if (var(__qs[i]) != v){
-             for (int j = 0; j < ps.size(); j++)
-                 if (var(__ps[j]) == var(__qs[i]))
-+                {
-                     if (__ps[j] == ~__qs[i])
-                         return false;
-                     else
-                         goto next;
-+                }
-             size++;
-         }
-         next:;
-@@ -687,11 +692,11 @@ bool SimpSolver::eliminate(bool turn_off
+--- glucose-syrup/simp/SimpSolver.cc   2014-10-03 11:10:22.000000000 +0200
++++ glucose-syrup-patched/simp/SimpSolver.cc   2018-04-21 16:58:22.950005391 +0200
+@@ -713,11 +713,11 @@ bool SimpSolver::eliminate(bool turn_off
      //
  
      int toPerform = clauses.size()<=4800000;
@@ -158,31 +57,6 @@ diff -rupNw glucose-syrup/simp/SimpSolver.cc glucose-syrup-patched/simp/SimpSolv
      while (toPerform && (n_touched > 0 || bwdsub_assigns < trail.size() || elim_heap.size() > 0)){
  
          gatherTouchedClauses();
-@@ -760,10 +765,11 @@ bool SimpSolver::eliminate(bool turn_off
-         checkGarbage();
-     }
- 
-+#if 0
-     if (verbosity >= 0 && elimclauses.size() > 0)
-         printf("c |  Eliminated clauses:     %10.2f Mb                                                                |\n", 
-                double(elimclauses.size() * sizeof(uint32_t)) / (1024*1024));
--
-+#endif
-                
-     return ok;
- 
-diff -rupNw glucose-syrup/utils/Options.h glucose-syrup-patched/utils/Options.h
---- glucose-syrup/utils/Options.h	2014-10-03 11:10:22.000000000 +0200
-+++ glucose-syrup-patched/utils/Options.h	2018-04-21 16:58:22.950005391 +0200
-@@ -60,7 +60,7 @@ class Option
-     struct OptionLt {
-         bool operator()(const Option* x, const Option* y) {
-             int test1 = strcmp(x->category, y->category);
--            return test1 < 0 || test1 == 0 && strcmp(x->type_name, y->type_name) < 0;
-+            return test1 < 0 || (test1 == 0 && strcmp(x->type_name, y->type_name) < 0);
-         }
-     };
- 
 diff -rupNw glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUtils.h
 --- glucose-syrup/utils/ParseUtils.h	2014-10-03 11:10:22.000000000 +0200
 +++ glucose-syrup-patched/utils/ParseUtils.h	2018-04-21 16:58:22.950005391 +0200
@@ -217,15 +91,6 @@ diff -rupNw glucose-syrup/utils/ParseUtils.h glucose-syrup-patched/utils/ParseUt
  
      int  operator *  () const { return (pos >= size) ? EOF : buf[pos]; }
      void operator ++ ()       { pos++; assureLookahead(); }
-@@ -96,7 +96,7 @@
- 	if (*in != '.') printf("PARSE ERROR! Unexpected char: %c\n", *in),exit(3);
- 	++in; // skip dot
- 	currentExponent = 0.1;
--    while (*in >= '0' && *in <= '9')
-+	while (*in >= '0' && *in <= '9')
-         accu = accu + currentExponent * ((double)(*in - '0')),
- 		currentExponent /= 10,
-         ++in;
 diff -rupNw glucose-syrup/utils/System.h glucose-syrup-patched/utils/System.h
 --- glucose-syrup/utils/System.h	2014-10-03 11:10:22.000000000 +0200
 +++ glucose-syrup-patched/utils/System.h	2018-04-21 16:58:22.950005391 +0200

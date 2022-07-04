@@ -88,10 +88,10 @@ elseif("${sat_impl}" STREQUAL "glucose")
     message(STATUS "Building solvers with glucose")
 
     download_project(PROJ glucose
-        URL http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
+        URL https://github.com/BrunoDutertre/glucose-syrup/archive/0bb2afd3b9baace6981cbb8b4a1c7683c44968b7.tar.gz
         PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/glucose-syrup-patch
         COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/glucose_CMakeLists.txt CMakeLists.txt
-        URL_MD5 b6f040a6c28f011f3be994663338f548
+        URL_MD5 7c539c62c248b74210aef7414787323a
     )
 
     add_subdirectory(${glucose_SOURCE_DIR} ${glucose_BINARY_DIR})
