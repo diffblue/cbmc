@@ -123,6 +123,11 @@ std::ostream &goto_programt::instructiont::output(std::ostream &out) const
             << '\n';
         break;
       }
+      else if(code.get_statement() == ID_expression)
+      {
+        out << "EXPRESSION " << format(code.op0()) << '\n';
+        break;
+      }
       else if(code.get_statement() == ID_havoc_object)
       {
         out << "HAVOC_OBJECT " << format(code.op0()) << '\n';
