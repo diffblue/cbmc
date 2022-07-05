@@ -13,19 +13,13 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_program.h>
 
-#include <util/base_type.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check
-/// \param ns: the namespace of the goto program (used for checking type
-///   equality)
-does_remove_constt::does_remove_constt(
-  const goto_programt &goto_program,
-  const namespacet &ns):
-    goto_program(goto_program),
-    ns(ns)
+does_remove_constt::does_remove_constt(const goto_programt &goto_program)
+  : goto_program(goto_program)
 {}
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
@@ -69,11 +63,11 @@ bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
 {
   const typet &root_type=expr.type();
 
-  // Look in each child that has the same base type as the root
+  // Look in each child that has the same type as the root
   for(const exprt &op : expr.operands())
   {
     const typet &op_type=op.type();
-    if(base_type_eq(op_type, root_type, ns))
+    if(op_type == root_type)
     {
       // Is this child more const-qualified than the root
       if(!does_type_preserve_const_correctness(&root_type, &op_type))
