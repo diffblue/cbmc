@@ -18,13 +18,8 @@ Author: Diffblue Ltd.
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check
-/// \param ns: the namespace of the goto program (used for checking type
-///   equality)
-does_remove_constt::does_remove_constt(
-  const goto_programt &goto_program,
-  const namespacet &ns):
-    goto_program(goto_program),
-    ns(ns)
+does_remove_constt::does_remove_constt(const goto_programt &goto_program)
+  : goto_program(goto_program)
 {}
 
 /// A naive analysis to look for casts that remove const-ness from pointers.

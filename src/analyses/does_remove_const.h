@@ -14,7 +14,6 @@ Author: Diffblue Ltd.
 #include <utility>
 
 class goto_programt;
-class namespacet;
 class exprt;
 class source_locationt;
 class typet;
@@ -22,7 +21,7 @@ class typet;
 class does_remove_constt
 {
 public:
-  does_remove_constt(const goto_programt &goto_program, const namespacet &ns);
+  explicit does_remove_constt(const goto_programt &);
   std::pair<bool, source_locationt>  operator()() const;
 
 private:
@@ -35,7 +34,6 @@ private:
     const typet *target_type, const typet *source_type) const;
 
   const goto_programt &goto_program;
-  const namespacet &ns;
 
   friend class does_remove_const_testt;
 };

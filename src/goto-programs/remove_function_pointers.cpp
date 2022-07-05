@@ -270,7 +270,7 @@ void remove_function_pointerst::remove_function_pointer(
 
   const exprt &pointer = function.pointer();
   remove_const_function_pointerst::functionst functions;
-  does_remove_constt const_removal_check(goto_program, ns);
+  does_remove_constt const_removal_check(goto_program);
   const auto does_remove_const = const_removal_check();
   messaget log{message_handler};
   if(does_remove_const.first)

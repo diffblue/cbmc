@@ -29,7 +29,7 @@ SCENARIO("is_type_at_least_as_const",
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   goto_programt program;
-  does_remove_constt does_remove_const(program, ns);
+  does_remove_constt does_remove_const(program);
   does_remove_const_testt does_remove_const_test(does_remove_const);
 
   GIVEN("Const and non-const primitive and pointers to primitives")
