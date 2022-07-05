@@ -1,0 +1,16 @@
+CORE
+array_literal.c
+
+Passing problem to incremental SMT2 solving
+line \d+ Non-existent element: SUCCESS
+line \d+ Index 0: FAILURE
+line \d+ Index 1: FAILURE
+line \d+ Index 2: FAILURE
+line \d+ Index 3: FAILURE
+line \d+ Index 4: FAILURE
+line \d+ Index value relation: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test of reading an array which is initialised using an array literal.
