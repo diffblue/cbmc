@@ -38,6 +38,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['Quantifiers-simplify', 'simplify_not_forall.desc'],
     ['array-cell-sensitivity15', 'test.desc'],
     ['saturating_arithmetric', 'output-formula.desc'],
+    ['apply_condition2', 'test.desc'],
     # these test for invalid command line handling
     ['bad_option', 'test_multiple.desc'],
     ['bad_option', 'test.desc'],
