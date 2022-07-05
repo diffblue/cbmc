@@ -61,7 +61,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'true'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == true_exprt{});
@@ -75,7 +75,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'false'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == false_exprt{});
@@ -89,7 +89,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'true'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == true_exprt{});
@@ -103,7 +103,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'false'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == false_exprt{});
@@ -117,7 +117,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'false'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == false_exprt{});
@@ -131,7 +131,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'true'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == true_exprt{});
@@ -145,7 +145,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'false'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == false_exprt{});
@@ -159,7 +159,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'true'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == true_exprt{});
@@ -173,7 +173,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'true'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == true_exprt{});
@@ -187,7 +187,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'false'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == false_exprt{});
@@ -201,7 +201,7 @@ SCENARIO(
 
     THEN("b should be in the constant propagator with value 'true'")
     {
-      auto it = goto_state.propagation.find(
+      auto it = goto_state.branch_propagation.find(
         to_ssa_expr(renamed_b).get_l1_object_identifier());
       REQUIRE(it);
       REQUIRE(it->get() == true_exprt{});

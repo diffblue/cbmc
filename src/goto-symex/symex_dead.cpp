@@ -41,6 +41,7 @@ static void remove_l1_object_rec(
       state.value_set.values.erase_if_exists(l1_identifier);
     }
     state.propagation.erase_if_exists(l1_identifier);
+    state.branch_propagation.erase_if_exists(l1_identifier);
     // Remove from the local L2 renaming map; this means any reads from the dead
     // identifier will use generation 0 (e.g. x!N@M#0, where N and M are
     // positive integers), which is never defined by any write, and will be
