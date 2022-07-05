@@ -372,15 +372,19 @@ goto_symext::try_evaluate_constant_string(
     return {};
   }
 
-  const auto s_pointer_opt =
-    state.propagation.find(to_symbol_expr(content).get_identifier());
+  const irep_idt &content_id = to_symbol_expr(content).get_identifier();
 
-  if(!s_pointer_opt)
-  {
-    return {};
-  }
+  const auto s_pointer_opt = state.propagation.find(content_id);
 
-  return try_get_string_data_array(s_pointer_opt->get(), ns);
+  if(s_pointer_opt)
+    return try_get_string_data_array(s_pointer_opt->get(), ns);
+
+  const auto b_entry = state.branch_propagation.find(content_id);
+
+  if(b_entry)
+    return try_get_string_data_array(b_entry->get(), ns);
+
+  return {};
 }
 
 std::optional<std::reference_wrapper<const constant_exprt>>
@@ -391,16 +395,25 @@ goto_symext::try_evaluate_constant(const statet &state, const exprt &expr)
     return {};
   }
 
-  const auto constant_expr_opt =
-    state.propagation.find(to_symbol_expr(expr).get_identifier());
+  const irep_idt &expr_id = to_symbol_expr(expr).get_identifier();
 
-  if(!constant_expr_opt || !constant_expr_opt->get().is_constant())
+  const auto constant_expr_opt = state.propagation.find(expr_id);
+
+  if(constant_expr_opt && constant_expr_opt->get().is_constant())
   {
-    return {};
+    return std::optional<std::reference_wrapper<const constant_exprt>>(
+      to_constant_expr(constant_expr_opt->get()));
   }
 
-  return std::optional<std::reference_wrapper<const constant_exprt>>(
-    to_constant_expr(constant_expr_opt->get()));
+  const auto b_entry = state.branch_propagation.find(expr_id);
+
+  if(b_entry && b_entry->get().id() == ID_constant)
+  {
+    return std::optional<std::reference_wrapper<const constant_exprt>>(
+      to_constant_expr(b_entry->get()));
+  }
+
+  return {};
 }
 
 void goto_symext::constant_propagate_empty_string(

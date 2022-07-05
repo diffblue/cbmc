@@ -68,7 +68,10 @@ public:
   // "constants" can include symbols, but only in the context of an address-of
   // op (i.e. &x can be propagated), and an address-taken thing should only be
   // L1.
-  sharing_mapt<irep_idt, exprt> propagation;
+  //
+  // Entries in branch_propagation are local to the current branch and will
+  // never be merged back in phi nodes.
+  sharing_mapt<irep_idt, exprt> propagation, branch_propagation;
 
   void output_propagation_map(std::ostream &);
 

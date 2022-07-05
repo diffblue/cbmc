@@ -1,0 +1,12 @@
+CORE paths-lifo-expected-failure
+main.c
+--program-only
+s2!0@1#2 == s!0@1#1
+^EXIT=0$
+^SIGNAL=0$
+--
+ASSERT
+s2!0@1#[3-9]
+--
+The branch condition should yield constant propagation on s without introducing
+fresh assignments to s.

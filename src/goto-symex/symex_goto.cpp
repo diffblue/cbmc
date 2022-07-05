@@ -799,7 +799,13 @@ static void merge_names(
     if(p_it.has_value())
       goto_state_rhs = *p_it;
     else
-      to_ssa_expr(goto_state_rhs).set_level_2(goto_count);
+    {
+      auto b_entry = goto_state.branch_propagation.find(l1_identifier);
+      if(b_entry.has_value())
+        goto_state_rhs = *b_entry;
+      else
+        to_ssa_expr(goto_state_rhs).set_level_2(goto_count);
+    }
   }
 
   {
@@ -808,7 +814,13 @@ static void merge_names(
     if(p_it.has_value())
       dest_state_rhs = *p_it;
     else
-      to_ssa_expr(dest_state_rhs).set_level_2(dest_count);
+    {
+      auto b_entry = dest_state.branch_propagation.find(l1_identifier);
+      if(b_entry.has_value())
+        dest_state_rhs = *b_entry;
+      else
+        to_ssa_expr(dest_state_rhs).set_level_2(dest_count);
+    }
   }
 
   exprt rhs;
@@ -921,6 +933,12 @@ void goto_symext::phi_function(
       goto_count,
       dest_count);
   }
+
+  sharing_mapt<irep_idt, exprt>::delta_viewt bp_delta_view =
+    dest_state.branch_propagation.get_delta_view(
+      goto_state.branch_propagation, false);
+  for(const auto &delta_item : bp_delta_view)
+    dest_state.branch_propagation.erase(delta_item.k);
 }
 
 void goto_symext::loop_bound_exceeded(
