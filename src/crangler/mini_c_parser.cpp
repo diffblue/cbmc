@@ -282,11 +282,26 @@ mini_c_parsert::tokenst mini_c_parsert::parse_post_declarator()
   // 3) '=' (initializer)
 
   tokenst result;
+  std::size_t open_parentheses = 0;
 
   while(true)
   {
     if(eof())
       return result;
+
+    if(peek() == '(')
+    {
+      ++open_parentheses;
+      result.push_back(consume_token());
+      continue;
+    }
+    else if(open_parentheses > 0)
+    {
+      if(peek() == ')')
+        --open_parentheses;
+      result.push_back(consume_token());
+      continue;
+    }
 
     if(peek() == ';' || peek() == '{' || peek() == '=')
       return result;
