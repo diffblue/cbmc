@@ -52,4 +52,6 @@ int main()
 
   // generic wide string, OS-dependent
   assert(sizeof(L""[0])==sizeof(wchar_t));
+
+  assert(0);
 }
