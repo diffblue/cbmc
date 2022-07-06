@@ -14,6 +14,7 @@
 
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/smt_array_theory.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
@@ -94,6 +95,20 @@ expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
     object_map,
     pointer_sizes,
     object_size_function.make_application);
+}
+
+TEST_CASE("\"array_typet\" to smt sort conversion", "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+
+  const auto array_type =
+    array_typet{signedbv_typet{8}, from_integer(8, c_index_type())};
+  INFO("Type being converted: " + array_type.pretty(2, 0));
+  const auto conversion_result = convert_type_to_smt_sort(array_type);
+  CHECK(
+    conversion_result ==
+    smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{8}});
 }
 
 TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
@@ -1123,6 +1138,52 @@ TEST_CASE(
         CHECK(test.convert(input) == expected_result);
       }
     }
+  }
+}
+
+TEST_CASE(
+  "expr to smt conversion for index_exprt expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const typet value_type = signedbv_typet{8};
+  const exprt array = symbol_exprt{
+    "my_array", array_typet{value_type, from_integer(10, signed_size_type())}};
+  const exprt index = from_integer(42, unsignedbv_typet{64});
+  const index_exprt index_expr{array, index};
+  INFO("Expression being converted: " + index_expr.pretty(2, 0));
+  const smt_termt expected = smt_array_theoryt::select(
+    smt_identifier_termt{
+      "my_array",
+      smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{8}}},
+    smt_bit_vector_constant_termt{42, 64});
+  CHECK(test.convert(index_expr) == expected);
+}
+
+TEST_CASE(
+  "expr to smt conversion for with_exprt expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  SECTION("Array types")
+  {
+    const typet value_type = signedbv_typet{8};
+    const exprt array = symbol_exprt{
+      "my_array",
+      array_typet{value_type, from_integer(10, signed_size_type())}};
+    const exprt index = from_integer(42, unsignedbv_typet{64});
+    const exprt value = from_integer(12, value_type);
+    const with_exprt with{array, index, value};
+    INFO("Expression being converted: " + with.pretty(2, 0));
+    const smt_termt expected = smt_array_theoryt::store(
+      smt_identifier_termt{
+        "my_array",
+        smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{8}}},
+      smt_bit_vector_constant_termt{42, 64},
+      smt_bit_vector_constant_termt{12, 8});
+    CHECK(test.convert(with) == expected);
   }
 }
 

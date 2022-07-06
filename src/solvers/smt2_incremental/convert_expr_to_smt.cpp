@@ -18,6 +18,7 @@
 
 #include <solvers/prop/literal_expr.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/smt_array_theory.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 
@@ -89,6 +90,13 @@ static smt_sortt convert_type_to_smt_sort(const bitvector_typet &type)
   return smt_bit_vector_sortt{type.get_width()};
 }
 
+static smt_sortt convert_type_to_smt_sort(const array_typet &type)
+{
+  return smt_array_sortt{
+    convert_type_to_smt_sort(type.index_type()),
+    convert_type_to_smt_sort(type.element_type())};
+}
+
 smt_sortt convert_type_to_smt_sort(const typet &type)
 {
   if(const auto bool_type = type_try_dynamic_cast<bool_typet>(type))
@@ -98,6 +106,10 @@ smt_sortt convert_type_to_smt_sort(const typet &type)
   if(const auto bitvector_type = type_try_dynamic_cast<bitvector_typet>(type))
   {
     return convert_type_to_smt_sort(*bitvector_type);
+  }
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(type))
+  {
+    return convert_type_to_smt_sort(*array_type);
   }
   UNIMPLEMENTED_FEATURE("Generation of SMT formula for type: " + type.pretty());
 }
@@ -906,11 +918,12 @@ static smt_termt convert_expr_to_smt(
 }
 
 static smt_termt convert_expr_to_smt(
-  const index_exprt &index,
+  const index_exprt &index_of,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for index expression: " + index.pretty());
+  const smt_termt &array = converted.at(index_of.array());
+  const smt_termt &index = converted.at(index_of.index());
+  return smt_array_theoryt::select(array, index);
 }
 
 template <typename factoryt, typename shiftt>
@@ -978,10 +991,29 @@ static smt_termt convert_expr_to_smt(
     "Generation of SMT formula for shift expression: " + shift.pretty());
 }
 
+static smt_termt convert_array_update_to_smt(
+  const exprt &old,
+  const exprt &index,
+  const exprt &new_value,
+  const sub_expression_mapt &converted)
+{
+  const smt_termt &old_array_term = converted.at(old);
+  const smt_termt &index_term = converted.at(index);
+  const smt_termt &value_term = converted.at(new_value);
+  return smt_array_theoryt::store(old_array_term, index_term, value_term);
+}
+
 static smt_termt convert_expr_to_smt(
   const with_exprt &with,
   const sub_expression_mapt &converted)
 {
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(with.type()))
+  {
+    return convert_array_update_to_smt(
+      with.old(), with.where(), with.new_value(), converted);
+  }
+  // 'with' expression is also used to update struct fields, but for now we do
+  // not support them, so we fail.
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for with expression: " + with.pretty());
 }

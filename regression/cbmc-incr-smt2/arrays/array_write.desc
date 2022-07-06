@@ -1,0 +1,11 @@
+CORE
+array_write.c
+
+Passing problem to incremental SMT2 solving
+\[main\.assertion\.1\] line \d+ Array condition: SUCCESS
+\[main\.assertion\.2\] line \d+ Array condition: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test of updating the value at an index of an array.
