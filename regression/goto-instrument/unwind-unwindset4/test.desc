@@ -1,6 +1,6 @@
 CORE
 main.c
---unwindset main.0:10,f.0:10,g.0:10,g.1:10 --unwinding-assertions
+--unwindset main.0:10,f.0:10 --unwindset g.0:10,g.1:10 --unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -15,7 +15,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/message.h>
-#include <util/string_utils.h>
 #include <util/version.h>
 
 #include <goto-programs/goto_model.h>
@@ -103,9 +102,6 @@ int memory_analyzer_parse_optionst::doit()
 
   std::string binary = cmdline.args.front();
 
-  const std::string symbol_list(cmdline.get_value("symbols"));
-  std::vector<std::string> result = split_string(symbol_list, ',', true, true);
-
   auto opt = read_goto_binary(binary, ui_message_handler);
 
   if(!opt.has_value())
@@ -131,12 +127,8 @@ int memory_analyzer_parse_optionst::doit()
     gdb_value_extractor.run_gdb_to_breakpoint(breakpoint);
   }
 
-  std::vector<irep_idt> result_ids(result.size());
-  std::transform(
-    result.begin(), result.end(), result_ids.begin(), [](std::string &name) {
-      return irep_idt{name};
-    });
-  gdb_value_extractor.analyze_symbols(result_ids);
+  gdb_value_extractor.analyze_symbols(
+    cmdline.get_comma_separated_values("symbols"));
 
   std::ofstream file;
 

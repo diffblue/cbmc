@@ -255,7 +255,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.get_values("unwindset"));
+  {
+    options.set_option(
+      "unwindset", cmdline.get_comma_separated_values("unwindset"));
+  }
 
   // constant propagation
   if(cmdline.isset("no-propagation"))

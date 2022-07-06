@@ -203,7 +203,10 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("depth", cmdline.get_value("depth"));
 
   if(cmdline.isset("unwindset"))
-    options.set_option("unwindset", cmdline.get_value("unwindset"));
+  {
+    options.set_option(
+      "unwindset", cmdline.get_comma_separated_values("unwindset"));
+  }
 
   // constant propagation
   if(cmdline.isset("no-propagation"))

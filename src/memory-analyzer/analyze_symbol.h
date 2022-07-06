@@ -44,7 +44,7 @@ public:
   ///   \ref symbol_exprt (via the `values` map) and then call
   ///   \ref analyze_symbol on it.
   /// \param symbols: names of symbols to be analysed
-  void analyze_symbols(const std::vector<irep_idt> &symbols);
+  void analyze_symbols(const std::list<std::string> &symbols);
 
   /// Get memory snapshot as C code
   /// \return converted block of code with the collected assignments
