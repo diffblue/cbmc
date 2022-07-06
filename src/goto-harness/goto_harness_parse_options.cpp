@@ -8,13 +8,6 @@ Author: Diffblue Ltd.
 
 #include "goto_harness_parse_options.h"
 
-#include <algorithm>
-#include <fstream>
-#include <set>
-#include <string>
-#include <unordered_set>
-#include <utility>
-
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
@@ -23,14 +16,23 @@ Author: Diffblue Ltd.
 #include <util/suffix.h>
 #include <util/version.h>
 
-#include <goto-instrument/dump_c.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <goto-instrument/dump_c.h>
+
 #include "function_call_harness_generator.h"
 #include "goto_harness_generator_factory.h"
 #include "memory_snapshot_harness_generator.h"
+
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <set>
+#include <string>
+#include <unordered_set>
+#include <utility>
 
 std::unordered_set<irep_idt>
 get_symbol_names_from_goto_model(const goto_modelt &goto_model)
@@ -96,7 +98,7 @@ int goto_harness_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    log.status() << CBMC_VERSION << '\n';
+    std::cout << CBMC_VERSION << '\n';
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -170,7 +172,7 @@ int goto_harness_parse_optionst::doit()
 
 void goto_harness_parse_optionst::help()
 {
-  log.status()
+  std::cout
     << '\n'
     << banner_string("Goto-Harness", CBMC_VERSION) << '\n'
     << align_center_with_border("Copyright (C) 2019") << '\n'
@@ -195,7 +197,7 @@ void goto_harness_parse_optionst::help()
     << "--harness-type             one of the harness types listed below\n"
     << "\n\n"
     << FUNCTION_HARNESS_GENERATOR_HELP << "\n\n"
-    << MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP << messaget::eom;
+    << MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP << '\n';
 }
 
 goto_harness_parse_optionst::goto_harness_parse_optionst(

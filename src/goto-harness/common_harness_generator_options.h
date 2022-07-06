@@ -46,9 +46,9 @@ Author: Diffblue Ltd.
   "                              (default: 2)\n"                               \
   "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT               \
   " <function-name>,  name of the function(s) pointer parameters\n"            \
-  "              that can be NULL pointing."                                   \
+  "              that can be NULL pointing.\n"                                 \
   "--" COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT                               \
-  "              path to the member to be havoced\n"                           \
+  " <member-expr>  path to the member to be havoced\n"                         \
   // COMMON_HARNESS_GENERATOR_HELP
 
 // clang-format on
