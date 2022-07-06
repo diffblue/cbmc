@@ -53,8 +53,5 @@ array_exprt string_constantt::to_array_expr() const
     *it = from_integer(ch, char_type);
   }
 
-  if(source_location().is_not_nil())
-    dest.add_source_location() = source_location();
-
-  return dest;
+  return std::move(dest).with_source_location(*this);
 }
