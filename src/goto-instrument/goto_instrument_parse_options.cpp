@@ -186,7 +186,8 @@ int goto_instrument_parse_optionst::doit()
         if(unwindset_given)
         {
           unwindset.parse_unwindset(
-            cmdline.get_values("unwindset"), ui_message_handler);
+            cmdline.get_comma_separated_values("unwindset"),
+            ui_message_handler);
         }
 
         bool unwinding_assertions=cmdline.isset("unwinding-assertions");

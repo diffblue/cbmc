@@ -179,13 +179,7 @@ void unwindsett::parse_unwindset(
   message_handlert &message_handler)
 {
   for(auto &element : unwindset)
-  {
-    std::vector<std::string> unwindset_elements =
-      split_string(element, ',', true, true);
-
-    for(auto &element : unwindset_elements)
-      parse_unwindset_one_loop(element, message_handler);
-  }
+    parse_unwindset_one_loop(element, message_handler);
 }
 
 optionalt<unsigned>

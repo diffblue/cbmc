@@ -106,7 +106,8 @@ mp_integer gdb_value_extractort::get_type_size(const typet &type) const
   return *maybe_size / CHAR_BIT;
 }
 
-void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)
+void gdb_value_extractort::analyze_symbols(
+  const std::list<std::string> &symbols)
 {
   // record addresses of given symbols
   for(const auto &id : symbols)
