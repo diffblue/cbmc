@@ -1571,6 +1571,16 @@ public:
   {
     return static_cast<array_typet &>(multi_ary_exprt::type());
   }
+
+  array_exprt &with_source_location(const exprt &other) &
+  {
+    return exprt::with_source_location<array_exprt>(other);
+  }
+
+  array_exprt &&with_source_location(const exprt &other) &&
+  {
+    return std::move(*this).exprt::with_source_location<array_exprt>(other);
+  }
 };
 
 template <>

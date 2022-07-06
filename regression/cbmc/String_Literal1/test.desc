@@ -1,8 +1,15 @@
 CORE
 main.c
-
-^EXIT=0$
+--trace
+^State \d+ file main.c function main line 20 thread 0$
+^State \d+ file main.c function main line 36 thread 0$
+^State \d+ file main.c function main line 44 thread 0$
+^\*\* 1 of \d+ failed \(\d+ iterations\)$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+^State \d+ (function main )?thread 0$
+--
+Each step in the trace must have a full source location, including line numbers.

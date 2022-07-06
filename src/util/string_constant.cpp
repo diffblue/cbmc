@@ -53,5 +53,5 @@ array_exprt string_constantt::to_array_expr() const
     *it = from_integer(ch, char_type);
   }
 
-  return dest;
+  return std::move(dest).with_source_location(*this);
 }

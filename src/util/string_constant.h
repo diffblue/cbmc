@@ -24,7 +24,6 @@ public:
   }
 
   array_exprt to_array_expr() const;
-  bool from_array_expr(const array_exprt &);
 };
 
 template <>
