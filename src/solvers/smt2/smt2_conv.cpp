@@ -297,14 +297,6 @@ exprt smt2_convt::get(const exprt &expr) const
     if(it!=identifier_map.end())
       return it->second.value;
   }
-  else if(expr.id()==ID_member)
-  {
-    const member_exprt &member_expr=to_member_expr(expr);
-    exprt tmp=get(member_expr.struct_op());
-    if(tmp.is_nil())
-      return nil_exprt();
-    return member_exprt(tmp, member_expr.get_component_name(), expr.type());
-  }
   else if(expr.id() == ID_literal)
   {
     auto l = to_literal_expr(expr).get_literal();
@@ -321,16 +313,23 @@ exprt smt2_convt::get(const exprt &expr) const
     else if(op.is_false())
       return true_exprt();
   }
-  else if(expr.is_constant())
-    return expr;
-  else if(const auto &array = expr_try_dynamic_cast<array_exprt>(expr))
+  else if(
+    expr.is_constant() || expr.id() == ID_empty_union ||
+    (!expr.has_operands() && (expr.id() == ID_struct || expr.id() == ID_array)))
   {
-    exprt array_copy = *array;
-    for(auto &element : array_copy.operands())
+    return expr;
+  }
+  else if(expr.has_operands())
+  {
+    exprt copy = expr;
+    for(auto &op : copy.operands())
     {
-      element = get(element);
+      exprt eval_op = get(op);
+      if(eval_op.is_nil())
+        return nil_exprt{};
+      op = std::move(eval_op);
     }
-    return array_copy;
+    return copy;
   }
 
   return nil_exprt();
@@ -4780,7 +4779,9 @@ void smt2_convt::set_to(const exprt &expr, bool value)
       const irep_idt &identifier=
         to_symbol_expr(equal_expr.lhs()).get_identifier();
 
-      if(identifier_map.find(identifier)==identifier_map.end())
+      if(
+        identifier_map.find(identifier) == identifier_map.end() &&
+        equal_expr.lhs() != equal_expr.rhs())
       {
         identifiert &id=identifier_map[identifier];
         CHECK_RETURN(id.type.is_nil());
