@@ -44,13 +44,20 @@ public:
 
   virtual void l_set_to(literalt a, bool value)
   {
-    set_equal(a, const_literal(value));
+    if(value)
+      lcnf({a});
+    else
+      lcnf({!a});
   }
 
   void l_set_to_true(literalt a)
-  { l_set_to(a, true); }
+  {
+    lcnf({a});
+  }
   void l_set_to_false(literalt a)
-  { l_set_to(a, false); }
+  {
+    lcnf({!a});
+  }
 
   // constraints
   void lcnf(literalt l0, literalt l1)
