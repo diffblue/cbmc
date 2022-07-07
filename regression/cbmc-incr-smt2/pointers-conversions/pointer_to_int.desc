@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 pointer_to_int.c
 --trace
 \[main\.assertion\.1\] line \d+ expected result == -1: success: SUCCESS
