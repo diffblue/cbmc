@@ -332,9 +332,13 @@ void symex_target_equationt::convert_without_assertions(
     hardness.register_ssa_size(SSA_steps.size());
   });
 
-  convert_guards(decision_procedure);
+  // The order matters here: the decision procedure may be able to re-use
+  // variables obtained from constructing the right-hand side of an assignment
+  // for the left-hand side. Those left-hand sides might then appear in guards
+  // or assumptions, so do assignments and decls before any of the others.
   convert_assignments(decision_procedure);
   convert_decls(decision_procedure);
+  convert_guards(decision_procedure);
   convert_assumptions(decision_procedure);
   convert_goto_instructions(decision_procedure);
   convert_function_calls(decision_procedure);
