@@ -386,11 +386,10 @@ void symex_target_equationt::convert_decls(
   {
     if(step.is_decl() && !step.ignore && !step.converted)
     {
-      // The result is not used, these have no impact on
-      // the satisfiability of the formula.
-      decision_procedure.handle(step.cond_expr);
-      decision_procedure.handle(
-        equal_exprt{step.ssa_full_lhs, step.ssa_full_lhs});
+      decision_procedure.set_to_true(step.cond_expr);
+      equal_exprt eq{step.ssa_full_lhs, step.ssa_full_lhs};
+      merge_irep(eq);
+      decision_procedure.set_to_true(eq);
       step.converted = true;
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
