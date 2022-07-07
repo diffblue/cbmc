@@ -444,6 +444,7 @@ void symex_target_equationt::convert_assumptions(
         with_solver_hardness(
           decision_procedure, hardness_register_ssa(step_index, step));
       }
+      step.converted = true;
     }
     ++step_index;
   }
@@ -532,10 +533,8 @@ void symex_target_equationt::convert_assertions(
       }
       else if(step.is_assume())
       {
-        decision_procedure.set_to_true(step.cond_expr);
-
-        with_solver_hardness(
-          decision_procedure, hardness_register_ssa(step_index, step));
+        PRECONDITION(step.converted);
+        decision_procedure.set_to_true(step.cond_handle);
       }
       ++step_index;
     }
@@ -585,6 +584,7 @@ void symex_target_equationt::convert_assertions(
     }
     else if(step.is_assume())
     {
+      PRECONDITION(step.converted);
       // the assumptions have been converted before
       // avoid deep nesting of ID_and expressions
       if(assumption.id()==ID_and)
