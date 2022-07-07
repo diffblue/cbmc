@@ -620,33 +620,18 @@ void symex_target_equationt::convert_function_calls(
   {
     if(!step.ignore)
     {
-      and_exprt::operandst conjuncts;
       step.converted_function_arguments.reserve(step.ssa_function_arguments.size());
 
       for(const auto &arg : step.ssa_function_arguments)
       {
-        if(arg.is_constant() ||
-           arg.id()==ID_string_constant)
-          step.converted_function_arguments.push_back(arg);
-        else
+        if(!arg.is_constant() && arg.id() != ID_string_constant)
         {
-          const irep_idt identifier="symex::args::"+std::to_string(argument_count++);
-          symbol_exprt symbol(identifier, arg.type());
-
-          equal_exprt eq(arg, symbol);
+          equal_exprt eq{arg, arg};
           merge_irep(eq);
-
-          decision_procedure.set_to(eq, true);
-          conjuncts.push_back(eq);
-          step.converted_function_arguments.push_back(symbol);
+          decision_procedure.set_to_true(eq);
         }
+        step.converted_function_arguments.push_back(arg);
       }
-      with_solver_hardness(
-        decision_procedure,
-        [step_index, &conjuncts, &step](solver_hardnesst &hardness) {
-          hardness.register_ssa(
-            step_index, conjunction(conjuncts), step.source.pc);
-        });
     }
     ++step_index;
   }
@@ -659,32 +644,16 @@ void symex_target_equationt::convert_io(decision_proceduret &decision_procedure)
   {
     if(!step.ignore)
     {
-      and_exprt::operandst conjuncts;
       for(const auto &arg : step.io_args)
       {
-        if(arg.is_constant() ||
-           arg.id()==ID_string_constant)
-          step.converted_io_args.push_back(arg);
-        else
+        if(!arg.is_constant() && arg.id() != ID_string_constant)
         {
-          const irep_idt identifier =
-            "symex::io::" + std::to_string(io_count++);
-          symbol_exprt symbol(identifier, arg.type());
-
-          equal_exprt eq(arg, symbol);
+          equal_exprt eq{arg, arg};
           merge_irep(eq);
-
-          decision_procedure.set_to(eq, true);
-          conjuncts.push_back(eq);
-          step.converted_io_args.push_back(symbol);
+          decision_procedure.set_to_true(eq);
         }
+        step.converted_io_args.push_back(arg);
       }
-      with_solver_hardness(
-        decision_procedure,
-        [step_index, &conjuncts, &step](solver_hardnesst &hardness) {
-          hardness.register_ssa(
-            step_index, conjunction(conjuncts), step.source.pc);
-        });
     }
     ++step_index;
   }
