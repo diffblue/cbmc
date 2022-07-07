@@ -489,10 +489,12 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
     const bvt &bv1=convert_bv(expr.rhs());
 
-    const irep_idt &identifier=
-      to_symbol_expr(expr.lhs()).get_identifier();
+    if(expr.rhs() != expr.lhs())
+    {
+      const irep_idt &identifier = to_symbol_expr(expr.lhs()).get_identifier();
 
-    map.set_literals(identifier, type, bv1);
+      map.set_literals(identifier, type, bv1);
+    }
 
     if(freeze_all)
       set_frozen(bv1);
