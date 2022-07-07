@@ -196,8 +196,6 @@ public:
     return result;
   }
 
-  void set_equal(const bvt &a, const bvt &b);
-
   // if cond holds, a has to be equal to b
   void cond_implies_equal(literalt cond, const bvt &a, const bvt &b);
 

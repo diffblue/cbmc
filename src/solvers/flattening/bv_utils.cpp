@@ -28,13 +28,6 @@ literalt bv_utilst::is_one(const bvt &bv)
   return prop.land(is_zero(tmp), bv[0]);
 }
 
-void bv_utilst::set_equal(const bvt &a, const bvt &b)
-{
-  PRECONDITION(a.size() == b.size());
-  for(std::size_t i=0; i<a.size(); i++)
-    prop.set_equal(a[i], b[i]);
-}
-
 bvt bv_utilst::extract(const bvt &a, std::size_t first, std::size_t last)
 {
   // preconditions

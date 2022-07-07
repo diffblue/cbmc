@@ -82,6 +82,11 @@ public:
     return to_literal(result);
   }
 
+  void gate_bv_and(const bvt &bv, literalt output) override
+  {
+    UNREACHABLE;
+  }
+
   literalt lor(const bvt &bv) override
   {
     mini_bddt result = mgr.False();
