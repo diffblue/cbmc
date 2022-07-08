@@ -32,7 +32,6 @@ public:
   virtual literalt land(literalt a, literalt b)=0;
   virtual literalt lor(literalt a, literalt b)=0;
   virtual literalt land(const bvt &bv)=0;
-  virtual void gate_bv_and(const bvt &bv, literalt output) = 0;
   virtual literalt lor(const bvt &bv)=0;
   virtual literalt lxor(literalt a, literalt b)=0;
   virtual literalt lxor(const bvt &bv)=0;

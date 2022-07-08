@@ -124,12 +124,6 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
     const bvt &bv1=eq_bvs[it->first.first];
     const bvt &bv2=eq_bvs[it->first.second];
 
-    bvt equal_bv;
-    equal_bv.resize(bv1.size());
-
-    for(std::size_t i = 0; i < bv1.size(); i++)
-      equal_bv[i] = prop.lequal(bv1[i], bv2[i]);
-
-    prop.gate_bv_and(equal_bv, it->second);
+    prop.set_equal(bv_utils.equal(bv1, bv2), it->second);
   }
 }

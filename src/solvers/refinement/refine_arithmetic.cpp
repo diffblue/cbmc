@@ -270,8 +270,7 @@ void bv_refinementt::check_SAT(approximationt &a)
         UNREACHABLE;
 
       CHECK_RETURN(r.size()==res.size());
-      for(std::size_t i = 0; i < r.size(); i++)
-        prop.set_equal(r[i], res[i]);
+      bv_utils.set_equal(r, res);
     }
   }
   else if(type.id()==ID_signedbv ||
@@ -339,9 +338,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       else
         UNREACHABLE;
 
-      CHECK_RETURN(r.size() == a.result_bv.size());
-      for(std::size_t i = 0; i < r.size(); i++)
-        prop.set_equal(r[i], a.result_bv[i]);
+      bv_utils.set_equal(r, a.result_bv);
     }
     else
       UNREACHABLE;

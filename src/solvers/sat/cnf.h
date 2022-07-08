@@ -28,7 +28,6 @@ public:
   virtual literalt land(literalt a, literalt b) override;
   virtual literalt lor(literalt a, literalt b) override;
   virtual literalt land(const bvt &bv) override;
-  void gate_bv_and(const bvt &bv, literalt output) override;
   virtual literalt lor(const bvt &bv) override;
   virtual literalt lxor(const bvt &bv) override;
   virtual literalt lxor(literalt a, literalt b) override;

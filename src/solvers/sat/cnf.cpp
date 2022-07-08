@@ -196,64 +196,6 @@ literalt cnft::land(const bvt &bv)
   return literal;
 }
 
-/// Tseitin encoding of conjunction between multiple literals
-/// \param bv: Any number of inputs to the AND gate
-/// \param output: Output signal of the circuit
-void cnft::gate_bv_and(const bvt &bv, literalt output)
-{
-  if(bv.empty())
-  {
-    lcnf({output});
-    return;
-  }
-  if(bv.size() == 1)
-  {
-    lcnf(bv[0], !output);
-    lcnf(!bv[0], output);
-    return;
-  }
-  if(bv.size() == 2)
-  {
-    gate_and(bv[0], bv[1], output);
-    return;
-  }
-
-  for(const auto &l : bv)
-  {
-    if(l.is_false())
-    {
-      lcnf({!output});
-      return;
-    }
-  }
-
-  if(is_all(bv, const_literal(true)))
-  {
-    lcnf({output});
-    return;
-  }
-
-  bvt new_bv = eliminate_duplicates(bv);
-
-  bvt lits(2);
-  lits[1] = neg(output);
-
-  for(const auto &l : new_bv)
-  {
-    lits[0] = pos(l);
-    lcnf(lits);
-  }
-
-  lits.clear();
-  lits.reserve(new_bv.size() + 1);
-
-  for(const auto &l : new_bv)
-    lits.push_back(neg(l));
-
-  lits.push_back(pos(output));
-  lcnf(lits);
-}
-
 /// Tseitin encoding of disjunction between multiple literals
 /// \par parameters: Any number of inputs to the OR gate
 /// \return Output signal of the OR gate as literal
