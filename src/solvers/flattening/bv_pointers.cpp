@@ -958,9 +958,26 @@ void bv_pointerst::do_postponed(
       PRECONDITION(size_bv.size() == postponed.bv.size());
 
       literalt l1=bv_utils.equal(bv, saved_bv);
+      if(l1.is_true())
+      {
+        for(std::size_t i = 0; i < postponed.bv.size(); ++i)
+          prop.set_equal(postponed.bv[i], size_bv[i]);
+        break;
+      }
+      else if(l1.is_false())
+        continue;
+#define COMPACT_OBJECT_SIZE_EQ
+#ifndef COMPACT_OBJECT_SIZE_EQ
       literalt l2=bv_utils.equal(postponed.bv, size_bv);
 
       prop.l_set_to_true(prop.limplies(l1, l2));
+#else
+      for(std::size_t i = 0; i < postponed.bv.size(); ++i)
+      {
+        prop.lcnf({!l1, !postponed.bv[i], size_bv[i]});
+        prop.lcnf({!l1, postponed.bv[i], !size_bv[i]});
+      }
+#endif
     }
   }
   else
