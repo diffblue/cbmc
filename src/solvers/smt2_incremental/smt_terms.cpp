@@ -151,6 +151,40 @@ smt_function_application_termt::arguments() const
   });
 }
 
+smt_forall_termt::smt_forall_termt(
+  std::vector<smt_identifier_termt> bound_variables,
+  smt_termt predicate)
+  : smt_termt{ID_smt_forall_term, smt_bool_sortt{}}
+{
+  INVARIANT(
+    !bound_variables.empty(),
+    "A forall term should bind at least one variable.");
+  std::transform(
+    std::make_move_iterator(bound_variables.begin()),
+    std::make_move_iterator(bound_variables.end()),
+    std::back_inserter(get_sub()),
+    [](smt_identifier_termt &&bound_variable) {
+      return irept{std::move(bound_variable)};
+    });
+  INVARIANT(
+    predicate.get_sort().cast<smt_bool_sortt>(),
+    "Predicate of forall quantifier is expected to have bool sort.");
+  set(ID_body, std::move(predicate));
+}
+
+const smt_termt &smt_forall_termt::predicate() const
+{
+  return static_cast<const smt_termt &>(find(ID_body));
+}
+
+std::vector<std::reference_wrapper<const smt_identifier_termt>>
+smt_forall_termt::bound_variables() const
+{
+  return make_range(get_sub()).map([](const irept &variable) {
+    return std::cref(static_cast<const smt_identifier_termt &>(variable));
+  });
+}
+
 template <typename visitort>
 void accept(const smt_termt &term, const irep_idt &id, visitort &&visitor)
 {

@@ -153,6 +153,7 @@ private:
   void visit(const smt_bit_vector_constant_termt &bit_vector_constant) override;
   void
   visit(const smt_function_application_termt &function_application) override;
+  void visit(const smt_forall_termt &forall) override;
 
 public:
   /// \brief This function is complete the external interface to this class. All
@@ -253,6 +254,11 @@ void smt_term_to_string_convertert::visit(
   const auto &id = function_application.function_identifier();
   auto arguments = function_application.arguments();
   push_outputs("(", id, std::move(arguments), ")");
+}
+
+void smt_term_to_string_convertert::visit(const smt_forall_termt &forall)
+{
+  UNIMPLEMENTED;
 }
 
 std::ostream &
