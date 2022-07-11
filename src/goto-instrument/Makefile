@@ -68,6 +68,8 @@ SRC = accelerate/accelerate.cpp \
       source_lines.cpp \
       splice_call.cpp \
       stack_depth.cpp \
+      synthesizer/loop_invariant_synthesizer.cpp \
+      synthesizer/synthesizer_utils.cpp \
       thread_instrumentation.cpp \
       undefined_functions.cpp \
       uninitialized.cpp \

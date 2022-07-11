@@ -1177,6 +1177,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       contracts.apply_loop_contracts(to_exclude_from_nondet_static);
   }
 
+  if(cmdline.isset("synthesize-loop-invariants"))
+  {
+    log.warning() << "Loop invariant synthesizer is still work in progress. "
+                     "It only generates TRUE as invariants."
+                  << messaget::eom;
+
+    // Synthesize loop invariants and annotate them into `goto_model`
+    enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
+    annotate_invariants(synthesizer.synthesize(), goto_model, log);
+  }
+
   if(cmdline.isset("value-set-fi-fp-removal"))
   {
     value_set_fi_fp_removal(goto_model, ui_message_handler);
@@ -1897,6 +1908,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
+    HELP_LOOP_INVARIANT_SYNTHESIZER
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     "\n"

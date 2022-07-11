@@ -1,0 +1,16 @@
+CORE
+main.c
+--synthesize-loop-invariants
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.\d+\] line 11 Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] line 11 Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] line 16 Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] line 16 Check that loop invariant is preserved: SUCCESS$
+^\[main\.\d+\] line 24 Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] line 24 Check that loop invariant is preserved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test case checks if invariants are generated for unannotated loops.
