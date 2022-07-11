@@ -2,6 +2,7 @@
 
 #include "smt2_incremental_decision_procedure.h"
 
+#include <util/arith_tools.h>
 #include <util/expr.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
@@ -78,23 +79,21 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
 void smt2_incremental_decision_proceduret::define_array_function(
   const array_exprt &array)
 {
-  const auto array_sort =
-    convert_type_to_smt_sort(array.type()).cast<smt_array_sortt>();
+  const smt_sortt array_sort = convert_type_to_smt_sort(array.type());
   INVARIANT(
-    array_sort,
+    array_sort.cast<smt_array_sortt>(),
     "Converting array typed expression to SMT should result in a term of array "
     "sort.");
   const smt_identifier_termt array_identifier = smt_identifier_termt{
-    "array_" + std::to_string(array_sequence()), *array_sort};
+    "array_" + std::to_string(array_sequence()), array_sort};
   solver_process->send(smt_declare_function_commandt{array_identifier, {}});
   const std::vector<exprt> &elements = array.operands();
-  const std::size_t index_width =
-    array_sort->index_sort().cast<smt_bit_vector_sortt>()->bit_width();
+  const typet &index_type = array.type().index_type();
   for(std::size_t i = 0; i < elements.size(); ++i)
   {
+    const smt_termt index = convert_expr_to_smt(from_integer(i, index_type));
     const smt_assert_commandt element_definition{smt_core_theoryt::equal(
-      smt_array_theoryt::select(
-        array_identifier, smt_bit_vector_constant_termt{i, index_width}),
+      smt_array_theoryt::select(array_identifier, index),
       convert_expr_to_smt(elements.at(i)))};
     solver_process->send(element_definition);
   }
