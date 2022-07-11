@@ -9,6 +9,7 @@
 #include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
+#include <solvers/smt2_incremental/smt_array_theory.h>
 #include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_responses.h>
@@ -515,5 +516,47 @@ TEST_CASE(
         test.sent_commands ==
         std::vector<smt_commandt>{smt_get_value_commandt{foo_term}});
     }
+  }
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret array commands.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const auto index_type = signedbv_typet{32};
+  const symbolt index = make_test_symbol("index", index_type);
+  const auto value_type = signedbv_typet{8};
+  const symbolt foo = make_test_symbol("foo", value_type);
+  const auto array_type = array_typet{value_type, from_integer(2, index_type)};
+  SECTION("array_exprt - list of literal array elements")
+  {
+    const array_exprt array_literal{
+      {from_integer(9, value_type), from_integer(12, value_type)}, array_type};
+    test.sent_commands.clear();
+    test.procedure.set_to(
+      equal_exprt{
+        foo.symbol_expr(), index_exprt{array_literal, index.symbol_expr()}},
+      true);
+    const auto foo_term = smt_identifier_termt{"foo", smt_bit_vector_sortt{8}};
+    const auto array_term = smt_identifier_termt{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}}};
+    const auto index_term =
+      smt_identifier_termt{"index", smt_bit_vector_sortt{32}};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{foo_term, {}},
+      smt_declare_function_commandt{array_term, {}},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        smt_array_theoryt::select(
+          array_term, smt_bit_vector_constant_termt{0, 32}),
+        smt_bit_vector_constant_termt{9, 8})},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        smt_array_theoryt::select(
+          array_term, smt_bit_vector_constant_termt{1, 32}),
+        smt_bit_vector_constant_termt{12, 8})},
+      smt_declare_function_commandt{index_term, {}},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        foo_term, smt_array_theoryt::select(array_term, index_term))}};
   }
 }
