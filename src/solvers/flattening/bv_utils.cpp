@@ -1181,6 +1181,16 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
     return equal_const(op0, op1);
   #endif
 
+  // If the eventual result would be "false" anyway, avoid constructing
+  // equalities that would end up not affecting the satisfiability of the
+  // formula (effectively doing preprocessing steps that the SAT solver would
+  // otherwise have to undertake).
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    if(op0[i] != op1[i] && op0[i].var_no() == op1[i].var_no())
+      return const_literal(false);
+  }
+
   bvt equal_bv;
   equal_bv.resize(op0.size());
 
