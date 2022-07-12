@@ -151,8 +151,8 @@ program using contracts.
 
 ## Additional Resources
 
-- [Requires \& Ensures Clauses](../../contracts/requires-and-ensures/)
-- [Assigns Clause](../../contracts/assigns/)
-- [Memory Predicates](../../contracts/memory-predicates/)
-- [History Variables](../../contracts/history-variables/)
-- [Quantifiers](../../contracts/quantifiers/)
+- [Requires \& Ensures Clauses](contracts-requires-and-ensures.md)
+- [Assigns Clause](contracts-assigns.md)
+- [Memory Predicates](contracts-memory-predicates.md)
+- [History Variables](contracts-history-variables.md)
+- [Quantifiers](contracts-quantifiers.md)
