@@ -145,10 +145,10 @@ and finally we verify the instrumented GOTO binary with desired checks.
 
 ## Additional Resources
 
-- [Assigns Clause](../../contracts/assigns/)
-- [Decreases Clause](../../contracts/decreases/)
-- [History Variables](../../contracts/history-variables/)
-- [Invariant Clause](../../contracts/invariants/)
-- [Quantifiers](../../contracts/quantifiers/)
+- [Assigns Clause](contracts-assigns.md)
+- [Decreases Clause](contracts-decreases.md)
+- [History Variables](contracts-history-variables.md)
+- [Invariant Clause](contracts-invariants.md)
+- [Quantifiers](contracts-quantifiers.md)
 
 [binary search algorithm]: https://en.wikipedia.org/wiki/Binary_search_algorithm
