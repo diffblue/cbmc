@@ -154,6 +154,7 @@ private:
   void
   visit(const smt_function_application_termt &function_application) override;
   void visit(const smt_forall_termt &forall) override;
+  void visit(const smt_exists_termt &exists) override;
 
 public:
   /// \brief This function is complete the external interface to this class. All
@@ -257,6 +258,11 @@ void smt_term_to_string_convertert::visit(
 }
 
 void smt_term_to_string_convertert::visit(const smt_forall_termt &forall)
+{
+  UNIMPLEMENTED;
+}
+
+void smt_term_to_string_convertert::visit(const smt_exists_termt &exists)
 {
   UNIMPLEMENTED;
 }
