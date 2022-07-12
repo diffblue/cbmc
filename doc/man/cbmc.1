@@ -176,6 +176,25 @@ Output formula to given file
 Never turn arrays into uninterpreted functions
 .IP --arrays-uf-always
 Always turn arrays into uninterpreted functions
+.IP "--incremental-smt2-solver <cmd>"
+Use the incremental SMT backend where <cmd> is the command to invoke the SMT
+solver of choice.
+.br
+Examples invocations:
+.br
+  --incremental-smt2-solver 'z3 -smt2 -in' (use the Z3 solver).
+.br
+  --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the CVC5 solver).
+.sp
+Note that:
+.br
+The solver name must be in the "PATH" or be an executable with full path.
+.br
+The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.
+.br
+The SMT solver should support the QF_AUFBV logic.
+.br
+The flag --slice-formula should be added to remove some not-yet supported features.
 .SH ENVIRONMENT
 All tools honor the TMPDIR environment variable when generating temporary
 files and directories. Furthermore note that
