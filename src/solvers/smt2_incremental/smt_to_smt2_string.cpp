@@ -96,6 +96,11 @@ std::string smt_to_smt2_string(const smt_sortt &sort)
   return ss.str();
 }
 
+struct sorted_variablest final
+{
+  std::vector<std::reference_wrapper<const smt_identifier_termt>> identifiers;
+};
+
 /// \note The printing algorithm in the `smt_term_to_string_convertert` class is
 ///   implemented using an explicit `std::stack` rather than using recursion
 ///   and the call stack. This is done in order to ensure we can print smt terms
@@ -124,6 +129,7 @@ private:
   template <typename elementt>
   output_functiont make_output_function(
     const std::vector<std::reference_wrapper<const elementt>> &output);
+  output_functiont make_output_function(const sorted_variablest &output);
 
   /// \brief Single argument version of `push_outputs`.
   template <typename outputt>
@@ -201,6 +207,25 @@ smt_term_to_string_convertert::make_output_function(
   };
 }
 
+smt_term_to_string_convertert::output_functiont
+smt_term_to_string_convertert::make_output_function(
+  const sorted_variablest &output)
+{
+  return [=](std::ostream &os) {
+    const auto push_sorted_variable =
+      [&](const smt_identifier_termt &identifier) {
+        push_outputs("(", identifier, " ", identifier.get_sort(), ")");
+      };
+    for(const auto &bound_variable :
+        make_range(output.identifiers.rbegin(), --output.identifiers.rend()))
+    {
+      push_sorted_variable(bound_variable);
+      push_output(" ");
+    }
+    push_sorted_variable(output.identifiers.front());
+  };
+}
+
 template <typename outputt>
 void smt_term_to_string_convertert::push_output(outputt &&output)
 {
@@ -259,12 +284,16 @@ void smt_term_to_string_convertert::visit(
 
 void smt_term_to_string_convertert::visit(const smt_forall_termt &forall)
 {
-  UNIMPLEMENTED;
+  sorted_variablest bound_variables{forall.bound_variables()};
+  auto predicate = forall.predicate();
+  push_outputs("(forall (", bound_variables, ") ", std::move(predicate), ")");
 }
 
 void smt_term_to_string_convertert::visit(const smt_exists_termt &exists)
 {
-  UNIMPLEMENTED;
+  sorted_variablest bound_variables{exists.bound_variables()};
+  auto predicate = exists.predicate();
+  push_outputs("(exists (", bound_variables, ") ", std::move(predicate), ")");
 }
 
 std::ostream &

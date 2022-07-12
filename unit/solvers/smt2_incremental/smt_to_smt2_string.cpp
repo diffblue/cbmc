@@ -202,3 +202,45 @@ TEST_CASE(
   CHECK(
     smt_to_smt2_string(smt_set_logic_commandt{qf_bv}) == "(set-logic QF_BV)");
 }
+
+TEST_CASE("SMT forall term to string conversion", "[core][smt2_incremental]")
+{
+  const smt_identifier_termt i{"i", smt_bit_vector_sortt{8}};
+  const smt_identifier_termt j{"j", smt_bool_sortt{}};
+  SECTION("One bound variable")
+  {
+    const auto predicate = smt_core_theoryt::equal(i, i);
+    const smt_forall_termt forall{{i}, predicate};
+    CHECK(smt_to_smt2_string(forall) == "(forall ((i (_ BitVec 8))) (= i i))");
+  }
+  SECTION("Two bound variables")
+  {
+    const auto predicate =
+      smt_core_theoryt::make_or(smt_core_theoryt::equal(i, i), j);
+    const smt_forall_termt forall{{i, j}, predicate};
+    CHECK(
+      smt_to_smt2_string(forall) ==
+      "(forall ((i (_ BitVec 8)) (j Bool)) (or (= i i) j))");
+  }
+}
+
+TEST_CASE("SMT exists term to string conversion", "[core][smt2_incremental]")
+{
+  const smt_identifier_termt i{"i", smt_bit_vector_sortt{8}};
+  const smt_identifier_termt j{"j", smt_bool_sortt{}};
+  SECTION("One bound variable")
+  {
+    const auto predicate = smt_core_theoryt::equal(i, i);
+    const smt_exists_termt exists{{i}, predicate};
+    CHECK(smt_to_smt2_string(exists) == "(exists ((i (_ BitVec 8))) (= i i))");
+  }
+  SECTION("Two bound variables")
+  {
+    const auto predicate =
+      smt_core_theoryt::make_or(smt_core_theoryt::equal(i, i), j);
+    const smt_exists_termt exists{{i, j}, predicate};
+    CHECK(
+      smt_to_smt2_string(exists) ==
+      "(exists ((i (_ BitVec 8)) (j Bool)) (or (= i i) j))");
+  }
+}
