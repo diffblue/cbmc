@@ -76,7 +76,7 @@ class optionst;
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)" \
   "(ppc-macos)" \
   "(arrays-uf-always)(arrays-uf-never)" \
-  "(no-arch)(arch):" \
+  "(arch):" \
   OPT_FLUSH \
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \

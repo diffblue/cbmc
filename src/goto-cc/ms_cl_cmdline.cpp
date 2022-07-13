@@ -38,7 +38,6 @@ const char *non_ms_cl_options[]=
   "--little-endian",
   "--big-endian",
   "--unsigned-char",
-  "--no-arch",
   "--help",
   "--xml",
   "--partial-inlining",

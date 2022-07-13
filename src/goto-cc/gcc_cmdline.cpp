@@ -49,7 +49,6 @@ const char *goto_cc_options_without_argument[]=
   "--64",
   "--little-endian",
   "--big-endian",
-  "--no-arch",
   "--partial-inlining",
   "--validate-goto-model",
   "-?",
