@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
+#include <util/prefix.h>
 #include <util/replace_symbol.h>
 #include <util/string_utils.h>
 
@@ -495,9 +496,14 @@ void dump_ct::convert_compound(
     while(non_array_type->id()==ID_array)
       non_array_type = &(to_array_type(*non_array_type).element_type());
 
+    bool is_anon =
+      can_cast_type<tag_typet>(comp.type()) &&
+      has_prefix(
+        id2string(to_tag_type(comp.type()).get_identifier()), "tag-#anon");
+
     if(recursive)
     {
-      if(non_array_type->id()!=ID_pointer)
+      if(non_array_type->id() != ID_pointer && !is_anon)
         convert_compound(comp.type(), comp.type(), recursive, os);
       else
         collect_typedefs(comp.type(), true);
@@ -511,7 +517,22 @@ void dump_ct::convert_compound(
     // component names such as "main" would collide with other objects in the
     // namespace
     std::string fake_unique_name="NO/SUCH/NS::"+id2string(comp_name);
-    std::string s=make_decl(fake_unique_name, comp.type());
+    typet comp_type_to_use = comp.type();
+    if(is_anon)
+    {
+      comp_type_to_use = ns.follow(comp.type());
+      comp_type_to_use.remove(ID_tag);
+      if(
+        recursive && (comp_type_to_use.id() == ID_struct ||
+                      comp_type_to_use.id() == ID_union))
+      {
+        const auto &sub_comps =
+          to_struct_union_type(comp_type_to_use).components();
+        for(const auto &sc : sub_comps)
+          convert_compound(sc.type(), sc.type(), recursive, os);
+      }
+    }
+    std::string s = make_decl(fake_unique_name, comp_type_to_use);
     POSTCONDITION(s.find("NO/SUCH/NS")==std::string::npos);
 
     if(comp_type.id()==ID_c_bit_field &&
@@ -1523,10 +1544,6 @@ void dump_ct::cleanup_type(typet &type)
 
   if(type.id()==ID_array)
     cleanup_expr(to_array_type(type).size());
-
-  POSTCONDITION(
-    (type.id()!=ID_union && type.id()!=ID_struct) ||
-    !type.get(ID_tag).empty());
 }
 
 static expr2c_configurationt expr2c_configuration()

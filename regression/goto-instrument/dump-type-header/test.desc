@@ -8,5 +8,7 @@ struct A
   signed int a;
   // b
   signed int b;
+  // u
+  union \{ signed int x; \} u;
 --
 ^warning: ignoring
