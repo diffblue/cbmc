@@ -2,6 +2,10 @@ struct A
 {
   int a;
   int b;
+  union
+  {
+    int x;
+  } u;
 };
 
 int main()
