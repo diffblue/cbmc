@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 
 #include <util/mp_arith.h>
+#include <util/nodiscard.h>
 
 #include <solvers/prop/prop.h>
 
@@ -221,19 +222,18 @@ public:
 protected:
   propt &prop;
 
-  void adder(
-    bvt &sum,
-    const bvt &op,
-    literalt carry_in,
-    literalt &carry_out);
+  /// Return the sum and carry-out when adding \p op0 and \p op1 under initial
+  /// carry \p carry_in.
+  NODISCARD std::pair<bvt, literalt>
+  adder(const bvt &op0, const bvt &op1, literalt carry_in);
 
-  void adder_no_overflow(
-    bvt &sum,
-    const bvt &op,
+  NODISCARD bvt adder_no_overflow(
+    const bvt &op0,
+    const bvt &op1,
     bool subtract,
     representationt rep);
 
-  void adder_no_overflow(bvt &sum, const bvt &op);
+  NODISCARD bvt adder_no_overflow(const bvt &op0, const bvt &op1);
 
   bvt unsigned_multiplier_no_overflow(
     const bvt &op0, const bvt &op1);
