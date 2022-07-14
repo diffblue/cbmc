@@ -45,7 +45,8 @@ bool process_goto_program(
   remove_function_pointers(
     log.get_message_handler(),
     goto_model,
-    options.get_bool_option("pointer-check"));
+    options.get_bool_option("pointer-check"),
+    false);
 
   mm_io(goto_model);
 

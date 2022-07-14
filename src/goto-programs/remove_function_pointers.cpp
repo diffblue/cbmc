@@ -539,53 +539,18 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
     functions.compute_location_numbers();
 }
 
-bool remove_function_pointers(
-  message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
-  goto_programt &goto_program,
-  const irep_idt &function_id,
-  bool add_safety_assertion,
-  bool only_remove_const_fps)
-{
-  remove_function_pointerst
-    rfp(
-      _message_handler,
-      symbol_table,
-      add_safety_assertion,
-      only_remove_const_fps,
-      goto_functions);
-
-  return rfp.remove_function_pointers(goto_program, function_id);
-}
-
 void remove_function_pointers(
   message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  bool add_safety_assertion,
-  bool only_remove_const_fps)
-{
-  remove_function_pointerst
-    rfp(
-      _message_handler,
-      symbol_table,
-      add_safety_assertion,
-      only_remove_const_fps,
-      goto_functions);
-
-  rfp(goto_functions);
-}
-
-void remove_function_pointers(message_handlert &_message_handler,
   goto_modelt &goto_model,
   bool add_safety_assertion,
   bool only_remove_const_fps)
 {
-  remove_function_pointers(
+  remove_function_pointerst rfp(
     _message_handler,
     goto_model.symbol_table,
-    goto_model.goto_functions,
     add_safety_assertion,
-    only_remove_const_fps);
+    only_remove_const_fps,
+    goto_model.goto_functions);
+
+  rfp(goto_model.goto_functions);
 }

@@ -29,23 +29,7 @@ void remove_function_pointers(
   message_handlert &_message_handler,
   goto_modelt &goto_model,
   bool add_safety_assertion,
-  bool only_remove_const_fps=false);
-
-void remove_function_pointers(
-  message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  bool add_safety_assertion,
-  bool only_remove_const_fps=false);
-
-bool remove_function_pointers(
-  message_handlert &_message_handler,
-  symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
-  goto_programt &goto_program,
-  const irep_idt &function_id,
-  bool add_safety_assertion,
-  bool only_remove_const_fps = false);
+  bool only_remove_const_fps);
 
 /// Replace a call to a dynamic function at location
 /// target in the given goto-program by a case-split
