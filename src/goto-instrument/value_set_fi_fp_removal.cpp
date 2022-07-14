@@ -75,8 +75,7 @@ void value_set_fi_fp_removal(
               f.second.body,
               f.first,
               target,
-              functions,
-              true);
+              functions);
           }
         }
       }

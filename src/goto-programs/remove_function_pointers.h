@@ -28,7 +28,6 @@ class symbol_tablet;
 void remove_function_pointers(
   message_handlert &_message_handler,
   goto_modelt &goto_model,
-  bool add_safety_assertion,
   bool only_remove_const_fps);
 
 /// Replace a call to a dynamic function at location
@@ -40,16 +39,13 @@ void remove_function_pointers(
 /// \param function_id: Name of function containing the target
 /// \param target: location with function call with function pointer
 /// \param functions: The set of functions to consider
-/// \param add_safety_assertion: Iff true, include an assertion that the
-//         pointer matches one of the candidate functions
 void remove_function_pointer(
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
   const irep_idt &function_id,
   goto_programt::targett target,
-  const std::unordered_set<symbol_exprt, irep_hash> &functions,
-  const bool add_safety_assertion);
+  const std::unordered_set<symbol_exprt, irep_hash> &functions);
 
 /// Returns true iff \p call_type can be converted to produce a function call of
 /// the same type as \p function_type.

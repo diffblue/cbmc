@@ -37,7 +37,6 @@ public:
   remove_function_pointerst(
     message_handlert &_message_handler,
     symbol_tablet &_symbol_table,
-    bool _add_safety_assertion,
     bool only_resolve_const_fps,
     const goto_functionst &goto_functions);
 
@@ -51,7 +50,6 @@ protected:
   message_handlert &message_handler;
   const namespacet ns;
   symbol_tablet &symbol_table;
-  bool add_safety_assertion;
 
   // We can optionally halt the FP removal if we aren't able to use
   // remove_const_function_pointerst to successfully narrow to a small
@@ -81,13 +79,11 @@ protected:
 remove_function_pointerst::remove_function_pointerst(
   message_handlert &_message_handler,
   symbol_tablet &_symbol_table,
-  bool _add_safety_assertion,
   bool only_resolve_const_fps,
   const goto_functionst &goto_functions)
   : message_handler(_message_handler),
     ns(_symbol_table),
     symbol_table(_symbol_table),
-    add_safety_assertion(_add_safety_assertion),
     only_resolve_const_fps(only_resolve_const_fps)
 {
   for(const auto &s : symbol_table.symbols)
@@ -343,8 +339,7 @@ void remove_function_pointerst::remove_function_pointer(
     goto_program,
     function_id,
     target,
-    functions,
-    add_safety_assertion);
+    functions);
 }
 
 static std::string function_pointer_assertion_comment(
@@ -385,8 +380,7 @@ void remove_function_pointer(
   goto_programt &goto_program,
   const irep_idt &function_id,
   goto_programt::targett target,
-  const std::unordered_set<symbol_exprt, irep_hash> &functions,
-  const bool add_safety_assertion)
+  const std::unordered_set<symbol_exprt, irep_hash> &functions)
 {
   const exprt &function = target->call_function();
   const exprt &pointer = to_dereference_expr(function).pointer();
@@ -430,14 +424,11 @@ void remove_function_pointer(
   }
 
   // fall-through
-  if(add_safety_assertion)
-  {
-    goto_programt::targett t =
-      new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
-    t->source_location_nonconst().set_property_class("pointer dereference");
-    t->source_location_nonconst().set_comment(
-      function_pointer_assertion_comment(functions));
-  }
+  goto_programt::targett t =
+    new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
+  t->source_location_nonconst().set_property_class("pointer dereference");
+  t->source_location_nonconst().set_comment(
+    function_pointer_assertion_comment(functions));
   new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
 
   goto_programt new_code;
@@ -542,13 +533,11 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
 void remove_function_pointers(
   message_handlert &_message_handler,
   goto_modelt &goto_model,
-  bool add_safety_assertion,
   bool only_remove_const_fps)
 {
   remove_function_pointerst rfp(
     _message_handler,
     goto_model.symbol_table,
-    add_safety_assertion,
     only_remove_const_fps,
     goto_model.goto_functions);
 

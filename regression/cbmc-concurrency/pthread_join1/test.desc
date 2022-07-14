@@ -5,6 +5,6 @@ main.c
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 21 assertion i==1: FAILURE$
 ^\[main\.assertion\.2\] line 22 assertion i==2: SUCCESS$
-^\*\* 1 of 2 failed 
+^\*\* 1 of 3 failed
 --
 ^warning: ignoring
