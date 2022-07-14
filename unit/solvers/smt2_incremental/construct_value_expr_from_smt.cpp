@@ -128,6 +128,18 @@ TEST_CASE(
       unsignedbv_typet{16},
       "Unexpected conversion of function application to value expression."},
     rowt{
+      smt_forall_termt{
+        {smt_identifier_termt{"i", smt_bool_sortt{}}},
+        smt_bool_literal_termt{true}},
+      bool_typet{},
+      "Unexpected conversion of forall quantifier to value expression."},
+    rowt{
+      smt_exists_termt{
+        {smt_identifier_termt{"j", smt_bool_sortt{}}},
+        smt_bool_literal_termt{true}},
+      bool_typet{},
+      "Unexpected conversion of exists quantifier to value expression."},
+    rowt{
       smt_bit_vector_constant_termt{0, 16},
       pointer_typet{unsigned_int_type(), 0},
       "Width of smt bit vector term must match the width of pointer type"});

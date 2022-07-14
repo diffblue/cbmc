@@ -87,6 +87,18 @@ private:
       "Unexpected conversion of function application to value expression.");
   }
 
+  void visit(const smt_forall_termt &forall) override
+  {
+    INVARIANT(
+      false, "Unexpected conversion of forall quantifier to value expression.");
+  }
+
+  void visit(const smt_exists_termt &exists) override
+  {
+    INVARIANT(
+      false, "Unexpected conversion of exists quantifier to value expression.");
+  }
+
 public:
   /// \brief This function is complete the external interface to this class. All
   ///   construction of this class and construction of expressions should be

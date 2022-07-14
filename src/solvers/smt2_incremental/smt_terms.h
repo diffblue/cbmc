@@ -207,6 +207,28 @@ public:
   };
 };
 
+class smt_forall_termt : public smt_termt
+{
+public:
+  smt_forall_termt(
+    std::vector<smt_identifier_termt> bound_variables,
+    smt_termt predicate);
+  std::vector<std::reference_wrapper<const smt_identifier_termt>>
+  bound_variables() const;
+  const smt_termt &predicate() const;
+};
+
+class smt_exists_termt : public smt_termt
+{
+public:
+  smt_exists_termt(
+    std::vector<smt_identifier_termt> bound_variables,
+    smt_termt predicate);
+  std::vector<std::reference_wrapper<const smt_identifier_termt>>
+  bound_variables() const;
+  const smt_termt &predicate() const;
+};
+
 class smt_term_const_downcast_visitort
 {
 public:

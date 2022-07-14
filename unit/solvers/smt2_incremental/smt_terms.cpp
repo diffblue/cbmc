@@ -1,11 +1,11 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
+#include <util/mp_arith.h>
 
 #include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_terms.h>
-
-#include <util/mp_arith.h>
+#include <testing-utils/invariant.h>
+#include <testing-utils/use_catch.h>
 
 #include <type_traits>
 
@@ -85,6 +85,82 @@ TEST_CASE("smt_termt equality.", "[core][smt2_incremental]")
     smt_bit_vector_constant_termt{12, 8});
 }
 
+template <typename term_typet>
+std::string term_description();
+
+template <>
+std::string term_description<smt_forall_termt>()
+{
+  return "forall";
+}
+
+template <>
+std::string term_description<smt_exists_termt>()
+{
+  return "exists";
+}
+
+TEMPLATE_TEST_CASE(
+  "smt quantifier terms",
+  "[core][smt2_incremental]",
+  smt_forall_termt,
+  smt_exists_termt)
+{
+  using quantifiert = TestType;
+  const smt_identifier_termt i{"i", smt_bit_vector_sortt{8}};
+  const smt_identifier_termt j{"j", smt_bit_vector_sortt{8}};
+  SECTION("Getters")
+  {
+    SECTION("One bound variable")
+    {
+      const auto predicate = smt_core_theoryt::equal(i, i);
+      const quantifiert quantifier{{i}, predicate};
+      CHECK(quantifier.get_sort() == smt_bool_sortt{});
+      const auto variables = quantifier.bound_variables();
+      CHECK(quantifier.predicate() == predicate);
+      REQUIRE(variables.size() == 1);
+      CHECK(variables[0].get() == i);
+    }
+    SECTION("Two bound variables")
+    {
+      const auto predicate = smt_core_theoryt::distinct(i, j);
+      const quantifiert quantifier{{i, j}, predicate};
+      CHECK(quantifier.get_sort() == smt_bool_sortt{});
+      const auto variables = quantifier.bound_variables();
+      CHECK(quantifier.predicate() == predicate);
+      REQUIRE(variables.size() == 2);
+      CHECK(variables[0].get() == i);
+      CHECK(variables[1].get() == j);
+    }
+  }
+  SECTION("Constructor validation")
+  {
+    cbmc_invariants_should_throwt invariants_throw;
+    SECTION("Empty variables")
+    {
+      const auto generate_error = [&]() {
+        quantifiert{{}, smt_core_theoryt::equal(i, i)};
+      };
+      REQUIRE_THROWS_MATCHES(
+        generate_error(),
+        invariant_failedt,
+        invariant_failure_containing(
+          "A " + term_description<quantifiert>() +
+          " term should bind at least one variable."));
+    }
+    SECTION("Non bool predicate")
+    {
+      const auto generate_error = [&]() { quantifiert{{i}, i}; };
+      REQUIRE_THROWS_MATCHES(
+        generate_error(),
+        invariant_failedt,
+        invariant_failure_containing(
+          "Predicate of " + term_description<quantifiert>() +
+          " quantifier is expected to have bool sort."));
+    }
+  }
+}
+
 template <typename expected_termt>
 class term_visit_type_checkert final : public smt_term_const_downcast_visitort
 {
@@ -139,6 +215,30 @@ public:
       unexpected_term_visited = true;
     }
   }
+
+  void visit(const smt_forall_termt &) override
+  {
+    if(std::is_same<expected_termt, smt_forall_termt>::value)
+    {
+      expected_term_visited = true;
+    }
+    else
+    {
+      unexpected_term_visited = true;
+    }
+  }
+
+  void visit(const smt_exists_termt &) override
+  {
+    if(std::is_same<expected_termt, smt_exists_termt>::value)
+    {
+      expected_term_visited = true;
+    }
+    else
+    {
+      unexpected_term_visited = true;
+    }
+  }
 };
 
 template <typename term_typet>
@@ -168,13 +268,31 @@ smt_function_application_termt make_test_term<smt_function_application_termt>()
   return smt_core_theoryt::make_not(smt_bool_literal_termt{true});
 }
 
+template <>
+smt_forall_termt make_test_term<smt_forall_termt>()
+{
+  const smt_identifier_termt identifier{"i", smt_bit_vector_sortt{8}};
+  return smt_forall_termt{
+    {identifier}, smt_core_theoryt::equal(identifier, identifier)};
+}
+
+template <>
+smt_exists_termt make_test_term<smt_exists_termt>()
+{
+  const smt_identifier_termt identifier{"i", smt_bit_vector_sortt{8}};
+  return smt_exists_termt{
+    {identifier}, smt_core_theoryt::equal(identifier, identifier)};
+}
+
 TEMPLATE_TEST_CASE(
   "smt_termt::accept(visitor)",
   "[core][smt2_incremental]",
   smt_bool_literal_termt,
   smt_identifier_termt,
   smt_bit_vector_constant_termt,
-  smt_function_application_termt)
+  smt_function_application_termt,
+  smt_forall_termt,
+  smt_exists_termt)
 {
   term_visit_type_checkert<TestType> checker;
   make_test_term<TestType>().accept(checker);
