@@ -798,7 +798,8 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
 
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
-  #if 1
+//#ifndef SATCHECK_CADICAL
+#if 0
   bvt op0=_op0, op1=_op1;
 
   if(is_constant(op1))
@@ -827,7 +828,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     }
 
   return product;
-  #else
+#else
   // Wallace tree multiplier. This is disabled, as runtimes have
   // been observed to go up by 5%-10%, and on some models even by 20%.
 
@@ -862,8 +863,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     return zeros(op0.size());
   else
     return wallace_tree(pps);
-
-  #endif
+#endif
 }
 
 bvt bv_utilst::unsigned_multiplier_no_overflow(
