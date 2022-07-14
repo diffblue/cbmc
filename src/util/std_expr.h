@@ -1417,9 +1417,7 @@ public:
         _array,
         ID_index,
         std::move(_index),
-        _array.type().has_subtype()
-          ? to_type_with_subtype(_array.type()).subtype()
-          : typet(ID_nil))
+        to_type_with_subtype(_array.type()).subtype())
   {
   }
 

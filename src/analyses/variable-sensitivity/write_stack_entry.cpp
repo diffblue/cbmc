@@ -39,15 +39,10 @@ simple_entryt::simple_entryt(exprt expr) : simple_entry(expr)
 
 /// Get the expression part needed to read this stack entry. For simple
 /// expressions this is just the expression itself.
-/// \return The expression to read this part of the stack
-exprt simple_entryt::get_access_expr() const
+/// \return The expression to read this part of the stack and false
+std::pair<exprt, bool> simple_entryt::get_access_expr() const
 {
-  return simple_entry;
-}
-
-/// For a simple entry, no type adjustment is needed for the access expression
-void simple_entryt::adjust_access_type(exprt &expr) const
-{
+  return {simple_entry, false};
 }
 
 offset_entryt::offset_entryt(abstract_object_pointert offset_value)
@@ -61,26 +56,11 @@ offset_entryt::offset_entryt(abstract_object_pointert offset_value)
 }
 
 /// Get the expression part needed to read this stack entry. For offset entries
-/// this is an index expression with the index() part the offset.
-/// It is important to note that the returned index_exprt does not have a type,
-/// so it will be necessary for the caller to update the type whenever the index
-/// expression is completed using `adjust_access_type` on the resulting exprt.
-/// \return The untyped expression to read this part of the stack
-exprt offset_entryt::get_access_expr() const
+/// this is the offset for an index expression.
+/// \return The offset expression to read this part of the stack and true
+std::pair<exprt, bool> offset_entryt::get_access_expr() const
 {
-  // This constructs a something that is basicallyt '(null)[offset])'
-  // meaning that we don't know what the type is at this point, as the
-  // array part will be filled in later.
-  return index_exprt(nil_exprt(), offset->to_constant());
-}
-
-/// For an offset entry, the type of the access expression can only be
-/// determined once the access expression has been completed with the next
-/// entry on the write stack.
-void offset_entryt::adjust_access_type(exprt &expr) const
-{
-  PRECONDITION(expr.id() == ID_index);
-  expr.type() = to_index_expr(expr).array().type().subtype();
+  return {offset->to_constant(), true};
 }
 
 /// Try to combine a new stack element with the current top of the stack. This

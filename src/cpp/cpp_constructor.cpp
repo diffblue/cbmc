@@ -100,7 +100,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
         exprt constant = from_integer(i, c_index_type());
         constant.add_source_location()=source_location;
 
-        index_exprt index(object, constant);
+        index_exprt index = index_exprt(object_tc, constant);
         index.add_source_location()=source_location;
 
         if(!operands.empty())

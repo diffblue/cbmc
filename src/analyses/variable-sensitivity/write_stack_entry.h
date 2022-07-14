@@ -21,8 +21,7 @@ class write_stack_entryt
 {
 public:
   virtual ~write_stack_entryt() = default;
-  virtual exprt get_access_expr() const = 0;
-  virtual void adjust_access_type(exprt &expr) const = 0;
+  virtual std::pair<exprt, bool> get_access_expr() const = 0;
   virtual bool try_squash_in(
     std::shared_ptr<const write_stack_entryt> new_entry,
     const abstract_environmentt &enviroment,
@@ -33,8 +32,7 @@ class simple_entryt : public write_stack_entryt
 {
 public:
   explicit simple_entryt(exprt expr);
-  exprt get_access_expr() const override;
-  void adjust_access_type(exprt &expr) const override;
+  std::pair<exprt, bool> get_access_expr() const override;
 
 private:
   exprt simple_entry;
@@ -44,8 +42,7 @@ class offset_entryt : public write_stack_entryt
 {
 public:
   explicit offset_entryt(abstract_object_pointert offset_value);
-  exprt get_access_expr() const override;
-  void adjust_access_type(exprt &expr) const override;
+  std::pair<exprt, bool> get_access_expr() const override;
   bool try_squash_in(
     std::shared_ptr<const write_stack_entryt> new_entry,
     const abstract_environmentt &enviroment,
