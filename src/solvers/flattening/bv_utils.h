@@ -223,11 +223,10 @@ public:
 protected:
   propt &prop;
 
-  void adder(
+  literalt adder(
     bvt &sum,
     const bvt &op,
-    literalt carry_in,
-    literalt &carry_out);
+    literalt carry_in);
 
   void adder_no_overflow(
     bvt &sum,

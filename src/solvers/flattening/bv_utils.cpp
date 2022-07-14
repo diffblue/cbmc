@@ -290,20 +290,21 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   }
 }
 
-void bv_utilst::adder(
+literalt bv_utilst::adder(
   bvt &sum,
   const bvt &op,
-  literalt carry_in,
-  literalt &carry_out)
+  literalt carry_in)
 {
   PRECONDITION(sum.size() == op.size());
 
-  carry_out=carry_in;
+  literalt carry_out = carry_in;
 
   for(std::size_t i=0; i<sum.size(); i++)
   {
     sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
   }
+
+  return carry_out;
 }
 
 literalt bv_utilst::carry_out(
@@ -337,12 +338,12 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
   PRECONDITION(op0.size() == op1.size());
 
   literalt carry_in=const_literal(subtract);
-  literalt carry_out;
 
   bvt result=op0;
   bvt tmp_op1=subtract?inverted(op1):op1;
 
-  adder(result, tmp_op1, carry_in, carry_out);
+  // we ignore the carry-out
+  (void)adder(result, tmp_op1, carry_in);
 
   return result;
 }
@@ -353,9 +354,9 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
     select(subtract, inverted(op1), op1);
 
   bvt result=op0;
-  literalt carry_out;
 
-  adder(result, op1_sign_applied, subtract, carry_out);
+  // we ignore the carry-out
+  (void)adder(result, op1_sign_applied, subtract);
 
   return result;
 }
@@ -371,12 +372,11 @@ bvt bv_utilst::saturating_add_sub(
     rep == representationt::SIGNED || rep == representationt::UNSIGNED);
 
   literalt carry_in = const_literal(subtract);
-  literalt carry_out;
 
   bvt add_sub_result = op0;
   bvt tmp_op1 = subtract ? inverted(op1) : op1;
 
-  adder(add_sub_result, tmp_op1, carry_in, carry_out);
+  literalt carry_out = adder(add_sub_result, tmp_op1, carry_in);
 
   bvt result;
   result.reserve(add_sub_result.size());
@@ -496,8 +496,8 @@ void bv_utilst::adder_no_overflow(
     literalt sign_the_same=
       prop.lequal(sum[sum.size()-1], tmp_op[tmp_op.size()-1]);
 
-    literalt carry;
-    adder(sum, tmp_op, const_literal(subtract), carry);
+    // we ignore the carry-out
+    (void)adder(sum, tmp_op, const_literal(subtract));
 
     // result of addition in sum
     prop.l_set_to_false(
@@ -508,18 +508,14 @@ void bv_utilst::adder_no_overflow(
     INVARIANT(
       rep == representationt::UNSIGNED,
       "representation has either value signed or unsigned");
-    literalt carry_out;
-    adder(sum, tmp_op, const_literal(subtract), carry_out);
+    literalt carry_out = adder(sum, tmp_op, const_literal(subtract));
     prop.l_set_to(carry_out, subtract);
   }
 }
 
 void bv_utilst::adder_no_overflow(bvt &sum, const bvt &op)
 {
-  literalt carry_out=const_literal(false);
-
-  adder(sum, op, carry_out, carry_out);
-
+  literalt carry_out = adder(sum, op, const_literal(false));
   prop.l_set_to_false(carry_out); // enforce no overflow
 }
 
