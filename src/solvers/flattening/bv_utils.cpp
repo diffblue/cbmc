@@ -297,14 +297,90 @@ literalt bv_utilst::adder(
 {
   PRECONDITION(sum.size() == op.size());
 
-  literalt carry_out = carry_in;
-
-  for(std::size_t i=0; i<sum.size(); i++)
+  if(sum.empty() || !prop.has_set_to() || !prop.cnf_handled_well())
   {
-    sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
-  }
+    literalt carry_out=carry_in;
 
-  return carry_out;
+    for(std::size_t i=0; i<sum.size(); i++)
+    {
+      sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
+    }
+
+    return carry_out;
+  }
+  else
+  {
+    bvt first_op = sum;
+
+    bvt constants;
+    constants.reserve(2);
+    if(first_op[0].is_constant())
+      constants.push_back(first_op[0]);
+    if(op[0].is_constant())
+      constants.push_back(op[0]);
+    else
+      sum[0] = op[0];
+    if(constants.size() == 2)
+      sum[0] = constants[0] == constants[1] ? carry_in : !carry_in;
+    else if(constants.size() == 1 && carry_in.is_constant())
+    {
+      if(constants[0] != carry_in)
+        sum[0].invert();
+    }
+    else
+    {
+      sum[0] = prop.new_variable();
+      prop.lcnf({sum[0], first_op[0], op[0], !carry_in});
+      prop.lcnf({sum[0], first_op[0], !op[0], carry_in});
+      prop.lcnf({sum[0], !first_op[0], op[0], carry_in});
+      prop.lcnf({sum[0], !first_op[0], !op[0], !carry_in});
+      prop.lcnf({!sum[0], first_op[0], op[0], carry_in});
+      prop.lcnf({!sum[0], first_op[0], !op[0], !carry_in});
+      prop.lcnf({!sum[0], !first_op[0], op[0], !carry_in});
+      prop.lcnf({!sum[0], !first_op[0], !op[0], carry_in});
+    }
+
+    for(std::size_t i=1; i<sum.size(); i++)
+    {
+      sum[i] = prop.new_variable();
+
+      prop.lcnf({sum[i], first_op[i], op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({sum[i], first_op[i], op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({sum[i], first_op[i], op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({sum[i], first_op[i], !op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({sum[i], first_op[i], !op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({sum[i], first_op[i], !op[i], !sum[i-1], op[i-1]});
+
+      prop.lcnf({sum[i], !first_op[i], op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({sum[i], !first_op[i], op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({sum[i], !first_op[i], op[i], !sum[i-1], op[i-1]});
+
+      prop.lcnf({sum[i], !first_op[i], !op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({sum[i], !first_op[i], !op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({sum[i], !first_op[i], !op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({!sum[i], first_op[i], op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({!sum[i], first_op[i], op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({!sum[i], first_op[i], op[i], !sum[i-1], op[i-1]});
+
+      prop.lcnf({!sum[i], first_op[i], !op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({!sum[i], first_op[i], !op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({!sum[i], first_op[i], !op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({!sum[i], !first_op[i], op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({!sum[i], !first_op[i], op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({!sum[i], !first_op[i], op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({!sum[i], !first_op[i], !op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({!sum[i], !first_op[i], !op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({!sum[i], !first_op[i], !op[i], !sum[i-1], op[i-1]});
+    }
+
+    return prop.lor(
+      prop.land(first_op.back(), op.back()),
+      prop.land(!sum.back(), prop.lor(first_op.back(), op.back())));
+  }
 }
 
 literalt bv_utilst::carry_out(
