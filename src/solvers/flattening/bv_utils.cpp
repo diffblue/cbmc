@@ -1287,7 +1287,7 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 
 // Saves space but slows the solver
 // There is a variant that uses the xor as an auxiliary that should improve both
-// #define COMPACT_LT_OR_LE
+#define COMPACT_LT_OR_LE
 
 
 
