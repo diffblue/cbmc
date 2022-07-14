@@ -290,7 +290,37 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   }
 }
 
-literalt bv_utilst::adder(
+static literalt carry_out_of_sum(
+  propt &prop,
+  const bvt &op0,
+  const bvt &op1,
+  const bvt &sum)
+{
+  literalt a = op0.back();
+  literalt b = op1.back();
+  literalt s = sum.back();
+
+  const auto const_count =
+    a.is_constant() + b.is_constant() + s.is_constant();
+
+  if(const_count >= 2 || true)
+  {
+    return
+      prop.lor(
+      prop.land(a, b),
+      prop.land(!s, prop.lor(a, b)));
+  }
+
+  literalt c = prop.new_variable();
+
+  // TODO
+  assert(false);
+  prop.lcnf({a, b, s, c});
+
+  return c;
+}
+
+void bv_utilst::adder(
   bvt &sum,
   const bvt &op,
   literalt carry_in)
@@ -305,8 +335,6 @@ literalt bv_utilst::adder(
     {
       sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
     }
-
-    return carry_out;
   }
   else
   {
@@ -376,10 +404,6 @@ literalt bv_utilst::adder(
       prop.lcnf({!sum[i], !first_op[i], !op[i], !sum[i-1], first_op[i-1]});
       prop.lcnf({!sum[i], !first_op[i], !op[i], !sum[i-1], op[i-1]});
     }
-
-    return prop.lor(
-      prop.land(first_op.back(), op.back()),
-      prop.land(!sum.back(), prop.lor(first_op.back(), op.back())));
   }
 }
 
@@ -418,8 +442,7 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
   bvt result=op0;
   bvt tmp_op1=subtract?inverted(op1):op1;
 
-  // we ignore the carry-out
-  (void)adder(result, tmp_op1, carry_in);
+  adder(result, tmp_op1, carry_in);
 
   return result;
 }
@@ -431,8 +454,7 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
 
   bvt result=op0;
 
-  // we ignore the carry-out
-  (void)adder(result, op1_sign_applied, subtract);
+  adder(result, op1_sign_applied, subtract);
 
   return result;
 }
@@ -452,7 +474,8 @@ bvt bv_utilst::saturating_add_sub(
   bvt add_sub_result = op0;
   bvt tmp_op1 = subtract ? inverted(op1) : op1;
 
-  literalt carry_out = adder(add_sub_result, tmp_op1, carry_in);
+  adder(add_sub_result, tmp_op1, carry_in);
+  literalt carry_out = carry_out_of_sum(prop, op0, tmp_op1, add_sub_result);
 
   bvt result;
   result.reserve(add_sub_result.size());
@@ -572,8 +595,7 @@ void bv_utilst::adder_no_overflow(
     literalt sign_the_same=
       prop.lequal(sum[sum.size()-1], tmp_op[tmp_op.size()-1]);
 
-    // we ignore the carry-out
-    (void)adder(sum, tmp_op, const_literal(subtract));
+    adder(sum, tmp_op, const_literal(subtract));
 
     // result of addition in sum
     prop.l_set_to_false(
@@ -584,14 +606,18 @@ void bv_utilst::adder_no_overflow(
     INVARIANT(
       rep == representationt::UNSIGNED,
       "representation has either value signed or unsigned");
-    literalt carry_out = adder(sum, tmp_op, const_literal(subtract));
+    bvt op0 = sum;
+    adder(sum, tmp_op, const_literal(subtract));
+    literalt carry_out = carry_out_of_sum(prop, op0, tmp_op, sum);
     prop.l_set_to(carry_out, subtract);
   }
 }
 
 void bv_utilst::adder_no_overflow(bvt &sum, const bvt &op)
 {
-  literalt carry_out = adder(sum, op, const_literal(false));
+  bvt op0 = sum;
+  adder(sum, op, const_literal(false));
+  literalt carry_out = carry_out_of_sum(prop, op0, op, sum);
   prop.l_set_to_false(carry_out); // enforce no overflow
 }
 
