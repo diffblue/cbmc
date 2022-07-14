@@ -2789,12 +2789,20 @@ public:
   member_exprt(exprt op, const irep_idt &component_name, typet _type)
     : unary_exprt(ID_member, std::move(op), std::move(_type))
   {
+    const auto &compound_type_id = compound().type().id();
+    PRECONDITION(
+      compound_type_id == ID_struct_tag || compound_type_id == ID_union_tag ||
+      compound_type_id == ID_struct || compound_type_id == ID_union);
     set_component_name(component_name);
   }
 
   member_exprt(exprt op, const struct_typet::componentt &c)
     : unary_exprt(ID_member, std::move(op), c.type())
   {
+    const auto &compound_type_id = compound().type().id();
+    PRECONDITION(
+      compound_type_id == ID_struct_tag || compound_type_id == ID_union_tag ||
+      compound_type_id == ID_struct || compound_type_id == ID_union);
     set_component_name(c.get_name());
   }
 
