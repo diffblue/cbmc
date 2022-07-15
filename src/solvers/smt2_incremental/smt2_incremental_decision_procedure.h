@@ -52,6 +52,12 @@ public:
   void push() override;
   void pop() override;
 
+  /// Gets the value of \p descriptor from the solver and returns the solver
+  /// response expressed as an exprt of type \p type. This is an implementation
+  /// detail of the `get(exprt)` member function.
+  exprt get_expr(const smt_termt &descriptor, const typet &type) const;
+  array_exprt get_expr(const smt_termt &array, const array_typet &type) const;
+
 protected:
   // Implementation of protected decision_proceduret member function.
   resultt dec_solve() override;
