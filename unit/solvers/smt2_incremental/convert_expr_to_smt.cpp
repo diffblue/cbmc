@@ -1358,20 +1358,20 @@ TEST_CASE(
     {
       config.bv_encoding.object_bits = 8;
       const auto converted = test.convert(address_of_foo);
-      CHECK(test.object_map.at(foo).unique_id == 1);
+      CHECK(test.object_map.at(foo).unique_id == 2);
       CHECK(
         converted == smt_bit_vector_theoryt::concat(
-                       smt_bit_vector_constant_termt{1, 8},
+                       smt_bit_vector_constant_termt{2, 8},
                        smt_bit_vector_constant_termt{0, 56}));
     }
     SECTION("16 object bits")
     {
       config.bv_encoding.object_bits = 16;
       const auto converted = test.convert(address_of_foo);
-      CHECK(test.object_map.at(foo).unique_id == 1);
+      CHECK(test.object_map.at(foo).unique_id == 2);
       CHECK(
         converted == smt_bit_vector_theoryt::concat(
-                       smt_bit_vector_constant_termt{1, 16},
+                       smt_bit_vector_constant_termt{2, 16},
                        smt_bit_vector_constant_termt{0, 48}));
     }
   }
@@ -1429,15 +1429,15 @@ TEST_CASE(
     track_expression_objects(comparison, ns, test.object_map);
     INFO("Expression " + comparison.pretty(1, 0));
     const auto converted = test.convert(comparison);
-    CHECK(test.object_map.at(foo).unique_id == 2);
-    CHECK(test.object_map.at(bar).unique_id == 1);
+    CHECK(test.object_map.at(foo).unique_id == 3);
+    CHECK(test.object_map.at(bar).unique_id == 2);
     CHECK(
       converted == smt_core_theoryt::distinct(
                      smt_bit_vector_theoryt::concat(
-                       smt_bit_vector_constant_termt{2, 8},
+                       smt_bit_vector_constant_termt{3, 8},
                        smt_bit_vector_constant_termt{0, 56}),
                      smt_bit_vector_theoryt::concat(
-                       smt_bit_vector_constant_termt{1, 8},
+                       smt_bit_vector_constant_termt{2, 8},
                        smt_bit_vector_constant_termt{0, 56})));
   }
 }
@@ -1543,7 +1543,7 @@ TEST_CASE(
   const object_size_exprt object_size{
     address_of_exprt{foo}, unsignedbv_typet{64}};
   track_expression_objects(object_size, ns, test.object_map);
-  const auto foo_id = 1;
+  const auto foo_id = 2;
   CHECK(test.object_map.at(foo).unique_id == foo_id);
   const auto object_bits = config.bv_encoding.object_bits;
   const auto object = smt_bit_vector_constant_termt{foo_id, object_bits};

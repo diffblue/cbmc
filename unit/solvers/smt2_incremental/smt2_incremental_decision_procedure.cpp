@@ -414,6 +414,9 @@ TEST_CASE(
   const auto null_object_size_definition =
     test.object_size_function.make_definition(
       0, smt_bit_vector_constant_termt{0, 32});
+  const auto invalid_pointer_object_size_definition =
+    test.object_size_function.make_definition(
+      1, smt_bit_vector_constant_termt{0, 32});
   const symbolt foo = make_test_symbol("foo", signedbv_typet{16});
   const smt_identifier_termt foo_term{"foo", smt_bit_vector_sortt{16}};
   const exprt expr_42 = from_integer({42}, signedbv_typet{16});
@@ -425,13 +428,23 @@ TEST_CASE(
     test.procedure.set_to(equal_42, true);
     test.mock_responses.push_back(smt_check_sat_responset{smt_sat_responset{}});
     test.procedure();
+    std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{foo_term, {}},
+      smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
+      invalid_pointer_object_size_definition,
+      null_object_size_definition,
+      smt_check_sat_commandt{}};
     REQUIRE(
-      test.sent_commands ==
-      std::vector<smt_commandt>{
-        smt_declare_function_commandt{foo_term, {}},
-        smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
-        null_object_size_definition,
-        smt_check_sat_commandt{}});
+      (test.sent_commands.size() == expected_commands.size() &&
+       std::all_of(
+         expected_commands.begin(),
+         expected_commands.end(),
+         [&](const smt_commandt &command) -> bool {
+           return std::find(
+                    test.sent_commands.begin(),
+                    test.sent_commands.end(),
+                    command) != test.sent_commands.end();
+         })));
     SECTION("Get \"foo\" value back")
     {
       test.sent_commands.clear();
