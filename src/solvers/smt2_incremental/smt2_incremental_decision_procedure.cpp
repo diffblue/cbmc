@@ -252,6 +252,59 @@ static optionalt<smt_termt> get_identifier(
   return {};
 }
 
+array_exprt smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &array,
+  const array_typet &type) const
+{
+  INVARIANT(
+    type.is_complete(), "Array size is required for getting array values.");
+  const auto size = numeric_cast<std::size_t>(get(type.size()));
+  INVARIANT(
+    size,
+    "Size of array must be convertible to std::size_t for getting array value");
+  std::vector<exprt> elements;
+  const auto index_type = type.index_type();
+  elements.reserve(*size);
+  for(std::size_t index = 0; index < size; ++index)
+  {
+    elements.push_back(get_expr(
+      smt_array_theoryt::select(
+        array,
+        ::convert_expr_to_smt(
+          from_integer(index, index_type),
+          object_map,
+          pointer_sizes_map,
+          object_size_function.make_application)),
+      type.element_type()));
+  }
+  return array_exprt{elements, type};
+}
+
+exprt smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &descriptor,
+  const typet &type) const
+{
+  const smt_get_value_commandt get_value_command{descriptor};
+  const smt_responset response =
+    get_response_to_command(*solver_process, get_value_command);
+  const auto get_value_response = response.cast<smt_get_value_responset>();
+  if(!get_value_response)
+  {
+    throw analysis_exceptiont{
+      "Expected get-value response from solver, but received - " +
+      response.pretty()};
+  }
+  if(get_value_response->pairs().size() > 1)
+  {
+    throw analysis_exceptiont{
+      "Expected single valuation pair in get-value response from solver, but "
+      "received multiple pairs - " +
+      response.pretty()};
+  }
+  return construct_value_expr_from_smt(
+    get_value_response->pairs()[0].get().value(), type);
+}
+
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
@@ -291,25 +344,13 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       return expr;
     }
   }
-  const smt_get_value_commandt get_value_command{*descriptor};
-  const smt_responset response =
-    get_response_to_command(*solver_process, get_value_command);
-  const auto get_value_response = response.cast<smt_get_value_responset>();
-  if(!get_value_response)
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
   {
-    throw analysis_exceptiont{
-      "Expected get-value response from solver, but received - " +
-      response.pretty()};
+    if(array_type->is_incomplete())
+      return expr;
+    return get_expr(*descriptor, *array_type);
   }
-  if(get_value_response->pairs().size() > 1)
-  {
-    throw analysis_exceptiont{
-      "Expected single valuation pair in get-value response from solver, but "
-      "received multiple pairs - " +
-      response.pretty()};
-  }
-  return construct_value_expr_from_smt(
-    get_value_response->pairs()[0].get().value(), expr.type());
+  return get_expr(*descriptor, expr.type());
 }
 
 void smt2_incremental_decision_proceduret::print_assignment(
