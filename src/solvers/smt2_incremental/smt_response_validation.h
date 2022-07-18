@@ -38,7 +38,8 @@ private:
   std::vector<std::string> messages;
 };
 
-NODISCARD response_or_errort<smt_responset>
-validate_smt_response(const irept &parse_tree);
+NODISCARD response_or_errort<smt_responset> validate_smt_response(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table);
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_RESPONSE_VALIDATION_H

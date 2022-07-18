@@ -27,12 +27,13 @@
 /// return a success status followed by the actual response of interest.
 static smt_responset get_response_to_command(
   smt_base_solver_processt &solver_process,
-  const smt_commandt &command)
+  const smt_commandt &command,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   solver_process.send(command);
-  auto response = solver_process.receive_response();
+  auto response = solver_process.receive_response(identifier_table);
   if(response.cast<smt_success_responset>())
-    return solver_process.receive_response();
+    return solver_process.receive_response(identifier_table);
   else
     return response;
 }
@@ -285,8 +286,8 @@ exprt smt2_incremental_decision_proceduret::get_expr(
   const typet &type) const
 {
   const smt_get_value_commandt get_value_command{descriptor};
-  const smt_responset response =
-    get_response_to_command(*solver_process, get_value_command);
+  const smt_responset response = get_response_to_command(
+    *solver_process, get_value_command, identifier_table);
   const auto get_value_response = response.cast<smt_get_value_responset>();
   if(!get_value_response)
   {
@@ -312,6 +313,7 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   });
   optionalt<smt_termt> descriptor =
     get_identifier(expr, expression_handle_identifiers, expression_identifiers);
+  
   if(!descriptor)
   {
     if(gather_dependent_expressions(expr).empty())
@@ -350,6 +352,7 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       return expr;
     return get_expr(*descriptor, *array_type);
   }
+
   return get_expr(*descriptor, expr.type());
 }
 
@@ -447,8 +450,8 @@ decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
   define_object_sizes();
-  const smt_responset result =
-    get_response_to_command(*solver_process, smt_check_sat_commandt{});
+  const smt_responset result = get_response_to_command(
+    *solver_process, smt_check_sat_commandt{}, identifier_table);
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
   {
     if(check_sat_response->kind().cast<smt_unknown_responset>())

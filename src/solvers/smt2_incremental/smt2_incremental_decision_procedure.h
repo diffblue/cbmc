@@ -119,6 +119,7 @@ protected:
   /// array expressions when support for them is implemented.
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
+  std::unordered_map<irep_idt, smt_identifier_termt> identifier_table;
   /// This map is used to track object related state. See documentation in
   /// object_tracking.h for details.
   smt_object_mapt object_map;

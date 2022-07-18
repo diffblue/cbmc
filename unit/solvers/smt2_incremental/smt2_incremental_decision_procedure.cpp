@@ -80,7 +80,9 @@ public:
     _send(smt_command);
   }
 
-  smt_responset receive_response() override
+  smt_responset receive_response(
+    const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
+    override
   {
     return _receive();
   }

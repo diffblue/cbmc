@@ -353,7 +353,9 @@ valid_smt_get_value_response(const irept &parse_tree)
   }
 }
 
-response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
+response_or_errort<smt_responset> validate_smt_response(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   if(parse_tree.id() == "sat")
     return response_or_errort<smt_responset>{
