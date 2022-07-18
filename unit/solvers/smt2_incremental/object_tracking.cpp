@@ -12,6 +12,36 @@
 #include <string>
 #include <utility>
 
+TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
+{
+  const typet base_type = pointer_typet{unsignedbv_typet{8}, 18};
+  const symbol_exprt object_base{"base", base_type};
+  const symbol_exprt index{"index", base_type};
+  const pointer_typet pointer_type{base_type, 12};
+  std::string description;
+  optionalt<address_of_exprt> address_of;
+  using rowt = std::pair<std::string, address_of_exprt>;
+  std::tie(description, address_of) = GENERATE_REF(
+    rowt{"Address of symbol", {object_base, pointer_type}},
+    rowt{"Address of index", {index_exprt{object_base, index}, pointer_type}},
+    rowt{
+      "Address of struct member",
+      {member_exprt{object_base, "baz", unsignedbv_typet{8}}, pointer_type}},
+    rowt{
+      "Address of index of struct member",
+      {index_exprt{member_exprt{object_base, "baz", base_type}, index},
+       pointer_type}},
+    rowt{
+      "Address of struct member at index",
+      {member_exprt{
+         index_exprt{object_base, index}, "baz", unsignedbv_typet{8}},
+       pointer_type}});
+  SECTION(description)
+  {
+    CHECK(find_object_base_expression(*address_of) == object_base);
+  }
+}
+
 TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
 {
   const typet base_type = pointer_typet{signedbv_typet{16}, 18};
