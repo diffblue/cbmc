@@ -817,24 +817,32 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
   if(object.id()==ID_member)
   {
     const member_exprt &o_mem=to_member_expr(object);
-    dest=member_exprt(exprt(), o_mem.get_component_name(), abstract_type);
-    return build_wrap(
-      o_mem.struct_op(), to_member_expr(dest).compound(), write);
+    exprt compound;
+    if(build_wrap(o_mem.struct_op(), compound, write))
+      return true;
+    dest = member_exprt{
+      std::move(compound), o_mem.get_component_name(), abstract_type};
+    return false;
   }
 
   if(object.id()==ID_dereference)
   {
     const dereference_exprt &o_deref=to_dereference_expr(object);
-    dest=dereference_exprt(exprt(), abstract_type);
-    return build_wrap(
-      o_deref.pointer(), to_dereference_expr(dest).pointer(), write);
+    exprt pointer;
+    if(build_wrap(o_deref.pointer(), pointer, write))
+      return true;
+    dest = dereference_exprt{std::move(pointer)};
+    return false;
   }
 
   if(object.id()==ID_index)
   {
     const index_exprt &o_index=to_index_expr(object);
-    dest=index_exprt(exprt(), o_index.index(), abstract_type);
-    return build_wrap(o_index.array(), to_index_expr(dest).array(), write);
+    exprt array;
+    if(build_wrap(o_index.array(), array, write))
+      return true;
+    dest = index_exprt{std::move(array), o_index.index()};
+    return false;
   }
 
   // handle pointer stuff

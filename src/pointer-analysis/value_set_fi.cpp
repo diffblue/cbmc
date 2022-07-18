@@ -916,11 +916,10 @@ void value_set_fit::get_reference_set_sharing_rec(
       if(object.id()==ID_unknown)
         insert(dest, exprt(ID_unknown, expr.type()));
       else if(
-        object.id() == ID_dynamic_object && obj_type.id() != ID_struct &&
-        obj_type.id() != ID_union && obj_type.id() != ID_struct_tag &&
-        obj_type.id() != ID_union_tag)
+        obj_type.id() != ID_struct && obj_type.id() != ID_union &&
+        obj_type.id() != ID_struct_tag && obj_type.id() != ID_union_tag)
       {
-        // we catch dynamic objects of the wrong type,
+        // we catch objects of the wrong type,
         // to avoid non-integral typecasts.
         insert(dest, exprt(ID_unknown, expr.type()));
       }

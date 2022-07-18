@@ -1192,7 +1192,10 @@ void value_sett::get_reference_set_rec(
 
       if(object.id()==ID_unknown)
         insert(dest, exprt(ID_unknown, expr.type()));
-      else
+      else if(
+        object.type().id() == ID_struct ||
+        object.type().id() == ID_struct_tag || object.type().id() == ID_union ||
+        object.type().id() == ID_union_tag)
       {
         offsett o = it->second;
 
@@ -1218,6 +1221,8 @@ void value_sett::get_reference_set_rec(
         else
           insert(dest, exprt(ID_unknown, expr.type()));
       }
+      else
+        insert(dest, exprt(ID_unknown, expr.type()));
     }
 
     return;

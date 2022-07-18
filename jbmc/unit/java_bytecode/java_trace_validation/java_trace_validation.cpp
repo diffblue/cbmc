@@ -22,12 +22,13 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
 {
   const exprt plain_expr = exprt();
   const exprt expr_with_data = exprt("id", java_int_type());
-  const symbol_exprt valid_symbol_expr = symbol_exprt("id", java_int_type());
+  const symbol_exprt valid_symbol_expr =
+    symbol_exprt("id", struct_typet{{{"member", java_int_type()}}});
   const symbol_exprt invalid_symbol_expr = symbol_exprt(java_int_type());
   const member_exprt valid_member =
     member_exprt(valid_symbol_expr, "member", java_int_type());
-  const member_exprt invalid_member =
-    member_exprt(plain_expr, "member", java_int_type());
+  exprt invalid_member = unary_exprt{ID_member, plain_expr, java_int_type()};
+  invalid_member.set(ID_component_name, "member");
   const constant_exprt invalid_constant = constant_exprt("", java_int_type());
   const constant_exprt valid_constant = constant_exprt("0", java_int_type());
   const index_exprt valid_index = index_exprt(
@@ -88,7 +89,8 @@ TEST_CASE("java trace validation", "[core][java_trace_validation]")
     INFO("valid member structure")
     REQUIRE(check_member_structure(valid_member));
     INFO("invalid member structure, no symbol operand")
-    REQUIRE_FALSE(check_member_structure(invalid_member));
+    REQUIRE_FALSE(check_member_structure(
+      static_cast<const member_exprt &>(invalid_member)));
   }
 
   SECTION("can_evaluate_to_constant")

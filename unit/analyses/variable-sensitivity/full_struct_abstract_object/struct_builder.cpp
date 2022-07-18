@@ -19,6 +19,10 @@ full_struct_abstract_objectt::constant_struct_pointert build_struct(
 
   auto struct_type = to_struct_type(starting_value.type());
   size_t comp_index = 0;
+
+  auto nil_with_type = nil_exprt();
+  nil_with_type.type() = struct_type;
+
   for(const exprt &op : starting_value.operands())
   {
     const auto &component = struct_type.components()[comp_index];
@@ -26,7 +30,7 @@ full_struct_abstract_objectt::constant_struct_pointert build_struct(
       environment,
       ns,
       std::stack<exprt>(),
-      member_exprt(nil_exprt(), component.get_name(), component.type()),
+      member_exprt(nil_with_type, component.get_name(), component.type()),
       environment.eval(op, ns),
       false);
 

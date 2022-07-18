@@ -135,7 +135,8 @@ SCENARIO(
     WHEN("We query what (a1 WITH x = NULL).x points to")
     {
       with_exprt a1_with(
-        a1_symbol.symbol_expr(), member_exprt(nil_exprt(), A_x), null_A_ptr);
+        a1_symbol.symbol_expr(), exprt{ID_member_name}, null_A_ptr);
+      a1_with.where().set(ID_component_name, A_x.get_name());
 
       member_exprt member_of_with(a1_with, A_x);
 
@@ -153,7 +154,8 @@ SCENARIO(
     WHEN("We query what (a1 WITH x = NULL).y points to")
     {
       with_exprt a1_with(
-        a1_symbol.symbol_expr(), member_exprt(nil_exprt(), A_x), null_A_ptr);
+        a1_symbol.symbol_expr(), exprt{ID_member_name}, null_A_ptr);
+      a1_with.where().set(ID_component_name, A_x.get_name());
 
       member_exprt member_of_with(a1_with, A_y);
 
@@ -171,7 +173,8 @@ SCENARIO(
     WHEN("We query what (a1 WITH x = NULL) points to")
     {
       with_exprt a1_with(
-        a1_symbol.symbol_expr(), member_exprt(nil_exprt(), A_x), null_A_ptr);
+        a1_symbol.symbol_expr(), exprt{ID_member_name}, null_A_ptr);
+      a1_with.where().set(ID_component_name, A_x.get_name());
 
       const std::vector<exprt> maybe_matching_with_result =
         value_set.get_value_set(a1_with, ns);

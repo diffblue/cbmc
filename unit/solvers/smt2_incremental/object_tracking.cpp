@@ -12,41 +12,12 @@
 #include <string>
 #include <utility>
 
-TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
-{
-  const typet base_type = pointer_typet{unsignedbv_typet{8}, 18};
-  const symbol_exprt object_base{"base", base_type};
-  const symbol_exprt index{"index", base_type};
-  const pointer_typet pointer_type{base_type, 12};
-  std::string description;
-  optionalt<address_of_exprt> address_of;
-  using rowt = std::pair<std::string, address_of_exprt>;
-  std::tie(description, address_of) = GENERATE_REF(
-    rowt{"Address of symbol", {object_base, pointer_type}},
-    rowt{"Address of index", {index_exprt{object_base, index}, pointer_type}},
-    rowt{
-      "Address of struct member",
-      {member_exprt{object_base, "baz", unsignedbv_typet{8}}, pointer_type}},
-    rowt{
-      "Address of index of struct member",
-      {index_exprt{member_exprt{object_base, "baz", base_type}, index},
-       pointer_type}},
-    rowt{
-      "Address of struct member at index",
-      {member_exprt{
-         index_exprt{object_base, index}, "baz", unsignedbv_typet{8}},
-       pointer_type}});
-  SECTION(description)
-  {
-    CHECK(find_object_base_expression(*address_of) == object_base);
-  }
-}
-
 TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
 {
   const typet base_type = pointer_typet{signedbv_typet{16}, 18};
   const symbol_exprt foo{"foo", base_type};
   const symbol_exprt bar{"bar", base_type};
+  const symbol_exprt qux{"qux", struct_typet{}};
   const symbol_exprt index{"index", base_type};
   const pointer_typet pointer_type{base_type, 32};
   const exprt bar_address = address_of_exprt{bar, pointer_type};
@@ -55,7 +26,7 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
       address_of_exprt{index_exprt{foo, index}, pointer_type}, bar_address},
     notequal_exprt{
       address_of_exprt{
-        member_exprt{foo, "baz", unsignedbv_typet{8}}, pointer_type},
+        member_exprt(qux, "baz", unsignedbv_typet{8}), pointer_type},
       bar_address}};
   SECTION("Find base expressions")
   {
@@ -63,7 +34,7 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
     find_object_base_expressions(compound_expression, [&](const exprt &expr) {
       expressions.push_back(expr);
     });
-    CHECK(expressions == std::vector<exprt>{bar, foo, bar, foo});
+    CHECK(expressions == std::vector<exprt>{bar, qux, bar, foo});
   }
   smt_object_mapt object_map = initial_smt_object_map();
   SECTION("Check initial object map has null pointer")
@@ -83,11 +54,11 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
   track_expression_objects(compound_expression, ns, object_map);
   SECTION("Tracking expression objects")
   {
-    CHECK(object_map.size() == 3);
+    CHECK(object_map.size() == 4);
     const auto foo_object = object_map.find(foo);
     REQUIRE(foo_object != object_map.end());
     CHECK(foo_object->second.base_expression == foo);
-    CHECK(foo_object->second.unique_id == 2);
+    CHECK(foo_object->second.unique_id == 3);
     const auto bar_object = object_map.find(bar);
     REQUIRE(bar_object != object_map.end());
     CHECK(bar_object->second.base_expression == bar);

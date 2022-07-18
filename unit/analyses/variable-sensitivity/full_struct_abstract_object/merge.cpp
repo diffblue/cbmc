@@ -33,10 +33,13 @@ SCENARIO(
     // struct val2 = {.a = 1, .b = 4, .c = 5}
     auto val2 = std::map<std::string, int>{{"a", 1}, {"b", 4}, {"c", 5}};
 
-    // index_exprt for reading from an array
-    const member_exprt a(nil_exprt(), "a", integer_typet());
-    const member_exprt b(nil_exprt(), "b", integer_typet());
-    const member_exprt c(nil_exprt(), "c", integer_typet());
+    // member_exprt for reading from a struct
+    exprt dummy = nil_exprt{};
+    dummy.type() = struct_typet{
+      {{"a", integer_typet{}}, {"b", integer_typet{}}, {"c", integer_typet{}}}};
+    const auto a = member_exprt(dummy, "a", integer_typet());
+    const auto b = member_exprt(dummy, "b", integer_typet());
+    const auto c = member_exprt(dummy, "c", integer_typet());
 
     auto object_factory = variable_sensitivity_object_factoryt::configured_with(
       vsd_configt::constant_domain());
