@@ -53,7 +53,8 @@ static void handle_invalid_smt(
   throw analysis_exceptiont{"Invalid SMT response received from solver."};
 }
 
-smt_responset smt_piped_solver_processt::receive_response()
+smt_responset smt_piped_solver_processt::receive_response(
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   const auto response_text = process.wait_receive();
   log.debug() << "Solver response - " << response_text << messaget::eom;
@@ -61,7 +62,8 @@ smt_responset smt_piped_solver_processt::receive_response()
   const auto parse_tree = smt2irep(response_stream, log.get_message_handler());
   if(!parse_tree)
     throw deserialization_exceptiont{"Incomplete SMT response."};
-  const auto validation_result = validate_smt_response(*parse_tree);
+  const auto validation_result =
+    validate_smt_response(*parse_tree, identifier_table);
   if(const auto validation_errors = validation_result.get_if_error())
     handle_invalid_smt(*validation_errors, log);
   return *validation_result.get_if_valid();
