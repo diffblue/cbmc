@@ -2,7 +2,6 @@
 
 #include <util/c_types.h>
 #include <util/namespace.h>
-#include <util/optional.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -18,27 +17,36 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
   const symbol_exprt object_base{"base", base_type};
   const symbol_exprt index{"index", base_type};
   const pointer_typet pointer_type{base_type, 12};
-  std::string description;
-  optionalt<address_of_exprt> address_of;
-  using rowt = std::pair<std::string, address_of_exprt>;
-  std::tie(description, address_of) = GENERATE_REF(
-    rowt{"Address of symbol", {object_base, pointer_type}},
-    rowt{"Address of index", {index_exprt{object_base, index}, pointer_type}},
-    rowt{
-      "Address of struct member",
-      {member_exprt{object_base, "baz", unsignedbv_typet{8}}, pointer_type}},
-    rowt{
-      "Address of index of struct member",
-      {index_exprt{member_exprt{object_base, "baz", base_type}, index},
-       pointer_type}},
-    rowt{
-      "Address of struct member at index",
-      {member_exprt{
-         index_exprt{object_base, index}, "baz", unsignedbv_typet{8}},
-       pointer_type}});
-  SECTION(description)
+  SECTION("Address of symbol")
   {
-    CHECK(find_object_base_expression(*address_of) == object_base);
+    const address_of_exprt address_of{object_base, pointer_type};
+    CHECK(find_object_base_expression(address_of) == object_base);
+  }
+  SECTION("Address of index")
+  {
+    const address_of_exprt address_of{
+      index_exprt{object_base, index}, pointer_type};
+    CHECK(find_object_base_expression(address_of) == object_base);
+  }
+  SECTION("Address of struct member")
+  {
+    const address_of_exprt address_of{
+      member_exprt{object_base, "baz", unsignedbv_typet{8}}, pointer_type};
+    CHECK(find_object_base_expression(address_of) == object_base);
+  }
+  SECTION("Address of index of struct member")
+  {
+    const address_of_exprt address_of{
+      index_exprt{member_exprt{object_base, "baz", base_type}, index},
+      pointer_type};
+    CHECK(find_object_base_expression(address_of) == object_base);
+  }
+  SECTION("Address of struct member at index")
+  {
+    const address_of_exprt address_of{
+      member_exprt{index_exprt{object_base, index}, "baz", unsignedbv_typet{8}},
+      pointer_type};
+    CHECK(find_object_base_expression(address_of) == object_base);
   }
 }
 
