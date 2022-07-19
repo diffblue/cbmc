@@ -1,5 +1,6 @@
 // Author: Diffblue Ltd.
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
@@ -13,39 +14,63 @@
 
 TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
 {
-  const typet base_type = pointer_typet{unsignedbv_typet{8}, 18};
-  const symbol_exprt object_base{"base", base_type};
-  const symbol_exprt index{"index", base_type};
-  const pointer_typet pointer_type{base_type, 12};
+  const std::size_t pointer_bits = 64;
   SECTION("Address of symbol")
   {
-    const address_of_exprt address_of{object_base, pointer_type};
+    const typet base_type = unsignedbv_typet{8};
+    const symbol_exprt object_base{"base", base_type};
+    const address_of_exprt address_of{
+      object_base, pointer_typet{base_type, pointer_bits}};
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of index")
   {
+    const unsignedbv_typet element_type{8};
+    const signedbv_typet index_type{pointer_bits};
+    const array_typet base_type{element_type, from_integer(42, index_type)};
+    const symbol_exprt object_base{"base", base_type};
+    const symbol_exprt index{"index", index_type};
+    const pointer_typet pointer_type{element_type, pointer_bits};
     const address_of_exprt address_of{
       index_exprt{object_base, index}, pointer_type};
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of struct member")
   {
+    const struct_tag_typet base_type{"structt"};
+    const symbol_exprt object_base{"base", base_type};
+    const unsignedbv_typet member_type{8};
     const address_of_exprt address_of{
-      member_exprt{object_base, "baz", unsignedbv_typet{8}}, pointer_type};
+      member_exprt{object_base, "baz", member_type},
+      pointer_typet{member_type, pointer_bits}};
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of index of struct member")
   {
+    const struct_tag_typet base_type{"structt"};
+    const symbol_exprt object_base{"base", base_type};
+
+    const unsignedbv_typet element_type{8};
+    const signedbv_typet index_type{pointer_bits};
+    const array_typet member_type{element_type, from_integer(42, index_type)};
+    const symbol_exprt index{"index", index_type};
+
     const address_of_exprt address_of{
-      index_exprt{member_exprt{object_base, "baz", base_type}, index},
-      pointer_type};
+      index_exprt{member_exprt{object_base, "baz", member_type}, index},
+      pointer_typet{element_type, pointer_bits}};
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of struct member at index")
   {
+    const struct_tag_typet element_type{"struct_elementt"};
+    const signedbv_typet index_type{pointer_bits};
+    const array_typet base_type{element_type, from_integer(42, index_type)};
+    const symbol_exprt object_base{"base", base_type};
+    const symbol_exprt index{"index", index_type};
+    const unsignedbv_typet member_type{8};
     const address_of_exprt address_of{
-      member_exprt{index_exprt{object_base, index}, "baz", unsignedbv_typet{8}},
-      pointer_type};
+      member_exprt{index_exprt{object_base, index}, "qux", member_type},
+      pointer_typet{member_type, pointer_bits}};
     CHECK(find_object_base_expression(address_of) == object_base);
   }
 }
