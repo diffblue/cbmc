@@ -21,6 +21,7 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
     const symbol_exprt object_base{"base", base_type};
     const address_of_exprt address_of{
       object_base, pointer_typet{base_type, pointer_bits}};
+    INFO("Address of expression is: " + address_of.pretty(2, 0));
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of index")
@@ -33,6 +34,7 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
     const pointer_typet pointer_type{element_type, pointer_bits};
     const address_of_exprt address_of{
       index_exprt{object_base, index}, pointer_type};
+    INFO("Address of expression is: " + address_of.pretty(2, 0));
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of struct member")
@@ -43,6 +45,7 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
     const address_of_exprt address_of{
       member_exprt{object_base, "baz", member_type},
       pointer_typet{member_type, pointer_bits}};
+    INFO("Address of expression is: " + address_of.pretty(2, 0));
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of index of struct member")
@@ -58,6 +61,7 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
     const address_of_exprt address_of{
       index_exprt{member_exprt{object_base, "baz", member_type}, index},
       pointer_typet{element_type, pointer_bits}};
+    INFO("Address of expression is: " + address_of.pretty(2, 0));
     CHECK(find_object_base_expression(address_of) == object_base);
   }
   SECTION("Address of struct member at index")
@@ -71,6 +75,7 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
     const address_of_exprt address_of{
       member_exprt{index_exprt{object_base, index}, "qux", member_type},
       pointer_typet{member_type, pointer_bits}};
+    INFO("Address of expression is: " + address_of.pretty(2, 0));
     CHECK(find_object_base_expression(address_of) == object_base);
   }
 }
