@@ -90,8 +90,5 @@ bool process_goto_program(
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 
-  // add loop ids
-  goto_model.goto_functions.compute_loop_numbers();
-
   return false;
 }
