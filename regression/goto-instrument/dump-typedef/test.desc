@@ -1,0 +1,13 @@
+CORE
+main.c
+--dump-c --use-all-headers
+#include <(stdint.h|_types/_intmax_t.h)>
+intmax_t
+^EXIT=0$
+^SIGNAL=0$
+--
+typedef
+^warning: ignoring
+--
+Dump-c with --use-all-headers should re-generate the #include and not print a
+local typedef statement for intmax_t instead.

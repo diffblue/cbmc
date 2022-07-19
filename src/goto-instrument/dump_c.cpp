@@ -733,9 +733,6 @@ void dump_ct::collect_typedefs_rec(
   bool early,
   std::unordered_set<irep_idt> &dependencies)
 {
-  if(system_symbols.is_type_internal(type, system_headers))
-    return;
-
   std::unordered_set<irep_idt> local_deps;
 
   if(type.id()==ID_code)

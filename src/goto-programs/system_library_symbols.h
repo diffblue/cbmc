@@ -35,10 +35,6 @@ public:
     const symbolt &symbol,
     std::set<std::string> &out_system_headers) const;
 
-  bool is_type_internal(
-    const typet &type,
-    std::set<std::string> &out_system_headers) const;
-
   void set_use_all_headers(bool use)
   {
     use_all_headers=use;
