@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 -Dlocals_bug
 ^EXIT=0$
@@ -7,12 +7,6 @@ main.c
 --
 ^warning: ignoring
 --
-There is a need for further debugging around copying local objects in
-the procedure spawning threads as we generate the following non-sensical
-constraint:
-// 28 file regression/cbmc-concurrency/dirty_local3/main.c line 3 function worker
-(57) CONSTRAINT(z!1@0#2 == z!1@0 || !choice_rf0)
-                ^^^^^^^^^^^^^^^^
-                comparison of L2 and L1 SSA symbols
-// 28 file regression/cbmc-concurrency/dirty_local3/main.c line 3 function worker
-(58) CONSTRAINT(choice_rf0)
+We previously missed SHARED_WRITE events in program order in a newly-spawned
+thread for dirty locals, resulting in spurious failures as reading from initial
+values seemed possible.
