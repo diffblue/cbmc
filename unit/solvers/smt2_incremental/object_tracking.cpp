@@ -17,6 +17,8 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
   const std::size_t pointer_bits = 64;
   SECTION("Address of symbol")
   {
+    // Constructed address of expression should be equivalent to the following
+    // C expression - `&base`.
     const typet base_type = unsignedbv_typet{8};
     const symbol_exprt object_base{"base", base_type};
     const address_of_exprt address_of{
@@ -26,6 +28,8 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
   }
   SECTION("Address of index")
   {
+    // Constructed address of expression should be equivalent to the following
+    // C expression - `&(base[index])`.
     const unsignedbv_typet element_type{8};
     const signedbv_typet index_type{pointer_bits};
     const array_typet base_type{element_type, from_integer(42, index_type)};
@@ -39,6 +43,8 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
   }
   SECTION("Address of struct member")
   {
+    // Constructed address of expression should be equivalent to the following
+    // C expression - `&(base.baz)`.
     const struct_tag_typet base_type{"structt"};
     const symbol_exprt object_base{"base", base_type};
     const unsignedbv_typet member_type{8};
@@ -50,6 +56,8 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
   }
   SECTION("Address of index of struct member")
   {
+    // Constructed address of expression should be equivalent to the following
+    // C expression - `&(base.baz[index])`.
     const struct_tag_typet base_type{"structt"};
     const symbol_exprt object_base{"base", base_type};
 
@@ -66,6 +74,8 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
   }
   SECTION("Address of struct member at index")
   {
+    // Constructed address of expression should be equivalent to the following
+    // C expression - `&(base[index].qux)`.
     const struct_tag_typet element_type{"struct_elementt"};
     const signedbv_typet index_type{pointer_bits};
     const array_typet base_type{element_type, from_integer(42, index_type)};
