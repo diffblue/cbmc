@@ -1409,6 +1409,7 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
 class index_exprt:public binary_exprt
 {
 public:
+  // _array must have either index or vector type.
   // When _array has array_type, the type of _index
   // must be array_type.index_type().
   // This will eventually be enforced using a precondition.
@@ -1419,6 +1420,9 @@ public:
         std::move(_index),
         to_type_with_subtype(_array.type()).subtype())
   {
+    const auto &array_op_type = _array.type();
+    PRECONDITION(
+      array_op_type.id() == ID_array || array_op_type.id() == ID_vector);
   }
 
   index_exprt(exprt _array, exprt _index, typet _type)
@@ -1428,6 +1432,9 @@ public:
         std::move(_index),
         std::move(_type))
   {
+    const auto &array_op_type = array().type();
+    PRECONDITION(
+      array_op_type.id() == ID_array || array_op_type.id() == ID_vector);
   }
 
   exprt &array()

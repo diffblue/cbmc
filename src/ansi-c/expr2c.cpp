@@ -1401,15 +1401,10 @@ std::string expr2ct::convert_unary_post(
   return dest;
 }
 
-std::string expr2ct::convert_index(
-  const exprt &src,
-  unsigned precedence)
+std::string expr2ct::convert_index(const binary_exprt &src, unsigned precedence)
 {
-  if(src.operands().size()!=2)
-    return convert_norep(src, precedence);
-
   unsigned p;
-  std::string op = convert_with_precedence(to_index_expr(src).array(), p);
+  std::string op = convert_with_precedence(src.op0(), p);
 
   std::string dest;
   if(precedence>p)
@@ -1419,7 +1414,7 @@ std::string expr2ct::convert_index(
     dest+=')';
 
   dest+='[';
-  dest += convert(to_index_expr(src).index());
+  dest += convert(src.op1());
   dest+=']';
 
   return dest;
@@ -3680,15 +3675,14 @@ std::string expr2ct::convert_with_precedence(
       to_plus_expr(pointer).op0().type().id() == ID_pointer)
     {
       // Note that index[pointer] is legal C, but we avoid it nevertheless.
-      return convert(
-        index_exprt(to_plus_expr(pointer).op0(), to_plus_expr(pointer).op1()));
+      return convert_index(to_binary_expr(pointer), precedence = 16);
     }
     else
       return convert_unary(to_unary_expr(src), "*", precedence = 15);
   }
 
   else if(src.id()==ID_index)
-    return convert_index(src, precedence=16);
+    return convert_index(to_binary_expr(src), precedence = 16);
 
   else if(src.id()==ID_member)
     return convert_member(to_member_expr(src), precedence=16);
