@@ -976,13 +976,23 @@ bvt bv_utilst::multiplier(
   const bvt &op1,
   representationt rep)
 {
+  auto cache_entry =
+    circuit_cache[{ID_mult, rep}].insert({{op0, op1}, {bvt{}}});
+  if(!cache_entry.second)
+    return cache_entry.first->second[0];
+
   switch(rep)
   {
-  case representationt::SIGNED: return signed_multiplier(op0, op1);
-  case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
+  case representationt::SIGNED:
+    cache_entry.first->second[0] = signed_multiplier(op0, op1);
+  case representationt::UNSIGNED:
+    cache_entry.first->second[0] = unsigned_multiplier(op0, op1);
   }
 
-  UNREACHABLE;
+  // multiplication is commutative
+  circuit_cache[{ID_mult, rep}][{op1, op0}] = {cache_entry.first->second};
+
+  return cache_entry.first->second[0];
 }
 
 bvt bv_utilst::multiplier_no_overflow(
@@ -1045,6 +1055,15 @@ void bv_utilst::divider(
 {
   PRECONDITION(prop.has_set_to());
 
+  auto cache_entry =
+    circuit_cache[{ID_div, rep}].insert({{op0, op1}, {bvt{}, bvt{}}});
+  if(!cache_entry.second)
+  {
+    result = cache_entry.first->second[0];
+    remainer = cache_entry.first->second[1];
+    return;
+  }
+
   switch(rep)
   {
   case representationt::SIGNED:
@@ -1052,6 +1071,9 @@ void bv_utilst::divider(
   case representationt::UNSIGNED:
     unsigned_divider(op0, op1, result, remainer); break;
   }
+
+  cache_entry.first->second[0] = result;
+  cache_entry.first->second[1] = remainer;
 }
 
 void bv_utilst::unsigned_divider(
