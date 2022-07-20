@@ -945,8 +945,7 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   function_pointer_removal_done=true;
 
   log.status() << "Function Pointer Removal" << messaget::eom;
-  remove_function_pointers(
-    ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+  remove_function_pointers(ui_message_handler, goto_model, false);
   log.status() << "Virtual function removal" << messaget::eom;
   remove_virtual_functions(goto_model);
   log.status() << "Cleaning inline assembler statements" << messaget::eom;
@@ -969,7 +968,6 @@ void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
   remove_function_pointers(
     ui_message_handler,
     goto_model,
-    cmdline.isset("pointer-check"),
     true); // abort if we can't resolve via const pointers
 }
 

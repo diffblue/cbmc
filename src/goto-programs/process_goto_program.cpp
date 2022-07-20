@@ -42,10 +42,7 @@ bool process_goto_program(
   // remove function pointers
   log.status() << "Removal of function pointers and virtual functions"
                << messaget::eom;
-  remove_function_pointers(
-    log.get_message_handler(),
-    goto_model,
-    options.get_bool_option("pointer-check"));
+  remove_function_pointers(log.get_message_handler(), goto_model, false);
 
   mm_io(goto_model);
 

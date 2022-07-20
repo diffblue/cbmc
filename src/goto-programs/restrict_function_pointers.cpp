@@ -79,8 +79,7 @@ static void restrict_function_pointer(
     goto_program,
     function_id,
     location,
-    candidates,
-    true);
+    candidates);
 }
 } // namespace
 

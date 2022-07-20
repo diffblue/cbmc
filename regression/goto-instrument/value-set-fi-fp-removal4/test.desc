@@ -1,9 +1,11 @@
 CORE
 test.c
 --value-set-fi-fp-removal
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
 ^file test.c line 20 function main: replacing function pointer by 2 possible targets$
+\[main.pointer_dereference.1\] line 20 dereferenced function pointer must be one of \[(g, f|f, g)\]: FAILURE$
+--
 --
 This test checks that the value-set-fi-based function pointer removal
 precisely identifies the function to call for a particular function pointer

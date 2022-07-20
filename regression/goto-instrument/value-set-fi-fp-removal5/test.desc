@@ -1,9 +1,11 @@
 CORE
 test.c
 --value-set-fi-fp-removal
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
 ^file test.c line 19 function main: replacing function pointer by 0 possible targets$
+\[main.pointer_dereference.1\] line 19 no candidates for dereferenced function pointer: FAILURE$
+--
 --
 This test checks that the value-set-fi-based function pointer removal
 precisely identifies the function to call for a particular function pointer

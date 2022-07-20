@@ -172,8 +172,7 @@ bool jdiff_parse_optionst::process_goto_program(
   // remove function pointers
   log.status() << "Removing function pointers and virtual functions"
                << messaget::eom;
-  remove_function_pointers(
-    ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+  remove_function_pointers(ui_message_handler, goto_model, false);
 
   // Java virtual functions -> explicit dispatch tables:
   remove_virtual_functions(goto_model);

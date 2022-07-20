@@ -4,7 +4,7 @@ module.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\*\* 1 of 2 failed
+^\*\* 1 of 3 failed
 line 21 assertion \*g\.a == 42: SUCCESS
 line 22 assertion \*g\.b == 41: FAILURE
 --
