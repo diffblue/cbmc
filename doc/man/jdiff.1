@@ -1,1 +1,82 @@
-cbmc.1
+.TH JDIFF "1" "June 2022" "jdiff-5.59.0" "User Commands"
+.SH NAME
+jdiff \- Syntactic diff of goto programs obtained from Java bytecode
+.SH SYNOPSIS
+.TP
+.B jdiff [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B jdiff old new
+jars to be compared
+.SH DESCRIPTION
+.SH OPTIONS
+.SS "Diff options:"
+.TP
+\fB\-\-show\-goto\-functions\fR
+show loaded goto program
+.TP
+\fB\-\-list\-goto\-functions\fR
+list loaded goto functions
+.TP
+\fB\-\-show\-properties\fR
+show the properties, but don't run analysis
+.TP
+\fB\-\-show\-loops\fR
+show the loops in the programs
+.TP
+\fB\-u\fR | \fB\-\-unified\fR
+output unified diff
+.HP
+\fB\-\-change\-impact\fR |
+.HP
+\fB\-\-forward\-impact\fR |
+.TP
+\fB\-\-backward\-impact\fR
+output unified diff with forward&backward/forward/backward dependencies
+.TP
+\fB\-\-compact\-output\fR
+output dependencies in compact mode
+.SS "Program instrumentation options:"
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-no\-assumptions\fR
+ignore user assumptions
+.TP
+\fB\-\-cover\fR CC
+Add instrumentation as used with \fBjbmc\fR(1) for creating test\-suite with
+coverage criterion CC, where CC is one of assertion[s], assume[s], branch[es],
+condition[s], cover, decision[s], location[s], or mcdc.
+.TP
+\fB\-\-cover\-failed\-assertions\fR
+do not stop coverage checking at failed assertions
+(this is the default for \fB\-\-cover\fR assertions)
+.TP
+\fB\-\-show\-test\-suite\fR
+print test suite for coverage criterion (requires \fB\-\-cover\fR)
+.SS "Other options:"
+.TP
+\fB\-\-version\fR
+show version and exit
+.TP
+\fB\-\-json\-ui\fR
+use JSON\-formatted output
+.TP
+\fB\-\-verbosity\fR \fIn\fR
+verbosity level
+.TP
+\fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
+Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
+monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR jbmc (1),
+.BR goto-analyzer (1)
+.SH COPYRIGHT
+2016\-2018, Daniel Kroening, Peter Schrammel
