@@ -93,7 +93,8 @@ TEST_CASE("find_object_base_expression", "[core][smt2_incremental]")
 TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
 {
   const typet base_type = pointer_typet{signedbv_typet{16}, 18};
-  const symbol_exprt foo{"foo", base_type};
+  const symbol_exprt foo{
+    "foo", array_typet(base_type, from_integer(2, size_type()))};
   const symbol_exprt bar{"bar", base_type};
   const symbol_exprt qux{"qux", struct_typet{}};
   const symbol_exprt index{"index", base_type};
