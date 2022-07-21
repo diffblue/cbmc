@@ -21,7 +21,13 @@
 #include <util/mp_arith.h>
 #include <util/range.h>
 
+#include "smt_array_theory.h"
+
 #include <regex>
+
+static response_or_errort<smt_termt> validate_term(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table);
 
 template <class smtt>
 response_or_errort<smtt>::response_or_errort(smtt smt) : smt{std::move(smt)}
@@ -271,6 +277,30 @@ valid_smt_bit_vector_constant(const irept &parse_tree)
   return {};
 }
 
+static optionalt<response_or_errort<smt_termt>> try_select_validation(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
+{
+  if(parse_tree.get_sub().empty())
+    return {};
+  if(parse_tree.get_sub()[0].id() != "select")
+    return {};
+  if(parse_tree.get_sub().size() != 3)
+  {
+    return response_or_errort<smt_termt>{
+      "\"select\" is expected to have 2 arguments, but " +
+      std::to_string(parse_tree.get_sub().size()) +
+      " arguments were found - \"" + print_parse_tree(parse_tree) + "\"."};
+  }
+  const auto array = validate_term(parse_tree.get_sub()[1], identifier_table);
+  const auto index = validate_term(parse_tree.get_sub()[2], identifier_table);
+  const auto messages = collect_messages(array, index);
+  if(!messages.empty())
+    return response_or_errort<smt_termt>{messages};
+  return response_or_errort<smt_termt>{
+    smt_array_theoryt::select(*array.get_if_valid(), *index.get_if_valid())};
+}
+
 static response_or_errort<smt_termt> validate_term(
   const irept &parse_tree,
   const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
@@ -282,7 +312,12 @@ static response_or_errort<smt_termt> validate_term(
   const auto find_result = identifier_table.find(parse_tree.id());
   if(find_result != identifier_table.end())
     return response_or_errort<smt_termt>{find_result->second};
-
+  if(
+    const auto select_validation =
+      try_select_validation(parse_tree, identifier_table))
+  {
+    return *select_validation;
+  }
   return response_or_errort<smt_termt>{"Unrecognised SMT term - \"" +
                                        print_parse_tree(parse_tree) + "\"."};
 }
