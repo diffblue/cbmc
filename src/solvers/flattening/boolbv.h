@@ -243,11 +243,8 @@ protected:
 
   virtual exprt bv_get_unbounded_array(const exprt &) const;
 
-  virtual exprt bv_get_rec(
-    const exprt &expr,
-    const bvt &bv,
-    std::size_t offset,
-    const typet &type) const;
+  virtual exprt
+  bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset) const;
 
   exprt bv_get(const bvt &bv, const typet &type) const;
   exprt bv_get_cache(const exprt &expr) const;

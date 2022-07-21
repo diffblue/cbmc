@@ -52,8 +52,7 @@ protected:
   bvt convert_bitvector(const exprt &) override; // no cache
 
   exprt
-  bv_get_rec(const exprt &, const bvt &, std::size_t offset, const typet &)
-    const override;
+  bv_get_rec(const exprt &, const bvt &, std::size_t offset) const override;
 
   NODISCARD
   optionalt<bvt> convert_address_of_rec(const exprt &);

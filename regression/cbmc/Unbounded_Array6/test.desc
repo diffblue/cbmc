@@ -1,0 +1,10 @@
+CORE
+main.c
+--trace
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^Invariant check failed
+--
+This test requires that bv_get_rec always uses properly typed expressions.
