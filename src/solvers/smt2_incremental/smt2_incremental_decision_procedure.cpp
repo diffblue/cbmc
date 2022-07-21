@@ -87,6 +87,7 @@ void smt2_incremental_decision_proceduret::define_array_function(
     "sort.");
   const smt_identifier_termt array_identifier = smt_identifier_termt{
     "array_" + std::to_string(array_sequence()), array_sort};
+  identifier_table.emplace(array_identifier.identifier(), array_identifier);
   solver_process->send(smt_declare_function_commandt{array_identifier, {}});
   const std::vector<exprt> &elements = array.operands();
   const typet &index_type = array.type().index_type();
@@ -140,6 +141,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
             identifier, convert_type_to_smt_sort(symbol_expr->type())),
           {}};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
+        identifier_table.emplace(identifier, function.identifier());
         solver_process->send(function);
       }
       else
@@ -149,6 +151,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         const smt_define_function_commandt function{
           symbol->name, {}, convert_expr_to_smt(symbol->value)};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
+        identifier_table.emplace(identifier, function.identifier());
         solver_process->send(function);
       }
     }
@@ -206,6 +209,8 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
   expression_handle_identifiers.emplace(expr, function.identifier());
+  identifier_table.emplace(
+    function.identifier().identifier(), function.identifier());
   solver_process->send(function);
 }
 
