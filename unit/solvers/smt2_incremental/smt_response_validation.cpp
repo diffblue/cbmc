@@ -101,17 +101,32 @@ TEST_CASE("Validation of SMT error response", "[core][smt2_incremental]")
 
 TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
 {
+  const auto table_with_identifiers =
+    [](const std::vector<std::pair<std::string, smt_sortt>> &identifiers) {
+      std::unordered_map<irep_idt, smt_identifier_termt> table;
+      for(auto &identifier_pair : identifiers)
+      {
+        auto &identifier = identifier_pair.first;
+        auto &sort = identifier_pair.second;
+        table.insert({identifier, smt_identifier_termt{identifier, sort}});
+      }
+      return table;
+    };
   SECTION("Boolean sorted values.")
   {
+    const auto identifier_table =
+      table_with_identifiers({{"a", smt_bool_sortt{}}});
     const response_or_errort<smt_responset> true_response =
-      validate_smt_response(*smt2irep("((a true))").parsed_output, {});
+      validate_smt_response(
+        *smt2irep("((a true))").parsed_output, identifier_table);
     CHECK(
       *true_response.get_if_valid() ==
       smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
         smt_identifier_termt{"a", smt_bool_sortt{}},
         smt_bool_literal_termt{true}}}});
     const response_or_errort<smt_responset> false_response =
-      validate_smt_response(*smt2irep("((a false))").parsed_output, {});
+      validate_smt_response(
+        *smt2irep("((a false))").parsed_output, identifier_table);
     CHECK(
       *false_response.get_if_valid() ==
       smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
@@ -120,10 +135,13 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
   }
   SECTION("Bit vector sorted values.")
   {
+    const auto identifier_table =
+      table_with_identifiers({{"a", smt_bit_vector_sortt{8}}});
     SECTION("Hex value")
     {
       const response_or_errort<smt_responset> response_255 =
-        validate_smt_response(*smt2irep("((a #xff))").parsed_output, {});
+        validate_smt_response(
+          *smt2irep("((a #xff))").parsed_output, identifier_table);
       CHECK(
         *response_255.get_if_valid() ==
         smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
@@ -133,7 +151,8 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
     SECTION("Binary value")
     {
       const response_or_errort<smt_responset> response_42 =
-        validate_smt_response(*smt2irep("((a #b00101010))").parsed_output, {});
+        validate_smt_response(
+          *smt2irep("((a #b00101010))").parsed_output, identifier_table);
       CHECK(
         *response_42.get_if_valid() ==
         smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
@@ -159,11 +178,10 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
               *smt2irep("(((_ bv256 8) #xff))").parsed_output, {});
           CHECK(
             *pair_value_response.get_if_error() ==
-            std::vector<std::string>{
-              "Expected descriptor SMT term, found - \"\n"
-              "0: _\n"
-              "1: bv256\n"
-              "2: 8\"."});
+            std::vector<std::string>{"Unrecognised SMT term - \"\n"
+                                     "0: _\n"
+                                     "1: bv256\n"
+                                     "2: 8\"."});
         }
         SECTION("Value missing bv prefix.")
         {
@@ -172,11 +190,10 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
               *smt2irep("(((_ 42 8) #xff))").parsed_output, {});
           CHECK(
             *pair_value_response.get_if_error() ==
-            std::vector<std::string>{
-              "Expected descriptor SMT term, found - \"\n"
-              "0: _\n"
-              "1: 42\n"
-              "2: 8\"."});
+            std::vector<std::string>{"Unrecognised SMT term - \"\n"
+                                     "0: _\n"
+                                     "1: 42\n"
+                                     "2: 8\"."});
         }
         SECTION("Hex value.")
         {
@@ -185,11 +202,10 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
               *smt2irep("(((_ bv2A 8) #xff))").parsed_output, {});
           CHECK(
             *pair_value_response.get_if_error() ==
-            std::vector<std::string>{
-              "Expected descriptor SMT term, found - \"\n"
-              "0: _\n"
-              "1: bv2A\n"
-              "2: 8\"."});
+            std::vector<std::string>{"Unrecognised SMT term - \"\n"
+                                     "0: _\n"
+                                     "1: bv2A\n"
+                                     "2: 8\"."});
         }
         SECTION("Zero width.")
         {
@@ -198,20 +214,21 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
               *smt2irep("(((_ bv0 0) #xff))").parsed_output, {});
           CHECK(
             *pair_value_response.get_if_error() ==
-            std::vector<std::string>{
-              "Expected descriptor SMT term, found - \"\n"
-              "0: _\n"
-              "1: bv0\n"
-              "2: 0\"."});
+            std::vector<std::string>{"Unrecognised SMT term - \"\n"
+                                     "0: _\n"
+                                     "1: bv0\n"
+                                     "2: 0\"."});
         }
       }
     }
   }
   SECTION("Multiple valuation pairs.")
   {
+    const auto identifier_table = table_with_identifiers(
+      {{"a", smt_bool_sortt{}}, {"b", smt_bool_sortt{}}});
     const response_or_errort<smt_responset> two_pair_response =
       validate_smt_response(
-        *smt2irep("((a true) (b false))").parsed_output, {});
+        *smt2irep("((a true) (b false))").parsed_output, identifier_table);
     CHECK(
       *two_pair_response.get_if_valid() ==
       smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
@@ -223,14 +240,17 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
   }
   SECTION("Invalid terms.")
   {
+    const auto identifier_table = table_with_identifiers(
+      {{"a", smt_bit_vector_sortt{16}}, {"b", smt_bit_vector_sortt{16}}});
     const response_or_errort<smt_responset> empty_value_response =
-      validate_smt_response(*smt2irep("((a ())))").parsed_output, {});
+      validate_smt_response(
+        *smt2irep("((a ())))").parsed_output, identifier_table);
     CHECK(
       *empty_value_response.get_if_error() ==
       std::vector<std::string>{"Unrecognised SMT term - \"\"."});
     const response_or_errort<smt_responset> pair_value_response =
       validate_smt_response(
-        *smt2irep("((a (#xF00D #xBAD))))").parsed_output, {});
+        *smt2irep("((a (#xF00D #xBAD))))").parsed_output, identifier_table);
     CHECK(
       *pair_value_response.get_if_error() ==
       std::vector<std::string>{"Unrecognised SMT term - \"\n"
@@ -239,7 +259,7 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
     const response_or_errort<smt_responset> two_pair_value_response =
       validate_smt_response(
         *smt2irep("((a (#xF00D #xBAD)) (b (#xDEAD #xFA11)))").parsed_output,
-        {});
+        identifier_table);
     CHECK(
       *two_pair_value_response.get_if_error() ==
       std::vector<std::string>{"Unrecognised SMT term - \"\n"
@@ -252,11 +272,12 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
       validate_smt_response(*smt2irep("((() true))").parsed_output, {});
     CHECK(
       *empty_descriptor_response.get_if_error() ==
-      std::vector<std::string>{"Expected descriptor SMT term, found - \"\"."});
+      std::vector<std::string>{"Unrecognised SMT term - \"\"."});
     const response_or_errort<smt_responset> empty_pair =
       validate_smt_response(*smt2irep("((() ())))").parsed_output, {});
     CHECK(
       *empty_pair.get_if_error() ==
-      std::vector<std::string>{"Unrecognised SMT term - \"\"."});
+      std::vector<std::string>{
+        "Unrecognised SMT term - \"\".", "Unrecognised SMT term - \"\"."});
   }
 }
