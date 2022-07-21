@@ -1,10 +1,11 @@
 // Author: Diffblue Ltd.
 
+#include <util/mp_arith.h>
+
+#include <solvers/smt2_incremental/smt_array_theory.h>
+#include <solvers/smt2_incremental/smt_response_validation.h>
 #include <testing-utils/smt2irep.h>
 #include <testing-utils/use_catch.h>
-
-#include <solvers/smt2_incremental/smt_response_validation.h>
-#include <util/mp_arith.h>
 
 // Debug printer for `smt_responset`. This will be used by the catch framework
 // for printing in the case of failed checks / requirements.
@@ -158,6 +159,32 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
         smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
           smt_identifier_termt{"a", smt_bit_vector_sortt{8}},
           smt_bit_vector_constant_termt{42, 8}}}});
+    }
+    SECTION("Array values")
+    {
+      // Construction of select part of response
+      const smt_bit_vector_constant_termt index_term(
+        0xA, smt_bit_vector_sortt(32));
+      const smt_sortt value_sort(smt_bit_vector_sortt(32));
+      const smt_identifier_termt array_term(
+        "b", smt_array_sortt(index_term.get_sort(), value_sort));
+      const smt_function_application_termt select =
+        smt_array_theoryt::select(array_term, index_term);
+      // Identifier table needs to contain identifier of array
+      const auto identifier_table = table_with_identifiers(
+        {{"b",
+          smt_array_sortt{
+            smt_bit_vector_sortt{32}, smt_bit_vector_sortt{32}}}});
+
+      const response_or_errort<smt_responset> response_get_select =
+        validate_smt_response(
+          *smt2irep("(((select |b| (_ bv10 32)) #x0000002a))").parsed_output,
+          identifier_table);
+
+      CHECK(
+        *response_get_select.get_if_valid() ==
+        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+          select, smt_bit_vector_constant_termt{0x2A, 32}}}});
     }
     SECTION("Descriptors which are bit vector constants")
     {
