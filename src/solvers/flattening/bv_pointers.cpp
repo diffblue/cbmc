@@ -769,11 +769,12 @@ static std::string bits_to_string(const propt &prop, const bvt &bv)
 exprt bv_pointerst::bv_get_rec(
   const exprt &expr,
   const bvt &bv,
-  std::size_t offset,
-  const typet &type) const
+  std::size_t offset) const
 {
+  const typet &type = expr.type();
+
   if(type.id() != ID_pointer)
-    return SUB::bv_get_rec(expr, bv, offset, type);
+    return SUB::bv_get_rec(expr, bv, offset);
 
   const pointer_typet &pt = to_pointer_type(type);
   const std::size_t bits = boolbv_width(pt);

@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
@@ -15,7 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/threeval.h>
 
+#include "boolbv.h"
 #include "boolbv_type.h"
+
+#include <iostream>
 
 exprt boolbvt::get(const exprt &expr) const
 {
@@ -33,21 +34,26 @@ exprt boolbvt::get(const exprt &expr) const
       // the value of clock symbols, which do not have a fixed type as the clock
       // type is computed during symbolic execution) or match the type stored in
       // the mapping
-      PRECONDITION(expr.type() == typet() || expr.type() == map_entry.type);
-
-      return bv_get_rec(expr, map_entry.literal_map, 0, map_entry.type);
+      if(expr.type() == map_entry.type)
+        return bv_get_rec(expr, map_entry.literal_map, 0);
+      else
+      {
+        PRECONDITION(expr.type() == typet{});
+        exprt skeleton = expr;
+        skeleton.type() = map_entry.type;
+        return bv_get_rec(skeleton, map_entry.literal_map, 0);
+      }
     }
   }
 
   return SUB::get(expr);
 }
 
-exprt boolbvt::bv_get_rec(
-  const exprt &expr,
-  const bvt &bv,
-  std::size_t offset,
-  const typet &type) const
+exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
+  const
 {
+  const typet &type = expr.type();
+
   if(type.id()==ID_bool)
   {
     PRECONDITION(bv.size() > offset);
@@ -91,7 +97,7 @@ exprt boolbvt::bv_get_rec(
           const index_exprt index{
             expr,
             from_integer(new_offset / sub_width, array_type.index_type())};
-          op.push_back(bv_get_rec(index, bv, offset + new_offset, subtype));
+          op.push_back(bv_get_rec(index, bv, offset + new_offset));
         }
 
         exprt dest=exprt(ID_array, type);
@@ -103,24 +109,12 @@ exprt boolbvt::bv_get_rec(
         return array_exprt{{}, array_type};
       }
     }
-    else if(type.id()==ID_struct_tag)
+    else if(type.id() == ID_struct || type.id() == ID_struct_tag)
     {
-      exprt result =
-        bv_get_rec(expr, bv, offset, ns.follow_tag(to_struct_tag_type(type)));
-      result.type() = type;
-      return result;
-    }
-    else if(type.id()==ID_union_tag)
-    {
-      exprt result =
-        bv_get_rec(expr, bv, offset, ns.follow_tag(to_union_tag_type(type)));
-      result.type() = type;
-      return result;
-    }
-    else if(type.id()==ID_struct)
-    {
-      const struct_typet &struct_type=to_struct_type(type);
-      const struct_typet::componentst &components=struct_type.components();
+      const struct_typet::componentst &components =
+        type.id() == ID_struct
+          ? to_struct_type(type).components()
+          : ns.follow_tag(to_struct_tag_type(type)).components();
       std::size_t new_offset=0;
       exprt::operandst op;
       op.reserve(components.size());
@@ -130,17 +124,19 @@ exprt boolbvt::bv_get_rec(
         const typet &subtype = c.type();
 
         const member_exprt member{expr, c.get_name(), subtype};
-        op.push_back(bv_get_rec(member, bv, offset + new_offset, subtype));
+        op.push_back(bv_get_rec(member, bv, offset + new_offset));
 
         new_offset += boolbv_width(subtype);
       }
 
       return struct_exprt(std::move(op), type);
     }
-    else if(type.id()==ID_union)
+    else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
-      const union_typet &union_type=to_union_type(type);
-      const union_typet::componentst &components=union_type.components();
+      const union_typet::componentst &components =
+        type.id() == ID_union
+          ? to_union_type(type).components()
+          : ns.follow_tag(to_union_tag_type(type)).components();
 
       if(components.empty())
         return empty_union_exprt(type);
@@ -154,8 +150,8 @@ exprt boolbvt::bv_get_rec(
         expr, components[component_nr].get_name(), subtype};
       return union_exprt(
         components[component_nr].get_name(),
-        bv_get_rec(member, bv, offset, subtype),
-        union_type);
+        bv_get_rec(member, bv, offset),
+        type);
     }
     else if(type.id()==ID_vector)
     {
@@ -176,8 +172,7 @@ exprt boolbvt::bv_get_rec(
         {
           const index_exprt index{expr,
                                   from_integer(i, vector_type.index_type())};
-          value.operands().push_back(
-            bv_get_rec(index, bv, i * element_width, element_type));
+          value.operands().push_back(bv_get_rec(index, bv, i * element_width));
         }
 
         return std::move(value);
@@ -195,8 +190,8 @@ exprt boolbvt::bv_get_rec(
         "complex type has two elements of equal bit width");
 
       return complex_exprt{
-        bv_get_rec(complex_real_exprt{expr}, bv, 0 * sub_width, subtype),
-        bv_get_rec(complex_imag_exprt{expr}, bv, 1 * sub_width, subtype),
+        bv_get_rec(complex_real_exprt{expr}, bv, 0 * sub_width),
+        bv_get_rec(complex_imag_exprt{expr}, bv, 1 * sub_width),
         to_complex_type(type)};
     }
   }
@@ -274,7 +269,9 @@ exprt boolbvt::bv_get_rec(
 
 exprt boolbvt::bv_get(const bvt &bv, const typet &type) const
 {
-  return bv_get_rec(nil_exprt{}, bv, 0, type);
+  nil_exprt skeleton;
+  skeleton.type() = type;
+  return bv_get_rec(skeleton, bv, 0);
 }
 
 exprt boolbvt::bv_get_cache(const exprt &expr) const
