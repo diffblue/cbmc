@@ -41,8 +41,7 @@ for example by walking a chain of pointers and updating a points-to set, but
 abstract value (for example, SKIP instructions). Therefore, not recommended for
 new code.
 
-Only current user in-tree is \ref value_set_analysis_fit and its close
-relatives, \ref value_set_analysis_fivrt and \ref value_set_analysis_fivrnst
+Only current user in-tree is \ref value_set_analysis_fit.
 
 \section analyses-specific-analyses Specific analyses:
 
