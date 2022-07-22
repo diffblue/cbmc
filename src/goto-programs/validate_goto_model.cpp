@@ -34,9 +34,6 @@ private:
   /// until they are linked.
   void entry_point_exists();
 
-  /// Check that no function calls via function pointer are present
-  void function_pointer_calls_removed();
-
   /// Check that for all:
   /// -# functions that are called or
   /// -# functions of which the address is taken
@@ -61,13 +58,7 @@ validate_goto_modelt::validate_goto_modelt(
   if(validation_options.entry_point_exists)
     entry_point_exists();
 
-  if(validation_options.function_pointer_calls_removed)
-  {
-    function_pointer_calls_removed();
-  }
-
-  if(validation_options.check_called_functions)
-    check_called_functions();
+  check_called_functions();
 }
 
 void validate_goto_modelt::entry_point_exists()
@@ -76,23 +67,6 @@ void validate_goto_modelt::entry_point_exists()
     vm,
     function_map.find(goto_functionst::entry_point()) != function_map.end(),
     "an entry point must exist");
-}
-
-void validate_goto_modelt::function_pointer_calls_removed()
-{
-  for(const auto &fun : function_map)
-  {
-    for(const auto &instr : fun.second.body.instructions)
-    {
-      if(instr.is_function_call())
-      {
-        DATA_CHECK(
-          vm,
-          instr.call_function().id() == ID_symbol,
-          "no calls via function pointer should be present");
-      }
-    }
-  }
 }
 
 void validate_goto_modelt::check_called_functions()
@@ -123,6 +97,18 @@ void validate_goto_modelt::check_called_functions()
       // check functions that are called
       if(instr.is_function_call())
       {
+        // calls through function pointers are represented by dereference
+        // expressions
+        if(instr.call_function().id() == ID_dereference)
+          continue;
+
+        // the only other permitted expression is a symbol
+        DATA_CHECK(
+          vm,
+          instr.call_function().id() == ID_symbol &&
+            instr.call_function().type().id() == ID_code,
+          "function call expected to be code-typed symbol expression");
+
         const irep_idt &identifier =
           to_symbol_expr(instr.call_function()).get_identifier();
 
