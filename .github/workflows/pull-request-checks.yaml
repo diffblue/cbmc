@@ -382,8 +382,8 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L THOROUGH -j2
 
-  check-macos-10_15-make-clang:
-    runs-on: macos-10.15
+  check-macos-11-make-clang:
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
         with:
