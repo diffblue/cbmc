@@ -144,7 +144,7 @@ jobs:
 
 
   homebrew-pr:
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - name: Get release tag name
         # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
