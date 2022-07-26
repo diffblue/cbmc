@@ -241,6 +241,8 @@ bool remove_instanceoft::lower_instanceof(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
+  bool changed;
+
   if(
     target->is_target() &&
     (contains_instanceof(target->code()) ||
@@ -255,14 +257,16 @@ bool remove_instanceoft::lower_instanceof(
     ++target;
   }
 
-  return lower_instanceof(
-           function_identifier, target->code_nonconst(), goto_program, target) |
-         (target->has_condition() ? lower_instanceof(
-                                      function_identifier,
-                                      target->condition_nonconst(),
-                                      goto_program,
-                                      target)
-                                  : false);
+  changed = lower_instanceof(
+    function_identifier, target->code_nonconst(), goto_program, target);
+  changed |=
+    (target->has_condition() ? lower_instanceof(
+                                 function_identifier,
+                                 target->condition_nonconst(),
+                                 goto_program,
+                                 target)
+                             : false);
+  return changed;
 }
 
 /// Replace every instanceof in the passed function body with an explicit
