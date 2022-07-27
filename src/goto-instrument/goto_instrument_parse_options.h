@@ -48,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // Options that have been moved to goto-analyzer
 #define GOTO_INSTRUMENT_MIGRATED_OPTIONS \
   "(show-dependence-graph)" \
+  "(show-intervals)" \
   // empty last line
 
 #define GOTO_INSTRUMENT_OPTIONS                 \
@@ -79,7 +80,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-escape-analysis)(escape-analysis)" \
   "(custom-bitvector-analysis)" \
-  "(show-struct-alignment)(interval-analysis)(show-intervals)" \
+  "(show-struct-alignment)(interval-analysis)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(fp-reachability-slice):" \

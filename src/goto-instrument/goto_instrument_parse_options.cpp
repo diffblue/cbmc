@@ -58,7 +58,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/escape_analysis.h>
 #include <analyses/global_may_alias.h>
 #include <analyses/interval_analysis.h>
-#include <analyses/interval_domain.h>
 #include <analyses/is_threaded.h>
 #include <analyses/lexical_loops.h>
 #include <analyses/local_bitvector_analysis.h>
@@ -487,17 +486,10 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-intervals"))
     {
-      do_indirect_call_and_rtti_removal();
-
-      // recalculate numbers, etc.
-      goto_model.goto_functions.update();
-
-      log.status() << "Interval Analysis" << messaget::eom;
-      namespacet ns(goto_model.symbol_table);
-      ait<interval_domaint> interval_analysis;
-      interval_analysis(goto_model);
-      interval_analysis.output(goto_model, std::cout);
-      return CPROVER_EXIT_SUCCESS;
+      log.status() << "--show-intervals is deprecated, "
+                   << "use goto-analyzer --show --intervals"
+                   << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
     }
 
     if(cmdline.isset("show-call-sequences"))
@@ -1801,7 +1793,6 @@ void goto_instrument_parse_optionst::help()
     " --show-custom-bitvector-analysis\n"
     "                              show results of configurable bitvector analysis\n" // NOLINT(*)
     " --interval-analysis          perform interval analysis\n"
-    " --show-intervals             show results of interval analysis\n"
     " --show-uninitialized         show maybe-uninitialized variables\n"
     " --show-points-to             show points-to information\n"
     " --show-rw-set                show read-write sets\n"
