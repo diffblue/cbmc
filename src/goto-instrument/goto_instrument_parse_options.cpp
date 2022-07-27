@@ -55,7 +55,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/custom_bitvector_analysis.h>
-#include <analyses/dependence_graph.h>
 #include <analyses/escape_analysis.h>
 #include <analyses/global_may_alias.h>
 #include <analyses/interval_analysis.h>
@@ -568,15 +567,10 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-dependence-graph"))
     {
-      do_indirect_call_and_rtti_removal();
-
-      const namespacet ns(goto_model.symbol_table);
-      dependence_grapht dependence_graph(ns);
-      dependence_graph(goto_model);
-      dependence_graph.output(goto_model, std::cout);
-      dependence_graph.output_dot(std::cout);
-
-      return CPROVER_EXIT_SUCCESS;
+      log.status() << "--show-dependence-graph is deprecated, "
+                   << "use goto-analyzer --show --dependence-graph"
+                   << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
     }
 
     if(cmdline.isset("count-eloc"))
@@ -1813,7 +1807,6 @@ void goto_instrument_parse_optionst::help()
     " --show-rw-set                show read-write sets\n"
     " --show-call-sequences        show function call sequences\n"
     " --show-reaching-definitions  show reaching definitions\n"
-    " --show-dependence-graph      show program-dependence graph\n"
     " --show-sese-regions          show single-entry-single-exit regions\n"
     "\n"
     "Safety checks:\n"

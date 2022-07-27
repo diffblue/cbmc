@@ -1,9 +1,8 @@
 CORE
 main.c
---show-dependence-graph
+--show --dependence-graph
 ^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 ^Data dependencies: \d+$
 --
 ^warning: ignoring
