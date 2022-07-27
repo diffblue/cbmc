@@ -223,6 +223,27 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "expr to smt conversion for \"is_invalid_pointer\" operator",
+  "[core][smt2_incremental]")
+{
+  const std::size_t object_bits = config.bv_encoding.object_bits;
+  const auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const pointer_typet pointer_type = ::pointer_type(void_type());
+  const std::size_t pointer_width = pointer_type.get_width();
+  const constant_exprt invalid_ptr{
+    integer2bvrep(1ul << (pointer_width - object_bits), pointer_width),
+    pointer_type};
+  const is_invalid_pointer_exprt is_invalid_ptr{invalid_ptr};
+  const smt_termt expected_smt_term = smt_core_theoryt::equal(
+    smt_bit_vector_constant_termt{1, config.bv_encoding.object_bits},
+    smt_bit_vector_theoryt::extract(
+      pointer_width - 1,
+      pointer_width - object_bits)(test.convert(invalid_ptr)));
+  CHECK(test.convert(is_invalid_ptr) == expected_smt_term);
+}
+
+TEST_CASE(
   "expr to smt conversion for \"xor\" operator",
   "[core][smt2_incremental]")
 {

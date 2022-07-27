@@ -1046,20 +1046,37 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt convert_expr_to_smt(
   const is_invalid_pointer_exprt &is_invalid_pointer,
+  const smt_object_mapt &object_map,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for is invalid pointer expression: " +
-    is_invalid_pointer.pretty());
+  const exprt &pointer_expr(to_unary_expr(is_invalid_pointer).op());
+  const bitvector_typet *pointer_type =
+    type_try_dynamic_cast<bitvector_typet>(pointer_expr.type());
+  INVARIANT(pointer_type, "Pointer object should have a bitvector-based type.");
+  const std::size_t object_bits = config.bv_encoding.object_bits;
+  const std::size_t width = pointer_type->get_width();
+  INVARIANT(
+    width >= object_bits,
+    "Width should be at least as big as the number of object bits.");
+
+  const auto extract_op = smt_bit_vector_theoryt::extract(
+    width - 1, width - object_bits)(converted.at(pointer_expr));
+
+  const auto &invalid_pointer = object_map.at(make_invalid_pointer_expr());
+
+  const smt_termt invalid_pointer_address = smt_bit_vector_constant_termt(
+    invalid_pointer.unique_id, config.bv_encoding.object_bits);
+
+  return smt_core_theoryt::equal(invalid_pointer_address, extract_op);
 }
 
 static smt_termt convert_expr_to_smt(
-  const string_constantt &is_invalid_pointer,
+  const string_constantt &string_constant,
   const sub_expression_mapt &converted)
 {
   UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for is invalid pointer expression: " +
-    is_invalid_pointer.pretty());
+    "Generation of SMT formula for string constant expression: " +
+    string_constant.pretty());
 }
 
 static smt_termt convert_expr_to_smt(
@@ -1643,7 +1660,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
     const auto is_invalid_pointer =
       expr_try_dynamic_cast<is_invalid_pointer_exprt>(expr))
   {
-    return convert_expr_to_smt(*is_invalid_pointer, converted);
+    return convert_expr_to_smt(*is_invalid_pointer, object_map, converted);
   }
   if(const auto string_constant = expr_try_dynamic_cast<string_constantt>(expr))
   {
