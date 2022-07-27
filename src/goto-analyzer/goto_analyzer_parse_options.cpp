@@ -160,6 +160,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       "simplify-slicing",
       !(cmdline.isset("no-simplify-slicing")));
   }
+  // Legacy options
   else if(cmdline.isset("show-intervals"))
   {
     // For backwards compatibility
@@ -167,6 +168,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("general-analysis", true);
     options.set_option("intervals", true);
     options.set_option("domain set", true);
+    log.status() << "--show-intervals is deprecated,"
+                 << "please use --show --intervals" << messaget::eom;
   }
   else if(cmdline.isset("show-non-null"))
   {
@@ -175,6 +178,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("general-analysis", true);
     options.set_option("non-null", true);
     options.set_option("domain set", true);
+    log.status() << "--show-non-null is deprecated,"
+                 << "please use --show --non-null" << messaget::eom;
   }
   else if(cmdline.isset("intervals") || cmdline.isset("non-null"))
   {
