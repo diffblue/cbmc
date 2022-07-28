@@ -90,6 +90,22 @@ public:
     return no==0; // string 0 is exactly the empty string
   }
 
+  /// equivalent of as_string().starts_with(s)
+  bool starts_with(const char *s)
+  {
+    for(const char *t = c_str(); *s != 0; s++, t++)
+      if(*t != *s)
+        return false;
+
+    return true;
+  }
+
+  /// equivalent of as_string().starts_with(s)
+  bool starts_with(const std::string &prefix)
+  {
+    return as_string().compare(0, prefix.size(), prefix) == 0;
+  }
+
   char operator[](size_t i) const
   {
     return as_string()[i];
