@@ -185,6 +185,12 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_string_constant)
     return convert_bitvector(
       to_string_constant(expr).to_array_expr());
+  else if(expr.id() == ID_named_term)
+  {
+    const auto &named_term_expr = to_named_term_expr(expr);
+    set_to_true(equal_exprt(named_term_expr.symbol(), named_term_expr.value()));
+    return convert_symbol(named_term_expr.symbol());
+  }
   else if(expr.id()==ID_array)
     return convert_array(expr);
   else if(expr.id()==ID_vector)
