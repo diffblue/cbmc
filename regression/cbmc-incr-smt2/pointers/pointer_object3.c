@@ -12,8 +12,9 @@ int main()
     __CPROVER_POINTER_OBJECT(NULL) != 0,
     "expected to fail with object ID == 0");
   // In the case where the program contains a single address of operation,
-  // the pointer object is going to be 1.
+  // the pointer object is going to be 2 (1 is invalid pointer that is tested
+  // somewhere else).
   __CPROVER_assert(
-    __CPROVER_POINTER_OBJECT(&foo) != 1,
-    "expected to fail with object ID == 1");
+    __CPROVER_POINTER_OBJECT(&foo) != 2,
+    "expected to fail with object ID == 2");
 }

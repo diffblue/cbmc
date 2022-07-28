@@ -118,11 +118,20 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
   smt_object_mapt object_map = initial_smt_object_map();
   SECTION("Check initial object map has null pointer")
   {
-    REQUIRE(object_map.size() == 1);
+    REQUIRE(object_map.size() == 2);
     const exprt null_pointer = null_pointer_exprt{::pointer_type(void_type())};
-    CHECK(object_map.begin()->first == null_pointer);
-    CHECK(object_map.begin()->second.unique_id == 0);
-    CHECK(object_map.begin()->second.base_expression == null_pointer);
+    const auto actual_null_object = object_map.find(null_pointer);
+    CHECK(actual_null_object->first == null_pointer);
+    CHECK(actual_null_object->second.unique_id == 0);
+    CHECK(actual_null_object->second.base_expression == null_pointer);
+    const exprt invalid_object_pointer = make_invalid_pointer_expr();
+    const auto actual_invalid_object_pointer =
+      object_map.find(invalid_object_pointer);
+    CHECK(actual_invalid_object_pointer->first == invalid_object_pointer);
+    CHECK(actual_invalid_object_pointer->second.unique_id == 1);
+    CHECK(
+      actual_invalid_object_pointer->second.base_expression ==
+      invalid_object_pointer);
   }
   symbol_tablet symbol_table;
   namespacet ns{symbol_table};
@@ -133,15 +142,15 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
   track_expression_objects(compound_expression, ns, object_map);
   SECTION("Tracking expression objects")
   {
-    CHECK(object_map.size() == 4);
+    CHECK(object_map.size() == 5);
     const auto foo_object = object_map.find(foo);
     REQUIRE(foo_object != object_map.end());
     CHECK(foo_object->second.base_expression == foo);
-    CHECK(foo_object->second.unique_id == 3);
+    CHECK(foo_object->second.unique_id == 4);
     const auto bar_object = object_map.find(bar);
     REQUIRE(bar_object != object_map.end());
     CHECK(bar_object->second.base_expression == bar);
-    CHECK(bar_object->second.unique_id == 1);
+    CHECK(bar_object->second.unique_id == 2);
   }
   SECTION("Confirming objects are tracked.")
   {

@@ -115,4 +115,7 @@ bool objects_are_already_tracked(
   const exprt &expression,
   const smt_object_mapt &object_map);
 
+/// \brief Create the invalid pointer constant
+exprt make_invalid_pointer_expr();
+
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_OBJECT_TRACKING_H

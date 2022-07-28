@@ -9,6 +9,11 @@
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 
+exprt make_invalid_pointer_expr()
+{
+  return constant_exprt(ID_invalid, pointer_type(void_type()));
+}
+
 exprt find_object_base_expression(const address_of_exprt &address_of)
 {
   auto current = std::ref(address_of.object());
@@ -47,12 +52,28 @@ static decision_procedure_objectt make_null_object()
   return null_object;
 }
 
+static decision_procedure_objectt make_invalid_pointer_object()
+{
+  decision_procedure_objectt invalid_pointer_object;
+  // Using unique_id = 1, so 0 is the NULL object, 1 is the invalid object and
+  // other valid objects have unique_id > 1.
+  invalid_pointer_object.unique_id = 1;
+  invalid_pointer_object.base_expression = make_invalid_pointer_expr();
+  invalid_pointer_object.size = from_integer(0, size_type());
+  return invalid_pointer_object;
+}
+
 smt_object_mapt initial_smt_object_map()
 {
   smt_object_mapt object_map;
   decision_procedure_objectt null_object = make_null_object();
-  exprt base = null_object.base_expression;
-  object_map.emplace(std::move(base), std::move(null_object));
+  exprt null_object_base = null_object.base_expression;
+  object_map.emplace(std::move(null_object_base), std::move(null_object));
+  decision_procedure_objectt invalid_pointer_object =
+    make_invalid_pointer_object();
+  exprt invalid_pointer_object_base = invalid_pointer_object.base_expression;
+  object_map.emplace(
+    std::move(invalid_pointer_object_base), std::move(invalid_pointer_object));
   return object_map;
 }
 
