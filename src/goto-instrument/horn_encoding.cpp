@@ -663,8 +663,14 @@ exprt state_encodingt::assignment_constraint(loct loc, exprt lhs, exprt rhs)
 
   auto new_state = update_state_exprt(s, address, new_value);
 
-  return forall_states_expr(
-    loc, function_application_exprt(out_state_expr(loc), {new_state}));
+  forall_exprt::variablest binding = {state_expr()};
+  binding.insert(binding.end(), nondet_symbols.begin(), nondet_symbols.end());
+
+  return forall_exprt(
+    std::move(binding),
+    implies_exprt(
+      function_application_exprt(in_state_expr(loc), {state_expr()}),
+      function_application_exprt(out_state_expr(loc), {new_state})));
 }
 
 void state_encodingt::setup_incoming(const goto_functiont &goto_function)
@@ -1042,11 +1048,17 @@ exprt variable_encoding(exprt src, const binding_exprt::variablest &variables)
   {
     auto &forall_expr = to_forall_expr(src);
     if(
-      forall_expr.variables().size() == 1 &&
-      forall_expr.symbol().type().id() == ID_state)
+      forall_expr.variables().size() >= 1 &&
+      forall_expr.variables().front().type().id() == ID_state)
     {
+      // replace 'state' by the program variables
+      forall_exprt::variablest new_variables = variables;
+      new_variables.insert(
+        new_variables.end(),
+        forall_expr.variables().begin() + 1,
+        forall_expr.variables().end());
       forall_expr
-        .variables() = variables;
+        .variables() = std::move(new_variables);
       return std::move(forall_expr);
     }
   }
