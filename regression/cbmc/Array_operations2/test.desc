@@ -1,0 +1,14 @@
+CORE broken-smt-backend
+main.c
+
+^\[main.assertion.12\] line 34 assertion arr\[1\].c\[2\] == 0: FAILURE$
+^\[main.assertion.13\] line 35 assertion arr\[1\].c\[3\] == 0: FAILURE$
+^\[main.assertion.14\] line 36 assertion arr\[1\].c\[4\] == 0: FAILURE$
+^\*\* 3 of 21 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Verify the properties of various cprover array primitves

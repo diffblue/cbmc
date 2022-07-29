@@ -572,12 +572,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     else if(
       root_object_type.id() == ID_array &&
       dereference_type_compare(
-        to_array_type(root_object_type).element_type(), dereference_type, ns))
+        to_array_type(root_object_type).element_type(), dereference_type, ns) &&
+      pointer_offset_bits(to_array_type(root_object_type).element_type(), ns) ==
+        pointer_offset_bits(dereference_type, ns))
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
-      // We will require well-alignedness!
-
       exprt offset;
 
       // this should work as the object is essentially the root object
@@ -609,13 +609,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         adjusted_offset=binary_exprt(
           offset, ID_div, element_size_expr, offset.type());
 
-        // TODO: need to assert well-alignedness
       }
 
-      const index_exprt &index_expr = index_exprt(
-        root_object,
-        adjusted_offset,
-        to_array_type(root_object_type).element_type());
+      index_exprt index_expr{root_object, adjusted_offset};
       result.value =
         typecast_exprt::conditional_cast(index_expr, dereference_type);
       result.pointer = typecast_exprt::conditional_cast(
