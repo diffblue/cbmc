@@ -430,8 +430,7 @@ void goto_convertt::clean_expr(
 
   if(expr.id()==ID_side_effect)
   {
-    remove_side_effect(
-      to_side_effect_expr(expr), dest, mode, result_is_used, false);
+    remove_side_effect(to_side_effect_expr(expr), dest, mode, result_is_used);
   }
   else if(expr.id()==ID_compound_literal)
   {
@@ -504,7 +503,8 @@ void goto_convertt::clean_expr_address_of(
   }
   else if(expr.id() == ID_side_effect)
   {
-    remove_side_effect(to_side_effect_expr(expr), dest, mode, true, true);
+    // side effects yield rvalues, and thus cannot have their address taken
+    DATA_INVARIANT(false, "cannot take address of side effect");
   }
   else
     Forall_operands(it, expr)

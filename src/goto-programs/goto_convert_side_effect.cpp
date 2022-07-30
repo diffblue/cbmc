@@ -39,7 +39,6 @@ void goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   goto_programt &dest,
   bool result_is_used,
-  bool address_taken,
   const irep_idt &mode)
 {
   const irep_idt statement=expr.get_statement();
@@ -50,7 +49,7 @@ void goto_convertt::remove_assignment(
   {
     auto &old_assignment = to_side_effect_expr_assign(expr);
 
-    if(result_is_used && !address_taken && needs_cleaning(old_assignment.lhs()))
+    if(result_is_used && needs_cleaning(old_assignment.lhs()))
     {
       if(!old_assignment.rhs().is_constant())
         make_temp_symbol(old_assignment.rhs(), "assign", dest, mode);
@@ -122,7 +121,7 @@ void goto_convertt::remove_assignment(
     exprt rhs = binary_exprt{binary_expr.op0(), new_id, binary_expr.op1()};
     rhs.add_source_location() = expr.source_location();
 
-    if(result_is_used && !address_taken && needs_cleaning(binary_expr.op0()))
+    if(result_is_used && needs_cleaning(binary_expr.op0()))
     {
       make_temp_symbol(rhs, "assign", dest, mode);
       replacement_expr_opt = rhs;
@@ -176,7 +175,6 @@ void goto_convertt::remove_pre(
   side_effect_exprt &expr,
   goto_programt &dest,
   bool result_is_used,
-  bool address_taken,
   const irep_idt &mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
@@ -223,8 +221,7 @@ void goto_convertt::remove_pre(
     op, statement == ID_preincrement ? ID_plus : ID_minus, std::move(constant)};
   rhs.add_source_location() = expr.source_location();
 
-  const bool cannot_use_lhs =
-    result_is_used && !address_taken && needs_cleaning(op);
+  const bool cannot_use_lhs = result_is_used && needs_cleaning(op);
   if(cannot_use_lhs)
     make_temp_symbol(rhs, "pre", dest, mode);
 
@@ -654,8 +651,7 @@ void goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
   goto_programt &dest,
   const irep_idt &mode,
-  bool result_is_used,
-  bool address_taken)
+  bool result_is_used)
 {
   const irep_idt &statement=expr.get_statement();
 
@@ -674,13 +670,17 @@ void goto_convertt::remove_side_effect(
           statement==ID_assign_ashr ||
           statement==ID_assign_shl ||
           statement==ID_assign_mod)
-    remove_assignment(expr, dest, result_is_used, address_taken, mode);
+  {
+    remove_assignment(expr, dest, result_is_used, mode);
+  }
   else if(statement==ID_postincrement ||
           statement==ID_postdecrement)
     remove_post(expr, dest, mode, result_is_used);
   else if(statement==ID_preincrement ||
           statement==ID_predecrement)
-    remove_pre(expr, dest, result_is_used, address_taken, mode);
+  {
+    remove_pre(expr, dest, result_is_used, mode);
+  }
   else if(statement==ID_cpp_new ||
           statement==ID_cpp_new_array)
     remove_cpp_new(expr, dest, result_is_used);
