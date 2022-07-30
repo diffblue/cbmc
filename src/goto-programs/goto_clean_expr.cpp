@@ -384,7 +384,7 @@ void goto_convertt::clean_expr(
         clean_expr(side_effect_assign.lhs(), dest, mode);
         exprt lhs = side_effect_assign.lhs();
 
-        const bool must_use_rhs = needs_cleaning(lhs);
+        const bool must_use_rhs = assignment_lhs_needs_temporary(lhs);
         if(must_use_rhs)
         {
           remove_function_call(

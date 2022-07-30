@@ -89,6 +89,15 @@ protected:
 
   static bool needs_cleaning(const exprt &expr);
 
+  // Do we need to introduce a temporary for the value of an assignment
+  // to the given lhs? E.g., a[i] needs a temporary as its value may change
+  // when i is changed; likewise, *p needs a temporary as its value may change
+  // when p is changed.
+  static bool assignment_lhs_needs_temporary(const exprt &lhs)
+  {
+    return lhs.id() != ID_symbol;
+  }
+
   void make_temp_symbol(
     exprt &expr,
     const std::string &suffix,
