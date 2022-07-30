@@ -50,7 +50,9 @@ void goto_convertt::remove_assignment(
   {
     auto &old_assignment = to_side_effect_expr_assign(expr);
 
-    if(result_is_used && !address_taken && needs_cleaning(old_assignment.lhs()))
+    if(
+      result_is_used && !address_taken &&
+      assignment_lhs_needs_temporary(old_assignment.lhs()))
     {
       if(!old_assignment.rhs().is_constant())
         make_temp_symbol(old_assignment.rhs(), "assign", dest, mode);
@@ -122,7 +124,9 @@ void goto_convertt::remove_assignment(
     exprt rhs = binary_exprt{binary_expr.op0(), new_id, binary_expr.op1()};
     rhs.add_source_location() = expr.source_location();
 
-    if(result_is_used && !address_taken && needs_cleaning(binary_expr.op0()))
+    if(
+      result_is_used && !address_taken &&
+      assignment_lhs_needs_temporary(binary_expr.op0()))
     {
       make_temp_symbol(rhs, "assign", dest, mode);
       replacement_expr_opt = rhs;
@@ -237,7 +241,7 @@ void goto_convertt::remove_pre(
   }
 
   const bool cannot_use_lhs =
-    result_is_used && !address_taken && needs_cleaning(lhs);
+    result_is_used && !address_taken && assignment_lhs_needs_temporary(lhs);
   if(cannot_use_lhs)
     make_temp_symbol(rhs, "pre", dest, mode);
 
