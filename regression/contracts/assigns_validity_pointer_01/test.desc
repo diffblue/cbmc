@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --enforce-contract foo --replace-call-with-contract bar --replace-call-with-contract baz
 ^EXIT=0$

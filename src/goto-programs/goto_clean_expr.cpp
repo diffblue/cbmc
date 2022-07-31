@@ -59,23 +59,17 @@ symbol_exprt goto_convertt::make_compound_literal(
   return result;
 }
 
+/// Returns 'true' for expressions that may change the program
+/// state.
+/// Expressions that may trigger undefined behavior
+/// (e.g., dereference, index, division) are deliberately not
+/// included.
 bool goto_convertt::needs_cleaning(const exprt &expr)
 {
-  if(expr.id()==ID_dereference ||
-     expr.id()==ID_side_effect ||
-     expr.id()==ID_compound_literal ||
-     expr.id()==ID_comma)
-    return true;
-
-  if(expr.id()==ID_index)
+  if(
+    expr.id() == ID_side_effect || expr.id() == ID_compound_literal ||
+    expr.id() == ID_comma)
   {
-    // Will usually clean index expressions because of possible
-    // memory violation in case of out-of-bounds indices.
-    // We do an exception for "string-lit"[0], which is safe.
-    if(to_index_expr(expr).array().id()==ID_string_constant &&
-       to_index_expr(expr).index().is_zero())
-      return false;
-
     return true;
   }
 
