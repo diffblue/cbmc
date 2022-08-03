@@ -7,11 +7,14 @@
 #    define _mm_extract_pi16(a, b) _mm_extract_epi16(a, b)
 #  endif
 #else
-#  include <immintrin.h>
+#  ifdef __MMX__
+#    include <immintrin.h>
+#  endif
 #endif
 
 int main()
 {
+#if defined(_MSC_VER) || defined(__MMX__)
   __m128i values = _mm_setr_epi32(0x1234, 0x2345, 0x3456, 0x4567);
   int val1 = _mm_extract_epi32(values, 0);
   assert(val1 == 0x1234);
@@ -53,6 +56,7 @@ int main()
   __m128i result128 = _mm_subs_epu16(x, y);
   short s = _mm_extract_epi16(result128, 0);
   assert(s == 0);
+#endif
 
   return 0;
 }
