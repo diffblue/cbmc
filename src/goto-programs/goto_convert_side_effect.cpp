@@ -223,12 +223,25 @@ void goto_convertt::remove_pre(
     op, statement == ID_preincrement ? ID_plus : ID_minus, std::move(constant)};
   rhs.add_source_location() = expr.source_location();
 
+  // Is there a typecast, e.g., for _Bool? If so, transform
+  // t1(op : t2) := op+1  -->  op := t2(op+1)
+  exprt lhs;
+  if(op.id() == ID_typecast)
+  {
+    lhs = to_typecast_expr(op).op();
+    rhs = typecast_exprt(rhs, lhs.type());
+  }
+  else
+  {
+    lhs = op;
+  }
+
   const bool cannot_use_lhs =
-    result_is_used && !address_taken && needs_cleaning(op);
+    result_is_used && !address_taken && needs_cleaning(lhs);
   if(cannot_use_lhs)
     make_temp_symbol(rhs, "pre", dest, mode);
 
-  code_assignt assignment(op, rhs);
+  code_assignt assignment(lhs, rhs);
   assignment.add_source_location()=expr.find_source_location();
 
   convert(assignment, dest, mode);
@@ -236,11 +249,14 @@ void goto_convertt::remove_pre(
   if(result_is_used)
   {
     if(cannot_use_lhs)
-      expr.swap(rhs);
+    {
+      auto tmp = typecast_exprt::conditional_cast(rhs, expr.type());
+      expr.swap(tmp);
+    }
     else
     {
       // revert to argument of pre-inc/pre-dec
-      exprt tmp = op;
+      auto tmp = typecast_exprt::conditional_cast(lhs, expr.type());
       expr.swap(tmp);
     }
   }
