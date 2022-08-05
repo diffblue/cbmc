@@ -2732,6 +2732,18 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    const auto &param_id = expr.arguments().front().id();
+    if(!(param_id == ID_dereference || param_id == ID_member ||
+         param_id == ID_symbol || param_id == ID_ptrmember ||
+         param_id == ID_constant || param_id == ID_typecast ||
+         param_id == ID_index))
+    {
+      error().source_location = f_op.source_location();
+      error() << "Tracking history of " << param_id
+              << " expressions is not supported yet." << eom;
+      throw 0;
+    }
+
     irep_idt id = identifier == CPROVER_PREFIX "old" ? ID_old : ID_loop_entry;
 
     history_exprt old_expr(expr.arguments()[0], id);
