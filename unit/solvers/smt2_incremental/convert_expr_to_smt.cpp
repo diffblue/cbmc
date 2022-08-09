@@ -120,6 +120,20 @@ TEST_CASE("\"symbol_exprt\" to smt term conversion", "[core][smt2_incremental]")
 }
 
 TEST_CASE(
+  "\"nondet_symbol_exprt\" to smt term conversion",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  CHECK(
+    test.convert(nondet_symbol_exprt{"nondet_symbol1", bool_typet{}}) ==
+    smt_identifier_termt("nondet_symbol1", smt_bool_sortt{}));
+  CHECK(
+    test.convert(
+      nondet_symbol_exprt{"nondet_symbol2", bitvector_typet{ID_bv, 42}}) ==
+    smt_identifier_termt{"nondet_symbol2", smt_bit_vector_sortt{42}});
+}
+
+TEST_CASE(
   "\"exprt\" to smt term conversion for constants/literals",
   "[core][smt2_incremental]")
 {
@@ -1350,7 +1364,7 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
         exprt{false_exprt{}});
       const smt_termt from_term = test.convert(from_expr);
       const std::size_t width = GENERATE(1, 8, 16, 32, 64);
-      const typecast_exprt cast{from_expr, bitvector_typet{ID_bv, width}};
+      const typecast_exprt cast{from_expr, bv_typet(width)};
       CHECK(
         test.convert(cast) == smt_core_theoryt::if_then_else(
                                 from_term,
