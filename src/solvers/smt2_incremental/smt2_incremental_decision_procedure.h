@@ -70,13 +70,21 @@ protected:
   /// Sends the solver the definitions of the object sizes.
   void define_object_sizes();
 
+  /// Namespace for looking up the expressions which symbol_exprts relate to.
+  /// This includes the symbols defined outside of the decision procedure but
+  /// does not include any additional SMT function identifiers introduced by the
+  /// decision procedure.
   const namespacet &ns;
-
+  /// The number of times `dec_solve()` has been called.
   size_t number_of_solver_calls;
-
+  /// \brief For handling the lifetime of and communication with the separate
+  ///   SMT solver process.
+  /// \note This may be mocked for unit testing purposes.
   std::unique_ptr<smt_base_solver_processt> solver_process;
+  /// For reporting errors, warnings and debugging information back to the user.
   messaget log;
-
+  /// Generators of sequences of uniquely identifying numbers used for naming
+  /// SMT functions introduced by the decision procedure.
   class sequencet
   {
     size_t next_id = 0;
@@ -87,14 +95,38 @@ protected:
       return next_id++;
     }
   } handle_sequence, array_sequence;
-
+  /// When the `handle(exprt)` member function is called, the decision procedure
+  /// commands the SMT solver to define a new function corresponding to the
+  /// given expression. The mapping of the expressions to the function
+  /// identifiers is stored in this map so that when there is as subsequent
+  /// `get(exprt)` call for the same expression, the function identifier can be
+  /// requested from the solver, rather than reconverting the expression.
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_handle_identifiers;
+  /// As part of the decision procedure's overall translation of CBMCs `exprt`s
+  /// into SMT terms, some subexpressions are substituted for separate SMT
+  /// functions. This map associates these sub-expressions to the identifiers of
+  /// the separated functions. This applies to `symbol_exprt` where it is fairly
+  /// natural to define the value of the symbol using a separate function, but
+  /// also to the expressions which define entire arrays. This includes
+  /// `array_exprt` for example and will additionally include other similar
+  /// array expressions when support for them is implemented.
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
+  /// This map is used to track object related state. See documentation in
+  /// object_tracking.h for details.
   smt_object_mapt object_map;
+  /// The size of each object is separately defined as a pre-solving step.
+  /// `object_size_defined[object ID]` is set to true for objects where the size
+  /// has been defined. This is used to avoid defining the size of the same
+  /// object multiple times in the case where multiple rounds of solving are
+  /// carried out.
   std::vector<bool> object_size_defined;
+  /// Implementation of the SMT formula for the object size function. This is
+  /// stateful because it depends on the configuration of the number of object
+  /// bits and how many bits wide the size type is configured to be.
   smt_object_sizet object_size_function;
+  /// Precalculated type sizes used for pointer arithmetic.
   type_size_mapt pointer_sizes_map;
 };
 
