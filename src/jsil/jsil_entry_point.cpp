@@ -74,7 +74,7 @@ bool jsil_entry_point(
       if(s_it==symbol_table.symbols.end())
         continue;
 
-      if(s_it->second.type.id()==ID_code)
+      if(s_it->second.type.id() == ID_code && !s_it->second.is_property)
         matches.push_back(symbol_name_entry.second);
     }
 

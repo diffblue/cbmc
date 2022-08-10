@@ -165,7 +165,7 @@ get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
     if(s_it==symbol_table.symbols.end())
       continue;
 
-    if(s_it->second.type.id()==ID_code)
+    if(s_it->second.type.id() == ID_code && !s_it->second.is_property)
       matches.push_back(s_it->second.symbol_expr());
   }
 
