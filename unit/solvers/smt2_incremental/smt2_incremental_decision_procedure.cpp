@@ -130,8 +130,14 @@ private:
   decision_procedure_test_environmentt() = default;
 };
 
+#include <iostream>
+#define WATCHVAR( var ) \
+  std::cerr << "DBG: " << __FILE__ << "(" << __LINE__ << ") " << #var << \
+    " = [" << (var) << "]" << std::endl
+
 void decision_procedure_test_environmentt::send(const smt_commandt &smt_command)
 {
+  WATCHVAR(smt_command);
   sent_commands.push_back(smt_command);
 }
 
@@ -140,6 +146,7 @@ smt_responset decision_procedure_test_environmentt::receive_response()
   INVARIANT(
     !mock_responses.empty(), "There must be responses remaining for test.");
   smt_responset response = mock_responses.front();
+  WATCHVAR(response.pretty());
   mock_responses.pop_front();
   return response;
 }
