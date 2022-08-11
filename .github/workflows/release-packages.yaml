@@ -71,6 +71,13 @@ jobs:
           asset_path: ${{ steps.create_packages.outputs.deb_package }}
           asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
           asset_content_type: application/x-deb
+      - name: Slack notification of CI status
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: team_open_source
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: Github Actions CI bot
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
   ubuntu-18_04-package:
     runs-on: ubuntu-18.04
@@ -141,6 +148,13 @@ jobs:
           asset_path: ${{ steps.create_packages.outputs.deb_package }}
           asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
           asset_content_type: application/x-deb
+      - name: Slack notification of CI status
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: team_open_source
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: Github Actions CI bot
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
 
   homebrew-pr:
@@ -160,6 +174,13 @@ jobs:
           brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
+      - name: Slack notification of CI status
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: team_open_source
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: Github Actions CI bot
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
   windows-msi-package:
     runs-on: windows-2019
@@ -248,6 +269,13 @@ jobs:
           asset_path: ${{ steps.create_packages.outputs.msi_installer }}
           asset_name: ${{ steps.create_packages.outputs.msi_name }}
           asset_content_type: application/x-msi
+      - name: Slack notification of CI status
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: team_open_source
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: Github Actions CI bot
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
   push-docker-image-dockerhub:
     runs-on: ubuntu-20.04
@@ -271,3 +299,10 @@ jobs:
           # For security reasons remove stored login credentials from
           # configuration file they are stored at by docker login.
           docker logout
+      - name: Slack notification of CI status
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: team_open_source
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: Github Actions CI bot
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
