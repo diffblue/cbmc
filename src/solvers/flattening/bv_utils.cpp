@@ -1198,16 +1198,12 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 /// \par parameters: bvts for each input and whether they are signed and whether
 /// a model of < or <= is required.
 /// \return A literalt that models the value of the comparison.
+
+#define COMPACT_LT_OR_LE
 /* Some clauses are not needed for correctness but they remove
    models (effectively setting "don't care" bits) and so may be worth
    including.*/
 // #define INCLUDE_REDUNDANT_CLAUSES
-
-// Saves space but slows the solver
-// There is a variant that uses the xor as an auxiliary that should improve both
-// #define COMPACT_LT_OR_LE
-
-
 
 literalt bv_utilst::lt_or_le(
   bool or_equal,

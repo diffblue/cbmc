@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 My
 --function My.stringArg --java-assume-inputs-non-null
 ^EXIT=10$
@@ -10,3 +10,6 @@ My
 ^warning: ignoring
 --
 Check that --java-assume-inputs-non-null restricts inputs to non-null strings
+
+The test is marked "THOROUGH" as it requires more memory than may be available
+on some GitHub runners.
