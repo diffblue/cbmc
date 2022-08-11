@@ -109,10 +109,15 @@ class optionst;
 #define GOTO_ANALYSER_OPTIONS_TASKS \
   "(show)(verify)(simplify):" \
   "(show-on-source)" \
+  "(instrument):" \
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)"           \
   "(no-standard-checks)"
 
+#define GOTO_ANALYZER_OPTIONS_TASKS_CONFIG \
+  "(no-simplify-slicing)" \
+  "(instrument-targets):" \
+  
 #define GOTO_ANALYSER_OPTIONS_AI \
   "(recursive-interprocedural)" \
   "(three-way-merge)" \
@@ -161,7 +166,7 @@ class optionst;
   OPT_TIMESTAMP \
   OPT_VALIDATE \
   GOTO_ANALYSER_OPTIONS_TASKS \
-  "(no-simplify-slicing)" \
+  GOTO_ANALYZER_OPTIONS_TASKS_CONFIG \
   "(show-intervals)(show-non-null)" \
   GOTO_ANALYSER_OPTIONS_AI \
   "(location-sensitive)(concurrent)" \
