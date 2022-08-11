@@ -1,0 +1,14 @@
+KNOWNBUG
+array_read_multi_dimension.c
+--trace
+Passing problem to incremental SMT2 solving
+^Trace for main\.assertion\.1
+example_array=\{ 42, 42, 42, 42, 
+^EXIT=10$
+^SIGNAL=0$
+--
+Unrecognised SMT term - \"
+Invalid SMT response received from solver
+--
+Test of writing a value at a non-deterministic index of a two-dimensional array,
+then asserting the value we expect.
