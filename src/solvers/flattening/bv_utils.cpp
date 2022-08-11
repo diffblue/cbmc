@@ -1231,7 +1231,7 @@ literalt bv_utilst::lt_or_le(
     compareBelow = prop.new_variables(bv0.size());
     result = prop.new_variable();
 
-    if(rep==SIGNED)
+    if(rep == representationt::SIGNED)
     {
       INVARIANT(
         bv0.size() >= 2, "signed bitvectors should have at least two bits");
@@ -1332,7 +1332,7 @@ literalt bv_utilst::unsigned_less_than(
   const bvt &op1)
 {
 #ifdef COMPACT_LT_OR_LE
-  return lt_or_le(false, op0, op1, UNSIGNED);
+  return lt_or_le(false, op0, op1, representationt::UNSIGNED);
 #else
   // A <= B  iff  there is an overflow on A-B
   return !carry_out(op0, inverted(op1), const_literal(true));
