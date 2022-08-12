@@ -275,9 +275,31 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   solver_process->send(function);
 }
 
+void smt2_incremental_decision_proceduret::define_index_identifiers(
+  const exprt &expr)
+{
+  expr.visit_pre([&](const exprt &expr_node) {
+    if(!can_cast_type<array_typet>(expr_node.type()))
+      return;
+    if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
+    {
+      const auto index_expr = with_expr->where();
+      const auto index_term = convert_expr_to_smt(index_expr);
+      const auto index_identifier = "index_" + std::to_string(index_sequence());
+      const auto index_definition =
+        smt_define_function_commandt{index_identifier, {}, index_term};
+      expression_identifiers.emplace(index_expr, index_definition.identifier());
+      identifier_table.emplace(index_identifier, index_definition.identifier());
+      solver_process->send(
+        smt_define_function_commandt{index_identifier, {}, index_term});
+    }
+  });
+}
+
 smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
+  define_index_identifiers(expr);
   const exprt substituted =
     substitute_identifiers(expr, expression_identifiers);
   track_expression_objects(substituted, ns, object_map);

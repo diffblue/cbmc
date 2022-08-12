@@ -91,6 +91,7 @@ protected:
   /// \brief Add objects in \p expr to object_map if needed and convert to smt.
   /// \note This function is non-const because it mutates the object_map.
   smt_termt convert_expr_to_smt(const exprt &expr);
+  void define_index_identifiers(const exprt &expr);
   /// Sends the solver the definitions of the object sizes.
   void define_object_sizes();
 
@@ -118,7 +119,7 @@ protected:
     {
       return next_id++;
     }
-  } handle_sequence, array_sequence;
+  } handle_sequence, array_sequence, index_sequence;
   /// When the `handle(exprt)` member function is called, the decision procedure
   /// commands the SMT solver to define a new function corresponding to the
   /// given expression. The mapping of the expressions to the function
