@@ -136,7 +136,19 @@ void satcheck_cadicalt::set_assignment(literalt a, bool value)
 satcheck_cadicalt::satcheck_cadicalt(message_handlert &message_handler)
   : cnf_solvert(message_handler), solver(new CaDiCaL::Solver())
 {
-  solver->set("quiet", 1);
+  bool ok;
+  ok = solver->set("quiet", 1);
+  CHECK_RETURN(ok);
+  ok = solver->set("chrono", 2);
+  CHECK_RETURN(ok);
+  ok = solver->set("cover", 1);
+  CHECK_RETURN(ok);
+  ok = solver->set("target", 0);
+  CHECK_RETURN(ok);
+  ok = solver->set("vivify", 0);
+  CHECK_RETURN(ok);
+  ok = solver->set("seed", 3);
+  CHECK_RETURN(ok);
 }
 
 satcheck_cadicalt::~satcheck_cadicalt()
