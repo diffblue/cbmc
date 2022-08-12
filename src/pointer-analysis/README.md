@@ -51,14 +51,6 @@ program. The main classes are \ref value_set_analysis_templatet,
 
 To be documented.
 
-\subsubsection pointer-analysis-flow-insensitive-with-vr Flow-insensitive with 'vr' (value reduction?)
-
-To be documented.
-
-\subsubsection pointer-analysis-flow-insensitive-with-vr-ns Flow-insensitive with 'vr' and 'ns' (value reduction, ???)
-
-To be documented.
-
 \section pointer-analysis-transformations Transformations:
 
 \subsection pointer-analysis-add-failed-symbols
