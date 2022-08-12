@@ -399,9 +399,24 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
   });
-  optionalt<smt_termt> descriptor =
-    get_identifier(expr, expression_handle_identifiers, expression_identifiers);
-
+  auto descriptor = [&]() -> optionalt<smt_termt> {
+    if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
+    {
+      const auto array = get_identifier(
+        index_expr->array(),
+        expression_handle_identifiers,
+        expression_identifiers);
+      const auto index = get_identifier(
+        index_expr->index(),
+        expression_handle_identifiers,
+        expression_identifiers);
+      if(!array || !index)
+        return {};
+      return smt_array_theoryt::select(*array, *index);
+    }
+    return get_identifier(
+      expr, expression_handle_identifiers, expression_identifiers);
+  }();
   if(!descriptor)
   {
     if(gather_dependent_expressions(expr).empty())
