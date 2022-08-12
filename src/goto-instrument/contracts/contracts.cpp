@@ -1382,15 +1382,12 @@ void code_contractst::enforce_contract(const irep_idt &function)
   goto_functions.function_map.erase(old_function);
 
   // Place a new symbol with the mangled name into the symbol table
-  source_locationt sl;
-  sl.set_file("instrumented for code contracts");
-  sl.set_line("0");
   symbolt mangled_sym;
   const symbolt *original_sym = symbol_table.lookup(original);
   mangled_sym = *original_sym;
   mangled_sym.name = mangled;
   mangled_sym.base_name = mangled;
-  mangled_sym.location = sl;
+  mangled_sym.location = original_sym->location;
   const auto mangled_found = symbol_table.insert(std::move(mangled_sym));
   INVARIANT(
     mangled_found.second,
@@ -1414,7 +1411,7 @@ void code_contractst::enforce_contract(const irep_idt &function)
 
   goto_functiont &wrapper = goto_functions.function_map[original];
   wrapper.parameter_identifiers = mangled_fun->second.parameter_identifiers;
-  wrapper.body.add(goto_programt::make_end_function(sl));
+  wrapper.body.add(goto_programt::make_end_function());
   add_contract_check(original, mangled, wrapper.body);
 }
 
@@ -1485,7 +1482,9 @@ void code_contractst::add_contract_check(
   // with expressions from the call site (e.g. the return value).
   exprt::operandst instantiation_values;
 
-  const auto &source_location = function_symbol.location;
+  source_locationt source_location = function_symbol.location;
+  // Set function in source location to original function
+  source_location.set_function(wrapper_function);
 
   // decl ret
   optionalt<code_returnt> return_stmt;

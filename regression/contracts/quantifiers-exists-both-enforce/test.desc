@@ -3,7 +3,7 @@ main.c
 --enforce-contract f1
 ^EXIT=0$
 ^SIGNAL=0$
-^\[postcondition.\d+\] file main.c line \d+ Check ensures clause: SUCCESS$
+^\[f1.postcondition.\d+\] line \d+ Check ensures clause: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

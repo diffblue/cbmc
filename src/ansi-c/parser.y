@@ -3407,6 +3407,19 @@ cprover_function_contract_sequence_opt:
           /* nothing */
           { init($$); }
         | cprover_function_contract_sequence
+        {
+          // Function contracts should either be attached to a
+          // top-level function declaration or top-level function
+          // definition.  Any embedded function pointer scopes should
+          // be disallowed.
+          int contract_in_global_scope = (PARSER.scopes.size() == 1);
+          int contract_in_top_level_function_scope = (PARSER.scopes.size() == 2);
+          if(!contract_in_global_scope && !contract_in_top_level_function_scope)
+          {
+            yyansi_cerror("Function contracts allowed only at top-level declarations.");
+            YYABORT;
+          }
+        }
         ;
 
 postfixing_abstract_declarator:
@@ -3447,15 +3460,41 @@ postfixing_abstract_declarator:
 parameter_postfixing_abstract_declarator:
           array_abstract_declarator
         | '(' ')'
+          {
+            // Set function name (last declarator) in source location
+            // before parsing function contracts.  Only do this if we
+            // are at a global scope.
+            if (PARSER.current_scope().prefix.empty()) {
+              PARSER.set_function(PARSER.current_scope().last_declarator);
+            }
+            // Use last declarator (i.e., function name) to name
+            // the scope.
+            PARSER.new_scope(
+              id2string(PARSER.current_scope().last_declarator)+"::");
+          }
           cprover_function_contract_sequence_opt
         {
           set($1, ID_code);
           stack_type($1).add(ID_parameters);
           stack_type($1).subtype()=typet(ID_abstract);
-          $$ = merge($3, $1);
+          PARSER.pop_scope();
+
+          // Clear function name in source location after parsing if
+          // at global scope.
+          if (PARSER.current_scope().prefix.empty()) {
+            PARSER.set_function(irep_idt());
+          }
+
+          $$ = merge($4, $1);
         }
         | '('
           {
+            // Set function name (last declarator) in source location
+            // before parsing function contracts.  Only do this if we
+            // are at a global scope.
+            if (PARSER.current_scope().prefix.empty()) {
+              PARSER.set_function(PARSER.current_scope().last_declarator);
+            }
             // Use last declarator (i.e., function name) to name
             // the scope.
             PARSER.new_scope(
@@ -3471,6 +3510,12 @@ parameter_postfixing_abstract_declarator:
           stack_type($1).add(ID_parameters).get_sub().
             swap((irept::subt &)(to_type_with_subtypes(stack_type($3)).subtypes()));
           PARSER.pop_scope();
+
+          // Clear function name in source location after parsing if
+          // at global scope.
+          if (PARSER.current_scope().prefix.empty()) {
+            PARSER.set_function(irep_idt());
+          }
 
           if(parser_stack($5).is_not_nil())
           {
