@@ -760,6 +760,24 @@ void value_sett::get_value_set_rec(
       insert(dest, it->first, offset);
     }
   }
+  else if(expr.id() == ID_lshr || expr.id() == ID_ashr || expr.id() == ID_shl)
+  {
+    const binary_exprt &binary_expr = to_binary_expr(expr);
+
+    object_mapt pointer_expr_set;
+    get_value_set_rec(
+      binary_expr.op0(), pointer_expr_set, "", binary_expr.op0().type(), ns);
+
+    for(const auto &object_map_entry : pointer_expr_set.read())
+    {
+      offsett offset = object_map_entry.second;
+
+      // kill any offset
+      offset.reset();
+
+      insert(dest, object_map_entry.first, offset);
+    }
+  }
   else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement = to_side_effect_expr(expr).get_statement();

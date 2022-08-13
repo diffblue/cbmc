@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Value sets must also track pointers the integer conversion of which is subject
+to shifts (just like we already tracked them through other bit operations).
