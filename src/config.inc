@@ -5,7 +5,7 @@ BUILD_ENV = AUTO
 ifeq ($(BUILD_ENV),MSVC)
   #CXXFLAGS += /Wall /WX
 else
-  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
+  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wno-register -Wswitch-enum
 endif
 
 ifeq ($(CPROVER_WITH_PROFILING),1)
@@ -30,12 +30,13 @@ endif
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
 #MINISAT2 = ../../minisat-2.2.1
+#MERGESAT = ../../mergesat-3.0
 #IPASIR = ../../ipasir
 #GLUCOSE = ../../glucose-syrup
 #CADICAL = ../../cadical
 
 # select default solver to be minisat2 if no other is specified
-ifeq ($(BOOLEFORCE)$(CHAFF)$(GLUCOSE)$(IPASIR)$(LINGELING)$(MINISAT)$(MINISAT2)$(PICOSAT)$(CADICAL),)
+ifeq ($(BOOLEFORCE)$(CHAFF)$(GLUCOSE)$(IPASIR)$(LINGELING)$(MINISAT)$(MINISAT2)$(MERGESAT)$(PICOSAT)$(CADICAL),)
   MINISAT2 = ../../minisat-2.2.1
 endif
 
@@ -61,6 +62,10 @@ endif
 
 ifneq ($(MINISAT2),)
   CP_CXXFLAGS += -DSATCHECK_MINISAT2
+endif
+
+ifneq ($(MERGESAT),)
+  CP_CXXFLAGS += -DSATCHECK_MERGESAT
 endif
 
 ifneq ($(GLUCOSE),)

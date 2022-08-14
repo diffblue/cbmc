@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/prop/prop.h>
 
+#include <map>
+
 // Shares variables between var == const tests for registered variables.
 // Gives ~15% memory savings on some programs using constant arrays
 // but seems to give a run-time penalty.
@@ -226,8 +228,7 @@ protected:
   void adder(
     bvt &sum,
     const bvt &op,
-    literalt carry_in,
-    literalt &carry_out);
+    literalt carry_in);
 
   void adder_no_overflow(
     bvt &sum,
@@ -246,6 +247,11 @@ protected:
   bvt cond_negate_no_overflow(const bvt &bv, const literalt cond);
 
   bvt wallace_tree(const std::vector<bvt> &pps);
+
+  using circuit_cachet = std::map<
+    std::pair<irep_idt, representationt>,
+    std::map<std::vector<bvt>, std::vector<bvt>>>;
+  circuit_cachet circuit_cache;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H

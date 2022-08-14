@@ -290,19 +290,120 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   }
 }
 
+static literalt carry_out_of_sum(
+  propt &prop,
+  const bvt &op0,
+  const bvt &op1,
+  const bvt &sum)
+{
+  literalt a = op0.back();
+  literalt b = op1.back();
+  literalt s = sum.back();
+
+  const auto const_count =
+    a.is_constant() + b.is_constant() + s.is_constant();
+
+  if(const_count >= 2 || true)
+  {
+    return
+      prop.lor(
+      prop.land(a, b),
+      prop.land(!s, prop.lor(a, b)));
+  }
+
+  literalt c = prop.new_variable();
+
+  // TODO
+  assert(false);
+  prop.lcnf({a, b, s, c});
+
+  return c;
+}
+
 void bv_utilst::adder(
   bvt &sum,
   const bvt &op,
-  literalt carry_in,
-  literalt &carry_out)
+  literalt carry_in)
 {
   PRECONDITION(sum.size() == op.size());
 
-  carry_out=carry_in;
-
-  for(std::size_t i=0; i<sum.size(); i++)
+  if(sum.empty() || !prop.has_set_to() || !prop.cnf_handled_well())
   {
-    sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
+    literalt carry_out=carry_in;
+
+    for(std::size_t i=0; i<sum.size(); i++)
+    {
+      sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
+    }
+  }
+  else
+  {
+    bvt first_op = sum;
+
+    bvt constants;
+    constants.reserve(2);
+    if(first_op[0].is_constant())
+      constants.push_back(first_op[0]);
+    if(op[0].is_constant())
+      constants.push_back(op[0]);
+    else
+      sum[0] = op[0];
+    if(constants.size() == 2)
+      sum[0] = constants[0] == constants[1] ? carry_in : !carry_in;
+    else if(constants.size() == 1 && carry_in.is_constant())
+    {
+      if(constants[0] != carry_in)
+        sum[0].invert();
+    }
+    else
+    {
+      sum[0] = prop.new_variable();
+      prop.lcnf({sum[0], first_op[0], op[0], !carry_in});
+      prop.lcnf({sum[0], first_op[0], !op[0], carry_in});
+      prop.lcnf({sum[0], !first_op[0], op[0], carry_in});
+      prop.lcnf({sum[0], !first_op[0], !op[0], !carry_in});
+      prop.lcnf({!sum[0], first_op[0], op[0], carry_in});
+      prop.lcnf({!sum[0], first_op[0], !op[0], !carry_in});
+      prop.lcnf({!sum[0], !first_op[0], op[0], !carry_in});
+      prop.lcnf({!sum[0], !first_op[0], !op[0], carry_in});
+    }
+
+    for(std::size_t i=1; i<sum.size(); i++)
+    {
+      sum[i] = prop.new_variable();
+
+      prop.lcnf({sum[i], first_op[i], op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({sum[i], first_op[i], op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({sum[i], first_op[i], op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({sum[i], first_op[i], !op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({sum[i], first_op[i], !op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({sum[i], first_op[i], !op[i], !sum[i-1], op[i-1]});
+
+      prop.lcnf({sum[i], !first_op[i], op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({sum[i], !first_op[i], op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({sum[i], !first_op[i], op[i], !sum[i-1], op[i-1]});
+
+      prop.lcnf({sum[i], !first_op[i], !op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({sum[i], !first_op[i], !op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({sum[i], !first_op[i], !op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({!sum[i], first_op[i], op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({!sum[i], first_op[i], op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({!sum[i], first_op[i], op[i], !sum[i-1], op[i-1]});
+
+      prop.lcnf({!sum[i], first_op[i], !op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({!sum[i], first_op[i], !op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({!sum[i], first_op[i], !op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({!sum[i], !first_op[i], op[i], !first_op[i-1], !op[i-1]});
+      prop.lcnf({!sum[i], !first_op[i], op[i], sum[i-1], !first_op[i-1]});
+      prop.lcnf({!sum[i], !first_op[i], op[i], sum[i-1], !op[i-1]});
+
+      prop.lcnf({!sum[i], !first_op[i], !op[i], first_op[i-1], op[i - 1]});
+      prop.lcnf({!sum[i], !first_op[i], !op[i], !sum[i-1], first_op[i-1]});
+      prop.lcnf({!sum[i], !first_op[i], !op[i], !sum[i-1], op[i-1]});
+    }
   }
 }
 
@@ -337,12 +438,11 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
   PRECONDITION(op0.size() == op1.size());
 
   literalt carry_in=const_literal(subtract);
-  literalt carry_out;
 
   bvt result=op0;
   bvt tmp_op1=subtract?inverted(op1):op1;
 
-  adder(result, tmp_op1, carry_in, carry_out);
+  adder(result, tmp_op1, carry_in);
 
   return result;
 }
@@ -353,9 +453,8 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
     select(subtract, inverted(op1), op1);
 
   bvt result=op0;
-  literalt carry_out;
 
-  adder(result, op1_sign_applied, subtract, carry_out);
+  adder(result, op1_sign_applied, subtract);
 
   return result;
 }
@@ -371,12 +470,12 @@ bvt bv_utilst::saturating_add_sub(
     rep == representationt::SIGNED || rep == representationt::UNSIGNED);
 
   literalt carry_in = const_literal(subtract);
-  literalt carry_out;
 
   bvt add_sub_result = op0;
   bvt tmp_op1 = subtract ? inverted(op1) : op1;
 
-  adder(add_sub_result, tmp_op1, carry_in, carry_out);
+  adder(add_sub_result, tmp_op1, carry_in);
+  literalt carry_out = carry_out_of_sum(prop, op0, tmp_op1, add_sub_result);
 
   bvt result;
   result.reserve(add_sub_result.size());
@@ -496,8 +595,7 @@ void bv_utilst::adder_no_overflow(
     literalt sign_the_same=
       prop.lequal(sum[sum.size()-1], tmp_op[tmp_op.size()-1]);
 
-    literalt carry;
-    adder(sum, tmp_op, const_literal(subtract), carry);
+    adder(sum, tmp_op, const_literal(subtract));
 
     // result of addition in sum
     prop.l_set_to_false(
@@ -508,18 +606,18 @@ void bv_utilst::adder_no_overflow(
     INVARIANT(
       rep == representationt::UNSIGNED,
       "representation has either value signed or unsigned");
-    literalt carry_out;
-    adder(sum, tmp_op, const_literal(subtract), carry_out);
+    bvt op0 = sum;
+    adder(sum, tmp_op, const_literal(subtract));
+    literalt carry_out = carry_out_of_sum(prop, op0, tmp_op, sum);
     prop.l_set_to(carry_out, subtract);
   }
 }
 
 void bv_utilst::adder_no_overflow(bvt &sum, const bvt &op)
 {
-  literalt carry_out=const_literal(false);
-
-  adder(sum, op, carry_out, carry_out);
-
+  bvt op0 = sum;
+  adder(sum, op, const_literal(false));
+  literalt carry_out = carry_out_of_sum(prop, op0, op, sum);
   prop.l_set_to_false(carry_out); // enforce no overflow
 }
 
@@ -700,7 +798,8 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
 
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
-  #if 1
+//#ifndef SATCHECK_CADICAL
+#if 0
   bvt op0=_op0, op1=_op1;
 
   if(is_constant(op1))
@@ -729,7 +828,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     }
 
   return product;
-  #else
+#else
   // Wallace tree multiplier. This is disabled, as runtimes have
   // been observed to go up by 5%-10%, and on some models even by 20%.
 
@@ -764,8 +863,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     return zeros(op0.size());
   else
     return wallace_tree(pps);
-
-  #endif
+#endif
 }
 
 bvt bv_utilst::unsigned_multiplier_no_overflow(
@@ -878,13 +976,23 @@ bvt bv_utilst::multiplier(
   const bvt &op1,
   representationt rep)
 {
+  auto cache_entry =
+    circuit_cache[{ID_mult, rep}].insert({{op0, op1}, {bvt{}}});
+  if(!cache_entry.second)
+    return cache_entry.first->second[0];
+
   switch(rep)
   {
-  case representationt::SIGNED: return signed_multiplier(op0, op1);
-  case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
+  case representationt::SIGNED:
+    cache_entry.first->second[0] = signed_multiplier(op0, op1);
+  case representationt::UNSIGNED:
+    cache_entry.first->second[0] = unsigned_multiplier(op0, op1);
   }
 
-  UNREACHABLE;
+  // multiplication is commutative
+  circuit_cache[{ID_mult, rep}][{op1, op0}] = {cache_entry.first->second};
+
+  return cache_entry.first->second[0];
 }
 
 bvt bv_utilst::multiplier_no_overflow(
@@ -947,6 +1055,15 @@ void bv_utilst::divider(
 {
   PRECONDITION(prop.has_set_to());
 
+  auto cache_entry =
+    circuit_cache[{ID_div, rep}].insert({{op0, op1}, {bvt{}, bvt{}}});
+  if(!cache_entry.second)
+  {
+    result = cache_entry.first->second[0];
+    remainer = cache_entry.first->second[1];
+    return;
+  }
+
   switch(rep)
   {
   case representationt::SIGNED:
@@ -954,6 +1071,9 @@ void bv_utilst::divider(
   case representationt::UNSIGNED:
     unsigned_divider(op0, op1, result, remainer); break;
   }
+
+  cache_entry.first->second[0] = result;
+  cache_entry.first->second[1] = remainer;
 }
 
 void bv_utilst::unsigned_divider(
@@ -1185,6 +1305,16 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
     return equal_const(op0, op1);
   #endif
 
+  // If the eventual result would be "false" anyway, avoid constructing
+  // equalities that would end up not affecting the satisfiability of the
+  // formula (effectively doing preprocessing steps that the SAT solver would
+  // otherwise have to undertake).
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    if(op0[i] != op1[i] && op0[i].var_no() == op1[i].var_no())
+      return const_literal(false);
+  }
+
   bvt equal_bv;
   equal_bv.resize(op0.size());
 
@@ -1205,7 +1335,7 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 
 // Saves space but slows the solver
 // There is a variant that uses the xor as an auxiliary that should improve both
-// #define COMPACT_LT_OR_LE
+#define COMPACT_LT_OR_LE
 
 
 

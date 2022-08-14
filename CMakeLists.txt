@@ -72,10 +72,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
     #   Enable lots of warnings
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wswitch-enum")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wpedantic -Werror -Wno-deprecated-declarations -Wno-register -Wswitch-enum")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    # This would be the place to enable warnings for Windows builds, although
-    # config.inc doesn't seem to do that currently
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF ")
 
     # Include Git Bash Environment (rqeuired for download_project (patch))
     find_package(Git)
@@ -180,16 +179,12 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 endif()
 
 function(cprover_default_properties)
-    set(CBMC_CXX_STANDARD 11)
-    set(CBMC_CXX_STANDARD_REQUIRED true)
     set(CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY
             "Developer ID Application: Daniel Kroening")
 
     set_target_properties(
       ${ARGN}
      PROPERTIES
-     CXX_STANDARD ${CBMC_CXX_STANDARD}
-     CXX_STANDARD_REQUIRED ${CBMC_CXX_STANDARD_REQUIRED}
      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY})
 endfunction()
 

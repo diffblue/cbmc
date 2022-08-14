@@ -110,7 +110,11 @@ void boolbv_mapt::set_literals(
       INVARIANT(
         bit < map_entry.literal_map.size(), "bit index shall be within bounds");
 
-      prop.set_equal(map_entry.literal_map[bit], literal);
+      if(map_entry.literal_map[bit] != literal)
+      {
+        // this branch should be avoided wherever possible
+        prop.set_equal(map_entry.literal_map[bit], literal);
+      }
     }
   }
 }

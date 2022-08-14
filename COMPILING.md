@@ -152,7 +152,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    dnf install gcc gcc-c++ flex bison curl patch
    ```
-   Note that you need g++ version 5.0 or newer.
+   Note that you need g++ version 7.0 or newer.
 
    On Amazon Linux and similar distributions, do as root:
    ```

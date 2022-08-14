@@ -1,0 +1,28 @@
+# CBMC only uses part of MergeSat.
+# This CMakeLists is designed to build just the parts that are needed.
+
+add_library(mergesat-condensed
+    minisat/core/Lookahead.cc
+    minisat/core/Solver.cc
+    minisat/simp/SimpSolver.cc
+    minisat/utils/ccnr.cc
+    minisat/utils/Options.cc
+    minisat/utils/System.cc
+)
+
+set_target_properties(
+    mergesat-condensed
+    PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED true
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    target_compile_options(mergesat-condensed PUBLIC /w)
+endif()
+
+target_include_directories(mergesat-condensed
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)

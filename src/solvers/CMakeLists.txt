@@ -1,6 +1,3 @@
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
-
 #   We may use one of several different solver libraries.
 #   The following files wrap the chosen solver library.
 #   We remove them all from the solver-library sources list, and then add the
@@ -12,7 +9,7 @@ set(chaff_source
 set(minisat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_minisat.cpp
 )
-set(minisat2_source
+set(minisat2_mergesat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_minisat2.cpp
 )
 set(glucose_source
@@ -47,7 +44,7 @@ file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
     ${chaff_source}
     ${minisat_source}
-    ${minisat2_source}
+    ${minisat2_mergesat_source}
     ${glucose_source}
     ${squolem2_source}
     ${cudd_source}
@@ -81,9 +78,28 @@ if("${sat_impl}" STREQUAL "minisat2")
         SATCHECK_MINISAT2 HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
     )
 
-    target_sources(solvers PRIVATE ${minisat2_source})
+    target_sources(solvers PRIVATE ${minisat2_mergesat_source})
 
     target_link_libraries(solvers minisat2-condensed)
+elseif("${sat_impl}" STREQUAL "mergesat")
+    message(STATUS "Building solvers with MergeSat")
+
+    download_project(PROJ mergesat
+        URL https://github.com/conp-solutions/mergesat/archive/4.0-rc.tar.gz
+        PATCH_COMMAND true
+        COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/mergesat_CMakeLists.txt CMakeLists.txt
+        URL_MD5 069c0d4f69723847055c3491cff5940e
+    )
+
+    add_subdirectory(${mergesat_SOURCE_DIR} ${mergesat_BINARY_DIR})
+
+    target_compile_definitions(solvers PUBLIC
+        SATCHECK_MERGESAT HAVE_MERGESAT __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
+    )
+
+    target_sources(solvers PRIVATE ${minisat2_mergesat_source})
+
+    target_link_libraries(solvers mergesat-condensed)
 elseif("${sat_impl}" STREQUAL "glucose")
     message(STATUS "Building solvers with glucose")
 
@@ -109,7 +125,7 @@ elseif("${sat_impl}" STREQUAL "cadical")
     download_project(PROJ cadical
         URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
-        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++14
+        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++17
         URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 
@@ -139,7 +155,7 @@ elseif("${sat_impl}" STREQUAL "ipasir-cadical")
     download_project(PROJ cadical
         URL https://github.com/arminbiere/cadical/archive/rel-1.4.1.tar.gz
         PATCH_COMMAND true
-        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++14
+        COMMAND CXX=${CMAKE_CXX_COMPILER} ./configure -O3 -s CXXFLAGS=-std=c++17
         URL_MD5 b44874501a175106424f4bd5de29aa59
     )
 

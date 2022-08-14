@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define SATCHECK_ZCHAFF
 // #define SATCHECK_MINISAT1
 // #define SATCHECK_MINISAT2
+// #define SATCHECK_MERGESAT
 // #define SATCHECK_GLUCOSE
 // #define SATCHECK_BOOLEFORCE
 // #define SATCHECK_PICOSAT
@@ -37,6 +38,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #if defined(HAVE_MINISAT2) && !defined(SATCHECK_MINISAT2)
 #define SATCHECK_MINISAT2
+#endif
+
+#if defined(HAVE_MERGESAT) && !defined(SATCHECK_MERGESAT)
+#  define SATCHECK_MERGESAT
 #endif
 
 #if defined(HAVE_GLUCOSE) && !defined(SATCHECK_GLUCOSE)
@@ -80,9 +85,11 @@ typedef satcheck_booleforcet satcheck_no_simplifiert;
 typedef satcheck_minisat1t satcheckt;
 typedef satcheck_minisat1t satcheck_no_simplifiert;
 
-#elif defined SATCHECK_MINISAT2
+#elif defined SATCHECK_MINISAT2 || defined SATCHECK_MERGESAT
+// MergeSat is based on MiniSat2 and is invoked (with suitable defines/ifdefs)
+// via satcheck_minisat2.{h,cpp}
 
-#include "satcheck_minisat2.h"
+#  include "satcheck_minisat2.h"
 
 typedef satcheck_minisat_simplifiert satcheckt;
 typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;

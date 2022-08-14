@@ -6,7 +6,7 @@ set -e
 cd `dirname $0`
 
 echo "Compiling the helper file to extract the raw list of parameters from cbmc"
-g++ -E -dM -std=c++11 -I../../src ../../src/cbmc/cbmc_parse_options.cpp -o macros.c
+g++ -E -dM -std=c++17 -I../../src ../../src/cbmc/cbmc_parse_options.cpp -o macros.c
 echo CBMC_OPTIONS >> macros.c
 
 echo "Converting the raw parameter list to the format required by autocomplete scripts"

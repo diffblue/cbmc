@@ -332,9 +332,13 @@ void symex_target_equationt::convert_without_assertions(
     hardness.register_ssa_size(SSA_steps.size());
   });
 
-  convert_guards(decision_procedure);
+  // The order matters here: the decision procedure may be able to re-use
+  // variables obtained from constructing the right-hand side of an assignment
+  // for the left-hand side. Those left-hand sides might then appear in guards
+  // or assumptions, so do assignments and decls before any of the others.
   convert_assignments(decision_procedure);
   convert_decls(decision_procedure);
+  convert_guards(decision_procedure);
   convert_assumptions(decision_procedure);
   convert_goto_instructions(decision_procedure);
   convert_function_calls(decision_procedure);
@@ -386,11 +390,10 @@ void symex_target_equationt::convert_decls(
   {
     if(step.is_decl() && !step.ignore && !step.converted)
     {
-      // The result is not used, these have no impact on
-      // the satisfiability of the formula.
-      decision_procedure.handle(step.cond_expr);
-      decision_procedure.handle(
-        equal_exprt{step.ssa_full_lhs, step.ssa_full_lhs});
+      decision_procedure.set_to_true(step.cond_expr);
+      equal_exprt eq{step.ssa_full_lhs, step.ssa_full_lhs};
+      merge_irep(eq);
+      decision_procedure.set_to_true(eq);
       step.converted = true;
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
@@ -445,6 +448,7 @@ void symex_target_equationt::convert_assumptions(
         with_solver_hardness(
           decision_procedure, hardness_register_ssa(step_index, step));
       }
+      step.converted = true;
     }
     ++step_index;
   }
@@ -533,10 +537,8 @@ void symex_target_equationt::convert_assertions(
       }
       else if(step.is_assume())
       {
-        decision_procedure.set_to_true(step.cond_expr);
-
-        with_solver_hardness(
-          decision_procedure, hardness_register_ssa(step_index, step));
+        PRECONDITION(step.converted);
+        decision_procedure.set_to_true(step.cond_handle);
       }
       ++step_index;
     }
@@ -586,6 +588,7 @@ void symex_target_equationt::convert_assertions(
     }
     else if(step.is_assume())
     {
+      PRECONDITION(step.converted);
       // the assumptions have been converted before
       // avoid deep nesting of ID_and expressions
       if(assumption.id()==ID_and)
@@ -620,33 +623,18 @@ void symex_target_equationt::convert_function_calls(
   {
     if(!step.ignore)
     {
-      and_exprt::operandst conjuncts;
       step.converted_function_arguments.reserve(step.ssa_function_arguments.size());
 
       for(const auto &arg : step.ssa_function_arguments)
       {
-        if(arg.is_constant() ||
-           arg.id()==ID_string_constant)
-          step.converted_function_arguments.push_back(arg);
-        else
+        if(!arg.is_constant() && arg.id() != ID_string_constant)
         {
-          const irep_idt identifier="symex::args::"+std::to_string(argument_count++);
-          symbol_exprt symbol(identifier, arg.type());
-
-          equal_exprt eq(arg, symbol);
+          equal_exprt eq{arg, arg};
           merge_irep(eq);
-
-          decision_procedure.set_to(eq, true);
-          conjuncts.push_back(eq);
-          step.converted_function_arguments.push_back(symbol);
+          decision_procedure.set_to_true(eq);
         }
+        step.converted_function_arguments.push_back(arg);
       }
-      with_solver_hardness(
-        decision_procedure,
-        [step_index, &conjuncts, &step](solver_hardnesst &hardness) {
-          hardness.register_ssa(
-            step_index, conjunction(conjuncts), step.source.pc);
-        });
     }
     ++step_index;
   }
@@ -659,32 +647,16 @@ void symex_target_equationt::convert_io(decision_proceduret &decision_procedure)
   {
     if(!step.ignore)
     {
-      and_exprt::operandst conjuncts;
       for(const auto &arg : step.io_args)
       {
-        if(arg.is_constant() ||
-           arg.id()==ID_string_constant)
-          step.converted_io_args.push_back(arg);
-        else
+        if(!arg.is_constant() && arg.id() != ID_string_constant)
         {
-          const irep_idt identifier =
-            "symex::io::" + std::to_string(io_count++);
-          symbol_exprt symbol(identifier, arg.type());
-
-          equal_exprt eq(arg, symbol);
+          equal_exprt eq{arg, arg};
           merge_irep(eq);
-
-          decision_procedure.set_to(eq, true);
-          conjuncts.push_back(eq);
-          step.converted_io_args.push_back(symbol);
+          decision_procedure.set_to_true(eq);
         }
+        step.converted_io_args.push_back(arg);
       }
-      with_solver_hardness(
-        decision_procedure,
-        [step_index, &conjuncts, &step](solver_hardnesst &hardness) {
-          hardness.register_ssa(
-            step_index, conjunction(conjuncts), step.source.pc);
-        });
     }
     ++step_index;
   }
