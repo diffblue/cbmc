@@ -62,13 +62,16 @@ get_problem_messages(const smt_responset &response)
 ///   `convert_expr_to_smt`. This is because any sub expressions which
 ///   `convert_expr_to_smt` translates into function applications, must also be
 ///   returned by this`gather_dependent_expressions` function.
+/// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
+///   dependant expressions.
 static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
 {
   std::vector<exprt> dependent_expressions;
   expr.visit_pre([&](const exprt &expr_node) {
     if(
       can_cast_expr<symbol_exprt>(expr_node) ||
-      can_cast_expr<array_exprt>(expr_node))
+      can_cast_expr<array_exprt>(expr_node) ||
+      can_cast_expr<nondet_symbol_exprt>(expr_node))
     {
       dependent_expressions.push_back(expr_node);
     }
@@ -98,6 +101,21 @@ void smt2_incremental_decision_proceduret::define_array_function(
     solver_process->send(element_definition);
   }
   expression_identifiers.emplace(array, array_identifier);
+}
+
+void send_function_definition(
+  const exprt &expr,
+  const irep_idt &symbol_identifier,
+  const std::unique_ptr<smt_base_solver_processt> &solver_process,
+  std::unordered_map<exprt, smt_identifier_termt, irep_hash>
+    &expression_identifiers)
+{
+  const smt_declare_function_commandt function{
+    smt_identifier_termt(
+      symbol_identifier, convert_type_to_smt_sort(expr.type())),
+    {}};
+  expression_identifiers.emplace(expr, function.identifier());
+  solver_process->send(function);
 }
 
 /// \brief Defines any functions which \p expr depends on, which have not yet
@@ -134,12 +152,11 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
       const symbolt *symbol = nullptr;
       if(ns.lookup(identifier, symbol) || symbol->value.is_nil())
       {
-        const smt_declare_function_commandt function{
-          smt_identifier_termt(
-            identifier, convert_type_to_smt_sort(symbol_expr->type())),
-          {}};
-        expression_identifiers.emplace(*symbol_expr, function.identifier());
-        solver_process->send(function);
+        send_function_definition(
+          *symbol_expr,
+          symbol_expr->get_identifier(),
+          solver_process,
+          expression_identifiers);
       }
       else
       {
@@ -153,6 +170,16 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
     }
     if(const auto array_expr = expr_try_dynamic_cast<array_exprt>(current))
       define_array_function(*array_expr);
+    if(
+      const auto nondet_symbol =
+        expr_try_dynamic_cast<nondet_symbol_exprt>(current))
+    {
+      send_function_definition(
+        *nondet_symbol,
+        nondet_symbol->get_identifier(),
+        solver_process,
+        expression_identifiers);
+    }
     to_be_defined.pop();
   }
 }

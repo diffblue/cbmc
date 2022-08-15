@@ -23,6 +23,7 @@
 // means that we get error messages showing the smt formula expressed as SMT2
 // strings instead of `{?}` being printed. It works because catch uses the
 // appropriate overload of `operator<<` where it exists.
+#include <goto-symex/path_storage.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <deque>
@@ -305,6 +306,49 @@ TEST_CASE(
           smt_define_function_commandt{
             "B0", {}, smt_identifier_termt{"bar", smt_bit_vector_sortt{8}}}});
     }
+  }
+  SECTION("Handle single nondet_symbol")
+  {
+    // Using the standard way to create nondet_symbol_exprt.
+    ::symex_nondet_generatort generator;
+    const nondet_symbol_exprt nondet_symbol0 =
+      generator(bool_typet{}, source_locationt{});
+    const smt_identifier_termt nondet_symbol_term0{
+      nondet_symbol0.get_identifier(), smt_bool_sortt{}};
+    test.sent_commands.clear();
+    test.procedure.handle(nondet_symbol0);
+    REQUIRE(
+      test.sent_commands ==
+      std::vector<smt_commandt>{
+        smt_declare_function_commandt{nondet_symbol_term0, {}},
+        smt_define_function_commandt{"B0", {}, nondet_symbol_term0}});
+  }
+  SECTION("Handle multiple nested nondet_symbol")
+  {
+    ::symex_nondet_generatort generator;
+    const nondet_symbol_exprt nondet_symbol1 =
+      generator(bv_typet(42), source_locationt{});
+    const smt_identifier_termt nondet_symbol_term1{
+      nondet_symbol1.get_identifier(), smt_bit_vector_sortt{42}};
+    const nondet_symbol_exprt nondet_symbol2 =
+      generator(bv_typet(42), source_locationt{});
+    const smt_identifier_termt nondet_symbol_term2{
+      nondet_symbol2.get_identifier(), smt_bit_vector_sortt{42}};
+    // Check that the 2 calls to the generator returns unique nondet_symbols.
+    REQUIRE(
+      nondet_symbol1.get_identifier() != nondet_symbol_term2.identifier());
+    test.sent_commands.clear();
+    test.procedure.handle(equal_exprt{nondet_symbol1, nondet_symbol2});
+    // Checking that we defined 2 symbols and that they are correctly compared.
+    REQUIRE(
+      test.sent_commands ==
+      std::vector<smt_commandt>{
+        smt_declare_function_commandt{nondet_symbol_term1, {}},
+        smt_declare_function_commandt{nondet_symbol_term2, {}},
+        smt_define_function_commandt{
+          "B0",
+          {},
+          smt_core_theoryt::equal(nondet_symbol_term1, nondet_symbol_term2)}});
   }
 }
 
