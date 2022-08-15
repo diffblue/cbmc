@@ -85,6 +85,7 @@ void smt2_incremental_decision_proceduret::initialize_array_elements(
   const array_exprt &array,
   const smt_identifier_termt &array_identifier)
 {
+  identifier_table.emplace(array_identifier.identifier(), array_identifier);
   const std::vector<exprt> &elements = array.operands();
   const typet &index_type = array.type().index_type();
   for(std::size_t i = 0; i < elements.size(); ++i)
@@ -136,13 +137,15 @@ void send_function_definition(
   const irep_idt &symbol_identifier,
   const std::unique_ptr<smt_base_solver_processt> &solver_process,
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_identifiers)
+    &expression_identifiers,
+  std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   const smt_declare_function_commandt function{
     smt_identifier_termt(
       symbol_identifier, convert_type_to_smt_sort(expr.type())),
     {}};
   expression_identifiers.emplace(expr, function.identifier());
+  identifier_table.emplace(symbol_identifier, function.identifier());
   solver_process->send(function);
 }
 
@@ -184,7 +187,8 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
           *symbol_expr,
           symbol_expr->get_identifier(),
           solver_process,
-          expression_identifiers);
+          expression_identifiers,
+          identifier_table);
       }
       else
       {
@@ -193,6 +197,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         const smt_define_function_commandt function{
           symbol->name, {}, convert_expr_to_smt(symbol->value)};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
+        identifier_table.emplace(identifier, function.identifier());
         solver_process->send(function);
       }
     }
@@ -211,7 +216,8 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         *nondet_symbol,
         nondet_symbol->get_identifier(),
         solver_process,
-        expression_identifiers);
+        expression_identifiers,
+        identifier_table);
     }
     to_be_defined.pop();
   }
@@ -264,6 +270,8 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
   expression_handle_identifiers.emplace(expr, function.identifier());
+  identifier_table.emplace(
+    function.identifier().identifier(), function.identifier());
   solver_process->send(function);
 }
 
