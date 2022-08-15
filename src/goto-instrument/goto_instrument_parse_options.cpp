@@ -1147,6 +1147,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
+  if(cmdline.isset("synthesize-loop-invariants"))
+  {
+    log.warning() << "Loop invariant synthesizer is still work in progress. "
+                     "It only generates TRUE as invariants."
+                  << messaget::eom;
+
+    // Synthesize loop invariants and annotate them into `goto_model`
+    enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
+    annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
+  }
+
   if(
     cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
     cmdline.isset(FLAG_ENFORCE_CONTRACT))
@@ -1897,6 +1908,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Code contracts:\n"
     HELP_LOOP_CONTRACTS
+    HELP_LOOP_INVARIANT_SYNTHESIZER
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     "\n"
