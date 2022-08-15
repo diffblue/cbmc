@@ -41,6 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwindset.h"
 
 #include "contracts/contracts.h"
+#include "synthesizer/enumerative_loop_invariant_synthesizer.h"
 #include "wmm/weak_memory.h"
 
 // clang-format off
@@ -116,6 +117,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_NONDET_VOLATILE \
   "(ensure-one-backedge-per-target)" \
   OPT_CONFIG_LIBRARY \
+  OPT_SYNTHESIZE_LOOP_INVARIANTS \
   // empty last line
 
 // clang-format on

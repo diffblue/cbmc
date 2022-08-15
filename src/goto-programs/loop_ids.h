@@ -18,6 +18,34 @@ class goto_functionst;
 class goto_modelt;
 class goto_programt;
 
+/// Loop id used to identify loops. It consists of two arguments:
+/// `function_id`
+///     the function id stored as keys of `function_mapt`; and
+/// `loop_number`
+///     the index of loop indicated by `loop_number` of backward
+///     goto instruction.
+struct loop_idt
+{
+  loop_idt(const irep_idt &function_id, const unsigned int loop_number)
+    : function_id(function_id), loop_number(loop_number)
+  {
+  }
+
+  irep_idt function_id;
+  unsigned int loop_number;
+
+  bool operator==(const loop_idt &o) const
+  {
+    return function_id == o.function_id && loop_number == o.loop_number;
+  }
+
+  bool operator<(const loop_idt &o) const
+  {
+    return function_id < o.function_id ||
+           (function_id == o.function_id && loop_number < o.loop_number);
+  }
+};
+
 void show_loop_ids(
   ui_message_handlert::uit,
   const goto_modelt &);
