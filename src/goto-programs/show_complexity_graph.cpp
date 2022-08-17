@@ -917,7 +917,8 @@ void dump_nodes
     //  }
     //}
 
-    std::string color; 
+    std::string color = "000000"; 
+    std::string fillcolor; 
     // int size = (8 + sqrt(metrics.find(name)->second.function_size));
     std::string size;
     std::string style;
@@ -930,8 +931,11 @@ void dump_nodes
               node.has_property("private") ? "ellipse" : 
               node.has_property("library") ? "pentagon" :
               "rect";
-      //color = color_of_score (globalized_scores.find (name)->second);
-      color = color_of_score (scores.find (name)->second); // , globalized_scores.find (name)->second);
+      if (node.has_property("library")) {
+        color = "FF0000";
+      }
+      //fillcolor = fillcolor_of_score (globalized_scores.find (name)->second);
+      fillcolor = color_of_score (scores.find (name)->second); // , globalized_scores.find (name)->second);
       style = "filled";
       size = "8";
       label << node.display_name;
@@ -944,14 +948,14 @@ void dump_nodes
       break;
     case complexity_grapht::nodet::node_typet::FUNCTION_POINTER:
       shape = "rarrow";
-      color = "ffffff";
+      fillcolor = "ffffff";
       style = "filled";
       size = "8";
       label << node.display_name;
       break;
     case complexity_grapht::nodet::node_typet::LOOP:
       shape = "doublecircle";
-      color = "ffffff";
+      fillcolor = "ffffff";
       style = "filled";
       size = "8";
       label << node.display_name;
@@ -968,7 +972,8 @@ void dump_nodes
         << "label=" << "<" << label.str() << ">" << ","
         << "shape=" << shape << ","
         << "style=" << style << ","
-        << "fillcolor=" << "\"#" << color << "\","
+        << "color=" << "\"#" << color << "\","
+        << "fillcolor=" << "\"#" << fillcolor << "\","
         << "fontsize=" << size
         << "];\n\n";
 
@@ -1015,7 +1020,7 @@ void dump_edges
       out << dot_node_naming.find(node1.name)->second << " -> " << dot_node_naming.find(node2.name)->second << ";\n\n";
 
       /*
-    std::string color = "0000ff";
+    std::string fillcolor = "0000ff";
     std::string opacity = "18";
                  << " ["
                  << "color=" << "\"#" << color << opacity << "\""
