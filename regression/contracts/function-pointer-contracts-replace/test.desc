@@ -1,7 +1,7 @@
 CORE
 main.c
 --replace-call-with-contract foo
-^\[precondition.\d+] file main.c line 19 Assert function pointer 'infun' obeys contract 'contract': SUCCESS$
+^\[foo.precondition.\d+] line 19 Assert function pointer 'infun' obeys contract 'contract': SUCCESS$
 ^\[main.assertion.\d+].* assertion outfun1 == contract: SUCCESS$
 ^\[main.assertion.\d+].* assertion outfun2 == contract: SUCCESS$
 ^EXIT=0$

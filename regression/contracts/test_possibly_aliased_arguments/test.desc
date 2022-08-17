@@ -3,7 +3,7 @@ main.c
 --replace-call-with-contract sub_ptr_values
 ^EXIT=0$
 ^SIGNAL=0$
-\[precondition.\d+\] file main.c line \d+ Check requires clause: SUCCESS
+\[sub_ptr_values.precondition.\d+\] line \d+ Check requires clause: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 --

@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^.*: Function contracts allowed only at top-level declarations. .*$
+^PARSING ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks if function contracts can be attached to function pointers
+(with non-empty parameter lists) in function parameters.  This should
+fail.  Exit code 64 for Windows servers.

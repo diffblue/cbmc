@@ -1,8 +1,8 @@
 CORE
 main.c
 --apply-loop-contracts --replace-call-with-contract ackermann
-^\[precondition\.\d+\] .* line 17 Check requires clause: SUCCESS$
-^\[precondition\.\d+\] .* line 17 Check requires clause: SUCCESS$
+^\[ackermann.precondition\.\d+\] line 17 Check requires clause: SUCCESS$
+^\[ackermann.precondition\.\d+\] line 17 Check requires clause: SUCCESS$
 ^\[ackermann\.\d+\] line 21 Check loop invariant before entry: SUCCESS$
 ^\[ackermann\.\d+\] line 21 Check that loop invariant is preserved: SUCCESS$
 ^\[ackermann\.\d+\] line 21 Check decreases clause on loop iteration: SUCCESS$
