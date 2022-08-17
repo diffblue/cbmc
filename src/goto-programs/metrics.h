@@ -103,7 +103,7 @@ int num_func_pointer_calls (const std::vector<std::vector<goto_programt::const_t
 
 int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
-int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
+int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_targett>> &instructions, const std::set<std::string> &lib_funcs);
 
 int num_complex_cbmc_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 

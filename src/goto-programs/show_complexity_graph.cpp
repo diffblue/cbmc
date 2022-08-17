@@ -131,6 +131,7 @@ void produce_node_rec (const goto_functionst &goto_functions,
                        const namespacet &ns,
                        const irep_idt name, 
                        complexity_grapht &graph,
+                       const std::set<std::string> &lib_funcs,
                        const std::set<irep_idt> &omitted_functions,
                        const bool omit_function_pointers, 
                        std::function<void(goto_programt::const_targett&, remove_const_function_pointerst::functionst&)> find_functions_for_function_pointer) {
@@ -139,6 +140,10 @@ void produce_node_rec (const goto_functionst &goto_functions,
 
     std::string display_name = normalize_name(name);
     complexity_grapht::nodet &node = graph.add_node (complexity_grapht::nodet (name, display_name, complexity_grapht::nodet::node_typet::FUNCTION));
+
+    if (lib_funcs.find(id2string(name)) != lib_funcs.end()) {
+      node.add_property ("library");
+    }
 
     if (is_private(name)) {
       node.add_property ("private");
@@ -171,7 +176,7 @@ void produce_node_rec (const goto_functionst &goto_functions,
         
               if (omitted_functions.find(str_call) == omitted_functions.end()) {
                 if (!graph.has_node(call)) {
-                  produce_node_rec (goto_functions, ns, call, graph,
+                  produce_node_rec (goto_functions, ns, call, graph, lib_funcs,
                                     omitted_functions,
                                     omit_function_pointers, find_functions_for_function_pointer);
                 }
@@ -229,6 +234,7 @@ void produce_graph (
   const std::vector<irep_idt> &roots,
   const goto_functionst &goto_functions,
   complexity_grapht &graph,
+  const std::set<std::string> &lib_funcs,
   const bool omit_function_pointers,
   const std::set<irep_idt> &omitted_functions
   ) {
@@ -246,7 +252,7 @@ void produce_graph (
 
   for (const auto &root : roots) {
     const irep_idt &iden = root;
-    produce_node_rec (goto_functions, ns, iden, graph,
+    produce_node_rec (goto_functions, ns, iden, graph, lib_funcs,
                       omitted_functions, omit_function_pointers, 
                       find_functions_for_fp);
   }
@@ -282,6 +288,7 @@ std::string color_of_score (int score1, int score2) {
 
 void compute_metrics (const complexity_grapht &graph,
                       std::map<irep_idt, func_metricst> &metrics,
+                      std::set<std::string> &lib_funcs,
                       const bool use_symex_info,
                       const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
                       const bool use_solver_info,
@@ -293,7 +300,7 @@ void compute_metrics (const complexity_grapht &graph,
     m.num_func_pointer_calls = num_func_pointer_calls (node.instructions);
     m.function_size = function_size (node.instructions);
     m.num_complex_user_ops = num_complex_user_ops (node.instructions);
-    m.num_complex_lib_funcs = num_complex_lib_funcs (node.instructions);
+    m.num_complex_lib_funcs = num_complex_lib_funcs (node.instructions, lib_funcs);
     m.num_complex_cbmc_ops = num_complex_cbmc_ops (node.instructions);
     m.num_loops = num_loops (node.instructions);
 
@@ -920,7 +927,9 @@ void dump_nodes
     {
     case complexity_grapht::nodet::node_typet::FUNCTION:
       shape = node.has_property("no_body") ? "Mdiamond" :
-              node.has_property("private") ? "ellipse" : "rect";
+              node.has_property("private") ? "ellipse" : 
+              node.has_property("library") ? "pentagon" :
+              "rect";
       //color = color_of_score (globalized_scores.find (name)->second);
       color = color_of_score (scores.find (name)->second); // , globalized_scores.find (name)->second);
       style = "filled";
@@ -1041,6 +1050,37 @@ void dump_complexity_graph(
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info)
 {
   // null_message_handlert message_handler = null_message_handlert();
+  std::set<std::string> lib_funcs;
+  lib_funcs.insert ("memset");
+  lib_funcs.insert ("__builtin___strcpy_chk");
+  lib_funcs.insert ("__builtin___strcat_chk");
+  lib_funcs.insert ("__builtin___strncat_chk");
+  lib_funcs.insert ("strcpy");
+  lib_funcs.insert ("strncpy");
+  lib_funcs.insert ("__builtin___strncpy_chk");
+  lib_funcs.insert ("strcat");
+  lib_funcs.insert ("strncat");
+  lib_funcs.insert ("strcmp");
+  lib_funcs.insert ("strcasecmp");
+  lib_funcs.insert ("strncmp");
+  lib_funcs.insert ("strncasecmp");
+  lib_funcs.insert ("strlen");
+  lib_funcs.insert ("strdup");
+  lib_funcs.insert ("memcpy");
+  lib_funcs.insert ("__builtin___memcpy_chk");
+  lib_funcs.insert ("memset");
+  lib_funcs.insert ("__builtin_memset");
+  lib_funcs.insert ("__builtin___memset_chk");
+  lib_funcs.insert ("memmove");
+  lib_funcs.insert ("__builtin___memmove_chk");
+  lib_funcs.insert ("memcmp");
+  lib_funcs.insert ("strchr");
+  lib_funcs.insert ("strrchr");
+  lib_funcs.insert ("strerror");
+
+  lib_funcs.insert ("malloc");
+  lib_funcs.insert ("realloc");
+  lib_funcs.insert ("free");
 
   std::cout << "Writing complexity graph to " << path << "\n";
 
@@ -1086,7 +1126,7 @@ void dump_complexity_graph(
 
   //std::cout << "produce begin" << "\n";
   produce_graph (goto_model.get_symbol_table(), ns, message_handler, type_map, address_taken,
-                 roots, goto_functions, graph,
+                 roots, goto_functions, graph, lib_funcs,
                  omit_function_pointers, omitted_functions);
   //std::cout << "produce end" << "\n";
 
@@ -1126,7 +1166,7 @@ void dump_complexity_graph(
 
   // initialize scores
   //std::cout << "scores begin" << "\n";
-  compute_metrics (graph, metrics, 
+  compute_metrics (graph, metrics, lib_funcs,
                    use_symex_info, instr_symex_info, 
                    use_solver_info, instr_solver_info);
   compute_scores (metrics, scores, use_symex_info, use_solver_info);

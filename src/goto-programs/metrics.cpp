@@ -142,15 +142,8 @@ int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_tar
   return count;
 }
 
-int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
+int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_targett>> &instructions, const std::set<std::string> &lib_funcs) {
   int count = 0;
-  std::set<std::string> to_look_for;
-  to_look_for.insert ("malloc");
-  to_look_for.insert ("realloc");
-  to_look_for.insert ("free");
-  to_look_for.insert ("memcpy");
-  to_look_for.insert ("memmove");
-  to_look_for.insert ("memcmp");
 
   for (const auto &insts : instructions) {
     for (const auto &target : insts) {
@@ -158,7 +151,7 @@ int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_ta
 
         if (target->call_function().id() == ID_symbol) {
           std::string s = id2string(to_symbol_expr(target->call_function()).get_identifier());
-          if (to_look_for.find (s) != to_look_for.end()) {
+          if (lib_funcs.find (s) != lib_funcs.end()) {
             count += 1;
           }
         }
