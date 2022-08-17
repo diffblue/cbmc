@@ -1,0 +1,12 @@
+CORE
+array_write.c
+--trace
+Passing problem to incremental SMT2 solving
+^Trace for main\.assertion\.2
+example_array\[\d{1,4}ll?\]=42
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test of writing a value at a non-deterministic index of an array, then asserting
+the value we expect.
