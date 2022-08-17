@@ -293,6 +293,7 @@ void compute_metrics (const complexity_grapht &graph,
     m.num_func_pointer_calls = num_func_pointer_calls (node.instructions);
     m.function_size = function_size (node.instructions);
     m.num_complex_user_ops = num_complex_user_ops (node.instructions);
+    m.num_complex_lib_funcs = num_complex_lib_funcs (node.instructions);
     m.num_complex_cbmc_ops = num_complex_cbmc_ops (node.instructions);
     m.num_loops = num_loops (node.instructions);
 
@@ -330,8 +331,9 @@ void compute_scores (std::map<irep_idt, func_metricst> &metrics,
   int w_num_func_pointer_calls = 5;
   int w_function_size = 1;
   int w_num_complex_user_ops = 5;
+  int w_num_complex_lib_funcs = 50;
   int w_num_complex_cbmc_ops = 5;
-  int w_num_loops = 15;
+  int w_num_loops = 20;
   int w_avg_time_per_symex_step = 0; // 1 ? use_symex_info : 0;
 
   for (auto it = metrics.begin(); it != metrics.end(); it++) {
@@ -340,6 +342,7 @@ void compute_scores (std::map<irep_idt, func_metricst> &metrics,
     int score = w_num_func_pointer_calls * m.num_func_pointer_calls
               + w_function_size * m.function_size
               + w_num_complex_user_ops * m.num_complex_user_ops
+              + w_num_complex_lib_funcs * m.num_complex_lib_funcs
               + w_num_complex_cbmc_ops * m.num_complex_cbmc_ops
               + w_num_loops * m.num_loops
               + w_avg_time_per_symex_step * (int)m.avg_time_per_symex_step()/10000;
@@ -924,7 +927,9 @@ void dump_nodes
       size = "8";
       label << node.display_name;
       label << " <br/> ";
-      metrics.find(name)->second.dump_html (label);
+      if (!node.has_property ("no_body")) {
+        metrics.find(name)->second.dump_html (label);
+      }
       //label << " <br/> local complexity: " << scores.find (name)->second;
       //label << " <br/> global complexity: " << globalized_scores.find (name)->second;
       break;

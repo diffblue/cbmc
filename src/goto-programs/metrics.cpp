@@ -119,26 +119,10 @@ int num_complex_user_ops_expr (const exprt &e) {
 
 int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
   int count = 0;
-  int count2 = 0;
-  std::set<std::string> to_look_for;
-  to_look_for.insert ("malloc");
-  to_look_for.insert ("realloc");
-  to_look_for.insert ("free");
-  to_look_for.insert ("memcpy");
-  to_look_for.insert ("memmove");
-  to_look_for.insert ("memcmp");
 
   for (const auto &insts : instructions) {
     for (const auto &target : insts) {
       if (target->is_function_call()) {
-
-        if (target->call_function().id() == ID_symbol) {
-          std::string s = id2string(to_symbol_expr(target->call_function()).get_identifier());
-          if (to_look_for.find (s) != to_look_for.end()) {
-            count2 += 1;
-          }
-        }
-
         count += num_complex_user_ops_expr (target->call_lhs());
         for (const auto &oper : target->call_arguments()) {
           count += num_complex_user_ops_expr (oper);
@@ -155,7 +139,33 @@ int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_tar
       }
     }
   }
-  return count + count2;
+  return count;
+}
+
+int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
+  int count = 0;
+  std::set<std::string> to_look_for;
+  to_look_for.insert ("malloc");
+  to_look_for.insert ("realloc");
+  to_look_for.insert ("free");
+  to_look_for.insert ("memcpy");
+  to_look_for.insert ("memmove");
+  to_look_for.insert ("memcmp");
+
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      if (target->is_function_call()) {
+
+        if (target->call_function().id() == ID_symbol) {
+          std::string s = id2string(to_symbol_expr(target->call_function()).get_identifier());
+          if (to_look_for.find (s) != to_look_for.end()) {
+            count += 1;
+          }
+        }
+      } 
+    }
+  }
+  return count;
 }
 
 int num_complex_cbmc_ops_expr (const exprt &e) {
@@ -213,12 +223,22 @@ const double func_metricst::avg_time_per_symex_step () const {
 const void func_metricst::dump_html (std::ostream &out) const {
   std::string endline = " <br/> ";
   int avg_time_per_step = (int)avg_time_per_symex_step()/10000;
-  out << "complex user ops: " << num_complex_user_ops << endline
-      << "complex CBMC ops: " << num_complex_cbmc_ops << endline
-      << "overall function size: " << function_size << endline
-      << "function pointer calls: " << num_func_pointer_calls << endline
-      << "loops: " << num_loops;
-
+  out << "overall function size: " << function_size;
+  if (num_complex_user_ops != 0) {
+    out << endline << "complex user ops: " << num_complex_user_ops;
+  }
+  if (num_complex_lib_funcs != 0) {
+    out << endline << "complex library functions: " << num_complex_lib_funcs;
+  }
+  if (num_complex_cbmc_ops != 0) {
+    out << endline << "complex CBMC ops: " << num_complex_cbmc_ops;
+  }
+  if (num_func_pointer_calls != 0) {
+    out << endline << "function pointer calls: " << num_func_pointer_calls;
+  }
+  if (num_loops != 0) {
+    out << endline << "loops: " << num_loops;
+  }
   if (use_symex_info) {
     out << endline
         << "symex steps: " << symex_info.steps << endline

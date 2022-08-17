@@ -71,6 +71,7 @@ class func_metricst {
   // e.g. memcpy, memmove, memcmp, malloc, free, realloc
   //      struct field access, array indexing, pointer dereferencing
   int num_complex_user_ops = 0;
+  int num_complex_lib_funcs = 0;
   // number of high-complexity CBMC-internal functions
   // e.g. byte_extract_little_endian,
   //      byte_extract_big_endian,
@@ -101,6 +102,8 @@ int function_size (const std::vector<std::vector<goto_programt::const_targett>> 
 int num_func_pointer_calls (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
 int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
+
+int num_complex_lib_funcs (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
 int num_complex_cbmc_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
