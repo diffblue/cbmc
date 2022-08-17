@@ -39,5 +39,8 @@ Relevant FLAGS
   --omit-function-pointers
   Removes function pointer edges from the graph, which have a habit of producing visual clutter.
 
+
   --add-library
   Includes the CBMC library for functions like `malloc`, `free`, etc.
+
+
