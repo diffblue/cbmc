@@ -598,7 +598,7 @@ jobs:
         
 
   check-clang-format:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -612,7 +612,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang-format
-      - name: Check updated lines of code match clang-format-10 style
+      - name: Check updated lines of code match clang-format-14 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
           MERGE_BRANCH: ${{ github.ref }}
