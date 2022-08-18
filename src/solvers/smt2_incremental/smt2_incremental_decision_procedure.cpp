@@ -71,6 +71,7 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
     if(
       can_cast_expr<symbol_exprt>(expr_node) ||
       can_cast_expr<array_exprt>(expr_node) ||
+      can_cast_expr<array_of_exprt>(expr_node) ||
       can_cast_expr<nondet_symbol_exprt>(expr_node))
     {
       dependent_expressions.push_back(expr_node);
@@ -79,17 +80,10 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
   return dependent_expressions;
 }
 
-void smt2_incremental_decision_proceduret::define_array_function(
-  const array_exprt &array)
+void smt2_incremental_decision_proceduret::initialize_array_elements(
+  const array_exprt &array,
+  const smt_identifier_termt &array_identifier)
 {
-  const smt_sortt array_sort = convert_type_to_smt_sort(array.type());
-  INVARIANT(
-    array_sort.cast<smt_array_sortt>(),
-    "Converting array typed expression to SMT should result in a term of array "
-    "sort.");
-  const smt_identifier_termt array_identifier = smt_identifier_termt{
-    "array_" + std::to_string(array_sequence()), array_sort};
-  solver_process->send(smt_declare_function_commandt{array_identifier, {}});
   const std::vector<exprt> &elements = array.operands();
   const typet &index_type = array.type().index_type();
   for(std::size_t i = 0; i < elements.size(); ++i)
@@ -100,6 +94,39 @@ void smt2_incremental_decision_proceduret::define_array_function(
       convert_expr_to_smt(elements.at(i)))};
     solver_process->send(element_definition);
   }
+}
+
+void smt2_incremental_decision_proceduret::initialize_array_elements(
+  const array_of_exprt &array,
+  const smt_identifier_termt &array_identifier)
+{
+  const smt_sortt index_type =
+    convert_type_to_smt_sort(array.type().index_type());
+  const smt_identifier_termt array_index_identifier{
+    id2string(array_identifier.identifier()) + "_index", index_type};
+  const smt_termt element_value = convert_expr_to_smt(array.what());
+
+  const smt_assert_commandt elements_definition{smt_forall_termt{
+    {array_index_identifier},
+    smt_core_theoryt::equal(
+      smt_array_theoryt::select(array_identifier, array_index_identifier),
+      element_value)}};
+  solver_process->send(elements_definition);
+}
+
+template <typename t_exprt>
+void smt2_incremental_decision_proceduret::define_array_function(
+  const t_exprt &array)
+{
+  const smt_sortt array_sort = convert_type_to_smt_sort(array.type());
+  INVARIANT(
+    array_sort.cast<smt_array_sortt>(),
+    "Converting array typed expression to SMT should result in a term of array "
+    "sort.");
+  const smt_identifier_termt array_identifier{
+    "array_" + std::to_string(array_sequence()), array_sort};
+  solver_process->send(smt_declare_function_commandt{array_identifier, {}});
+  initialize_array_elements(array, array_identifier);
   expression_identifiers.emplace(array, array_identifier);
 }
 
@@ -168,9 +195,14 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         solver_process->send(function);
       }
     }
-    if(const auto array_expr = expr_try_dynamic_cast<array_exprt>(current))
+    else if(const auto array_expr = expr_try_dynamic_cast<array_exprt>(current))
       define_array_function(*array_expr);
-    if(
+    else if(
+      const auto array_of_expr = expr_try_dynamic_cast<array_of_exprt>(current))
+    {
+      define_array_function(*array_of_expr);
+    }
+    else if(
       const auto nondet_symbol =
         expr_try_dynamic_cast<nondet_symbol_exprt>(current))
     {
@@ -213,8 +245,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
 {
   solver_process->send(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
-  solver_process->send(smt_set_logic_commandt{
-    smt_logic_quantifier_free_arrays_uninterpreted_functions_bit_vectorst{}});
+  solver_process->send(smt_set_logic_commandt{smt_logic_allt{}});
   solver_process->send(object_size_function.declaration);
 }
 

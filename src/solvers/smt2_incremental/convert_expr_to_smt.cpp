@@ -906,8 +906,10 @@ static smt_termt convert_expr_to_smt(
   const array_of_exprt &array_of,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for array of expression: " + array_of.pretty());
+  // This function is unreachable as the `array_of_exprt` nodes are already
+  // fully converted by the incremental decision procedure functions
+  // (smt2_incremental_decision_proceduret::define_array_function).
+  UNHANDLED_CASE;
 }
 
 static smt_termt convert_expr_to_smt(
@@ -1353,9 +1355,10 @@ static smt_termt convert_expr_to_smt(
   const array_exprt &array_construction,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for array construction expression: " +
-    array_construction.pretty());
+  // This function is unreachable as the `array_exprt` nodes are already fully
+  // converted by the incremental decision procedure functions
+  // (smt2_incremental_decision_proceduret::define_array_function).
+  UNHANDLED_CASE;
 }
 
 static smt_termt convert_expr_to_smt(
