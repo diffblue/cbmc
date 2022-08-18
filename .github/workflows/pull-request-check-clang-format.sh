@@ -7,7 +7,6 @@ set -e
 echo "Pull request's base branch is: ${BASE_BRANCH}"
 echo "Pull request's merge branch is: ${MERGE_BRANCH}"
 echo "Pull request's source branch is: ${GITHUB_HEAD_REF}"
-clang-format-14 --version
 
 # The checkout action leaves us in detatched head state. The following line
 # names the checked out commit, for simpler reference later.
