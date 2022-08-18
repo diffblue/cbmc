@@ -612,6 +612,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang-format-12
+      - name: Log clang-format version
+        run: clang-format-12 --version
       - name: Check updated lines of code match clang-format-12 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
