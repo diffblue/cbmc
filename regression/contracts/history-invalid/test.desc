@@ -1,0 +1,11 @@
+CORE
+main.c
+--apply-loop-contracts
+^main.c.* error: Tracking history of side_effect expressions is not supported yet.$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test ensures that expressions with side effect, such as function calls,
+may not be used in history variables.
