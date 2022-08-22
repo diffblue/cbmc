@@ -615,5 +615,6 @@ TEST_CASE(
       smt_declare_function_commandt{index_term, {}},
       smt_assert_commandt{smt_core_theoryt::equal(
         foo_term, smt_array_theoryt::select(array_term, index_term))}};
+    REQUIRE(test.sent_commands == expected_commands);
   }
 }
