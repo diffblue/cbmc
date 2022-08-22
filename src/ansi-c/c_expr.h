@@ -364,12 +364,22 @@ public:
     return op0();
   }
 
-  const exprt &contract() const
+  const symbol_exprt &contract_symbol_expr() const
+  {
+    return to_symbol_expr(op1().operands().at(0));
+  }
+
+  symbol_exprt &contract_symbol_expr()
+  {
+    return to_symbol_expr(op1().operands().at(0));
+  }
+
+  const exprt &address_of_contract() const
   {
     return op1();
   }
 
-  exprt &contract()
+  exprt &address_of_contract()
   {
     return op1();
   }

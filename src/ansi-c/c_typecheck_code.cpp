@@ -1040,14 +1040,14 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
   }
 
   // second parameter must be the address of a function symbol
-  auto &contract = obeys_expr.contract();
-  typecheck_expr(contract);
+  auto &address_of_contract = obeys_expr.address_of_contract();
+  typecheck_expr(address_of_contract);
 
   if(
-    contract.id() != ID_address_of ||
-    to_address_of_expr(contract).object().id() != ID_symbol ||
-    contract.type().id() != ID_pointer ||
-    to_pointer_type(contract.type()).subtype().id() != ID_code)
+    address_of_contract.id() != ID_address_of ||
+    to_address_of_expr(address_of_contract).object().id() != ID_symbol ||
+    address_of_contract.type().id() != ID_pointer ||
+    to_pointer_type(address_of_contract.type()).subtype().id() != ID_code)
   {
     error().source_location = expr.source_location();
     error() << "the second parameter of the requires_contract/ensures_contract "
@@ -1056,7 +1056,7 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
     throw 0;
   }
 
-  if(function_pointer.type() != contract.type())
+  if(function_pointer.type() != address_of_contract.type())
   {
     error().source_location = expr.source_location();
     error() << "the first and second parameter of the "
