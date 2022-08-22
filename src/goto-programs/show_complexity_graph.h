@@ -31,7 +31,7 @@ class ui_message_handlert;
 #define HELP_SHOW_COMPLEXITY_GRAPH \
   " --show-complexity-graph        show goto control-flow-graph with nodes colored with proof complexity\n" \
   " --complexity-graph-root        provides a root for the complexity control-flow-graph\n" \
-  " --complexity-graph-omit-function   omits a function from the complexity control-flow-graph\n"
+  " --complexity-graph-omit-function   omits a function from the complexity control-flow-graph\n" \
   " --complexity-graph-omit-function-pointers   omits function pointers from the complexity control-flow-graph\n"
 // clang-format on
 

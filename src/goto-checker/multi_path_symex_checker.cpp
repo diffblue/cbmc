@@ -33,15 +33,18 @@ multi_path_symex_checkert::multi_path_symex_checkert(
 {
 }
 
+// generates a complexity graph associated with the given query,
+// possibly with symex and SAT formula information.
 void generate_goto_dot (const abstract_goto_modelt &goto_model,
                         const symex_bmct &symex,
                         const optionst &options,
                         ui_message_handlert &ui_message_handler,
                         const goto_symex_property_decidert &property_decider,
-                        const std::string type) {
+                        const std::string &type) 
+{
   const std::string path = options.get_option(type);
-  if (!path.empty()) {
-
+  if (!path.empty()) 
+  {
     const auto &goto_functions = goto_model.get_goto_functions();
 
     messaget msg(ui_message_handler);
@@ -53,16 +56,20 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
     std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
 
     // populate instr_symex_info
-    for(const auto &fun : sorted) {
+    for(const auto &fun : sorted) 
+    {
       const bool has_body = fun->second.body_available();
 
-      if (has_body) {
+      if (has_body) 
+      {
         const goto_programt &body = fun->second.body;
-        forall_goto_program_instructions(from, body) {
+        forall_goto_program_instructions(from, body) 
+        {
           const goto_programt::const_targetst to_list = symex_coverage.coverage_to (from);
           int total_steps = 0;
           double total_duration = 0.0;
-          for (goto_programt::const_targett to : to_list) {
+          for (goto_programt::const_targett to : to_list) 
+          {
             total_steps += symex_coverage.num_executions(from, to);
             total_duration += symex_coverage.duration(from, to);
           }
@@ -79,15 +86,18 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
     // populate instr_solver_info
     with_solver_hardness(
       property_decider.get_decision_procedure(),
-      [&instr_solver_info](solver_hardnesst &solver_hardness) {
+      [&instr_solver_info](solver_hardnesst &solver_hardness) 
+        {
         // source: solver_hardness.cpp solver_hardnesst::produce_report
         const std::vector<std::unordered_map<solver_hardnesst::hardness_ssa_keyt, solver_hardnesst::sat_hardnesst>> &hardness_stats = solver_hardness.get_hardness_stats();
-        for(std::size_t i = 0; i < hardness_stats.size(); i++) {
+        for(std::size_t i = 0; i < hardness_stats.size(); i++) 
+        {
           const auto &ssa_step_hardness = hardness_stats[i];
           if(ssa_step_hardness.empty())
             continue;
 
-          for(const auto &key_value_pair : ssa_step_hardness) {
+          for(const auto &key_value_pair : ssa_step_hardness) 
+          {
             auto const &ssa = key_value_pair.first;
             auto const &hardness = key_value_pair.second;
             const goto_programt::const_targett target = ssa.pc;
@@ -95,7 +105,8 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
             // TODO: we could also compute the number of SSA expressions associated with a GOTO, but it doesn't seem important.
 
             auto ensure_exists = instr_solver_info.find (target);
-            if (ensure_exists == instr_solver_info.end()) {
+            if (ensure_exists == instr_solver_info.end()) 
+            {
               solver_infot solver_info;
               instr_solver_info.insert ({target, solver_info});
             }
@@ -109,12 +120,15 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
         }
       });
 
-    if (type == "show-complexity-graph") {
+    if (type == "show-complexity-graph") 
+    {
       show_complexity_graph(options, goto_model, path, ui_message_handler);
-    } else if (type == "show-complexity-graph-with-symex") {
+    } else if (type == "show-complexity-graph-with-symex") 
+    {
       show_complexity_graph(options, goto_model, path, ui_message_handler, 
                             instr_symex_info);
-    } else if (type == "show-complexity-graph-with-solver") {
+    } else if (type == "show-complexity-graph-with-solver") 
+    {
       show_complexity_graph(options, goto_model, path, ui_message_handler, 
                             instr_symex_info, instr_solver_info);
     } 

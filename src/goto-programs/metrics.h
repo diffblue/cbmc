@@ -124,7 +124,7 @@ class func_metricst
 
 };
 
-typedef instruction_collectiont std::vector<std::vector<goto_programt::const_targett>>;
+using instruction_collectiont = std::vector<std::vector<goto_programt::const_targett>>;
 
 int num_loops (const instruction_collectiont &instructions);
 
