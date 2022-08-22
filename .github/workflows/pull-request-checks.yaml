@@ -698,13 +698,22 @@ jobs:
       - name: Fetch dependencies
         run: | 
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
+          sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
           # remove libgcc-s1, which isn't normally available in Ubuntu 18.04
           target=$(dpkg-query -W --showformat='${Version}\n' gcc-8-base | head -n 1)
           # libgcc1 uses an epoch, thus the extra 1:
           sudo apt-get install -y --allow-downgrades --reinstall gcc g++ libgcc-s1- libstdc++6=$target liblsan0=$target libtsan0=$target libcc1-0=$target libgcc1=1:$target gdb=8.1.1-0ubuntu1
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
+      - name: Download z3 4.11.0 from the python wheel package, extract it and make sure it can be deployed
+        run: |
+          sudo apt-get install --no-install-recommends -y unzip
+          # download the z3 python wheel package
+          wget -O z3.4.11.0.whl https://github.com/Z3Prover/z3/releases/download/z3-4.11.0/z3_solver-4.11.0.0-py2.py3-none-manylinux1_x86_64.whl
+          # unpack the bundle using python
+          unzip z3.4.11.0.whl
+          # make z3 executable and move it in /usr/local/bin
+          chmod u+x ./z3_solver-4.11.0.0.data/data/bin/z3
+          mv ./z3_solver-4.11.0.0.data/data/bin/z3 /usr/local/bin/
+          z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
           wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
