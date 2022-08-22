@@ -870,6 +870,13 @@ void goto_convertt::convert_loop_contracts(
     loop->condition_nonconst().add(ID_C_spec_assigns).swap(assigns.op());
   }
 
+  auto frees = static_cast<const unary_exprt &>(code.find(ID_C_spec_frees));
+  if(frees.is_not_nil())
+  {
+    PRECONDITION(loop->is_goto());
+    loop->condition_nonconst().add(ID_C_spec_frees).swap(frees.op());
+  }
+
   auto invariant =
     static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
   if(!invariant.is_nil())

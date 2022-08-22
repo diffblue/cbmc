@@ -151,6 +151,11 @@ void remove_internal_symbols(
   special.insert(INITIALIZE_FUNCTION);
   special.insert(CPROVER_PREFIX "deallocated");
   special.insert(CPROVER_PREFIX "dead_object");
+  special.insert(CPROVER_PREFIX "assignable_t");
+  special.insert(CPROVER_PREFIX "assignable");
+  special.insert(CPROVER_PREFIX "object_upto");
+  special.insert(CPROVER_PREFIX "object_from");
+  special.insert(CPROVER_PREFIX "whole_object");
   special.insert(rounding_mode_identifier());
   special.insert("__new");
   special.insert("__new_array");

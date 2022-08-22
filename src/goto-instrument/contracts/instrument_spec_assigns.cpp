@@ -505,7 +505,7 @@ car_exprt instrument_spec_assignst::create_car_expr(
           upper_bound_var,
           car_havoc_methodt::HAVOC_SLICE};
       }
-      if(ident == CPROVER_PREFIX "object_slice")
+      else if(ident == CPROVER_PREFIX "object_upto")
       {
         const auto &ptr = funcall.arguments().at(0);
         const auto &size = funcall.arguments().at(1);
@@ -518,6 +518,44 @@ car_exprt instrument_spec_assignst::create_car_expr(
           lower_bound_var,
           upper_bound_var,
           car_havoc_methodt::HAVOC_SLICE};
+      }
+      else if(ident == CPROVER_PREFIX "whole_object")
+      {
+        const auto &ptr = funcall.arguments().at(0);
+        return {
+          condition,
+          target,
+          minus_exprt(
+            typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+            pointer_offset(ptr)),
+          typecast_exprt::conditional_cast(object_size(ptr), size_type()),
+          valid_var,
+          lower_bound_var,
+          upper_bound_var,
+          car_havoc_methodt::HAVOC_OBJECT};
+      }
+      else if(ident == CPROVER_PREFIX "assignable")
+      {
+        const auto &ptr = funcall.arguments().at(0);
+        const auto &size = funcall.arguments().at(1);
+        const auto &is_ptr_to_ptr = funcall.arguments().at(2);
+        return {
+          condition,
+          target,
+          typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+          typecast_exprt::conditional_cast(size, size_type()),
+          valid_var,
+          lower_bound_var,
+          upper_bound_var,
+          is_ptr_to_ptr.is_true() ? car_havoc_methodt::NONDET_ASSIGN
+                                  : car_havoc_methodt::HAVOC_SLICE};
+      }
+      else
+      {
+        log.error().source_location = target.source_location();
+        log.error() << "call to " + id2string(ident) +
+                         " in assigns clauses not supported in "
+                         "this version";
       }
     }
   }

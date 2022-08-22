@@ -777,6 +777,24 @@ void c_typecheck_baset::typecheck_declaration(
           CPROVER_PREFIX "loop_entry is not allowed in preconditions.");
       };
 
+      auto check_return_value = [&](const exprt &expr) {
+        const irep_idt id = CPROVER_PREFIX "return_value";
+
+        auto pred = [&](const exprt &expr) {
+          if(!can_cast_expr<symbol_exprt>(expr))
+            return false;
+
+          return to_symbol_expr(expr).get_identifier() == id;
+        };
+
+        if(!has_subexpr(expr, pred))
+          return;
+
+        error().source_location = expr.source_location();
+        error() << id2string(id) + "is not allowed in preconditions." << eom;
+        throw 0;
+      };
+
       // check the contract, if any
       symbolt &new_symbol = symbol_table.get_writeable_ref(identifier);
       if(
@@ -833,6 +851,8 @@ void c_typecheck_baset::typecheck_declaration(
           typecheck_expr(requires);
           implicit_typecast_bool(requires);
           check_history_expr(requires);
+          check_return_value(requires);
+          check_return_value(requires);
           lambda_exprt lambda{temporary_parameter_symbols, requires};
           lambda.add_source_location() = requires.source_location();
           requires.swap(lambda);
@@ -844,6 +864,14 @@ void c_typecheck_baset::typecheck_declaration(
           lambda_exprt lambda{temporary_parameter_symbols, assigns};
           lambda.add_source_location() = assigns.source_location();
           assigns.swap(lambda);
+        }
+
+        typecheck_spec_frees(code_type.frees());
+        for(auto &frees : code_type.frees())
+        {
+          lambda_exprt lambda{temporary_parameter_symbols, frees};
+          lambda.add_source_location() = frees.source_location();
+          frees.swap(lambda);
         }
 
         for(auto &expr : code_type.ensures_contract())
@@ -898,6 +926,7 @@ void c_typecheck_baset::typecheck_declaration(
         // Remove the contract from the original symbol as we have created a
         // dedicated contract symbol.
         new_symbol.type.remove(ID_C_spec_assigns);
+        new_symbol.type.remove(ID_C_spec_frees);
         new_symbol.type.remove(ID_C_spec_ensures);
         new_symbol.type.remove(ID_C_spec_ensures_contract);
         new_symbol.type.remove(ID_C_spec_requires);

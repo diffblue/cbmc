@@ -1,0 +1,9 @@
+CORE
+main.c
+--apply-loop-contracts
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that frees clauses are parsed and typechecked for while loops.

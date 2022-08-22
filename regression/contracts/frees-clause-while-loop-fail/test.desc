@@ -1,0 +1,10 @@
+CORE
+main.c
+--apply-loop-contracts
+^main.c.*: error: frees clause target must be a pointer-typed expression$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test is expected trigger a typchecking error on a frees clause target.

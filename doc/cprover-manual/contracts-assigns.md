@@ -17,28 +17,46 @@ value(s) therein are not modified.
 
 ### Object slice expressions
 
-The following functions can be used in assigns clause to specify ranges of 
-assignable addresses.
+The following functions can be used in assigns clauses to specify ranges of assignable bytes.
 
-Given a pointer `ptr` pointing into some object `o`, `__CPROVER_object_from(ptr)` 
-specifies that all bytes starting from the given pointer and until the end of 
-the object are assignable:
+Given an lvalue expression `expr` with a complete type `expr_t`,
+ `__CPROVER_typed_target(expr)` specifies that the range
+ of `sizeof(expr_t)` bytes starting at `&expr` is assignable:
 ```c
-__CPROVER_size_t __CPROVER_object_from(void *ptr); 
+__CPROVER_assignable_t __CPROVER_typed_target(expr_t expr);
 ```
 
-Given a pointer `ptr` pointing into some object `o`, `__CPROVER_object_from(ptr, size)` 
-specifies that `size` bytes starting from the given pointer and until the end of the object are assignable.
-The `size` value must such that `size <= __CPROVER_object_size(ptr) - __CPROVER_pointer_offset(ptr)` holds:
-
+Given a pointer `ptr` pointing into some object `o`,
+`__CPROVER_whole_object(ptr)` specifies that all bytes of the object `o`
+are assignable:
 ```c
-__CPROVER_size_t __CPROVER_object_slice(void *ptr, __CPROVER_size_t size);
+__CPROVER_assignable_t __CPROVER_whole_object(void *ptr);
 ```
 
-Caveats and limitations: The slices in question must *not*
-be interpreted as pointers by the program. During call-by-contract replacement, 
-`__CPROVER_havoc_slice(ptr, size)` is used to havoc these targets, 
-and `__CPROVER_havoc_slice` does not support havocing pointers. 
+Given a pointer `ptr` pointing into some object `o`, `__CPROVER_object_from(ptr)`
+specifies that the range of bytes starting from the pointer and until the end of
+the object `o` are assignable:
+```c
+__CPROVER_assignable_t __CPROVER_object_from(void *ptr);
+```
+
+Given a pointer `ptr` pointing into some object `o`, `__CPROVER_object_upto(ptr, size)`
+specifies that the range of `size` bytes of `o` starting at `ptr` are assignable:
+The `size` value must such that the range does not exceed the object boundary,
+that is, `__CPROVER_object_size(ptr) - __CPROVER_pointer_offset(ptr) >= size` must hold:
+
+```c
+__CPROVER_assignable_t __CPROVER_object_upto(void *ptr, __CPROVER_size_t size);
+```
+
+CAVEAT: The ranges specified by `__CPROVER_whole_object`,
+`__CPROVER_object_from` and `__CPROVER_object_upto` must *not*
+be interpreted as pointers by the program. This is because during
+call-by-contract replacement, `__CPROVER_havoc_slice(ptr, size)` is used to
+havoc these byte ranges, and `__CPROVER_havoc_slice` does not support
+havocing pointers. `__CPROVER_typed_target` must be used to specify targets
+that are pointers.
+
 ### Parameters
 
 An _assigns_ clause currently supports simple variable types and their pointers,

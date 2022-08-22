@@ -492,7 +492,9 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // already type checked
   }
-  else if(expr.id() == ID_C_spec_assigns || expr.id() == ID_target_list)
+  else if(
+    expr.id() == ID_C_spec_assigns || expr.id() == ID_C_spec_frees ||
+    expr.id() == ID_target_list)
   {
     // already type checked
   }
@@ -1943,8 +1945,54 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
       // This is an undeclared function.
+
+      // Is it the polymorphic typed_target function ?
+      if(identifier == CPROVER_PREFIX "typed_target")
+      {
+        if(expr.arguments().size() != 1)
+        {
+          error().source_location = f_op.source_location();
+          error() << "expected 1 argument for " << CPROVER_PREFIX "typed_target"
+                  << " found " << expr.arguments().size() << eom;
+          throw 0;
+        }
+
+        auto arg0 = expr.arguments().at(0);
+        typecheck_expr(arg0);
+        if(!is_assignable(arg0) || !arg0.get_bool(ID_C_lvalue))
+        {
+          error().source_location = arg0.source_location();
+          error() << "argument of " << CPROVER_PREFIX "typed_target"
+                  << "must be assignable" << eom;
+          throw 0;
+        }
+        const auto &size = size_of_expr(arg0.type(), *this);
+        if(!size.has_value())
+        {
+          error().source_location = arg0.source_location();
+          error() << "sizeof not defined for argument of "
+                  << CPROVER_PREFIX "typed_target"
+                  << " of type " << to_string(arg0.type()) << eom;
+          throw 0;
+        }
+        // rewrite call to "assignable"
+        to_symbol_expr(f_op).set_identifier(CPROVER_PREFIX "assignable");
+        exprt::operandst arguments;
+        // pointer
+        arguments.push_back(address_of_exprt(arg0));
+        // size
+        arguments.push_back(size.value());
+        // is_pointer
+        if(arg0.type().id() == ID_pointer)
+          arguments.push_back(true_exprt());
+        else
+          arguments.push_back(false_exprt());
+
+        expr.arguments().swap(arguments);
+        typecheck_side_effect_function_call(expr);
+      }
       // Is this a builtin?
-      if(!builtin_factory(identifier, symbol_table, get_message_handler()))
+      else if(!builtin_factory(identifier, symbol_table, get_message_handler()))
       {
         // yes, it's a builtin
       }
