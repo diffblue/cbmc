@@ -505,6 +505,12 @@ void c_typecheck_baset::typecheck_for(codet &code)
     typecheck_spec_assigns(
       static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
   }
+
+  if(code.find(ID_C_spec_frees).is_not_nil())
+  {
+    typecheck_spec_frees(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_frees)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_label(code_labelt &code)
@@ -805,6 +811,12 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
     typecheck_spec_assigns(
       static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
   }
+
+  if(code.find(ID_C_spec_frees).is_not_nil())
+  {
+    typecheck_spec_frees(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_frees)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
@@ -845,9 +857,15 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
     typecheck_spec_assigns(
       static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
   }
+
+  if(code.find(ID_C_spec_frees).is_not_nil())
+  {
+    typecheck_spec_frees(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_frees)).op().operands());
+  }
 }
 
-void c_typecheck_baset::typecheck_spec_assigns_condition(exprt &condition)
+void c_typecheck_baset::typecheck_spec_condition(exprt &condition)
 {
   // compute type
   typecheck_expr(condition);
@@ -903,38 +921,42 @@ void c_typecheck_baset::typecheck_spec_assigns_condition(exprt &condition)
     throw 0;
 }
 
+void c_typecheck_baset::throw_on_side_effects(const exprt &expr)
+{
+  if(has_subexpr(expr, ID_side_effect))
+  {
+    error().source_location = expr.source_location();
+    error() << "side-effects not allowed in assigns clause targets"
+            << messaget::eom;
+    throw 0;
+  }
+  if(has_subexpr(expr, ID_if))
+  {
+    error().source_location = expr.source_location();
+    error() << "ternary expressions not allowed in assigns "
+               "clause targets"
+            << messaget::eom;
+    throw 0;
+  }
+}
+
 void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
 {
   // compute type
   typecheck_expr(target);
 
   // fatal errors
-  if(target.type().id() == ID_empty)
+  bool is_empty_type = target.type().id() == ID_empty;
+  bool is_assignable_typedef =
+    target.type().get(ID_C_typedef) == CPROVER_PREFIX "assignable_t";
+  // only allow void type if it is the typedef CPROVER_PREFIX "assignable_t"
+  if(target.type().id() == ID_empty && !is_assignable_typedef)
   {
     error().source_location = target.source_location();
     error() << "void-typed expressions not allowed as assigns clause targets"
             << eom;
     throw 0;
   }
-
-  // throws exception if expr contains side effect or ternary expr
-  auto throw_on_side_effects = [&](const exprt &expr) {
-    if(has_subexpr(expr, ID_side_effect))
-    {
-      error().source_location = expr.source_location();
-      error() << "side-effects not allowed in assigns clause targets"
-              << messaget::eom;
-      throw 0;
-    }
-    if(has_subexpr(expr, ID_if))
-    {
-      error().source_location = expr.source_location();
-      error() << "ternary expressions not allowed in assigns "
-                 "clause targets"
-              << messaget::eom;
-      throw 0;
-    }
-  };
 
   if(target.get_bool(ID_C_lvalue))
   {
@@ -950,37 +972,53 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
     if(can_cast_expr<symbol_exprt>(funcall.function()))
     {
       const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
-      if(
-        ident == CPROVER_PREFIX "object_from" || ident == CPROVER_PREFIX
-                                                   "object_slice")
-      {
-        for(const auto &argument : funcall.arguments())
-          throw_on_side_effects(argument);
-      }
-      else
+      if(!(is_empty_type && is_assignable_typedef))
       {
         error().source_location = target.source_location();
-        error() << "function calls in assigns clause targets must be "
-                   "to " CPROVER_PREFIX "object_from, " CPROVER_PREFIX
-                   "object_slice"
+        error() << "expecting " CPROVER_PREFIX
+                   "assignable_t return type for function " +
+                     id2string(ident) + " called in assigns clause"
                 << eom;
         throw 0;
       }
+      for(const auto &argument : funcall.arguments())
+        throw_on_side_effects(argument);
     }
     else
     {
       error().source_location = target.source_location();
-      error() << "function pointer calls not allowed in assigns targets" << eom;
+      error() << "function pointer calls not allowed in assigns clauses" << eom;
       throw 0;
     }
   }
   else
   {
     error().source_location = target.source_location();
-    error() << "assigns clause target must be an lvalue or a " CPROVER_PREFIX
-               "POINTER_OBJECT, " CPROVER_PREFIX "object_from, " CPROVER_PREFIX
-               "object_slice expression"
-            << eom;
+    error()
+      << "assigns clause target must be an lvalue or a call to " CPROVER_PREFIX
+         "POINTER_OBJECT or to a function returning " CPROVER_PREFIX
+         "assignable_t"
+      << eom;
+    throw 0;
+  }
+}
+
+void c_typecheck_baset::typecheck_spec_frees_target(exprt &target)
+{
+  // compute type
+  typecheck_expr(target);
+  const auto &type = target.type();
+
+  if(can_cast_type<pointer_typet>(type))
+  {
+    // an expression with pointer-type without side effects
+    throw_on_side_effects(target);
+  }
+  else
+  {
+    // anything else is rejected
+    error().source_location = target.source_location();
+    error() << "frees clause target must be a pointer-typed expression" << eom;
     throw 0;
   }
 }
@@ -1067,7 +1105,10 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
   }
 }
 
-void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
+void c_typecheck_baset::typecheck_conditional_targets(
+  exprt::operandst &targets,
+  const std::function<void(exprt &)> typecheck_target,
+  const std::string &clause_type)
 {
   exprt::operandst tmp;
   bool must_throw = false;
@@ -1078,8 +1119,8 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
     {
       must_throw = true;
       error().source_location = target.source_location();
-      error() << "expected ID_conditional_target_group expression in assigns "
-                 "clause, found "
+      error() << "expected ID_conditional_target_group expression in " +
+                   clause_type + "clause, found "
               << id2string(target.id()) << eom;
     }
 
@@ -1088,7 +1129,7 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
 
     // typecheck condition
     auto &condition = conditional_target_group.condition();
-    typecheck_spec_assigns_condition(condition);
+    typecheck_spec_condition(condition);
 
     if(condition.is_true())
     {
@@ -1096,7 +1137,7 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
       // simplify expr and expose the bare expressions
       for(auto &actual_target : conditional_target_group.targets())
       {
-        typecheck_spec_assigns_target(actual_target);
+        typecheck_target(actual_target);
         tmp.push_back(actual_target);
       }
     }
@@ -1105,7 +1146,7 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
       // if the condition is not trivially true, typecheck in place
       for(auto &actual_target : conditional_target_group.targets())
       {
-        typecheck_spec_assigns_target(actual_target);
+        typecheck_target(actual_target);
       }
       tmp.push_back(std::move(target));
     }
@@ -1121,6 +1162,22 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
 
   // update original vector in-place
   std::swap(targets, tmp);
+}
+
+void c_typecheck_baset::typecheck_spec_frees(exprt::operandst &targets)
+{
+  const std::function<void(exprt &)> typecheck_target = [&](exprt &target) {
+    typecheck_spec_frees_target(target);
+  };
+  typecheck_conditional_targets(targets, typecheck_target, "frees");
+}
+
+void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
+{
+  const std::function<void(exprt &)> typecheck_target = [&](exprt &target) {
+    typecheck_spec_assigns_target(target);
+  };
+  typecheck_conditional_targets(targets, typecheck_target, "assigns");
 }
 
 void c_typecheck_baset::typecheck_spec_loop_invariant(codet &code)

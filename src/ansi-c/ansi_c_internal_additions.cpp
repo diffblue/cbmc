@@ -216,6 +216,21 @@ void ansi_c_internal_additions(std::string &code)
     // This function needs to be declared, or otherwise can't be called
     // by the entry-point construction.
     "void " INITIALIZE_FUNCTION "(void);\n"
+    "\n"
+    // frame specifications for contracts
+    // Type that describes assignable memory locations
+    "typedef void " CPROVER_PREFIX "assignable_t;\n"
+    // Declares a range of bytes as assignable (internal representation)
+    CPROVER_PREFIX "assignable_t " CPROVER_PREFIX "assignable(void *ptr, "
+    CPROVER_PREFIX "size_t size,"
+    CPROVER_PREFIX "bool is_ptr_to_ptr);\n"
+    // Declares a range of bytes as assignable
+    CPROVER_PREFIX "assignable_t " CPROVER_PREFIX "object_upto(void *ptr, "
+    CPROVER_PREFIX "size_t size);\n"
+    // Declares bytes from ptr to the end of the object as assignable
+    CPROVER_PREFIX "assignable_t " CPROVER_PREFIX "object_from(void *ptr);\n"
+    // Declares the whole object pointer to by ptr
+    CPROVER_PREFIX "assignable_t " CPROVER_PREFIX "whole_object(void *ptr);\n"
     "\n";
   // clang-format on
 

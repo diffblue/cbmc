@@ -1,0 +1,20 @@
+CORE
+main.c
+
+CALL __CPROVER_whole_object
+CALL __CPROVER_object_upto
+CALL __CPROVER_object_from
+CALL __CPROVER_assignable
+^\[my_write_set.assertion.\d+\] .* target null or writable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+CALL __CPROVER_typed_target
+--
+This test checks that:
+- built-in __CPROVER_assignable_t functions are supported;
+- GOTO conversion preserves calls to __CPROVER_whole_object,
+  __CPROVER_object_upto, __CPROVER_object_from;
+- GOTO conversion translates __CPROVER_typed_target to __CPROVER_assignable;
+- user-defined checks embedded in `my_write_set` persist after conversion.

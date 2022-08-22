@@ -209,6 +209,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_ENSURES_CONTRACT "__CPROVER_ensures_contract"
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
+%token TOK_CPROVER_FREES "__CPROVER_frees"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_XORXOR      "^^"
@@ -2447,26 +2448,31 @@ declaration_or_expression_statement:
 iteration_statement:
         TOK_WHILE '(' comma_expression_opt ')'
           cprover_contract_assigns_opt
-          cprover_contract_loop_invariant_list_opt 
+          cprover_contract_frees_opt
+          cprover_contract_loop_invariant_list_opt
           cprover_contract_decreases_opt
           statement
         {
           $$=$1;
           statement($$, ID_while);
-          parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($8)));
+          parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($9)));
 
           if(!parser_stack($5).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($5).operands());
 
           if(!parser_stack($6).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($6).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_frees)).operands().swap(parser_stack($6).operands());
 
           if(!parser_stack($7).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($7).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($7).operands());
+
+          if(!parser_stack($8).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($8).operands());
         }
         | TOK_DO statement TOK_WHILE '(' comma_expression ')'
           cprover_contract_assigns_opt
-          cprover_contract_loop_invariant_list_opt 
+          cprover_contract_frees_opt
+          cprover_contract_loop_invariant_list_opt
           cprover_contract_decreases_opt ';'
         {
           $$=$1;
@@ -2477,10 +2483,13 @@ iteration_statement:
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($7).operands());
 
           if(!parser_stack($8).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($8).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_frees)).operands().swap(parser_stack($8).operands());
 
           if(!parser_stack($9).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($9).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($9).operands());
+
+          if(!parser_stack($10).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($10).operands());
         }
         | TOK_FOR
           {
@@ -2495,7 +2504,8 @@ iteration_statement:
               comma_expression_opt ';'
               comma_expression_opt ')'
               cprover_contract_assigns_opt
-              cprover_contract_loop_invariant_list_opt 
+              cprover_contract_frees_opt
+              cprover_contract_loop_invariant_list_opt
               cprover_contract_decreases_opt
           statement
         {
@@ -2505,16 +2515,19 @@ iteration_statement:
           mto($$, $4);
           mto($$, $5);
           mto($$, $7);
-          mto($$, $12);
+          mto($$, $13);
 
           if(!parser_stack($9).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($9).operands());
 
           if(!parser_stack($10).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($10).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_frees)).operands().swap(parser_stack($10).operands());
 
           if(!parser_stack($11).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($11).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($11).operands());
+
+          if(!parser_stack($12).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($12).operands());
 
           if(PARSER.for_has_scope)
             PARSER.pop_scope(); // remove the C99 for-scope
@@ -3317,6 +3330,7 @@ cprover_function_contract:
           parser_stack($$).add_to_operands(std::move(tmp));
         }
         | cprover_contract_assigns
+        | cprover_contract_frees
         ;
 
 unary_expression_list:
@@ -3370,7 +3384,7 @@ conditional_target_list_opt_semicol:
         }
         | conditional_target_list
         {
-          $$ = $1;          
+          $$ = $1;
         }
 
 cprover_contract_assigns:
@@ -3392,6 +3406,27 @@ cprover_contract_assigns_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
         | cprover_contract_assigns
+        ;
+
+cprover_contract_frees:
+         TOK_CPROVER_FREES '(' conditional_target_list_opt_semicol ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_frees);
+          mto($$, $3);
+        }
+        | TOK_CPROVER_FREES '(' ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_frees);
+          parser_stack($$).add_to_operands(exprt(ID_target_list));
+        }
+        ;
+
+cprover_contract_frees_opt:
+        /* nothing */
+        { init($$); parser_stack($$).make_nil(); }
+        | cprover_contract_frees
         ;
 
 cprover_function_contract_sequence:
