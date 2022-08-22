@@ -1,9 +1,6 @@
 /*******************************************************************\
-
 Module: Program Transformation
-
 Author: Daniel Kroening, kroening@kroening.com
-
 \*******************************************************************/
 
 /// \file
@@ -58,20 +55,6 @@ protected:
   // This can be activated in goto-instrument using
   // --remove-const-function-pointers instead of --remove-function-pointers
   bool only_resolve_const_fps;
-
-  /// Determine which functions have a compatible signature to the call to 
-  /// a dynamic function at location target in the given goto-program
-  /// \param goto_program: The goto program that contains target
-  /// \param function_id: Name of function containing the target
-  /// \param target: location with function call with function pointer
-  /// \param functions: the collection of functions to populate
-  /// \param abort: whether the call can be replaced by calls to the returned functions
-  void find_functions_for_target(
-    goto_programt &goto_program,
-    const irep_idt &function_id,
-    goto_programt::targett target,
-    remove_const_function_pointerst::functionst &functions,
-    bool &abort);
 
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by determining
@@ -255,13 +238,11 @@ static void fix_return_type(
       tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()))));
 }
 
-void remove_function_pointerst::find_functions_for_target (
+void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
   const irep_idt &function_id,
-  goto_programt::targett target,
-  remove_const_function_pointerst::functionst &functions,
-  bool &abort) {
-
+  goto_programt::targett target)
+{
   const auto &function = to_dereference_expr(as_const(*target).call_function());
 
   // this better have the right type
@@ -281,7 +262,8 @@ void remove_function_pointerst::find_functions_for_target (
   bool found_functions;
 
   const exprt &pointer = function.pointer();
-  does_remove_constt const_removal_check(goto_program, ns);
+  remove_const_function_pointerst::functionst functions;
+  does_remove_constt const_removal_check(goto_program);
   const auto does_remove_const = const_removal_check();
   messaget log{message_handler};
   if(does_remove_const.first)
@@ -308,8 +290,6 @@ void remove_function_pointerst::find_functions_for_target (
     if(functions.size()==1)
     {
       target->call_function() = *functions.cbegin();
-
-      abort = true;
       return;
     }
   }
@@ -324,7 +304,6 @@ void remove_function_pointerst::find_functions_for_target (
       // Since we haven't found functions, we would now resort to
       // replacing the function pointer with any function with a valid signature
       // Since we don't want to do that, we abort.
-      abort = true;
       return;
     }
 
@@ -349,20 +328,6 @@ void remove_function_pointerst::find_functions_for_target (
       symbol_exprt expr(t.first, t.second);
       functions.insert(expr);
     }
-  }
-}
-
-void remove_function_pointerst::remove_function_pointer(
-  goto_programt &goto_program,
-  const irep_idt &function_id,
-  goto_programt::targett target)
-{
-  remove_const_function_pointerst::functionst functions;
-  bool abort;
-  find_functions_for_target (goto_program, function_id, target, functions, abort);
-
-  if (abort) {
-    return;
   }
 
   ::remove_function_pointer(
