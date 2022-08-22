@@ -35,6 +35,7 @@ SRC = allocate_objects.cpp \
       link_goto_model.cpp \
       link_to_library.cpp \
       loop_ids.cpp \
+      metrics.cpp \
       mm_io.cpp \
       name_mangler.cpp \
       osx_fat_reader.cpp \
@@ -60,6 +61,7 @@ SRC = allocate_objects.cpp \
       resolve_inherited_component.cpp \
       safety_checker.cpp \
       set_properties.cpp \
+      show_complexity_graph.cpp \
       show_goto_functions.cpp \
       show_goto_functions_json.cpp \
       show_goto_functions_xml.cpp \

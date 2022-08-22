@@ -1,14 +1,15 @@
 /*******************************************************************\
 
-Module: Show the goto functions as a dot program
+Module: Show the complexity call graph as a dot program
 
 Author: Benjamin Quiring
 
 \*******************************************************************/
 
 /// \file
-/// Show the goto cfg, where nodes are colored based on a
-/// "proof complexity" weight mechanism.
+/// Show the complexity call graph, where nodes are colored based on a
+/// "proof complexity" weight mechanism and have annotations describing
+/// the features of different functions.
 
 #ifndef CPROVER_COMPLEXITY_GRAPH_SHOW_COMPLEXITY_GRAPH
 #define CPROVER_COMPLEXITY_GRAPH_SHOW_COMPLEXITY_GRAPH
@@ -27,31 +28,29 @@ class abstract_goto_modelt;
 class goto_functionst;
 class ui_message_handlert;
 
-// clang-format off
-#define OPT_SHOW_COMPLEXITY_GRAPH \
-  "(show-complexity-graph)" \
-  "(complexity-graph-roots)"
-
 #define HELP_SHOW_COMPLEXITY_GRAPH \
-  " --show-complexity-graph        show goto control-flow-graph with nodes colored with proof complexity\n"
+  " --show-complexity-graph        show goto control-flow-graph with nodes colored with proof complexity\n" \
+  " --complexity-graph-root        provides a root for the complexity control-flow-graph\n" \
+  " --complexity-graph-omit-function   omits a function from the complexity control-flow-graph\n"
+  " --complexity-graph-omit-function-pointers   omits function pointers from the complexity control-flow-graph\n"
 // clang-format on
 
 void show_complexity_graph(
   const optionst &options,
-  const abstract_goto_modelt &, 
+  const abstract_goto_modelt &,
   const std::string &path,
   message_handlert &message_handler);
 
 void show_complexity_graph(
   const optionst &options,
-  const abstract_goto_modelt &, 
+  const abstract_goto_modelt &,
   const std::string &path,
   message_handlert &message_handler,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
 void show_complexity_graph(
   const optionst &options,
-  const abstract_goto_modelt &, 
+  const abstract_goto_modelt &,
   const std::string &path,
   message_handlert &message_handler,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
