@@ -40,99 +40,13 @@ Date: February 2016
 
 #include "cfg_info.h"
 #include "havoc_assigns_clause_targets.h"
+#include "inlining_decorator.h"
 #include "instrument_spec_assigns.h"
 #include "memory_predicates.h"
 #include "utils.h"
 
 #include <algorithm>
 #include <map>
-
-/// Decorator for \ref message_handlert that keeps track of warnings
-/// occuring when inlining a function.
-///
-/// It counts the number of :
-/// - recursive functions warnings
-/// - missing functions warnings
-/// - missing function body warnings
-/// - missing function arguments warnings
-class inlining_decoratort : public message_handlert
-{
-private:
-  message_handlert &wrapped;
-  unsigned int recursive_function_warnings_count = 0;
-
-  void parse_message(const std::string &message)
-  {
-    if(message.find("recursion is ignored on call") != std::string::npos)
-      recursive_function_warnings_count++;
-  }
-
-public:
-  explicit inlining_decoratort(message_handlert &_wrapped) : wrapped(_wrapped)
-  {
-  }
-
-  unsigned int get_recursive_function_warnings_count()
-  {
-    return recursive_function_warnings_count;
-  }
-
-  void print(unsigned level, const std::string &message) override
-  {
-    parse_message(message);
-    wrapped.print(level, message);
-  }
-
-  void print(unsigned level, const xmlt &xml) override
-  {
-    wrapped.print(level, xml);
-  }
-
-  void print(unsigned level, const jsont &json) override
-  {
-    wrapped.print(level, json);
-  }
-
-  void print(unsigned level, const structured_datat &data) override
-  {
-    wrapped.print(level, data);
-  }
-
-  void print(
-    unsigned level,
-    const std::string &message,
-    const source_locationt &location) override
-  {
-    parse_message(message);
-    wrapped.print(level, message, location);
-    return;
-  }
-
-  void flush(unsigned i) override
-  {
-    return wrapped.flush(i);
-  }
-
-  void set_verbosity(unsigned _verbosity)
-  {
-    wrapped.set_verbosity(_verbosity);
-  }
-
-  unsigned get_verbosity() const
-  {
-    return wrapped.get_verbosity();
-  }
-
-  std::size_t get_message_count(unsigned level) const
-  {
-    return wrapped.get_message_count(level);
-  }
-
-  std::string command(unsigned i) const override
-  {
-    return wrapped.command(i);
-  }
-};
 
 void code_contractst::check_apply_loop_contracts(
   const irep_idt &function_name,
@@ -1031,7 +945,7 @@ void code_contractst::apply_loop_contract(
     goto_functions, function_name, ns, log.get_message_handler());
 
   INVARIANT(
-    decorated.get_recursive_function_warnings_count() == 0,
+    decorated.get_recursive_call_set().size() == 0,
     "Recursive functions found during inlining");
 
   // restore internal invariants
@@ -1301,9 +1215,7 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
   inlining_decoratort decorated(log.get_message_handler());
   goto_function_inline(goto_functions, function, ns, decorated);
 
-  INVARIANT(
-    decorated.get_recursive_function_warnings_count() == 0,
-    "Recursive functions found during inlining");
+  decorated.throw_on_recursive_calls(log, 0);
 
   // Clean up possible fake loops that are due to `IF 0!=0 GOTO i` instructions
   simplify_gotos(function_body, ns);
