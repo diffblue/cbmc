@@ -20,6 +20,7 @@ Author: Benjamin Quiring
 #include <goto-programs/goto_program.h>
 #include "metrics.h"
 #include <util/options.h>
+#include <util/ui_message.h>
 
 class namespacet;
 class abstract_goto_modelt;
@@ -38,21 +39,21 @@ class ui_message_handlert;
 void show_complexity_graph(
   const optionst &options,
   const abstract_goto_modelt &, 
-  const std::list<std::string> roots,
-  const std::string &path);
+  const std::string &path,
+  message_handlert &message_handler);
 
 void show_complexity_graph(
   const optionst &options,
   const abstract_goto_modelt &, 
-  const std::list<std::string> roots,
   const std::string &path,
+  message_handlert &message_handler,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
 void show_complexity_graph(
   const optionst &options,
   const abstract_goto_modelt &, 
-  const std::list<std::string> roots,
   const std::string &path,
+  message_handlert &message_handler,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
   const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info);
 

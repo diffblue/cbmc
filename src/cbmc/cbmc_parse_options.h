@@ -55,6 +55,8 @@ class optionst;
   "(symex-record-coverage)" \
   "(complexity-graph-instructions)" \
   "(complexity-graph-roots):" \
+  "(complexity-graph-omit-function):" \
+  "(complexity-graph-omit-function-pointers)"    \
   "(show-complexity-graph):" \
   "(show-complexity-graph-with-symex):" \
   "(show-complexity-graph-with-solver):" \

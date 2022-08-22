@@ -63,20 +63,24 @@ class symex_infot {
 class func_metricst {
   
  public:
-  // how many times is the function called
-  int indegree = 0;
-  // how many function calls are in the function's body
-  int outdegree = 0;
   // how many calls to function pointers are in the function's body
   int num_func_pointer_calls = 0;
   // sum of the sides of all right-hand sides in the function body
   int function_size = 0;
   // number of high-complexity primitives in the function's body
-  // e.g. TODO: memcpy, memmove, memcmp
-  //      writes to pointers, arrays
-  int num_complex_ops = 0;
+  // e.g. memcpy, memmove, memcmp, malloc, free, realloc
+  //      struct field access, array indexing, pointer dereferencing
+  int num_complex_user_ops = 0;
+  // number of high-complexity CBMC-internal functions
+  // e.g. byte_extract_little_endian,
+  //      byte_extract_big_endian,
+  //      byte_update_little_endian,
+  //      byte_update_big_endian,
+  int num_complex_cbmc_ops = 0;
   // number of loops (backwards jumps) in the function's body
   int num_loops = 0;
+  // number of join points
+  int num_join_points = 0;
 
   bool use_symex_info = false;
   symex_infot symex_info;
@@ -90,33 +94,33 @@ class func_metricst {
 
 };
 
-int num_loops (const goto_programt &goto_program);
+int num_loops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
-int outdegree (const goto_programt &goto_program);
+int function_size (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
-int indegree (const symbolt &symbol, 
-              const namespacet &ns, 
-              const goto_functionst &goto_functions);
+int num_func_pointer_calls (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
-int function_size (const goto_programt &goto_program);
+int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
-int num_complex_ops (const goto_programt &goto_program);
+int num_complex_cbmc_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions);
 
-symex_infot aggregate_symex_info (const goto_programt &goto_program,
+symex_infot aggregate_symex_info (const std::vector<std::vector<goto_programt::const_targett>> &instructions,
                                   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
-solver_infot aggregate_solver_info (const goto_programt &goto_program,
+solver_infot aggregate_solver_info (const std::vector<std::vector<goto_programt::const_targett>> &instructions,
                                     const std::map<goto_programt::const_targett, solver_infot> &instr_symex_info);
 
 template<class T> T aggregate_instr_info
-  (const goto_programt &goto_program,
+  (const std::vector<std::vector<goto_programt::const_targett>> &instructions,
    const std::map<goto_programt::const_targett, T> &instr_info) {
   T total;
-  forall_goto_program_instructions(target, goto_program) {
-    const auto &info = instr_info.find (target);
-    if (info != instr_info.end()) {
-      const T &other = info->second;
-      total += other;
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      const auto &info = instr_info.find (target);
+      if (info != instr_info.end()) {
+        const T &other = info->second;
+        total += other;
+      }
     }
   }
   return total;

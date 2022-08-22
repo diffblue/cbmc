@@ -48,9 +48,6 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
     const namespacet ns(goto_model.get_symbol_table());
     const auto sorted = goto_functions.sorted();
 
-    std::list<std::string> roots;
-    roots.push_back (options.get_option("complexity-graph-roots"));
-
     const symex_coveraget &symex_coverage = symex.get_coverage();
     std::map<goto_programt::const_targett, symex_infot> instr_symex_info;
     std::map<goto_programt::const_targett, solver_infot> instr_solver_info;
@@ -113,12 +110,12 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
       });
 
     if (type == "show-complexity-graph") {
-      show_complexity_graph(options, goto_model, roots, path);
+      show_complexity_graph(options, goto_model, path, ui_message_handler);
     } else if (type == "show-complexity-graph-with-symex") {
-      show_complexity_graph(options, goto_model, roots, path, 
+      show_complexity_graph(options, goto_model, path, ui_message_handler, 
                             instr_symex_info);
     } else if (type == "show-complexity-graph-with-solver") {
-      show_complexity_graph(options, goto_model, roots, path, 
+      show_complexity_graph(options, goto_model, path, ui_message_handler, 
                             instr_symex_info, instr_solver_info);
     } 
   }

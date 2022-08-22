@@ -17,68 +17,44 @@ Author: Benjamin Quiring
 #include <goto_model.h>
 #include <pointer_expr.h>
 
-int num_loops (const goto_programt &goto_program) {
+int num_func_pointer_calls (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
+  // number of loops = number of backward jumps
+  int count = 0;
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      if(target->is_function_call()) {
+        count += (target->call_function().id() == ID_dereference);
+      }
+    }
+  }
+
+  return count;
+}
+
+int num_loops (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
   // number of loops = number of backward jumps
   // TODO: look at goto_program is_backwards_goto()
 
   std::set<int> seen;
   int num_loops = 0;
 
-  forall_goto_program_instructions(target, goto_program) {
-    if (target->is_target()) {
-      seen.insert (target->target_number);
-    }
-    if(target->is_goto())
-    {
-      for (auto gt_it = target->targets.begin(); gt_it != target->targets.end(); gt_it++) {
-        if (seen.find ((*gt_it)->target_number) != seen.end()) {
-          num_loops = num_loops + 1;
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      if (target->is_target()) {
+        seen.insert (target->target_number);
+      }
+      if(target->is_goto())
+      {
+        for (auto gt_it = target->targets.begin(); gt_it != target->targets.end(); gt_it++) {
+          if (seen.find ((*gt_it)->target_number) != seen.end()) {
+            num_loops = num_loops + 1;
+          }
         }
       }
     }
   }
 
   return num_loops;
-}
-
-int outdegree (const goto_programt &goto_program) {
-  int count = 0;
-  forall_goto_program_instructions(target, goto_program) {
-    if(target->is_function_call())
-    {
-      count = count + 1;
-    }
-  }
-  return count;
-}
-
-// TODO inefficient to traverse graph for every function
-int indegree (const symbolt &symbol, 
-              const namespacet &ns, 
-              const goto_functionst &goto_functions) {
-  int indegree = 0;
-
-  const auto funs = goto_functions.sorted();
-
-  for (const auto &fun : funs) {
-    const bool has_body = fun->second.body_available();
-    if (has_body) {
-      const goto_programt &body = fun->second.body;
-      forall_goto_program_instructions(target, body) {
-        if(target->is_function_call())
-        {
-          // only look at real function calls, not function pointer calls
-          if (target->call_function().id() != ID_dereference) {
-            const irep_idt call = ns.lookup(to_symbol_expr(target->call_function())).name;
-            if (call == symbol.name) {
-              indegree = indegree + 1;
-            }
-          }
-        }
-      }
-    }
-  }
-  return indegree;
 }
 
 // compute an integer size for an expr
@@ -100,40 +76,127 @@ int expr_size (const exprt e) {
 // excluding assertions and assumptions.
 // the size of an expression is equal to the number of non-trivial subexpressions, i.e.
 // the number of nodes that have operands.
-int function_size (const goto_programt &goto_program) {
+int function_size (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
   int size = 0;
-  forall_goto_program_instructions(target, goto_program) {
-    if(target->is_function_call()) {
-      const exprt &f = target->call_function();
-      size = size + 1;
-      size = size + expr_size (f);
-      const exprt::operandst &args = target->call_arguments();
-      for (const auto &arg : args) {
-        size = size + expr_size (arg);
-      }
-    } else if (target->is_set_return_value()) {
-      const exprt &rhs = target->return_value();
-      size = size + expr_size (rhs);
-    } else if (target->is_assign()) {
-      const exprt &rhs = target->assign_rhs();
-      size = size + expr_size (rhs);
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      if(target->is_function_call()) {
+        size += 1 + expr_size (target->call_function());
+        for (const auto &arg : target->call_arguments()) {
+          size += expr_size (arg);
+        }
+      } else if (target->is_assign()) {
+        size += expr_size (target->assign_lhs());
+        size += expr_size (target->assign_rhs());
+      } else if (target->is_assume()) {
+        size += expr_size (target->condition());
+      } else if (target->is_set_return_value()) {
+        size += expr_size (target->return_value());
+      } 
     }
   }
   return size;
 }
 
-int num_complex_ops (const goto_programt &goto_program) {
+int num_complex_user_ops_expr (const exprt &e) {
+  int sum = 0;
+
+  if (e.id() == ID_dereference || // pointer dereference
+      e.id() == ID_pointer_offset || // pointer dereference with offset?
+      e.id() == ID_field_address || // struct field selection
+      e.id() == ID_index) { // indexing an array
+    sum += 1;
+  } 
+
+  if (e.has_operands()) {
+    for (const exprt &oper : e.operands()) {
+      sum += num_complex_user_ops_expr (oper);
+    }
+  }
+
+  return sum;
+}
+
+int num_complex_user_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
   int count = 0;
-  forall_goto_program_instructions(target, goto_program) {
-    if (target->is_function_call()) {
-      const exprt &lhs = target->call_lhs();
-      if (lhs.has_operands()) {
-        count = count + 1;
+  int count2 = 0;
+  std::set<std::string> to_look_for;
+  to_look_for.insert ("malloc");
+  to_look_for.insert ("realloc");
+  to_look_for.insert ("free");
+  to_look_for.insert ("memcpy");
+  to_look_for.insert ("memmove");
+  to_look_for.insert ("memcmp");
+
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      if (target->is_function_call()) {
+
+        if (target->call_function().id() == ID_symbol) {
+          std::string s = id2string(to_symbol_expr(target->call_function()).get_identifier());
+          if (to_look_for.find (s) != to_look_for.end()) {
+            count2 += 1;
+          }
+        }
+
+        count += num_complex_user_ops_expr (target->call_lhs());
+        for (const auto &oper : target->call_arguments()) {
+          count += num_complex_user_ops_expr (oper);
+        }
+      } else if (target->is_assign()) {
+        count += num_complex_user_ops_expr (target->assign_lhs());
+        count += num_complex_user_ops_expr (target->assign_rhs());
+      } else if (target->is_assert()) {
+        count += num_complex_user_ops_expr (target->condition());
+      } else if (target->is_assume()) {
+        count += num_complex_user_ops_expr (target->condition());
+      } else if (target->is_set_return_value()) {
+        count += num_complex_user_ops_expr (target->return_value());
       }
-    } else if (target->is_assign()) {
-      const exprt &lhs = target->assign_lhs();
-      if (lhs.has_operands()) {
-        count = count + 1;
+    }
+  }
+  return count + count2;
+}
+
+int num_complex_cbmc_ops_expr (const exprt &e) {
+  int sum = 0;
+
+  const irep_idt &e_id = e.id();
+  if (e_id == ID_byte_extract_big_endian ||
+      e_id == ID_byte_extract_little_endian ||
+      e_id == ID_byte_update_big_endian ||
+      e_id == ID_byte_update_little_endian ||
+      e_id == ID_allocate) {
+    sum += 1;
+  }
+
+  if (e.has_operands()) {
+    for (const exprt &oper : e.operands()) {
+      sum += num_complex_cbmc_ops_expr (oper);
+    }
+  }
+
+  return sum;
+}
+
+int num_complex_cbmc_ops (const std::vector<std::vector<goto_programt::const_targett>> &instructions) {
+  int count = 0;
+  for (const auto &insts : instructions) {
+    for (const auto &target : insts) {
+      if (target->is_function_call()) {
+        count += num_complex_cbmc_ops_expr (target->call_lhs());
+        for (const auto &oper : target->call_arguments()) {
+          count += num_complex_cbmc_ops_expr (oper);
+        }
+      } else if (target->is_assign()) {
+        count += num_complex_cbmc_ops_expr (target->assign_lhs());
+        count += num_complex_cbmc_ops_expr (target->assign_rhs());
+      } else if (target->is_assert()) {
+        count += num_complex_cbmc_ops_expr (target->condition());
+      } else if (target->is_assume()) {
+        count += num_complex_cbmc_ops_expr (target->condition());
+      } else if (target->is_set_return_value()) {
+        count += num_complex_cbmc_ops_expr (target->return_value());
       }
     }
   }
@@ -150,7 +213,10 @@ const double func_metricst::avg_time_per_symex_step () const {
 const void func_metricst::dump_html (std::ostream &out) const {
   std::string endline = " <br/> ";
   int avg_time_per_step = (int)avg_time_per_symex_step()/10000;
-  out << "complex ops: " << num_complex_ops << endline
+  out << "complex user ops: " << num_complex_user_ops << endline
+      << "complex CBMC ops: " << num_complex_cbmc_ops << endline
+      << "overall function size: " << function_size << endline
+      << "function pointer calls: " << num_func_pointer_calls << endline
       << "loops: " << num_loops;
 
   if (use_symex_info) {
