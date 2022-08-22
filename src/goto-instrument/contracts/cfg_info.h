@@ -31,6 +31,51 @@ Date: June 2022
 #include <set>
 #include <vector>
 
+/// Work around the fact that dirtyt does not look into
+/// OTHER instructions
+class dirty_altt : public dirtyt
+{
+public:
+  dirty_altt() : dirtyt()
+  {
+  }
+
+  explicit dirty_altt(const goto_functiont &goto_function)
+    : dirtyt(goto_function)
+  {
+    collect_other(goto_function);
+  }
+
+  explicit dirty_altt(const goto_functionst &goto_functions)
+    : dirtyt(goto_functions)
+  {
+    for(const auto &gf_entry : goto_functions.function_map)
+      collect_other(gf_entry.second);
+  }
+
+protected:
+  void collect_other(const goto_functiont &goto_function)
+  {
+    for(const auto &i : goto_function.body.instructions)
+    {
+      if(i.is_other())
+      {
+        auto &statement = i.get_other().get_statement();
+        if(
+          statement == ID_array_set || statement == ID_array_copy ||
+          statement == ID_array_replace || statement == ID_array_equal ||
+          statement == ID_havoc_object)
+        {
+          for(const auto &op : i.get_other().operands())
+          {
+            find_dirty(op);
+          }
+        }
+      }
+    }
+  }
+};
+
 /// Stores information about a goto function computed from its CFG.
 ///
 /// The methods of this class provide information about identifiers
@@ -110,7 +155,7 @@ class function_cfg_infot : public cfg_infot
 {
 public:
   explicit function_cfg_infot(const goto_functiont &_goto_function)
-    : dirty_analysis(_goto_function), locals(_goto_function)
+    : is_dirty(_goto_function), locals(_goto_function)
   {
     parameters.insert(
       _goto_function.parameter_identifiers.begin(),
@@ -128,15 +173,11 @@ public:
   /// or is a local that is dirty.
   bool is_not_local_or_dirty_local(const irep_idt &ident) const override
   {
-    if(is_local(ident))
-      return dirty_analysis.get_dirty_ids().find(ident) !=
-             dirty_analysis.get_dirty_ids().end();
-    else
-      return true;
+    return is_local(ident) ? is_dirty(ident) : true;
   }
 
 private:
-  const dirtyt dirty_analysis;
+  const dirty_altt is_dirty;
   const localst locals;
   std::unordered_set<irep_idt> parameters;
 };
@@ -146,7 +187,7 @@ class loop_cfg_infot : public cfg_infot
 {
 public:
   loop_cfg_infot(goto_functiont &_goto_function, const loopt &loop)
-    : dirty_analysis(_goto_function)
+    : is_dirty(_goto_function)
   {
     for(const auto &t : loop)
     {
@@ -166,8 +207,7 @@ public:
   bool is_not_local_or_dirty_local(const irep_idt &ident) const override
   {
     if(is_local(ident))
-      return dirty_analysis.get_dirty_ids().find(ident) !=
-             dirty_analysis.get_dirty_ids().end();
+      return is_dirty(ident);
     else
       return true;
   }
@@ -190,8 +230,7 @@ public:
   }
 
 private:
-  const dirtyt dirty_analysis;
+  const dirty_altt is_dirty;
   std::unordered_set<irep_idt> locals;
 };
-
 #endif
