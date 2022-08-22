@@ -141,6 +141,7 @@ protected:
 
   std::unordered_set<irep_idt> summarized;
 
+public:
   /// Translates a function_pointer_obeys_contract_exprt into an assertion
   /// ```
   /// ASSERT function_pointer == contract;
