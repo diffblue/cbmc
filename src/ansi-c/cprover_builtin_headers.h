@@ -47,6 +47,8 @@ void __CPROVER_fence(const char *kind, ...);
 __CPROVER_bool __CPROVER_is_freeable(const void *mem);
 __CPROVER_bool __CPROVER_is_freed(const void *mem);
 __CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size);
+// Is fresh, reference version (pronounced "fresher")
+__CPROVER_bool __CPROVER_is_freshr(const void **mem, __CPROVER_size_t size);
 void __CPROVER_old(const void *);
 void __CPROVER_loop_entry(const void *);
 

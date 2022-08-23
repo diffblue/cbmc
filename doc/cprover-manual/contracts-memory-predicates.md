@@ -4,19 +4,62 @@
 
 ### Syntax
 
+To specify memory footprint we provide the built-in function `__CPROVER_is_fresh`.
+
 ```c
-bool __CPROVER_is_fresh(void *p, size_t size);
+bool __CPROVER_is_fresh(const void *p, size_t size);
 ```
 
-To specify memory footprint we use a special function called `__CPROVER_is_fresh `. The meaning of `__CPROVER_is_fresh` is that we are borrowing a pointer from the
-external environment (in a precondition), or returning it to the calling context (in a postcondition).
+When used in a precondition, `__CPROVER_is_fresh(p, s)` expresses that the contract
+is expecting `p` to be a pointer to a fresh object of size at least `s` provided
+by the calling context. In a postcondition, `__CPROVER_is_fresh(p, s)` expresses
+that the function returns a pointer to a fresh object to the calling context.
+From the perspective of the contract, and object is _fresh_ if and only if it is
+distinct from any other object seen by any other occurrences of
+`__CPROVER_is_fresh` in the same contract.
 
+When asserting a precondition (in contract replacement mode) or asserting a
+postcondition (in contract checking mode), a call to `__CPROVER_is_fresh(p, s)`
+returns true if and only if `p` points to and object distinct from any other
+object seen by another occurrence of `__CPROVER_is_fresh(p', s')` (in either
+preconditions or post-conditions).
+
+When assuming a postcondition (in contract replacement mode) or assuming a
+precondition (in contact enforcement mode), a call to `__CPROVER_is_fresh(p, s)`
+gets translated to a statement `p = malloc(s)` which ensures that `p` points to
+an object distinct from any other object.
+
+The predicate `__CPROVER_is_freshr ` has the same meaning as
+`__CPROVER_is_fresh` but takes its pointer parameter by reference:
+
+```c
+bool __CPROVER_is_freshr(const void **p, size_t size);
+```
+
+This allows `__CPROVER_is_freshr` to be called from within functions and still
+check or update the desired pointer:
+
+```c
+// a function specifying that `arr` must be fresh
+bool foo_preconditions(const char **arr, const size_t size) {
+  return __CPROVER_is_freshr(arr, size);
+}
+
+int foo(char *arr, size_t size)
+// call if from the requires clause, checks or updates arr as seen
+// by foo
+__CPROVER_requires(foo_preconditions(&arr, size))
+{
+  for(size_t i = 0; i < size ; i ++)
+    arr[i] = i;
+}
+```
 ### Parameters
 
 `__CPROVER_is_fresh` takes two arguments: a pointer and an allocation size.
 The first argument is the pointer to be checked for "freshness" (i.e., not previously
 allocated), and the second is the expected size in bytes for the memory
-available at the pointer.  
+available at the pointer.
 
 ### Return Value
 

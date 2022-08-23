@@ -2253,6 +2253,18 @@ exprt c_typecheck_baset::do_special_functions(
     typecheck_function_call_arguments(expr);
     return nil_exprt();
   }
+  if(identifier == CPROVER_PREFIX "is_freshr")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << CPROVER_PREFIX "is_freshr expects two operands; "
+              << expr.arguments().size() << "provided." << eom;
+      throw 0;
+    }
+    typecheck_function_call_arguments(expr);
+    return nil_exprt();
+  }
   else if(identifier == CPROVER_PREFIX "is_freeable")
   {
     if(expr.arguments().size() != 1)
