@@ -44,6 +44,8 @@ void __CPROVER_atomic_end();
 void __CPROVER_fence(const char *kind, ...);
 
 // contract-related functions
+__CPROVER_bool __CPROVER_is_freeable(const void *mem);
+__CPROVER_bool __CPROVER_is_freed(const void *mem);
 __CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size);
 void __CPROVER_old(const void *);
 void __CPROVER_loop_entry(const void *);
@@ -138,4 +140,5 @@ __CPROVER_assignable_t __CPROVER_assignable(void *ptr, __CPROVER_size_t size,
 __CPROVER_assignable_t __CPROVER_whole_object(void *ptr);
 __CPROVER_assignable_t __CPROVER_object_from(void *ptr);
 __CPROVER_assignable_t __CPROVER_object_upto(void *ptr, __CPROVER_size_t size);
+__CPROVER_assignable_t __CPROVER_freeable(void *ptr);
 // clang-format on

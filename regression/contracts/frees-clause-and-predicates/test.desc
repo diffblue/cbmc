@@ -1,0 +1,17 @@
+CORE
+main.c
+--enforce-contract foo
+^\[foo.postcondition.\d+\] line \d+ Check ensures clause: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test checks that the front end parses and typchecks correct uses of:
+- __CPROVER_freeable_t function calls as frees clause targets
+- the predicate __CPROVER_freeable
+- the predicate __CPROVER_is_freeable
+- the predicate __CPROVER_is_freed
+
+The post condition of the contract is expected to fail because the predicates
+have no interpretation in the back-end yet.

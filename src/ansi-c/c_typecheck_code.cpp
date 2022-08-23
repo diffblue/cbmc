@@ -1014,11 +1014,43 @@ void c_typecheck_baset::typecheck_spec_frees_target(exprt &target)
     // an expression with pointer-type without side effects
     throw_on_side_effects(target);
   }
+  else if(can_cast_expr<side_effect_expr_function_callt>(target))
+  {
+    // A call to a freeable_t function symbol without other side effects
+    const auto &funcall = to_side_effect_expr_function_call(target);
+
+    if(!can_cast_expr<symbol_exprt>(funcall.function()))
+    {
+      error().source_location = target.source_location();
+      error() << "function pointer calls not allowed in frees clauses" << eom;
+      throw 0;
+    }
+
+    bool has_freeable_type =
+      (type.id() == ID_empty) &&
+      (type.get(ID_C_typedef) == CPROVER_PREFIX "freeable_t");
+    if(!has_freeable_type)
+    {
+      error().source_location = target.source_location();
+      error() << "expecting " CPROVER_PREFIX
+                 "freeable_t return type for function " +
+                   id2string(
+                     to_symbol_expr(funcall.function()).get_identifier()) +
+                   " called in frees clause"
+              << eom;
+      throw 0;
+    }
+
+    for(const auto &argument : funcall.arguments())
+      throw_on_side_effects(argument);
+  }
   else
   {
     // anything else is rejected
     error().source_location = target.source_location();
-    error() << "frees clause target must be a pointer-typed expression" << eom;
+    error() << "frees clause target must be a pointer-typed expression or a "
+               "call to a function returning " CPROVER_PREFIX "freeable_t"
+            << eom;
     throw 0;
   }
 }

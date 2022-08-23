@@ -231,6 +231,14 @@ void ansi_c_internal_additions(std::string &code)
     CPROVER_PREFIX "assignable_t " CPROVER_PREFIX "object_from(void *ptr);\n"
     // Declares the whole object pointer to by ptr
     CPROVER_PREFIX "assignable_t " CPROVER_PREFIX "whole_object(void *ptr);\n"
+    // Type that describes sets of freeable pointers
+    "typedef void " CPROVER_PREFIX "freeable_t;\n"
+    // Declares a pointer as freeable
+    CPROVER_PREFIX "freeable_t " CPROVER_PREFIX "freeable(void *ptr);\n"
+    // True iff ptr satisfies the preconditions of the free stdlib function
+    CPROVER_PREFIX "bool " CPROVER_PREFIX "is_freeable(void *ptr);\n"
+    // True iff ptr was freed during function execution or loop execution
+    CPROVER_PREFIX "bool " CPROVER_PREFIX "is_freed(void *ptr);\n"
     "\n";
   // clang-format on
 
