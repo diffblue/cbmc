@@ -1,0 +1,12 @@
+CORE
+main_even.c
+--dfcc main --enforce-contract even --replace-call-with-contract odd
+^\[even.postcondition.\d+\] .* Check ensures clause of contract contract::even for function even: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This model tries to proves the contract of even by assuming the contract of odd.
+We exepect the analysis to fail since even itself contains a bug which falsifies
+its postconditions.

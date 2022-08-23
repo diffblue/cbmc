@@ -1,0 +1,16 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that the front end parses and typechecks correct uses of
+- void function calls as frees clause targets
+- the predicate __CPROVER_freeable
+- the predicate __CPROVER_is_freeable
+- the predicate __CPROVER_was_freed
+
+The post condition of the contract is expected to fail because the predicates
+have no interpretation in the back-end yet.

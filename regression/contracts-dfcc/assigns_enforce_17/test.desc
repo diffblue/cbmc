@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract pure
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion x \=\= 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether verification correctly distinguishes local variables
+and global variables with same name when checking frame conditions.

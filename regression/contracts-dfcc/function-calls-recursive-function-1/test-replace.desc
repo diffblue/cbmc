@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract f --replace-call-with-contract g
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+f calls g, g is recursive, g is replaced by its contract.
+This test shows that we can prove the contract on f by abstracting the recursive
+function g with its contract.

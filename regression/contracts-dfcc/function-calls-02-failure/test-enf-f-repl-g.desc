@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --enforce-contract f --replace-call-with-contract g
+^\[f.postcondition.\d+\] .* Check ensures clause of contract contract::f for function f: SUCCESS$
+^\[g.precondition.\d+\] .* Check requires clause of contract contract::g for function g: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+f is checked against its contract. f calls g and g is replaced by its
+contract. The analysis must fail since f violates the preconditions of g.
+However we expect the post conditions of f to hold since contract replacement
+assumes post conditions hold.

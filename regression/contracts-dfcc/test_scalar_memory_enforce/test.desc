@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: SUCCESS
+\[foo.assigns.\d+\].*Check that \*x is assignable: SUCCESS
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Checks whether __CPROVER_is_fresh works properly for scalars (enforce context).
+It tests both positive and negative cases for __CPROVER_is_fresh.

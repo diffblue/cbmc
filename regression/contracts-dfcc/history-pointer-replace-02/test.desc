@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo
+^\[foo.precondition.\d+\].*Check requires clause of contract contract::foo for function foo: SUCCESS$
+^\[main.assertion.\d+\].*assertion x >= old_x: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verification:
+This test checks that history variables are supported with the use of the
+--replace-call-with-contract flag.
+

@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^.* error: (dereferencing void pointer|lvalue expressions with void type not allowed in assigns clauses)$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that void-typed expressions are rejected from conditional targets.

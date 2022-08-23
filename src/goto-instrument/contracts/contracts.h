@@ -195,35 +195,6 @@ public:
     const irep_idt &wrapper_function,
     const irep_idt &mangled_function,
     goto_programt &dest);
-
-  /// This function recursively searches \p expression to find nested or
-  /// non-nested quantified expressions. When a quantified expression is found,
-  /// a fresh quantified variable is added to the symbol table and \p expression
-  /// is updated to use this fresh variable.
-  void add_quantified_variable(exprt &expression, const irep_idt &mode);
-
-  /// This function recursively identifies the "old" expressions within expr
-  /// and replaces them with correspoding history variables.
-  void replace_history_parameter(
-    exprt &expr,
-    std::map<exprt, exprt> &parameter2history,
-    source_locationt location,
-    const irep_idt &mode,
-    goto_programt &history,
-    const irep_idt &id);
-
-  /// This function generates all the instructions required to initialize
-  /// history variables.
-  void generate_history_variables_initialization(
-    exprt &clause,
-    const irep_idt &mode,
-    goto_programt &program);
-
-  // for "auxiliary" functions generate contract constrainst
-  goto_convertt &get_converter()
-  {
-    return converter;
-  }
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H

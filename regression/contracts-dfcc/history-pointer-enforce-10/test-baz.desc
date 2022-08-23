@@ -1,0 +1,16 @@
+CORE
+main.c
+--dfcc main --enforce-contract baz
+^EXIT=0$
+^SIGNAL=0$
+^\[baz.postcondition.\d+\] line \d+ Check ensures clause of contract contract::baz for function baz: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion \*\(p->y\) == 7: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion \*\(p->y\) == -1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that history variables are supported for structs, symbols, and
+struct members. By using the --enforce-contract flag, the postcondition
+(with history variable) is asserted. In this case, this assertion should pass.
+Note: A function is always authorized to assign the variables that store
+its arguments, there is no need to mention them in the assigns clause.

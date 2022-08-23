@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo
+^\[foo.precondition.\d+\].*Check requires clause of contract contract::foo for function foo: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that when __CPROVER_is_fresh in preconditions replacement checks
+succeed when separation and size are as expected.

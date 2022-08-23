@@ -193,4 +193,45 @@ private:
   const dirtyt is_dirty;
   std::unordered_set<irep_idt> locals;
 };
+
+/// For a goto program. locals and dirty locals are inferred directly from
+/// the instruction sequence.
+class goto_program_cfg_infot : public cfg_infot
+{
+public:
+  explicit goto_program_cfg_infot(const goto_programt &goto_program)
+  {
+    // collect symbols declared in the insruction sequence as locals
+    goto_program.get_decl_identifiers(locals);
+
+    // collect dirty locals
+    goto_functiont goto_function;
+    goto_function.body.copy_from(goto_program);
+
+    dirtyt is_dirty(goto_function);
+    const auto &dirty_ids = is_dirty.get_dirty_ids();
+    dirty.insert(dirty_ids.begin(), dirty_ids.end());
+  }
+
+  /// Returns true iff `ident` is a loop local.
+  bool is_local(const irep_idt &ident) const override
+  {
+    return locals.find(ident) != locals.end();
+  }
+
+  /// Returns true iff the given `ident` is either not a loop local
+  /// or is a loop local that is dirty.
+  bool is_not_local_or_dirty_local(const irep_idt &ident) const override
+  {
+    if(is_local(ident))
+      return dirty.find(ident) != dirty.end();
+    else
+      return true;
+  }
+
+protected:
+  std::set<irep_idt> locals;
+  std::set<irep_idt> dirty;
+};
+
 #endif

@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract goo
+^Function to check 'goo' either not found or has no body$
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--
+--
+Checks that attempting to enforce the contract of an unknown function creates
+an error.

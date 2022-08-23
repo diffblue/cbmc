@@ -1,0 +1,15 @@
+CORE
+main_even.c
+--dfcc main --enforce-contract-rec even
+^\[even.precondition.\d+\] .* Check requires clause of contract contract::even for function even: FAILURE$
+^\[even.postcondition.\d+\] .* Check ensures clause of contract contract::even for function even: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This model proves the contract of even by handling the recursive call using
+--enforce-contract-rec.
+We expect the analysis to fail since even calls odd and odd calls even again
+while falsifying its preconditions, and even contains itself a bug which
+falsifying its post conditions.

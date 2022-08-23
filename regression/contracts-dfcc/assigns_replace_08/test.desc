@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
+^\[bar.assigns.\d+\].*Check that the assigns clause of contract::bar is included in the caller's assigns clause: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks whether CBMC properly evaluates subset relationship on assigns
+during replacement when the targets are global variables.

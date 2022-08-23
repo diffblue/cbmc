@@ -1,0 +1,16 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.assigns.\d+\].*Check that \*out_ptr1 is assignable: SUCCESS$
+^\[foo.assigns.\d+\].*Check that \*out_ptr2 is assignable: SUCCESS$
+^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^\[main.assertion.\d+\].*out1 is rw_ok: SUCCESS$
+^\[main.assertion.\d+\].*out2 is rw_ok: SUCCESS$
+^\[main.assertion.\d+\].*out1 and out2 are not aliased: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that foo satisfies its contract and serves as a baseline for
+test-replace.desc.

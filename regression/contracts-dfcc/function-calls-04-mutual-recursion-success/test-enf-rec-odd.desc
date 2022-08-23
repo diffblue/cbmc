@@ -1,0 +1,14 @@
+CORE
+main_odd.c
+--dfcc main --enforce-contract-rec odd
+^\[odd.assigns.\d+\].*Check that the assigns clause of contract::odd is included in the caller's assigns clause: SUCCESS$
+^\[odd.frees.\d+\].*Check that the frees clause of contract::odd is included in the caller's frees clause: SUCCESS$
+^\[odd.precondition.\d+\].*Check requires clause of contract contract::odd for function odd: SUCCESS$
+^\[odd.postcondition.\d+\].*Check ensures clause of contract contract::odd for function odd: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This model proves the contract of odd by handling the recursive call using
+--enforce-contract-rec.

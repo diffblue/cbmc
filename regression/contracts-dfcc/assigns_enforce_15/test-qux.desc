@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract qux
+^\[qux.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks whether verification fails when enforcing a contract
+for functions, without assigns clauses, that modify an input.

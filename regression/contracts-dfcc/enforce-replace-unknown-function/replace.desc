@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract goo
+^Function to replace 'goo' not found$
+^EXIT=(127|134)$
+^SIGNAL=0$
+--
+--
+Checks that attempting call replacement with an unknown function creates an
+error.

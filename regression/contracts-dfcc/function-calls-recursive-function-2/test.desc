@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract sum
+^\[sum.postcondition.\d+\].*Check ensures clause of contract contract::sum for function sum: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The main function calls a recursive function for which unwinding and constant
+propagation suffices to prove termination. The frame condition checking scales
+automatically with the unwinding.

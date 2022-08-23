@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo
+^\[main.assertion.\d+\].*out1 is rw_ok: SUCCESS$
+^\[main.assertion.\d+\].*out2 is rw_ok: SUCCESS$
+^\[main.assertion.\d+\].*out1 and out2 are not aliased: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that when __CPROVER_is_fresh in preconditions replacement checks
+succeed when separation and size are as expected.

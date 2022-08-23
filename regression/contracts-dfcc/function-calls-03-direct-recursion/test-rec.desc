@@ -1,0 +1,18 @@
+CORE
+main.c
+--dfcc main --enforce-contract-rec f
+^\[f.postcondition.\d+\].*Check ensures clause of contract contract::f for function f: SUCCESS$
+^\[f.precondition.\d+\].*Check requires clause of contract contract::f for function f: SUCCESS$
+^\[f.assigns.\d+\].*Check that the assigns clause of contract::f is included in the caller's assigns clause: SUCCESS$
+^\[f.frees.\d+\].*Check that the frees clause of contract::f is included in the caller's frees clause: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that when checking a contract against a function using
+--enforce-contract-rec, if the function is recursive and satsifies the contract
+then the verification succeeds.
+We want to see that post conditions are checked (top level call)
+and preconditions are checked (recursive call).
+We also want to see assigns and frees clause inclusion checks.

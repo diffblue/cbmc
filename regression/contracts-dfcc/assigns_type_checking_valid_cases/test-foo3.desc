@@ -1,0 +1,9 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo3 _ --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^\[foo3.assigns.\d+\] line \d+ Check that y is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC parses correctly all standard cases for assigns clauses.

@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract bar
+^EXIT=0$
+^SIGNAL=0$
+^\[bar.assigns.\d+\] line \d+ Check that s->f is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that \*f is assignable: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion x \=\= 1: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion x \=\= 2: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether assigns clause accepts function pointers
+and pointers to function pointers.

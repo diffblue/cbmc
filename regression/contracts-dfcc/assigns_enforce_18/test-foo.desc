@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo _ --pointer-primitive-check
+^\[foo.assigns.\d+\] line 13 Check that \*xp is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 14 Check that y is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks whether contract enforcement works with functions that deallocate memory.
+We had problems before when freeing a variable, but still keeping it on
+the writable set, which lead to deallocated variables issues.
+Now, if a memory is deallocated, we remove it from the our freely assignable set.

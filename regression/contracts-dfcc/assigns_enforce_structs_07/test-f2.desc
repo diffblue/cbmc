@@ -1,0 +1,15 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract f2 _ --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[f2.assigns.\d+\].*line 23 Check that pp->p->buf\[\(.*\)0\] is assignable: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+In f1, the assigns clause specifies `*(p->buf)` as target (which can be invalid)
+and assigns `p->buf[0]` unconditionally. When both target and lhs are invalid,
+its inclusion check can be trivially satisfied (or not) but we expect the target
+validity check to fail.
+
+In f2 tests this behaviour with chained dereferences.

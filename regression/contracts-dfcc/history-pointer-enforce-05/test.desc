@@ -1,0 +1,14 @@
+KNOWNBUG
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+ASSERT .*::tmp_if_expr
+--
+--
+Verification:
+This test checks that history variables are supported in the case where the
+function under test has multiple parameters. By using the
+--enforce-contract flag, the post-condition (which contains the history
+variables) is asserted. In this case, this assertion should fail.

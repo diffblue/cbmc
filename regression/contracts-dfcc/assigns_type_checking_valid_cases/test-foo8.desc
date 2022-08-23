@@ -1,0 +1,18 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo8 _ --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)0\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)1\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)2\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)3\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)4\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)5\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)6\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)7\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)8\] is assignable: SUCCESS$
+^\[foo8.assigns.\d+\] line \d+ Check that array\[\(.* int\)9\] is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC parses correctly all standard cases for assigns clauses.

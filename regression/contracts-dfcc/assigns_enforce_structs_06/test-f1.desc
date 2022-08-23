@@ -1,0 +1,15 @@
+CORE
+main.c
+--dfcc main --enforce-contract f1
+^EXIT=10$
+^SIGNAL=0$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)1\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)2\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->size is assignable: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks whether CBMC properly evaluates write set of members
+from the same object. In this case, we have a dynamic object
+as one of the struct members.

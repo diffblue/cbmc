@@ -1,0 +1,15 @@
+CORE
+main.c
+--dfcc main --enforce-contract f1
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_exists
+within positive contexts (enforced ENSURES clauses).
+
+With the SAT backend existential quantifiers in a positive context,
+e.g., the ENSURES clause being enforced in this case,
+are supported only if the quantifier is bound to a constant range.

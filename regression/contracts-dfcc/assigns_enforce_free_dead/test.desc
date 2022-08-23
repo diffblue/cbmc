@@ -1,0 +1,14 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-primitive-check
+^\[foo.assigns.\d+\] line 6 Check that \*x is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 9 Check that \*\(\*y\) is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 21 Check that \*\(\*y\) is assignable: FAILURE$
+^\[foo.assigns.\d+\] line 33 Check that \*x is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Checks that assignments to potentially freed or DEAD memory locations are
+detected as errors.

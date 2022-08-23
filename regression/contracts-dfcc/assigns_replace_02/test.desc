@@ -1,0 +1,9 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that a variable outside the assigns clause is not havocked.

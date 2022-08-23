@@ -1,0 +1,17 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract f1 --replace-call-with-contract f2
+^EXIT=10$
+^SIGNAL=0$
+^\[f1.precondition.\d+\] line \d+ Check requires clause of contract contract::f1 for function f1: SUCCESS$
+^\[f2.precondition.\d+\] line \d+ Check requires clause of contract contract::f2 for function f2: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_exists
+within both positive contexts (replaced REQUIRES clauses).
+
+With the SAT backend existential quantifiers in a positive context,
+e.g., the REQUIRES clause being replaced in this case,
+are supported only if the quantifier is bound to a constant range.

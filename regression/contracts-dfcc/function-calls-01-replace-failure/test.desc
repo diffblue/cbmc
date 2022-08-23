@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract f
+^\[f.precondition.\d+\] .* Check requires clause of contract contract::f for function f: FAILURE$
+^\[main.assertion.\d+\] .* assertion __return_value == x \+ 1: SUCCESS$
+^\[main.assertion.\d+\] .* assertion 1 <= __return_value && __return_value <= 10001: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Heere we test contract replacement at a call site where contract pre-conditions
+do not hold and precondition checks must fail, while having downstream
+assertions satisfied by virtue of assuming the contract post conditions.

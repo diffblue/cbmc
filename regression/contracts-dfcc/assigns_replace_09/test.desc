@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract bar --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^\[bar.assigns.\d+\].*Check that the assigns clause of contract::bar is included in the caller's assigns clause: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that assigns clause inclusion checks succeed when targets are
+global variables and the checked function is a static function.

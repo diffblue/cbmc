@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract f
+^EXIT=0$
+^SIGNAL=0$
+^\[f.assigns.\d+\] line \d+ Check that \*a is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^\[.*assigns.*\].*: FAILURE$
+--
+Checks whether verification succeeds when a pointer deref that is not
+specified in the assigns clause is first pointed at a member of a
+locally malloc'd struct before being assigned.

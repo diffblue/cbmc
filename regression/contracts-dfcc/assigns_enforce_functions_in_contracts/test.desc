@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks whether verification succeeds when requires and ensures
+contain functions.
+
+Note: We still don't check for function purity, i.e.,
+functions in contracts must only work as predicates.

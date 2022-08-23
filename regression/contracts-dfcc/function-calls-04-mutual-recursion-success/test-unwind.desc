@@ -1,0 +1,10 @@
+CORE
+main_unwind.c
+--dfcc main _ --unwind 20 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This model is solved by unwinding to establish the ground truth for both
+even and odd post conditions.

@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo _ --pointer-primitive-check
+^\[foo.assigns.\d+\] line \d+ Check that y is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that foo\$\$1\$\$x is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*y is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks wether assigning a global static that's not declared
+in the assigns clause through a pointer is detected as an error.

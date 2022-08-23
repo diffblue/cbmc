@@ -1,0 +1,15 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: SUCCESS$
+\[foo.assigns.\d+\].*Check that \*x is assignable: SUCCESS
+\[foo.assigns.\d+\].*Check that \*y is assignable: SUCCESS
+\[foo.assigns.\d+\].*Check that z is assignable: SUCCESS
+\[main.assertion.\d+\].*assertion \!\(n \< 4\): SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether ensures(is_fresh()) pass on functions that perform allocation
+directly and return a new object.

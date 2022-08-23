@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract f _ --unwind 20 --unwinding-assertions
+^\[f.postcondition.\d+].*Check ensures clause of contract contract::f for function f: SUCCESS$
+^\[g.recursion\].*recursion unwinding assertion: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+f calls g and g is recursive, and is not replaced by its contract.
+This shows that we can unwind recursion to completion on g using and prove the
+contract on f. The frame condition checking scales with the unwinding.

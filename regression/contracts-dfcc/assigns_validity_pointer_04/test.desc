@@ -1,0 +1,21 @@
+KNOWNBUG
+main.c
+--dfcc main --enforce-contract foo --replace-call-with-contract bar --replace-call-with-contract baz _ --pointer-primitive-check
+^EXIT=10$
+^SIGNAL=0$
+^\[foo.assigns.\d+\] line \d+ Check that z is assignable: FAILURE$
+^.* 1 of \d+ failed \(\d+ iteration.*\)$
+^VERIFICATION FAILED$
+// bar
+ASSERT \*foo::x > 0
+IF ¬\(\*foo::x = 3\) THEN GOTO \d
+ASSIGN goto_convertt::tmp_if_expr := \(\*foo::1::y = 5 \? true : false\)
+ASSUME .*::tmp_if_expr
+// baz
+ASSUME \*z = 7
+--
+--
+This test checks support for a malloced pointer that is assigned to by
+a function (bar and baz). Both functions bar and baz are being replaced by
+their function contracts, while the calling function foo is being checked
+(by enforcing it's function contracts).

@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract sub_ptr_values
+^EXIT=0$
+^SIGNAL=0$
+^\[sub_ptr_values.precondition.\d+\] line \d+ Check requires clause of contract contract::sub_ptr_values for function sub_ptr_values: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether __CPROVER_is_fresh can be used conditionally,
+in order to allow possibly-aliased arguments.

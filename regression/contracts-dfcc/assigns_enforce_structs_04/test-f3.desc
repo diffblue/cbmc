@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract f3
+^EXIT=0$
+^SIGNAL=0$
+^\[f3.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether CBMC properly evaluates write set of members
+from the same object.

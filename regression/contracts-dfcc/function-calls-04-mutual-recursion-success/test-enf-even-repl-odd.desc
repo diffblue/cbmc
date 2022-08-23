@@ -1,0 +1,14 @@
+CORE
+main_even.c
+--dfcc main --enforce-contract even --replace-call-with-contract odd
+^\[odd.assigns.\d+\].*Check that the assigns clause of contract::odd is included in the caller's assigns clause: SUCCESS$
+^\[odd.frees.\d+\].*Check that the frees clause of contract::odd is included in the caller's frees clause: SUCCESS$
+^\[odd.precondition.\d+\].*Check requires clause of contract contract::odd for function odd: SUCCESS$
+^\[even.postcondition.\d+\].*Check ensures clause of contract contract::even for function even: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This model proves the contract of even by assuming the contract of odd.
+Verification is expected to succeed.

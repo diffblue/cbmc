@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.postcondition.\d+\] line \d+ Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^\[add_operator.assigns.\d+\] line 7 Check that \*y is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that frame condition checking is propagated
+through function pointer calls.

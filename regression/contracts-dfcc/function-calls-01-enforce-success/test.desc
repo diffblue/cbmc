@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract f
+^\[f.postcondition.\d+\] .* Check ensures clause of contract contract::f for function f: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that contract checking is successfull for a function satifying
+its contract. The harness does not restrain the input parameter in any way and
+so this test shows that requires clauses are turned into assumptions.

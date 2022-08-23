@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract f1
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds when enforcing a contract
+for functions, without assigns clauses, that don't modify anything.

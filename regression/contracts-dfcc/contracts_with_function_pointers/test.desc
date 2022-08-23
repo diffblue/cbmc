@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract bar
+^EXIT=0$
+^SIGNAL=0$
+^\[bar.postcondition.\d+\].*Check ensures clause of contract contract::bar for function bar: SUCCESS$
+^\[bar.assigns.\d+\].*Check that \*return\_value\_baz is assignable: SUCCESS$
+^\[foo.assigns.\d+\].*Check that \*y is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC properly instrument functions with function pointers
+during contract enforcement.

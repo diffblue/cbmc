@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.assigns.\d+\].*Check that \*out is assignable: SUCCESS$
+^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that using __CPROVER_is_fresh in postconditions when checking
+a contract will effectively fail if objects passed to __CPROVER_is_fresh have
+the wrong size.

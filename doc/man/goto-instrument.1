@@ -1003,6 +1003,12 @@ replace calls to \fIfun\fR with \fIfun\fR's contract
 .TP
 \fB\-\-enforce\-contract\fR \fIfun\fR
 wrap \fIfun\fR with an assertion of its contract
+.TP
+\fB\-\-enforce\-contract\-rec\fR \fIfun\fR
+wrap \fIfun\fR with an assertion of its contract that can handle recursive calls
+.TP
+\fB\-\-dfcc\fR \fIfun\fR
+instrument dynamic frame condition checks method using \fIfun\fR as entry point
 .SS "User-interface options:"
 .TP
 \fB\-\-flush\fR
