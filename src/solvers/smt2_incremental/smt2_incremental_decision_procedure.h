@@ -55,11 +55,29 @@ public:
 protected:
   // Implementation of protected decision_proceduret member function.
   resultt dec_solve() override;
-  /// \brief Defines a function of array sort and asserts the element values.
+  /// \brief Defines a function of array sort and asserts the element values
+  /// from `array_exprt` or `array_of_exprt`.
   /// \details
   ///   The new array function identifier is added to the
   ///   `expression_identifiers` map.
-  void define_array_function(const array_exprt &array);
+  /// \note Statically fails if the template type is not a `array_exprt` or
+  /// `array_of_exprt`.
+  template <typename t_exprt>
+  void define_array_function(const t_exprt &array);
+  /// \brief Generate and send to the SMT solver clauses asserting that each
+  /// array element is as specified by \p array.
+  void initialize_array_elements(
+    const array_exprt &array,
+    const smt_identifier_termt &array_identifier);
+  /// \brief Generate and send to the SMT solver clauses asserting that each
+  /// array element is as specified by \p array.
+  /// \note This function uses a forall SMT2 term. Using it in combination with
+  /// arrays, bit vectors and uninterpreted functions requires the `ALL` SMT
+  /// logic that is not in the SMT 2.6 standard, but that it has been tested
+  /// working on Z3 and CVC5.
+  void initialize_array_elements(
+    const array_of_exprt &array,
+    const smt_identifier_termt &array_identifier);
   /// \brief Defines any functions which \p expr depends on, which have not yet
   ///   been defined, along with their dependencies in turn.
   void define_dependent_functions(const exprt &expr);

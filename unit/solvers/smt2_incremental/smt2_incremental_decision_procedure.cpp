@@ -171,9 +171,7 @@ TEST_CASE(
       test.sent_commands ==
       std::vector<smt_commandt>{
         smt_set_option_commandt{smt_option_produce_modelst{true}},
-        smt_set_logic_commandt{
-          // NOLINTNEXTLINE(whitespace/line_length)
-          smt_logic_quantifier_free_arrays_uninterpreted_functions_bit_vectorst{}},
+        smt_set_logic_commandt{smt_logic_allt{}},
         test.object_size_function.declaration});
     test.sent_commands.clear();
     SECTION("Set symbol to true.")
@@ -615,5 +613,36 @@ TEST_CASE(
       smt_declare_function_commandt{index_term, {}},
       smt_assert_commandt{smt_core_theoryt::equal(
         foo_term, smt_array_theoryt::select(array_term, index_term))}};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+  SECTION("array_of_exprt - all elements set to a given value")
+  {
+    const array_of_exprt array_of_expr{
+      from_integer(42, value_type), array_type};
+    test.sent_commands.clear();
+    test.procedure.set_to(
+      equal_exprt{
+        foo.symbol_expr(), index_exprt{array_of_expr, index.symbol_expr()}},
+      true);
+    const auto foo_term = smt_identifier_termt{"foo", smt_bit_vector_sortt{8}};
+    const auto array_term = smt_identifier_termt{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}}};
+    const auto index_term =
+      smt_identifier_termt{"index", smt_bit_vector_sortt{32}};
+    const auto forall_term =
+      smt_identifier_termt{"array_0_index", smt_bit_vector_sortt{32}};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{foo_term, {}},
+      smt_declare_function_commandt{array_term, {}},
+      smt_assert_commandt{smt_forall_termt{
+        {forall_term},
+        smt_core_theoryt::equal(
+          smt_array_theoryt::select(array_term, forall_term),
+          smt_bit_vector_constant_termt{42, 8})}},
+      smt_declare_function_commandt{index_term, {}},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        foo_term, smt_array_theoryt::select(array_term, index_term))}};
+    REQUIRE(test.sent_commands == expected_commands);
   }
 }

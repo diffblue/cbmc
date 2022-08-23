@@ -3,7 +3,7 @@ control_flow.c
 --verbosity 10
 Passing problem to incremental SMT2 solving via
 Sending command to SMT2 solver - \(set-option :produce-models true\)
-Sending command to SMT2 solver - \(set-logic QF_AUFBV\)
+Sending command to SMT2 solver - \(set-logic ALL\)
 Sending command to SMT2 solver - \(declare-fun |goto_symex::&92;guard#1| \(\) Bool\)
 Sending command to SMT2 solver - \(define-fun |B1| \(\) Bool |goto_symex::&92;guard#1|\)
 Sending command to SMT2 solver - \(declare-fun |main::1::x!0@1#1| \(\) \(_ BitVec 32\)\)
