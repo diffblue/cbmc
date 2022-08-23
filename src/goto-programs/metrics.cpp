@@ -52,12 +52,19 @@ int num_loops (const instruction_collectiont &instructions)
       }
       if(target->is_goto())
       {
-        for (auto gt_it = target->targets.begin(); gt_it != target->targets.end(); gt_it++)
+        const exprt &cond = target->condition();
+        const bool degenerate = (cond.id() == ID_notequal)
+                              && (cond.operands()[0].is_zero())
+                              && (cond.operands()[1].is_zero());
+        if (!degenerate)
         {
-          // disable things like IF 0 != 0 GOTO 1
-          if (seen.find ((*gt_it)->target_number) != seen.end())
+          for (auto gt_it = target->targets.begin(); gt_it != target->targets.end(); gt_it++)
           {
-            num_loops = num_loops + 1;
+            // disable things like IF 0 != 0 GOTO 1
+            if (seen.find ((*gt_it)->target_number) != seen.end())
+            {
+              num_loops = num_loops + 1;
+            }
           }
         }
       }
