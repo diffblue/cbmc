@@ -275,6 +275,14 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
     CHECK(
       *empty_value_response.get_if_error() ==
       std::vector<std::string>{"Unrecognised SMT term - \"\"."});
+    const response_or_errort<smt_responset> unknown_identifier_response =
+      validate_smt_response(
+        *smt2irep("((foo bar)))").parsed_output, identifier_table);
+    CHECK(
+      *unknown_identifier_response.get_if_error() ==
+      std::vector<std::string>{
+        "Unrecognised SMT term - \"foo\".",
+        "Unrecognised SMT term - \"bar\"."});
     const response_or_errort<smt_responset> pair_value_response =
       validate_smt_response(
         *smt2irep("((a (#xF00D #xBAD))))").parsed_output, identifier_table);
