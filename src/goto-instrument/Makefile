@@ -18,6 +18,7 @@ SRC = accelerate/accelerate.cpp \
       call_sequences.cpp \
       contracts/contracts.cpp \
       contracts/dynamic-frames/dfcc_utils.cpp \
+      contracts/dynamic-frames/dfcc_library.cpp \
       contracts/havoc_assigns_clause_targets.cpp \
       contracts/instrument_spec_assigns.cpp \
       contracts/memory_predicates.cpp \
