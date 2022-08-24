@@ -4,21 +4,41 @@
 
 ### Syntax
 
+A _frees_ clause allows the user to specify a set of pointers that may be freed
+by a function or the body of a loop:
+
 ```c
-__CPROVER_frees(*pointer-typed-expression*, ...)
+__CPROVER_frees(*targets*)
 ```
 
-A _frees_ clause allows the user to specify a set of pointers that may be freed
-by a function or the body of a loop.
 A function or loop contract contract may have zero or more _frees_ clauses.
 
-_Frees_ clause targets must be pointer-typed expressions.
-
-_Frees_ clause targets can also be _conditional_ and written as follows:
+The clause accepts a semicolon-separated list of _conditional target groups_.
+A _conditional target group+ consists of an optional _condition_ followed by a
+coma-separated list of _targets_.
+A _target_ is either a pointer-typed expression or a call to a function returning
+the built-in type `__CPROVER_freeable_t`.
 
 ```
-condition: list-of-pointer-typed-expressions;
+targets ::= conditional_target_group (';' conditional_target_group)* (';')?
+conditional_target_group ::= (condition ':')? target (',' target)*
+target ::= pointer-typed-expression | call-to-cprover-freeable-t-function
 ```
+
+The built-in type `__CPROVER_freeable_t` is the return type for functions that
+describe sets of freeable pointers.
+
+We provide the following built-in function that declares a single pointer
+as freeable.
+
+```c
+__CPROVER_freeable_t __CRPROVER_freeable(const void *ptr);
+```
+
+Users can write their own functions returning `__CPROVER_freeable_t`, which
+can call other `__CPROVER_freeable_t` functions and must be side-effect free,
+deterministic and loop-free, or contain loops that must be unwound to completion
+using a preliminary `goto-instrument --unwindset` pass.
 
 ### Examples
 

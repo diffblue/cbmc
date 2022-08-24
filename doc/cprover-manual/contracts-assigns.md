@@ -6,14 +6,34 @@
 
 ### Syntax
 
+An _assigns_ clause allows the user to specify a set of locations that may be
+assigned to by a function or the body of a loop:
+
 ```c
-__CPROVER_assigns(*identifier*, ...)
+__CPROVER_assigns(*targets*)
 ```
 
-An _assigns_ clause allows the user to specify that a memory location may be written by a function. The set of locations writable by a function is the union of the locations specified by the assigns clauses, or the empty set of no _assigns_ clause is specified. While, in general, an _assigns_ clause could be interpreted with either _writes_ or _modifies_ semantics, this
-design is based on the former. This means that memory not captured by an
-_assigns_ clause must not be written within the given function, even if the
-value(s) therein are not modified.
+A function or loop contract contract may have zero or more _assigns_ clauses.
+
+The clause accepts a semicolon-separated list of _conditional target groups_.
+A _conditional target group+ consists of an optional _condition_ followed by a
+coma-separated list of _targets_.
+A _target_ is either an lvalue expression or a call to a function returning
+the built-in type `__CPROVER_assignable_t`.
+
+```
+targets ::= conditional_target_group (';' conditional_target_group)* (';')?
+conditional_target_group ::= (condition ':')? target (',' target)*
+target ::= lvalue-expression | call-to-cprover-assignable-t-function
+```
+
+The set of locations writable by a function is the union of the locations
+specified by the assigns clauses, or the empty set of no _assigns_ clause is
+specified.
+While, in general, an _assigns_ clause could be interpreted with either
+_writes_ or _modifies_ semantics, this design is based on the former.
+This means that memory not captured by an _assigns_ clause must not be assigned
+to by the given function, even if the value(s) therein are not modified.
 
 ### Object slice expressions
 
@@ -56,6 +76,66 @@ call-by-contract replacement, `__CPROVER_havoc_slice(ptr, size)` is used to
 havoc these byte ranges, and `__CPROVER_havoc_slice` does not support
 havocing pointers. `__CPROVER_typed_target` must be used to specify targets
 that are pointers.
+
+### Specifying parameterized and reusable sets of assignable locations
+
+Users can specify sets of assignable locations by writing their own functions
+returning the built-in type `__CPROVER_assignable_t`.
+
+Such functions may call other functions returning `__CPROVER_assignable_t` (built-in or user-defined).
+These functions must ultimately be side-effect free, deterministic and loop-free,
+or can contain loops that must be unwound to completion using a preliminary
+`goto-instrument --unwindset` pass.
+
+For example, the following function declares even cells of `arr` up to index `10`
+as assignable:
+
+```c
+__CPROVER_assignable_t assign_even_upto_ten(int *arr, size_t size)
+{
+   assert(arr && size > 10);
+   __CPROVER_typed_target(arr[0]);
+   __CPROVER_typed_target(arr[2]);
+   __CPROVER_typed_target(arr[4]);
+   __CPROVER_typed_target(arr[6]);
+   __CPROVER_typed_target(arr[8]);
+   __CPROVER_typed_target(arr[10]);
+}
+```
+
+This function other defines a conditional set of assignable locations,
+and calls the function `assign_even_upto_ten`.
+
+```c
+__CPROVER_assignable_t my_assignable_set(int *arr, size_t size)
+{
+   if (arr && 0 < size)
+      __CPROVER_typed_target(arr[0]);
+
+   if (arr && 5 < size && size < 10)
+      __CPROVER_object_upto(arr, 5 * sizeof(int));
+
+   if (arr && 10 < size)
+      assign_even_upto_ten(arr, 5 * sizeof(int));
+}
+```
+
+An assigns clause target can consist of a call to a function returning
+`__CPROVER_assignable_t`:
+
+```c
+int foo(int *arr, size_t size)
+__CPROVER_requires(!arr || __CPROVER_is_fresh(arr, size))
+__CPROVER_assigns(my_assignable_set(arr, size))
+__CPROVER_ensures(true)
+{ ... }
+```
+
+When checking a function contract at some call-site or
+(loop contract at some program location), these `__CPROVER_assignable_t`
+functions are evaluated and any target they describe gets added to
+the write set. If a function call is not reachable according to the control flow
+the target does not get added to the write set.
 
 ### Parameters
 
@@ -186,7 +266,7 @@ int foo()
   uint32_t b;
   uint32_t out;
   int rval = sum(a, b, &out);
-  if (rval == SUCCESS) 
+  if (rval == SUCCESS)
     return out;
   return rval;
 }
@@ -201,21 +281,21 @@ int foo()
   uint32_t a;
   uint32_t b;
   uint32_t out;
-	
+
   /* Function Contract Replacement */
   /* Precondition */
   __CPROVER_assert(__CPROVER_is_fresh(out, sizeof(*out)), "Check requires clause");
-	
+
   /* Writable Set */
   *(&out) = nondet_uint32_t();
-	
+
   /* Postconditions */
   int return_value_sum = nondet_int();
   __CPROVER_assume(return_value_sum == SUCCESS || return_value_sum == FAILURE);
   __CPROVER_assume((return_value_sum == SUCCESS) ==> (*out == (a + b)));
 
   int rval = return_value_sum;
-  if (rval == SUCCESS) 
+  if (rval == SUCCESS)
     return out;
   return rval;
 }
