@@ -175,7 +175,6 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
 #ifndef _WIN32
 
-/*
 static Minisat::Solver *solver_to_interrupt=nullptr;
 
 static void interrupt_solver(int signum)
@@ -183,7 +182,6 @@ static void interrupt_solver(int signum)
   (void)signum; // unused parameter -- just removing the name trips up cpplint
   solver_to_interrupt->interrupt();
 }
-*/
 
 #endif
 
@@ -195,10 +193,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
   log.statistics() << (no_variables() - 1) << " variables, "
                    << solver->nClauses() << " clauses" << messaget::eom;
 
-  status = statust::ERROR;
-  return resultt::P_ERROR;
-
-  /*
   try
   {
     add_variables();
@@ -288,7 +282,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
     status=statust::ERROR;
     return resultt::P_ERROR;
   }
-  */
 }
 
 template<typename T>

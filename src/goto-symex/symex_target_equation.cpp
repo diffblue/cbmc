@@ -340,7 +340,6 @@ void symex_target_equationt::convert_without_assertions(
   convert_function_calls(decision_procedure);
   convert_io(decision_procedure);
   convert_constraints(decision_procedure);
-
 }
 
 void symex_target_equationt::convert(decision_proceduret &decision_procedure)
@@ -357,31 +356,14 @@ void symex_target_equationt::convert(decision_proceduret &decision_procedure)
                << messaget::eom;
 }
 
-// This step seems to cause non-termination on large examples.
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure)
 {
-
-  log.status() << "begin convert assignments" << messaget::eom;
-
   std::size_t step_index = 0;
-  int count = 0;
-  int total = 0;
   for(auto &step : SSA_steps)
   {
     if(step.is_assignment() && !step.ignore && !step.converted)
     {
-      total++;
-    }
-  }
-
-  for(auto &step : SSA_steps)
-  {
-    if(step.is_assignment() && !step.ignore && !step.converted)
-    {
-      if (count % (total/100) == 0) {
-        //log.status() << count << "/" << total << messaget::eom;
-      }
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
         step.output(mstream);
         mstream << messaget::eom;
@@ -391,13 +373,9 @@ void symex_target_equationt::convert_assignments(
       step.converted = true;
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
-
-      count++;
     }
     ++step_index;
   }
-
-  log.status() << "end convert assignments" << messaget::eom;
 }
 
 void symex_target_equationt::convert_decls(
