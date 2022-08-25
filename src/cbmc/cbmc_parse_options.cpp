@@ -58,6 +58,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/set_properties.h>
+#include <goto-programs/show_complexity_graph.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
@@ -374,6 +375,51 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   parse_solver_options(cmdline, options);
 }
 
+void set_complexity_graph_options (const cmdlinet &cmdline, optionst &options) {
+  if (cmdline.isset ("show-complexity-graph-with-symex")
+      || cmdline.isset ("show-complexity-graph-with-solver")) {
+    options.set_option("symex-record-coverage", true);
+  }
+  
+  options.set_option ("show-complexity-graph", cmdline.get_values ("show-complexity-graph"));
+  options.set_option ("show-complexity-graph-with-symex", cmdline.get_values ("show-complexity-graph-with-symex"));
+  options.set_option ("show-complexity-graph-with-solver", cmdline.get_values ("show-complexity-graph-with-solver"));
+  if (cmdline.isset ("complexity-graph-root")) 
+  {
+    std::stringstream stream;
+    for (const std::string &val : cmdline.get_values("complexity-graph-root")) 
+    {
+      stream << val << ",";
+    }
+    options.set_option ("complexity-graph-roots", stream.str());
+  }
+
+  if (cmdline.isset ("complexity-graph-omit-function")) 
+  {
+    std::stringstream stream;
+    for (const std::string &val : cmdline.get_values("complexity-graph-omit-function")) 
+    {
+      stream << val << ",";
+    }
+    options.set_option ("complexity-graph-omit-function", stream.str());
+  }
+
+  if (cmdline.isset ("complexity-graph-global-scores")) 
+  {
+    options.set_option ("complexity-graph-global-scores", true);
+  }
+
+  if (cmdline.isset ("complexity-graph-omit-function-pointers")) 
+  {
+    options.set_option ("complexity-graph-omit-function-pointers", true);
+  }
+
+  if (cmdline.isset ("complexity-graph-instructions")) 
+  {
+    options.set_option ("complexity-graph-instructions", true);
+  }
+}
+
 /// invoke main modules
 int cbmc_parse_optionst::doit()
 {
@@ -500,6 +546,8 @@ int cbmc_parse_optionst::doit()
     language->show_parse(std::cout);
     return CPROVER_EXIT_SUCCESS;
   }
+
+  set_complexity_graph_options (cmdline, options);
 
   int get_goto_program_ret =
     get_goto_program(goto_model, options, cmdline, ui_message_handler);
@@ -643,50 +691,6 @@ int cbmc_parse_optionst::doit()
   else
   {
     UNREACHABLE;
-  }
-
-  if (cmdline.isset ("show-complexity-graph-with-symex")
-      || cmdline.isset ("show-complexity-graph-with-solver")) {
-    options.set_option("symex-record-coverage", cmdline.get_values ("symex-record-coverage"));
-  }
-  
-  options.set_option ("show-complexity-graph", cmdline.get_values ("show-complexity-graph"));
-  options.set_option ("show-complexity-graph-with-symex", cmdline.get_values ("show-complexity-graph-with-symex"));
-  options.set_option ("show-complexity-graph-with-solver", cmdline.get_values ("show-complexity-graph-with-solver"));
-  options.set_option ("disable-solver", false);
-  if (cmdline.isset ("complexity-graph-root")) 
-  {
-    std::stringstream stream;
-    for (const std::string &val : cmdline.get_values("complexity-graph-root")) 
-    {
-      stream << val << ",";
-    }
-    options.set_option ("complexity-graph-roots", stream.str());
-  }
-
-  if (cmdline.isset ("complexity-graph-omit-function")) 
-  {
-    std::stringstream stream;
-    for (const std::string &val : cmdline.get_values("complexity-graph-omit-function")) 
-    {
-      stream << val << ",";
-    }
-    options.set_option ("complexity-graph-omit-function", stream.str());
-  }
-
-  if (cmdline.isset ("complexity-graph-global-scores")) 
-  {
-    options.set_option ("complexity-graph-global-scores", true);
-  }
-
-  if (cmdline.isset ("complexity-graph-omit-function-pointers")) 
-  {
-    options.set_option ("complexity-graph-omit-function-pointers", true);
-  }
-
-  if (cmdline.isset ("complexity-graph-instructions")) 
-  {
-    options.set_option ("complexity-graph-instructions", true);
   }
 
   const resultt result = (*verifier)();
@@ -941,6 +945,8 @@ void cbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_COMPLEXITY_GRAPH
+    HELP_SHOW_COMPLEXITY_GRAPH_CBMC
     HELP_VALIDATE
     "\n"
     "Program instrumentation options:\n"

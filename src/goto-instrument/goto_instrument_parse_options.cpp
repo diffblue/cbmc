@@ -52,8 +52,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/write_goto_binary.h>
 
-#include <goto-programs/show_complexity_graph.h>
-
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/custom_bitvector_analysis.h>
@@ -1821,6 +1819,7 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_COMPLEXITY_GRAPH
     HELP_GOTO_PROGRAM_STATS
     " --show-locations             show all source locations\n"
     " --dot                        generate CFG graph in DOT format\n"

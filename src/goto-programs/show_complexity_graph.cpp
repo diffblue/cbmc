@@ -59,6 +59,31 @@ std::string normalize_name (const irep_idt &name)
   return str;
 }
 
+// replaces all substrings in the string with the provided string
+// \param str: the string to look in
+// \param from: the substring to look for
+// \param to: the replacement
+void replace_all_substrings (std::string &str, const std::string &from, const std::string &to)
+{
+  size_t index = 0;
+  while (true)
+  {
+     index = str.find(from, index);
+     if (index == std::string::npos) break;
+     str.replace(index, from.length(), to);
+     index += from.length();
+  }
+}
+
+void normalize_html (std::string &str) 
+{
+  // other characters which don't seem to cause a problem: {"$", "&dollar"}, {":", "&colon"}
+  replace_all_substrings (str, "\"", "&quot;");
+  replace_all_substrings (str, ">", "&gt;");
+  replace_all_substrings (str, "<", "&lt;");
+  replace_all_substrings (str, "\n", "<br/>");
+}
+
 // initialize the data structures used for function pointer target detection
 void function_pointer_setup (const symbol_tablet &symbol_table,
                              const namespacet &ns,
@@ -153,11 +178,10 @@ void produce_node_rec (
   const bool omit_function_pointers,
   std::function<void(goto_programt::const_targett&, remove_const_function_pointerst::functionst&)> find_functions_for_function_pointer)
 {
-
   if (!(graph.has_node (name)))
   {
-
     std::string display_name = normalize_name(name);
+    normalize_html(display_name);
     complexity_grapht::nodet &node = graph.add_node (complexity_grapht::nodet (name, display_name, complexity_grapht::nodet::node_typet::FUNCTION));
 
     if (lib_funcs.find(name) != lib_funcs.end())
@@ -220,6 +244,7 @@ void produce_node_rec (
                 rhs_stream << node.name << "." << stream.str();
                 std::string rhs = rhs_stream.str();
                 std::string rhs_display = stream.str();
+                normalize_html(rhs_display);
 
                 graph.add_node (complexity_grapht::nodet (rhs, rhs_display, complexity_grapht::nodet::node_typet::FUNCTION_POINTER));
                 graph.add_edge (node.name, rhs);
@@ -232,7 +257,9 @@ void produce_node_rec (
                   const irep_idt &name = function.get_identifier();
                   if (!graph.has_node (name))
                   {
-                    graph.add_node (complexity_grapht::nodet (name, normalize_name (name), complexity_grapht::nodet::node_typet::FUNCTION));
+                    std::string display_name = normalize_name (name);
+                    normalize_html(display_name);
+                    graph.add_node (complexity_grapht::nodet (name, display_name, complexity_grapht::nodet::node_typet::FUNCTION));
                   }
 
                   graph.add_edge (rhs, name);
@@ -457,7 +484,7 @@ void count_num_paths (const complexity_grapht &graph,
     for (const auto &it : graph.dual_edge_map.find(node)->second)
     {
       const irep_idt other = it.first;
-      // TODO: cycles
+      // deals with cycles in a degenerate way
       path_count += num_paths.find(other) == num_paths.end() ? 0 : num_paths.find(other)->second;
     }
     // source nodes have a path count of 1
@@ -496,22 +523,6 @@ void globalize_scores (const complexity_grapht &graph,
 
 }
 
-// replaces all substrings in the string with the provided string
-// \param str: the string to look in
-// \param from: the substring to look for
-// \param to: the replacement
-void replace_all_substrings (std::string& str, const std::string& from, const std::string& to)
-{
-  size_t index = 0;
-  while (true)
-  {
-     index = str.find(from, index);
-     if (index == std::string::npos) break;
-     str.replace(index, from.length(), to);
-     index += from.length();
-  }
-}
-
 // dumps a valid HTML table entry with the given text to the given output stream.
 void dump_html_table_entry (std::ostream &out, const std::string &text, const std::string &color)
 {
@@ -545,7 +556,8 @@ bool dump_instruction
     if (symex_info != instr_symex_info.end())
     {
       double duration = symex_info->second.duration;
-      s_symex = std::max<size_t>(0, std::min<size_t> (255, (size_t) (255.0 * duration / max_symex_info.duration)));
+      double temp = 255.0 * duration / max_symex_info.duration;
+      s_symex = std::max<size_t>(0, std::min<size_t> (255, temp));
     }
   }
 
@@ -557,7 +569,8 @@ bool dump_instruction
     if (solver_info != instr_solver_info.end())
     {
       size_t clauses = solver_info->second.clauses;
-      s_solver = std::max<size_t>(0, std::min<size_t> (255, 255 * clauses / max_solver_info.clauses));
+      size_t temp = 255 * clauses / max_solver_info.clauses;
+      s_solver = std::max<size_t>(0, std::min<size_t> (255, temp));
     }
   }
   std::string color = color_of_score (s_symex, s_solver);
@@ -567,11 +580,7 @@ bool dump_instruction
   irep_idt empty = "";
   program.output_instruction (ns, empty, instr_str_stream, instruction);
   std::string instr_str = instr_str_stream.str();
-  // other characters which don't seem to cause a problem: {"$", "&dollar"}, {":", "&colon"}
-  replace_all_substrings (instr_str, "\"", "&quot;");
-  replace_all_substrings (instr_str, ">", "&gt;");
-  replace_all_substrings (instr_str, "<", "&lt;");
-  replace_all_substrings (instr_str, "\n", "<br/>");
+  normalize_html (instr_str);
 
   bool use_instruction = (s_symex > 8) || (s_solver > 8);
   if (use_instruction)
@@ -641,22 +650,7 @@ void dump_instructions
     out << "fontname=\"Courier\",";
     out << "label=<";
     out << " <table border=\"0\"> ";
-
-    // dump the list of parameters
-    // out << "<tr><td align=\"text\">" << node.display_name << "(";
-    // size_t param_index = 0;
-    // for (const auto &param : params)
-    // {
-    //   out << ((param_index == 0) ? "" : ", ") << param;
-    //   ++param_index;
-    // }
-    // out << ")";
-    // out << "<br align=\"left\" /></td></tr>";
-
-
     out << instructions_stream.str();
-
-
     out << "</table> ";
     out << ">]" << ";\n\n";
 
@@ -899,8 +893,8 @@ void compute_all_scores (
         const auto &symex_info = instr_symex_info.find (target);
         if (symex_info != instr_symex_info.end())
         {
-          max_symex_info.duration = std::max(max_symex_info.duration, symex_info->second.duration);
-          max_symex_info.steps = std::max(max_symex_info.steps, symex_info->second.steps);
+          max_symex_info.duration = std::max<double>(max_symex_info.duration, symex_info->second.duration);
+          max_symex_info.steps = std::max<size_t>(max_symex_info.steps, symex_info->second.steps);
         }
       }
     }

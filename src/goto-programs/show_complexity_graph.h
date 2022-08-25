@@ -23,16 +23,39 @@ Author: Benjamin Quiring
 #include <util/options.h>
 #include <util/ui_message.h>
 
-class namespacet;
 class abstract_goto_modelt;
-class goto_functionst;
 class ui_message_handlert;
 
+// clang-format off
+
+// flags usable by both goto-instrument and CBMC
 #define HELP_SHOW_COMPLEXITY_GRAPH \
-  " --show-complexity-graph        show goto control-flow-graph with nodes colored with proof complexity\n" \
-  " --complexity-graph-root        provides a root for the complexity control-flow-graph\n" \
-  " --complexity-graph-omit-function   omits a function from the complexity control-flow-graph\n" \
-  " --complexity-graph-omit-function-pointers   omits function pointers from the complexity control-flow-graph\n"
+  " --show-complexity-graph        show call graph with nodes colored with proof complexity\n" \
+  " --complexity-graph-root        provides a root for the complexity graph. TODO\n" \
+  " --complexity-graph-omit-function   omits a function from the complexity graph\n" \
+  " --complexity-graph-omit-function-pointers   omits function pointers from the complexity graph\n" \
+  " --complexity-graph-global-scores   uses a globalized notion of complexity for the complexity graph\n"
+
+// flags only usable with CBMC
+#define HELP_SHOW_COMPLEXITY_GRAPH_CBMC \
+  "--show-complexity-graph-with-symex     show the complexity graph and include symbolic execution information \n" \
+  "--show-complexity-graph-with-solver     show the complexity graph and include symbolic execution and solver formula information \n" \
+  "--complexity-graph-instructions     display which GOTO instructions were complex for symbolic execution and generating the solver formula\n"
+
+// flags usable by both goto-instrument and CBMC
+#define OPT_COMPLEXITY_GRAPH \
+  "(show-complexity-graph)" \
+  "(complexity-graph-root):" \
+  "(complexity-graph-omit-function):" \
+  "(complexity-graph-omit-function-pointers)" \
+  "(complexity-graph-global-scores)"
+
+// flags only usable with CBMC
+#define OPT_COMPLEXITY_GRAPH_CBMC \
+  "(show-complexity-graph-with-symex):" \
+  "(show-complexity-graph-with-solver):" \
+  "(complexity-graph-instructions)"
+
 // clang-format on
 
 void show_complexity_graph(
