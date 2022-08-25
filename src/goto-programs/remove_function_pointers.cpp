@@ -1,6 +1,9 @@
 /*******************************************************************\
+
 Module: Program Transformation
+
 Author: Daniel Kroening, kroening@kroening.com
+
 \*******************************************************************/
 
 /// \file

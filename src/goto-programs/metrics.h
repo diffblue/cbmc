@@ -22,9 +22,9 @@ class solver_infot
 {
   public:
   // the number of clauses, literals, and variables
-  int clauses = 0;
-  int literals = 0;
-  int variables = 0;
+  size_t clauses = 0;
+  size_t literals = 0;
+  size_t variables = 0;
 
   // Adds together this and another solver_info
   // \param other: the other solver_info to add
@@ -52,7 +52,7 @@ class symex_infot
 {
   public:
   // number of symex steps
-  int steps = 0;
+  size_t steps = 0;
   // duration of symex steps (in nanoseconds)
   double duration = 0.0;
 
@@ -84,28 +84,28 @@ class func_metricst
 
  public:
   // how many calls to function pointers are in the function's body
-  int num_func_pointer_calls = 0;
+  size_t num_func_pointer_calls = 0;
 
   // sum of the sides of all right-hand sides in the function body
-  int function_size = 0;
+  size_t function_size = 0;
 
   // number of high-complexity primitives in the function's body
   // e.g. struct field access, array indexing, pointer dereferencing
-  int num_complex_user_ops = 0;
+  size_t num_complex_user_ops = 0;
 
   // number of standard library functions called
   // e.g. memcpy, memmove, memcmp, malloc, free, realloc
-  int num_complex_lib_funcs = 0;
+  size_t num_complex_lib_funcs = 0;
 
   // number of high-complexity CBMC-internal functions
   // e.g. byte_extract_little_endian,
   //      byte_extract_big_endian,
   //      byte_update_little_endian,
   //      byte_update_big_endian,
-  int num_complex_cbmc_ops = 0;
+  size_t num_complex_cbmc_ops = 0;
 
   // number of loops (backwards jumps) in the function's body
-  int num_loops = 0;
+  size_t num_loops = 0;
 
   // wheter there is valid symex info
   bool use_symex_info = false;
@@ -126,23 +126,27 @@ class func_metricst
 
 using instruction_collectiont = std::vector<std::vector<goto_programt::const_targett>>;
 
-int num_loops (const instruction_collectiont &instructions);
+size_t num_loops (const instruction_collectiont &instructions);
 
-int function_size (const instruction_collectiont &instructions);
+size_t function_size (const instruction_collectiont &instructions);
 
-int num_func_pointer_calls (const instruction_collectiont &instructions);
+size_t num_func_pointer_calls (const instruction_collectiont &instructions);
 
-int num_complex_user_ops (const instruction_collectiont &instructions);
+size_t num_complex_user_ops (const instruction_collectiont &instructions);
 
-int num_complex_lib_funcs (const instruction_collectiont &instructions, const std::set<irep_idt> &lib_funcs);
+size_t num_complex_lib_funcs 
+  (const instruction_collectiont &instructions, 
+   const std::set<irep_idt> &lib_funcs);
 
-int num_complex_cbmc_ops (const instruction_collectiont &instructions);
+size_t num_complex_cbmc_ops (const instruction_collectiont &instructions);
 
-symex_infot aggregate_symex_info (const instruction_collectiont &instructions,
-                                  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
+symex_infot aggregate_symex_info 
+  (const instruction_collectiont &instructions,
+   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info);
 
-solver_infot aggregate_solver_info (const instruction_collectiont &instructions,
-                                    const std::map<goto_programt::const_targett, solver_infot> &instr_symex_info);
+solver_infot aggregate_solver_info 
+  (const instruction_collectiont &instructions,
+   const std::map<goto_programt::const_targett, solver_infot> &instr_symex_info);
 
 template<class T> T aggregate_instr_info (
   const instruction_collectiont &instructions,

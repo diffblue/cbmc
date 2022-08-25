@@ -691,6 +691,7 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
+
     {
       optionst options;
       options.set_option ("show-complexity-graph", cmdline.get_value ("show-complexity-graph"));
@@ -714,6 +715,11 @@ int goto_instrument_parse_optionst::doit()
         options.set_option ("complexity-graph-omit-function", stream.str());
       }
 
+      if (cmdline.isset ("complexity-graph-global-scores")) 
+      {
+        options.set_option ("complexity-graph-global-scores", true);
+      }
+
       if (cmdline.isset ("complexity-graph-omit-function-pointers")) 
       {
         options.set_option ("complexity-graph-omit-function-pointers", true);
@@ -731,7 +737,6 @@ int goto_instrument_parse_optionst::doit()
         return CPROVER_EXIT_SUCCESS;
       }
     }
-
 
 
     if(cmdline.isset("list-undefined-functions"))

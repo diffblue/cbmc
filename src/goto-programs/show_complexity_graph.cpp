@@ -183,7 +183,6 @@ void produce_node_rec (
 
         while (target != end)
         {
-
           // FUTURE: can segment function bodies into loops
           node.instructions[0].push_back (target);
 
@@ -192,7 +191,6 @@ void produce_node_rec (
             // normal function calls
             if (target->call_function().id() != ID_dereference)
             {
-
               const irep_idt call = ns.lookup(to_symbol_expr(target->call_function())).name;
 
               std::stringstream stream;
@@ -245,7 +243,6 @@ void produce_node_rec (
 
           target++;
         }
-
 
       } else
       {
@@ -301,9 +298,9 @@ void produce_graph (
 
 // provides a color given the numeric input.
 // color ranges from white to red
-std::string color_of_score (int score)
+std::string color_of_score (size_t score)
 {
-  int s = 255 - score;
+  size_t s = 255 - score;
   std::stringstream stream;
   // Red
   stream << std::hex << 255;
@@ -317,10 +314,10 @@ std::string color_of_score (int score)
 
 // provides a color given the numeric inputs.
 // color ranges from white to magenta to yellow
-std::string color_of_score (int score1, int score2)
+std::string color_of_score (size_t score1, size_t score2)
 {
-  int s1 = 255 - score1;
-  int s2 = 255 - score2;
+  size_t s1 = 255 - score1;
+  size_t s2 = 255 - score2;
   std::stringstream stream;
   // Red
   stream << std::hex << 255;
@@ -367,9 +364,9 @@ void compute_metrics (const complexity_grapht &graph,
 }
 
 // normalize the score map
-void normalize_scores (std::map<irep_idt, int> &scores)
+void normalize_scores (std::map<irep_idt, size_t> &scores)
 {
-  int max = 0;
+  size_t max = 0;
   for (auto it = scores.begin(); it != scores.end(); it++)
   {
     max = std::max (max, it->second);
@@ -378,10 +375,10 @@ void normalize_scores (std::map<irep_idt, int> &scores)
   for (auto it = scores.begin(); it != scores.end(); it++)
   {
     // score between [0, inf)
-    int score = it->second;
+    size_t score = it->second;
     // normalized score between [0, 255]
     float norm_score = 255.0 * ((float) score) / ((float) max);
-    int normalized_score = std::min(255, std::max(0, (int) norm_score));
+    size_t normalized_score = std::min(255, std::max(0, (int) norm_score));
     it->second = normalized_score;
   }
 }
@@ -390,27 +387,27 @@ void normalize_scores (std::map<irep_idt, int> &scores)
 // currently uses a weighted sum
 // does not use the solver or symex information at the moment
 void compute_scores (std::map<irep_idt, func_metricst> &metrics,
-                     std::map<irep_idt, int> &scores,
+                     std::map<irep_idt, size_t> &scores,
                      const bool use_symex_info,
                      const bool use_solver_info)
 {
-  int w_num_func_pointer_calls = 5;
-  int w_function_size = 1;
-  int w_num_complex_user_ops = 5;
-  int w_num_complex_lib_funcs = 50;
-  int w_num_complex_cbmc_ops = 5;
-  int w_num_loops = 20;
+  size_t w_num_func_pointer_calls = 5;
+  size_t w_function_size = 1;
+  size_t w_num_complex_user_ops = 5;
+  size_t w_num_complex_lib_funcs = 50;
+  size_t w_num_complex_cbmc_ops = 5;
+  size_t w_num_loops = 20;
 
   for (auto it = metrics.begin(); it != metrics.end(); it++)
   {
     const irep_idt &name = it->first;
     const func_metricst &m = it->second;
-    int score = w_num_func_pointer_calls * m.num_func_pointer_calls
-              + w_function_size * m.function_size
-              + w_num_complex_user_ops * m.num_complex_user_ops
-              + w_num_complex_lib_funcs * m.num_complex_lib_funcs
-              + w_num_complex_cbmc_ops * m.num_complex_cbmc_ops
-              + w_num_loops * m.num_loops;
+    size_t score = w_num_func_pointer_calls * m.num_func_pointer_calls
+                 + w_function_size * m.function_size
+                 + w_num_complex_user_ops * m.num_complex_user_ops
+                 + w_num_complex_lib_funcs * m.num_complex_lib_funcs
+                 + w_num_complex_cbmc_ops * m.num_complex_cbmc_ops
+                 + w_num_loops * m.num_loops;
     scores.find(name)->second = score;
   }
 }
@@ -452,11 +449,11 @@ void compute_top_sort (const complexity_grapht &graph,
 // counts the number of paths to each node in the graph, assuming the graph is acyclic.
 void count_num_paths (const complexity_grapht &graph,
                       const std::vector<irep_idt> &top_sort,
-                      std::map<irep_idt, int> &num_paths)
+                      std::map<irep_idt, size_t> &num_paths)
 {
   for (const irep_idt &node : top_sort)
   {
-    int path_count = 0;
+    size_t path_count = 0;
     for (const auto &it : graph.dual_edge_map.find(node)->second)
     {
       const irep_idt other = it.first;
@@ -472,107 +469,28 @@ void count_num_paths (const complexity_grapht &graph,
   }
 }
 
-void compute_dominated_nodes_node (
-  const complexity_grapht &graph,
-  std::set<irep_idt> &dominated_nodes,
-  const irep_idt node,
-  const bool bypass)
-{
-
-  bool all_backwards_edges_dominated = true;
-  if (!bypass)
-  {
-    for (const auto &it : graph.dual_edge_map.find(node)->second)
-    {
-      const irep_idt other = it.first;
-      if (dominated_nodes.find(other) != dominated_nodes.end())
-      {
-        all_backwards_edges_dominated = false;
-        break;
-      }
-    }
-  }
-
-  if (all_backwards_edges_dominated)
-  {
-    dominated_nodes.insert (node);
-    for (const auto &it : graph.edge_map.find(node)->second)
-    {
-      const irep_idt other = it.first;
-      compute_dominated_nodes_node (graph, dominated_nodes, other, false);
-    }
-  }
-}
-
-// computes dominator sets for each node, assuming the graph is acyclic.
-// inefficient because it'll touch nodes multiple times.
-void compute_dominated_nodes (const complexity_grapht &graph,
-                              std::map<irep_idt, std::set<irep_idt>> &dominated_nodes)
-{
-  for (const auto &it : graph.node_map)
-  {
-    const irep_idt node = it.first;
-    dominated_nodes.insert ({node, std::set<irep_idt>()});
-    std::set<irep_idt> &nodes = dominated_nodes.find(node)->second;
-    compute_dominated_nodes_node (graph, nodes, node, true);
-  }
-}
-
-void compute_reachable_nodes_node (const complexity_grapht &graph,
-                                   std::set<irep_idt> &reachable_nodes,
-                                   const irep_idt node)
-{
-  if (reachable_nodes.find(node) == reachable_nodes.end())
-  {
-    reachable_nodes.insert (node);
-    for (const auto &it : graph.edge_map.find(node)->second)
-    {
-      const irep_idt other = it.first;
-      compute_reachable_nodes_node (graph, reachable_nodes, other);
-    }
-  }
-}
-
-// computes reachable sets for each node
-// inefficient because it'll touch nodes multiple times.
-void compute_reachable_nodes (const complexity_grapht &graph,
-                              std::map<irep_idt, std::set<irep_idt>> &reachable_nodes)
-{
-  for (const auto &it : graph.node_map)
-  {
-    const irep_idt node = it.first;
-    reachable_nodes.insert ({node, std::set<irep_idt>()});
-    std::set<irep_idt> &nodes = reachable_nodes.find(node)->second;
-    compute_reachable_nodes_node (graph, nodes, node);
-  }
-}
-
-
 // computes a globalized score for a node dependent on how many paths it took to get there
 void globalize_scores (const complexity_grapht &graph,
-                       const std::map<irep_idt, int> &scores,
-                       std::map<irep_idt, int> &global_scores)
+                       const std::map<irep_idt, size_t> &scores,
+                       std::map<irep_idt, size_t> &global_scores)
 {
   std::vector<irep_idt> top_sort;
   compute_top_sort (graph, top_sort);
-  std::map<irep_idt, int> num_paths;
+  std::map<irep_idt, size_t> num_paths;
   count_num_paths (graph, top_sort, num_paths);
-  std::map<irep_idt, std::set<irep_idt>> dominated_nodes;
-  compute_dominated_nodes (graph, dominated_nodes);
-  std::map<irep_idt, std::set<irep_idt>> reachable_nodes;
-  compute_reachable_nodes (graph, reachable_nodes);
 
   for (const irep_idt &node : top_sort)
   {
-    int paths = num_paths.find (node)->second;
-    int base_score = 0;
-    //std::set<irep_idt> &other_nodes = dominated_nodes.find(node)->second;
-    std::set<irep_idt> &other_nodes = reachable_nodes.find(node)->second;
-    for (const irep_idt &other : other_nodes)
+    size_t paths = num_paths.find (node)->second;
+    size_t base_score = 0;
+
+    for (const auto &it : graph.edge_map.find(node)->second)
     {
-      base_score += scores.find(other)->second;
+      const irep_idt other = it.first;
+      base_score += global_scores.find(other)->second;
     }
-    int global_score = base_score * paths;
+
+    size_t global_score = base_score * paths;
     global_scores.find (node)->second = global_score;
   }
 
@@ -584,7 +502,7 @@ void globalize_scores (const complexity_grapht &graph,
 // \param to: the replacement
 void replace_all_substrings (std::string& str, const std::string& from, const std::string& to)
 {
-  int index = 0;
+  size_t index = 0;
   while (true)
   {
      index = str.find(from, index);
@@ -620,32 +538,26 @@ bool dump_instruction
    const solver_infot &max_solver_info)
 {
 
-  int s_symex = 0;
+  size_t s_symex = 0;
   if (use_symex_info)
   {
     auto symex_info = instr_symex_info.find (target);
     if (symex_info != instr_symex_info.end())
     {
-      // milliseconds
-      // double avg_time_per_step = (symex_info->second.duration / (double) symex_info->second.steps) / 1000000.0;
       double duration = symex_info->second.duration;
-      s_symex = std::max(0, std::min (255, (int) (255.0 * duration / max_symex_info.duration)));
-      /*
-      int steps = symex_info->second.steps;
-      s_symex = std::max(0, std::min (255, (int) ((255 * steps) / max_symex_info.steps)));
-      */
+      s_symex = std::max<size_t>(0, std::min<size_t> (255, (size_t) (255.0 * duration / max_symex_info.duration)));
     }
   }
 
 
-  int s_solver = 0;
+  size_t s_solver = 0;
   if (use_solver_info)
   {
     auto solver_info = instr_solver_info.find (target);
     if (solver_info != instr_solver_info.end())
     {
-      int clauses = solver_info->second.clauses;
-      s_solver = std::max(0, std::min (255, 255 * clauses / max_solver_info.clauses));
+      size_t clauses = solver_info->second.clauses;
+      s_solver = std::max<size_t>(0, std::min<size_t> (255, 255 * clauses / max_solver_info.clauses));
     }
   }
   std::string color = color_of_score (s_symex, s_solver);
@@ -674,7 +586,7 @@ bool dump_instruction
 // dumps an edge between the source node and the node for the body.
 void dump_instructions
   (const complexity_grapht::nodet &node,
-   std::map<irep_idt, int> &dot_node_naming,
+   std::map<irep_idt, size_t> &dot_node_naming,
    const goto_functiont::parameter_identifierst &params,
    const goto_programt &program,
    const std::vector<std::vector<goto_programt::const_targett>> &instructions,
@@ -693,7 +605,7 @@ void dump_instructions
   std::stringstream instructions_stream;
   bool any_used_instructions = false;
 
-  int index = 0;
+  size_t index = 0;
   for (const auto &insts : instructions)
   {
     for (const auto &target : insts)
@@ -710,7 +622,7 @@ void dump_instructions
       dump_html_table_entry (out, "...", "FFFFFF");
     }
 
-    index++;
+    ++index;
   }
 
   if (any_used_instructions)
@@ -732,11 +644,11 @@ void dump_instructions
 
     // dump the list of parameters
     // out << "<tr><td align=\"text\">" << node.display_name << "(";
-    // int param_index = 0;
+    // size_t param_index = 0;
     // for (const auto &param : params)
     // {
     //   out << ((param_index == 0) ? "" : ", ") << param;
-    //   param_index++;
+    //   ++param_index;
     // }
     // out << ")";
     // out << "<br align=\"left\" /></td></tr>";
@@ -762,14 +674,13 @@ void dump_instructions
 // dumps all of the nodes in the graph to the output stream.
 void dump_nodes
 (const complexity_grapht &graph,
- std::map<irep_idt, int> &dot_node_naming,
+ std::map<irep_idt, size_t> &dot_node_naming,
  std::ostream &out,
  const bool include_instructions,
  const namespacet &ns,
  const goto_functionst &goto_functions,
  const std::map<irep_idt, func_metricst> &metrics,
- const std::map<irep_idt, int> &scores,
- const std::map<irep_idt, int> &globalized_scores,
+ const std::map<irep_idt, size_t> &scores,
  const bool use_symex_info,
  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
  const symex_infot &max_symex_info,
@@ -807,8 +718,6 @@ void dump_nodes
       {
         metrics.find(name)->second.dump_html (label);
       }
-      //label << " <br/> local complexity: " << scores.find (name)->second;
-      //label << " <br/> global complexity: " << globalized_scores.find (name)->second;
       break;
     case complexity_grapht::nodet::node_typet::FUNCTION_POINTER:
       shape = "rarrow";
@@ -857,18 +766,10 @@ void dump_nodes
 // dumps all of the edges in the graph to the output stream.
 void dump_edges (
   const complexity_grapht &graph,
-  std::map<irep_idt, int> &dot_node_naming,
+  std::map<irep_idt, size_t> &dot_node_naming,
   std::ostream &out,
   const optionst &options,
-  const namespacet &ns,
-  const std::map<irep_idt, func_metricst> &metrics,
-  const std::map<irep_idt, int> &scores,
-  const bool use_symex_info,
-  const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
-  const symex_infot &max_symex_info,
-  const bool use_solver_info,
-  const std::map<goto_programt::const_targett, solver_infot> &instr_solver_info,
-  const solver_infot &max_solver_info)
+  const namespacet &ns)
 {
 
   for (const auto &it : graph.edge_map)
@@ -954,9 +855,10 @@ void construct_complexity_graph (
 void compute_all_scores (
   const complexity_grapht &graph,
   const goto_functionst &goto_functions,
+  const optionst &options,
   std::map<irep_idt, func_metricst> &metrics,
-  std::map<irep_idt, int> &scores,
-  std::map<irep_idt, int> &globalized_scores,
+  std::map<irep_idt, size_t> &scores,
+  std::map<irep_idt, size_t> &globalized_scores,
   const std::set<irep_idt> &lib_funcs,
   const bool use_symex_info,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
@@ -970,8 +872,8 @@ void compute_all_scores (
   {
     const irep_idt &name = it.first;
     metrics.insert({name, func_metricst()});
-    scores.insert({name, 0});
-    globalized_scores.insert({name, 0});
+    scores.insert({name, 1});
+    globalized_scores.insert({name, 1});
   }
 
   // initialize scores
@@ -979,8 +881,11 @@ void compute_all_scores (
                    use_symex_info, instr_symex_info,
                    use_solver_info, instr_solver_info);
   compute_scores (metrics, scores, use_symex_info, use_solver_info);
-  globalize_scores (graph, scores, globalized_scores);
-  normalize_scores (globalized_scores);
+  if (options.get_bool_option("complexity-graph-global-scores")) 
+  {
+    globalize_scores (graph, scores, globalized_scores);
+    normalize_scores (globalized_scores);
+  }
   normalize_scores (scores);
 
   const auto sorted = goto_functions.sorted();
@@ -1028,8 +933,8 @@ void dump_complexity_graph (
   std::ostream &out,
   const optionst &options,
   const std::map<irep_idt, func_metricst> &metrics,
-  const std::map<irep_idt, int> &scores,
-  const std::map<irep_idt, int> &globalized_scores,
+  const std::map<irep_idt, size_t> &scores,
+  const std::map<irep_idt, size_t> &globalized_scores,
   const bool use_symex_info,
   const std::map<goto_programt::const_targett, symex_infot> &instr_symex_info,
   const symex_infot &max_symex_info,
@@ -1038,13 +943,13 @@ void dump_complexity_graph (
   const solver_infot &max_solver_info)
 {
 
-  std::map<irep_idt, int> dot_node_naming;
+  std::map<irep_idt, size_t> dot_node_naming;
   {
-    int index = 0;
+    size_t index = 0;
     for (const auto &it : graph.node_map)
     {
       dot_node_naming.insert ({it.first, index});
-      index++;
+      ++index;
     }
   }
 
@@ -1053,14 +958,13 @@ void dump_complexity_graph (
   out << "rankdir=\"LR\";\n\n";
 
   bool include_instructions = options.get_bool_option ("complexity-graph-instructions");
+  const std::map<irep_idt, size_t> &scores_to_use = options.get_bool_option ("complexity-graph-global-scores") ? globalized_scores : scores;
   dump_nodes (graph, dot_node_naming, out, include_instructions, ns, goto_functions,
-              metrics, scores, globalized_scores,
+              metrics, scores_to_use,
               use_symex_info, instr_symex_info, max_symex_info,
               use_solver_info, instr_solver_info, max_solver_info);
 
-  dump_edges (graph, dot_node_naming, out, options, ns, metrics, scores,
-              use_symex_info, instr_symex_info, max_symex_info,
-              use_solver_info, instr_solver_info, max_solver_info);
+  dump_edges (graph, dot_node_naming, out, options, ns);
 
   out << "} // end digraph G\n";
 
@@ -1106,14 +1010,16 @@ void complexity_graph_main(
                               options, lib_funcs, message_handler);
 
 
-  std::map<irep_idt, int> scores;
-  std::map<irep_idt, int> globalized_scores;
+  std::map<irep_idt, size_t> scores;
+  std::map<irep_idt, size_t> globalized_scores;
   std::map<irep_idt, func_metricst> metrics;
 
   symex_infot max_symex_info;
   solver_infot max_solver_info;
 
-  compute_all_scores (graph, goto_functions, metrics, scores, globalized_scores, lib_funcs,
+  compute_all_scores (graph, goto_functions, options, 
+                      metrics, scores, globalized_scores, 
+                      lib_funcs,
                       use_symex_info, instr_symex_info, max_symex_info,
                       use_solver_info, instr_solver_info, max_solver_info);
 

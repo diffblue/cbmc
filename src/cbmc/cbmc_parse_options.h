@@ -53,7 +53,7 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   "(disable-solver)" \
   "(symex-record-coverage)" \
-  "(complexity-graph-instructions)(complexity-graph-root):(complexity-graph-omit-function):(complexity-graph-omit-function-pointers)"    \
+  "(complexity-graph-instructions)(complexity-graph-root):(complexity-graph-omit-function):(complexity-graph-omit-function-pointers)(complexity-graph-global-scores)"    \
   "(show-complexity-graph)(show-complexity-graph-with-symex):(show-complexity-graph-with-solver):"                        \
   OPT_SHOW_PROPERTIES \
   "(show-symbol-table)(show-parse-tree)" \

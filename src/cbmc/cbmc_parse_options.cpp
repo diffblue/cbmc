@@ -653,7 +653,7 @@ int cbmc_parse_optionst::doit()
   options.set_option ("show-complexity-graph", cmdline.get_values ("show-complexity-graph"));
   options.set_option ("show-complexity-graph-with-symex", cmdline.get_values ("show-complexity-graph-with-symex"));
   options.set_option ("show-complexity-graph-with-solver", cmdline.get_values ("show-complexity-graph-with-solver"));
-  options.set_option ("disable-solver", true);
+  options.set_option ("disable-solver", false);
   if (cmdline.isset ("complexity-graph-root")) 
   {
     std::stringstream stream;
@@ -672,6 +672,11 @@ int cbmc_parse_optionst::doit()
       stream << val << ",";
     }
     options.set_option ("complexity-graph-omit-function", stream.str());
+  }
+
+  if (cmdline.isset ("complexity-graph-global-scores")) 
+  {
+    options.set_option ("complexity-graph-global-scores", true);
   }
 
   if (cmdline.isset ("complexity-graph-omit-function-pointers")) 

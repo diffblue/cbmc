@@ -165,5 +165,4 @@ class complexity_grapht
     return edge_map2.find(name1)->second;
   }
 
-
 };

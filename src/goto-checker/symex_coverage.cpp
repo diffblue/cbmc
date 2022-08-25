@@ -447,7 +447,7 @@ const goto_programt::const_targetst symex_coveraget::coverage_to (goto_programt:
   if (inner != coverage.end()) 
   {
     const std::map<goto_programt::const_targett, coverage_infot> &to_map = inner->second;
-    for (auto it = to_map.begin(); it != to_map.end(); it++)
+    for (auto it = to_map.begin(); it != to_map.end(); ++it)
     {
       to_list.push_back (it->first);
     }

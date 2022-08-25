@@ -67,7 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-static-exclude):" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
-  "(show-complexity-graph):(complexity-graph-root):(complexity-graph-omit-function):(complexity-graph-omit-function-pointers)(complexity-graph-instructions)"   \
+  "(show-complexity-graph):(complexity-graph-root):(complexity-graph-omit-function):(complexity-graph-omit-function-pointers)(complexity-graph-instructions)(complexity-graph-global-scores)"   \
   OPT_SHOW_PROPERTIES \
   "(drop-unused-functions)" \
   "(show-value-sets)" \

@@ -47,7 +47,6 @@ void remove_function_pointer(
   goto_programt::targett target,
   const std::unordered_set<symbol_exprt, irep_hash> &functions);
 
-
 /// Returns true iff \p call_type can be converted to produce a function call of
 /// the same type as \p function_type.
 bool function_is_type_compatible(

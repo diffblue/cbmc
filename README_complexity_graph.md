@@ -35,7 +35,7 @@ We recommend this file because it is produced before any program transformations
 
 
   --constant-propagator
-  Recommended to run for the reason that it simplifies that program.
+  Recommended to run for the reason that it simplifies the underlying program, and hence the graph.
 
 
   --omit-function-pointers
@@ -45,6 +45,8 @@ We recommend this file because it is produced before any program transformations
   --add-library
   Includes the CBMC library for functions like `malloc`, `free`, etc.
 
+  --complexity-graph-global-scores
+  Uses a more global notion of scoring, where the "global score" for a node is the number of paths to that node multiplied by the sum of the global scores of its children. 
 
 The following flags can be used with the main CBMC executable
 ```
@@ -61,7 +63,7 @@ cbmc FILE.goto FLAGS
 
 
   --complexity-graph-instructions
-  When used with '--show-complexity-graph-with-symex' or '--show-complexity-graph-with-symex' displays the instructions of the program that have a high cost in symbolic execution and/or the solver formula.
+  When used with '--show-complexity-graph-with-symex' or '--show-complexity-graph-with-solver' displays the instructions of the program that have a high cost in symbolic execution and/or the solver formula.
 
 # Reading the graph
 
@@ -77,7 +79,7 @@ cbmc FILE.goto FLAGS
 
 The intensity of red coloring on a node is a display of its complexity relative to other nodes in the graph.
 
-When using `--show-complexity-graph-with-symex` with `--complexity-graph-instructions`, intensity of pink on instructions shows the complexity of that instruction in symbolic execution, and intensity of yellow shows the complexity of that instruction in symbolic execution.
+When using `--show-complexity-graph-with-symex` with `--complexity-graph-instructions`, intensity of pink on instructions shows the complexity of that instruction in symbolic execution, and intensity of yellow shows the complexity of that instruction in the creation of the solver formula.
 
 
 # Samples
@@ -110,3 +112,4 @@ When doing a proof, you should use information provided in the graph along with 
 It's good to abstract functions that are complex. In the case that there is a simple function `g` that calls a complex function `f`, it may be better to abstract `g` if the contract is easier to write.
 A good way to approximate where a contract is easy to write is by how many memory locations a function can write to.
 
+TODO:http://cprover.diffblue.com/md__home_travis_build_diffblue_cbmc_doc_architectural_restrict-function-pointer.html

@@ -66,7 +66,7 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
         forall_goto_program_instructions(from, body) 
         {
           const goto_programt::const_targetst to_list = symex_coverage.coverage_to (from);
-          int total_steps = 0;
+          size_t total_steps = 0;
           double total_duration = 0.0;
           for (goto_programt::const_targett to : to_list) 
           {
@@ -93,16 +93,11 @@ void generate_goto_dot (const abstract_goto_modelt &goto_model,
         for(std::size_t i = 0; i < hardness_stats.size(); i++) 
         {
           const auto &ssa_step_hardness = hardness_stats[i];
-          if(ssa_step_hardness.empty())
-            continue;
-
           for(const auto &key_value_pair : ssa_step_hardness) 
           {
             auto const &ssa = key_value_pair.first;
             auto const &hardness = key_value_pair.second;
             const goto_programt::const_targett target = ssa.pc;
-
-            // TODO: we could also compute the number of SSA expressions associated with a GOTO, but it doesn't seem important.
 
             auto ensure_exists = instr_solver_info.find (target);
             if (ensure_exists == instr_solver_info.end()) 
