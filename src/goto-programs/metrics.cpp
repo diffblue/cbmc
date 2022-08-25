@@ -34,10 +34,9 @@ size_t num_func_pointer_calls (const instruction_collectiont &instructions)
   return count;
 }
 
+// number of loops = number of backward jumps
 size_t num_loops (const instruction_collectiont &instructions)
 {
-  // number of loops = number of backward jumps
-
   size_t num_loops = 0;
 
   for (const auto &insts : instructions)
