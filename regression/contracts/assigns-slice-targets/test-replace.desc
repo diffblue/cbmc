@@ -1,6 +1,6 @@
 CORE
 main-replace.c
---replace-call-with-contract foo
+--dfcc main --replace-call-with-contract foo
 ^\[main.assertion.\d+\].*assertion s.a == 0: SUCCESS$
 ^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)0\] == 0: FAILURE$
 ^\[main.assertion.\d+\].*assertion \(.*\)s.arr1\[\(.*\)1\] == 0: FAILURE$

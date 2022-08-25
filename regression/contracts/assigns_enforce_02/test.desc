@@ -1,7 +1,6 @@
 CORE
 main.c
---enforce-contract foo
-^\[foo.assigns.\d+\] line 3 Check that z is valid: SUCCESS$
+--dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\] line 6 Check that \*x is assignable: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

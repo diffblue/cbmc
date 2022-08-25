@@ -1,6 +1,6 @@
 CORE
 main-enforce.c
---enforce-contract foo
+--dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)0\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)1\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)2\] is assignable: SUCCESS$
