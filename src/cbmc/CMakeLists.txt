@@ -13,7 +13,6 @@ target_link_libraries(cbmc-lib
     assembler
     big-int
     cpp
-#    complexity-graph
     goto-checker
     goto-instrument-lib
     goto-programs
