@@ -10,8 +10,8 @@ Author: Remi Delmas, delmasrd@amazon.com
 /// Generates the body of a wrapper function from a DSL-style contract
 /// for contract checking or contract replacement
 
-#ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DFCC_DSL_WRAPPER_PROGRAM_H
-#define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DFCC_DSL_WRAPPER_PROGRAM_H
+#ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_DSL_WRAPPER_PROGRAM_H
+#define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_DSL_WRAPPER_PROGRAM_H
 
 #include <goto-programs/goto_convert_class.h>
 
