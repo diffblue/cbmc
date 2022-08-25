@@ -1,5 +1,6 @@
+[CPROVER Manual TOC](../)
 
-# Use
+## Complexity Graph
 
 This tool is meant to help decompose CBMC proofs.
 It does this by producing a control-flow graph that contains information about where CBMC may run into issues.
@@ -65,9 +66,9 @@ cbmc FILE.goto FLAGS
   --complexity-graph-instructions
   When used with '--show-complexity-graph-with-symex' or '--show-complexity-graph-with-solver' displays the instructions of the program that have a high cost in symbolic execution and/or the solver formula.
 
-# Reading the graph
+## Reading the graph
 
-## Node shapes
+### Node shapes
 
 - Rectangluar nodes: normal functions
 - Elliptical nodes: private functions
@@ -75,14 +76,14 @@ cbmc FILE.goto FLAGS
 - Arrow-shaped nodes: function pointers
 - Pentagon: standard/CBMC library functions
 
-## Node colors
+### Node colors
 
 The intensity of red coloring on a node is a display of its complexity relative to other nodes in the graph.
 
 When using `--show-complexity-graph-with-symex` with `--complexity-graph-instructions`, intensity of pink on instructions shows the complexity of that instruction in symbolic execution, and intensity of yellow shows the complexity of that instruction in the creation of the solver formula.
 
 
-# Samples
+## Sample interaction
 
 Suppose we have a function `foobar` and we'd like to do a proof for it.
 After creating a GOTO file `foobar_harness1.goto` with the starter kit or `goto-cc`, try the following
@@ -98,8 +99,9 @@ dot -Tpdf graph.dot -o graph.pdf
 This will display the call graph for foobar.
 The first step is to take steps to clean the graph.
 
-Likely, you can ignore function pointers at this point.
-Additionally, there may be some high-indegree functions in the graph that don't appear to complicate the graph.
+Likely, you can ignore function pointers at this point. See [this page](http://cprover.diffblue.com/md__home_travis_build_diffblue_cbmc_doc_architectural_restrict-function-pointer.html) for how to restrict function pointers - the information provided in the graph displays CBMC's sound overapproximation of what functions can be targets of which function pointers.
+
+Additionally, there may be some high-indegree functions in the graph that don't appear to be useful and just complicate the graph.
 Let's say one of those functions is `notuseful`.
 We can then run a new command
 ```
@@ -112,4 +114,3 @@ When doing a proof, you should use information provided in the graph along with 
 It's good to abstract functions that are complex. In the case that there is a simple function `g` that calls a complex function `f`, it may be better to abstract `g` if the contract is easier to write.
 A good way to approximate where a contract is easy to write is by how many memory locations a function can write to.
 
-TODO:http://cprover.diffblue.com/md__home_travis_build_diffblue_cbmc_doc_architectural_restrict-function-pointer.html
