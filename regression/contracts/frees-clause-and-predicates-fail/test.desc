@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^main.c.* error: __CPROVER_is_freed is not allowed in preconditions.$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that the front end rejects __CPROVER_is_freed in preconditions.

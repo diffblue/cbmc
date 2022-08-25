@@ -791,7 +791,25 @@ void c_typecheck_baset::typecheck_declaration(
           return;
 
         error().source_location = expr.source_location();
-        error() << id2string(id) + "is not allowed in preconditions." << eom;
+        error() << id2string(id) + " is not allowed in preconditions." << eom;
+        throw 0;
+      };
+
+      auto check_is_freed = [&](const exprt &expr) {
+        const irep_idt id = CPROVER_PREFIX "is_freed";
+
+        auto pred = [&](const exprt &expr) {
+          if(!can_cast_expr<symbol_exprt>(expr))
+            return false;
+
+          return to_symbol_expr(expr).get_identifier() == id;
+        };
+
+        if(!has_subexpr(expr, pred))
+          return;
+
+        error().source_location = expr.source_location();
+        error() << id2string(id) + " is not allowed in preconditions." << eom;
         throw 0;
       };
 
@@ -852,7 +870,7 @@ void c_typecheck_baset::typecheck_declaration(
           implicit_typecast_bool(requires);
           check_history_expr(requires);
           check_return_value(requires);
-          check_return_value(requires);
+          check_is_freed(requires);
           lambda_exprt lambda{temporary_parameter_symbols, requires};
           lambda.add_source_location() = requires.source_location();
           requires.swap(lambda);

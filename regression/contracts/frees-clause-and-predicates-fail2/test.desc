@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^main.c.* error: expecting __CPROVER_freeable_t return type for function foo_frees called in frees clause$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that the front-end rejects non-__CPROVER_freeable_t-typed
+function calls in frees clauses.
