@@ -1157,9 +1157,56 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
   }
 
+  bool use_dfcc = false;
+  if(cmdline.isset(FLAG_DFCC))
+  {
+    use_dfcc = true;
+
+    if(cmdline.get_values(FLAG_DFCC).size() != 1)
+    {
+      log.error() << "Only a single --" << FLAG_DFCC << " is allowed"
+                  << messaget::eom;
+      throw 0;
+    }
+
+    if(cmdline.isset(FLAG_LOOP_CONTRACTS))
+    {
+      log.error() << " The combination of  " << FLAG_DFCC << " and "
+                  << FLAG_LOOP_CONTRACTS << " is not yet supported"
+                  << messaget::eom;
+      throw 0;
+    }
+
+    do_indirect_call_and_rtti_removal();
+
+    const std::string &harness_id = *cmdline.get_values(FLAG_DFCC).begin();
+
+    std::set<std::string> to_replace(
+      cmdline.get_values(FLAG_REPLACE_CALL).begin(),
+      cmdline.get_values(FLAG_REPLACE_CALL).end());
+
+    std::set<std::string> to_check(
+      cmdline.get_values(FLAG_ENFORCE_CONTRACT).begin(),
+      cmdline.get_values(FLAG_ENFORCE_CONTRACT).end());
+
+    std::set<std::string> to_exclude_from_nondet_static(
+      cmdline.get_values("nondet-static-exclude").begin(),
+      cmdline.get_values("nondet-static-exclude").end());
+
+    dfcc(
+      goto_model,
+      harness_id,
+      to_check,
+      to_replace,
+      false,
+      to_exclude_from_nondet_static,
+      log);
+  }
+
   if(
-    cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
-    cmdline.isset(FLAG_ENFORCE_CONTRACT))
+    !use_dfcc &&
+    (cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
+     cmdline.isset(FLAG_ENFORCE_CONTRACT)))
   {
     do_indirect_call_and_rtti_removal();
     code_contractst contracts(goto_model, log);
@@ -1911,6 +1958,7 @@ void goto_instrument_parse_optionst::help()
     "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
     "\n"
     "Code contracts:\n"
+    HELP_DFCC
     HELP_LOOP_CONTRACTS
     HELP_LOOP_INVARIANT_SYNTHESIZER
     HELP_REPLACE_CALL
