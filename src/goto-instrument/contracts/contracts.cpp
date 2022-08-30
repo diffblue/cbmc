@@ -1428,10 +1428,10 @@ void code_contractst::assert_function_pointer_obeys_contract(
   comment << "Assert function pointer '"
           << from_expr_using_mode(ns, mode, expr.function_pointer())
           << "' obeys contract '"
-          << from_expr_using_mode(ns, mode, expr.contract()) << "'";
+          << from_expr_using_mode(ns, mode, expr.address_of_contract()) << "'";
   loc.set_comment(comment.str());
   code_assertt assert_expr(
-    equal_exprt{expr.function_pointer(), expr.contract()});
+    equal_exprt{expr.function_pointer(), expr.address_of_contract()});
   assert_expr.add_source_location() = loc;
   goto_programt instructions;
   converter.goto_convert(assert_expr, instructions, mode);
@@ -1448,10 +1448,10 @@ void code_contractst::assume_function_pointer_obeys_contract(
   comment << "Assume function pointer '"
           << from_expr_using_mode(ns, mode, expr.function_pointer())
           << "' obeys contract '"
-          << from_expr_using_mode(ns, mode, expr.contract()) << "'";
+          << from_expr_using_mode(ns, mode, expr.address_of_contract()) << "'";
   loc.set_comment(comment.str());
   dest.add(goto_programt::make_assignment(
-    expr.function_pointer(), expr.contract(), loc));
+    expr.function_pointer(), expr.address_of_contract(), loc));
 }
 
 void code_contractst::add_contract_check(
