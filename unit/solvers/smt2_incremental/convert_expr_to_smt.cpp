@@ -1590,3 +1590,62 @@ TEST_CASE(
       smt_bit_vector_theoryt::extract(63, 64 - object_bits)(
         smt_bit_vector_theoryt::concat(object, offset))}));
 }
+
+TEST_CASE(
+  "lower_address_of_array_index works correctly",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+  const typet value_type = signedbv_typet{8};
+  const exprt array = symbol_exprt{
+    "my_array", array_typet{value_type, from_integer(10, signed_size_type())}};
+  const exprt index = from_integer(42, unsignedbv_typet{64});
+  const index_exprt index_expr{array, index};
+  const address_of_exprt address_of_expr{index_expr};
+  const plus_exprt lowered{
+    address_of_exprt{
+      array, type_checked_cast<pointer_typet>(address_of_expr.type())},
+    index};
+  SECTION("Lowering address_of(array[idx])")
+  {
+    CHECK(lower_address_of_array_index(address_of_expr) == lowered);
+  }
+  SECTION("Lowering expression containing address_of(array[idx])")
+  {
+    const symbol_exprt symbol{"a_symbol", address_of_expr.type()};
+    const equal_exprt assignment{symbol, address_of_expr};
+    const equal_exprt expected{symbol, lowered};
+    CHECK(lower_address_of_array_index(assignment) == expected);
+  }
+  SECTION("Lowering does not lower other expressions")
+  {
+    const symbol_exprt symbol{"a_symbol", index_expr.type()};
+    const equal_exprt assignment{symbol, index_expr};
+    CHECK(lower_address_of_array_index(assignment) == assignment);
+  }
+  SECTION("Lowering is done during convert_to_smt")
+  {
+    const symbol_exprt symbol{"a_symbol", address_of_expr.type()};
+    const equal_exprt assignment{symbol, address_of_expr};
+    track_expression_objects(assignment, ns, test.object_map);
+    associate_pointer_sizes(
+      assignment,
+      ns,
+      test.pointer_sizes,
+      test.object_map,
+      test.object_size_function.make_application);
+    const smt_termt expected = smt_core_theoryt::equal(
+      smt_identifier_termt(symbol.get_identifier(), smt_bit_vector_sortt{64}),
+      smt_bit_vector_theoryt::add(
+        smt_bit_vector_theoryt::concat(
+          smt_bit_vector_constant_termt{2, 8},
+          smt_bit_vector_constant_termt{0, 56}),
+        smt_bit_vector_theoryt::multiply(
+          smt_bit_vector_constant_termt{42, 64},
+          smt_bit_vector_constant_termt{1, 64})));
+    CHECK(test.convert(assignment) == expected);
+  }
+}

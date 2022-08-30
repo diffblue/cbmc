@@ -1,0 +1,11 @@
+CORE
+array_address_of.c
+
+Passing problem to incremental SMT2 solving
+line \d+ Array condition 1: SUCCESS
+line \d+ Array condition 2: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test of getting the size of an array resulting in a address_of(array[0]) expression.
