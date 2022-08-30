@@ -16,6 +16,11 @@ class typet;
 ///   stored as sort ast (abstract syntax tree).
 smt_sortt convert_type_to_smt_sort(const typet &type);
 
+/// \brief Lower the `address_of(array[idx])` sub expressions in \p expr to
+///   `idx + address_of(array)`, so that it can be fed to
+///   `convert_expr_to_smt`.
+exprt lower_address_of_array_index(exprt expr);
+
 /// \brief Converts the \p expression to an smt encoding of the same expression
 ///   stored as term ast (abstract syntax tree).
 smt_termt convert_expr_to_smt(
