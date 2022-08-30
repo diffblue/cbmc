@@ -1,8 +1,6 @@
 CORE
 main-enforce.c
 --enforce-contract foo
-^\[foo.assigns.\d+\].* Check that __CPROVER_object_slice\(\(void \*\)s->arr1, \(.*\)5\) is valid: SUCCESS$
-^\[foo.assigns.\d+\].* Check that __CPROVER_object_from\(\(void \*\)\(s->arr2 \+ \(.*\)5\)\) is valid: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)0\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)1\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr1\[\(.*\)2\] is assignable: SUCCESS$
@@ -23,6 +21,14 @@ main-enforce.c
 ^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)7\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)8\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that s->arr2\[\(.*\)9\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->a is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->arr1\[\(.*\)0\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->arr1\[\(.*\)7\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->arr1\[\(.*\)9\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->b is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->arr2\[\(.*\)6\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->arr2\[\(.*\)8\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\].* Check that ss->c is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

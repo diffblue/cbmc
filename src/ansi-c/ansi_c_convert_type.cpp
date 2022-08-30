@@ -273,6 +273,14 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     for(const exprt &target : to_unary_expr(as_expr).op().operands())
       assigns.push_back(target);
   }
+  else if(type.id() == ID_C_spec_frees)
+  {
+    const exprt &as_expr =
+      static_cast<const exprt &>(static_cast<const irept &>(type));
+
+    for(const exprt &target : to_unary_expr(as_expr).op().operands())
+      frees.push_back(target);
+  }
   else if(type.id() == ID_C_spec_ensures)
   {
     const exprt &as_expr =
@@ -340,6 +348,9 @@ void ansi_c_convert_typet::write(typet &type)
 
     if(!assigns.empty())
       to_code_with_contract_type(type).assigns() = std::move(assigns);
+
+    if(!frees.empty())
+      to_code_with_contract_type(type).frees() = std::move(frees);
 
     if(!ensures.empty())
       to_code_with_contract_type(type).ensures() = std::move(ensures);
