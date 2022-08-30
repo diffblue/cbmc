@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 Main
 --context-include Main.main --context-include 'Main.<clinit' --context-include org.cprover.MyClass --context-exclude 'org.cprover.MyClass$Inner.'
 ^EXIT=10$
@@ -12,3 +12,6 @@ WARNING: no body for function .*
 --
 Tests that only the specified methods and classes are included, while
 the inner class from MyClass is excluded.
+
+The test is marked "THOROUGH" as it requires more memory than may be available
+on some GitHub runners.
