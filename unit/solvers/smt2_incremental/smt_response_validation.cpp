@@ -176,15 +176,40 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
           smt_array_sortt{
             smt_bit_vector_sortt{32}, smt_bit_vector_sortt{32}}}});
 
-      const response_or_errort<smt_responset> response_get_select =
-        validate_smt_response(
-          *smt2irep("(((select |b| (_ bv10 32)) #x0000002a))").parsed_output,
-          identifier_table);
-
-      CHECK(
-        *response_get_select.get_if_valid() ==
-        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
-          select, smt_bit_vector_constant_termt{0x2A, 32}}}});
+      SECTION("Valid application of smt_array_theoryt::select")
+      {
+        const response_or_errort<smt_responset> response_get_select =
+          validate_smt_response(
+            *smt2irep("(((select |b| (_ bv10 32)) #x0000002a))").parsed_output,
+            identifier_table);
+        CHECK(
+          *response_get_select.get_if_valid() ==
+          smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+            select, smt_bit_vector_constant_termt{0x2A, 32}}}});
+      }
+      SECTION("Invalid due to selecting from non-array")
+      {
+        const response_or_errort<smt_responset> response_get_select =
+          validate_smt_response(
+            *smt2irep("(((select (_ bv10 32) (_ bv10 32)) #x0000002a))")
+               .parsed_output,
+            identifier_table);
+        CHECK(
+          *response_get_select.get_if_error() ==
+          std::vector<std::string>{
+            "\"select\" may only select from an array."});
+      }
+      SECTION("Invalid due to selecting invalid index sort")
+      {
+        const response_or_errort<smt_responset> response_get_select =
+          validate_smt_response(
+            *smt2irep("(((select |b| (_ bv10 16)) #x0000002a))").parsed_output,
+            identifier_table);
+        CHECK(
+          *response_get_select.get_if_error() ==
+          std::vector<std::string>{
+            "Sort of arrays index must match the sort of the index supplied."});
+      }
     }
     SECTION("Descriptors which are bit vector constants")
     {

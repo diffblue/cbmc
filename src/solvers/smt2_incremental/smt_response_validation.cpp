@@ -29,45 +29,6 @@ static response_or_errort<smt_termt> validate_term(
   const irept &parse_tree,
   const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table);
 
-template <class smtt>
-response_or_errort<smtt>::response_or_errort(smtt smt) : smt{std::move(smt)}
-{
-}
-
-template <class smtt>
-response_or_errort<smtt>::response_or_errort(std::string message)
-  : messages{std::move(message)}
-{
-}
-
-template <class smtt>
-response_or_errort<smtt>::response_or_errort(std::vector<std::string> messages)
-  : messages{std::move(messages)}
-{
-}
-
-template <class smtt>
-const smtt *response_or_errort<smtt>::get_if_valid() const
-{
-  INVARIANT(
-    smt.has_value() == messages.empty(),
-    "The response_or_errort class must be in the valid state or error state, "
-    "exclusively.");
-  return smt.has_value() ? &smt.value() : nullptr;
-}
-
-template <class smtt>
-const std::vector<std::string> *response_or_errort<smtt>::get_if_error() const
-{
-  INVARIANT(
-    smt.has_value() == messages.empty(),
-    "The response_or_errort class must be in the valid state or error state, "
-    "exclusively.");
-  return smt.has_value() ? nullptr : &messages;
-}
-
-template class response_or_errort<smt_responset>;
-
 // Implementation detail of `collect_messages` below.
 template <typename argumentt, typename... argumentst>
 void collect_messages_impl(
@@ -297,8 +258,8 @@ static optionalt<response_or_errort<smt_termt>> try_select_validation(
   const auto messages = collect_messages(array, index);
   if(!messages.empty())
     return response_or_errort<smt_termt>{messages};
-  return response_or_errort<smt_termt>{
-    smt_array_theoryt::select(*array.get_if_valid(), *index.get_if_valid())};
+  return {smt_array_theoryt::select.validation(
+    *array.get_if_valid(), *index.get_if_valid())};
 }
 
 static response_or_errort<smt_termt> validate_term(
