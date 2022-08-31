@@ -6,7 +6,7 @@
 
 // clang-format off
 int initialize(int *arr)
-  __CPROVER_assigns(__CPROVER_POINTER_OBJECT(arr))
+  __CPROVER_assigns(__CPROVER_object_whole(arr))
   __CPROVER_ensures(
     __CPROVER_forall {
       int i;

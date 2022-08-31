@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-int baz(int *x) __CPROVER_assigns(__CPROVER_POINTER_OBJECT())
+int baz(int *x) __CPROVER_assigns(__CPROVER_object_whole())
 {
   *x = 0;
   return 0;

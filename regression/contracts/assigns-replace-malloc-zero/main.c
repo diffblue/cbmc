@@ -6,7 +6,7 @@ int foo(char *a, int size)
   // clang-format off
 __CPROVER_requires(0 <= size && size <= __CPROVER_max_malloc_size)
 __CPROVER_requires(a == NULL || __CPROVER_rw_ok(a, size))
-__CPROVER_assigns(__CPROVER_POINTER_OBJECT(a))
+__CPROVER_assigns(__CPROVER_object_whole(a))
 __CPROVER_ensures(
     a && __CPROVER_return_value >= 0 ==> a[__CPROVER_return_value] == 0)
 // clang-format on

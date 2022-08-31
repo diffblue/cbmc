@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-void foo(char c[]) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(c))
+void foo(char c[]) __CPROVER_assigns(__CPROVER_object_whole(c))
 {
 }
 

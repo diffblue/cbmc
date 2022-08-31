@@ -15,7 +15,8 @@ typedef struct stb
 
 typedef struct sta
 {
-  union {
+  union
+  {
     stb *b;
     int i;
     int j;
@@ -32,8 +33,7 @@ void bar(sta *a)
   return;
 }
 
-void foo(sta *a1, sta *a2)
-  __CPROVER_assigns(__CPROVER_POINTER_OBJECT(a1->u.b->c))
+void foo(sta *a1, sta *a2) __CPROVER_assigns(__CPROVER_object_whole(a1->u.b->c))
 {
   bar(a1);
   bar(a2);

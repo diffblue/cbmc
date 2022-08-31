@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^main.c.*error: assigns clause target must be a non-void lvalue or a call to one of __CPROVER_POINTER_OBJECT, __CPROVER_assignable, __CPROVER_object_whole, __CPROVER_object_upto, __CPROVER_object_from$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that __CPROVER_old occurences in assigns clauses
+are detected and rejected.

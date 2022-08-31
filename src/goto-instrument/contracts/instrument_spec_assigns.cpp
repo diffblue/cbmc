@@ -493,7 +493,9 @@ car_exprt instrument_spec_assignst::create_car_expr(
         return {
           condition,
           target,
+          // lb = ptr
           typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+          // size = object_size(ptr) - pointer_offset(ptr)
           typecast_exprt::conditional_cast(
             minus_exprt{
               typecast_exprt::conditional_cast(
@@ -505,19 +507,62 @@ car_exprt instrument_spec_assignst::create_car_expr(
           upper_bound_var,
           car_havoc_methodt::HAVOC_SLICE};
       }
-      if(ident == CPROVER_PREFIX "object_slice")
+      else if(ident == CPROVER_PREFIX "object_upto")
       {
         const auto &ptr = funcall.arguments().at(0);
         const auto &size = funcall.arguments().at(1);
         return {
           condition,
           target,
+          // lb = ptr
           typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+          // size = size
           typecast_exprt::conditional_cast(size, size_type()),
           valid_var,
           lower_bound_var,
           upper_bound_var,
           car_havoc_methodt::HAVOC_SLICE};
+      }
+      else if(ident == CPROVER_PREFIX "object_whole")
+      {
+        const auto &ptr = funcall.arguments().at(0);
+        return {
+          condition,
+          target,
+          // lb = ptr - pointer_offset(ptr)
+          minus_exprt(
+            typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+            pointer_offset(ptr)),
+          // size = object_size(ptr)
+          typecast_exprt::conditional_cast(object_size(ptr), size_type()),
+          valid_var,
+          lower_bound_var,
+          upper_bound_var,
+          car_havoc_methodt::HAVOC_OBJECT};
+      }
+      else if(ident == CPROVER_PREFIX "assignable")
+      {
+        const auto &ptr = funcall.arguments().at(0);
+        const auto &size = funcall.arguments().at(1);
+        const auto &is_ptr_to_ptr = funcall.arguments().at(2);
+        return {
+          condition,
+          target,
+          // lb = ptr
+          typecast_exprt::conditional_cast(ptr, pointer_type(char_type())),
+          // size = size
+          typecast_exprt::conditional_cast(size, size_type()),
+          valid_var,
+          lower_bound_var,
+          upper_bound_var,
+          is_ptr_to_ptr.is_true() ? car_havoc_methodt::NONDET_ASSIGN
+                                  : car_havoc_methodt::HAVOC_SLICE};
+      }
+      else
+      {
+        log.error().source_location = target.source_location();
+        log.error() << "call to " << ident
+                    << " in assigns clauses not supported in this version";
       }
     }
   }
@@ -532,8 +577,10 @@ car_exprt instrument_spec_assignst::create_car_expr(
     return {
       condition,
       target,
+      // lb = &target
       typecast_exprt::conditional_cast(
         address_of_exprt{target}, pointer_type(char_type())),
+      // size = sizeof(target)
       typecast_exprt::conditional_cast(size.value(), size_type()),
       valid_var,
       lower_bound_var,

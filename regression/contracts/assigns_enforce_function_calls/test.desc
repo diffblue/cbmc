@@ -3,7 +3,7 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: function calls in assigns clause targets must be to __CPROVER_object_from, __CPROVER_object_slice$
+^.*error: assigns clause target must be a non-void lvalue or a call to one of __CPROVER_POINTER_OBJECT, __CPROVER_assignable, __CPROVER_object_whole, __CPROVER_object_upto, __CPROVER_object_from$
 ^CONVERSION ERROR$
 --
 --

@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^main.c.*error: __CPROVER_return_value is not allowed in preconditions.$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that __CPROVER_return_value occurences in preconditions
+are detected and rejected.

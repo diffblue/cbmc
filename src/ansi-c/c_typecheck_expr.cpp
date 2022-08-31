@@ -1922,6 +1922,61 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
   }
 }
 
+void c_typecheck_baset::typecheck_typed_target_call(
+  side_effect_expr_function_callt &expr)
+{
+  INVARIANT(
+    expr.function().id() == ID_symbol &&
+      to_symbol_expr(expr.function()).get_identifier() == CPROVER_PREFIX
+        "typed_target",
+    "expression must be a " CPROVER_PREFIX "typed_target function call");
+
+  auto &f_op = to_symbol_expr(expr.function());
+
+  if(expr.arguments().size() != 1)
+  {
+    throw invalid_source_file_exceptiont{
+      "expected 1 argument for " CPROVER_PREFIX "typed_target, found " +
+        std::to_string(expr.arguments().size()),
+      expr.source_location()};
+  }
+
+  auto arg0 = expr.arguments().front();
+  typecheck_expr(arg0);
+  if(!is_assignable(arg0) || !arg0.get_bool(ID_C_lvalue))
+  {
+    throw invalid_source_file_exceptiont{
+      "argument of " CPROVER_PREFIX "typed_target must be assignable",
+      arg0.source_location()};
+  }
+
+  const auto &size = size_of_expr(arg0.type(), *this);
+  if(!size.has_value())
+  {
+    throw invalid_source_file_exceptiont{
+      "sizeof not defined for argument of " CPROVER_PREFIX
+      "typed_target of type " +
+        to_string(arg0.type()),
+      arg0.source_location()};
+  }
+
+  // rewrite call to "assignable"
+  f_op.set_identifier(CPROVER_PREFIX "assignable");
+  exprt::operandst arguments;
+  // pointer
+  arguments.push_back(address_of_exprt(arg0));
+  // size
+  arguments.push_back(size.value());
+  // is_pointer
+  if(arg0.type().id() == ID_pointer)
+    arguments.push_back(true_exprt());
+  else
+    arguments.push_back(false_exprt());
+
+  expr.arguments().swap(arguments);
+  typecheck_side_effect_function_call(expr);
+}
+
 void c_typecheck_baset::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -1949,8 +2004,14 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
       // This is an undeclared function.
+
+      // Is it the polymorphic typed_target function ?
+      if(identifier == CPROVER_PREFIX "typed_target")
+      {
+        typecheck_typed_target_call(expr);
+      }
       // Is this a builtin?
-      if(!builtin_factory(identifier, symbol_table, get_message_handler()))
+      else if(!builtin_factory(identifier, symbol_table, get_message_handler()))
       {
         // yes, it's a builtin
       }

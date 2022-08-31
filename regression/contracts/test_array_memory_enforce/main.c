@@ -14,7 +14,7 @@ bool return_ok(int ret_value, int *x)
 
 // clang-format off
 int foo(int *x)
-  __CPROVER_assigns(__CPROVER_POINTER_OBJECT(x))
+  __CPROVER_assigns(__CPROVER_object_whole(x))
   __CPROVER_requires(
     __CPROVER_is_fresh(x, sizeof(int) * 10) &&
     x[0] > 0 &&

@@ -11,7 +11,7 @@ __CPROVER_requires(x && y && z)
 __CPROVER_assigns(
    a && nz(*x): *x;
   !a && nz(*y): *y;
-  !nz(*x) && !nz(*y): __CPROVER_POINTER_OBJECT(z);
+  !nz(*x) && !nz(*y): __CPROVER_object_whole(z);
 )
 __CPROVER_ensures(true)
 // clang-format on

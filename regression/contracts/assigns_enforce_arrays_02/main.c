@@ -9,7 +9,7 @@ void f1(int *a, int len) __CPROVER_assigns(*a)
   a[5] = 5;
 }
 
-void f2(int *a, int len) __CPROVER_assigns(__CPROVER_POINTER_OBJECT(a))
+void f2(int *a, int len) __CPROVER_assigns(__CPROVER_object_whole(a))
 {
   a[0] = 0;
   a[5] = 5;
