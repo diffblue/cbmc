@@ -21,7 +21,9 @@ public:
   ///    solver process.
   virtual void send(const smt_commandt &command) = 0;
 
-  virtual smt_responset receive_response() = 0;
+  virtual smt_responset
+  receive_response(const std::unordered_map<irep_idt, smt_identifier_termt>
+                     &identifier_table) = 0;
 
   virtual ~smt_base_solver_processt() = default;
 };
@@ -41,7 +43,9 @@ public:
 
   void send(const smt_commandt &smt_command) override;
 
-  smt_responset receive_response() override;
+  smt_responset receive_response(
+    const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
+    override;
 
   ~smt_piped_solver_processt() override = default;
 

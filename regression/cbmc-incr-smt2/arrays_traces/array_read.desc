@@ -1,0 +1,15 @@
+CORE
+array_read.c
+--trace
+Passing problem to incremental SMT2 solving
+\[main\.assertion\.1\] line \d+ Array condition: FAILURE
+^Trace for main\.assertion\.1
+example_array=\{ (\d+, )*42
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test of reading a value at a non-deterministic index of an array.
+Similar to the test in ../arrays/array_read.c, but we want to assert
+the value of the array that comes back in the trace to make sure we're
+observing the correct values.

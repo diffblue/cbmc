@@ -27,12 +27,13 @@
 /// return a success status followed by the actual response of interest.
 static smt_responset get_response_to_command(
   smt_base_solver_processt &solver_process,
-  const smt_commandt &command)
+  const smt_commandt &command,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   solver_process.send(command);
-  auto response = solver_process.receive_response();
+  auto response = solver_process.receive_response(identifier_table);
   if(response.cast<smt_success_responset>())
-    return solver_process.receive_response();
+    return solver_process.receive_response(identifier_table);
   else
     return response;
 }
@@ -84,6 +85,7 @@ void smt2_incremental_decision_proceduret::initialize_array_elements(
   const array_exprt &array,
   const smt_identifier_termt &array_identifier)
 {
+  identifier_table.emplace(array_identifier.identifier(), array_identifier);
   const std::vector<exprt> &elements = array.operands();
   const typet &index_type = array.type().index_type();
   for(std::size_t i = 0; i < elements.size(); ++i)
@@ -135,13 +137,15 @@ void send_function_definition(
   const irep_idt &symbol_identifier,
   const std::unique_ptr<smt_base_solver_processt> &solver_process,
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_identifiers)
+    &expression_identifiers,
+  std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   const smt_declare_function_commandt function{
     smt_identifier_termt(
       symbol_identifier, convert_type_to_smt_sort(expr.type())),
     {}};
   expression_identifiers.emplace(expr, function.identifier());
+  identifier_table.emplace(symbol_identifier, function.identifier());
   solver_process->send(function);
 }
 
@@ -183,7 +187,8 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
           *symbol_expr,
           symbol_expr->get_identifier(),
           solver_process,
-          expression_identifiers);
+          expression_identifiers,
+          identifier_table);
       }
       else
       {
@@ -192,6 +197,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         const smt_define_function_commandt function{
           symbol->name, {}, convert_expr_to_smt(symbol->value)};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
+        identifier_table.emplace(identifier, function.identifier());
         solver_process->send(function);
       }
     }
@@ -210,7 +216,8 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
         *nondet_symbol,
         nondet_symbol->get_identifier(),
         solver_process,
-        expression_identifiers);
+        expression_identifiers,
+        identifier_table);
     }
     to_be_defined.pop();
   }
@@ -263,12 +270,36 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
   expression_handle_identifiers.emplace(expr, function.identifier());
+  identifier_table.emplace(
+    function.identifier().identifier(), function.identifier());
   solver_process->send(function);
+}
+
+void smt2_incremental_decision_proceduret::define_index_identifiers(
+  const exprt &expr)
+{
+  expr.visit_pre([&](const exprt &expr_node) {
+    if(!can_cast_type<array_typet>(expr_node.type()))
+      return;
+    if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
+    {
+      const auto index_expr = with_expr->where();
+      const auto index_term = convert_expr_to_smt(index_expr);
+      const auto index_identifier = "index_" + std::to_string(index_sequence());
+      const auto index_definition =
+        smt_define_function_commandt{index_identifier, {}, index_term};
+      expression_identifiers.emplace(index_expr, index_definition.identifier());
+      identifier_table.emplace(index_identifier, index_definition.identifier());
+      solver_process->send(
+        smt_define_function_commandt{index_identifier, {}, index_term});
+    }
+  });
 }
 
 smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
+  define_index_identifiers(expr);
   const exprt substituted =
     substitute_identifiers(expr, expression_identifiers);
   track_expression_objects(substituted, ns, object_map);
@@ -310,13 +341,82 @@ static optionalt<smt_termt> get_identifier(
   return {};
 }
 
+array_exprt smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &array,
+  const array_typet &type) const
+{
+  INVARIANT(
+    type.is_complete(), "Array size is required for getting array values.");
+  const auto size = numeric_cast<std::size_t>(get(type.size()));
+  INVARIANT(
+    size,
+    "Size of array must be convertible to std::size_t for getting array value");
+  std::vector<exprt> elements;
+  const auto index_type = type.index_type();
+  elements.reserve(*size);
+  for(std::size_t index = 0; index < size; ++index)
+  {
+    elements.push_back(get_expr(
+      smt_array_theoryt::select(
+        array,
+        ::convert_expr_to_smt(
+          from_integer(index, index_type),
+          object_map,
+          pointer_sizes_map,
+          object_size_function.make_application)),
+      type.element_type()));
+  }
+  return array_exprt{elements, type};
+}
+
+exprt smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &descriptor,
+  const typet &type) const
+{
+  const smt_get_value_commandt get_value_command{descriptor};
+  const smt_responset response = get_response_to_command(
+    *solver_process, get_value_command, identifier_table);
+  const auto get_value_response = response.cast<smt_get_value_responset>();
+  if(!get_value_response)
+  {
+    throw analysis_exceptiont{
+      "Expected get-value response from solver, but received - " +
+      response.pretty()};
+  }
+  if(get_value_response->pairs().size() > 1)
+  {
+    throw analysis_exceptiont{
+      "Expected single valuation pair in get-value response from solver, but "
+      "received multiple pairs - " +
+      response.pretty()};
+  }
+  return construct_value_expr_from_smt(
+    get_value_response->pairs()[0].get().value(), type);
+}
+
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
   });
-  optionalt<smt_termt> descriptor =
-    get_identifier(expr, expression_handle_identifiers, expression_identifiers);
+  auto descriptor = [&]() -> optionalt<smt_termt> {
+    if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
+    {
+      const auto array = get_identifier(
+        index_expr->array(),
+        expression_handle_identifiers,
+        expression_identifiers);
+      const auto index = get_identifier(
+        index_expr->index(),
+        expression_handle_identifiers,
+        expression_identifiers);
+      if(!array || !index)
+        return {};
+      return smt_array_theoryt::select(*array, *index);
+    }
+    return get_identifier(
+      expr, expression_handle_identifiers, expression_identifiers);
+  }();
   if(!descriptor)
   {
     if(gather_dependent_expressions(expr).empty())
@@ -349,25 +449,13 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       return expr;
     }
   }
-  const smt_get_value_commandt get_value_command{*descriptor};
-  const smt_responset response =
-    get_response_to_command(*solver_process, get_value_command);
-  const auto get_value_response = response.cast<smt_get_value_responset>();
-  if(!get_value_response)
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
   {
-    throw analysis_exceptiont{
-      "Expected get-value response from solver, but received - " +
-      response.pretty()};
+    if(array_type->is_incomplete())
+      return expr;
+    return get_expr(*descriptor, *array_type);
   }
-  if(get_value_response->pairs().size() > 1)
-  {
-    throw analysis_exceptiont{
-      "Expected single valuation pair in get-value response from solver, but "
-      "received multiple pairs - " +
-      response.pretty()};
-  }
-  return construct_value_expr_from_smt(
-    get_value_response->pairs()[0].get().value(), expr.type());
+  return get_expr(*descriptor, expr.type());
 }
 
 void smt2_incremental_decision_proceduret::print_assignment(
@@ -464,8 +552,8 @@ decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
   define_object_sizes();
-  const smt_responset result =
-    get_response_to_command(*solver_process, smt_check_sat_commandt{});
+  const smt_responset result = get_response_to_command(
+    *solver_process, smt_check_sat_commandt{}, identifier_table);
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
   {
     if(check_sat_response->kind().cast<smt_unknown_responset>())

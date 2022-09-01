@@ -81,7 +81,9 @@ public:
     _send(smt_command);
   }
 
-  smt_responset receive_response() override
+  smt_responset receive_response(
+    const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
+    override
   {
     return _receive();
   }
@@ -614,6 +616,27 @@ TEST_CASE(
       smt_assert_commandt{smt_core_theoryt::equal(
         foo_term, smt_array_theoryt::select(array_term, index_term))}};
     REQUIRE(test.sent_commands == expected_commands);
+
+    SECTION("Get values of array literal")
+    {
+      test.sent_commands.clear();
+      test.mock_responses = {
+        // get-value response for array_size
+        smt_get_value_responset{
+          {{{smt_bit_vector_constant_termt{2, 32}},
+            smt_bit_vector_constant_termt{2, 32}}}},
+        // get-value response for first element
+        smt_get_value_responset{
+          {{{smt_array_theoryt::select(
+              array_term, smt_bit_vector_constant_termt{0, 32})},
+            smt_bit_vector_constant_termt{9, 8}}}},
+        // get-value response for second element
+        smt_get_value_responset{
+          {{{smt_array_theoryt::select(
+              array_term, smt_bit_vector_constant_termt{1, 32})},
+            smt_bit_vector_constant_termt{12, 8}}}}};
+      REQUIRE(test.procedure.get(array_literal) == array_literal);
+    }
   }
   SECTION("array_of_exprt - all elements set to a given value")
   {

@@ -5,6 +5,7 @@
 
 #include <util/irep.h>
 
+#include <solvers/smt2_incremental/response_or_error.h>
 #include <solvers/smt2_incremental/smt_index.h>
 #include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/type_traits.h>
@@ -203,6 +204,20 @@ public:
         smt_identifier_termt{
           function.identifier(), std::move(return_sort), indices(function)},
         {std::forward<argument_typest>(arguments)...}};
+    }
+
+    template <typename... argument_typest>
+    response_or_errort<smt_termt>
+    validation(argument_typest &&... arguments) const
+    {
+      const auto validation_errors = function.validation_errors(arguments...);
+      if(!validation_errors.empty())
+        return response_or_errort<smt_termt>{validation_errors};
+      auto return_sort = function.return_sort(arguments...);
+      return response_or_errort<smt_termt>{smt_function_application_termt{
+        smt_identifier_termt{
+          function.identifier(), std::move(return_sort), indices(function)},
+        {std::forward<argument_typest>(arguments)...}}};
     }
   };
 };

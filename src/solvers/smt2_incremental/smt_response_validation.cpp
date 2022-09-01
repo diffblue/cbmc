@@ -21,46 +21,13 @@
 #include <util/mp_arith.h>
 #include <util/range.h>
 
+#include "smt_array_theory.h"
+
 #include <regex>
 
-template <class smtt>
-response_or_errort<smtt>::response_or_errort(smtt smt) : smt{std::move(smt)}
-{
-}
-
-template <class smtt>
-response_or_errort<smtt>::response_or_errort(std::string message)
-  : messages{std::move(message)}
-{
-}
-
-template <class smtt>
-response_or_errort<smtt>::response_or_errort(std::vector<std::string> messages)
-  : messages{std::move(messages)}
-{
-}
-
-template <class smtt>
-const smtt *response_or_errort<smtt>::get_if_valid() const
-{
-  INVARIANT(
-    smt.has_value() == messages.empty(),
-    "The response_or_errort class must be in the valid state or error state, "
-    "exclusively.");
-  return smt.has_value() ? &smt.value() : nullptr;
-}
-
-template <class smtt>
-const std::vector<std::string> *response_or_errort<smtt>::get_if_error() const
-{
-  INVARIANT(
-    smt.has_value() == messages.empty(),
-    "The response_or_errort class must be in the valid state or error state, "
-    "exclusively.");
-  return smt.has_value() ? nullptr : &messages;
-}
-
-template class response_or_errort<smt_responset>;
+static response_or_errort<smt_termt> validate_term(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table);
 
 // Implementation detail of `collect_messages` below.
 template <typename argumentt, typename... argumentst>
@@ -271,52 +238,62 @@ valid_smt_bit_vector_constant(const irept &parse_tree)
   return {};
 }
 
-static optionalt<smt_termt> valid_term(const irept &parse_tree)
+static optionalt<response_or_errort<smt_termt>> try_select_validation(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
-  if(const auto smt_bool = valid_smt_bool(parse_tree))
-    return {*smt_bool};
-  if(const auto bit_vector_constant = valid_smt_bit_vector_constant(parse_tree))
-    return {*bit_vector_constant};
-  return {};
+  if(parse_tree.get_sub().empty())
+    return {};
+  if(parse_tree.get_sub()[0].id() != "select")
+    return {};
+  if(parse_tree.get_sub().size() != 3)
+  {
+    return response_or_errort<smt_termt>{
+      "\"select\" is expected to have 2 arguments, but " +
+      std::to_string(parse_tree.get_sub().size()) +
+      " arguments were found - \"" + print_parse_tree(parse_tree) + "\"."};
+  }
+  const auto array = validate_term(parse_tree.get_sub()[1], identifier_table);
+  const auto index = validate_term(parse_tree.get_sub()[2], identifier_table);
+  const auto messages = collect_messages(array, index);
+  if(!messages.empty())
+    return response_or_errort<smt_termt>{messages};
+  return {smt_array_theoryt::select.validation(
+    *array.get_if_valid(), *index.get_if_valid())};
 }
 
-static response_or_errort<smt_termt> validate_term(const irept &parse_tree)
+static response_or_errort<smt_termt> validate_term(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
-  if(const auto term = valid_term(parse_tree))
-    return response_or_errort<smt_termt>{*term};
+  if(const auto smt_bool = valid_smt_bool(parse_tree))
+    return response_or_errort<smt_termt>{*smt_bool};
+  if(const auto bit_vector_constant = valid_smt_bit_vector_constant(parse_tree))
+    return response_or_errort<smt_termt>{*bit_vector_constant};
+  const auto find_result = identifier_table.find(parse_tree.id());
+  if(find_result != identifier_table.end())
+    return response_or_errort<smt_termt>{find_result->second};
+  if(
+    const auto select_validation =
+      try_select_validation(parse_tree, identifier_table))
+  {
+    return *select_validation;
+  }
   return response_or_errort<smt_termt>{"Unrecognised SMT term - \"" +
                                        print_parse_tree(parse_tree) + "\"."};
 }
 
-static response_or_errort<smt_termt>
-validate_smt_descriptor(const irept &parse_tree, const smt_sortt &sort)
-{
-  if(const auto term = valid_term(parse_tree))
-    return response_or_errort<smt_termt>{*term};
-  const auto id = parse_tree.id();
-  if(!id.empty())
-    return response_or_errort<smt_termt>{smt_identifier_termt{id, sort}};
-  return response_or_errort<smt_termt>{
-    "Expected descriptor SMT term, found - \"" + print_parse_tree(parse_tree) +
-    "\"."};
-}
-
 static response_or_errort<smt_get_value_responset::valuation_pairt>
-validate_valuation_pair(const irept &pair_parse_tree)
+validate_valuation_pair(
+  const irept &pair_parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   PRECONDITION(pair_parse_tree.get_sub().size() == 2);
   const auto &descriptor = pair_parse_tree.get_sub()[0];
   const auto &value = pair_parse_tree.get_sub()[1];
-  const response_or_errort<smt_termt> value_validation = validate_term(value);
-  if(const auto value_errors = value_validation.get_if_error())
-  {
-    return response_or_errort<smt_get_value_responset::valuation_pairt>{
-      *value_errors};
-  }
-  const smt_termt value_term = *value_validation.get_if_valid();
   return validation_propagating<smt_get_value_responset::valuation_pairt>(
-    validate_smt_descriptor(descriptor, value_term.get_sort()),
-    validate_term(value));
+    validate_term(descriptor, identifier_table),
+    validate_term(value, identifier_table));
 }
 
 /// \returns: A response or error in the case where the parse tree appears to be
@@ -325,7 +302,9 @@ validate_valuation_pair(const irept &pair_parse_tree)
 ///   keyword, it will be considered that the response is intended to be a
 ///   get-value response if it is composed of a collection of one or more pairs.
 static optionalt<response_or_errort<smt_responset>>
-valid_smt_get_value_response(const irept &parse_tree)
+valid_smt_get_value_response(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   // Shape matching for does this look like a get value response?
   if(!parse_tree.id().empty())
@@ -338,7 +317,8 @@ valid_smt_get_value_response(const irept &parse_tree)
   std::vector<smt_get_value_responset::valuation_pairt> valuation_pairs;
   for(const auto &pair : parse_tree.get_sub())
   {
-    const auto pair_validation_result = validate_valuation_pair(pair);
+    const auto pair_validation_result =
+      validate_valuation_pair(pair, identifier_table);
     if(const auto error = pair_validation_result.get_if_error())
       error_messages.insert(error_messages.end(), error->begin(), error->end());
     if(const auto valid_pair = pair_validation_result.get_if_valid())
@@ -353,7 +333,9 @@ valid_smt_get_value_response(const irept &parse_tree)
   }
 }
 
-response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
+response_or_errort<smt_responset> validate_smt_response(
+  const irept &parse_tree,
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
   if(parse_tree.id() == "sat")
     return response_or_errort<smt_responset>{
@@ -370,8 +352,12 @@ response_or_errort<smt_responset> validate_smt_response(const irept &parse_tree)
     return response_or_errort<smt_responset>{smt_success_responset{}};
   if(parse_tree.id() == "unsupported")
     return response_or_errort<smt_responset>{smt_unsupported_responset{}};
-  if(const auto get_value_response = valid_smt_get_value_response(parse_tree))
+  if(
+    const auto get_value_response =
+      valid_smt_get_value_response(parse_tree, identifier_table))
+  {
     return *get_value_response;
+  }
   return response_or_errort<smt_responset>{"Invalid SMT response \"" +
                                            id2string(parse_tree.id()) + "\""};
 }

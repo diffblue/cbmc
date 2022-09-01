@@ -52,6 +52,12 @@ public:
   void push() override;
   void pop() override;
 
+  /// Gets the value of \p descriptor from the solver and returns the solver
+  /// response expressed as an exprt of type \p type. This is an implementation
+  /// detail of the `get(exprt)` member function.
+  exprt get_expr(const smt_termt &descriptor, const typet &type) const;
+  array_exprt get_expr(const smt_termt &array, const array_typet &type) const;
+
 protected:
   // Implementation of protected decision_proceduret member function.
   resultt dec_solve() override;
@@ -85,6 +91,7 @@ protected:
   /// \brief Add objects in \p expr to object_map if needed and convert to smt.
   /// \note This function is non-const because it mutates the object_map.
   smt_termt convert_expr_to_smt(const exprt &expr);
+  void define_index_identifiers(const exprt &expr);
   /// Sends the solver the definitions of the object sizes.
   void define_object_sizes();
 
@@ -112,7 +119,7 @@ protected:
     {
       return next_id++;
     }
-  } handle_sequence, array_sequence;
+  } handle_sequence, array_sequence, index_sequence;
   /// When the `handle(exprt)` member function is called, the decision procedure
   /// commands the SMT solver to define a new function corresponding to the
   /// given expression. The mapping of the expressions to the function
@@ -131,6 +138,7 @@ protected:
   /// array expressions when support for them is implemented.
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
+  std::unordered_map<irep_idt, smt_identifier_termt> identifier_table;
   /// This map is used to track object related state. See documentation in
   /// object_tracking.h for details.
   smt_object_mapt object_map;
