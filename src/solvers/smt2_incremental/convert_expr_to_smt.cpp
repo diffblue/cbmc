@@ -1813,6 +1813,25 @@ at_scope_exitt<functiont> at_scope_exit(functiont exit_function)
 }
 #endif
 
+exprt lower_address_of_array_index(exprt expr)
+{
+  expr.visit_pre([](exprt &expr) {
+    const auto address_of_expr = expr_try_dynamic_cast<address_of_exprt>(expr);
+    if(!address_of_expr)
+      return;
+    const auto array_index_expr =
+      expr_try_dynamic_cast<index_exprt>(address_of_expr->object());
+    if(!array_index_expr)
+      return;
+    expr = plus_exprt{
+      address_of_exprt{
+        array_index_expr->array(),
+        type_checked_cast<pointer_typet>(address_of_expr->type())},
+      array_index_expr->index()};
+  });
+  return expr;
+}
+
 smt_termt convert_expr_to_smt(
   const exprt &expr,
   const smt_object_mapt &object_map,
@@ -1830,7 +1849,8 @@ smt_termt convert_expr_to_smt(
   const auto end_conversion = at_scope_exit([&]() { in_conversion = false; });
 #endif
   sub_expression_mapt sub_expression_map;
-  expr.visit_post([&](const exprt &expr) {
+  const auto lowered_expr = lower_address_of_array_index(expr);
+  lowered_expr.visit_post([&](const exprt &expr) {
     const auto find_result = sub_expression_map.find(expr);
     if(find_result != sub_expression_map.cend())
       return;
@@ -1838,5 +1858,5 @@ smt_termt convert_expr_to_smt(
       expr, sub_expression_map, object_map, pointer_sizes, object_size);
     sub_expression_map.emplace_hint(find_result, expr, std::move(term));
   });
-  return std::move(sub_expression_map.at(expr));
+  return std::move(sub_expression_map.at(lowered_expr));
 }
