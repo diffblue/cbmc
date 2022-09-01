@@ -21,6 +21,7 @@ SRC = accelerate/accelerate.cpp \
       contracts/instrument_spec_assigns.cpp \
       contracts/memory_predicates.cpp \
       contracts/utils.cpp \
+      contracts/inlining_decorator.cpp \
       concurrency.cpp \
       count_eloc.cpp \
       cover.cpp \
