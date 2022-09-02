@@ -30,40 +30,40 @@ static response_or_errort<smt_termt> validate_term(
   const irept &parse_tree,
   const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table);
 
-// Implementation detail of `collect_messages` below.
+// Implementation detail of `collect_error_messages` below.
 template <typename argumentt, typename... argumentst>
-void collect_messages_impl(
-  std::vector<std::string> &collected_messages,
+void collect_error_messages_impl(
+  std::vector<std::string> &collected_error_messages,
   argumentt &&argument)
 {
   if(const auto messages = argument.get_if_error())
   {
-    collected_messages.insert(
-      collected_messages.end(), messages->cbegin(), messages->end());
+    collected_error_messages.insert(
+      collected_error_messages.end(), messages->cbegin(), messages->end());
   }
 }
 
-// Implementation detail of `collect_messages` below.
+// Implementation detail of `collect_error_messages` below.
 template <typename argumentt, typename... argumentst>
-void collect_messages_impl(
-  std::vector<std::string> &collected_messages,
+void collect_error_messages_impl(
+  std::vector<std::string> &collected_error_messages,
   argumentt &&argument,
   argumentst &&... arguments)
 {
-  collect_messages_impl(collected_messages, argument);
-  collect_messages_impl(collected_messages, arguments...);
+  collect_error_messages_impl(collected_error_messages, argument);
+  collect_error_messages_impl(collected_error_messages, arguments...);
 }
 
-/// Builds a collection of messages composed all messages in the
+/// Builds a collection of error messages composed all error messages in the
 /// `response_or_errort` typed arguments in \p arguments. This is a templated
 /// function in order to handle `response_or_errort` instances which are
 /// specialised differently.
 template <typename... argumentst>
-std::vector<std::string> collect_messages(argumentst &&... arguments)
+std::vector<std::string> collect_error_messages(argumentst &&... arguments)
 {
-  std::vector<std::string> collected_messages;
-  collect_messages_impl(collected_messages, arguments...);
-  return collected_messages;
+  std::vector<std::string> collected_error_messages;
+  collect_error_messages_impl(collected_error_messages, arguments...);
+  return collected_error_messages;
 }
 
 /// \brief Given a class to construct and a set of arguments to its constructor
@@ -86,9 +86,9 @@ template <
   typename... argumentst>
 response_or_errort<smt_baset> validation_propagating(argumentst &&... arguments)
 {
-  const auto collected_messages = collect_messages(arguments...);
-  if(!collected_messages.empty())
-    return response_or_errort<smt_baset>(collected_messages);
+  const auto collected_error_messages = collect_error_messages(arguments...);
+  if(!collected_error_messages.empty())
+    return response_or_errort<smt_baset>(collected_error_messages);
   else
   {
     return response_or_errort<smt_baset>{
@@ -256,9 +256,9 @@ static optionalt<response_or_errort<smt_termt>> try_select_validation(
   }
   const auto array = validate_term(parse_tree.get_sub()[1], identifier_table);
   const auto index = validate_term(parse_tree.get_sub()[2], identifier_table);
-  const auto messages = collect_messages(array, index);
-  if(!messages.empty())
-    return response_or_errort<smt_termt>{messages};
+  const auto error_messages = collect_error_messages(array, index);
+  if(!error_messages.empty())
+    return response_or_errort<smt_termt>{error_messages};
   return {smt_array_theoryt::select.validation(
     *array.get_if_valid(), *index.get_if_valid())};
 }
@@ -295,10 +295,10 @@ validate_valuation_pair(
     validate_term(pair_parse_tree.get_sub()[0], identifier_table);
   const auto value_validation =
     validate_term(pair_parse_tree.get_sub()[1], identifier_table);
-  const auto messages =
-    collect_messages(descriptor_validation, value_validation);
-  if(!messages.empty())
-    return resultt{messages};
+  const auto error_messages =
+    collect_error_messages(descriptor_validation, value_validation);
+  if(!error_messages.empty())
+    return resultt{error_messages};
   const auto &valid_descriptor = *descriptor_validation.get_if_valid();
   const auto &valid_value = *value_validation.get_if_valid();
   if(valid_descriptor.get_sort() != valid_value.get_sort())
