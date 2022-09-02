@@ -612,6 +612,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang-format
+          wget -O git-clang-format https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-14.0.6/clang/tools/clang-format/git-clang-format
+          chmod u+x git-clang-format
+          mv git-clang-format /usr/local/bin
       - name: Log clang-format version
         run: clang-format-14 --version
       - name: Check updated lines of code match clang-format-14 style
