@@ -22,6 +22,7 @@
 #include <util/range.h>
 
 #include "smt_array_theory.h"
+#include "smt_to_smt2_string.h"
 
 #include <regex>
 
@@ -288,12 +289,27 @@ validate_valuation_pair(
   const irept &pair_parse_tree,
   const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
+  using resultt = response_or_errort<smt_get_value_responset::valuation_pairt>;
   PRECONDITION(pair_parse_tree.get_sub().size() == 2);
-  const auto &descriptor = pair_parse_tree.get_sub()[0];
-  const auto &value = pair_parse_tree.get_sub()[1];
-  return validation_propagating<smt_get_value_responset::valuation_pairt>(
-    validate_term(descriptor, identifier_table),
-    validate_term(value, identifier_table));
+  const auto descriptor_validation =
+    validate_term(pair_parse_tree.get_sub()[0], identifier_table);
+  const auto value_validation =
+    validate_term(pair_parse_tree.get_sub()[1], identifier_table);
+  const auto messages =
+    collect_messages(descriptor_validation, value_validation);
+  if(!messages.empty())
+    return resultt{messages};
+  const auto &valid_descriptor = *descriptor_validation.get_if_valid();
+  const auto &valid_value = *value_validation.get_if_valid();
+  if(valid_descriptor.get_sort() != valid_value.get_sort())
+  {
+    return resultt{
+      "Mismatched descriptor and value sorts in - " +
+      print_parse_tree(pair_parse_tree) + "\nDescriptor has sort " +
+      smt_to_smt2_string(valid_descriptor.get_sort()) + "\nValue has sort " +
+      smt_to_smt2_string(valid_value.get_sort())};
+  }
+  return resultt{{valid_descriptor, valid_value}};
 }
 
 /// \returns: A response or error in the case where the parse tree appears to be
