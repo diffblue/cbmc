@@ -2,16 +2,18 @@
 
 # Function Contracts
 
-CBMC offers support for function contracts, which includes three basic clauses:
-_requires_, _ensures_, and _assigns_.
-These clauses formally describe the specification of a function.
-CBMC also provides a series of built-in constructs to be used with functions
-contracts (e.g., _history variables_, _quantifiers_, and _memory predicates_).
+CBMC offers support for function contracts, which includes the following types of clauses:
+- _requires clauses_ specify preconditions,
+- _requires contract clauses_ specify preconditions on function pointers,
+- _ensures clauses_ specify postconditions,
+- _ensures contract clauses_ specify postconditions on function pointers,
+- _assigns clauses_ specify memory locations that may be assigned to by the function,
+- _frees clauses_ specify pointers that may be freed by the function.
 
-When a function contract is checked, the tool automatically havocs all static variables
-of the program (to start the analysis in an arbitrary state), in the same way
-as using `--nondet-static` would do. If one wishes not to havoc some static variables,
-then `--nondet-static-exclude name-of-variable` can be used.
+These clauses allow to describe the specification of a function formally.
+CBMC also provides a series of built-in constructs to be used with functions
+contracts (e.g., _history variables_, _quantifiers_, _memory predicates_, etc.).
+
 ## Overview
 
 Take a look at the example below.
@@ -47,13 +49,12 @@ Function `sum` writes the sum of `a` and `b` to `out`, and returns `SUCCESS`;
 unless the result of the addition is too large to be represented as an `uint32_t`, in which case it returns `FAILURE`. Let's write
 a function contract for this function.
 
-A function contract has three parts:
+A function contract has 4 parts:
 
-- **Precondition** - describes what the function requires of the arguments
-  supplied by the caller and of global variables;
-- **Postcondition** - describes the effect of the function;
-- **Write Set** - describes the set of locations outside the function that
-  might be written to.
+- **Preconditions** - describes requirements on the arguments supplied by the caller and on global variables;
+- **Postconditions** - describes the effects of the function;
+- **Assignable Set** - describes the set of memory locations the function is allowed to assign to;
+- **Freeable Set** - describes the set of pointers the function is allowed to free.
 
 In our example, the developer may require from the caller to properly allocate
 all arguments, thus, pointers must be valid. We can specify the preconditions of
@@ -133,6 +134,13 @@ First, we have to prove that the function satisfies the contract.
 The first command just compiles the GOTO program as usual, the second command
 instruments the code to check the function satisfies the contract,
 and the third one runs CBMC to do the checking.
+
+In order to start the analysis in an arbitrary state when a function contract
+gets checked, the contract instrumentation pass automatically havocs all static
+variables of the program. To avoid havocing certain static variables,
+the command line switch `--nondet-static-exclude name-of-variable` can be passed
+to `goto-instrument` in addition to the other swtiches specifying the contract
+to check.
 
 Now that we have proved that the function satisfies the contract, we can use the function
 contract in place of the function implementation wherever the function is
