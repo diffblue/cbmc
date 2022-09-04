@@ -269,10 +269,14 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       {
         // use this->...
         assert(this_expr.type().id()==ID_pointer);
-        object=exprt(ID_dereference, this_expr.type().subtype());
+        object =
+          exprt(ID_dereference, to_pointer_type(this_expr.type()).base_type());
         object.copy_to_operands(this_expr);
-        object.type().set(ID_C_constant,
-                          this_expr.type().subtype().get_bool(ID_C_constant));
+        object.type().set(
+          ID_C_constant,
+          to_pointer_type(this_expr.type())
+            .base_type()
+            .get_bool(ID_C_constant));
         object.set(ID_C_lvalue, true);
         object.add_source_location()=source_location;
       }
@@ -1838,19 +1842,24 @@ void cpp_typecheck_resolvet::guess_template_args(
   else if(is_reference(template_type) ||
           is_rvalue_reference(template_type))
   {
-    guess_template_args(template_type.subtype(), desired_type);
+    guess_template_args(
+      to_reference_type(template_type).base_type(), desired_type);
   }
   else if(template_type.id()==ID_pointer)
   {
     if(desired_type.id() == ID_pointer)
-      guess_template_args(template_type.subtype(), desired_type.subtype());
+      guess_template_args(
+        to_pointer_type(template_type).base_type(),
+        to_pointer_type(desired_type).base_type());
   }
   else if(template_type.id()==ID_array)
   {
     if(desired_type.id() == ID_array)
     {
       // look at subtype first
-      guess_template_args(template_type.subtype(), desired_type.subtype());
+      guess_template_args(
+        to_array_type(template_type).element_type(),
+        to_array_type(desired_type).element_type());
 
       // size (e.g., buffer size guessing)
       guess_template_args(
@@ -2134,7 +2143,8 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
       if(type.return_type().id() == ID_constructor)
       {
         // it's a constructor
-        const typet &object_type=parameter.type().subtype();
+        const typet &object_type =
+          to_pointer_type(parameter.type()).base_type();
         symbol_exprt object(irep_idt(), object_type);
         object.set(ID_C_lvalue, true);
 

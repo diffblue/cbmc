@@ -424,7 +424,7 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
     require_goto_statements::require_declaration_of_name(
       symbol_identifier, entry_point_instructions);
   const typet &component_type =
-    to_pointer_type(component_declaration.symbol().type()).subtype();
+    to_pointer_type(component_declaration.symbol().type()).base_type();
   REQUIRE(component_type.id() == ID_struct_tag);
   const auto &component_struct =
     ns.follow_tag(to_struct_tag_type(component_type));
@@ -480,7 +480,7 @@ require_goto_statements::require_struct_array_component_assignment(
   REQUIRE(component_assignment_rhs.type().id() == ID_pointer);
   REQUIRE(
     to_struct_tag_type(
-      to_pointer_type(component_assignment_rhs.type()).subtype())
+      to_pointer_type(component_assignment_rhs.type()).base_type())
       .get(ID_identifier) == array_type_name);
 
   // Get the tmp_object name and find assignments to it, there should be only
@@ -501,7 +501,8 @@ require_goto_statements::require_struct_array_component_assignment(
   PRECONDITION(
     array_component_reference_assignment_rhs.type().id() == ID_pointer);
   const typet &array =
-    to_pointer_type(array_component_reference_assignment_rhs.type()).subtype();
+    to_pointer_type(array_component_reference_assignment_rhs.type())
+      .base_type();
   PRECONDITION(is_java_array_tag(array.get(ID_identifier)));
   REQUIRE(array.get(ID_identifier) == array_type_name);
 

@@ -23,7 +23,7 @@ pointer_typet require_type::require_pointer(
   const pointer_typet &pointer = to_pointer_type(type);
 
   if(subtype)
-    REQUIRE(pointer.subtype() == subtype.value());
+    REQUIRE(pointer.base_type() == subtype.value());
 
   return pointer;
 }
@@ -155,8 +155,8 @@ bool require_java_generic_type_argument_expectation(
   {
     REQUIRE(!is_java_generic_parameter(type_argument));
     REQUIRE(
-      to_struct_tag_type(type_argument.subtype()).get_identifier() ==
-      expected.description);
+      to_struct_tag_type(to_pointer_type(type_argument).base_type())
+        .get_identifier() == expected.description);
     return true;
   }
   }
@@ -248,7 +248,7 @@ const typet &require_type::require_java_non_generic_type(
   REQUIRE(!is_java_generic_parameter(type));
   REQUIRE(!is_java_generic_type(type));
   if(expect_subtype)
-    REQUIRE(type.subtype() == expect_subtype.value());
+    REQUIRE(to_pointer_type(type).base_type() == expect_subtype.value());
   return type;
 }
 
@@ -474,7 +474,7 @@ pointer_typet
 require_type::require_pointer_to_tag(const typet &type, const irep_idt &tag)
 {
   const auto pointer_type = require_type::require_pointer(type, {});
-  require_type::require_struct_tag(pointer_type.subtype(), tag);
+  require_type::require_struct_tag(pointer_type.base_type(), tag);
   return pointer_type;
 }
 

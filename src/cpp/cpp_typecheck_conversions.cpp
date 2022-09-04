@@ -687,7 +687,8 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   // bit fields are converted like their underlying type
   if(type.id()==ID_c_bit_field)
-    return standard_conversion_sequence(expr, type.subtype(), new_expr, rank);
+    return standard_conversion_sequence(
+      expr, to_c_bit_field_type(type).underlying_type(), new_expr, rank);
 
   // we turn bit fields into their underlying type
   if(curr_expr.type().id()==ID_c_bit_field)
@@ -774,7 +775,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id()==ID_pointer)
     {
-      if(expr.type().subtype().id()==ID_nullptr)
+      if(
+        expr.type().id() == ID_pointer &&
+        to_pointer_type(expr.type()).base_type().id() == ID_nullptr)
       {
         // std::nullptr_t to _any_ pointer type is ok
         new_expr = typecast_exprt::conditional_cast(new_expr, type);
@@ -1132,9 +1135,9 @@ bool cpp_typecheckt::reference_related(
     return subtype_typecast(to_struct_type(from),
                             to_struct_type(to));
 
-  if(from.id()==ID_struct &&
-     type.get_bool(ID_C_this) &&
-     type.subtype().id()==ID_empty)
+  if(
+    from.id() == ID_struct && type.get_bool(ID_C_this) &&
+    to_pointer_type(type).base_type().id() == ID_empty)
   {
     // virtual-call case
     return true;
@@ -1158,14 +1161,14 @@ bool cpp_typecheckt::reference_compatible(
   if(!reference_related(expr, type))
     return false;
 
-  if(expr.type()!=type.subtype())
+  if(expr.type() != to_reference_type(type).base_type())
     rank+=3;
 
   c_qualifierst qual_from;
     qual_from.read(expr.type());
 
   c_qualifierst qual_to;
-    qual_to.read(type.subtype());
+  qual_to.read(to_reference_type(type).base_type());
 
   if(qual_from!=qual_to)
     rank+=1;
@@ -1264,7 +1267,7 @@ bool cpp_typecheckt::reference_binding(
         new_expr.swap(tmp);
       }
 
-      if(expr.type()!=type.subtype())
+      if(expr.type() != to_reference_type(type).base_type())
       {
         c_qualifierst qual_from;
         qual_from.read(expr.type());
@@ -1341,7 +1344,7 @@ bool cpp_typecheckt::reference_binding(
 
           new_expr = to_multi_ary_expr(returned_value).op0();
 
-          if(returned_value.type() != type.subtype())
+          if(returned_value.type() != to_reference_type(type).base_type())
           {
             c_qualifierst qual_from;
             qual_from.read(returned_value.type());
@@ -1359,13 +1362,15 @@ bool cpp_typecheckt::reference_binding(
   if(type.get_bool(ID_C_this))
     return false;
 
-  if(!type.subtype().get_bool(ID_C_constant) ||
-     type.subtype().get_bool(ID_C_volatile))
+  if(
+    !to_reference_type(type).base_type().get_bool(ID_C_constant) ||
+    to_reference_type(type).base_type().get_bool(ID_C_volatile))
     return false;
 
   // TODO: handle the case for implicit parameters
-  if(!type.subtype().get_bool(ID_C_constant) &&
-     !expr.get_bool(ID_C_lvalue))
+  if(
+    !to_reference_type(type).base_type().get_bool(ID_C_constant) &&
+    !expr.get_bool(ID_C_lvalue))
     return false;
 
   exprt arg_expr=expr;
@@ -1376,7 +1381,8 @@ bool cpp_typecheckt::reference_binding(
     arg_expr.set(ID_C_lvalue, true);
   }
 
-  if(user_defined_conversion_sequence(arg_expr, type.subtype(), new_expr, rank))
+  if(user_defined_conversion_sequence(
+       arg_expr, to_reference_type(type).base_type(), new_expr, rank))
   {
     address_of_exprt tmp(new_expr, reference_type(new_expr.type()));
     tmp.add_source_location()=new_expr.source_location();
@@ -1385,12 +1391,15 @@ bool cpp_typecheckt::reference_binding(
   }
 
   rank=backup_rank;
-  if(standard_conversion_sequence(expr, type.subtype(), new_expr, rank))
+  if(standard_conversion_sequence(
+       expr, to_reference_type(type).base_type(), new_expr, rank))
   {
     {
       // create temporary object
       side_effect_exprt tmp(
-        ID_temporary_object, type.subtype(), expr.source_location());
+        ID_temporary_object,
+        to_reference_type(type).base_type(),
+        expr.source_location());
       tmp.set(ID_mode, ID_cpp);
       // tmp.set(ID_C_lvalue, true);
       tmp.add_to_operands(std::move(new_expr));

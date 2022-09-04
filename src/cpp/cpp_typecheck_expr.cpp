@@ -324,12 +324,13 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
     {
       // sizeof(expr[index]) can be parsed as an array type!
 
-      if(type.subtype().id()==ID_cpp_name)
+      if(to_array_type(type).element_type().id() == ID_cpp_name)
       {
         cpp_typecheck_fargst fargs;
 
-        exprt symbol_expr=resolve(
-          to_cpp_name(static_cast<const irept &>(type.subtype())),
+        exprt symbol_expr = resolve(
+          to_cpp_name(
+            static_cast<const irept &>(to_array_type(type).element_type())),
           cpp_typecheck_resolvet::wantt::BOTH,
           fargs);
 
@@ -1652,7 +1653,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       // look for the right entry
       irep_idt vtentry_component_name =
-        vt_compo.type().subtype().get_string(ID_identifier) +
+        to_pointer_type(vt_compo.type()).base_type().get_string(ID_identifier) +
         "::" + expr.function().type().get_string(ID_C_virtual_name);
 
       exprt vtentry_member(ID_ptrmember);
@@ -1719,14 +1720,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     assert(parameters.size()>=1);
 
-    const typet &this_type=parameters[0].type();
+    const auto &this_type = to_pointer_type(parameters[0].type());
 
     // change type from 'constructor' to object type
-    expr.type()=this_type.subtype();
+    expr.type() = this_type.base_type();
 
     // create temporary object
     side_effect_exprt tmp_object_expr(
-      ID_temporary_object, this_type.subtype(), expr.source_location());
+      ID_temporary_object, this_type.base_type(), expr.source_location());
     tmp_object_expr.set(ID_C_lvalue, true);
     tmp_object_expr.set(ID_mode, ID_cpp);
 
@@ -1808,7 +1809,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       if(
         operand.type().id() != ID_pointer &&
-        operand.type() == parameter.type().subtype())
+        operand.type() == to_pointer_type(parameter.type()).base_type())
       {
         address_of_exprt tmp(operand, pointer_type(operand.type()));
         tmp.add_source_location()=operand.source_location();
@@ -1869,7 +1870,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
         exprt temporary;
         new_temporary(
           arg_it->source_location(),
-          parameter.type().subtype(),
+          to_reference_type(parameter.type()).base_type(),
           already_typechecked_exprt{*arg_it},
           temporary);
         arg_it->swap(temporary);
