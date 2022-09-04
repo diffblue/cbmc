@@ -46,7 +46,8 @@ bool string_abstractiont::build_wrap(
   if(
     dest.type() != a_t &&
     !(dest.type().id() == ID_array && a_t.id() == ID_pointer &&
-      dest.type().subtype() == a_t.subtype()))
+      to_array_type(dest.type()).element_type() ==
+        to_pointer_type(a_t).base_type()))
   {
     messaget log{message_handler};
     log.warning() << "warning: inconsistent abstract type for "
@@ -59,7 +60,8 @@ bool string_abstractiont::build_wrap(
 
 bool string_abstractiont::is_ptr_string_struct(const typet &type) const
 {
-  return type.id() == ID_pointer && type.subtype() == string_struct;
+  return type.id() == ID_pointer &&
+         to_pointer_type(type).base_type() == string_struct;
 }
 
 static inline bool is_ptr_argument(const typet &type)
@@ -334,10 +336,16 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
 {
   if(symbol.type.id() == ID_array || symbol.type.id() == ID_pointer)
   {
-    const typet &source_subt =
-      is_ptr_string_struct(symbol.type) ? source_type : source_type.subtype();
+    const typet &source_subt = is_ptr_string_struct(symbol.type)
+                                 ? source_type
+                                 : to_type_with_subtype(source_type).subtype();
     symbol_exprt sym_expr = add_dummy_symbol_and_value(
-      dest, ref_instr, symbol, irep_idt(), symbol.type.subtype(), source_subt);
+      dest,
+      ref_instr,
+      symbol,
+      irep_idt(),
+      to_type_with_subtype(symbol.type).subtype(),
+      source_subt);
 
     if(symbol.type.id() == ID_array)
       return array_of_exprt(sym_expr, to_array_type(symbol.type));
@@ -429,7 +437,8 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
 
   // set the value - may be nil
   if(
-    source_type.id() == ID_array && is_char_type(source_type.subtype()) &&
+    source_type.id() == ID_array &&
+    is_char_type(to_array_type(source_type).element_type()) &&
     type == string_struct)
   {
     new_symbol.value = struct_exprt(
@@ -561,7 +570,8 @@ void string_abstractiont::abstract_function_call(
         abstract_type.id()==ID_pointer)
     {
       INVARIANT(
-        str_args.back().type().subtype() == abstract_type.subtype(),
+        to_array_type(str_args.back().type()).element_type() ==
+          to_pointer_type(abstract_type).base_type(),
         "argument array type differs from formal parameter pointer type");
 
       index_exprt idx(str_args.back(), from_integer(0, c_index_type()));
@@ -706,11 +716,14 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
   if(type.id() == ID_array || type.id() == ID_pointer)
   {
     // char* or void* or char[]
-    if(is_char_type(type.subtype()) || type.subtype().id() == ID_empty)
+    if(
+      is_char_type(to_type_with_subtype(type).subtype()) ||
+      to_type_with_subtype(type).subtype().id() == ID_empty)
       map_entry.first->second=pointer_type(string_struct);
     else
     {
-      const typet &subt = build_abstraction_type_rec(type.subtype(), known);
+      const typet &subt =
+        build_abstraction_type_rec(to_type_with_subtype(type).subtype(), known);
       if(!subt.is_nil())
       {
         if(type.id() == ID_array)
@@ -787,7 +800,8 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
 
     return dest.type() != abstract_type ||
            (dest.type().id() == ID_array && abstract_type.id() == ID_pointer &&
-            dest.type().subtype() == abstract_type.subtype());
+            to_array_type(dest.type()).element_type() ==
+              to_pointer_type(abstract_type).base_type());
   }
 
   if(object.id()==ID_string_constant)
@@ -801,7 +815,9 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
     return build_symbol_constant(str_len, str_len+1, dest);
   }
 
-  if(object.id()==ID_array && is_char_type(object.type().subtype()))
+  if(
+    object.id() == ID_array &&
+    is_char_type(to_array_type(object.type()).element_type()))
     return build_array(to_array_expr(object), dest, write);
 
   // other constants aren't useful
@@ -928,8 +944,9 @@ bool string_abstractiont::build_pointer(const exprt &object,
     dest=address_of_exprt(dest);
     return false;
   }
-  else if(ptr.pointer.id()==ID_symbol &&
-      is_char_type(object.type().subtype()))
+  else if(
+    ptr.pointer.id() == ID_symbol &&
+    is_char_type(to_pointer_type(object.type()).base_type()))
     // recursive call; offset will be handled by pointer_offset in SIZE/LENGTH
     // checks
     return build_wrap(ptr.pointer, dest, write);
