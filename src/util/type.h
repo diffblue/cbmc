@@ -45,6 +45,8 @@ public:
   }
 #endif
 
+  // Deliberately protected -- use type-specific accessor methods instead.
+protected:
   const typet &subtype() const
   {
     if(get_sub().empty())
@@ -52,6 +54,8 @@ public:
     return static_cast<const typet &>(get_sub().front());
   }
 
+public:
+  // This method will be protected eventually.
   typet &subtype()
   {
     subt &sub=get_sub();
