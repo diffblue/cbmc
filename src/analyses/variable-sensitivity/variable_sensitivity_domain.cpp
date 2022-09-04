@@ -11,6 +11,7 @@ Date: April 2016
 #include "variable_sensitivity_domain.h"
 
 #include <util/cprover_prefix.h>
+#include <util/pointer_expr.h>
 #include <util/symbol_table.h>
 
 #include <algorithm>
@@ -325,7 +326,9 @@ void variable_sensitivity_domaint::transform_function_call(
         {
           if(
             called_arg.type().id() == ID_pointer &&
-            !called_arg.type().subtype().get_bool(ID_C_constant))
+            !to_pointer_type(called_arg.type())
+               .base_type()
+               .get_bool(ID_C_constant))
           {
             abstract_object_pointert pointer_value =
               abstract_state.eval(called_arg, ns);
@@ -339,7 +342,10 @@ void variable_sensitivity_domaint::transform_function_call(
               std::stack<exprt>(),
               nil_exprt(),
               abstract_state.abstract_object_factory(
-                called_arg.type().subtype(), ns, true, false),
+                to_pointer_type(called_arg.type()).base_type(),
+                ns,
+                true,
+                false),
               false);
           }
         }

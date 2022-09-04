@@ -523,9 +523,10 @@ bool remove_const_function_pointerst::try_resolve_index_of(
     bool all_possible_const=true;
     for(const exprt &potential_array_expr : potential_array_exprs)
     {
-      all_possible_const=
+      all_possible_const =
         all_possible_const &&
-        is_const_type(potential_array_expr.type().subtype());
+        is_const_type(
+          to_array_type(potential_array_expr.type()).element_type());
 
       if(potential_array_expr.id()==ID_array)
       {

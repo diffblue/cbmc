@@ -201,7 +201,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
     // Return top if dereferencing a null pointer or we are top
     bool is_value_top = is_top() || value_stack.is_top_value();
     return env.abstract_object_factory(
-      type().subtype(), ns, is_value_top, !is_value_top);
+      to_pointer_type(type()).base_type(), ns, is_value_top, !is_value_top);
   }
   else
   {
@@ -230,7 +230,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
   if(stack.empty())
   {
     // We should not be changing the type of an abstract object
-    PRECONDITION(new_value->type() == ns.follow(type().subtype()));
+    PRECONDITION(
+      new_value->type() == ns.follow(to_pointer_type(type()).base_type()));
 
     // Get an expression that we can assign to
     exprt value = to_address_of_expr(value_stack.to_expression()).object();
@@ -273,7 +274,8 @@ abstract_object_pointert constant_pointer_abstract_objectt::typecast(
   {
     auto &env = const_cast<abstract_environmentt &>(environment);
 
-    auto heap_array_type = array_typet(new_type.subtype(), nil_exprt());
+    auto heap_array_type =
+      array_typet(to_pointer_type(new_type).base_type(), nil_exprt());
     auto array_object =
       environment.abstract_object_factory(heap_array_type, ns, true, false);
     auto heap_symbol = symbol_exprt(value.get(ID_identifier), heap_array_type);

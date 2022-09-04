@@ -205,7 +205,7 @@ exprt value_set_dereferencet::handle_dereference_base_case(
   const exprt &pointer,
   bool display_points_to_sets)
 { // type of the object
-  const typet &type=pointer.type().subtype();
+  const typet &type = to_pointer_type(pointer.type()).base_type();
 
   // collect objects the pointer may point to
   const std::vector<exprt> points_to_set =
@@ -335,8 +335,9 @@ bool value_set_dereferencet::dereference_type_compare(
   while(object_unwrapped->id() == ID_pointer &&
         dereference_unwrapped->id() == ID_pointer)
   {
-    object_unwrapped = &object_unwrapped->subtype();
-    dereference_unwrapped = &dereference_unwrapped->subtype();
+    object_unwrapped = &to_pointer_type(*object_unwrapped).base_type();
+    dereference_unwrapped =
+      &to_pointer_type(*dereference_unwrapped).base_type();
   }
   if(dereference_unwrapped->id() == ID_empty)
   {
@@ -494,7 +495,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     const symbol_exprt symbol_expr(memory_symbol.name, memory_symbol.type);
 
-    if(memory_symbol.type.subtype() == dereference_type)
+    if(to_array_type(memory_symbol.type).element_type() == dereference_type)
     {
       // Types match already, what a coincidence!
       // We can use an index expression.
@@ -502,19 +503,20 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       const index_exprt index_expr(
         symbol_expr,
         pointer_offset(pointer_expr),
-        memory_symbol.type.subtype());
+        to_array_type(memory_symbol.type).element_type());
 
       result.value=index_expr;
       result.pointer = address_of_exprt{index_expr};
     }
-    else if(
-      dereference_type_compare(
-        memory_symbol.type.subtype(), dereference_type, ns))
+    else if(dereference_type_compare(
+              to_array_type(memory_symbol.type).element_type(),
+              dereference_type,
+              ns))
     {
       const index_exprt index_expr(
         symbol_expr,
         pointer_offset(pointer_expr),
-        memory_symbol.type.subtype());
+        to_array_type(memory_symbol.type).element_type());
       result.value=typecast_exprt(index_expr, dereference_type);
       result.pointer =
         typecast_exprt{address_of_exprt{index_expr}, pointer_type};
@@ -753,13 +755,16 @@ bool value_set_dereferencet::memory_model_bytes(
 
   // See if we have an array of bytes already,
   // and we want something byte-sized.
-  auto from_type_subtype_size = pointer_offset_size(from_type.subtype(), ns);
+  auto from_type_element_type_size =
+    from_type.id() == ID_array
+      ? pointer_offset_size(to_array_type(from_type).element_type(), ns)
+      : optionalt<mp_integer>{};
 
   auto to_type_size = pointer_offset_size(to_type, ns);
 
   if(
-    from_type.id() == ID_array && from_type_subtype_size.has_value() &&
-    *from_type_subtype_size == 1 && to_type_size.has_value() &&
+    from_type.id() == ID_array && from_type_element_type_size.has_value() &&
+    *from_type_element_type_size == 1 && to_type_size.has_value() &&
     *to_type_size == 1 &&
     is_a_bv_type(to_array_type(from_type).element_type()) &&
     is_a_bv_type(to_type))

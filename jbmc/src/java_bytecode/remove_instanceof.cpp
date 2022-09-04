@@ -176,8 +176,8 @@ bool remove_instanceoft::lower_instanceof(
 
   if(target_type_is_reference_array)
   {
-    const auto &underlying_type =
-      to_struct_tag_type(underlying_type_and_dimension.first.subtype());
+    const auto &underlying_type = to_struct_tag_type(
+      to_pointer_type(underlying_type_and_dimension.first).base_type());
 
     test_conjuncts.push_back(equal_exprt(
       object_class_identifier_field,
