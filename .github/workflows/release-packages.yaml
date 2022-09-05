@@ -78,6 +78,7 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: 'Ubuntu 20.04 package built and uploaded successfully'
 
   ubuntu-18_04-package:
     runs-on: ubuntu-18.04
@@ -164,6 +165,7 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: 'Ubuntu 18.04 package built and uploaded successfully'
 
 
   homebrew-pr:
@@ -315,3 +317,4 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: 'Docker Image built and submitted to DockerHub successfully'
