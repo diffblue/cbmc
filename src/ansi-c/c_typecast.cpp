@@ -422,7 +422,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   case PTR:
     if(expr.type().id() == ID_array)
     {
-      new_type = pointer_type(expr.type().subtype());
+      new_type = pointer_type(to_array_type(expr.type()).element_type());
       break;
     }
     return;
@@ -535,7 +535,7 @@ void c_typecastt::implicit_typecast_followed(
       src_type.id() == ID_pointer &&
       to_pointer_type(src_type).base_type().get_bool(ID_C_constant))
     {
-      src_type_no_const.subtype().remove(ID_C_constant);
+      to_pointer_type(src_type_no_const).base_type().remove(ID_C_constant);
     }
 
     // Check union members.

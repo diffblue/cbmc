@@ -1784,9 +1784,9 @@ std::string expr2ct::convert_constant(
   else if(type.id()==ID_c_enum ||
           type.id()==ID_c_enum_tag)
   {
-    typet c_enum_type=
-      type.id()==ID_c_enum?to_c_enum_type(type):
-                           ns.follow_tag(to_c_enum_tag_type(type));
+    c_enum_typet c_enum_type = type.id() == ID_c_enum
+                                 ? to_c_enum_type(type)
+                                 : ns.follow_tag(to_c_enum_tag_type(type));
 
     if(c_enum_type.id()!=ID_c_enum)
       return convert_norep(src, precedence);
@@ -1804,8 +1804,9 @@ std::string expr2ct::convert_constant(
     }
 
     // lookup failed or enum is to be output as integer
-    const bool is_signed = c_enum_type.subtype().id() == ID_signedbv;
-    const auto width = to_bitvector_type(c_enum_type.subtype()).get_width();
+    const bool is_signed = c_enum_type.underlying_type().id() == ID_signedbv;
+    const auto width =
+      to_bitvector_type(c_enum_type.underlying_type()).get_width();
 
     std::string value_as_string =
       integer2string(bvrep2integer(value, width, is_signed));

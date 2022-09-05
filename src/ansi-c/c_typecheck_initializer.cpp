@@ -149,7 +149,8 @@ exprt c_typecheck_baset::do_initializer_rec(
 
     string_constantt tmp1=to_string_constant(value);
     // adjust char type
-    tmp1.type().subtype() = to_array_type(full_type).element_type();
+    to_array_type(tmp1.type()).element_type() =
+      to_array_type(full_type).element_type();
 
     exprt tmp2=tmp1.to_array_expr();
 

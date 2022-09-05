@@ -31,11 +31,11 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_pointer)
   {
-    typecheck_type(type.subtype());
+    typecheck_type(to_pointer_type(type).base_type());
   }
   else if(type.id()==ID_array)
   {
-    typecheck_type(type.subtype());
+    typecheck_type(to_array_type(type).element_type());
     typecheck_expr(to_array_type(type).size());
   }
   else if(type.id()==ID_code)

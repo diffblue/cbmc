@@ -400,7 +400,8 @@ void goto_symext::dereference_rec(
       tc_op.id() == ID_address_of &&
       to_address_of_expr(tc_op).object().type().id() == ID_array &&
       expr.type() ==
-        pointer_type(to_address_of_expr(tc_op).object().type().subtype()))
+        pointer_type(to_array_type(to_address_of_expr(tc_op).object().type())
+                       .element_type()))
     {
       expr = address_of_exprt(index_exprt(
         to_address_of_expr(tc_op).object(), from_integer(0, c_index_type())));

@@ -1008,7 +1008,7 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
 
   if(
     function_pointer.type().id() != ID_pointer ||
-    to_pointer_type(function_pointer.type()).subtype().id() != ID_code)
+    to_pointer_type(function_pointer.type()).base_type().id() != ID_code)
   {
     error().source_location = expr.source_location();
     error() << "the first parameter of the clause must be a function pointer "
@@ -1047,7 +1047,7 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
     address_of_contract.id() != ID_address_of ||
     to_address_of_expr(address_of_contract).object().id() != ID_symbol ||
     address_of_contract.type().id() != ID_pointer ||
-    to_pointer_type(address_of_contract.type()).subtype().id() != ID_code)
+    to_pointer_type(address_of_contract.type()).base_type().id() != ID_code)
   {
     error().source_location = expr.source_location();
     error() << "the second parameter of the requires_contract/ensures_contract "

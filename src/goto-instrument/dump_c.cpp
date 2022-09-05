@@ -1341,7 +1341,7 @@ void dump_ct::cleanup_expr(exprt &expr)
     // add a typecast for NULL
     else if(
       u.op().id() == ID_constant && is_null_pointer(to_constant_expr(u.op())) &&
-      u.op().type().subtype().id() == ID_empty)
+      to_pointer_type(u.op().type()).base_type().id() == ID_empty)
     {
       const struct_union_typet::componentt &comp=
         u_type_f.get_component(u.get_component_name());

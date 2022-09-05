@@ -718,7 +718,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
       result = plus_exprt(result, mult_exprt(element_size_opt.value(), index));
 
-      typet tmp=type.subtype();
+      typet tmp = to_array_type(type).element_type();
       type=tmp;
     }
   }
@@ -928,7 +928,8 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     // arrays here turn into pointers (array decay)
     if(op.type().id()==ID_array)
-      implicit_typecast(op, pointer_type(op.type().subtype()));
+      implicit_typecast(
+        op, pointer_type(to_array_type(op.type()).element_type()));
 
     expr.type()=op.type();
   }
@@ -1603,19 +1604,20 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     // is one of them void * AND null? Convert that to the other.
     // (at least that's how GCC behaves)
     if(
-      operands[1].type().subtype().id() == ID_empty && tmp1.is_constant() &&
-      is_null_pointer(to_constant_expr(tmp1)))
+      to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
+      tmp1.is_constant() && is_null_pointer(to_constant_expr(tmp1)))
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
-      operands[2].type().subtype().id() == ID_empty && tmp2.is_constant() &&
-      is_null_pointer(to_constant_expr(tmp2)))
+      to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
+      tmp2.is_constant() && is_null_pointer(to_constant_expr(tmp2)))
     {
       implicit_typecast(operands[2], operands[1].type());
     }
-    else if(operands[1].type().subtype().id()!=ID_code ||
-            operands[2].type().subtype().id()!=ID_code)
+    else if(
+      to_pointer_type(operands[1].type()).base_type().id() != ID_code ||
+      to_pointer_type(operands[2].type()).base_type().id() != ID_code)
     {
       // Make it void *.
       // gcc and clang issue a warning for this.
@@ -1626,8 +1628,10 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     else
     {
       // maybe functions without parameter lists
-      const code_typet &c_type1=to_code_type(operands[1].type().subtype());
-      const code_typet &c_type2=to_code_type(operands[2].type().subtype());
+      const code_typet &c_type1 =
+        to_code_type(to_pointer_type(operands[1].type()).base_type());
+      const code_typet &c_type2 =
+        to_code_type(to_pointer_type(operands[2].type()).base_type());
 
       if(c_type1.return_type()==c_type2.return_type())
       {
@@ -2004,9 +2008,10 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         // suffices to distinguish different implementations.
         if(parameters.front().type().id() == ID_pointer)
         {
-          identifier_with_type = id2string(identifier) + "_" +
-                                 type_to_partial_identifier(
-                                   parameters.front().type().subtype(), *this);
+          identifier_with_type =
+            id2string(identifier) + "_" +
+            type_to_partial_identifier(
+              to_pointer_type(parameters.front().type()).base_type(), *this);
         }
         else
         {
@@ -2456,7 +2461,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    expr.type()=expr.arguments().front().type().subtype();
+    expr.type() = to_pointer_type(expr.arguments().front().type()).base_type();
 
     return expr;
   }
@@ -3108,21 +3113,22 @@ exprt c_typecheck_baset::do_special_functions(
     else
     {
       type_number =
-          type.id() == ID_empty
+        type.id() == ID_empty
           ? 0u
           : (type.id() == ID_bool || type.id() == ID_c_bool)
-            ? 4u
-            : (type.id() == ID_pointer || type.id() == ID_array)
-              ? 5u
-              : type.id() == ID_floatbv
-                ? 8u
-                : (type.id() == ID_complex && type.subtype().id() == ID_floatbv)
-                  ? 9u
-                  : type.id() == ID_struct
-                    ? 12u
-                    : type.id() == ID_union
-                      ? 13u
-                      : 1u; // int, short, char, enum_tag
+              ? 4u
+              : (type.id() == ID_pointer || type.id() == ID_array)
+                  ? 5u
+                  : type.id() == ID_floatbv
+                      ? 8u
+                      : (type.id() == ID_complex &&
+                         to_complex_type(type).subtype().id() == ID_floatbv)
+                          ? 9u
+                          : type.id() == ID_struct
+                              ? 12u
+                              : type.id() == ID_union
+                                  ? 13u
+                                  : 1u; // int, short, char, enum_tag
     }
 
     exprt tmp=from_integer(type_number, expr.type());
@@ -3315,9 +3321,9 @@ exprt c_typecheck_baset::typecheck_builtin_overflow(
       }
     }
     if(
-      !is__p_variant &&
-      (result.type().id() != ID_pointer ||
-       !is_signed_or_unsigned_bitvector(result.type().subtype())))
+      !is__p_variant && (result.type().id() != ID_pointer ||
+                         !is_signed_or_unsigned_bitvector(
+                           to_pointer_type(result.type()).base_type())))
     {
       raise_wrong_argument_error(result, 3, is__p_variant);
     }
@@ -3435,8 +3441,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
 
       if(op.type().id() == ID_array)
       {
-        typet dest_type=pointer_type(void_type());
-        dest_type.subtype().set(ID_C_constant, true);
+        auto dest_type = pointer_type(void_type());
+        dest_type.base_type().set(ID_C_constant, true);
         implicit_typecast(op, dest_type);
       }
     }
@@ -3899,7 +3905,8 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   // Add a cast to the underlying type for bit fields.
   // In particular, sizeof(s.f=1) works for bit fields.
   if(op0.type().id()==ID_c_bit_field)
-    op0 = typecast_exprt(op0, op0.type().subtype());
+    op0 =
+      typecast_exprt(op0, to_c_bit_field_type(op0.type()).underlying_type());
 
   const typet o_type0=op0.type();
   const typet o_type1=op1.type();

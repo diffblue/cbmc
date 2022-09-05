@@ -60,7 +60,7 @@ inline const typet &template_subtype(const typet &type)
 inline typet &template_subtype(typet &type)
 {
   if(type.id()==ID_template)
-    return type.subtype();
+    return to_template_type(type).subtype();
 
   return type;
 }
