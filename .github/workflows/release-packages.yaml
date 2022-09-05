@@ -73,6 +73,7 @@ jobs:
           asset_content_type: application/x-deb
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
@@ -160,6 +161,7 @@ jobs:
           asset_content_type: application/x-deb
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
@@ -312,6 +314,7 @@ jobs:
           docker logout
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
