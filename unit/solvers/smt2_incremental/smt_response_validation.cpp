@@ -339,5 +339,19 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
       *empty_pair.get_if_error() ==
       std::vector<std::string>{
         "Unrecognised SMT term - \"\".", "Unrecognised SMT term - \"\"."});
+    SECTION("Mismatched descriptor and value sorts")
+    {
+      const response_or_errort<smt_responset> mismatched_pair =
+        validate_smt_response(
+          *smt2irep("((foo #x2A)))").parsed_output,
+          table_with_identifiers({{"foo", smt_bool_sortt{}}}));
+      CHECK(
+        *mismatched_pair.get_if_error() ==
+        std::vector<std::string>{"Mismatched descriptor and value sorts in - \n"
+                                 "0: foo\n"
+                                 "1: #x2A\n"
+                                 "Descriptor has sort Bool\n"
+                                 "Value has sort (_ BitVec 8)"});
+    }
   }
 }
