@@ -73,11 +73,13 @@ jobs:
           asset_content_type: application/x-deb
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 20.04 package built and uploaded successfully' || 'Ubuntu 20.04 package build failed' }}"
 
   ubuntu-18_04-package:
     runs-on: ubuntu-18.04
@@ -159,11 +161,13 @@ jobs:
           asset_content_type: application/x-deb
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 18.04 package built and uploaded successfully' || 'Ubuntu 18.04 package build failed' }}"
 
 
   homebrew-pr:
@@ -310,8 +314,10 @@ jobs:
           docker logout
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "${{ job.status == 'success' && 'Docker Image built and submitted to DockerHub successfully' || 'Docker Image build failed' }}"

@@ -105,3 +105,4 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "${{ job.status == 'success' && 'Successful creation of new CBMC release page' || 'Failed to create new CBMC release page' }}"
