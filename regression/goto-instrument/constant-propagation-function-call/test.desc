@@ -3,6 +3,7 @@ main.c
 --constant-propagator
 ^EXIT=10$
 ^SIGNAL=0$
+Removing returns
 VERIFICATION FAILED
 ASSIGN main\:\:1\:\:a \:\= 4
 ASSERT ¬\(main::1::b ≥ 0\) ∨ main::1::b ≥ 5

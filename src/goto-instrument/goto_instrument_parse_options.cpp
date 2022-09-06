@@ -1285,7 +1285,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("constant-propagator"))
   {
     do_indirect_call_and_rtti_removal();
-    remove_returns(goto_model);
+    do_remove_returns();
 
     log.status() << "Propagating Constants" << messaget::eom;
 
