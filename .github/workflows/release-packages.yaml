@@ -187,13 +187,20 @@ jobs:
           brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
+      - name: Checkout CBMC project source code to obtain access to scripts
+        if: always()
+        uses: actions/checkout@v2
+      - name: Install golang toolchain to run the notification step
+        if: always()
+        run: brew install go
       - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: go run scripts/slack_notification_action.go
 
   windows-msi-package:
     runs-on: windows-2019
