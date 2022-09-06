@@ -192,7 +192,8 @@ func main() {
 	case "failure":
 		color = "danger"
 	default:
-		color = envOr(EnvSlackColor, "good")
+		// yellow for default, unless environment variable present
+		color = envOr(EnvSlackColor, "#FFFF00")
 	}
 
 	msg := Webhook{
@@ -208,7 +209,7 @@ func main() {
 				AuthorName: envOr(EnvGithubActor, ""),
 				AuthorLink: os.Getenv("GITHUB_SERVER_URL") + "/" + os.Getenv(EnvGithubActor),
 				AuthorIcon: os.Getenv("GITHUB_SERVER_URL") + "/" + os.Getenv(EnvGithubActor) + ".png?size=32",
-				Footer:     envOr(EnvSlackFooter, "<https://github.com/rtCamp/github-actions-library|Powered By rtCamp's GitHub Actions Library>"),
+				Footer:     envOr(EnvSlackFooter, ""),
 				Fields:     fields,
 			},
 		},
