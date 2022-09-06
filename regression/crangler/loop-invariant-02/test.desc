@@ -1,0 +1,10 @@
+CORE
+test.json
+
+^\s+for\(int i = 0; i \< 2; i\+\+\) \_\_CPROVER\_loop\_invariant
+^EXIT=0$
+^SIGNAL=0$
+--
+^\s+while\(i \< 2\) \_\_CPROVER
+--
+Annotate loop invariant only to the while-loop.

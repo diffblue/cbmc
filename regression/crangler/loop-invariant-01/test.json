@@ -1,0 +1,13 @@
+{
+  "sources": [
+    "main.c"
+  ],
+  "functions": [
+    {
+      "foo": [
+        "while 1 invariant 1==1"
+      ]
+    }
+  ],
+  "output": "stdout"
+}
