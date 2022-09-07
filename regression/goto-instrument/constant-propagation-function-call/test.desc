@@ -1,0 +1,17 @@
+CORE
+main.c
+--constant-propagator
+^EXIT=10$
+^SIGNAL=0$
+Removing returns
+VERIFICATION FAILED
+ASSIGN main\:\:1\:\:a \:\= 4
+ASSERT ¬\(main::1::b ≥ 0\) ∨ main::1::b ≥ 5
+--
+^warning: ignoring
+ASSERT true
+--
+This tests that constants are propagated through function calls, correctly
+taking into account the return value. Constant propagation should result in
+simplifying away the conditions in the assertion on `a` but not the conditions
+on `b`.
