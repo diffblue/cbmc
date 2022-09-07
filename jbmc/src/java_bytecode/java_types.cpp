@@ -660,7 +660,7 @@ optionalt<typet> java_type_from_string(
       if(subtype_letter == 'a')
       {
         return java_reference_array_type(
-          to_struct_tag_type(subtype->subtype()));
+          to_struct_tag_type(to_java_reference_type(*subtype).base_type()));
       }
       else
         return java_array_type(subtype_letter);
@@ -684,7 +684,8 @@ optionalt<typet> java_type_from_string(
     return java_generic_parametert(
       type_var_name,
       to_struct_tag_type(
-        java_type_from_string("Ljava/lang/Object;")->subtype()));
+        to_java_reference_type(*java_type_from_string("Ljava/lang/Object;"))
+          .base_type()));
   }
   case 'L':
     {
@@ -785,7 +786,8 @@ std::vector<typet> java_generic_type_from_string(
     java_generic_parametert type_var_type(
       type_var_name,
       to_struct_tag_type(
-        java_type_from_string(bound_type, class_name)->subtype()));
+        to_java_reference_type(*java_type_from_string(bound_type, class_name))
+          .base_type()));
 
     types.push_back(type_var_type);
     signature=signature.substr(var_sep+1, std::string::npos);
@@ -807,7 +809,8 @@ static std::string slash_to_dot(const std::string &src)
 struct_tag_typet java_classname(const std::string &id)
 {
   if(!id.empty() && id[0]=='[')
-    return to_struct_tag_type(java_type_from_string(id)->subtype());
+    return to_struct_tag_type(
+      to_java_reference_type(*java_type_from_string(id)).base_type());
 
   std::string class_name=id;
 

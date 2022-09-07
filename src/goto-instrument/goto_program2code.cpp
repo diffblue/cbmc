@@ -1592,7 +1592,7 @@ void goto_program2codet::remove_const(typet &type)
     remove_const(symbol.type);
   }
   else if(type.id()==ID_array)
-    remove_const(type.subtype());
+    remove_const(to_array_type(type).element_type());
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {

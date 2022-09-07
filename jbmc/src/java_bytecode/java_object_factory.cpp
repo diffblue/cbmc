@@ -1158,7 +1158,9 @@ static void allocate_nondet_length_array(
   side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), location);
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
-  java_new_array.type().subtype().set(ID_element_type, element_type);
+  to_type_with_subtype(java_new_array.type())
+    .subtype()
+    .set(ID_element_type, element_type);
   code_frontend_assignt assign(lhs, java_new_array);
   assign.add_source_location() = location;
   assignments.add(assign);

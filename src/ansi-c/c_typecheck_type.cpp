@@ -84,7 +84,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_array_type(to_array_type(type));
   else if(type.id()==ID_pointer)
   {
-    typecheck_type(type.subtype());
+    typecheck_type(to_pointer_type(type).base_type());
     INVARIANT(
       to_bitvector_type(type).get_width() > 0, "pointers must have width");
   }
@@ -126,9 +126,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
 
     // A list of all modes is at
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
-    typecheck_type(type.subtype());
+    typecheck_type(to_type_with_subtype(type).subtype());
 
-    typet underlying_type=type.subtype();
+    typet underlying_type = to_type_with_subtype(type).subtype();
 
     // gcc allows this, but clang doesn't; it's a compiler hint only,
     // but we'll try to interpret it the GCC way
@@ -239,16 +239,18 @@ void c_typecheck_baset::typecheck_type(typet &type)
             from_integer(4, size_type()));
       }
       else // give up, just use subtype
-        result=type.subtype();
+        result = to_type_with_subtype(type).subtype();
 
       // save the location
       result.add_source_location()=type.source_location();
 
-      if(type.subtype().id()==ID_c_enum_tag)
+      if(to_type_with_subtype(type).subtype().id() == ID_c_enum_tag)
       {
-        const irep_idt &tag_name=
-          to_c_enum_tag_type(type.subtype()).get_identifier();
-        symbol_table.get_writeable_ref(tag_name).type.subtype()=result;
+        const irep_idt &tag_name =
+          to_c_enum_tag_type(to_type_with_subtype(type).subtype())
+            .get_identifier();
+        to_type_with_subtype(symbol_table.get_writeable_ref(tag_name).type)
+          .subtype() = result;
       }
 
       type=result;
@@ -272,7 +274,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
       else if(gcc_attr_mode == "__V4DF__") // deprecated vector of 4 doubles
         result=vector_typet(double_type(), from_integer(4, size_type()));
       else // give up, just use subtype
-        result=type.subtype();
+        result = to_type_with_subtype(type).subtype();
 
       // save the location
       result.add_source_location()=type.source_location();
@@ -291,7 +293,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
       else if(gcc_attr_mode == "__TC__") // 128 bits
         result=gcc_float128_type();
       else // give up, just use subtype
-        result=type.subtype();
+        result = to_type_with_subtype(type).subtype();
 
       // save the location
       result.add_source_location()=type.source_location();
@@ -425,7 +427,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
   // the return type is still 'subtype()'
-  type.return_type()=type.subtype();
+  type.return_type() = to_type_with_subtype(type).subtype();
   type.remove_subtype();
 
   code_typet::parameterst &parameters=type.parameters();
@@ -663,7 +665,7 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
 
   typecheck_expr(size);
 
-  typet subtype = type.subtype();
+  typet subtype = to_type_with_subtype(type).subtype();
   typecheck_type(subtype);
 
   // we are willing to combine 'vector' with various
@@ -1645,7 +1647,7 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
   if(type.id()==ID_array)
   {
     source_locationt source_location=type.source_location();
-    type=pointer_type(type.subtype());
+    type = pointer_type(to_array_type(type).element_type());
     type.add_source_location()=source_location;
   }
   else if(type.id()==ID_code)

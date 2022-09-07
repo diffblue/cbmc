@@ -388,7 +388,8 @@ string_constraint_generatort::add_axioms_for_char_at(
 {
   PRECONDITION(f.arguments().size() == 2);
   array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
-  symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
+  symbol_exprt char_sym =
+    fresh_symbol("char", to_array_type(str.type()).element_type());
   string_constraintst constraints;
   constraints.existential = {equal_exprt(char_sym, str[f.arguments()[1]])};
   return {std::move(char_sym), std::move(constraints)};

@@ -65,7 +65,7 @@ exprt get_class_identifier_field(
   PRECONDITION(this_expr_in.type().id() == ID_pointer);
 
   exprt this_expr=this_expr_in;
-  const auto &points_to=this_expr.type().subtype();
+  const auto &points_to = to_pointer_type(this_expr.type()).base_type();
   if(points_to==empty_typet())
     this_expr=typecast_exprt(this_expr, pointer_type(suggested_type));
   const dereference_exprt deref{this_expr};

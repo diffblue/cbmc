@@ -320,7 +320,7 @@ static void remove_vector(typet &type)
           type.id()==ID_complex ||
           type.id()==ID_array)
   {
-    remove_vector(type.subtype());
+    remove_vector(to_type_with_subtype(type).subtype());
   }
   else if(type.id()==ID_vector)
   {

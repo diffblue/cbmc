@@ -467,8 +467,7 @@ void value_set_fit::get_value_set_rec(
     }
     else if(v_it!=values.end())
     {
-      typet t("#REF#");
-      t.subtype() = expr.type();
+      type_with_subtypet t("#REF#", expr.type());
       symbol_exprt sym(ident, t);
       insert(dest, sym, mp_integer{0});
       return;

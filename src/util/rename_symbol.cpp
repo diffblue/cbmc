@@ -125,7 +125,7 @@ bool rename_symbolt::rename(typet &dest) const
   bool result=true;
 
   if(dest.has_subtype())
-    if(!rename(dest.subtype()))
+    if(!rename(to_type_with_subtype(dest).subtype()))
       result=false;
 
   for(typet &subtype : to_type_with_subtypes(dest).subtypes())

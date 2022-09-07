@@ -35,8 +35,8 @@ code_function_callt function_to_call(
   if(s_it==symbol_table.symbols.end())
   {
     // not there
-    typet p=pointer_type(char_type());
-    p.subtype().set(ID_C_constant, true);
+    auto p = pointer_type(char_type());
+    p.base_type().set(ID_C_constant, true);
 
     const code_typet function_type({code_typet::parametert(p)}, empty_typet());
 
