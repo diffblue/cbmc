@@ -1364,7 +1364,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   for(const auto &member : enum_members)
     body.push_back(member);
 
-  enum_tag_symbol.type.subtype()=underlying_type;
+  enum_tag_symbol.type.add_subtype() = underlying_type;
 
   // is it in the symbol table already?
   symbol_tablet::symbolst::const_iterator s_it=

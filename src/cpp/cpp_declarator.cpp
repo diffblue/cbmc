@@ -51,7 +51,7 @@ typet cpp_declaratort::merge_type(const typet &declaration_type) const
     else
     {
       assert(!t.id().empty());
-      p=&t.subtype();
+      p = &t.add_subtype();
     }
   }
 

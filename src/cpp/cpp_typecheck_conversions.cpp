@@ -145,10 +145,10 @@ bool cpp_typecheckt::standard_conversion_qualification(
     if(qual_from!=qual_to && !const_to)
       return false;
 
-    typet tmp1=sub_from.subtype();
+    typet tmp1 = to_pointer_type(sub_from).base_type();
     sub_from.swap(tmp1);
 
-    typet tmp2=sub_to.subtype();
+    typet tmp2 = sub_to.add_subtype();
     sub_to.swap(tmp2);
   }
 
@@ -497,7 +497,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
     c_qualifierst qual_from;
     qual_from.read(to_pointer_type(expr.type()).base_type());
     new_expr = typecast_exprt::conditional_cast(expr, type);
-    qual_from.write(new_expr.type().subtype());
+    qual_from.write(to_pointer_type(new_expr.type()).base_type());
     return true;
   }
 
@@ -512,7 +512,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
       qual_from.read(to_pointer_type(expr.type()).base_type());
       new_expr=expr;
       make_ptr_typecast(new_expr, type);
-      qual_from.write(new_expr.type().subtype());
+      qual_from.write(to_pointer_type(new_expr.type()).base_type());
       return true;
     }
   }
@@ -586,8 +586,9 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
       INVARIANT(this2.get_this(), "first parameter should be `this'");
       code2.parameters().erase(code2.parameters().begin());
 
-      if(this2.type().subtype().get_bool(ID_C_constant) &&
-         !this1.type().subtype().get_bool(ID_C_constant))
+      if(
+        to_pointer_type(this2.type()).base_type().get_bool(ID_C_constant) &&
+        !to_pointer_type(this1.type()).base_type().get_bool(ID_C_constant))
         return false;
 
       // give a second chance ignoring `this'
@@ -692,7 +693,8 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   // we turn bit fields into their underlying type
   if(curr_expr.type().id()==ID_c_bit_field)
-    curr_expr = typecast_exprt(curr_expr, curr_expr.type().subtype());
+    curr_expr = typecast_exprt(
+      curr_expr, to_c_bit_field_type(curr_expr.type()).underlying_type());
 
   if(curr_expr.type().id()==ID_array)
   {
@@ -818,9 +820,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
     do
     {
-      typet tmp_from=sub_from.subtype();
+      typet tmp_from = to_pointer_type(sub_from).base_type();
       sub_from.swap(tmp_from);
-      typet tmp_to=sub_to.subtype();
+      typet tmp_to = sub_to.add_subtype();
       sub_to.swap(tmp_to);
 
       c_qualifierst qual_from;
@@ -951,7 +953,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         if(is_reference(arg1_type))
         {
-          typet tmp=arg1_type.subtype();
+          typet tmp = to_reference_type(arg1_type).base_type();
           arg1_type.swap(tmp);
         }
 
@@ -1272,7 +1274,7 @@ bool cpp_typecheckt::reference_binding(
         c_qualifierst qual_from;
         qual_from.read(expr.type());
         new_expr = typecast_exprt::conditional_cast(new_expr, type);
-        qual_from.write(new_expr.type().subtype());
+        qual_from.write(to_reference_type(new_expr.type()).base_type());
       }
 
       return true;
@@ -1349,7 +1351,7 @@ bool cpp_typecheckt::reference_binding(
             c_qualifierst qual_from;
             qual_from.read(returned_value.type());
             make_ptr_typecast(new_expr, type);
-            qual_from.write(new_expr.type().subtype());
+            qual_from.write(to_reference_type(new_expr.type()).base_type());
           }
           rank+=4+tmp_rank;
           return true;
@@ -1598,7 +1600,7 @@ bool cpp_typecheckt::cast_away_constness(
   while(snt1.back().has_subtype())
   {
     snt1.reserve(snt1.size()+1);
-    snt1.push_back(snt1.back().subtype());
+    snt1.push_back(to_type_with_subtype(snt1.back()).subtype());
   }
 
   c_qualifierst q1;
@@ -1613,7 +1615,7 @@ bool cpp_typecheckt::cast_away_constness(
   while(snt2.back().has_subtype())
   {
     snt2.reserve(snt2.size()+1);
-    snt2.push_back(snt2.back().subtype());
+    snt2.push_back(to_type_with_subtype(snt2.back()).subtype());
   }
 
   c_qualifierst q2;
@@ -1627,10 +1629,12 @@ bool cpp_typecheckt::cast_away_constness(
 
   for(std::size_t i=k; i > 1; i--)
   {
-    snt1[snt1.size()-2].subtype()=snt1[snt1.size()-1];
+    to_type_with_subtype(snt1[snt1.size() - 2]).subtype() =
+      snt1[snt1.size() - 1];
     snt1.pop_back();
 
-    snt2[snt2.size()-2].subtype()=snt2[snt2.size()-1];
+    to_type_with_subtype(snt2[snt2.size() - 2]).subtype() =
+      snt2[snt2.size() - 1];
     snt2.pop_back();
   }
 

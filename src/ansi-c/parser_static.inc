@@ -211,7 +211,7 @@ static void make_subtype(typet &dest, typet &src)
        sub->id()==ID_code)
     {
       // walk down
-      p=&sub->subtype();
+      p=&sub->add_subtype();
     }
     else
     {
@@ -250,7 +250,7 @@ static void make_subtype(typet &dest, typet &src)
           else if(p->is_nil())
             assert(false);
           else
-            p=&p->subtype();
+            p=&p->add_subtype();
         }
         break;
       }
@@ -292,7 +292,7 @@ static void make_pointer(const YYSTYPE dest)
   // The below deliberately avoids pointer_type().
   // The width is set during conversion.
   stack_type(dest).id(ID_frontend_pointer);
-  stack_type(dest).subtype()=typet(ID_abstract);
+  stack_type(dest).add_subtype()=typet(ID_abstract);
 }
 
 /*******************************************************************\

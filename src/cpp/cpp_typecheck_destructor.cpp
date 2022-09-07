@@ -37,7 +37,7 @@ void cpp_typecheckt::default_dtor(
   cpp_declaratort decl;
   decl.name() = cpp_namet("~" + id2string(symbol.base_name), symbol.location);
   decl.type().id(ID_function_type);
-  decl.type().subtype().make_nil();
+  decl.type().add_subtype().make_nil();
 
   decl.value() = code_blockt();
   decl.add(ID_cv).make_nil();

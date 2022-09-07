@@ -401,7 +401,7 @@ protected:
         p = &merged_type.last_type();
       }
       else
-        p=&p->subtype();
+        p = &p->add_subtype();
     }
 
     *p=src;
@@ -1604,10 +1604,12 @@ bool Parser::rIntegralDeclaration(
       declaration.type().id() == ID_auto &&
       declaration.declarators().size() == 1 &&
       declaration.declarators().front().type().id() == ID_function_type &&
-      declaration.declarators().front().type().subtype().is_not_nil())
+      declaration.declarators().front().type().add_subtype().is_not_nil())
     {
-      declaration.type() = declaration.declarators().front().type().subtype();
-      declaration.declarators().front().type().subtype().make_nil();
+      declaration.type() =
+        to_type_with_subtype(declaration.declarators().front().type())
+          .subtype();
+      declaration.declarators().front().type().add_subtype().make_nil();
     }
 
 #ifdef DEBUG
@@ -2643,7 +2645,7 @@ bool Parser::rConstructorDecl(
   trailing_return_type.make_nil();
 
   constructor=cpp_declaratort(typet(ID_function_type));
-  constructor.type().subtype().make_nil();
+  constructor.type().add_subtype().make_nil();
   constructor.name().swap(type_name);
 
   cpp_tokent op;
@@ -2874,7 +2876,7 @@ bool Parser::rDeclaratorWithInit(
 
     typet bit_field_type(ID_c_bit_field);
     bit_field_type.set(ID_size, e);
-    bit_field_type.subtype().make_nil();
+    bit_field_type.add_subtype().make_nil();
     set_location(bit_field_type, tk);
 
     merge_types(bit_field_type, dw.type());
@@ -2949,7 +2951,7 @@ bool Parser::rDeclaratorWithInit(
 
       typet bit_field_type(ID_c_bit_field);
       bit_field_type.set(ID_size, e);
-      bit_field_type.subtype().make_nil();
+      bit_field_type.add_subtype().make_nil();
       set_location(bit_field_type, tk);
 
       merge_types(bit_field_type, declarator.type());
@@ -3122,7 +3124,7 @@ bool Parser::rDeclarator(
       if(is_args)
       {
         typet function_type(ID_function_type);
-        function_type.subtype().swap(d_outer);
+        function_type.add_subtype().swap(d_outer);
         function_type.add(ID_parameters).swap(args);
 
         // make this subtype of d_inner
@@ -3159,10 +3161,10 @@ bool Parser::rDeclarator(
         if(!rTypeSpecifier(return_type, false))
           return false;
 
-        if(d_outer.subtype().is_not_nil())
+        if(d_outer.add_subtype().is_not_nil())
           return false;
 
-        d_outer.subtype().swap(return_type);
+        d_outer.add_subtype().swap(return_type);
       }
 
       if(lex.LookAhead(0)==':')
@@ -3205,7 +3207,7 @@ bool Parser::rDeclarator(
       tl.push_back(d_outer);
       while(tl.back().id() == ID_array)
       {
-        tl.push_back(tl.back().subtype());
+        tl.push_back(tl.back().add_subtype());
       }
 
       array_typet array_type(tl.back(), expr);
@@ -3213,7 +3215,7 @@ bool Parser::rDeclarator(
       d_outer.swap(array_type);
       while(!tl.empty())
       {
-        tl.back().subtype().swap(d_outer);
+        tl.back().add_subtype().swap(d_outer);
         d_outer.swap(tl.back());
         tl.pop_back();
       }
@@ -3357,12 +3359,12 @@ bool Parser::optPtrOperator(typet &ptrs)
     if(it->id()==ID_merged_type)
     {
       auto &merged_type = to_merged_type(*it);
-      merged_type.last_type().subtype().swap(ptrs);
+      merged_type.last_type().add_subtype().swap(ptrs);
     }
     else
     {
       assert(it->is_not_nil());
-      it->subtype().swap(ptrs);
+      it->add_subtype().swap(ptrs);
     }
 
     ptrs.swap(*it);
@@ -4302,7 +4304,7 @@ bool Parser::rEnumSpec(typet &spec)
   spec=cpp_enum_typet();
   set_location(spec, tk);
 
-  spec.subtype().make_nil();
+  spec.add_subtype().make_nil();
 
   // C++11 enum classes
   if(lex.LookAhead(0)==TOK_CLASS)
@@ -4332,7 +4334,7 @@ bool Parser::rEnumSpec(typet &spec)
   if(lex.LookAhead(0)==':')
   {
     lex.get_token(tk); // read the colon
-    if(!rTypeName(spec.subtype()))
+    if(!rTypeName(spec.add_subtype()))
       return false;
   }
 

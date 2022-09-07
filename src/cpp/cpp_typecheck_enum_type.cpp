@@ -151,15 +151,15 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     // C++11 enumerations have an underlying type,
     // which defaults to int.
     // enums without underlying type may be 'packed'.
-    if(type.subtype().is_nil())
-      type.subtype()=signed_int_type();
+    if(type.add_subtype().is_nil())
+      type.add_subtype() = signed_int_type();
     else
     {
-      typecheck_type(type.subtype());
+      typecheck_type(to_type_with_subtype(type).subtype());
       if(
-        type.subtype().id() != ID_signedbv &&
-        type.subtype().id() != ID_unsignedbv &&
-        type.subtype().id() != ID_c_bool)
+        to_type_with_subtype(type).subtype().id() != ID_signedbv &&
+        to_type_with_subtype(type).subtype().id() != ID_unsignedbv &&
+        to_type_with_subtype(type).subtype().id() != ID_c_bool)
       {
         error().source_location=type.source_location();
         error() << "underlying type must be integral" << eom;
