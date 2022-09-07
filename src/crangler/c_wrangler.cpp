@@ -213,8 +213,8 @@ void c_wranglert::configure_functions(const jsont &config)
           function_config.assertions.emplace_back(split[1], rest.str());
         }
         else if(
-          (split[0] == "for" && split.size() >= 3 && split[2] == "invariant") ||
-          (split[0] == "while" && split.size() >= 3 && split[2] == "invariant"))
+          (split[0] == "for" || split[0] == "while" || split[0] == "loop") &&
+          split.size() >= 3 && split[2] == "invariant")
         {
           std::ostringstream rest;
           join_strings(rest, split.begin() + 3, split.end(), ' ');
@@ -434,7 +434,10 @@ static void mangle_function(
         {
           while_count++;
           const auto &invariant =
-            loop_invariants["while" + std::to_string(while_count)];
+            loop_invariants.count("while" + std::to_string(while_count))
+              ? loop_invariants["while" + std::to_string(while_count)]
+              : loop_invariants
+                  ["loop" + std::to_string(while_count + for_count)];
 
           if(!invariant.empty())
           {
@@ -449,7 +452,10 @@ static void mangle_function(
         {
           for_count++;
           const auto &invariant =
-            loop_invariants["for" + std::to_string(for_count)];
+            loop_invariants.count("for" + std::to_string(for_count))
+              ? loop_invariants["for" + std::to_string(for_count)]
+              : loop_invariants
+                  ["loop" + std::to_string(while_count + for_count)];
 
           if(!invariant.empty())
           {

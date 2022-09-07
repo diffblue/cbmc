@@ -1,0 +1,5 @@
+{
+  "sources" : ["main.c"],
+              "functions" : [{"foo": ["loop 2 invariant 1==1"]}],
+                            "output" : "stdout"
+}
