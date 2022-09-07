@@ -128,7 +128,8 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
           cpp_declaratort &declarator=cpp_declaration.declarators().front();
 
           if(is_reference(declarator.type()))
-            declarator.type()=declarator.type().subtype();
+            declarator.type() =
+              to_reference_type(declarator.type()).base_type();
         }
 
         // typecheck the body
@@ -309,7 +310,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       // maybe the name of the member collides with a parameter of the
       // constructor
       exprt dereference(
-        ID_dereference, cpp_scopes.current_scope().this_expr.type().subtype());
+        ID_dereference,
+        to_pointer_type(cpp_scopes.current_scope().this_expr.type())
+          .base_type());
       dereference.copy_to_operands(cpp_scopes.current_scope().this_expr);
       cpp_typecheck_fargst deref_fargs;
       deref_fargs.add_object(dereference);

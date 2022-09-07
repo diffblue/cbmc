@@ -79,7 +79,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   else if(cpp_is_pod(symbol.type))
   {
     if(
-      symbol.type.id() == ID_pointer && symbol.type.subtype().id() == ID_code &&
+      symbol.type.id() == ID_pointer &&
+      to_pointer_type(symbol.type).base_type().id() == ID_code &&
       symbol.value.id() == ID_address_of &&
       to_address_of_expr(symbol.value).object().id() == ID_cpp_name)
     {
@@ -90,7 +91,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       cpp_typecheck_fargst fargs;
       fargs.in_use = true;
 
-      const code_typet &code_type=to_code_type(symbol.type.subtype());
+      const code_typet &code_type =
+        to_code_type(to_pointer_type(symbol.type).base_type());
 
       for(const auto &parameter : code_type.parameters())
       {

@@ -280,7 +280,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   if(!rhs.get_bool(ID_skip_initialize))
   {
     const auto zero_element =
-      zero_initializer(data.type().subtype(), location, ns);
+      zero_initializer(to_pointer_type(data.type()).base_type(), location, ns);
     CHECK_RETURN(zero_element.has_value());
     codet array_set{ID_array_set, {new_array_data_symbol, *zero_element}};
     dest.insert_before(next, goto_programt::make_other(array_set, location));
@@ -316,7 +316,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 
     plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
     dereference_exprt deref_expr(
-      plus_exprt(data, tmp_i), data.type().subtype());
+      plus_exprt(data, tmp_i), to_pointer_type(data.type()).base_type());
 
     code_blockt for_body;
     symbol_exprt init_sym =
