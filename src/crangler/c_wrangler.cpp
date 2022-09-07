@@ -456,8 +456,8 @@ static void mangle_function(
             auto t_end = match_bracket(t, '(', ')');
             for(; t != t_end; t++)
               out << t->text;
-            out << ' ' << CPROVER_PREFIX << "invariant(" << defines(invariant)
-                << ')';
+            out << ' ' << CPROVER_PREFIX << "loop_invariant("
+                << defines(invariant) << ')';
           }
         }
       }
