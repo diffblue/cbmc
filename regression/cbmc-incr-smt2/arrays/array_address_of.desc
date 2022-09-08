@@ -1,7 +1,9 @@
 CORE
 array_address_of.c
-
+--verbosity 10
 Passing problem to incremental SMT2 solving
+address_of\(main\:\:1\:\:example_array1\!0\@1\[0\]\)
+address_of\(main\:\:1\:\:example_array2\!0\@1\[0\]\)
 line \d+ Array condition 1: SUCCESS
 line \d+ Array condition 2: FAILURE
 ^EXIT=10$

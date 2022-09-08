@@ -1,0 +1,17 @@
+CORE
+address_of_two_array_sizes.c
+--verbosity 10
+Passing problem to incremental SMT2 solving
+address_of\(main\:\:1\:\:example_array1\!0\@1\[0\]\)
+address_of\(main\:\:1\:\:example_array2\!0\@1\[0\]\)
+line \d+ Array condition 1: SUCCESS
+line \d+ Array condition 2: FAILURE
+line \d+ Array condition 3: SUCCESS
+line \d+ Array condition 4: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that __CPROVER_OBJECT_SIZE returns the expected results in the case where
+the pointer passed to it may point to one of 2 arrays, where each array has a
+different size.
