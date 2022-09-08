@@ -54,8 +54,6 @@ protected:
     return static_cast<const typet &>(get_sub().front());
   }
 
-  // This method will be protected eventually.
-public:
   typet &subtype()
   {
     subt &sub=get_sub();
