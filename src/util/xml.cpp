@@ -108,7 +108,7 @@ void xmlt::escape(const std::string &s, std::ostream &out)
 
     default:
       DATA_INVARIANT(
-        ch >= ' ',
+        static_cast<unsigned char>(ch) >= 32u,
         "XML does not support escaping non-printable character " +
           std::to_string((unsigned char)ch));
       out << ch;
@@ -149,7 +149,7 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
 
     default:
       DATA_INVARIANT(
-        ch >= ' ',
+        static_cast<unsigned char>(ch) >= 32u,
         "XML does not support escaping non-printable character " +
           std::to_string((unsigned char)ch));
       out << ch;
