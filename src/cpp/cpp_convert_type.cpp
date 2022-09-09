@@ -85,7 +85,8 @@ void cpp_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_array)
   {
     other.push_back(type);
-    cpp_convert_plain_type(other.back().subtype(), get_message_handler());
+    cpp_convert_plain_type(
+      to_array_type(other.back()).element_type(), get_message_handler());
   }
   else if(type.id()==ID_template)
   {
@@ -124,7 +125,8 @@ void cpp_convert_typet::read_template(const typet &type)
   other.push_back(type);
   typet &t=other.back();
 
-  cpp_convert_plain_type(t.subtype(), get_message_handler());
+  cpp_convert_plain_type(
+    to_type_with_subtype(t).subtype(), get_message_handler());
 
   irept &arguments=t.add(ID_arguments);
 
@@ -157,7 +159,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
   // change subtype to return_type
   typet &return_type = t.return_type();
 
-  return_type.swap(t.subtype());
+  return_type.swap(to_type_with_subtype(t).subtype());
   t.remove_subtype();
 
   if(return_type.is_not_nil())
@@ -203,7 +205,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
         if(final_type.id()==ID_array)
         {
           // turn into pointer type
-          final_type=pointer_type(final_type.subtype());
+          final_type = pointer_type(to_array_type(final_type).element_type());
         }
 
         code_typet::parametert new_parameter(final_type);
@@ -352,7 +354,8 @@ void cpp_convert_auto(
 {
   if(dest.id() != ID_merged_type && dest.has_subtype())
   {
-    cpp_convert_auto(dest.subtype(), src, message_handler);
+    cpp_convert_auto(
+      to_type_with_subtype(dest).subtype(), src, message_handler);
     return;
   }
 

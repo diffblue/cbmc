@@ -54,11 +54,23 @@ protected:
     return static_cast<const typet &>(get_sub().front());
   }
 
-public:
-  // This method will be protected eventually.
   typet &subtype()
   {
     subt &sub=get_sub();
+    if(sub.empty())
+      sub.resize(1);
+    return static_cast<typet &>(sub.front());
+  }
+
+public:
+  // This method allows the construction of a type with a subtype by
+  // starting from a type without subtype.  It avoids copying the contents
+  // of the type.  The primary use-case are parsers, where a copy could be
+  // too expensive.  Consider type_with_subtypet(id, subtype) for other
+  // use-cases.
+  typet &add_subtype()
+  {
+    subt &sub = get_sub();
     if(sub.empty())
       sub.resize(1);
     return static_cast<typet &>(sub.front());

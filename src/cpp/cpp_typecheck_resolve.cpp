@@ -526,13 +526,13 @@ void cpp_typecheck_resolvet::disambiguate_functions(
 
           if(type1.id()==ID_pointer)
           {
-            typet tmp=type1.subtype();
+            typet tmp = to_pointer_type(type1).base_type();
             type1=tmp;
           }
 
           if(type2.id()==ID_pointer)
           {
-            typet tmp=type2.subtype();
+            typet tmp = to_pointer_type(type2).base_type();
             type2=tmp;
           }
 

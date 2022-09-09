@@ -315,7 +315,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
            declarator.name().get_sub().front().id()==ID_operator);
 
     typet type=static_cast<typet &>(declarator.name().get_sub()[1]);
-    declarator.type().subtype()=type;
+    declarator.type().add_subtype() = type;
 
     cpp_namet::namet name("(" + cpp_type2name(type) + ")");
     declarator.name().get_sub().back().swap(name);
@@ -638,7 +638,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // change the type of the 'this' pointer
         code_typet &code_type=to_code_type(func_symb.type);
         code_typet::parametert &this_parameter = code_type.parameters().front();
-        this_parameter.type().subtype().set(ID_identifier, virtual_base);
+        to_pointer_type(this_parameter.type())
+          .base_type()
+          .set(ID_identifier, virtual_base);
 
         // create symbols for the parameters
         code_typet::parameterst &args=code_type.parameters();

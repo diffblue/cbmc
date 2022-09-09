@@ -53,7 +53,7 @@ void ansi_c_declaratort::build(irept &src)
       p = &merged_type.last_type();
     }
     else
-      p=&t.subtype();
+      p = &t.add_subtype();
   }
 
   type()=static_cast<const typet &>(src);
@@ -103,7 +103,9 @@ typet ansi_c_declarationt::full_type(
     if(p->id()==ID_frontend_pointer || p->id()==ID_array ||
        p->id()==ID_vector || p->id()==ID_c_bit_field ||
        p->id()==ID_block_pointer || p->id()==ID_code)
-      p=&p->subtype();
+    {
+      p = &p->add_subtype();
+    }
     else if(p->id()==ID_merged_type)
     {
       // we always go down on the right-most subtype

@@ -82,7 +82,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     // the pointer/reference might have a qualifier,
     // but do subtype first
-    typecheck_type(type.subtype());
+    typecheck_type(to_pointer_type(type).base_type());
 
     // Check if it is a pointer-to-member
     if(type.find(ID_to_member).is_not_nil())
@@ -101,10 +101,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
       typecheck_type(class_object);
 
       // there may be parameters if this is a pointer to member function
-      if(type.subtype().id()==ID_code)
+      if(to_pointer_type(type).base_type().id() == ID_code)
       {
         code_typet::parameterst &parameters =
-          to_code_type(type.subtype()).parameters();
+          to_code_type(to_pointer_type(type).base_type()).parameters();
 
         if(parameters.empty() || !parameters.front().get_this())
         {
@@ -132,12 +132,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
       simplify(size_expr, *this);
     }
 
-    typecheck_type(type.subtype());
+    typecheck_type(to_array_type(type).element_type());
 
-    if(type.subtype().get_bool(ID_C_constant))
+    if(to_array_type(type).element_type().get_bool(ID_C_constant))
       type.set(ID_C_constant, true);
 
-    if(type.subtype().get_bool(ID_C_volatile))
+    if(to_array_type(type).element_type().get_bool(ID_C_volatile))
       type.set(ID_C_volatile, true);
   }
   else if(type.id()==ID_vector)
@@ -169,7 +169,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_template)
   {
-    typecheck_type(type.subtype());
+    typecheck_type(to_template_type(type).subtype());
   }
   else if(type.id()==ID_c_enum)
   {
@@ -245,7 +245,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     typecheck_expr(e);
 
     if(e.type().id() == ID_c_bit_field)
-      type = e.type().subtype();
+      type = to_c_bit_field_type(e.type()).underlying_type();
     else
       type = e.type();
   }
@@ -276,7 +276,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     PRECONDITION(type.has_subtype());
     merged_typet as_parsed;
-    as_parsed.move_to_subtypes(type.subtype());
+    as_parsed.move_to_subtypes(to_type_with_subtype(type).subtype());
     type.get_sub().clear();
     as_parsed.move_to_subtypes(type);
     type.swap(as_parsed);

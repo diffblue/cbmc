@@ -63,7 +63,7 @@ exprt goto_symext::address_arithmetic(
       address_of_exprt &a=to_address_of_expr(result);
 
       // turn &a of type T[i][j] into &(a[0][0])
-      for(const typet *t = &(a.type().subtype());
+      for(const typet *t = &(to_type_with_subtype(a.type()).subtype());
           t->id() == ID_array && expr.type() != *t;
           t = &(to_array_type(*t).element_type()))
         a.object() = index_exprt(a.object(), from_integer(0, c_index_type()));

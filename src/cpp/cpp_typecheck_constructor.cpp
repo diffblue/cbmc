@@ -39,7 +39,7 @@ static void copy_parent(
     "explicit-typecast",
     pointer_type(cpp_namet(parent_base_name, source_location).as_type()));
   op1.type().set(ID_C_reference, true);
-  op1.type().subtype().set(ID_C_constant, true);
+  to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
   op1.get_sub().push_back(cpp_namet(arg_name, source_location));
   op1.add_source_location()=source_location;
 
@@ -123,7 +123,7 @@ void cpp_typecheckt::default_ctor(
   cpp_declaratort decl;
   decl.name() = cpp_namet(base_name, source_location);
   decl.type()=typet(ID_function_type);
-  decl.type().subtype().make_nil();
+  decl.type().add_subtype().make_nil();
   decl.add_source_location()=source_location;
 
   decl.value() = code_blockt();
@@ -308,8 +308,11 @@ void cpp_typecheckt::default_assignop(
   declarator_name.get_sub().push_back(irept("="));
 
   declarator_type.id(ID_function_type);
-  declarator_type.subtype() = reference_type(uninitialized_typet{});
-  declarator_type.subtype().add(ID_C_qualifier).make_nil();
+  declarator_type.add_subtype() = reference_type(uninitialized_typet{});
+  to_type_with_subtype(declarator_type)
+    .subtype()
+    .add(ID_C_qualifier)
+    .make_nil();
 
   exprt &args=static_cast<exprt&>(declarator.type().add(ID_parameters));
   args.add_source_location()=source_location;

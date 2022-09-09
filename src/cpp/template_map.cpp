@@ -11,13 +11,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "template_map.h"
 
-#include <ostream>
-
+#include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/std_expr.h>
 
 #include "cpp_template_parameter.h"
 #include "cpp_template_type.h"
+
+#include <ostream>
 
 void template_mapt::apply(typet &type) const
 {
@@ -28,7 +29,7 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_pointer)
   {
-    apply(type.subtype());
+    apply(to_pointer_type(type).base_type());
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)

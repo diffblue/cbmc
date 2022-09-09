@@ -44,7 +44,7 @@ symbolt &cpp_declarator_convertert::convert(
   {
     typet type;
     type.swap(declarator.name().get_sub().back());
-    declarator.type().subtype()=type;
+    declarator.type().add_subtype() = type;
     cpp_typecheck.typecheck_type(type);
     cpp_namet::namet name("(" + cpp_type2name(type) + ")");
     declarator.name().get_sub().back().swap(name);
@@ -110,7 +110,7 @@ symbolt &cpp_declarator_convertert::convert(
     {
       UNREACHABLE;
       typet tmp;
-      tmp.swap(final_type.subtype());
+      tmp.swap(to_template_type(final_type).subtype());
       final_type.swap(tmp);
     }
 
