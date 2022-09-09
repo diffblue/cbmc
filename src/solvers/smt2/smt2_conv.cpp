@@ -2137,20 +2137,25 @@ void smt2_convt::convert_expr(const exprt &expr)
     else if(quantifier_expr.id() == ID_exists)
       out << "(exists ";
 
-    out << "( ";
+    out << '(';
+    bool first = true;
     for(const auto &bound : quantifier_expr.variables())
     {
-      out << "(";
+      if(first)
+        first = false;
+      else
+        out << ' ';
+      out << '(';
       convert_expr(bound);
-      out << " ";
+      out << ' ';
       convert_type(bound.type());
-      out << ") ";
+      out << ')';
     }
     out << ") ";
 
     convert_expr(quantifier_expr.where());
 
-    out << ")";
+    out << ')';
   }
   else if(expr.id()==ID_vector)
   {
@@ -2383,7 +2388,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     convert_expr(src);
     out << " ";
     convert_expr(from_integer(0, src_type));
-    out << ")) "; // not, =
+    out << "))"; // not, =
     out << " (_ bv1 " << to_width << ")";
     out << " (_ bv0 " << to_width << ")";
     out << ")"; // ite
