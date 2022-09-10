@@ -324,6 +324,16 @@ public:
     : unary_predicate_exprt(ID_is_dynamic_object, op)
   {
   }
+
+  exprt &address()
+  {
+    return op();
+  }
+
+  const exprt &address() const
+  {
+    return op();
+  }
 };
 
 template <>
