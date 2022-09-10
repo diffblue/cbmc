@@ -13,6 +13,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <util/expr_util.h>
 #include <util/invariant.h>
+#include <util/narrow.h>
 #include <util/std_expr.h>
 
 bddt bdd_exprt::from_expr_rec(const exprt &expr)
