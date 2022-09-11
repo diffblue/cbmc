@@ -779,9 +779,10 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
 // been observed to go up by 5%-10%, and on some models even by 20%.
 // #define WALLACE_TREE
 // Dadda' reduction scheme. This yields a smaller formula size than Wallace
-// trees (and also the default addition scheme), but remains disabled as it
-// isn't consistently more performant either.
-// #define DADDA_TREE
+// trees (and also the default addition scheme), but isn't consistently more
+// performant with simple partial-product generation. Only when using
+// higher-radix multipliers the combination appears to perform better.
+#define DADDA_TREE
 
 // The following examples demonstrate the performance differences (with a
 // time-out of 7200 seconds):
@@ -915,16 +916,81 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
 // our multiplier that's not using a tree reduction scheme, but aren't uniformly
 // better either.
 
+// Higher radix multipliers pre-compute partial products for groups of bits:
+// radix-4 are groups of 2 bits, radix-8 are groups of 3 bits, and radix-16 are
+// groups of 4 bits. Performance data for these variants combined with different
+// (tree) reduction schemes are recorded at
+// https://tinyurl.com/multiplier-comparison. The data suggests that radix-8
+// with Dadda's reduction yields the most consistent performance improvement
+// while not regressing substantially in the matrix of different benchmarks and
+// CaDiCaL and MiniSat2 as solvers.
+#define RADIX_MULTIPLIER 8
+
+#ifdef RADIX_MULTIPLIER
+static bvt unsigned_multiply_by_3(propt &prop, const bvt &op)
+{
+  PRECONDITION(prop.cnf_handled_well());
+  PRECONDITION(!op.empty());
+
+  bvt result;
+  result.reserve(op.size());
+
+  result.push_back(op[0]);
+  literalt prev_bit = const_literal(false);
+
+  for(std::size_t i = 1; i < op.size(); ++i)
+  {
+    literalt sum = prop.new_variable();
+
+    prop.lcnf({sum, !op[i - 1], !op[i], !prev_bit});
+    prop.lcnf({sum, !op[i - 1], !op[i], result.back()});
+    prop.lcnf({sum, op[i - 1], op[i], !prev_bit, result.back()});
+    prop.lcnf({sum, !op[i - 1], op[i], prev_bit, !result.back()});
+    prop.lcnf({sum, op[i - 1], !op[i], !result.back()});
+    prop.lcnf({sum, op[i - 1], !op[i], prev_bit});
+
+    prop.lcnf({!sum, !op[i - 1], op[i], !prev_bit});
+    prop.lcnf({!sum, !op[i - 1], op[i], result.back()});
+    prop.lcnf({!sum, !op[i - 1], !op[i], prev_bit, !result.back()});
+
+    prop.lcnf({!sum, op[i - 1], op[i], !result.back()});
+    prop.lcnf({!sum, op[i - 1], op[i], prev_bit});
+    prop.lcnf({!sum, op[i - 1], !op[i], !prev_bit, result.back()});
+
+    prop.lcnf({!sum, op[i], prev_bit, result.back()});
+    prop.lcnf({!sum, op[i], !prev_bit, !result.back()});
+
+    result.push_back(sum);
+    prev_bit = op[i - 1];
+  }
+
+  return result;
+}
+#endif
+
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
-  bvt op0=_op0, op1=_op1;
+  PRECONDITION(!_op0.empty());
+  PRECONDITION(!_op1.empty());
 
+  if(_op1.size() == 1)
+  {
+    bvt product;
+    product.reserve(_op0.size());
+    for(const auto &lit : _op0)
+      product.push_back(prop.land(lit, _op1.front()));
+    return product;
+  }
+
+  // store partial products
+  std::vector<bvt> pps;
+  pps.reserve(_op0.size());
+
+  bvt op0 = _op0, op1 = _op1;
+
+#ifndef RADIX_MULTIPLIER
   if(is_constant(op1))
     std::swap(op0, op1);
-
-  // build the usual quadratic number of partial products
-  std::vector<bvt> pps;
-  pps.reserve(op0.size());
 
   for(std::size_t bit=0; bit<op0.size(); bit++)
   {
@@ -940,6 +1006,797 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 
     pps.push_back(pp);
   }
+#else
+#  if RADIX_MULTIPLIER == 4
+#    define RADIX_GROUP_SIZE 2
+#  elif RADIX_MULTIPLIER == 8
+#    define RADIX_GROUP_SIZE 3
+#  elif RADIX_MULTIPLIER == 16
+#    define RADIX_GROUP_SIZE 4
+#  else
+#    error Unsupported radix
+#  endif
+  if(is_constant(op0) && !is_constant(op1))
+    std::swap(op0, op1);
+
+  optionalt<bvt> times_three_opt;
+  auto times_three = [this, &times_three_opt, &op0]() -> const bvt & {
+    if(!times_three_opt.has_value())
+    {
+#  if 1
+      if(prop.cnf_handled_well())
+        times_three_opt = unsigned_multiply_by_3(prop, op0);
+      else
+#  endif
+        times_three_opt = add(op0, shift(op0, shiftt::SHIFT_LEFT, 1));
+    }
+    return *times_three_opt;
+  };
+
+#  if RADIX_MULTIPLIER >= 8
+  optionalt<bvt> times_five_opt, times_seven_opt;
+  auto times_five = [this, &times_five_opt, &op0]() -> const bvt & {
+    if(!times_five_opt.has_value())
+      times_five_opt = add(op0, shift(op0, shiftt::SHIFT_LEFT, 2));
+    return *times_five_opt;
+  };
+  auto times_seven =
+    [this, &times_seven_opt, &op0, &times_three]() -> const bvt & {
+    if(!times_seven_opt.has_value())
+      times_seven_opt = add(times_three(), shift(op0, shiftt::SHIFT_LEFT, 2));
+    return *times_seven_opt;
+  };
+#  endif
+
+#  if RADIX_MULTIPLIER == 16
+  optionalt<bvt> times_nine_opt, times_eleven_opt, times_thirteen_opt,
+    times_fifteen_opt;
+  auto times_nine = [this, &times_nine_opt, &op0]() -> const bvt & {
+    if(!times_nine_opt.has_value())
+      times_nine_opt = add(op0, shift(op0, shiftt::SHIFT_LEFT, 3));
+    return *times_nine_opt;
+  };
+  auto times_eleven =
+    [this, &times_eleven_opt, &op0, &times_three]() -> const bvt & {
+    if(!times_eleven_opt.has_value())
+      times_eleven_opt = add(times_three(), shift(op0, shiftt::SHIFT_LEFT, 3));
+    return *times_eleven_opt;
+  };
+  auto times_thirteen =
+    [this, &times_thirteen_opt, &op0, &times_five]() -> const bvt & {
+    if(!times_thirteen_opt.has_value())
+      times_thirteen_opt = add(times_five(), shift(op0, shiftt::SHIFT_LEFT, 3));
+    return *times_thirteen_opt;
+  };
+  auto times_fifteen =
+    [this, &times_fifteen_opt, &op0, &times_seven]() -> const bvt & {
+    if(!times_fifteen_opt.has_value())
+      times_fifteen_opt = add(times_seven(), shift(op0, shiftt::SHIFT_LEFT, 3));
+    return *times_fifteen_opt;
+  };
+#  endif
+
+  for(std::size_t op1_idx = 0; op1_idx + RADIX_GROUP_SIZE - 1 < op1.size();
+      op1_idx += RADIX_GROUP_SIZE)
+  {
+    const literalt &bit0 = op1[op1_idx];
+    const literalt &bit1 = op1[op1_idx + 1];
+#  if RADIX_MULTIPLIER >= 8
+    const literalt &bit2 = op1[op1_idx + 2];
+#    if RADIX_MULTIPLIER == 16
+    const literalt &bit3 = op1[op1_idx + 3];
+#    endif
+#  endif
+    bvt partial_sum;
+
+    if(
+      bit0.is_constant() && bit1.is_constant()
+#  if RADIX_MULTIPLIER >= 8
+      && bit2.is_constant()
+#    if RADIX_MULTIPLIER == 16
+      && bit3.is_constant()
+#    endif
+#  endif
+    )
+    {
+      if(bit0.is_false()) // *0
+      {
+        if(bit1.is_false()) // *00
+        {
+#  if RADIX_MULTIPLIER >= 8
+          if(bit2.is_false()) // *000
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0000
+              continue;
+            else // 1000
+              partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx + 3);
+#    else
+            continue;
+#    endif
+          }
+          else // *100
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0100
+              partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx + 2);
+            else // 1100
+              partial_sum =
+                shift(times_three(), shiftt::SHIFT_LEFT, op1_idx + 2);
+#    else
+            partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx + 2);
+#    endif
+          }
+#  else
+          continue;
+#  endif
+        }
+        else // *10
+        {
+#  if RADIX_MULTIPLIER >= 8
+          if(bit2.is_false()) // *010
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0010
+              partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx + 1);
+            else // 1010
+              partial_sum =
+                shift(times_five(), shiftt::SHIFT_LEFT, op1_idx + 1);
+#    else
+            partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx + 1);
+#    endif
+          }
+          else // *110
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0110
+              partial_sum =
+                shift(times_three(), shiftt::SHIFT_LEFT, op1_idx + 1);
+            else // 1110
+              partial_sum =
+                shift(times_seven(), shiftt::SHIFT_LEFT, op1_idx + 1);
+#    else
+            partial_sum = shift(times_three(), shiftt::SHIFT_LEFT, op1_idx + 1);
+#    endif
+          }
+#  else
+          partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx + 1);
+#  endif
+        }
+      }
+      else // *1
+      {
+        if(bit1.is_false()) // *01
+        {
+#  if RADIX_MULTIPLIER >= 8
+          if(bit2.is_false()) // *001
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0001
+              partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx);
+            else // 1001
+              partial_sum = shift(times_nine(), shiftt::SHIFT_LEFT, op1_idx);
+#    else
+            partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx);
+#    endif
+          }
+          else // *101
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0101
+              partial_sum = shift(times_five(), shiftt::SHIFT_LEFT, op1_idx);
+            else // 1101
+              partial_sum =
+                shift(times_thirteen(), shiftt::SHIFT_LEFT, op1_idx);
+#    else
+            partial_sum = shift(times_five(), shiftt::SHIFT_LEFT, op1_idx);
+#    endif
+          }
+#  else
+          partial_sum = shift(op0, shiftt::SHIFT_LEFT, op1_idx);
+#  endif
+        }
+        else // *11
+        {
+#  if RADIX_MULTIPLIER >= 8
+          if(bit2.is_false()) // *011
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0011
+              partial_sum = shift(times_three(), shiftt::SHIFT_LEFT, op1_idx);
+            else // 1011
+              partial_sum = shift(times_eleven(), shiftt::SHIFT_LEFT, op1_idx);
+#    else
+            partial_sum = shift(times_three(), shiftt::SHIFT_LEFT, op1_idx);
+#    endif
+          }
+          else // *111
+          {
+#    if RADIX_MULTIPLIER == 16
+            if(bit3.is_false()) // 0111
+              partial_sum = shift(times_seven(), shiftt::SHIFT_LEFT, op1_idx);
+            else // 1111
+              partial_sum = shift(times_fifteen(), shiftt::SHIFT_LEFT, op1_idx);
+#    else
+            partial_sum = shift(times_seven(), shiftt::SHIFT_LEFT, op1_idx);
+#    endif
+          }
+#  else
+          partial_sum = shift(times_three(), shiftt::SHIFT_LEFT, op1_idx);
+#  endif
+        }
+      }
+    }
+    else
+    {
+      partial_sum = bvt(op1_idx, const_literal(false));
+      for(std::size_t op0_idx = 0; op0_idx + op1_idx < op0.size(); ++op0_idx)
+      {
+#  if RADIX_MULTIPLIER == 4
+        if(prop.cnf_handled_well())
+        {
+          literalt partial_sum_bit = prop.new_variable();
+          partial_sum.push_back(partial_sum_bit);
+
+          // 00
+          prop.lcnf({bit0, bit1, !partial_sum_bit});
+          // 01 -> sum = _op0
+          prop.lcnf({!bit0, bit1, !partial_sum_bit, _op0[op0_idx]});
+          prop.lcnf({!bit0, bit1, partial_sum_bit, !_op0[op0_idx]});
+          // 10 -> sum = (_op0 << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, !partial_sum_bit});
+          else
+          {
+            prop.lcnf({bit0, !bit1, !partial_sum_bit, _op0[op0_idx - 1]});
+            prop.lcnf({bit0, !bit1, partial_sum_bit, !_op0[op0_idx - 1]});
+          }
+          // 11 -> sum = times_three
+          prop.lcnf({!bit0, !bit1, !partial_sum_bit, times_three()[op0_idx]});
+          prop.lcnf({!bit0, !bit1, partial_sum_bit, !times_three()[op0_idx]});
+        }
+        else
+        {
+          partial_sum.push_back(prop.lselect(
+            !bit1,
+            prop.land(bit0, op0[op0_idx]), // 0x
+            prop.lselect(                  // 1x
+              !bit0,
+              op0_idx == 0 ? const_literal(false) : op0[op0_idx - 1],
+              times_three()[op0_idx])));
+        }
+#  elif RADIX_MULTIPLIER == 8
+        if(prop.cnf_handled_well())
+        {
+          literalt partial_sum_bit = prop.new_variable();
+          partial_sum.push_back(partial_sum_bit);
+
+          // 000
+          prop.lcnf({bit0, bit1, bit2, !partial_sum_bit});
+          // 001 -> sum = _op0
+          prop.lcnf({!bit0, bit1, bit2, !partial_sum_bit, _op0[op0_idx]});
+          prop.lcnf({!bit0, bit1, bit2, partial_sum_bit, !_op0[op0_idx]});
+          // 010 -> sum = (_op0 << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, bit2, !partial_sum_bit});
+          else
+          {
+            prop.lcnf({bit0, !bit1, bit2, !partial_sum_bit, _op0[op0_idx - 1]});
+            prop.lcnf({bit0, !bit1, bit2, partial_sum_bit, !_op0[op0_idx - 1]});
+          }
+          // 011 -> sum = times_three
+          prop.lcnf(
+            {!bit0, !bit1, bit2, !partial_sum_bit, times_three()[op0_idx]});
+          prop.lcnf(
+            {!bit0, !bit1, bit2, partial_sum_bit, !times_three()[op0_idx]});
+          // 100 -> sum = (_op0 << 2)
+          if(op0_idx == 0 || op0_idx == 1)
+            prop.lcnf({bit0, bit1, !bit2, !partial_sum_bit});
+          else
+          {
+            prop.lcnf({bit0, bit1, !bit2, !partial_sum_bit, _op0[op0_idx - 2]});
+            prop.lcnf({bit0, bit1, !bit2, partial_sum_bit, !_op0[op0_idx - 2]});
+          }
+          // 101 -> sum = times_five
+          prop.lcnf(
+            {!bit0, bit1, !bit2, !partial_sum_bit, times_five()[op0_idx]});
+          prop.lcnf(
+            {!bit0, bit1, !bit2, partial_sum_bit, !times_five()[op0_idx]});
+          // 110 -> sum = (times_three << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, !bit2, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               !bit2,
+               !partial_sum_bit,
+               times_three()[op0_idx - 1]});
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               !bit2,
+               partial_sum_bit,
+               !times_three()[op0_idx - 1]});
+          }
+          // 111 -> sum = times_seven
+          prop.lcnf(
+            {!bit0, !bit1, !bit2, !partial_sum_bit, times_seven()[op0_idx]});
+          prop.lcnf(
+            {!bit0, !bit1, !bit2, partial_sum_bit, !times_seven()[op0_idx]});
+        }
+        else
+        {
+          partial_sum.push_back(prop.lselect(
+            !bit2,
+            prop.lselect( // 0*
+              !bit1,
+              prop.land(bit0, op0[op0_idx]), // 00x
+              prop.lselect(                  // 01x
+                !bit0,
+                op0_idx == 0 ? const_literal(false) : op0[op0_idx - 1],
+                times_three()[op0_idx])),
+            prop.lselect( // 1*
+              !bit1,
+              prop.lselect( // 10x
+                !bit0,
+                op0_idx <= 1 ? const_literal(false) : op0[op0_idx - 2],
+                times_five()[op0_idx]),
+              prop.lselect( // 11x
+                !bit0,
+                op0_idx == 0 ? const_literal(false)
+                             : times_three()[op0_idx - 1],
+                times_seven()[op0_idx]))));
+        }
+#  elif RADIX_MULTIPLIER == 16
+        if(prop.cnf_handled_well())
+        {
+          literalt partial_sum_bit = prop.new_variable();
+          partial_sum.push_back(partial_sum_bit);
+
+          // 0000
+          prop.lcnf({bit0, bit1, bit2, bit3, !partial_sum_bit});
+          // 0001 -> sum = op0
+          prop.lcnf({!bit0, bit1, bit2, bit3, !partial_sum_bit, op0[op0_idx]});
+          prop.lcnf({!bit0, bit1, bit2, bit3, partial_sum_bit, !op0[op0_idx]});
+          // 0010 -> sum = (op0 << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, bit2, bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0, !bit1, bit2, bit3, !partial_sum_bit, op0[op0_idx - 1]});
+            prop.lcnf(
+              {bit0, !bit1, bit2, bit3, partial_sum_bit, !op0[op0_idx - 1]});
+          }
+          // 0011 -> sum = times_three
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             bit2,
+             bit3,
+             !partial_sum_bit,
+             times_three()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             bit2,
+             bit3,
+             partial_sum_bit,
+             !times_three()[op0_idx]});
+          // 0100 -> sum = (op0 << 2)
+          if(op0_idx == 0 || op0_idx == 1)
+            prop.lcnf({bit0, bit1, !bit2, bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0, bit1, !bit2, bit3, !partial_sum_bit, op0[op0_idx - 2]});
+            prop.lcnf(
+              {bit0, bit1, !bit2, bit3, partial_sum_bit, !op0[op0_idx - 2]});
+          }
+          // 0101 -> sum = times_five
+          prop.lcnf(
+            {!bit0,
+             bit1,
+             !bit2,
+             bit3,
+             !partial_sum_bit,
+             times_five()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             bit1,
+             !bit2,
+             bit3,
+             partial_sum_bit,
+             !times_five()[op0_idx]});
+          // 0110 -> sum = (times_three << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, !bit2, bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               !bit2,
+               bit3,
+               !partial_sum_bit,
+               times_three()[op0_idx - 1]});
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               !bit2,
+               bit3,
+               partial_sum_bit,
+               !times_three()[op0_idx - 1]});
+          }
+          // 0111 -> sum = times_seven
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             !bit2,
+             bit3,
+             !partial_sum_bit,
+             times_seven()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             !bit2,
+             bit3,
+             partial_sum_bit,
+             !times_seven()[op0_idx]});
+
+          // 1000 -> sum = (op0 << 3)
+          if(op0_idx == 0 || op0_idx == 1 || op0_idx == 2)
+            prop.lcnf({bit0, bit1, bit2, !bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0, bit1, bit2, !bit3, !partial_sum_bit, op0[op0_idx - 3]});
+            prop.lcnf(
+              {bit0, bit1, bit2, !bit3, partial_sum_bit, !op0[op0_idx - 3]});
+          }
+          // 1001 -> sum = times_nine
+          prop.lcnf(
+            {!bit0,
+             bit1,
+             bit2,
+             !bit3,
+             !partial_sum_bit,
+             times_nine()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             bit1,
+             bit2,
+             !bit3,
+             partial_sum_bit,
+             !times_nine()[op0_idx]});
+          // 1010 -> sum = (times_five << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, bit2, !bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               bit2,
+               !bit3,
+               !partial_sum_bit,
+               times_five()[op0_idx - 1]});
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               bit2,
+               !bit3,
+               partial_sum_bit,
+               !times_five()[op0_idx - 1]});
+          }
+          // 1011 -> sum = times_eleven
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             bit2,
+             !bit3,
+             !partial_sum_bit,
+             times_eleven()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             bit2,
+             !bit3,
+             partial_sum_bit,
+             !times_eleven()[op0_idx]});
+          // 1100 -> sum = (times_three << 2)
+          if(op0_idx == 0 || op0_idx == 1)
+            prop.lcnf({bit0, bit1, !bit2, !bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0,
+               bit1,
+               !bit2,
+               !bit3,
+               !partial_sum_bit,
+               times_three()[op0_idx - 2]});
+            prop.lcnf(
+              {bit0,
+               bit1,
+               !bit2,
+               !bit3,
+               partial_sum_bit,
+               !times_three()[op0_idx - 2]});
+          }
+          // 1101 -> sum = times_thirteen
+          prop.lcnf(
+            {!bit0,
+             bit1,
+             !bit2,
+             !bit3,
+             !partial_sum_bit,
+             times_thirteen()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             bit1,
+             !bit2,
+             !bit3,
+             partial_sum_bit,
+             !times_thirteen()[op0_idx]});
+          // 1110 -> sum = (times_seven << 1)
+          if(op0_idx == 0)
+            prop.lcnf({bit0, !bit1, !bit2, !bit3, !partial_sum_bit});
+          else
+          {
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               !bit2,
+               !bit3,
+               !partial_sum_bit,
+               times_seven()[op0_idx - 1]});
+            prop.lcnf(
+              {bit0,
+               !bit1,
+               !bit2,
+               !bit3,
+               partial_sum_bit,
+               !times_seven()[op0_idx - 1]});
+          }
+          // 1111 -> sum = times_fifteen
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             !bit2,
+             !bit3,
+             !partial_sum_bit,
+             times_fifteen()[op0_idx]});
+          prop.lcnf(
+            {!bit0,
+             !bit1,
+             !bit2,
+             !bit3,
+             partial_sum_bit,
+             !times_fifteen()[op0_idx]});
+        }
+        else
+        {
+          partial_sum.push_back(prop.lselect(
+            !bit3,
+            prop.lselect( // 0*
+              !bit2,
+              prop.lselect( // 00*
+                !bit1,
+                prop.land(bit0, op0[op0_idx]), // 000x
+                prop.lselect(                  // 001x
+                  !bit0,
+                  op0_idx == 0 ? const_literal(false) : op0[op0_idx - 1],
+                  times_three()[op0_idx])),
+              prop.lselect( // 01*
+                !bit1,
+                prop.lselect( // 010x
+                  !bit0,
+                  op0_idx <= 1 ? const_literal(false) : op0[op0_idx - 2],
+                  times_five()[op0_idx]),
+                prop.lselect( // 011x
+                  !bit0,
+                  op0_idx == 0 ? const_literal(false)
+                               : times_three()[op0_idx - 1],
+                  times_seven()[op0_idx]))),
+            prop.lselect( // 1*
+              !bit2,
+              prop.lselect( // 10*
+                !bit1,
+                prop.lselect( // 100x
+                  !bit0,
+                  op0_idx <= 2 ? const_literal(false) : op0[op0_idx - 3],
+                  times_nine()[op0_idx]),
+                prop.lselect( // 101x
+                  !bit0,
+                  op0_idx == 0 ? const_literal(false)
+                               : times_five()[op0_idx - 1],
+                  times_eleven()[op0_idx])),
+              prop.lselect( // 11*
+                !bit1,
+                prop.lselect( // 110x
+                  !bit0,
+                  op0_idx <= 1 ? const_literal(false)
+                               : times_three()[op0_idx - 2],
+                  times_thirteen()[op0_idx]),
+                prop.lselect( // 111x
+                  !bit0,
+                  op0_idx == 0 ? const_literal(false)
+                               : times_seven()[op0_idx - 1],
+                  times_fifteen()[op0_idx])))));
+        }
+#  else
+#    error Unsupported radix
+#  endif
+      }
+    }
+
+    pps.push_back(std::move(partial_sum));
+  }
+
+  if(op1.size() % RADIX_GROUP_SIZE == 1)
+  {
+    if(op0.size() == op1.size())
+    {
+      if(pps.empty())
+        pps.push_back(bvt(op0.size(), const_literal(false)));
+
+      // This is the partial product of the MSB of op1 with op0, which is all
+      // zeros except for (possibly) the MSB. Since we don't need to account for
+      // any carry out of adding this partial product, we just need to compute
+      // the sum the MSB of one of the partial products and this partial
+      // product, we is an xor of just those bits.
+      pps.back().back() =
+        prop.lxor(pps.back().back(), prop.land(op0[0], op1.back()));
+    }
+    else
+    {
+      bvt partial_sum = bvt(op1.size() - 1, const_literal(false));
+      for(const auto &lit : op0)
+      {
+        partial_sum.push_back(prop.land(lit, op1.back()));
+        if(partial_sum.size() == op0.size())
+          break;
+      }
+      pps.push_back(std::move(partial_sum));
+    }
+  }
+#  if RADIX_MULTIPLIER >= 8
+  else if(op1.size() % RADIX_GROUP_SIZE == 2)
+  {
+    const literalt &bit0 = op1[op1.size() - 2];
+    const literalt &bit1 = op1[op1.size() - 1];
+
+    bvt partial_sum = bvt(op1.size() - 2, const_literal(false));
+    for(std::size_t op0_idx = 0; op0_idx < 2; ++op0_idx)
+    {
+      if(prop.cnf_handled_well())
+      {
+        literalt partial_sum_bit = prop.new_variable();
+        partial_sum.push_back(partial_sum_bit);
+        // 00
+        prop.lcnf({bit0, bit1, !partial_sum_bit});
+        // 01 -> sum = op0
+        prop.lcnf({!bit0, bit1, !partial_sum_bit, op0[op0_idx]});
+        prop.lcnf({!bit0, bit1, partial_sum_bit, !op0[op0_idx]});
+        // 10 -> sum = (op0 << 1)
+        if(op0_idx == 0)
+          prop.lcnf({bit0, !bit1, !partial_sum_bit});
+        else
+        {
+          prop.lcnf({bit0, !bit1, !partial_sum_bit, op0[op0_idx - 1]});
+          prop.lcnf({bit0, !bit1, partial_sum_bit, !op0[op0_idx - 1]});
+        }
+        // 11 -> sum = times_three
+        prop.lcnf({!bit0, !bit1, !partial_sum_bit, times_three()[op0_idx]});
+        prop.lcnf({!bit0, !bit1, partial_sum_bit, !times_three()[op0_idx]});
+      }
+      else
+      {
+        partial_sum.push_back(prop.lselect(
+          !bit1,
+          prop.land(bit0, op0[op0_idx]), // 0x
+          prop.lselect(                  // 1x
+            !bit0,
+            op0_idx == 0 ? const_literal(false) : op0[op0_idx - 1],
+            times_three()[op0_idx])));
+      }
+    }
+
+    pps.push_back(std::move(partial_sum));
+  }
+#  endif
+#  if RADIX_MULTIPLIER == 16
+  else if(op1.size() % RADIX_GROUP_SIZE == 3)
+  {
+    const literalt &bit0 = op1[op1.size() - 3];
+    const literalt &bit1 = op1[op1.size() - 2];
+    const literalt &bit2 = op1[op1.size() - 1];
+
+    bvt partial_sum = bvt(op1.size() - 3, const_literal(false));
+    for(std::size_t op0_idx = 0; op0_idx < 3; ++op0_idx)
+    {
+      if(prop.cnf_handled_well())
+      {
+        literalt partial_sum_bit = prop.new_variable();
+        partial_sum.push_back(partial_sum_bit);
+        // 000
+        prop.lcnf({bit0, bit1, bit2, !partial_sum_bit});
+        // 001 -> sum = op0
+        prop.lcnf({!bit0, bit1, bit2, !partial_sum_bit, op0[op0_idx]});
+        prop.lcnf({!bit0, bit1, bit2, partial_sum_bit, !op0[op0_idx]});
+        // 010 -> sum = (op0 << 1)
+        if(op0_idx == 0)
+          prop.lcnf({bit0, !bit1, bit2, !partial_sum_bit});
+        else
+        {
+          prop.lcnf({bit0, !bit1, bit2, !partial_sum_bit, op0[op0_idx - 1]});
+          prop.lcnf({bit0, !bit1, bit2, partial_sum_bit, !op0[op0_idx - 1]});
+        }
+        // 011 -> sum = times_three
+        prop.lcnf(
+          {!bit0, !bit1, bit2, !partial_sum_bit, times_three()[op0_idx]});
+        prop.lcnf(
+          {!bit0, !bit1, bit2, partial_sum_bit, !times_three()[op0_idx]});
+        // 100 -> sum = (op0 << 2)
+        if(op0_idx == 0 || op0_idx == 1)
+          prop.lcnf({bit0, bit1, !bit2, !partial_sum_bit});
+        else
+        {
+          prop.lcnf({bit0, bit1, !bit2, !partial_sum_bit, op0[op0_idx - 2]});
+          prop.lcnf({bit0, bit1, !bit2, partial_sum_bit, !op0[op0_idx - 2]});
+        }
+        // 101 -> sum = times_five
+        prop.lcnf(
+          {!bit0, bit1, !bit2, !partial_sum_bit, times_five()[op0_idx]});
+        prop.lcnf(
+          {!bit0, bit1, !bit2, partial_sum_bit, !times_five()[op0_idx]});
+        // 110 -> sum = (times_three << 1)
+        if(op0_idx == 0)
+          prop.lcnf({bit0, !bit1, !bit2, !partial_sum_bit});
+        else
+        {
+          prop.lcnf(
+            {bit0, !bit1, !bit2, !partial_sum_bit, times_three()[op0_idx - 1]});
+          prop.lcnf(
+            {bit0, !bit1, !bit2, partial_sum_bit, !times_three()[op0_idx - 1]});
+        }
+        // 111 -> sum = times_seven
+        prop.lcnf(
+          {!bit0, !bit1, !bit2, !partial_sum_bit, times_seven()[op0_idx]});
+        prop.lcnf(
+          {!bit0, !bit1, !bit2, partial_sum_bit, !times_seven()[op0_idx]});
+      }
+      else
+      {
+        partial_sum.push_back(prop.lselect(
+          !bit2,
+          prop.lselect( // 0*
+            !bit1,
+            prop.land(bit0, op0[op0_idx]), // 00x
+            prop.lselect(                  // 01x
+              !bit0,
+              op0_idx == 0 ? const_literal(false) : op0[op0_idx - 1],
+              times_three()[op0_idx])),
+          prop.lselect( // 1*
+            !bit1,
+            prop.lselect( // 10x
+              !bit0,
+              op0_idx <= 1 ? const_literal(false) : op0[op0_idx - 2],
+              times_five()[op0_idx]),
+            prop.lselect( // 11x
+              !bit0,
+              op0_idx == 0 ? const_literal(false) : times_three()[op0_idx - 1],
+              times_seven()[op0_idx]))));
+      }
+    }
+
+    pps.push_back(std::move(partial_sum));
+  }
+#  endif
+#endif
 
   if(pps.empty())
     return zeros(op0.size());
