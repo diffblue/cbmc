@@ -1059,4 +1059,115 @@ inline void validate_expr(const object_size_exprt &value)
     "Object size expression must have pointer typed operand.");
 }
 
+/// A predicate that indicates that the object pointed to is live
+class live_object_exprt : public unary_predicate_exprt
+{
+public:
+  explicit live_object_exprt(exprt pointer)
+    : unary_predicate_exprt(ID_live_object, std::move(pointer))
+  {
+    PRECONDITION(as_const(*this).pointer().type().id() == ID_pointer);
+  }
+
+  exprt &pointer()
+  {
+    return op0();
+  }
+
+  const exprt &pointer() const
+  {
+    return op0();
+  }
+};
+
+template <>
+inline bool can_cast_expr<live_object_exprt>(const exprt &base)
+{
+  return base.id() == ID_live_object;
+}
+
+inline void validate_expr(const live_object_exprt &value)
+{
+  validate_operands(value, 1, "live_object must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref live_object_exprt
+///
+/// \a expr must be known to be \ref live_object_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref live_object_exprt
+inline const live_object_exprt &to_live_object_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_live_object);
+  const live_object_exprt &ret = static_cast<const live_object_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_live_object_expr(const exprt &)
+inline live_object_exprt &to_live_object_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_live_object);
+  live_object_exprt &ret = static_cast<live_object_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// A predicate that indicates that the object pointed to is writeable
+class writeable_object_exprt : public unary_predicate_exprt
+{
+public:
+  explicit writeable_object_exprt(exprt pointer)
+    : unary_predicate_exprt(ID_writeable_object, std::move(pointer))
+  {
+    PRECONDITION(as_const(*this).pointer().type().id() == ID_pointer);
+  }
+
+  exprt &pointer()
+  {
+    return op0();
+  }
+
+  const exprt &pointer() const
+  {
+    return op0();
+  }
+};
+
+template <>
+inline bool can_cast_expr<writeable_object_exprt>(const exprt &base)
+{
+  return base.id() == ID_writeable_object;
+}
+
+inline void validate_expr(const writeable_object_exprt &value)
+{
+  validate_operands(value, 1, "writeable_object must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref writeable_object_exprt
+///
+/// \a expr must be known to be \ref writeable_object_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref writeable_object_exprt
+inline const writeable_object_exprt &to_writeable_object_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_writeable_object);
+  const writeable_object_exprt &ret =
+    static_cast<const writeable_object_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_writeable_object_expr(const exprt &)
+inline writeable_object_exprt &to_writeable_object_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_writeable_object);
+  writeable_object_exprt &ret = static_cast<writeable_object_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_POINTER_EXPR_H
