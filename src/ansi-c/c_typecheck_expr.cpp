@@ -2289,6 +2289,33 @@ exprt c_typecheck_baset::do_special_functions(
 
     return buffer_size_expr;
   }
+  else if(identifier == CPROVER_PREFIX "is_list")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "is_list expects one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    if(
+      expr.arguments()[0].type().id() != ID_pointer ||
+      to_pointer_type(expr.arguments()[0].type()).base_type().id() !=
+        ID_struct_tag)
+    {
+      error().source_location = expr.arguments()[0].source_location();
+      error() << "is_list expects a struct-pointer operand" << eom;
+      throw 0;
+    }
+
+    predicate_exprt is_list_expr("is_list");
+    is_list_expr.operands() = expr.arguments();
+    is_list_expr.add_source_location() = source_location;
+
+    return std::move(is_list_expr);
+  }
   else if(identifier==CPROVER_PREFIX "is_zero_string")
   {
     if(expr.arguments().size()!=1)
