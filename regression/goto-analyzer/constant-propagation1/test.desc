@@ -1,0 +1,8 @@
+CORE
+main.c
+--verify --constants --recursive-interprocedural --loop-unwind 4 --one-domain-per-history
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] line 17 assertion i \!= n: UNKNOWN
+--
+^warning: ignoring

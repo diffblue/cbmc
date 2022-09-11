@@ -1270,13 +1270,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("constant-propagator"))
   {
-    do_indirect_call_and_rtti_removal();
-    do_remove_returns();
-
-    log.status() << "Propagating Constants" << messaget::eom;
-
-    constant_propagator_ait constant_propagator_ai(goto_model);
-    remove_skip(goto_model);
+    log.status() << "--constant-propagator is deprecated, "
+                 << "'goto-analyzer --simplify out.gb "
+                 << "--vsd --vsd-value constants'"
+                 << " is the recommended replacement but "
+                 << "'goto-analyzer --simplify out.gb --constants'"
+                 << " should provide backwards compatability"
+                 << messaget::eom;
   }
 
   if(cmdline.isset("generate-function-body"))
@@ -1841,7 +1841,6 @@ void goto_instrument_parse_optionst::help()
     "                              single edge back to the loop head\n"
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     HELP_REMOVE_POINTERS
-    " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
     " --inline                     perform full inlining\n"
     " --partial-inline             perform partial inlining\n"
     " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)

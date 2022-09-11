@@ -47,6 +47,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 // Options that have been moved to goto-analyzer
 #define GOTO_INSTRUMENT_MIGRATED_OPTIONS \
+  "(constant-propagator)" \
   "(show-dependence-graph)" \
   "(show-intervals)" \
   // empty last line
@@ -94,7 +95,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
   "(verbosity):(version)(xml-ui)(json-ui)" \
-  "(accelerate)(constant-propagator)" \
+  "(accelerate)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \
   "(interpreter)(show-reaching-definitions)" \

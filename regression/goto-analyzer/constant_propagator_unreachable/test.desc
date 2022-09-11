@@ -1,9 +1,9 @@
 CORE
 test.c
---constant-propagator
+ --verify --constants
 ^EXIT=0$
 ^SIGNAL=0$
-VERIFICATION SUCCESSFUL
+SUCCESS \(unreachable\)
 --
 failed to find state
 --
