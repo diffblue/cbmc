@@ -55,11 +55,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/call_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/custom_bitvector_analysis.h>
-#include <analyses/dependence_graph.h>
 #include <analyses/escape_analysis.h>
 #include <analyses/global_may_alias.h>
 #include <analyses/interval_analysis.h>
-#include <analyses/interval_domain.h>
 #include <analyses/is_threaded.h>
 #include <analyses/lexical_loops.h>
 #include <analyses/local_bitvector_analysis.h>
@@ -488,17 +486,10 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-intervals"))
     {
-      do_indirect_call_and_rtti_removal();
-
-      // recalculate numbers, etc.
-      goto_model.goto_functions.update();
-
-      log.status() << "Interval Analysis" << messaget::eom;
-      namespacet ns(goto_model.symbol_table);
-      ait<interval_domaint> interval_analysis;
-      interval_analysis(goto_model);
-      interval_analysis.output(goto_model, std::cout);
-      return CPROVER_EXIT_SUCCESS;
+      log.status() << "--show-intervals is deprecated, "
+                   << "use goto-analyzer --show --intervals"
+                   << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
     }
 
     if(cmdline.isset("show-call-sequences"))
@@ -568,15 +559,10 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-dependence-graph"))
     {
-      do_indirect_call_and_rtti_removal();
-
-      const namespacet ns(goto_model.symbol_table);
-      dependence_grapht dependence_graph(ns);
-      dependence_graph(goto_model);
-      dependence_graph.output(goto_model, std::cout);
-      dependence_graph.output_dot(std::cout);
-
-      return CPROVER_EXIT_SUCCESS;
+      log.status() << "--show-dependence-graph is deprecated, "
+                   << "use goto-analyzer --show --dependence-graph"
+                   << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
     }
 
     if(cmdline.isset("count-eloc"))
@@ -1284,13 +1270,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("constant-propagator"))
   {
-    do_indirect_call_and_rtti_removal();
-    do_remove_returns();
-
-    log.status() << "Propagating Constants" << messaget::eom;
-
-    constant_propagator_ait constant_propagator_ai(goto_model);
-    remove_skip(goto_model);
+    log.status() << "--constant-propagator is deprecated, "
+                 << "'goto-analyzer --simplify out.gb "
+                 << "--vsd --vsd-value constants'"
+                 << " is the recommended replacement but "
+                 << "'goto-analyzer --simplify out.gb --constants'"
+                 << " should provide backwards compatability"
+                 << messaget::eom;
   }
 
   if(cmdline.isset("generate-function-body"))
@@ -1807,13 +1793,11 @@ void goto_instrument_parse_optionst::help()
     " --show-custom-bitvector-analysis\n"
     "                              show results of configurable bitvector analysis\n" // NOLINT(*)
     " --interval-analysis          perform interval analysis\n"
-    " --show-intervals             show results of interval analysis\n"
     " --show-uninitialized         show maybe-uninitialized variables\n"
     " --show-points-to             show points-to information\n"
     " --show-rw-set                show read-write sets\n"
     " --show-call-sequences        show function call sequences\n"
     " --show-reaching-definitions  show reaching definitions\n"
-    " --show-dependence-graph      show program-dependence graph\n"
     " --show-sese-regions          show single-entry-single-exit regions\n"
     "\n"
     "Safety checks:\n"
@@ -1857,7 +1841,6 @@ void goto_instrument_parse_optionst::help()
     "                              single edge back to the loop head\n"
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     HELP_REMOVE_POINTERS
-    " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
     " --inline                     perform full inlining\n"
     " --partial-inline             perform partial inlining\n"
     " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)

@@ -1,15 +1,12 @@
 CORE
 main.c
---constant-propagator
-^EXIT=10$
+--verify --constants
+^EXIT=0$
 ^SIGNAL=0$
-Removing returns
-VERIFICATION FAILED
-ASSIGN main\:\:1\:\:a \:\= 4
-ASSERT ¬\(main::1::b ≥ 0\) ∨ main::1::b ≥ 5
+\[main.assertion.1\] line 16 assertion a == 4: SUCCESS
+\[main.assertion.2\] line 17 assertion !\(0 <= a && a < 5 && 0 <= b && b < 5\): UNKNOWN
 --
 ^warning: ignoring
-ASSERT true
 --
 This tests that constants are propagated through function calls, correctly
 taking into account the return value. Constant propagation should result in

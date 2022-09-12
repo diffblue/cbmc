@@ -144,6 +144,9 @@ class optionst;
   "(taint):(show-taint)" \
   "(show-local-may-alias)"
 
+#define GOTO_ANALYZER_OPTIONS_LEGACY \
+  "(show-intervals)(show-non-null)" \
+
 #define GOTO_ANALYSER_OPTIONS \
   OPT_FUNCTIONS \
   OPT_CONFIG_C_CPP \
@@ -159,7 +162,6 @@ class optionst;
   OPT_VALIDATE \
   GOTO_ANALYSER_OPTIONS_TASKS \
   "(no-simplify-slicing)" \
-  "(show-intervals)(show-non-null)" \
   GOTO_ANALYSER_OPTIONS_AI \
   "(location-sensitive)(concurrent)" \
   GOTO_ANALYSER_OPTIONS_HISTORY \
@@ -168,6 +170,7 @@ class optionst;
   GOTO_ANALYSER_OPTIONS_STORAGE  \
   GOTO_ANALYSER_OPTIONS_OUTPUT \
   GOTO_ANALYSER_OPTIONS_SPECIFIC_ANALYSES \
+  GOTO_ANALYZER_OPTIONS_LEGACY \
 // clang-format on
 
 class goto_analyzer_parse_optionst: public parse_options_baset

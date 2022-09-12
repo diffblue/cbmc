@@ -13,5 +13,6 @@ int main()
   int b;
   b = nondet();
   a = f(a);
+  assert(a == 4);
   assert(!(0 <= a && a < 5 && 0 <= b && b < 5));
 }

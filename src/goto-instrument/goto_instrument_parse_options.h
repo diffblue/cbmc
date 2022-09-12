@@ -45,7 +45,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "wmm/weak_memory.h"
 
 // clang-format off
-#define GOTO_INSTRUMENT_OPTIONS \
+// Options that have been moved to goto-analyzer
+#define GOTO_INSTRUMENT_MIGRATED_OPTIONS \
+  "(constant-propagator)" \
+  "(show-dependence-graph)" \
+  "(show-intervals)" \
+  // empty last line
+
+#define GOTO_INSTRUMENT_OPTIONS                 \
   OPT_DOCUMENT_PROPERTIES \
   OPT_DUMP_C \
   "(dot)(xml)" \
@@ -74,7 +81,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-escape-analysis)(escape-analysis)" \
   "(custom-bitvector-analysis)" \
-  "(show-struct-alignment)(interval-analysis)(show-intervals)" \
+  "(show-struct-alignment)(interval-analysis)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(fp-reachability-slice):" \
@@ -88,12 +95,12 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \
   "(verbosity):(version)(xml-ui)(json-ui)" \
-  "(accelerate)(constant-propagator)" \
+  "(accelerate)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \
   "(interpreter)(show-reaching-definitions)" \
   "(list-symbols)(list-undefined-functions)" \
-  "(z3)(add-library)(show-dependence-graph)" \
+  "(z3)(add-library)" \
   "(horn)(skip-loops):(model-argc-argv):" \
   "(" FLAG_LOOP_CONTRACTS ")" \
   "(" FLAG_REPLACE_CALL "):" \
