@@ -1288,6 +1288,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_remove_returns();
 
     log.status() << "Propagating Constants" << messaget::eom;
+    log.warning() << "**** WARNING: Constant propagation as performed by "
+                     "goto-instrument is not expected to be sound. Do not use "
+                     "--constant-propagator if soundness is important for your "
+                     "use case."
+                  << messaget::eom;
 
     constant_propagator_ait constant_propagator_ai(goto_model);
     remove_skip(goto_model);
