@@ -37,8 +37,7 @@ bvt boolbvt::convert_div(const div_exprt &expr)
     std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
 
-    bvt zeros;
-    zeros.resize(fraction_bits, const_literal(false));
+    bvt zeros = bv_utils.zeros(fraction_bits);
 
     // add fraction_bits least-significant bits
     op0.insert(op0.begin(), zeros.begin(), zeros.end());

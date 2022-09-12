@@ -715,12 +715,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   for(std::size_t sum=0; sum<op0.size(); sum++)
     if(op0[sum]!=const_literal(false))
     {
-      bvt tmpop;
-
+      bvt tmpop = zeros(sum);
       tmpop.reserve(op0.size());
-
-      for(std::size_t idx=0; idx<sum; idx++)
-        tmpop.push_back(const_literal(false));
 
       for(std::size_t idx=sum; idx<op0.size(); idx++)
         tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
@@ -746,13 +742,9 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   for(std::size_t bit=0; bit<op0.size(); bit++)
     if(op0[bit]!=const_literal(false))
     {
-      bvt pp;
-
-      pp.reserve(op0.size());
-
       // zeros according to weight
-      for(std::size_t idx=0; idx<bit; idx++)
-        pp.push_back(const_literal(false));
+      bvt pp = zeros(bit);
+      pp.reserve(op0.size());
 
       for(std::size_t idx=bit; idx<op0.size(); idx++)
         pp.push_back(prop.land(op1[idx-bit], op0[bit]));
