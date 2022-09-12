@@ -587,6 +587,21 @@ TEST_CASE(
     REQUIRE(constructed_term == expected_term);
   }
 
+  SECTION("Subtraction of pointer from integer")
+  {
+    // 2 - (*int32_t)a -- Semantically void expression, need to make sure
+    // we throw in this case.
+    const cbmc_invariants_should_throwt invariants_throw;
+
+    const auto pointer_arith_expr = minus_exprt{two_bvint, pointer_a};
+
+    REQUIRE_THROWS_MATCHES(
+      test.convert(pointer_arith_expr),
+      invariant_failedt,
+      invariant_failure_containing("minus expressions of pointer and integer "
+                                   "expect lhs to be the pointer"));
+  }
+
   SECTION("Subtraction of two pointer arguments")
   {
     // (int32_t *)a - (int32_t *)b
