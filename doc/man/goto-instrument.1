@@ -1,1 +1,1033 @@
-cbmc.1
+.TH GOTO-INSTRUMENT "1" "June 2022" "goto-instrument-5.59.0" "User Commands"
+.SH NAME
+goto\-instrument \- Perform analysis or instrumentation of goto binaries
+.SH SYNOPSIS
+.TP
+.B goto\-instrument [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B goto\-instrument \-\-version
+show version and exit
+.TP
+.B goto\-instrument [options] \fIin\fR [\fIout\fR]
+perform analysis or instrumentation
+.SH DESCRIPTION
+\fBgoto-instrument\fR reads a GOTO binary, performs a given program
+transformation, and then writes the resulting program as GOTO binary on
+disk.
+.SH OPTIONS
+.SS "Dump Source:"
+.TP
+\fB\-\-dump\-c\fR
+generate C source
+.TP
+\fB\-\-dump\-c\-type\-header\fR \fIm\fR
+generate a C header for types local in \fIm\fR
+.TP
+\fB\-\-dump\-cpp\fR
+generate C++ source
+.TP
+\fB\-\-no\-system\-headers\fR
+generate C source expanding libc includes
+.TP
+\fB\-\-use\-all\-headers\fR
+generate C source with all includes
+.TP
+\fB\-\-harness\fR
+include input generator in output
+.TP
+\fB\-\-horn\fR
+print program as constrained horn clauses
+.SS "Diagnosis:"
+.TP
+\fB\-\-show\-properties\fR
+show the properties, but don't run analysis
+.TP
+\fB\-\-document\-properties\-html\fR
+generate HTML property documentation
+.TP
+\fB\-\-document\-properties\-latex\fR
+generate Latex property documentation
+.TP
+\fB\-\-show\-symbol\-table\fR
+show loaded symbol table
+.TP
+\fB\-\-list\-symbols\fR
+list symbols with type information
+.TP
+\fB\-\-show\-goto\-functions\fR
+show loaded goto program
+.TP
+\fB\-\-list\-goto\-functions\fR
+list loaded goto functions
+.TP
+\fB\-\-count\-eloc\fR
+count effective lines of code
+.TP
+\fB\-\-list\-eloc\fR
+list full path names of lines containing code
+.TP
+\fB\-\-print\-global\-state\-size\fR
+count the total number of bits of global objects
+.TP
+\fB\-\-print\-path\-lengths\fR
+print statistics about control\-flow graph paths
+.TP
+\fB\-\-show\-locations\fR
+show all source locations
+.TP
+\fB\-\-dot\fR
+generate CFG graph in DOT format
+.TP
+\fB\-\-print\-internal\-representation\fR
+show verbose internal representation of the program
+.TP
+\fB\-\-list\-undefined\-functions\fR
+list functions without body
+.TP
+\fB\-\-list\-calls\-args\fR
+list all function calls with their arguments
+.TP
+\fB\-\-call\-graph\fR
+show graph of function calls
+.TP
+\fB\-\-reachable\-call\-graph\fR
+show graph of function calls potentially reachable from main function
+.TP
+\fB\-\-show\-class\-hierarchy\fR
+show the class hierarchy
+.TP
+\fB\-\-validate\-goto\-model\fR
+enable additional well\-formedness checks on the
+goto program
+.TP
+\fB\-\-validate\-ssa\-equation\fR
+enable additional well\-formedness checks on the
+SSA representation
+.TP
+\fB\-\-validate\-goto\-binary\fR
+check the well\-formedness of the passed in GOTO
+binary and then exit
+.TP
+\fB\-\-interpreter\fR
+do concrete execution
+.SS "Data-flow analyses:"
+.TP
+\fB\-\-show\-struct\-alignment\fR
+show struct members that might be concurrently accessed
+.TP
+\fB\-\-show\-threaded\fR
+show instructions that may be executed by more than one thread
+.TP
+\fB\-\-show\-local\-safe\-pointers\fR
+show pointer expressions that are trivially dominated by a not\-null check
+.TP
+\fB\-\-show\-safe\-dereferences\fR
+show pointer expressions that are trivially dominated by a not\-null check
+*and* used as a dereference operand
+.TP
+\fB\-\-show\-value\-sets\fR
+show points\-to information (using value sets)
+.TP
+\fB\-\-show\-global\-may\-alias\fR
+show may\-alias information over globals
+.TP
+\fB\-\-show\-local\-bitvector\-analysis\fR
+show procedure\-local pointer analysis
+.TP
+\fB\-\-escape\-analysis\fR
+perform escape analysis
+.TP
+\fB\-\-show\-escape\-analysis\fR
+show results of escape analysis
+.TP
+\fB\-\-custom\-bitvector\-analysis\fR
+perform configurable bitvector analysis
+.TP
+\fB\-\-show\-custom\-bitvector\-analysis\fR
+show results of configurable bitvector analysis
+.TP
+\fB\-\-interval\-analysis\fR
+perform interval analysis
+.TP
+\fB\-\-show\-intervals\fR
+show results of interval analysis
+.TP
+\fB\-\-show\-uninitialized\fR
+show maybe\-uninitialized variables
+.TP
+\fB\-\-show\-points\-to\fR
+show points\-to information
+.TP
+\fB\-\-show\-rw\-set\fR
+show read\-write sets
+.TP
+\fB\-\-show\-call\-sequences\fR
+show function call sequences
+.TP
+\fB\-\-show\-reaching\-definitions\fR
+show reaching definitions
+.TP
+\fB\-\-show\-dependence\-graph\fR
+show program\-dependence graph
+.TP
+\fB\-\-show\-sese\-regions\fR
+show single\-entry\-single\-exit regions
+.SS "Safety checks:"
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-bounds\-check\fR
+enable array bounds checks
+.TP
+\fB\-\-pointer\-check\fR
+enable pointer checks
+.TP
+\fB\-\-memory\-leak\-check\fR
+enable memory leak checks
+.TP
+\fB\-\-div\-by\-zero\-check\fR
+enable division by zero checks
+.TP
+\fB\-\-signed\-overflow\-check\fR
+enable signed arithmetic over\- and underflow checks
+.TP
+\fB\-\-unsigned\-overflow\-check\fR
+enable arithmetic over\- and underflow checks
+.TP
+\fB\-\-pointer\-overflow\-check\fR
+enable pointer arithmetic over\- and underflow checks
+.TP
+\fB\-\-conversion\-check\fR
+check whether values can be represented after type cast
+.TP
+\fB\-\-undefined\-shift\-check\fR
+check shift greater than bit\-width
+.TP
+\fB\-\-float\-overflow\-check\fR
+check floating\-point for +/\-Inf
+.TP
+\fB\-\-nan\-check\fR
+check floating\-point for NaN
+.TP
+\fB\-\-enum\-range\-check\fR
+checks that all enum type expressions have values in the enum range
+.TP
+\fB\-\-pointer\-primitive\-check\fR
+checks that all pointers in pointer primitives are valid or null
+.TP
+\fB\-\-retain\-trivial\-checks\fR
+include checks that are trivially true
+.TP
+\fB\-\-error\-label\fR label
+check that label is unreachable
+.TP
+\fB\-\-no\-built\-in\-assertions\fR
+ignore assertions in built\-in library
+.TP
+\fB\-\-no\-assertions\fR
+ignore user assertions
+.TP
+\fB\-\-no\-assumptions\fR
+ignore user assumptions
+.TP
+\fB\-\-assert\-to\-assume\fR
+convert user assertions to assumptions
+.TP
+\fB\-\-uninitialized\-check\fR
+add checks for uninitialized locals (experimental)
+.TP
+\fB\-\-stack\-depth\fR n
+add check that call stack size of non\-inlined functions never exceeds n
+.TP
+\fB\-\-race\-check\fR
+add floating\-point data race checks
+.SS "Semantic transformations:"
+.TP
+\fB\-\-nondet\-volatile\fR
+.TQ
+\fB\-\-nondet\-volatile\-variable\fR \fIvariable\fR
+By default, \fBcbmc\fR(1) treats volatile variables the same as non-volatile
+variables.  That is, it assumes that a volatile variable does not change between
+subsequent reads, unless it was written to by the program. With the above
+options, \fBgoto\-instrument\fR can be instructed to instrument the given goto
+program such as to (1) make reads from all volatile expressions
+non-deterministic (\fB\-\-nondet\-volatile\fR), (2) make reads from specific
+variables non-deterministic (\fB\-\-nondet\-volatile\-variable\fR), or (3) model
+reads from specific variables by given models
+(\fB\-\-nondet\-volatile\-model\fR).
+
+Below we give two usage examples for the options. Consider the following test,
+for function \fIget_celsius\fR and with harness \fItest_get_celsius\fR:
+
+.EX
+.in +4n
+\fB#include\fP \fC<assert.h>\fP
+\fB#include\fP \fC<limits.h>\fP
+\fB#include\fP \fC<stdint.h>\fP
+
+\fB// hardware sensor for temperature in kelvin\fP
+\fBextern\fP \fBvolatile\fP uint16_t temperature;
+
+int \fBget_celsius\fP() {
+  \fBif\fP (temperature > (1000 + 273)) {
+    \fBreturn\fP INT_MIN; \fB// value indicating error\fP
+  }
+  \fBreturn\fP temperature - 273;
+}
+
+void \fBtest_get_celsius\fP() {
+  int t = \fBget_celsius\fP();
+  \fBassert\fP(t == INT_MIN || t <= 1000);
+  \fBassert\fP(t == INT_MIN || t >= -273);
+}
+.in
+.EE
+
+Here the variable \fItemperature\fR corresponds to a hardware sensor. It returns
+the current temperature on each read. The \fIget_celsius\fR function converts
+the value in Kelvin to degrees Celsius, given the value is in the expected
+range.  However, it has a bug where it reads \fItemperature\fR a second time
+after the check, which may yield a value for which the check would not succeed.
+Verifying this program as is with \fBcbmc\fR(1) would yield a verification
+success. We can use \fBgoto\-instrument\fR to make reads from \fItemperature\fR
+non-deterministic:
+
+.EX
+.in +4n
+goto-cc -o get_celsius_test.gb get_celsius_test.c
+goto-instrument --nondet-volatile-variable temperature \\
+  get_celsius_test.gb get_celsius_test-mod.gb
+cbmc --function test_get_celsius get_celsius_test-mod.gb
+.in
+.EE
+
+Here the final invocation of \fBcbmc\fR(1) correctly reports a verification
+failure.
+.TP
+\fB\-\-nondet\-volatile\-model\fR \fIvariable\fR:\fImodel\fR
+Simply treating volatile variables as non-deterministic may for some use cases
+be too inaccurate. Consider the following test, for function \fIget_message\fR
+and with harness \fItest_get_message\fR:
+
+.EX
+.in +4n
+\fB#include\fP \fC<assert.h>\fP
+\fB#include\fP \fC<stdint.h>\fP
+
+\fBextern\fP \fBvolatile\fP uint32_t clock;
+
+\fBtypedef\fP \fBstruct\fP message {
+  uint32_t timestamp;
+  void *data;
+} message_t;
+
+void *\fBread_data\fP();
+
+message_t \fBget_message\fP() {
+  message_t msg;
+  msg.timestamp = clock;
+  msg.data = \fBread_data\fP();
+  \fBreturn\fP msg;
+}
+
+void \fBtest_get_message\fP() {
+  message_t msg1 = \fBget_message\fP();
+  message_t msg2 = \fBget_message\fP();
+  \fBassert\fP(msg1.timestamp <= msg2.timestamp);
+}
+.in
+.EE
+
+The harness verifies that \fIget_message\fR assigns non-decreasing time stamps
+to the returned messages. However, simply treating \fIclock\fR as
+non-deterministic would not allow to prove this property. Thus, we can supply a
+model for reads from \fIclock\fR:
+
+.EX
+.in +4n
+\fB// model for reads of the variable clock\fP
+uint32_t \fBclock_read_model\fP() {
+  \fBstatic\fP uint32_t clock_value = 0;
+  uint32_t increment;
+  \fB__CPROVER_assume\fP(increment <= 100);
+  clock_value += increment;
+  \fBreturn\fP clock_value;
+}
+.in
+.EE
+
+The model is stateful in that it keeps the current clock value between
+invocations in the variable \fIclock_value\fR. On each invocation, it increments
+the clock by a non-deterministic value in the range 0 to 100. We can tell
+\fBgoto-instrument\fR to use the model \fIclock_read_model\fR for reads from the
+variable \fIclock\fR as follows:
+
+.EX
+.in +4n
+goto-cc -o get_message_test.gb get_message_test.c
+goto-instrument --nondet-volatile-model clock:clock_read_model \\
+  get_message_test.gb get_message_test-mod.gb
+cbmc --function get_message_test get_message_test-mod.gb
+.in
+.EE
+
+Now the final invocation of \fBcbmc\fR(1) reports verification success.
+.TP
+\fB\-\-isr\fR \fIfunction\fR
+instruments an interrupt service routine
+.TP
+\fB\-\-mmio\fR
+instruments memory\-mapped I/O
+.TP
+\fB\-\-nondet\-static\fR
+add nondeterministic initialization of variables with static lifetime
+.TP
+\fB\-\-nondet\-static\-exclude\fR \fIe\fR
+same as nondet\-static except for the variable \fIe\fR
+(use multiple times if required)
+.TP
+\fB\-\-function\-enter\fR \fIf\fR
+.TQ
+\fB\-\-function\-exit\fR \fIf\fR
+.TQ
+\fB\-\-branch\fR \fIf\fR
+instruments a call to \fIf\fR at the beginning,
+the exit, or a branch point, respectively
+.TP
+\fB\-\-splice\-call\fR \fIcaller\fR,\fIcallee\fR
+prepends a call to \fIcallee\fR in the body of \fIcaller\fR
+.TP
+\fB\-\-check\-call\-sequence\fR \fIseq\fR
+instruments checks to assert that all call
+sequences match \fIseq\fR
+.TP
+\fB\-\-undefined\-function\-is\-assume\-false\fR
+convert each call to an undefined function to assume(false)
+.TP
+\fB\-\-insert\-final\-assert\-false\fR \fIfunction\fR
+generate assert(false) at end of \fIfunction\fR
+.TP
+\fB\-\-generate\-function\-body\fR \fIregex\fR
+This transformation inserts implementations of functions without definition,
+i.e., a body. The behavior of the generated function is chosen via
+\fB\-\-generate\-function\-body\-options\fR \fIoption\fR:
+.TP
+\fB\-\-generate\-function\-body\-options\fR \fIoption\fR
+One of \fBassert\-false\fR, \fBassume\-false\fR,
+\fBnondet\-return\fR, \fBassert\-false\-assume\-false\fR and
+\fBhavoc\fR[,\fBparams:\fR\fIregex\fR][,\fBglobals:\fR\fIregex\fR][,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..]
+(default: \fBnondet\-return\fR)
+.IP
+\fBassert\-false\fR: The body consists of a single command: \fBassert(0)\fR.
+.IP
+\fBassume\-false\fR: The body consists of a single command: \fBassume(0)\fR.
+.IP
+\fBassert\-false\-assume\-false\fR: Two commands as above.
+.IP
+\fBnondet\-return\fR: The generated function returns a non-deterministic value
+of its return type.
+.IP
+\fBhavoc\fR[,\fBparams:\fR\fIp-regex\fR][,\fBglobals:\fR\fIg-regex\fR]:
+Assign non-deterministic values to the targets of pointer-to-non-constant
+parameters matching the regular expression \fIp-regex\fR, and non-constant
+globals matching \fIg-regex\fR, and then (in case of non-void function)
+returning as with \fBnondet\-return\fR.
+The following example demonstrates the use:
+
+.EX
+.in +4n
+\fB// main.c\fP
+int global;
+\fBconst\fP int c_global;
+int \fBfunction\fP(int *param, \fBconst\fP int *c_param);
+.in
+.EE
+
+Often we want to avoid overwriting internal symbols, i.e., those with an
+\fB__\fR prefix, which is done using the pattern \fB(?!__)\fR.
+
+.EX
+.in +4n
+goto-cc main.c -o main.gb
+goto-instrument main.gb main-out.gb \\
+  --generate-function-body-options 'havoc,params:(?!__).*,globals:(?!__).*' \\
+  --generate-funtion-body function
+.in
+.EE
+
+This leads to a GOTO binary equivalent to the following C code:
+
+.EX
+.in +4n
+\fB// main-mod.c\fP
+int \fBfunction\fP(int *param, \fBconst\fP int *c_param) {
+  *param = \fBnondet_int\fP();
+  global = \fBnondet_int\fP();
+  \fBreturn\fP \fBnondet_int\fP();
+}
+.in
+.EE
+
+The parameters should that should be non-deterministically updated can be
+specified either by a regular expression (as above) or by a semicolon-separated
+list of their numbers. For example \fIhavoc,params:0;3;4\fR will assign
+non-deterministic values to the first, fourth, and fifth parameter.
+
+Note that only parameters of pointer type can be havoced and
+\fBgoto\-instrument\fR will produce an error report if given a parameter number
+associated with a non-pointer parameter. Requesting to havoc a parameter with a
+number higher than the number of parameters a given function takes will also
+results in an error report.
+.TP
+\fB\-\-generate\-havocing\-body\fR \fIoption\fR \fIfun_name\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..
+.TQ
+\fB\-\-generate\-havocing\-body\fR \fIoption\fR \fIfun_name\fR[,\fIcall\-site\-id\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..>]+
+Request a different implementation for a number of
+call-sites of a single function. The option \fB\-\-generate\-havocing\-body\fR
+inserts new functions for selected call-sites and replaces the calls to the
+origin function with calls to the respective new functions.
+
+.EX
+.in +4n
+\fB// main.c\fP
+int \fBfunction\fP(int *first, int *second, int *third);
+
+int \fBmain\fP() {
+  int a = 10;
+  int b = 10;
+  int c = 10;
+  \fBfunction\fP(&a, &b, &c);
+  \fBfunction\fP(&a, &b, &c);
+}
+.in
+.EE
+
+The user can specify different behavior for each call-site as follows:
+
+.EX
+.in +4n
+goto-cc main.c -o main.gb
+goto-instrument main.gb  main-mod.gb \\
+  --generate-havocing-body 'function,1,params:0;2,2,params:1'
+.in
+.EE
+
+This results in a GOTO binary equivalent to:
+
+.EX
+.in +4n
+\fB// main-mod.c\fP
+int \fBfunction_1\fP(int *first, int *second, int *third) {
+  *first = \fBnondet_int\fP();
+  *third = \fBnondet_int\fP();
+}
+
+int \fBfunction_2\fP(int *first, int *second, int *third) { *second = \fBnondet_int\fP(); }
+
+int \fBmain\fP() {
+  int a = 10;
+  int b = 10;
+  int c = 10;
+  \fBfunction_1\fP(&a, &b, &c);
+  \fBfunction_2\fP(&a, &b, &c);
+}
+.in
+.EE
+.TP
+\fB\-\-restrict\-function\-pointer\fR
+\fIpointer_name\fR/\fItarget\fR[,\fItargets\fR]* Replace function pointers by a
+user-defined set of targets. This may be required when
+\fB\-\-remove\-function\-pointers\fR creates to large a set of direct calls.
+Consider the example presented for \fB\-\-remove\-function\-pointers\fR. Assume
+that \fIcall\fR will always receive pointers to either \fIf\fR or \fIg\fR during
+actual executions of the program, and symbolic execution for \fIh\fR is too
+expensive to simply ignore the cost of its branch.
+
+To facilitate the controlled replace, we will label the places in each
+function where function pointers are being called, to this pattern:
+
+\fIfunction-name\fR.\fBfunction_pointer_call\fR.\fIN\fR
+
+where \fIN\fR is refers to the \fIN\fR-th function call via a function pointer
+in \fIfunction-name\fR, i.e., the first call to a
+function pointer in a function will have \fIN=1\fR, the fifth \fIN=5\fR etc.
+Alternatively, if the calls carry labels in the source code, we can also refer
+to a function pointer as
+
+\fIfunction-name\fR.\fIlabel\fR
+
+To implement this assumption that the first call to a function pointer in
+function \fIcall\fR an only be a call to \fIf\fR or \fIg\fR, use
+
+.EX
+.in +4n
+goto-instrument --restrict-function-pointer \\
+  call.function_pointer_call.1/f,g in.gb out.gb
+.in
+.EE
+
+The resulting output (written to GOTO binary \fIout.gb\fR) looks similar to the
+original example, except now there will not be a call to \fIh\fR:
+
+.EX
+.in +4n
+void \fBcall\fP(fptr_t fptr) {
+  int r;
+  \fBif\fP (fptr == &f) {
+    r = \fBf\fP(10);
+  } \fBelse\fP \fBif\fP (fptr == &g) {
+    r = \fBg\fP(10);
+  } \fBelse\fP {
+    \fB// sanity check\fP
+    \fBassert\fP(false);
+    \fBassume\fP(false);
+  }
+  \fBreturn\fP r;
+}
+.in
+.EE
+
+As another example imagine we have a simple virtual filesystem API and
+implementation like this:
+
+.EX
+.in +4n
+\fBtypedef\fP \fBstruct\fP filesystem_t filesystem_t;
+\fBstruct\fP filesystem_t {
+  int (*open)(filesystem_t *filesystem, \fBconst\fP char *file_name);
+};
+
+int \fBfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) {
+  filesystem->\fBopen\fP(filesystem, file_name);
+}
+
+int \fBnullfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) { \fBreturn\fP -1; }
+
+filesystem_t nullfs_val = {.open = nullfs_open};
+filesystem *\fBconst\fP nullfs = &nullfs_val;
+
+filesystem_t *\fBget_fs_impl\fP() {
+  \fB// some fancy logic to determine\fP
+  \fB// which filesystem we're getting -\fP
+  \fB// in-memory, backed by a database, OS file system\fP
+  \fB// - but in our case, we know that\fP
+  \fB// it always ends up being nullfs\fP
+  \fB// for the cases we care about\fP
+  \fBreturn\fP nullfs;
+}
+int \fBmain\fP(void) {
+  filesystem_t *fs = \fBget_fs_impl\fP();
+  \fBassert\fP(\fBfs_open\fP(fs, \fC"hello.txt"\fP) != -1);
+}
+.in
+.EE
+
+In this case, the assumption is that in function \fImain\fR, \fIfs\fR can be
+nothing other than \fInullfs\fR. But perhaps due to the logic being too
+complicated, symbolic execution ends up being unable to figure this out, so in
+the call to \fIfs_open\fR we end up branching on all functions matching the
+signature of \fIfilesystem_t::open\fR, which could be quite a few functions
+within the program.  Worst of all, if its address is ever taken in the program,
+as far as function pointer removal via \fB\-\-remove\-function\-pointers\fR is
+concerned it could be \fIfs_open\fR itself due to it having a matching
+signature, leading to symbolic execution being forced to follow a potentially
+infinite recursion until its unwind limit.
+
+In this case we can again restrict the function pointer to the value which we
+know it will have:
+
+.EX
+.in +4n
+goto-instrument --restrict-function-pointer \\
+  fs_open.function_pointer_call.1/nullfs_open in.gb out.gb
+.in
+.EE
+.TP
+\fB\-\-function\-pointer\-restrictions\-file\fR \fIfile_name\fR
+If you have many places where you want to restrict function pointers, it'd be a
+nuisance to have to specify them all on the command line. In these cases, you
+can specify a file to load the restrictions from instead, which you can give the
+name of a JSON file with this format:
+
+.EX
+.in +4n
+{
+  "function_call_site_name": ["function1", "function2", ...],
+   ...
+}
+.in
+.EE
+
+If you pass in multiple files, or a mix of files and command line
+restrictions, the final restrictions will be a set union of all specified
+restrictions.
+
+Note that if something goes wrong during type checking (i.e., making sure that
+all function pointer replacements refer to functions in the symbol table that
+have the correct type), the error message will refer to the command line option
+\fB\-\-restrict\-function\-pointer\fR regardless of whether the restriction in
+question came from the command line or a file.
+.TP
+\fB\-\-restrict\-function\-pointer\-by\-name\fR \fIsymbol_name\fR/\fItarget\fR[,\fItargets\fR]*
+Restrict a function pointer where \fIsymbol_name\fR is the unmangled name,
+before labeling function pointers.
+.TP
+\fB\-\-remove\-calls\-no\-body\fR
+remove calls to functions without a body
+.TP
+\fB\-\-add\-library\fR
+add models of C library functions
+.TP
+\fB\-\-malloc\-may\-fail\fR
+allow malloc calls to return a null pointer
+.TP
+\fB\-\-malloc\-fail\-assert\fR
+set malloc failure mode to assert\-then\-assume
+.TP
+\fB\-\-malloc\-fail\-null\fR
+set malloc failure mode to return null
+.TP
+\fB\-\-string\-abstraction\fR
+track C string lengths and zero\-termination
+.TP
+\fB\-\-model\-argc\-argv\fR \fIn\fR
+Create up to \fIn\fR non-deterministic C strings as entries to \fIargv\fR and
+set \fIargc\fR accordingly. In absence of such modelling, \fIargv\fR is left
+uninitialized except for a terminating \fBNULL\fR pointer. Consider the
+following example:
+
+.EX
+.in +4n
+\fB// needs_argv.c\fP
+\fB#include\fP \fC<assert.h>\fP
+
+int \fBmain\fP(int argc, char *argv[]) {
+  \fBif\fP (argc >= 2)
+    \fBassert\fP(argv[1] != 0);
+
+  \fBreturn\fP 0;
+}
+.in
+.EE
+
+If \fBcbmc\fR(1) is run directly on this example, it will report a failing
+assertion for the lack of modeling of \fIargv\fR. To make the assertion succeed,
+as expected, use:
+
+.EX
+.in +4n
+goto-cc needs_argv.c
+goto-instrument --model-argc-argv 2 a.out a.out
+cbmc a.out
+.in
+.EE
+.TP
+\fB\-\-remove\-function\-body\fR \fIf\fR
+remove the implementation of function \fIf\fR (may be repeated)
+.TP
+\fB\-\-replace\-calls\fR \fIf\fR:\fIg\fR
+replace calls to \fIf\fR with calls to \fIg\fR
+.TP
+\fB\-\-max\-nondet\-tree\-depth\fR \fIN\fR
+limit size of nondet (e.g. input) object tree;
+at level N pointers are set to null
+.TP
+\fB\-\-min\-null\-tree\-depth\fR \fIN\fR
+minimum level at which a pointer can first be
+NULL in a recursively nondet initialized struct
+.SS "Semantics-preserving transformations:"
+.TP
+\fB\-\-ensure\-one\-backedge\-per\-target\fR
+transform loop bodies such that there is a
+single edge back to the loop head
+.TP
+\fB\-\-drop\-unused\-functions\fR
+drop functions trivially unreachable from main function
+.TP
+\fB\-\-remove\-pointers\fR
+converts pointer arithmetic to base+offset expressions
+.TP
+\fB\-\-constant\-propagator\fR
+propagate constants and simplify expressions
+.TP
+\fB\-\-inline\fR
+perform full inlining
+.TP
+\fB\-\-partial\-inline\fR
+perform partial inlining
+.TP
+\fB\-\-function\-inline\fR \fIfunction\fR
+transitively inline all calls \fIfunction\fR makes
+.TP
+\fB\-\-no\-caching\fR
+disable caching of intermediate results during transitive function inlining
+.TP
+\fB\-\-log\fR \fIfile\fR
+log in JSON format which code segments were inlined, use with \fB\-\-function\-inline\fR
+.TP
+\fB\-\-remove\-function\-pointers\fR
+Resolve calls via function pointers to direct function calls. Candidate
+functions are chosen based on their signature and whether or not they have their
+address taken somewhere in the program The following example illustrates the
+approach taken. Given that there are functions with these signatures available
+in the program:
+
+.EX
+.in +4n
+int \fBf\fP(int x);
+int \fBg\fP(int x);
+int \fBh\fP(int x);
+.in
+.EE
+
+And we have a call site like this:
+
+.EX
+.in +4n
+\fBtypedef\fP int (*fptr_t)(int x);
+void \fBcall\fP(fptr_t fptr) {
+  int r = \fBfptr\fP(10);
+  \fBassert\fP(r > 0);
+}
+.in
+.EE
+
+Function pointer removal will turn this into code similar to this:
+
+.EX
+.in +4n
+void \fBcall\fP(fptr_t fptr) {
+  int r;
+  \fBif\fP (fptr == &f) {
+    r = \fBf\fP(10);
+  } \fBelse\fP \fBif\fP (fptr == &g) {
+    r = \fBg\fP(10);
+  } \fBelse\fP \fBif\fP (fptr == &h) {
+    r = \fBh\fP(10);
+  } \fBelse\fP {
+    \fB// sanity check\fP
+    \fBassert\fP(false);
+    \fBassume\fP(false);
+  }
+  \fBreturn\fP r;
+}
+.in
+.EE
+
+Beware that there may be many functions matching a particular signature, and
+some of them may be costly to a subsequently run analysis. Consider using
+\fB\-\-restrict\-function\-pointer\fR to manually specify this set of functions,
+or \fB\-\-value\-set\-fi\-fp\-removal\fR.
+.TP
+\fB\-\-remove\-const\-function\-pointers\fR
+remove function pointers that are constant or constant part of an array
+.TP
+\fB\-\-value\-set\-fi\-fp\-removal\fR
+Build a flow-insensitive value set and replace function pointers by a case
+statement over the possible assignments. If the set of possible assignments is
+empty the function pointer is removed using the standard
+\fB\-\-remove\-function\-pointers\fR pass.
+.SS "Loop information and transformations:"
+.TP
+\fB\-\-show\-loops\fR
+show the loops in the program
+.TP
+\fB\-\-unwind\fR \fInr\fR
+unwind nr times
+.TP
+\fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
+unwind loop \fIL\fR with a bound of \fIB\fR
+(optionally restricted to thread \fIT\fR)
+(use \fB\-\-show\-loops\fR to get the loop IDs)
+.TP
+\fB\-\-unwindset\-file\fR \fIfile\fR
+read unwindset from file
+.TP
+\fB\-\-partial\-loops\fR
+permit paths with partial loops
+.TP
+\fB\-\-unwinding\-assertions\fR
+generate unwinding assertions
+.TP
+\fB\-\-continue\-as\-loops\fR
+add loop for remaining iterations after unwound part
+.TP
+\fB\-\-k\-induction\fR \fIk\fR
+check loops with k\-induction
+.TP
+\fB\-\-step\-case\fR
+k\-induction: do step\-case
+.TP
+\fB\-\-base\-case\fR
+k\-induction: do base\-case
+.TP
+\fB\-\-havoc\-loops\fR
+over\-approximate all loops
+.TP
+\fB\-\-accelerate\fR
+add loop accelerators
+.TP
+\fB\-\-z3\fR
+use Z3 when computing loop accelerators
+.TP
+\fB\-\-skip\-loops\fR \fIloop\-ids\fR
+add gotos to skip selected loops during execution
+.TP
+\fB\-\-show\-lexical\-loops\fR
+Show lexical loops.
+.\" from src/analyses/lexical_loops.h
+A lexical loop is a block of goto program instructions with a single entry
+edge at the top and a single backedge leading from bottom to top, where
+"top" and "bottom" refer to program order. The loop may have holes:
+instructions which sit in between the top and bottom in program order, but
+which can't reach the loop backedge. Lexical loops are a subset of the
+natural loops, which are cheaper to compute and include most natural loops
+generated from typical C code.
+.TP
+\fB\-\-show\-natural\-loops\fR
+Show natural loop heads.
+.\" from src/analyses/natural_loops.h
+A natural loop is when the nodes and edges of a graph make one
+self-encapsulating circle with no incoming edges from external nodes. For
+example A -> B -> C -> D -> A is a natural loop, but if B has an incoming edge
+from X, then it isn't a natural loop, because X is an external node. Outgoing
+edges don't affect the natural-ness of a loop.
+.SS "Memory model instrumentations:"
+.\" more information at http://www.cprover.org/wmm/esop13/manual.shtml
+.TP
+\fB\-\-mm\fR [\fBtso\fR|\fBpso\fR|\fBrmo\fR|\fBpower\fR]
+Instruments the program so that it can be verified for different weak memory
+models with a model-checker verifying sequentially consistent programs.
+.TP
+\fB\-\-scc\fR
+detects critical cycles per SCC (one thread per SCC)
+.TP
+\fB\-\-one\-event\-per\-cycle\fR
+only instruments one event per cycle
+.TP
+\fB\-\-minimum\-interference\fR
+instruments an optimal number of events
+.TP
+\fB\-\-my\-events\fR
+only instruments events whose ids appear in inst.evt
+.TP
+\fB\-\-read\-first\fR, \fB\-\-write\-first\fR
+only instrument cycles where a read or
+write occurs as first event, respectively
+.TP
+\fB\-\-max\-var\fR \fIN\fR
+limit cycles to \fIN\fR variables read/written
+.TP
+\fB\-\-max\-po\-trans\fR \fIN\fR
+limit cycles to \fIN\fR program\-order edges
+.TP
+\fB\-\-ignore\-arrays\fR
+instrument arrays as a single object
+.TP
+\fB\-\-cav11\fR
+always instrument shared variables, even
+when they are not part of any cycle
+.TP
+\fB\-\-force\-loop\-duplication\fR, \fB\-\-no\-loop\-duplication\fR
+optional program transformation to
+construct cycles in program loops
+.TP
+\fB\-\-cfg\-kill\fR
+enables symbolic execution used to reduce spurious cycles
+.TP
+\fB\-\-no\-dependencies\fR
+no dependency analysis
+.TP
+\fB\-\-no\-po\-rendering\fR
+no representation of the threads in the dot
+.TP
+\fB\-\-hide\-internals\fR
+do not include thread\-internal (Rfi)
+events in dot output
+.TP
+\fB\-\-render\-cluster\-file\fR
+clusterises the dot by files
+.TP
+\fB\-\-render\-cluster\-function\fR
+clusterises the dot by functions
+.SS "Slicing:"
+.TP
+\fB\-\-fp\-reachability\-slice\fR \fIf\fR
+Remove instructions that cannot appear on a trace
+that visits all given functions. The list of
+functions has to be given as a comma separated
+list \fIf\fR.
+.TP
+\fB\-\-reachability\-slice\fR
+remove instructions that cannot appear on a trace
+from entry point to a property
+.TP
+\fB\-\-full\-slice\fR
+slice away instructions that don't affect assertions
+.TP
+\fB\-\-property\fR \fIid\fR
+slice with respect to specific property \fIid\fR only
+.TP
+\fB\-\-slice\-global\-inits\fR
+slice away initializations of unused global variables
+.TP
+\fB\-\-aggressive\-slice\fR
+remove bodies of any functions not on the shortest path between
+the start function and the function containing the property(s)
+.TP
+\fB\-\-aggressive\-slice\-call\-depth\fR \fIn\fR
+used with \fB\-\-aggressive\-slice, preserves all functions within \fIn\fR
+function calls of the functions on the shortest path
+.TP
+\fB\-\-aggressive\-slice\-preserve\-function\fR \fIf\fR
+force the aggressive slicer to preserve function \fIf\fR
+.TP
+\fB\-\-aggressive\-slice\-preserve\-functions\-containing\fR \fIf\fR
+force the aggressive slicer to preserve all functions with names containing
+\fIf\fR
+.TP
+\fB\-\-aggressive\-slice\-preserve\-all\-direct\-paths\fR
+force aggressive slicer to preserve all direct paths
+.SS "Code contracts:"
+.TP
+\fB\-\-apply\-loop\-contracts\fR
+check and use loop contracts when provided
+.TP
+\fB\-\-replace\-call\-with\-contract\fR \fIfun\fR
+replace calls to \fIfun\fR with \fIfun\fR's contract
+.TP
+\fB\-\-enforce\-contract\fR \fIfun\fR
+wrap \fIfun\fR with an assertion of its contract
+.SS "User-interface options:"
+.TP
+\fB\-\-flush\fR
+flush every line of output
+.TP
+\fB\-\-xml\fR
+output files in XML where supported
+.TP
+\fB\-\-xml\-ui\fR
+use XML\-formatted output
+.TP
+\fB\-\-json\-ui\fR
+use JSON\-formatted output
+.TP
+\fB\-\-verbosity\fR \fIn\fR
+verbosity level
+.TP
+\fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
+Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
+monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto-cc (1)
+.SH COPYRIGHT
+2008\-2013, Daniel Kroening
