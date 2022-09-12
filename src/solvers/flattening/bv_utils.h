@@ -191,9 +191,7 @@ public:
 
   static bvt zeros(std::size_t new_size)
   {
-    bvt result;
-    result.resize(new_size, const_literal(false));
-    return result;
+    return bvt(new_size, const_literal(false));
   }
 
   void set_equal(const bvt &a, const bvt &b);
