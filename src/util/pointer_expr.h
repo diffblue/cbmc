@@ -1059,6 +1059,62 @@ inline void validate_expr(const object_size_exprt &value)
     "Object size expression must have pointer typed operand.");
 }
 
+/// A predicate that indicates that a zero-terminated string
+/// starts at the given address
+class is_cstring_exprt : public unary_predicate_exprt
+{
+public:
+  explicit is_cstring_exprt(exprt address)
+    : unary_predicate_exprt(ID_is_cstring, std::move(address))
+  {
+    PRECONDITION(as_const(*this).address().type().id() == ID_pointer);
+  }
+
+  exprt &address()
+  {
+    return op0();
+  }
+
+  const exprt &address() const
+  {
+    return op0();
+  }
+};
+
+template <>
+inline bool can_cast_expr<is_cstring_exprt>(const exprt &base)
+{
+  return base.id() == ID_is_cstring;
+}
+
+inline void validate_expr(const is_cstring_exprt &value)
+{
+  validate_operands(value, 1, "is_cstring must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref is_cstring_exprt
+///
+/// \a expr must be known to be \ref is_cstring_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref is_cstring_exprt
+inline const is_cstring_exprt &to_is_cstring_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_is_cstring);
+  const is_cstring_exprt &ret = static_cast<const is_cstring_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_is_cstring_expr(const exprt &)
+inline is_cstring_exprt &to_is_cstring_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_is_cstring);
+  is_cstring_exprt &ret = static_cast<is_cstring_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 /// A predicate that indicates that the object pointed to is live
 class live_object_exprt : public unary_predicate_exprt
 {
