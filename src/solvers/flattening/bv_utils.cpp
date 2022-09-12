@@ -615,10 +615,10 @@ literalt bv_utilst::overflow_negate(const bvt &bv)
   // a overflow on unary- can only happen with the smallest
   // representable number 100....0
 
-  bvt zeros(bv);
-  zeros.erase(--zeros.end());
+  bvt should_be_zeros(bv);
+  should_be_zeros.pop_back();
 
-  return prop.land(bv[bv.size()-1], !prop.lor(zeros));
+  return prop.land(bv[bv.size() - 1], !prop.lor(should_be_zeros));
 }
 
 void bv_utilst::incrementer(
