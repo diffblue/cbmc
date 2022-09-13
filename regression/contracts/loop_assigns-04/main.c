@@ -17,7 +17,7 @@ void main()
   b->data[5] = 0;
   for(unsigned i = 0; i < SIZE; i++)
     // clang-format off
-    __CPROVER_assigns(i, __CPROVER_POINTER_OBJECT(b->data))
+    __CPROVER_assigns(i, __CPROVER_object_whole(b->data))
     __CPROVER_loop_invariant(i <= SIZE)
     // clang-format on
     {

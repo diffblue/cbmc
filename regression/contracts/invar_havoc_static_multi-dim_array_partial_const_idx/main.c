@@ -11,7 +11,7 @@ void main()
   data[4][5][6] = 0;
 
   for(unsigned i = 0; i < SIZE; i++)
-    __CPROVER_assigns(i, __CPROVER_POINTER_OBJECT(data))
+    __CPROVER_assigns(i, __CPROVER_object_whole(data))
       __CPROVER_loop_invariant(i <= SIZE)
     {
       data[4][i][6] = 1;

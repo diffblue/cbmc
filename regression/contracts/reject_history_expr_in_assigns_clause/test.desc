@@ -1,7 +1,7 @@
 CORE
 main.c
 --enforce-contract foo
-^main.c.*error: assigns clause target must be a non-void lvalue, a call to __CPROVER_POINTER_OBJECT or a call to a function returning void$
+^.*error: assigns clause target must be a non-void lvalue or a call to a function returning void$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$
 ^SIGNAL=0$

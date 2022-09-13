@@ -1,0 +1,23 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)0\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)i\] is assignable: FAILURE$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assigns.\d+\] .* Check that __CPROVER_assignable\(\(.*\)&b->data\[\(.*\)0\], 1ul?l?, FALSE\) is valid: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[0\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[1\] == 0: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[2\] == 0: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[3\] == 0: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[4\] == 0: SUCCESS$
+^VERIFICATION FAILED$
+--
+^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: FAILED$
+--
+This test shows that __CPROVER_typed_target is supported in loop contracts,
+and gets translated to __CPROVER_assignable(&target, sizeof(target), FALSE)
+for scalar targets.

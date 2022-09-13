@@ -1,0 +1,21 @@
+CORE
+main.c
+--apply-loop-contracts
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)0\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)1\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)2\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)i\] is assignable: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[0\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[1\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[2\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[3\] == 0: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[4\] == 0: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test shows that __CPROVER_object_upto is supported in loop contracts.

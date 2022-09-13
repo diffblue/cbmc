@@ -20,7 +20,7 @@ Date: July 2021
 
 void havoc_utilst::append_full_havoc_code(
   const source_locationt location,
-  goto_programt &dest) const
+  goto_programt &dest)
 {
   for(const auto &expr : assigns)
     append_havoc_code_for_expr(location, expr, dest);
@@ -29,7 +29,7 @@ void havoc_utilst::append_full_havoc_code(
 void havoc_utilst::append_havoc_code_for_expr(
   const source_locationt location,
   const exprt &expr,
-  goto_programt &dest) const
+  goto_programt &dest)
 {
   if(expr.id() == ID_index || expr.id() == ID_dereference)
   {
