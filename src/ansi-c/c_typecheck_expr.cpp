@@ -2316,6 +2316,90 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(is_list_expr);
   }
+  else if(identifier == CPROVER_PREFIX "is_dll")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "is_dll expects one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    if(
+      expr.arguments()[0].type().id() != ID_pointer ||
+      to_pointer_type(expr.arguments()[0].type()).base_type().id() !=
+        ID_struct_tag)
+    {
+      error().source_location = expr.arguments()[0].source_location();
+      error() << "is_dll expects a struct-pointer operand" << eom;
+      throw 0;
+    }
+
+    predicate_exprt is_dll_expr("is_dll");
+    is_dll_expr.operands() = expr.arguments();
+    is_dll_expr.add_source_location() = source_location;
+
+    return std::move(is_dll_expr);
+  }
+  else if(identifier == CPROVER_PREFIX "is_cyclic_dll")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "is_cyclic_dll expects one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    if(
+      expr.arguments()[0].type().id() != ID_pointer ||
+      to_pointer_type(expr.arguments()[0].type()).base_type().id() !=
+        ID_struct_tag)
+    {
+      error().source_location = expr.arguments()[0].source_location();
+      error() << "is_cyclic_dll expects a struct-pointer operand" << eom;
+      throw 0;
+    }
+
+    predicate_exprt is_cyclic_dll_expr("is_cyclic_dll");
+    is_cyclic_dll_expr.operands() = expr.arguments();
+    is_cyclic_dll_expr.add_source_location() = source_location;
+
+    return std::move(is_cyclic_dll_expr);
+  }
+  else if(identifier == CPROVER_PREFIX "is_sentinel_dll")
+  {
+    if(expr.arguments().size() != 2 && expr.arguments().size() != 3)
+    {
+      error().source_location = f_op.source_location();
+      error() << "is_sentinel_dll expects two or three operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    for(const auto &argument : expr.arguments())
+    {
+      if(
+        argument.type().id() != ID_pointer ||
+        to_pointer_type(argument.type()).base_type().id() != ID_struct_tag)
+      {
+        error().source_location = expr.arguments()[0].source_location();
+        error() << "is_sentinel_dll_node expects struct-pointer operands"
+                << eom;
+        throw 0;
+      }
+    }
+
+    predicate_exprt is_sentinel_dll_expr("is_sentinel_dll");
+    is_sentinel_dll_expr.operands() = expr.arguments();
+    is_sentinel_dll_expr.add_source_location() = source_location;
+
+    return std::move(is_sentinel_dll_expr);
+  }
   else if(identifier == CPROVER_PREFIX "is_cstring")
   {
     if(expr.arguments().size() != 1)
