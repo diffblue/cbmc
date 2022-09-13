@@ -557,20 +557,49 @@ TEST_CASE(
         smt_term_four_32bit));
   }
 
-  SECTION(
-    "Ensure that conversion of a minus node with only one operand"
-    "being a pointer fails")
+  SECTION("Subtraction of an integer value from a pointer")
   {
     // (*int32_t)a - 2
-    const cbmc_invariants_should_throwt invariants_throw;
-    // We don't support that - look at the test above.
+
+    // NOTE: This may look similar to the above, but the above test
+    // is a desugared version of this construct - with the difference
+    // being that there exist cases where the construct is not desugared,
+    // so we can still come across this expression as an input to
+    // convert_expr_to_smt.
+    const auto two_bvint = from_integer(2, signedbv_typet{pointer_width});
     const auto pointer_arith_expr = minus_exprt{pointer_a, two_bvint};
+
+    const symbol_tablet symbol_table;
+    const namespacet ns{symbol_table};
+    track_expression_objects(pointer_arith_expr, ns, test.object_map);
+    associate_pointer_sizes(
+      pointer_arith_expr,
+      ns,
+      test.pointer_sizes,
+      test.object_map,
+      test.object_size_function.make_application);
+    INFO("Input expr: " + pointer_arith_expr.pretty(2, 0));
+    const auto constructed_term = test.convert(pointer_arith_expr);
+    const auto expected_term = smt_bit_vector_theoryt::subtract(
+      smt_term_a,
+      smt_bit_vector_theoryt::multiply(
+        smt_term_two_32bit, smt_term_four_32bit));
+    REQUIRE(constructed_term == expected_term);
+  }
+
+  SECTION("Subtraction of pointer from integer")
+  {
+    // 2 - (*int32_t)a -- Semantically void expression, need to make sure
+    // we throw in this case.
+    const cbmc_invariants_should_throwt invariants_throw;
+
+    const auto pointer_arith_expr = minus_exprt{two_bvint, pointer_a};
+
     REQUIRE_THROWS_MATCHES(
       test.convert(pointer_arith_expr),
       invariant_failedt,
-      invariant_failure_containing(
-        "convert_expr_to_smt::minus_exprt doesn't handle expressions where"
-        "only one operand is a pointer - this is because these expressions"));
+      invariant_failure_containing("minus expressions of pointer and integer "
+                                   "expect lhs to be the pointer"));
   }
 
   SECTION("Subtraction of two pointer arguments")

@@ -724,15 +724,17 @@ static smt_termt convert_expr_to_smt(
   }
   else if(one_operand_pointer)
   {
-    UNIMPLEMENTED_FEATURE(
-      "convert_expr_to_smt::minus_exprt doesn't handle expressions where"
-      "only one operand is a pointer - this is because these expressions"
-      "are normally handled by convert_expr_to_smt::plus_exprt due to"
-      "transformations of the expressions by previous passes bringing"
-      "them into a form more suitably handled by that version of the function."
-      "If you are here, this is a mistake or something went wrong before."
-      "The expression that caused the problem is: " +
-      minus.pretty());
+    // It's semantically void to have an expression `3 - a` where `a`
+    // is a pointer.
+    INVARIANT(
+      lhs_is_pointer,
+      "minus expressions of pointer and integer expect lhs to be the pointer");
+    const auto lhs_base_type = to_pointer_type(minus.lhs().type()).base_type();
+
+    return smt_bit_vector_theoryt::subtract(
+      converted.at(minus.lhs()),
+      smt_bit_vector_theoryt::multiply(
+        converted.at(minus.rhs()), pointer_sizes.at(lhs_base_type)));
   }
   else
   {
