@@ -618,8 +618,8 @@ void goto_check_ct::mod_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero = from_integer(0, expr.op1().type());
-  const notequal_exprt inequality(expr.op1(), std::move(zero));
+  exprt zero = from_integer(0, expr.divisor().type());
+  const notequal_exprt inequality(expr.divisor(), std::move(zero));
 
   add_guarded_property(
     inequality,
