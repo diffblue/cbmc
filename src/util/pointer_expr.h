@@ -1115,63 +1115,6 @@ inline is_cstring_exprt &to_is_cstring_expr(exprt &expr)
   return ret;
 }
 
-/// An expression, akin to ISO C's strlen, that denotes the
-/// length of a zero-terminated string that starts at the
-/// given address. The trailing zero is not included in the count.
-class cstrlen_exprt : public unary_exprt
-{
-public:
-  cstrlen_exprt(exprt address, typet type)
-    : unary_exprt(ID_cstrlen, std::move(address), std::move(type))
-  {
-    PRECONDITION(as_const(*this).address().type().id() == ID_pointer);
-  }
-
-  exprt &address()
-  {
-    return op0();
-  }
-
-  const exprt &address() const
-  {
-    return op0();
-  }
-};
-
-template <>
-inline bool can_cast_expr<cstrlen_exprt>(const exprt &base)
-{
-  return base.id() == ID_cstrlen;
-}
-
-inline void validate_expr(const cstrlen_exprt &value)
-{
-  validate_operands(value, 1, "cstrlen must have one operand");
-}
-
-/// \brief Cast an exprt to a \ref cstrlen_exprt
-///
-/// \a expr must be known to be \ref cstrlen_exprt.
-///
-/// \param expr: Source expression
-/// \return Object of type \ref cstrlen_exprt
-inline const cstrlen_exprt &to_cstrlen_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_cstrlen);
-  const cstrlen_exprt &ret = static_cast<const cstrlen_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
-}
-
-/// \copydoc to_cstrlen_expr(const exprt &)
-inline cstrlen_exprt &to_cstrlen_expr(exprt &expr)
-{
-  PRECONDITION(expr.id() == ID_cstrlen);
-  cstrlen_exprt &ret = static_cast<cstrlen_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
-}
-
 /// A predicate that indicates that the object pointed to is live
 class live_object_exprt : public unary_predicate_exprt
 {
