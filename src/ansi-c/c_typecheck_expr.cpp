@@ -2441,7 +2441,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    unary_exprt cstrlen_expr("cstrlen", expr.arguments()[0], size_type());
+    cstrlen_exprt cstrlen_expr(expr.arguments()[0], size_type());
     cstrlen_expr.add_source_location() = source_location;
 
     return std::move(cstrlen_expr);
