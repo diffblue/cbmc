@@ -25,25 +25,25 @@ bvt boolbvt::convert_mod(const mod_exprt &expr)
   std::size_t width=boolbv_width(expr.type());
 
   DATA_INVARIANT(
-    expr.op0().type().id() == expr.type().id(),
-    "type of the first operand of a modulo operation shall equal the "
+    expr.dividend().type().id() == expr.type().id(),
+    "type of the dividend of a modulo operation shall equal the "
     "expression type");
 
   DATA_INVARIANT(
-    expr.op1().type().id() == expr.type().id(),
-    "type of the second operand of a modulo operation shall equal the "
+    expr.divisor().type().id() == expr.type().id(),
+    "type of the divisor of a modulo operation shall equal the "
     "expression type");
 
   bv_utilst::representationt rep=
     expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
                                   bv_utilst::representationt::UNSIGNED;
 
-  const bvt &op0 = convert_bv(expr.op0(), width);
-  const bvt &op1 = convert_bv(expr.op1(), width);
+  const bvt &dividend_bv = convert_bv(expr.dividend(), width);
+  const bvt &divisor_bv = convert_bv(expr.divisor(), width);
 
   bvt res, rem;
 
-  bv_utils.divider(op0, op1, res, rem, rep);
+  bv_utils.divider(dividend_bv, divisor_bv, res, rem, rep);
 
   return rem;
 }
