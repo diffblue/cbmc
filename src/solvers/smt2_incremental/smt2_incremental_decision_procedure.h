@@ -138,6 +138,13 @@ protected:
   /// array expressions when support for them is implemented.
   std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     expression_identifiers;
+  /// This maps from the unsorted/untyped string/symbol for the identifiers
+  /// which we have declared in SMT solver to the corresponding sorted/typed
+  /// `smt_identifier_termt`. This enables type checking the parse trees of
+  /// responses received back from the solver. It is required because without
+  /// the definitive sorts we would need to attempt to infer the sorts of
+  /// identifiers from the surrounding terms which would be a looser check with
+  /// a more complex implementation.
   std::unordered_map<irep_idt, smt_identifier_termt> identifier_table;
   /// This map is used to track object related state. See documentation in
   /// object_tracking.h for details.
