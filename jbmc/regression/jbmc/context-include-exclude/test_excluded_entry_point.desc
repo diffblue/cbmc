@@ -1,4 +1,4 @@
-CORE
+CORE broken-1804-test
 Main
 --context-exclude 'org.cprover.MyClass$Inner.' --function 'org.cprover.MyClass$Inner.doIt:(I)I'
 ^EXIT=1$

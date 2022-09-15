@@ -1,4 +1,4 @@
-CORE
+CORE broken-1804-test
 ExcludedProperties
 --context-exclude org.cprover.other --show-symbol-table --function ExcludedProperties.parameters
 ^EXIT=0$
