@@ -2291,6 +2291,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "is_list")
   {
+    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 1)
     {
       error().source_location = f_op.source_location();
@@ -2318,6 +2319,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "is_dll")
   {
+    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 1)
     {
       error().source_location = f_op.source_location();
@@ -2345,6 +2347,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "is_cyclic_dll")
   {
+    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 1)
     {
       error().source_location = f_op.source_location();
@@ -2372,6 +2375,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "is_sentinel_dll")
   {
+    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 2 && expr.arguments().size() != 3)
     {
       error().source_location = f_op.source_location();
@@ -2402,6 +2406,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "is_cstring")
   {
+    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 1)
     {
       error().source_location = f_op.source_location();
@@ -2425,6 +2430,7 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "cstrlen")
   {
+    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 1)
     {
       error().source_location = f_op.source_location();

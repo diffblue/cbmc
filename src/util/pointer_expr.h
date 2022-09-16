@@ -1060,7 +1060,8 @@ inline void validate_expr(const object_size_exprt &value)
 }
 
 /// A predicate that indicates that a zero-terminated string
-/// starts at the given address
+/// starts at the given address.
+/// This is an experimental feature for CHC encodings -- do not use.
 class is_cstring_exprt : public unary_predicate_exprt
 {
 public:
@@ -1118,6 +1119,7 @@ inline is_cstring_exprt &to_is_cstring_expr(exprt &expr)
 /// An expression, akin to ISO C's strlen, that denotes the
 /// length of a zero-terminated string that starts at the
 /// given address. The trailing zero is not included in the count.
+/// This is an experimental feature for CHC encodings -- do not use.
 class cstrlen_exprt : public unary_exprt
 {
 public:
@@ -1172,7 +1174,8 @@ inline cstrlen_exprt &to_cstrlen_expr(exprt &expr)
   return ret;
 }
 
-/// A predicate that indicates that the object pointed to is live
+/// A predicate that indicates that the object pointed to is live.
+/// This is an experimental feature for CHC encodings -- do not use.
 class live_object_exprt : public unary_predicate_exprt
 {
 public:
@@ -1227,7 +1230,8 @@ inline live_object_exprt &to_live_object_expr(exprt &expr)
   return ret;
 }
 
-/// A predicate that indicates that the object pointed to is writeable
+/// A predicate that indicates that the object pointed to is writeable.
+/// This is an experimental feature for CHC encodings -- do not use.
 class writeable_object_exprt : public unary_predicate_exprt
 {
 public:

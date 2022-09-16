@@ -10,18 +10,19 @@ __CPROVER_bool __CPROVER_equal();
 __CPROVER_bool __CPROVER_same_object(const void *, const void *);
 __CPROVER_bool __CPROVER_is_invalid_pointer(const void *);
 _Bool __CPROVER_is_zero_string(const void *);
-// a singly-linked null-terminated dynamically-allocated list
-__CPROVER_bool __CPROVER_is_list();
-__CPROVER_bool __CPROVER_is_dll();
-__CPROVER_bool __CPROVER_is_cyclic_dll();
-__CPROVER_bool __CPROVER_is_sentinel_dll();
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);
-__CPROVER_bool __CPROVER_is_cstring(const char *);
-__CPROVER_size_t __CPROVER_cstrlen(const char *);
 __CPROVER_size_t __CPROVER_buffer_size(const void *);
 __CPROVER_bool __CPROVER_r_ok();
 __CPROVER_bool __CPROVER_w_ok();
 __CPROVER_bool __CPROVER_rw_ok();
+
+// experimental features for CHC encodings -- do not use
+__CPROVER_bool __CPROVER_is_list(); // a singly-linked null-terminated dynamically-allocated list
+__CPROVER_bool __CPROVER_is_dll();
+__CPROVER_bool __CPROVER_is_cyclic_dll();
+__CPROVER_bool __CPROVER_is_sentinel_dll();
+__CPROVER_bool __CPROVER_is_cstring(const char *);
+__CPROVER_size_t __CPROVER_cstrlen(const char *);
 
 // bitvector analysis
 __CPROVER_bool __CPROVER_get_flag(const void *, const char *);
