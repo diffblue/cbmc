@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 Main
 --context-include Main.
 ^EXIT=10$
@@ -11,3 +11,6 @@ Main
 WARNING: no body for function .*
 --
 Tests that only methods from the specified class are included.
+
+The test is marked "THOROUGH" as it requires more memory than may be available
+on some GitHub runners.
