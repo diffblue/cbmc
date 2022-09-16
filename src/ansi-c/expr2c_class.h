@@ -141,8 +141,8 @@ protected:
   std::string convert_overflow(
     const exprt &src, unsigned &precedence);
 
-  std::string convert_quantifier(
-    const quantifier_exprt &,
+  std::string convert_binding(
+    const binding_exprt &,
     const std::string &symbol,
     unsigned precedence);
 
