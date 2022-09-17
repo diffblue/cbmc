@@ -877,8 +877,8 @@ void c_typecheck_baset::typecheck_declaration(
         // create a contract symbol
         symbolt contract;
         contract.name = "contract::" + id2string(new_symbol.name);
-        contract.base_name = new_symbol.name;
-        contract.pretty_name = new_symbol.name;
+        contract.base_name = new_symbol.base_name;
+        contract.pretty_name = new_symbol.pretty_name;
         contract.is_property = true;
         contract.type = code_type;
         contract.mode = new_symbol.mode;
