@@ -93,7 +93,7 @@ public:
 protected:
   CLONE
 
-  /// \copydoc abstract_object::merge
+  /// \copydoc abstract_objectt::merge
   abstract_object_pointert merge(
     const abstract_object_pointert &other,
     const widen_modet &widen_mode) const override;

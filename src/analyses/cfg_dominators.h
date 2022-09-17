@@ -256,7 +256,8 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 
 /// Pretty-print a single node in the dominator tree. Supply a specialisation if
 /// operator<< is not sufficient.
-/// \par parameters: `node` to print and stream `out` to pretty-print it to
+/// \param node: node to print
+/// \param out: stream to pretty-print it to
 template <class T>
 void dominators_pretty_print_node(const T &node, std::ostream &out)
 {

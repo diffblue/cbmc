@@ -291,13 +291,12 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 }
 
 /// Add association for each char pointer in the equation
-/// \param symbol_solver: a union_find_replacet object to keep track of
-///   char pointer equations
+/// \param [in,out] symbol_solver: a union_find_replacet object to keep track of
+///   char pointer equations. Char pointers that have been set equal by an
+///   equation are associated to the same element.
 /// \param equations: vector of equations
 /// \param ns: namespace
 /// \param stream: output stream
-/// \return union_find_replacet where char pointer that have been set equal
-///   by an equation are associated to the same element
 static void add_equations_for_symbol_resolution(
   union_find_replacet &symbol_solver,
   const std::vector<exprt> &equations,

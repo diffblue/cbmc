@@ -95,7 +95,7 @@ To be documented.
 
 Implemented in `src/analyses/dependence_graph.h(cpp)`. It is a graph and an
 abstract interpreter at the same time. The abstract interpretation nature
-allows a dependence graph to [build itself](#Construction)
+allows a dependence graph to [build itself](Construction)
 (the graph) from a given GOTO program.
 
 A dependence graph extends the class `grapht` with `dep_nodet` as the type of

@@ -1138,7 +1138,6 @@ void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
 ///   A function to generate a new local symbol and add it to the symbol table
 /// \param location:
 ///   Source location associated with nondet-initialization.
-/// \return Appends instructions to `assignments`
 static void allocate_nondet_length_array(
   code_blockt &assignments,
   const exprt &lhs,

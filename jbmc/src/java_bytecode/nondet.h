@@ -22,9 +22,8 @@ using allocate_local_symbolt =
 ///   const mp_integer &max_value,
 ///   const std::string &name_prefix,
 ///   const typet &int_type,
-///   const irep_idt &mode,
 ///   const source_locationt &source_location,
-///   symbol_table_baset &symbol_table,
+///   allocate_objectst &allocate_objects,
 ///   code_blockt &instructions)
 /// except the minimum and maximum values are represented as exprts.
 symbol_exprt generate_nondet_int(
@@ -35,6 +34,16 @@ symbol_exprt generate_nondet_int(
   allocate_objectst &allocate_objects,
   code_blockt &instructions);
 
+/// Same as \ref generate_nondet_int(
+///   const mp_integer &min_value,
+///   const mp_integer &max_value,
+///   const std::string &name_prefix,
+///   const typet &int_type,
+///   const source_locationt &source_location,
+///   allocate_objectst &allocate_objects,
+///   code_blockt &instructions)
+/// except the minimum and maximum values are represented as exprts, and symbols
+/// are allocated using \ref allocate_local_symbolt.
 symbol_exprt generate_nondet_int(
   const exprt &min_value_expr,
   const exprt &max_value_expr,

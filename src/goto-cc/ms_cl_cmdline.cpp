@@ -97,7 +97,6 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &arguments)
   return false;
 }
 
-/// \return none
 void ms_cl_cmdlinet::parse_env()
 {
   // first do environment
@@ -170,7 +169,6 @@ static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
   return in;
 }
 
-/// \return none
 void ms_cl_cmdlinet::process_response_file(const std::string &file)
 {
   std::ifstream infile(file);
@@ -231,7 +229,6 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   }
 }
 
-/// \return none
 void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 {
   // In a response file, multiple compiler options and source-code files can
@@ -271,7 +268,6 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
   parse(arguments);
 }
 
-/// \return none
 void ms_cl_cmdlinet::process_non_cl_option(
   const std::string &s)
 {

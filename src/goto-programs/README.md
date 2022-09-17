@@ -631,7 +631,7 @@ returned from.
 
 If the function has a return value, an \ref assignment-step-structure
 assignment will be made to a variable with identifier with suffix
-\ref remove_returns::RETURN_VALUE_SUFFIX.
+\ref RETURN_VALUE_SUFFIX.
 
 \subsection assignment-step-structure Assignment
 
