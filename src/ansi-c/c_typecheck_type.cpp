@@ -524,13 +524,10 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 
 void c_typecheck_baset::typecheck_array_type(array_typet &type)
 {
-  exprt &size=type.size();
-  const source_locationt size_source_location = size.find_source_location();
-
-  // check subtype
+  // Typecheck the element type.
   typecheck_type(type.element_type());
 
-  // we don't allow void as subtype
+  // We don't allow void as the element type.
   if(type.element_type().id() == ID_empty)
   {
     error().source_location=type.source_location();
@@ -538,7 +535,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     throw 0;
   }
 
-  // we don't allow incomplete structs or unions as subtype
+  // We don't allow incomplete structs or unions as element type.
   const typet &followed_subtype = follow(type.element_type());
 
   if(
@@ -551,7 +548,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     throw 0;
   }
 
-  // we don't allow functions as subtype
+  // We don't allow functions as element type.
   if(type.element_type().id() == ID_code)
   {
     // ISO/IEC 9899 6.7.5.2
@@ -560,10 +557,14 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     throw 0;
   }
 
-  // check size, if any
+  // We add the index type.
+  type.index_type_nonconst() = c_index_type();
 
-  if(size.is_not_nil())
+  // Check the array size, if given.
+  if(type.is_complete())
   {
+    exprt &size = type.size();
+    const source_locationt size_source_location = size.find_source_location();
     typecheck_expr(size);
     make_index_type(size);
 

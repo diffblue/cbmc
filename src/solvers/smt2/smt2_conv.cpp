@@ -3097,7 +3097,7 @@ void smt2_convt::flatten_array(const exprt &expr)
     if(i!=1)
       out << "(concat ";
     out << "(select ?far ";
-    convert_expr(from_integer(i-1, array_type.size().type()));
+    convert_expr(from_integer(i - 1, array_type.index_type()));
     out << ")";
     if(i!=1)
       out << " ";
@@ -4041,7 +4041,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       out << "(store ";
       convert_expr(expr.old());
       out << " ";
-      convert_expr(typecast_exprt(expr.where(), array_type.size().type()));
+      convert_expr(typecast_exprt(expr.where(), array_type.index_type()));
       out << " ";
       convert_expr(expr.new_value());
       out << ")";
@@ -4267,7 +4267,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
         out << "(select ";
         convert_expr(expr.array());
         out << " ";
-        convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+        convert_expr(typecast_exprt(expr.index(), array_type.index_type()));
         out << ")";
         out << " #b1)";
       }
@@ -4276,7 +4276,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
         out << "(select ";
         convert_expr(expr.array());
         out << " ";
-        convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+        convert_expr(typecast_exprt(expr.index(), array_type.index_type()));
         out << ")";
       }
     }
@@ -4891,7 +4891,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 
         // use a quantifier-based initialization instead of lambda
         out << "(assert (forall ((i ";
-        convert_type(array_type.size().type());
+        convert_type(array_type.index_type());
         out << ")) (= (select " << id << " i) ";
         if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
         {
@@ -4972,7 +4972,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       for(std::size_t i=0; i<expr.operands().size(); i++)
       {
         out << "(assert (= (select " << id << " ";
-        convert_expr(from_integer(i, array_type.size().type()));
+        convert_expr(from_integer(i, array_type.index_type()));
         out << ") "; // select
         if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
         {
@@ -5008,7 +5008,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       for(std::size_t i=0; i<tmp.operands().size(); i++)
       {
         out << "(assert (= (select " << id << ' ';
-        convert_expr(from_integer(i, array_type.size().type()));
+        convert_expr(from_integer(i, array_type.index_type()));
         out << ") "; // select
         convert_expr(tmp.operands()[i]);
         out << "))" << "\n";
@@ -5127,8 +5127,9 @@ void smt2_convt::convert_type(const typet &type)
     // we always use array theory for top-level arrays
     const typet &subtype = array_type.element_type();
 
+    // Arrays map the index type to the element type.
     out << "(Array ";
-    convert_type(array_type.size().type());
+    convert_type(array_type.index_type());
     out << " ";
 
     if(subtype.id()==ID_bool && !use_array_of_bool)
