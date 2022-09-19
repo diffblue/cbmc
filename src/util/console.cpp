@@ -227,13 +227,6 @@ std::size_t consolet::width()
   return _width;
 }
 
-extern "C" int mk_wcwidth(wchar_t ucs);
-
-int consolet::wcwidth(wchar_t ucs)
-{
-  return mk_wcwidth(ucs);
-}
-
 consolet::redirectt::redirectt(
   std::ostream &__console_out,
   std::ostream &__console_err)

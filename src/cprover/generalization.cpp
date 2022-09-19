@@ -11,9 +11,9 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "generalization.h"
 
+#include <util/console.h>
 #include <util/format_expr.h>
 
-#include "console.h"
 #include "solver.h"
 
 #include <iostream>

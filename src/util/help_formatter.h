@@ -9,8 +9,8 @@ Author: Daniel Kroening, dkr@amazon.com
 /// \file
 /// Help Formatter
 
-#ifndef CPROVER_CPROVER_HELP_FORMATTER_H
-#define CPROVER_CPROVER_HELP_FORMATTER_H
+#ifndef CPROVER_UTIL_HELP_FORMATTER_H
+#define CPROVER_UTIL_HELP_FORMATTER_H
 
 #include <iosfwd>
 #include <string>
@@ -49,4 +49,4 @@ operator<<(std::ostream &out, const help_formattert &h)
   return out;
 }
 
-#endif // CPROVER_CPROVER_HELP_FORMATTER_H
+#endif // CPROVER_UTIL_HELP_FORMATTER_H

@@ -11,7 +11,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "solver_progress.h"
 
-#include "console.h"
+#include <util/console.h>
 
 #include <iostream>
 

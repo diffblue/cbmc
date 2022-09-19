@@ -11,9 +11,9 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "report_traces.h"
 
+#include <util/console.h>
 #include <util/format_expr.h>
 
-#include "console.h"
 #include "state.h"
 
 #include <iomanip>

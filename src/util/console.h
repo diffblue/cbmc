@@ -9,8 +9,8 @@ Author: Daniel Kroening, dkr@amazon.com
 /// \file
 /// Console
 
-#ifndef CPROVER_CPROVER_CONSOLE_H
-#define CPROVER_CPROVER_CONSOLE_H
+#ifndef CPROVER_UTIL_CONSOLE_H
+#define CPROVER_UTIL_CONSOLE_H
 
 #include <cstddef>
 #include <iosfwd>
@@ -66,12 +66,6 @@ public:
 
   static std::size_t width();
 
-  // -1: not printable
-  //  0: no width
-  //  1: usual single width
-  //  2: double width
-  static int wcwidth(wchar_t);
-
   // redirection
   class redirectt
   {
@@ -95,4 +89,4 @@ protected:
   static std::ostream *_err;
 };
 
-#endif // CPROVER_CPROVER_CONSOLE_H
+#endif // CPROVER_UTIL_CONSOLE_H

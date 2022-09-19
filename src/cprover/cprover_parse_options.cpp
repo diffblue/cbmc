@@ -14,6 +14,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/config.h>
 #include <util/cout_message.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/options.h>
 #include <util/signal_catcher.h>
 #include <util/ui_message.h>
@@ -35,7 +36,6 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "c_safety_checks.h"
 #include "format_hooks.h"
-#include "help_formatter.h"
 #include "instrument_contracts.h"
 #include "instrument_given_invariants.h"
 #include "state_encoding.h"

@@ -2,7 +2,6 @@ SRC = address_taken.cpp \
       axioms.cpp \
       bv_pointers_wide.cpp \
       c_safety_checks.cpp \
-      console.cpp \
       cprover_main.cpp \
       cprover_parse_options.cpp \
       counterexample_found.cpp \
@@ -13,7 +12,6 @@ SRC = address_taken.cpp \
       format_hooks.cpp \
       free_symbols.cpp \
       generalization.cpp \
-      help_formatter.cpp \
       inductiveness.cpp \
       instrument_contracts.cpp \
       instrument_given_invariants.cpp \

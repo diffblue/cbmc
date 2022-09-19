@@ -12,6 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "inductiveness.h"
 
 #include <util/arith_tools.h>
+#include <util/console.h>
 #include <util/cout_message.h>
 #include <util/format_expr.h>
 #include <util/simplify_expr.h>
@@ -20,7 +21,6 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "axioms.h"
 #include "bv_pointers_wide.h"
-#include "console.h"
 #include "counterexample_found.h"
 #include "propagate.h"
 #include "solver.h"
