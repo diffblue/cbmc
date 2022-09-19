@@ -297,6 +297,8 @@ identifier:
           TOK_IDENTIFIER
         | TOK_CPROVER_ID TOK_STRING
         {
+          // construct an identifier from a string that would otherwise not be a
+          // valid identifier in C
           $$=$1;
           parser_stack($$).id(ID_symbol);
           irep_idt value=parser_stack($2).get(ID_value);
