@@ -595,8 +595,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       else
         offset=pointer_offset(pointer_expr);
 
-      exprt adjusted_offset;
-
       // are we doing a byte?
       auto element_size =
         pointer_offset_size(to_array_type(root_object_type).element_type(), ns);
@@ -606,19 +604,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         throw "unknown or invalid type size of:\n" +
           to_array_type(root_object_type).element_type().pretty();
       }
-      else if(*element_size == 1)
-      {
-        // no need to adjust offset
-        adjusted_offset = offset;
-      }
-      else
-      {
-        exprt element_size_expr = from_integer(*element_size, offset.type());
 
-        adjusted_offset=binary_exprt(
-          offset, ID_div, element_size_expr, offset.type());
+      exprt element_size_expr = from_integer(*element_size, offset.type());
 
-      }
+      exprt adjusted_offset =
+        simplify_expr(div_exprt{offset, element_size_expr}, ns);
 
       index_exprt index_expr{root_object, adjusted_offset};
       result.value =
