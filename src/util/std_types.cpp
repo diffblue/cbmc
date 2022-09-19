@@ -32,8 +32,14 @@ void array_typet::check(const typet &type, const validation_modet vm)
 
 typet array_typet::index_type() const
 {
-  // we may wish to make the index type part of the array type
-  return c_index_type();
+  // For backwards compatibility, allow the case that the array type is
+  // not annotated with an index type.
+  const auto &annotated_type =
+    static_cast<const typet &>(find(ID_C_index_type));
+  if(annotated_type.is_nil())
+    return c_index_type();
+  else
+    return annotated_type;
 }
 
 /// Return the sequence number of the component with given name.
