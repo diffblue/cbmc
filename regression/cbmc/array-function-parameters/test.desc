@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 test.c
 --function test --min-null-tree-depth 2 --max-nondet-tree-depth 2 --bounds-check
 ^EXIT=10$
