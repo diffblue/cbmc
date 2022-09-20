@@ -23,8 +23,10 @@ shuffle_vector_exprt::shuffle_vector_exprt(
     op1() = std::move(*vector2);
 
   const vector_typet &vt = to_vector_type(op0().type());
-  type() = vector_typet{vt.element_type(),
-                        from_integer(indices.size(), vt.size().type())};
+  type() = vector_typet{
+    vt.index_type(),
+    vt.element_type(),
+    from_integer(indices.size(), vt.size().type())};
 
   op2().operands().swap(indices);
 }

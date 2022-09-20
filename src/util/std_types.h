@@ -1007,10 +1007,18 @@ inline range_typet &to_range_type(typet &type)
 class vector_typet:public type_with_subtypet
 {
 public:
-  vector_typet(const typet &_subtype, const constant_exprt &_size);
+  vector_typet(typet index_type, typet element_type, constant_exprt size);
 
   /// The type of any index expression into an instance of this type.
   typet index_type() const;
+
+  /// The type of any index expression into an instance of this type.
+  /// This is added as a comment now for backwards compatibility, but will
+  /// eventually be the first subtype.
+  typet &index_type_nonconst()
+  {
+    return static_cast<typet &>(add(ID_C_index_type));
+  }
 
   /// The type of the elements of the vector.
   /// This method is preferred over .subtype(),
