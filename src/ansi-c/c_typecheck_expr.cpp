@@ -1442,8 +1442,10 @@ void c_typecheck_baset::typecheck_expr_rel_vector(binary_exprt &expr)
   // with the same dimension.
   auto subtype_width =
     to_bitvector_type(to_vector_type(o_type0).element_type()).get_width();
-  expr.type() =
-    vector_typet{signedbv_typet{subtype_width}, to_vector_type(o_type0).size()};
+  expr.type() = vector_typet{
+    to_vector_type(o_type0).index_type(),
+    signedbv_typet{subtype_width},
+    to_vector_type(o_type0).size()};
 
   // Replace the id as the semantics of these are point-wise application (and
   // the result is not of bool type).

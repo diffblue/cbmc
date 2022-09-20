@@ -255,10 +255,11 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     std::vector<typet> types = {
       struct_typet({{"comp1", u16}, {"comp2", u16}}),
       struct_typet({{"comp1", u32}, {"comp2", u64}}),
-      struct_typet({{"comp1", u32},
-                    {"compX", c_bit_field_typet(u8, 4)},
-                    {"pad", c_bit_field_typet(u8, 4)},
-                    {"comp2", u8}}),
+      struct_typet(
+        {{"comp1", u32},
+         {"compX", c_bit_field_typet(u8, 4)},
+         {"pad", c_bit_field_typet(u8, 4)},
+         {"comp2", u8}}),
       union_typet({{"compA", u32}, {"compB", u64}}),
       c_enum_typet(u16),
       c_enum_typet(unsignedbv_typet(128)),
@@ -272,8 +273,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       ieee_float_spect::single_precision().to_type(),
       // generates the correct value, but remains wrapped in a typecast
       // pointer_typet(u64, 64),
-      vector_typet(u8, size),
-      vector_typet(u64, size),
+      vector_typet(size_type(), u8, size),
+      vector_typet(size_type(), u64, size),
       complex_typet(s16),
       complex_typet(u64)};
 
@@ -405,10 +406,11 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
     std::vector<typet> types = {
       struct_typet({{"comp1", u16}, {"comp2", u16}}),
       struct_typet({{"comp1", u32}, {"comp2", u64}}),
-      struct_typet({{"comp1", u32},
-                    {"compX", c_bit_field_typet(u8, 4)},
-                    {"pad", c_bit_field_typet(u8, 4)},
-                    {"comp2", u8}}),
+      struct_typet(
+        {{"comp1", u32},
+         {"compX", c_bit_field_typet(u8, 4)},
+         {"pad", c_bit_field_typet(u8, 4)},
+         {"comp2", u8}}),
       union_typet({{"compA", u32}, {"compB", u64}}),
       c_enum_typet(u16),
       c_enum_typet(unsignedbv_typet(128)),
@@ -422,8 +424,8 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
       ieee_float_spect::single_precision().to_type(),
       // generates the correct value, but remains wrapped in a typecast
       // pointer_typet(u64, 64),
-      vector_typet(u8, size),
-      vector_typet(u64, size),
+      vector_typet(size_type(), u8, size),
+      vector_typet(size_type(), u64, size),
       // complex_typet(s16),
       // complex_typet(u64)
     };

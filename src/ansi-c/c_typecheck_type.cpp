@@ -219,24 +219,28 @@ void c_typecheck_baset::typecheck_type(typet &type)
       else if(gcc_attr_mode == "__V2SI__") // vector of 2 ints, deprecated
       {
         if(is_signed)
-          result=vector_typet(
-            signed_int_type(),
-            from_integer(2, size_type()));
+        {
+          result = vector_typet(
+            c_index_type(), signed_int_type(), from_integer(2, size_type()));
+        }
         else
-          result=vector_typet(
-            unsigned_int_type(),
-            from_integer(2, size_type()));
+        {
+          result = vector_typet(
+            c_index_type(), unsigned_int_type(), from_integer(2, size_type()));
+        }
       }
       else if(gcc_attr_mode == "__V4SI__") // vector of 4 ints, deprecated
       {
         if(is_signed)
-          result=vector_typet(
-            signed_int_type(),
-            from_integer(4, size_type()));
+        {
+          result = vector_typet(
+            c_index_type(), signed_int_type(), from_integer(4, size_type()));
+        }
         else
-          result=vector_typet(
-            unsigned_int_type(),
-            from_integer(4, size_type()));
+        {
+          result = vector_typet(
+            c_index_type(), unsigned_int_type(), from_integer(4, size_type()));
+        }
       }
       else // give up, just use subtype
         result = to_type_with_subtype(type).subtype();
@@ -266,13 +270,17 @@ void c_typecheck_baset::typecheck_type(typet &type)
       else if(gcc_attr_mode == "__TF__") // 128 bits
         result=gcc_float128_type();
       else if(gcc_attr_mode == "__V2SF__") // deprecated vector of 2 floats
-        result=vector_typet(float_type(), from_integer(2, size_type()));
+        result = vector_typet(
+          c_index_type(), float_type(), from_integer(2, size_type()));
       else if(gcc_attr_mode == "__V2DF__") // deprecated vector of 2 doubles
-        result=vector_typet(double_type(), from_integer(2, size_type()));
+        result = vector_typet(
+          c_index_type(), double_type(), from_integer(2, size_type()));
       else if(gcc_attr_mode == "__V4SF__") // deprecated vector of 4 floats
-        result=vector_typet(float_type(), from_integer(4, size_type()));
+        result = vector_typet(
+          c_index_type(), float_type(), from_integer(4, size_type()));
       else if(gcc_attr_mode == "__V4DF__") // deprecated vector of 4 doubles
-        result=vector_typet(double_type(), from_integer(4, size_type()));
+        result = vector_typet(
+          c_index_type(), double_type(), from_integer(4, size_type()));
       else // give up, just use subtype
         result = to_type_with_subtype(type).subtype();
 
@@ -745,7 +753,8 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   s /= *sub_size;
 
   // produce the type with ID_vector
-  vector_typet new_type(subtype, from_integer(s, signed_size_type()));
+  vector_typet new_type(
+    c_index_type(), subtype, from_integer(s, signed_size_type()));
   new_type.add_source_location() = source_location;
   new_type.size().add_source_location() = source_location;
   type = new_type;

@@ -244,16 +244,26 @@ bool is_constant_or_has_constant_components(
   return false;
 }
 
-vector_typet::vector_typet(const typet &_subtype, const constant_exprt &_size)
-  : type_with_subtypet(ID_vector, _subtype)
+vector_typet::vector_typet(
+  typet _index_type,
+  typet _element_type,
+  constant_exprt _size)
+  : type_with_subtypet(ID_vector, std::move(_element_type))
 {
-  size() = _size;
+  index_type_nonconst() = std::move(_index_type);
+  size() = std::move(_size);
 }
 
 typet vector_typet::index_type() const
 {
-  // we may wish to make the index type part of the vector type
-  return c_index_type();
+  // For backwards compatibility, allow the case that the array type is
+  // not annotated with an index type.
+  const auto &annotated_type =
+    static_cast<const typet &>(find(ID_C_index_type));
+  if(annotated_type.is_nil())
+    return c_index_type();
+  else
+    return annotated_type;
 }
 
 const constant_exprt &vector_typet::size() const
