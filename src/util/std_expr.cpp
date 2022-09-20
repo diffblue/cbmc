@@ -48,6 +48,30 @@ void constant_exprt::check(const exprt &expr, const validation_modet vm)
     "bitvector constant must not have leading zeros");
 }
 
+index_exprt::index_exprt(exprt _array, exprt _index, typet _type)
+  : binary_exprt(
+      std::move(_array),
+      ID_index,
+      std::move(_index),
+      std::move(_type))
+{
+  const auto &array_op_type = array().type();
+  PRECONDITION(
+    array_op_type.id() == ID_array || array_op_type.id() == ID_vector);
+
+  if(array_op_type.id() == ID_array)
+  {
+    // There is too much code at the moment that uses the wrong type
+    // for the index argument. We add a cast, but this will eventually
+    // become a precondition.
+    auto index_type = to_array_type(array_op_type).index_type();
+    if(index().type() != index_type)
+      index() = typecast_exprt(index(), index_type);
+  }
+  else if(array_op_type.id() == ID_vector)
+    PRECONDITION(index().type() == to_vector_type(array_op_type).index_type());
+}
+
 exprt disjunction(const exprt::operandst &op)
 {
   if(op.empty())

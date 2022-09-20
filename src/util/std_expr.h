@@ -1414,28 +1414,14 @@ public:
   // must be array_type.index_type().
   // This will eventually be enforced using a precondition.
   index_exprt(const exprt &_array, exprt _index)
-    : binary_exprt(
+    : index_exprt(
         _array,
-        ID_index,
         std::move(_index),
         to_type_with_subtype(_array.type()).subtype())
   {
-    const auto &array_op_type = _array.type();
-    PRECONDITION(
-      array_op_type.id() == ID_array || array_op_type.id() == ID_vector);
   }
 
-  index_exprt(exprt _array, exprt _index, typet _type)
-    : binary_exprt(
-        std::move(_array),
-        ID_index,
-        std::move(_index),
-        std::move(_type))
-  {
-    const auto &array_op_type = array().type();
-    PRECONDITION(
-      array_op_type.id() == ID_array || array_op_type.id() == ID_vector);
-  }
+  index_exprt(exprt _array, exprt _index, typet);
 
   exprt &array()
   {
