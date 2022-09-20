@@ -5277,8 +5277,8 @@ void smt2_convt::find_symbols_rec(
         "complex." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
 
-      out << "(declare-datatypes () ((" << smt_typename << " "
-          << "(mk-" << smt_typename;
+      out << "(declare-datatypes ((" << smt_typename << " 0)) "
+          << "(((mk-" << smt_typename;
 
       out << " (" << smt_typename << ".imag ";
       convert_type(to_complex_type(type).subtype());
@@ -5306,8 +5306,8 @@ void smt2_convt::find_symbols_rec(
         "vector." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
 
-      out << "(declare-datatypes () ((" << smt_typename << " "
-          << "(mk-" << smt_typename;
+      out << "(declare-datatypes ((" << smt_typename << " 0)) "
+          << "(((mk-" << smt_typename;
 
       for(mp_integer i=0; i!=size; ++i)
       {
@@ -5348,12 +5348,12 @@ void smt2_convt::find_symbols_rec(
       // argument for each member of the struct.  The declaration that
       // creates this type looks like:
       //
-      // (declare-datatypes () ((struct.0 (mk-struct.0
+      // (declare-datatypes ((struct.0 0)) (((mk-struct.0
       //                                   (struct.0.component1 type1)
       //                                   ...
       //                                   (struct.0.componentN typeN)))))
-      out << "(declare-datatypes () ((" << smt_typename << " "
-          << "(mk-" << smt_typename << " ";
+      out << "(declare-datatypes ((" << smt_typename << " 0)) "
+          << "(((mk-" << smt_typename << " ";
 
       for(const auto &component : components)
       {
