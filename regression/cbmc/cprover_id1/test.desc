@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test demonstrates the use of __CPROVER_ID to form identifier names that
+would not otherwise constitute syntactically identifiers in C code.
