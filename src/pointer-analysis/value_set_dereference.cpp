@@ -99,9 +99,11 @@ static json_objectt value_set_dereference_stats_to_json(
   return json_result;
 }
 
-optionalt<exprt> value_set_dereferencet::try_add_offset_to_indices(
-  const exprt &expr,
-  const exprt &offset_elements)
+/// If `expr` is of the form (c1 ? e1[o1] : c2 ? e2[o2] : c3 ? ...)
+/// then return `c1 ? e1[o1 + offset] : e2[o2 + offset] : c3 ? ...`
+/// otherwise return an empty optionalt.
+static optionalt<exprt>
+try_add_offset_to_indices(const exprt &expr, const exprt &offset_elements)
 {
   if(const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr))
   {
@@ -122,6 +124,13 @@ optionalt<exprt> value_set_dereferencet::try_add_offset_to_indices(
     if(!false_case)
       return {};
     return if_exprt{if_expr->cond(), *true_case, *false_case};
+  }
+  else if(can_cast_expr<typecast_exprt>(expr))
+  {
+    // the case of a type cast is _not_ handled here, because that would require
+    // doing arithmetic on the offset, and may result in an offset into some
+    // sub-element
+    return {};
   }
   else
   {
@@ -572,12 +581,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     else if(
       root_object_type.id() == ID_array &&
       dereference_type_compare(
-        to_array_type(root_object_type).element_type(), dereference_type, ns))
+        to_array_type(root_object_type).element_type(), dereference_type, ns) &&
+      pointer_offset_bits(to_array_type(root_object_type).element_type(), ns) ==
+        pointer_offset_bits(dereference_type, ns))
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
-      // We will require well-alignedness!
-
       exprt offset;
 
       // this should work as the object is essentially the root object
@@ -585,8 +594,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         offset=o.offset();
       else
         offset=pointer_offset(pointer_expr);
-
-      exprt adjusted_offset;
 
       // are we doing a byte?
       auto element_size =
@@ -597,25 +604,13 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         throw "unknown or invalid type size of:\n" +
           to_array_type(root_object_type).element_type().pretty();
       }
-      else if(*element_size == 1)
-      {
-        // no need to adjust offset
-        adjusted_offset = offset;
-      }
-      else
-      {
-        exprt element_size_expr = from_integer(*element_size, offset.type());
 
-        adjusted_offset=binary_exprt(
-          offset, ID_div, element_size_expr, offset.type());
+      exprt element_size_expr = from_integer(*element_size, offset.type());
 
-        // TODO: need to assert well-alignedness
-      }
+      exprt adjusted_offset =
+        simplify_expr(div_exprt{offset, element_size_expr}, ns);
 
-      const index_exprt &index_expr = index_exprt(
-        root_object,
-        adjusted_offset,
-        to_array_type(root_object_type).element_type());
+      index_exprt index_expr{root_object, adjusted_offset};
       result.value =
         typecast_exprt::conditional_cast(index_expr, dereference_type);
       result.pointer = typecast_exprt::conditional_cast(

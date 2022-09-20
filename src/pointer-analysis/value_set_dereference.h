@@ -54,12 +54,6 @@ public:
   /// \param display_points_to_sets: Display size and contents of points to sets
   exprt dereference(const exprt &pointer, bool display_points_to_sets = false);
 
-  /// If `expr` is of the form (c1 ? e1[o1] : c2 ? e2[o2] : c3 ? ...)
-  /// then return `c1 ? e1[o1 + offset] : e2[o2 + offset] : c3 ? ...`
-  /// otherwise return an empty optionalt.
-  optionalt<exprt>
-  try_add_offset_to_indices(const exprt &expr, const exprt &offset);
-
   /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
   {
