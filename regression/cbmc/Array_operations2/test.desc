@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-cprover-smt-backend
 main.c
 
 ^\[main.assertion.12\] line 34 assertion arr\[1\].c\[2\] == 0: FAILURE$
