@@ -459,9 +459,6 @@ inline code_with_contract_typet &to_code_with_contract_type(typet &type)
   return static_cast<code_with_contract_typet &>(type);
 }
 
-DEPRECATED(SINCE(2022, 1, 13, "use c_enum_constant_type() instead"))
-bitvector_typet enum_constant_type();
-
 bitvector_typet c_enum_constant_type();
 bitvector_typet c_index_type();
 signedbv_typet signed_int_type();
