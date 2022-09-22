@@ -240,6 +240,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   {
     return convert_overflow_result(*overflow_with_result);
   }
+  else if(expr.id() == ID_find_first_set)
+    return convert_bv(simplify_expr(to_find_first_set_expr(expr).lower(), ns));
 
   return conversion_failed(expr);
 }
