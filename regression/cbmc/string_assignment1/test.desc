@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^l2_rename_rvalues case `array' not handled
+^warning: ignoring
+--
+The assignment to a C string constant should be ignored by symex, even when it
+happens via a type cast to a two-dimensional array.
