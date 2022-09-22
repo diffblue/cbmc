@@ -1,4 +1,5 @@
 \ingroup module_hidden 
+
 \page code-walkthrough Code Walkthrough
 
 \author Cesar Rodriguez, Owen Jones
