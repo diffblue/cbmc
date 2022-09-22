@@ -1,0 +1,25 @@
+name: Publish CBMC documentation
+on: [push, pull_request]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install doxygen
+        run: sudo apt install doxygen graphviz pandoc
+
+      - name: Install python modules
+        run: sudo python3 -m pip install gitpython pandocfilters
+
+      - name: Build documentation
+        run: cd doc/doxygen-root && make && touch html/.nojekyll
+
+      - name: Publish documentation
+        if: ${{ github.event_name == 'push' && startsWith('refs/heads/develop', github.ref) }}
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: doc/doxygen-root/html
