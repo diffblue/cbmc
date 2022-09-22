@@ -67,8 +67,6 @@ you can access it <a href=
 
 * \subpage memory-analyzer
 * \subpage memory-bounds-checking
-* \subpage nondet-volatile
-* \subpage restricting-function-pointers
 * \subpage satabs
 
 ### For contributors:

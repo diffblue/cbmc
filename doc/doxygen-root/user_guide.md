@@ -15,8 +15,6 @@ Other tips for using CBMC:
 
 * \ref memory-analyzer
 * \ref memory-bounds-checking
-* \ref nondet-volatile
-* \ref restricting-function-pointers
 * \ref satabs
 
 This CBMC user guide is a work in progress.
