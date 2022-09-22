@@ -1,4 +1,3 @@
-
 \page cprover_documentation CProver documentation
 
 These pages contain user tutorials, automatically-generated API
