@@ -176,7 +176,7 @@ the `for` loop in the program. As CBMC performs Bounded Model Checking,
 all loops have to have a finite upper run-time bound in order to
 guarantee that all bugs are found. CBMC can optionally check that enough
 unwinding is performed. As an example, consider the program
-[binsearch.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/binsearch1.c):
+[binsearch.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/binsearch.c):
 
 ```C
 int binsearch(int x)
@@ -333,7 +333,7 @@ comes with a small set of definitions, which includes functions such as
 
 ### Further Reading
 
--   [Understanding Loop Unwinding](../unwinding/)
+-   [Understanding Loop Unwinding](../../cbmc/unwinding/)
 -   [Hardware Verification using ANSI-C Programs as a
     Reference](http://www-2.cs.cmu.edu/~svc/papers/view-publications-ck03.html)
 -   [Behavioral Consistency of C and Verilog Programs Using Bounded
