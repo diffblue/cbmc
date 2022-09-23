@@ -485,7 +485,9 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
   catch(const invalid_restriction_exceptiont &e)
   {
     throw invalid_command_line_argument_exceptiont{
-      e.reason, "--" RESTRICT_FUNCTION_POINTER_OPT, e.correct_format};
+      static_cast<cprover_exception_baset>(e).what(),
+      "--" RESTRICT_FUNCTION_POINTER_OPT,
+      e.correct_format};
   }
 
   restrictionst file_restrictions;
@@ -514,7 +516,9 @@ function_pointer_restrictionst function_pointer_restrictionst::from_options(
   catch(const invalid_restriction_exceptiont &e)
   {
     throw invalid_command_line_argument_exceptiont{
-      e.reason, "--" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT, e.correct_format};
+      static_cast<cprover_exception_baset>(e).what(),
+      "--" RESTRICT_FUNCTION_POINTER_BY_NAME_OPT,
+      e.correct_format};
   }
 
   return {merge_function_pointer_restrictions(

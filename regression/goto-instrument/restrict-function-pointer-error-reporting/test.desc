@@ -1,0 +1,10 @@
+CORE
+main.c
+--restrict-function-pointer fun_ptr.function_pointer_call.1/foo
+^Reason: fun_ptr.function_pointer_call.1 not found in the symbol table$
+^EXIT=1$
+^SIGNAL=0$
+--
+^Reason:\s*$
+--
+This test checks that invalid usage results in meaningful error reports.

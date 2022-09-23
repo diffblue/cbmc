@@ -79,7 +79,6 @@ public:
 
   std::string what() const override;
 
-  std::string reason;
   std::string correct_format;
 };
 
