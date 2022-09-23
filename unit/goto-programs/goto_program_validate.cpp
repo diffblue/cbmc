@@ -132,59 +132,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
     }
   }
 
-  /// check function_pointer_calls_removed()
-  WHEN("not all function calls via fn pointer have been removed")
-  {
-    THEN("fail!")
-    {
-      // introduce function k that has a function pointer call;
-      symbolt k;
-      k.name = "k";
-      k.mode = ID_C;
-      k.type = code_typet({}, empty_typet{}); // void return, take no params
-
-      code_function_callt function_call{
-        dereference_exprt{fn_ptr.symbol_expr(),
-                          pointer_typet(code_typet{{}, empty_typet{}}, 64)}};
-
-      code_blockt k_body{{function_call}};
-      k.value = k_body;
-
-      goto_model.symbol_table.add(k);
-      goto_convert(goto_model, null_message_handler);
-
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
-      validation_options.function_pointer_calls_removed = true;
-
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
-    }
-  }
-
-  WHEN("all function calls via fn pointer have been removed")
-  {
-    THEN("pass!")
-    {
-      goto_convert(goto_model, null_message_handler);
-
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
-      validation_options.function_pointer_calls_removed = true;
-
-      REQUIRE_NOTHROW(validate_goto_model(
-        goto_model.goto_functions,
-        validation_modet::EXCEPTION,
-        validation_options));
-    }
-  }
-
   WHEN("all returns have been removed")
   {
     THEN("true!")
@@ -218,8 +165,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       goto_model_validation_optionst validation_options{
         goto_model_validation_optionst ::set_optionst::all_false};
 
-      validation_options.check_called_functions = true;
-
       REQUIRE_THROWS_AS(
         validate_goto_model(
           goto_model.goto_functions,
@@ -242,8 +187,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       goto_model_validation_optionst validation_options{
         goto_model_validation_optionst ::set_optionst::all_false};
 
-      validation_options.check_called_functions = true;
-
       REQUIRE_THROWS_AS(
         validate_goto_model(
           goto_model.goto_functions,
@@ -263,8 +206,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 
       goto_model_validation_optionst validation_options{
         goto_model_validation_optionst ::set_optionst::all_false};
-
-      validation_options.check_called_functions = true;
 
       REQUIRE_NOTHROW(validate_goto_model(
         goto_model.goto_functions,

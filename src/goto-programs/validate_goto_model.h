@@ -18,18 +18,13 @@ public:
   // this check is disabled by default (not all goto programs
   // have an entry point)
   bool entry_point_exists = false;
-
-  bool function_pointer_calls_removed = true;
   bool check_returns_removed = true;
-  bool check_called_functions = true;
 
 private:
   void set_all_flags(bool options_value)
   {
     entry_point_exists = options_value;
-    function_pointer_calls_removed = options_value;
     check_returns_removed = options_value;
-    check_called_functions = options_value;
   }
 
 public:
