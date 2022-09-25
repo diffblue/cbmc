@@ -5,7 +5,7 @@ This is a CBMC developr guide.
 * \ref cprover_documentation
   * [CProver Architecture Decision Records](adr/index.html)
   * [CProver APIs](api/index.html)
-  * [CProver assets](assets/index.html)
+  * [CProver Assets](assets/index.html)
 
 * \ref tutorial "CProver developer tutorial"
 
