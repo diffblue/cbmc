@@ -2,38 +2,51 @@
 
 This is the root of CBMC documentation.
 
-## Install doxygen
+## Install tools
 
-Building this documentation requires `doxygen` and `graphviz`.
+Building this documentation requires `doxygen`, `graphviz`, and `pandoc`.
 
 * On MacOS,
   we recommend installing with [brew](https://brew.sh/):
   ```
-  brew install doxygen graphviz
+  brew install doxygen graphviz pandoc
   ```
 * On Ubuntu, we recommend installing with using `apt`:
   ```
-  sudo apt install doxygen graphviz
+  sudo apt install doxygen graphviz pandoc
   ```
-
-Note: As of
 
 ## Build the documentation
 
 To build the documentation, run
 
 ```
-doxygen
+make
 ```
 
-The documentation takes about five minutes to build and is written to
-the `html` subdirectory as a set of 2600+ html files.  To view the
-documentation,
+The build takes about five minutes, and the documentation is written to
+the `html` subdirectory as a mostly-flat collection of 2600+ html files.
+To view the documentation,
 open the file `html/index.html` in a web browser.  One MacOS, run
 
 ```
 open html/index.html
 ```
+
+The build will refuse to run if the repository is dirty
+(if there are uncomitted changes).
+The build appends "last modified" tags to the end of every markdown file,
+which modifies about 60 markdown files.
+Run `git checkout .` in the repository root to restore the markdown files
+to their original state.
+
+The build actually runs six builds:
+
+* the legacy CPROVER documentation in `src` and `doc` which now includes the
+  top-level pages in this directory,
+* the legacy CPROVER manual in `doc/cprover-manual`,
+* the man pages in `doc/man`,  and
+* some supplemental documentation in `doc/API`, `doc/ADR`, and `doc/assets`.
 
 ## Publish the documentation
 
@@ -44,7 +57,11 @@ the `github.io` web site.
 
 ## Contribute documentation
 
-Coming soon...
+To contribute to this documentation,
+there are some [documentation instructions](contributing.md) written
+to make it easier for you to link your documentation into the right
+location.
+
 
 ## References
 
