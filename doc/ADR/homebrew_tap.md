@@ -1,4 +1,4 @@
-# Homebrew tap instructions
+\page homebrew-tap-instructions Homebrew tap instructions
 
 CBMC archives versions into a tap which you can use to quickly download and
 build various historical versions.

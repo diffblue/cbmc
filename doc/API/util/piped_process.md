@@ -1,4 +1,4 @@
-# `src/util/piped_process.{cpp, h}`
+\page piped-process `src/util/piped_process.{cpp, h}`
 
 To utilise the `piped_process` API for interprocess communication with any binary:
 

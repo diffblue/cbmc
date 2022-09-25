@@ -1,4 +1,4 @@
-# Release Process
+\page release-process Release Process
 
 **Date**: 2020-10-08
 **Updated**: 2022-06-23
@@ -9,7 +9,7 @@
 
 The current process we follow through to make a new release is the following:
 
-1. At the point in time we want to make the release, we make a change to 
+1. At the point in time we want to make the release, we make a change to
    `src/config.inc`, and update the configuration variable `CBMC_VERSION`.
    This is important as it informs the various tools of the current version
    of CBMC.

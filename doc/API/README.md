@@ -1,3 +1,3 @@
-# CProver APIs
+# CPROVER APIs
 
-* [piped_process](util/piped_process.md)
+* \subpage piped-process
