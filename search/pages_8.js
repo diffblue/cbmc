@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['readme_40344',['README',['../group__module__hidden.html',1,'']]],
+  ['readme_40345',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40346',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40347',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40348',['README',['../group__module__hidden.html',1,'']]],
@@ -26,7 +28,5 @@ var searchData=
   ['readme_40369',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40370',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40371',['README',['../group__module__hidden.html',1,'']]],
-  ['readme_40372',['README',['../group__module__hidden.html',1,'']]],
-  ['readme_40373',['README',['../group__module__hidden.html',1,'']]],
-  ['reference_20guide_40374',['Reference guide',['../reference_guide.html',1,'index']]]
+  ['reference_20guide_40372',['Reference guide',['../reference_guide.html',1,'index']]]
 ];

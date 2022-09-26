@@ -15,11 +15,9 @@ var find__symbols_8cpp =
     [ "find_symbols", "find__symbols_8cpp.html#a5844da5ec4a1be38654d7d2fd2fae01a", null ],
     [ "find_symbols", "find__symbols_8cpp.html#ab7d18735e4838c092f5d33a5553865f6", null ],
     [ "find_symbols", "find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c", null ],
-    [ "find_symbols_or_nexts", "find__symbols_8cpp.html#ae040a1fa26ca0f66abf05648cc82f02a", null ],
     [ "find_type_and_expr_symbols", "find__symbols_8cpp.html#a13fc98bf96d342d61b44a7adc4e9a309", null ],
     [ "find_type_and_expr_symbols", "find__symbols_8cpp.html#a6b70046a0b40864d615c7954b97cf514", null ],
     [ "find_type_symbols", "find__symbols_8cpp.html#a8f89990d3dba856d5ef0ebeb3dcd1d24", null ],
     [ "find_type_symbols", "find__symbols_8cpp.html#aefd702536b30289b06a4e84a34ebd973", null ],
-    [ "has_symbol", "find__symbols_8cpp.html#a94ace8f3563b7655f8f16c422ab6e6d5", null ],
     [ "has_symbol_expr", "find__symbols_8cpp.html#a9a2bbb43565d5267eb29a975965cef7b", null ]
 ];

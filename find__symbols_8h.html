@@ -95,8 +95,7 @@ $(document).ready(function(){initNavTree('find__symbols_8h.html',''); initResiza
 <div class="title">find_symbols.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="deprecate_8h_source.html">deprecate.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="irep_8h_source.html">irep.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="irep_8h_source.html">irep.h</a>&quot;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;set&gt;</code><br />
 <code>#include &lt;unordered_set&gt;</code><br />
@@ -105,7 +104,7 @@ $(document).ready(function(){initNavTree('find__symbols_8h.html',''); initResiza
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="find__symbols_8h__incl.svg" width="1500" height="500"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="find__symbols_8h__incl.svg" width="1536" height="500"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -129,14 +128,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9a2bbb43565d5267eb29a975965cef7b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#a9a2bbb43565d5267eb29a975965cef7b">has_symbol_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, bool include_bound_symbols)</td></tr>
 <tr class="memdesc:a9a2bbb43565d5267eb29a975965cef7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if one of the symbol expressions in <code>src</code> has identifier <code>identifier</code>; if <code>include_bound_symbols</code> is true, then bindings are included in the search.  <a href="find__symbols_8h.html#a9a2bbb43565d5267eb29a975965cef7b">More...</a><br /></td></tr>
 <tr class="separator:a9a2bbb43565d5267eb29a975965cef7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae040a1fa26ca0f66abf05648cc82f02a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#ae040a1fa26ca0f66abf05648cc82f02a">find_symbols_or_nexts</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, <a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> &amp;dest)</td></tr>
-<tr class="separator:ae040a1fa26ca0f66abf05648cc82f02a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac94268f5bcbf2cf10e3de6d81e80e411"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#ac94268f5bcbf2cf10e3de6d81e80e411">find_symbols</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, <a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> &amp;dest)</td></tr>
 <tr class="memdesc:ac94268f5bcbf2cf10e3de6d81e80e411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add to the set <code>dest</code> the sub-expressions of <code>src</code> with id ID_symbol, for both free and bound variables.  <a href="find__symbols_8h.html#ac94268f5bcbf2cf10e3de6d81e80e411">More...</a><br /></td></tr>
 <tr class="separator:ac94268f5bcbf2cf10e3de6d81e80e411"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5305a749a273c0d93f6f0793cb90d64e"><td class="memTemplParams" colspan="2">template&lt;typename iteratort &gt; </td></tr>
-<tr class="memitem:a5305a749a273c0d93f6f0793cb90d64e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#a5305a749a273c0d93f6f0793cb90d64e">find_symbols_or_nexts</a> (iteratort begin, iteratort end)</td></tr>
-<tr class="separator:a5305a749a273c0d93f6f0793cb90d64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d76b8f1fa14d12f046a9a02c9cc5ddb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#a9d76b8f1fa14d12f046a9a02c9cc5ddb">find_symbols</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;dest)</td></tr>
 <tr class="memdesc:a9d76b8f1fa14d12f046a9a02c9cc5ddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find sub expressions with id ID_symbol, considering both free and bound variables.  <a href="find__symbols_8h.html#a9d76b8f1fa14d12f046a9a02c9cc5ddb">More...</a><br /></td></tr>
 <tr class="separator:a9d76b8f1fa14d12f046a9a02c9cc5ddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,8 +140,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a05f2dae11de7edac6496370342cc664e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#a05f2dae11de7edac6496370342cc664e">find_symbol_identifiers</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src)</td></tr>
 <tr class="memdesc:a05f2dae11de7edac6496370342cc664e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find identifiers of the sub expressions with id ID_symbol, considering both free and bound variables.  <a href="find__symbols_8h.html#a05f2dae11de7edac6496370342cc664e">More...</a><br /></td></tr>
 <tr class="separator:a05f2dae11de7edac6496370342cc664e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94ace8f3563b7655f8f16c422ab6e6d5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#a94ace8f3563b7655f8f16c422ab6e6d5">has_symbol</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> &amp;symbols)</td></tr>
-<tr class="separator:a94ace8f3563b7655f8f16c422ab6e6d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefd702536b30289b06a4e84a34ebd973"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="find__symbols_8h.html#aefd702536b30289b06a4e84a34ebd973">find_type_symbols</a> (const <a class="el" href="classtypet.html">typet</a> &amp;src, <a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> &amp;dest)</td></tr>
 <tr class="memdesc:aefd702536b30289b06a4e84a34ebd973"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect all type tags contained in <code>src</code> and add them to <code>dest</code>.  <a href="find__symbols_8h.html#aefd702536b30289b06a4e84a34ebd973">More...</a><br /></td></tr>
 <tr class="separator:aefd702536b30289b06a4e84a34ebd973"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,7 +172,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00022">22</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00021">21</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
 
 </div>
 </div>
@@ -213,7 +205,7 @@ Functions</h2></td></tr>
 
 <p>Collect type tags contained in <code>src</code> when the expression of such a type is not a pointer, and add them to <code>dest</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00275">275</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00261">261</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +237,7 @@ Functions</h2></td></tr>
 
 <p>Collect type tags contained in <code>src</code> when the expression of such a type is not a pointer, and add them to <code>dest</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00286">286</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00272">272</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -275,7 +267,7 @@ Functions</h2></td></tr>
 
 <p>Find identifiers of the sub expressions with id ID_symbol, considering both free and bound variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00074">74</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00054">54</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
 
 </div>
 </div>
@@ -305,7 +297,7 @@ Functions</h2></td></tr>
 
 <p>Find sub expressions with id ID_symbol, considering both free and bound variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00065">65</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00045">45</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
 
 </div>
 </div>
@@ -337,7 +329,7 @@ Functions</h2></td></tr>
 
 <p>Add to the set <code>dest</code> the sub-expressions of <code>src</code> with id ID_symbol, for both free and bound variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00321">321</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00299">299</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -369,74 +361,7 @@ Functions</h2></td></tr>
 
 <p>Find sub expressions with id ID_symbol, considering both free and bound variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00238">238</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ae040a1fa26ca0f66abf05648cc82f02a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae040a1fa26ca0f66abf05648cc82f02a">&#9670;&nbsp;</a></span>find_symbols_or_nexts() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void find_symbols_or_nexts </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000030">Deprecated:</a></b></dt><dd>"deprecated since " "2022" "-" "3" "-" "14" "; " "use find_symbols" <br  />
- Add to the set <code>dest</code> the sub-expressions of <code>src</code> with id ID_symbol or ID_next_symbol </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00313">313</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a5305a749a273c0d93f6f0793cb90d64e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5305a749a273c0d93f6f0793cb90d64e">&#9670;&nbsp;</a></span>find_symbols_or_nexts() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename iteratort &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> find_symbols_or_nexts </td>
-          <td>(</td>
-          <td class="paramtype">iteratort&#160;</td>
-          <td class="paramname"><em>begin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">iteratort&#160;</td>
-          <td class="paramname"><em>end</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>set of sub-expressions of the expressions contained in the range defined by <code>begin</code> and <code>end</code> which have id ID_symbol or ID_next_symbol </dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000031">Deprecated:</a></b></dt><dd>"deprecated since " "2022" "-" "3" "-" "14" "; " "use find_symbols and a local iteration" <br  />
- </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="find__symbols_8h_source.html#l00047">47</a> of file <a class="el" href="find__symbols_8h_source.html">find_symbols.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00224">224</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +393,7 @@ template&lt;typename iteratort &gt; </div>
 
 <p>Find identifiers of the sub expressions with id ID_symbol, considering both free and bound variables, as well as any type tags. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00297">297</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00283">283</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -500,7 +425,7 @@ template&lt;typename iteratort &gt; </div>
 
 <p>Find identifiers of the sub expressions with id ID_symbol, considering both free and bound variables, as well as any type tags. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00305">305</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00291">291</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -532,7 +457,7 @@ template&lt;typename iteratort &gt; </div>
 
 <p>Collect all type tags contained in <code>src</code> and add them to <code>dest</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00259">259</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00245">245</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -564,40 +489,7 @@ template&lt;typename iteratort &gt; </div>
 
 <p>Collect all type tags contained in <code>src</code> and add them to <code>dest</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00267">267</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a94ace8f3563b7655f8f16c422ab6e6d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94ace8f3563b7655f8f16c422ab6e6d5">&#9670;&nbsp;</a></span>has_symbol()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool has_symbol </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>src</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> &amp;&#160;</td>
-          <td class="paramname"><em>symbols</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000032">Deprecated:</a></b></dt><dd>"deprecated since " "2022" "-" "3" "-" "14" "; " "use has_symbol_expr(exprt, irep_idt, bool)" <br  />
- </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>true if one of the symbols in <code>src</code> is present in <code>symbols</code> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00032">32</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00253">253</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>
@@ -635,7 +527,7 @@ template&lt;typename iteratort &gt; </div>
 
 <p>Returns true if one of the symbol expressions in <code>src</code> has identifier <code>identifier</code>; if <code>include_bound_symbols</code> is true, then bindings are included in the search. </p>
 
-<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00246">246</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="find__symbols_8cpp_source.html#l00232">232</a> of file <a class="el" href="find__symbols_8cpp_source.html">find_symbols.cpp</a>.</p>
 
 </div>
 </div>

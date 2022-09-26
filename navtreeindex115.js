@@ -1,10 +1,5 @@
 var NAVTREEINDEX115 =
 {
-"string__expr_8h.html#aa8d0d755684f68ad73d6545ca5092981":[5,0,2,26,222,3],
-"string__expr_8h.html#ab455920c41d72a6c7b2711e82450b48a":[5,0,2,26,222,9],
-"string__expr_8h.html#abf321d48391c43728814fe234572d3f0":[5,0,2,26,222,7],
-"string__expr_8h.html#add8b69d2be395217a7aefebfb57ed686":[5,0,2,26,222,11],
-"string__expr_8h.html#ae656a7b328e02318e86aed63c9ec87f3":[5,0,2,26,222,13],
 "string__expr_8h.html#ae752b92f9400975543e45d3e2c9b82c6":[5,0,2,26,222,4],
 "string__expr_8h.html#af1f1f4b5a71b5b35db9af1b8f1bf63b4":[5,0,2,26,222,6],
 "string__expr_8h.html#afa78fefc3600041a5a86d256a9b2586e":[5,0,2,26,222,2],
@@ -249,5 +244,10 @@ var NAVTREEINDEX115 =
 "structabstract__object__statisticst.html#ad740586f25bfe7f88fd60abbc8679c25":[4,0,21,7],
 "structabstract__object__statisticst.html#ae33014307e2687422fafbf52daf56a9f":[4,0,21,5],
 "structabstract__object__statisticst.html#ae40dc60ba4545c13c9142418fb5573ec":[4,0,21,3],
-"structabstract__objectt_1_1abstract__object__visitort.html":[4,0,22,0]
+"structabstract__objectt_1_1abstract__object__visitort.html":[4,0,22,0],
+"structabstract__objectt_1_1abstract__object__visitort.html#a4205d30d931cec63a5527ca7c7625c5e":[4,0,22,0,0],
+"structabstract__objectt_1_1combine__result.html":[4,0,22,1],
+"structabstract__objectt_1_1combine__result.html#a497fd14e8a70ee156d8364d715db87b7":[4,0,22,1,1],
+"structabstract__objectt_1_1combine__result.html#ae102a2c90d8a35057df5bb33ec7d3010":[4,0,22,1,0],
+"structacceleration__utilst_1_1polynomial__array__assignmentt.html":[4,0,28,0]
 };
