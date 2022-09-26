@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "range.h"
 #include "std_expr.h"
 
-/// Kinds of symbols to be considered by \ref has_symbol or \ref find_symbols.
+/// Kinds of symbols to be considered by \ref find_symbols.
 enum class symbol_kindt
 {
   /// Struct, union, or enum tag symbols.
@@ -28,20 +28,6 @@ enum class symbol_kindt
   /// All of the above.
   F_ALL
 };
-
-bool has_symbol(const exprt &src, const find_symbols_sett &symbols)
-{
-  if(src.id() == ID_symbol)
-    return symbols.count(to_symbol_expr(src).get_identifier()) != 0;
-  else
-  {
-    forall_operands(it, src)
-      if(has_symbol(*it, symbols))
-        return true;
-  }
-
-  return false;
-}
 
 static bool find_symbols(
   symbol_kindt,
@@ -305,14 +291,6 @@ void find_type_and_expr_symbols(const exprt &src, find_symbols_sett &dest)
 void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 {
   find_symbols(symbol_kindt::F_ALL, src, [&dest](const symbol_exprt &e) {
-    dest.insert(e.get_identifier());
-    return true;
-  });
-}
-
-void find_symbols_or_nexts(const exprt &src, find_symbols_sett &dest)
-{
-  find_symbols(symbol_kindt::F_EXPR, src, [&dest](const symbol_exprt &e) {
     dest.insert(e.get_identifier());
     return true;
   });
