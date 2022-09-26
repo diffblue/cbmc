@@ -38,12 +38,13 @@ public:
   }
   virtual ~loop_invariant_synthesizer_baset() = default;
 
-  /// Synthesize loop invariants with which all checks in `goto_model`
-  /// succeed. The result is a map from `loop_idt` ids of loops to `exprt`
-  /// the goto-expression representation of synthesized invariants.
+  /// Synthesize loop invariants that are inductive in the given GOTO program.
+  ///
+  /// The result is a map from `loop_idt` ids of loops to `exprt`
+  /// the GOTO-expression representation of synthesized invariants.
   virtual invariant_mapt synthesize_all() = 0;
 
-  /// Synthesize loop invariant for a specified loop in the `goto_model`
+  /// Synthesize loop invariant for a specified loop in the `goto_model`.
   virtual exprt synthesize(loop_idt) = 0;
 
 protected:
