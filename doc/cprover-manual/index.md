@@ -25,6 +25,7 @@
    * [Pointers](modeling/pointers/)
    * [Floating Point](modeling/floating-point/)
    * [Generating Environments](goto-harness/)
+   * [Memory-mapped I/O](modeling/mmio/)
 
 9. Build Systems
 
