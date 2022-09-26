@@ -25,6 +25,7 @@ At a later stage, BMC will convert the generated SSA steps into an
 equation that can be passed to the solver.
 
 ---
+
 \section symbolic-execution Symbolic Execution
 
 In the \ref goto-symex directory.
@@ -35,13 +36,13 @@ In the \ref goto-symex directory.
 
 \dot
 digraph G {
-	node [shape=box];
-	rankdir="LR";
-	1 [shape=none, label=""];
-	2 [label="goto conversion"];
-	3 [shape=none, label=""];
-	1 -> 2 [label="goto-programs, goto-functions, symbol table"];
-	2 -> 3 [label="equations"];
+        node [shape=box];
+        rankdir="LR";
+        1 [shape=none, label=""];
+        2 [label="goto conversion"];
+        3 [shape=none, label=""];
+        1 -> 2 [label="goto-programs, goto-functions, symbol table"];
+        2 -> 3 [label="equations"];
 }
 \enddot
 
@@ -144,6 +145,7 @@ all the paths together, so the additional path-exploration loop is
 skipped over.
 
 ---
+
 \section static-single-assignment Static Single Assignment (SSA) Form
 
 **Key classes:**
@@ -253,6 +255,7 @@ Seminal paper on SSA:
 > (pp. 12-27). ACM.
 
 ---
+
 \section counter-example-production Counter Example Production
 
 In the \ref goto-symex directory.

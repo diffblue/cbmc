@@ -1,6 +1,5 @@
-[CPROVER Manual TOC](../../)
 
-## Memory Analyzer
+\page memory-analyzer Memory Analyzer
 
 The memory analyzer is a front-end that runs and queries GDB in order to obtain
 a snapshot of the state of the input program at a particular program location.

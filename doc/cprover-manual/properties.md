@@ -133,14 +133,15 @@ The goto-instrument program supports these checks:
 | `--error-label label`        |  check that given label is unreachable               |
 
 As all of these checks apply across the entire input program, we may wish to
-disable or enable them for selected statements in the program. 
-For example, unsigned overflows can be expected and acceptable in certain 
-instructions even when elsewhere we do not expect them. 
+disable or enable them for selected statements in the program.
+For example, unsigned overflows can be expected and acceptable in certain
+instructions even when elsewhere we do not expect them.
 As of version 5.12, CBMC supports selectively disabling or enabling
 automatically generated properties using pragmas.
 
 
 CPROVER pragmas are handled using a stack:
+
 - `#pragma CPROVER check push` pushes a new level on the pragma stack
 - `#pragma CPROVER check disable "<name_of_check>"` adds a disable pragma
   at the top of the stack

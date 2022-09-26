@@ -1,7 +1,4 @@
-\ingroup module_hidden
-\page other_documentation Other Documentation
-
-\section satabs SATABS
+\page satabs SATABS
 
 We document two programs that try to achieve formal guarantees of the
 absence of specific problems: CBMC and SATABS. The algorithms
@@ -607,13 +604,13 @@ and the function `getConfig` in `lib_aeon.c`:
     int getConfig(char settings[MAX_SETTINGS][MAX_LEN])
     {
         char home[MAX_LEN];
-    FILE *fp;	/* .rc file handler */
-    int numSet = 0;	/* number of settings */
+    FILE *fp;   /* .rc file handler */
+    int numSet = 0;     /* number of settings */
 
-    strcpy(home, getenv("HOME"));  	/* get home path */
-    strcat(home, "/.aeonrc");	/* full path to rc file */
+    strcpy(home, getenv("HOME"));       /* get home path */
+    strcat(home, "/.aeonrc");   /* full path to rc file */
     fp = fopen(home, "r");
-    if (fp == NULL) return -1;	/* no cfg - ERROR */
+    if (fp == NULL) return -1;  /* no cfg - ERROR */
       while (fgets(settings[numSet], MAX_LEN-1, fp)
         && (numSet < MAX_SETTINGS)) numSet++;
     fclose(fp);

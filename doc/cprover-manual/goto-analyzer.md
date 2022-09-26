@@ -18,6 +18,7 @@ iterations or B. possibly false.  In this sense, each tool has its own
 strengths and weaknesses.
 
 To use `goto-analyzer` you need to give options for:
+
 * What [task](#task) to perform after the abstract interpreter has run.
 * How to format the [output](#output).
 * Which [abstract interpreter](#abstractinterpreter) is used.
@@ -48,7 +49,7 @@ goto-analyzer  --verify --three-way-merge --vsd --vsd-values set-of-constants --
 
 I want to discharge obvious conditions and remove unreachable code:
 ```
-goto-analyzer --simplify out.gb --three-way-merge --vsd 
+goto-analyzer --simplify out.gb --three-way-merge --vsd
 ```
 
 
@@ -182,7 +183,7 @@ will likely become the default at some point in the future.
 : This extends `--recursive-interprocedural` by performing a
 "modification aware" merge after function calls.  At the time of
 writing only `--vsd` supports the necessary differential reasoning.
-If you are using `--vsd` this is recommended as it is more accurate 
+If you are using `--vsd` this is recommended as it is more accurate
 with little extra cost.
 
 
@@ -412,7 +413,7 @@ location will use the same domain.  Setting this means that the
 results of other histories will be similar to setting
 `--ahistorical`.  One difference is how and when widening occurs.
 `--one-domain-per-location --loop-unwind n` will wait until `n`
-iterations of a loop have been completed and then will start to widen. 
+iterations of a loop have been completed and then will start to widen.
 
 `--one-domain-per-history`
 : This is the best option to use if you are using a history other than
@@ -430,4 +431,3 @@ instrumentation.  These all function exactly the same as CBMC does.
 It also supports specific analyses which do not fit into the
 configurable scheme above.  At the time of writing this is just
 `--taint` which performs a configurable taint analysis.
-

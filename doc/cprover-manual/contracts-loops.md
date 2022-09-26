@@ -3,6 +3,7 @@
 # Loop Contracts
 
 CBMC offers support for loop contracts, which includes three basic clauses:
+
 - _invariant_ clause for establishing safety properties
 - _decreases_ clause for establishing termination, and
 - _assigns_ clause for declaring the subset of variables that is modifiable in the loop.

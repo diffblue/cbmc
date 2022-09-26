@@ -1,4 +1,5 @@
 \ingroup module_hidden 
+
 \page background-concepts Background Concepts
 
 \author Martin Brain, Peter Schrammel, Johannes Kloos

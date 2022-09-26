@@ -8,5 +8,5 @@ of the system and the surrounding infrastructure.
 
 ## Release & Packaging
 
-* [Release Process](release_process.md)
-* [Homebrew tap](homebrew_tap.md)
+* \subpage release-process
+* \subpage homebrew-tap-instructions

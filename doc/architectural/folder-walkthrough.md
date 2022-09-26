@@ -1,4 +1,5 @@
 \ingroup module_hidden 
+
 \page folder-walkthrough Folder Walkthrough
 
 \author Martin Brain, Peter Schrammel

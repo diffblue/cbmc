@@ -15,6 +15,7 @@ Design](https://www.georgefairbanks.com/york-university-contract-based-design-20
 by George Fairbanks.
 
 CBMC currently supports contracts on functions and loops:
+
 - [Function Contracts](../contracts/functions/)
 - [Loop Contracts](../contracts/loops/)
 
