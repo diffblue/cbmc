@@ -24,19 +24,6 @@ bitvector_typet index_type()
   return c_index_type();
 }
 
-/// return type of enum constants
-bitvector_typet c_enum_constant_type()
-{
-  // usually same as 'int',
-  // but might be unsigned, or shorter than 'int'
-  return signed_int_type();
-}
-
-bitvector_typet enum_constant_type()
-{
-  return c_enum_constant_type();
-}
-
 signedbv_typet signed_int_type()
 {
   signedbv_typet result(config.ansi_c.int_width);
