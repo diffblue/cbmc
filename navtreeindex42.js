@@ -1,9 +1,5 @@
 var NAVTREEINDEX42 =
 {
-"classjsil__typecheckt.html#ad10bd28c7cc125c0926de4bb8477e219":[4,0,668,40],
-"classjsil__typecheckt.html#ae495cdbe0e95e87404ff9dea0aa48ef1":[4,0,668,35],
-"classjsil__typecheckt.html#ae9223cad5b7530943b019067cb1543bf":[4,0,668,15],
-"classjsil__typecheckt.html#aff1f862336f947486030d895b91fc776":[4,0,668,5],
 "classjsil__union__typet.html":[4,0,669],
 "classjsil__union__typet.html#a64a82c6ebfd6902422f6b54390b16016":[4,0,669,6],
 "classjsil__union__typet.html#a75bc7c230c35a69c0fc6a26ba66614af":[4,0,669,1],
@@ -249,5 +245,9 @@ var NAVTREEINDEX42 =
 "classlazy__class__to__declared__symbols__mapt.html#a55768b5ad30ad8cb8ec307dfaf536c1e":[4,0,692,1],
 "classlazy__class__to__declared__symbols__mapt.html#a72ce8b7b1ce1d84227f74ebd2f52212a":[4,0,692,3],
 "classlazy__class__to__declared__symbols__mapt.html#a91feb6c529f262ad7e040d4c85610a8e":[4,0,692,4],
-"classlazy__goto__functions__mapt.html":[4,0,693]
+"classlazy__goto__functions__mapt.html":[4,0,693],
+"classlazy__goto__functions__mapt.html#a08952e7791b3549e388b4e716e2d7b53":[4,0,693,18],
+"classlazy__goto__functions__mapt.html#a0adbca21ef5424c63d54c98ec3fdb22b":[4,0,693,10],
+"classlazy__goto__functions__mapt.html#a19796728910d2daea69d641e82a1b8cd":[4,0,693,20],
+"classlazy__goto__functions__mapt.html#a19f4c2a8e5cf93e1c35377475a3f69da":[4,0,693,26]
 };
