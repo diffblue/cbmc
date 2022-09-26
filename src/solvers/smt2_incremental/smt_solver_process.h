@@ -5,10 +5,12 @@
 
 class smt_commandt;
 
-#include <solvers/smt2_incremental/smt_responses.h>
 #include <util/message.h>
 #include <util/piped_process.h>
 
+#include <solvers/smt2_incremental/smt_responses.h>
+
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -58,6 +60,47 @@ protected:
   std::stringstream response_stream;
   /// For debug printing.
   messaget log;
+};
+
+/// Class for an incremental SMT solver used in combination with `--outfile`
+///    argument where the solver is never run.
+class smt_incremental_dry_run_solvert : public smt_base_solver_processt
+{
+public:
+  /// \param message_handler:
+  ///   The messaging system to be used for logging purposes.
+  /// \param out_stream:
+  ///   Reference to the stream to print the SMT formula.
+  /// \param file_stream:
+  ///   Pointer to the file stream to print the SMT formula into. `nullptr` if
+  ///     output is to `std::cout`.
+  smt_incremental_dry_run_solvert(
+    message_handlert &message_handler,
+    std::ostream &out_stream,
+    std::unique_ptr<std::ostream> file_stream);
+
+  const std::string &description() override;
+
+  void send(const smt_commandt &smt_command) override;
+
+  /// \note This function returns always a valid unsat response.
+  smt_responset receive_response(
+    const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
+    override;
+
+  ~smt_incremental_dry_run_solvert() override = default;
+
+protected:
+  /// Pointer to the file stream to print the SMT formula. `nullptr` if output
+  ///    is to `std::cout`.
+  std::unique_ptr<std::ostream> file_stream;
+  /// The output stream reference to print the SMT formula to.
+  std::ostream &out_stream;
+  /// For debug printing.
+  messaget log;
+
+  /// Description of the current solver
+  const std::string desc = "SMT2 incremental dry-run";
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_SOLVER_PROCESS_H
