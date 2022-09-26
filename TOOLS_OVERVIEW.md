@@ -23,7 +23,7 @@ The tools in the CProver project are as follows:
     - [others (converter, driver, file_converter, java-converter)](#others)
 
 The rest of this document provides a section on each of these tools in alphabetical order.
-Most links in this document are to the [CProver online documentation](http://cprover.diffblue.com/index.html).
+Most links in this document are to the [CProver online documentation](https://diffblue.github.io/cbmc/).
 
 
 ## cbmc
@@ -34,39 +34,31 @@ including generating traces. This includes invoking various sub-tools and
 modules.
 
 For details on usage of the `cbmc` tool see the following documentation
-- [Developer Tutorial](http://cprover.diffblue.com/tutorial.html)
+- [Developer Tutorial](https://diffblue.github.io/cbmc/tutorial.html)
 includes a very brief tutorial on many aspects of `cbmc` and other tools.
 
 For details on the architecture of the `cbmc` tool and how the analysis is performed
 see the following documents:
-- [CBMC Architecture](http://cprover.diffblue.com/cbmc-architecture.html)
+- [CBMC Architecture](https://diffblue.github.io/cbmc/cbmc-architecture.html)
 gives a high level overview of the `cbmc` architecture and data flow.
-- [Background Concepts](http://cprover.diffblue.com/background-concepts.html)
+- [Background Concepts](https://diffblue.github.io/cbmc/background-concepts.html)
 overviews all the key concepts used in the `cbmc` analysis.
 
 For details on compiling, testing, contributing, and documentation related to 
 development see:
-- [CProver Developer Documentation](http://cprover.diffblue.com/index.html)
+- [CProver Developer Documentation](https://diffblue.github.io/cbmc/)
 
 
 ## goto-analyzer
 
 The `goto-analyzer` is a wrapper program around the
-[abstract interpretation](http://cprover.diffblue.com/background-concepts.html#abstract_interpretation_section)
+[abstract interpretation](https://diffblue.github.io/cbmc/background-concepts.html#abstract_interpretation_section)
 implementations. (For more detail on these implementations see
-[here](http://cprover.diffblue.com/group__analyses.html).)
+[here](https://diffblue.github.io/cbmc/group__analyses.html).)
 It is possible to configure which abstractions are used and what
 is done with the chosen abstractions (verification, display,
-simplification, etc.). The current best documentation is available
-[here](http://cprover.diffblue.com/goto__analyzer__parse__options_8h.html).
-
-Other documentation useful for this tool can be found:
-- [Analysis Information](http://cprover.diffblue.com/group__analyses.html)
-
-Details of all the options can be seen by running
-```
-goto-analyzer --help
-```
+simplification, etc.). See the [man
+page](https://diffblue.github.io/cbmc/man/goto-analyzer.html) for details.
 
 ## goto-cc
 
@@ -81,12 +73,12 @@ will behave like `gcc`). The additional object code is used as the internal
 representation for `cbmc` and related tools. These can also be extracted and
 used themselves.
 
-Further information on `goto-cc` can be found:
-- [Developer Tutorial](http://cprover.diffblue.com/tutorial.html) with
+Further information on `goto-cc` can be found at:
+- [Developer Tutorial](https://diffblue.github.io/cbmc/tutorial.html) with
 some very simple examples and notes.
-- [goto-cc](http://cprover.diffblue.com/group__goto-cc.html) information
+- [goto-cc](https://diffblue.github.io/cbmc/man/goto-cc.html) information
 on the `goto-cc` compilers
-- [goto Programs](http://cprover.diffblue.com/group__goto-programs.html)
+- [goto Programs](https://diffblue.github.io/cbmc/group__goto-programs.html)
 for information on goto programs and how they are used.
 
 Note that `goto-cc` can emulate GCC, Visual Studio, and CodeWarrior
@@ -115,13 +107,8 @@ can then be analysed (using the harness). Harnesses can be either function
 call environments, or memory snapshots. 
 
 Documentation on `goto-harness` can be found
-[here](http://cprover.diffblue.com/md__home_travis_build_diffblue_cbmc_doc_architectural_goto-harness.html)
+[in it's man page](https://diffblue.github.io/cbmc/man/goto-harness.html)
 including details and examples.
-
-Details of all the options can be seen by running
-```
-goto-harness --help
-```
 
 
 ## goto-instrument
@@ -130,10 +117,10 @@ This is a collection of tools for analysing and modifying goto programs
 (programs created with #goto-cc). Generally these take a goto program 
 and output another goto program.
 
-Further examples and documentation can be found:
-- [goto-instrument](http://cprover.diffblue.com/group__goto-instrument.html)
+Further examples and documentation can be found at:
+- [goto-instrument](https://diffblue.github.io/cbmc/group__goto-instrument.html)
 has an overview of `goto-instrument` and a small tutorial example.
-- [Developer Tutorial](http://cprover.diffblue.com/tutorial.html) has high
+- [Developer Tutorial](https://diffblue.github.io/cbmc/tutorial.html) has high
 level overview and some example commands for `goto-instrument`.
 
 
@@ -144,7 +131,7 @@ Java programs. This is a fork of [goto-analyzer](#goto-analyzer) with
 a Java Virtual Machine front end.
 
 Documentation useful for this tool can be found:
-- [Analysis Information](http://cprover.diffblue.com/group__analyses.html)
+- [Analysis Information](https://diffblue.github.io/cbmc/group__analyses.html)
 
 Details of all the options can be seen by running
 ```
@@ -174,13 +161,13 @@ simple examples and information.
 
 For details on how analysis is performed in the `cbmc` and
 `jbmc` tools see see the following documents:
-- [CBMC Architecture](http://cprover.diffblue.com/cbmc-architecture.html)
+- [CBMC Architecture](https://diffblue.github.io/cbmc/cbmc-architecture.html)
 gives a high level overview of the `cbmc` architecture and data flow that *should also apply to* `jbmc`.
-- [Background Concepts](http://cprover.diffblue.com/background-concepts.html)
+- [Background Concepts](https://diffblue.github.io/cbmc/background-concepts.html)
 overviews all the key concepts used in the `jbmc` analysis.
 
 For details on compiling, testing, contributing, and documentation related to development see:
-- [CProver Development Documentation](http://cprover.diffblue.com/index.html)
+- [CProver Development Documentation](https://diffblue.github.io/cbmc/)
 
 
 ## jdiff
@@ -212,14 +199,14 @@ Note that to use `memory-analyzer` the program must be compiled with
 compile with the `-g` option. 
 
 For further documentation and examples see 
-[here](http://cprover.diffblue.com/md__home_travis_build_diffblue_cbmc_doc_architectural_memory-analyzer.html).
+[here](https://diffblue.github.io/cbmc/man/memory-analyzer.html).
 
 
 ## smt2_solver
 
 This is an (Satisfiability Modulo Theories) SMT solver that
 parses SMT-LIB 2 format files and uses CProver's internal bit-blasting
-solver (see [solvers](http://cprover.diffblue.com/group__solvers.html))
+solver (see [solvers](https://diffblue.github.io/cbmc/group__solvers.html))
 to resolve queries.
 
 ## symtab2gb

@@ -1,7 +1,7 @@
 [![Build Status][coverity_img]][coverity]
 [![Build Status][codecov_img]][codecov]
 
-[CProver Documentation](http://cprover.diffblue.com)
+[CProver Documentation](https://diffblue.github.io/cbmc/)
 
 About
 =====

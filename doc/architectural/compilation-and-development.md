@@ -235,7 +235,7 @@ contained in the `doc/` directory and gives some options for these
 tools. All of these could be improved and patches are very welcome. In
 some cases the algorithms used are described in the relevant papers.
 
-The doxygen documentation can be [accessed online](http://cprover.diffblue.com).
+The doxygen documentation can be [accessed online](https://diffblue.github.io/cbmc/).
 To build it locally, run `scripts/run_doxygen.sh`.  HTML output will be created
 in `doc/html/`. The index page is `doc/html/index.html`.  This script will
 filter out expected warning messages from doxygen, so that new problems are more

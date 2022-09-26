@@ -44,8 +44,7 @@ You are now ready to use CBMC. We recommend you follow the
 
 ### Building CBMC from Source
 
-See the [CPROVER Developer
-Documentation](http://cprover.diffblue.com/compilation-and-development.html).
+See the [CPROVER Developer Documentation](https://diffblue.github.io/cbmc/compilation-and-development.html).
 
 ## Installing the Eclipse Plugin
 

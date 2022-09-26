@@ -65,7 +65,7 @@ location.
 
 ## References
 
-* The cprover documentation: http://cprover.diffblue.com/
+* The cprover documentation: https://diffblue.github.io/cbmc/
   * Sources: https://github.com/diffblue/cbmc/tree/develop/doc
 
 * The cprover manual: http://www.cprover.org/cprover-manual/
