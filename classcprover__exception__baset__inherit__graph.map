@@ -1,0 +1,14 @@
+<map id="cprover_exception_baset" name="cprover_exception_baset">
+<area shape="rect" id="node1" title="Base class for exceptions thrown in the cprover project." alt="" coords="5,260,191,287"/>
+<area shape="rect" id="node2" href="$classanalysis__exceptiont.html" title="Thrown when an unexpected error occurs during the analysis (e.g., when the SAT solver returns an erro..." alt="" coords="265,5,417,32"/>
+<area shape="rect" id="node3" href="$classdeserialization__exceptiont.html" title="Thrown when failing to deserialize a value from some low level format, like JSON or raw bytes." alt="" coords="243,56,438,83"/>
+<area shape="rect" id="node4" href="$classgdb__interaction__exceptiont.html" title=" " alt="" coords="241,107,440,133"/>
+<area shape="rect" id="node5" href="$classincorrect__goto__program__exceptiont.html" title="Thrown when a goto program that&#39;s being processed is in an invalid format, for example passing the wr..." alt="" coords="252,158,429,199"/>
+<area shape="rect" id="node6" href="$classinvalid__command__line__argument__exceptiont.html" title="Thrown when users pass incorrect command line arguments, for example passing no files to analysis or ..." alt="" coords="256,223,425,265"/>
+<area shape="rect" id="node7" href="$classinvalid__input__exceptiont.html" title="Thrown when user&#45;provided input cannot be processed." alt="" coords="249,289,432,316"/>
+<area shape="rect" id="node9" href="$classinvalid__restriction__exceptiont.html" title=" " alt="" coords="271,341,410,382"/>
+<area shape="rect" id="node10" href="$classsystem__exceptiont.html" title="Thrown when some external system fails unexpectedly." alt="" coords="267,407,414,433"/>
+<area shape="rect" id="node11" href="$classunsupported__operation__exceptiont.html" title="Thrown when we encounter an instruction, parameters to an instruction etc." alt="" coords="255,458,427,499"/>
+<area shape="rect" id="node12" href="$classuser__input__error__exceptiont.html" title=" " alt="" coords="239,524,443,551"/>
+<area shape="rect" id="node8" href="$classinvalid__source__file__exceptiont.html" title="Thrown when we can&#39;t handle something in an input source file." alt="" coords="491,282,633,323"/>
+</map>

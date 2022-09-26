@@ -1,0 +1,246 @@
+<h1>NAME</h1>
+<p>janalyzer - Data-flow analysis for Java bytecode</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>janalyzer [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>janalyzer <em>method-name</em></strong></dt>
+<dd><p>Use the fully qualified name of a method as entry point, e.g., <em>'mypackage.Myclass.foo:(I)Z'</em></p>
+</dd>
+<dt><strong>janalyzer <em>class-name</em></strong></dt>
+<dd><p>The entry point is the method specified by <strong>--function</strong>, or otherwise, the <strong>public static void main(String[])</strong> method of the given class <em>class-name</em>.</p>
+</dd>
+<dt><strong>janalyzer -jar <em>jarfile</em></strong></dt>
+<dd><p>JAR file to be checked. The entry point is the method specified by <strong>--function</strong> or otherwise, the <strong>public static void main(String[])</strong> method of the class specified by <strong>--main-class</strong> or the main class specified in the JAR manifest (checked in this order).</p>
+</dd>
+<dt><strong>janalyzer --gb <em>goto-binary</em></strong></dt>
+<dd><p>GOTO binary file to be checked. The entry point is the method specified by <strong>--function</strong>, or otherwise, the <strong>public static void main(String[])</strong> of the class specified by <strong>--main-class</strong> (checked in this order).</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<h1>OPTIONS</h1>
+<dl>
+<dt><strong>-classpath</strong> dirs/jars, <strong>-cp</strong> dirs/jars, <strong>--classpath</strong> dirs/jars</dt>
+<dd><p>Set class search path of directories and jar files using a colon-separated list of directories and JAR archives to search for class files.</p>
+</dd>
+<dt><strong>--main-class</strong> class-name</dt>
+<dd><p>Set the name of the main class.</p>
+</dd>
+<dt><strong>--function</strong> name</dt>
+<dd><p>Set entry point function name.</p>
+</dd>
+</dl>
+<h2>Task options:</h2>
+<dl>
+<dt><strong>--show</strong></dt>
+<dd><p>Displays a domain for every instruction in the GOTO binary. The format and information will depend on the <em>domain</em> that has been selected.</p>
+</dd>
+<dt><strong>--verify</strong></dt>
+<dd><p>Every property in the program is checked to see whether it is true (it always holds), unreachable, false if it is reachable (due to the over-approximate analysis, it is not clear if locations are reachable or if it is an overapproximation, so this is the best that can be achieved) or unknown. If there are multiple points of execution that reach the same location, each will be checked and the answers combined, with unknown taking precedence.</p>
+</dd>
+<dt><strong>--simplify</strong> <em>file_name</em></dt>
+<dd><p>Writes a new version of the input program to <em>file_name</em> in which the program has been simplified using information from the abstract interpreter. The exact simplification will depend on the domain that is used but typically this might be replacing any expression that has a constant value. If this makes instructions unreachable (for example if <strong>GOTO</strong> can be shown to never be taken) they will be removed. Removal can be deactivated by passing <strong>--no-simplify-slicing</strong>. In the ideal world simplify would be idempotent (i.e. running it a second time would not simplify anything more than the first). However there are edge cases which are difficult or prohibitively expensive to handle in the domain which can result in a second (or more) runs giving simplification. Submitting bug reports for these is helpful but they may not be viable to fix.</p>
+</dd>
+<dt><strong>--no-simplify-slicing</strong></dt>
+<dd><p>Do not remove instructions from which no property can be reached (use with <strong>--simplify</strong>).</p>
+</dd>
+<dt><strong>--unreachable-instructions</strong></dt>
+<dd><p>Lists which instructions have a domain which is bottom (i.e. unreachable). If <strong>--function</strong> has been used to set the program entry point then this can flag things like the <em>main</em> function as unreachable.</p>
+</dd>
+<dt><strong>--unreachable-functions</strong></dt>
+<dd><p>Similar to <strong>--unreachable-instructions</strong>, but reports which functions are definitely unreachable rather than just instructions.</p>
+</dd>
+<dt><strong>--reachable-functions</strong></dt>
+<dd><p>The negation of <strong>--unreachable-functions</strong>, reports which functions may be reachable. Note that because the analysis is over-approximate, it is possible this will mark functions as reachable when a more precise analysis (possibly using <strong>jbmc</strong>(1)) will show that there are no execution traces that reach them.</p>
+</dd>
+</dl>
+<h2>Abstract interpreter options:</h2>
+<dl>
+<dt><strong>--location-sensitive</strong></dt>
+<dd><p>use location-sensitive abstract interpreter</p>
+</dd>
+<dt><strong>--concurrent</strong></dt>
+<dd><p>This extends abstract interpretation with very restricted and special purpose handling of threads. This needs the domain to have certain unusual properties for it to give a correct answer. At the time of writing only <strong>--dependence-graph</strong> is compatible with it.</p>
+</dd>
+</dl>
+<h2>Domain options:</h2>
+<dl>
+<dt><strong>--constants</strong></dt>
+<dd><p>The default option, this stores one constant value per variable. This means it is fast but will only find things that can be resolved by constant propagation. The domain has some handling of arrays but limited support for pointers which means that in can potentially give unsound behavior.</p>
+</dd>
+<dt><strong>--intervals</strong></dt>
+<dd><p>A domain that stores an interval for each integer and float variable. At the time of writing not all operations are supported so the results can be quite over-approximate at points. It also has limitations in the handling of pointers so can give unsound results.</p>
+</dd>
+<dt><strong>--non-null</strong></dt>
+<dd><p>This domain is intended to find which pointers are not null. Its implementation is very limited and it is not recommended.</p>
+</dd>
+<dt><strong>--dependence-graph</strong></dt>
+<dd><p>Tracks data flow and information flow dependencies between instructions and produces a graph. This includes doing points-to analysis and tracking reaching definitions (i.e. use-def chains). This is one of the most extensive, correct and feature complete domains.</p>
+</dd>
+</dl>
+<h2>Output options:</h2>
+<p>These options control how the result of the task is output. The default is text to the standard output. In the case of tasks that produce goto-programs (<strong>--simplify</strong> for example), the output options only affect the logging and not the final form of the program.</p>
+<dl>
+<dt><strong>--text</strong> <em>file_name</em></dt>
+<dd><p>Output results in plain text to given file.</p>
+</dd>
+<dt><strong>--json</strong> <em>file_name</em></dt>
+<dd><p>Writes the output as a JSON object to <em>file_name</em>.</p>
+</dd>
+<dt><strong>--xml</strong> <em>file_name</em></dt>
+<dd><p>Output results in XML format to <em>file_name.</em></p>
+</dd>
+<dt><strong>--dot</strong> <em>file_name</em></dt>
+<dd><p>Writes the output in <strong>dot</strong>(1) format to <em>file_name</em>. This is only supported by some domains and tasks (for example <strong>--show</strong> <strong>--dependence-graph</strong>).</p>
+</dd>
+</dl>
+<h2>Specific analyses:</h2>
+<dl>
+<dt><strong>--taint</strong> file_name</dt>
+<dd><p>perform taint analysis using rules in given file</p>
+</dd>
+<dt><strong>--show-taint</strong></dt>
+<dd><p>print taint analysis results on stdout</p>
+</dd>
+<dt><strong>--show-local-may-alias</strong></dt>
+<dd><p>perform procedure-local may alias analysis</p>
+</dd>
+</dl>
+<h2>Java Bytecode frontend options:</h2>
+<dl>
+<dt><strong>--disable-uncaught-exception-check</strong></dt>
+<dd><p>ignore uncaught exceptions and errors</p>
+</dd>
+<dt><strong>--throw-assertion-error</strong></dt>
+<dd><p>Throw java.lang.AssertionError on violated <strong>assert</strong> statements instead of failing at the location of the <strong>assert</strong> statement.</p>
+</dd>
+<dt><strong>--throw-runtime-exceptions</strong></dt>
+<dd><p>Make implicit runtime exceptions explicit.</p>
+</dd>
+<dt><strong>--assert-no-exceptions-thrown</strong></dt>
+<dd><p>Transform <strong>throw</strong> instructions into <strong>assert FALSE</strong> followed by <strong>assume FALSE</strong>.</p>
+</dd>
+<dt><strong>--max-nondet-array-length</strong> <em>N</em></dt>
+<dd><p>Limit nondet (e.g. input) array size to at most <em>N</em>.</p>
+</dd>
+<dt><strong>--max-nondet-tree-depth</strong> <em>N</em></dt>
+<dd><p>Limit size of nondet (e.g. input) object tree; at level <em>N</em> references are set to <strong>null</strong>.</p>
+</dd>
+<dt><strong>--java-assume-inputs-non-null</strong></dt>
+<dd><p>Never initialize reference-typed parameter to the entry point with <strong>null</strong>.</p>
+</dd>
+<dt><strong>--java-assume-inputs-interval</strong> [<em>L</em>:<em>U</em>] or [<em>L</em>:] or [:<em>U</em>]</dt>
+<dd><p>Force numerical primitive-typed inputs (<strong>byte</strong>, <strong>short</strong>, <strong>int</strong>, <strong>long</strong>, <strong>float</strong>, <strong>double</strong>) to be initialized within the given range; lower bound <em>L</em> and upper bound <em>U</em> must be integers; does not work for arrays.</p>
+</dd>
+<dt><strong>--java-assume-inputs-integral</strong></dt>
+<dd><p>Force float and double inputs to have integer values; does not work for arrays;</p>
+</dd>
+<dt><strong>--java-max-vla-length</strong> <em>N</em></dt>
+<dd><p>Limit the length of user-code-created arrays to <em>N</em>.</p>
+</dd>
+<dt><strong>--java-cp-include-files</strong> <em>r</em></dt>
+<dd><p>Regular expression or JSON list of files to load (with '@' prefix).</p>
+</dd>
+<dt><strong>--java-load-class</strong> <em>CLASS</em></dt>
+<dd><p>Also load code from class <em>CLASS</em>.</p>
+</dd>
+<dt><strong>--java-no-load-class</strong> <em>CLASS</em></dt>
+<dd><p>Never load code from class <em>CLASS</em>.</p>
+</dd>
+<dt><strong>--ignore-manifest-main-class</strong></dt>
+<dd><p>Ignore Main-Class entries in JAR manifest files. If this option is specified and the options <strong>--function</strong> and <strong>--main-class</strong> are not, we can be certain that all classes in the JAR file are loaded.</p>
+</dd>
+<dt><strong>--context-include</strong> <em>i</em>, <strong>--context-exclude</strong> <em>e</em></dt>
+<dd><p>Only analyze code matching specification <em>i</em> that does not match specification <em>e</em>, if <strong>--context-exclude</strong> <em>e</em> is also used. All other methods are excluded, i.e., we load their signatures and meta-information, but not their bodies. A specification is any prefix of a package, class or method name, e.g. "org.cprover." or "org.cprover.MyClass." or "org.cprover.MyClass.methodToStub:(I)Z". These options can be given multiple times. The default for context-include is 'all included'; default for context-exclude is 'nothing excluded'.</p>
+</dd>
+<dt><strong>--no-lazy-methods</strong></dt>
+<dd><p>Load and translate all methods given on the command line and in <strong>--classpath</strong> Default is to load methods that appear to be reachable from the <strong>--function</strong> entry point or main class. Note that <strong>--show-symbol-table</strong>, <strong>--show-goto-functions</strong> and <strong>--show-properties</strong> output are restricted to loaded methods by default.</p>
+</dd>
+<dt><strong>--lazy-methods-extra-entry-point</strong> <em>METHODNAME</em></dt>
+<dd><p>Treat <em>METHODNAME</em> as a possible program entry point for the purpose of lazy method loading. <em>METHODNAME</em> can be a regular expression that will be matched against all symbols. If missing, a <strong>java::</strong> prefix will be added. If no descriptor is found, all overloads of a method will also be added.</p>
+</dd>
+<dt><strong>--static-values</strong> <em>f</em></dt>
+<dd><p>Load initial values of static fields from the given JSON file. We assign static fields to these values instead of calling the normal static initializer (clinit) method. The argument can be a relative or absolute path to the file.</p>
+</dd>
+<dt><strong>--java-lift-clinit-calls</strong></dt>
+<dd><p>Lifts clinit calls in function bodies to the top of the function. This may reduce the overall cost of static initialisation, but may be unsound if there are cyclic dependencies between static initializers due to potentially changing their order of execution, or if static initializers have side-effects such as updating another class' static field.</p>
+</dd>
+</dl>
+<h2>Platform options:</h2>
+<dl>
+<dt><strong>--arch</strong> <em>arch</em></dt>
+<dd><p>Set analysis architecture, which defaults to the host architecture. Use one of: <strong>alpha</strong>, <strong>arm</strong>, <strong>arm64</strong>, <strong>armel</strong>, <strong>armhf</strong>, <strong>hppa</strong>, <strong>i386</strong>, <strong>ia64</strong>, <strong>mips</strong>, <strong>mips64</strong>, <strong>mips64el</strong>, <strong>mipsel</strong>, <strong>mipsn32</strong>, <strong>mipsn32el</strong>, <strong>powerpc</strong>, <strong>ppc64</strong>, <strong>ppc64le</strong>, <strong>riscv64</strong>, <strong>s390</strong>, <strong>s390x</strong>, <strong>sh4</strong>, <strong>sparc</strong>, <strong>sparc64</strong>, <strong>v850</strong>, <strong>x32</strong>, <strong>x86_64</strong>, or <strong>none</strong>.</p>
+</dd>
+<dt><strong>--os</strong> <em>os</em></dt>
+<dd><p>Set analysis operating system, which defaults to the host operating system. Use one of: <strong>freebsd</strong>, <strong>linux</strong>, <strong>macos</strong>, <strong>solaris</strong>, or <strong>windows</strong>.</p>
+</dd>
+<dt><strong>--i386-linux</strong>, <strong>--i386-win32</strong>, <strong>--i386-macos</strong>, <strong>--ppc-macos</strong>, <strong>--win32</strong>, <strong>--winx64</strong></dt>
+<dd><p>Set analysis architecture and operating system.</p>
+</dd>
+<dt><strong>--LP64</strong>, <strong>--ILP64</strong>, <strong>--LLP64</strong>, <strong>--ILP32</strong>, <strong>--LP32</strong></dt>
+<dd><p>Set width of int, long and pointers, but don't override default architecture and operating system.</p>
+</dd>
+<dt><strong>--16</strong>, <strong>--32</strong>, <strong>--64</strong></dt>
+<dd><p>Equivalent to <strong>--LP32</strong>, <strong>--ILP32</strong>, <strong>--LP64</strong> (on Windows: <strong>--LLP64</strong>).</p>
+</dd>
+<dt><strong>--little-endian</strong></dt>
+<dd><p>allow little-endian word-byte conversions</p>
+</dd>
+<dt><strong>--big-endian</strong></dt>
+<dd><p>allow big-endian word-byte conversions</p>
+</dd>
+<dt><strong>--gcc</strong></dt>
+<dd><p>use GCC as preprocessor</p>
+</dd>
+</dl>
+<h2>Program representations:</h2>
+<dl>
+<dt><strong>--show-parse-tree</strong></dt>
+<dd><p>show parse tree</p>
+</dd>
+<dt><strong>--show-symbol-table</strong></dt>
+<dd><p>show loaded symbol table</p>
+</dd>
+<dt><strong>--show-goto-functions</strong></dt>
+<dd><p>show loaded goto program</p>
+</dd>
+<dt><strong>--list-goto-functions</strong></dt>
+<dd><p>list loaded goto functions</p>
+</dd>
+<dt><strong>--show-properties</strong></dt>
+<dd><p>show the properties, but don't run analysis</p>
+</dd>
+</dl>
+<h2>Program instrumentation options:</h2>
+<dl>
+<dt><strong>--no-assertions</strong></dt>
+<dd><p>ignore user assertions</p>
+</dd>
+<dt><strong>--no-assumptions</strong></dt>
+<dd><p>ignore user assumptions</p>
+</dd>
+<dt><strong>--property</strong> <em>id</em></dt>
+<dd><p>enable selected properties only</p>
+</dd>
+</dl>
+<h2>Other options:</h2>
+<dl>
+<dt><strong>--version</strong></dt>
+<dd><p>show version and exit</p>
+</dd>
+<dt><strong>--verbosity</strong> <em>n</em></dt>
+<dd><p>verbosity level</p>
+</dd>
+<dt><strong>--timestamp</strong> [<strong>monotonic</strong>|<strong>wall</strong>]</dt>
+<dd><p>Print microsecond-precision timestamps. <strong>monotonic</strong>: stamps increase monotonically. <strong>wall</strong>: ISO-8601 wall clock timestamps.</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>jbmc</strong>(1), <strong>goto-analyzer</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2016-2018, Daniel Kroening, Diffblue</p>

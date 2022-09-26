@@ -1,0 +1,5 @@
+<map id="path_storaget" name="path_storaget">
+<area shape="rect" id="node1" title="Storage for symbolic execution paths to be resumed later." alt="" coords="45,5,157,32"/>
+<area shape="rect" id="node2" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="5,80,89,107"/>
+<area shape="rect" id="node3" href="$classpath__lifot.html" title="LIFO save queue: depth&#45;first search, try to finish paths." alt="" coords="113,80,197,107"/>
+</map>

@@ -1,0 +1,366 @@
+<h1>NAME</h1>
+<p>goto-analyzer - Data-flow analysis for C programs and goto binaries</p>
+<h1>SYNOPSIS</h1>
+<p><strong>goto-analyzer [-?|-h|--help]</strong></p>
+<p><strong>goto-analyzer --version</strong></p>
+<p><strong>goto-analyzer [options] file.c|file.gb</strong></p>
+<h1>DESCRIPTION</h1>
+<p><strong>goto-analyzer</strong> is an abstract interpreter which uses the same front-end and GOTO binary representation as <strong>cbmc</strong>(1).</p>
+<p>The key difference is that <strong>cbmc</strong>(1) under-approximates the behavior of the program (execution traces that are too long or require too many loop unwindings are not considered) while <strong>goto-analyzer</strong> over-approximates the behavior of the program. <strong>cbmc</strong>(1) can determine if a property is A. true for a bounded number of iterations or B. false and giving an error trace. In contrast <strong>goto-analyzer</strong> can determine if a property is A. true for all iterations or B. possibly false. In this sense, each tool has its own strengths and weaknesses.</p>
+<p>To use <strong>goto-analyzer</strong> you need to give options for:</p>
+<blockquote>
+<p>What <em>task</em> to perform after the abstract interpreter has run.</p>
+<p>How to format the <em>output</em>.</p>
+<p>Which <em>abstract interpreter</em> is used.</p>
+<p>Which <em>domain</em> is used to describe the state of the program at a point during execution.</p>
+<p>How the <em>history</em> of the control flow of the program determines the number of points of execution.</p>
+<p>The <em>storage</em> that links points of execution and domains.</p>
+</blockquote>
+<h1>OPTIONS</h1>
+<h2>Task options:</h2>
+<p><strong>goto-analyzer</strong> first runs the abstract interpreter until it reaches a fix-point, then it will perform the task the user has chosen.</p>
+<dl>
+<dt><strong>--show</strong></dt>
+<dd><p>Displays a domain for every instruction in the GOTO binary. The format and information will depend on the <em>domain</em> that has been selected. If there are multiple domains corresponding to the same location (see <em>history</em> below) these will be merged before they are displayed.</p>
+</dd>
+<dt><strong>--show-on-source</strong></dt>
+<dd><p>The source code of the program is displayed line-by-line with the abstract domains corresponding to each location displayed between them. As the analysis is done at the level of instructions in the GOTO binary, some domains may not be displayed. Also if parts of the GOTO binary have been generated or manipulated by other tools, these may not be displayed as there is no corresponding source. <strong>--show-on-source</strong> is the more user-friendly output, but <strong>--show</strong> gives a better picture of exactly what is computed.</p>
+</dd>
+<dt><strong>--verify</strong></dt>
+<dd><p>Every property in the program is checked to see whether it is true (it always holds), unreachable, false if it is reachable (due to the over-approximate analysis, it is not clear if locations are reachable or if it is an overapproximation, so this is the best that can be achieved) or unknown. If there are multiple points of execution that reach the same location, each will be checked and the answers combined, with unknown taking precedence.</p>
+</dd>
+<dt><strong>--simplify</strong> <em>file_name</em></dt>
+<dd><p>Writes a new version of the input program to <em>file_name</em> in which the program has been simplified using information from the abstract interpreter. The exact simplification will depend on the domain that is used but typically this might be replacing any expression that has a constant value. If this makes instructions unreachable (for example if <strong>GOTO</strong> can be shown to never be taken) they will be removed. Removal can be deactivated by passing <strong>--no-simplify-slicing</strong>. In the ideal world simplify would be idempotent (i.e. running it a second time would not simplify anything more than the first). However there are edge cases which are difficult or prohibitively expensive to handle in the domain which can result in a second (or more) runs giving simplification. Submitting bug reports for these is helpful but they may not be viable to fix.</p>
+</dd>
+<dt><strong>--no-simplify-slicing</strong></dt>
+<dd><p>Do not remove instructions from which no property can be reached (use with <strong>--simplify</strong>).</p>
+</dd>
+<dt><strong>--unreachable-instructions</strong></dt>
+<dd><p>Lists which instructions have a domain which is bottom (i.e. unreachable). If <strong>--function</strong> has been used to set the program entry point then this can flag things like the <em>main</em> function as unreachable.</p>
+</dd>
+<dt><strong>--unreachable-functions</strong></dt>
+<dd><p>Similar to <strong>--unreachable-instructions</strong>, but reports which functions are definitely unreachable rather than just instructions.</p>
+</dd>
+<dt><strong>--reachable-functions</strong></dt>
+<dd><p>The negation of <strong>--unreachable-functions</strong>, reports which functions may be reachable. Note that because the analysis is over-approximate, it is possible this will mark functions as reachable when a more precise analysis (possibly using <strong>cbmc</strong>(1)) will show that there are no execution traces that reach them.</p>
+</dd>
+</dl>
+<h2>Abstract interpreter options:</h2>
+<p>These options control which abstract interpreter is used and how the analysis is performed. In principle this can significantly change the accuracy and performance of <strong>goto-analyzer</strong> but the current options are reasonably similar.</p>
+<p>If <strong>--verbosity</strong> is set above <strong>8</strong> the abstract interpreter will log what it is doing. This is intended to aid developers in understanding how the algorithms work, where time is being spent, etc. but can be generally quite instructive.</p>
+<dl>
+<dt><strong>--legacy-ait</strong></dt>
+<dd><p>This is the default option. Abstract interpretation is performed eagerly from the start of the program until fixed-point is reached. Functions are analyzed as needed and in the order of that they are reached. This option also fixes the <em>history</em> and <em>storage</em> options to their defaults.</p>
+</dd>
+<dt><strong>--recursive-interprocedural</strong></dt>
+<dd><p>This extends <strong>--legacy-ait</strong> by allowing the <em>history</em> and <em>storage</em> to be configured. As the name implies, function calls are handled by recursion within the interpreter. This is a good all-round choice and will likely become the default at some point in the future.</p>
+</dd>
+<dt><strong>--three-way-merge</strong></dt>
+<dd><p>This extends <strong>--recursive-interprocedural</strong> by performing a "modification aware" merge after function calls. At the time of writing only <strong>--vsd</strong> supports the necessary differential reasoning. If you are using <strong>--vsd</strong> this is recommended as it is more accurate with little extra cost.</p>
+</dd>
+<dt><strong>--legacy-concurrent</strong></dt>
+<dd><p>This extends <strong>--legacy-ait</strong> with very restricted and special purpose handling of threads. This needs the domain to have certain unusual properties for it to give a correct answer. At the time of writing only <strong>--dependence-graph</strong> is compatible with it.</p>
+</dd>
+<dt><strong>--location-sensitive</strong></dt>
+<dd><p>Use location-sensitive abstract interpreter.</p>
+</dd>
+</dl>
+<h2>History options:</h2>
+<p>To over-approximate what a program does, it is necessary to consider all of the paths of execution through the program. As there are a potentially infinite set of traces (and they can be potentially infinitely long) it is necessary to merge some of them. The common approach (the "collecting abstraction") is to merge all paths that reach the same instruction. The abstract interpretation is then done between instructions without thinking about execution paths. This ensures termination but means that it is not possible to distinguish different call sites, loop iterations or paths through a program.</p>
+<p>Note that <strong>--legacy-ait</strong>, the default abstract interpreter fixes the history to <strong>--ahistorical</strong> so you will need to choose another abstract interpreter to make use of these options.</p>
+<dl>
+<dt><strong>--ahistorical</strong></dt>
+<dd><p>This is the default and the coarsest abstraction. No history information is kept, so all traces that reach an instruction are merged. This is the collecting abstraction that is used in most abstract interpreters.</p>
+</dd>
+<dt><strong>--call-stack</strong> <em>n</em></dt>
+<dd><p>This is an inter-procedural abstraction; it tracks the call stack and only merges traces that reach the same location and have the same call stack. The effect of this is equivalent to inlining all functions and then using <strong>--ahistorical</strong>. In larger programs this can be very expensive in terms of both time and memory but can give much more accurate results. Recursive functions create a challenge as the call stack will be different each time. To prevent non-termination, the parameter <em>n</em> limits how many times a loop of recursive functions can be called. When <em>n</em> is reached all later ones will be merged. Setting this to <em>0</em> will disable the limit.</p>
+</dd>
+<dt><strong>--loop-unwind</strong> <em>n</em></dt>
+<dd><p>This tracks the backwards jumps that are taken in the current function. Traces that reach the same location are merged if their history of backwards jumps is the same. At most <em>n</em> traces are kept for each location, after that they are merged regardless of whether their histories match. This gives a similar effect to unrolling the loops <em>n</em> times and then using <strong>--ahistorical</strong>. In the case of nested loops, the behavior can be a little different to unrolling as the limit is the number of times a location is reached, so a loop with <em>x</em> iterations containing a loop with <em>y</em> iterations will require <em>n</em> = <em>x*y</em>. The time and memory taken by this option will rise (at worst) linearly in terms of <em>n</em>. If <em>n</em> is <strong>0</strong> then there is no limit. Be warned that if there are loops that can execute an unbounded number of iterations or if the domain is not sufficiently precise to identify the termination conditions then the analysis will not terminate.</p>
+</dd>
+<dt><strong>--branching</strong> n</dt>
+<dd><p>This works in a similar way to <strong>--loop-unwind</strong> but tracking forwards jumps (<strong>if</strong>, <strong>switch</strong>, <strong>goto</strong>, etc.) rather than backwards ones. This gives per-path analysis but limiting the number of times each location is visited. There is not a direct form of program transformation that matches this but it is similar to the per-path analysis that symbolic execution does. The scalability and the risk of non-termination if <em>n</em> is <strong>0</strong> remain the same. Note that the goto-programs generated by various language front-ends have a conditional forwards jump to exit the loop if the condition fails at the start and an unconditional backwards jump at the end. This means that <strong>--branching</strong> can wind up distinguishing different loop iterations — "has not exited for the last 3 iterations" rather than "has jumped back to the top 3 times".</p>
+</dd>
+<dt><strong>--loop-unwind-and-branching</strong> <em>n</em></dt>
+<dd><p>Again, this is similar to <strong>--loop-unwind</strong> but tracks both forwards and backwards jumps. This is only a very small amount more expensive than <strong>--branching</strong> and is probably the best option for detailed analysis of each function.</p>
+</dd>
+</dl>
+<h2>Domain options:</h2>
+<p>These control how the possible states at a given execution point are represented and manipulated.</p>
+<dl>
+<dt><strong>--dependence-graph</strong></dt>
+<dd><p>Tracks data flow and information flow dependencies between instructions and produces a graph. This includes doing points-to analysis and tracking reaching definitions (i.e. use-def chains). This is one of the most extensive, correct and feature complete domains.</p>
+</dd>
+<dt><strong>--vsd</strong>, <strong>--variable-sensitivity</strong></dt>
+<dd><p>This is the Variable Sensitivity Domain (VSD). It is a non-relational domain that stores an abstract object for each live variable. Which kind of abstract objects are used depends on the type of the variable and the run-time configuration. This means that sensitivity of the domain can be chosen — for example, do you want to track every element of an array independently, or just a few of them or simply ignore arrays all together. A set of options to configure VSD are given below. This domain is extensive and does not have any known architectural limits on correctness. As such it is a good choice for many kinds of analysis.</p>
+</dd>
+<dt><strong>--dependence-graph-vs</strong></dt>
+<dd><p>This is a variant of the dependence graph domain that uses VSD to do the foundational pointer and reaching definitions analysis. This means it can be configured using the VSD options and give more precise analysis (for example, field aware) of the dependencies.</p>
+</dd>
+<dt><strong>--constants</strong></dt>
+<dd><p>The default option, this stores one constant value per variable. This means it is fast but will only find things that can be resolved by constant propagation. The domain has some handling of arrays but limited support for pointers which means that in can potentially give unsound behavior. <strong>--vsd</strong> <strong>--vsd-values</strong> <em>constants</em> is probably a better choice for this kind of analysis.</p>
+</dd>
+<dt><strong>--intervals</strong></dt>
+<dd><p>A domain that stores an interval for each integer and float variable. At the time of writing not all operations are supported so the results can be quite over-approximate at points. It also has limitations in the handling of pointers so can give unsound results. <strong>--vsd</strong> <strong>--vsd-values</strong> <em>intervals</em> is probably a better choice for this kind of analysis.</p>
+</dd>
+<dt><strong>--non-null</strong></dt>
+<dd><p>This domain is intended to find which pointers are not null. Its implementation is very limited and it is not recommended.</p>
+</dd>
+</dl>
+<h2>Variable sensitivity domain (VSD) options:</h2>
+<p>VSD has a wide range of options that allow you to choose what kind of abstract objects (and thus abstractions) are used to represent variables of each type.</p>
+<dl>
+<dt><strong>--vsd-values</strong> [<strong>constants</strong>|<strong>intervals</strong>|<strong>set-of-constants</strong>]</dt>
+<dd><p>This controls the abstraction used for values, both <strong>int</strong> and <strong>float</strong>. The default option is <strong>constants</strong> which tracks if the variable has a constant value. This is fast but not very precise so it may well be unable to prove very much. <strong>intervals</strong> uses an interval that contains all of the possible values the variable can take. It is more precise than <strong>constants</strong> in all cases but a bit slower. It is good for numerical code. <strong>set-of-constants</strong> uses a set of up to <strong>10</strong> (currently fixed) constants. This is more general than using a single constant but can make analysis up to 10 times (or in rare cases 100 times) slower. It is good for control code with flags and modes.</p>
+</dd>
+<dt><strong>--vsd-structs</strong> [<strong>top-bottom</strong>|<strong>every-field</strong>]</dt>
+<dd><p>This controls how structures are handled. The default is <strong>top-bottom</strong> which uses an abstract object with just two states (top and bottom). In effect writes to structures are ignored and reads from them will always return top (any value). The other alternative is <strong>every-field</strong> which stores an abstract object for each field. Depending on how many structures are live at any one time and how many fields they have this may increase the amount of memory used by <strong>goto-analyzer</strong> by a reasonable amount. But this means that the analysis will be field-sensitive.</p>
+</dd>
+<dt><strong>--vsd-arrays</strong> [<strong>top-bottom</strong>|<strong>smash</strong>|<strong>up-to-n-elements</strong>|<strong>every-element</strong>]</dt>
+<dd><p>This controls how arrays are handled. As with structures, the default is <strong>top-bottom</strong> which effectively ignores writes to the array and returns top on a read. More precise than this is <strong>smash</strong> which stores one abstract element for all of the values. This is relatively cheap but a lot more precise, particularly if used with <strong>intervals</strong> or <strong>set-of-constants</strong>. <strong>up-to-n-elements</strong> generalizes <strong>smash</strong> by storing abstract objects for the first <em>n</em> elements of each array (<em>n defaults to </em><strong>10</strong> and can be controlled by <strong>--vsd-array-max-elements</strong>) and then condensing all other elements down to a single abstract object. This allows reasonably fine-grained control over the amount of memory used and can give much more precise results for small arrays. <strong>every-element</strong> is the most precise, but most expensive option where an abstract element is stored for every entry in the array.</p>
+</dd>
+<dt><strong>--vsd-array-max-elements</strong></dt>
+<dd><p>Configures the value of <strong>n</strong> in <strong>--vsd-arrays</strong> <strong>up-to-n-elements</strong> and defaults to 10 if not given.</p>
+</dd>
+<dt><strong>--vsd-pointers</strong> [<strong>top-bottom</strong>|<strong>constants</strong>|<strong>value-set</strong>]</dt>
+<dd><p>This controls the handling of pointers. The default, <strong>top-bottom</strong> effectively ignores pointers, this is OK if they are just read (all reads return top) but if they are written then there is the problem that we know that a variable is changed but we don't know which one, so we have to set the whole domain to top. <strong>constants</strong> is somewhat misleadingly named as it uses an abstract object that tracks a pointer to a single variable. This includes the offset within the variable; a stack of field names for structs and abstract objects for offsets in arrays. Offsets are tracked even if the abstract object for the variable itself does not distinguish different fields or indexes. <strong>value-set</strong> is the most precise option; it stores a set of pointers to single variables as described above.</p>
+</dd>
+<dt><strong>--vsd-unions</strong> <strong>top-bottom</strong></dt>
+<dd><p>At the time of writing there is only one option for unions which is <strong>top-bottom</strong>, discarding writes and returning top for all reads from a variable of union type.</p>
+</dd>
+<dt><strong>--vsd-data-dependencies</strong></dt>
+<dd><p>Wraps each abstract object with a set of locations where the variable was last modified. The set is reset when the variable is written and takes the union of the two sides' sets on merge. This was originally intended for <strong>--dependence-graph-vs</strong> but has proved useful for <strong>--vsd</strong> as well. This is not strictly necessary for <strong>--three-way-merge</strong> as the mechanism it uses to work out which variables have changed is independent of this option.</p>
+</dd>
+<dt><strong>--vsd-liveness</strong></dt>
+<dd><p>Wraps each abstract object with the location of the last assignment or merge. This is more basic and limited than <strong>--vsd-data-dependencies</strong> and is intended to track SSA-like regions of variable liveness.</p>
+</dd>
+<dt><strong>--vsd-flow-insensitive</strong></dt>
+<dd><p>This does not alter the abstract objects used or their configuration. It disables the reduction of the domain when a branch is taken or an assumption is reached. This normally gives a small saving in time but at the cost of a large amount of precision. This is why the default is to do the reduction. It can be useful for debugging issues with the reduction.</p>
+</dd>
+</dl>
+<h2>Storage options:</h2>
+<p>The histories described above are used to keep track of where in the computation needs to be explored. The most precise option is to keep one domain for every history but in some cases, to save memory and time, it may be desirable to share domains between histories. The storage options allow this kind of sharing.</p>
+<dl>
+<dt><strong>--one-domain-per-location</strong></dt>
+<dd><p>This is the default option. All histories that reach the same location will use the same domain. Setting this means that the results of other histories will be similar to setting <strong>--ahistorical</strong>. One difference is how and when widening occurs: <strong>--one-domain-per-location</strong> <strong>--loop-unwind</strong> <em>n</em> will wait until <em>n</em> iterations of a loop have been completed and then will start to widen.</p>
+</dd>
+<dt><strong>--one-domain-per-history</strong></dt>
+<dd><p>This is the best option to use if you are using a history other than <strong>--ahistorical</strong>. It stores one domain per history which can result in a significant increase in the amount of memory used.</p>
+</dd>
+</dl>
+<h2>Output options:</h2>
+<p>These options control how the result of the task is output. The default is text to the standard output. In the case of tasks that produce goto-programs (<strong>--simplify</strong> for example), the output options only affect the logging and not the final form of the program.</p>
+<dl>
+<dt><strong>--text</strong> <em>file_name</em></dt>
+<dd><p>Output results in plain text to given file.</p>
+</dd>
+<dt><strong>--json</strong> <em>file_name</em></dt>
+<dd><p>Writes the output as a JSON object to <em>file_name</em>.</p>
+</dd>
+<dt><strong>--xml</strong> <em>file_name</em></dt>
+<dd><p>Output results in XML format to <em>file_name.</em></p>
+</dd>
+<dt><strong>--dot</strong> <em>file_name</em></dt>
+<dd><p>Writes the output in <strong>dot</strong>(1) format to <em>file_name</em>. This is only supported by some domains and tasks (for example <strong>--show</strong> <strong>--dependence-graph</strong>).</p>
+</dd>
+</dl>
+<h2>Specific analyses:</h2>
+<dl>
+<dt><strong>--taint</strong> file_name</dt>
+<dd><p>perform taint analysis using rules in given file</p>
+</dd>
+<dt><strong>--show-taint</strong></dt>
+<dd><p>print taint analysis results on stdout</p>
+</dd>
+<dt><strong>--show-local-may-alias</strong></dt>
+<dd><p>perform procedure-local may alias analysis</p>
+</dd>
+</dl>
+<h2>C/C++ frontend options:</h2>
+<dl>
+<dt><strong>-I</strong> path</dt>
+<dd><p>set include path (C/C++)</p>
+</dd>
+<dt><strong>--include</strong> file</dt>
+<dd><p>set include file (C/C++)</p>
+</dd>
+<dt><strong>-D</strong> macro</dt>
+<dd><p>define preprocessor macro (C/C++)</p>
+</dd>
+<dt><strong>--c89</strong>, <strong>--c99</strong>, <strong>--c11</strong></dt>
+<dd><p>set C language standard (default: c11)</p>
+</dd>
+<dt><strong>--cpp98</strong>, <strong>--cpp03</strong>, <strong>--cpp11</strong></dt>
+<dd><p>set C++ language standard (default: cpp98)</p>
+</dd>
+<dt><strong>--unsigned-char</strong></dt>
+<dd><p>make "char" unsigned by default</p>
+</dd>
+<dt><strong>--round-to-nearest</strong>, <strong>--round-to-even</strong></dt>
+<dd><p>rounding towards nearest even (default)</p>
+</dd>
+<dt><strong>--round-to-plus-inf</strong></dt>
+<dd><p>rounding towards plus infinity</p>
+</dd>
+<dt><strong>--round-to-minus-inf</strong></dt>
+<dd><p>rounding towards minus infinity</p>
+</dd>
+<dt><strong>--round-to-zero</strong></dt>
+<dd><p>rounding towards zero</p>
+</dd>
+<dt><strong>--no-library</strong></dt>
+<dd><p>disable built-in abstract C library</p>
+</dd>
+<dt><strong>--function</strong> name</dt>
+<dd><p>set main function name</p>
+</dd>
+</dl>
+<h2>Platform options:</h2>
+<dl>
+<dt><strong>--arch</strong> <em>arch</em></dt>
+<dd><p>Set analysis architecture, which defaults to the host architecture. Use one of: <strong>alpha</strong>, <strong>arm</strong>, <strong>arm64</strong>, <strong>armel</strong>, <strong>armhf</strong>, <strong>hppa</strong>, <strong>i386</strong>, <strong>ia64</strong>, <strong>mips</strong>, <strong>mips64</strong>, <strong>mips64el</strong>, <strong>mipsel</strong>, <strong>mipsn32</strong>, <strong>mipsn32el</strong>, <strong>powerpc</strong>, <strong>ppc64</strong>, <strong>ppc64le</strong>, <strong>riscv64</strong>, <strong>s390</strong>, <strong>s390x</strong>, <strong>sh4</strong>, <strong>sparc</strong>, <strong>sparc64</strong>, <strong>v850</strong>, <strong>x32</strong>, <strong>x86_64</strong>, or <strong>none</strong>.</p>
+</dd>
+<dt><strong>--os</strong> <em>os</em></dt>
+<dd><p>Set analysis operating system, which defaults to the host operating system. Use one of: <strong>freebsd</strong>, <strong>linux</strong>, <strong>macos</strong>, <strong>solaris</strong>, or <strong>windows</strong>.</p>
+</dd>
+<dt><strong>--i386-linux</strong>, <strong>--i386-win32</strong>, <strong>--i386-macos</strong>, <strong>--ppc-macos</strong>, <strong>--win32</strong>, <strong>--winx64</strong></dt>
+<dd><p>Set analysis architecture and operating system.</p>
+</dd>
+<dt><strong>--LP64</strong>, <strong>--ILP64</strong>, <strong>--LLP64</strong>, <strong>--ILP32</strong>, <strong>--LP32</strong></dt>
+<dd><p>Set width of int, long and pointers, but don't override default architecture and operating system.</p>
+</dd>
+<dt><strong>--16</strong>, <strong>--32</strong>, <strong>--64</strong></dt>
+<dd><p>Equivalent to <strong>--LP32</strong>, <strong>--ILP32</strong>, <strong>--LP64</strong> (on Windows: <strong>--LLP64</strong>).</p>
+</dd>
+<dt><strong>--little-endian</strong></dt>
+<dd><p>allow little-endian word-byte conversions</p>
+</dd>
+<dt><strong>--big-endian</strong></dt>
+<dd><p>allow big-endian word-byte conversions</p>
+</dd>
+<dt><strong>--gcc</strong></dt>
+<dd><p>use GCC as preprocessor</p>
+</dd>
+</dl>
+<h2>Program representations:</h2>
+<dl>
+<dt><strong>--show-parse-tree</strong></dt>
+<dd><p>show parse tree</p>
+</dd>
+<dt><strong>--show-symbol-table</strong></dt>
+<dd><p>show loaded symbol table</p>
+</dd>
+<dt><strong>--show-goto-functions</strong></dt>
+<dd><p>show loaded goto program</p>
+</dd>
+<dt><strong>--list-goto-functions</strong></dt>
+<dd><p>list loaded goto functions</p>
+</dd>
+<dt><strong>--show-properties</strong></dt>
+<dd><p>show the properties, but don't run analysis</p>
+</dd>
+</dl>
+<h2>Program instrumentation options:</h2>
+<dl>
+<dt><strong>--property</strong> id</dt>
+<dd><p>enable selected properties only</p>
+</dd>
+<dt><strong>--bounds-check</strong></dt>
+<dd><p>enable array bounds checks</p>
+</dd>
+<dt><strong>--pointer-check</strong></dt>
+<dd><p>enable pointer checks</p>
+</dd>
+<dt><strong>--memory-leak-check</strong></dt>
+<dd><p>enable memory leak checks</p>
+</dd>
+<dt><strong>--div-by-zero-check</strong></dt>
+<dd><p>enable division by zero checks</p>
+</dd>
+<dt><strong>--signed-overflow-check</strong></dt>
+<dd><p>enable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--unsigned-overflow-check</strong></dt>
+<dd><p>enable arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--pointer-overflow-check</strong></dt>
+<dd><p>enable pointer arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--conversion-check</strong></dt>
+<dd><p>check whether values can be represented after type cast</p>
+</dd>
+<dt><strong>--undefined-shift-check</strong></dt>
+<dd><p>check shift greater than bit-width</p>
+</dd>
+<dt><strong>--float-overflow-check</strong></dt>
+<dd><p>check floating-point for +/-Inf</p>
+</dd>
+<dt><strong>--nan-check</strong></dt>
+<dd><p>check floating-point for NaN</p>
+</dd>
+<dt><strong>--enum-range-check</strong></dt>
+<dd><p>checks that all enum type expressions have values in the enum range</p>
+</dd>
+<dt><strong>--pointer-primitive-check</strong></dt>
+<dd><p>checks that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--retain-trivial-checks</strong></dt>
+<dd><p>include checks that are trivially true</p>
+</dd>
+<dt><strong>--error-label</strong> label</dt>
+<dd><p>check that label is unreachable</p>
+</dd>
+<dt><strong>--no-built-in-assertions</strong></dt>
+<dd><p>ignore assertions in built-in library</p>
+</dd>
+<dt><strong>--no-assertions</strong></dt>
+<dd><p>ignore user assertions</p>
+</dd>
+<dt><strong>--no-assumptions</strong></dt>
+<dd><p>ignore user assumptions</p>
+</dd>
+<dt><strong>--assert-to-assume</strong></dt>
+<dd><p>convert user assertions to assumptions</p>
+</dd>
+<dt><strong>--malloc-may-fail</strong></dt>
+<dd><p>allow malloc calls to return a null pointer</p>
+</dd>
+<dt><strong>--malloc-fail-assert</strong></dt>
+<dd><p>set malloc failure mode to assert-then-assume</p>
+</dd>
+<dt><strong>--malloc-fail-null</strong></dt>
+<dd><p>set malloc failure mode to return null</p>
+</dd>
+<dt><strong>--string-abstraction</strong></dt>
+<dd><p>track C string lengths and zero-termination</p>
+</dd>
+</dl>
+<h2>Other options:</h2>
+<dl>
+<dt><strong>--validate-goto-model</strong></dt>
+<dd><p>enable additional well-formedness checks on the goto program</p>
+</dd>
+<dt><strong>--validate-ssa-equation</strong></dt>
+<dd><p>enable additional well-formedness checks on the SSA representation</p>
+</dd>
+<dt><strong>--version</strong></dt>
+<dd><p>show version and exit</p>
+</dd>
+<dt><strong>--flush</strong></dt>
+<dd><p>flush every line of output</p>
+</dd>
+<dt><strong>--verbosity</strong> #</dt>
+<dd><p>verbosity level</p>
+</dd>
+<dt><strong>--timestamp</strong> [<strong>monotonic</strong>|<strong>wall</strong>]</dt>
+<dd><p>Print microsecond-precision timestamps. <strong>monotonic</strong>: stamps increase monotonically. <strong>wall</strong>: ISO-8601 wall clock timestamps.</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>cbmc</strong>(1), <strong>goto-cc</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2017-2018, Daniel Kroening, Diffblue</p>

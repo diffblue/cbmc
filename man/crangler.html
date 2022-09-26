@@ -1,0 +1,42 @@
+<h1>NAME</h1>
+<p>crangler - C source transformation</p>
+<h1>SYNOPSIS</h1>
+<p><strong>crangler [-?] [-h] [--help]</strong></p>
+<p><strong>crangler</strong><em> file.json</em></p>
+<h1>DESCRIPTION</h1>
+<p><strong>crangler</strong> is a command-line utility that makes changes to a preprocessed C file that are prescribed in a JSON configuration file.</p>
+<p>The supported transformations are:</p>
+<blockquote>
+<p>Add a contract (pre/post/assigns) to a named C function.</p>
+<p>Add a loop invariant to a loop identified by the name of the function its in and a loop number.</p>
+<p>Remove the <strong>static</strong> storage classifier from a function or a variable.</p>
+<p>Replace a function call by a call to a stub.</p>
+</blockquote>
+<p>The resulting source file is written to standard output or to a file specified in the JSON configuration.</p>
+<h1>EXAMPLE</h1>
+<p>The following JSON configuration file makes <strong>crangler</strong> preprocess <em>remove_static1.c</em>. While processing this file to produce a preprocessed result, no non-standard include paths or defines reqired. Transformations configured here are removing the <strong>static</strong> storage classifier from all functions matching the regular expression <strong>foobar[12]</strong>, and replacing calls to <em>bar</em> by calls to a function called <em>bar_stub</em>. No objects are listed that require transformation. The result is written to standard output.</p>
+<pre><code>{
+  &quot;sources&quot;: [
+    &quot;remove_static1.c&quot;
+  ],
+  &quot;includes&quot;: [],
+  &quot;defines&quot;: [],
+  &quot;functions&quot;: [
+    {
+      &quot;foobar[12]&quot;: [
+        &quot;remove static&quot;
+      ],
+      &quot;bar&quot;: [
+        &quot;stub bar_stub&quot;
+      ]
+    }
+  ],
+  &quot;objects&quot;: [],
+  &quot;output&quot;: &quot;stdout&quot;
+}</code></pre>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>COPYRIGHT</h1>
+<p>2021, Daniel Kroening</p>

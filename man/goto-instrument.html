@@ -1,0 +1,789 @@
+<h1>NAME</h1>
+<p>goto-instrument - Perform analysis or instrumentation of goto binaries</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>goto-instrument [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>goto-instrument --version</strong></dt>
+<dd><p>show version and exit</p>
+</dd>
+<dt><strong>goto-instrument [options] <em>in</em> [<em>out</em>]</strong></dt>
+<dd><p>perform analysis or instrumentation</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<p><strong>goto-instrument</strong> reads a GOTO binary, performs a given program transformation, and then writes the resulting program as GOTO binary on disk.</p>
+<h1>OPTIONS</h1>
+<h2>Dump Source:</h2>
+<dl>
+<dt><strong>--dump-c</strong></dt>
+<dd><p>generate C source</p>
+</dd>
+<dt><strong>--dump-c-type-header</strong> <em>m</em></dt>
+<dd><p>generate a C header for types local in <em>m</em></p>
+</dd>
+<dt><strong>--dump-cpp</strong></dt>
+<dd><p>generate C++ source</p>
+</dd>
+<dt><strong>--no-system-headers</strong></dt>
+<dd><p>generate C source expanding libc includes</p>
+</dd>
+<dt><strong>--use-all-headers</strong></dt>
+<dd><p>generate C source with all includes</p>
+</dd>
+<dt><strong>--harness</strong></dt>
+<dd><p>include input generator in output</p>
+</dd>
+<dt><strong>--horn</strong></dt>
+<dd><p>print program as constrained horn clauses</p>
+</dd>
+</dl>
+<h2>Diagnosis:</h2>
+<dl>
+<dt><strong>--show-properties</strong></dt>
+<dd><p>show the properties, but don't run analysis</p>
+</dd>
+<dt><strong>--document-properties-html</strong></dt>
+<dd><p>generate HTML property documentation</p>
+</dd>
+<dt><strong>--document-properties-latex</strong></dt>
+<dd><p>generate Latex property documentation</p>
+</dd>
+<dt><strong>--show-symbol-table</strong></dt>
+<dd><p>show loaded symbol table</p>
+</dd>
+<dt><strong>--list-symbols</strong></dt>
+<dd><p>list symbols with type information</p>
+</dd>
+<dt><strong>--show-goto-functions</strong></dt>
+<dd><p>show loaded goto program</p>
+</dd>
+<dt><strong>--list-goto-functions</strong></dt>
+<dd><p>list loaded goto functions</p>
+</dd>
+<dt><strong>--count-eloc</strong></dt>
+<dd><p>count effective lines of code</p>
+</dd>
+<dt><strong>--list-eloc</strong></dt>
+<dd><p>list full path names of lines containing code</p>
+</dd>
+<dt><strong>--print-global-state-size</strong></dt>
+<dd><p>count the total number of bits of global objects</p>
+</dd>
+<dt><strong>--print-path-lengths</strong></dt>
+<dd><p>print statistics about control-flow graph paths</p>
+</dd>
+<dt><strong>--show-locations</strong></dt>
+<dd><p>show all source locations</p>
+</dd>
+<dt><strong>--dot</strong></dt>
+<dd><p>generate CFG graph in DOT format</p>
+</dd>
+<dt><strong>--print-internal-representation</strong></dt>
+<dd><p>show verbose internal representation of the program</p>
+</dd>
+<dt><strong>--list-undefined-functions</strong></dt>
+<dd><p>list functions without body</p>
+</dd>
+<dt><strong>--list-calls-args</strong></dt>
+<dd><p>list all function calls with their arguments</p>
+</dd>
+<dt><strong>--call-graph</strong></dt>
+<dd><p>show graph of function calls</p>
+</dd>
+<dt><strong>--reachable-call-graph</strong></dt>
+<dd><p>show graph of function calls potentially reachable from main function</p>
+</dd>
+<dt><strong>--show-class-hierarchy</strong></dt>
+<dd><p>show the class hierarchy</p>
+</dd>
+<dt><strong>--validate-goto-model</strong></dt>
+<dd><p>enable additional well-formedness checks on the goto program</p>
+</dd>
+<dt><strong>--validate-ssa-equation</strong></dt>
+<dd><p>enable additional well-formedness checks on the SSA representation</p>
+</dd>
+<dt><strong>--validate-goto-binary</strong></dt>
+<dd><p>check the well-formedness of the passed in GOTO binary and then exit</p>
+</dd>
+<dt><strong>--interpreter</strong></dt>
+<dd><p>do concrete execution</p>
+</dd>
+</dl>
+<h2>Data-flow analyses:</h2>
+<dl>
+<dt><strong>--show-struct-alignment</strong></dt>
+<dd><p>show struct members that might be concurrently accessed</p>
+</dd>
+<dt><strong>--show-threaded</strong></dt>
+<dd><p>show instructions that may be executed by more than one thread</p>
+</dd>
+<dt><strong>--show-local-safe-pointers</strong></dt>
+<dd><p>show pointer expressions that are trivially dominated by a not-null check</p>
+</dd>
+<dt><strong>--show-safe-dereferences</strong></dt>
+<dd><p>show pointer expressions that are trivially dominated by a not-null check *and* used as a dereference operand</p>
+</dd>
+<dt><strong>--show-value-sets</strong></dt>
+<dd><p>show points-to information (using value sets)</p>
+</dd>
+<dt><strong>--show-global-may-alias</strong></dt>
+<dd><p>show may-alias information over globals</p>
+</dd>
+<dt><strong>--show-local-bitvector-analysis</strong></dt>
+<dd><p>show procedure-local pointer analysis</p>
+</dd>
+<dt><strong>--escape-analysis</strong></dt>
+<dd><p>perform escape analysis</p>
+</dd>
+<dt><strong>--show-escape-analysis</strong></dt>
+<dd><p>show results of escape analysis</p>
+</dd>
+<dt><strong>--custom-bitvector-analysis</strong></dt>
+<dd><p>perform configurable bitvector analysis</p>
+</dd>
+<dt><strong>--show-custom-bitvector-analysis</strong></dt>
+<dd><p>show results of configurable bitvector analysis</p>
+</dd>
+<dt><strong>--interval-analysis</strong></dt>
+<dd><p>perform interval analysis</p>
+</dd>
+<dt><strong>--show-intervals</strong></dt>
+<dd><p>show results of interval analysis</p>
+</dd>
+<dt><strong>--show-uninitialized</strong></dt>
+<dd><p>show maybe-uninitialized variables</p>
+</dd>
+<dt><strong>--show-points-to</strong></dt>
+<dd><p>show points-to information</p>
+</dd>
+<dt><strong>--show-rw-set</strong></dt>
+<dd><p>show read-write sets</p>
+</dd>
+<dt><strong>--show-call-sequences</strong></dt>
+<dd><p>show function call sequences</p>
+</dd>
+<dt><strong>--show-reaching-definitions</strong></dt>
+<dd><p>show reaching definitions</p>
+</dd>
+<dt><strong>--show-dependence-graph</strong></dt>
+<dd><p>show program-dependence graph</p>
+</dd>
+<dt><strong>--show-sese-regions</strong></dt>
+<dd><p>show single-entry-single-exit regions</p>
+</dd>
+</dl>
+<h2>Safety checks:</h2>
+<dl>
+<dt><strong>--no-assertions</strong></dt>
+<dd><p>ignore user assertions</p>
+</dd>
+<dt><strong>--bounds-check</strong></dt>
+<dd><p>enable array bounds checks</p>
+</dd>
+<dt><strong>--pointer-check</strong></dt>
+<dd><p>enable pointer checks</p>
+</dd>
+<dt><strong>--memory-leak-check</strong></dt>
+<dd><p>enable memory leak checks</p>
+</dd>
+<dt><strong>--div-by-zero-check</strong></dt>
+<dd><p>enable division by zero checks</p>
+</dd>
+<dt><strong>--signed-overflow-check</strong></dt>
+<dd><p>enable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--unsigned-overflow-check</strong></dt>
+<dd><p>enable arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--pointer-overflow-check</strong></dt>
+<dd><p>enable pointer arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--conversion-check</strong></dt>
+<dd><p>check whether values can be represented after type cast</p>
+</dd>
+<dt><strong>--undefined-shift-check</strong></dt>
+<dd><p>check shift greater than bit-width</p>
+</dd>
+<dt><strong>--float-overflow-check</strong></dt>
+<dd><p>check floating-point for +/-Inf</p>
+</dd>
+<dt><strong>--nan-check</strong></dt>
+<dd><p>check floating-point for NaN</p>
+</dd>
+<dt><strong>--enum-range-check</strong></dt>
+<dd><p>checks that all enum type expressions have values in the enum range</p>
+</dd>
+<dt><strong>--pointer-primitive-check</strong></dt>
+<dd><p>checks that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--retain-trivial-checks</strong></dt>
+<dd><p>include checks that are trivially true</p>
+</dd>
+<dt><strong>--error-label</strong> label</dt>
+<dd><p>check that label is unreachable</p>
+</dd>
+<dt><strong>--no-built-in-assertions</strong></dt>
+<dd><p>ignore assertions in built-in library</p>
+</dd>
+<dt><strong>--no-assertions</strong></dt>
+<dd><p>ignore user assertions</p>
+</dd>
+<dt><strong>--no-assumptions</strong></dt>
+<dd><p>ignore user assumptions</p>
+</dd>
+<dt><strong>--assert-to-assume</strong></dt>
+<dd><p>convert user assertions to assumptions</p>
+</dd>
+<dt><strong>--uninitialized-check</strong></dt>
+<dd><p>add checks for uninitialized locals (experimental)</p>
+</dd>
+<dt><strong>--stack-depth</strong> n</dt>
+<dd><p>add check that call stack size of non-inlined functions never exceeds n</p>
+</dd>
+<dt><strong>--race-check</strong></dt>
+<dd><p>add floating-point data race checks</p>
+</dd>
+</dl>
+<h2>Semantic transformations:</h2>
+<dl>
+<dt><strong>--nondet-volatile</strong><br />
+<strong>--nondet-volatile-variable</strong> <em>variable</em></dt>
+<dd><p>By default, <strong>cbmc</strong>(1) treats volatile variables the same as non-volatile variables. That is, it assumes that a volatile variable does not change between subsequent reads, unless it was written to by the program. With the above options, <strong>goto-instrument</strong> can be instructed to instrument the given goto program such as to (1) make reads from all volatile expressions non-deterministic (<strong>--nondet-volatile</strong>), (2) make reads from specific variables non-deterministic (<strong>--nondet-volatile-variable</strong>), or (3) model reads from specific variables by given models (<strong>--nondet-volatile-model</strong>).</p>
+</dd>
+</dl>
+<p>Below we give two usage examples for the options. Consider the following test, for function <em>get_celsius</em> and with harness <em>test_get_celsius</em>:</p>
+<pre><code>#include &lt;assert.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;stdint.h&gt;
+
+// hardware sensor for temperature in kelvin
+extern volatile uint16_t temperature;
+
+int get_celsius() {
+  if (temperature &gt; (1000 + 273)) {
+    return INT_MIN; // value indicating error
+  }
+  return temperature - 273;
+}
+
+void test_get_celsius() {
+  int t = get_celsius();
+  assert(t == INT_MIN || t &lt;= 1000);
+  assert(t == INT_MIN || t &gt;= -273);
+}</code></pre>
+<p>Here the variable <em>temperature</em> corresponds to a hardware sensor. It returns the current temperature on each read. The <em>get_celsius</em> function converts the value in Kelvin to degrees Celsius, given the value is in the expected range. However, it has a bug where it reads <em>temperature</em> a second time after the check, which may yield a value for which the check would not succeed. Verifying this program as is with <strong>cbmc</strong>(1) would yield a verification success. We can use <strong>goto-instrument</strong> to make reads from <em>temperature</em> non-deterministic:</p>
+<pre><code>goto-cc -o get_celsius_test.gb get_celsius_test.c
+goto-instrument --nondet-volatile-variable temperature \
+  get_celsius_test.gb get_celsius_test-mod.gb
+cbmc --function test_get_celsius get_celsius_test-mod.gb</code></pre>
+<p>Here the final invocation of <strong>cbmc</strong>(1) correctly reports a verification failure.</p>
+<dl>
+<dt><strong>--nondet-volatile-model</strong> <em>variable</em>:<em>model</em></dt>
+<dd><p>Simply treating volatile variables as non-deterministic may for some use cases be too inaccurate. Consider the following test, for function <em>get_message</em> and with harness <em>test_get_message</em>:</p>
+</dd>
+</dl>
+<pre><code>#include &lt;assert.h&gt;
+#include &lt;stdint.h&gt;
+
+extern volatile uint32_t clock;
+
+typedef struct message {
+  uint32_t timestamp;
+  void *data;
+} message_t;
+
+void *read_data();
+
+message_t get_message() {
+  message_t msg;
+  msg.timestamp = clock;
+  msg.data = read_data();
+  return msg;
+}
+
+void test_get_message() {
+  message_t msg1 = get_message();
+  message_t msg2 = get_message();
+  assert(msg1.timestamp &lt;= msg2.timestamp);
+}</code></pre>
+<p>The harness verifies that <em>get_message</em> assigns non-decreasing time stamps to the returned messages. However, simply treating <em>clock</em> as non-deterministic would not allow to prove this property. Thus, we can supply a model for reads from <em>clock</em>:</p>
+<pre><code>// model for reads of the variable clock
+uint32_t clock_read_model() {
+  static uint32_t clock_value = 0;
+  uint32_t increment;
+  __CPROVER_assume(increment &lt;= 100);
+  clock_value += increment;
+  return clock_value;
+}</code></pre>
+<p>The model is stateful in that it keeps the current clock value between invocations in the variable <em>clock_value</em>. On each invocation, it increments the clock by a non-deterministic value in the range 0 to 100. We can tell <strong>goto-instrument</strong> to use the model <em>clock_read_model</em> for reads from the variable <em>clock</em> as follows:</p>
+<pre><code>goto-cc -o get_message_test.gb get_message_test.c
+goto-instrument --nondet-volatile-model clock:clock_read_model \
+  get_message_test.gb get_message_test-mod.gb
+cbmc --function get_message_test get_message_test-mod.gb</code></pre>
+<p>Now the final invocation of <strong>cbmc</strong>(1) reports verification success.</p>
+<dl>
+<dt><strong>--isr</strong> <em>function</em></dt>
+<dd><p>instruments an interrupt service routine</p>
+</dd>
+<dt><strong>--mmio</strong></dt>
+<dd><p>instruments memory-mapped I/O</p>
+</dd>
+<dt><strong>--nondet-static</strong></dt>
+<dd><p>add nondeterministic initialization of variables with static lifetime</p>
+</dd>
+<dt><strong>--nondet-static-exclude</strong> <em>e</em></dt>
+<dd><p>same as nondet-static except for the variable <em>e</em> (use multiple times if required)</p>
+</dd>
+<dt><strong>--function-enter</strong> <em>f</em><br />
+<strong>--function-exit</strong> <em>f</em><br />
+<strong>--branch</strong> <em>f</em></dt>
+<dd><p>instruments a call to <em>f</em> at the beginning, the exit, or a branch point, respectively</p>
+</dd>
+<dt><strong>--splice-call</strong> <em>caller</em>,<em>callee</em></dt>
+<dd><p>prepends a call to <em>callee</em> in the body of <em>caller</em></p>
+</dd>
+<dt><strong>--check-call-sequence</strong> <em>seq</em></dt>
+<dd><p>instruments checks to assert that all call sequences match <em>seq</em></p>
+</dd>
+<dt><strong>--undefined-function-is-assume-false</strong></dt>
+<dd><p>convert each call to an undefined function to assume(false)</p>
+</dd>
+<dt><strong>--insert-final-assert-false</strong> <em>function</em></dt>
+<dd><p>generate assert(false) at end of <em>function</em></p>
+</dd>
+<dt><strong>--generate-function-body</strong> <em>regex</em></dt>
+<dd><p>This transformation inserts implementations of functions without definition, i.e., a body. The behavior of the generated function is chosen via <strong>--generate-function-body-options</strong> <em>option</em>:</p>
+</dd>
+<dt><strong>--generate-function-body-options</strong> <em>option</em></dt>
+<dd><p>One of <strong>assert-false</strong>, <strong>assume-false</strong>, <strong>nondet-return</strong>, <strong>assert-false-assume-false</strong> and <strong>havoc</strong>[,<strong>params:</strong><em>regex</em>][,<strong>globals:</strong><em>regex</em>][,<strong>params:</strong><em>p_n1</em>;<em>p_n2</em>;..] (default: <strong>nondet-return</strong>)</p>
+<p><strong>assert-false</strong>: The body consists of a single command: <strong>assert(0)</strong>.</p>
+<p><strong>assume-false</strong>: The body consists of a single command: <strong>assume(0)</strong>.</p>
+<p><strong>assert-false-assume-false</strong>: Two commands as above.</p>
+<p><strong>nondet-return</strong>: The generated function returns a non-deterministic value of its return type.</p>
+<p><strong>havoc</strong>[,<strong>params:</strong><em>p-regex</em>][,<strong>globals:</strong><em>g-regex</em>]: Assign non-deterministic values to the targets of pointer-to-non-constant parameters matching the regular expression <em>p-regex</em>, and non-constant globals matching <em>g-regex</em>, and then (in case of non-void function) returning as with <strong>nondet-return</strong>. The following example demonstrates the use:</p>
+</dd>
+</dl>
+<pre><code>// main.c
+int global;
+const int c_global;
+int function(int *param, const int *c_param);</code></pre>
+<p>Often we want to avoid overwriting internal symbols, i.e., those with an <strong>__</strong> prefix, which is done using the pattern <strong>(?!__)</strong>.</p>
+<pre><code>goto-cc main.c -o main.gb
+goto-instrument main.gb main-out.gb \
+  --generate-function-body-options &#39;havoc,params:(?!__).*,globals:(?!__).*&#39; \
+  --generate-funtion-body function</code></pre>
+<p>This leads to a GOTO binary equivalent to the following C code:</p>
+<pre><code>// main-mod.c
+int function(int *param, const int *c_param) {
+  *param = nondet_int();
+  global = nondet_int();
+  return nondet_int();
+}</code></pre>
+<p>The parameters should that should be non-deterministically updated can be specified either by a regular expression (as above) or by a semicolon-separated list of their numbers. For example <em>havoc,params:0;3;4</em> will assign non-deterministic values to the first, fourth, and fifth parameter.</p>
+<p>Note that only parameters of pointer type can be havoced and <strong>goto-instrument</strong> will produce an error report if given a parameter number associated with a non-pointer parameter. Requesting to havoc a parameter with a number higher than the number of parameters a given function takes will also results in an error report.</p>
+<dl>
+<dt><strong>--generate-havocing-body</strong> <em>option</em> <em>fun_name</em>,<strong>params:</strong><em>p_n1</em>;<em>p_n2</em>;..<br />
+<strong>--generate-havocing-body</strong> <em>option</em> <em>fun_name</em>[,<em>call-site-id</em>,<strong>params:</strong><em>p_n1</em>;<em>p_n2</em>;..&gt;]+</dt>
+<dd><p>Request a different implementation for a number of call-sites of a single function. The option <strong>--generate-havocing-body</strong> inserts new functions for selected call-sites and replaces the calls to the origin function with calls to the respective new functions.</p>
+</dd>
+</dl>
+<pre><code>// main.c
+int function(int *first, int *second, int *third);
+
+int main() {
+  int a = 10;
+  int b = 10;
+  int c = 10;
+  function(&amp;a, &amp;b, &amp;c);
+  function(&amp;a, &amp;b, &amp;c);
+}</code></pre>
+<p>The user can specify different behavior for each call-site as follows:</p>
+<pre><code>goto-cc main.c -o main.gb
+goto-instrument main.gb  main-mod.gb \
+  --generate-havocing-body &#39;function,1,params:0;2,2,params:1&#39;</code></pre>
+<p>This results in a GOTO binary equivalent to:</p>
+<pre><code>// main-mod.c
+int function_1(int *first, int *second, int *third) {
+  *first = nondet_int();
+  *third = nondet_int();
+}
+
+int function_2(int *first, int *second, int *third) { *second = nondet_int(); }
+
+int main() {
+  int a = 10;
+  int b = 10;
+  int c = 10;
+  function_1(&amp;a, &amp;b, &amp;c);
+  function_2(&amp;a, &amp;b, &amp;c);
+}</code></pre>
+<dl>
+<dt><strong>--restrict-function-pointer</strong></dt>
+<dd><p><em>pointer_name</em>/<em>target</em>[,<em>targets</em>]* Replace function pointers by a user-defined set of targets. This may be required when <strong>--remove-function-pointers</strong> creates to large a set of direct calls. Consider the example presented for <strong>--remove-function-pointers</strong>. Assume that <em>call</em> will always receive pointers to either <em>f</em> or <em>g</em> during actual executions of the program, and symbolic execution for <em>h</em> is too expensive to simply ignore the cost of its branch.</p>
+</dd>
+</dl>
+<p>To facilitate the controlled replace, we will label the places in each function where function pointers are being called, to this pattern:</p>
+<p><em>function-name</em>.<strong>function_pointer_call</strong>.<em>N</em></p>
+<p>where <em>N</em> is refers to the <em>N</em>-th function call via a function pointer in <em>function-name</em>, i.e., the first call to a function pointer in a function will have <em>N=1</em>, the fifth <em>N=5</em> etc. Alternatively, if the calls carry labels in the source code, we can also refer to a function pointer as</p>
+<p><em>function-name</em>.<em>label</em></p>
+<p>To implement this assumption that the first call to a function pointer in function <em>call</em> an only be a call to <em>f</em> or <em>g</em>, use</p>
+<pre><code>goto-instrument --restrict-function-pointer \
+  call.function_pointer_call.1/f,g in.gb out.gb</code></pre>
+<p>The resulting output (written to GOTO binary <em>out.gb</em>) looks similar to the original example, except now there will not be a call to <em>h</em>:</p>
+<pre><code>void call(fptr_t fptr) {
+  int r;
+  if (fptr == &amp;f) {
+    r = f(10);
+  } else if (fptr == &amp;g) {
+    r = g(10);
+  } else {
+    // sanity check
+    assert(false);
+    assume(false);
+  }
+  return r;
+}</code></pre>
+<p>As another example imagine we have a simple virtual filesystem API and implementation like this:</p>
+<pre><code>typedef struct filesystem_t filesystem_t;
+struct filesystem_t {
+  int (*open)(filesystem_t *filesystem, const char *file_name);
+};
+
+int fs_open(filesystem_t *filesystem, const char *file_name) {
+  filesystem-&gt;open(filesystem, file_name);
+}
+
+int nullfs_open(filesystem_t *filesystem, const char *file_name) { return -1; }
+
+filesystem_t nullfs_val = {.open = nullfs_open};
+filesystem *const nullfs = &amp;nullfs_val;
+
+filesystem_t *get_fs_impl() {
+  // some fancy logic to determine
+  // which filesystem we&#39;re getting -
+  // in-memory, backed by a database, OS file system
+  // - but in our case, we know that
+  // it always ends up being nullfs
+  // for the cases we care about
+  return nullfs;
+}
+int main(void) {
+  filesystem_t *fs = get_fs_impl();
+  assert(fs_open(fs, &quot;hello.txt&quot;) != -1);
+}</code></pre>
+<p>In this case, the assumption is that in function <em>main</em>, <em>fs</em> can be nothing other than <em>nullfs</em>. But perhaps due to the logic being too complicated, symbolic execution ends up being unable to figure this out, so in the call to <em>fs_open</em> we end up branching on all functions matching the signature of <em>filesystem_t::open</em>, which could be quite a few functions within the program. Worst of all, if its address is ever taken in the program, as far as function pointer removal via <strong>--remove-function-pointers</strong> is concerned it could be <em>fs_open</em> itself due to it having a matching signature, leading to symbolic execution being forced to follow a potentially infinite recursion until its unwind limit.</p>
+<p>In this case we can again restrict the function pointer to the value which we know it will have:</p>
+<pre><code>goto-instrument --restrict-function-pointer \
+  fs_open.function_pointer_call.1/nullfs_open in.gb out.gb</code></pre>
+<dl>
+<dt><strong>--function-pointer-restrictions-file</strong> <em>file_name</em></dt>
+<dd><p>If you have many places where you want to restrict function pointers, it'd be a nuisance to have to specify them all on the command line. In these cases, you can specify a file to load the restrictions from instead, which you can give the name of a JSON file with this format:</p>
+</dd>
+</dl>
+<pre><code>{
+  &quot;function_call_site_name&quot;: [&quot;function1&quot;, &quot;function2&quot;, ...],
+   ...
+}</code></pre>
+<p>If you pass in multiple files, or a mix of files and command line restrictions, the final restrictions will be a set union of all specified restrictions.</p>
+<p>Note that if something goes wrong during type checking (i.e., making sure that all function pointer replacements refer to functions in the symbol table that have the correct type), the error message will refer to the command line option <strong>--restrict-function-pointer</strong> regardless of whether the restriction in question came from the command line or a file.</p>
+<dl>
+<dt><strong>--restrict-function-pointer-by-name</strong> <em>symbol_name</em>/<em>target</em>[,<em>targets</em>]*</dt>
+<dd><p>Restrict a function pointer where <em>symbol_name</em> is the unmangled name, before labeling function pointers.</p>
+</dd>
+<dt><strong>--remove-calls-no-body</strong></dt>
+<dd><p>remove calls to functions without a body</p>
+</dd>
+<dt><strong>--add-library</strong></dt>
+<dd><p>add models of C library functions</p>
+</dd>
+<dt><strong>--malloc-may-fail</strong></dt>
+<dd><p>allow malloc calls to return a null pointer</p>
+</dd>
+<dt><strong>--malloc-fail-assert</strong></dt>
+<dd><p>set malloc failure mode to assert-then-assume</p>
+</dd>
+<dt><strong>--malloc-fail-null</strong></dt>
+<dd><p>set malloc failure mode to return null</p>
+</dd>
+<dt><strong>--string-abstraction</strong></dt>
+<dd><p>track C string lengths and zero-termination</p>
+</dd>
+<dt><strong>--model-argc-argv</strong> <em>n</em></dt>
+<dd><p>Create up to <em>n</em> non-deterministic C strings as entries to <em>argv</em> and set <em>argc</em> accordingly. In absence of such modelling, <em>argv</em> is left uninitialized except for a terminating <strong>NULL</strong> pointer. Consider the following example:</p>
+</dd>
+</dl>
+<pre><code>// needs_argv.c
+#include &lt;assert.h&gt;
+
+int main(int argc, char *argv[]) {
+  if (argc &gt;= 2)
+    assert(argv[1] != 0);
+
+  return 0;
+}</code></pre>
+<p>If <strong>cbmc</strong>(1) is run directly on this example, it will report a failing assertion for the lack of modeling of <em>argv</em>. To make the assertion succeed, as expected, use:</p>
+<pre><code>goto-cc needs_argv.c
+goto-instrument --model-argc-argv 2 a.out a.out
+cbmc a.out</code></pre>
+<dl>
+<dt><strong>--remove-function-body</strong> <em>f</em></dt>
+<dd><p>remove the implementation of function <em>f</em> (may be repeated)</p>
+</dd>
+<dt><strong>--replace-calls</strong> <em>f</em>:<em>g</em></dt>
+<dd><p>replace calls to <em>f</em> with calls to <em>g</em></p>
+</dd>
+<dt><strong>--max-nondet-tree-depth</strong> <em>N</em></dt>
+<dd><p>limit size of nondet (e.g. input) object tree; at level N pointers are set to null</p>
+</dd>
+<dt><strong>--min-null-tree-depth</strong> <em>N</em></dt>
+<dd><p>minimum level at which a pointer can first be NULL in a recursively nondet initialized struct</p>
+</dd>
+</dl>
+<h2>Semantics-preserving transformations:</h2>
+<dl>
+<dt><strong>--ensure-one-backedge-per-target</strong></dt>
+<dd><p>transform loop bodies such that there is a single edge back to the loop head</p>
+</dd>
+<dt><strong>--drop-unused-functions</strong></dt>
+<dd><p>drop functions trivially unreachable from main function</p>
+</dd>
+<dt><strong>--remove-pointers</strong></dt>
+<dd><p>converts pointer arithmetic to base+offset expressions</p>
+</dd>
+<dt><strong>--constant-propagator</strong></dt>
+<dd><p>propagate constants and simplify expressions</p>
+</dd>
+<dt><strong>--inline</strong></dt>
+<dd><p>perform full inlining</p>
+</dd>
+<dt><strong>--partial-inline</strong></dt>
+<dd><p>perform partial inlining</p>
+</dd>
+<dt><strong>--function-inline</strong> <em>function</em></dt>
+<dd><p>transitively inline all calls <em>function</em> makes</p>
+</dd>
+<dt><strong>--no-caching</strong></dt>
+<dd><p>disable caching of intermediate results during transitive function inlining</p>
+</dd>
+<dt><strong>--log</strong> <em>file</em></dt>
+<dd><p>log in JSON format which code segments were inlined, use with <strong>--function-inline</strong></p>
+</dd>
+<dt><strong>--remove-function-pointers</strong></dt>
+<dd><p>Resolve calls via function pointers to direct function calls. Candidate functions are chosen based on their signature and whether or not they have their address taken somewhere in the program The following example illustrates the approach taken. Given that there are functions with these signatures available in the program:</p>
+</dd>
+</dl>
+<pre><code>int f(int x);
+int g(int x);
+int h(int x);</code></pre>
+<p>And we have a call site like this:</p>
+<pre><code>typedef int (*fptr_t)(int x);
+void call(fptr_t fptr) {
+  int r = fptr(10);
+  assert(r &gt; 0);
+}</code></pre>
+<p>Function pointer removal will turn this into code similar to this:</p>
+<pre><code>void call(fptr_t fptr) {
+  int r;
+  if (fptr == &amp;f) {
+    r = f(10);
+  } else if (fptr == &amp;g) {
+    r = g(10);
+  } else if (fptr == &amp;h) {
+    r = h(10);
+  } else {
+    // sanity check
+    assert(false);
+    assume(false);
+  }
+  return r;
+}</code></pre>
+<p>Beware that there may be many functions matching a particular signature, and some of them may be costly to a subsequently run analysis. Consider using <strong>--restrict-function-pointer</strong> to manually specify this set of functions, or <strong>--value-set-fi-fp-removal</strong>.</p>
+<dl>
+<dt><strong>--remove-const-function-pointers</strong></dt>
+<dd><p>remove function pointers that are constant or constant part of an array</p>
+</dd>
+<dt><strong>--value-set-fi-fp-removal</strong></dt>
+<dd><p>Build a flow-insensitive value set and replace function pointers by a case statement over the possible assignments. If the set of possible assignments is empty the function pointer is removed using the standard <strong>--remove-function-pointers</strong> pass.</p>
+</dd>
+</dl>
+<h2>Loop information and transformations:</h2>
+<dl>
+<dt><strong>--show-loops</strong></dt>
+<dd><p>show the loops in the program</p>
+</dd>
+<dt><strong>--unwind</strong> <em>nr</em></dt>
+<dd><p>unwind nr times</p>
+</dd>
+<dt><strong>--unwindset</strong> [<em>T</em>:]<em>L</em>:<em>B</em>,...</dt>
+<dd><p>unwind loop <em>L</em> with a bound of <em>B</em> (optionally restricted to thread <em>T</em>) (use <strong>--show-loops</strong> to get the loop IDs)</p>
+</dd>
+<dt><strong>--unwindset-file</strong> <em>file</em></dt>
+<dd><p>read unwindset from file</p>
+</dd>
+<dt><strong>--partial-loops</strong></dt>
+<dd><p>permit paths with partial loops</p>
+</dd>
+<dt><strong>--unwinding-assertions</strong></dt>
+<dd><p>generate unwinding assertions</p>
+</dd>
+<dt><strong>--continue-as-loops</strong></dt>
+<dd><p>add loop for remaining iterations after unwound part</p>
+</dd>
+<dt><strong>--k-induction</strong> <em>k</em></dt>
+<dd><p>check loops with k-induction</p>
+</dd>
+<dt><strong>--step-case</strong></dt>
+<dd><p>k-induction: do step-case</p>
+</dd>
+<dt><strong>--base-case</strong></dt>
+<dd><p>k-induction: do base-case</p>
+</dd>
+<dt><strong>--havoc-loops</strong></dt>
+<dd><p>over-approximate all loops</p>
+</dd>
+<dt><strong>--accelerate</strong></dt>
+<dd><p>add loop accelerators</p>
+</dd>
+<dt><strong>--z3</strong></dt>
+<dd><p>use Z3 when computing loop accelerators</p>
+</dd>
+<dt><strong>--skip-loops</strong> <em>loop-ids</em></dt>
+<dd><p>add gotos to skip selected loops during execution</p>
+</dd>
+<dt><strong>--show-lexical-loops</strong></dt>
+<dd><p>Show lexical loops. A lexical loop is a block of goto program instructions with a single entry edge at the top and a single backedge leading from bottom to top, where "top" and "bottom" refer to program order. The loop may have holes: instructions which sit in between the top and bottom in program order, but which can't reach the loop backedge. Lexical loops are a subset of the natural loops, which are cheaper to compute and include most natural loops generated from typical C code.</p>
+</dd>
+<dt><strong>--show-natural-loops</strong></dt>
+<dd><p>Show natural loop heads. A natural loop is when the nodes and edges of a graph make one self-encapsulating circle with no incoming edges from external nodes. For example A -&gt; B -&gt; C -&gt; D -&gt; A is a natural loop, but if B has an incoming edge from X, then it isn't a natural loop, because X is an external node. Outgoing edges don't affect the natural-ness of a loop.</p>
+</dd>
+</dl>
+<h2>Memory model instrumentations:</h2>
+<dl>
+<dt><strong>--mm</strong> [<strong>tso</strong>|<strong>pso</strong>|<strong>rmo</strong>|<strong>power</strong>]</dt>
+<dd><p>Instruments the program so that it can be verified for different weak memory models with a model-checker verifying sequentially consistent programs.</p>
+</dd>
+<dt><strong>--scc</strong></dt>
+<dd><p>detects critical cycles per SCC (one thread per SCC)</p>
+</dd>
+<dt><strong>--one-event-per-cycle</strong></dt>
+<dd><p>only instruments one event per cycle</p>
+</dd>
+<dt><strong>--minimum-interference</strong></dt>
+<dd><p>instruments an optimal number of events</p>
+</dd>
+<dt><strong>--my-events</strong></dt>
+<dd><p>only instruments events whose ids appear in inst.evt</p>
+</dd>
+<dt><strong>--read-first</strong>, <strong>--write-first</strong></dt>
+<dd><p>only instrument cycles where a read or write occurs as first event, respectively</p>
+</dd>
+<dt><strong>--max-var</strong> <em>N</em></dt>
+<dd><p>limit cycles to <em>N</em> variables read/written</p>
+</dd>
+<dt><strong>--max-po-trans</strong> <em>N</em></dt>
+<dd><p>limit cycles to <em>N</em> program-order edges</p>
+</dd>
+<dt><strong>--ignore-arrays</strong></dt>
+<dd><p>instrument arrays as a single object</p>
+</dd>
+<dt><strong>--cav11</strong></dt>
+<dd><p>always instrument shared variables, even when they are not part of any cycle</p>
+</dd>
+<dt><strong>--force-loop-duplication</strong>, <strong>--no-loop-duplication</strong></dt>
+<dd><p>optional program transformation to construct cycles in program loops</p>
+</dd>
+<dt><strong>--cfg-kill</strong></dt>
+<dd><p>enables symbolic execution used to reduce spurious cycles</p>
+</dd>
+<dt><strong>--no-dependencies</strong></dt>
+<dd><p>no dependency analysis</p>
+</dd>
+<dt><strong>--no-po-rendering</strong></dt>
+<dd><p>no representation of the threads in the dot</p>
+</dd>
+<dt><strong>--hide-internals</strong></dt>
+<dd><p>do not include thread-internal (Rfi) events in dot output</p>
+</dd>
+<dt><strong>--render-cluster-file</strong></dt>
+<dd><p>clusterises the dot by files</p>
+</dd>
+<dt><strong>--render-cluster-function</strong></dt>
+<dd><p>clusterises the dot by functions</p>
+</dd>
+</dl>
+<h2>Slicing:</h2>
+<dl>
+<dt><strong>--fp-reachability-slice</strong> <em>f</em></dt>
+<dd><p>Remove instructions that cannot appear on a trace that visits all given functions. The list of functions has to be given as a comma separated list <em>f</em>.</p>
+</dd>
+<dt><strong>--reachability-slice</strong></dt>
+<dd><p>remove instructions that cannot appear on a trace from entry point to a property</p>
+</dd>
+<dt><strong>--full-slice</strong></dt>
+<dd><p>slice away instructions that don't affect assertions</p>
+</dd>
+<dt><strong>--property</strong> <em>id</em></dt>
+<dd><p>slice with respect to specific property <em>id</em> only</p>
+</dd>
+<dt><strong>--slice-global-inits</strong></dt>
+<dd><p>slice away initializations of unused global variables</p>
+</dd>
+<dt><strong>--aggressive-slice</strong></dt>
+<dd><p>remove bodies of any functions not on the shortest path between the start function and the function containing the property(s)</p>
+</dd>
+<dt><strong>--aggressive-slice-call-depth</strong> <em>n</em></dt>
+<dd><p>used with <strong>--aggressive-slice, preserves all functions within </strong><em>n</em> function calls of the functions on the shortest path</p>
+</dd>
+<dt><strong>--aggressive-slice-preserve-function</strong> <em>f</em></dt>
+<dd><p>force the aggressive slicer to preserve function <em>f</em></p>
+</dd>
+<dt><strong>--aggressive-slice-preserve-functions-containing</strong> <em>f</em></dt>
+<dd><p>force the aggressive slicer to preserve all functions with names containing <em>f</em></p>
+</dd>
+<dt><strong>--aggressive-slice-preserve-all-direct-paths</strong></dt>
+<dd><p>force aggressive slicer to preserve all direct paths</p>
+</dd>
+</dl>
+<h2>Code contracts:</h2>
+<dl>
+<dt><strong>--apply-loop-contracts</strong></dt>
+<dd><p>check and use loop contracts when provided</p>
+</dd>
+<dt><strong>--replace-call-with-contract</strong> <em>fun</em></dt>
+<dd><p>replace calls to <em>fun</em> with <em>fun</em>'s contract</p>
+</dd>
+<dt><strong>--enforce-contract</strong> <em>fun</em></dt>
+<dd><p>wrap <em>fun</em> with an assertion of its contract</p>
+</dd>
+</dl>
+<h2>User-interface options:</h2>
+<dl>
+<dt><strong>--flush</strong></dt>
+<dd><p>flush every line of output</p>
+</dd>
+<dt><strong>--xml</strong></dt>
+<dd><p>output files in XML where supported</p>
+</dd>
+<dt><strong>--xml-ui</strong></dt>
+<dd><p>use XML-formatted output</p>
+</dd>
+<dt><strong>--json-ui</strong></dt>
+<dd><p>use JSON-formatted output</p>
+</dd>
+<dt><strong>--verbosity</strong> <em>n</em></dt>
+<dd><p>verbosity level</p>
+</dd>
+<dt><strong>--timestamp</strong> [<strong>monotonic</strong>|<strong>wall</strong>]</dt>
+<dd><p>Print microsecond-precision timestamps. <strong>monotonic</strong>: stamps increase monotonically. <strong>wall</strong>: ISO-8601 wall clock timestamps.</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>cbmc</strong>(1), <strong>goto-cc</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2008-2013, Daniel Kroening</p>

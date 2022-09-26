@@ -1,0 +1,25 @@
+var classcpp__scopest =
+[
+    [ "id_mapt", "classcpp__scopest.html#a347f1a9c996f067da566621c054d7e12", null ],
+    [ "id_sett", "classcpp__scopest.html#a82dc6f2cb6d265a0192c2a10cbfeaceb", null ],
+    [ "scope_sett", "classcpp__scopest.html#a5297fb8db1dd2f8e90bc79f449961f28", null ],
+    [ "cpp_scopest", "classcpp__scopest.html#a24e1dc59cc4fcf7bd1f892ef5b0f52a3", null ],
+    [ "current_scope", "classcpp__scopest.html#a5d67d4b71ce3c537bc6ce695c8c472b9", null ],
+    [ "get_global_scope", "classcpp__scopest.html#af9057ee374f4ccc020b257d4b6413019", null ],
+    [ "get_id", "classcpp__scopest.html#a6a1fb9e0b389badfff6904e240ffdaf4", null ],
+    [ "get_root_scope", "classcpp__scopest.html#a517b71d12f61ffb83a146b6d55712a67", null ],
+    [ "get_scope", "classcpp__scopest.html#a95012e445a972571a19ae7229d695ea6", null ],
+    [ "go_to", "classcpp__scopest.html#a039af38e03bd6a70fcbf92da5cf0a0e8", null ],
+    [ "go_to_global_scope", "classcpp__scopest.html#af2bb806738a58250d1501ee076f89e98", null ],
+    [ "go_to_root_scope", "classcpp__scopest.html#a006b5acc939c8316eaefbc243ec0eb7a", null ],
+    [ "new_block_scope", "classcpp__scopest.html#a2d9c6ff56d72be43d0cb1a6c73792297", null ],
+    [ "new_namespace", "classcpp__scopest.html#a319d9a77d2987baa5a2c22d0dd68cb78", null ],
+    [ "new_scope", "classcpp__scopest.html#a696902e757d3e2f998857bdfc0e64b76", null ],
+    [ "print_current", "classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0", null ],
+    [ "put_into_scope", "classcpp__scopest.html#a5e80877a9563a69598d2ad9229ef07e9", null ],
+    [ "put_into_scope", "classcpp__scopest.html#aa57d6c1a77ad8076e956ff8d9816e1d1", null ],
+    [ "set_scope", "classcpp__scopest.html#a671441c461da2f6b226ed3c9937eacd1", null ],
+    [ "current_scope_ptr", "classcpp__scopest.html#a2e03091e26ddba2cf418fd3d5b484920", null ],
+    [ "id_map", "classcpp__scopest.html#ab61ea261b1ffcca30d5aa21727bf7e27", null ],
+    [ "root_scope", "classcpp__scopest.html#aecad2d4329db30de15733fa65e3f6d9e", null ]
+];

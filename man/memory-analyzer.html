@@ -1,0 +1,74 @@
+<h1>NAME</h1>
+<p>memory-analyzer - Snapshot program state for symbolic analysis</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>memory-analyzer [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>memory-analyzer --version</strong></dt>
+<dd><p>show version</p>
+</dd>
+<dt><strong>memory-analyzer --symbols <em>symbol_list</em> [options] <em>binary</em></strong></dt>
+<dd><p>analyze binary</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<p><strong>memory-analyzer</strong> is a front-end that runs and queries <strong>gdb</strong>(1) in order to obtain a snapshot of the state of an input program at a particular program location. Such a snapshot could be useful on its own: to check the values of variables at a particular program location. Furthermore, since the snapshot is a state of a valid concrete execution, it can also be used for subsequent analyses.</p>
+<p>In order to analyze a program with <strong>memory-analyzer</strong> it needs to be compiled with <strong>goto-gcc</strong>(1). This yields an <strong>elf</strong>(5) executable that also includes a <em>goto-cc</em> section holding the goto model:</p>
+<pre><code>goto-gcc -g input_program.c -o input_program_exe</code></pre>
+<p><strong>memory-analyzer</strong> supports two ways of running <strong>gdb</strong>(1) on user code: either to run the code from a core-file or up to a break-point. If the user already has a core-file, they can specify it with the option <strong>--core-file</strong> <em>cf</em>. If the user knows the point of their program from where they want to run the analysis, they can specify it with the option <strong>--breakpoint</strong> <em>bp</em>. Only one of core-file/break-point option can be used.</p>
+<p>The tool also expects a comma-separated list of symbols to be analyzed via <strong>--symbols </strong><em>s1</em>,<em>s2</em>,<em>...</em>. The tool invokes <strong>gdb</strong>(1) to obtain the snapshot which is why the <strong>-g</strong> option is necessary when compiling for the program symbols to be visible.</p>
+<p>Take for example the following program:</p>
+<pre><code>// main.c
+void checkpoint() {}
+
+int array[] = {1, 2, 3};
+
+int main()
+{
+  array[1] = 4;
+  checkpoint();
+  return 0;
+}</code></pre>
+<p>Say we are interested in the evaluation of <em>array</em> at the call-site of <em>checkpoint</em>. We compile the program with</p>
+<pre><code>goto-gcc -g main.c -o main_exe</code></pre>
+<p>And then we call <strong>memory-analyzer</strong> with:</p>
+<blockquote>
+<p>memory-analyzer --breakpoint checkpoint --symbols array main_exe</p>
+</blockquote>
+<p>to obtain as output the human readable list of values for each requested symbol:</p>
+<pre><code>{
+  array = { 1, 4, 3 };
+}</code></pre>
+<p>The above result is useful for the user and their preliminary analysis but does not contain enough information for further automated analyses. To that end, memory analyzer has an option for the snapshot to be represented in the format of a symbol table (with <strong>--symtab-snapshot</strong>). Finally, to obtain an output in JSON format, e.g., for further analyses by <strong>goto-harness</strong>(1) the additional option <strong>--json-ui</strong> needs to be passed to <strong>memory-analyzer</strong>:</p>
+<pre><code>memory-analyzer --symtab-snapshot --json-ui --breakpoint checkpoint
+  --symbols array main_exe &gt; snapshot.json</code></pre>
+<h1>OPTIONS</h1>
+<dl>
+<dt><strong>--core-file</strong> <em>file_name</em></dt>
+<dd><p>Analyze from core dump <em>file_name</em>.</p>
+</dd>
+<dt><strong>--breakpoint</strong> <em>breakpoint</em></dt>
+<dd><p>Analyze from given breakpoint.</p>
+</dd>
+<dt><strong>--symbols</strong> <em>symbol_list</em></dt>
+<dd><p>List of symbols to analyze.</p>
+</dd>
+<dt><strong>--symtab-snapshot</strong></dt>
+<dd><p>Output snapshot as JSON symbol table that can be used with <strong>symtab2gb</strong>(1).</p>
+</dd>
+<dt><strong>--output-file</strong> <em>file_name</em></dt>
+<dd><p>Write snapshot to <em>file_name</em>.</p>
+</dd>
+<dt><strong>--json-ui</strong></dt>
+<dd><p>Output snapshot in JSON format.</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>cbmc</strong>(1), <strong>elf</strong>(5), <strong>gdb</strong>(1), <strong>goto-gcc</strong>(1), <strong>goto-harness</strong>(1), <strong>symtab2gb</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2019, Malte Mues, Diffblue</p>

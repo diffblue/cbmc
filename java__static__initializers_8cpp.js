@@ -1,0 +1,37 @@
+var java__static__initializers_8cpp =
+[
+    [ "clinit_statest", "java__static__initializers_8cpp.html#a1618420e411b94ad82e72acbf31b97e8", [
+      [ "NOT_INIT", "java__static__initializers_8cpp.html#a1618420e411b94ad82e72acbf31b97e8aca0408a962115a6e199dbac349bd3597", null ],
+      [ "IN_PROGRESS", "java__static__initializers_8cpp.html#a1618420e411b94ad82e72acbf31b97e8aca69f96c768067fbff6c911ca87bccc9", null ],
+      [ "INIT_COMPLETE", "java__static__initializers_8cpp.html#a1618420e411b94ad82e72acbf31b97e8a049cafb27bd423dbedf712220bbf9de1", null ]
+    ] ],
+    [ "add_new_variable_symbol", "java__static__initializers_8cpp.html#aedaa87937b5b43408909cf2381212af7", null ],
+    [ "advance_to_next_key", "java__static__initializers_8cpp.html#ac717242b6f83a164e6c1fea7e47657f3", null ],
+    [ "class_to_declared_symbols", "java__static__initializers_8cpp.html#ae3b2ac40cedb906b3a022ef21f13d56b", null ],
+    [ "clinit_already_run_variable_name", "java__static__initializers_8cpp.html#add72a7fd88fb215993ce9b0f55e8d406", null ],
+    [ "clinit_function_name", "java__static__initializers_8cpp.html#ad9adedf694947e9d8032ba81e952a01c", null ],
+    [ "clinit_local_init_complete_var_name", "java__static__initializers_8cpp.html#ae729f6d8610ce60b80ad8ece4ab95c67", null ],
+    [ "clinit_state_var_name", "java__static__initializers_8cpp.html#a3d703dd014740a522ca077687f6f84c4", null ],
+    [ "clinit_states_type", "java__static__initializers_8cpp.html#a33bf4ef9cb1387963f59b286320e2c1d", null ],
+    [ "clinit_thread_local_state_var_name", "java__static__initializers_8cpp.html#ac234081e06f5c20f2fe8509232d05cb2", null ],
+    [ "clinit_wrapper_do_recursive_calls", "java__static__initializers_8cpp.html#a709c8ddd4b9e638a2be7d290fc178dc0", null ],
+    [ "clinit_wrapper_name", "java__static__initializers_8cpp.html#ad60490e360af4ef3be7a91f21a10b4d0", null ],
+    [ "create_clinit_wrapper_function_symbol", "java__static__initializers_8cpp.html#ad81ef358fcb2fd15d91f83afc0c04c01", null ],
+    [ "create_clinit_wrapper_symbols", "java__static__initializers_8cpp.html#a25cfd493bc44db4bf96ffd5819227759", null ],
+    [ "create_function_symbol", "java__static__initializers_8cpp.html#a2afd799df7954f6e5c3722a997369dcf", null ],
+    [ "create_static_initializer_symbols", "java__static__initializers_8cpp.html#a11a741617dc54e374fc7f6b1e2fd69ef", null ],
+    [ "create_user_specified_clinit_function_symbol", "java__static__initializers_8cpp.html#ad43882e23515076d6e07a98b543221a5", null ],
+    [ "gen_clinit_assign", "java__static__initializers_8cpp.html#a0f3144257c670085d952e4a04e20ccc7", null ],
+    [ "gen_clinit_eqexpr", "java__static__initializers_8cpp.html#a6f81355cc788f0e2e88da40d7aedb55a", null ],
+    [ "get_clinit_wrapper_body", "java__static__initializers_8cpp.html#a60ea6ee3867e0aab4042a9b2ea9a5d06", null ],
+    [ "get_thread_safe_clinit_wrapper_body", "java__static__initializers_8cpp.html#ac16046ef29399f7db303a040d4bb9f30", null ],
+    [ "get_user_specified_clinit_body", "java__static__initializers_8cpp.html#a86cb5921f55f61e624979c79e8309df8", null ],
+    [ "is_clinit_function", "java__static__initializers_8cpp.html#ae11e338daee487348e9d94cddfe35969", null ],
+    [ "is_clinit_wrapper_function", "java__static__initializers_8cpp.html#ac7532b44d1a71f44fb902c74b9f92d80", null ],
+    [ "is_user_specified_clinit_function", "java__static__initializers_8cpp.html#a9a7b05b5bd7b1597a086aeca9008da97", null ],
+    [ "needs_clinit_wrapper", "java__static__initializers_8cpp.html#aa3ed1e6438e4fbd28ad53c0ae2adb995", null ],
+    [ "user_specified_clinit_name", "java__static__initializers_8cpp.html#aa7b8e625acd192dc3f08859fcf582ddf", null ],
+    [ "clinit_function_suffix", "java__static__initializers_8cpp.html#a5aaca16e12f94becd880a820c01c8f24", null ],
+    [ "clinit_wrapper_suffix", "java__static__initializers_8cpp.html#af7f5795059446aa2eb5a00f54846d1dc", null ],
+    [ "user_specified_clinit_suffix", "java__static__initializers_8cpp.html#ab001e12bb321a88d6963ac40b863538a", null ]
+];

@@ -1,0 +1,434 @@
+<h1>NAME</h1>
+<p>jbmc - Bounded model checking for Java bytecode</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>jbmc [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>jbmc <em>method-name</em></strong></dt>
+<dd><p>Use the fully qualified name of a method as entry point, e.g., <em>'mypackage.Myclass.foo:(I)Z'</em></p>
+</dd>
+<dt><strong>jbmc <em>class-name</em></strong></dt>
+<dd><p>The entry point is the method specified by <strong>--function</strong>, or otherwise, the <strong>public static void main(String[])</strong> method of the given class <em>class-name</em>.</p>
+</dd>
+<dt><strong>jbmc -jar <em>jarfile</em></strong></dt>
+<dd><p>JAR file to be checked. The entry point is the method specified by <strong>--function</strong> or otherwise, the <strong>public static void main(String[])</strong> method of the class specified by <strong>--main-class</strong> or the main class specified in the JAR manifest (checked in this order).</p>
+</dd>
+<dt>jbmc --gb <em>goto-binary</em></dt>
+<dd><p>GOTO binary file to be checked. The entry point is the method specified by <strong>--function</strong>, or otherwise, the <strong>public static void main(String[])</strong> of the class specified by <strong>--main-class</strong> (checked in this order).</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<h1>OPTIONS</h1>
+<dl>
+<dt><strong>-classpath</strong> dirs/jars, <strong>-cp</strong> dirs/jars, <strong>--classpath</strong> dirs/jars</dt>
+<dd><p>Set class search path of directories and jar files using a colon-separated list of directories and JAR archives to search for class files.</p>
+</dd>
+<dt><strong>--main-class</strong> class-name</dt>
+<dd><p>Set the name of the main class.</p>
+</dd>
+<dt><strong>--function</strong> name</dt>
+<dd><p>Set entry point function name.</p>
+</dd>
+</dl>
+<h2>Analysis options:</h2>
+<dl>
+<dt><strong>--show-properties</strong></dt>
+<dd><p>show the properties, but don't run analysis</p>
+</dd>
+<dt><strong>--symex-coverage-report</strong> f</dt>
+<dd><p>generate a Cobertura XML coverage report in f</p>
+</dd>
+<dt><strong>--property</strong> id</dt>
+<dd><p>only check one specific property</p>
+</dd>
+<dt><strong>--trace</strong></dt>
+<dd><p>give a counterexample trace for failed properties</p>
+</dd>
+<dt><strong>--stop-on-fail</strong></dt>
+<dd><p>stop analysis once a failed property is detected (implies <strong>--trace</strong>)</p>
+</dd>
+<dt><strong>--localize-faults</strong></dt>
+<dd><p>localize faults (experimental)</p>
+</dd>
+<dt><strong>--validate-trace</strong></dt>
+<dd><p>throw an error if the structure of the counterexample trace does not match certain assumptions (experimental, currently java only)</p>
+</dd>
+</dl>
+<h2>Platform options:</h2>
+<dl>
+<dt><strong>--arch</strong> <em>arch</em></dt>
+<dd><p>Set analysis architecture, which defaults to the host architecture. Use one of: <strong>alpha</strong>, <strong>arm</strong>, <strong>arm64</strong>, <strong>armel</strong>, <strong>armhf</strong>, <strong>hppa</strong>, <strong>i386</strong>, <strong>ia64</strong>, <strong>mips</strong>, <strong>mips64</strong>, <strong>mips64el</strong>, <strong>mipsel</strong>, <strong>mipsn32</strong>, <strong>mipsn32el</strong>, <strong>powerpc</strong>, <strong>ppc64</strong>, <strong>ppc64le</strong>, <strong>riscv64</strong>, <strong>s390</strong>, <strong>s390x</strong>, <strong>sh4</strong>, <strong>sparc</strong>, <strong>sparc64</strong>, <strong>v850</strong>, <strong>x32</strong>, <strong>x86_64</strong>, or <strong>none</strong>.</p>
+</dd>
+<dt><strong>--os</strong> <em>os</em></dt>
+<dd><p>Set analysis operating system, which defaults to the host operating system. Use one of: <strong>freebsd</strong>, <strong>linux</strong>, <strong>macos</strong>, <strong>solaris</strong>, or <strong>windows</strong>.</p>
+</dd>
+<dt><strong>--i386-linux</strong>, <strong>--i386-win32</strong>, <strong>--i386-macos</strong>, <strong>--ppc-macos</strong>, <strong>--win32</strong>, <strong>--winx64</strong></dt>
+<dd><p>Set analysis architecture and operating system.</p>
+</dd>
+<dt><strong>--LP64</strong>, <strong>--ILP64</strong>, <strong>--LLP64</strong>, <strong>--ILP32</strong>, <strong>--LP32</strong></dt>
+<dd><p>Set width of int, long and pointers, but don't override default architecture and operating system.</p>
+</dd>
+<dt><strong>--16</strong>, <strong>--32</strong>, <strong>--64</strong></dt>
+<dd><p>Equivalent to <strong>--LP32</strong>, <strong>--ILP32</strong>, <strong>--LP64</strong> (on Windows: <strong>--LLP64</strong>).</p>
+</dd>
+<dt><strong>--little-endian</strong></dt>
+<dd><p>allow little-endian word-byte conversions</p>
+</dd>
+<dt><strong>--big-endian</strong></dt>
+<dd><p>allow big-endian word-byte conversions</p>
+</dd>
+<dt><strong>--gcc</strong></dt>
+<dd><p>use GCC as preprocessor</p>
+</dd>
+</dl>
+<h2>Program representations:</h2>
+<dl>
+<dt><strong>--show-parse-tree</strong></dt>
+<dd><p>show parse tree</p>
+</dd>
+<dt><strong>--show-symbol-table</strong></dt>
+<dd><p>show loaded symbol table</p>
+</dd>
+<dt><strong>--list-symbols</strong></dt>
+<dd><p>list symbols with type information</p>
+</dd>
+<dt><strong>--show-goto-functions</strong></dt>
+<dd><p>show loaded goto program</p>
+</dd>
+<dt><strong>--list-goto-functions</strong></dt>
+<dd><p>list loaded goto functions</p>
+</dd>
+<dt><strong>--drop-unused-functions</strong></dt>
+<dd><p>drop functions trivially unreachable from main function</p>
+</dd>
+<dt><strong>--show-class-hierarchy</strong></dt>
+<dd><p>show the class hierarchy</p>
+</dd>
+</dl>
+<h2>Program instrumentation options:</h2>
+<dl>
+<dt><strong>--no-assertions</strong></dt>
+<dd><p>ignore user assertions</p>
+</dd>
+<dt><strong>--no-assumptions</strong></dt>
+<dd><p>ignore user assumptions</p>
+</dd>
+<dt><strong>--mm</strong> MM</dt>
+<dd><p>memory consistency model for concurrent programs</p>
+</dd>
+<dt><strong>--fp-reachability-slice</strong> f</dt>
+<dd><p>remove instructions that cannot appear on a trace that visits all given functions. The list of functions has to be given as a comma separated list f.</p>
+</dd>
+<dt><strong>--reachability-slice</strong></dt>
+<dd><p>remove instructions that cannot appear on a trace from entry point to a property</p>
+</dd>
+<dt><strong>--reachability-slice-fb</strong></dt>
+<dd><p>remove instructions that cannot appear on a trace from entry point through a property</p>
+</dd>
+<dt><strong>--full-slice</strong></dt>
+<dd><p>run full slicer (experimental)</p>
+</dd>
+</dl>
+<h2>Java Bytecode frontend options:</h2>
+<dl>
+<dt><strong>--disable-uncaught-exception-check</strong></dt>
+<dd><p>ignore uncaught exceptions and errors</p>
+</dd>
+<dt><strong>--throw-assertion-error</strong></dt>
+<dd><p>Throw java.lang.AssertionError on violated <strong>assert</strong> statements instead of failing at the location of the <strong>assert</strong> statement.</p>
+</dd>
+<dt><strong>--throw-runtime-exceptions</strong></dt>
+<dd><p>Make implicit runtime exceptions explicit.</p>
+</dd>
+<dt><strong>--assert-no-exceptions-thrown</strong></dt>
+<dd><p>Transform <strong>throw</strong> instructions into <strong>assert FALSE</strong> followed by <strong>assume FALSE</strong>.</p>
+</dd>
+<dt><strong>--max-nondet-array-length</strong> <em>N</em></dt>
+<dd><p>Limit nondet (e.g. input) array size to at most <em>N</em>.</p>
+</dd>
+<dt><strong>--max-nondet-tree-depth</strong> <em>N</em></dt>
+<dd><p>Limit size of nondet (e.g. input) object tree; at level <em>N</em> references are set to <strong>null</strong>.</p>
+</dd>
+<dt><strong>--java-assume-inputs-non-null</strong></dt>
+<dd><p>Never initialize reference-typed parameter to the entry point with <strong>null</strong>.</p>
+</dd>
+<dt><strong>--java-assume-inputs-interval</strong> [<em>L</em>:<em>U</em>] or [<em>L</em>:] or [:<em>U</em>]</dt>
+<dd><p>Force numerical primitive-typed inputs (<strong>byte</strong>, <strong>short</strong>, <strong>int</strong>, <strong>long</strong>, <strong>float</strong>, <strong>double</strong>) to be initialized within the given range; lower bound <em>L</em> and upper bound <em>U</em> must be integers; does not work for arrays.</p>
+</dd>
+<dt><strong>--java-assume-inputs-integral</strong></dt>
+<dd><p>Force float and double inputs to have integer values; does not work for arrays;</p>
+</dd>
+<dt><strong>--java-max-vla-length</strong> <em>N</em></dt>
+<dd><p>Limit the length of user-code-created arrays to <em>N</em>.</p>
+</dd>
+<dt><strong>--java-cp-include-files</strong> <em>r</em></dt>
+<dd><p>Regular expression or JSON list of files to load (with '@' prefix).</p>
+</dd>
+<dt><strong>--java-load-class</strong> <em>CLASS</em></dt>
+<dd><p>Also load code from class <em>CLASS</em>.</p>
+</dd>
+<dt><strong>--java-no-load-class</strong> <em>CLASS</em></dt>
+<dd><p>Never load code from class <em>CLASS</em>.</p>
+</dd>
+<dt><strong>--ignore-manifest-main-class</strong></dt>
+<dd><p>Ignore Main-Class entries in JAR manifest files. If this option is specified and the options <strong>--function</strong> and <strong>--main-class</strong> are not, we can be certain that all classes in the JAR file are loaded.</p>
+</dd>
+<dt><strong>--context-include</strong> <em>i</em>, <strong>--context-exclude</strong> <em>e</em></dt>
+<dd><p>Only analyze code matching specification <em>i</em> that does not match specification <em>e</em>, if <strong>--context-exclude</strong> <em>e</em> is also used. All other methods are excluded, i.e., we load their signatures and meta-information, but not their bodies. A specification is any prefix of a package, class or method name, e.g. "org.cprover." or "org.cprover.MyClass." or "org.cprover.MyClass.methodToStub:(I)Z". These options can be given multiple times. The default for context-include is 'all included'; default for context-exclude is 'nothing excluded'.</p>
+</dd>
+<dt><strong>--no-lazy-methods</strong></dt>
+<dd><p>Load and translate all methods given on the command line and in <strong>--classpath</strong> Default is to load methods that appear to be reachable from the <strong>--function</strong> entry point or main class. Note that <strong>--show-symbol-table</strong>, <strong>--show-goto-functions</strong> and <strong>--show-properties</strong> output are restricted to loaded methods by default.</p>
+</dd>
+<dt><strong>--lazy-methods-extra-entry-point</strong> <em>METHODNAME</em></dt>
+<dd><p>Treat <em>METHODNAME</em> as a possible program entry point for the purpose of lazy method loading. <em>METHODNAME</em> can be a regular expression that will be matched against all symbols. If missing, a <strong>java::</strong> prefix will be added. If no descriptor is found, all overloads of a method will also be added.</p>
+</dd>
+<dt><strong>--static-values</strong> <em>f</em></dt>
+<dd><p>Load initial values of static fields from the given JSON file. We assign static fields to these values instead of calling the normal static initializer (clinit) method. The argument can be a relative or absolute path to the file.</p>
+</dd>
+<dt><strong>--java-lift-clinit-calls</strong></dt>
+<dd><p>Lifts clinit calls in function bodies to the top of the function. This may reduce the overall cost of static initialisation, but may be unsound if there are cyclic dependencies between static initializers due to potentially changing their order of execution, or if static initializers have side-effects such as updating another class' static field.</p>
+</dd>
+<dt><strong>--java-threading</strong></dt>
+<dd><p>enable java multi-threading support (experimental)</p>
+</dd>
+<dt><strong>--java-unwind-enum-static</strong></dt>
+<dd><p>unwind loops in static initialization of enums</p>
+</dd>
+<dt><strong>--symex-driven-lazy-loading</strong></dt>
+<dd><p>only load functions when first entered by symbolic execution. Note that <strong>--show-symbol-table</strong>, <strong>--show-goto-functions</strong>/properties output will be restricted to loaded methods in this case, and only output after the symex phase.</p>
+</dd>
+</dl>
+<h2>Semantic transformations:</h2>
+<dl>
+<dt><strong>--nondet-static</strong></dt>
+<dd><p>add nondeterministic initialization of variables with static lifetime</p>
+</dd>
+</dl>
+<h2>BMC options:</h2>
+<dl>
+<dt><strong>--paths</strong> [strategy]</dt>
+<dd><p>explore paths one at a time</p>
+</dd>
+<dt><strong>--show-symex-strategies</strong></dt>
+<dd><p>list strategies for use with <strong>--paths</strong></p>
+</dd>
+<dt><strong>--show-goto-symex-steps</strong></dt>
+<dd><p>show which steps symex travels, includes diagnostic information</p>
+</dd>
+<dt><strong>--show-points-to-sets</strong></dt>
+<dd><p>show points-to sets for pointer dereference. Requires <strong>--json-ui</strong>.</p>
+</dd>
+<dt><strong>--program-only</strong></dt>
+<dd><p>only show program expression</p>
+</dd>
+<dt><strong>--show-byte-ops</strong></dt>
+<dd><p>show all byte extracts and updates</p>
+</dd>
+<dt><strong>--depth</strong> nr</dt>
+<dd><p>limit search depth</p>
+</dd>
+<dt><strong>--max-field-sensitivity-array-size</strong> M</dt>
+<dd><p>maximum size M of arrays for which field sensitivity will be applied to array, the default is 64</p>
+</dd>
+<dt><strong>--no-array-field-sensitivity</strong></dt>
+<dd><p>deactivate field sensitivity for arrays, this is equivalent to setting the maximum field sensitivity size for arrays to 0</p>
+</dd>
+<dt><strong>--show-loops</strong></dt>
+<dd><p>show the loops in the program</p>
+</dd>
+<dt><strong>--unwind</strong> nr</dt>
+<dd><p>unwind nr times</p>
+</dd>
+<dt><strong>--unwindset</strong> [T:]L:B,...</dt>
+<dd><p>unwind loop L with a bound of B (optionally restricted to thread T) (use <strong>--show-loops</strong> to get the loop IDs)</p>
+</dd>
+<dt><strong>--incremental-loop</strong> L</dt>
+<dd><p>check properties after each unwinding of loop L (use <strong>--show-loops</strong> to get the loop IDs)</p>
+</dd>
+<dt><strong>--unwind-min</strong> nr</dt>
+<dd><p>start incremental-loop after nr unwindings but before solving that iteration. If for example it is 1, then the loop will be unwound once, and immediately checked. Note: this means for min-unwind 1 or 0 all properties are checked.</p>
+</dd>
+<dt><strong>--unwind-max</strong> nr</dt>
+<dd><p>stop incremental-loop after nr unwindings</p>
+</dd>
+<dt><strong>--ignore-properties-before-unwind-min</strong></dt>
+<dd><p>do not check properties before unwind-min when using incremental-loop</p>
+</dd>
+<dt><strong>--show-vcc</strong></dt>
+<dd><p>show the verification conditions</p>
+</dd>
+<dt><strong>--slice-formula</strong></dt>
+<dd><p>remove assignments unrelated to property</p>
+</dd>
+<dt><strong>--unwinding-assertions</strong></dt>
+<dd><p>generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+</dd>
+<dt><strong>--partial-loops</strong></dt>
+<dd><p>permit paths with partial loops</p>
+</dd>
+<dt><strong>--no-self-loops-to-assumptions</strong></dt>
+<dd><p>do not simplify while(1){} to assume(0)</p>
+</dd>
+<dt><strong>--symex-complexity-limit</strong> <em>N</em></dt>
+<dd><p>how complex (<em>N</em>) a path can become before symex abandons it. Currently uses guard size to calculate complexity.</p>
+</dd>
+<dt><strong>--symex-complexity-failed-child-loops-limit</strong> <em>N</em></dt>
+<dd><p>how many child branches (<em>N</em>) in an iteration are allowed to fail due to complexity violations before the loop gets blacklisted</p>
+</dd>
+<dt><strong>--graphml-witness</strong> <em>filename</em></dt>
+<dd><p>write the witness in GraphML format to filename</p>
+</dd>
+<dt><strong>--symex-cache-dereferences</strong></dt>
+<dd><p>enable caching of repeated dereferences</p>
+</dd>
+</dl>
+<h2>Backend options:</h2>
+<dl>
+<dt><strong>--object-bits</strong> n</dt>
+<dd><p>number of bits used for object addresses</p>
+</dd>
+<dt><strong>--external-sat-solver</strong> <em>cmd</em></dt>
+<dd><p>command to invoke SAT solver process</p>
+</dd>
+<dt><strong>--no-sat-preprocessor</strong></dt>
+<dd><p>disable the SAT solver's simplifier</p>
+</dd>
+<dt><strong>--dimacs</strong></dt>
+<dd><p>generate CNF in DIMACS format</p>
+</dd>
+<dt><strong>--beautify</strong></dt>
+<dd><p>beautify the counterexample (greedy heuristic)</p>
+</dd>
+<dt><strong>--smt1</strong></dt>
+<dd><p>use default SMT1 solver (obsolete)</p>
+</dd>
+<dt><strong>--smt2</strong></dt>
+<dd><p>use default SMT2 solver (Z3)</p>
+</dd>
+<dt><strong>--boolector</strong></dt>
+<dd><p>use Boolector</p>
+</dd>
+<dt><strong>--cprover-smt2</strong></dt>
+<dd><p>use CPROVER SMT2 solver</p>
+</dd>
+<dt><strong>--cvc3</strong></dt>
+<dd><p>use CVC3</p>
+</dd>
+<dt><strong>--cvc4</strong></dt>
+<dd><p>use CVC4</p>
+</dd>
+<dt><strong>--mathsat</strong></dt>
+<dd><p>use MathSAT</p>
+</dd>
+<dt><strong>--yices</strong></dt>
+<dd><p>use Yices</p>
+</dd>
+<dt><strong>--z3</strong></dt>
+<dd><p>use Z3</p>
+</dd>
+<dt><strong>--fpa</strong></dt>
+<dd><p>use theory of floating-point arithmetic</p>
+</dd>
+<dt><strong>--refine</strong></dt>
+<dd><p>use refinement procedure (experimental)</p>
+</dd>
+<dt><strong>--refine-arrays</strong></dt>
+<dd><p>use refinement for arrays only</p>
+</dd>
+<dt><strong>--refine-arithmetic</strong></dt>
+<dd><p>refinement of arithmetic expressions only</p>
+</dd>
+<dt><strong>--max-node-refinement</strong></dt>
+<dd><p>maximum refinement iterations for arithmetic expressions</p>
+</dd>
+<dt><strong>--incremental-smt2-solver</strong> <em>cmd</em></dt>
+<dd><p>command to invoke external SMT solver for incremental solving (experimental)</p>
+</dd>
+<dt><strong>--outfile</strong> filename</dt>
+<dd><p>output formula to given file</p>
+</dd>
+<dt><strong>--write-solver-stats-to</strong> <em>json-file</em></dt>
+<dd><p>collect the solver query complexity</p>
+</dd>
+<dt><strong>--no-refine-strings</strong></dt>
+<dd><p>turn off string refinement</p>
+</dd>
+<dt><strong>--string-printable</strong></dt>
+<dd><p>restrict to printable strings and characters</p>
+</dd>
+<dt><strong>--string-non-empty</strong></dt>
+<dd><p>restrict to non-empty strings (experimental)</p>
+</dd>
+<dt><strong>--string-input-value</strong> st</dt>
+<dd><p>restrict non-null strings to a fixed value st; the switch can be used multiple times to give several strings</p>
+</dd>
+<dt><strong>--max-nondet-string-length</strong> n bound the length of nondet (e.g. input) strings.</dt>
+<dd><p>Default is 67108863; note that setting the value higher than this does not work with <strong>--trace</strong> or <strong>--validate-trace</strong>.</p>
+</dd>
+<dt><strong>--arrays-uf-never</strong></dt>
+<dd><p>never turn arrays into uninterpreted functions</p>
+</dd>
+<dt><strong>--arrays-uf-always</strong></dt>
+<dd><p>always turn arrays into uninterpreted functions</p>
+</dd>
+</dl>
+<h2>Other options:</h2>
+<dl>
+<dt><strong>--version</strong></dt>
+<dd><p>show version and exit</p>
+</dd>
+<dt><strong>--xml-ui</strong></dt>
+<dd><p>use XML-formatted output</p>
+</dd>
+<dt><strong>--xml-interface</strong></dt>
+<dd><p>bi-directional XML interface</p>
+</dd>
+<dt><strong>--json-ui</strong></dt>
+<dd><p>use JSON-formatted output</p>
+</dd>
+<dt><strong>--json-interface</strong></dt>
+<dd><p>bi-directional JSON interface</p>
+</dd>
+<dt><strong>--validate-goto-model</strong></dt>
+<dd><p>enable additional well-formedness checks on the goto program</p>
+</dd>
+<dt><strong>--validate-ssa-equation</strong></dt>
+<dd><p>enable additional well-formedness checks on the SSA representation</p>
+</dd>
+<dt><strong>--trace-json-extended</strong></dt>
+<dd><p>add rawLhs property to trace</p>
+</dd>
+<dt><strong>--trace-show-function-calls</strong></dt>
+<dd><p>show function calls in plain trace</p>
+</dd>
+<dt><strong>--trace-show-code</strong></dt>
+<dd><p>show original code in plain trace</p>
+</dd>
+<dt><strong>--trace-hex</strong></dt>
+<dd><p>represent plain trace values in hex</p>
+</dd>
+<dt><strong>--compact-trace</strong></dt>
+<dd><p>give a compact trace</p>
+</dd>
+<dt><strong>--stack-trace</strong></dt>
+<dd><p>give a stack trace only</p>
+</dd>
+<dt><strong>--flush</strong></dt>
+<dd><p>flush every line of output</p>
+</dd>
+<dt><strong>--verbosity</strong> #</dt>
+<dd><p>verbosity level</p>
+</dd>
+<dt><strong>--timestamp</strong> [<strong>monotonic</strong>|<strong>wall</strong>]</dt>
+<dd><p>Print microsecond-precision timestamps. <strong>monotonic</strong>: stamps increase monotonically. <strong>wall</strong>: ISO-8601 wall clock timestamps.</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>cbmc</strong>(1), <strong>janalyzer</strong>(1), <strong>jdiff</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2001-2018, Daniel Kroening, Edmund Clarke</p>

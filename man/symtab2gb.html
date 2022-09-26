@@ -1,0 +1,23 @@
+<h1>NAME</h1>
+<p>symtab2gb - Compile JSON symbol tables to a goto binary</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>symtab2gb [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>symtab2gb <em>json-symtab-file</em>+ [<strong>--out</strong> <em>outfile</em>]</strong></dt>
+<dd><p>compile symbol tables in JSON format to a single goto binary</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<p>This utility is to compile a <strong>cbmc</strong>(1) symbols table (in JSON format) into a goto binary. This is to support integration of external language frontends, such as Ada (using GNAT2GOTO: https://github.com/diffblue/gnat2goto) or Rust (using Kani: https://github.com/model-checking/kani).</p>
+<h1>OPTIONS</h1>
+<p><strong>--out</strong> <em>outfile</em> Specify the filename of the resulting binary (default: a.out)</p>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>cbmc</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2019, Diffblue</p>

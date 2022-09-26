@@ -1,0 +1,82 @@
+<h1>NAME</h1>
+<p>jdiff - Syntactic diff of goto programs obtained from Java bytecode</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>jdiff [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>jdiff old new</strong></dt>
+<dd><p>jars to be compared</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<h1>OPTIONS</h1>
+<h2>Diff options:</h2>
+<dl>
+<dt><strong>--show-goto-functions</strong></dt>
+<dd><p>show loaded goto program</p>
+</dd>
+<dt><strong>--list-goto-functions</strong></dt>
+<dd><p>list loaded goto functions</p>
+</dd>
+<dt><strong>--show-properties</strong></dt>
+<dd><p>show the properties, but don't run analysis</p>
+</dd>
+<dt><strong>--show-loops</strong></dt>
+<dd><p>show the loops in the programs</p>
+</dd>
+<dt><strong>-u</strong> | <strong>--unified</strong></dt>
+<dd><p>output unified diff</p>
+</dd>
+</dl>
+<p><strong>--change-impact</strong> |</p>
+<p><strong>--forward-impact</strong> |</p>
+<dl>
+<dt><strong>--backward-impact</strong></dt>
+<dd><p>output unified diff with forward&amp;backward/forward/backward dependencies</p>
+</dd>
+<dt><strong>--compact-output</strong></dt>
+<dd><p>output dependencies in compact mode</p>
+</dd>
+</dl>
+<h2>Program instrumentation options:</h2>
+<dl>
+<dt><strong>--no-assertions</strong></dt>
+<dd><p>ignore user assertions</p>
+</dd>
+<dt><strong>--no-assumptions</strong></dt>
+<dd><p>ignore user assumptions</p>
+</dd>
+<dt><strong>--cover</strong> CC</dt>
+<dd><p>Add instrumentation as used with <strong>jbmc</strong>(1) for creating test-suite with coverage criterion CC, where CC is one of assertion[s], assume[s], branch[es], condition[s], cover, decision[s], location[s], or mcdc.</p>
+</dd>
+<dt><strong>--cover-failed-assertions</strong></dt>
+<dd><p>do not stop coverage checking at failed assertions (this is the default for <strong>--cover</strong> assertions)</p>
+</dd>
+<dt><strong>--show-test-suite</strong></dt>
+<dd><p>print test suite for coverage criterion (requires <strong>--cover</strong>)</p>
+</dd>
+</dl>
+<h2>Other options:</h2>
+<dl>
+<dt><strong>--version</strong></dt>
+<dd><p>show version and exit</p>
+</dd>
+<dt><strong>--json-ui</strong></dt>
+<dd><p>use JSON-formatted output</p>
+</dd>
+<dt><strong>--verbosity</strong> <em>n</em></dt>
+<dd><p>verbosity level</p>
+</dd>
+<dt><strong>--timestamp</strong> [<strong>monotonic</strong>|<strong>wall</strong>]</dt>
+<dd><p>Print microsecond-precision timestamps. <strong>monotonic</strong>: stamps increase monotonically. <strong>wall</strong>: ISO-8601 wall clock timestamps.</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>jbmc</strong>(1), <strong>goto-analyzer</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2016-2018, Daniel Kroening, Peter Schrammel</p>
