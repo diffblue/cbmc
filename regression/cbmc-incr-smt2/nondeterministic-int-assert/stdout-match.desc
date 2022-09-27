@@ -1,0 +1,18 @@
+CORE
+test.c
+--outfile -
+Starting Bounded Model Checking
+^\(set-option :produce-models true\)$
+^\(set-logic ALL\)$
+^\(declare-fun size_of_object \(\(_ BitVec 8\)\) \(_ BitVec 64\)\)$
+^Passing problem to incremental SMT2 solving via SMT2 incremental dry-run$
+^\(define-fun B0 \(\) Bool true\)$
+^\(define-fun B2 \(\) Bool \(not false\)\)$
+^\(assert B2\)$
+^\(assert \(= \(size_of_object \(_ bv1 8\)\) \(_ bv0 64\)\)\)$
+^\(assert \(= \(size_of_object \(_ bv0 8\)\) \(_ bv0 64\)\)\)$
+^\(check-sat\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+Test to check that the `--outfile -` argument is used correctly.

@@ -1,0 +1,10 @@
+CORE
+test.c
+--incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --slice-formula --outfile %out-file-name%
+Passing problem to incremental SMT2 solving via SMT2 incremental dry-run
+Output file matches.
+^EXIT=0$
+^SIGNAL=0$
+--
+Test to check that the --outfile argument is used correctly and that the output file matches the
+rules defined in test-outfile-rules.txt
