@@ -696,9 +696,6 @@ void code_contractst::apply_function_contract(
 
   // Isolate each component of the contract.
   const auto &type = get_contract(target_function, ns);
-  auto assigns_clause = type.assigns();
-  auto requires_contract = type.requires_contract();
-  auto ensures_contract = type.ensures_contract();
 
   // Prepare to instantiate expressions in the callee
   // with expressions from the call site (e.g. the return value).
@@ -772,35 +769,39 @@ void code_contractst::apply_function_contract(
   is_fresh.add_memory_map_decl(new_program);
 
   // Insert assertion of the precondition immediately before the call site.
-  exprt::operandst requires_conjuncts;
-  for(const auto &r : type.requires())
+  for(const auto &clause : type.requires())
   {
-    requires_conjuncts.push_back(
-      to_lambda_expr(r).application(instantiation_values));
-  }
-  auto requires = conjunction(requires_conjuncts);
-  requires.add_source_location() =
-    requires_conjuncts.empty() ? type.source_location()
-                               : type.requires().front().source_location();
-  if(!requires.is_true())
-  {
-    if(has_subexpr(requires, ID_exists) || has_subexpr(requires, ID_forall))
-      add_quantified_variable(requires, mode);
+    auto instantiated_clause =
+      to_lambda_expr(clause).application(instantiation_values);
+    if(!instantiated_clause.is_true())
+    {
+      if(
+        has_subexpr(instantiated_clause, ID_exists) ||
+        has_subexpr(instantiated_clause, ID_forall))
+        add_quantified_variable(instantiated_clause, mode);
 
-    goto_programt assertion;
-    converter.goto_convert(code_assertt(requires), assertion, mode);
-    assertion.instructions.back().source_location_nonconst() =
-      requires.source_location();
-    assertion.instructions.back().source_location_nonconst().set_comment(
-      "Check requires clause");
-    assertion.instructions.back().source_location_nonconst().set_property_class(
-      ID_precondition);
-    is_fresh.update_requires(assertion);
-    new_program.destructive_append(assertion);
+      goto_programt assertion;
+      converter.goto_convert(
+        code_assertt(instantiated_clause), assertion, mode);
+      assertion.instructions.back().source_location_nonconst() =
+        clause.source_location();
+      assertion.instructions.back().source_location_nonconst().set_line(
+        location.get_line());
+      assertion.instructions.back().source_location_nonconst().set_comment(
+        std::string("Check ")
+          .append(target_function.c_str())
+          .append("'s requires clause in ")
+          .append(function.c_str()));
+      assertion.instructions.back()
+        .source_location_nonconst()
+        .set_property_class(ID_precondition);
+      is_fresh.update_requires(assertion);
+      new_program.destructive_append(assertion);
+    }
   }
 
   // Translate requires_contract(ptr, contract) clauses to assertions
-  for(auto &expr : requires_contract)
+  for(auto &expr : type.requires_contract())
   {
     assert_function_pointer_obeys_contract(
       to_function_pointer_obeys_contract_expr(
@@ -812,34 +813,31 @@ void code_contractst::apply_function_contract(
 
   // Gather all the instructions required to handle history variables
   // as well as the ensures clause
-  exprt::operandst ensures_conjuncts;
-  for(const auto &r : type.ensures())
+  std::vector<std::pair<goto_programt, goto_programt>> ensures_clauses;
+  for(const auto &clause : type.ensures())
   {
-    ensures_conjuncts.push_back(
-      to_lambda_expr(r).application(instantiation_values));
-  }
-  auto ensures = conjunction(ensures_conjuncts);
-  ensures.add_source_location() = ensures_conjuncts.empty()
-                                    ? type.source_location()
-                                    : type.ensures().front().source_location();
-  std::pair<goto_programt, goto_programt> ensures_pair;
-  if(!ensures.is_false())
-  {
-    if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
-      add_quantified_variable(ensures, mode);
+    auto instantiated_clause =
+      to_lambda_expr(clause).application(instantiation_values);
+    if(!instantiated_clause.is_false())
+    {
+      if(
+        has_subexpr(instantiated_clause, ID_exists) ||
+        has_subexpr(instantiated_clause, ID_forall))
+        add_quantified_variable(instantiated_clause, mode);
 
-    auto assumption = code_assumet(ensures);
-    ensures_pair =
-      create_ensures_instruction(assumption, ensures.source_location(), mode);
+      auto assumption = code_assumet(instantiated_clause);
+      ensures_clauses.push_back(
+        create_ensures_instruction(assumption, clause.source_location(), mode));
 
-    // add all the history variable initialization instructions
-    new_program.destructive_append(ensures_pair.second);
+      // add all the history variable initialization instructions
+      new_program.destructive_append(ensures_clauses.back().second);
+    }
   }
 
   // ASSIGNS clause should not refer to any quantified variables,
   // and only refer to the common symbols to be replaced.
   exprt::operandst targets;
-  for(auto &target : assigns_clause)
+  for(auto &target : type.assigns())
     targets.push_back(to_lambda_expr(target).application(instantiation_values));
 
   // Create a sequence of non-deterministic assignments ...
@@ -881,14 +879,14 @@ void code_contractst::apply_function_contract(
 
   // To remove the function call, insert statements related to the assumption.
   // Then, replace the function call with a SKIP statement.
-  if(!ensures.is_false())
+  for(auto &clause : ensures_clauses)
   {
-    is_fresh.update_ensures(ensures_pair.first);
-    new_program.destructive_append(ensures_pair.first);
+    is_fresh.update_ensures(clause.first);
+    new_program.destructive_append(clause.first);
   }
 
   // Translate ensures_contract(ptr, contract) clauses to assumptions
-  for(auto &expr : ensures_contract)
+  for(auto &expr : type.ensures_contract())
   {
     assume_function_pointer_obeys_contract(
       to_function_pointer_obeys_contract_expr(
@@ -1373,10 +1371,6 @@ void code_contractst::add_contract_check(
 {
   PRECONDITION(!dest.instructions.empty());
 
-  const auto &code_type = get_contract(wrapper_function, ns);
-  auto assigns = code_type.assigns();
-  auto requires_contract = code_type.requires_contract();
-  auto ensures_contract = code_type.ensures_contract();
   // build:
   // decl ret
   // decl parameter1 ...
@@ -1385,6 +1379,7 @@ void code_contractst::add_contract_check(
   // ret=function(parameter1, ...)
   // assert(ensures)
 
+  const auto &code_type = get_contract(wrapper_function, ns);
   goto_programt check;
 
   // prepare function call including all declarations
@@ -1445,67 +1440,67 @@ void code_contractst::add_contract_check(
   is_fresh_enforcet visitor(*this, log, wrapper_function);
   visitor.create_declarations();
   visitor.add_memory_map_decl(check);
+
   // Generate: assume(requires)
-  exprt::operandst requires_conjuncts;
-  for(const auto &r : code_type.requires())
+  for(const auto &clause : code_type.requires())
   {
-    requires_conjuncts.push_back(
-      to_lambda_expr(r).application(instantiation_values));
+    auto instantiated_clause =
+      to_lambda_expr(clause).application(instantiation_values);
+
+    if(!instantiated_clause.is_false())
+    {
+      if(
+        has_subexpr(instantiated_clause, ID_exists) ||
+        has_subexpr(instantiated_clause, ID_forall))
+        add_quantified_variable(instantiated_clause, function_symbol.mode);
+
+      goto_programt assumption;
+      converter.goto_convert(
+        code_assumet(instantiated_clause), assumption, function_symbol.mode);
+
+      visitor.update_requires(assumption);
+      check.destructive_append(assumption);
+    }
   }
-  auto requires = conjunction(requires_conjuncts);
-  requires.add_source_location() =
-    requires_conjuncts.empty() ? code_type.source_location()
-                               : code_type.requires().front().source_location();
-  if(!requires.is_false())
+
+  // Gather all the instructions required to handle history variables
+  // as well as the ensures clause
+  std::vector<std::pair<goto_programt, goto_programt>> ensures_clauses;
+  for(const auto &clause : code_type.ensures())
   {
-    if(has_subexpr(requires, ID_exists) || has_subexpr(requires, ID_forall))
-      add_quantified_variable(requires, function_symbol.mode);
+    // Generate: copies for history variables
+    auto instantiated_clause =
+      to_lambda_expr(clause).application(instantiation_values);
 
-    goto_programt assumption;
-    converter.goto_convert(
-      code_assumet(requires), assumption, function_symbol.mode);
-    visitor.update_requires(assumption);
-    check.destructive_append(assumption);
-  }
+    if(!instantiated_clause.is_true())
+    {
+      if(
+        has_subexpr(instantiated_clause, ID_exists) ||
+        has_subexpr(instantiated_clause, ID_forall))
+        add_quantified_variable(instantiated_clause, function_symbol.mode);
 
-  // Prepare the history variables handling
-  std::pair<goto_programt, goto_programt> ensures_pair;
+      // get all the relevant instructions related to history variables
+      auto assertion = code_assertt(instantiated_clause);
+      assertion.add_source_location() = clause.source_location();
+      ensures_clauses.push_back(create_ensures_instruction(
+        assertion, clause.source_location(), function_symbol.mode));
+      ensures_clauses.back()
+        .first.instructions.back()
+        .source_location_nonconst()
+        .set_comment("Check ensures clause");
+      ensures_clauses.back()
+        .first.instructions.back()
+        .source_location_nonconst()
+        .set_property_class(ID_postcondition);
 
-  // Generate: copies for history variables
-  exprt::operandst ensures_conjuncts;
-  for(const auto &r : code_type.ensures())
-  {
-    ensures_conjuncts.push_back(
-      to_lambda_expr(r).application(instantiation_values));
-  }
-  auto ensures = conjunction(ensures_conjuncts);
-  ensures.add_source_location() =
-    ensures_conjuncts.empty() ? code_type.source_location()
-                              : code_type.ensures().front().source_location();
-  if(!ensures.is_true())
-  {
-    if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
-      add_quantified_variable(ensures, function_symbol.mode);
-
-    // get all the relevant instructions related to history variables
-    auto assertion = code_assertt(ensures);
-    assertion.add_source_location() = ensures.source_location();
-    ensures_pair = create_ensures_instruction(
-      assertion, ensures.source_location(), function_symbol.mode);
-    ensures_pair.first.instructions.back()
-      .source_location_nonconst()
-      .set_comment("Check ensures clause");
-    ensures_pair.first.instructions.back()
-      .source_location_nonconst()
-      .set_property_class(ID_postcondition);
-
-    // add all the history variable initializations
-    visitor.update_ensures(ensures_pair.first);
-    check.destructive_append(ensures_pair.second);
+      // add all the history variable initializations
+      visitor.update_ensures(ensures_clauses.back().first);
+      check.destructive_append(ensures_clauses.back().second);
+    }
   }
 
   // Translate requires_contract(ptr, contract) clauses to assumptions
-  for(auto &expr : requires_contract)
+  for(auto &expr : code_type.requires_contract())
   {
     assume_function_pointer_obeys_contract(
       to_function_pointer_obeys_contract_expr(
@@ -1518,13 +1513,13 @@ void code_contractst::add_contract_check(
   check.add(goto_programt::make_function_call(call, source_location));
 
   // Generate: assert(ensures)
-  if(ensures.is_not_nil())
+  for(auto &pair : ensures_clauses)
   {
-    check.destructive_append(ensures_pair.first);
+    check.destructive_append(pair.first);
   }
 
   // Translate ensures_contract(ptr, contract) clauses to assertions
-  for(auto &expr : ensures_contract)
+  for(auto &expr : code_type.ensures_contract())
   {
     assert_function_pointer_obeys_contract(
       to_function_pointer_obeys_contract_expr(

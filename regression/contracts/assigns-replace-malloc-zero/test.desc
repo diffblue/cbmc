@@ -1,6 +1,7 @@
 CORE
 main.c
 --replace-call-with-contract foo _ --malloc-may-fail --malloc-fail-null
+^\[foo.precondition.\d+\] line \d+ Check foo's requires clause in main: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line 35 expecting SUCCESS: SUCCESS$
