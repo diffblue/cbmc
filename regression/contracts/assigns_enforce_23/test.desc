@@ -6,4 +6,4 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that POINTER_OBJECT can be used both on arrays and scalars.
+This test checks that __CPROVER_object_whole can be used both on arrays and scalars.

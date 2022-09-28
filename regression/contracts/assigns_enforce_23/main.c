@@ -10,8 +10,8 @@ typedef struct
 void foo(blob *b, uint8_t *value)
   // clang-format off
 __CPROVER_requires(b->size == 5)
-__CPROVER_assigns(__CPROVER_POINTER_OBJECT(b->buf))
-__CPROVER_assigns(__CPROVER_POINTER_OBJECT(value))
+__CPROVER_assigns(__CPROVER_object_whole(b->buf))
+__CPROVER_assigns(__CPROVER_object_whole(value))
 __CPROVER_ensures(b->buf[0] == 1)
 __CPROVER_ensures(b->buf[1] == 1)
 __CPROVER_ensures(b->buf[2] == 1)

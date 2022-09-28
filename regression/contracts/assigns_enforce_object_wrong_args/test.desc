@@ -3,8 +3,8 @@ main.c
 --enforce-contract baz
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: pointer_object expects one argument$
+^.*error: wrong number of function arguments: expected 1, but got 0$
 ^CONVERSION ERROR$
 --
 --
-Check that `__CPROVER_POINTER_OBJECT` in assigns clauses are invoked correctly.
+Check that incorrect uses of `__CPROVER_object_whole` in assigns clauses are detected.

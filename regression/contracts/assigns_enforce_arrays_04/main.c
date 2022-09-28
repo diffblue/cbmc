@@ -5,8 +5,7 @@ void assigns_single(int a[], int len)
   a[i] = 0;
 }
 
-void uses_assigns(int a[], int len)
-  __CPROVER_assigns(__CPROVER_POINTER_OBJECT(a))
+void uses_assigns(int a[], int len) __CPROVER_assigns(__CPROVER_object_whole(a))
 {
   assigns_single(a, len);
 }

@@ -4,7 +4,7 @@ main_replace.c
 ^VERIFICATION SUCCESSFUL$
 ^\[.*\] .* Check that v->size \(assigned by the contract of resize_vec\) is assignable: SUCCESS
 ^\[.*\] .* Check that v->arr \(assigned by the contract of resize_vec\) is assignable: SUCCESS
-^\[.*\] .* Check that POINTER_OBJECT\(\(const void \*\)v->arr\) \(assigned by the contract of resize_vec\) is assignable: SUCCESS
+^\[.*\] .* Check that __CPROVER_object_whole\(\(.*\)v->arr\) \(assigned by the contract of resize_vec\) is assignable: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$
 --

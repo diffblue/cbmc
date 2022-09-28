@@ -3,8 +3,8 @@
 int foo(bool a, char *x, char *y)
   // clang-format off
  __CPROVER_assigns(
-    a: __CPROVER_POINTER_OBJECT(x);
-   !a: __CPROVER_POINTER_OBJECT(y);
+    a: __CPROVER_object_whole(x);
+   !a: __CPROVER_object_whole(y);
   )
 // clang-format on
 {

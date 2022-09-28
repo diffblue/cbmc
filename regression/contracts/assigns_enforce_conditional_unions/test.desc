@@ -1,9 +1,9 @@
 CORE
 main.c
 --enforce-contract update _ --pointer-check --pointer-overflow-check --signed-overflow-check --unsigned-overflow-check --conversion-check
-^\[update.assigns.\d+] line 73 Check that POINTER_OBJECT\(\(const void \*\)state->digest.high_level.first.ctx->digest\) is valid when .*: SUCCESS
+^\[update.assigns.\d+] line 73 Check that __CPROVER_object_whole\(\(.*\)state->digest.high_level.first.ctx->digest\) is valid when .*: SUCCESS
 ^\[update.assigns.\d+] line 74 Check that state->digest.high_level.first.ctx->flags is valid when .*: SUCCESS
-^\[update.assigns.\d+] line 76 Check that POINTER_OBJECT\(\(const void \*\)state->digest.high_level.second.ctx->digest\) is valid when .*: SUCCESS
+^\[update.assigns.\d+] line 76 Check that __CPROVER_object_whole\(\(.*\)state->digest.high_level.second.ctx->digest\) is valid when .*: SUCCESS
 ^\[update.assigns.\d+] line 77 Check that state->digest.high_level.second.ctx->flags is valid when .*: SUCCESS
 ^\[is_high_level.assigns.\d+\] line 50 Check that latch is assignable: SUCCESS$
 ^\[is_high_level.assigns.\d+\] line 51 Check that once is assignable: SUCCESS$

@@ -70,10 +70,10 @@ __CPROVER_requires(
               sizeof(*(state->digest.high_level.second.ctx->digest))))
 __CPROVER_assigns(
   is_high_level():
-    __CPROVER_POINTER_OBJECT(state->digest.high_level.first.ctx->digest),
+    __CPROVER_object_whole(state->digest.high_level.first.ctx->digest),
     state->digest.high_level.first.ctx->flags;
   is_high_level() && also_second:
-    __CPROVER_POINTER_OBJECT(state->digest.high_level.second.ctx->digest),  
+    __CPROVER_object_whole(state->digest.high_level.second.ctx->digest),  
     state->digest.high_level.second.ctx->flags;
 )
 // clang-format on
