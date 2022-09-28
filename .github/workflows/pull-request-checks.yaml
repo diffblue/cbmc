@@ -612,9 +612,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang-format-11
-          wget -O git-clang-format https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-14.0.6/clang/tools/clang-format/git-clang-format
-          chmod u+x git-clang-format
-          mv git-clang-format /usr/local/bin
       - name: Check updated lines of code match clang-format-11 style
         env:
           BASE_BRANCH: ${{ github.base_ref }}
