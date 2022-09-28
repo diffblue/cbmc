@@ -1,5 +1,9 @@
 var NAVTREEINDEX23 =
 {
+"classdata__dpt.html#a0667b2ced4707c1bec1c617a576bdd81":[4,0,326,3],
+"classdata__dpt.html#a06764974a6c30d3c2e1bb4fe29e87822":[4,0,326,4],
+"classdata__dpt.html#a0d27687515eae56fc0afa4436be5368c":[4,0,326,5],
+"classdata__dpt.html#a4c9be3bb190df9d74d5d6eed5293ef5e":[4,0,326,0],
 "classdata__dpt.html#a5f9934d3cc68d395b4455eea44e11ced":[4,0,326,1],
 "classdata__dpt.html#a837a854e495080d1f48cbe8bc0354f02":[4,0,326,2],
 "classdata__dpt.html#ab796bae6491e9b59e9c6b358b0fc3dba":[4,0,326,6],
@@ -245,9 +249,5 @@ var NAVTREEINDEX23 =
 "classdisjunctive__polynomial__accelerationt.html#a0864e4d387429387d5736f9a8f5a1498":[4,0,359,26],
 "classdisjunctive__polynomial__accelerationt.html#a0a180d5f46fdc6b3b826f25361bf20ce":[4,0,359,13],
 "classdisjunctive__polynomial__accelerationt.html#a0faef81ef2604639604d2ff25aaeac16":[4,0,359,19],
-"classdisjunctive__polynomial__accelerationt.html#a1533c598c96f17530b0199c2a101965b":[4,0,359,14],
-"classdisjunctive__polynomial__accelerationt.html#a17b3700c6dbea840c382098e2ca3b8c2":[4,0,359,8],
-"classdisjunctive__polynomial__accelerationt.html#a2ee18d1b7fa5329a898ef807ac73d2d8":[4,0,359,24],
-"classdisjunctive__polynomial__accelerationt.html#a34d96c8895e9147dd1e0401bceb7048c":[4,0,359,5],
-"classdisjunctive__polynomial__accelerationt.html#a4143abca56855ca7936eb95b1ed1d229":[4,0,359,23]
+"classdisjunctive__polynomial__accelerationt.html#a1533c598c96f17530b0199c2a101965b":[4,0,359,14]
 };

@@ -1,5 +1,9 @@
 var NAVTREEINDEX24 =
 {
+"classdisjunctive__polynomial__accelerationt.html#a17b3700c6dbea840c382098e2ca3b8c2":[4,0,359,8],
+"classdisjunctive__polynomial__accelerationt.html#a2ee18d1b7fa5329a898ef807ac73d2d8":[4,0,359,24],
+"classdisjunctive__polynomial__accelerationt.html#a34d96c8895e9147dd1e0401bceb7048c":[4,0,359,5],
+"classdisjunctive__polynomial__accelerationt.html#a4143abca56855ca7936eb95b1ed1d229":[4,0,359,23],
 "classdisjunctive__polynomial__accelerationt.html#a48e85e16ad12e43fe1e665a0eaa0d9c4":[4,0,359,4],
 "classdisjunctive__polynomial__accelerationt.html#a4dd231687ff953eee96d7d5557450357":[4,0,359,20],
 "classdisjunctive__polynomial__accelerationt.html#a55cdd0be96d05a2352f867076b127e31":[4,0,359,12],
@@ -245,9 +249,5 @@ var NAVTREEINDEX24 =
 "classenumeration__typet.html#a343d0dae0b36081dddade1ecd95ee51b":[4,0,387,2],
 "classenumeration__typet.html#abea9dd8a3d2cccfaf75d069825ee034a":[4,0,387,1],
 "classenumerative__loop__invariant__synthesizert.html":[4,0,388],
-"classenumerative__loop__invariant__synthesizert.html#a0601b942684ec488d9d97869f8da3f35":[4,0,388,2],
-"classenumerative__loop__invariant__synthesizert.html#a2c1f6ee713cb0c8d2f630947cfea6d01":[4,0,388,3],
-"classenumerative__loop__invariant__synthesizert.html#a4fc389e3d4f4cc320b9c29c13514c65b":[4,0,388,1],
-"classenumerative__loop__invariant__synthesizert.html#accbf66acd814b89fdd6a01f597c4c05d":[4,0,388,4],
-"classenumerative__loop__invariant__synthesizert.html#ad7fa5a94a7176f71976ae1112d48af9f":[4,0,388,0]
+"classenumerative__loop__invariant__synthesizert.html#a0601b942684ec488d9d97869f8da3f35":[4,0,388,2]
 };

@@ -311,10 +311,14 @@ Functions</h2></td></tr>
 <tr class="separator:a5ffa489d4c2aa6bba33411556a6b60f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a073fa9ed18b0272adb286341f36b3761"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a073fa9ed18b0272adb286341f36b3761">__CPROVER_enum_is_in_range</a> ()</td></tr>
 <tr class="separator:a073fa9ed18b0272adb286341f36b3761"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03a196521cb8fb4d269c0b8f4af5f5f4"><td class="memItemLeft" align="right" valign="top">__CPROVER_size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a03a196521cb8fb4d269c0b8f4af5f5f4">__CPROVER_object_from</a> (void *)</td></tr>
-<tr class="separator:a03a196521cb8fb4d269c0b8f4af5f5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01fc7198580408b44cabbca6aa1d961f"><td class="memItemLeft" align="right" valign="top">__CPROVER_size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a01fc7198580408b44cabbca6aa1d961f">__CPROVER_object_slice</a> (void *, __CPROVER_size_t)</td></tr>
-<tr class="separator:a01fc7198580408b44cabbca6aa1d961f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e08d89143da191d8d4ace2f025d5c60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a5e08d89143da191d8d4ace2f025d5c60">__CPROVER_assignable</a> (void *ptr, __CPROVER_size_t size, __CPROVER_bool is_ptr_to_ptr)</td></tr>
+<tr class="separator:a5e08d89143da191d8d4ace2f025d5c60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa7fcb05ec9018275a358ae39f80392"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a4fa7fcb05ec9018275a358ae39f80392">__CPROVER_object_whole</a> (void *ptr)</td></tr>
+<tr class="separator:a4fa7fcb05ec9018275a358ae39f80392"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abca0337cfd5268f7bce166885ccd74ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#abca0337cfd5268f7bce166885ccd74ba">__CPROVER_object_from</a> (void *ptr)</td></tr>
+<tr class="separator:abca0337cfd5268f7bce166885ccd74ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2be80782db5f3cfb2a75f18530b2c992"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a2be80782db5f3cfb2a75f18530b2c992">__CPROVER_object_upto</a> (void *ptr, __CPROVER_size_t size)</td></tr>
+<tr class="separator:a2be80782db5f3cfb2a75f18530b2c992"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a9b10d4cf8fd8912b7c88cfb9d796e747"></a>
@@ -492,6 +496,40 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>description</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5e08d89143da191d8d4ace2f025d5c60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e08d89143da191d8d4ace2f025d5c60">&#9670;&nbsp;</a></span>__CPROVER_assignable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void __CPROVER_assignable </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_bool&#160;</td>
+          <td class="paramname"><em>is_ptr_to_ptr</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1989,17 +2027,17 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a03a196521cb8fb4d269c0b8f4af5f5f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03a196521cb8fb4d269c0b8f4af5f5f4">&#9670;&nbsp;</a></span>__CPROVER_object_from()</h2>
+<a id="abca0337cfd5268f7bce166885ccd74ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abca0337cfd5268f7bce166885ccd74ba">&#9670;&nbsp;</a></span>__CPROVER_object_from()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">__CPROVER_size_t __CPROVER_object_from </td>
+          <td class="memname">void __CPROVER_object_from </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -2025,28 +2063,46 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a01fc7198580408b44cabbca6aa1d961f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01fc7198580408b44cabbca6aa1d961f">&#9670;&nbsp;</a></span>__CPROVER_object_slice()</h2>
+<a id="a2be80782db5f3cfb2a75f18530b2c992"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2be80782db5f3cfb2a75f18530b2c992">&#9670;&nbsp;</a></span>__CPROVER_object_upto()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">__CPROVER_size_t __CPROVER_object_slice </td>
+          <td class="memname">void __CPROVER_object_upto </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>ptr</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4fa7fcb05ec9018275a358ae39f80392"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fa7fcb05ec9018275a358ae39f80392">&#9670;&nbsp;</a></span>__CPROVER_object_whole()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void __CPROVER_object_whole </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
