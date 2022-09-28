@@ -56,6 +56,10 @@ bool static_simplifier(
 
   messaget m(message_handler);
   m.status() << "Simplifying program" << messaget::eom;
+  m.warning() << "**** WARNING: This simplification is currently known to be "
+                 "unsound for input programs which include recursion. Do not "
+                 "use it if soundness is important for your use case."
+              << messaget::eom;
 
   for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
