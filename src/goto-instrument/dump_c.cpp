@@ -25,10 +25,34 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_utils.h>
 
 #include <ansi-c/expr2c.h>
+#include <ansi-c/type2name.h>
+#include <cpp/cpp_type2name.h>
 #include <cpp/expr2cpp.h>
 #include <linking/static_lifetime_init.h>
 
 #include "goto_program2code.h"
+
+static std::string clean_identifier(const irep_idt &id)
+{
+  std::string result;
+  result.reserve(id2string(id).size());
+
+  for(auto c : id2string(id))
+  {
+    if(c >= '0' && c <= '9')
+      result += c;
+    else if(c >= 'A' && c <= 'Z')
+      result += c;
+    else if(c >= 'a' && c <= 'z')
+      result += c;
+    else if(c == '_' || c == '$')
+      result += c;
+    else
+      result += "_" + std::to_string(c);
+  }
+
+  return result;
+}
 
 dump_c_configurationt dump_c_configurationt::default_configuration =
   dump_c_configurationt();
@@ -58,10 +82,31 @@ void dump_ct::operator()(std::ostream &os)
 
   // add copies of struct types when ID_C_transparent_union is only
   // annotated to parameter
-  symbol_tablet symbols_transparent;
+  symbol_tablet additional_symbols;
   for(const auto &named_symbol : copied_symbol_table.symbols)
   {
     const symbolt &symbol=named_symbol.second;
+
+    if(
+      (symbol.type.id() == ID_union || symbol.type.id() == ID_struct) &&
+      !symbol.is_type)
+    {
+      type_symbolt ts{symbol.type};
+      ts.mode = symbol.mode;
+      if(mode == ID_C)
+        ts.name = "tag-" + type2name(symbol.type, ns);
+      else if(mode == ID_cpp)
+        ts.name = "tag-" + cpp_type2name(symbol.type);
+      else
+        UNREACHABLE;
+      typet &type =
+        copied_symbol_table.get_writeable_ref(named_symbol.first).type;
+      if(ts.type.id() == ID_union)
+        type = union_tag_typet{ts.name};
+      else
+        type = struct_tag_typet{ts.name};
+      additional_symbols.add(ts);
+    }
 
     if(symbol.type.id()!=ID_code)
       continue;
@@ -86,14 +131,14 @@ void dump_ct::operator()(std::ostream &os)
         new_type_sym.type.set(ID_C_transparent_union, true);
 
         // we might have it already, in which case this has no effect
-        symbols_transparent.add(new_type_sym);
+        additional_symbols.add(new_type_sym);
 
         to_union_tag_type(type).set_identifier(new_type_sym.name);
         type.remove(ID_C_transparent_union);
       }
     }
   }
-  for(const auto &symbol_pair : symbols_transparent.symbols)
+  for(const auto &symbol_pair : additional_symbols.symbols)
   {
     copied_symbol_table.add(symbol_pair.second);
   }
@@ -509,10 +554,10 @@ void dump_ct::convert_compound(
         collect_typedefs(comp.type(), true);
     }
 
-    irep_idt comp_name=comp.get_name();
-
-    struct_body << indent(1) << "// " << comp_name << '\n';
+    struct_body << indent(1) << "// " << comp.get_name() << '\n';
     struct_body << indent(1);
+
+    irep_idt comp_name = clean_identifier(comp.get_name());
 
     // component names such as "main" would collide with other objects in the
     // namespace
@@ -1518,6 +1563,12 @@ void dump_ct::cleanup_expr(exprt &expr)
       // build an initializer list without designators
       expr = unary_exprt{ID_initializer_list, bu.value()};
     }
+  }
+  else if(expr.id() == ID_member)
+  {
+    member_exprt &member_expr = to_member_expr(expr);
+    member_expr.set_component_name(
+      clean_identifier(member_expr.get_component_name()));
   }
 }
 

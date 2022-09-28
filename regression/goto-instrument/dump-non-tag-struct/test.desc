@@ -1,0 +1,13 @@
+CORE
+main.c
+--dump-c
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^Invariant check failed
+^warning: ignoring
+irep
+--
+This test must pass compiling the output generated using dump-c, which implies
+that dump-c succeeded and that all struct declarations are present.
