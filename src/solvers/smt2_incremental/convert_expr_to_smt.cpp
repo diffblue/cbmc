@@ -362,7 +362,7 @@ static smt_termt convert_expr_to_smt(
   const bitand_exprt &bitwise_and_expr,
   const sub_expression_mapt &converted)
 {
-  if(operands_are_of_type<integer_bitvector_typet>(bitwise_and_expr))
+  if(operands_are_of_type<bitvector_typet>(bitwise_and_expr))
   {
     return convert_multiary_operator_to_terms(
       bitwise_and_expr, converted, smt_bit_vector_theoryt::make_and);
@@ -379,7 +379,7 @@ static smt_termt convert_expr_to_smt(
   const bitor_exprt &bitwise_or_expr,
   const sub_expression_mapt &converted)
 {
-  if(operands_are_of_type<integer_bitvector_typet>(bitwise_or_expr))
+  if(operands_are_of_type<bitvector_typet>(bitwise_or_expr))
   {
     return convert_multiary_operator_to_terms(
       bitwise_or_expr, converted, smt_bit_vector_theoryt::make_or);
@@ -396,7 +396,7 @@ static smt_termt convert_expr_to_smt(
   const bitxor_exprt &bitwise_xor,
   const sub_expression_mapt &converted)
 {
-  if(operands_are_of_type<integer_bitvector_typet>(bitwise_xor))
+  if(operands_are_of_type<bitvector_typet>(bitwise_xor))
   {
     return convert_multiary_operator_to_terms(
       bitwise_xor, converted, smt_bit_vector_theoryt::make_xor);
@@ -413,10 +413,7 @@ static smt_termt convert_expr_to_smt(
   const bitnot_exprt &bitwise_not,
   const sub_expression_mapt &converted)
 {
-  const bool operand_is_bitvector =
-    can_cast_type<integer_bitvector_typet>(bitwise_not.op().type());
-
-  if(operand_is_bitvector)
+  if(can_cast_type<bitvector_typet>(bitwise_not.op().type()))
   {
     return smt_bit_vector_theoryt::make_not(converted.at(bitwise_not.op()));
   }
@@ -431,9 +428,7 @@ static smt_termt convert_expr_to_smt(
   const unary_minus_exprt &unary_minus,
   const sub_expression_mapt &converted)
 {
-  const bool operand_is_bitvector =
-    can_cast_type<integer_bitvector_typet>(unary_minus.op().type());
-  if(operand_is_bitvector)
+  if(can_cast_type<bitvector_typet>(unary_minus.op().type()))
   {
     return smt_bit_vector_theoryt::negate(converted.at(unary_minus.op()));
   }

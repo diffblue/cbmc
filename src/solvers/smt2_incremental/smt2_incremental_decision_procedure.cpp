@@ -23,6 +23,8 @@
 
 #include <stack>
 
+#include "lowering/expr_lowering.h"
+
 /// Issues a command to the solving process which is expected to optionally
 /// return a success status followed by the actual response of interest.
 static smt_responset get_response_to_command(
@@ -257,14 +259,16 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
-  const exprt &expr)
+  const exprt &in_expr)
 {
   if(
-    expression_handle_identifiers.find(expr) !=
+    expression_handle_identifiers.find(in_expr) !=
     expression_handle_identifiers.cend())
   {
     return;
   }
+
+  const exprt expr = lower_byte_operators(in_expr, ns);
 
   define_dependent_functions(expr);
   smt_define_function_commandt function{
@@ -476,8 +480,11 @@ smt2_incremental_decision_proceduret::get_number_of_solver_calls() const
   return number_of_solver_calls;
 }
 
-void smt2_incremental_decision_proceduret::set_to(const exprt &expr, bool value)
+void smt2_incremental_decision_proceduret::set_to(
+  const exprt &in_expr,
+  bool value)
 {
+  const exprt expr = lower_byte_operators(in_expr, ns);
   PRECONDITION(can_cast_type<bool_typet>(expr.type()));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
