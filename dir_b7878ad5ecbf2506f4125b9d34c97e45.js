@@ -341,6 +341,8 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "string_utils.h", "string__utils_8h.html", "string__utils_8h" ],
     [ "structured_data.cpp", "structured__data_8cpp.html", "structured__data_8cpp" ],
     [ "structured_data.h", "structured__data_8h.html", "structured__data_8h" ],
+    [ "substitute_symbols.cpp", "substitute__symbols_8cpp.html", "substitute__symbols_8cpp" ],
+    [ "substitute_symbols.h", "substitute__symbols_8h.html", "substitute__symbols_8h" ],
     [ "suffix.h", "suffix_8h.html", "suffix_8h" ],
     [ "symbol.cpp", "symbol_8cpp.html", "symbol_8cpp" ],
     [ "symbol.h", "symbol_8h.html", "symbol_8h" ],

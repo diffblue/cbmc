@@ -318,13 +318,13 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <a class="code" href="polynomial_8h.html#a0e23f231f0bd1eb8a5d027de1e0550b4">substitutiont</a> stashed;</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aea82a7ee070abb98ebdfe56d17c42240">utils</a>.<a class="code" href="classacceleration__utilst.html#a39804e5343bc73181aa8601157591d2d">stash_polynomials</a>(program, polynomials, stashed, path);</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <a class="code" href="classexprt.html">exprt</a> guard;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <a class="code" href="classexprt.html">exprt</a> <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>;</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  <span class="keywordtype">bool</span> path_is_monotone;</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  {</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    path_is_monotone =</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aea82a7ee070abb98ebdfe56d17c42240">utils</a>.<a class="code" href="classacceleration__utilst.html#a9a27b8f499dabc5786880d465683e870">do_assumptions</a>(polynomials, path, guard, <a class="code" href="classdisjunctive__polynomial__accelerationt.html#a0faef81ef2604639604d2ff25aaeac16">guard_manager</a>);</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aea82a7ee070abb98ebdfe56d17c42240">utils</a>.<a class="code" href="classacceleration__utilst.html#a9a27b8f499dabc5786880d465683e870">do_assumptions</a>(polynomials, path, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="classdisjunctive__polynomial__accelerationt.html#a0faef81ef2604639604d2ff25aaeac16">guard_manager</a>);</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  }</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::string &amp;s)</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  {</div>
@@ -333,13 +333,13 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  }</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <a class="code" href="classexprt.html">exprt</a> pre_guard(guard);</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <a class="code" href="classexprt.html">exprt</a> pre_guard(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>);</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="keywordflow">for</span>(std::map&lt;exprt, polynomialt&gt;::iterator it=polynomials.begin();</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      it!=polynomials.end();</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      ++it)</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  {</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(it-&gt;first, it-&gt;second.to_expr(), guard);</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(it-&gt;first, it-&gt;second.to_expr(), <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>);</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  }</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="keywordflow">if</span>(path_is_monotone)</div>
@@ -349,7 +349,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aaee766f16433625eff462e17c0fea8da">loop_counter</a>,</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      <a class="code" href="classminus__exprt.html">minus_exprt</a>(<a class="code" href="classdisjunctive__polynomial__accelerationt.html#aaee766f16433625eff462e17c0fea8da">loop_counter</a>, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(1, <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aaee766f16433625eff462e17c0fea8da">loop_counter</a>.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())),</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      guard);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>);</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  }</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  {</div>
@@ -361,13 +361,13 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keyword">const</span> <a class="code" href="classand__exprt.html">and_exprt</a> k_bound(</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a>(<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, k.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()), ID_le, k),</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a>(k, ID_lt, <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aaee766f16433625eff462e17c0fea8da">loop_counter</a>));</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(<a class="code" href="classdisjunctive__polynomial__accelerationt.html#aaee766f16433625eff462e17c0fea8da">loop_counter</a>, k, guard);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(<a class="code" href="classdisjunctive__polynomial__accelerationt.html#aaee766f16433625eff462e17c0fea8da">loop_counter</a>, k, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>);</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <a class="code" href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a>(guard, <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aa1d02c2200329fecc3866d1bd21e10a5">ns</a>);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <a class="code" href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="classdisjunctive__polynomial__accelerationt.html#aa1d02c2200329fecc3866d1bd21e10a5">ns</a>);</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <a class="code" href="classimplies__exprt.html">implies_exprt</a> implies(k_bound, guard);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <a class="code" href="classimplies__exprt.html">implies_exprt</a> implies(k_bound, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>);</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160; </div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    guard = <a class="code" href="classforall__exprt.html">forall_exprt</a>(k, implies);</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a> = <a class="code" href="classforall__exprt.html">forall_exprt</a>(k, implies);</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  }</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="comment">// All our conditions are met -- we can finally build the accelerator!</span></div>
@@ -401,7 +401,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  }</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  program.add(<a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(guard));</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  program.add(<a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>));</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  program.fix_types();</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <span class="keywordflow">if</span>(path_is_monotone)</div>
@@ -1211,6 +1211,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="ttc" id="aclasssymbolt_html"><div class="ttname"><a href="classsymbolt.html">symbolt</a></div><div class="ttdoc">Symbol table entry.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00027">symbol.h:27</a></div></div>
 <div class="ttc" id="areplace__expr_8cpp_html_aab92a05844d0a7899fc516fe37f4e786"><div class="ttname"><a href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a></div><div class="ttdeci">bool replace_expr(const exprt &amp;what, const exprt &amp;by, exprt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="replace__expr_8cpp_source.html#l00012">replace_expr.cpp:12</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
+<div class="ttc" id="ac__safety__checks_8cpp_html_a1675f729dc854238dd23840d004c7c0a"><div class="ttname"><a href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a></div><div class="ttdeci">static exprt guard(const exprt::operandst &amp;guards, exprt cond)</div><div class="ttdef"><b>Definition:</b> <a href="c__safety__checks_8cpp_source.html#l00070">c_safety_checks.cpp:70</a></div></div>
 <div class="ttc" id="acone__of__influence_8h_html"><div class="ttname"><a href="cone__of__influence_8h.html">cone_of_influence.h</a></div></div>
 <div class="ttc" id="aclassbinary__relation__exprt_html"><div class="ttname"><a href="classbinary__relation__exprt.html">binary_relation_exprt</a></div><div class="ttdoc">A base class for relations, i.e., binary predicates whose two operands have the same type.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00706">std_expr.h:706</a></div></div>
 <div class="ttc" id="aclasspolynomial__acceleratort_html"><div class="ttname"><a href="classpolynomial__acceleratort.html">polynomial_acceleratort</a></div><div class="ttdef"><b>Definition:</b> <a href="polynomial__accelerator_8h_source.html#l00030">polynomial_accelerator.h:30</a></div></div>

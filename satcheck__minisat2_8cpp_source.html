@@ -143,14 +143,14 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="classtvt.html">tvt</a> result;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()&gt;=(<span class="keywordtype">unsigned</span>)<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model.size())</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()&gt;=(<span class="keywordtype">unsigned</span>)<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model.size())</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classtvt.html#ada307d17e1365e97ed710cef9da79358">tvt::unknown</a>();</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keyword">using</span> Minisat::lbool;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_True)</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_True)</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    result=<a class="code" href="classtvt.html">tvt</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_False)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_False)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    result=<a class="code" href="classtvt.html">tvt</a>(<span class="keyword">false</span>);</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classtvt.html#ada307d17e1365e97ed710cef9da79358">tvt::unknown</a>();</div>
@@ -171,7 +171,7 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    add_variables();</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;setPolarity(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>(), value ? l_True : l_False);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;setPolarity(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>(), value ? l_True : l_False);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">catch</span>(Minisat::OutOfMemoryException)</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  {</div>
@@ -184,13 +184,13 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="classsatcheck__minisat2__baset.html#a6451ce3bbbe7c9c747a07ff42b44c4bf">   91</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsatcheck__minisat2__baset.html#a6451ce3bbbe7c9c747a07ff42b44c4bf">satcheck_minisat2_baset&lt;T&gt;::interrupt</a>()</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;interrupt();</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;interrupt();</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="classsatcheck__minisat2__baset.html#a01d7a196a7f61b8c3062b5d4c1b582cd">   97</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsatcheck__minisat2__baset.html#a01d7a196a7f61b8c3062b5d4c1b582cd">satcheck_minisat2_baset&lt;T&gt;::clear_interrupt</a>()</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;{</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;clearInterrupt();</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;clearInterrupt();</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
 <div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="classsatcheck__minisat__no__simplifiert.html#a56016994adc8557f6d368381d60d29a1">  102</a></span>&#160;<span class="keyword">const</span> std::string <a class="code" href="classsatcheck__minisat__no__simplifiert.html#a56016994adc8557f6d368381d60d29a1">satcheck_minisat_no_simplifiert::solver_text</a>()</div>
@@ -206,8 +206,8 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classsatcheck__minisat2__baset.html#a827a06e7e0db59bd71c746fdf05ac284">  113</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsatcheck__minisat2__baset.html#a827a06e7e0db59bd71c746fdf05ac284">satcheck_minisat2_baset&lt;T&gt;::add_variables</a>()</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">while</span>((<span class="keywordtype">unsigned</span>)<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;nVars()&lt;no_variables())</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;newVar();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">while</span>((<span class="keywordtype">unsigned</span>)<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;nVars()&lt;no_variables())</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;newVar();</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
@@ -224,7 +224,7 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!literal.is_false())</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      {</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;          literal.var_no() &lt; (<span class="keywordtype">unsigned</span>)<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;nVars(),</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;          literal.var_no() &lt; (<span class="keywordtype">unsigned</span>)<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;nVars(),</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;          <span class="stringliteral">&quot;variable not added yet&quot;</span>);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      }</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
@@ -236,7 +236,7 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">// Note the underscore.</span></div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="comment">// Add a clause to the solver without making superflous internal copy.</span></div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;addClause_(c);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;addClause_(c);</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">if</span>(solver_hardness)</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
@@ -285,13 +285,13 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(status != statust::ERROR);</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  log.statistics() &lt;&lt; (no_variables() - 1) &lt;&lt; <span class="stringliteral">&quot; variables, &quot;</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                   &lt;&lt; <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;nClauses() &lt;&lt; <span class="stringliteral">&quot; clauses&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                   &lt;&lt; <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;nClauses() &lt;&lt; <span class="stringliteral">&quot; clauses&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  {</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    add_variables();</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;okay())</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;okay())</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      log.status() &lt;&lt; <span class="stringliteral">&quot;SAT checker inconsistent: instance is UNSATISFIABLE&quot;</span></div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                   &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
@@ -322,7 +322,7 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">if</span>(time_limit_seconds != 0)</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <a class="code" href="satcheck__minisat2_8cpp.html#a075f860aa9ba72c736fbebd1390c3ec7">solver_to_interrupt</a> = <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>.get();</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <a class="code" href="satcheck__minisat2_8cpp.html#a075f860aa9ba72c736fbebd1390c3ec7">solver_to_interrupt</a> = <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>.get();</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      old_handler = signal(SIGALRM, <a class="code" href="satcheck__minisat2_8cpp.html#a22a0bc2658cb8d521ef0d536650ac832">interrupt_solver</a>);</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <span class="keywordflow">if</span>(old_handler == SIG_ERR)</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        log.warning() &lt;&lt; <span class="stringliteral">&quot;Failed to set solver time limit&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
@@ -330,13 +330,13 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        alarm(time_limit_seconds);</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    lbool solver_result = <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;solveLimited(solver_assumptions);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    lbool solver_result = <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;solveLimited(solver_assumptions);</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">if</span>(old_handler != SIG_ERR)</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    {</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      alarm(0);</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      signal(SIGALRM, old_handler);</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <a class="code" href="satcheck__minisat2_8cpp.html#a075f860aa9ba72c736fbebd1390c3ec7">solver_to_interrupt</a> = <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>.get();</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <a class="code" href="satcheck__minisat2_8cpp.html#a075f860aa9ba72c736fbebd1390c3ec7">solver_to_interrupt</a> = <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>.get();</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="preprocessor">#else // _WIN32</span></div>
@@ -347,14 +347,14 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;                    &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    }</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    lbool solver_result = <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;solve(solver_assumptions) ? l_True : l_False;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    lbool solver_result = <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;solve(solver_assumptions) ? l_True : l_False;</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">if</span>(solver_result == l_True)</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    {</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      log.status() &lt;&lt; <span class="stringliteral">&quot;SAT checker: instance is SATISFIABLE&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model.size() &gt; 0);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model.size() &gt; 0);</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      status = statust::SAT;</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      <span class="keywordflow">return</span> resultt::P_SATISFIABLE;</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
@@ -389,9 +389,9 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordtype">bool</span> sign = a.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>();</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    <span class="comment">// MiniSat2 kills the model in case of UNSAT</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model.growTo(v + 1);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model.growTo(v + 1);</div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    value ^= sign;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model[v] = Minisat::lbool(value);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model[v] = Minisat::lbool(value);</div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  }</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> Minisat::OutOfMemoryException &amp;)</div>
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  {</div>
@@ -405,7 +405,7 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="classsatcheck__minisat2__baset.html#a81957cb7a06adcb619bd52fdf0c35207">  311</a></span>&#160;<a class="code" href="classsatcheck__minisat2__baset.html#a81957cb7a06adcb619bd52fdf0c35207">satcheck_minisat2_baset&lt;T&gt;::satcheck_minisat2_baset</a>(</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  : <a class="code" href="classcnf__solvert.html">cnf_solvert</a>(message_handler),</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>(<a class="code" href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a>&lt;T&gt;()),</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(<a class="code" href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a>&lt;T&gt;()),</div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    time_limit_seconds(0)</div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;{</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;}</div>
@@ -418,8 +418,8 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordtype">int</span> v=a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>();</div>
 <div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;conflict.size(); i++)</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">if</span>(var(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;conflict[i])==v)</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;conflict.size(); i++)</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">if</span>(var(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;conflict[i])==v)</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
 <div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -504,11 +504,11 @@ $(document).ready(function(){initNavTree('satcheck__minisat2_8cpp_source.html','
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:27</a></div></div>
 <div class="ttc" id="aclasstvt_html_ada307d17e1365e97ed710cef9da79358"><div class="ttname"><a href="classtvt.html#ada307d17e1365e97ed710cef9da79358">tvt::unknown</a></div><div class="ttdeci">static tvt unknown()</div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00033">threeval.h:33</a></div></div>
 <div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00097">prop.h:97</a></div></div>
+<div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00282">solver.cpp:282</a></div></div>
 <div class="ttc" id="aclasstvt_html"><div class="ttname"><a href="classtvt.html">tvt</a></div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00019">threeval.h:19</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a155aee401f2145171e9fe78a2578584a"><div class="ttname"><a href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">literalt::sign</a></div><div class="ttdeci">bool sign() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00088">literal.h:88</a></div></div>
 <div class="ttc" id="aclasssatcheck__minisat__no__simplifiert_html_a56016994adc8557f6d368381d60d29a1"><div class="ttname"><a href="classsatcheck__minisat__no__simplifiert.html#a56016994adc8557f6d368381d60d29a1">satcheck_minisat_no_simplifiert::solver_text</a></div><div class="ttdeci">const std::string solver_text() override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__minisat2_8cpp_source.html#l00102">satcheck_minisat2.cpp:102</a></div></div>
 <div class="ttc" id="asatcheck__minisat2_8cpp_html_a22a0bc2658cb8d521ef0d536650ac832"><div class="ttname"><a href="satcheck__minisat2_8cpp.html#a22a0bc2658cb8d521ef0d536650ac832">interrupt_solver</a></div><div class="ttdeci">static void interrupt_solver(int signum)</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__minisat2_8cpp_source.html#l00180">satcheck_minisat2.cpp:180</a></div></div>
-<div class="ttc" id="asmt2__solver_8cpp_html_a6ae5034eec99c41b9bf9daa35c0f7dcf"><div class="ttname"><a href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a></div><div class="ttdeci">int solver(std::istream &amp;in)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__solver_8cpp_source.html#l00407">smt2_solver.cpp:407</a></div></div>
 <div class="ttc" id="aclassliteralt_html"><div class="ttname"><a href="classliteralt.html">literalt</a></div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00025">literal.h:25</a></div></div>
 <div class="ttc" id="aclasssatcheck__minisat2__baset_html_a51db4820eecc955588f9204e00d6b779"><div class="ttname"><a href="classsatcheck__minisat2__baset.html#a51db4820eecc955588f9204e00d6b779">satcheck_minisat2_baset::~satcheck_minisat2_baset</a></div><div class="ttdeci">~satcheck_minisat2_baset() override</div><div class="ttdoc">A default destructor defined in the .cpp is used to ensure the unique_ptr to the solver is correctly ...</div></div>
 <div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00128">prop.h:128</a></div></div>

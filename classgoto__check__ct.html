@@ -155,25 +155,25 @@ Protected Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a1d6aadaf1808e3ef60ce670525fdff00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a1d6aadaf1808e3ef60ce670525fdff00">check_rec_address</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a1d6aadaf1808e3ef60ce670525fdff00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a1d6aadaf1808e3ef60ce670525fdff00">check_rec_address</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a1d6aadaf1808e3ef60ce670525fdff00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check an address-of expression: if it is a dereference then check the pointer if it is an index then address-check the array and then check the index.  <a href="classgoto__check__ct.html#a1d6aadaf1808e3ef60ce670525fdff00">More...</a><br /></td></tr>
 <tr class="separator:a1d6aadaf1808e3ef60ce670525fdff00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10fdf598b5041ab585e413a12e318e9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a10fdf598b5041ab585e413a12e318e9e">check_rec_logical_op</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a10fdf598b5041ab585e413a12e318e9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a10fdf598b5041ab585e413a12e318e9e">check_rec_logical_op</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a10fdf598b5041ab585e413a12e318e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a logical operation: check each operand in separation while extending the guarding condition as follows.  <a href="classgoto__check__ct.html#a10fdf598b5041ab585e413a12e318e9e">More...</a><br /></td></tr>
 <tr class="separator:a10fdf598b5041ab585e413a12e318e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a933c3e7796f63de068effe46aa52945e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a933c3e7796f63de068effe46aa52945e">check_rec_if</a> (const <a class="el" href="classif__exprt.html">if_exprt</a> &amp;if_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a933c3e7796f63de068effe46aa52945e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a933c3e7796f63de068effe46aa52945e">check_rec_if</a> (const <a class="el" href="classif__exprt.html">if_exprt</a> &amp;if_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a933c3e7796f63de068effe46aa52945e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check an if expression: check the if-condition alone, and then check the true/false-cases with the guard extended with if-condition and it's negation, respectively.  <a href="classgoto__check__ct.html#a933c3e7796f63de068effe46aa52945e">More...</a><br /></td></tr>
 <tr class="separator:a933c3e7796f63de068effe46aa52945e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77923b2c35b5e16f12e958fa26ad0a24"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a77923b2c35b5e16f12e958fa26ad0a24">check_rec_member</a> (const <a class="el" href="classmember__exprt.html">member_exprt</a> &amp;member, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a77923b2c35b5e16f12e958fa26ad0a24"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a77923b2c35b5e16f12e958fa26ad0a24">check_rec_member</a> (const <a class="el" href="classmember__exprt.html">member_exprt</a> &amp;member, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a77923b2c35b5e16f12e958fa26ad0a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that a member expression is valid:  <a href="classgoto__check__ct.html#a77923b2c35b5e16f12e958fa26ad0a24">More...</a><br /></td></tr>
 <tr class="separator:a77923b2c35b5e16f12e958fa26ad0a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65b754715eaa6596a463e45ae5b27fd1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a65b754715eaa6596a463e45ae5b27fd1">check_rec_div</a> (const <a class="el" href="classdiv__exprt.html">div_exprt</a> &amp;div_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a65b754715eaa6596a463e45ae5b27fd1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a65b754715eaa6596a463e45ae5b27fd1">check_rec_div</a> (const <a class="el" href="classdiv__exprt.html">div_exprt</a> &amp;div_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a65b754715eaa6596a463e45ae5b27fd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that a division is valid: check for division by zero, overflow and NaN (for floating point numbers).  <a href="classgoto__check__ct.html#a65b754715eaa6596a463e45ae5b27fd1">More...</a><br /></td></tr>
 <tr class="separator:a65b754715eaa6596a463e45ae5b27fd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae69459893dd5b5bf93dd2432142f80c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ae69459893dd5b5bf93dd2432142f80c9">check_rec_arithmetic_op</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:ae69459893dd5b5bf93dd2432142f80c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ae69459893dd5b5bf93dd2432142f80c9">check_rec_arithmetic_op</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:ae69459893dd5b5bf93dd2432142f80c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that an arithmetic operation is valid: overflow check, NaN-check (for floating point numbers), and pointer overflow check.  <a href="classgoto__check__ct.html#ae69459893dd5b5bf93dd2432142f80c9">More...</a><br /></td></tr>
 <tr class="separator:ae69459893dd5b5bf93dd2432142f80c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1068e7d5cbd3a670dcaf70355a9f2315"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a1068e7d5cbd3a670dcaf70355a9f2315">check_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a1068e7d5cbd3a670dcaf70355a9f2315"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a1068e7d5cbd3a670dcaf70355a9f2315">check_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a1068e7d5cbd3a670dcaf70355a9f2315"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively descend into <code>expr</code> and run the appropriate check for each sub-expression, while collecting the condition for the check in <code>guard</code>.  <a href="classgoto__check__ct.html#a1068e7d5cbd3a670dcaf70355a9f2315">More...</a><br /></td></tr>
 <tr class="separator:a1068e7d5cbd3a670dcaf70355a9f2315"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c42214b1a5a4a29baeb9f7abf4058eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a6c42214b1a5a4a29baeb9f7abf4058eb">check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
@@ -200,10 +200,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ac6fdf8ed79f120ad50f096b2437ab37f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a884eaca58562585b1837913ca1b4121b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a884eaca58562585b1837913ca1b4121b">pointer_overflow_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;)</td></tr>
 <tr class="separator:a884eaca58562585b1837913ca1b4121b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#af4ea47ede9713c23b48ee1fceb35ca7e">pointer_validity_check</a> (const <a class="el" href="classdereference__exprt.html">dereference_exprt</a> &amp;expr, const <a class="el" href="classexprt.html">exprt</a> &amp;src_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#af4ea47ede9713c23b48ee1fceb35ca7e">pointer_validity_check</a> (const <a class="el" href="classdereference__exprt.html">dereference_exprt</a> &amp;expr, const <a class="el" href="classexprt.html">exprt</a> &amp;src_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates VCCs for the validity of the given dereferencing operation.  <a href="classgoto__check__ct.html#af4ea47ede9713c23b48ee1fceb35ca7e">More...</a><br /></td></tr>
 <tr class="separator:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a691ee3439bef64ec8924cd75eb266652"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a691ee3439bef64ec8924cd75eb266652">pointer_primitive_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a691ee3439bef64ec8924cd75eb266652"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a691ee3439bef64ec8924cd75eb266652">pointer_primitive_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a691ee3439bef64ec8924cd75eb266652"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates VCCs to check that pointers passed to pointer primitives are either null or valid.  <a href="classgoto__check__ct.html#a691ee3439bef64ec8924cd75eb266652">More...</a><br /></td></tr>
 <tr class="separator:a691ee3439bef64ec8924cd75eb266652"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56ac5872139c119a106592e3676e2cb3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a56ac5872139c119a106592e3676e2cb3">requires_pointer_primitive_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
@@ -225,12 +225,12 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a4af35b3ac886381587b270f4352cd165"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa487b46cceaaa5d90e8ebadce69ac54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#aaa487b46cceaaa5d90e8ebadce69ac54">nan_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;)</td></tr>
 <tr class="separator:aaa487b46cceaaa5d90e8ebadce69ac54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4581387750293ede670372d195e35e13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a4581387750293ede670372d195e35e13">rw_ok_check</a> (<a class="el" href="classexprt.html">exprt</a>)</td></tr>
-<tr class="memdesc:a4581387750293ede670372d195e35e13"><td class="mdescLeft">&#160;</td><td class="mdescRight">expand the r_ok, w_ok and rw_ok predicates  <a href="classgoto__check__ct.html#a4581387750293ede670372d195e35e13">More...</a><br /></td></tr>
-<tr class="separator:a4581387750293ede670372d195e35e13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5e6602f587e76a548c38b9308f80b8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ac5e6602f587e76a548c38b9308f80b8c">expand_pointer_checks</a> (<a class="el" href="classexprt.html">exprt</a>)</td></tr>
+<tr class="memdesc:ac5e6602f587e76a548c38b9308f80b8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">expand the r_ok, w_ok, rw_ok, pointer_in_range predicates  <a href="classgoto__check__ct.html#ac5e6602f587e76a548c38b9308f80b8c">More...</a><br /></td></tr>
+<tr class="separator:ac5e6602f587e76a548c38b9308f80b8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2267d82c1e9e7365ead2d53bdcb7f11c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a2267d82c1e9e7365ead2d53bdcb7f11c">array_name</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
 <tr class="separator:a2267d82c1e9e7365ead2d53bdcb7f11c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7fc9b8e104fbf5cd5a11233a76f18daa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a7fc9b8e104fbf5cd5a11233a76f18daa">add_guarded_property</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;asserted_expr, const std::string &amp;<a class="el" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>, const std::string &amp;property_class, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const <a class="el" href="classexprt.html">exprt</a> &amp;src_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;guard)</td></tr>
+<tr class="memitem:a7fc9b8e104fbf5cd5a11233a76f18daa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a7fc9b8e104fbf5cd5a11233a76f18daa">add_guarded_property</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;asserted_expr, const std::string &amp;<a class="el" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>, const std::string &amp;property_class, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const <a class="el" href="classexprt.html">exprt</a> &amp;src_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a7fc9b8e104fbf5cd5a11233a76f18daa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Include the <code>asserted_expr</code> in the code conditioned by the <code>guard</code>.  <a href="classgoto__check__ct.html#a7fc9b8e104fbf5cd5a11233a76f18daa">More...</a><br /></td></tr>
 <tr class="separator:a7fc9b8e104fbf5cd5a11233a76f18daa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a469235f5589c8ca9068e6b5b95dc3391"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a469235f5589c8ca9068e6b5b95dc3391">invalidate</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs)</td></tr>
@@ -598,7 +598,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds "checked" pragmas for all currently active named checks on the given source location. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02433">2433</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02449">2449</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +628,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds "disable" pragmas for all named checks on the given source location. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02441">2441</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02457">2457</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1362,6 +1362,36 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac5e6602f587e76a548c38b9308f80b8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5e6602f587e76a548c38b9308f80b8c">&#9670;&nbsp;</a></span>expand_pointer_checks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt; goto_check_ct::expand_pointer_checks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a>&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>expand the r_ok, w_ok, rw_ok, pointer_in_range predicates </p>
+
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01996">1996</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a4af35b3ac886381587b270f4352cd165"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4af35b3ac886381587b270f4352cd165">&#9670;&nbsp;</a></span>float_overflow_check()</h2>
 
@@ -1472,7 +1502,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02353">2353</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02369">2369</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1510,7 +1540,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02275">2275</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02291">2291</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1540,7 +1570,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02035">2035</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02051">2051</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1652,7 +1682,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02374">2374</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02390">2390</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1684,7 +1714,7 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line">(<span class="stringliteral">&quot;enable&quot;</span>|<span class="stringliteral">&quot;disable&quot;</span>|<span class="stringliteral">&quot;checked&quot;</span>) <span class="stringliteral">&quot;:&quot;</span> &lt;named-<a class="code" href="classgoto__check__ct.html#a6c42214b1a5a4a29baeb9f7abf4058eb">check</a>&gt;</div>
 </div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd>a pair (name, status) if the match succeeds and the name is known, nothing otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02449">2449</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02465">2465</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2015,36 +2045,6 @@ Protected Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>true if the given expression is a pointer primitive that requires checking </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01478">1478</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a4581387750293ede670372d195e35e13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4581387750293ede670372d195e35e13">&#9670;&nbsp;</a></span>rw_ok_check()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt; goto_check_ct::rw_ok_check </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a>&#160;</td>
-          <td class="paramname"><em>expr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>expand the r_ok, w_ok and rw_ok predicates </p>
-
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01996">1996</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>

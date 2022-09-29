@@ -122,6 +122,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6b6544717f6d758cc924dfc601db0112"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classelement__address__exprt.html#a6b6544717f6d758cc924dfc601db0112">element_address_exprt</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;<a class="el" href="classelement__address__exprt.html#adc71a0a2a2583213d1105d30b51923f7">base</a>, <a class="el" href="classexprt.html">exprt</a> <a class="el" href="classelement__address__exprt.html#afdb30859a79ea74e4610f44b5432170b">index</a>)</td></tr>
 <tr class="memdesc:a6b6544717f6d758cc924dfc601db0112"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor for element addresses.  <a href="classelement__address__exprt.html#a6b6544717f6d758cc924dfc601db0112">More...</a><br /></td></tr>
 <tr class="separator:a6b6544717f6d758cc924dfc601db0112"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d4c4925185b805aa96f48e6c92fbfb4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classelement__address__exprt.html#a2d4c4925185b805aa96f48e6c92fbfb4">element_address_exprt</a> (<a class="el" href="classexprt.html">exprt</a> <a class="el" href="classelement__address__exprt.html#adc71a0a2a2583213d1105d30b51923f7">base</a>, <a class="el" href="classexprt.html">exprt</a> <a class="el" href="classelement__address__exprt.html#afdb30859a79ea74e4610f44b5432170b">index</a>, <a class="el" href="classpointer__typet.html">pointer_typet</a>)</td></tr>
+<tr class="memdesc:a2d4c4925185b805aa96f48e6c92fbfb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor for element addresses.  <a href="classelement__address__exprt.html#a2d4c4925185b805aa96f48e6c92fbfb4">More...</a><br /></td></tr>
+<tr class="separator:a2d4c4925185b805aa96f48e6c92fbfb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a291c8386efb86db07ebf7a47156852c4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classpointer__typet.html">pointer_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classelement__address__exprt.html#a291c8386efb86db07ebf7a47156852c4">type</a> () const</td></tr>
 <tr class="separator:a291c8386efb86db07ebf7a47156852c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb86b5783468e9cd160d036a1782cd8f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classpointer__typet.html">pointer_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classelement__address__exprt.html#aeb86b5783468e9cd160d036a1782cd8f">type</a> ()</td></tr>
@@ -483,10 +486,10 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Operator to return the address of an array element relative to a base address. </p>
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00578">578</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00630">630</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6b6544717f6d758cc924dfc601db0112"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b6544717f6d758cc924dfc601db0112">&#9670;&nbsp;</a></span>element_address_exprt()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b6544717f6d758cc924dfc601db0112">&#9670;&nbsp;</a></span>element_address_exprt() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -514,7 +517,46 @@ Additional Inherited Members</h2></td></tr>
 <p>constructor for element addresses. </p>
 <p>The base address must be a pointer to an element. The index is expected to have an integer type. </p>
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8cpp_source.html#l00157">157</a> of file <a class="el" href="pointer__expr_8cpp_source.html">pointer_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8cpp_source.html#l00158">158</a> of file <a class="el" href="pointer__expr_8cpp_source.html">pointer_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2d4c4925185b805aa96f48e6c92fbfb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d4c4925185b805aa96f48e6c92fbfb4">&#9670;&nbsp;</a></span>element_address_exprt() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">element_address_exprt::element_address_exprt </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a>&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a>&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classpointer__typet.html">pointer_typet</a>&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>constructor for element addresses. </p>
+<p>The base address must be a pointer to an element. The index is expected to have an integer type. </p>
+
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8cpp_source.html#l00168">168</a> of file <a class="el" href="pointer__expr_8cpp_source.html">pointer_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -542,7 +584,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00602">602</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00659">659</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>
@@ -569,7 +611,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00607">607</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00664">664</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>
@@ -598,7 +640,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>returns the type of the array element whose address is represented </p>
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00597">597</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00654">654</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>
@@ -625,7 +667,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00612">612</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00669">669</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>
@@ -652,7 +694,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00617">617</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00674">674</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>
@@ -679,7 +721,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00591">591</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00648">648</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>
@@ -706,7 +748,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00586">586</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pointer__expr_8h_source.html#l00643">643</a> of file <a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>.</p>
 
 </div>
 </div>

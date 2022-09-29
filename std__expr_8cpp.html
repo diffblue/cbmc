@@ -98,13 +98,14 @@ $(document).ready(function(){initNavTree('std__expr_8cpp.html',''); initResizabl
 <code>#include &quot;<a class="el" href="namespace_8h_source.html">namespace.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="range_8h_source.html">range.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="substitute__symbols_8h_source.html">substitute_symbols.h</a>&quot;</code><br />
 <code>#include &lt;map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for std_expr.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="std__expr_8cpp__incl.svg" width="1294" height="948"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="std__expr_8cpp__incl.svg" width="1211" height="948"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -121,8 +122,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ac90ae77b82997e0b8d1091b112e694b4"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ac90ae77b82997e0b8d1091b112e694b4"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> (T &amp;struct_expr, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) -&gt; decltype(struct_expr.op0())</td></tr>
 <tr class="separator:ac90ae77b82997e0b8d1091b112e694b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82f0607e90cd70e4a6166f7815a61da3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a> (const std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &amp;substitutions, <a class="el" href="classexprt.html">exprt</a> src)</td></tr>
-<tr class="separator:a82f0607e90cd70e4a6166f7815a61da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ac90ae77b82997e0b8d1091b112e694b4"></a>
@@ -160,7 +159,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00076">76</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00077">77</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -182,7 +181,7 @@ template&lt;typename T &gt; </div>
 
 <p>1) generates a conjunction for two or more operands 2) for one operand, returns the operand 3) returns true otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00062">62</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00063">63</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -204,45 +203,7 @@ template&lt;typename T &gt; </div>
 
 <p>1) generates a disjunction for two or more operands 2) for one operand, returns the operand 3) returns false otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00050">50</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a82f0607e90cd70e4a6166f7815a61da3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82f0607e90cd70e4a6166f7815a61da3">&#9670;&nbsp;</a></span>substitute_symbols_rec()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classexprt.html">exprt</a>&gt; substitute_symbols_rec </td>
-          <td>(</td>
-          <td class="paramtype">const std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>substitutions</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a>&#160;</td>
-          <td class="paramname"><em>src</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00168">168</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00051">51</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>

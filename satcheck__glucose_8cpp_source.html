@@ -136,14 +136,14 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="classtvt.html">tvt</a> result;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()&gt;=(<span class="keywordtype">unsigned</span>)<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model.size())</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()&gt;=(<span class="keywordtype">unsigned</span>)<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model.size())</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a>);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keyword">using</span> Glucose::lbool;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_True)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_True)</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    result=<a class="code" href="classtvt.html">tvt</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_False)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model[a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>()]==l_False)</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    result=<a class="code" href="classtvt.html">tvt</a>(<span class="keyword">false</span>);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a>);</div>
@@ -162,7 +162,7 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  {</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    add_variables();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;setPolarity(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>(), value);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;setPolarity(a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>(), value);</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keywordflow">catch</span>(Glucose::OutOfMemoryException)</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  {</div>
@@ -185,8 +185,8 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="classsatcheck__glucose__baset.html#af44a4d532bc00ee0dace71d7838daebf">   92</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsatcheck__glucose__baset.html#af44a4d532bc00ee0dace71d7838daebf">satcheck_glucose_baset&lt;T&gt;::add_variables</a>()</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keywordflow">while</span>((<span class="keywordtype">unsigned</span>)<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;nVars()&lt;no_variables())</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;newVar();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keywordflow">while</span>((<span class="keywordtype">unsigned</span>)<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;nVars()&lt;no_variables())</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;newVar();</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
@@ -203,7 +203,7 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!literal.is_false())</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      {</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;          literal.var_no() &lt; (<span class="keywordtype">unsigned</span>)<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;nVars(),</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;          literal.var_no() &lt; (<span class="keywordtype">unsigned</span>)<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;nVars(),</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;          <span class="stringliteral">&quot;variable not added yet&quot;</span>);</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      }</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
@@ -215,7 +215,7 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// Note the underscore.</span></div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// Add a clause to the solver without making superflous internal copy.</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;addClause_(c);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;addClause_(c);</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">if</span>(solver_hardness)</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
@@ -253,13 +253,13 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="comment">// We start counting at 1, thus there is one variable fewer.</span></div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  log.statistics() &lt;&lt; (no_variables() - 1) &lt;&lt; <span class="stringliteral">&quot; variables, &quot;</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                   &lt;&lt; <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;nClauses() &lt;&lt; <span class="stringliteral">&quot; clauses&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                   &lt;&lt; <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;nClauses() &lt;&lt; <span class="stringliteral">&quot; clauses&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  {</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    add_variables();</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;okay())</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;okay())</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      log.status() &lt;&lt; <span class="stringliteral">&quot;SAT checker inconsistent: instance is UNSATISFIABLE&quot;</span></div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                   &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
@@ -285,7 +285,7 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        Glucose::vec&lt;Glucose::Lit&gt; solver_assumptions;</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <a class="code" href="satcheck__glucose_8cpp.html#a40b69ebeceecc72659aee95f58495208">convert</a>(assumptions, solver_assumptions);</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;solve(solver_assumptions))</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;solve(solver_assumptions))</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        {</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;          log.status() &lt;&lt; <span class="stringliteral">&quot;SAT checker: instance is SATISFIABLE&quot;</span></div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                       &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
@@ -322,9 +322,9 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordtype">bool</span> sign = a.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>();</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">// MiniSat2 kills the model in case of UNSAT</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model.growTo(v + 1);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model.growTo(v + 1);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    value ^= sign;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;model[v] = Glucose::lbool(value);</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;model[v] = Glucose::lbool(value);</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  }</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="keywordflow">catch</span>(Glucose::OutOfMemoryException)</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  {</div>
@@ -337,7 +337,7 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00244"></a><span class="lineno"><a class="line" href="classsatcheck__glucose__baset.html#a8e54c79b98b1d423ac8d6e4596f5259c">  244</a></span>&#160;<a class="code" href="classsatcheck__glucose__baset.html#a8e54c79b98b1d423ac8d6e4596f5259c">satcheck_glucose_baset&lt;T&gt;::satcheck_glucose_baset</a>(</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  : <a class="code" href="classcnf__solvert.html">cnf_solvert</a>(message_handler), <a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>(<a class="code" href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a>&lt;T&gt;())</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  : <a class="code" href="classcnf__solvert.html">cnf_solvert</a>(message_handler), <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(<a class="code" href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a>&lt;T&gt;())</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;{</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;}</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
@@ -349,8 +349,8 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordtype">int</span> v=a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>();</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;conflict.size(); i++)</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keywordflow">if</span>(var(<a class="code" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>-&gt;conflict[i])==v)</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;conflict.size(); i++)</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keywordflow">if</span>(var(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>-&gt;conflict[i])==v)</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -425,10 +425,10 @@ $(document).ready(function(){initNavTree('satcheck__glucose_8cpp_source.html',''
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:27</a></div></div>
 <div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00097">prop.h:97</a></div></div>
 <div class="ttc" id="aclasssatcheck__glucose__no__simplifiert_html_a0d78c9044d7ca72967426b9d503e875d"><div class="ttname"><a href="classsatcheck__glucose__no__simplifiert.html#a0d78c9044d7ca72967426b9d503e875d">satcheck_glucose_no_simplifiert::solver_text</a></div><div class="ttdeci">const std::string solver_text() override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__glucose_8cpp_source.html#l00081">satcheck_glucose.cpp:81</a></div></div>
+<div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00282">solver.cpp:282</a></div></div>
 <div class="ttc" id="aclasstvt_html"><div class="ttname"><a href="classtvt.html">tvt</a></div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00019">threeval.h:19</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a155aee401f2145171e9fe78a2578584a"><div class="ttname"><a href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">literalt::sign</a></div><div class="ttdeci">bool sign() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00088">literal.h:88</a></div></div>
 <div class="ttc" id="asatcheck__glucose_8cpp_html_a40b69ebeceecc72659aee95f58495208"><div class="ttname"><a href="satcheck__glucose_8cpp.html#a40b69ebeceecc72659aee95f58495208">convert</a></div><div class="ttdeci">void convert(const bvt &amp;bv, Glucose::vec&lt; Glucose::Lit &gt; &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__glucose_8cpp_source.html#l00024">satcheck_glucose.cpp:24</a></div></div>
-<div class="ttc" id="asmt2__solver_8cpp_html_a6ae5034eec99c41b9bf9daa35c0f7dcf"><div class="ttname"><a href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a></div><div class="ttdeci">int solver(std::istream &amp;in)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__solver_8cpp_source.html#l00407">smt2_solver.cpp:407</a></div></div>
 <div class="ttc" id="aclassliteralt_html"><div class="ttname"><a href="classliteralt.html">literalt</a></div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00025">literal.h:25</a></div></div>
 <div class="ttc" id="aclasssatcheck__glucose__baset_html_a643625c0882f1a0ac853a501a6d3f212"><div class="ttname"><a href="classsatcheck__glucose__baset.html#a643625c0882f1a0ac853a501a6d3f212">satcheck_glucose_baset::lcnf</a></div><div class="ttdeci">void lcnf(const bvt &amp;bv) override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__glucose_8cpp_source.html#l00099">satcheck_glucose.cpp:99</a></div></div>
 <div class="ttc" id="aclasssatcheck__glucose__simplifiert_html_ab9e5d16b47dce751fec5a600e4bab64a"><div class="ttname"><a href="classsatcheck__glucose__simplifiert.html#ab9e5d16b47dce751fec5a600e4bab64a">satcheck_glucose_simplifiert::is_eliminated</a></div><div class="ttdeci">bool is_eliminated(literalt a) const</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__glucose_8cpp_source.html#l00298">satcheck_glucose.cpp:298</a></div></div>

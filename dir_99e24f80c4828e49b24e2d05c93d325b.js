@@ -20,7 +20,7 @@ var dir_99e24f80c4828e49b24e2d05c93d325b =
       [ "field_sensitivityt", "classfield__sensitivityt.html", "classfield__sensitivityt" ]
     ] ],
     [ "frame.h", "frame_8h.html", [
-      [ "framet", "structframet.html", "structframet" ],
+      [ "framet", "classframet.html", "classframet" ],
       [ "loop_infot", "structframet_1_1loop__infot.html", "structframet_1_1loop__infot" ],
       [ "active_loop_infot", "classframet_1_1active__loop__infot.html", "classframet_1_1active__loop__infot" ]
     ] ],

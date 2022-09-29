@@ -151,6 +151,8 @@ Functions</h2></td></tr>
 <tr class="separator:ad65e8a3c3fd7881a820d68171bd18964"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a203dc14798713c043976dfea6feaa832"><td class="memItemLeft" align="right" valign="top">__CPROVER_size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a203dc14798713c043976dfea6feaa832">__CPROVER_cstrlen</a> (const char *)</td></tr>
 <tr class="separator:a203dc14798713c043976dfea6feaa832"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25e2da6e87b6210d370a6c69315bfae7"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a25e2da6e87b6210d370a6c69315bfae7">__CPROVER_separate</a> (const void *, const void *,...)</td></tr>
+<tr class="separator:a25e2da6e87b6210d370a6c69315bfae7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadd679878c08e2ba49dc786a4707346e"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#aadd679878c08e2ba49dc786a4707346e">__CPROVER_get_flag</a> (const void *, const char *)</td></tr>
 <tr class="separator:aadd679878c08e2ba49dc786a4707346e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3a2aedad97977b64290f8141eed690c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a> (const void *, const char *)</td></tr>
@@ -199,6 +201,8 @@ Functions</h2></td></tr>
 <tr class="separator:a38adef7c2c9358562c98c9f2b54115fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada85b7fd94e31925350fe3f725b7f7bc"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#ada85b7fd94e31925350fe3f725b7f7bc">__CPROVER_DYNAMIC_OBJECT</a> (const void *)</td></tr>
 <tr class="separator:ada85b7fd94e31925350fe3f725b7f7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b20b799960319368a2fa329aaf5f676"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a1b20b799960319368a2fa329aaf5f676">__CPROVER_pointer_in_range</a> (const void *, const void *, const void *)</td></tr>
+<tr class="separator:a1b20b799960319368a2fa329aaf5f676"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61070b4ee324f21f8eed4661f23adff0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a61070b4ee324f21f8eed4661f23adff0">__CPROVER_allocated_memory</a> (__CPROVER_size_t address, __CPROVER_size_t extent)</td></tr>
 <tr class="separator:a61070b4ee324f21f8eed4661f23adff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae213ad2a091cf7e42fa8e71078b88097"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#ae213ad2a091cf7e42fa8e71078b88097">__CPROVER_fpclassify</a> (int, int, int, int, int,...)</td></tr>
@@ -2240,6 +2244,40 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a1b20b799960319368a2fa329aaf5f676"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b20b799960319368a2fa329aaf5f676">&#9670;&nbsp;</a></span>__CPROVER_pointer_in_range()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__CPROVER_bool __CPROVER_pointer_in_range </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a84fcea3f7109884566cb6e4e934abf13"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a84fcea3f7109884566cb6e4e934abf13">&#9670;&nbsp;</a></span>__CPROVER_POINTER_OBJECT()</h2>
 
@@ -2516,6 +2554,40 @@ Functions</h2></td></tr>
           <td class="memname">int __CPROVER_scanf </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a25e2da6e87b6210d370a6c69315bfae7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25e2da6e87b6210d370a6c69315bfae7">&#9670;&nbsp;</a></span>__CPROVER_separate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__CPROVER_bool __CPROVER_separate </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>

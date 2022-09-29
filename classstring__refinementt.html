@@ -930,7 +930,7 @@ Refinement loop</h2>
 <div class="line">    <span class="keywordflow">else</span></div>
 <div class="line">      <span class="keywordflow">return</span> UNSAT;</div>
 <div class="line">  }</div>
-<div class="line">  <span class="keywordflow">return</span> <a class="code" href="properties_8h.html#a6a3450b5a7e86762bcb726f2cb000b4eabb1ca97ec761fc37101737ba0aa2e7c5">ERROR</a>;</div>
+<div class="line">  <span class="keywordflow">return</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5cabb1ca97ec761fc37101737ba0aa2e7c5">ERROR</a>;</div>
 <div class="line">}</div>
 </div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd><code><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0ae832e8985e3878039c2ca0e08761f26d">resultt::D_SATISFIABLE</a></code> if the constraints are satisfiable, <code><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a884d24c603cadb4630432f52133d3027">resultt::D_UNSATISFIABLE</a></code> if they are unsatisfiable, <code><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a53a299451b07d786124b2dd6f6ece682">resultt::D_ERROR</a></code> if the limit of iteration was reached. </dd></dl>
 
@@ -1364,8 +1364,8 @@ Refinement loop</h2>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="astring__refinement_8cpp_html_a479ec7cdc1b70d68eefdc14deaaabfab"><div class="ttname"><a href="string__refinement_8cpp.html#a479ec7cdc1b70d68eefdc14deaaabfab">check_axioms</a></div><div class="ttdeci">static std::pair&lt; bool, std::vector&lt; exprt &gt; &gt; check_axioms(const string_axiomst &amp;axioms, string_constraint_generatort &amp;generator, const std::function&lt; exprt(const exprt &amp;)&gt; &amp;get, messaget::mstreamt &amp;stream, const namespacet &amp;ns, bool use_counter_example, const union_find_replacet &amp;symbol_resolve, const std::unordered_map&lt; string_not_contains_constraintt, symbol_exprt &gt; &amp;not_contain_witnesses)</div><div class="ttdoc">Check axioms takes the model given by the underlying solver and answers whether it satisfies the stri...</div><div class="ttdef"><b>Definition:</b> <a href="string__refinement_8cpp_source.html#l01351">string_refinement.cpp:1351</a></div></div>
-<div class="ttc" id="aproperties_8h_html_a6a3450b5a7e86762bcb726f2cb000b4eabb1ca97ec761fc37101737ba0aa2e7c5"><div class="ttname"><a href="properties_8h.html#a6a3450b5a7e86762bcb726f2cb000b4eabb1ca97ec761fc37101737ba0aa2e7c5">property_statust::ERROR</a></div><div class="ttdeci">@ ERROR</div><div class="ttdoc">An error occurred during goto checking.</div></div>
 <div class="ttc" id="astring__constraint__instantiation_8cpp_html_a88704cb4fd93c9210cb5615ac8d385ce"><div class="ttname"><a href="string__constraint__instantiation_8cpp.html#a88704cb4fd93c9210cb5615ac8d385ce">instantiate</a></div><div class="ttdeci">exprt instantiate(const string_constraintt &amp;axiom, const exprt &amp;str, const exprt &amp;val)</div><div class="ttdoc">Instantiates a string constraint by substituting the quantifiers.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint__instantiation_8cpp_source.html#l00173">string_constraint_instantiation.cpp:173</a></div></div>
+<div class="ttc" id="asolver_8h_html_a7ded4e07f7714ed7771328d660370d5cabb1ca97ec761fc37101737ba0aa2e7c5"><div class="ttname"><a href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5cabb1ca97ec761fc37101737ba0aa2e7c5">solver_resultt::ERROR</a></div><div class="ttdeci">@ ERROR</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

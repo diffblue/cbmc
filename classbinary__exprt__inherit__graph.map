@@ -1,61 +1,61 @@
 <map id="binary_exprt" name="binary_exprt">
-<area shape="rect" id="node1" title="A base class for binary expressions." alt="" coords="1028,1319,1132,1345"/>
-<area shape="rect" id="node7" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="1183,515,1355,541"/>
-<area shape="rect" id="node27" href="$classbinding__exprt.html" title="A base class for variable bindings (quantifiers, let, lambda)" alt="" coords="1214,732,1325,759"/>
-<area shape="rect" id="node33" href="$classbyte__extract__exprt.html" title="Expression of type type extracted from some object op starting at position offset (given in number of..." alt="" coords="1197,783,1342,809"/>
-<area shape="rect" id="node34" href="$classcomplex__exprt.html" title="Complex constructor from a pair of numbers." alt="" coords="1210,833,1329,860"/>
-<area shape="rect" id="node35" href="$classconstant__interval__exprt.html" title="Represents an interval of values." alt="" coords="1181,884,1357,911"/>
-<area shape="rect" id="node36" href="$classcpp__static__assertt.html" title=" " alt="" coords="1199,935,1339,961"/>
-<area shape="rect" id="node37" href="$classdiv__exprt.html" title="Division." alt="" coords="1228,985,1311,1012"/>
-<area shape="rect" id="node38" href="$classdynamic__object__exprt.html" title="Representation of heap&#45;allocated objects." alt="" coords="1186,1036,1353,1063"/>
-<area shape="rect" id="node39" href="$classelement__address__exprt.html" title="Operator to return the address of an array element relative to a base address." alt="" coords="1182,1087,1357,1113"/>
-<area shape="rect" id="node40" href="$classeuclidean__mod__exprt.html" title="Boute&#39;s Euclidean definition of Modulo – to match SMT&#45;LIB2." alt="" coords="1188,1137,1351,1164"/>
-<area shape="rect" id="node41" href="$classevaluate__exprt.html" title=" " alt="" coords="1209,1188,1329,1215"/>
-<area shape="rect" id="node42" href="$classfactorial__power__exprt.html" title="Falling factorial power." alt="" coords="1187,1239,1351,1265"/>
-<area shape="rect" id="node43" href="$classfloatbv__typecast__exprt.html" title="Semantic type conversion from/to floating&#45;point formats." alt="" coords="1184,1289,1355,1316"/>
-<area shape="rect" id="node44" href="$classfunction__application__exprt.html" title="Application of (mathematical) function." alt="" coords="1192,1341,1347,1382"/>
-<area shape="rect" id="node45" href="$classimplies__exprt.html" title="Boolean implication." alt="" coords="1214,1407,1325,1433"/>
-<area shape="rect" id="node46" href="$classindex__exprt.html" title="Array index operator." alt="" coords="1220,1457,1319,1484"/>
-<area shape="rect" id="node47" href="$classlet__exprt.html" title="A let expression." alt="" coords="1229,1508,1309,1535"/>
-<area shape="rect" id="node48" href="$classminus__exprt.html" title="Binary minus." alt="" coords="1218,1559,1321,1585"/>
-<area shape="rect" id="node49" href="$classmod__exprt.html" title="Modulo defined as lhs&#45;(rhs * truncate(lhs/rhs))." alt="" coords="1223,1609,1315,1636"/>
-<area shape="rect" id="node50" href="$classnamed__term__exprt.html" title="Expression that introduces a new symbol that is equal to the operand." alt="" coords="1196,1660,1343,1687"/>
-<area shape="rect" id="node51" href="$classobject__descriptor__exprt.html" title="Split an expression into a base object and a (byte) offset." alt="" coords="1182,1711,1357,1737"/>
-<area shape="rect" id="node52" href="$classpower__exprt.html" title="Exponentiation." alt="" coords="1218,1761,1321,1788"/>
-<area shape="rect" id="node53" href="$classreplication__exprt.html" title="Bit&#45;vector replication." alt="" coords="1203,1812,1335,1839"/>
-<area shape="rect" id="node54" href="$classsaturating__minus__exprt.html" title="Saturating subtraction expression." alt="" coords="1181,1863,1357,1889"/>
-<area shape="rect" id="node55" href="$classsaturating__plus__exprt.html" title="The saturating plus expression." alt="" coords="1188,1913,1351,1940"/>
-<area shape="rect" id="node56" href="$classshift__exprt.html" title="A base class for shift and rotate operators." alt="" coords="1224,1964,1315,1991"/>
-<area shape="rect" id="node2" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,1319,979,1345"/>
-<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,1319,804,1345"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,1319,699,1345"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="431,1304,597,1360"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1311,187,1353"/>
-<area shape="rect" id="node8" href="$classbinary__overflow__exprt.html" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to o..." alt="" coords="1407,107,1573,133"/>
-<area shape="rect" id="node13" href="$classbinary__relation__exprt.html" title="A base class for relations, i.e., binary predicates whose two operands have the same type." alt="" coords="1409,435,1571,461"/>
-<area shape="rect" id="node22" href="$classextractbit__exprt.html" title="Extracts a single bit of a bit&#45;vector operand." alt="" coords="1427,489,1553,516"/>
-<area shape="rect" id="node23" href="$classjava__instanceof__exprt.html" title=" " alt="" coords="1407,540,1573,567"/>
-<area shape="rect" id="node24" href="$classr__or__w__ok__exprt.html" title="A base class for a predicate that indicates that an address range is ok to read or write or both." alt="" coords="1425,644,1555,671"/>
-<area shape="rect" id="node9" href="$classminus__overflow__exprt.html" title=" " alt="" coords="1625,5,1791,32"/>
-<area shape="rect" id="node10" href="$classmult__overflow__exprt.html" title=" " alt="" coords="1630,56,1786,83"/>
-<area shape="rect" id="node11" href="$classplus__overflow__exprt.html" title=" " alt="" coords="1631,107,1785,133"/>
-<area shape="rect" id="node12" href="$classshl__overflow__exprt.html" title=" " alt="" coords="1635,157,1781,184"/>
-<area shape="rect" id="node14" href="$classequal__exprt.html" title="Equality." alt="" coords="1659,208,1757,235"/>
-<area shape="rect" id="node15" href="$classgreater__than__exprt.html" title="Binary greater than operator expression." alt="" coords="1635,259,1781,285"/>
-<area shape="rect" id="node16" href="$classgreater__than__or__equal__exprt.html" title="Binary greater than or equal operator expression." alt="" coords="1624,310,1792,351"/>
-<area shape="rect" id="node17" href="$classieee__float__equal__exprt.html" title="IEEE&#45;floating&#45;point equality." alt="" coords="1623,376,1793,403"/>
-<area shape="rect" id="node18" href="$classieee__float__notequal__exprt.html" title="IEEE floating&#45;point disequality." alt="" coords="1633,427,1783,469"/>
-<area shape="rect" id="node19" href="$classless__than__exprt.html" title="Binary less than operator expression." alt="" coords="1645,493,1771,520"/>
-<area shape="rect" id="node20" href="$classless__than__or__equal__exprt.html" title="Binary less than or equal operator expression." alt="" coords="1635,545,1781,586"/>
-<area shape="rect" id="node21" href="$classnotequal__exprt.html" title="Disequality." alt="" coords="1648,611,1768,637"/>
-<area shape="rect" id="node25" href="$classr__ok__exprt.html" title="A predicate that indicates that an address range is ok to read." alt="" coords="1663,661,1753,688"/>
-<area shape="rect" id="node26" href="$classw__ok__exprt.html" title="A predicate that indicates that an address range is ok to write." alt="" coords="1659,712,1757,739"/>
-<area shape="rect" id="node28" href="$classarray__comprehension__exprt.html" title="Expression to define a mapping from an argument (index) to elements." alt="" coords="1409,695,1571,737"/>
-<area shape="rect" id="node29" href="$classlambda__exprt.html" title="A (mathematical) lambda expression." alt="" coords="1434,761,1546,788"/>
-<area shape="rect" id="node30" href="$classquantifier__exprt.html" title="A base class for quantifier expressions." alt="" coords="1427,812,1553,839"/>
-<area shape="rect" id="node31" href="$classexists__exprt.html" title="An exists expression." alt="" coords="1657,796,1759,823"/>
-<area shape="rect" id="node32" href="$classforall__exprt.html" title="A forall expression." alt="" coords="1659,847,1757,873"/>
-<area shape="rect" id="node57" href="$classashr__exprt.html" title="Arithmetic right shift." alt="" coords="1445,1913,1535,1940"/>
-<area shape="rect" id="node58" href="$classlshr__exprt.html" title="Logical right shift." alt="" coords="1447,1964,1533,1991"/>
-<area shape="rect" id="node59" href="$classshl__exprt.html" title="Left shift." alt="" coords="1449,2015,1531,2041"/>
+<area shape="rect" id="node1" title="A base class for binary expressions." alt="" coords="1028,1193,1132,1220"/>
+<area shape="rect" id="node7" href="$classallocate__exprt.html" title=" " alt="" coords="1215,263,1330,289"/>
+<area shape="rect" id="node8" href="$classallocate__state__exprt.html" title=" " alt="" coords="1195,313,1350,340"/>
+<area shape="rect" id="node9" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="1187,364,1359,391"/>
+<area shape="rect" id="node23" href="$classbinding__exprt.html" title="A base class for variable bindings (quantifiers, let, lambda)" alt="" coords="1217,509,1328,536"/>
+<area shape="rect" id="node27" href="$classbyte__extract__exprt.html" title="Expression of type type extracted from some object op starting at position offset (given in number of..." alt="" coords="1200,560,1345,587"/>
+<area shape="rect" id="node28" href="$classcomplex__exprt.html" title="Complex constructor from a pair of numbers." alt="" coords="1213,611,1332,637"/>
+<area shape="rect" id="node29" href="$classconstant__interval__exprt.html" title="Represents an interval of values." alt="" coords="1185,661,1361,688"/>
+<area shape="rect" id="node30" href="$classcpp__static__assertt.html" title=" " alt="" coords="1203,712,1343,739"/>
+<area shape="rect" id="node31" href="$classdeallocate__state__exprt.html" title=" " alt="" coords="1187,763,1358,789"/>
+<area shape="rect" id="node32" href="$classdiv__exprt.html" title="Division." alt="" coords="1231,813,1314,840"/>
+<area shape="rect" id="node33" href="$classdynamic__object__exprt.html" title="Representation of heap&#45;allocated objects." alt="" coords="1189,864,1356,891"/>
+<area shape="rect" id="node34" href="$classelement__address__exprt.html" title="Operator to return the address of an array element relative to a base address." alt="" coords="1185,915,1360,941"/>
+<area shape="rect" id="node35" href="$classenter__scope__state__exprt.html" title=" " alt="" coords="1181,965,1364,992"/>
+<area shape="rect" id="node36" href="$classeuclidean__mod__exprt.html" title="Boute&#39;s Euclidean definition of Modulo – to match SMT&#45;LIB2." alt="" coords="1191,1016,1354,1043"/>
+<area shape="rect" id="node37" href="$classevaluate__exprt.html" title=" " alt="" coords="1213,1067,1333,1093"/>
+<area shape="rect" id="node38" href="$classexit__scope__state__exprt.html" title=" " alt="" coords="1186,1117,1359,1144"/>
+<area shape="rect" id="node39" href="$classfactorial__power__exprt.html" title="Falling factorial power." alt="" coords="1191,1168,1355,1195"/>
+<area shape="rect" id="node40" href="$classfloatbv__typecast__exprt.html" title="Semantic type conversion from/to floating&#45;point formats." alt="" coords="1187,1219,1358,1245"/>
+<area shape="rect" id="node41" href="$classfunction__application__exprt.html" title="Application of (mathematical) function." alt="" coords="1195,1270,1350,1311"/>
+<area shape="rect" id="node42" href="$classimplies__exprt.html" title="Boolean implication." alt="" coords="1217,1336,1328,1363"/>
+<area shape="rect" id="node43" href="$classindex__exprt.html" title="Array index operator." alt="" coords="1223,1387,1322,1413"/>
+<area shape="rect" id="node44" href="$classlet__exprt.html" title="A let expression." alt="" coords="1233,1437,1313,1464"/>
+<area shape="rect" id="node45" href="$classminus__exprt.html" title="Binary minus." alt="" coords="1221,1488,1324,1515"/>
+<area shape="rect" id="node46" href="$classmod__exprt.html" title="Modulo defined as lhs&#45;(rhs * truncate(lhs/rhs))." alt="" coords="1227,1539,1319,1565"/>
+<area shape="rect" id="node47" href="$classnamed__term__exprt.html" title="Expression that introduces a new symbol that is equal to the operand." alt="" coords="1199,1589,1346,1616"/>
+<area shape="rect" id="node48" href="$classobject__descriptor__exprt.html" title="Split an expression into a base object and a (byte) offset." alt="" coords="1185,1640,1360,1667"/>
+<area shape="rect" id="node49" href="$classpower__exprt.html" title="Exponentiation." alt="" coords="1221,1691,1324,1717"/>
+<area shape="rect" id="node50" href="$classreplication__exprt.html" title="Bit&#45;vector replication." alt="" coords="1207,1741,1339,1768"/>
+<area shape="rect" id="node51" href="$classsaturating__minus__exprt.html" title="Saturating subtraction expression." alt="" coords="1185,1792,1361,1819"/>
+<area shape="rect" id="node52" href="$classsaturating__plus__exprt.html" title="The saturating plus expression." alt="" coords="1191,1843,1354,1869"/>
+<area shape="rect" id="node53" href="$classshift__exprt.html" title="A base class for shift and rotate operators." alt="" coords="1227,1893,1318,1920"/>
+<area shape="rect" id="node57" href="$classstate__cstrlen__exprt.html" title=" " alt="" coords="1199,1944,1346,1971"/>
+<area shape="rect" id="node58" href="$classstate__object__size__exprt.html" title=" " alt="" coords="1185,1995,1361,2021"/>
+<area shape="rect" id="node59" href="$classstate__type__compatible__exprt.html" title=" " alt="" coords="1187,2046,1358,2087"/>
+<area shape="rect" id="node2" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,1193,979,1220"/>
+<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,1193,804,1220"/>
+<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,1193,699,1220"/>
+<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="431,1179,597,1235"/>
+<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1186,187,1227"/>
+<area shape="rect" id="node10" href="$classbinary__overflow__exprt.html" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to o..." alt="" coords="1421,81,1588,108"/>
+<area shape="rect" id="node15" href="$classbinary__relation__exprt.html" title="A base class for relations, i.e., binary predicates whose two operands have the same type." alt="" coords="1424,132,1585,159"/>
+<area shape="rect" id="node16" href="$classextractbit__exprt.html" title="Extracts a single bit of a bit&#45;vector operand." alt="" coords="1441,183,1568,209"/>
+<area shape="rect" id="node17" href="$classjava__instanceof__exprt.html" title=" " alt="" coords="1421,233,1588,260"/>
+<area shape="rect" id="node18" href="$classr__or__w__ok__exprt.html" title="A base class for a predicate that indicates that an address range is ok to read or write or both." alt="" coords="1440,284,1569,311"/>
+<area shape="rect" id="node19" href="$classstate__is__cstring__exprt.html" title=" " alt="" coords="1422,335,1587,361"/>
+<area shape="rect" id="node20" href="$classstate__is__dynamic__object__exprt.html" title=" " alt="" coords="1413,386,1596,427"/>
+<area shape="rect" id="node21" href="$classstate__live__object__exprt.html" title=" " alt="" coords="1417,452,1592,479"/>
+<area shape="rect" id="node22" href="$classstate__writeable__object__exprt.html" title=" " alt="" coords="1419,503,1590,545"/>
+<area shape="rect" id="node11" href="$classminus__overflow__exprt.html" title=" " alt="" coords="1645,5,1812,32"/>
+<area shape="rect" id="node12" href="$classmult__overflow__exprt.html" title=" " alt="" coords="1651,56,1807,83"/>
+<area shape="rect" id="node13" href="$classplus__overflow__exprt.html" title=" " alt="" coords="1652,107,1805,133"/>
+<area shape="rect" id="node14" href="$classshl__overflow__exprt.html" title=" " alt="" coords="1656,157,1801,184"/>
+<area shape="rect" id="node24" href="$classarray__comprehension__exprt.html" title="Expression to define a mapping from an argument (index) to elements." alt="" coords="1423,569,1586,610"/>
+<area shape="rect" id="node25" href="$classlambda__exprt.html" title="A (mathematical) lambda expression." alt="" coords="1449,635,1561,661"/>
+<area shape="rect" id="node26" href="$classquantifier__exprt.html" title="A base class for quantifier expressions." alt="" coords="1442,685,1567,712"/>
+<area shape="rect" id="node54" href="$classashr__exprt.html" title="Arithmetic right shift." alt="" coords="1459,1843,1550,1869"/>
+<area shape="rect" id="node55" href="$classlshr__exprt.html" title="Logical right shift." alt="" coords="1461,1893,1548,1920"/>
+<area shape="rect" id="node56" href="$classshl__exprt.html" title="Left shift." alt="" coords="1463,1944,1546,1971"/>
 </map>
