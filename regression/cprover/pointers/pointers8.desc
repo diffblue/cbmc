@@ -3,8 +3,8 @@ pointers8.c
 --text --solve --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ S20\(ς\[ς\(❝main::1::p❞\):=123\]\)$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝main::1::p_value❞:=ς\(ς\(❝main::1::p❞\)\)\]\)$
-^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(❝main::1::p_value❞\) = 123\)$
+^\(\d+\) ∀ ς : state \. S16\(ς\) ⇒ S17\(ς\[ς\(❝main::1::p❞\):=123\]\)$
+^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ S19\(ς\[❝main::1::p_value❞:=ς\(ς\(❝main::1::p❞\)\)\]\)$
+^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ \(ς\(❝main::1::p_value❞\) = 123\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --

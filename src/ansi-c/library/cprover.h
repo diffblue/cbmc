@@ -23,8 +23,6 @@ typedef signed long long __CPROVER_ssize_t;
 void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);
 void __CPROVER_deallocate(void *);
 extern const void *__CPROVER_deallocated;
-extern const void *__CPROVER_new_object;
-extern __CPROVER_bool __CPROVER_malloc_is_new_array;
 extern const void *__CPROVER_memory_leak;
 
 extern int __CPROVER_malloc_failure_mode;

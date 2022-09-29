@@ -3,8 +3,8 @@ main.c
 --variable-sensitivity --vsd-liveness --three-way-merge --show
 ^EXIT=0$
 ^SIGNAL=0$
-globalX .* 0 @ \[24\]
+globalX .* 0 @ \[21\]
 globalX .* 1 @ \[0\]
 globalX .* 2 @ \[3\]
-globalX .* TOP @ \[27\]
+globalX .* TOP @ \[24\]
 --

@@ -3,14 +3,14 @@ branching2.c
 --text --solve --inline
 ^EXIT=10$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. \(S20\(ς\) ∧ ¬\(ς\(❝main::1::a❞\) ≥ 5\)\) ⇒ S21T\(ς\)$
-^\(\d+\) ∀ ς : state \. \(S20\(ς\) ∧ ς\(❝main::1::a❞\) ≥ 5\) ⇒ S21\(ς\)$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝main::1::b❞:=1\]\)$
-^\(\d+\) S23 = S22$
-^\(\d+\) ∀ ς : state \. S21T\(ς\) ⇒ S24\(ς\[❝main::1::b❞:=0\]\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ S25in\(ς\)$
-^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ S25in\(ς\)$
-^\(\d+\) S25 = S25in$
+^\(\d+\) ∀ ς : state \. \(S17\(ς\) ∧ ¬\(ς\(❝main::1::a❞\) ≥ 5\)\) ⇒ S18T\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S17\(ς\) ∧ ς\(❝main::1::a❞\) ≥ 5\) ⇒ S18\(ς\)$
+^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ S19\(ς\[❝main::1::b❞:=1\]\)$
+^\(\d+\) S20 = S19$
+^\(\d+\) ∀ ς : state \. S18T\(ς\) ⇒ S21\(ς\[❝main::1::b❞:=0\]\)$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S22in\(ς\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22in\(ς\)$
+^\(\d+\) S22 = S22in$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ property 2: REFUTED$
 --

@@ -3,7 +3,7 @@ struct1.c
 --text --solve --inline
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ S20\(ς\[❝s❞.❝x❞:=1\]\)$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ \(ς\(❝s❞.❝x❞\) = 1\)$
+^\(\d+\) ∀ ς : state \. S16\(ς\) ⇒ S17\(ς\[❝s❞.❝x❞:=1\]\)$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ \(ς\(❝s❞.❝x❞\) = 1\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --

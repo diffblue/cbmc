@@ -3,7 +3,7 @@ basic-float1.c
 --text --solve --inline
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ S20\(ς\[❝main::1::f❞:=floatbv_typecast\(1, floatbv\[32\], ς\(❝__CPROVER_rounding_mode❞\)\)\]\)$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ ieee_float_equal\(floatbv_plus\(ς\(❝main::1::f❞\), 0\.5, ς\(❝__CPROVER_rounding_mode❞\)\), 1\.5\)$
+^\(\d+\) ∀ ς : state \. S16\(ς\) ⇒ S17\(ς\[❝main::1::f❞:=floatbv_typecast\(1, floatbv\[32\], ς\(❝__CPROVER_rounding_mode❞\)\)\]\)$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ ieee_float_equal\(floatbv_plus\(ς\(❝main::1::f❞\), 0\.5, ς\(❝__CPROVER_rounding_mode❞\)\), 1\.5\)$
 ^\[main\.assertion\.1\] line \d+ addition: SUCCESS$
 --

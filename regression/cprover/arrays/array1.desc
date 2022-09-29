@@ -3,11 +3,11 @@ array1.c
 --text --solve --inline --no-safety
 ^EXIT=10$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ S20\(ς\[element_address\(❝array❞, .*1.*\):=10\]\)$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S21\(ς\[element_address\(❝array❞, .*2.*\):=20\]\)$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ \(ς\(element_address\(❝array❞, .*1.*\)\) = 10\)$
-^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(element_address\(❝array❞, .*2.*\)\) = 20\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(element_address\(❝array❞, .*2.*\)\) = 30\)$
+^\(\d+\) ∀ ς : state \. S16\(ς\) ⇒ S17\(ς\[element_address\(❝array❞, .*1.*\):=10\]\)$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ S18\(ς\[element_address\(❝array❞, .*2.*\):=20\]\)$
+^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ \(ς\(element_address\(❝array❞, .*1.*\)\) = 10\)$
+^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ \(ς\(element_address\(❝array❞, .*2.*\)\) = 20\)$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ \(ς\(element_address\(❝array❞, .*2.*\)\) = 30\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
 ^\[main\.assertion\.3\] line \d+ property 3: REFUTED$

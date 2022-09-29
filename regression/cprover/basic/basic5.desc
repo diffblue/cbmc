@@ -3,12 +3,12 @@ basic5.c
 --text --solve --inline
 ^EXIT=10$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S21\(ς\[❝main::1::c1❞:=ς\(❝main::1::x❞\) ≥ 10\]\)$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(enter_scope_state\(ς, ❝main::1::c2❞\)\)$
-^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ S23\(ς\[❝main::1::c2❞:=ς\(❝main::1::x❞\) ≥ 5\]\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(❝main::1::c1❞\) ⇒ ς\(❝main::1::c2❞\)\)$
-^\(\d+\) S24 = S23$
-^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ \(ς\(❝main::1::c2❞\) ⇒ ς\(❝main::1::c1❞\)\)$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ S18\(ς\[❝main::1::c1❞:=ς\(❝main::1::x❞\) ≥ 10\]\)$
+^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ S19\(enter_scope_state\(ς, ❝main::1::c2❞\)\)$
+^\(\d+\) ∀ ς : state \. S19\(ς\) ⇒ S20\(ς\[❝main::1::c2❞:=ς\(❝main::1::x❞\) ≥ 5\]\)$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ \(ς\(❝main::1::c1❞\) ⇒ ς\(❝main::1::c2❞\)\)$
+^\(\d+\) S21 = S20$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ \(ς\(❝main::1::c2❞\) ⇒ ς\(❝main::1::c1❞\)\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ property 2: REFUTED$
 --

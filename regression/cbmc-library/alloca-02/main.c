@@ -4,9 +4,14 @@
 void *alloca(size_t alloca_size);
 #endif
 
+// intentionally type conflicting: the built-in library uses const void*; this
+// is to check that object type updates are performed
+extern const char *__CPROVER_alloca_object;
+
 int *foo()
 {
   int *foo_ptr = alloca(sizeof(int));
+  __CPROVER_assert(foo_ptr == __CPROVER_alloca_object, "may fail");
   return foo_ptr;
 }
 

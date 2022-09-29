@@ -6,9 +6,9 @@ assume1.c
 ^ \(\d+\) ∀ ς : state \. initial_state\(ς\) ⇒ SInitial\(ς\)$
 ^ \(\d+\) S0 = SInitial$
 ^ \(\d+\) S1 = S0$
-^\(\d+\) ∀ ς : state \. \(S19\(ς\) ∧ ς\(❝main::1::x❞\) ≥ 10\) ⇒ S20\(ς\)$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ \(ς\(❝main::1::x❞\) ≥ 5\)$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ \(ς\(❝main::1::x❞\) ≥ 15\)$
+^\(\d+\) ∀ ς : state \. \(S16\(ς\) ∧ ς\(❝main::1::x❞\) ≥ 10\) ⇒ S17\(ς\)$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ \(ς\(❝main::1::x❞\) ≥ 5\)$
+^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ \(ς\(❝main::1::x❞\) ≥ 15\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ property 2: REFUTED$
 --

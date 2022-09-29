@@ -3,7 +3,7 @@ pointers3.c
 --text --solve --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. \(S19\(ς\) ∧ ς\(ς\(❝main::1::p❞\)\) = 10\) ⇒ S20\(ς\)$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = 10\)$
+^\(\d+\) ∀ ς : state \. \(S16\(ς\) ∧ ς\(ς\(❝main::1::p❞\)\) = 10\) ⇒ S17\(ς\)$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = 10\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --
