@@ -588,21 +588,18 @@ void value_sett::get_value_set_rec(
 
     if(op_type.id()==ID_pointer)
     {
-      // pointer-to-pointer -- we just ignore these
+      // pointer-to-something -- we just ignore the type cast
       get_value_set_rec(op, dest, suffix, original_type, ns);
     }
     else if(
       op_type.id() == ID_unsignedbv || op_type.id() == ID_signedbv ||
       op_type.id() == ID_bv)
     {
-      // integer-to-pointer
+      // integer-to-something
 
       if(op.is_zero())
       {
-        insert(
-          dest,
-          exprt(ID_null_object, to_type_with_subtype(expr_type).subtype()),
-          mp_integer{0});
+        insert(dest, exprt(ID_null_object, empty_typet{}), mp_integer{0});
       }
       else
       {
