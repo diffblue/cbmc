@@ -1,5 +1,15 @@
 var NAVTREEINDEX101 =
 {
+"mathematical__expr_8h.html#afab452d2a0693c4ac37aab8346849a25":[5,0,2,26,121,19],
+"mathematical__expr_8h.html#afb8957c3798aff3bd9b45883124bc7c9":[5,0,2,26,121,14],
+"mathematical__expr_8h_source.html":[5,0,2,26,121],
+"mathematical__types_8cpp.html":[5,0,2,26,122],
+"mathematical__types_8cpp.html#a4dbd3512cff41a42aad30545c12268e3":[5,0,2,26,122,0],
+"mathematical__types_8cpp_source.html":[5,0,2,26,122],
+"mathematical__types_8h.html":[5,0,2,26,123],
+"mathematical__types_8h.html#a4dbd3512cff41a42aad30545c12268e3":[5,0,2,26,123,6],
+"mathematical__types_8h.html#a516c2dadf52addd013a19bc7389b3f03":[5,0,2,26,123,7],
+"mathematical__types_8h.html#a7f27524524d5789769d0efdab0f1da02":[5,0,2,26,123,8],
 "mathematical__types_8h.html#ac759df92b404d29bde2652f17994c8ad":[5,0,2,26,123,5],
 "mathematical__types_8h_source.html":[5,0,2,26,123],
 "memory-analyzer.html":[0,4,5],
@@ -239,15 +249,5 @@ var NAVTREEINDEX101 =
 "miniz_8cpp.html#a9aa631c7bc8147b39b6d8a910682463e":[5,0,1,0,4,0,191],
 "miniz_8cpp.html#a9b76ea2ad5e09a1bd4a7d663745ac29e":[5,0,1,0,4,0,32],
 "miniz_8cpp.html#a9b93b1cd46aaf29a27dfb526bd110d63":[5,0,1,0,4,0,33],
-"miniz_8cpp.html#a9c0a8d94e9c3aa66050e29e3c0013e24":[5,0,1,0,4,0,165],
-"miniz_8cpp.html#a9d0a18d927aab166ef7ea84cb98cd9ea":[5,0,1,0,4,0,213],
-"miniz_8cpp.html#aa0ce62915456b6c5f0bcf1ed09e94599":[5,0,1,0,4,0,138],
-"miniz_8cpp.html#aa1b2bd10c69963c1b6bd3be7a91357b2":[5,0,1,0,4,0,22],
-"miniz_8cpp.html#aa9d3abc65b4b9b91efc437ec151e9c99":[5,0,1,0,4,0,193],
-"miniz_8cpp.html#aaa53ceaf8230510769b12e04df060c23":[5,0,1,0,4,0,241],
-"miniz_8cpp.html#aaac0bd73d99bf67e7b32be8acddc4718":[5,0,1,0,4,0,175],
-"miniz_8cpp.html#aac2174a6cb49f234d050051bff59bfdd":[5,0,1,0,4,0,200],
-"miniz_8cpp.html#aaed356efd84e96e9f5eecdf078b07e50":[5,0,1,0,4,0,259],
-"miniz_8cpp.html#aaf20afef8b149b8653572002646e7e0a":[5,0,1,0,4,0,163],
-"miniz_8cpp.html#ab04a0655cd1e3bcac5e8f48c18df1a57a03aa0ae942083ab0f6bee9f23f3eec45":[5,0,1,0,4,0,103]
+"miniz_8cpp.html#a9c0a8d94e9c3aa66050e29e3c0013e24":[5,0,1,0,4,0,165]
 };

@@ -1047,6 +1047,7 @@ var annotated_dup =
     [ "smt_get_value_commandt", "classsmt__get__value__commandt.html", "classsmt__get__value__commandt" ],
     [ "smt_get_value_responset", "classsmt__get__value__responset.html", "classsmt__get__value__responset" ],
     [ "smt_identifier_termt", "classsmt__identifier__termt.html", "classsmt__identifier__termt" ],
+    [ "smt_incremental_dry_run_solvert", "classsmt__incremental__dry__run__solvert.html", "classsmt__incremental__dry__run__solvert" ],
     [ "smt_index_const_downcast_visitort", "classsmt__index__const__downcast__visitort.html", "classsmt__index__const__downcast__visitort" ],
     [ "smt_index_output_visitort", "classsmt__index__output__visitort.html", "classsmt__index__output__visitort" ],
     [ "smt_indext", "classsmt__indext.html", "classsmt__indext" ],
