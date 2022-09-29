@@ -1,0 +1,16 @@
+CORE
+for1.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S25\(ς\) ⇒ S22in\(ς\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22in\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S22in\(ς\) ∧ ¬\(ς\(❝main::1::i❞\) < 10\)\) ⇒ S22T\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S22in\(ς\) ∧ ς\(❝main::1::i❞\) < 10\) ⇒ S22\(ς\)$
+^\(\d+\) S23 = S22$
+^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ S24\(ς\[❝main::1::i❞:=ς\(❝main::1::i❞\) \+ 1\]\)$
+^\(\d+\) S25 = S24$
+^\(\d+\) S26 = S22T$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--
+--

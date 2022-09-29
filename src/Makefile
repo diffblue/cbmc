@@ -4,6 +4,7 @@ DIRS = analyses \
        big-int \
        cbmc \
        cpp \
+       cprover \
        crangler \
        goto-analyzer \
        goto-cc \
@@ -28,6 +29,7 @@ DIRS = analyses \
        # Empty last line
 
 all: cbmc.dir \
+     cprover.dir \
      crangler.dir \
      goto-analyzer.dir \
      goto-cc.dir \
@@ -83,6 +85,9 @@ goto-checker.dir: solvers.dir goto-symex.dir goto-programs.dir
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
           goto-instrument.dir goto-checker.dir
+
+cprover.dir: ansi-c.dir langapi.dir solvers.dir goto-programs.dir \
+             linking.dir analyses.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    goto-instrument.dir goto-checker.dir

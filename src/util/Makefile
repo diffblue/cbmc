@@ -92,6 +92,7 @@ SRC = arith_tools.cpp \
       string_hash.cpp \
       string_utils.cpp \
       structured_data.cpp \
+      substitute_symbols.cpp \
       symbol.cpp \
       symbol_table_base.cpp \
       symbol_table.cpp \

@@ -1,0 +1,17 @@
+CORE
+while-break1.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S28\(ς\) ⇒ S22in\(ς\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22in\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S22in\(ς\) ∧ ¬\(1 ≠ 0\)\) ⇒ S22T\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S22in\(ς\) ∧ 1 ≠ 0\) ⇒ S22\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S22\(ς\) ∧ ¬\(ς\(❝main::1::x❞\) = 0\)\) ⇒ S23T\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S22\(ς\) ∧ ς\(❝main::1::x❞\) = 0\) ⇒ S23\(ς\)$
+^\(\d+\) ∀ ς : state \. S22T\(ς\) ⇒ S29in\(ς\)$
+^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ S29in\(ς\)$
+^\(\d+\) ∀ ς : state \. S26\(ς\) ⇒ S29in\(ς\)$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--
+--

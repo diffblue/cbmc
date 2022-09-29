@@ -996,6 +996,14 @@ std::string smt2_convt::type2id(const typet &type) const
     else
       return "S" + std::to_string(boolbv_width(type));
   }
+  else if(type.id() == ID_union_tag)
+  {
+    return "U" + std::to_string(boolbv_width(type));
+  }
+  else if(type.id() == ID_array)
+  {
+    return "A" + type2id(to_array_type(type).element_type());
+  }
   else
   {
     UNREACHABLE;
@@ -1043,8 +1051,29 @@ void smt2_convt::convert_floatbv(const exprt &expr)
   out << ')';
 }
 
+void smt2_convt::convert_string_literal(const std::string &s)
+{
+  out << '"';
+  for(auto ch : s)
+  {
+    // " is escaped by double-quoting
+    if(ch == '"')
+      out << '"';
+    out << ch;
+  }
+  out << '"';
+}
+
 void smt2_convt::convert_expr(const exprt &expr)
 {
+  // try hash table first
+  auto converter_result = converters.find(expr.id());
+  if(converter_result != converters.end())
+  {
+    converter_result->second(expr);
+    return; // done
+  }
+
   // huge monster case split over expression id
   if(expr.id()==ID_symbol)
   {
@@ -1621,7 +1650,42 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_update)
   {
-    convert_update(expr);
+    convert_update(to_update_expr(expr));
+  }
+  else if(expr.id() == ID_object_address)
+  {
+    out << "(object-address ";
+    convert_string_literal(
+      id2string(to_object_address_expr(expr).object_identifier()));
+    out << ')';
+  }
+  else if(expr.id() == ID_element_address)
+  {
+    // We turn this binary expression into a ternary expression
+    // by adding the size of the array elements as third argument.
+    const auto &element_address_expr = to_element_address_expr(expr);
+
+    auto element_size_expr_opt =
+      ::size_of_expr(element_address_expr.element_type(), ns);
+    CHECK_RETURN(element_size_expr_opt.has_value());
+
+    out << "(element-address-" << type2id(expr.type()) << ' ';
+    convert_expr(element_address_expr.base());
+    out << ' ';
+    convert_expr(element_address_expr.index());
+    out << ' ';
+    convert_expr(typecast_exprt::conditional_cast(
+      *element_size_expr_opt, element_address_expr.index().type()));
+    out << ')';
+  }
+  else if(expr.id() == ID_field_address)
+  {
+    const auto &field_address_expr = to_field_address_expr(expr);
+    out << "(field-address-" << type2id(expr.type()) << ' ';
+    convert_expr(field_address_expr.base());
+    out << ' ';
+    convert_string_literal(id2string(field_address_expr.component_name()));
+    out << ')';
   }
   else if(expr.id()==ID_member)
   {
@@ -4248,7 +4312,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       expr.type().id_string());
 }
 
-void smt2_convt::convert_update(const exprt &expr)
+void smt2_convt::convert_update(const update_exprt &expr)
 {
   PRECONDITION(expr.operands().size() == 3);
 
@@ -4663,49 +4727,47 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         smt2_identifiers.insert(smt2_identifier);
 
         out << "; set_to true (equal)\n";
-        out << "(define-fun " << smt2_identifier;
 
         if(equal_expr.lhs().type().id() == ID_mathematical_function)
         {
+          // We avoid define-fun, since it has been reported to cause
+          // trouble with Z3's parser.
+          out << "(declare-fun " << smt2_identifier;
+
           auto &mathematical_function_type =
             to_mathematical_function_type(equal_expr.lhs().type());
+
           out << " (";
           bool first = true;
 
-          for(std::size_t p_nr = 0;
-              p_nr < mathematical_function_type.domain().size();
-              p_nr++)
+          for(auto &t : mathematical_function_type.domain())
           {
             if(first)
               first = false;
             else
               out << ' ';
 
-            out << '(' << 'p' << (p_nr + 1) << ' ';
-            convert_type(mathematical_function_type.domain()[p_nr]);
-            out << ')';
+            convert_type(t);
           }
 
           out << ") ";
           convert_type(mathematical_function_type.codomain());
+          out << ")\n";
 
-          out << ' ' << '(';
+          out << "(assert (= " << smt2_identifier << ' ';
           convert_expr(prepared_rhs);
-          for(std::size_t p_nr = 0;
-              p_nr < mathematical_function_type.domain().size();
-              p_nr++)
-            out << ' ' << 'p' << (p_nr + 1);
-          out << ')';
+          out << ')' << ')' << '\n';
         }
         else
         {
+          out << "(define-fun " << smt2_identifier;
           out << " () ";
           convert_type(equal_expr.lhs().type());
           out << ' ';
           convert_expr(prepared_rhs);
+          out << ')' << '\n';
         }
 
-        out << ')' << '\n';
         return; // done
       }
     }
@@ -5098,6 +5160,219 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")\n"; // define-fun
     }
   }
+  else if(expr.id() == ID_initial_state)
+  {
+    irep_idt function = "initial-state";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_unary_expr(expr).op().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_evaluate)
+  {
+    irep_idt function = "evaluate-" + type2id(expr.type());
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_binary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_binary_expr(expr).op1().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(
+    expr.id() == ID_state_is_cstring ||
+    expr.id() == ID_state_is_dynamic_object ||
+    expr.id() == ID_state_live_object || expr.id() == ID_state_writeable_object)
+  {
+    irep_idt function =
+      expr.id() == ID_state_is_cstring          ? "state-is-cstring"
+      : expr.id() == ID_state_is_dynamic_object ? "state-is-dynamic-object"
+      : expr.id() == ID_state_live_object       ? "state-live-object"
+                                                : "state-writeable-object";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_binary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_binary_expr(expr).op1().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(
+    expr.id() == ID_state_r_ok || expr.id() == ID_state_w_ok ||
+    expr.id() == ID_state_rw_ok)
+  {
+    irep_idt function = expr.id() == ID_state_r_ok   ? "state-r-ok"
+                        : expr.id() == ID_state_w_ok ? "state-w-ok"
+                                                     : "state-rw-ok";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_ternary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_ternary_expr(expr).op1().type());
+      out << ' ';
+      convert_type(to_ternary_expr(expr).op2().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_update_state)
+  {
+    irep_idt function =
+      "update-state-" + type2id(to_multi_ary_expr(expr).op2().type());
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_multi_ary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_multi_ary_expr(expr).op1().type());
+      out << ' ';
+      convert_type(to_multi_ary_expr(expr).op2().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_enter_scope_state)
+  {
+    irep_idt function =
+      "enter-scope-state-" + type2id(to_binary_expr(expr).op1().type());
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_binary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_binary_expr(expr).op1().type());
+      out << ' ';
+      convert_type(size_type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_exit_scope_state)
+  {
+    irep_idt function =
+      "exit-scope-state-" + type2id(to_binary_expr(expr).op1().type());
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_binary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_binary_expr(expr).op1().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_allocate)
+  {
+    irep_idt function = "allocate";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_binary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_binary_expr(expr).op1().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_reallocate)
+  {
+    irep_idt function = "reallocate";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_ternary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_ternary_expr(expr).op1().type());
+      out << ' ';
+      convert_type(to_ternary_expr(expr).op2().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_deallocate_state)
+  {
+    irep_idt function = "deallocate";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_binary_expr(expr).op0().type());
+      out << ' ';
+      convert_type(to_binary_expr(expr).op1().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_object_address)
+  {
+    irep_idt function = "object-address";
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (String) ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_field_address)
+  {
+    irep_idt function = "field-address-" + type2id(expr.type());
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_field_address_expr(expr).op().type());
+      out << ' ';
+      out << "String";
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
+  else if(expr.id() == ID_element_address)
+  {
+    irep_idt function = "element-address-" + type2id(expr.type());
+
+    if(state_fkt_declared.insert(function).second)
+    {
+      out << "(declare-fun " << function << " (";
+      convert_type(to_element_address_expr(expr).base().type());
+      out << ' ';
+      convert_type(to_element_address_expr(expr).index().type());
+      out << ' '; // repeat, for the element size
+      convert_type(to_element_address_expr(expr).index().type());
+      out << ") ";
+      convert_type(expr.type()); // return type
+      out << ")\n";              // declare-fun
+    }
+  }
 }
 
 bool smt2_convt::use_array_theory(const exprt &expr)
@@ -5247,6 +5522,10 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id()==ID_c_bit_field)
   {
     convert_type(c_bit_field_replacement_type(to_c_bit_field_type(type), ns));
+  }
+  else if(type.id() == ID_state)
+  {
+    out << "state";
   }
   else
   {
@@ -5462,6 +5741,14 @@ void smt2_convt::find_symbols_rec(
     {
       recstack.insert(id);
       find_symbols_rec(ns.follow_tag(union_tag), recstack);
+    }
+  }
+  else if(type.id() == ID_state)
+  {
+    if(datatype_map.find(type) == datatype_map.end())
+    {
+      datatype_map[type] = "state";
+      out << "(declare-sort state 0)\n";
     }
   }
   else if(type.id() == ID_mathematical_function)

@@ -35,6 +35,7 @@ endif
   CXXFLAGS ?= -Wall -O2
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   CP_CXXFLAGS += -MMD -MP -mmacosx-version-min=10.15 -std=c++11 -stdlib=libc++
+  CP_CFLAGS += -mmacosx-version-min=10.15
   LINKFLAGS += -mmacosx-version-min=10.15 -stdlib=libc++
   LINKNATIVE += -mmacosx-version-min=10.15 -stdlib=libc++
 else
@@ -215,6 +216,7 @@ CP_CXXFLAGS += $(CXXFLAGS) $(CP_EXTRA_CXXFLAGS) $(INCLUDES)
 
 OBJ += $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC)))
 OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
+OBJ += $(patsubst %.c, %$(OBJEXT), $(filter %.c, $(SRC)))
 
 .SUFFIXES: .cc $(DEPEXT) .cpp
 
@@ -242,6 +244,8 @@ clean:
 		$(patsubst %.cpp, %$(DEPEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC))) \
 		$(patsubst %.cc, %$(DEPEXT), $(filter %.cc, $(SRC))) \
+		$(patsubst %.c, %$(OBJEXT), $(filter %.c, $(SRC))) \
+		$(patsubst %.c, %$(DEPEXT), $(filter %.c, $(SRC))) \
 		$(CLEANFILES)
 
 .PHONY: first_target clean all

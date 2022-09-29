@@ -1,0 +1,8 @@
+CORE
+malloc1.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝main::\$tmp::return_value_malloc❞:=allocate\(ς, 4 \* cast\(10, unsignedbv\[64\]\)\)\]\)$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

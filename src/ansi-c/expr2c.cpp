@@ -3988,6 +3988,7 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_live_object, "LIVE_OBJECT"},
     {ID_writeable_object, "WRITEABLE_OBJECT"},
     {ID_find_first_set, "__builtin_ffs"},
+    {ID_separate, "SEPARATE"},
     {ID_floatbv_div, "FLOAT/"},
     {ID_floatbv_minus, "FLOAT-"},
     {ID_floatbv_mult, "FLOAT*"},

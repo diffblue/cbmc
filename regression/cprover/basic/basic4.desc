@@ -1,0 +1,11 @@
+CORE
+basic4.c
+--text --solve --inline
+^EXIT=10$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ S18\(ς\[❝x❞:=0\]\)$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S21\(ς\[❝x❞:=1\]\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝x❞:=2\]\)$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(❝x❞\) = 1\)$
+^\[main\.assertion\.1\] line \d+ property 1: REFUTED$
+--

@@ -1,0 +1,14 @@
+CORE
+array1.c
+--text --solve --inline --no-safety
+^EXIT=10$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S21\(ς\[element_address\(❝array❞, 1\):=10\]\)$
+^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[element_address\(❝array❞, 2\):=20\]\)$
+^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(element_address\(❝array❞, 1\)\) = 10\)$
+^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(element_address\(❝array❞, 2\)\) = 20\)$
+^\(\d+\) ∀ ς : state \. S24\(ς\) ⇒ \(ς\(element_address\(❝array❞, 2\)\) = 30\)$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
+^\[main\.assertion\.3\] line \d+ property 3: REFUTED$
+--

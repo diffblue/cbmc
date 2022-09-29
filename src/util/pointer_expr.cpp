@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "expr_util.h"
 #include "pointer_offset_size.h"
+#include "pointer_predicates.h"
 #include "simplify_expr.h"
 
 void dynamic_object_exprt::set_instance(unsigned int instance)
@@ -155,13 +156,24 @@ field_address_exprt::field_address_exprt(
 }
 
 element_address_exprt::element_address_exprt(const exprt &base, exprt index)
-  : binary_exprt(
+  : element_address_exprt(
       base,
-      ID_element_address,
       std::move(index),
       pointer_typet(
         to_pointer_type(base.type()).base_type(),
         to_pointer_type(base.type()).get_width()))
+{
+}
+
+element_address_exprt::element_address_exprt(
+  exprt base,
+  exprt index,
+  pointer_typet type)
+  : binary_exprt(
+      std::move(base),
+      ID_element_address,
+      std::move(index),
+      std::move(type))
 {
 }
 
@@ -213,4 +225,16 @@ void dereference_exprt::validate(
     dereference_expr.type() == pointer_type->base_type(),
     "dereference expression's type must match the base type of the type of its "
     "operand");
+}
+
+exprt pointer_in_range_exprt::lower() const
+{
+  return and_exprt(
+    {same_object(op0(), op1()),
+     same_object(op1(), op2()),
+     r_ok_exprt(
+       op0(), minus_exprt(pointer_offset(op2()), pointer_offset(op0()))),
+     binary_relation_exprt(pointer_offset(op0()), ID_le, pointer_offset(op1())),
+     binary_relation_exprt(
+       pointer_offset(op1()), ID_le, pointer_offset(op2()))});
 }

@@ -1,0 +1,8 @@
+KNOWNBUG
+function_pointer1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be my_function: SUCCESS$
+^\[main\.pointer_dereference\.2\] line \d+ dereferenced function pointer must be my_function: REFUTED$
+--

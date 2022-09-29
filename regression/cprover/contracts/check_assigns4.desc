@@ -1,0 +1,11 @@
+CORE
+check_assigns4.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[my_function1\.assigns\.1\] line \d+ assigns clause: SUCCESS$
+^\[my_function1\.assigns\.2\] line \d+ assigns clause: SUCCESS$
+^\[my_function2\.assigns\.1\] line \d+ assigns clause: SUCCESS$
+^\[my_function3\.assigns\.1\] line \d+ assigns clause: SUCCESS$
+^\[my_function4\.assigns\.1\] line \d+ assigns clause: REFUTED$
+--

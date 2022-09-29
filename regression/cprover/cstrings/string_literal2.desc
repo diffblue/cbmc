@@ -1,0 +1,6 @@
+CORE
+string_literal2.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--

@@ -224,7 +224,7 @@ protected:
   void conversion_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
   void nan_check(const exprt &, const guardt &);
-  optionalt<exprt> rw_ok_check(exprt);
+  optionalt<exprt> expand_pointer_checks(exprt);
 
   std::string array_name(const exprt &);
 
@@ -1992,14 +1992,14 @@ void goto_check_ct::check(const exprt &expr)
   check_rec(expr, identity);
 }
 
-/// expand the r_ok, w_ok and rw_ok predicates
-optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
+/// expand the r_ok, w_ok, rw_ok, pointer_in_range predicates
+optionalt<exprt> goto_check_ct::expand_pointer_checks(exprt expr)
 {
   bool modified = false;
 
   for(auto &op : expr.operands())
   {
-    auto op_result = rw_ok_check(op);
+    auto op_result = expand_pointer_checks(op);
     if(op_result.has_value())
     {
       op = *op_result;
@@ -2025,6 +2025,22 @@ optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
     if(enable_simplify)
       simplify(c, ns);
     return c;
+  }
+  else if(expr.id() == ID_pointer_in_range)
+  {
+    const auto &pointer_in_range_expr = to_pointer_in_range_expr(expr);
+
+    auto expanded = pointer_in_range_expr.lower();
+
+    // rec. call
+    auto expanded_rec_opt = expand_pointer_checks(expanded);
+    if(expanded_rec_opt.has_value())
+      expanded = *expanded_rec_opt;
+
+    if(enable_simplify)
+      simplify(expanded, ns);
+
+    return expanded;
   }
   else if(modified)
     return std::move(expr);
@@ -2228,7 +2244,7 @@ void goto_check_ct::goto_check(
       }
     }
 
-    i.transform([this](exprt expr) { return rw_ok_check(expr); });
+    i.transform([this](exprt expr) { return expand_pointer_checks(expr); });
 
     for(auto &instruction : new_code.instructions)
     {

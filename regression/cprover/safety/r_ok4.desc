@@ -1,0 +1,7 @@
+CORE
+r_ok4.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ p is not null: SUCCESS$
+--

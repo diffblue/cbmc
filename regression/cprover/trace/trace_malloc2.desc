@@ -1,0 +1,9 @@
+CORE
+trace_malloc2.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^Trace for main\.assertion\.1:$
+^   7 \[cast\(❝heap-1❞, signedbv\[32\]\*\) \+ 10\] := 1$
+^   8 \[cast\(❝heap-1❞, signedbv\[32\]\*\) \+ 10\] := 2$
+--

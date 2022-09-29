@@ -1,0 +1,9 @@
+CORE
+trace_pointer1.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^Trace for main\.assertion\.1:$
+^   5 main::1::x := address_of\(global\)$
+^   7 global := 123$
+--
