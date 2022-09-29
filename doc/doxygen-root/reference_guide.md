@@ -1,6 +1,6 @@
-\page reference_guide Reference guide
+\page reference_guide Reference Guide
 
-Man pages for CBMC tools:
+These are the man pages for the CBMC tools:
 
 * [cbmc](man/cbmc.html)
 * [crangler](man/crangler.html)
