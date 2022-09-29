@@ -67,25 +67,6 @@ void cpp_internal_additions(std::ostream &out)
   out << "const unsigned __CPROVER::constant_infinity_uint;" << '\n';
   out << "typedef void " CPROVER_PREFIX "integer;" << '\n';
   out << "typedef void " CPROVER_PREFIX "rational;" << '\n';
-  // TODO: thread_local is still broken
-  // out << "thread_local unsigned long "
-  //     << CPROVER_PREFIX "thread_id = 0;" << '\n';
-  out << CPROVER_PREFIX "bool "
-      << CPROVER_PREFIX "threads_exited[__CPROVER::constant_infinity_uint];"
-      << '\n';
-  out << "unsigned long " CPROVER_PREFIX "next_thread_id = 0;" << '\n';
-  // TODO: thread_local is still broken
-  out << "void* "
-      << CPROVER_PREFIX "thread_keys[__CPROVER::constant_infinity_uint];"
-      << '\n';
-  // TODO: thread_local is still broken
-  out << "void (*"
-      << CPROVER_PREFIX "thread_key_dtors[__CPROVER::constant_infinity_uint])"
-      << "(void *);" << '\n';
-  // TODO: thread_local is still broken
-  out << "unsigned long " CPROVER_PREFIX "next_thread_key = 0;" << '\n';
-  out << "extern unsigned char "
-      << CPROVER_PREFIX "memory[__CPROVER::constant_infinity_uint];" << '\n';
 
   // malloc
   out << "const void *" CPROVER_PREFIX "deallocated = 0;" << '\n';

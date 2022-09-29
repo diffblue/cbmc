@@ -3,5 +3,5 @@ call_no_body2.c
 --text
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state, nondet::S24\.2-0 : signedbv\[32\] \. S24\.1\(ς\) ⇒ S24\.2\(ς\[❝main::\$tmp::return_value_function_without_body❞\.❝x❞:=nondet::S24\.2-0\]\)$
+^\(\d+\) ∀ ς : state, nondet::S18\.2-0 : signedbv\[32\] \. S18\.1\(ς\) ⇒ S18\.2\(ς\[❝main::\$tmp::return_value_function_without_body❞\.❝x❞:=nondet::S18\.2-0\]\)$
 --

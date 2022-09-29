@@ -1,15 +1,15 @@
 CORE broken-smt-backend
 main.c
 --smt2 --outfile -
-\(= \(select array_of\.2 i\) \(ite false #b1 #b0\)\)
-\(= \(select array\.3 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1\)
-\(= \(select array\.3 \(_ bv\d+ 64\)\) \(ite false #b1 #b0\)\)
+\(= \(select array_of\.0 i\) \(ite false #b1 #b0\)\)
+\(= \(select array\.1 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1\)
+\(= \(select array\.1 \(_ bv\d+ 64\)\) \(ite false #b1 #b0\)\)
 ^EXIT=0$
 ^SIGNAL=0$
 --
-\(= \(select array_of\.2 i\) false\)
-\(= \(select array\.3 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1 #b0\)
-\(= \(select array\.3 \(_ bv\d+ 64\)\) false\)
+\(= \(select array_of\.0 i\) false\)
+\(= \(select array\.1 \(\(_ zero_extend 32\) \|main::1::idx!0@1#1\|\)\) #b1 #b0\)
+\(= \(select array\.1 \(_ bv\d+ 64\)\) false\)
 --
 This test checks for correctness of BitVec-array encoding of Boolean arrays.
 

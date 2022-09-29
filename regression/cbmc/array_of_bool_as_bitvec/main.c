@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 __CPROVER_bool w[8];
+__CPROVER_bool v[__CPROVER_constant_infinity_uint];
 
 void main()
 {

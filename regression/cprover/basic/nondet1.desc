@@ -3,13 +3,13 @@ nondet1.c
 --text --solve --inline
 ^EXIT=10$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state, nondet::S18-0 : signedbv\[32\] \. S17\(ς\) ⇒ S18\(ς\[❝main::1::x❞:=nondet::S18-0\]\)$
-^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ \(ς\(❝main::1::x❞\) = 20\)$
-^\(\d+\) S19 = S18$
-^\(\d+\) ∀ ς : state, nondet::S20-0 : signedbv\[32\] \. S19\(ς\) ⇒ S20\(ς\[❝main::1::y❞:=nondet::S20-0\]\)$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ \(ς\(❝main::1::x❞\) = ς\(❝main::1::y❞\)\)$
-^\(\d+\) S21 = S20$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝return'❞:=0\]\)$
+^\(\d+\) ∀ ς : state, nondet::S12-0 : signedbv\[32\] \. S11\(ς\) ⇒ S12\(ς\[❝main::1::x❞:=nondet::S12-0\]\)$
+^\(\d+\) ∀ ς : state \. S12\(ς\) ⇒ \(ς\(❝main::1::x❞\) = 20\)$
+^\(\d+\) S13 = S12$
+^\(\d+\) ∀ ς : state, nondet::S14-0 : signedbv\[32\] \. S13\(ς\) ⇒ S14\(ς\[❝main::1::y❞:=nondet::S14-0\]\)$
+^\(\d+\) ∀ ς : state \. S14\(ς\) ⇒ \(ς\(❝main::1::x❞\) = ς\(❝main::1::y❞\)\)$
+^\(\d+\) S15 = S14$
+^\(\d+\) ∀ ς : state \. S15\(ς\) ⇒ S16\(ς\[❝return'❞:=0\]\)$
 ^\[main\.assertion\.1\] line \d+ property 1: REFUTED$
 ^\[main\.assertion\.2\] line \d+ property 2: REFUTED$
 --

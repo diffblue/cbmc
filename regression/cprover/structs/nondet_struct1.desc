@@ -3,5 +3,5 @@ nondet_struct1.c
 --text --inline
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state, nondet::S17-0 : signedbv\[32\], nondet::S17-1 : signedbv\[32\] \. S16\(ς\) ⇒ S17\(ς\[❝s❞\.❝x❞:=nondet::S17-0\]\[❝s❞\.❝y❞:=nondet::S17-1\]\)$
+^\(\d+\) ∀ ς : state, nondet::S11-0 : signedbv\[32\], nondet::S11-1 : signedbv\[32\] \. S10\(ς\) ⇒ S11\(ς\[❝s❞\.❝x❞:=nondet::S11-0\]\[❝s❞\.❝y❞:=nondet::S11-1\]\)$
 --

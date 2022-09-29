@@ -3,7 +3,7 @@ pointers0.c
 --text --solve --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S17\(ς\) ⇒ S18\(ς\[❝main::1::p❞:=❝main::1::x❞\]\)$
-^\(\d+\) ∀ ς : state \. S18\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = ς\(❝main::1::x❞\)\)$
+^\(\d+\) ∀ ς : state \. S11\(ς\) ⇒ S12\(ς\[❝main::1::p❞:=❝main::1::x❞\]\)$
+^\(\d+\) ∀ ς : state \. S12\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = ς\(❝main::1::x❞\)\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --
