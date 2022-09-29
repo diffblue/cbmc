@@ -271,7 +271,7 @@ var searchData=
   ['used_5fbyt_18938',['used_byt',['../classlinkingt.html#a759150342699d901b37beebcec3ec272',1,'linkingt']]],
   ['used_5flocal_5fnames_18939',['used_local_names',['../classjava__bytecode__convert__methodt.html#a1bad86977856b1567d0c54444a306f1a',1,'java_bytecode_convert_methodt']]],
   ['user_5fdefined_5fconversion_5fsequence_18940',['user_defined_conversion_sequence',['../classcpp__typecheckt.html#aa9cc769f1fa0fc2f21462576704ddb04',1,'cpp_typecheckt']]],
-  ['user_20guide_18941',['User guide',['../user_guide.html',1,'index']]],
+  ['user_20guide_18941',['User Guide',['../user_guide.html',1,'index']]],
   ['user_5fguide_2emd_18942',['user_guide.md',['../user__guide_8md.html',1,'']]],
   ['user_5finput_5ferror_5fexceptiont_18943',['user_input_error_exceptiont',['../classuser__input__error__exceptiont.html',1,'user_input_error_exceptiont'],['../classuser__input__error__exceptiont.html#a0fd45dbb67217c339ed4484cb97e8bbe',1,'user_input_error_exceptiont::user_input_error_exceptiont()']]],
   ['user_5fspecified_5fclinit_5fname_18944',['user_specified_clinit_name',['../java__static__initializers_8cpp.html#aa7b8e625acd192dc3f08859fcf582ddf',1,'user_specified_clinit_name(const irep_idt &amp;class_name):&#160;java_static_initializers.cpp'],['../java__static__initializers_8h.html#aa7b8e625acd192dc3f08859fcf582ddf',1,'user_specified_clinit_name(const irep_idt &amp;class_name):&#160;java_static_initializers.cpp']]],

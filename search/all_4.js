@@ -235,7 +235,7 @@ var searchData=
   ['detect_5ffile_5ftype_8374',['detect_file_type',['../compile_8cpp.html#a3be7dba771785eb0d6eb881e46a7bdd6',1,'compile.cpp']]],
   ['determine_5fresult_8375',['determine_result',['../properties_8cpp.html#a86d68d9c5afa6d4e193fadb8d695ecb5',1,'determine_result(const propertiest &amp;properties):&#160;properties.cpp'],['../properties_8h.html#a86d68d9c5afa6d4e193fadb8d695ecb5',1,'determine_result(const propertiest &amp;properties):&#160;properties.cpp']]],
   ['determinise_8376',['determinise',['../classtrace__automatont.html#a00d3f980c7e6e7f9959dc0b24db8ca6e',1,'trace_automatont']]],
-  ['developer_20guide_8377',['Developer guide',['../developer_guide.html',1,'index']]],
+  ['developer_20guide_8377',['Developer Guide',['../developer_guide.html',1,'index']]],
   ['developer_5fguide_2emd_8378',['developer_guide.md',['../developer__guide_8md.html',1,'']]],
   ['dfs_8379',['dfs',['../structmemory__snapshot__harness__generatort_1_1preordert.html#aedc1b0e9d3bcf9bf9b76a827800ac015',1,'memory_snapshot_harness_generatort::preordert']]],
   ['dfs_5finner_8380',['dfs_inner',['../structmemory__snapshot__harness__generatort_1_1preordert.html#aee563dd091b88e25aca9cb114537bf0d',1,'memory_snapshot_harness_generatort::preordert']]],

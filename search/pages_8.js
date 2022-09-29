@@ -28,5 +28,5 @@ var searchData=
   ['readme_41009',['README',['../group__module__hidden.html',1,'']]],
   ['readme_41010',['README',['../group__module__hidden.html',1,'']]],
   ['readme_41011',['README',['../group__module__hidden.html',1,'']]],
-  ['reference_20guide_41012',['Reference guide',['../reference_guide.html',1,'index']]]
+  ['reference_20guide_41012',['Reference Guide',['../reference_guide.html',1,'index']]]
 ];

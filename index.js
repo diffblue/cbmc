@@ -1,9 +1,9 @@
 var index =
 [
-    [ "Installation", "installation.html", null ],
-    [ "User guide", "user_guide.html", null ],
-    [ "Reference guide", "reference_guide.html", null ],
-    [ "Developer guide", "developer_guide.html", null ],
+    [ "Installation Guide", "installation_guide.html", null ],
+    [ "User Guide", "user_guide.html", null ],
+    [ "Reference Guide", "reference_guide.html", null ],
+    [ "Developer Guide", "developer_guide.html", null ],
     [ "CProver documentation", "cprover_documentation.html", "cprover_documentation" ],
     [ "Contributing documentation", "contributing_documentation.html", null ]
 ];

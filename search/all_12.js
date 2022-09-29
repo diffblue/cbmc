@@ -238,7 +238,7 @@ var searchData=
   ['reference_5fcounting_3c_20object_5fmap_5fdt_2c_20empty_5fobject_5fmap_20_3e_15519',['reference_counting&lt; object_map_dt, empty_object_map &gt;',['../classreference__counting.html',1,'']]],
   ['reference_5fcounting_3c_20ref_5fexpr_5fset_5fdt_20_3e_15520',['reference_counting&lt; ref_expr_set_dt &gt;',['../classreference__counting.html',1,'']]],
   ['reference_5fflag_15521',['REFERENCE_FLAG',['../expr2statement__list_8cpp.html#a1de9f97efed7fa9f8ae45bda8bf9908f',1,'expr2statement_list.cpp']]],
-  ['reference_20guide_15522',['Reference guide',['../reference_guide.html',1,'index']]],
+  ['reference_20guide_15522',['Reference Guide',['../reference_guide.html',1,'index']]],
   ['reference_5fguide_2emd_15523',['reference_guide.md',['../reference__guide_8md.html',1,'']]],
   ['reference_5fid_15524',['reference_id',['../classreference__allocationt.html#adca468059f7364c7e3338f54abf3d7c3',1,'reference_allocationt']]],
   ['reference_5findex_15525',['reference_index',['../classmethod__handle__infot.html#a1b0b27be2bf57b41a186fc3d545e1d3c',1,'method_handle_infot']]],

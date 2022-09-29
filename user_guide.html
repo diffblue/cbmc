@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CBMC: User guide</title>
+<title>CBMC: User Guide</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -89,28 +89,35 @@ $(document).ready(function(){initNavTree('user_guide.html',''); initResizable();
 
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">User guide </div>  </div>
+<div class="title">User Guide </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This is a CBMC user guide.</p>
+<div class="textblock"><p>For a quick start with CBMC on simple problems, read</p>
 <ul>
-<li><a href="cprover-manual/index.html">CProver manual</a></li>
-<li><a href="cprover-manual/md_cbmc-tutorial.html">CProver tutorial</a></li>
-<li><a href="https://model-checking.github.io/cbmc-training">Training material</a></li>
+<li>The <a class="el" href="installation_guide.html">Installation Guide</a></li>
+<li>A <a href="cprover-manual/md_cbmc-tutorial.html">short tutorial</a></li>
+<li>A <a href="cprover-manual/index.html">short manual</a></li>
 </ul>
-<p>Tools:</p>
+<p>For a quick start with CBMC on large software projects, read</p>
 <ul>
-<li><a href="https://model-checking.github.io/cbmc-viewer">CBMC Viewer</a></li>
-<li><a href="https://model-checking.github.io/cbmc-starter-kit">CBMC Starter Kit</a></li>
+<li><a href="https://model-checking.github.io/cbmc-training">Deploying CBMC on industrial software projects</a> describing how to use CBMC as part of routine software development and continuous integration.</li>
 </ul>
-<p>Other tips for using CBMC:</p>
+<p>Two third-party tools simplify using CBMC:</p>
 <ul>
-<li><a class="el" href="memory-analyzer.html">Memory Analyzer</a></li>
-<li><a class="el" href="memory-bounds-checking.html">Memory Bounds Checking</a></li>
-<li><a class="el" href="satabs.html">SATABS</a></li>
+<li><a href="https://model-checking.github.io/cbmc-viewer">CBMC Viewer</a> scans the output of CBMC and produces a browsable summary of its findings.</li>
+<li><a href="https://model-checking.github.io/cbmc-starter-kit">CBMC Starter Kit</a> makes it easy to add CBMC verification to an existing software project.</li>
 </ul>
-<p>This CBMC user guide is a work in progress. Please <a class="el" href="contributing_documentation.html">contribute documentation</a> and help us improve this user guide.</p>
-<p>Last modified: 2022-09-29 19:49:49 +0100 </p>
+<p>Key concepts:</p>
+<ul>
+<li>The <a class="el" href="reference_guide.html">Reference Guide</a> describes CBMC and the CBMC tool chain</li>
+<li>CBMC <a href="cprover-manual/md_api.html">primitives</a> and <a href="cprover-manual/md_memory-primitives.html">memory primitives</a> are useful when writing CBMC assumptions and CBMC assertions.</li>
+<li><a class="el" href="group__goto-programs.html">goto programs</a> are the intermediate representation of C code used by the CBMC tool chain</li>
+<li><a class="el" href="group__goto-cc.html">goto-cc</a> (<a href="man/goto-cc.html">man page</a>) compiles C into the goto program used by CBMC. It is intended to be a drop-in replacement for <code>gcc</code> and <code>cl</code>.</li>
+<li><a class="el" href="group__goto-instrument.html">goto-instrument</a> (<a href="man/goto-instrument.html">man page</a>) is a collection of tools for modifying goto programs. One example is unwinding loops in a goto program.</li>
+<li><a class="el" href="group__goto-analyzer.html">goto-analyser</a> (<a href="man/goto-analyzer.html">man page</a>) is a collection of tools for analyzing goto programs. One example is finding the set of reachable functions in a goto program.</li>
+</ul>
+<p>Please <a class="el" href="contributing_documentation.html">contribute documentation</a> when you find mistakes or missing information to help us improve this user guide.</p>
+<p>Last modified: 2022-09-29 23:03:23 +0200 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

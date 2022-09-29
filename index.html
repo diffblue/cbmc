@@ -92,15 +92,23 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="title">Documentation </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><ul>
-<li><a class="el" href="installation.html">Installation</a></li>
-<li><a class="el" href="user_guide.html">User guide</a></li>
-<li><a class="el" href="reference_guide.html">Reference guide</a></li>
-<li><a class="el" href="developer_guide.html">Developer guide</a></li>
+<div class="textblock"><p><a href="https://github.com/diffblue/cbmc">CBMC</a> is a model checker for C. This means that CBMC will explore all possible paths through your code on all possible inputs, and will check that all assertions in your code are true. CBMC can also check for the possibility of memory safety errors (like buffer overflow) and for instances of undefined behavior (like signed integer overflow). CBMC is a <em>bounded</em> model checker, however, and using CBMC may require restricting inputs to inputs of some bounded size. The result is assurance that your code behaves as expected for all such inputs.</p>
+<p>This page is the root of all documentation for CBMC:</p>
+<ul>
+<li>The <a class="el" href="installation_guide.html">Installation Guide</a> describes how to install CBMC</li>
+<li>The <a class="el" href="user_guide.html">User Guide</a> describes what you need to know to use CBMC</li>
+<li>The <a class="el" href="reference_guide.html">Reference Guide</a> describes the CBMC tools</li>
+<li>The <a class="el" href="developer_guide.html">Developer Guide</a> describes what you need to know to contribute to CBMC</li>
+</ul>
+<p>CBMC documentation has traditionally been generated from doxygen comments in the source code and a few additional markdown files. Over time, we will move this documentation into the guides listed above, but for now, this source code documentation is avilable here:</p>
+<ul>
 <li><a class="el" href="cprover_documentation.html">CProver documentation</a></li>
+</ul>
+<p>CBMC documentation will never be done. If you learn something interesting or find a mistake, please consider contributing documentation with a <a href="https://github.com/diffblue/cbmc/pulls">pull request</a> or describing the problem to us by filing an <a href="https://github.com/diffblue/cbmc/issues">issue</a>. Some advice on contributing documentation is available here:</p>
+<ul>
 <li><a class="el" href="contributing_documentation.html">Contributing documentation</a></li>
 </ul>
-<p>Last modified: 2022-09-29 19:49:49 +0100 </p>
+<p>Last modified: 2022-09-29 23:03:23 +0200 </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->

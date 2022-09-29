@@ -202,7 +202,7 @@ var NAVTREEINDEX96 =
 "insert__final__assert__false_8h.html#a3ec4fd08b258466818fe54521071dd00":[5,0,2,13,61,3],
 "insert__final__assert__false_8h.html#a9dadc09501d038d3e7d221ba9bf41edd":[5,0,2,13,61,2],
 "insert__final__assert__false_8h_source.html":[5,0,2,13,61],
-"installation.html":[0,0],
+"installation_guide.html":[0,0],
 "instrument__contracts_8cpp.html":[5,0,2,6,29],
 "instrument__contracts_8cpp.html#a22ae418d9f6477b8e8fd131bdd3e2d51":[5,0,2,6,29,4],
 "instrument__contracts_8cpp.html#a2f11c848825c7cdef893b1955e81afb1":[5,0,2,6,29,13],
