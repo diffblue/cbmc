@@ -1,3 +1,5 @@
-\page installation Installation
+\page installation_guide Installation Guide
 
-CBMC installation instructions are on the [CBMC release page](https://github.com/diffblue/cbmc/releases/latest).
+The [CBMC release page](https://github.com/diffblue/cbmc/releases/latest)
+gives instructions for installing CBMC on MacOS, Ubuntu, Windows, and
+Docker.
