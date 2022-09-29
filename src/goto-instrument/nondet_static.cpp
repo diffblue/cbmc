@@ -108,8 +108,12 @@ static void nondet_static(
     {
       const symbol_exprt &fsym = to_symbol_expr(instruction.call_function());
 
-      if(has_prefix(id2string(fsym.get_identifier()), "#ini#"))
+      // see cpp/cpp_typecheck.cpp, which creates initialization functions
+      if(has_prefix(
+           id2string(fsym.get_identifier()), "#cpp_dynamic_initialization#"))
+      {
         nondet_static(ns, goto_functions, fsym.get_identifier());
+      }
     }
   }
 
