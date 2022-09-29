@@ -219,6 +219,12 @@ public:
     codet &expression,
     source_locationt location,
     const irep_idt &mode);
+
+  // for "auxiliary" functions generate contract constrainst
+  goto_convertt &get_converter()
+  {
+    return converter;
+  }
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H

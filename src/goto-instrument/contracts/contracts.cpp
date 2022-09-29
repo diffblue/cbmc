@@ -654,6 +654,39 @@ code_contractst::create_ensures_instruction(
   return std::make_pair(std::move(ensures_program), std::move(history));
 }
 
+/// This function generates instructions for all contract constraint, i.e.,
+/// assumptions and assertions based on requires and ensures clauses.
+static void generate_contract_constraints(
+  code_contractst &contract,
+  exprt &instantiated_clause,
+  const irep_idt &mode,
+  const std::function<void(goto_programt &)> &is_fresh_update,
+  goto_programt &program,
+  const source_locationt &location)
+{
+  if(
+    has_subexpr(instantiated_clause, ID_exists) ||
+    has_subexpr(instantiated_clause, ID_forall))
+  {
+    contract.add_quantified_variable(instantiated_clause, mode);
+  }
+
+  goto_programt constraint;
+  if(location.get_property_class() == ID_assume)
+  {
+    contract.get_converter().goto_convert(
+      code_assumet(instantiated_clause), constraint, mode);
+  }
+  else
+  {
+    contract.get_converter().goto_convert(
+      code_assertt(instantiated_clause), constraint, mode);
+  }
+  constraint.instructions.back().source_location_nonconst() = location;
+  is_fresh_update(constraint);
+  program.destructive_append(constraint);
+}
+
 static const code_with_contract_typet &
 get_contract(const irep_idt &function, const namespacet &ns)
 {
@@ -768,36 +801,27 @@ void code_contractst::apply_function_contract(
   is_fresh.create_declarations();
   is_fresh.add_memory_map_decl(new_program);
 
-  // Insert assertion of the precondition immediately before the call site.
+  // Generate: assert(requires)
   for(const auto &clause : type.requires())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
-    if(!instantiated_clause.is_true())
-    {
-      if(
-        has_subexpr(instantiated_clause, ID_exists) ||
-        has_subexpr(instantiated_clause, ID_forall))
-        add_quantified_variable(instantiated_clause, mode);
-
-      goto_programt assertion;
-      converter.goto_convert(
-        code_assertt(instantiated_clause), assertion, mode);
-      assertion.instructions.back().source_location_nonconst() =
-        clause.source_location();
-      assertion.instructions.back().source_location_nonconst().set_line(
-        location.get_line());
-      assertion.instructions.back().source_location_nonconst().set_comment(
-        std::string("Check ")
-          .append(target_function.c_str())
-          .append("'s requires clause in ")
-          .append(function.c_str()));
-      assertion.instructions.back()
-        .source_location_nonconst()
-        .set_property_class(ID_precondition);
-      is_fresh.update_requires(assertion);
-      new_program.destructive_append(assertion);
-    }
+    source_locationt _location = clause.source_location();
+    _location.set_line(location.get_line());
+    _location.set_comment(std::string("Check requires clause of ")
+                            .append(target_function.c_str())
+                            .append(" in ")
+                            .append(function.c_str()));
+    _location.set_property_class(ID_precondition);
+    generate_contract_constraints(
+      *this,
+      instantiated_clause,
+      mode,
+      [&is_fresh](goto_programt &requires) {
+        is_fresh.update_requires(requires);
+      },
+      new_program,
+      _location);
   }
 
   // Translate requires_contract(ptr, contract) clauses to assertions
@@ -812,26 +836,25 @@ void code_contractst::apply_function_contract(
   }
 
   // Gather all the instructions required to handle history variables
-  // as well as the ensures clause
-  std::vector<std::pair<goto_programt, goto_programt>> ensures_clauses;
-  for(const auto &clause : type.ensures())
+  std::vector<exprt> instantiated_ensures_clauses;
+  for(auto clause : type.ensures())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
-    if(!instantiated_clause.is_false())
-    {
-      if(
-        has_subexpr(instantiated_clause, ID_exists) ||
-        has_subexpr(instantiated_clause, ID_forall))
-        add_quantified_variable(instantiated_clause, mode);
-
-      auto assumption = code_assumet(instantiated_clause);
-      ensures_clauses.push_back(
-        create_ensures_instruction(assumption, clause.source_location(), mode));
-
-      // add all the history variable initialization instructions
-      new_program.destructive_append(ensures_clauses.back().second);
-    }
+    instantiated_clause.add_source_location() = clause.source_location();
+    std::map<exprt, exprt> parameter2history;
+    goto_programt history;
+    // Find and replace "old" expression in the "expression" variable
+    replace_history_parameter(
+      instantiated_clause,
+      parameter2history,
+      clause.source_location(),
+      mode,
+      history,
+      ID_old);
+    instantiated_ensures_clauses.push_back(instantiated_clause);
+    // Add all the history variable initialization instructions
+    new_program.destructive_append(history);
   }
 
   // ASSIGNS clause should not refer to any quantified variables,
@@ -877,12 +900,26 @@ void code_contractst::apply_function_contract(
   // Insert havoc instructions immediately before the call site.
   new_program.destructive_append(havoc_instructions);
 
-  // To remove the function call, insert statements related to the assumption.
-  // Then, replace the function call with a SKIP statement.
-  for(auto &clause : ensures_clauses)
+  // Generate: assume(ensures)
+  for(auto &clause : instantiated_ensures_clauses)
   {
-    is_fresh.update_ensures(clause.first);
-    new_program.destructive_append(clause.first);
+    if(clause.is_false())
+    {
+      throw invalid_input_exceptiont(
+        std::string("Attempt to assume false at ")
+          .append(clause.source_location().as_string())
+          .append(".\nPlease update ensures clause to avoid vacuity."));
+    }
+    source_locationt _location = clause.source_location();
+    _location.set_comment("Assume ensures clause");
+    _location.set_property_class(ID_assume);
+    generate_contract_constraints(
+      *this,
+      clause,
+      mode,
+      [&is_fresh](goto_programt &ensures) { is_fresh.update_ensures(ensures); },
+      new_program,
+      _location);
   }
 
   // Translate ensures_contract(ptr, contract) clauses to assumptions
@@ -1446,57 +1483,47 @@ void code_contractst::add_contract_check(
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
-
-    if(!instantiated_clause.is_false())
+    if(instantiated_clause.is_false())
     {
-      if(
-        has_subexpr(instantiated_clause, ID_exists) ||
-        has_subexpr(instantiated_clause, ID_forall))
-        add_quantified_variable(instantiated_clause, function_symbol.mode);
-
-      goto_programt assumption;
-      converter.goto_convert(
-        code_assumet(instantiated_clause), assumption, function_symbol.mode);
-
-      visitor.update_requires(assumption);
-      check.destructive_append(assumption);
+      throw invalid_input_exceptiont(
+        std::string("Attempt to assume false at ")
+          .append(clause.source_location().as_string())
+          .append(".\nPlease update requires clause to avoid vacuity."));
     }
+    source_locationt _location = clause.source_location();
+    _location.set_comment("Assume requires clause");
+    _location.set_property_class(ID_assume);
+    generate_contract_constraints(
+      *this,
+      instantiated_clause,
+      function_symbol.mode,
+      [&visitor](goto_programt &requires) {
+        visitor.update_requires(requires);
+      },
+      check,
+      _location);
   }
 
   // Gather all the instructions required to handle history variables
-  // as well as the ensures clause
-  std::vector<std::pair<goto_programt, goto_programt>> ensures_clauses;
-  for(const auto &clause : code_type.ensures())
+  std::vector<exprt> instantiated_ensures_clauses;
+  for(auto clause : code_type.ensures())
   {
-    // Generate: copies for history variables
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
-
-    if(!instantiated_clause.is_true())
-    {
-      if(
-        has_subexpr(instantiated_clause, ID_exists) ||
-        has_subexpr(instantiated_clause, ID_forall))
-        add_quantified_variable(instantiated_clause, function_symbol.mode);
-
-      // get all the relevant instructions related to history variables
-      auto assertion = code_assertt(instantiated_clause);
-      assertion.add_source_location() = clause.source_location();
-      ensures_clauses.push_back(create_ensures_instruction(
-        assertion, clause.source_location(), function_symbol.mode));
-      ensures_clauses.back()
-        .first.instructions.back()
-        .source_location_nonconst()
-        .set_comment("Check ensures clause");
-      ensures_clauses.back()
-        .first.instructions.back()
-        .source_location_nonconst()
-        .set_property_class(ID_postcondition);
-
-      // add all the history variable initializations
-      visitor.update_ensures(ensures_clauses.back().first);
-      check.destructive_append(ensures_clauses.back().second);
-    }
+    instantiated_clause.add_source_location() = clause.source_location();
+    std::map<exprt, exprt> parameter2history;
+    goto_programt history;
+    // Find and replace "old" expression in the "expression" variable
+    replace_history_parameter(
+      instantiated_clause,
+      parameter2history,
+      clause.source_location(),
+      function_symbol.mode,
+      history,
+      ID_old);
+    instantiated_ensures_clauses.push_back(instantiated_clause);
+    // Add all the history variable initialization instructions
+    check.destructive_append(history);
   }
 
   // Translate requires_contract(ptr, contract) clauses to assumptions
@@ -1513,9 +1540,18 @@ void code_contractst::add_contract_check(
   check.add(goto_programt::make_function_call(call, source_location));
 
   // Generate: assert(ensures)
-  for(auto &pair : ensures_clauses)
+  for(auto &clause : instantiated_ensures_clauses)
   {
-    check.destructive_append(pair.first);
+    source_locationt _location = clause.source_location();
+    _location.set_comment("Check ensures clause");
+    _location.set_property_class(ID_postcondition);
+    generate_contract_constraints(
+      *this,
+      clause,
+      function_symbol.mode,
+      [&visitor](goto_programt &ensures) { visitor.update_ensures(ensures); },
+      check,
+      _location);
   }
 
   // Translate ensures_contract(ptr, contract) clauses to assertions
