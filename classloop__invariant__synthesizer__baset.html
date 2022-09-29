@@ -125,10 +125,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a67f33d4934b88aa3fc5e26377531118c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classloop__invariant__synthesizer__baset.html#a67f33d4934b88aa3fc5e26377531118c">~loop_invariant_synthesizer_baset</a> ()=default</td></tr>
 <tr class="separator:a67f33d4934b88aa3fc5e26377531118c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6d597b748530c23a9ccbec82c641ed2"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classloop__invariant__synthesizer__baset.html#ac6d597b748530c23a9ccbec82c641ed2">synthesize_all</a> ()=0</td></tr>
-<tr class="memdesc:ac6d597b748530c23a9ccbec82c641ed2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synthesize loop invariants with which all checks in <code>goto_model</code> succeed.  <a href="classloop__invariant__synthesizer__baset.html#ac6d597b748530c23a9ccbec82c641ed2">More...</a><br /></td></tr>
+<tr class="memdesc:ac6d597b748530c23a9ccbec82c641ed2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synthesize loop invariants that are inductive in the given GOTO program.  <a href="classloop__invariant__synthesizer__baset.html#ac6d597b748530c23a9ccbec82c641ed2">More...</a><br /></td></tr>
 <tr class="separator:ac6d597b748530c23a9ccbec82c641ed2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e60e5a6edfc0b561837c099618a7821"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classloop__invariant__synthesizer__baset.html#a8e60e5a6edfc0b561837c099618a7821">synthesize</a> (<a class="el" href="structloop__idt.html">loop_idt</a>)=0</td></tr>
-<tr class="memdesc:a8e60e5a6edfc0b561837c099618a7821"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synthesize loop invariant for a specified loop in the <code>goto_model</code>  <a href="classloop__invariant__synthesizer__baset.html#a8e60e5a6edfc0b561837c099618a7821">More...</a><br /></td></tr>
+<tr class="memdesc:a8e60e5a6edfc0b561837c099618a7821"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synthesize loop invariant for a specified loop in the <code>goto_model</code>.  <a href="classloop__invariant__synthesizer__baset.html#a8e60e5a6edfc0b561837c099618a7821">More...</a><br /></td></tr>
 <tr class="separator:a8e60e5a6edfc0b561837c099618a7821"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
@@ -233,7 +233,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Synthesize loop invariant for a specified loop in the <code>goto_model</code> </p>
+<p>Synthesize loop invariant for a specified loop in the <code>goto_model</code>. </p>
 
 <p>Implemented in <a class="el" href="classenumerative__loop__invariant__synthesizert.html#a0601b942684ec488d9d97869f8da3f35">enumerative_loop_invariant_synthesizert</a>.</p>
 
@@ -262,8 +262,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Synthesize loop invariants with which all checks in <code>goto_model</code> succeed. </p>
-<p>The result is a map from <code><a class="el" href="structloop__idt.html" title="Loop id used to identify loops.">loop_idt</a></code> ids of loops to <code>exprt</code> the goto-expression representation of synthesized invariants. </p>
+<p>Synthesize loop invariants that are inductive in the given GOTO program. </p>
+<p>The result is a map from <code><a class="el" href="structloop__idt.html" title="Loop id used to identify loops.">loop_idt</a></code> ids of loops to <code>exprt</code> the GOTO-expression representation of synthesized invariants. </p>
 
 <p>Implemented in <a class="el" href="classenumerative__loop__invariant__synthesizert.html#a2c1f6ee713cb0c8d2f630947cfea6d01">enumerative_loop_invariant_synthesizert</a>.</p>
 
@@ -290,7 +290,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="loop__invariant__synthesizer__base_8h_source.html#l00050">50</a> of file <a class="el" href="loop__invariant__synthesizer__base_8h_source.html">loop_invariant_synthesizer_base.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="loop__invariant__synthesizer__base_8h_source.html#l00051">51</a> of file <a class="el" href="loop__invariant__synthesizer__base_8h_source.html">loop_invariant_synthesizer_base.h</a>.</p>
 
 </div>
 </div>
@@ -314,7 +314,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="loop__invariant__synthesizer__base_8h_source.html#l00051">51</a> of file <a class="el" href="loop__invariant__synthesizer__base_8h_source.html">loop_invariant_synthesizer_base.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="loop__invariant__synthesizer__base_8h_source.html#l00052">52</a> of file <a class="el" href="loop__invariant__synthesizer__base_8h_source.html">loop_invariant_synthesizer_base.h</a>.</p>
 
 </div>
 </div>
