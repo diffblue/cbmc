@@ -21,8 +21,10 @@ Author: Qinheping Hu
 class messaget;
 
 /// Enumerative loop invariant synthesizers.
-/// It handles `goto_model` containing only checks instrumented by
+/// It is designed for `goto_model` containing only checks instrumented by
 /// `goto-instrument` with the `--pointer-check` flag.
+/// When other checks present, it will just enumerate candidates and check
+/// if they are valid.
 class enumerative_loop_invariant_synthesizert
   : public loop_invariant_synthesizer_baset
 {
@@ -34,6 +36,8 @@ public:
   {
   }
 
+  /// This synthesizer guarantees that, with the synthesized loop invariants,
+  /// all checks in the annotated GOTO program pass.
   invariant_mapt synthesize_all() override;
   exprt synthesize(loop_idt loop_id) override;
 
