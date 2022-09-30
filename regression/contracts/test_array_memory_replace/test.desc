@@ -3,7 +3,7 @@ main.c
 --replace-call-with-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
-\[foo.precondition.\d+\] line \d+ Check foo's requires clause in main: SUCCESS
+\[foo.precondition.\d+\] line \d+ Check requires clause of foo in main: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion o >\= 10 \&\& o \=\= \*n \+ 5: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion n\[9\] == 113: SUCCESS
 ^VERIFICATION SUCCESSFUL$
