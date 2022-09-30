@@ -55,4 +55,10 @@ else()
       ${CMAKE_BINARY_DIR}/bin/ls_parse.py
     DESTINATION
       ${CMAKE_INSTALL_BINDIR})
+
+  # Man page
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING REGEX "goto-(cc|gcc|ld).*")
 endif()

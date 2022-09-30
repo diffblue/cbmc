@@ -25,3 +25,11 @@ target_link_libraries(janalyzer-lib
 add_executable(janalyzer janalyzer_main.cpp)
 target_link_libraries(janalyzer janalyzer-lib)
 install(TARGETS janalyzer DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Man page
+if(NOT WIN32)
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING PATTERN "janalyzer*")
+endif()

@@ -25,3 +25,11 @@ target_link_libraries(jdiff-lib
 add_executable(jdiff jdiff_main.cpp)
 target_link_libraries(jdiff jdiff-lib)
 install(TARGETS jdiff DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Man page
+if(NOT WIN32)
+  install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING PATTERN "jdiff*")
+endif()
