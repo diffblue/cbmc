@@ -115,6 +115,9 @@ eager_multi_path_symex_checkert::operator()(propertiest &properties)
 
         // We convert the assertions in a new context.
         property_decider.get_stack_decision_procedure().push();
+        prop_conv_solvert *maybe_prop_conv = dynamic_cast<prop_conv_solvert*>(&property_decider.get_decision_procedure());
+        assert(maybe_prop_conv);
+        maybe_prop_conv->post_processing_done = false;
         equation.convert_assertions(
           property_decider.get_decision_procedure(), false);
         property_decider.convert_goals();

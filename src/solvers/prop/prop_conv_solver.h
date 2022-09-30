@@ -104,8 +104,8 @@ public:
     return dynamic_cast<hardness_collectort *>(&prop);
   }
 
-protected:
   bool post_processing_done = false;
+protected:
 
   /// Get a _boolean_ value from the model if the formula is satisfiable.
   /// If the argument is not a boolean expression from the formula,
