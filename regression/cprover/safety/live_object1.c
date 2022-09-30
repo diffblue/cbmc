@@ -1,6 +1,6 @@
 int main()
 {
-  void *p, *q;
+  char *p, *q;
   // functional consistency of live_object
   __CPROVER_assume(__CPROVER_LIVE_OBJECT(p));
   __CPROVER_assume(p == q);
