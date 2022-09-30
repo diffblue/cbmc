@@ -631,27 +631,18 @@ void code_contractst::replace_history_parameter(
   }
 }
 
-std::pair<goto_programt, goto_programt>
-code_contractst::create_ensures_instruction(
-  codet &expression,
-  source_locationt location,
-  const irep_idt &mode)
+void code_contractst::generate_history_variables_initialization(
+  exprt &clause,
+  const irep_idt &mode,
+  goto_programt &program)
 {
   std::map<exprt, exprt> parameter2history;
   goto_programt history;
-
   // Find and replace "old" expression in the "expression" variable
   replace_history_parameter(
-    expression, parameter2history, location, mode, history, ID_old);
-
-  // Create instructions corresponding to the ensures clause
-  goto_programt ensures_program;
-  converter.goto_convert(expression, ensures_program, mode);
-
-  // return a pair containing:
-  // 1. instructions corresponding to the ensures clause
-  // 2. instructions related to initializing the history variables
-  return std::make_pair(std::move(ensures_program), std::move(history));
+    clause, parameter2history, clause.source_location(), mode, history, ID_old);
+  // Add all the history variable initialization instructions
+  program.destructive_append(history);
 }
 
 /// This function generates instructions for all contract constraint, i.e.,
@@ -835,26 +826,16 @@ void code_contractst::apply_function_contract(
       new_program);
   }
 
-  // Gather all the instructions required to handle history variables
-  std::vector<exprt> instantiated_ensures_clauses;
+  // Generate all the instructions required to initialize history variables
+  exprt::operandst instantiated_ensures_clauses;
   for(auto clause : type.ensures())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
     instantiated_clause.add_source_location() = clause.source_location();
-    std::map<exprt, exprt> parameter2history;
-    goto_programt history;
-    // Find and replace "old" expression in the "expression" variable
-    replace_history_parameter(
-      instantiated_clause,
-      parameter2history,
-      clause.source_location(),
-      mode,
-      history,
-      ID_old);
+    generate_history_variables_initialization(
+      instantiated_clause, mode, new_program);
     instantiated_ensures_clauses.push_back(instantiated_clause);
-    // Add all the history variable initialization instructions
-    new_program.destructive_append(history);
   }
 
   // ASSIGNS clause should not refer to any quantified variables,
@@ -1504,26 +1485,16 @@ void code_contractst::add_contract_check(
       _location);
   }
 
-  // Gather all the instructions required to handle history variables
-  std::vector<exprt> instantiated_ensures_clauses;
+  // Generate all the instructions required to initialize history variables
+  exprt::operandst instantiated_ensures_clauses;
   for(auto clause : code_type.ensures())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
     instantiated_clause.add_source_location() = clause.source_location();
-    std::map<exprt, exprt> parameter2history;
-    goto_programt history;
-    // Find and replace "old" expression in the "expression" variable
-    replace_history_parameter(
-      instantiated_clause,
-      parameter2history,
-      clause.source_location(),
-      function_symbol.mode,
-      history,
-      ID_old);
+    generate_history_variables_initialization(
+      instantiated_clause, function_symbol.mode, check);
     instantiated_ensures_clauses.push_back(instantiated_clause);
-    // Add all the history variable initialization instructions
-    check.destructive_append(history);
   }
 
   // Translate requires_contract(ptr, contract) clauses to assumptions

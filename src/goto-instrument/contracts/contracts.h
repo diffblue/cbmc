@@ -212,13 +212,12 @@ public:
     goto_programt &history,
     const irep_idt &id);
 
-  /// This function creates and returns an instruction that corresponds to the
-  /// ensures clause. It also returns a list of instructions related to
-  /// initializing history variables, if required.
-  std::pair<goto_programt, goto_programt> create_ensures_instruction(
-    codet &expression,
-    source_locationt location,
-    const irep_idt &mode);
+  /// This function generates all the instructions required to initialize
+  /// history variables.
+  void generate_history_variables_initialization(
+    exprt &clause,
+    const irep_idt &mode,
+    goto_programt &program);
 
   // for "auxiliary" functions generate contract constrainst
   goto_convertt &get_converter()
