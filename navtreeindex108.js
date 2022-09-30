@@ -1,5 +1,6 @@
 var NAVTREEINDEX108 =
 {
+"pointer__expr_8h.html#ad1089e5afb8cd6fe844213ec213988fd":[5,0,2,27,154,67],
 "pointer__expr_8h.html#ad1d824f099842e183b27ef368424754a":[5,0,2,27,154,103],
 "pointer__expr_8h.html#ada964afd9012cac10beb841dca10865e":[5,0,2,27,154,35],
 "pointer__expr_8h.html#adc1e80fd323a342b9d1adffddc346f06":[5,0,2,27,154,92],
@@ -248,6 +249,5 @@ var NAVTREEINDEX108 =
 "qdimacs__cnf_8h_source.html":[5,0,2,24,5,18],
 "qdimacs__core_8cpp.html":[5,0,2,24,5,19],
 "qdimacs__core_8cpp_source.html":[5,0,2,24,5,19],
-"qdimacs__core_8h.html":[5,0,2,24,5,20],
-"qdimacs__core_8h_source.html":[5,0,2,24,5,20]
+"qdimacs__core_8h.html":[5,0,2,24,5,20]
 };

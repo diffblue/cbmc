@@ -108,6 +108,8 @@ $(document).ready(function(){initNavTree('dump__c_8cpp.html',''); initResizable(
 <code>#include &lt;<a class="el" href="replace__symbol_8h_source.html">util/replace_symbol.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string__utils_8h_source.html">util/string_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr2c_8h_source.html">ansi-c/expr2c.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="type2name_8h_source.html">ansi-c/type2name.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="cpp__type2name_8h_source.html">cpp/cpp_type2name.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr2cpp_8h_source.html">cpp/expr2cpp.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="goto__program2code_8h_source.html">goto_program2code.h</a>&quot;</code><br />
@@ -116,7 +118,7 @@ $(document).ready(function(){initNavTree('dump__c_8cpp.html',''); initResizable(
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dump__c_8cpp__incl.svg" width="2896" height="708"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dump__c_8cpp__incl.svg" width="3244" height="694"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -124,6 +126,8 @@ $(document).ready(function(){initNavTree('dump__c_8cpp.html',''); initResizable(
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ac7a230bc040ed013e17e03eb7eae526c"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dump__c_8cpp.html#ac7a230bc040ed013e17e03eb7eae526c">clean_identifier</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
+<tr class="separator:ac7a230bc040ed013e17e03eb7eae526c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b9ba6f7b12f199fea8ef3fafdc4e4f2"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dump__c_8cpp.html#a9b9ba6f7b12f199fea8ef3fafdc4e4f2">operator&lt;&lt;</a> (std::ostream &amp;out, <a class="el" href="classdump__ct.html">dump_ct</a> &amp;src)</td></tr>
 <tr class="separator:a9b9ba6f7b12f199fea8ef3fafdc4e4f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fcb814b278f93a7a377236fac507068"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dump__c_8cpp.html#a5fcb814b278f93a7a377236fac507068">find_block_position_rec</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, <a class="el" href="classcodet.html">codet</a> &amp;root, <a class="el" href="classcode__blockt.html">code_blockt</a> *&amp;dest, exprt::operandst::iterator &amp;before)</td></tr>
@@ -144,6 +148,34 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ac7a230bc040ed013e17e03eb7eae526c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7a230bc040ed013e17e03eb7eae526c">&#9670;&nbsp;</a></span>clean_identifier()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::string clean_identifier </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l00035">35</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aac7c744551a4c932dd16e1634f506385"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aac7c744551a4c932dd16e1634f506385">&#9670;&nbsp;</a></span>dump_c()</h2>
 
@@ -194,7 +226,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01591">1591</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01642">1642</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -254,7 +286,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01626">1626</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01677">1677</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +340,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01604">1604</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01655">1655</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -335,7 +367,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01546">1546</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01597">1597</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -385,7 +417,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01140">1140</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01185">1185</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -423,7 +455,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01618">1618</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l01669">1669</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +493,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l00043">43</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dump__c_8cpp_source.html#l00067">67</a> of file <a class="el" href="dump__c_8cpp_source.html">dump_c.cpp</a>.</p>
 
 </div>
 </div>

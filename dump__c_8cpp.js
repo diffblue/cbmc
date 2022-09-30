@@ -1,5 +1,6 @@
 var dump__c_8cpp =
 [
+    [ "clean_identifier", "dump__c_8cpp.html#ac7a230bc040ed013e17e03eb7eae526c", null ],
     [ "dump_c", "dump__c_8cpp.html#aac7c744551a4c932dd16e1634f506385", null ],
     [ "dump_c_type_header", "dump__c_8cpp.html#abb65aa9c615f2e5faf7db88a6a425e6c", null ],
     [ "dump_cpp", "dump__c_8cpp.html#aaa10c9d655bc66bf660907c9e5e6fa55", null ],

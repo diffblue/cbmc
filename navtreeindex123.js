@@ -1,5 +1,6 @@
 var NAVTREEINDEX123 =
 {
+"structlevenshtein__automatont.html":[4,0,715],
 "structlevenshtein__automatont.html#a14a1f7ade33a02bf7e11ce2b404f0aa4":[4,0,715,1],
 "structlevenshtein__automatont.html#a21b9fe937c616c76cf810639a94e17e7":[4,0,715,0],
 "structlevenshtein__automatont.html#a34b174492a1a57c43e31b13f344710da":[4,0,715,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX123 =
 "structoperator__entryt.html":[4,0,834],
 "structoperator__entryt.html#a4db70adbed8a9b2af904d52606dc90f9":[4,0,834,1],
 "structoperator__entryt.html#ad368075a67bca4742770ae44fd83e1f8":[4,0,834,0],
-"structosx__mach__o__readert_1_1sectiont.html":[4,0,838,0],
-"structosx__mach__o__readert_1_1sectiont.html#a03dedf6a1dbe06a06263c1ac89ee9cd0":[4,0,838,0,0]
+"structosx__mach__o__readert_1_1sectiont.html":[4,0,838,0]
 };
