@@ -251,7 +251,7 @@ void string_instrumentationt::do_function_call(
       do_sprintf(dest, target, lhs, arguments);
     else if(identifier=="snprintf")
       do_snprintf(dest, target, lhs, arguments);
-    else if(identifier=="fscanf")
+    else if(identifier == "fscanf" || identifier == "__isoc99_fscanf")
       do_fscanf(dest, target, lhs, arguments);
 
     remove_skip(dest);
