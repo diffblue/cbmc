@@ -43,6 +43,7 @@ src/ansi-c/gcc_builtin_headers_generic.inc
 src/ansi-c/gcc_builtin_headers_ia32-2.inc
 src/ansi-c/gcc_builtin_headers_ia32-3.inc
 src/ansi-c/gcc_builtin_headers_ia32-4.inc
+src/ansi-c/gcc_builtin_headers_ia32-5.inc
 src/ansi-c/gcc_builtin_headers_ia32.inc
 src/ansi-c/gcc_builtin_headers_math.inc
 src/ansi-c/gcc_builtin_headers_mem_string.inc
@@ -81,6 +82,7 @@ src/ansi-c/ansi_c_y.output
 src/ansi-c/ansi_c_y.tab.cpp
 src/ansi-c/ansi_c_y.tab.h
 src/assembler/assembler_lex.yy.cpp
+src/crangler/c_lex.yy.cpp
 src/jsil/jsil_lex.yy.cpp
 src/jsil/jsil_y.output
 src/jsil/jsil_y.tab.cpp
@@ -105,6 +107,8 @@ src/memory-models/mm_y.tab.h
 # binaries
 src/cbmc/cbmc
 src/cbmc/cbmc.exe
+src/cprover/cprover
+src/crangler/crangler
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
 src/goto-cc/goto-cc
