@@ -17,6 +17,8 @@ Date:   December 2014
 
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
+#include <util/prefix.h>
+#include <util/range.h>
 #include <util/std_code.h>
 #include <util/string_constant.h>
 
@@ -36,22 +38,26 @@ public:
   void operator()()
   {
     for(auto &f : goto_functions.function_map)
-      process_function(f.second);
+      process_function(f.first, f.second);
   }
 
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 
-  void process_function(goto_functionst::goto_functiont &);
+  void process_function(const irep_idt &, goto_functionst::goto_functiont &);
 
   void process_instruction(
+    const irep_idt &function_id,
     goto_programt::instructiont &instruction,
     goto_programt &dest);
 
   void process_instruction_gcc(const code_asm_gcct &, goto_programt &dest);
 
-  void process_instruction_msc(const code_asmt &, goto_programt &dest);
+  void process_instruction_msc(
+    const irep_idt &,
+    const code_asmt &,
+    goto_programt &dest);
 
   void gcc_asm_function_call(
     const irep_idt &function_base_name,
@@ -60,6 +66,7 @@ protected:
 
   void msc_asm_function_call(
     const irep_idt &function_base_name,
+    const exprt::operandst &operands,
     const code_asmt &code,
     goto_programt &dest);
 };
@@ -102,7 +109,10 @@ void remove_asmt::gcc_asm_function_call(
     }
   }
 
-  code_typet fkt_type({}, empty_typet());
+  code_typet fkt_type{
+    code_typet::parameterst{
+      arguments.size(), code_typet::parametert{void_pointer}},
+    empty_typet()};
 
   symbol_exprt fkt(function_identifier, fkt_type);
 
@@ -138,23 +148,33 @@ void remove_asmt::gcc_asm_function_call(
 /// assembly statement
 ///
 /// \param function_base_name: Name of the function to call
+/// \param operands: Arguments to be passed to function
 /// \param code: msc-style inline assembly statement to translate to function
 ///   call
 /// \param dest: Goto program to append the function call to
 void remove_asmt::msc_asm_function_call(
   const irep_idt &function_base_name,
+  const exprt::operandst &operands,
   const code_asmt &code,
   goto_programt &dest)
 {
   irep_idt function_identifier = function_base_name;
 
+  code_function_callt::argumentst arguments;
+
   const typet void_pointer = pointer_type(empty_typet());
 
-  code_typet fkt_type({}, empty_typet());
+  for(const auto &op : operands)
+    arguments.push_back(typecast_exprt::conditional_cast(op, void_pointer));
+
+  code_typet fkt_type{
+    code_typet::parameterst{
+      arguments.size(), code_typet::parametert{void_pointer}},
+    empty_typet()};
 
   symbol_exprt fkt(function_identifier, fkt_type);
 
-  code_function_callt function_call(fkt);
+  code_function_callt function_call(std::move(fkt), std::move(arguments));
 
   dest.add(
     goto_programt::make_function_call(function_call, code.source_location()));
@@ -185,10 +205,12 @@ void remove_asmt::msc_asm_function_call(
 /// Translates the given inline assembly code (which must be in either gcc or
 /// msc style) to non-assembly goto program instructions
 ///
+/// \param function_id: Name of function being processed
 /// \param instruction: The goto program instruction containing the inline
 ///   assembly statements
 /// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction(
+  const irep_idt &function_id,
   goto_programt::instructiont &instruction,
   goto_programt &dest)
 {
@@ -199,7 +221,7 @@ void remove_asmt::process_instruction(
   if(flavor == ID_gcc)
     process_instruction_gcc(to_code_asm_gcc(code), dest);
   else if(flavor == ID_msc)
-    process_instruction_msc(code, dest);
+    process_instruction_msc(function_id, code, dest);
   else
     DATA_INVARIANT(false, "unexpected assembler flavor");
 }
@@ -376,9 +398,11 @@ void remove_asmt::process_instruction_gcc(
 /// Translates the given inline assembly code (in msc style) to non-assembly
 /// goto program instructions
 ///
+/// \param function_id: Name of function being processed
 /// \param code: The inline assembly code statement to translate
 /// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction_msc(
+  const irep_idt &function_id,
   const code_asmt &code,
   goto_programt &dest)
 {
@@ -450,12 +474,35 @@ void remove_asmt::process_instruction_msc(
 
     if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
     {
-      msc_asm_function_call("__asm_" + id2string(command), code, tmp_dest);
+      exprt::operandst args{null_pointer_exprt{pointer_type(empty_typet{})}};
+      // try to typecheck the argument
+      if(pos != instruction.size() && instruction[pos].id() == ID_symbol)
+      {
+        const irep_idt &name = instruction[pos].get(ID_identifier);
+        for(const auto &entry : equal_range(symbol_table.symbol_base_map, name))
+        {
+          // global scope symbol, don't replace a local one
+          if(entry.second == name && args[0].id() != ID_address_of)
+          {
+            args[0] =
+              address_of_exprt{symbol_table.lookup_ref(name).symbol_expr()};
+          }
+          // parameter or symbol in local scope
+          else if(has_prefix(
+                    id2string(entry.second), id2string(function_id) + "::"))
+          {
+            args[0] = address_of_exprt{
+              symbol_table.lookup_ref(entry.second).symbol_expr()};
+          }
+        }
+      }
+      msc_asm_function_call(
+        "__asm_" + id2string(command), args, code, tmp_dest);
     }
     else if(
       command == "mfence" || command == "lfence" || command == "sfence") // x86
     {
-      msc_asm_function_call("__asm_" + id2string(command), code, tmp_dest);
+      msc_asm_function_call("__asm_" + id2string(command), {}, code, tmp_dest);
     }
     else
       unknown = true; // give up
@@ -479,8 +526,10 @@ void remove_asmt::process_instruction_msc(
 /// Replaces inline assembly instructions in the goto function by non-assembly
 /// goto program instructions
 ///
+/// \param function_id: Name of function being processed
 /// \param goto_function: The goto function
 void remove_asmt::process_function(
+  const irep_idt &function_id,
   goto_functionst::goto_functiont &goto_function)
 {
   bool did_something = false;
@@ -490,7 +539,7 @@ void remove_asmt::process_function(
     if(it->is_other() && it->get_other().get_statement() == ID_asm)
     {
       goto_programt tmp_dest;
-      process_instruction(*it, tmp_dest);
+      process_instruction(function_id, *it, tmp_dest);
       it->turn_into_skip();
       did_something = true;
 
