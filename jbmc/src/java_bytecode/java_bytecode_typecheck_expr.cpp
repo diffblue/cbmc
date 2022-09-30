@@ -69,50 +69,14 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
 
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 {
-  irep_idt identifier=expr.get_identifier();
+  const irep_idt &identifier = expr.get_identifier();
 
-  // does it exist already in the destination symbol table?
-  symbol_tablet::symbolst::const_iterator s_it=
-    symbol_table.symbols.find(identifier);
+  // the java_bytecode_convert_class and java_bytecode_convert_method made sure
+  // "identifier" exists in the symbol table
+  const symbolt &symbol = symbol_table.lookup_ref(identifier);
 
-  if(s_it==symbol_table.symbols.end())
-  {
-    PRECONDITION(
-      has_prefix(id2string(identifier), "java::") ||
-      has_prefix(id2string(identifier), CPROVER_PREFIX));
+  INVARIANT(!symbol.is_type, "symbol identifier should not be a type");
 
-    // no, create the symbol
-    symbolt new_symbol;
-    new_symbol.name=identifier;
-    new_symbol.type=expr.type();
-    new_symbol.base_name=expr.get(ID_C_base_name);
-    new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
-
-    if(new_symbol.type.id()==ID_code)
-    {
-      new_symbol.is_lvalue=false;
-    }
-    else
-    {
-      new_symbol.is_lvalue=true;
-    }
-
-    if(symbol_table.add(new_symbol))
-    {
-      error() << "failed to add expression symbol to symbol table" << eom;
-      throw 0;
-    }
-  }
-  else
-  {
-    // yes!
-    INVARIANT(!s_it->second.is_type, "symbol identifier should not be a type");
-
-    const symbolt &symbol=s_it->second;
-
-    // type the expression
-    expr.type()=symbol.type;
-  }
+  // type the expression
+  expr.type() = symbol.type;
 }
