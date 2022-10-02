@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['readme_40984',['README',['../group__module__hidden.html',1,'']]],
-  ['readme_40985',['README',['../group__module__hidden.html',1,'']]],
-  ['readme_40986',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40987',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40988',['README',['../group__module__hidden.html',1,'']]],
   ['readme_40989',['README',['../group__module__hidden.html',1,'']]],
@@ -28,5 +25,9 @@ var searchData=
   ['readme_41009',['README',['../group__module__hidden.html',1,'']]],
   ['readme_41010',['README',['../group__module__hidden.html',1,'']]],
   ['readme_41011',['README',['../group__module__hidden.html',1,'']]],
-  ['reference_20guide_41012',['Reference Guide',['../reference_guide.html',1,'index']]]
+  ['readme_41012',['README',['../group__module__hidden.html',1,'']]],
+  ['readme_41013',['README',['../group__module__hidden.html',1,'']]],
+  ['readme_41014',['README',['../group__module__hidden.html',1,'']]],
+  ['readme_41015',['README',['../group__module__hidden.html',1,'']]],
+  ['reference_20guide_41016',['Reference Guide',['../reference_guide.html',1,'index']]]
 ];

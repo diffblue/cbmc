@@ -93,7 +93,7 @@ $(document).ready(function(){initNavTree('memory-analyzer.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The memory analyzer is a front-end that runs and queries GDB in order to obtain a snapshot of the state of the input program at a particular program location. Such a snapshot could be useful on its own: to check the values of variables at a particular program location. Furthermore, since the snapshot is a state of a valid concrete execution, it can also be used for subsequent analyses.</p>
-<h2><a class="anchor" id="autotoc_md87"></a>
+<h2><a class="anchor" id="autotoc_md90"></a>
 Usage</h2>
 <p>In order to analyze a program with <code>memory-analyzer</code> it needs to be compiled with <code>goto-gcc</code> (assuming <code>goto-gcc</code> is on the <code>PATH</code>):</p>
 <div class="fragment"><div class="line">$ goto-gcc -g input_program.c -o input_program_exe</div>
@@ -125,7 +125,7 @@ Usage</h2>
 </div><!-- fragment --><p>The above option is useful for the user and their preliminary analysis but does not contain enough information for further automated analyses. To that end, memory analyzer has an option for the snapshot to be represented in the format of a symbol table (with <code>--symtab-snapshot</code>). Finally, to obtain an output in JSON format, e.g., for further analyses by <code>goto-harness</code> the additional option <code>--json-ui</code> needs to be passed to <code>memory-analyzer</code>.</p>
 <div class="fragment"><div class="line">$ memory-analyzer --symtab-snapshot --json-ui \</div>
 <div class="line">--breakpoint checkpoint --symbols array main_exe &gt; snapshot.json</div>
-</div><!-- fragment --><p>Last modified: 2022-10-01 14:32:44 +0200 </p>
+</div><!-- fragment --><p>Last modified: 2022-10-02 19:03:09 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

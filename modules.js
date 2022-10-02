@@ -6,6 +6,7 @@ var modules =
     [ "big-int", "group__big-int.html", null ],
     [ "cbmc", "group__cbmc.html", null ],
     [ "cpp", "group__cpp.html", null ],
+    [ "cprover", "group__cprover.html", null ],
     [ "goto-analyzer", "group__goto-analyzer.html", null ],
     [ "goto-cc", "group__goto-cc.html", null ],
     [ "goto-checker", "group__goto-checker.html", null ],

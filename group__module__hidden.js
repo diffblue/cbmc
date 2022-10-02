@@ -6,6 +6,7 @@ var group__module__hidden =
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_big-int_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_cbmc_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_cpp_README", null ],
+    [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_cprover_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto-analyzer_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto-cc_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto-checker_README", null ],
