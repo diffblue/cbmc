@@ -18,11 +18,11 @@ goto\-cc \- C/C++ to goto compiler
 
 .SH DESCRIPTION
 .B goto\-cc
-reads source code, and generates a goto-binary. Its
+reads source code, and generates a GOTO binary. Its
 command-line interface is designed to mimic that of
 .BR gcc (1).
 Note in particular that \fBgoto-cc\fR distinguishes between compiling
-and linking phases, just as \fBgcc\fR(1) does. \fBcbmc\fR(1) expects a goto-binary
+and linking phases, just as \fBgcc\fR(1) does. \fBcbmc\fR(1) expects a GOTO binary
 for which linking has been completed.
 .PP
 The basename of the file that is used to invoke \fBgoto-cc\fR controls which
@@ -30,10 +30,10 @@ behavior will be emulated. This is typically accomplished by using symbolic
 links.
 .IP
 \fBgoto-cc\fR: invokes the default system compiler as preprocessor and just
-builds a goto-binary.
+builds a GOTO binary.
 .IP
 \fBgoto-gcc\fR: invokes \fBgcc\fR(1) as preprocessor and builds an \fBelf\fR(5)
-object file including an additional \fIgoto-cc\fR section that holds the goto
+object file including an additional \fIgoto-cc\fR section that holds the GOTO
 binary.
 .IP
 \fBgoto-ld\fR: only performs linking, and also builds an \fBelf\fR(5) object as

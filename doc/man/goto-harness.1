@@ -11,7 +11,7 @@ show version
 .TP
 .B goto\-harness \fIin\fB \fIout\fB \-\-harness\-function\-name\ \fIname\fB \-\-harness\-type \fIharness\-type\fR [\fBharness-options\fR]
 build harness for \fIin\fR and write harness to \fIout\fR; the harness is
-printed as C code, if \fIout\fR has a .c suffix, else a goto binary including
+printed as C code, if \fIout\fR has a .c suffix, else a GOTO binary including
 the harness is generated
 .SH DESCRIPTION
 \fBgoto\-harness\fR constructs functions that set up an appropriate environment
@@ -104,7 +104,7 @@ Treat the function parameter with the name \fIp\fR as a string of characters.
 Initialize memory from JSON memory snapshot stored in \fIfile\fR.
 .TP
 \fB\-\-initial\-goto\-location\fR \fIfunc\fR[:\fIn\fR]
-Use function \fIfunc\fR and goto binary location number \fIn\fR as entry point.
+Use function \fIfunc\fR and GOTO binary location number \fIn\fR as entry point.
 .TP
 \fB\-\-initial\-source\-location\fR \fIfile\R:\fIn\fR
 Use given file name \fIfile\fR and line number \fIn\R in that file as entry
