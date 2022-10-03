@@ -144,10 +144,8 @@ int cprover_parse_optionst::main()
         ? static_cast<message_handlert &>(message_handler)
         : static_cast<message_handlert &>(null_message_handler);
 
-    const bool safety = !cmdline.isset("no-safety");
-
     remove_function_pointers(
-      remove_function_pointers_message_handler, goto_model, safety);
+      remove_function_pointers_message_handler, goto_model, false);
 
     adjust_float_expressions(goto_model);
     instrument_given_invariants(goto_model);
@@ -166,7 +164,7 @@ int cprover_parse_optionst::main()
     if(!perform_inlining)
       instrument_contracts(goto_model);
 
-    if(safety)
+    if(!cmdline.isset("no-safety"))
       c_safety_checks(goto_model);
 
     if(cmdline.isset("no-assertions"))
