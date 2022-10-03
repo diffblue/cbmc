@@ -157,9 +157,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a11efc113f041f08a9394d9baf0357a17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcode__contractst.html#a11efc113f041f08a9394d9baf0357a17">replace_history_parameter</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, std::map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &amp;parameter2history, <a class="el" href="classsource__locationt.html">source_locationt</a> location, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;history, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
 <tr class="memdesc:a11efc113f041f08a9394d9baf0357a17"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function recursively identifies the "old" expressions within expr and replaces them with correspoding history variables.  <a href="classcode__contractst.html#a11efc113f041f08a9394d9baf0357a17">More...</a><br /></td></tr>
 <tr class="separator:a11efc113f041f08a9394d9baf0357a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b67462199374e1a2ea9bcf53002e416"><td class="memItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classgoto__programt.html">goto_programt</a>, <a class="el" href="classgoto__programt.html">goto_programt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcode__contractst.html#a0b67462199374e1a2ea9bcf53002e416">create_ensures_instruction</a> (<a class="el" href="classcodet.html">codet</a> &amp;expression, <a class="el" href="classsource__locationt.html">source_locationt</a> location, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
-<tr class="memdesc:a0b67462199374e1a2ea9bcf53002e416"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function creates and returns an instruction that corresponds to the ensures clause.  <a href="classcode__contractst.html#a0b67462199374e1a2ea9bcf53002e416">More...</a><br /></td></tr>
-<tr class="separator:a0b67462199374e1a2ea9bcf53002e416"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addbf6dc6205a2889f234d2c42427752b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcode__contractst.html#addbf6dc6205a2889f234d2c42427752b">generate_history_variables_initialization</a> (<a class="el" href="classexprt.html">exprt</a> &amp;clause, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program)</td></tr>
+<tr class="memdesc:addbf6dc6205a2889f234d2c42427752b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function generates all the instructions required to initialize history variables.  <a href="classcode__contractst.html#addbf6dc6205a2889f234d2c42427752b">More...</a><br /></td></tr>
+<tr class="separator:addbf6dc6205a2889f234d2c42427752b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0ee20ace90fc5559ed393d941829153"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__convertt.html">goto_convertt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcode__contractst.html#ae0ee20ace90fc5559ed393d941829153">get_converter</a> ()</td></tr>
+<tr class="separator:ae0ee20ace90fc5559ed393d941829153"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -258,7 +260,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instruments <code>wrapper_function</code> adding assumptions based on requires clauses and assertions based on ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01369">1369</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01385">1385</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -335,7 +337,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Replaces function calls with assertions based on requires clauses, non-deterministic assignments for the write set, and assumptions based on ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00680">680</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00704">704</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -368,7 +370,7 @@ Protected Attributes</h2></td></tr>
 <p>Apply loop contracts, whenever available, to all loops in <code>function</code>. </p>
 <p>Loop invariants, loop variants, and loop assigns clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00929">929</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00945">945</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -391,7 +393,7 @@ Protected Attributes</h2></td></tr>
 <p>Applies loop contract transformations. </p>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01607">1607</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01609">1609</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -445,7 +447,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01331">1331</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01347">1347</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -492,7 +494,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01353">1353</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01369">1369</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -514,7 +516,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Throws an exception if some function <code>functions</code> is found in the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01552">1552</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01554">1554</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -614,46 +616,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instrument functions to check frame conditions. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01186">1186</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a0b67462199374e1a2ea9bcf53002e416"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b67462199374e1a2ea9bcf53002e416">&#9670;&nbsp;</a></span>create_ensures_instruction()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::pair&lt; <a class="el" href="classgoto__programt.html">goto_programt</a>, <a class="el" href="classgoto__programt.html">goto_programt</a> &gt; code_contractst::create_ensures_instruction </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classcodet.html">codet</a> &amp;&#160;</td>
-          <td class="paramname"><em>expression</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classsource__locationt.html">source_locationt</a>&#160;</td>
-          <td class="paramname"><em>location</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>mode</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function creates and returns an instruction that corresponds to the ensures clause. </p>
-<p>It also returns a list of instructions related to initializing history variables, if required. </p>
-
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00635">635</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01202">1202</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -675,7 +638,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Enforce contract of a single function. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01277">1277</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01293">1293</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -711,7 +674,72 @@ Protected Attributes</h2></td></tr>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init.</p>
 <p>Implementation: mangle the name of each function F into a new name, <code>__CPROVER_contracts_original_F</code> (<code>CF</code> for short). Then mint a new function called <code>F</code> that assumes <code>CF</code>'s <code>requires</code> clause, calls <code>CF</code>, and then asserts <code>CF</code>'s <code>ensures</code> clause. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01619">1619</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01621">1621</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+
+</div>
+</div>
+<a id="addbf6dc6205a2889f234d2c42427752b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addbf6dc6205a2889f234d2c42427752b">&#9670;&nbsp;</a></span>generate_history_variables_initialization()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void code_contractst::generate_history_variables_initialization </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>clause</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>program</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This function generates all the instructions required to initialize history variables. </p>
+
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00634">634</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae0ee20ace90fc5559ed393d941829153"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0ee20ace90fc5559ed393d941829153">&#9670;&nbsp;</a></span>get_converter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classgoto__convertt.html">goto_convertt</a>&amp; code_contractst::get_converter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00223">223</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -730,7 +758,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01181">1181</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01197">1197</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -749,7 +777,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01176">1176</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01192">1192</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -773,7 +801,7 @@ Protected Attributes</h2></td></tr>
 <p>Throws an exception if some <code>to_replace</code> functions are not found.</p>
 <p>Use this function when proving code that calls into an expensive function, <code>F</code>. You can write a contract for F using __CPROVER_requires and __CPROVER_ensures, and then use this function to replace all calls to <code>F</code> with an assertion that the <code>requires</code> clause holds followed by an assumption that the <code>ensures</code> clause holds. In order to ensure that <code>F</code> actually abides by its <code>ensures</code> and <code>requires</code> clauses, you should separately call <code>code_constractst::enforce_contracts()</code> on <code>F</code> and verify it using <code>cbmc --function F</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01567">1567</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01569">1569</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>

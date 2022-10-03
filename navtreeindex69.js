@@ -1,5 +1,6 @@
 var NAVTREEINDEX69 =
 {
+"compilation-and-development.html#compilation-and-development-section-formatting":[0,4,8,3],
 "compilation-and-development.html#compilation-and-development-section-linting":[0,4,8,4],
 "compilation-and-development.html#compilation-and-development-section-running-tests":[0,4,8,1],
 "compilation-and-development.html#compilation-and-development-section-time-profiling":[0,4,8,5],
@@ -127,7 +128,8 @@ var NAVTREEINDEX69 =
 "context__abstract__object_8h.html":[5,0,2,0,0,17],
 "context__abstract__object_8h_source.html":[5,0,2,0,0,17],
 "contracts_8cpp.html":[5,0,2,13,1,1],
-"contracts_8cpp.html#a67b8b84f69ec94d01dfdd6b343ef928e":[5,0,2,13,1,1,0],
+"contracts_8cpp.html#a283f86d5fdfde2812ef4d665301dfa6a":[5,0,2,13,1,1,0],
+"contracts_8cpp.html#a67b8b84f69ec94d01dfdd6b343ef928e":[5,0,2,13,1,1,1],
 "contracts_8cpp_source.html":[5,0,2,13,1,1],
 "contracts_8h.html":[5,0,2,13,1,2],
 "contracts_8h.html#a051e6496766835c8bfc4d5f74cf6b56a":[5,0,2,13,1,2,6],
@@ -247,7 +249,5 @@ var NAVTREEINDEX69 =
 "convert__expr__to__smt_8cpp.html#acfb01da4c090b20e4f32337ed0a888c7":[5,0,2,24,9,2,59],
 "convert__expr__to__smt_8cpp.html#ad483fe347ef67cf36dd3a7db84d00eb4":[5,0,2,24,9,2,72],
 "convert__expr__to__smt_8cpp.html#ad7541c1dd17c8fdbc7a4d1f492430749":[5,0,2,24,9,2,40],
-"convert__expr__to__smt_8cpp.html#adc0b57da305e05a8896dd39e32da8ab1":[5,0,2,24,9,2,25],
-"convert__expr__to__smt_8cpp.html#adeb6380b74052e553423cfce16d34ca7":[5,0,2,24,9,2,54],
-"convert__expr__to__smt_8cpp.html#adf1348cd9f8868b468b9a13dfebeeb2d":[5,0,2,24,9,2,92]
+"convert__expr__to__smt_8cpp.html#adc0b57da305e05a8896dd39e32da8ab1":[5,0,2,24,9,2,25]
 };

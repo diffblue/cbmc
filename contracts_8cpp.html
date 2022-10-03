@@ -138,6 +138,9 @@ $(document).ready(function(){initNavTree('contracts_8cpp.html',''); initResizabl
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a283f86d5fdfde2812ef4d665301dfa6a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8cpp.html#a283f86d5fdfde2812ef4d665301dfa6a">generate_contract_constraints</a> (<a class="el" href="classcode__contractst.html">code_contractst</a> &amp;contract, <a class="el" href="classexprt.html">exprt</a> &amp;instantiated_clause, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, const std::function&lt; void(<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;)&gt; &amp;is_fresh_update, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location)</td></tr>
+<tr class="memdesc:a283f86d5fdfde2812ef4d665301dfa6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function generates instructions for all contract constraint, i.e., assumptions and assertions based on requires and ensures clauses.  <a href="contracts_8cpp.html#a283f86d5fdfde2812ef4d665301dfa6a">More...</a><br /></td></tr>
+<tr class="separator:a283f86d5fdfde2812ef4d665301dfa6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67b8b84f69ec94d01dfdd6b343ef928e"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classcode__with__contract__typet.html">code_with_contract_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8cpp.html#a67b8b84f69ec94d01dfdd6b343ef928e">get_contract</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="separator:a67b8b84f69ec94d01dfdd6b343ef928e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -146,6 +149,70 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a283f86d5fdfde2812ef4d665301dfa6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a283f86d5fdfde2812ef4d665301dfa6a">&#9670;&nbsp;</a></span>generate_contract_constraints()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void generate_contract_constraints </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcode__contractst.html">code_contractst</a> &amp;&#160;</td>
+          <td class="paramname"><em>contract</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>instantiated_clause</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::function&lt; void(<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>is_fresh_update</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function generates instructions for all contract constraint, i.e., assumptions and assertions based on requires and ensures clauses. </p>
+
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00650">650</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a67b8b84f69ec94d01dfdd6b343ef928e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a67b8b84f69ec94d01dfdd6b343ef928e">&#9670;&nbsp;</a></span>get_contract()</h2>
 
@@ -180,7 +247,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00658">658</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00682">682</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
