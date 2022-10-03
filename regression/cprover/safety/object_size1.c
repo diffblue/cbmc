@@ -1,6 +1,6 @@
 int main()
 {
-  void *p, *q;
+  char *p, *q;
   // functional consistency of object_size
   __CPROVER_assume(p == q);
 

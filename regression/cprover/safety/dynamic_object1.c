@@ -1,6 +1,6 @@
 int main()
 {
-  void *p, *q;
+  char *p, *q;
   // functional consistency of dynamic_object
   __CPROVER_assume(p == q);
 
