@@ -844,6 +844,28 @@ __CPROVER_HIDE:;
   return result;
 }
 
+/* FUNCTION: __isoc99_fscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __isoc99_fscanf(FILE *restrict stream, const char *restrict format, ...)
+{
+__CPROVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result = vfscanf(stream, format, list);
+  va_end(list);
+  return result;
+}
+
 /* FUNCTION: scanf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED

@@ -1,8 +1,11 @@
 KNOWNBUG
 main.c
---pointer-check --bounds-check
+--pointer-check --bounds-check --string-abstraction
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test demonstrates a bug in string abstraction which appears to introduce a
+type inconsistency that trips up the simplifier.
