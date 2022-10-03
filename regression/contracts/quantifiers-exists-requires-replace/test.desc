@@ -3,8 +3,8 @@ main.c
 --replace-call-with-contract f1 --replace-call-with-contract f2
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f1.precondition.\d+\] line \d+ Check requires clause: SUCCESS$
-^\[f2.precondition.\d+\] line \d+ Check requires clause: FAILURE$
+^\[f1.precondition.\d+\] line \d+ Check requires clause of f1 in main: SUCCESS$
+^\[f2.precondition.\d+\] line \d+ Check requires clause of f2 in main: FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

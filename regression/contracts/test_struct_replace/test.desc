@@ -3,7 +3,7 @@ main.c
 --replace-call-with-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
-\[foo.precondition.\d+\] line \d+ Check requires clause: SUCCESS
+\[foo.precondition.\d+\] line \d+ Check requires clause of foo in main: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion rval \=\= x->baz \+ x->qux: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion \*x \=\= \*y: SUCCESS
 ^VERIFICATION SUCCESSFUL$
