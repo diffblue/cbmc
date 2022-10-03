@@ -1,0 +1,11 @@
+CORE
+msvc.c
+--mm tso --winx64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This is the same test as main.c/test.desc, but now using Visual Studio inline
+ASM syntax.

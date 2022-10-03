@@ -1,9 +1,20 @@
 #include <assert.h>
-#include <x86_assembler.h>
+#include <fenv.h>
 
 int main()
 {
-  __asm_fstcw();
-  assert(0);
-  return 0;
+  unsigned short cw;
+#ifdef __GNUC__
+  __asm__("fstcw %0" : "=m"(cw));
+#else
+  __asm { fstcw cw; }
+#endif
+  assert((cw & 0xc00) == 0);
+  fesetround(FE_UPWARD);
+#ifdef __GNUC__
+  __asm__("fstcw %0" : "=m"(cw));
+#else
+  __asm { fstcw cw; }
+#endif
+  assert((cw & 0xc00) == 0x800);
 }
