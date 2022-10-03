@@ -236,195 +236,193 @@ $(document).ready(function(){initNavTree('cprover__parse__options_8cpp_source.ht
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        ? <span class="keyword">static_cast&lt;</span><a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;<span class="keyword">&gt;</span>(<a class="code" href="classarrayst.html#a46d27a50c532a8da69accc765628b2a1">message_handler</a>)</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        : <span class="keyword">static_cast&lt;</span><a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;<span class="keyword">&gt;</span>(<a class="code" href="unit_2testing-utils_2message_8cpp.html#aec96a1a78cefd248c9556d0fb2394f34">null_message_handler</a>);</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> safety = !cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;no-safety&quot;</span>);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <a class="code" href="remove__function__pointers_8cpp.html#adcbbb61dec4ade79261bdbd77f4ebb52">remove_function_pointers</a>(</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      remove_function_pointers_message_handler, goto_model, safety);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <a class="code" href="adjust__float__expressions_8cpp.html#a77a0bb95074a10043426432f76f9820a">adjust_float_expressions</a>(goto_model);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(goto_model);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <a class="code" href="remove__function__pointers_8cpp.html#adcbbb61dec4ade79261bdbd77f4ebb52">remove_function_pointers</a>(</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      remove_function_pointers_message_handler, goto_model, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <a class="code" href="adjust__float__expressions_8cpp.html#a77a0bb95074a10043426432f76f9820a">adjust_float_expressions</a>(goto_model);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(goto_model);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordtype">bool</span> perform_inlining;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordtype">bool</span> perform_inlining;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;smt2&quot;</span>))</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    {</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      perform_inlining = !cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;no-inline&quot;</span>);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      perform_inlining = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;inline&quot;</span>);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    }</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">if</span>(!perform_inlining)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      <a class="code" href="instrument__contracts_8cpp.html#abc4da72175239985bf22f0b5fefe67bc">instrument_contracts</a>(goto_model);</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">if</span>(safety)</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#ab051dcdf7b5a0a63e414e126a7f741d9">c_safety_checks</a>(goto_model);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;no-assertions&quot;</span>))</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#ac54f072d045c71b3a790325edd561435">no_assertions</a>(goto_model);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;smt2&quot;</span>))</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      perform_inlining = !cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;no-inline&quot;</span>);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      perform_inlining = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;inline&quot;</span>);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">if</span>(!perform_inlining)</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <a class="code" href="instrument__contracts_8cpp.html#abc4da72175239985bf22f0b5fefe67bc">instrument_contracts</a>(goto_model);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordflow">if</span>(!cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;no-safety&quot;</span>))</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#ab051dcdf7b5a0a63e414e126a7f741d9">c_safety_checks</a>(goto_model);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;no-assertions&quot;</span>))</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#ac54f072d045c71b3a790325edd561435">no_assertions</a>(goto_model);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <a class="code" href="set__properties_8cpp.html#abc9825c32f9fdd47e1094a6b72e544f0">label_properties</a>(goto_model);</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <a class="code" href="set__properties_8cpp.html#abc9825c32f9fdd47e1094a6b72e544f0">label_properties</a>(goto_model);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">// bool perform_inlining = false;</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;variables&quot;</span>);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">if</span>(perform_inlining || <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    {</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;Performing inlining\n&quot;</span>;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <a class="code" href="goto__inline_8cpp.html#a1bda8e60852801511c9632d4b66fd508">goto_inline</a>(goto_model, <a class="code" href="classarrayst.html#a46d27a50c532a8da69accc765628b2a1">message_handler</a>, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    goto_model.goto_functions.compute_target_numbers();</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    goto_model.goto_functions.compute_location_numbers();</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-goto-functions&quot;</span>))</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <a class="code" href="cprover__parse__options_8cpp.html#af1d42b4b0ca950e1b99ebfdac362e54b">show_goto_functions</a>(goto_model);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    }</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">// show loop ids?</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-loops&quot;</span>))</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    {</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      <a class="code" href="loop__ids_8cpp.html#a5124c9837d10199211a6daedaf921bff">show_loop_ids</a>(<a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8af62eb0bf5e5c72e80983fbbac1cb70e5">ui_message_handlert::uit::PLAIN</a>, goto_model);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    }</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-functions-with-loops&quot;</span>))</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      <a class="code" href="cprover__parse__options_8cpp.html#a6a9df03aa20df5035d1351fe80247424">show_functions_with_loops</a>(goto_model);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;validate-goto-model&quot;</span>))</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    {</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      goto_model.validate();</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    }</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-properties&quot;</span>))</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    {</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <a class="code" href="classui__message__handlert.html">ui_message_handlert</a> ui_message_handler(cmdline, <span class="stringliteral">&quot;cprover&quot;</span>);</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <a class="code" href="show__properties_8cpp.html#af04636e0fb6e7b12be8ffa073ced3ebc">show_properties</a>(goto_model, ui_message_handler);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="comment">// gcc produces a spurious warning on optionalt&lt;irep_idt&gt;.</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment">// This will likely go away once we use std::optional&lt;irep_idt&gt;.</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment">// To make clang ignore the pragma, we need to guard it with an ifdef.</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">#pragma GCC diagnostic push</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#ifndef __clang__</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="preprocessor">#  pragma GCC diagnostic ignored &quot;-Wmaybe-uninitialized&quot;</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;irep_idt&gt;</a> contract = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;contract&quot;</span>)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                                     ? <a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;contract&quot;</span>))</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                                     : <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;irep_idt&gt;</a>{};</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="preprocessor">#pragma GCC diagnostic pop</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;smt2&quot;</span>) || cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;text&quot;</span>) || <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="keyword">auto</span> <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;smt2&quot;</span>) ? <a class="code" href="state__encoding_8h.html#a1c10c96df493816b27fa6f27653b0008a9afe7d0f8e588b6ac2d560857ec576c2">state_encoding_formatt::SMT2</a></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                                          : <a class="code" href="state__encoding_8h.html#a1c10c96df493816b27fa6f27653b0008ad2cd8253361a9c732d21ca1d336599cc">state_encoding_formatt::ASCII</a>;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;outfile&quot;</span>))</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <span class="keyword">auto</span> file_name = cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;outfile&quot;</span>);</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        std::ofstream out(<a class="code" href="unicode_8cpp.html#a684683d701fe53be069b2e5f883044cd">widen</a>(file_name));</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        std::ofstream out(file_name);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordflow">if</span>(!out)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;failed to open &quot;</span> &lt;&lt; file_name &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a9e68730613a173477846135fe7928f39">CPROVER_EXIT_PARSE_ERROR</a>;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">::variable_encoding</a>(goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, out);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          <a class="code" href="state__encoding_8cpp.html#aa428ddd6527ae6d5e5976ca8a845cd9a">state_encoding</a>(goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, perform_inlining, contract, out);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;formula written to &quot;</span> &lt;&lt; file_name &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      }</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      {</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;          <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">::variable_encoding</a>(goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, std::cout);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;          <a class="code" href="state__encoding_8cpp.html#aa428ddd6527ae6d5e5976ca8a845cd9a">state_encoding</a>(</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, perform_inlining, contract, std::cout);</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      <span class="keywordflow">if</span>(!cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;solve&quot;</span>))</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    }</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">// bool perform_inlining = false;</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;variables&quot;</span>);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">if</span>(perform_inlining || <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;Performing inlining\n&quot;</span>;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <a class="code" href="goto__inline_8cpp.html#a1bda8e60852801511c9632d4b66fd508">goto_inline</a>(goto_model, <a class="code" href="classarrayst.html#a46d27a50c532a8da69accc765628b2a1">message_handler</a>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    goto_model.goto_functions.compute_target_numbers();</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    goto_model.goto_functions.compute_location_numbers();</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-goto-functions&quot;</span>))</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <a class="code" href="cprover__parse__options_8cpp.html#af1d42b4b0ca950e1b99ebfdac362e54b">show_goto_functions</a>(goto_model);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    }</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="comment">// show loop ids?</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-loops&quot;</span>))</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      <a class="code" href="loop__ids_8cpp.html#a5124c9837d10199211a6daedaf921bff">show_loop_ids</a>(<a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8af62eb0bf5e5c72e80983fbbac1cb70e5">ui_message_handlert::uit::PLAIN</a>, goto_model);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-functions-with-loops&quot;</span>))</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <a class="code" href="cprover__parse__options_8cpp.html#a6a9df03aa20df5035d1351fe80247424">show_functions_with_loops</a>(goto_model);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;validate-goto-model&quot;</span>))</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    {</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      goto_model.validate();</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    }</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-properties&quot;</span>))</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <a class="code" href="classui__message__handlert.html">ui_message_handlert</a> ui_message_handler(cmdline, <span class="stringliteral">&quot;cprover&quot;</span>);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      <a class="code" href="show__properties_8cpp.html#af04636e0fb6e7b12be8ffa073ced3ebc">show_properties</a>(goto_model, ui_message_handler);</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    }</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="comment">// gcc produces a spurious warning on optionalt&lt;irep_idt&gt;.</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;<span class="comment">// This will likely go away once we use std::optional&lt;irep_idt&gt;.</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="comment">// To make clang ignore the pragma, we need to guard it with an ifdef.</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="preprocessor">#pragma GCC diagnostic push</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="preprocessor">#ifndef __clang__</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">#  pragma GCC diagnostic ignored &quot;-Wmaybe-uninitialized&quot;</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;irep_idt&gt;</a> contract = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;contract&quot;</span>)</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;                                     ? <a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;contract&quot;</span>))</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                                     : <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;irep_idt&gt;</a>{};</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="preprocessor">#pragma GCC diagnostic pop</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;smt2&quot;</span>) || cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;text&quot;</span>) || <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      <span class="keyword">auto</span> <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;smt2&quot;</span>) ? <a class="code" href="state__encoding_8h.html#a1c10c96df493816b27fa6f27653b0008a9afe7d0f8e588b6ac2d560857ec576c2">state_encoding_formatt::SMT2</a></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                                          : <a class="code" href="state__encoding_8h.html#a1c10c96df493816b27fa6f27653b0008ad2cd8253361a9c732d21ca1d336599cc">state_encoding_formatt::ASCII</a>;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;outfile&quot;</span>))</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      {</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keyword">auto</span> file_name = cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;outfile&quot;</span>);</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        std::ofstream out(<a class="code" href="unicode_8cpp.html#a684683d701fe53be069b2e5f883044cd">widen</a>(file_name));</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        std::ofstream out(file_name);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">if</span>(!out)</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        {</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;failed to open &quot;</span> &lt;&lt; file_name &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a9e68730613a173477846135fe7928f39">CPROVER_EXIT_PARSE_ERROR</a>;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        }</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;          <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">::variable_encoding</a>(goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, out);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          <a class="code" href="state__encoding_8cpp.html#aa428ddd6527ae6d5e5976ca8a845cd9a">state_encoding</a>(goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, perform_inlining, contract, out);</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;formula written to &quot;</span> &lt;&lt; file_name &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      {</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">variable_encoding</a>)</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;          <a class="code" href="state__encoding_8cpp.html#abeab3689f1fd9ca12f6eeb8251fbeea0">::variable_encoding</a>(goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, std::cout);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;          <a class="code" href="state__encoding_8cpp.html#aa428ddd6527ae6d5e5976ca8a845cd9a">state_encoding</a>(</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            goto_model, <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, perform_inlining, contract, std::cout);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      <span class="keywordflow">if</span>(!cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;solve&quot;</span>))</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="classsolver__optionst.html">solver_optionst</a> solver_options;</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <a class="code" href="classsolver__optionst.html">solver_optionst</a> solver_options;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;unwind&quot;</span>))</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    {</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      solver_options.<a class="code" href="classsolver__optionst.html#ad3dfe49ad660d486fd4acda65fc8a7fd">loop_limit</a> = std::stoull(cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;unwind&quot;</span>));</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    }</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      solver_options.<a class="code" href="classsolver__optionst.html#ad3dfe49ad660d486fd4acda65fc8a7fd">loop_limit</a> = 1;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    solver_options.<a class="code" href="classsolver__optionst.html#af93df050d8da8951d2c8e8fea7ef732f">trace</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;trace&quot;</span>);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    solver_options.<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;verbose&quot;</span>);</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="comment">// solve</span></div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="state__encoding_8cpp.html#a6730966280adce050c1c5ba1a7671bac">state_encoding_solver</a>(</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      goto_model, perform_inlining, contract, solver_options);</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">switch</span>(result)</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    {</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5caa8e145b98bbb8438b5e98030caaea02b">solver_resultt::ALL_PASS</a>:</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160; </div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5ca7048568c25be497a17a364e899e6cb92">solver_resultt::SOME_FAIL</a>:</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ad140e2519608ff377745c8524d1166e5">CPROVER_EXIT_VERIFICATION_UNSAFE</a>;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5cabb1ca97ec761fc37101737ba0aa2e7c5">solver_resultt::ERROR</a>:</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a344cebae9dbcedcf3be9d03065d392a0">CPROVER_EXIT_INTERNAL_ERROR</a>;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    }</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  }</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  {</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;error: &quot;</span> &lt;&lt; e.<a class="code" href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">what</a>() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ad728e1b002f7b1ea0ada09b7fadd86a4">CPROVER_EXIT_EXCEPTION</a>;</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  }</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160; </div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// to silence a gcc warning</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;}</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno"><a class="line" href="classcprover__parse__optionst.html#a50b41432fff49988a5c07a65d9543b67">  309</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcprover__parse__optionst.html#a50b41432fff49988a5c07a65d9543b67">cprover_parse_optionst::help</a>()</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;{</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  std::cout</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    &lt;&lt; <a class="code" href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a><span class="stringliteral">&quot;* * CPROVER &quot;</span> &lt;&lt; <a class="code" href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; (<span class="keyword">sizeof</span>(<span class="keywordtype">void</span> *) * 8)</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    &lt;&lt; <span class="stringliteral">&quot;-bit)&quot;</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    &lt;&lt; <span class="stringliteral">&quot; * *\n&quot;</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    &lt;&lt; <span class="stringliteral">&quot;* *                       Copyright 2022                       * *\n&quot;</span>;</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  std::cout &lt;&lt; <a class="code" href="help__formatter_8h.html#a4acde3ef7739289b9c7f10a0eb48bc2e">help_formatter</a>(</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;unwind&quot;</span>))</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    {</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      solver_options.<a class="code" href="classsolver__optionst.html#ad3dfe49ad660d486fd4acda65fc8a7fd">loop_limit</a> = std::stoull(cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;unwind&quot;</span>));</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    }</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;      solver_options.<a class="code" href="classsolver__optionst.html#ad3dfe49ad660d486fd4acda65fc8a7fd">loop_limit</a> = 1;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160; </div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    solver_options.<a class="code" href="classsolver__optionst.html#af93df050d8da8951d2c8e8fea7ef732f">trace</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;trace&quot;</span>);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    solver_options.<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a> = cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;verbose&quot;</span>);</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="comment">// solve</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="state__encoding_8cpp.html#a6730966280adce050c1c5ba1a7671bac">state_encoding_solver</a>(</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      goto_model, perform_inlining, contract, solver_options);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160; </div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">switch</span>(result)</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    {</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5caa8e145b98bbb8438b5e98030caaea02b">solver_resultt::ALL_PASS</a>:</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ae3d923a6040e47d63fc9992c96a9f0a6">CPROVER_EXIT_SUCCESS</a>;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5ca7048568c25be497a17a364e899e6cb92">solver_resultt::SOME_FAIL</a>:</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ad140e2519608ff377745c8524d1166e5">CPROVER_EXIT_VERIFICATION_UNSAFE</a>;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5cabb1ca97ec761fc37101737ba0aa2e7c5">solver_resultt::ERROR</a>:</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a344cebae9dbcedcf3be9d03065d392a0">CPROVER_EXIT_INTERNAL_ERROR</a>;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    }</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  }</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;error: &quot;</span> &lt;&lt; e.<a class="code" href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">what</a>() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#ad728e1b002f7b1ea0ada09b7fadd86a4">CPROVER_EXIT_EXCEPTION</a>;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  }</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160; </div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// to silence a gcc warning</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;}</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160; </div>
+<div class="line"><a name="l00307"></a><span class="lineno"><a class="line" href="classcprover__parse__optionst.html#a50b41432fff49988a5c07a65d9543b67">  307</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcprover__parse__optionst.html#a50b41432fff49988a5c07a65d9543b67">cprover_parse_optionst::help</a>()</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;{</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  std::cout</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    &lt;&lt; <a class="code" href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a><span class="stringliteral">&quot;* * CPROVER &quot;</span> &lt;&lt; <a class="code" href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; (<span class="keyword">sizeof</span>(<span class="keywordtype">void</span> *) * 8)</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    &lt;&lt; <span class="stringliteral">&quot;-bit)&quot;</span></div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    &lt;&lt; <span class="stringliteral">&quot; * *\n&quot;</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    &lt;&lt; <span class="stringliteral">&quot;* *                       Copyright 2022                       * *\n&quot;</span>;</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="comment">// clang-format off</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  std::cout &lt;&lt; <a class="code" href="help__formatter_8h.html#a4acde3ef7739289b9c7f10a0eb48bc2e">help_formatter</a>(</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="stringliteral">&quot;Usage:                     \tPurpose:\n&quot;</span></div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="stringliteral">&quot;Usage:                     \tPurpose:\n&quot;</span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="stringliteral">&quot; {bcprover} [{y-?}] [{y-h}] [{y--help}] \t show this help\n&quot;</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="stringliteral">&quot; {bcprover} {usource-file.c}    \t convert a given C program\n&quot;</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="stringliteral">&quot;Other options:\n&quot;</span></div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="stringliteral">&quot; {y--inline} \t perform function call inlining before\n&quot;</span></div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="stringliteral">&quot; \t generating the formula\n&quot;</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="stringliteral">&quot; {y--no-safety} \t disable safety checks\n&quot;</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="stringliteral">&quot; {y--contract} {ufunction} \t check contract of given function\n&quot;</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    <span class="stringliteral">&quot; {y--outfile} {ufile-name} \t set output file for formula\n&quot;</span></div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="stringliteral">&quot; {y--smt2} \t output formula in SMT-LIB2 format\n&quot;</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="stringliteral">&quot; {y--text} \t output formula in text format\n&quot;</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span>);</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;}</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="stringliteral">&quot; {bcprover} [{y-?}] [{y-h}] [{y--help}] \t show this help\n&quot;</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="stringliteral">&quot; {bcprover} {usource-file.c}    \t convert a given C program\n&quot;</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="stringliteral">&quot;Other options:\n&quot;</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="stringliteral">&quot; {y--inline} \t perform function call inlining before\n&quot;</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="stringliteral">&quot; \t generating the formula\n&quot;</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="stringliteral">&quot; {y--no-safety} \t disable safety checks\n&quot;</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="stringliteral">&quot; {y--contract} {ufunction} \t check contract of given function\n&quot;</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="stringliteral">&quot; {y--outfile} {ufile-name} \t set output file for formula\n&quot;</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="stringliteral">&quot; {y--smt2} \t output formula in SMT-LIB2 format\n&quot;</span></div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    <span class="stringliteral">&quot; {y--text} \t output formula in text format\n&quot;</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclasscmdlinet_html_a71c26c279a95d2804eddf3772fb2ce88"><div class="ttname"><a href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">cmdlinet::args</a></div><div class="ttdeci">argst args</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00145">cmdline.h:145</a></div></div>
@@ -470,7 +468,7 @@ $(document).ready(function(){initNavTree('cprover__parse__options_8cpp_source.ht
 <div class="ttc" id="aset__properties_8cpp_html_abc9825c32f9fdd47e1094a6b72e544f0"><div class="ttname"><a href="set__properties_8cpp.html#abc9825c32f9fdd47e1094a6b72e544f0">label_properties</a></div><div class="ttdeci">void label_properties(goto_modelt &amp;goto_model)</div><div class="ttdef"><b>Definition:</b> <a href="set__properties_8cpp_source.html#l00045">set_properties.cpp:45</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:90</a></div></div>
 <div class="ttc" id="aclassnamespacet_html_a564f54a32d91e10781812a6681e62c39"><div class="ttname"><a href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">namespacet::lookup</a></div><div class="ttdeci">bool lookup(const irep_idt &amp;name, const symbolt *&amp;symbol) const override</div><div class="ttdoc">See documentation for namespace_baset::lookup().</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00138">namespace.cpp:138</a></div></div>
-<div class="ttc" id="aclasscprover__parse__optionst_html_a50b41432fff49988a5c07a65d9543b67"><div class="ttname"><a href="classcprover__parse__optionst.html#a50b41432fff49988a5c07a65d9543b67">cprover_parse_optionst::help</a></div><div class="ttdeci">void help()</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="cprover__parse__options_8cpp_source.html#l00309">cprover_parse_options.cpp:309</a></div></div>
+<div class="ttc" id="aclasscprover__parse__optionst_html_a50b41432fff49988a5c07a65d9543b67"><div class="ttname"><a href="classcprover__parse__optionst.html#a50b41432fff49988a5c07a65d9543b67">cprover_parse_optionst::help</a></div><div class="ttdeci">void help()</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="cprover__parse__options_8cpp_source.html#l00307">cprover_parse_options.cpp:307</a></div></div>
 <div class="ttc" id="aset__properties_8h_html"><div class="ttname"><a href="set__properties_8h.html">set_properties.h</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html"><div class="ttname"><a href="classcmdlinet.html">cmdlinet</a></div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00020">cmdline.h:20</a></div></div>
 <div class="ttc" id="aversion_8h_html_a1a24d8124c3c2a9ed466d3ff1a63b92d"><div class="ttname"><a href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a></div><div class="ttdeci">const char * CBMC_VERSION</div></div>
