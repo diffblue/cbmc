@@ -9,11 +9,11 @@
 <p><strong>goto-armcc [options]</strong></p>
 <p><strong>goto-cw [options]</strong></p>
 <h1>DESCRIPTION</h1>
-<p><strong>goto-cc</strong> reads source code, and generates a goto-binary. Its command-line interface is designed to mimic that of <strong>gcc</strong>(1). Note in particular that <strong>goto-cc</strong> distinguishes between compiling and linking phases, just as <strong>gcc</strong>(1) does. <strong>cbmc</strong>(1) expects a goto-binary for which linking has been completed.</p>
+<p><strong>goto-cc</strong> reads source code, and generates a GOTO binary. Its command-line interface is designed to mimic that of <strong>gcc</strong>(1). Note in particular that <strong>goto-cc</strong> distinguishes between compiling and linking phases, just as <strong>gcc</strong>(1) does. <strong>cbmc</strong>(1) expects a GOTO binary for which linking has been completed.</p>
 <p>The basename of the file that is used to invoke <strong>goto-cc</strong> controls which behavior will be emulated. This is typically accomplished by using symbolic links.</p>
 <blockquote>
-<p><strong>goto-cc</strong>: invokes the default system compiler as preprocessor and just builds a goto-binary.</p>
-<p><strong>goto-gcc</strong>: invokes <strong>gcc</strong>(1) as preprocessor and builds an <strong>elf</strong>(5) object file including an additional <em>goto-cc</em> section that holds the goto binary.</p>
+<p><strong>goto-cc</strong>: invokes the default system compiler as preprocessor and just builds a GOTO binary.</p>
+<p><strong>goto-gcc</strong>: invokes <strong>gcc</strong>(1) as preprocessor and builds an <strong>elf</strong>(5) object file including an additional <em>goto-cc</em> section that holds the GOTO binary.</p>
 <p><strong>goto-ld</strong>: only performs linking, and also builds an <strong>elf</strong>(5) object as above.</p>
 <p><strong>goto-as</strong>: invokes the system assembler <strong>as</strong>(1) and includes the original assembly source as a string in the output file.</p>
 <p><strong>goto-bcc</strong>: invokes <strong>bcc</strong>(1) as preprocessor.</p>

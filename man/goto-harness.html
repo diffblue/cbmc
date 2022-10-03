@@ -9,7 +9,7 @@
 <dd><p>show version</p>
 </dd>
 <dt><strong>goto-harness <em>in</em> <em>out</em> --harness-function-name <em>name</em> --harness-type <em>harness-type</em> [<strong>harness-options</strong>]</strong></dt>
-<dd><p>build harness for <em>in</em> and write harness to <em>out</em>; the harness is printed as C code, if <em>out</em> has a .c suffix, else a goto binary including the harness is generated</p>
+<dd><p>build harness for <em>in</em> and write harness to <em>out</em>; the harness is printed as C code, if <em>out</em> has a .c suffix, else a GOTO binary including the harness is generated</p>
 </dd>
 </dl>
 <h1>DESCRIPTION</h1>
@@ -83,7 +83,7 @@ cbmc --pointer-check harness.c --function generated_harness_test_function</code>
 <dd><p>Initialize memory from JSON memory snapshot stored in <em>file</em>.</p>
 </dd>
 <dt><strong>--initial-goto-location</strong> <em>func</em>[:<em>n</em>]</dt>
-<dd><p>Use function <em>func</em> and goto binary location number <em>n</em> as entry point.</p>
+<dd><p>Use function <em>func</em> and GOTO binary location number <em>n</em> as entry point.</p>
 </dd>
 <dt><strong>--initial-source-location</strong> <em>file:n</em></dt>
 <dd><p>Use given file name <em>file</em> and line number <em>n in that file as entry</em> point.</p>
