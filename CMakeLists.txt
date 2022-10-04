@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.8)
 
 # Compile with /usr/bin/clang on MacOS
 # See https://github.com/diffblue/cbmc/issues/4956
