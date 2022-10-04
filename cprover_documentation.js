@@ -5,31 +5,29 @@ var cprover_documentation =
     [ "Contributing to the code base", "cprover_documentation.html#autotoc_md78", null ],
     [ "License", "cprover_documentation.html#autotoc_md79", null ],
     [ "Overview of Documentation", "cprover_documentation.html#autotoc_md80", null ],
-    [ "Memory Analyzer", "memory-analyzer.html", null ],
     [ "Memory Bounds Checking", "memory-bounds-checking.html", null ],
     [ "SATABS", "satabs.html", [
       [ "SATABS—Predicate Abstraction with SAT", "satabs.html#man_satabs", [
         [ "For users:", "cprover_documentation.html#autotoc_md81", null ],
         [ "For contributors:", "cprover_documentation.html#autotoc_md82", null ],
-        [ "Usage", "memory-analyzer.html#autotoc_md90", null ],
-        [ "Automatic Program Verification with SATABS", "satabs.html#autotoc_md93", null ],
+        [ "Automatic Program Verification with SATABS", "satabs.html#autotoc_md92", null ],
         [ "Installing SATABS", "satabs.html#man_install-satabs", [
-          [ "Requirements", "satabs.html#autotoc_md94", null ],
-          [ "Choosing and Installing a Model Checker", "satabs.html#autotoc_md95", null ],
-          [ "Installing SATABS", "satabs.html#autotoc_md96", null ],
-          [ "Requirements", "satabs.html#autotoc_md97", null ]
+          [ "Requirements", "satabs.html#autotoc_md93", null ],
+          [ "Choosing and Installing a Model Checker", "satabs.html#autotoc_md94", null ],
+          [ "Installing SATABS", "satabs.html#autotoc_md95", null ],
+          [ "Requirements", "satabs.html#autotoc_md96", null ]
         ] ],
         [ "Overview", "satabs.html#man_satabs-overview", [
-          [ "Working with Claims", "satabs.html#autotoc_md98", null ]
+          [ "Working with Claims", "satabs.html#autotoc_md97", null ]
         ] ],
         [ "Programs that use Libraries", "satabs.html#man_satabs-libraries", null ],
         [ "Unit Testing with SATABS", "satabs.html#man_satabs-unit-test", [
-          [ "Further Reading", "satabs.html#autotoc_md99", null ]
+          [ "Further Reading", "satabs.html#autotoc_md98", null ]
         ] ],
         [ "Background", "satabs.html#man_satabs-background", [
-          [ "Sound Abstractions", "satabs.html#autotoc_md100", null ],
-          [ "Spurious Counterexamples", "satabs.html#autotoc_md101", null ],
-          [ "Automatic Refinement", "satabs.html#autotoc_md102", null ]
+          [ "Sound Abstractions", "satabs.html#autotoc_md99", null ],
+          [ "Spurious Counterexamples", "satabs.html#autotoc_md100", null ],
+          [ "Automatic Refinement", "satabs.html#autotoc_md101", null ]
         ] ],
         [ "Tutorials", "satabs.html#man_satabs-tutorials", [
           [ "Reference Counting in Linux Device Drivers", "satabs.html#man_satabs-tutorial-driver", null ],
@@ -128,7 +126,7 @@ var cprover_documentation =
       [ "Static analysis APIs", "code-walkthrough.html#static-analysis-apis-section", null ]
     ] ],
     [ "Other Tools", "other-tools.html", [
-      [ "Other Tools", "other-tools.html#autotoc_md91", null ]
+      [ "Other Tools", "other-tools.html#autotoc_md90", null ]
     ] ],
     [ "Tutorials", "tutorial.html", [
       [ "CBMC Developer Tutorial", "tutorial.html#cbmc_tutorial", [

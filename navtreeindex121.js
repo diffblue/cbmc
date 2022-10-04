@@ -1,7 +1,5 @@
 var NAVTREEINDEX121 =
 {
-"structfloat__utilst_1_1unpacked__floatt.html#acd84ae7406da2d08fadeecb9b2cb1208":[4,0,444,3,1],
-"structfloat__utilst_1_1unpacked__floatt.html#af57de1dcd2224efce538ac71eb9e652f":[4,0,444,3,6],
 "structframet_1_1implicationt.html":[4,0,461,1],
 "structframet_1_1implicationt.html#a045b3c1e169f371b94d10e57f5f54163":[4,0,461,1,1],
 "structframet_1_1implicationt.html#a5cf8e15444de89d55bdafab9c8da33ef":[4,0,461,1,2],
@@ -249,5 +247,7 @@ var NAVTREEINDEX121 =
 "structis__predecessor__oft.html#a82e37789f215d64b6fa063515b89a8d1":[4,0,625,1],
 "structis__predecessor__oft.html#a9d16d18216f8558b04e63d72f14c2509":[4,0,625,0],
 "structis__predecessor__oft.html#acb0984db9c4b025f6fdc4ca31f924acc":[4,0,625,2],
-"structjava__boxed__type__infot.html":[4,0,636]
+"structjava__boxed__type__infot.html":[4,0,636],
+"structjava__boxed__type__infot.html#a84842af4eca670abae989e62ed19eabb":[4,0,636,0],
+"structjava__boxed__type__infot.html#ac8f9f7f85d35217929b1e8990b295e84":[4,0,636,1]
 };
