@@ -65,6 +65,8 @@ public:
 bool consolet::_is_terminal = false;
 bool consolet::_use_SGR = false;
 bool consolet::_init_done = false;
+bool consolet::_width_is_set = false;
+std::size_t consolet::_width;
 std::ostream *consolet::_out = nullptr;
 std::ostream *consolet::_err = nullptr;
 
@@ -181,15 +183,19 @@ std::ostream &consolet::reset(std::ostream &str)
 
 std::size_t consolet::width()
 {
-  std::size_t width = 80; // default
+  if(_width_is_set)
+    return _width;
 
-  if(_is_terminal)
+  _width_is_set = true;
+  _width = 80; // default
+
+  if(is_terminal())
   {
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO info;
     GetConsoleScreenBufferInfo(h, &info);
-    width = info.srWindow.Right - info.srWindow.Left + 1;
+    _width = info.srWindow.Right - info.srWindow.Left + 1;
 #else
     std::ostringstream width_stream;
     run("stty", {"stty", "size"}, "", width_stream, "");
@@ -200,12 +206,12 @@ std::size_t consolet::width()
     {
       auto width_l = atol(stty_output[1].c_str());
       if(width_l >= 10 && width_l <= 400)
-        width = width_l;
+        _width = width_l;
     }
 #endif
   }
 
-  return width;
+  return _width;
 }
 
 extern "C" int mk_wcwidth(wchar_t ucs);

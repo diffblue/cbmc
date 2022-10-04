@@ -12,6 +12,23 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <ostream>
 
+void help_formattert::emit_word(statet &state, std::ostream &out)
+{
+  if(state.word.empty())
+    return;
+
+  // screen width exceeded when aligning?
+  if(state.column + state.word.size() > consolet::width() && state.aligning)
+  {
+    out << '\n' << std::string(first_column_width + 1, ' ');
+    state.column = first_column_width + 1;
+  }
+
+  out << state.word;
+  state.column += state.word.size();
+  state.word.clear();
+}
+
 void help_formattert::operator()(std::ostream &out) const
 {
   std::size_t pos = 0;
@@ -22,7 +39,7 @@ void help_formattert::operator()(std::ostream &out) const
       return 0;
   };
 
-  std::size_t col = 0;
+  statet state;
 
   while(pos < s.size())
   {
@@ -30,7 +47,13 @@ void help_formattert::operator()(std::ostream &out) const
 
     if(ch == '{')
     {
+      emit_word(state, out);
+
       auto what = next();
+      // spaces in formatted text are non-breakable
+      while(pos < s.size() && (ch = next()) != '}')
+        state.word += ch;
+
       switch(what)
       {
       case 'b':
@@ -46,31 +69,33 @@ void help_formattert::operator()(std::ostream &out) const
         break;
       }
 
-      while(pos < s.size() && (ch = next()) != '}')
-      {
-        out << ch;
-        col++;
-      }
-
+      emit_word(state, out);
       out << consolet::reset;
     }
     else if(ch == '\t')
     {
-      if(col < 29)
+      emit_word(state, out);
+      if(state.column < first_column_width)
       {
-        out << std::string(29 - col, ' ');
-        col = 40;
+        out << std::string(first_column_width - state.column, ' ');
+        state.column = first_column_width;
       }
+      state.aligning = true;
     }
     else if(ch == '\n')
     {
-      out << ch;
-      col = 0;
+      emit_word(state, out);
+      out << '\n';
+      state.column = 0;
+      state.aligning = false;
     }
     else
     {
-      out << ch;
-      col++;
+      state.word += ch;
+      if(ch == ' ')
+        emit_word(state, out);
     }
   }
+
+  emit_word(state, out);
 }

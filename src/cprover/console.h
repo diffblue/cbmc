@@ -82,6 +82,8 @@ protected:
   static bool _is_terminal;
   static bool _use_SGR;
   static bool _init_done;
+  static std::size_t _width;
+  static bool _width_is_set;
   static std::ostream *_out;
   static std::ostream *_err;
 };
