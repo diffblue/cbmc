@@ -24,6 +24,17 @@ public:
 
   const std::string &s;
   void operator()(std::ostream &) const;
+
+protected:
+  struct statet
+  {
+    std::size_t column = 0;
+    bool aligning = false;
+    std::string word = "";
+  };
+
+  static void emit_word(statet &, std::ostream &);
+  static const std::size_t first_column_width = 29;
 };
 
 static inline help_formattert help_formatter(const std::string &s)
