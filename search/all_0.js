@@ -4696,9 +4696,11 @@ var searchData=
   ['_5fui_4693',['_ui',['../classui__message__handlert.html#a6df644192a70806bffe4d988ec6d6739',1,'ui_message_handlert']]],
   ['_5fuse_5fsgr_4694',['_use_SGR',['../classconsolet.html#ac27878a00388898426005e63790e38aa',1,'consolet']]],
   ['_5fvalue_4695',['_value',['../classprop__minimizet.html#a682fd96580f6361d18aa441170e17dd1',1,'prop_minimizet']]],
-  ['_5fwritefsbase_5fu32_4696',['_writefsbase_u32',['../gcc__builtin__headers__ia32_8h.html#ad5a4a9c62799e868e2d18f12e82e6c22',1,'gcc_builtin_headers_ia32.h']]],
-  ['_5fwritefsbase_5fu64_4697',['_writefsbase_u64',['../gcc__builtin__headers__ia32_8h.html#a7d7269f9e0a420dc4bcd1db8fcc77b2e',1,'gcc_builtin_headers_ia32.h']]],
-  ['_5fwritegsbase_5fu32_4698',['_writegsbase_u32',['../gcc__builtin__headers__ia32_8h.html#a969906039f2889f5b5944d3bb3de9f6b',1,'gcc_builtin_headers_ia32.h']]],
-  ['_5fwritegsbase_5fu64_4699',['_writegsbase_u64',['../gcc__builtin__headers__ia32_8h.html#ac3e5603ffb2911921362f885b8048da1',1,'gcc_builtin_headers_ia32.h']]],
-  ['_5fhidden_4700',['_hidden',['../group__module__hidden.html',1,'']]]
+  ['_5fwidth_4696',['_width',['../classconsolet.html#a066eda798d48376cfc2301c74c2b5a85',1,'consolet']]],
+  ['_5fwidth_5fis_5fset_4697',['_width_is_set',['../classconsolet.html#acb537dc92fb668141e1906be441842ac',1,'consolet']]],
+  ['_5fwritefsbase_5fu32_4698',['_writefsbase_u32',['../gcc__builtin__headers__ia32_8h.html#ad5a4a9c62799e868e2d18f12e82e6c22',1,'gcc_builtin_headers_ia32.h']]],
+  ['_5fwritefsbase_5fu64_4699',['_writefsbase_u64',['../gcc__builtin__headers__ia32_8h.html#a7d7269f9e0a420dc4bcd1db8fcc77b2e',1,'gcc_builtin_headers_ia32.h']]],
+  ['_5fwritegsbase_5fu32_4700',['_writegsbase_u32',['../gcc__builtin__headers__ia32_8h.html#a969906039f2889f5b5944d3bb3de9f6b',1,'gcc_builtin_headers_ia32.h']]],
+  ['_5fwritegsbase_5fu64_4701',['_writegsbase_u64',['../gcc__builtin__headers__ia32_8h.html#ac3e5603ffb2911921362f885b8048da1',1,'gcc_builtin_headers_ia32.h']]],
+  ['_5fhidden_4702',['_hidden',['../group__module__hidden.html',1,'']]]
 ];

@@ -22,5 +22,7 @@ var classconsolet =
     [ "_init_done", "classconsolet.html#a31f20dfbb681a1fa85a6c88ac545f138", null ],
     [ "_is_terminal", "classconsolet.html#a3603d0d53e990c149f1bb495dfa71f45", null ],
     [ "_out", "classconsolet.html#a4e726f64f9e3155ca7712800e790d6fe", null ],
-    [ "_use_SGR", "classconsolet.html#ac27878a00388898426005e63790e38aa", null ]
+    [ "_use_SGR", "classconsolet.html#ac27878a00388898426005e63790e38aa", null ],
+    [ "_width", "classconsolet.html#a066eda798d48376cfc2301c74c2b5a85", null ],
+    [ "_width_is_set", "classconsolet.html#acb537dc92fb668141e1906be441842ac", null ]
 ];

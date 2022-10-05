@@ -106,79 +106,111 @@ $(document).ready(function(){initNavTree('help__formatter_8cpp_source.html','');
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;ostream&gt;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classhelp__formattert.html#a9ffc846f282121096f61609082e1253f">   15</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classhelp__formattert.html#a9ffc846f282121096f61609082e1253f">help_formattert::operator()</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  std::size_t <a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> = 0;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">auto</span> next = [<span class="keyword">this</span>, &amp;<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>]() -&gt; <span class="keywordtype">char</span> {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> &lt; <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>.size())</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>[<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>++];</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  };</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::size_t col = 0;</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">   15</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">help_formattert::emit_word</a>(<a class="code" href="structhelp__formattert_1_1statet.html">statet</a> &amp;state, std::ostream &amp;out)</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;{</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordflow">if</span>(state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a>.empty())</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="comment">// screen width exceeded when aligning?</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">if</span>(state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a> + state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a>.size() &gt; <a class="code" href="classconsolet.html#a8b2f0cf55009c8500ca6d802ff36e67e">consolet::width</a>() &amp;&amp; state.<a class="code" href="structhelp__formattert_1_1statet.html#a9980ff2272f1b74448c0b22ea54390f7">aligning</a>)</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> &lt;&lt; std::string(<a class="code" href="classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89">first_column_width</a> + 1, <span class="charliteral">&#39; &#39;</span>);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a> = <a class="code" href="classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89">first_column_width</a> + 1;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  }</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">while</span>(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> &lt; <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>.size())</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">auto</span> ch = next();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;{&#39;</span>)</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="keyword">auto</span> what = next();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      <span class="keywordflow">switch</span>(what)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">case</span> <span class="charliteral">&#39;b&#39;</span>:</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        out &lt;&lt; <a class="code" href="classconsolet.html#a964ec4b301c6348d589421cf5a7fdfdb">consolet::bold</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">case</span> <span class="charliteral">&#39;u&#39;</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        out &lt;&lt; <a class="code" href="classconsolet.html#a414348bd56961176c20ac2bdddd343dc">consolet::underline</a>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">case</span> <span class="charliteral">&#39;y&#39;</span>:</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        out &lt;&lt; <a class="code" href="classconsolet.html#a2d57c6ac6783df486733eed31b21a54d">consolet::yellow</a>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">while</span>(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> &lt; <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>.size() &amp;&amp; (ch = next()) != <span class="charliteral">&#39;}&#39;</span>)</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        out &lt;&lt; ch;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        col++;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      out &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;\t&#39;</span>)</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">if</span>(col &lt; 29)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        out &lt;&lt; std::string(29 - col, <span class="charliteral">&#39; &#39;</span>);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        col = 40;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      }</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      out &lt;&lt; ch;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      col = 0;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      out &lt;&lt; ch;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      col++;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  out &lt;&lt; state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a> += state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a>.size();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a>.clear();</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classhelp__formattert.html#a9ffc846f282121096f61609082e1253f">   32</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classhelp__formattert.html#a9ffc846f282121096f61609082e1253f">help_formattert::operator()</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  std::size_t <a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> = 0;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">auto</span> next = [<span class="keyword">this</span>, &amp;<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>]() -&gt; <span class="keywordtype">char</span> {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> &lt; <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>.size())</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>[<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>++];</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  };</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="structhelp__formattert_1_1statet.html">statet</a> state;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">while</span>(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> &lt; <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>.size())</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">auto</span> ch = next();</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;{&#39;</span>)</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">emit_word</a>(state, out);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <span class="keyword">auto</span> what = next();</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="comment">// spaces in formatted text are non-breakable</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <span class="keywordflow">while</span>(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> &lt; <a class="code" href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">s</a>.size() &amp;&amp; (ch = next()) != <span class="charliteral">&#39;}&#39;</span>)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a> += ch;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordflow">switch</span>(what)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">case</span> <span class="charliteral">&#39;b&#39;</span>:</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        out &lt;&lt; <a class="code" href="classconsolet.html#a964ec4b301c6348d589421cf5a7fdfdb">consolet::bold</a>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="keywordflow">case</span> <span class="charliteral">&#39;u&#39;</span>:</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        out &lt;&lt; <a class="code" href="classconsolet.html#a414348bd56961176c20ac2bdddd343dc">consolet::underline</a>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keywordflow">case</span> <span class="charliteral">&#39;y&#39;</span>:</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        out &lt;&lt; <a class="code" href="classconsolet.html#a2d57c6ac6783df486733eed31b21a54d">consolet::yellow</a>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">emit_word</a>(state, out);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      out &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a>;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;\t&#39;</span>)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">emit_word</a>(state, out);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordflow">if</span>(state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a> &lt; <a class="code" href="classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89">first_column_width</a>)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        out &lt;&lt; std::string(<a class="code" href="classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89">first_column_width</a> - state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a>, <span class="charliteral">&#39; &#39;</span>);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a> = <a class="code" href="classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89">first_column_width</a>;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      state.<a class="code" href="structhelp__formattert_1_1statet.html#a9980ff2272f1b74448c0b22ea54390f7">aligning</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    {</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">emit_word</a>(state, out);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      state.<a class="code" href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">column</a> = 0;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      state.<a class="code" href="structhelp__formattert_1_1statet.html#a9980ff2272f1b74448c0b22ea54390f7">aligning</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      state.<a class="code" href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">word</a> += ch;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39; &#39;</span>)</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">emit_word</a>(state, out);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <a class="code" href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">emit_word</a>(state, out);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassconsolet_html_a2d57c6ac6783df486733eed31b21a54d"><div class="ttname"><a href="classconsolet.html#a2d57c6ac6783df486733eed31b21a54d">consolet::yellow</a></div><div class="ttdeci">static std::ostream &amp; yellow(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00134">console.cpp:134</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a2d57c6ac6783df486733eed31b21a54d"><div class="ttname"><a href="classconsolet.html#a2d57c6ac6783df486733eed31b21a54d">consolet::yellow</a></div><div class="ttdeci">static std::ostream &amp; yellow(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00136">console.cpp:136</a></div></div>
 <div class="ttc" id="aliteral_8h_html_afe9a214e6401c7ef6920677a5a066fdf"><div class="ttname"><a href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a></div><div class="ttdeci">literalt pos(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00194">literal.h:194</a></div></div>
 <div class="ttc" id="ahelp__formatter_8h_html"><div class="ttname"><a href="help__formatter_8h.html">help_formatter.h</a></div></div>
+<div class="ttc" id="astructhelp__formattert_1_1statet_html_a9980ff2272f1b74448c0b22ea54390f7"><div class="ttname"><a href="structhelp__formattert_1_1statet.html#a9980ff2272f1b74448c0b22ea54390f7">help_formattert::statet::aligning</a></div><div class="ttdeci">bool aligning</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00032">help_formatter.h:32</a></div></div>
 <div class="ttc" id="aconsole_8h_html"><div class="ttname"><a href="console_8h.html">console.h</a></div></div>
-<div class="ttc" id="aclasshelp__formattert_html_a9ffc846f282121096f61609082e1253f"><div class="ttname"><a href="classhelp__formattert.html#a9ffc846f282121096f61609082e1253f">help_formattert::operator()</a></div><div class="ttdeci">void operator()(std::ostream &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8cpp_source.html#l00015">help_formatter.cpp:15</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a414348bd56961176c20ac2bdddd343dc"><div class="ttname"><a href="classconsolet.html#a414348bd56961176c20ac2bdddd343dc">consolet::underline</a></div><div class="ttdeci">static std::ostream &amp; underline(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00166">console.cpp:166</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a6d3593d920e93f841bee945e27eb85b2"><div class="ttname"><a href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a></div><div class="ttdeci">static std::ostream &amp; reset(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00174">console.cpp:174</a></div></div>
+<div class="ttc" id="astructhelp__formattert_1_1statet_html_a68a07d8f5d8f04f3e1847c42aa401a1d"><div class="ttname"><a href="structhelp__formattert_1_1statet.html#a68a07d8f5d8f04f3e1847c42aa401a1d">help_formattert::statet::word</a></div><div class="ttdeci">std::string word</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00033">help_formatter.h:33</a></div></div>
+<div class="ttc" id="astructhelp__formattert_1_1statet_html_a098e3a947f9c8ecf29559ee212ea196f"><div class="ttname"><a href="structhelp__formattert_1_1statet.html#a098e3a947f9c8ecf29559ee212ea196f">help_formattert::statet::column</a></div><div class="ttdeci">std::size_t column</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00031">help_formatter.h:31</a></div></div>
+<div class="ttc" id="aclasshelp__formattert_html_a2b5ec122e483c7563f0c9acbe9d21b89"><div class="ttname"><a href="classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89">help_formattert::first_column_width</a></div><div class="ttdeci">static const std::size_t first_column_width</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00037">help_formatter.h:37</a></div></div>
+<div class="ttc" id="aclasshelp__formattert_html_a9ffc846f282121096f61609082e1253f"><div class="ttname"><a href="classhelp__formattert.html#a9ffc846f282121096f61609082e1253f">help_formattert::operator()</a></div><div class="ttdeci">void operator()(std::ostream &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8cpp_source.html#l00032">help_formatter.cpp:32</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a414348bd56961176c20ac2bdddd343dc"><div class="ttname"><a href="classconsolet.html#a414348bd56961176c20ac2bdddd343dc">consolet::underline</a></div><div class="ttdeci">static std::ostream &amp; underline(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00168">console.cpp:168</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a8b2f0cf55009c8500ca6d802ff36e67e"><div class="ttname"><a href="classconsolet.html#a8b2f0cf55009c8500ca6d802ff36e67e">consolet::width</a></div><div class="ttdeci">static std::size_t width()</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00184">console.cpp:184</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a6d3593d920e93f841bee945e27eb85b2"><div class="ttname"><a href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a></div><div class="ttdeci">static std::ostream &amp; reset(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00176">console.cpp:176</a></div></div>
+<div class="ttc" id="aclasshelp__formattert_html_ad72bdc2e80e1b60ccd985c820d846d11"><div class="ttname"><a href="classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11">help_formattert::emit_word</a></div><div class="ttdeci">static void emit_word(statet &amp;, std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8cpp_source.html#l00015">help_formatter.cpp:15</a></div></div>
+<div class="ttc" id="astructhelp__formattert_1_1statet_html"><div class="ttname"><a href="structhelp__formattert_1_1statet.html">help_formattert::statet</a></div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00029">help_formatter.h:29</a></div></div>
 <div class="ttc" id="aclasshelp__formattert_html_aeb5c2a753ee263339866bde4b9455558"><div class="ttname"><a href="classhelp__formattert.html#aeb5c2a753ee263339866bde4b9455558">help_formattert::s</a></div><div class="ttdeci">const std::string &amp; s</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00025">help_formatter.h:25</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a964ec4b301c6348d589421cf5a7fdfdb"><div class="ttname"><a href="classconsolet.html#a964ec4b301c6348d589421cf5a7fdfdb">consolet::bold</a></div><div class="ttdeci">static std::ostream &amp; bold(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00150">console.cpp:150</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a964ec4b301c6348d589421cf5a7fdfdb"><div class="ttname"><a href="classconsolet.html#a964ec4b301c6348d589421cf5a7fdfdb">consolet::bold</a></div><div class="ttdeci">static std::ostream &amp; bold(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00152">console.cpp:152</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

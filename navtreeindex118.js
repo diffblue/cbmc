@@ -1,5 +1,9 @@
 var NAVTREEINDEX118 =
 {
+"string__refinement_8cpp.html#a77f96fdd4f2958bd8ce2c568774b0bcf":[5,0,2,24,10,30,2],
+"string__refinement_8cpp.html#a7c39282a58c54b5d804207f121ac88fa":[5,0,2,24,10,30,32],
+"string__refinement_8cpp.html#a846b09be0c9a450cf6bfe67b8894fc9f":[5,0,2,24,10,30,25],
+"string__refinement_8cpp.html#a991d4e4c1957ba0deac23a69c3530be4":[5,0,2,24,10,30,17],
 "string__refinement_8cpp.html#aad8e3229c296bfae89e6810d022c550b":[5,0,2,24,10,30,31],
 "string__refinement_8cpp.html#aae7cc64774c0f85bbc970c876407f594":[5,0,2,24,10,30,19],
 "string__refinement_8cpp.html#aaea4a14c3de95dcc0267c6e8ebc4b637":[5,0,2,24,10,30,26],
@@ -245,9 +249,5 @@ var NAVTREEINDEX118 =
 "structbv__refinementt_1_1approximationt.html#af06567bf6c2cd3b2d342ff173ac3001d":[4,0,125,0,0],
 "structbv__refinementt_1_1approximationt.html#af64f49811038d39aec99c38ba2fdc7a6":[4,0,125,0,6],
 "structbv__refinementt_1_1approximationt.html#afd67fd10df3f84ae3504c2155bd26c34":[4,0,125,0,10],
-"structbv__refinementt_1_1configt.html":[4,0,125,1],
-"structbv__refinementt_1_1configt.html#a2b786a619d95e0dbde1146992dc3bc7d":[4,0,125,1,0],
-"structbv__refinementt_1_1configt.html#a74953706601296f9967d75737acaccd5":[4,0,125,1,3],
-"structbv__refinementt_1_1configt.html#aafb18fe5e86bcc6f44ae3c7e63ecc58b":[4,0,125,1,1],
-"structbv__refinementt_1_1configt.html#abffff8ef54b348e2315a0af1018ab9df":[4,0,125,1,2]
+"structbv__refinementt_1_1configt.html":[4,0,125,1]
 };
