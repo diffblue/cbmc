@@ -353,6 +353,11 @@ static smt_termt convert_expr_to_smt(
   const concatenation_exprt &concatenation,
   const sub_expression_mapt &converted)
 {
+  if(operands_are_of_type<bitvector_typet>(concatenation))
+  {
+    return convert_multiary_operator_to_terms(
+      concatenation, converted, smt_bit_vector_theoryt::concat);
+  }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for concatenation expression: " +
     concatenation.pretty());
