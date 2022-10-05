@@ -439,7 +439,9 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
     {
       const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
       INVARIANT(
-        symbol_expr, "Unhandled expressions are expected to be symbols");
+        symbol_expr,
+        "Unhandled expressions are expected to be symbols - " +
+          expr.pretty(1,0));
       // Note this case is currently expected to be encountered during trace
       // generation for -
       //  * Steps which were removed via --slice-formula.
