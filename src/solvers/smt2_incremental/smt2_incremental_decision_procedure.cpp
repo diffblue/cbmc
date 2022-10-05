@@ -273,7 +273,7 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   define_dependent_functions(expr);
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
-  expression_handle_identifiers.emplace(expr, function.identifier());
+  expression_handle_identifiers.emplace(in_expr, function.identifier());
   identifier_table.emplace(
     function.identifier().identifier(), function.identifier());
   solver_process->send(function);
