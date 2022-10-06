@@ -995,34 +995,34 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
   else if(can_cast_expr<side_effect_expr_function_callt>(target))
   {
     const auto &funcall = to_side_effect_expr_function_call(target);
-    if(can_cast_expr<symbol_exprt>(funcall.function()))
-    {
-      const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
-      if(
-        ident == CPROVER_PREFIX "assignable" ||
-        ident == CPROVER_PREFIX "object_whole" ||
-        ident == CPROVER_PREFIX "object_upto" ||
-        ident == CPROVER_PREFIX "object_from")
-      {
-        for(const auto &argument : funcall.arguments())
-          throw_on_side_effects(argument);
-        return;
-      }
-    }
-    else
+    if(!can_cast_expr<symbol_exprt>(funcall.function()))
     {
       throw invalid_source_file_exceptiont(
         "function pointer calls not allowed in assigns clauses",
         target.source_location());
     }
+
+    if(target.type().id() != ID_empty)
+    {
+      throw invalid_source_file_exceptiont(
+        "expecting void return type for function '" +
+          id2string(to_symbol_expr(funcall.function()).get_identifier()) +
+          "' called in assigns clause",
+        target.source_location());
+    }
+
+    for(const auto &argument : funcall.arguments())
+      throw_on_side_effects(argument);
   }
-  // if we reach this point the target did not pass the checks
-  throw invalid_source_file_exceptiont(
-    "assigns clause target must be a non-void lvalue or a call to one "
-    "of " CPROVER_PREFIX "POINTER_OBJECT, " CPROVER_PREFIX
-    "assignable, " CPROVER_PREFIX "object_whole, " CPROVER_PREFIX
-    "object_upto, " CPROVER_PREFIX "object_from",
-    target.source_location());
+  else
+  {
+    // if we reach this point the target did not pass the checks
+    throw invalid_source_file_exceptiont(
+      "assigns clause target must be a non-void lvalue, a call "
+      "to " CPROVER_PREFIX
+      "POINTER_OBJECT or a call to a function returning void",
+      target.source_location());
+  }
 }
 
 void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(

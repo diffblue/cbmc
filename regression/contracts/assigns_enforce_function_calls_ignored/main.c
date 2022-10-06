@@ -1,6 +1,7 @@
-int *bar(int *x)
+void bar(int *x)
 {
-  return *x;
+  if(x)
+    __CPROVER_typed_target(x);
 }
 
 int foo(int *x) __CPROVER_assigns(bar(x))

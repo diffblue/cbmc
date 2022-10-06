@@ -3,8 +3,8 @@ main.c
 --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
-^.*error: assigns clause target must be a non-void lvalue or a call to one of __CPROVER_POINTER_OBJECT, __CPROVER_assignable, __CPROVER_object_whole, __CPROVER_object_upto, __CPROVER_object_from$
+^.*error: expecting void return type for function 'bar' called in assigns clause$
 ^CONVERSION ERROR$
 --
 --
-Check that function call expressions are rejected in assigns clauses.
+Check that non-void function call expressions are rejected in assigns clauses.
