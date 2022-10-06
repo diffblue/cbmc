@@ -113,7 +113,8 @@ static std::string architecture_string(const std::string &value, const char *s)
 template <typename T>
 static std::string architecture_string(T value, const char *s)
 {
-  return std::string("const int " CPROVER_PREFIX "architecture_") +
+  return std::string("const " CPROVER_PREFIX "integer " CPROVER_PREFIX
+                     "architecture_") +
          std::string(s) + "=" + std::to_string(value) + ";\n";
 }
 
