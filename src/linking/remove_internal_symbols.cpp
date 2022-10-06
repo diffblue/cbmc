@@ -155,6 +155,9 @@ void remove_internal_symbols(
   special.insert(CPROVER_PREFIX "object_upto");
   special.insert(CPROVER_PREFIX "object_from");
   special.insert(CPROVER_PREFIX "object_whole");
+  special.insert(CPROVER_PREFIX "freeable");
+  special.insert(CPROVER_PREFIX "is_freeable");
+  special.insert(CPROVER_PREFIX "was_freed");
   special.insert(rounding_mode_identifier());
   special.insert("__new");
   special.insert("__new_array");

@@ -151,14 +151,20 @@ protected:
   /// Checks that no history expr or return_value exists in expr
   virtual void
   check_history_expr_return_value(const exprt &expr, std::string &clause_type);
+  /// Checks that no occurence of the `CPROVER_PREFIX was_freed` predicate
+  /// is found in expr.
+  virtual void check_was_freed(const exprt &expr, std::string &clause_type);
+
   virtual void typecheck_spec_function_pointer_obeys_contract(exprt &expr);
   virtual void typecheck_spec_assigns(exprt::operandst &targets);
+  virtual void typecheck_spec_frees(exprt::operandst &targets);
   virtual void typecheck_conditional_targets(
     exprt::operandst &targets,
     const std::function<void(exprt &)> typecheck_target,
     const std::string &clause_type);
   virtual void typecheck_spec_condition(exprt &condition);
   virtual void typecheck_spec_assigns_target(exprt &target);
+  virtual void typecheck_spec_frees_target(exprt &target);
   virtual void typecheck_spec_loop_invariant(codet &code);
   virtual void typecheck_spec_decreases(codet &code);
   virtual void throw_on_side_effects(const exprt &expr);

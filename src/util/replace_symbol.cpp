@@ -237,6 +237,11 @@ bool replace_symbolt::replace(typet &dest) const
     if(spec_assigns.is_not_nil() && have_to_replace(spec_assigns))
       result &= replace(static_cast<exprt &>(dest.add(ID_C_spec_assigns)));
 
+    const exprt &spec_frees =
+      static_cast<const exprt &>(dest.find(ID_C_spec_frees));
+    if(spec_frees.is_not_nil() && have_to_replace(spec_frees))
+      result &= replace(static_cast<exprt &>(dest.add(ID_C_spec_frees)));
+
     const exprt &spec_ensures =
       static_cast<const exprt &>(dest.find(ID_C_spec_ensures));
     if(spec_ensures.is_not_nil() && have_to_replace(spec_ensures))

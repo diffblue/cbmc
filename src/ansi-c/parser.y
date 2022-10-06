@@ -209,6 +209,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_ENSURES_CONTRACT "__CPROVER_ensures_contract"
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
+%token TOK_CPROVER_FREES "__CPROVER_frees"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_XORXOR      "^^"
@@ -3319,6 +3320,7 @@ cprover_function_contract:
           parser_stack($$).add_to_operands(std::move(tmp));
         }
         | cprover_contract_assigns
+        | cprover_contract_frees
         ;
 
 unary_expression_list:
@@ -3394,6 +3396,27 @@ cprover_contract_assigns_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
         | cprover_contract_assigns
+        ;
+
+cprover_contract_frees:
+         TOK_CPROVER_FREES '(' conditional_target_list_opt_semicol ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_frees);
+          mto($$, $3);
+        }
+        | TOK_CPROVER_FREES '(' ')'
+        {
+          $$=$1;
+          set($$, ID_C_spec_frees);
+          parser_stack($$).add_to_operands(exprt(ID_target_list));
+        }
+        ;
+
+cprover_contract_frees_opt:
+        /* nothing */
+        { init($$); parser_stack($$).make_nil(); }
+        | cprover_contract_frees
         ;
 
 cprover_function_contract_sequence:
