@@ -28,6 +28,7 @@ var cprover__builtin__headers_8h =
     [ "__CPROVER_fmodf", "cprover__builtin__headers_8h.html#a11dd2c1c6eaaa857811c901c3557d0bf", null ],
     [ "__CPROVER_fmodl", "cprover__builtin__headers_8h.html#acd7881540ca881168ad50023dc7a7f0d", null ],
     [ "__CPROVER_fpclassify", "cprover__builtin__headers_8h.html#ae213ad2a091cf7e42fa8e71078b88097", null ],
+    [ "__CPROVER_freeable", "cprover__builtin__headers_8h.html#a205079ca3f34db4dd5799a46daa038cc", null ],
     [ "__CPROVER_get_flag", "cprover__builtin__headers_8h.html#aadd679878c08e2ba49dc786a4707346e", null ],
     [ "__CPROVER_get_may", "cprover__builtin__headers_8h.html#ab8d8f35d980004646617b18b0f9e524b", null ],
     [ "__CPROVER_get_must", "cprover__builtin__headers_8h.html#a8b425c9bbc30684bc01e7e1e4b9ac900", null ],
@@ -40,6 +41,7 @@ var cprover__builtin__headers_8h =
     [ "__CPROVER_is_cstring", "cprover__builtin__headers_8h.html#ad65e8a3c3fd7881a820d68171bd18964", null ],
     [ "__CPROVER_is_cyclic_dll", "cprover__builtin__headers_8h.html#a9b74f4f21c04f1db0f8b2c59a54b18ce", null ],
     [ "__CPROVER_is_dll", "cprover__builtin__headers_8h.html#a1cd00a1b4833beeb2a95dff866095201", null ],
+    [ "__CPROVER_is_freeable", "cprover__builtin__headers_8h.html#ab32db8895952dbd7e472a9fd51c5e04e", null ],
     [ "__CPROVER_is_fresh", "cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f", null ],
     [ "__CPROVER_is_invalid_pointer", "cprover__builtin__headers_8h.html#a6cd7ae3faa081ebf82adc21ba1f96bc0", null ],
     [ "__CPROVER_is_list", "cprover__builtin__headers_8h.html#add1485fd8e6d57dab0c2ca56d0e2564c", null ],
@@ -105,6 +107,7 @@ var cprover__builtin__headers_8h =
     [ "__CPROVER_signf", "cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70", null ],
     [ "__CPROVER_signld", "cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021", null ],
     [ "__CPROVER_w_ok", "cprover__builtin__headers_8h.html#a99bf36ef57e5e92ee393d44fad054ba3", null ],
+    [ "__CPROVER_was_freed", "cprover__builtin__headers_8h.html#acdde00b248a37c891befe36ccd9828ce", null ],
     [ "__CPROVER_WRITEABLE_OBJECT", "cprover__builtin__headers_8h.html#a8e36a2c17ffcbfe97efc5c459f78b239", null ],
     [ "__CPROVER_zero_string_length", "cprover__builtin__headers_8h.html#a85d3c5a542e78b671377625ec9e0e42a", null ],
     [ "__VERIFIER_assume", "cprover__builtin__headers_8h.html#a39ba168ce70f928e45cda6cad20a1a6c", null ]

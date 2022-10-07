@@ -183,6 +183,10 @@ Functions</h2></td></tr>
 <tr class="separator:a25834baa2dad8149e94c7c9c4f54e31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8095a7d8eedfc878e2f87d77cc1fdefa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a8095a7d8eedfc878e2f87d77cc1fdefa">__CPROVER_fence</a> (const char *kind,...)</td></tr>
 <tr class="separator:a8095a7d8eedfc878e2f87d77cc1fdefa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab32db8895952dbd7e472a9fd51c5e04e"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#ab32db8895952dbd7e472a9fd51c5e04e">__CPROVER_is_freeable</a> (const void *mem)</td></tr>
+<tr class="separator:ab32db8895952dbd7e472a9fd51c5e04e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdde00b248a37c891befe36ccd9828ce"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#acdde00b248a37c891befe36ccd9828ce">__CPROVER_was_freed</a> (const void *mem)</td></tr>
+<tr class="separator:acdde00b248a37c891befe36ccd9828ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4e9673ed79a6d8ff4af6cf12d95c29f"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a> (const void *mem, __CPROVER_size_t size)</td></tr>
 <tr class="separator:ad4e9673ed79a6d8ff4af6cf12d95c29f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10645790184f1c29e831659a4fd568bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a10645790184f1c29e831659a4fd568bb">__CPROVER_old</a> (const void *)</td></tr>
@@ -323,6 +327,8 @@ Functions</h2></td></tr>
 <tr class="separator:abca0337cfd5268f7bce166885ccd74ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2be80782db5f3cfb2a75f18530b2c992"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a2be80782db5f3cfb2a75f18530b2c992">__CPROVER_object_upto</a> (void *ptr, __CPROVER_size_t size)</td></tr>
 <tr class="separator:a2be80782db5f3cfb2a75f18530b2c992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a205079ca3f34db4dd5799a46daa038cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__builtin__headers_8h.html#a205079ca3f34db4dd5799a46daa038cc">__CPROVER_freeable</a> (void *ptr)</td></tr>
+<tr class="separator:a205079ca3f34db4dd5799a46daa038cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a9b10d4cf8fd8912b7c88cfb9d796e747"></a>
@@ -1005,6 +1011,24 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a205079ca3f34db4dd5799a46daa038cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a205079ca3f34db4dd5799a46daa038cc">&#9670;&nbsp;</a></span>__CPROVER_freeable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void __CPROVER_freeable </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aadd679878c08e2ba49dc786a4707346e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aadd679878c08e2ba49dc786a4707346e">&#9670;&nbsp;</a></span>__CPROVER_get_flag()</h2>
 
@@ -1262,6 +1286,24 @@ Functions</h2></td></tr>
           <td class="memname">__CPROVER_bool __CPROVER_is_dll </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab32db8895952dbd7e472a9fd51c5e04e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab32db8895952dbd7e472a9fd51c5e04e">&#9670;&nbsp;</a></span>__CPROVER_is_freeable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__CPROVER_bool __CPROVER_is_freeable </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>mem</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -2726,6 +2768,24 @@ Functions</h2></td></tr>
           <td class="memname">__CPROVER_bool __CPROVER_w_ok </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acdde00b248a37c891befe36ccd9828ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdde00b248a37c891befe36ccd9828ce">&#9670;&nbsp;</a></span>__CPROVER_was_freed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__CPROVER_bool __CPROVER_was_freed </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>mem</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

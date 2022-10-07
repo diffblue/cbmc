@@ -26,6 +26,7 @@ var classansi__c__convert__typet =
     [ "float_cnt", "classansi__c__convert__typet.html#a73d2d8fe2123521677ce15340d5dae3e", null ],
     [ "floatbv_cnt", "classansi__c__convert__typet.html#a50cd415b5a9cd9d6be90bb2c8b5689be", null ],
     [ "fraction_width", "classansi__c__convert__typet.html#a4a005ad3b7caff80e6ac03db59e43076", null ],
+    [ "frees", "classansi__c__convert__typet.html#aace104823086f582de9ab95a23fa7ace", null ],
     [ "gcc_attribute_mode", "classansi__c__convert__typet.html#a7299dab489d758ee62d246ffcfd58632", null ],
     [ "gcc_float128_cnt", "classansi__c__convert__typet.html#afdb28f380db24dc338a948f45149b8e9", null ],
     [ "gcc_float128x_cnt", "classansi__c__convert__typet.html#a70495dc55da4474ee68ce263f34af73c", null ],

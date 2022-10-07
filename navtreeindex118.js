@@ -1,5 +1,14 @@
 var NAVTREEINDEX118 =
 {
+"string__refinement_8cpp.html#a396e1c449e28ad3cd8bee9a157a36fa7":[5,0,2,24,10,30,9],
+"string__refinement_8cpp.html#a3bc8b23573f6ea21b43715c62b7a7593":[5,0,2,24,10,30,16],
+"string__refinement_8cpp.html#a41c296f3d6eae2764f28bf45efc96583":[5,0,2,24,10,30,11],
+"string__refinement_8cpp.html#a479ec7cdc1b70d68eefdc14deaaabfab":[5,0,2,24,10,30,3],
+"string__refinement_8cpp.html#a49c3b1ce089bc308eec0b577a8ce4021":[5,0,2,24,10,30,0],
+"string__refinement_8cpp.html#a546fcdd903f84c2bc8c952399f5666b5":[5,0,2,24,10,30,35],
+"string__refinement_8cpp.html#a55da349c2aca1bb96d54a6bfbc9519a3":[5,0,2,24,10,30,22],
+"string__refinement_8cpp.html#a62e555c7a9444102f7f994a77afa63fe":[5,0,2,24,10,30,1],
+"string__refinement_8cpp.html#a72ae9f77f37e8c92133b2f8a09a138a1":[5,0,2,24,10,30,37],
 "string__refinement_8cpp.html#a77f96fdd4f2958bd8ce2c568774b0bcf":[5,0,2,24,10,30,2],
 "string__refinement_8cpp.html#a7c39282a58c54b5d804207f121ac88fa":[5,0,2,24,10,30,32],
 "string__refinement_8cpp.html#a846b09be0c9a450cf6bfe67b8894fc9f":[5,0,2,24,10,30,25],
@@ -240,14 +249,5 @@ var NAVTREEINDEX118 =
 "structbv__refinementt_1_1approximationt.html#a90bc21ce7ddb883723918259a47bb092":[4,0,125,0,7],
 "structbv__refinementt_1_1approximationt.html#a939b461fc37699eb83277246872c0123":[4,0,125,0,3],
 "structbv__refinementt_1_1approximationt.html#a9e8527f5533d33f3625fda4fad7ec2b4":[4,0,125,0,5],
-"structbv__refinementt_1_1approximationt.html#aa561a01a2755e2d730fbbae46815ced4":[4,0,125,0,15],
-"structbv__refinementt_1_1approximationt.html#ab7f74f8ba20c7636dab7913900aaede2":[4,0,125,0,1],
-"structbv__refinementt_1_1approximationt.html#ac15ee02667959f755bc10be3d2e528a8":[4,0,125,0,17],
-"structbv__refinementt_1_1approximationt.html#aca902cc90c30456c04eba07437bd8aa9":[4,0,125,0,9],
-"structbv__refinementt_1_1approximationt.html#ae75be3510735ce7ed83c2eb2bd2cb1e4":[4,0,125,0,14],
-"structbv__refinementt_1_1approximationt.html#aefc4529da28e9925114aadf51aace5cd":[4,0,125,0,8],
-"structbv__refinementt_1_1approximationt.html#af06567bf6c2cd3b2d342ff173ac3001d":[4,0,125,0,0],
-"structbv__refinementt_1_1approximationt.html#af64f49811038d39aec99c38ba2fdc7a6":[4,0,125,0,6],
-"structbv__refinementt_1_1approximationt.html#afd67fd10df3f84ae3504c2155bd26c34":[4,0,125,0,10],
-"structbv__refinementt_1_1configt.html":[4,0,125,1]
+"structbv__refinementt_1_1approximationt.html#aa561a01a2755e2d730fbbae46815ced4":[4,0,125,0,15]
 };
