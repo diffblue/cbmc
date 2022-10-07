@@ -61,6 +61,15 @@ optionalt<exprt> address_to_lvalue(exprt src)
     return {};
 }
 
+static exprt use_address_of(exprt src)
+{
+  auto src_lvalue_opt = address_to_lvalue(src);
+  if(src_lvalue_opt.has_value())
+    return address_of_exprt(*src_lvalue_opt);
+  else
+    return src;
+}
+
 void show_trace(
   const std::vector<framet> &frames,
   const propertyt &property,
@@ -123,13 +132,17 @@ void show_trace(
           consolet::out() << std::setw(4) << ' ';
         }
 
-        auto lvalue_opt = address_to_lvalue(update.address);
-        if(lvalue_opt.has_value())
-          consolet::out() << format(*lvalue_opt);
+        // use an l-value expression for better readability, if possible
+        auto lhs_lvalue_opt = address_to_lvalue(update.address);
+        if(lhs_lvalue_opt.has_value())
+          consolet::out() << format(*lhs_lvalue_opt);
         else
           consolet::out() << '[' << format(update.address) << ']';
 
-        consolet::out() << " := " << format(update.value);
+        // use address_of for better readability
+        auto value_with_address_of = use_address_of(update.value);
+
+        consolet::out() << " := " << format(value_with_address_of);
         consolet::out() << '\n';
       }
     }
