@@ -1156,9 +1156,9 @@ const select_pointer_typet &
 
 /// Provide feedback to `language_filest` so that when asked for a lazy method,
 /// it can delegate to this instance of java_bytecode_languaget.
-/// \return Populates `methods` with the complete list of lazy methods that are
-///   available to convert (those which are valid parameters for
-///   `convert_lazy_method`)
+/// \param [out] methods: Populates `methods` with the complete list of lazy
+///   methods that are available to convert (those which are valid parameters
+///   for `convert_lazy_method`)
 void java_bytecode_languaget::methods_provided(
   std::unordered_set<irep_idt> &methods) const
 {

@@ -48,15 +48,15 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Iterates through the parameters of the function type \p ftype, finds a new
 /// new name for each parameter and renames them in `ftype.parameters()` as
 /// well as in the \p symbol_table.
+/// Assigns parameter names (side-effects on `ftype`) to function stub
+/// parameters, which are initially nameless as method conversion hasn't
+/// happened. Also creates symbols in `symbol_table`.
 /// \param [in,out] ftype:
 ///   Function type whose parameters should be named.
 /// \param name_prefix:
 ///   Prefix for parameter names, typically the parent function's name.
 /// \param [in,out] symbol_table:
 ///   Global symbol table.
-/// \return Assigns parameter names (side-effects on `ftype`) to function stub
-///   parameters, which are initially nameless as method conversion hasn't
-///   happened. Also creates symbols in `symbol_table`.
 static void assign_parameter_names(
   java_method_typet &ftype,
   const irep_idt &name_prefix,

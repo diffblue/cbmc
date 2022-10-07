@@ -23,7 +23,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <sstream>
 
 /// Convert UCS-2 or UTF-16 to an array expression.
-/// \par parameters: `in`: wide string to convert
+/// \param in: wide string to convert
 /// \return Returns a Java char array containing the same wchars.
 static array_exprt utf16_to_array(const std::wstring &in)
 {

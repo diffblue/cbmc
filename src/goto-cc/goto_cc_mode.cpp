@@ -131,8 +131,7 @@ int goto_cc_modet::main(int argc, const char **argv)
   }
 }
 
-/// prints a message informing the user about incorrect options
-/// \return none
+/// Prints a message informing the user about incorrect options.
 void goto_cc_modet::usage_error()
 {
   std::cerr << "Usage error!\n\n";

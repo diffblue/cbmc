@@ -69,7 +69,6 @@ cpp_idt &cpp_scopest::put_into_scope(
   }
 }
 
-/// \return Purpose:
 void cpp_scopest::print_current(std::ostream &out) const
 {
   const cpp_scopet *scope=current_scope_ptr;
