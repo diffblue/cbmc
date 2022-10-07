@@ -40,7 +40,7 @@ ui_message_handlert::ui_message_handlert(
     break;
 
   case uit::XML_UI:
-    out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    out << "<?xml version=\"1.1\" encoding=\"UTF-8\"?>"
         << "\n";
     out << "<cprover>"
         << "\n";

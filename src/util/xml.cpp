@@ -101,6 +101,19 @@ void xmlt::escape(const std::string &s, std::ostream &out)
       out << '\n';
       break;
 
+    // These values are coming from hex values that have been resolved
+    // into just their literal values from previous steps in the pipeline,
+    // which we are now quoting again, to allow to be printed gracefully
+    // in the XML output.
+    case 0x0:
+    case 0x1:
+    case 0x2:
+    case 0x3:
+    case 0x4:
+    case 0x5:
+    case 0x6:
+    case 0x7:
+    case 0x8:
     case 0x9:  // TAB
     case 0x7F: // DEL
       out << "&#" << std::to_string((unsigned char)ch) << ';';
@@ -140,6 +153,19 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
       out << "&quot;";
       break;
 
+    // These values are coming from hex values that have been resolved
+    // into just their literal values from previous steps in the pipeline,
+    // which we are now quoting again, to allow to be printed gracefully
+    // in the XML output.
+    case 0x0:
+    case 0x1:
+    case 0x2:
+    case 0x3:
+    case 0x4:
+    case 0x5:
+    case 0x6:
+    case 0x7:
+    case 0x8:
     case 0x9:  // TAB
     case 0xA:  // LF
     case 0xD:  // CR
