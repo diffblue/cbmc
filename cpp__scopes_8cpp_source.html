@@ -161,18 +161,18 @@ $(document).ready(function(){initNavTree('cpp__scopes_8cpp_source.html',''); ini
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0">   73</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0">cpp_scopest::print_current</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcpp__scopet.html">cpp_scopet</a> *scope=<a class="code" href="classcpp__scopest.html#a2e03091e26ddba2cf418fd3d5b484920">current_scope_ptr</a>;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">do</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    scope-&gt;<a class="code" href="classcpp__idt.html#acdf2de421f6662ba94f81f969b5cf007">print_fields</a>(out);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    scope=&amp;scope-&gt;<a class="code" href="classcpp__scopet.html#a62dca3920c39a6fef20be02a235dfd9d">get_parent</a>();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">while</span>(!scope-&gt;<a class="code" href="classcpp__scopet.html#aa58b32de674343d2cc2239ce09ae5ff4">is_root_scope</a>());</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0">   72</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0">cpp_scopest::print_current</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcpp__scopet.html">cpp_scopet</a> *scope=<a class="code" href="classcpp__scopest.html#a2e03091e26ddba2cf418fd3d5b484920">current_scope_ptr</a>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    scope-&gt;<a class="code" href="classcpp__idt.html#acdf2de421f6662ba94f81f969b5cf007">print_fields</a>(out);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    scope=&amp;scope-&gt;<a class="code" href="classcpp__scopet.html#a62dca3920c39a6fef20be02a235dfd9d">get_parent</a>();</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">while</span>(!scope-&gt;<a class="code" href="classcpp__scopet.html#aa58b32de674343d2cc2239ce09ae5ff4">is_root_scope</a>());</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="acpp__scopes_8h_html"><div class="ttname"><a href="cpp__scopes_8h.html">cpp_scopes.h</a></div></div>
@@ -205,7 +205,7 @@ $(document).ready(function(){initNavTree('cpp__scopes_8cpp_source.html',''); ini
 <div class="ttc" id="aclasscpp__scopet_html_aa58b32de674343d2cc2239ce09ae5ff4"><div class="ttname"><a href="classcpp__scopet.html#aa58b32de674343d2cc2239ce09ae5ff4">cpp_scopet::is_root_scope</a></div><div class="ttdeci">bool is_root_scope() const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__scope_8h_source.html#l00077">cpp_scope.h:77</a></div></div>
 <div class="ttc" id="aclasscpp__idt_html_a6800db05ddda388fc01a0cee5538457f"><div class="ttname"><a href="classcpp__idt.html#a6800db05ddda388fc01a0cee5538457f">cpp_idt::id_class</a></div><div class="ttdeci">id_classt id_class</div><div class="ttdef"><b>Definition:</b> <a href="cpp__id_8h_source.html#l00045">cpp_id.h:45</a></div></div>
 <div class="ttc" id="aclasscpp__idt_html_a2faf054d6fec331dc5d8992a5410bfc8"><div class="ttname"><a href="classcpp__idt.html#a2faf054d6fec331dc5d8992a5410bfc8">cpp_idt::prefix</a></div><div class="ttdeci">std::string prefix</div><div class="ttdef"><b>Definition:</b> <a href="cpp__id_8h_source.html#l00079">cpp_id.h:79</a></div></div>
-<div class="ttc" id="aclasscpp__scopest_html_a0db9b6470afea2ac517b853e94684aa0"><div class="ttname"><a href="classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0">cpp_scopest::print_current</a></div><div class="ttdeci">void print_current(std::ostream &amp;out) const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__scopes_8cpp_source.html#l00073">cpp_scopes.cpp:73</a></div></div>
+<div class="ttc" id="aclasscpp__scopest_html_a0db9b6470afea2ac517b853e94684aa0"><div class="ttname"><a href="classcpp__scopest.html#a0db9b6470afea2ac517b853e94684aa0">cpp_scopest::print_current</a></div><div class="ttdeci">void print_current(std::ostream &amp;out) const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__scopes_8cpp_source.html#l00072">cpp_scopes.cpp:72</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ab4fe07eaa16795818379d87e5e510686"><div class="ttname"><a href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">symbolt::name</a></div><div class="ttdeci">irep_idt name</div><div class="ttdoc">The unique identifier.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00040">symbol.h:40</a></div></div>
 <div class="ttc" id="aclasscpp__scopet_html_a975b6fa080e3f9f34a537b9ceb409832"><div class="ttname"><a href="classcpp__scopet.html#a975b6fa080e3f9f34a537b9ceb409832">cpp_scopet::insert</a></div><div class="ttdeci">cpp_idt &amp; insert(const irep_idt &amp;_base_name)</div><div class="ttdef"><b>Definition:</b> <a href="cpp__scope_8h_source.html#l00052">cpp_scope.h:52</a></div></div>
 <!-- start footer part -->

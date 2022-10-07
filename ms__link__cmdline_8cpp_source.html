@@ -192,285 +192,285 @@ $(document).ready(function(){initNavTree('ms__link__cmdline_8cpp_source.html',''
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordflow">return</span> in;</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#adb48d7771b4742e35c27f26e3e5912ce">  110</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#adb48d7771b4742e35c27f26e3e5912ce">ms_link_cmdlinet::process_response_file</a>(<span class="keyword">const</span> std::string &amp;file)</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;{</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  std::ifstream infile(file);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordflow">if</span>(!infile)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;failed to open response file &#39;&quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="comment">// these may be Unicode -- which is indicated by 0xff 0xfe</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  std::string line;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  getline(infile, line);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    line.size() &gt;= 2 &amp;&amp; line[0] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xff) &amp;&amp;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    line[1] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xfe))</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">// Unicode, UTF-16 little endian</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#if 1</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="comment">// Re-open -- should be using wifstream,</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">// but this isn&#39;t available everywhere.</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    std::ifstream infile2(file, <a class="code" href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">std::ios::binary</a>);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    infile2.seekg(2);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    std::wstring wline;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">while</span>(<a class="code" href="ms__link__cmdline_8cpp.html#a9d1e917edd1b42f57caa5ebf5136c41a">my_wgetline</a>(infile2, wline))</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(<a class="code" href="narrow_8h.html#a6a70c03c85cdfcd28ede72ae55edf80e">narrow</a>(wline)); <span class="comment">// we UTF-8 it</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    std::wifstream infile2(file, <a class="code" href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">std::ios::binary</a>);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    std::wstring wline;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">while</span>(std::getline(infile2, wline))</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(<a class="code" href="narrow_8h.html#a6a70c03c85cdfcd28ede72ae55edf80e">narrow</a>(wline)); <span class="comment">// we UTF-8 it</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    line.size() &gt;= 3 &amp;&amp; line[0] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xef) &amp;&amp;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    line[1] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xbb) &amp;&amp; line[2] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xbf))</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  {</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">// This is the UTF-8 BOM. We can proceed as usual, since</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="comment">// we use UTF-8 internally.</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    infile.seekg(3);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">while</span>(getline(infile, line))</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(line);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  }</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  {</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="comment">// normal ASCII</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    infile.seekg(0);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">while</span>(getline(infile, line))</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(line);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
-<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">  170</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">ms_link_cmdlinet::process_response_file_line</a>(<span class="keyword">const</span> std::string &amp;line)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="comment">// In a response file, multiple compiler options and source-code files can</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="comment">// appear on one line.  A single compiler-option specification must appear</span></div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="comment">// on one line (cannot span multiple lines).  Response files can have</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="comment">// comments that begin with the # symbol.</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keywordflow">if</span>(line.empty())</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <span class="keywordflow">if</span>(line[0] == <span class="charliteral">&#39;#&#39;</span>)</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">return</span>; <span class="comment">// comment</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  std::vector&lt;std::string&gt; arguments;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  std::string option;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <span class="keywordtype">bool</span> in_quotes = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; line.size(); i++)</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  {</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordtype">char</span> ch = line[i];</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39; &#39;</span> &amp;&amp; !in_quotes)</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">if</span>(!option.empty())</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        arguments.push_back(option);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      option.clear();</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;&quot;&#39;</span>)</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      in_quotes = !in_quotes;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    }</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      option += ch;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keywordflow">if</span>(!option.empty())</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    arguments.push_back(option);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <a class="code" href="classms__link__cmdlinet.html#a479291643e9ae2e7c4fcc3964636cf5d">parse</a>(arguments);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;}</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#a96c677d019190418796e5a9991026507">  210</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#a96c677d019190418796e5a9991026507">ms_link_cmdlinet::process_non_link_option</a>(<span class="keyword">const</span> std::string &amp;s)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;{</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <a class="code" href="classgoto__cc__cmdlinet.html#a054bdc02e35b5bbd7e9ffe771c28856a">set</a>(s);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp; opt : <a class="code" href="ms__link__cmdline_8cpp.html#aad399983af36f3065dfa379194b3b055">non_ms_link_options</a>)</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">if</span>(s == opt)</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="comment">// unrecognized option</span></div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;Warning: uninterpreted non-LINK option &#39;&quot;</span> &lt;&lt; s &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
-<div class="line"><a name="l00222"></a><span class="lineno"><a class="line" href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">  222</a></span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">ms_link_options</a>[] = {</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="stringliteral">&quot;ALIGN&quot;</span>,</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="stringliteral">&quot;ALLOWBIND&quot;</span>,</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="stringliteral">&quot;ALLOWISOLATION&quot;</span>,</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="stringliteral">&quot;APPCONTAINER&quot;</span>,</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYDEBUG&quot;</span>,</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYLINKRESOURCE&quot;</span>,</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYMODULE&quot;</span>,</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYRESOURCE&quot;</span>,</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="stringliteral">&quot;BASE&quot;</span>,</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="stringliteral">&quot;CLRIMAGETYPE&quot;</span>,</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="stringliteral">&quot;CLRLOADEROPTIMIZATION&quot;</span>,</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="stringliteral">&quot;CLRSUPPORTLASTERROR&quot;</span>,</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="stringliteral">&quot;CLRTHREADATTRIBUTE&quot;</span>,</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="stringliteral">&quot;CLRUNMANAGEDCODECHECK&quot;</span>,</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="stringliteral">&quot;DEBUG&quot;</span>,</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="stringliteral">&quot;DEF&quot;</span>,</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="stringliteral">&quot;DEFAULTLIB&quot;</span>,</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="stringliteral">&quot;DELAY&quot;</span>,</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="stringliteral">&quot;DELAYLOAD&quot;</span>,</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  <span class="stringliteral">&quot;DELAYSIGN&quot;</span>,</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  <span class="stringliteral">&quot;DLL&quot;</span>,</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <span class="stringliteral">&quot;DRIVER&quot;</span>,</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <span class="stringliteral">&quot;DYNAMICBASE&quot;</span>,</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="stringliteral">&quot;ENTRY&quot;</span>,</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="stringliteral">&quot;ERRORREPORT&quot;</span>,</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="stringliteral">&quot;EXPORT&quot;</span>,</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="stringliteral">&quot;EXPORTPADMIN&quot;</span>,</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="stringliteral">&quot;FASTGENPROFILE&quot;</span>,</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="stringliteral">&quot;FIXED&quot;</span>,</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="stringliteral">&quot;FORCE&quot;</span>,</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="stringliteral">&quot;FUNCTIONPADMIN&quot;</span>,</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="stringliteral">&quot;GUARD&quot;</span>,</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="stringliteral">&quot;GENPROFILE&quot;</span>,</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="stringliteral">&quot;HEAP&quot;</span>,</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="stringliteral">&quot;HIGHENTROPYVA&quot;</span>,</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="stringliteral">&quot;IDLOUT&quot;</span>,</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="stringliteral">&quot;IGNORE&quot;</span>,</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <span class="stringliteral">&quot;IGNOREIDL&quot;</span>,</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="stringliteral">&quot;IMPLIB&quot;</span>,</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="stringliteral">&quot;INCLUDE&quot;</span>,</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="stringliteral">&quot;INCREMENTAL&quot;</span>,</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <span class="stringliteral">&quot;INTEGRITYCHECK&quot;</span>,</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="stringliteral">&quot;KERNEL&quot;</span>,</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="stringliteral">&quot;KEYCONTAINER&quot;</span>,</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <span class="stringliteral">&quot;KEYFILE&quot;</span>,</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="stringliteral">&quot;LARGEADDRESSAWARE&quot;</span>,</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="stringliteral">&quot;LIBPATH&quot;</span>,</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="stringliteral">&quot;LTCG&quot;</span>,</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <span class="stringliteral">&quot;MACHINE&quot;</span>,</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="stringliteral">&quot;MANIFEST&quot;</span>,</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="stringliteral">&quot;MANIFESTDEPENDENCY&quot;</span>,</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="stringliteral">&quot;MANIFESTFILE&quot;</span>,</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="stringliteral">&quot;MANIFESTINPUT&quot;</span>,</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="stringliteral">&quot;MANIFESTUAC&quot;</span>,</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="stringliteral">&quot;MAP&quot;</span>,</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="stringliteral">&quot;MAPINFO&quot;</span>,</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="stringliteral">&quot;MERGE&quot;</span>,</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  <span class="stringliteral">&quot;MIDL&quot;</span>,</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="stringliteral">&quot;NOASSEMBLY&quot;</span>,</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <span class="stringliteral">&quot;NODEFAULTLIB&quot;</span>,</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="stringliteral">&quot;NOENTRY&quot;</span>,</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <span class="stringliteral">&quot;NOIMPLIB&quot;</span>,</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  <span class="stringliteral">&quot;NOLOGO&quot;</span>,</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="stringliteral">&quot;NXCOMPAT&quot;</span>,</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  <span class="stringliteral">&quot;OPT&quot;</span>,</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="stringliteral">&quot;ORDER&quot;</span>,</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="stringliteral">&quot;OUT&quot;</span>,</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="stringliteral">&quot;PDB&quot;</span>,</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="stringliteral">&quot;PDBSTRIPPED&quot;</span>,</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="stringliteral">&quot;PROFILE&quot;</span>,</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <span class="stringliteral">&quot;RELEASE&quot;</span>,</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="stringliteral">&quot;SAFESEH&quot;</span>,</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  <span class="stringliteral">&quot;SECTION&quot;</span>,</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  <span class="stringliteral">&quot;STACK&quot;</span>,</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="stringliteral">&quot;STUB&quot;</span>,</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="stringliteral">&quot;SUBSYSTEM&quot;</span>,</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="stringliteral">&quot;SWAPRUN&quot;</span>,</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <span class="stringliteral">&quot;TLBID&quot;</span>,</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <span class="stringliteral">&quot;TLBOUT&quot;</span>,</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  <span class="stringliteral">&quot;TIME&quot;</span>,</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  <span class="stringliteral">&quot;TSAWARE&quot;</span>,</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="stringliteral">&quot;USEPROFILE&quot;</span>,</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <span class="stringliteral">&quot;VERBOSE&quot;</span>,</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="stringliteral">&quot;VERSION&quot;</span>,</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="stringliteral">&quot;WINMD&quot;</span>,</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="stringliteral">&quot;WINMDDELAYSIGN&quot;</span>,</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="stringliteral">&quot;WINMDFILE&quot;</span>,</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <span class="stringliteral">&quot;WINMDKEYCONTAINER&quot;</span>,</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <span class="stringliteral">&quot;WINMDKEYFILE&quot;</span>,</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <span class="stringliteral">&quot;WHOLEARCHIVE&quot;</span>,</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="stringliteral">&quot;WX&quot;</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;};</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
-<div class="line"><a name="l00316"></a><span class="lineno"><a class="line" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">  316</a></span>&#160;<span class="keyword">static</span> std::string <a class="code" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a>(<span class="keyword">const</span> std::string &amp;s)</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;{</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  std::string result = s;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <a class="code" href="abstract__value__object_8cpp.html#ac48ee5854556f95e39edf1f91b1fe8c1">transform</a>(result.begin(), result.end(), result.begin(), toupper);</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;}</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#aed1c88239539e1630aa19f29f9417104">  323</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#aed1c88239539e1630aa19f29f9417104">ms_link_cmdlinet::process_link_option</a>(<span class="keyword">const</span> std::string &amp;s)</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;{</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordflow">if</span>(s.empty())</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160; </div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="keywordflow">if</span>(s[0] != <span class="charliteral">&#39;/&#39;</span> &amp;&amp; s[0] != <span class="charliteral">&#39;-&#39;</span>)</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  {</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>.push_back(s);</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  }</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> std::string ms_link_option : <a class="code" href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">ms_link_options</a>)</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  {</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="comment">// These are case insensitive.</span></div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      <a class="code" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a>(std::string(s, 1, std::string::npos)) == ms_link_option ||</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      <a class="code" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a>(std::string(s, 1, ms_link_option.size() + 1)) == ms_link_option + <span class="charliteral">&#39;:&#39;</span>)</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    {</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::size_t&gt;</a> optnr = <a class="code" href="classcmdlinet.html#a7a75ea8787c8f405d0487313ad487502">getoptnr</a>(ms_link_option);</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160; </div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      <span class="keywordflow">if</span>(!optnr.has_value())</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;      {</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <a class="code" href="structcmdlinet_1_1optiont.html">cmdlinet::optiont</a> option;</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        option.<a class="code" href="structcmdlinet_1_1optiont.html#a96aed8bfddfe741e9f2156921ce93b32">islong</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        option.<a class="code" href="structcmdlinet_1_1optiont.html#a947e7b6c4f77c34384b125b3e6f5962e">optstring</a> = ms_link_option;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        option.<a class="code" href="structcmdlinet_1_1optiont.html#a1a21143b04ed6ec0468d581449f6afb6">optchar</a> = 0;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>.push_back(option);</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        optnr = <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>.size() - 1;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;      }</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>[*optnr].isset = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      <span class="keywordflow">if</span>(s.size() &gt; ms_link_option.size() + 1)</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>[*optnr].values.push_back(</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;          std::string(s, ms_link_option.size() + 2, std::string::npos));</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    }</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  }</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160; </div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <span class="comment">// unrecognized option</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;Warning: uninterpreted LINK option &#39;&quot;</span> &lt;&lt; s &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;}</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#adb48d7771b4742e35c27f26e3e5912ce">  109</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#adb48d7771b4742e35c27f26e3e5912ce">ms_link_cmdlinet::process_response_file</a>(<span class="keyword">const</span> std::string &amp;file)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  std::ifstream infile(file);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">if</span>(!infile)</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;failed to open response file &#39;&quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  }</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="comment">// these may be Unicode -- which is indicated by 0xff 0xfe</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  std::string line;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  getline(infile, line);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    line.size() &gt;= 2 &amp;&amp; line[0] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xff) &amp;&amp;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    line[1] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xfe))</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">// Unicode, UTF-16 little endian</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#if 1</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">// Re-open -- should be using wifstream,</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="comment">// but this isn&#39;t available everywhere.</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    std::ifstream infile2(file, <a class="code" href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">std::ios::binary</a>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    infile2.seekg(2);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    std::wstring wline;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">while</span>(<a class="code" href="ms__link__cmdline_8cpp.html#a9d1e917edd1b42f57caa5ebf5136c41a">my_wgetline</a>(infile2, wline))</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(<a class="code" href="narrow_8h.html#a6a70c03c85cdfcd28ede72ae55edf80e">narrow</a>(wline)); <span class="comment">// we UTF-8 it</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    std::wifstream infile2(file, <a class="code" href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">std::ios::binary</a>);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    std::wstring wline;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">while</span>(std::getline(infile2, wline))</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(<a class="code" href="narrow_8h.html#a6a70c03c85cdfcd28ede72ae55edf80e">narrow</a>(wline)); <span class="comment">// we UTF-8 it</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  }</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    line.size() &gt;= 3 &amp;&amp; line[0] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xef) &amp;&amp;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    line[1] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xbb) &amp;&amp; line[2] == <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(0xbf))</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  {</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">// This is the UTF-8 BOM. We can proceed as usual, since</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">// we use UTF-8 internally.</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    infile.seekg(3);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordflow">while</span>(getline(infile, line))</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(line);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="comment">// normal ASCII</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    infile.seekg(0);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">while</span>(getline(infile, line))</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">process_response_file_line</a>(line);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;}</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00168"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">  168</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">ms_link_cmdlinet::process_response_file_line</a>(<span class="keyword">const</span> std::string &amp;line)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;{</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="comment">// In a response file, multiple compiler options and source-code files can</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="comment">// appear on one line.  A single compiler-option specification must appear</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="comment">// on one line (cannot span multiple lines).  Response files can have</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="comment">// comments that begin with the # symbol.</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keywordflow">if</span>(line.empty())</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keywordflow">if</span>(line[0] == <span class="charliteral">&#39;#&#39;</span>)</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">return</span>; <span class="comment">// comment</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  std::vector&lt;std::string&gt; arguments;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  std::string option;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  <span class="keywordtype">bool</span> in_quotes = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; line.size(); i++)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  {</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">char</span> ch = line[i];</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39; &#39;</span> &amp;&amp; !in_quotes)</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="keywordflow">if</span>(!option.empty())</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        arguments.push_back(option);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      option.clear();</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    }</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;&quot;&#39;</span>)</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    {</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      in_quotes = !in_quotes;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    }</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      option += ch;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  }</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">if</span>(!option.empty())</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    arguments.push_back(option);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <a class="code" href="classms__link__cmdlinet.html#a479291643e9ae2e7c4fcc3964636cf5d">parse</a>(arguments);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;}</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00207"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#a96c677d019190418796e5a9991026507">  207</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#a96c677d019190418796e5a9991026507">ms_link_cmdlinet::process_non_link_option</a>(<span class="keyword">const</span> std::string &amp;s)</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;{</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <a class="code" href="classgoto__cc__cmdlinet.html#a054bdc02e35b5bbd7e9ffe771c28856a">set</a>(s);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp; opt : <a class="code" href="ms__link__cmdline_8cpp.html#aad399983af36f3065dfa379194b3b055">non_ms_link_options</a>)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">if</span>(s == opt)</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <span class="comment">// unrecognized option</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;Warning: uninterpreted non-LINK option &#39;&quot;</span> &lt;&lt; s &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;}</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
+<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">  219</a></span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">ms_link_options</a>[] = {</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="stringliteral">&quot;ALIGN&quot;</span>,</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="stringliteral">&quot;ALLOWBIND&quot;</span>,</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <span class="stringliteral">&quot;ALLOWISOLATION&quot;</span>,</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="stringliteral">&quot;APPCONTAINER&quot;</span>,</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYDEBUG&quot;</span>,</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYLINKRESOURCE&quot;</span>,</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYMODULE&quot;</span>,</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="stringliteral">&quot;ASSEMBLYRESOURCE&quot;</span>,</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  <span class="stringliteral">&quot;BASE&quot;</span>,</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="stringliteral">&quot;CLRIMAGETYPE&quot;</span>,</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  <span class="stringliteral">&quot;CLRLOADEROPTIMIZATION&quot;</span>,</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="stringliteral">&quot;CLRSUPPORTLASTERROR&quot;</span>,</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="stringliteral">&quot;CLRTHREADATTRIBUTE&quot;</span>,</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="stringliteral">&quot;CLRUNMANAGEDCODECHECK&quot;</span>,</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="stringliteral">&quot;DEBUG&quot;</span>,</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="stringliteral">&quot;DEF&quot;</span>,</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="stringliteral">&quot;DEFAULTLIB&quot;</span>,</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="stringliteral">&quot;DELAY&quot;</span>,</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="stringliteral">&quot;DELAYLOAD&quot;</span>,</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="stringliteral">&quot;DELAYSIGN&quot;</span>,</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="stringliteral">&quot;DLL&quot;</span>,</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="stringliteral">&quot;DRIVER&quot;</span>,</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  <span class="stringliteral">&quot;DYNAMICBASE&quot;</span>,</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  <span class="stringliteral">&quot;ENTRY&quot;</span>,</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <span class="stringliteral">&quot;ERRORREPORT&quot;</span>,</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <span class="stringliteral">&quot;EXPORT&quot;</span>,</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="stringliteral">&quot;EXPORTPADMIN&quot;</span>,</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="stringliteral">&quot;FASTGENPROFILE&quot;</span>,</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="stringliteral">&quot;FIXED&quot;</span>,</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="stringliteral">&quot;FORCE&quot;</span>,</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="stringliteral">&quot;FUNCTIONPADMIN&quot;</span>,</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="stringliteral">&quot;GUARD&quot;</span>,</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="stringliteral">&quot;GENPROFILE&quot;</span>,</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="stringliteral">&quot;HEAP&quot;</span>,</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="stringliteral">&quot;HIGHENTROPYVA&quot;</span>,</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="stringliteral">&quot;IDLOUT&quot;</span>,</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="stringliteral">&quot;IGNORE&quot;</span>,</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="stringliteral">&quot;IGNOREIDL&quot;</span>,</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="stringliteral">&quot;IMPLIB&quot;</span>,</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="stringliteral">&quot;INCLUDE&quot;</span>,</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <span class="stringliteral">&quot;INCREMENTAL&quot;</span>,</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="stringliteral">&quot;INTEGRITYCHECK&quot;</span>,</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="stringliteral">&quot;KERNEL&quot;</span>,</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="stringliteral">&quot;KEYCONTAINER&quot;</span>,</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <span class="stringliteral">&quot;KEYFILE&quot;</span>,</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="stringliteral">&quot;LARGEADDRESSAWARE&quot;</span>,</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="stringliteral">&quot;LIBPATH&quot;</span>,</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <span class="stringliteral">&quot;LTCG&quot;</span>,</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="stringliteral">&quot;MACHINE&quot;</span>,</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="stringliteral">&quot;MANIFEST&quot;</span>,</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="stringliteral">&quot;MANIFESTDEPENDENCY&quot;</span>,</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <span class="stringliteral">&quot;MANIFESTFILE&quot;</span>,</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="stringliteral">&quot;MANIFESTINPUT&quot;</span>,</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="stringliteral">&quot;MANIFESTUAC&quot;</span>,</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="stringliteral">&quot;MAP&quot;</span>,</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="stringliteral">&quot;MAPINFO&quot;</span>,</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="stringliteral">&quot;MERGE&quot;</span>,</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="stringliteral">&quot;MIDL&quot;</span>,</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="stringliteral">&quot;NOASSEMBLY&quot;</span>,</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="stringliteral">&quot;NODEFAULTLIB&quot;</span>,</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  <span class="stringliteral">&quot;NOENTRY&quot;</span>,</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="stringliteral">&quot;NOIMPLIB&quot;</span>,</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <span class="stringliteral">&quot;NOLOGO&quot;</span>,</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="stringliteral">&quot;NXCOMPAT&quot;</span>,</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <span class="stringliteral">&quot;OPT&quot;</span>,</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  <span class="stringliteral">&quot;ORDER&quot;</span>,</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="stringliteral">&quot;OUT&quot;</span>,</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  <span class="stringliteral">&quot;PDB&quot;</span>,</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="stringliteral">&quot;PDBSTRIPPED&quot;</span>,</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="stringliteral">&quot;PROFILE&quot;</span>,</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="stringliteral">&quot;RELEASE&quot;</span>,</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="stringliteral">&quot;SAFESEH&quot;</span>,</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="stringliteral">&quot;SECTION&quot;</span>,</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <span class="stringliteral">&quot;STACK&quot;</span>,</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="stringliteral">&quot;STUB&quot;</span>,</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  <span class="stringliteral">&quot;SUBSYSTEM&quot;</span>,</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  <span class="stringliteral">&quot;SWAPRUN&quot;</span>,</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="stringliteral">&quot;TLBID&quot;</span>,</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="stringliteral">&quot;TLBOUT&quot;</span>,</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="stringliteral">&quot;TIME&quot;</span>,</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <span class="stringliteral">&quot;TSAWARE&quot;</span>,</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <span class="stringliteral">&quot;USEPROFILE&quot;</span>,</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  <span class="stringliteral">&quot;VERBOSE&quot;</span>,</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  <span class="stringliteral">&quot;VERSION&quot;</span>,</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="stringliteral">&quot;WINMD&quot;</span>,</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <span class="stringliteral">&quot;WINMDDELAYSIGN&quot;</span>,</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="stringliteral">&quot;WINMDFILE&quot;</span>,</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="stringliteral">&quot;WINMDKEYCONTAINER&quot;</span>,</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="stringliteral">&quot;WINMDKEYFILE&quot;</span>,</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="stringliteral">&quot;WHOLEARCHIVE&quot;</span>,</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <span class="stringliteral">&quot;WX&quot;</span></div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;};</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
+<div class="line"><a name="l00313"></a><span class="lineno"><a class="line" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">  313</a></span>&#160;<span class="keyword">static</span> std::string <a class="code" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a>(<span class="keyword">const</span> std::string &amp;s)</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;{</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  std::string result = s;</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <a class="code" href="abstract__value__object_8cpp.html#ac48ee5854556f95e39edf1f91b1fe8c1">transform</a>(result.begin(), result.end(), result.begin(), toupper);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;}</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
+<div class="line"><a name="l00320"></a><span class="lineno"><a class="line" href="classms__link__cmdlinet.html#aed1c88239539e1630aa19f29f9417104">  320</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classms__link__cmdlinet.html#aed1c88239539e1630aa19f29f9417104">ms_link_cmdlinet::process_link_option</a>(<span class="keyword">const</span> std::string &amp;s)</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;{</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  <span class="keywordflow">if</span>(s.empty())</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordflow">if</span>(s[0] != <span class="charliteral">&#39;/&#39;</span> &amp;&amp; s[0] != <span class="charliteral">&#39;-&#39;</span>)</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  {</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>.push_back(s);</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  }</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> std::string ms_link_option : <a class="code" href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">ms_link_options</a>)</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  {</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="comment">// These are case insensitive.</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      <a class="code" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a>(std::string(s, 1, std::string::npos)) == ms_link_option ||</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      <a class="code" href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a>(std::string(s, 1, ms_link_option.size() + 1)) == ms_link_option + <span class="charliteral">&#39;:&#39;</span>)</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    {</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::size_t&gt;</a> optnr = <a class="code" href="classcmdlinet.html#a7a75ea8787c8f405d0487313ad487502">getoptnr</a>(ms_link_option);</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160; </div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      <span class="keywordflow">if</span>(!optnr.has_value())</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      {</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        <a class="code" href="structcmdlinet_1_1optiont.html">cmdlinet::optiont</a> option;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        option.<a class="code" href="structcmdlinet_1_1optiont.html#a96aed8bfddfe741e9f2156921ce93b32">islong</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        option.<a class="code" href="structcmdlinet_1_1optiont.html#a947e7b6c4f77c34384b125b3e6f5962e">optstring</a> = ms_link_option;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        option.<a class="code" href="structcmdlinet_1_1optiont.html#a1a21143b04ed6ec0468d581449f6afb6">optchar</a> = 0;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>.push_back(option);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        optnr = <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>.size() - 1;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;      }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;      <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>[*optnr].isset = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160; </div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;      <span class="keywordflow">if</span>(s.size() &gt; ms_link_option.size() + 1)</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;        <a class="code" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">options</a>[*optnr].values.push_back(</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;          std::string(s, ms_link_option.size() + 2, std::string::npos));</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    }</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  }</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="comment">// unrecognized option</span></div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;Warning: uninterpreted LINK option &#39;&quot;</span> &lt;&lt; s &lt;&lt; <span class="stringliteral">&quot;&#39;\n&quot;</span>;</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclasscmdlinet_html_a71c26c279a95d2804eddf3772fb2ce88"><div class="ttname"><a href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">cmdlinet::args</a></div><div class="ttdeci">argst args</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00145">cmdline.h:145</a></div></div>
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html_a054bdc02e35b5bbd7e9ffe771c28856a"><div class="ttname"><a href="classgoto__cc__cmdlinet.html#a054bdc02e35b5bbd7e9ffe771c28856a">goto_cc_cmdlinet::set</a></div><div class="ttdeci">void set(const std::string &amp;opt, const char *value) override</div><div class="ttdoc">Set option option to value.</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__cmdline_8h_source.html#l00033">goto_cc_cmdline.h:33</a></div></div>
-<div class="ttc" id="aclassms__link__cmdlinet_html_adb48d7771b4742e35c27f26e3e5912ce"><div class="ttname"><a href="classms__link__cmdlinet.html#adb48d7771b4742e35c27f26e3e5912ce">ms_link_cmdlinet::process_response_file</a></div><div class="ttdeci">void process_response_file(const std::string &amp;file)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00110">ms_link_cmdline.cpp:110</a></div></div>
+<div class="ttc" id="aclassms__link__cmdlinet_html_adb48d7771b4742e35c27f26e3e5912ce"><div class="ttname"><a href="classms__link__cmdlinet.html#adb48d7771b4742e35c27f26e3e5912ce">ms_link_cmdlinet::process_response_file</a></div><div class="ttdeci">void process_response_file(const std::string &amp;file)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00109">ms_link_cmdline.cpp:109</a></div></div>
 <div class="ttc" id="aclassms__link__cmdlinet_html_a479291643e9ae2e7c4fcc3964636cf5d"><div class="ttname"><a href="classms__link__cmdlinet.html#a479291643e9ae2e7c4fcc3964636cf5d">ms_link_cmdlinet::parse</a></div><div class="ttdeci">virtual bool parse(int, const char **)</div><div class="ttdoc">parses the command line options into a cmdlinet</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00061">ms_link_cmdline.cpp:61</a></div></div>
 <div class="ttc" id="aabstract__value__object_8cpp_html_ac48ee5854556f95e39edf1f91b1fe8c1"><div class="ttname"><a href="abstract__value__object_8cpp.html#ac48ee5854556f95e39edf1f91b1fe8c1">transform</a></div><div class="ttdeci">static abstract_object_pointert transform(const exprt &amp;expr, const std::vector&lt; abstract_object_pointert &gt; &amp;operands, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="abstract__value__object_8cpp_source.html#l00159">abstract_value_object.cpp:159</a></div></div>
-<div class="ttc" id="aclassms__link__cmdlinet_html_a96c677d019190418796e5a9991026507"><div class="ttname"><a href="classms__link__cmdlinet.html#a96c677d019190418796e5a9991026507">ms_link_cmdlinet::process_non_link_option</a></div><div class="ttdeci">void process_non_link_option(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00210">ms_link_cmdline.cpp:210</a></div></div>
+<div class="ttc" id="aclassms__link__cmdlinet_html_a96c677d019190418796e5a9991026507"><div class="ttname"><a href="classms__link__cmdlinet.html#a96c677d019190418796e5a9991026507">ms_link_cmdlinet::process_non_link_option</a></div><div class="ttdeci">void process_non_link_option(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00207">ms_link_cmdline.cpp:207</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html_aa0bd525f4f7da48fe42cbe19784cca37"><div class="ttname"><a href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">cmdlinet::options</a></div><div class="ttdeci">std::vector&lt; optiont &gt; options</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00184">cmdline.h:184</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html_a96aed8bfddfe741e9f2156921ce93b32"><div class="ttname"><a href="structcmdlinet_1_1optiont.html#a96aed8bfddfe741e9f2156921ce93b32">cmdlinet::optiont::islong</a></div><div class="ttdeci">bool islong</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00159">cmdline.h:159</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html_a947e7b6c4f77c34384b125b3e6f5962e"><div class="ttname"><a href="structcmdlinet_1_1optiont.html#a947e7b6c4f77c34384b125b3e6f5962e">cmdlinet::optiont::optstring</a></div><div class="ttdeci">std::string optstring</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00161">cmdline.h:161</a></div></div>
 <div class="ttc" id="ams__link__cmdline_8cpp_html_a9d1e917edd1b42f57caa5ebf5136c41a"><div class="ttname"><a href="ms__link__cmdline_8cpp.html#a9d1e917edd1b42f57caa5ebf5136c41a">my_wgetline</a></div><div class="ttdeci">static std::istream &amp; my_wgetline(std::istream &amp;in, std::wstring &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00074">ms_link_cmdline.cpp:74</a></div></div>
-<div class="ttc" id="aclassms__link__cmdlinet_html_aed1c88239539e1630aa19f29f9417104"><div class="ttname"><a href="classms__link__cmdlinet.html#aed1c88239539e1630aa19f29f9417104">ms_link_cmdlinet::process_link_option</a></div><div class="ttdeci">void process_link_option(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00323">ms_link_cmdline.cpp:323</a></div></div>
+<div class="ttc" id="aclassms__link__cmdlinet_html_aed1c88239539e1630aa19f29f9417104"><div class="ttname"><a href="classms__link__cmdlinet.html#aed1c88239539e1630aa19f29f9417104">ms_link_cmdlinet::process_link_option</a></div><div class="ttdeci">void process_link_option(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00320">ms_link_cmdline.cpp:320</a></div></div>
 <div class="ttc" id="ams__link__cmdline_8h_html"><div class="ttname"><a href="ms__link__cmdline_8h.html">ms_link_cmdline.h</a></div></div>
-<div class="ttc" id="ams__link__cmdline_8cpp_html_a465bd1fa29f5c81aaf742a44f1015538"><div class="ttname"><a href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a></div><div class="ttdeci">static std::string to_upper_string(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00316">ms_link_cmdline.cpp:316</a></div></div>
+<div class="ttc" id="ams__link__cmdline_8cpp_html_a465bd1fa29f5c81aaf742a44f1015538"><div class="ttname"><a href="ms__link__cmdline_8cpp.html#a465bd1fa29f5c81aaf742a44f1015538">to_upper_string</a></div><div class="ttdeci">static std::string to_upper_string(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00313">ms_link_cmdline.cpp:313</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="anarrow_8h_html_a6a70c03c85cdfcd28ede72ae55edf80e"><div class="ttname"><a href="narrow_8h.html#a6a70c03c85cdfcd28ede72ae55edf80e">narrow</a></div><div class="ttdeci">output_type narrow(input_type input)</div><div class="ttdoc">Run-time checked narrowing cast.</div><div class="ttdef"><b>Definition:</b> <a href="narrow_8h_source.html#l00034">narrow.h:34</a></div></div>
-<div class="ttc" id="aclassms__link__cmdlinet_html_ad0ce2162f11ae7f07744f3874575671f"><div class="ttname"><a href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">ms_link_cmdlinet::process_response_file_line</a></div><div class="ttdeci">void process_response_file_line(const std::string &amp;line)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00170">ms_link_cmdline.cpp:170</a></div></div>
+<div class="ttc" id="aclassms__link__cmdlinet_html_ad0ce2162f11ae7f07744f3874575671f"><div class="ttname"><a href="classms__link__cmdlinet.html#ad0ce2162f11ae7f07744f3874575671f">ms_link_cmdlinet::process_response_file_line</a></div><div class="ttdeci">void process_response_file_line(const std::string &amp;line)</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00168">ms_link_cmdline.cpp:168</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html_a7a75ea8787c8f405d0487313ad487502"><div class="ttname"><a href="classcmdlinet.html#a7a75ea8787c8f405d0487313ad487502">cmdlinet::getoptnr</a></div><div class="ttdeci">optionalt&lt; std::size_t &gt; getoptnr(char option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00135">cmdline.cpp:135</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html_a1a21143b04ed6ec0468d581449f6afb6"><div class="ttname"><a href="structcmdlinet_1_1optiont.html#a1a21143b04ed6ec0468d581449f6afb6">cmdlinet::optiont::optchar</a></div><div class="ttdeci">char optchar</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00160">cmdline.h:160</a></div></div>
 <div class="ttc" id="ajson__expr_8cpp_html_a8ac246d85d634a72a481f40e23ccdd79"><div class="ttname"><a href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">binary</a></div><div class="ttdeci">static std::string binary(const constant_exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="json__expr_8cpp_source.html#l00189">json_expr.cpp:189</a></div></div>
 <div class="ttc" id="aunicode_8h_html"><div class="ttname"><a href="unicode_8h.html">unicode.h</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html"><div class="ttname"><a href="structcmdlinet_1_1optiont.html">cmdlinet::optiont</a></div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00155">cmdline.h:155</a></div></div>
 <div class="ttc" id="ams__link__cmdline_8cpp_html_aad399983af36f3065dfa379194b3b055"><div class="ttname"><a href="ms__link__cmdline_8cpp.html#aad399983af36f3065dfa379194b3b055">non_ms_link_options</a></div><div class="ttdeci">const char * non_ms_link_options[]</div><div class="ttdoc">parses the command line options into a cmdlinet</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00022">ms_link_cmdline.cpp:22</a></div></div>
-<div class="ttc" id="ams__link__cmdline_8cpp_html_a2b4247fe8eb0b4e7e6a3b55c76daf34a"><div class="ttname"><a href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">ms_link_options</a></div><div class="ttdeci">const char * ms_link_options[]</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00222">ms_link_cmdline.cpp:222</a></div></div>
+<div class="ttc" id="ams__link__cmdline_8cpp_html_a2b4247fe8eb0b4e7e6a3b55c76daf34a"><div class="ttname"><a href="ms__link__cmdline_8cpp.html#a2b4247fe8eb0b4e7e6a3b55c76daf34a">ms_link_options</a></div><div class="ttdeci">const char * ms_link_options[]</div><div class="ttdef"><b>Definition:</b> <a href="ms__link__cmdline_8cpp_source.html#l00219">ms_link_cmdline.cpp:219</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
