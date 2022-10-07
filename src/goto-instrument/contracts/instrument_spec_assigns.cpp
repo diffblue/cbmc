@@ -487,6 +487,15 @@ car_exprt instrument_spec_assignst::create_car_expr(
     if(can_cast_expr<symbol_exprt>(funcall.function()))
     {
       const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
+
+      PRECONDITION_WITH_DIAGNOSTICS(
+        ident == CPROVER_PREFIX "object_from" ||
+          ident == CPROVER_PREFIX "object_upto" ||
+          ident == CPROVER_PREFIX "object_whole" ||
+          ident == CPROVER_PREFIX "assignable",
+        "call to function '" + id2string(ident) +
+          "' in assigns clause not supported yet");
+
       if(ident == CPROVER_PREFIX "object_from")
       {
         const auto &ptr = funcall.arguments().at(0);
@@ -557,12 +566,6 @@ car_exprt instrument_spec_assignst::create_car_expr(
           upper_bound_var,
           is_ptr_to_ptr.is_true() ? car_havoc_methodt::NONDET_ASSIGN
                                   : car_havoc_methodt::HAVOC_SLICE};
-      }
-      else
-      {
-        log.error().source_location = target.source_location();
-        log.error() << "call to " << ident
-                    << " in assigns clauses not supported in this version";
       }
     }
   }
