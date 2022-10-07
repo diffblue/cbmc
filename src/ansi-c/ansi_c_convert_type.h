@@ -47,7 +47,7 @@ public:
   bool constructor, destructor;
 
   // contracts
-  exprt::operandst assigns, ensures, requires, ensures_contract,
+  exprt::operandst assigns, frees, ensures, requires, ensures_contract,
     requires_contract;
 
   // storage spec

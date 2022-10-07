@@ -505,6 +505,12 @@ void c_typecheck_baset::typecheck_for(codet &code)
     typecheck_spec_assigns(
       static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
   }
+
+  if(code.find(ID_C_spec_frees).is_not_nil())
+  {
+    typecheck_spec_frees(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_frees)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_label(code_labelt &code)
@@ -805,6 +811,12 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
     typecheck_spec_assigns(
       static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
   }
+
+  if(code.find(ID_C_spec_frees).is_not_nil())
+  {
+    typecheck_spec_frees(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_frees)).op().operands());
+  }
 }
 
 void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
@@ -844,6 +856,12 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
   {
     typecheck_spec_assigns(
       static_cast<unary_exprt &>(code.add(ID_C_spec_assigns)).op().operands());
+  }
+
+  if(code.find(ID_C_spec_frees).is_not_nil())
+  {
+    typecheck_spec_frees(
+      static_cast<unary_exprt &>(code.add(ID_C_spec_frees)).op().operands());
   }
 }
 
@@ -971,6 +989,14 @@ void c_typecheck_baset::typecheck_spec_assigns(exprt::operandst &targets)
   typecheck_conditional_targets(targets, typecheck_target, "assigns");
 }
 
+void c_typecheck_baset::typecheck_spec_frees(exprt::operandst &targets)
+{
+  const std::function<void(exprt &)> typecheck_target = [&](exprt &target) {
+    typecheck_spec_frees_target(target);
+  };
+  typecheck_conditional_targets(targets, typecheck_target, "frees");
+}
+
 void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
 {
   // compute type
@@ -1021,6 +1047,51 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
       "assigns clause target must be a non-void lvalue, a call "
       "to " CPROVER_PREFIX
       "POINTER_OBJECT or a call to a function returning void",
+      target.source_location());
+  }
+}
+
+void c_typecheck_baset::typecheck_spec_frees_target(exprt &target)
+{
+  // compute type
+  typecheck_expr(target);
+  const auto &type = target.type();
+
+  if(can_cast_type<pointer_typet>(type))
+  {
+    // an expression with pointer-type without side effects
+    throw_on_side_effects(target);
+  }
+  else if(can_cast_expr<side_effect_expr_function_callt>(target))
+  {
+    // A call to a void function symbol without other side effects
+    const auto &funcall = to_side_effect_expr_function_call(target);
+
+    if(!can_cast_expr<symbol_exprt>(funcall.function()))
+    {
+      throw invalid_source_file_exceptiont(
+        "function pointer calls not allowed in frees clauses",
+        target.source_location());
+    }
+
+    if(type.id() != ID_empty)
+    {
+      throw invalid_source_file_exceptiont(
+        "expecting void return type for function '" +
+          id2string(to_symbol_expr(funcall.function()).get_identifier()) +
+          "' called in frees clause",
+        target.source_location());
+    }
+
+    for(const auto &argument : funcall.arguments())
+      throw_on_side_effects(argument);
+  }
+  else
+  {
+    // anything else is rejected
+    throw invalid_source_file_exceptiont(
+      "frees clause target must be a pointer-typed expression or a call to a "
+      "function returning void",
       target.source_location());
   }
 }

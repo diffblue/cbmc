@@ -370,7 +370,7 @@ public:
   {
     return !ensures().empty() || !ensures_contract().empty() ||
            !requires().empty() || !requires_contract().empty() ||
-           !assigns().empty();
+           !assigns().empty() || !frees().empty();
   }
 
   const exprt::operandst &assigns() const
@@ -381,6 +381,16 @@ public:
   exprt::operandst &assigns()
   {
     return static_cast<exprt &>(add(ID_C_spec_assigns)).operands();
+  }
+
+  const exprt::operandst &frees() const
+  {
+    return static_cast<const exprt &>(find(ID_C_spec_frees)).operands();
+  }
+
+  exprt::operandst &frees()
+  {
+    return static_cast<exprt &>(add(ID_C_spec_frees)).operands();
   }
 
   const exprt::operandst &requires_contract() const
