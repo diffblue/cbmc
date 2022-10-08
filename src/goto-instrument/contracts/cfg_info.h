@@ -19,6 +19,7 @@ Date: June 2022
 
 #include <util/byte_operators.h>
 #include <util/expr_cast.h>
+#include <util/find_symbols.h>
 #include <util/message.h>
 
 #include <goto-programs/goto_model.h>
@@ -172,8 +173,12 @@ public:
     auto it = exprs.begin();
     while(it != exprs.end())
     {
+      const std::unordered_set<irep_idt> symbols = find_symbol_identifiers(*it);
+
       if(
-        it->id() == ID_symbol && is_local(to_symbol_expr(*it).get_identifier()))
+        std::find_if(symbols.begin(), symbols.end(), [this](const irep_idt &s) {
+          return is_local(s);
+        }) != symbols.end())
       {
         it = exprs.erase(it);
       }
