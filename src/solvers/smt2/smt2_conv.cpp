@@ -958,6 +958,23 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   return result;
 }
 
+/// Returns true iff \p type has effective width of zero bits.
+static bool is_zero_width(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_empty)
+    return true;
+  else if(type.id() == ID_struct_tag)
+    return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
+  else if(type.id() == ID_struct)
+    return to_struct_type(type).components().empty();
+  else if(type.id() == ID_union_tag)
+    return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
+  else if(type.id() == ID_union)
+    return to_union_type(type).components().empty();
+  else
+    return false;
+}
+
 std::string smt2_convt::type2id(const typet &type) const
 {
   if(type.id()==ID_floatbv)
@@ -1365,11 +1382,18 @@ void smt2_convt::convert_expr(const exprt &expr)
       equal_expr.op0().type() == equal_expr.op1().type(),
       "operands of equal expression shall have same type");
 
-    out << "(= ";
-    convert_expr(equal_expr.op0());
-    out << " ";
-    convert_expr(equal_expr.op1());
-    out << ")";
+    if(is_zero_width(equal_expr.lhs().type(), ns))
+    {
+      convert_expr(true_exprt());
+    }
+    else
+    {
+      out << "(= ";
+      convert_expr(equal_expr.op0());
+      out << " ";
+      convert_expr(equal_expr.op1());
+      out << ")";
+    }
   }
   else if(expr.id() == ID_notequal)
   {
@@ -2368,10 +2392,6 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id() == ID_find_first_set)
   {
     convert_expr(simplify_expr(to_find_first_set_expr(expr).lower(), ns));
-  }
-  else if(expr.id() == ID_empty_union)
-  {
-    out << "()";
   }
   else if(expr.id() == ID_bitreverse)
   {
@@ -3597,7 +3617,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
       else
       {
         auto element_size_opt = pointer_offset_size(base_type, ns);
-        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 1);
+        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 0);
         element_size = *element_size_opt;
       }
 
@@ -4701,9 +4721,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   if(expr.id() == ID_equal && value)
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
-    if(
-      equal_expr.lhs().type().id() == ID_empty ||
-      equal_expr.rhs().id() == ID_empty_union)
+    if(is_zero_width(equal_expr.lhs().type(), ns))
     {
       // ignore equality checking over expressions with empty (void) type
       return;
@@ -4955,21 +4973,24 @@ void smt2_convt::find_symbols(const exprt &expr)
         convert_type(array_type);
         out << ")\n";
 
-        // use a quantifier-based initialization instead of lambda
-        out << "(assert (forall ((i ";
-        convert_type(array_type.index_type());
-        out << ")) (= (select " << id << " i) ";
-        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
+        if(!is_zero_width(array_type.element_type(), ns))
         {
-          out << "(ite ";
-          convert_expr(array_of.what());
-          out << " #b1 #b0)";
+          // use a quantifier-based initialization instead of lambda
+          out << "(assert (forall ((i ";
+          convert_type(array_type.index_type());
+          out << ")) (= (select " << id << " i) ";
+          if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
+          {
+            out << "(ite ";
+            convert_expr(array_of.what());
+            out << " #b1 #b0)";
+          }
+          else
+          {
+            convert_expr(array_of.what());
+          }
+          out << ")))\n";
         }
-        else
-        {
-          convert_expr(array_of.what());
-        }
-        out << ")))\n";
 
         defined_expressions[expr] = id;
       }
@@ -5035,22 +5056,26 @@ void smt2_convt::find_symbols(const exprt &expr)
       convert_type(array_type);
       out << ")" << "\n";
 
-      for(std::size_t i=0; i<expr.operands().size(); i++)
+      if(!is_zero_width(array_type.element_type(), ns))
       {
-        out << "(assert (= (select " << id << " ";
-        convert_expr(from_integer(i, array_type.index_type()));
-        out << ") "; // select
-        if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
+        for(std::size_t i = 0; i < expr.operands().size(); i++)
         {
-          out << "(ite ";
-          convert_expr(expr.operands()[i]);
-          out << " #b1 #b0)";
+          out << "(assert (= (select " << id << " ";
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << ") "; // select
+          if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
+          {
+            out << "(ite ";
+            convert_expr(expr.operands()[i]);
+            out << " #b1 #b0)";
+          }
+          else
+          {
+            convert_expr(expr.operands()[i]);
+          }
+          out << "))"
+              << "\n"; // =, assert
         }
-        else
-        {
-          convert_expr(expr.operands()[i]);
-        }
-        out << "))" << "\n"; // =, assert
       }
 
       defined_expressions[expr]=id;
