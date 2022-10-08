@@ -1,0 +1,12 @@
+CORE
+main.c
+module.c
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+conflict on code contract
+--
+This test makes sure we support contracts in header files, which may then end up
+in multiple translation units.

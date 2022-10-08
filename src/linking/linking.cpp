@@ -1105,10 +1105,15 @@ void linkingt::duplicate_non_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
-  // we do not permit multiple contracts to be defined, or cases where only one
-  // of the symbols is a contract
-  if(old_symbol.is_property || new_symbol.is_property)
+  // we do not permit different contracts with the same name to be defined, or
+  // cases where only one of the symbols is a contract
+  if(
+    old_symbol.is_property != new_symbol.is_property ||
+    (old_symbol.is_property && new_symbol.is_property &&
+     old_symbol.type != new_symbol.type))
+  {
     link_error(old_symbol, new_symbol, "conflict on code contract");
+  }
 
   // see if it is a function or a variable
 
