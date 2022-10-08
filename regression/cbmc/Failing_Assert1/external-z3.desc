@@ -1,0 +1,10 @@
+CORE gcc-only
+main.c
+--external-sat-solver ./z3-wrapper.sh --trace
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test is marked "gcc-only" as resolving ./ won't work with Windows.
