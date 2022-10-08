@@ -44,6 +44,7 @@ public:
     switch(determine_result(properties))
     {
     case resultt::PASS:
+      output_properties(properties, 1, ui_message_handler);
       report_success(ui_message_handler);
       incremental_goto_checker.output_proof();
       break;
