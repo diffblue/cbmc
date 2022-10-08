@@ -3413,12 +3413,6 @@ cprover_contract_frees:
         }
         ;
 
-cprover_contract_frees_opt:
-        /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
-        | cprover_contract_frees
-        ;
-
 cprover_function_contract_sequence:
           cprover_function_contract
         | cprover_function_contract_sequence cprover_function_contract
