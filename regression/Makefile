@@ -14,6 +14,7 @@ DIRS = cbmc \
        cbmc-incr-oneloop \
        cbmc-incr-smt2 \
        cbmc-incr \
+       cbmc-output-file \
        cbmc-with-incr \
        array-refinement-with-incr \
        goto-instrument-chc \
