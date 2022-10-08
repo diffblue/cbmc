@@ -29,11 +29,14 @@ macro(generic_bison name)
         message(FATAL_ERROR "Generated file ${bison_source} found in source tree. If you previously built with `make`, run `make clean` and try again")
     endif()
 
+    if(${BISON_VERSION} VERSION_GREATER "2.3")
+      set(bison_warnings_as_errors "-Werror")
+    endif()
     bison_target(
         parser
         "${CMAKE_CURRENT_SOURCE_DIR}/parser.y"
         "${CMAKE_CURRENT_BINARY_DIR}/${bison_source}"
-        COMPILE_FLAGS "-pyy${name}"
+        COMPILE_FLAGS "${bison_warnings_as_errors} -pyy${name}"
     )
     set(renamed_parser_header "${CMAKE_CURRENT_BINARY_DIR}/${bison_header}")
     add_custom_command(OUTPUT "${renamed_parser_header}"
