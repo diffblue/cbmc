@@ -199,7 +199,7 @@ $(document).ready(function(){initNavTree('external__sat_8cpp_source.html',''); i
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span>(line[0] == <span class="charliteral">&#39;v&#39;</span>)</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keyword">auto</span> assignments = <a class="code" href="string__utils_8cpp.html#a6ed2086ccc7c5dffe024855536192cd6">split_string</a>(line, <span class="charliteral">&#39; &#39;</span>);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keyword">auto</span> assignments = <a class="code" href="string__utils_8cpp.html#a6ed2086ccc7c5dffe024855536192cd6">split_string</a>(line, <span class="charliteral">&#39; &#39;</span>, <span class="keyword">false</span>, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      <span class="comment">// remove the first element which should be &#39;v&#39; identifying</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <span class="comment">// the line as the satisfying assignments</span></div>
