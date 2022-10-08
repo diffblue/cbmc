@@ -3687,8 +3687,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   const exprt &f_op=expr.function();
   const code_typet &code_type=to_code_type(f_op.type());
   exprt::operandst &arguments=expr.arguments();
-  const code_typet::parameterst &parameter_types=
-    code_type.parameters();
+  const code_typet::parameterst &parameters = code_type.parameters();
 
   // no. of arguments test
 
@@ -3701,24 +3700,24 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     // We are generous on KnR; any number is ok.
     // We will in missing ones with "NIL".
 
-    while(parameter_types.size()>arguments.size())
+    while(parameters.size() > arguments.size())
       arguments.push_back(nil_exprt());
   }
   else if(code_type.has_ellipsis())
   {
-    if(parameter_types.size()>arguments.size())
+    if(parameters.size() > arguments.size())
     {
       error().source_location = expr.source_location();
       error() << "not enough function arguments" << eom;
       throw 0;
     }
   }
-  else if(parameter_types.size()!=arguments.size())
+  else if(parameters.size() != arguments.size())
   {
     error().source_location = expr.source_location();
     error() << "wrong number of function arguments: "
-            << "expected " << parameter_types.size()
-            << ", but got " << arguments.size() << eom;
+            << "expected " << parameters.size() << ", but got "
+            << arguments.size() << eom;
     throw 0;
   }
 
@@ -3730,23 +3729,19 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     {
       // ignore
     }
-    else if(i<parameter_types.size())
+    else if(i < parameters.size())
     {
-      const code_typet::parametert &parameter_type=
-        parameter_types[i];
+      const code_typet::parametert &parameter = parameters[i];
 
-      const typet &op_type=parameter_type.type();
-
-      if(op_type.id()==ID_bool &&
-         op.id()==ID_side_effect &&
-         op.get(ID_statement)==ID_assign &&
-         op.type().id()!=ID_bool)
+      if(
+        parameter.is_boolean() && op.id() == ID_side_effect &&
+        op.get(ID_statement) == ID_assign && op.type().id() != ID_bool)
       {
         warning().source_location=expr.find_source_location();
         warning() << "assignment where Boolean argument is expected" << eom;
       }
 
-      implicit_typecast(op, op_type);
+      implicit_typecast(op, parameter.type());
     }
     else
     {
