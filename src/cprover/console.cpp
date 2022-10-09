@@ -20,6 +20,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #  include <unistd.h>
 #endif
 
+#include <util/invariant.h>
 #include <util/run.h>
 #include <util/string_utils.h>
 #include <util/unicode.h>
@@ -179,6 +180,18 @@ std::ostream &consolet::reset(std::ostream &str)
     return str << "\x1b[m";
   else
     return str;
+}
+
+std::ostream &consolet::cursorup(std::ostream &str)
+{
+  PRECONDITION(is_terminal());
+  return str << "\x1b[1A";
+}
+
+std::ostream &consolet::cleareol(std::ostream &str)
+{
+  PRECONDITION(is_terminal());
+  return str << "\x1b[0K";
 }
 
 std::size_t consolet::width()
