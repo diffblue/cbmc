@@ -964,6 +964,16 @@ void c_typecheck_baset::typecheck_compound_body(
           throw 0;
         }
 
+        if(
+          new_component.type().id() == ID_c_bit_field &&
+          to_c_bit_field_type(new_component.type()).get_width() == 0 &&
+          !new_component.get_name().empty())
+        {
+          throw invalid_source_file_exceptiont{
+            "zero-width bit-field with declarator not permitted",
+            source_location};
+        }
+
         components.push_back(new_component);
       }
     }

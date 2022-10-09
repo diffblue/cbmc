@@ -1,0 +1,9 @@
+CORE
+main.c
+
+zero-width bit-field with declarator not permitted$
+CONVERSION ERROR
+^EXIT=(64|1)$
+^SIGNAL=0$
+--
+^warning: ignoring
