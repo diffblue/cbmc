@@ -1,9 +1,5 @@
 var NAVTREEINDEX72 =
 {
-"cpp__typecheck__using_8cpp_source.html":[5,0,2,5,73],
-"cpp__typecheck__virtual__table_8cpp.html":[5,0,2,5,74],
-"cpp__typecheck__virtual__table_8cpp_source.html":[5,0,2,5,74],
-"cpp__using_8h.html":[5,0,2,5,75],
 "cpp__using_8h_source.html":[5,0,2,5,75],
 "cpp__util_8cpp.html":[5,0,2,5,76],
 "cpp__util_8cpp.html#acdc3df88a36cb59eb67dc991fded61f3":[5,0,2,5,76,0],
@@ -249,5 +245,9 @@ var NAVTREEINDEX72 =
 "destructor__tree_8h.html":[5,0,2,14,16],
 "destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a":[5,0,2,14,16,4],
 "destructor__tree_8h_source.html":[5,0,2,14,16],
-"developer_guide.html":[0,3]
+"developer_guide.html":[0,3],
+"dimacs__cnf_8cpp.html":[5,0,2,24,7,4],
+"dimacs__cnf_8cpp_source.html":[5,0,2,24,7,4],
+"dimacs__cnf_8h.html":[5,0,2,24,7,5],
+"dimacs__cnf_8h_source.html":[5,0,2,24,7,5]
 };

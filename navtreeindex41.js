@@ -1,9 +1,5 @@
 var NAVTREEINDEX41 =
 {
-"classjava__bytecode__parsert.html#aa4e6f9750debc985692c23d77f9ab632":[4,0,643,27],
-"classjava__bytecode__parsert.html#aa5b41a84794461067e5271baf4d5d22d":[4,0,643,4],
-"classjava__bytecode__parsert.html#aa678ba0ab23fa748e80f4fe8483d6772":[4,0,643,22],
-"classjava__bytecode__parsert.html#aa78a6b5c854c24a233380dbd004f084f":[4,0,643,19],
 "classjava__bytecode__parsert.html#aa843b1418d36c060764979cab9cc9a3f":[4,0,643,42],
 "classjava__bytecode__parsert.html#ab2507dd15d9ed4ca8002b99ed7c9c3fe":[4,0,643,14],
 "classjava__bytecode__parsert.html#abcfbe4551a9439040868f0b98c11d6be":[4,0,643,17],
@@ -249,5 +245,9 @@ var NAVTREEINDEX41 =
 "classjava__qualifierst.html#adaaad3d7d66702750fb1c3ff4fff9718":[4,0,662,12],
 "classjava__qualifierst.html#ae8f3d13291ec06d4ee79248dcec726f2":[4,0,662,5],
 "classjava__qualifierst.html#af0651cf5a4f55b3275ec6b53b443100b":[4,0,662,13],
-"classjava__reference__typet.html":[4,0,663]
+"classjava__reference__typet.html":[4,0,663],
+"classjava__reference__typet.html#a5a73b58baf70daa7ff42b6090772256f":[4,0,663,0],
+"classjava__reference__typet.html#a8e75b467f5980a92adc24b8a48978bd7":[4,0,663,2],
+"classjava__reference__typet.html#ad51432c6789a9c23287ac766ed7189ad":[4,0,663,1],
+"classjava__simple__method__stubst.html":[4,0,664]
 };

@@ -1,14 +1,12 @@
 var c__types_8cpp =
 [
     [ "c_bool_type", "c__types_8cpp.html#aaec9388a77b8d7832e9c8dfe29443202", null ],
-    [ "c_enum_constant_type", "c__types_8cpp.html#a3e4f3da000fbe4383dc0e5642945457a", null ],
     [ "c_index_type", "c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83", null ],
     [ "c_type_as_string", "c__types_8cpp.html#a641173312bdd3600499dda124fe2b3ed", null ],
     [ "char16_t_type", "c__types_8cpp.html#ae8ff748666756531902cec1bca4d0034", null ],
     [ "char32_t_type", "c__types_8cpp.html#a3c4e09bea61bbdda7ac108ea80def97d", null ],
     [ "char_type", "c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164", null ],
     [ "double_type", "c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9", null ],
-    [ "enum_constant_type", "c__types_8cpp.html#aacd98d7273dd1b6aa5fb7367f25dd449", null ],
     [ "float_type", "c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46", null ],
     [ "index_type", "c__types_8cpp.html#a0adb1561af206c923aaa0fc6c6579edf", null ],
     [ "long_double_type", "c__types_8cpp.html#aa4b7e1b0ff1261815e7109613ccda5f4", null ],
