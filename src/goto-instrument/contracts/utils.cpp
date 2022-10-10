@@ -242,3 +242,29 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
   return id2string(comment).find(ASSIGNS_CLAUSE_REPLACEMENT_TRACKING) !=
          std::string::npos;
 }
+
+void widen_assigns(assignst &assigns)
+{
+  assignst result;
+
+  havoc_utils_is_constantt is_constant(assigns);
+
+  for(const auto &e : assigns)
+  {
+    if(e.id() == ID_index || e.id() == ID_dereference)
+    {
+      address_of_exprt address_of_expr(e);
+
+      // index or offset is non-constant.
+      if(!is_constant(address_of_expr))
+      {
+        result.emplace(pointer_object(address_of_expr));
+      }
+      else
+        result.emplace(e);
+    }
+    else
+      result.emplace(e);
+  }
+  assigns = result;
+}

@@ -208,11 +208,13 @@ void code_contractst::check_apply_loop_contracts(
     try
     {
       get_assigns(local_may_alias, loop, to_havoc);
-      // TODO: if the set contains pairs (i, a[i]),
-      // we must at least widen them to (i, pointer_object(a))
 
       // remove loop-local symbols from the inferred set
       cfg_info.erase_locals(to_havoc);
+
+      // If the set contains pairs (i, a[i]),
+      // we widen them to (i, __CPROVER_POINTER_OBJECT(a))
+      widen_assigns(to_havoc);
 
       log.debug() << "No loop assigns clause provided. Inferred targets: {";
       // Add inferred targets to the loop assigns clause.
