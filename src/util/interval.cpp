@@ -1094,7 +1094,7 @@ bool constant_interval_exprt::is_numeric(
 
 bool constant_interval_exprt::is_int(const typet &type)
 {
-  return (is_signed(type) || is_unsigned(type));
+  return is_signed(type) || is_unsigned(type) || type.id() == ID_integer;
 }
 
 bool constant_interval_exprt::is_float(const typet &src)
