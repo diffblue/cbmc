@@ -9,5 +9,6 @@ var utils_8cpp =
     [ "make_assigns_clause_replacement_tracking_comment", "utils_8cpp.html#a1c73b0b817e6e049ea409d0c86e7b3e3", null ],
     [ "new_tmp_symbol", "utils_8cpp.html#a5cf09fde997eeb78602693d324d9d34b", null ],
     [ "simplify_gotos", "utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024", null ],
+    [ "widen_assigns", "utils_8cpp.html#a5e4658887550eb3d68278da75cfe5b6b", null ],
     [ "ASSIGNS_CLAUSE_REPLACEMENT_TRACKING", "utils_8cpp.html#abe4637b56094bf90d6b488cbf4b6de92", null ]
 ];

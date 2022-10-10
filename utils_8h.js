@@ -10,5 +10,6 @@ var utils_8h =
     [ "is_loop_free", "utils_8h.html#a3813c832f1bc8415bed3d3f17d14b763", null ],
     [ "make_assigns_clause_replacement_tracking_comment", "utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3", null ],
     [ "new_tmp_symbol", "utils_8h.html#a5aa22ab7a0301e7955023b63a6868c15", null ],
-    [ "simplify_gotos", "utils_8h.html#aba81cb53e8d0082cbe68db4136188024", null ]
+    [ "simplify_gotos", "utils_8h.html#aba81cb53e8d0082cbe68db4136188024", null ],
+    [ "widen_assigns", "utils_8h.html#a5e4658887550eb3d68278da75cfe5b6b", null ]
 ];
