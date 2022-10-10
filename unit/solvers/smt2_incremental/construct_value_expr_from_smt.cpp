@@ -7,9 +7,9 @@
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>

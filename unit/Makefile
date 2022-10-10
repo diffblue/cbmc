@@ -100,20 +100,20 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
        solvers/smt2/smt2irep.cpp \
+       solvers/smt2_incremental/ast/smt_commands.cpp \
+       solvers/smt2_incremental/ast/smt_index.cpp \
+       solvers/smt2_incremental/ast/smt_responses.cpp \
+       solvers/smt2_incremental/ast/smt_sorts.cpp \
+       solvers/smt2_incremental/ast/smt_terms.cpp \
        solvers/smt2_incremental/construct_value_expr_from_smt.cpp \
        solvers/smt2_incremental/convert_expr_to_smt.cpp \
        solvers/smt2_incremental/object_tracking.cpp \
        solvers/smt2_incremental/smt2_incremental_decision_procedure.cpp \
        solvers/smt2_incremental/smt_array_theory.cpp \
        solvers/smt2_incremental/smt_bit_vector_theory.cpp \
-       solvers/smt2_incremental/smt_commands.cpp \
        solvers/smt2_incremental/smt_core_theory.cpp \
-       solvers/smt2_incremental/smt_index.cpp \
        solvers/smt2_incremental/smt_object_size.cpp \
        solvers/smt2_incremental/smt_response_validation.cpp \
-       solvers/smt2_incremental/smt_responses.cpp \
-       solvers/smt2_incremental/smt_sorts.cpp \
-       solvers/smt2_incremental/smt_terms.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \
        solvers/strings/array_pool/array_pool.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \

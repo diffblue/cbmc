@@ -1,11 +1,10 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_terms.h>
-
 #include <util/mp_arith.h>
+
+#include <solvers/smt2_incremental/ast/smt_terms.h>
+#include <solvers/smt2_incremental/smt_core_theory.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("SMT core theory \"not\".", "[core][smt2_incremental]")
 {

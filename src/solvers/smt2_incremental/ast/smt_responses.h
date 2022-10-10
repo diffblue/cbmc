@@ -3,8 +3,9 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_RESPONSES_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_RESPONSES_H
 
-#include "smt_terms.h"
 #include <util/irep.h>
+
+#include "smt_terms.h"
 
 class smt_responset : protected irept
 {

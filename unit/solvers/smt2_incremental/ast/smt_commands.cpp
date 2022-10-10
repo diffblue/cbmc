@@ -1,9 +1,8 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/smt2_incremental/smt_commands.h>
+#include <solvers/smt2_incremental/ast/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("Test smt_commandt.pretty is accessible.", "[core][smt2_incremental]")
 {
@@ -104,8 +103,8 @@ TEST_CASE("SMT2 function application factory tests", "[core][smt2_incremental]")
   const smt_function_application_termt::factoryt<smt_command_functiont> factory{
     function_declaration};
   const smt_function_application_termt application =
-    factory(std::vector<smt_termt>{smt_bool_literal_termt{true},
-                                   smt_bool_literal_termt{false}});
+    factory(std::vector<smt_termt>{
+      smt_bool_literal_termt{true}, smt_bool_literal_termt{false}});
   CHECK(application.get_sort() == smt_bool_sortt{});
   CHECK(application.function_identifier() == arbitary);
   REQUIRE(application.arguments().size() == 2);

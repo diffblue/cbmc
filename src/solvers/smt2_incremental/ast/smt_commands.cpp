@@ -1,13 +1,13 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_commands.h>
+#include "smt_commands.h"
 
 #include <util/range.h>
 
 // Define the irep_idts for commands.
 #define COMMAND_ID(the_id)                                                     \
   const irep_idt ID_smt_##the_id##_command{"smt_" #the_id "_command"};
-#include <solvers/smt2_incremental/smt_commands.def>
+#include "smt_commands.def"
 #undef COMMAND_ID
 
 bool smt_commandt::operator==(const smt_commandt &other) const
@@ -184,7 +184,7 @@ void accept(const smt_commandt &command, const irep_idt &id, visitort &&visitor)
     return visitor.visit(static_cast<const smt_##the_id##_commandt &>(command));
 // The include below is marked as nolint because including the same file
 // multiple times is required as part of the x macro pattern.
-#include <solvers/smt2_incremental/smt_commands.def> // NOLINT(build/include)
+#include "smt_commands.def" // NOLINT(build/include)
 #undef COMMAND_ID
   UNREACHABLE;
 }

@@ -2,12 +2,12 @@
 
 #include <util/mp_arith.h>
 
+#include <solvers/smt2_incremental/ast/smt_commands.h>
+#include <solvers/smt2_incremental/ast/smt_logics.h>
+#include <solvers/smt2_incremental/ast/smt_sorts.h>
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
-#include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_logics.h>
-#include <solvers/smt2_incremental/smt_sorts.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <testing-utils/use_catch.h>
 

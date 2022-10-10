@@ -8,14 +8,14 @@
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
+#include <solvers/smt2_incremental/ast/smt_commands.h>
+#include <solvers/smt2_incremental/ast/smt_responses.h>
+#include <solvers/smt2_incremental/ast/smt_sorts.h>
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_array_theory.h>
-#include <solvers/smt2_incremental/smt_commands.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_responses.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
-#include <solvers/smt2_incremental/smt_sorts.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 

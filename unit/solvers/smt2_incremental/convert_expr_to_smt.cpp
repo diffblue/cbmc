@@ -12,12 +12,12 @@
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_array_theory.h>
 #include <solvers/smt2_incremental/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <testing-utils/invariant.h>

@@ -7,7 +7,8 @@
 // Define the irep_idts for sorts.
 #define SORT_ID(the_id)                                                        \
   const irep_idt ID_smt_##the_id##_sort{"smt_" #the_id "_sort"};
-#include <solvers/smt2_incremental/smt_sorts.def>
+#include "smt_sorts.def"
+
 #undef SORT_ID
 
 #define SORT_ID(the_id)                                                        \
@@ -18,7 +19,7 @@
              ? static_cast<const smt_##the_id##_sortt *>(this)                 \
              : nullptr;                                                        \
   }
-#include <solvers/smt2_incremental/smt_sorts.def> // NOLINT(build/include)
+#include "smt_sorts.def" // NOLINT(build/include)
 #undef SORT_ID
 
 #define SORT_ID(the_id)                                                        \
@@ -30,7 +31,7 @@
     else                                                                       \
       return {};                                                               \
   }
-#include <solvers/smt2_incremental/smt_sorts.def> // NOLINT(build/include)
+#include "smt_sorts.def" // NOLINT(build/include)
 #undef SORT_ID
 
 bool smt_sortt::operator==(const smt_sortt &other) const

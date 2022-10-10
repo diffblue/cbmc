@@ -1,12 +1,12 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_terms.h>
-
-#include <solvers/smt2_incremental/smt_sorts.h>
+#include "smt_terms.h"
 
 #include <util/arith_tools.h>
 #include <util/mp_arith.h>
 #include <util/range.h>
+
+#include "smt_sorts.h"
 
 #include <algorithm>
 #include <regex>
@@ -14,7 +14,8 @@
 // Define the irep_idts for terms.
 #define TERM_ID(the_id)                                                        \
   const irep_idt ID_smt_##the_id##_term{"smt_" #the_id "_term"};
-#include <solvers/smt2_incremental/smt_terms.def>
+#include "smt_terms.def"
+
 #undef TERM_ID
 
 smt_termt::smt_termt(irep_idt id, smt_sortt sort)
@@ -227,7 +228,7 @@ void accept(const smt_termt &term, const irep_idt &id, visitort &&visitor)
     return visitor.visit(static_cast<const smt_##the_id##_termt &>(term));
 // The include below is marked as nolint because including the same file
 // multiple times is required as part of the x macro pattern.
-#include <solvers/smt2_incremental/smt_terms.def> // NOLINT(build/include)
+#include "smt_terms.def" // NOLINT(build/include)
 #undef TERM_ID
   UNREACHABLE;
 }

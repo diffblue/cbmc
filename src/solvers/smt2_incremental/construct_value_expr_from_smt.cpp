@@ -7,8 +7,8 @@
 #include <util/std_types.h>
 #include <util/type.h>
 
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 
 class value_expr_from_smt_factoryt : public smt_term_const_downcast_visitort
 {

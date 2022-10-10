@@ -1,13 +1,14 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_responses.h>
+#include "smt_responses.h"
 
 #include <util/range.h>
 
 // Define the irep_idts for responses.
 #define RESPONSE_ID(the_id, the_base)                                          \
   const irep_idt ID_smt_##the_id##_response{"smt_" #the_id "_response"};
-#include <solvers/smt2_incremental/smt_responses.def>
+#include "smt_responses.def"
+
 #undef RESPONSE_ID
 
 bool smt_responset::operator==(const smt_responset &other) const
@@ -29,7 +30,7 @@ bool smt_responset::operator!=(const smt_responset &other) const
              ? static_cast<const smt_##the_id##_responset *>(this)             \
              : nullptr;                                                        \
   }
-#include <solvers/smt2_incremental/smt_responses.def> // NOLINT(build/include)
+#include "smt_responses.def" // NOLINT(build/include)
 #undef RESPONSE_ID
 
 template <typename sub_classt>
@@ -38,14 +39,14 @@ const sub_classt *smt_responset::cast() const &
   return nullptr;
 }
 
-bool smt_check_sat_response_kindt::
-operator==(const smt_check_sat_response_kindt &other) const
+bool smt_check_sat_response_kindt::operator==(
+  const smt_check_sat_response_kindt &other) const
 {
   return irept::operator==(other);
 }
 
-bool smt_check_sat_response_kindt::
-operator!=(const smt_check_sat_response_kindt &other) const
+bool smt_check_sat_response_kindt::operator!=(
+  const smt_check_sat_response_kindt &other) const
 {
   return !(*this == other);
 }
@@ -133,14 +134,14 @@ const smt_termt &smt_get_value_responset::valuation_pairt::value() const
   return downcast(get_sub().at(1));
 }
 
-bool smt_get_value_responset::valuation_pairt::
-operator==(const smt_get_value_responset::valuation_pairt &other) const
+bool smt_get_value_responset::valuation_pairt::operator==(
+  const smt_get_value_responset::valuation_pairt &other) const
 {
   return irept::operator==(other);
 }
 
-bool smt_get_value_responset::valuation_pairt::
-operator!=(const smt_get_value_responset::valuation_pairt &other) const
+bool smt_get_value_responset::valuation_pairt::operator!=(
+  const smt_get_value_responset::valuation_pairt &other) const
 {
   return !(*this == other);
 }
