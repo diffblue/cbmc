@@ -171,8 +171,10 @@ void ansi_c_internal_additions(std::string &code)
       CPROVER_PREFIX "constant_infinity_uint];\n"
 
     // malloc
-    "const void *" CPROVER_PREFIX "deallocated=0;\n"
-    "const void *" CPROVER_PREFIX "dead_object=0;\n"
+    CPROVER_PREFIX "bool " CPROVER_PREFIX "deallocated["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
+    CPROVER_PREFIX "bool " CPROVER_PREFIX "dead_object["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
     "const void *" CPROVER_PREFIX "new_object=0;\n" // for C++
     CPROVER_PREFIX "bool " CPROVER_PREFIX "malloc_is_new_array=0;\n" // for C++
     "const void *" CPROVER_PREFIX "memory_leak=0;\n"

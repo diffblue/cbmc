@@ -1,0 +1,10 @@
+CORE
+main.c
+
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test checks that negations of __CPROVER_r_ok can safely be used.

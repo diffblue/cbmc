@@ -130,10 +130,6 @@ __CPROVER_HIDE:;
   // and __CPROVER_allocate doesn't, but no one cares
   malloc_res = __CPROVER_allocate(alloc_size, 1);
 
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated =
-    (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
-
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_is_new_array =
@@ -194,10 +190,6 @@ __CPROVER_HIDE:;
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
 
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated =
-    (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
-
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_is_new_array =
@@ -224,9 +216,6 @@ void *__builtin_alloca(__CPROVER_size_t alloca_size)
   __CPROVER_HIDE:;
   void *res;
   res = __CPROVER_allocate(alloca_size, 0);
-
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
@@ -275,8 +264,9 @@ void free(void *ptr)
                          "free argument has offset zero");
 
   // catch double free
-  __CPROVER_precondition(ptr==0 || __CPROVER_deallocated!=ptr,
-                         "double free");
+  __CPROVER_precondition(
+    ptr == 0 || !__CPROVER_deallocated[__CPROVER_POINTER_OBJECT(ptr)],
+    "double free");
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
@@ -613,10 +603,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __CPROVER_deallocate */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-
 void __CPROVER_deallocate(void *ptr)
 {
-  if(__VERIFIER_nondet___CPROVER_bool())
-    __CPROVER_deallocated = ptr;
+  __CPROVER_deallocated[__CPROVER_POINTER_OBJECT(ptr)] = 1;
 }

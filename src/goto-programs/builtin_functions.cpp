@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
@@ -1415,16 +1416,9 @@ void goto_convertt::do_function_call_symbol(
       make_temp_symbol(new_lhs, "alloca", dest, mode);
 
     // mark pointer to alloca result as dead
-    symbol_exprt dead_object_sym =
-      ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-    exprt alloca_result =
-      typecast_exprt::conditional_cast(new_lhs, dead_object_sym.type());
-    if_exprt rhs{
-      side_effect_expr_nondett{bool_typet(), source_location},
-      std::move(alloca_result),
-      dead_object_sym};
+    exprt dead_object_expr = dead_object(new_lhs, ns);
     code_assignt assign{
-      std::move(dead_object_sym), std::move(rhs), source_location};
+      std::move(dead_object_expr), true_exprt{}, source_location};
     targets.destructor_stack.add(assign);
   }
   else
