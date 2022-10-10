@@ -1,0 +1,13 @@
+CORE
+typesmain.c
+types1.c types2.c types3.c
+reason for conflict at \*#this.u: number of members is different \(3/0\)
+reason for conflict at \*#this.u: number of members is different \(0/3\)
+struct U   \(incomplete\)
+warning: pointer parameter types differ between declaration and definition "bar"
+warning: pointer parameter types differ between declaration and definition "foo"
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

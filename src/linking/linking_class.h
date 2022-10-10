@@ -19,8 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/typecheck.h>
 
+#include <unordered_set>
+
 class casting_replace_symbolt : public replace_symbolt
 {
+public:
+  bool replace(exprt &dest) const override;
+
 private:
   bool replace_symbol_expr(symbol_exprt &dest) const override;
 };
@@ -131,7 +136,10 @@ protected:
     return type_to_string_verbose(symbol, symbol.type);
   }
 
-  void detailed_conflict_report_rec(
+  /// Returns true iff the conflict report on a particular branch of the tree of
+  /// types was a definitive result, and not contingent on conflicts within a
+  /// tag type.
+  bool detailed_conflict_report_rec(
     const symbolt &old_symbol,
     const symbolt &new_symbol,
     const typet &type1,

@@ -148,7 +148,7 @@ void finalize_linking(
   goto_modelt &dest,
   const replace_symbolt::expr_mapt &type_updates)
 {
-  unchecked_replace_symbolt object_type_updates;
+  casting_replace_symbolt object_type_updates;
   object_type_updates.get_expr_map().insert(
     type_updates.begin(), type_updates.end());
 
@@ -196,10 +196,30 @@ void finalize_linking(
     {
       for(auto &instruction : gf_entry.second.body.instructions)
       {
-        instruction.transform([&object_type_updates](exprt expr) {
-          object_type_updates(expr);
-          return expr;
-        });
+        if(instruction.is_function_call())
+        {
+          const bool changed =
+            !object_type_updates.replace(instruction.call_function());
+          if(changed && instruction.call_lhs().is_not_nil())
+          {
+            object_type_updates(instruction.call_lhs());
+            if(
+              instruction.call_lhs().type() !=
+              to_code_type(instruction.call_function().type()).return_type())
+            {
+              instruction.call_lhs() = typecast_exprt{
+                instruction.call_lhs(),
+                to_code_type(instruction.call_function().type()).return_type()};
+            }
+          }
+        }
+        else
+        {
+          instruction.transform([&object_type_updates](exprt expr) {
+            const bool changed = !object_type_updates.replace(expr);
+            return changed ? optionalt<exprt>{expr} : nullopt;
+          });
+        }
       }
     }
   }
