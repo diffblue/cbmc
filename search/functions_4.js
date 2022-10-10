@@ -105,7 +105,7 @@ var searchData=
   ['det_5fflush_29867',['det_flush',['../classshared__bufferst.html#a82ebdd13385e657e04817d729fa831f6',1,'shared_bufferst']]],
   ['detach_29868',['detach',['../classsharing__treet.html#af17f533a5b1dd1f5879bee372977f916',1,'sharing_treet::detach()'],['../classreference__counting.html#ab24d3fb3a10504ce7587c00a56ce131d',1,'reference_counting::detach()']]],
   ['detailed_5fconflict_5freport_29869',['detailed_conflict_report',['../classlinkingt.html#acd5557b6a3aff3246385c9dc405dc75f',1,'linkingt']]],
-  ['detailed_5fconflict_5freport_5frec_29870',['detailed_conflict_report_rec',['../classlinkingt.html#a7c16ce819bab86a527518f163fca4daf',1,'linkingt']]],
+  ['detailed_5fconflict_5freport_5frec_29870',['detailed_conflict_report_rec',['../classlinkingt.html#aaf96cf13551a86c819140bf5e55e5d52',1,'linkingt']]],
   ['detect_5ffile_5ftype_29871',['detect_file_type',['../compile_8cpp.html#a3be7dba771785eb0d6eb881e46a7bdd6',1,'compile.cpp']]],
   ['determine_5fresult_29872',['determine_result',['../properties_8cpp.html#a86d68d9c5afa6d4e193fadb8d695ecb5',1,'determine_result(const propertiest &amp;properties):&#160;properties.cpp'],['../properties_8h.html#a86d68d9c5afa6d4e193fadb8d695ecb5',1,'determine_result(const propertiest &amp;properties):&#160;properties.cpp']]],
   ['determinise_29873',['determinise',['../classtrace__automatont.html#a00d3f980c7e6e7f9959dc0b24db8ca6e',1,'trace_automatont']]],

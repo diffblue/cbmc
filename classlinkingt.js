@@ -7,7 +7,7 @@ var classlinkingt =
     [ "adjust_object_type_rec", "classlinkingt.html#a39b7d6bd9b1e28215532f86fd76bd7ca", null ],
     [ "copy_symbols", "classlinkingt.html#a1da4cb208544d2c67cafbe114bb7b3bb", null ],
     [ "detailed_conflict_report", "classlinkingt.html#acd5557b6a3aff3246385c9dc405dc75f", null ],
-    [ "detailed_conflict_report_rec", "classlinkingt.html#a7c16ce819bab86a527518f163fca4daf", null ],
+    [ "detailed_conflict_report_rec", "classlinkingt.html#aaf96cf13551a86c819140bf5e55e5d52", null ],
     [ "do_type_dependencies", "classlinkingt.html#a7de28d8e1bcb224e697b3a768b1ce5e4", null ],
     [ "duplicate_code_symbol", "classlinkingt.html#ad7d80d4ad4379a6852330f7c5e0581ce", null ],
     [ "duplicate_non_type_symbol", "classlinkingt.html#a0119897371f9ced79a7e12097c5ae08a", null ],

@@ -1,5 +1,6 @@
 var NAVTREEINDEX21 =
 {
+"classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a95fbf728908187e4bb160a31525824d5":[4,0,290,2,2],
 "classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50ac18e8f1f430ea227dbd63d0d9a2bc5fb":[4,0,290,2,3],
 "classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50ad939b380bd895837cf94418281d6f4b6":[4,0,290,2,10],
 "classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50ae2c47a68e88ffcdd84ad0e344bd0869f":[4,0,290,2,9],
@@ -248,6 +249,5 @@ var NAVTREEINDEX21 =
 "classcpp__token__buffert.html#aa7f63aa5616827042ea29c4d9b864e15":[4,0,309,5],
 "classcpp__token__buffert.html#aae00689105f2b5f6355dbc55c6603006":[4,0,309,12],
 "classcpp__token__buffert.html#aba6bfe586319c746648ce54aa5ac6d95":[4,0,309,16],
-"classcpp__token__buffert.html#accfb770394088023ef1f3a790b45175a":[4,0,309,14],
-"classcpp__token__buffert.html#ae2fcd61132082b3300f234c799e92543":[4,0,309,7]
+"classcpp__token__buffert.html#accfb770394088023ef1f3a790b45175a":[4,0,309,14]
 };

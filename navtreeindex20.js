@@ -1,5 +1,6 @@
 var NAVTREEINDEX20 =
 {
+"classcopy__on__writet.html#acc3fdd1fe28f19b82c88a57ba06e732b":[4,0,262,2],
 "classcopy__on__writet.html#ae82f27875fce9d68ba9daed712da6336":[4,0,262,0],
 "classcount__leading__zeros__exprt.html":[4,0,263],
 "classcount__leading__zeros__exprt.html#a0599f66d148dca14d6fe64e9c1babbd5":[4,0,263,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX20 =
 "classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a7347fe5a0f184f79ef064e92e3beb297":[4,0,290,2,7],
 "classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a85a1979d26d0ef93dcc13a72fee80705":[4,0,290,2,4],
 "classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a8fc5a0642a90632e8418ca52c3ec761d":[4,0,290,2,1],
-"classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a9208fdeb4912b59451a5aa9c4a66aba1":[4,0,290,2,5],
-"classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a95fbf728908187e4bb160a31525824d5":[4,0,290,2,2]
+"classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50a9208fdeb4912b59451a5aa9c4a66aba1":[4,0,290,2,5]
 };

@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"cpp__using_8h.html":[5,0,2,5,75],
 "cpp__using_8h_source.html":[5,0,2,5,75],
 "cpp__util_8cpp.html":[5,0,2,5,76],
 "cpp__util_8cpp.html#acdc3df88a36cb59eb67dc991fded61f3":[5,0,2,5,76,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "developer_guide.html":[0,3],
 "dimacs__cnf_8cpp.html":[5,0,2,24,7,4],
 "dimacs__cnf_8cpp_source.html":[5,0,2,24,7,4],
-"dimacs__cnf_8h.html":[5,0,2,24,7,5],
-"dimacs__cnf_8h_source.html":[5,0,2,24,7,5]
+"dimacs__cnf_8h.html":[5,0,2,24,7,5]
 };

@@ -1,5 +1,6 @@
 var NAVTREEINDEX71 =
 {
+"cow_8h.html":[5,0,2,27,27],
 "cow_8h.html#a0935fe15293ccb7d6307607ba01068c7":[5,0,2,27,27,4],
 "cow_8h.html#a2aec67892535734d796ec5d7d397feb1":[5,0,2,27,27,3],
 "cow_8h.html#a6a5626c3127d1b8cecd9597d9f26e7c5":[5,0,2,27,27,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX71 =
 "cpp__typecheck__using_8cpp.html":[5,0,2,5,73],
 "cpp__typecheck__using_8cpp_source.html":[5,0,2,5,73],
 "cpp__typecheck__virtual__table_8cpp.html":[5,0,2,5,74],
-"cpp__typecheck__virtual__table_8cpp_source.html":[5,0,2,5,74],
-"cpp__using_8h.html":[5,0,2,5,75]
+"cpp__typecheck__virtual__table_8cpp_source.html":[5,0,2,5,74]
 };

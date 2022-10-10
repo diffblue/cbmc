@@ -218,8 +218,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ab4b4b512433adc019478a27e89583421"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a235a4d5b61da8a8d0c21fbf0115044fd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinkingt.html#a235a4d5b61da8a8d0c21fbf0115044fd">type_to_string_verbose</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol) const</td></tr>
 <tr class="separator:a235a4d5b61da8a8d0c21fbf0115044fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c16ce819bab86a527518f163fca4daf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinkingt.html#a7c16ce819bab86a527518f163fca4daf">detailed_conflict_report_rec</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;old_symbol, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;new_symbol, const <a class="el" href="classtypet.html">typet</a> &amp;type1, const <a class="el" href="classtypet.html">typet</a> &amp;type2, unsigned depth, <a class="el" href="classexprt.html">exprt</a> &amp;conflict_path)</td></tr>
-<tr class="separator:a7c16ce819bab86a527518f163fca4daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf96cf13551a86c819140bf5e55e5d52"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinkingt.html#aaf96cf13551a86c819140bf5e55e5d52">detailed_conflict_report_rec</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;old_symbol, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;new_symbol, const <a class="el" href="classtypet.html">typet</a> &amp;type1, const <a class="el" href="classtypet.html">typet</a> &amp;type2, unsigned depth, <a class="el" href="classexprt.html">exprt</a> &amp;conflict_path)</td></tr>
+<tr class="memdesc:aaf96cf13551a86c819140bf5e55e5d52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the conflict report on a particular branch of the tree of types was a definitive result, and not contingent on conflicts within a tag type.  <a href="classlinkingt.html#aaf96cf13551a86c819140bf5e55e5d52">More...</a><br /></td></tr>
+<tr class="separator:aaf96cf13551a86c819140bf5e55e5d52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd5557b6a3aff3246385c9dc405dc75f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinkingt.html#acd5557b6a3aff3246385c9dc405dc75f">detailed_conflict_report</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;old_symbol, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;new_symbol, const <a class="el" href="classtypet.html">typet</a> &amp;type1, const <a class="el" href="classtypet.html">typet</a> &amp;type2)</td></tr>
 <tr class="separator:acd5557b6a3aff3246385c9dc405dc75f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0d63238432aa03aa4290bc5699a8c57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinkingt.html#af0d63238432aa03aa4290bc5699a8c57">link_error</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;old_symbol, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;new_symbol, const std::string &amp;msg)</td></tr>
@@ -326,7 +327,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00028">28</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00033">33</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a759150342699d901b37beebcec3ec272"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a759150342699d901b37beebcec3ec272">&#9670;&nbsp;</a></span>used_byt</h2>
@@ -348,7 +349,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00178">178</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00186">186</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -393,7 +394,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00031">31</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00036">36</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -438,7 +439,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00999">999</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01065">1065</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -482,7 +483,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00807">807</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00873">873</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -510,7 +511,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01378">1378</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01444">1444</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -560,12 +561,12 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00142">142</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00150">150</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
-<a id="a7c16ce819bab86a527518f163fca4daf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c16ce819bab86a527518f163fca4daf">&#9670;&nbsp;</a></span>detailed_conflict_report_rec()</h2>
+<a id="aaf96cf13551a86c819140bf5e55e5d52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf96cf13551a86c819140bf5e55e5d52">&#9670;&nbsp;</a></span>detailed_conflict_report_rec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -574,7 +575,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void linkingt::detailed_conflict_report_rec </td>
+          <td class="memname">bool linkingt::detailed_conflict_report_rec </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td>
           <td class="paramname"><em>old_symbol</em>, </td>
@@ -622,7 +623,9 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00129">129</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p>Returns true iff the conflict report on a particular branch of the tree of types was a definitive result, and not contingent on conflicts within a tag type. </p>
+
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00193">193</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +653,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01300">1300</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01366">1366</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -688,7 +691,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00470">470</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00547">547</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -726,7 +729,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01104">1104</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01170">1170</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -764,7 +767,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01014">1014</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01080">1080</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -802,7 +805,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01148">1148</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01214">1214</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -840,7 +843,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00049">49</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00113">113</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -884,7 +887,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00397">397</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00474">474</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -928,7 +931,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00414">414</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00491">491</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -966,7 +969,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00056">56</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00061">61</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1004,7 +1007,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00456">456</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00533">533</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1042,7 +1045,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01243">1243</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01309">1309</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1070,7 +1073,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00432">432</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00509">509</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1098,7 +1101,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01345">1345</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01411">1411</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1172,7 +1175,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00056">56</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00120">120</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1200,7 +1203,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00128">128</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00133">133</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1238,7 +1241,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00077">77</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00141">141</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1267,7 +1270,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classtypecheckt.html#a94ed9be1b2005730c993ce4851003176">typecheckt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01444">1444</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01510">1510</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -1292,7 +1295,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00172">172</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00180">180</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1316,7 +1319,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00175">175</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00183">183</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1332,7 +1335,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00045">45</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00050">50</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1348,7 +1351,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00044">44</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00049">49</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1372,7 +1375,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00183">183</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00191">191</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>
@@ -1396,7 +1399,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00173">173</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking__class_8h_source.html#l00181">181</a> of file <a class="el" href="linking__class_8h_source.html">linking_class.h</a>.</p>
 
 </div>
 </div>

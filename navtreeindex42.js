@@ -1,5 +1,6 @@
 var NAVTREEINDEX42 =
 {
+"classjava__simple__method__stubst.html":[4,0,664],
 "classjava__simple__method__stubst.html#a02861edd98ff9d00f6c80ec0322d86df":[4,0,664,1],
 "classjava__simple__method__stubst.html#a3a701e7edc83fdf5284df955605579c5":[4,0,664,5],
 "classjava__simple__method__stubst.html#a6e192252ec810fd813c6dc54f714e86f":[4,0,664,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX42 =
 "classjsil__union__typet.html#a86bcfdbcaef3ea43249da6823855d74f":[4,0,681,3],
 "classjsil__union__typet.html#ac455457817d79ded8b6590ada7e2988a":[4,0,681,2],
 "classjsil__union__typet.html#ac7d3dc952a2e90ba241fb9e351155b41":[4,0,681,4],
-"classjsil__union__typet.html#ad84bc889a12832da476a05b15cd3903d":[4,0,681,0],
-"classjsil__union__typet.html#aefb616a5e6e8962bee33282d97cd7b7a":[4,0,681,5]
+"classjsil__union__typet.html#ad84bc889a12832da476a05b15cd3903d":[4,0,681,0]
 };
