@@ -83,9 +83,9 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
   {
     // OTHER __CPROVER_havoc_object(target_snapshot_var)
     codet code(ID_havoc_object, {car.lower_bound_var()});
-    const auto &inst =
-      dest.add(goto_programt::make_other(code, source_location));
-    inst->source_location_nonconst().set_comment(tracking_comment);
+    source_locationt annotated_location = source_location;
+    annotated_location.set_comment(tracking_comment);
+    dest.add(goto_programt::make_other(code, annotated_location));
   }
   else if(car.havoc_method == car_havoc_methodt::HAVOC_SLICE)
   {
@@ -106,12 +106,13 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
     // ASSIGN *(target.type() *)__car_lb = nondet(car.target().type())
     const auto &target_type = car.target().type();
     side_effect_expr_nondett nondet(target_type, source_location);
-    const auto &inst = dest.add(goto_programt::make_assignment(
+    source_locationt annotated_location = source_location;
+    annotated_location.set_comment(tracking_comment);
+    dest.add(goto_programt::make_assignment(
       dereference_exprt{typecast_exprt::conditional_cast(
         car.lower_bound_var(), pointer_type(target_type))},
       nondet,
-      source_location));
-    inst->source_location_nonconst().set_comment(tracking_comment);
+      annotated_location));
   }
   else
   {
@@ -154,10 +155,11 @@ void havoc_assigns_clause_targetst::havoc_static_local(
 
   const auto &target_type = car.target().type();
   side_effect_expr_nondett nondet(target_type, source_location);
-  const auto &inst = dest.add(
-    goto_programt::make_assignment(car.target(), nondet, source_location));
-  inst->source_location_nonconst().set_comment(tracking_comment);
-  add_propagate_static_local_pragma(inst->source_location_nonconst());
+  source_locationt annotated_location = source_location;
+  annotated_location.set_comment(tracking_comment);
+  add_propagate_static_local_pragma(annotated_location);
+  dest.add(
+    goto_programt::make_assignment(car.target(), nondet, annotated_location));
 
   dest.destructive_append(skip_program);
 

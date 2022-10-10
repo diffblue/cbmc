@@ -141,12 +141,15 @@ static void create_static_function_call(
 ///   the virtual function call
 /// \param temp_var_for_this: The new expression for the this argument of the
 ///   virtual function call
+/// \param vcall_source_loc: The source location of the function call, which is
+///   used for new instructions that are added
 /// \return A goto program consisting of all the amended asserts and assumes
 static goto_programt analyse_checks_directly_preceding_function_call(
   const goto_programt &goto_program,
   goto_programt::const_targett instr_it,
   const exprt &argument_for_this,
-  const symbol_exprt &temp_var_for_this)
+  const symbol_exprt &temp_var_for_this,
+  const source_locationt &vcall_source_loc)
 {
   goto_programt checks_directly_preceding_function_call;
 
@@ -181,7 +184,7 @@ static goto_programt analyse_checks_directly_preceding_function_call(
     {
       checks_directly_preceding_function_call.insert_before(
         checks_directly_preceding_function_call.instructions.cbegin(),
-        goto_programt::make_assumption(guard));
+        goto_programt::make_assumption(guard, vcall_source_loc));
     }
   }
 
@@ -230,7 +233,11 @@ static void process_this_argument(
 
     goto_programt checks_directly_preceding_function_call =
       analyse_checks_directly_preceding_function_call(
-        goto_program, target, argument_for_this, temp_var_for_this);
+        goto_program,
+        target,
+        argument_for_this,
+        temp_var_for_this,
+        vcall_source_loc);
 
     new_code_for_this_argument.destructive_append(
       checks_directly_preceding_function_call);
@@ -377,16 +384,14 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
       }
       else
       {
-        goto_programt::targett t1 = new_code_calls.add(
-          goto_programt::make_assertion(false_exprt(), vcall_source_loc));
-
+        source_locationt annotated_location = vcall_source_loc;
         // No definition for this type; shouldn't be possible...
-        t1->source_location_nonconst().set_comment(
+        annotated_location.set_comment(
           "cannot find calls for " +
           id2string(code.function().get(ID_identifier)) + " dispatching " +
           id2string(fun.class_id));
-
-        insertit.first->second = t1;
+        insertit.first->second = new_code_calls.add(
+          goto_programt::make_assertion(false_exprt(), annotated_location));
       }
 
       // goto final
@@ -440,20 +445,6 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
   new_code.destructive_append(new_code_gotos);
   new_code.destructive_append(new_code_calls);
   new_code.destructive_append(final_skip);
-
-  // set locations
-  for(auto &instruction : new_code.instructions)
-  {
-    source_locationt &source_location = instruction.source_location_nonconst();
-
-    const irep_idt property_class = source_location.get_property_class();
-    const irep_idt comment = source_location.get_comment();
-    source_location = target->source_location();
-    if(!property_class.empty())
-      source_location.set_property_class(property_class);
-    if(!comment.empty())
-      source_location.set_comment(comment);
-  }
 
   goto_program.destructive_insert(next_target, new_code);
 

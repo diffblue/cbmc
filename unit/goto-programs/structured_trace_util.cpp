@@ -22,9 +22,13 @@ goto_programt::targett add_instruction(
   const source_locationt &location,
   goto_programt::instructionst &instructions)
 {
-  goto_programt::instructiont instruction;
+  goto_programt::instructiont instruction{
+    codet{ID_nil},
+    location,
+    goto_program_instruction_typet::NO_INSTRUCTION_TYPE,
+    {},
+    {}};
   instruction.location_number = instructions.size();
-  instruction.source_location_nonconst() = location;
   instructions.push_back(instruction);
   return std::next(instructions.begin(), instruction.location_number);
 }

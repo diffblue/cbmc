@@ -294,10 +294,7 @@ static goto_programt::targett check_and_replace_target(
     inserted_expr.set_nullable(
       instr_info.get_nullable_type() ==
       nondet_instruction_infot::is_nullablet::TRUE);
-    target_instruction->code_nonconst() =
-      code_assignt(nondet_var, inserted_expr);
-    target_instruction->code_nonconst().add_source_location() =
-      target_instruction->source_location();
+    target_instruction->assign_rhs_nonconst() = inserted_expr;
   }
 
   goto_program.update();

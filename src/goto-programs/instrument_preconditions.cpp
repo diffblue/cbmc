@@ -129,11 +129,10 @@ void instrument_preconditions(
           goto_program.insert_before_swap(it);
           exprt instance = p->condition();
           r(instance);
-          *it = goto_programt::make_assertion(instance, source_location);
-          it->source_location_nonconst().set_property_class(
-            ID_precondition_instance);
-          it->source_location_nonconst().set_comment(
-            p->source_location().get_comment());
+          source_locationt annotated_location = source_location;
+          annotated_location.set_property_class(ID_precondition_instance);
+          annotated_location.set_comment(p->source_location().get_comment());
+          *it = goto_programt::make_assertion(instance, annotated_location);
           it++;
         }
       }

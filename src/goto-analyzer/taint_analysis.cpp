@@ -179,12 +179,13 @@ void taint_analysist::instrument(
                 where,
                 ID_get_may,
                 address_of_exprt(string_constantt(rule.taint))};
-              goto_programt::targett t =
-                insert_before.add(goto_programt::make_assertion(
-                  not_exprt(get_may), instruction.source_location()));
-              t->source_location_nonconst().set_property_class(
+              source_locationt annotated_location =
+                instruction.source_location();
+              annotated_location.set_property_class(
                 "taint rule " + id2string(rule.id));
-              t->source_location_nonconst().set_comment(rule.message);
+              annotated_location.set_comment(rule.message);
+              insert_before.add(goto_programt::make_assertion(
+                not_exprt(get_may), annotated_location));
               break;
             }
 

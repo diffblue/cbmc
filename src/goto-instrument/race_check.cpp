@@ -198,20 +198,18 @@ static void race_check(
         if(!is_shared(ns, w_entry.second.symbol_expr))
           continue;
 
-        goto_programt::targett t = goto_program.insert_before(
+        goto_program.insert_before(
           i_it,
           goto_programt::make_assignment(
             w_guards.get_w_guard_expr(w_entry.second),
             w_entry.second.guard,
             original_instruction.source_location()));
-        i_it=++t;
       }
 
       // insert original statement here
       {
         goto_programt::targett t=goto_program.insert_before(i_it);
         *t=original_instruction;
-        i_it=++t;
       }
 
       // now add assignments for what is written -- reset
@@ -220,13 +218,12 @@ static void race_check(
         if(!is_shared(ns, w_entry.second.symbol_expr))
           continue;
 
-        goto_programt::targett t = goto_program.insert_before(
+        goto_program.insert_before(
           i_it,
           goto_programt::make_assignment(
             w_guards.get_w_guard_expr(w_entry.second),
             false_exprt(),
             original_instruction.source_location()));
-        i_it = std::next(t);
       }
 
       // now add assertions for what is read and written
@@ -235,14 +232,13 @@ static void race_check(
         if(!is_shared(ns, r_entry.second.symbol_expr))
           continue;
 
-        goto_programt::targett t = goto_program.insert_before(
+        source_locationt annotated_location =
+          original_instruction.source_location();
+        annotated_location.set_comment(comment(r_entry.second, false));
+        goto_program.insert_before(
           i_it,
           goto_programt::make_assertion(
-            w_guards.get_assertion(r_entry.second),
-            original_instruction.source_location()));
-        t->source_location_nonconst().set_comment(
-          comment(r_entry.second, false));
-        i_it=++t;
+            w_guards.get_assertion(r_entry.second), annotated_location));
       }
 
       for(const auto &w_entry : rw_set.w_entries)
@@ -250,14 +246,13 @@ static void race_check(
         if(!is_shared(ns, w_entry.second.symbol_expr))
           continue;
 
-        goto_programt::targett t = goto_program.insert_before(
+        source_locationt annotated_location =
+          original_instruction.source_location();
+        annotated_location.set_comment(comment(w_entry.second, true));
+        goto_program.insert_before(
           i_it,
           goto_programt::make_assertion(
-            w_guards.get_assertion(w_entry.second),
-            original_instruction.source_location()));
-        t->source_location_nonconst().set_comment(
-          comment(w_entry.second, true));
-        i_it=++t;
+            w_guards.get_assertion(w_entry.second), annotated_location));
       }
 
       i_it--; // the for loop already counts us up

@@ -238,7 +238,8 @@ static void fix_return_type(
   dest.add(goto_programt::make_assignment(code_assignt(
     old_lhs,
     make_byte_extract(
-      tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()))));
+      tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()),
+    function_call.source_location())));
 }
 
 void remove_function_pointerst::remove_function_pointer(
@@ -388,7 +389,8 @@ void remove_function_pointer(
   // the final target is a skip
   goto_programt final_skip;
 
-  goto_programt::targett t_final = final_skip.add(goto_programt::make_skip());
+  goto_programt::targett t_final =
+    final_skip.add(goto_programt::make_skip(target->source_location()));
 
   // build the calls and gotos
 
@@ -407,11 +409,13 @@ void remove_function_pointer(
     goto_programt tmp;
     fix_return_type(function_id, new_call, symbol_table, tmp);
 
-    auto call = new_code_calls.add(goto_programt::make_function_call(new_call));
+    auto call = new_code_calls.add(
+      goto_programt::make_function_call(new_call, target->source_location()));
     new_code_calls.destructive_append(tmp);
 
     // goto final
-    new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
+    new_code_calls.add(goto_programt::make_goto(
+      t_final, true_exprt(), target->source_location()));
 
     // goto to call
     const address_of_exprt address_of(fun, pointer_type(fun.type()));
@@ -419,17 +423,18 @@ void remove_function_pointer(
     const auto casted_address =
       typecast_exprt::conditional_cast(address_of, pointer.type());
 
-    new_code_gotos.add(
-      goto_programt::make_goto(call, equal_exprt(pointer, casted_address)));
+    new_code_gotos.add(goto_programt::make_goto(
+      call, equal_exprt(pointer, casted_address), target->source_location()));
   }
 
   // fall-through
-  goto_programt::targett t =
-    new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
-  t->source_location_nonconst().set_property_class("pointer dereference");
-  t->source_location_nonconst().set_comment(
-    function_pointer_assertion_comment(functions));
-  new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("pointer dereference");
+  annotated_location.set_comment(function_pointer_assertion_comment(functions));
+  new_code_gotos.add(
+    goto_programt::make_assertion(false_exprt(), annotated_location));
+  new_code_gotos.add(
+    goto_programt::make_assumption(false_exprt(), target->source_location()));
 
   goto_programt new_code;
 
@@ -437,20 +442,6 @@ void remove_function_pointer(
   new_code.destructive_append(new_code_gotos);
   new_code.destructive_append(new_code_calls);
   new_code.destructive_append(final_skip);
-
-  // set locations
-  for(auto &instruction : new_code.instructions)
-  {
-    source_locationt &source_location = instruction.source_location_nonconst();
-
-    irep_idt property_class = source_location.get_property_class();
-    irep_idt comment = source_location.get_comment();
-    source_location = target->source_location();
-    if(!property_class.empty())
-      source_location.set_property_class(property_class);
-    if(!comment.empty())
-      source_location.set_comment(comment);
-  }
 
   goto_programt::targett next_target=target;
   next_target++;

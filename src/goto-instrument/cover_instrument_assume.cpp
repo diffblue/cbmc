@@ -23,7 +23,6 @@ void cover_assume_instrumentert::instrument(
 {
   if(i_it->is_assume())
   {
-    const auto location = i_it->source_location();
     const auto assume_condition =
       expr2c(i_it->condition(), namespacet{symbol_tablet()});
     const auto comment_before =
@@ -31,13 +30,14 @@ void cover_assume_instrumentert::instrument(
     const auto comment_after =
       "assert(false) after assume(" + assume_condition + ")";
 
+    source_locationt location = i_it->source_location();
+    initialize_source_location(location, comment_before, function_id);
     const auto assert_before = make_assertion(false_exprt{}, location);
-    goto_programt::targett t = goto_program.insert_before(i_it, assert_before);
-    initialize_source_location(t, comment_before, function_id);
+    goto_program.insert_before(i_it, assert_before);
 
+    initialize_source_location(location, comment_after, function_id);
     const auto assert_after = make_assertion(false_exprt{}, location);
-    t = goto_program.insert_after(i_it, assert_after);
-    initialize_source_location(t, comment_after, function_id);
+    goto_program.insert_after(i_it, assert_after);
   }
   // Otherwise, skip existing assertions.
   else if(i_it->is_assert())

@@ -76,14 +76,10 @@ protected:
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
-    // NOLINTNEXTLINE
-    auto add_instruction = [&](goto_programt::instructiont &&i) {
-      auto instruction = function.body.add(std::move(i));
-      instruction->source_location_nonconst() = function_symbol.location;
-      return instruction;
-    };
-    add_instruction(goto_programt::make_assumption(false_exprt()));
-    add_instruction(goto_programt::make_end_function());
+    function.body.add(
+      goto_programt::make_assumption(false_exprt(), function_symbol.location));
+    function.body.add(
+      goto_programt::make_end_function(function_symbol.location));
   }
 };
 
@@ -96,20 +92,17 @@ protected:
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
-    // NOLINTNEXTLINE
-    auto add_instruction = [&](goto_programt::instructiont &&i) {
-      auto instruction = function.body.add(std::move(i));
-      instruction->source_location_nonconst() = function_symbol.location;
-      instruction->source_location_nonconst().set_function(function_name);
-      return instruction;
-    };
-    auto assert_instruction =
-      add_instruction(goto_programt::make_assertion(false_exprt()));
-    assert_instruction->source_location_nonconst().set_comment(
-      "undefined function should be unreachable");
-    assert_instruction->source_location_nonconst().set_property_class(
-      ID_assertion);
-    add_instruction(goto_programt::make_end_function());
+
+    source_locationt annotated_location = function_symbol.location;
+    annotated_location.set_function(function_name);
+    annotated_location.set_comment("undefined function should be unreachable");
+    annotated_location.set_property_class(ID_assertion);
+    function.body.add(
+      goto_programt::make_assertion(false_exprt(), annotated_location));
+
+    source_locationt location = function_symbol.location;
+    location.set_function(function_name);
+    function.body.add(goto_programt::make_end_function(location));
   }
 };
 
@@ -123,21 +116,18 @@ protected:
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
-    // NOLINTNEXTLINE
-    auto add_instruction = [&](goto_programt::instructiont &&i) {
-      auto instruction = function.body.add(std::move(i));
-      instruction->source_location_nonconst() = function_symbol.location;
-      instruction->source_location_nonconst().set_function(function_name);
-      return instruction;
-    };
-    auto assert_instruction =
-      add_instruction(goto_programt::make_assertion(false_exprt()));
-    assert_instruction->source_location_nonconst().set_comment(
-      "undefined function should be unreachable");
-    assert_instruction->source_location_nonconst().set_property_class(
-      ID_assertion);
-    add_instruction(goto_programt::make_assumption(false_exprt()));
-    add_instruction(goto_programt::make_end_function());
+
+    source_locationt annotated_location = function_symbol.location;
+    annotated_location.set_function(function_name);
+    annotated_location.set_comment("undefined function should be unreachable");
+    annotated_location.set_property_class(ID_assertion);
+    function.body.add(
+      goto_programt::make_assertion(false_exprt(), annotated_location));
+
+    source_locationt location = function_symbol.location;
+    location.set_function(function_name);
+    function.body.add(goto_programt::make_assumption(false_exprt(), location));
+    function.body.add(goto_programt::make_end_function(location));
   }
 };
 
@@ -259,12 +249,6 @@ protected:
     }
 
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
-    // NOLINTNEXTLINE
-    auto add_instruction = [&](goto_programt::instructiont &&i) {
-      auto instruction = function.body.add(std::move(i));
-      instruction->source_location_nonconst() = function_symbol.location;
-      return instruction;
-    };
 
     for(std::size_t i = 0; i < function.parameter_identifiers.size(); ++i)
     {
@@ -278,9 +262,11 @@ protected:
         should_havoc_param(id2string(parameter_symbol.base_name), i))
       {
         auto goto_instruction =
-          add_instruction(goto_programt::make_incomplete_goto(equal_exprt(
-            parameter_symbol.symbol_expr(),
-            null_pointer_exprt(to_pointer_type(parameter_symbol.type)))));
+          function.body.add(goto_programt::make_incomplete_goto(
+            equal_exprt(
+              parameter_symbol.symbol_expr(),
+              null_pointer_exprt(to_pointer_type(parameter_symbol.type))),
+            function_symbol.location));
 
         dereference_exprt dereference_expr(
           parameter_symbol.symbol_expr(),
@@ -297,7 +283,8 @@ protected:
 
         function.body.destructive_append(dest);
 
-        auto label_instruction = add_instruction(goto_programt::make_skip());
+        auto label_instruction =
+          function.body.add(goto_programt::make_skip(function_symbol.location));
         goto_instruction->complete_goto(label_instruction);
       }
     }
@@ -335,7 +322,8 @@ protected:
 
       aux_symbol.is_static_lifetime = false;
 
-      add_instruction(goto_programt::make_decl(aux_symbol.symbol_expr()));
+      function.body.add(goto_programt::make_decl(
+        aux_symbol.symbol_expr(), function_symbol.location));
 
       goto_programt dest;
 
@@ -352,13 +340,15 @@ protected:
       exprt return_expr =
         typecast_exprt::conditional_cast(aux_symbol.symbol_expr(), return_type);
 
-      add_instruction(
-        goto_programt::make_set_return_value(std::move(return_expr)));
+      function.body.add(goto_programt::make_set_return_value(
+        std::move(return_expr), function_symbol.location));
 
-      add_instruction(goto_programt::make_dead(aux_symbol.symbol_expr()));
+      function.body.add(goto_programt::make_dead(
+        aux_symbol.symbol_expr(), function_symbol.location));
     }
 
-    add_instruction(goto_programt::make_end_function());
+    function.body.add(
+      goto_programt::make_end_function(function_symbol.location));
 
     remove_skip(function.body);
   }
@@ -623,8 +613,7 @@ void generate_function_bodies(
     {
       if(instruction.is_function_call())
       {
-        auto &called_function =
-          to_code_function_call(instruction.code_nonconst()).function();
+        auto &called_function = instruction.call_function();
         if(is_havoc_function_call(called_function))
         {
           if(++counter == *call_site_number)

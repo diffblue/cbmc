@@ -275,10 +275,10 @@ void string_instrumentationt::do_sprintf(
 
   // in the abstract model, we have to report a
   // (possibly false) positive here
-  goto_programt::targett assertion = tmp.add(
-    goto_programt::make_assertion(false_exprt(), target->source_location()));
-  assertion->source_location_nonconst().set_property_class("string");
-  assertion->source_location_nonconst().set_comment("sprintf buffer overflow");
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment("sprintf buffer overflow");
+  tmp.add(goto_programt::make_assertion(false_exprt(), annotated_location));
 
   do_format_string_read(tmp, target, arguments, 1, 2, "sprintf");
 
@@ -311,11 +311,11 @@ void string_instrumentationt::do_snprintf(
 
   exprt bufsize = buffer_size(arguments[0]);
 
-  goto_programt::targett assertion = tmp.add(goto_programt::make_assertion(
-    binary_relation_exprt(bufsize, ID_ge, arguments[1]),
-    target->source_location()));
-  assertion->source_location_nonconst().set_property_class("string");
-  assertion->source_location_nonconst().set_comment("snprintf buffer overflow");
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment("snprintf buffer overflow");
+  tmp.add(goto_programt::make_assertion(
+    binary_relation_exprt(bufsize, ID_ge, arguments[1]), annotated_location));
 
   do_format_string_read(tmp, target, arguments, 2, 3, "snprintf");
 
@@ -399,13 +399,13 @@ void string_instrumentationt::do_format_string_read(
             temp=address_of_exprt(index);
           }
 
-          goto_programt::targett assertion =
-            dest.add(goto_programt::make_assertion(
-              is_zero_string(temp), target->source_location()));
-          assertion->source_location_nonconst().set_property_class("string");
+          source_locationt annotated_location = target->source_location();
+          annotated_location.set_property_class("string");
           std::string comment("zero-termination of string argument of ");
           comment += function_name;
-          assertion->source_location_nonconst().set_comment(comment);
+          annotated_location.set_comment(comment);
+          dest.add(goto_programt::make_assertion(
+            is_zero_string(temp), annotated_location));
         }
       }
 
@@ -422,11 +422,12 @@ void string_instrumentationt::do_format_string_read(
   }
   else // non-const format string
   {
-    goto_programt::targett format_ass = dest.add(goto_programt::make_assertion(
-      is_zero_string(arguments[1]), target->source_location()));
-    format_ass->source_location_nonconst().set_property_class("string");
-    format_ass->source_location_nonconst().set_comment(
+    source_locationt annotated_location = target->source_location();
+    annotated_location.set_property_class("string");
+    annotated_location.set_comment(
       "zero-termination of format string of " + function_name);
+    dest.add(goto_programt::make_assertion(
+      is_zero_string(arguments[1]), annotated_location));
 
     for(std::size_t i=2; i<arguments.size(); i++)
     {
@@ -442,12 +443,12 @@ void string_instrumentationt::do_format_string_read(
           temp=address_of_exprt(index);
         }
 
-        goto_programt::targett assertion =
-          dest.add(goto_programt::make_assertion(
-            is_zero_string(temp), target->source_location()));
-        assertion->source_location_nonconst().set_property_class("string");
-        assertion->source_location_nonconst().set_comment(
+        source_locationt annotated_location = target->source_location();
+        annotated_location.set_property_class("string");
+        annotated_location.set_comment(
           "zero-termination of string argument of " + function_name);
+        dest.add(goto_programt::make_assertion(
+          is_zero_string(temp), annotated_location));
       }
     }
   }
@@ -521,13 +522,13 @@ void string_instrumentationt::do_format_string_write(
             condition = false_exprt();
           }
 
-          goto_programt::targett assertion =
-            dest.add(goto_programt::make_assertion(
-              condition, target->source_location()));
-          assertion->source_location_nonconst().set_property_class("string");
+          source_locationt annotated_location = target->source_location();
+          annotated_location.set_property_class("string");
           std::string comment("format string buffer overflow in ");
           comment += function_name;
-          assertion->source_location_nonconst().set_comment(comment);
+          annotated_location.set_comment(comment);
+          dest.add(
+            goto_programt::make_assertion(condition, annotated_location));
 
           // now kill the contents
           invalidate_buffer(
@@ -576,13 +577,13 @@ void string_instrumentationt::do_format_string_write(
         // as we don't know any field width for the %s that
         // should be here during runtime, we just report a
         // possibly false positive
-        goto_programt::targett assertion =
-          dest.add(goto_programt::make_assertion(
-            false_exprt(), target->source_location()));
-        assertion->source_location_nonconst().set_property_class("string");
+        source_locationt annotated_location = target->source_location();
+        annotated_location.set_property_class("string");
         std::string comment("format string buffer overflow in ");
         comment += function_name;
-        assertion->source_location_nonconst().set_comment(comment);
+        annotated_location.set_comment(comment);
+        dest.add(
+          goto_programt::make_assertion(false_exprt(), annotated_location));
 
         invalidate_buffer(dest, target, arguments[i], arg_type, 0);
       }
@@ -619,16 +620,15 @@ void string_instrumentationt::do_strchr(
       "strchr expected to have two arguments", target->source_location());
   }
 
-  goto_programt tmp;
-
-  goto_programt::targett assertion = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[0]), target->source_location()));
-  assertion->source_location_nonconst().set_property_class("string");
-  assertion->source_location_nonconst().set_comment(
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment(
     "zero-termination of string argument of strchr");
+  goto_programt::instructiont assertion = goto_programt::make_assertion(
+    is_zero_string(arguments[0]), annotated_location);
 
   target->turn_into_skip();
-  dest.insert_before_swap(target, tmp);
+  dest.insert_before_swap(target, assertion);
 }
 
 void string_instrumentationt::do_strrchr(
@@ -643,16 +643,15 @@ void string_instrumentationt::do_strrchr(
       "strrchr expected to have two arguments", target->source_location());
   }
 
-  goto_programt tmp;
-
-  goto_programt::targett assertion = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[0]), target->source_location()));
-  assertion->source_location_nonconst().set_property_class("string");
-  assertion->source_location_nonconst().set_comment(
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment(
     "zero-termination of string argument of strrchr");
+  goto_programt::instructiont assertion = goto_programt::make_assertion(
+    is_zero_string(arguments[0]), annotated_location);
 
   target->turn_into_skip();
-  dest.insert_before_swap(target, tmp);
+  dest.insert_before_swap(target, assertion);
 }
 
 void string_instrumentationt::do_strstr(
@@ -669,17 +668,18 @@ void string_instrumentationt::do_strstr(
 
   goto_programt tmp;
 
-  goto_programt::targett assertion0 = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[0]), target->source_location()));
-  assertion0->source_location_nonconst().set_property_class("string");
-  assertion0->source_location_nonconst().set_comment(
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment(
     "zero-termination of 1st string argument of strstr");
+  tmp.add(goto_programt::make_assertion(
+    is_zero_string(arguments[0]), annotated_location));
 
-  goto_programt::targett assertion1 = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[1]), target->source_location()));
-  assertion1->source_location_nonconst().set_property_class("string");
-  assertion1->source_location_nonconst().set_comment(
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment(
     "zero-termination of 2nd string argument of strstr");
+  tmp.add(goto_programt::make_assertion(
+    is_zero_string(arguments[1]), annotated_location));
 
   target->turn_into_skip();
   dest.insert_before_swap(target, tmp);
@@ -699,17 +699,18 @@ void string_instrumentationt::do_strtok(
 
   goto_programt tmp;
 
-  goto_programt::targett assertion0 = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[0]), target->source_location()));
-  assertion0->source_location_nonconst().set_property_class("string");
-  assertion0->source_location_nonconst().set_comment(
+  source_locationt annotated_location = target->source_location();
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment(
     "zero-termination of 1st string argument of strtok");
+  tmp.add(goto_programt::make_assertion(
+    is_zero_string(arguments[0]), annotated_location));
 
-  goto_programt::targett assertion1 = tmp.add(goto_programt::make_assertion(
-    is_zero_string(arguments[1]), target->source_location()));
-  assertion1->source_location_nonconst().set_property_class("string");
-  assertion1->source_location_nonconst().set_comment(
+  annotated_location.set_property_class("string");
+  annotated_location.set_comment(
     "zero-termination of 2nd string argument of strtok");
+  tmp.add(goto_programt::make_assertion(
+    is_zero_string(arguments[1]), annotated_location));
 
   target->turn_into_skip();
   dest.insert_before_swap(target, tmp);
@@ -860,12 +861,16 @@ void string_instrumentationt::invalidate_buffer(
   goto_programt::targett check = dest.add(
     goto_programt::make_incomplete_goto(condition, target->source_location()));
 
-  goto_programt::targett invalidate = dest.add(goto_programt::instructiont(
-    static_cast<const codet &>(get_nil_irep()),
-    target->source_location(),
-    ASSIGN,
-    nil_exprt(),
-    {}));
+  const plus_exprt b_plus_i(bufp, cntr_sym.symbol_expr());
+  const dereference_exprt deref(
+    b_plus_i, to_type_with_subtype(buf_type).subtype());
+
+  const side_effect_expr_nondett nondet(
+    to_type_with_subtype(buf_type).subtype(), target->source_location());
+
+  // invalidate
+  dest.add(
+    goto_programt::make_assignment(deref, nondet, target->source_location()));
 
   const plus_exprt plus(
     cntr_sym.symbol_expr(), from_integer(1, unsigned_int_type()));
@@ -880,13 +885,4 @@ void string_instrumentationt::invalidate_buffer(
     dest.add(goto_programt::make_skip(target->source_location()));
 
   check->complete_goto(exit);
-
-  const plus_exprt b_plus_i(bufp, cntr_sym.symbol_expr());
-  const dereference_exprt deref(
-    b_plus_i, to_type_with_subtype(buf_type).subtype());
-
-  const side_effect_expr_nondett nondet(
-    to_type_with_subtype(buf_type).subtype(), target->source_location());
-
-  invalidate->code_nonconst() = code_assignt(deref, nondet);
 }

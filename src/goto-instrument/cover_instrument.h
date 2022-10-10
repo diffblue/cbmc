@@ -81,15 +81,14 @@ protected:
     const assertion_factoryt &) const = 0;
 
   void initialize_source_location(
-    goto_programt::targett t,
+    source_locationt &source_location,
     const std::string &comment,
     const irep_idt &function_id) const
   {
-    t->source_location_nonconst().set_comment(comment);
-    t->source_location_nonconst().set(
-      ID_coverage_criterion, coverage_criterion);
-    t->source_location_nonconst().set_property_class(property_class);
-    t->source_location_nonconst().set_function(function_id);
+    source_location.set_comment(comment);
+    source_location.set(ID_coverage_criterion, coverage_criterion);
+    source_location.set_property_class(property_class);
+    source_location.set_function(function_id);
   }
 
   bool is_non_cover_assertion(goto_programt::const_targett t) const

@@ -662,21 +662,21 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string comment_t = description + " '" + p_string + "' true";
       goto_program.insert_before_swap(i_it);
-      *i_it = make_assertion(not_exprt(p), source_location);
-      i_it->source_location_nonconst().set_comment(comment_t);
-      i_it->source_location_nonconst().set(
-        ID_coverage_criterion, coverage_criterion);
-      i_it->source_location_nonconst().set_property_class(property_class);
-      i_it->source_location_nonconst().set_function(function_id);
+      source_locationt annotated_location = source_location;
+      annotated_location.set_comment(comment_t);
+      annotated_location.set(ID_coverage_criterion, coverage_criterion);
+      annotated_location.set_property_class(property_class);
+      annotated_location.set_function(function_id);
+      *i_it = make_assertion(not_exprt(p), annotated_location);
 
       std::string comment_f = description + " '" + p_string + "' false";
       goto_program.insert_before_swap(i_it);
-      *i_it = make_assertion(p, source_location);
-      i_it->source_location_nonconst().set_comment(comment_f);
-      i_it->source_location_nonconst().set(
-        ID_coverage_criterion, coverage_criterion);
-      i_it->source_location_nonconst().set_property_class(property_class);
-      i_it->source_location_nonconst().set_function(function_id);
+      annotated_location = source_location;
+      annotated_location.set_comment(comment_f);
+      annotated_location.set(ID_coverage_criterion, coverage_criterion);
+      annotated_location.set_property_class(property_class);
+      annotated_location.set_function(function_id);
+      *i_it = make_assertion(p, annotated_location);
     }
 
     std::set<exprt> controlling;
@@ -697,12 +697,12 @@ void cover_mcdc_instrumentert::instrument(
         "MC/DC independence condition '" + p_string + "'";
 
       goto_program.insert_before_swap(i_it);
-      *i_it = make_assertion(not_exprt(p), source_location);
-      i_it->source_location_nonconst().set_comment(description);
-      i_it->source_location_nonconst().set(
-        ID_coverage_criterion, coverage_criterion);
-      i_it->source_location_nonconst().set_property_class(property_class);
-      i_it->source_location_nonconst().set_function(function_id);
+      source_locationt annotated_location = source_location;
+      annotated_location.set_comment(description);
+      annotated_location.set(ID_coverage_criterion, coverage_criterion);
+      annotated_location.set_property_class(property_class);
+      annotated_location.set_function(function_id);
+      *i_it = make_assertion(not_exprt(p), annotated_location);
     }
 
     for(std::size_t i = 0; i < both.size() * 2 + controlling.size(); i++)

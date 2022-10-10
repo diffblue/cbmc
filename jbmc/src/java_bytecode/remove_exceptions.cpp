@@ -358,17 +358,16 @@ void remove_exceptionst::add_exception_dispatch_sequence(
         stack_catch[i][j].second;
       if(!stack_catch[i][j].first.empty())
       {
-        // Normal exception handler, make an instanceof check.
-        goto_programt::targett t_exc = goto_program.insert_after(
-          instr_it,
-          goto_programt::make_goto(
-            new_state_pc, true_exprt(), instr_it->source_location()));
-
         // use instanceof to check that this is the correct handler
         struct_tag_typet type(stack_catch[i][j].first);
 
         java_instanceof_exprt check(exc_thrown, type);
-        t_exc->condition_nonconst() = check;
+
+        // Normal exception handler, make an instanceof check.
+        goto_programt::targett t_exc = goto_program.insert_after(
+          instr_it,
+          goto_programt::make_goto(
+            new_state_pc, check, instr_it->source_location()));
 
         if(remove_added_instanceof)
         {

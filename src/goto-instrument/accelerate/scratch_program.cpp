@@ -145,12 +145,10 @@ void scratch_programt::fix_types()
   {
     if(it->is_assign())
     {
-      code_assignt &code = to_code_assign(it->code_nonconst());
-
-      if(code.lhs().type()!=code.rhs().type())
+      if(it->assign_lhs().type() != it->assign_rhs().type())
       {
-        typecast_exprt typecast(code.rhs(), code.lhs().type());
-        code.rhs()=typecast;
+        typecast_exprt typecast{it->assign_rhs(), it->assign_lhs().type()};
+        it->assign_rhs_nonconst() = typecast;
       }
     }
     else if(it->is_assume() || it->is_assert())

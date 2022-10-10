@@ -42,7 +42,9 @@ void cover_assertion_instrumentert::instrument(
   {
     i_it->condition_nonconst() = false_exprt();
     initialize_source_location(
-      i_it, id2string(i_it->source_location().get_comment()), function_id);
+      i_it->source_location_nonconst(),
+      id2string(i_it->source_location().get_comment()),
+      function_id);
   }
 }
 
@@ -65,7 +67,8 @@ void cover_cover_instrumentert::instrument(
       const exprt c = i_it->call_arguments()[0];
       *i_it = make_assertion(not_exprt(c), i_it->source_location());
       std::string comment = "condition '" + from_expr(ns, function_id, c) + "'";
-      initialize_source_location(i_it, comment, function_id);
+      initialize_source_location(
+        i_it->source_location_nonconst(), comment, function_id);
     }
   }
   else if(is_non_cover_assertion(i_it))
@@ -94,9 +97,9 @@ void cover_instrument_end_of_function(
   const std::string &comment =
     "additional goal to ensure reachability of end of function";
   goto_program.insert_before_swap(if_it);
-  *if_it = make_assertion(false_exprt(), location);
-  if_it->source_location_nonconst().set_comment(comment);
-  if_it->source_location_nonconst().set_property_class(
-    "reachability_constraint");
-  if_it->source_location_nonconst().set_function(function_id);
+  source_locationt annotated_location = location;
+  annotated_location.set_comment(comment);
+  annotated_location.set_property_class("reachability_constraint");
+  annotated_location.set_function(function_id);
+  *if_it = make_assertion(false_exprt(), annotated_location);
 }

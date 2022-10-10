@@ -106,7 +106,6 @@ void annotate_invariants(
     goto_programt::targett loop_end = get_loop_end(loop_number, function);
 
     // annotate the invariant to the condition of `loop_end`
-    exprt condition = loop_end->condition();
     loop_end->condition_nonconst().add(ID_C_spec_loop_invariant) =
       invariant_map_entry.second;
   }
