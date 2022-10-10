@@ -1451,12 +1451,36 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   {
     rank=backup_rank;
     if(!user_defined_conversion_sequence(e, type, new_expr, rank))
-      return false;
+    {
+      if(
+        type.id() == ID_integer &&
+        (expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv))
+      {
+        // This is a nonstandard implicit conversion, from
+        // bit-vectors to unbounded integers.
+        rank = 0;
+        new_expr = typecast_exprt(expr, type);
+        return true;
+      }
+      else if(
+        (type.id() == ID_signedbv || type.id() == ID_unsignedbv) &&
+        expr.type().id() == ID_integer)
+      {
+        // This is a nonstandard implicit conversion, from
+        // unbounded integers to bit-vectors.
+        rank = 0;
+        new_expr = typecast_exprt(expr, type);
+        return true;
+      }
 
-    #if 0
+      // no conversion
+      return false;
+    }
+
+#if 0
     simplify_exprt simplify(*this);
     simplify.simplify(new_expr);
-    #endif
+#endif
   }
 
   return true;

@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
 
@@ -68,6 +70,19 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     if(type.get_bool(ID_C_constant))
       qualifiers.is_constant = true;
+
+    // CPROVER extensions
+    irep_idt typedef_identifier = type.get(ID_C_typedef);
+    if(typedef_identifier == CPROVER_PREFIX "rational")
+    {
+      type = rational_typet();
+      type.add_source_location() = symbol_expr.source_location();
+    }
+    else if(typedef_identifier == CPROVER_PREFIX "integer")
+    {
+      type = integer_typet();
+      type.add_source_location() = symbol_expr.source_location();
+    }
 
     qualifiers.write(type);
   }
