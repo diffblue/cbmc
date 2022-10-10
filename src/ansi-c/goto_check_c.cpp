@@ -1454,15 +1454,8 @@ void goto_check_ct::pointer_primitive_check(
       return;
   }
 
-  const auto size_of_expr_opt =
-    size_of_expr(to_pointer_type(pointer.type()).base_type(), ns);
-
-  const exprt size = !size_of_expr_opt.has_value()
-                       ? from_integer(1, size_type())
-                       : size_of_expr_opt.value();
-
-  const conditionst &conditions =
-    get_pointer_points_to_valid_memory_conditions(pointer, size);
+  const conditionst &conditions = get_pointer_points_to_valid_memory_conditions(
+    pointer, from_integer(0, size_type()));
   for(const auto &c : conditions)
   {
     add_guarded_property(

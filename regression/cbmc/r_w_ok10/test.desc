@@ -1,0 +1,19 @@
+CORE
+main.c
+--pointer-primitive-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main.pointer_primitives.\d+\] line 7 pointer invalid in R_OK\(p1, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 7 pointer outside object bounds in R_OK\(p1, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 11 pointer invalid in R_OK\(p2, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 11 pointer outside object bounds in R_OK\(p2, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 15 pointer outside object bounds in R_OK\(p3, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 20 pointer outside object bounds in R_OK\(p4, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 34 dead object in R_OK\(p6, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\[main.pointer_primitives.\d+\] line 40 deallocated dynamic object in R_OK\(p7, \(unsigned (long (long )?)?int\)1\): FAILURE$
+^\*\* 8 of \d+ failed
+--
+^warning: ignoring
+--
+Verifies that the pointer primitives check fails for the various forms of
+invalid pointers

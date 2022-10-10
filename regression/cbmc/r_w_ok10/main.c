@@ -22,7 +22,8 @@ void main()
   // offset out of bounds
   char *p5 = malloc(10);
   p5 += 10;
-  __CPROVER_r_ok(p5, 1);
+  _Bool result = __CPROVER_r_ok(p5, 1);
+  __CPROVER_assert(!result, "should be false");
 
   // dead
   char *p6;
