@@ -1,0 +1,14 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b\[(.*)i\] is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks assigns clauses (i, __CPROVER_POINTER_OBJECT(b)) is inferred,
+and widened correctly.

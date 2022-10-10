@@ -180,4 +180,11 @@ irep_idt make_assigns_clause_replacement_tracking_comment(
 /// \ref make_assigns_clause_replacement_tracking_comment.
 bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
 
+/// Widen expressions in \p assigns with the following strategy.
+/// If an expression is an array index or object dereference expression,
+/// with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant `i`,
+/// then replace it by the entire underlying object. Otherwise, e.g. for a[i] or
+/// *(b+i) when `i` is a known constant, keep the expression in the result.
+void widen_assigns(assignst &assigns);
+
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
