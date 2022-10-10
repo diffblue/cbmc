@@ -1,6 +1,6 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
+#include "smt_bit_vector_theory.h"
 
 #include <util/invariant.h>
 

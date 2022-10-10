@@ -21,7 +21,8 @@
 #include <util/mp_arith.h>
 #include <util/range.h>
 
-#include "smt_array_theory.h"
+#include <solvers/smt2_incremental/theories/smt_array_theory.h>
+
 #include "smt_to_smt2_string.h"
 
 #include <regex>

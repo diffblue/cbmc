@@ -18,9 +18,9 @@
 
 #include <solvers/prop/literal_expr.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
-#include <solvers/smt2_incremental/smt_array_theory.h>
-#include <solvers/smt2_incremental/smt_bit_vector_theory.h>
-#include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/theories/smt_array_theory.h>
+#include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
+#include <solvers/smt2_incremental/theories/smt_core_theory.h>
 
 #include <functional>
 #include <numeric>

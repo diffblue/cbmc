@@ -3,8 +3,8 @@
 #include <util/c_types.h>
 #include <util/config.h>
 
-#include <solvers/smt2_incremental/smt_core_theory.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
+#include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("Test smt_object_sizet", "[core][smt2_incremental]")

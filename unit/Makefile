@@ -109,12 +109,12 @@ SRC += analyses/ai/ai.cpp \
        solvers/smt2_incremental/convert_expr_to_smt.cpp \
        solvers/smt2_incremental/object_tracking.cpp \
        solvers/smt2_incremental/smt2_incremental_decision_procedure.cpp \
-       solvers/smt2_incremental/smt_array_theory.cpp \
-       solvers/smt2_incremental/smt_bit_vector_theory.cpp \
-       solvers/smt2_incremental/smt_core_theory.cpp \
        solvers/smt2_incremental/smt_object_size.cpp \
        solvers/smt2_incremental/smt_response_validation.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \
+       solvers/smt2_incremental/theories/smt_array_theory.cpp \
+       solvers/smt2_incremental/theories/smt_bit_vector_theory.cpp \
+       solvers/smt2_incremental/theories/smt_core_theory.cpp \
        solvers/strings/array_pool/array_pool.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \

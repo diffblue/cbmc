@@ -3,7 +3,7 @@
 #include <util/mp_arith.h>
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
-#include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 

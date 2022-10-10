@@ -1,7 +1,7 @@
 // Author: Diffblue Ltd.
 
 #include <solvers/smt2_incremental/ast/smt_commands.h>
-#include <solvers/smt2_incremental/smt_core_theory.h>
+#include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("Test smt_commandt.pretty is accessible.", "[core][smt2_incremental]")
