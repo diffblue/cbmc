@@ -290,136 +290,132 @@ $(document).ready(function(){initNavTree('race__check_8cpp_source.html',''); ini
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, w_entry.second.symbol_expr))</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;          <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t = goto_program.insert_before(</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        goto_program.insert_before(</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;          i_it,</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;          <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#ad2af85428b488c53122bfca7a6486739">get_w_guard_expr</a>(w_entry.second),</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            w_entry.second.guard,</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>()));</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        i_it=++t;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="comment">// insert original statement here</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=goto_program.insert_before(i_it);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        *t=original_instruction;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        i_it=++t;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="comment">// now add assignments for what is written -- reset</span></div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;w_entry : rw_set.<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>)</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      {</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, w_entry.second.symbol_expr))</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;          <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t = goto_program.insert_before(</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;          i_it,</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#ad2af85428b488c53122bfca7a6486739">get_w_guard_expr</a>(w_entry.second),</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            <a class="code" href="classfalse__exprt.html">false_exprt</a>(),</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>()));</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        i_it = std::next(t);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      <span class="comment">// now add assertions for what is read and written</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;r_entry : rw_set.<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>)</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      {</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, r_entry.second.symbol_expr))</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;          <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t = goto_program.insert_before(</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="comment">// insert original statement here</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=goto_program.insert_before(i_it);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        *t=original_instruction;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <span class="comment">// now add assignments for what is written -- reset</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;w_entry : rw_set.<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>)</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, w_entry.second.symbol_expr))</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;          <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        goto_program.insert_before(</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;          i_it,</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;          <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#ad2af85428b488c53122bfca7a6486739">get_w_guard_expr</a>(w_entry.second),</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;            <a class="code" href="classfalse__exprt.html">false_exprt</a>(),</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>()));</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <span class="comment">// now add assertions for what is read and written</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;r_entry : rw_set.<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>)</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, r_entry.second.symbol_expr))</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;          <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <a class="code" href="classsource__locationt.html">source_locationt</a> annotated_location =</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;          original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>();</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        annotated_location.<a class="code" href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">set_comment</a>(<a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>(r_entry.second, <span class="keyword">false</span>));</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        goto_program.insert_before(</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;          i_it,</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;          <a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#aa576beb014fa3eb27fa3d8150d24b25d">get_assertion</a>(r_entry.second),</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>()));</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        t-&gt;source_location_nonconst().set_comment(</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;          <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>(r_entry.second, <span class="keyword">false</span>));</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        i_it=++t;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;w_entry : rw_set.<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>)</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      {</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, w_entry.second.symbol_expr))</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;          <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t = goto_program.insert_before(</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          i_it,</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;          <a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#aa576beb014fa3eb27fa3d8150d24b25d">get_assertion</a>(w_entry.second),</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>()));</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        t-&gt;source_location_nonconst().set_comment(</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;          <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>(w_entry.second, <span class="keyword">true</span>));</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        i_it=++t;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      }</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      i_it--; <span class="comment">// the for loop already counts us up</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    }</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(goto_program);</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;}</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
-<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="race__check_8h.html#a787c549cb38445e8e8bf04b5ecadadbb">  270</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;value_sets,</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;#ifdef LOCAL_MAY</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function,</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;#endif</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;{</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <a class="code" href="classw__guardst.html">w_guardst</a> w_guards(symbol_table);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    value_sets,</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    symbol_table,</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    function_id,</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <a class="code" href="race__check_8cpp.html#a85227c3edd3a9ac8cd5cbaab266aaafb">L_M_ARG</a>(goto_function) goto_program,</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    w_guards);</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  w_guards.<a class="code" href="classw__guardst.html#ac23a425c6fff75f032470585aa32df7a">add_initialization</a>(goto_program);</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  goto_program.update();</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;}</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160; </div>
-<div class="line"><a name="l00292"></a><span class="lineno"><a class="line" href="race__check_8h.html#a2840732231a7d0799c187230821517f5">  292</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;value_sets,</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;{</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  <a class="code" href="classw__guardst.html">w_guardst</a> w_guards(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  {</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      gf_entry.first != <a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>() &amp;&amp;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      gf_entry.first != <a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    {</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        value_sets,</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        gf_entry.first,</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <a class="code" href="race__check_8cpp.html#a85227c3edd3a9ac8cd5cbaab266aaafb">L_M_ARG</a>(gf_entry.second) gf_entry.second.body,</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        w_guards);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    }</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  }</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#aa576beb014fa3eb27fa3d8150d24b25d">get_assertion</a>(r_entry.second), annotated_location));</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      }</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;w_entry : rw_set.<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>)</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      {</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a>(ns, w_entry.second.symbol_expr))</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;          <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <a class="code" href="classsource__locationt.html">source_locationt</a> annotated_location =</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;          original_instruction.<a class="code" href="classgoto__programt_1_1instructiont.html#ab7e2e9acb32ac6e6af4859172646fbc1">source_location</a>();</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        annotated_location.<a class="code" href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">set_comment</a>(<a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>(w_entry.second, <span class="keyword">true</span>));</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        goto_program.insert_before(</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          i_it,</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          <a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;            w_guards.<a class="code" href="classw__guardst.html#aa576beb014fa3eb27fa3d8150d24b25d">get_assertion</a>(w_entry.second), annotated_location));</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      }</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      i_it--; <span class="comment">// the for loop already counts us up</span></div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    }</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  }</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(goto_program);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;}</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno"><a class="line" href="race__check_8h.html#a787c549cb38445e8e8bf04b5ecadadbb">  265</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;value_sets,</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;#ifdef LOCAL_MAY</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function,</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;#endif</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;{</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <a class="code" href="classw__guardst.html">w_guardst</a> w_guards(symbol_table);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    value_sets,</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    symbol_table,</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    function_id,</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <a class="code" href="race__check_8cpp.html#a85227c3edd3a9ac8cd5cbaab266aaafb">L_M_ARG</a>(goto_function) goto_program,</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    w_guards);</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  w_guards.<a class="code" href="classw__guardst.html#ac23a425c6fff75f032470585aa32df7a">add_initialization</a>(goto_program);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  goto_program.update();</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;}</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
+<div class="line"><a name="l00287"></a><span class="lineno"><a class="line" href="race__check_8h.html#a2840732231a7d0799c187230821517f5">  287</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;value_sets,</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;{</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <a class="code" href="classw__guardst.html">w_guardst</a> w_guards(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  {</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      gf_entry.first != <a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>() &amp;&amp;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      gf_entry.first != <a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>)</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <a class="code" href="race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790">race_check</a>(</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        value_sets,</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        gf_entry.first,</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <a class="code" href="race__check_8cpp.html#a85227c3edd3a9ac8cd5cbaab266aaafb">L_M_ARG</a>(gf_entry.second) gf_entry.second.body,</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        w_guards);</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    }</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  }</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="comment">// get &quot;main&quot;</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  goto_functionst::function_mapt::iterator</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    m_it=goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">entry_point</a>());</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="comment">// get &quot;main&quot;</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  goto_functionst::function_mapt::iterator</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    m_it=goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">entry_point</a>());</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="keywordflow">if</span>(m_it==goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;race check instrumentation needs an entry point&quot;</span>;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160; </div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;<a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>=m_it-&gt;second.body;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  w_guards.<a class="code" href="classw__guardst.html#ac23a425c6fff75f032470585aa32df7a">add_initialization</a>(<a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>);</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;  goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;}</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">if</span>(m_it==goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;race check instrumentation needs an entry point&quot;</span>;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;<a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>=m_it-&gt;second.body;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  w_guards.<a class="code" href="classw__guardst.html#ac23a425c6fff75f032470585aa32df7a">add_initialization</a>(<a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>);</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="agoto__program_8h_html_a70232dd124bfcc17855c337bac57477f"><div class="ttname"><a href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a></div><div class="ttdeci">#define Forall_goto_program_instructions(it, program)</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01234">goto_program.h:1234</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00036">dstring.h:36</a></div></div>
 <div class="ttc" id="aclasssymbol__tablet_html"><div class="ttname"><a href="classsymbol__tablet.html">symbol_tablet</a></div><div class="ttdoc">The symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table_8h_source.html#l00013">symbol_table.h:13</a></div></div>
 <div class="ttc" id="astructrw__set__baset_1_1entryt_html"><div class="ttname"><a href="structrw__set__baset_1_1entryt.html">rw_set_baset::entryt</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00043">rw_set.h:43</a></div></div>
+<div class="ttc" id="aclasssource__locationt_html_a1a5acc8bc6f3d2e68cf03fb5f0e494c6"><div class="ttname"><a href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">source_locationt::set_comment</a></div><div class="ttdeci">void set_comment(const irep_idt &amp;comment)</div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00135">source_location.h:135</a></div></div>
 <div class="ttc" id="aclassgoto__programt_1_1instructiont_html_ae009e280a082420fde2932e0bc1442a4"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#ae009e280a082420fde2932e0bc1442a4">goto_programt::instructiont::swap</a></div><div class="ttdeci">void swap(instructiont &amp;instruction)</div><div class="ttdoc">Swap two instructions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00513">goto_program.h:513</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ab2a27b105ccbeb19c64265c09198bb17"><div class="ttname"><a href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">symbolt::type</a></div><div class="ttdeci">typet type</div><div class="ttdoc">Type of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00031">symbol.h:31</a></div></div>
 <div class="ttc" id="arace__check_8cpp_html_ab2c2617f29279bb39a8c3ae78ae0943f"><div class="ttname"><a href="race__check_8cpp.html#ab2c2617f29279bb39a8c3ae78ae0943f">L_M_LAST_ARG</a></div><div class="ttdeci">#define L_M_LAST_ARG(x)</div><div class="ttdef"><b>Definition:</b> <a href="race__check_8cpp_source.html#l00031">race_check.cpp:31</a></div></div>
@@ -461,6 +457,7 @@ $(document).ready(function(){initNavTree('race__check_8cpp_source.html',''); ini
 <div class="ttc" id="aclassw__guardst_html_adf92737d72e5f8f64e169a0e3cda2774"><div class="ttname"><a href="classw__guardst.html#adf92737d72e5f8f64e169a0e3cda2774">w_guardst::symbol_table</a></div><div class="ttdeci">symbol_tablet &amp; symbol_table</div><div class="ttdef"><b>Definition:</b> <a href="race__check_8cpp_source.html#l00063">race_check.cpp:63</a></div></div>
 <div class="ttc" id="afile__converter_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="file__converter_8cpp_source.html#l00041">file_converter.cpp:41</a></div></div>
 <div class="ttc" id="aclasssymbol__tablet_html_aaa77a9150d654e4c985cb73da1b4c530"><div class="ttname"><a href="classsymbol__tablet.html#aaa77a9150d654e4c985cb73da1b4c530">symbol_tablet::move</a></div><div class="ttdeci">virtual bool move(symbolt &amp;symbol, symbolt *&amp;new_symbol) override</div><div class="ttdoc">Move a symbol into the symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table_8cpp_source.html#l00067">symbol_table.cpp:67</a></div></div>
+<div class="ttc" id="aclasssource__locationt_html"><div class="ttname"><a href="classsource__locationt.html">source_locationt</a></div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00018">source_location.h:18</a></div></div>
 <div class="ttc" id="arace__check_8cpp_html_a85227c3edd3a9ac8cd5cbaab266aaafb"><div class="ttname"><a href="race__check_8cpp.html#a85227c3edd3a9ac8cd5cbaab266aaafb">L_M_ARG</a></div><div class="ttdeci">#define L_M_ARG(x)</div><div class="ttdef"><b>Definition:</b> <a href="race__check_8cpp_source.html#l00030">race_check.cpp:30</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a75fd5a161012d70279ba54f9bac5bda2"><div class="ttname"><a href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a></div><div class="ttdeci">::goto_functiont goto_functiont</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00027">goto_functions.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00592">goto_program.h:592</a></div></div>

@@ -919,9 +919,9 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160; </div>
 <div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;  <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(cond, dest, mode);</div>
 <div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160; </div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t =</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(cond, code.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;  t-&gt;source_location_nonconst().set(<span class="stringliteral">&quot;user-provided&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> annotated_location = code.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;  annotated_location.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(<span class="stringliteral">&quot;user-provided&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;  dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(cond, annotated_location));</div>
 <div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;}</div>
 <div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160; </div>
 <div class="line"><a name="l00841"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a8a1e9cbf91dade9c7fe870895855dc3f">  841</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#a8a1e9cbf91dade9c7fe870895855dc3f">goto_convertt::convert_skip</a>(</div>
@@ -1688,8 +1688,8 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160; </div>
 <div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;  <span class="comment">// do the x label</span></div>
 <div class="line"><a name="l01608"></a><span class="lineno"> 1608</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> tmp_x;</div>
-<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> x =</div>
-<div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160;    tmp_x.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#af97945e0c0734b52c5bbbd8460b618f8">goto_programt::make_incomplete_goto</a>(<a class="code" href="classtrue__exprt.html">true_exprt</a>()));</div>
+<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> x = tmp_x.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#af97945e0c0734b52c5bbbd8460b618f8">goto_programt::make_incomplete_goto</a>(</div>
+<div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160;    <a class="code" href="classtrue__exprt.html">true_exprt</a>(), true_case.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.back().source_location()));</div>
 <div class="line"><a name="l01611"></a><span class="lineno"> 1611</span>&#160; </div>
 <div class="line"><a name="l01612"></a><span class="lineno"> 1612</span>&#160;  <span class="comment">// do the z label</span></div>
 <div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> tmp_z;</div>
@@ -1718,332 +1718,330 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;  <span class="comment">// x: goto z;</span></div>
 <div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(!tmp_w.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.empty());</div>
 <div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;  x-&gt;complete_goto(z);</div>
-<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;  x-&gt;source_location_nonconst() = tmp_w.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.back().source_location();</div>
-<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160; </div>
-<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_v);</div>
-<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_w);</div>
-<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160; </div>
-<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;  <span class="keywordflow">if</span>(has_else)</div>
-<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;  {</div>
-<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;    dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_x);</div>
-<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;    dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_y);</div>
-<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;  }</div>
-<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160; </div>
-<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_z);</div>
-<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;}</div>
-<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160; </div>
-<div class="line"><a name="l01654"></a><span class="lineno"><a class="line" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0"> 1654</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)</div>
-<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;{</div>
-<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;  <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a>(*it))</div>
-<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160; </div>
-<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_and || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_or)</div>
-<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160; </div>
-<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;}</div>
-<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160; </div>
-<div class="line"><a name="l01666"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#ac795efbe4217efbc5be8d4ab1d7fedda"> 1666</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">goto_convertt::generate_conditional_branch</a>(</div>
-<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>,</div>
-<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_true,</div>
-<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
-<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;{</div>
-<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>) &amp;&amp; <a class="code" href="classgoto__convertt.html#ab065db23ba8283f40bedca12ee1eddcf">needs_cleaning</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>))</div>
-<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;  {</div>
-<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;    <span class="comment">// if(guard) goto target;</span></div>
-<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;    <span class="comment">//   becomes</span></div>
-<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;    <span class="comment">// if(guard) goto target; else goto next;</span></div>
-<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160;    <span class="comment">// next: skip;</span></div>
-<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160; </div>
-<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;    <a class="code" href="classgoto__programt.html">goto_programt</a> tmp;</div>
-<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;    <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_false =</div>
-<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;      tmp.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>(source_location));</div>
-<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160; </div>
-<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;    <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
-<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, target_true, target_false, source_location, dest, mode);</div>
-<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160; </div>
-<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;    dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp);</div>
-<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;  }</div>
-<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;  {</div>
-<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;    <span class="comment">// simple branch</span></div>
-<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;    <a class="code" href="classexprt.html">exprt</a> cond=<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>;</div>
-<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;    <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(cond, dest, mode);</div>
-<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160; </div>
-<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_true, cond, source_location));</div>
-<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;  }</div>
-<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;}</div>
-<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160; </div>
-<div class="line"><a name="l01700"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528"> 1700</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">goto_convertt::generate_conditional_branch</a>(</div>
-<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>,</div>
-<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_true,</div>
-<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_false,</div>
-<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
-<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;{</div>
-<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_not)</div>
-<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;  {</div>
-<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;    <span class="comment">// simply swap targets</span></div>
-<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;    <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
-<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;      <a class="code" href="std__expr_8h.html#a6662a285d4d229964538bfc2113f19c7">to_not_expr</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>).op(),</div>
-<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;      target_false,</div>
-<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;      target_true,</div>
-<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;      source_location,</div>
-<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;      dest,</div>
-<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;      mode);</div>
-<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160;  }</div>
-<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160; </div>
-<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_and)</div>
-<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;  {</div>
-<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;    <span class="comment">// turn</span></div>
-<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;    <span class="comment">//   if(a &amp;&amp; b) goto target_true; else goto target_false;</span></div>
-<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160;    <span class="comment">// into</span></div>
-<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;    <span class="comment">//    if(!a) goto target_false;</span></div>
-<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;    <span class="comment">//    if(!b) goto target_false;</span></div>
-<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;    <span class="comment">//    goto target_true;</span></div>
-<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160; </div>
-<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;    std::list&lt;exprt&gt; op;</div>
-<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;    <a class="code" href="classgoto__convertt.html#a6545c89eb81bbafab65700ac80f26f77">collect_operands</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), op);</div>
-<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160; </div>
-<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : op)</div>
-<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;      <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
-<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;        <a class="code" href="expr__util_8cpp.html#ad7237ef22ecf42bb51ceb62cfe524595">boolean_negate</a>(expr), target_false, source_location, dest, mode);</div>
-<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160; </div>
-<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_true, source_location));</div>
-<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160; </div>
-<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;  }</div>
-<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_or)</div>
-<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;  {</div>
-<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;    <span class="comment">// turn</span></div>
-<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;    <span class="comment">//   if(a || b) goto target_true; else goto target_false;</span></div>
-<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;    <span class="comment">// into</span></div>
-<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;    <span class="comment">//   if(a) goto target_true;</span></div>
-<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;    <span class="comment">//   if(b) goto target_true;</span></div>
-<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;    <span class="comment">//   goto target_false;</span></div>
-<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160; </div>
-<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;    std::list&lt;exprt&gt; op;</div>
-<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;    <a class="code" href="classgoto__convertt.html#a6545c89eb81bbafab65700ac80f26f77">collect_operands</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), op);</div>
-<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160; </div>
-<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160;    <span class="comment">// true branch(es)</span></div>
-<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : op)</div>
-<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;      <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
-<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;        expr, target_true, source_location, dest, mode);</div>
-<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160; </div>
-<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;    <span class="comment">// false branch</span></div>
-<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_false, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
-<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160; </div>
-<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;  }</div>
-<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160; </div>
-<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;  <a class="code" href="classexprt.html">exprt</a> cond=<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>;</div>
-<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;  <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(cond, dest, mode);</div>
-<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160; </div>
-<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;  <span class="comment">// true branch</span></div>
-<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_true, cond, source_location));</div>
-<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160; </div>
-<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;  <span class="comment">// false branch</span></div>
-<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;  dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_false, source_location));</div>
-<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;}</div>
-<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160; </div>
-<div class="line"><a name="l01774"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a7c6fd63b1487ab9eb4a8baebc40db6ef"> 1774</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">goto_convertt::get_string_constant</a>(</div>
-<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> &amp;value)</div>
-<div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;{</div>
-<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_typecast)</div>
-<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr).op(), value);</div>
-<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160; </div>
-<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_address_of &amp;&amp;</div>
-<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;    <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<span class="keywordtype">object</span>().<span class="keywordtype">id</span>() == ID_index)</div>
-<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;  {</div>
-<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;    <a class="code" href="classexprt.html">exprt</a> index_op =</div>
-<div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160;      <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(<a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(<a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<span class="keywordtype">object</span>()).array());</div>
-<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;    <a class="code" href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a>(index_op, <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>);</div>
-<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160; </div>
-<div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160;    <span class="keywordflow">if</span>(index_op.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string_constant)</div>
-<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;    {</div>
-<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;      value = <a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(index_op).<a class="code" href="classstring__constantt.html#a68d5c40c22c92dc84f02daadecf2ed46">get_value</a>();</div>
-<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    }</div>
-<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(index_op.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;    {</div>
-<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;      std::string <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>;</div>
-<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;      <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, index_op)</div>
-<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;        <span class="keywordflow">if</span>(it-&gt;is_constant())</div>
-<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;        {</div>
-<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160;          <span class="keyword">const</span> <span class="keyword">auto</span> i = numeric_cast&lt;std::size_t&gt;(*it);</div>
-<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160;          <span class="keywordflow">if</span>(!i.has_value())</div>
-<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160; </div>
-<div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160;          <span class="keywordflow">if</span>(i.value() != 0) <span class="comment">// to skip terminating 0</span></div>
-<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;            <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a> += <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(i.value());</div>
-<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;        }</div>
-<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160; </div>
-<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;      <span class="keywordflow">return</span> value=<a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>, <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160;    }</div>
-<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;  }</div>
-<div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160; </div>
-<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string_constant)</div>
-<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;  {</div>
-<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;    value = <a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(expr).<a class="code" href="classstring__constantt.html#a68d5c40c22c92dc84f02daadecf2ed46">get_value</a>();</div>
-<div class="line"><a name="l01815"></a><span class="lineno"> 1815</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160;  }</div>
-<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160; </div>
-<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160;}</div>
-<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160; </div>
-<div class="line"><a name="l01821"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76"> 1821</a></span>&#160;<a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">goto_convertt::get_string_constant</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)</div>
-<div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160;{</div>
-<div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>;</div>
-<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160; </div>
-<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> res = <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(expr, <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>);</div>
-<div class="line"><a name="l01826"></a><span class="lineno"> 1826</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab4691937c31ef00244566d19d59e7449">INVARIANT_WITH_DIAGNOSTICS</a>(</div>
-<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;    !res,</div>
-<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;    <span class="stringliteral">&quot;expected string constant&quot;</span>,</div>
-<div class="line"><a name="l01829"></a><span class="lineno"> 1829</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
-<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;    expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
-<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160; </div>
-<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>;</div>
-<div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160;}</div>
-<div class="line"><a name="l01834"></a><span class="lineno"> 1834</span>&#160; </div>
-<div class="line"><a name="l01835"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c"> 1835</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">goto_convertt::get_constant</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)</div>
-<div class="line"><a name="l01836"></a><span class="lineno"> 1836</span>&#160;{</div>
-<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_symbol)</div>
-<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;  {</div>
-<div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=</div>
-<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;      <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(expr));</div>
-<div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160; </div>
-<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;    <span class="keywordflow">return</span> symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>;</div>
-<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;  }</div>
-<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
-<div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160;  {</div>
-<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;    <span class="keyword">auto</span> tmp = <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr);</div>
-<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;    tmp.compound() = <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(tmp.compound());</div>
-<div class="line"><a name="l01848"></a><span class="lineno"> 1848</span>&#160;    <span class="keywordflow">return</span> std::move(tmp);</div>
-<div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160;  }</div>
-<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_index)</div>
-<div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160;  {</div>
-<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;    <span class="keyword">auto</span> tmp = <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr);</div>
-<div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;    tmp.op0() = <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(tmp.op0());</div>
-<div class="line"><a name="l01854"></a><span class="lineno"> 1854</span>&#160;    tmp.op1() = <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(tmp.op1());</div>
-<div class="line"><a name="l01855"></a><span class="lineno"> 1855</span>&#160;    <span class="keywordflow">return</span> std::move(tmp);</div>
-<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;  }</div>
-<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01858"></a><span class="lineno"> 1858</span>&#160;    <span class="keywordflow">return</span> expr;</div>
-<div class="line"><a name="l01859"></a><span class="lineno"> 1859</span>&#160;}</div>
-<div class="line"><a name="l01860"></a><span class="lineno"> 1860</span>&#160; </div>
-<div class="line"><a name="l01861"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766"> 1861</a></span>&#160;<a class="code" href="classsymbolt.html">symbolt</a> &amp;<a class="code" href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766">goto_convertt::new_tmp_symbol</a>(</div>
-<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
-<div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
-<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;{</div>
-<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!mode.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>());</div>
-<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> &amp;new_symbol = <a class="code" href="fresh__symbol_8cpp.html#a1baa36294c4d640a926d615062a20feb">get_fresh_aux_symbol</a>(</div>
-<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;    type,</div>
-<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;    <a class="code" href="classgoto__convertt.html#a4281a494a4fedddcd8572f52578b3f3c">tmp_symbol_prefix</a>,</div>
-<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;    <span class="stringliteral">&quot;tmp_&quot;</span> + suffix,</div>
-<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;    source_location,</div>
-<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;    mode,</div>
-<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;    <a class="code" href="classgoto__convertt.html#a067983a4d2e743cc34833f719e64eedd">symbol_table</a>);</div>
-<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160; </div>
-<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160;  <a class="code" href="classcode__frontend__declt.html">code_frontend_declt</a> decl(new_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>());</div>
-<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;  decl.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;  <a class="code" href="classgoto__convertt.html#a43596d00acc51343e1c7eaafef3b05b5">convert_frontend_decl</a>(decl, dest, mode);</div>
-<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160; </div>
-<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;  <span class="keywordflow">return</span> new_symbol;</div>
-<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;}</div>
-<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160; </div>
-<div class="line"><a name="l01884"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6"> 1884</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6">goto_convertt::make_temp_symbol</a>(</div>
-<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
-<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
-<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160;{</div>
-<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
-<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160; </div>
-<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> &amp;new_symbol =</div>
-<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;    <a class="code" href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766">new_tmp_symbol</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), suffix, dest, source_location, mode);</div>
-<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160; </div>
-<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;  <a class="code" href="classcode__assignt.html">code_assignt</a> assignment;</div>
-<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;  assignment.<a class="code" href="classcode__assignt.html#a6efd1dd283c032bf2330c573dfbeada5">lhs</a>()=new_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
-<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;  assignment.<a class="code" href="classcode__assignt.html#a1249df401484782a4286869f87864c3a">rhs</a>()=expr;</div>
-<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160;  assignment.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160; </div>
-<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;  <a class="code" href="classgoto__convertt.html#ac390d7621af14e22a4e9ac16bc7695e0">convert</a>(assignment, dest, mode);</div>
-<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160; </div>
-<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;  expr=new_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
-<div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160;}</div>
-<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160; </div>
-<div class="line"><a name="l01905"></a><span class="lineno"><a class="line" href="goto__convert_8h.html#a0b2fdcf00509d08b762b33e0eae67278"> 1905</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(</div>
-<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcodet.html">codet</a> &amp;code,</div>
-<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01909"></a><span class="lineno"> 1909</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
-<div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
-<div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;{</div>
-<div class="line"><a name="l01912"></a><span class="lineno"> 1912</span>&#160;  <a class="code" href="classsymbol__table__buildert.html">symbol_table_buildert</a> symbol_table_builder =</div>
-<div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160;    <a class="code" href="classsymbol__table__buildert.html#ab8ad154054a288db6f71234ce66ffaff">symbol_table_buildert::wrap</a>(symbol_table);</div>
-<div class="line"><a name="l01914"></a><span class="lineno"> 1914</span>&#160;  <a class="code" href="classgoto__convertt.html">goto_convertt</a> <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(symbol_table_builder, message_handler);</div>
-<div class="line"><a name="l01915"></a><span class="lineno"> 1915</span>&#160;  <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>.goto_convert(code, dest, mode);</div>
-<div class="line"><a name="l01916"></a><span class="lineno"> 1916</span>&#160;}</div>
-<div class="line"><a name="l01917"></a><span class="lineno"> 1917</span>&#160; </div>
-<div class="line"><a name="l01918"></a><span class="lineno"><a class="line" href="goto__convert_8h.html#a868ca9e76f7e7c99568f3b255a9d0a56"> 1918</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(</div>
-<div class="line"><a name="l01919"></a><span class="lineno"> 1919</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;{</div>
-<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;  <span class="comment">// find main symbol</span></div>
-<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  <span class="keyword">const</span> symbol_tablet::symbolst::const_iterator s_it=</div>
-<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160;    symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(<span class="stringliteral">&quot;main&quot;</span>);</div>
-<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160; </div>
-<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160;    s_it != symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end(), <span class="stringliteral">&quot;failed to find main symbol&quot;</span>);</div>
-<div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160; </div>
-<div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=s_it-&gt;second;</div>
-<div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160; </div>
-<div class="line"><a name="l01932"></a><span class="lineno"> 1932</span>&#160;  <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">::goto_convert</a>(</div>
-<div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;    <a class="code" href="std__code__base_8h.html#a67360cabd5367011c466ee249fc7784d">to_code</a>(symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>), symbol_table, dest, message_handler, symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>);</div>
-<div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160;}</div>
-<div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160; </div>
-<div class="line"><a name="l01950"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791"> 1950</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791">goto_convertt::generate_thread_block</a>(</div>
-<div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__blockt.html">code_blockt</a> &amp;thread_body,</div>
-<div class="line"><a name="l01952"></a><span class="lineno"> 1952</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
-<div class="line"><a name="l01953"></a><span class="lineno"> 1953</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
-<div class="line"><a name="l01954"></a><span class="lineno"> 1954</span>&#160;{</div>
-<div class="line"><a name="l01955"></a><span class="lineno"> 1955</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> preamble, body, postamble;</div>
-<div class="line"><a name="l01956"></a><span class="lineno"> 1956</span>&#160; </div>
-<div class="line"><a name="l01957"></a><span class="lineno"> 1957</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> c = body.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
-<div class="line"><a name="l01958"></a><span class="lineno"> 1958</span>&#160;  <a class="code" href="classgoto__convertt.html#ac390d7621af14e22a4e9ac16bc7695e0">convert</a>(thread_body, body, mode);</div>
-<div class="line"><a name="l01959"></a><span class="lineno"> 1959</span>&#160; </div>
-<div class="line"><a name="l01960"></a><span class="lineno"> 1960</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> e = postamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a>(</div>
-<div class="line"><a name="l01961"></a><span class="lineno"> 1961</span>&#160;    <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcodet.html">codet</a> &amp;<span class="keyword">&gt;</span>(<a class="code" href="irep_8cpp.html#a420828b4903d7d8fcf25a91bb60a6c4c">get_nil_irep</a>()),</div>
-<div class="line"><a name="l01962"></a><span class="lineno"> 1962</span>&#160;    thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>(),</div>
-<div class="line"><a name="l01963"></a><span class="lineno"> 1963</span>&#160;    <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba94a589cebad3d1a830bd4ad9983317ed">END_THREAD</a>,</div>
-<div class="line"><a name="l01964"></a><span class="lineno"> 1964</span>&#160;    <a class="code" href="classnil__exprt.html">nil_exprt</a>(),</div>
-<div class="line"><a name="l01965"></a><span class="lineno"> 1965</span>&#160;    {}));</div>
-<div class="line"><a name="l01966"></a><span class="lineno"> 1966</span>&#160;  e-&gt;source_location_nonconst() = thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
-<div class="line"><a name="l01967"></a><span class="lineno"> 1967</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> z = postamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
-<div class="line"><a name="l01968"></a><span class="lineno"> 1968</span>&#160; </div>
-<div class="line"><a name="l01969"></a><span class="lineno"> 1969</span>&#160;  preamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a>(</div>
-<div class="line"><a name="l01970"></a><span class="lineno"> 1970</span>&#160;    <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcodet.html">codet</a> &amp;<span class="keyword">&gt;</span>(<a class="code" href="irep_8cpp.html#a420828b4903d7d8fcf25a91bb60a6c4c">get_nil_irep</a>()),</div>
-<div class="line"><a name="l01971"></a><span class="lineno"> 1971</span>&#160;    thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>(),</div>
-<div class="line"><a name="l01972"></a><span class="lineno"> 1972</span>&#160;    <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebab8e6ca77b590325d07845e028e002bad">START_THREAD</a>,</div>
-<div class="line"><a name="l01973"></a><span class="lineno"> 1973</span>&#160;    <a class="code" href="classnil__exprt.html">nil_exprt</a>(),</div>
-<div class="line"><a name="l01974"></a><span class="lineno"> 1974</span>&#160;    {c}));</div>
-<div class="line"><a name="l01975"></a><span class="lineno"> 1975</span>&#160;  preamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(z, thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
-<div class="line"><a name="l01976"></a><span class="lineno"> 1976</span>&#160; </div>
-<div class="line"><a name="l01977"></a><span class="lineno"> 1977</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(preamble);</div>
-<div class="line"><a name="l01978"></a><span class="lineno"> 1978</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(body);</div>
-<div class="line"><a name="l01979"></a><span class="lineno"> 1979</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(postamble);</div>
-<div class="line"><a name="l01980"></a><span class="lineno"> 1980</span>&#160;}</div>
+<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160; </div>
+<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_v);</div>
+<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_w);</div>
+<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160; </div>
+<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160;  <span class="keywordflow">if</span>(has_else)</div>
+<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;  {</div>
+<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;    dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_x);</div>
+<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;    dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_y);</div>
+<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;  }</div>
+<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160; </div>
+<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp_z);</div>
+<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;}</div>
+<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160; </div>
+<div class="line"><a name="l01653"></a><span class="lineno"><a class="line" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0"> 1653</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)</div>
+<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;{</div>
+<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
+<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a>(*it))</div>
+<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160; </div>
+<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_and || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_or)</div>
+<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160; </div>
+<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;}</div>
+<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160; </div>
+<div class="line"><a name="l01665"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#ac795efbe4217efbc5be8d4ab1d7fedda"> 1665</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">goto_convertt::generate_conditional_branch</a>(</div>
+<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>,</div>
+<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_true,</div>
+<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
+<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;{</div>
+<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>) &amp;&amp; <a class="code" href="classgoto__convertt.html#ab065db23ba8283f40bedca12ee1eddcf">needs_cleaning</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>))</div>
+<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;  {</div>
+<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;    <span class="comment">// if(guard) goto target;</span></div>
+<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;    <span class="comment">//   becomes</span></div>
+<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;    <span class="comment">// if(guard) goto target; else goto next;</span></div>
+<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;    <span class="comment">// next: skip;</span></div>
+<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160; </div>
+<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;    <a class="code" href="classgoto__programt.html">goto_programt</a> tmp;</div>
+<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;    <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_false =</div>
+<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;      tmp.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>(source_location));</div>
+<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160; </div>
+<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;    <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
+<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;      <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, target_true, target_false, source_location, dest, mode);</div>
+<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160; </div>
+<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;    dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(tmp);</div>
+<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  }</div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;  {</div>
+<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;    <span class="comment">// simple branch</span></div>
+<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;    <a class="code" href="classexprt.html">exprt</a> cond=<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>;</div>
+<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;    <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(cond, dest, mode);</div>
+<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160; </div>
+<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_true, cond, source_location));</div>
+<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;  }</div>
+<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;}</div>
+<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160; </div>
+<div class="line"><a name="l01699"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528"> 1699</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">goto_convertt::generate_conditional_branch</a>(</div>
+<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>,</div>
+<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_true,</div>
+<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target_false,</div>
+<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
+<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;{</div>
+<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_not)</div>
+<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;  {</div>
+<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;    <span class="comment">// simply swap targets</span></div>
+<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;    <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
+<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;      <a class="code" href="std__expr_8h.html#a6662a285d4d229964538bfc2113f19c7">to_not_expr</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>).op(),</div>
+<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;      target_false,</div>
+<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;      target_true,</div>
+<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;      source_location,</div>
+<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;      dest,</div>
+<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;      mode);</div>
+<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;  }</div>
+<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160; </div>
+<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_and)</div>
+<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;  {</div>
+<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;    <span class="comment">// turn</span></div>
+<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;    <span class="comment">//   if(a &amp;&amp; b) goto target_true; else goto target_false;</span></div>
+<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;    <span class="comment">// into</span></div>
+<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160;    <span class="comment">//    if(!a) goto target_false;</span></div>
+<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;    <span class="comment">//    if(!b) goto target_false;</span></div>
+<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;    <span class="comment">//    goto target_true;</span></div>
+<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160; </div>
+<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;    std::list&lt;exprt&gt; op;</div>
+<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;    <a class="code" href="classgoto__convertt.html#a6545c89eb81bbafab65700ac80f26f77">collect_operands</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), op);</div>
+<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160; </div>
+<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : op)</div>
+<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;      <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
+<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;        <a class="code" href="expr__util_8cpp.html#ad7237ef22ecf42bb51ceb62cfe524595">boolean_negate</a>(expr), target_false, source_location, dest, mode);</div>
+<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160; </div>
+<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_true, source_location));</div>
+<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160; </div>
+<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;  }</div>
+<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_or)</div>
+<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;  {</div>
+<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;    <span class="comment">// turn</span></div>
+<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;    <span class="comment">//   if(a || b) goto target_true; else goto target_false;</span></div>
+<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;    <span class="comment">// into</span></div>
+<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;    <span class="comment">//   if(a) goto target_true;</span></div>
+<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;    <span class="comment">//   if(b) goto target_true;</span></div>
+<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;    <span class="comment">//   goto target_false;</span></div>
+<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160; </div>
+<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;    std::list&lt;exprt&gt; op;</div>
+<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;    <a class="code" href="classgoto__convertt.html#a6545c89eb81bbafab65700ac80f26f77">collect_operands</a>(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), op);</div>
+<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160; </div>
+<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;    <span class="comment">// true branch(es)</span></div>
+<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : op)</div>
+<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;      <a class="code" href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">generate_conditional_branch</a>(</div>
+<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;        expr, target_true, source_location, dest, mode);</div>
+<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160; </div>
+<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;    <span class="comment">// false branch</span></div>
+<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_false, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
+<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160; </div>
+<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;  }</div>
+<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160; </div>
+<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;  <a class="code" href="classexprt.html">exprt</a> cond=<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>;</div>
+<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;  <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(cond, dest, mode);</div>
+<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160; </div>
+<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;  <span class="comment">// true branch</span></div>
+<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;  dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_true, cond, source_location));</div>
+<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160; </div>
+<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;  <span class="comment">// false branch</span></div>
+<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;  dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(target_false, source_location));</div>
+<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;}</div>
+<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160; </div>
+<div class="line"><a name="l01773"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a7c6fd63b1487ab9eb4a8baebc40db6ef"> 1773</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">goto_convertt::get_string_constant</a>(</div>
+<div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> &amp;value)</div>
+<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;{</div>
+<div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_typecast)</div>
+<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr).op(), value);</div>
+<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160; </div>
+<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_address_of &amp;&amp;</div>
+<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<span class="keywordtype">object</span>().<span class="keywordtype">id</span>() == ID_index)</div>
+<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;  {</div>
+<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;    <a class="code" href="classexprt.html">exprt</a> index_op =</div>
+<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;      <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(<a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(<a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<span class="keywordtype">object</span>()).array());</div>
+<div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160;    <a class="code" href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a>(index_op, <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>);</div>
+<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160; </div>
+<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160;    <span class="keywordflow">if</span>(index_op.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string_constant)</div>
+<div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160;    {</div>
+<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;      value = <a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(index_op).<a class="code" href="classstring__constantt.html#a68d5c40c22c92dc84f02daadecf2ed46">get_value</a>();</div>
+<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;    }</div>
+<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(index_op.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;    {</div>
+<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;      std::string <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>;</div>
+<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;      <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, index_op)</div>
+<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;        <span class="keywordflow">if</span>(it-&gt;is_constant())</div>
+<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;        {</div>
+<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;          <span class="keyword">const</span> <span class="keyword">auto</span> i = numeric_cast&lt;std::size_t&gt;(*it);</div>
+<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160;          <span class="keywordflow">if</span>(!i.has_value())</div>
+<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160; </div>
+<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160;          <span class="keywordflow">if</span>(i.value() != 0) <span class="comment">// to skip terminating 0</span></div>
+<div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160;            <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a> += <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(i.value());</div>
+<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;        }</div>
+<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160; </div>
+<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;      <span class="keywordflow">return</span> value=<a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>, <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;    }</div>
+<div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160;  }</div>
+<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160; </div>
+<div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string_constant)</div>
+<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;  {</div>
+<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;    value = <a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(expr).<a class="code" href="classstring__constantt.html#a68d5c40c22c92dc84f02daadecf2ed46">get_value</a>();</div>
+<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01815"></a><span class="lineno"> 1815</span>&#160;  }</div>
+<div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160; </div>
+<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;}</div>
+<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160; </div>
+<div class="line"><a name="l01820"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76"> 1820</a></span>&#160;<a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">goto_convertt::get_string_constant</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)</div>
+<div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160;{</div>
+<div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>;</div>
+<div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160; </div>
+<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> res = <a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(expr, <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>);</div>
+<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab4691937c31ef00244566d19d59e7449">INVARIANT_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l01826"></a><span class="lineno"> 1826</span>&#160;    !res,</div>
+<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;    <span class="stringliteral">&quot;expected string constant&quot;</span>,</div>
+<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
+<div class="line"><a name="l01829"></a><span class="lineno"> 1829</span>&#160;    expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160; </div>
+<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee">result</a>;</div>
+<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;}</div>
+<div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160; </div>
+<div class="line"><a name="l01834"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c"> 1834</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">goto_convertt::get_constant</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)</div>
+<div class="line"><a name="l01835"></a><span class="lineno"> 1835</span>&#160;{</div>
+<div class="line"><a name="l01836"></a><span class="lineno"> 1836</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_symbol)</div>
+<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;  {</div>
+<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=</div>
+<div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160;      <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(expr));</div>
+<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160; </div>
+<div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160;    <span class="keywordflow">return</span> symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>;</div>
+<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;  }</div>
+<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
+<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;  {</div>
+<div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160;    <span class="keyword">auto</span> tmp = <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr);</div>
+<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;    tmp.compound() = <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(tmp.compound());</div>
+<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;    <span class="keywordflow">return</span> std::move(tmp);</div>
+<div class="line"><a name="l01848"></a><span class="lineno"> 1848</span>&#160;  }</div>
+<div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_index)</div>
+<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;  {</div>
+<div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160;    <span class="keyword">auto</span> tmp = <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr);</div>
+<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;    tmp.op0() = <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(tmp.op0());</div>
+<div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;    tmp.op1() = <a class="code" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a>(tmp.op1());</div>
+<div class="line"><a name="l01854"></a><span class="lineno"> 1854</span>&#160;    <span class="keywordflow">return</span> std::move(tmp);</div>
+<div class="line"><a name="l01855"></a><span class="lineno"> 1855</span>&#160;  }</div>
+<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;    <span class="keywordflow">return</span> expr;</div>
+<div class="line"><a name="l01858"></a><span class="lineno"> 1858</span>&#160;}</div>
+<div class="line"><a name="l01859"></a><span class="lineno"> 1859</span>&#160; </div>
+<div class="line"><a name="l01860"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766"> 1860</a></span>&#160;<a class="code" href="classsymbolt.html">symbolt</a> &amp;<a class="code" href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766">goto_convertt::new_tmp_symbol</a>(</div>
+<div class="line"><a name="l01861"></a><span class="lineno"> 1861</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
+<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
+<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;{</div>
+<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!mode.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>());</div>
+<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> &amp;new_symbol = <a class="code" href="fresh__symbol_8cpp.html#a1baa36294c4d640a926d615062a20feb">get_fresh_aux_symbol</a>(</div>
+<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160;    type,</div>
+<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;    <a class="code" href="classgoto__convertt.html#a4281a494a4fedddcd8572f52578b3f3c">tmp_symbol_prefix</a>,</div>
+<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;    <span class="stringliteral">&quot;tmp_&quot;</span> + suffix,</div>
+<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;    source_location,</div>
+<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;    mode,</div>
+<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;    <a class="code" href="classgoto__convertt.html#a067983a4d2e743cc34833f719e64eedd">symbol_table</a>);</div>
+<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160; </div>
+<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;  <a class="code" href="classcode__frontend__declt.html">code_frontend_declt</a> decl(new_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>());</div>
+<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160;  decl.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;  <a class="code" href="classgoto__convertt.html#a43596d00acc51343e1c7eaafef3b05b5">convert_frontend_decl</a>(decl, dest, mode);</div>
+<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160; </div>
+<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160;  <span class="keywordflow">return</span> new_symbol;</div>
+<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;}</div>
+<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160; </div>
+<div class="line"><a name="l01883"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6"> 1883</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6">goto_convertt::make_temp_symbol</a>(</div>
+<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
+<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
+<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;{</div>
+<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
+<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160; </div>
+<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> &amp;new_symbol =</div>
+<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;    <a class="code" href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766">new_tmp_symbol</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), suffix, dest, source_location, mode);</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160; </div>
+<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;  <a class="code" href="classcode__assignt.html">code_assignt</a> assignment;</div>
+<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;  assignment.<a class="code" href="classcode__assignt.html#a6efd1dd283c032bf2330c573dfbeada5">lhs</a>()=new_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
+<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;  assignment.<a class="code" href="classcode__assignt.html#a1249df401484782a4286869f87864c3a">rhs</a>()=expr;</div>
+<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;  assignment.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160; </div>
+<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;  <a class="code" href="classgoto__convertt.html#ac390d7621af14e22a4e9ac16bc7695e0">convert</a>(assignment, dest, mode);</div>
+<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160; </div>
+<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160;  expr=new_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
+<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;}</div>
+<div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160; </div>
+<div class="line"><a name="l01904"></a><span class="lineno"><a class="line" href="goto__convert_8h.html#a0b2fdcf00509d08b762b33e0eae67278"> 1904</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(</div>
+<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcodet.html">codet</a> &amp;code,</div>
+<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
+<div class="line"><a name="l01909"></a><span class="lineno"> 1909</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
+<div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;{</div>
+<div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;  <a class="code" href="classsymbol__table__buildert.html">symbol_table_buildert</a> symbol_table_builder =</div>
+<div class="line"><a name="l01912"></a><span class="lineno"> 1912</span>&#160;    <a class="code" href="classsymbol__table__buildert.html#ab8ad154054a288db6f71234ce66ffaff">symbol_table_buildert::wrap</a>(symbol_table);</div>
+<div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160;  <a class="code" href="classgoto__convertt.html">goto_convertt</a> <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(symbol_table_builder, message_handler);</div>
+<div class="line"><a name="l01914"></a><span class="lineno"> 1914</span>&#160;  <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>.goto_convert(code, dest, mode);</div>
+<div class="line"><a name="l01915"></a><span class="lineno"> 1915</span>&#160;}</div>
+<div class="line"><a name="l01916"></a><span class="lineno"> 1916</span>&#160; </div>
+<div class="line"><a name="l01917"></a><span class="lineno"><a class="line" href="goto__convert_8h.html#a868ca9e76f7e7c99568f3b255a9d0a56"> 1917</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(</div>
+<div class="line"><a name="l01918"></a><span class="lineno"> 1918</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l01919"></a><span class="lineno"> 1919</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;{</div>
+<div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;  <span class="comment">// find main symbol</span></div>
+<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;  <span class="keyword">const</span> symbol_tablet::symbolst::const_iterator s_it=</div>
+<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;    symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(<span class="stringliteral">&quot;main&quot;</span>);</div>
+<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160; </div>
+<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;    s_it != symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end(), <span class="stringliteral">&quot;failed to find main symbol&quot;</span>);</div>
+<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160; </div>
+<div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=s_it-&gt;second;</div>
+<div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160; </div>
+<div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160;  <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">::goto_convert</a>(</div>
+<div class="line"><a name="l01932"></a><span class="lineno"> 1932</span>&#160;    <a class="code" href="std__code__base_8h.html#a67360cabd5367011c466ee249fc7784d">to_code</a>(symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>), symbol_table, dest, message_handler, symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>);</div>
+<div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;}</div>
+<div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160; </div>
+<div class="line"><a name="l01949"></a><span class="lineno"><a class="line" href="classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791"> 1949</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791">goto_convertt::generate_thread_block</a>(</div>
+<div class="line"><a name="l01950"></a><span class="lineno"> 1950</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__blockt.html">code_blockt</a> &amp;thread_body,</div>
+<div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;dest,</div>
+<div class="line"><a name="l01952"></a><span class="lineno"> 1952</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;mode)</div>
+<div class="line"><a name="l01953"></a><span class="lineno"> 1953</span>&#160;{</div>
+<div class="line"><a name="l01954"></a><span class="lineno"> 1954</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> preamble, body, postamble;</div>
+<div class="line"><a name="l01955"></a><span class="lineno"> 1955</span>&#160; </div>
+<div class="line"><a name="l01956"></a><span class="lineno"> 1956</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> c = body.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
+<div class="line"><a name="l01957"></a><span class="lineno"> 1957</span>&#160;  <a class="code" href="classgoto__convertt.html#ac390d7621af14e22a4e9ac16bc7695e0">convert</a>(thread_body, body, mode);</div>
+<div class="line"><a name="l01958"></a><span class="lineno"> 1958</span>&#160; </div>
+<div class="line"><a name="l01959"></a><span class="lineno"> 1959</span>&#160;  postamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a>(</div>
+<div class="line"><a name="l01960"></a><span class="lineno"> 1960</span>&#160;    <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcodet.html">codet</a> &amp;<span class="keyword">&gt;</span>(<a class="code" href="irep_8cpp.html#a420828b4903d7d8fcf25a91bb60a6c4c">get_nil_irep</a>()),</div>
+<div class="line"><a name="l01961"></a><span class="lineno"> 1961</span>&#160;    thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>(),</div>
+<div class="line"><a name="l01962"></a><span class="lineno"> 1962</span>&#160;    <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba94a589cebad3d1a830bd4ad9983317ed">END_THREAD</a>,</div>
+<div class="line"><a name="l01963"></a><span class="lineno"> 1963</span>&#160;    <a class="code" href="classnil__exprt.html">nil_exprt</a>(),</div>
+<div class="line"><a name="l01964"></a><span class="lineno"> 1964</span>&#160;    {}));</div>
+<div class="line"><a name="l01965"></a><span class="lineno"> 1965</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> z = postamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
+<div class="line"><a name="l01966"></a><span class="lineno"> 1966</span>&#160; </div>
+<div class="line"><a name="l01967"></a><span class="lineno"> 1967</span>&#160;  preamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a>(</div>
+<div class="line"><a name="l01968"></a><span class="lineno"> 1968</span>&#160;    <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcodet.html">codet</a> &amp;<span class="keyword">&gt;</span>(<a class="code" href="irep_8cpp.html#a420828b4903d7d8fcf25a91bb60a6c4c">get_nil_irep</a>()),</div>
+<div class="line"><a name="l01969"></a><span class="lineno"> 1969</span>&#160;    thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>(),</div>
+<div class="line"><a name="l01970"></a><span class="lineno"> 1970</span>&#160;    <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebab8e6ca77b590325d07845e028e002bad">START_THREAD</a>,</div>
+<div class="line"><a name="l01971"></a><span class="lineno"> 1971</span>&#160;    <a class="code" href="classnil__exprt.html">nil_exprt</a>(),</div>
+<div class="line"><a name="l01972"></a><span class="lineno"> 1972</span>&#160;    {c}));</div>
+<div class="line"><a name="l01973"></a><span class="lineno"> 1973</span>&#160;  preamble.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(z, thread_body.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
+<div class="line"><a name="l01974"></a><span class="lineno"> 1974</span>&#160; </div>
+<div class="line"><a name="l01975"></a><span class="lineno"> 1975</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(preamble);</div>
+<div class="line"><a name="l01976"></a><span class="lineno"> 1976</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(body);</div>
+<div class="line"><a name="l01977"></a><span class="lineno"> 1977</span>&#160;  dest.<a class="code" href="classgoto__programt.html#a5d5188f21969246ba3066c6eb0c3d27d">destructive_append</a>(postamble);</div>
+<div class="line"><a name="l01978"></a><span class="lineno"> 1978</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="agoto__program_8h_html_a70232dd124bfcc17855c337bac57477f"><div class="ttname"><a href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a></div><div class="ttdeci">#define Forall_goto_program_instructions(it, program)</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01234">goto_program.h:1234</a></div></div>
@@ -2067,7 +2065,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="aclassgoto__programt_1_1instructiont_html_a25bfbdf95a4074109af7c8d5c4c2c4b4"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#a25bfbdf95a4074109af7c8d5c4c2c4b4">goto_programt::instructiont::complete_goto</a></div><div class="ttdeci">void complete_goto(targett _target)</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00454">goto_program.h:454</a></div></div>
 <div class="ttc" id="aexpr__util_8cpp_html_aca6b71a541c76387dbcc2c635f94c959"><div class="ttname"><a href="expr__util_8cpp.html#aca6b71a541c76387dbcc2c635f94c959">has_subexpr</a></div><div class="ttdeci">bool has_subexpr(const exprt &amp;expr, const std::function&lt; bool(const exprt &amp;)&gt; &amp;pred)</div><div class="ttdoc">returns true if the expression has a subexpression that satisfies pred</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00139">expr_util.cpp:139</a></div></div>
 <div class="ttc" id="aclassgoto__programt_1_1instructiont_html_a724460bf153c4839c0bf1480e83e64f5"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#a724460bf153c4839c0bf1480e83e64f5">goto_programt::instructiont::code</a></div><div class="ttdeci">const goto_instruction_codet &amp; code() const</div><div class="ttdoc">Get the code represented by this instruction.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00195">goto_program.h:195</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_a3914738161cb1e433a38528a02ca2528"><div class="ttname"><a href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">goto_convertt::generate_conditional_branch</a></div><div class="ttdeci">void generate_conditional_branch(const exprt &amp;guard, goto_programt::targett target_true, goto_programt::targett target_false, const source_locationt &amp;, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdoc">if(guard) goto target_true; else goto target_false;</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01700">goto_convert.cpp:1700</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_a3914738161cb1e433a38528a02ca2528"><div class="ttname"><a href="classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528">goto_convertt::generate_conditional_branch</a></div><div class="ttdeci">void generate_conditional_branch(const exprt &amp;guard, goto_programt::targett target_true, goto_programt::targett target_false, const source_locationt &amp;, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdoc">if(guard) goto target_true; else goto target_false;</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01699">goto_convert.cpp:1699</a></div></div>
 <div class="ttc" id="aexpr_8h_html_aa4c7b7e1741461e72adae54944e86d49"><div class="ttname"><a href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a></div><div class="ttdeci">#define Forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00027">expr.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_ab7612c51c84b125e43d2002c64112fc6"><div class="ttname"><a href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">goto_convertt::ns</a></div><div class="ttdeci">namespacet ns</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__class_8h_source.html#l00052">goto_convert_class.h:52</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a1a03ce5e403c8ae8c0efb2a042c4e93b"><div class="ttname"><a href="classgoto__convertt.html#a1a03ce5e403c8ae8c0efb2a042c4e93b">goto_convertt::convert_msc_try_finally</a></div><div class="ttdeci">void convert_msc_try_finally(const codet &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__exceptions_8cpp_source.html#l00017">goto_convert_exceptions.cpp:17</a></div></div>
@@ -2104,7 +2102,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="aclassgoto__convertt_html_ac81cbde39e25da0494c1eb0b03d98fa7"><div class="ttname"><a href="classgoto__convertt.html#ac81cbde39e25da0494c1eb0b03d98fa7">goto_convertt::convert_CPROVER_try_finally</a></div><div class="ttdeci">void convert_CPROVER_try_finally(const codet &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__exceptions_8cpp_source.html#l00212">goto_convert_exceptions.cpp:212</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_aacbe9c206150f9986ce9cd45067a3361"><div class="ttname"><a href="classgoto__convertt.html#aacbe9c206150f9986ce9cd45067a3361">goto_convertt::convert_assert</a></div><div class="ttdeci">void convert_assert(const code_assertt &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l00827">goto_convert.cpp:827</a></div></div>
 <div class="ttc" id="agoto__convert_8cpp_html_ab6d7ae6cf464e4614729898876a1c5e4"><div class="ttname"><a href="goto__convert_8cpp.html#ab6d7ae6cf464e4614729898876a1c5e4">finish_catch_push_targets</a></div><div class="ttdeci">static void finish_catch_push_targets(goto_programt &amp;dest)</div><div class="ttdoc">Populate the CATCH instructions with the targets corresponding to their associated labels.</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l00043">goto_convert.cpp:43</a></div></div>
-<div class="ttc" id="agoto__convert_8cpp_html_a7a195715bee3635756d1897139314cb0"><div class="ttname"><a href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a></div><div class="ttdeci">static bool has_and_or(const exprt &amp;expr)</div><div class="ttdoc">if(guard) goto target;</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01654">goto_convert.cpp:1654</a></div></div>
+<div class="ttc" id="agoto__convert_8cpp_html_a7a195715bee3635756d1897139314cb0"><div class="ttname"><a href="goto__convert_8cpp.html#a7a195715bee3635756d1897139314cb0">has_and_or</a></div><div class="ttdeci">static bool has_and_or(const exprt &amp;expr)</div><div class="ttdoc">if(guard) goto target;</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01653">goto_convert.cpp:1653</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a4281a494a4fedddcd8572f52578b3f3c"><div class="ttname"><a href="classgoto__convertt.html#a4281a494a4fedddcd8572f52578b3f3c">goto_convertt::tmp_symbol_prefix</a></div><div class="ttdeci">std::string tmp_symbol_prefix</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__class_8h_source.html#l00053">goto_convert_class.h:53</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a9e266f27780c466a57045502447b354e"><div class="ttname"><a href="classgoto__convertt.html#a9e266f27780c466a57045502447b354e">goto_convertt::convert_try_catch</a></div><div class="ttdeci">void convert_try_catch(const codet &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__exceptions_8cpp_source.html#l00086">goto_convert_exceptions.cpp:86</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a2e79544a60b6ad45440bf77cb385784e"><div class="ttname"><a href="classgoto__convertt.html#a2e79544a60b6ad45440bf77cb385784e">goto_convertt::finish_gotos</a></div><div class="ttdeci">void finish_gotos(goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l00109">goto_convert.cpp:109</a></div></div>
@@ -2143,13 +2141,13 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="agoto__convert_8h_html"><div class="ttname"><a href="goto__convert_8h.html">goto_convert.h</a></div></div>
 <div class="ttc" id="adestructor__tree_8h_html_a133f0a5da8cf79fbc1420080e6d6bd5a"><div class="ttname"><a href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a></div><div class="ttdeci">std::size_t node_indext</div><div class="ttdef"><b>Definition:</b> <a href="destructor__tree_8h_source.html#l00015">destructor_tree.h:15</a></div></div>
 <div class="ttc" id="aclasssymbol__exprt_html"><div class="ttname"><a href="classsymbol__exprt.html">symbol_exprt</a></div><div class="ttdoc">Expression to hold a symbol (variable)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00112">std_expr.h:112</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_af81e40f8e24bbe1f7b71890024500791"><div class="ttname"><a href="classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791">goto_convertt::generate_thread_block</a></div><div class="ttdeci">void generate_thread_block(const code_blockt &amp;thread_body, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdoc">Generates the necessary goto-instructions to represent a thread-block.</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01950">goto_convert.cpp:1950</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_af81e40f8e24bbe1f7b71890024500791"><div class="ttname"><a href="classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791">goto_convertt::generate_thread_block</a></div><div class="ttdeci">void generate_thread_block(const code_blockt &amp;thread_body, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdoc">Generates the necessary goto-instructions to represent a thread-block.</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01949">goto_convert.cpp:1949</a></div></div>
 <div class="ttc" id="aclassequal__exprt_html"><div class="ttname"><a href="classequal__exprt.html">equal_exprt</a></div><div class="ttdoc">Equality.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01305">std_expr.h:1305</a></div></div>
 <div class="ttc" id="astd__code_8h_html_adf9588aa3f1253350a260b58911cbe8d"><div class="ttname"><a href="std__code_8h.html#adf9588aa3f1253350a260b58911cbe8d">to_code_for</a></div><div class="ttdeci">const code_fort &amp; to_code_for(const codet &amp;code)</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00823">std_code.h:823</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a923b38ca0a459f3f92b4e706909b22b5"><div class="ttname"><a href="classgoto__convertt.html#a923b38ca0a459f3f92b4e706909b22b5">goto_convertt::convert_switch_case</a></div><div class="ttdeci">void convert_switch_case(const code_switch_caset &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l00357">goto_convert.cpp:357</a></div></div>
 <div class="ttc" id="aclasscode__ifthenelset_html"><div class="ttname"><a href="classcode__ifthenelset.html">code_ifthenelset</a></div><div class="ttdoc">codet representation of an if-then-else statement.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00459">std_code.h:459</a></div></div>
 <div class="ttc" id="aclassif__exprt_html_adf44709fd0ed42bdc62fa97e5af2a8ba"><div class="ttname"><a href="classif__exprt.html#adf44709fd0ed42bdc62fa97e5af2a8ba">if_exprt::false_case</a></div><div class="ttdeci">exprt &amp; false_case()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02360">std_expr.h:2360</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_a4b9c0f1252cf24d8b6a193a526b78766"><div class="ttname"><a href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766">goto_convertt::new_tmp_symbol</a></div><div class="ttdeci">symbolt &amp; new_tmp_symbol(const typet &amp;type, const std::string &amp;suffix, goto_programt &amp;dest, const source_locationt &amp;, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01861">goto_convert.cpp:1861</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_a4b9c0f1252cf24d8b6a193a526b78766"><div class="ttname"><a href="classgoto__convertt.html#a4b9c0f1252cf24d8b6a193a526b78766">goto_convertt::new_tmp_symbol</a></div><div class="ttdeci">symbolt &amp; new_tmp_symbol(const typet &amp;type, const std::string &amp;suffix, goto_programt &amp;dest, const source_locationt &amp;, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01860">goto_convert.cpp:1860</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_ae34f002c1001fe7430f617688016e473"><div class="ttname"><a href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a></div><div class="ttdeci">static instructiont make_goto(targett _target, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01030">goto_program.h:1030</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a187f9b55fcb654516b520430116bfe4b"><div class="ttname"><a href="classgoto__convertt.html#a187f9b55fcb654516b520430116bfe4b">goto_convertt::goto_convert</a></div><div class="ttdeci">void goto_convert(const codet &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l00279">goto_convert.cpp:279</a></div></div>
 <div class="ttc" id="aclassexprt_html_a727eaab489ece52bb6abbee2af9bc019"><div class="ttname"><a href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">exprt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdoc">Return whether the expression is a constant representing false.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00043">expr.cpp:43</a></div></div>
@@ -2159,7 +2157,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="astd__expr_8h_html_a8fde3eed9e33fa5845c048d8c613d9bd"><div class="ttname"><a href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a></div><div class="ttdeci">const binary_exprt &amp; to_binary_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a binary_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00660">std_expr.h:660</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab4691937c31ef00244566d19d59e7449"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab4691937c31ef00244566d19d59e7449">INVARIANT_WITH_DIAGNOSTICS</a></div><div class="ttdeci">#define INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON,...)</div><div class="ttdoc">Same as invariant, with one or more diagnostics attached Diagnostics can be of any type that has a sp...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00437">invariant.h:437</a></div></div>
 <div class="ttc" id="aclasscode__frontend__returnt_html_a3a16890906023bf5d4d13ad5f3b6787d"><div class="ttname"><a href="classcode__frontend__returnt.html#a3a16890906023bf5d4d13ad5f3b6787d">code_frontend_returnt::return_value</a></div><div class="ttdeci">const exprt &amp; return_value() const</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00903">std_code.h:903</a></div></div>
-<div class="ttc" id="agoto__convert_8cpp_html_a0b2fdcf00509d08b762b33e0eae67278"><div class="ttname"><a href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a></div><div class="ttdeci">void goto_convert(const codet &amp;code, symbol_table_baset &amp;symbol_table, goto_programt &amp;dest, message_handlert &amp;message_handler, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01905">goto_convert.cpp:1905</a></div></div>
+<div class="ttc" id="agoto__convert_8cpp_html_a0b2fdcf00509d08b762b33e0eae67278"><div class="ttname"><a href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a></div><div class="ttdeci">void goto_convert(const codet &amp;code, symbol_table_baset &amp;symbol_table, goto_programt &amp;dest, message_handlert &amp;message_handler, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01904">goto_convert.cpp:1904</a></div></div>
 <div class="ttc" id="astd__code_8h_html_a4301aec6177fccdb59ccf6495d3dc5ce"><div class="ttname"><a href="std__code_8h.html#a4301aec6177fccdb59ccf6495d3dc5ce">to_code_switch_case</a></div><div class="ttdeci">const code_switch_caset &amp; to_code_switch_case(const codet &amp;code)</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01077">std_code.h:1077</a></div></div>
 <div class="ttc" id="astructgoto__convertt_1_1targetst_html_a9fd2edd81f379b7544bbd36730c75f38"><div class="ttname"><a href="structgoto__convertt_1_1targetst.html#a9fd2edd81f379b7544bbd36730c75f38">goto_convertt::targetst::has_return_value</a></div><div class="ttdeci">bool has_return_value</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__class_8h_source.html#l00385">goto_convert_class.h:385</a></div></div>
 <div class="ttc" id="aclasscode__blockt_html_ad5897ca2d58747b62e187ca4d9459882"><div class="ttname"><a href="classcode__blockt.html#ad5897ca2d58747b62e187ca4d9459882">code_blockt::statements</a></div><div class="ttdeci">code_operandst &amp; statements()</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00138">std_code.h:138</a></div></div>
@@ -2200,7 +2198,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="aclassancestry__resultt_html_a7588ffbb86a86697cc1eb5da2b787596"><div class="ttname"><a href="classancestry__resultt.html#a7588ffbb86a86697cc1eb5da2b787596">ancestry_resultt::right_depth_below_common_ancestor</a></div><div class="ttdeci">std::size_t right_depth_below_common_ancestor</div><div class="ttdef"><b>Definition:</b> <a href="destructor__tree_8h_source.html#l00040">destructor_tree.h:40</a></div></div>
 <div class="ttc" id="aclasscode__gcc__switch__case__ranget_html_a057e2334f3939c0653bc536c8d190ea1"><div class="ttname"><a href="classcode__gcc__switch__case__ranget.html#a057e2334f3939c0653bc536c8d190ea1">code_gcc_switch_case_ranget::code</a></div><div class="ttdeci">codet &amp; code()</div><div class="ttdoc">the statement to be executed when the case applies</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01131">std_code.h:1131</a></div></div>
 <div class="ttc" id="aclassmessaget_1_1mstreamt_html_ae35463c8d5f00a49e034580d11845daa"><div class="ttname"><a href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">messaget::mstreamt::source_location</a></div><div class="ttdeci">source_locationt source_location</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00247">message.h:247</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_a20327f38bb9df4112418dbd3b0e8da76"><div class="ttname"><a href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">goto_convertt::get_string_constant</a></div><div class="ttdeci">irep_idt get_string_constant(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01821">goto_convert.cpp:1821</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_a20327f38bb9df4112418dbd3b0e8da76"><div class="ttname"><a href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">goto_convertt::get_string_constant</a></div><div class="ttdeci">irep_idt get_string_constant(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01820">goto_convert.cpp:1820</a></div></div>
 <div class="ttc" id="astructgoto__convertt_1_1targetst_html_a4dba013360d0c008a14489baab47a473"><div class="ttname"><a href="structgoto__convertt_1_1targetst.html#a4dba013360d0c008a14489baab47a473">goto_convertt::targetst::break_stack_node</a></div><div class="ttdeci">node_indext break_stack_node</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__class_8h_source.html#l00399">goto_convert_class.h:399</a></div></div>
 <div class="ttc" id="astd__code_8h_html_a2c5f20e468d889f30f08546b1f4d55b5"><div class="ttname"><a href="std__code_8h.html#a2c5f20e468d889f30f08546b1f4d55b5">to_code_goto</a></div><div class="ttdeci">const code_gotot &amp; to_code_goto(const codet &amp;code)</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00875">std_code.h:875</a></div></div>
 <div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
@@ -2248,7 +2246,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="aclasscode__blockt_html_ab6b759ece6370bafd5db2d133f6982a3"><div class="ttname"><a href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">code_blockt::add</a></div><div class="ttdeci">void add(const codet &amp;code)</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00168">std_code.h:168</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a01ece0dd088ef255810bf3a7ccd58482"><div class="ttname"><a href="classgoto__convertt.html#a01ece0dd088ef255810bf3a7ccd58482">goto_convertt::convert_for</a></div><div class="ttdeci">void convert_for(const code_fort &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l00903">goto_convert.cpp:903</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_ad11145b9ad3a4ac1fcf0cedfb27feac6"><div class="ttname"><a href="classgoto__convertt.html#ad11145b9ad3a4ac1fcf0cedfb27feac6">goto_convertt::caset</a></div><div class="ttdeci">exprt::operandst caset</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__class_8h_source.html#l00379">goto_convert_class.h:379</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_a233e527fdbe44177319cebec3c4b9e2c"><div class="ttname"><a href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">goto_convertt::get_constant</a></div><div class="ttdeci">exprt get_constant(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01835">goto_convert.cpp:1835</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_a233e527fdbe44177319cebec3c4b9e2c"><div class="ttname"><a href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">goto_convertt::get_constant</a></div><div class="ttdeci">exprt get_constant(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01834">goto_convert.cpp:1834</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a></div><div class="ttdeci">@ SKIP</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00038">goto_program.h:38</a></div></div>
 <div class="ttc" id="aclasscode__deadt_html"><div class="ttname"><a href="classcode__deadt.html">code_deadt</a></div><div class="ttdoc">A goto_instruction_codet representing the removal of a local variable going out of scope.</div><div class="ttdef"><b>Definition:</b> <a href="goto__instruction__code_8h_source.html#l00131">goto_instruction_code.h:131</a></div></div>
 <div class="ttc" id="aclasscode__typet_html_aea0614e764b785c9a71b217eea487e4a"><div class="ttname"><a href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">code_typet::parameters</a></div><div class="ttdeci">const parameterst &amp; parameters() const</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00655">std_types.h:655</a></div></div>
@@ -2378,7 +2376,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="ttc" id="aclassancestry__resultt_html"><div class="ttname"><a href="classancestry__resultt.html">ancestry_resultt</a></div><div class="ttdoc">Result of an attempt to find ancestor information about two nodes.</div><div class="ttdef"><b>Definition:</b> <a href="destructor__tree_8h_source.html#l00020">destructor_tree.h:20</a></div></div>
 <div class="ttc" id="aclasscodet_html"><div class="ttname"><a href="classcodet.html">codet</a></div><div class="ttdoc">Data structure for representing an arbitrary statement in a program.</div><div class="ttdef"><b>Definition:</b> <a href="std__code__base_8h_source.html#l00028">std_code_base.h:28</a></div></div>
 <div class="ttc" id="astructgoto__convertt_1_1targetst_html_aa9cedbc8d90ab03b88ce69a6c7982f6a"><div class="ttname"><a href="structgoto__convertt_1_1targetst.html#aa9cedbc8d90ab03b88ce69a6c7982f6a">goto_convertt::targetst::return_target</a></div><div class="ttdeci">goto_programt::targett return_target</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__class_8h_source.html#l00396">goto_convert_class.h:396</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_ae3d43c2f2fff1dfe570162d1a0c7ebd6"><div class="ttname"><a href="classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6">goto_convertt::make_temp_symbol</a></div><div class="ttdeci">void make_temp_symbol(exprt &amp;expr, const std::string &amp;suffix, goto_programt &amp;, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01884">goto_convert.cpp:1884</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_ae3d43c2f2fff1dfe570162d1a0c7ebd6"><div class="ttname"><a href="classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6">goto_convertt::make_temp_symbol</a></div><div class="ttdeci">void make_temp_symbol(exprt &amp;expr, const std::string &amp;suffix, goto_programt &amp;, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01883">goto_convert.cpp:1883</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_aff5ed8472193f7ccdd24ce20881ac932"><div class="ttname"><a href="classgoto__convertt.html#aff5ed8472193f7ccdd24ce20881ac932">goto_convertt::convert_end_thread</a></div><div class="ttdeci">void convert_end_thread(const codet &amp;code, goto_programt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01400">goto_convert.cpp:1400</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a0fd4da5c9cd24910ff2cb0360c929858"><div class="ttname"><a href="classgoto__convertt.html#a0fd4da5c9cd24910ff2cb0360c929858">goto_convertt::convert_gcc_computed_goto</a></div><div class="ttdeci">void convert_gcc_computed_goto(const codet &amp;code, goto_programt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert_8cpp_source.html#l01376">goto_convert.cpp:1376</a></div></div>
 <!-- start footer part -->

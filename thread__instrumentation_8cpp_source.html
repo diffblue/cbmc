@@ -129,113 +129,111 @@ $(document).ready(function(){initNavTree('thread__instrumentation_8cpp_source.ht
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  assert(end-&gt;is_end_function());</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = end-&gt;source_location();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  goto_program.<a class="code" href="classgoto__programt.html#a32df6bf5af52e1065afd63fc549bd906">insert_before_swap</a>(end);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  goto_program.<a class="code" href="classgoto__programt.html#a32df6bf5af52e1065afd63fc549bd906">insert_before_swap</a>(end);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstring__constantt.html">string_constantt</a> mutex_locked_string(<span class="stringliteral">&quot;mutex-locked&quot;</span>);</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstring__constantt.html">string_constantt</a> mutex_locked_string(<span class="stringliteral">&quot;mutex-locked&quot;</span>);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="comment">// NULL is any</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a> get_may{</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classnull__pointer__exprt.html">null_pointer_exprt</a>(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="classempty__typet.html">empty_typet</a>())),</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    ID_get_may,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(mutex_locked_string)};</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="comment">// NULL is any</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a> get_may{</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classnull__pointer__exprt.html">null_pointer_exprt</a>(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="classempty__typet.html">empty_typet</a>())),</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    ID_get_may,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(mutex_locked_string)};</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = end-&gt;source_location();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  source_location.<a class="code" href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">set_comment</a>(<span class="stringliteral">&quot;mutexes must not be locked on thread exit&quot;</span>);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  *end = <a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(<a class="code" href="classnot__exprt.html">not_exprt</a>(get_may), source_location);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  end-&gt;source_location_nonconst().set_comment(</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="stringliteral">&quot;mutexes must not be locked on thread exit&quot;</span>);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;}</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="thread__instrumentation_8h.html#a2d0e488e717313cd0bbc496639b88d6a">   56</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="thread__instrumentation_8cpp.html#a1f38f13e1840b7642166fd451f457cf6">thread_exit_instrumentation</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;{</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="comment">// we&#39;ll look for START THREAD</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  std::set&lt;irep_idt&gt; thread_fkts;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="thread__instrumentation_8cpp.html#afa90d18fb10827c9a7758bf01839b678">has_start_thread</a>(gf_entry.second.body))</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="comment">// now look for functions called</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : gf_entry.second.body.instructions)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">if</span>(instruction.is_function_call())</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;          <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">function</span> = instruction.call_function();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          <span class="keywordflow">if</span>(<span class="keyword">function</span>.<span class="keywordtype">id</span>()==ID_symbol)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            thread_fkts.insert(<a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(<span class="keyword">function</span>).<a class="code" href="smt2__incremental__decision__procedure_8cpp.html#ac39a0adbcad4c2c02388ed215fe82ea0">get_identifier</a>());</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="comment">// now instrument</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;fkt : thread_fkts)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="thread__instrumentation_8cpp.html#a1f38f13e1840b7642166fd451f457cf6">thread_exit_instrumentation</a>(</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>[fkt].body);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">   83</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a>(</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program,</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <a class="code" href="classtypet.html">typet</a> lock_type)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  symbol_tablet::symbolst::const_iterator f_it =</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;set_must&quot;</span>);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="thread__instrumentation_8h.html#a2d0e488e717313cd0bbc496639b88d6a">   53</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="thread__instrumentation_8cpp.html#a1f38f13e1840b7642166fd451f457cf6">thread_exit_instrumentation</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="comment">// we&#39;ll look for START THREAD</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  std::set&lt;irep_idt&gt; thread_fkts;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="thread__instrumentation_8cpp.html#afa90d18fb10827c9a7758bf01839b678">has_start_thread</a>(gf_entry.second.body))</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="comment">// now look for functions called</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : gf_entry.second.body.instructions)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">if</span>(instruction.is_function_call())</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;          <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">function</span> = instruction.call_function();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;          <span class="keywordflow">if</span>(<span class="keyword">function</span>.<span class="keywordtype">id</span>()==ID_symbol)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            thread_fkts.insert(<a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(<span class="keyword">function</span>).<a class="code" href="smt2__incremental__decision__procedure_8cpp.html#ac39a0adbcad4c2c02388ed215fe82ea0">get_identifier</a>());</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// now instrument</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;fkt : thread_fkts)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="thread__instrumentation_8cpp.html#a1f38f13e1840b7642166fd451f457cf6">thread_exit_instrumentation</a>(</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>[fkt].body);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">   80</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a>(</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <a class="code" href="classtypet.html">typet</a> lock_type)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;{</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  symbol_tablet::symbolst::const_iterator f_it =</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;set_must&quot;</span>);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordflow">if</span>(f_it==symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordflow">if</span>(f_it==symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(it, goto_program)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_assign())</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">if</span>(it-&gt;assign_lhs().type() == lock_type)</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keyword">const</span> <a class="code" href="classcode__function__callt.html">code_function_callt</a> call(</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;          f_it-&gt;second.symbol_expr(),</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;          {address_of_exprt(it-&gt;assign_lhs()),</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;           address_of_exprt(string_constantt(<span class="stringliteral">&quot;mutex-init&quot;</span>))});</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        goto_program.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;          it, <a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(call, it-&gt;<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  }</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;}</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno"><a class="line" href="thread__instrumentation_8h.html#a2b609947dbd5bb56f6939947a02c622c">  112</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;{</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="comment">// get pthread_mutex_lock</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(it, goto_program)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_assign())</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    {</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">if</span>(it-&gt;assign_lhs().type() == lock_type)</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keyword">const</span> <a class="code" href="classcode__function__callt.html">code_function_callt</a> call(</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;          f_it-&gt;second.symbol_expr(),</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;          {address_of_exprt(it-&gt;assign_lhs()),</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;           address_of_exprt(string_constantt(<span class="stringliteral">&quot;mutex-init&quot;</span>))});</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        goto_program.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;          it, <a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(call, it-&gt;<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()));</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="thread__instrumentation_8h.html#a2b609947dbd5bb56f6939947a02c622c">  109</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="comment">// get pthread_mutex_lock</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  symbol_tablet::symbolst::const_iterator lock_entry =</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(<span class="stringliteral">&quot;pthread_mutex_lock&quot;</span>);</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  symbol_tablet::symbolst::const_iterator lock_entry =</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(<span class="stringliteral">&quot;pthread_mutex_lock&quot;</span>);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordflow">if</span>(lock_entry == goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordflow">if</span>(lock_entry == goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="comment">// get type of lock argument</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <a class="code" href="classcode__typet.html">code_typet</a> code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(lock_entry-&gt;second.type));</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordflow">if</span>(code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().size()!=1)</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <a class="code" href="classtypet.html">typet</a> lock_type=code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>()[0].type();</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="comment">// get type of lock argument</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <a class="code" href="classcode__typet.html">code_typet</a> code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(lock_entry-&gt;second.type));</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keywordflow">if</span>(code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().size()!=1)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <a class="code" href="classtypet.html">typet</a> lock_type=code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>()[0].type();</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordflow">if</span>(lock_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_pointer)</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordflow">if</span>(lock_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_pointer)</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <a class="code" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a>(</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      gf_entry.second.body,</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(lock_type).base_type());</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  }</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <a class="code" href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a>(</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      gf_entry.second.body,</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(lock_type).base_type());</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  }</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="agoto__program_8h_html_a70232dd124bfcc17855c337bac57477f"><div class="ttname"><a href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a></div><div class="ttdeci">#define Forall_goto_program_instructions(it, program)</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01234">goto_program.h:1234</a></div></div>
 <div class="ttc" id="aclasssymbol__tablet_html"><div class="ttname"><a href="classsymbol__tablet.html">symbol_tablet</a></div><div class="ttdoc">The symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table_8h_source.html#l00013">symbol_table.h:13</a></div></div>
-<div class="ttc" id="athread__instrumentation_8cpp_html_aeb0c046716b34cec122615130bc21b10"><div class="ttname"><a href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a></div><div class="ttdeci">void mutex_init_instrumentation(const symbol_tablet &amp;symbol_table, goto_programt &amp;goto_program, typet lock_type)</div><div class="ttdef"><b>Definition:</b> <a href="thread__instrumentation_8cpp_source.html#l00083">thread_instrumentation.cpp:83</a></div></div>
+<div class="ttc" id="aclasssource__locationt_html_a1a5acc8bc6f3d2e68cf03fb5f0e494c6"><div class="ttname"><a href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">source_locationt::set_comment</a></div><div class="ttdeci">void set_comment(const irep_idt &amp;comment)</div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00135">source_location.h:135</a></div></div>
+<div class="ttc" id="athread__instrumentation_8cpp_html_aeb0c046716b34cec122615130bc21b10"><div class="ttname"><a href="thread__instrumentation_8cpp.html#aeb0c046716b34cec122615130bc21b10">mutex_init_instrumentation</a></div><div class="ttdeci">void mutex_init_instrumentation(const symbol_tablet &amp;symbol_table, goto_programt &amp;goto_program, typet lock_type)</div><div class="ttdef"><b>Definition:</b> <a href="thread__instrumentation_8cpp_source.html#l00080">thread_instrumentation.cpp:80</a></div></div>
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:28</a></div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div></div>
 <div class="ttc" id="astring__constant_8h_html"><div class="ttname"><a href="string__constant_8h.html">string_constant.h</a></div></div>

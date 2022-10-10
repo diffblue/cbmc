@@ -149,8 +149,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a34d77f867f0ce627a83428d713162405"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__instrumenter__baset.html#a34d77f867f0ce627a83428d713162405">instrument</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;, const <a class="el" href="classcover__blocks__baset.html">cover_blocks_baset</a> &amp;, const <a class="el" href="classcover__instrumenter__baset.html#afcc476761859d709c84f5e8a6f62565d">assertion_factoryt</a> &amp;) const =0</td></tr>
 <tr class="memdesc:a34d77f867f0ce627a83428d713162405"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override this method to implement an instrumenter.  <a href="classcover__instrumenter__baset.html#a34d77f867f0ce627a83428d713162405">More...</a><br /></td></tr>
 <tr class="separator:a34d77f867f0ce627a83428d713162405"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53b24ea2061c06b7e9eb64f3e4d054cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__instrumenter__baset.html#a53b24ea2061c06b7e9eb64f3e4d054cb">initialize_source_location</a> (<a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t, const std::string &amp;<a class="el" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id) const</td></tr>
-<tr class="separator:a53b24ea2061c06b7e9eb64f3e4d054cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0f71ebd644af5802d9baf45e167d50b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__instrumenter__baset.html#af0f71ebd644af5802d9baf45e167d50b">initialize_source_location</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::string &amp;<a class="el" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id) const</td></tr>
+<tr class="separator:af0f71ebd644af5802d9baf45e167d50b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abef8e13fac33d32ca93c533426ae4b9c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__instrumenter__baset.html#abef8e13fac33d32ca93c533426ae4b9c">is_non_cover_assertion</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> t) const</td></tr>
 <tr class="separator:abef8e13fac33d32ca93c533426ae4b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -255,8 +255,8 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a53b24ea2061c06b7e9eb64f3e4d054cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53b24ea2061c06b7e9eb64f3e4d054cb">&#9670;&nbsp;</a></span>initialize_source_location()</h2>
+<a id="af0f71ebd644af5802d9baf45e167d50b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0f71ebd644af5802d9baf45e167d50b">&#9670;&nbsp;</a></span>initialize_source_location()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -267,8 +267,8 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void cover_instrumenter_baset::initialize_source_location </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td>
-          <td class="paramname"><em>t</em>, </td>
+          <td class="paramtype"><a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -381,7 +381,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cover__instrument_8h_source.html#l00095">95</a> of file <a class="el" href="cover__instrument_8h_source.html">cover_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cover__instrument_8h_source.html#l00094">94</a> of file <a class="el" href="cover__instrument_8h_source.html">cover_instrument.h</a>.</p>
 
 </div>
 </div>

@@ -2,7 +2,7 @@ var remove__virtual__functions_8cpp =
 [
     [ "get_virtual_calleest", "classget__virtual__calleest.html", "classget__virtual__calleest" ],
     [ "remove_virtual_functionst", "classremove__virtual__functionst.html", "classremove__virtual__functionst" ],
-    [ "analyse_checks_directly_preceding_function_call", "remove__virtual__functions_8cpp.html#a8b0c697722e29dc44dca84ad19d24aa6", null ],
+    [ "analyse_checks_directly_preceding_function_call", "remove__virtual__functions_8cpp.html#a427ef38dd05dea4ee2f930a0d14003c5", null ],
     [ "collect_virtual_function_callees", "remove__virtual__functions_8cpp.html#aca6cc439b33e675b72072f935000fe7e", null ],
     [ "create_static_function_call", "remove__virtual__functions_8cpp.html#aa60fdc580e31a4fccb988967b2fa3add", null ],
     [ "process_this_argument", "remove__virtual__functions_8cpp.html#a0e74247e9a418a6271a9948d6183afc0", null ],

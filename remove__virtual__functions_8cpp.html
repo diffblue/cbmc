@@ -131,9 +131,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa60fdc580e31a4fccb988967b2fa3add"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__virtual__functions_8cpp.html#aa60fdc580e31a4fccb988967b2fa3add">create_static_function_call</a> (<a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;call, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;function_symbol, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:aa60fdc580e31a4fccb988967b2fa3add"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a concrete function call to replace a virtual one.  <a href="remove__virtual__functions_8cpp.html#aa60fdc580e31a4fccb988967b2fa3add">More...</a><br /></td></tr>
 <tr class="separator:aa60fdc580e31a4fccb988967b2fa3add"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b0c697722e29dc44dca84ad19d24aa6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classgoto__programt.html">goto_programt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__virtual__functions_8cpp.html#a8b0c697722e29dc44dca84ad19d24aa6">analyse_checks_directly_preceding_function_call</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> instr_it, const <a class="el" href="classexprt.html">exprt</a> &amp;argument_for_this, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;temp_var_for_this)</td></tr>
-<tr class="memdesc:a8b0c697722e29dc44dca84ad19d24aa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate ASSUME instructions involving <code>argument_for_this</code> for <code>temp_var_for_this</code>.  <a href="remove__virtual__functions_8cpp.html#a8b0c697722e29dc44dca84ad19d24aa6">More...</a><br /></td></tr>
-<tr class="separator:a8b0c697722e29dc44dca84ad19d24aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a427ef38dd05dea4ee2f930a0d14003c5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classgoto__programt.html">goto_programt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__virtual__functions_8cpp.html#a427ef38dd05dea4ee2f930a0d14003c5">analyse_checks_directly_preceding_function_call</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> instr_it, const <a class="el" href="classexprt.html">exprt</a> &amp;argument_for_this, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;temp_var_for_this, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;vcall_source_loc)</td></tr>
+<tr class="memdesc:a427ef38dd05dea4ee2f930a0d14003c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate ASSUME instructions involving <code>argument_for_this</code> for <code>temp_var_for_this</code>.  <a href="remove__virtual__functions_8cpp.html#a427ef38dd05dea4ee2f930a0d14003c5">More...</a><br /></td></tr>
+<tr class="separator:a427ef38dd05dea4ee2f930a0d14003c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e74247e9a418a6271a9948d6183afc0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__virtual__functions_8cpp.html#a0e74247e9a418a6271a9948d6183afc0">process_this_argument</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target, <a class="el" href="classexprt.html">exprt</a> &amp;argument_for_this, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;vcall_source_loc, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;new_code_for_this_argument)</td></tr>
 <tr class="memdesc:a0e74247e9a418a6271a9948d6183afc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <code>argument_for_this</code> contains a dereference then create a temporary variable for it and use that instead.  <a href="remove__virtual__functions_8cpp.html#a0e74247e9a418a6271a9948d6183afc0">More...</a><br /></td></tr>
 <tr class="separator:a0e74247e9a418a6271a9948d6183afc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,8 +172,8 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a8b0c697722e29dc44dca84ad19d24aa6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b0c697722e29dc44dca84ad19d24aa6">&#9670;&nbsp;</a></span>analyse_checks_directly_preceding_function_call()</h2>
+<a id="a427ef38dd05dea4ee2f930a0d14003c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a427ef38dd05dea4ee2f930a0d14003c5">&#9670;&nbsp;</a></span>analyse_checks_directly_preceding_function_call()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -203,7 +203,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>temp_var_for_this</em>&#160;</td>
+          <td class="paramname"><em>temp_var_for_this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>vcall_source_loc</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -225,12 +231,13 @@ Functions</h2></td></tr>
     <tr><td class="paramname">instr_it</td><td>Iterator to the virtual function call in <code>goto_program</code> </td></tr>
     <tr><td class="paramname">argument_for_this</td><td>The original expression for the this argument of the virtual function call </td></tr>
     <tr><td class="paramname">temp_var_for_this</td><td>The new expression for the this argument of the virtual function call </td></tr>
+    <tr><td class="paramname">vcall_source_loc</td><td>The source location of the function call, which is used for new instructions that are added </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A goto program consisting of all the amended asserts and assumes </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00145">145</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00147">147</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -283,7 +290,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00860">860</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00851">851</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +426,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00202">202</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00205">205</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -473,7 +480,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00843">843</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00834">834</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +548,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a pointer to the statement in the supplied GOTO program after replaced function call </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00822">822</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00813">813</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -569,7 +576,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00779">779</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00770">770</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -608,7 +615,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00795">795</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00786">786</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -636,7 +643,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00756">756</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00747">747</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -675,7 +682,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00767">767</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00758">758</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -714,7 +721,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00728">728</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00719">719</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -760,7 +767,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00745">745</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00736">736</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -836,7 +843,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a pointer to the statement in the supplied GOTO program after replaced function call </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00260">260</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__virtual__functions_8cpp_source.html#l00267">267</a> of file <a class="el" href="remove__virtual__functions_8cpp_source.html">remove_virtual_functions.cpp</a>.</p>
 
 </div>
 </div>
