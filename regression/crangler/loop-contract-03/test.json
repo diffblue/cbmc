@@ -1,0 +1,15 @@
+{
+  "sources": [
+    "main.c"
+  ],
+  "functions": [
+    {
+      "foo": [
+        "loop 2 assigns i, __CPROVER_POINTER_OBJECT(arr)",
+        "loop 2 invariant i>=0",
+        "loop 2 decreases 2-i"
+      ]
+    }
+  ],
+  "output": "stdout"
+}

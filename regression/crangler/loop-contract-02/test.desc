@@ -1,7 +1,7 @@
 CORE
 test.json
 
-^\s+for\(int i = 0; i \< 2; i\+\+\) \_\_CPROVER\_loop\_invariant
+^\s+for\(int i = 0; i \< 2; i\+\+\) \_\_CPROVER\_assigns.*\_\_CPROVER\_loop\_invariant.*\_\_CPROVER_decreases
 ^EXIT=0$
 ^SIGNAL=0$
 --

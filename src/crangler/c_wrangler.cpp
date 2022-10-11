@@ -41,27 +41,30 @@ struct c_wranglert
   std::vector<std::string> defines;
 
   // transformations
-  struct contract_clauset
+  struct function_contract_clauset
   {
     std::string clause;
     std::string content;
-    contract_clauset(std::string _clause, std::string _content)
+    function_contract_clauset(std::string _clause, std::string _content)
       : clause(std::move(_clause)), content(std::move(_content))
     {
     }
   };
 
-  struct loop_invariantt
+  struct loop_contract_clauset
   {
     std::string loop_type;
     std::string identifier;
+    std::string clause;
     std::string content;
-    loop_invariantt(
+    loop_contract_clauset(
       std::string _loop_type,
       std::string _identifier,
+      std::string _clause,
       std::string _content)
       : loop_type(std::move(_loop_type)),
         identifier(std::move(_identifier)),
+        clause(std::move(_clause)),
         content(std::move(_content))
     {
     }
@@ -80,8 +83,8 @@ struct c_wranglert
   struct functiont
   {
     // should be variant to preserve ordering
-    std::vector<contract_clauset> contract;
-    std::vector<loop_invariantt> loop_invariants;
+    std::vector<function_contract_clauset> function_contract;
+    std::vector<loop_contract_clauset> loop_contract;
     std::vector<assertiont> assertions;
     optionalt<std::string> stub;
     bool remove_static = false;
@@ -203,7 +206,7 @@ void c_wranglert::configure_functions(const jsont &config)
           std::ostringstream rest;
           join_strings(rest, split.begin() + 1, split.end(), ' ');
 
-          function_config.contract.emplace_back(split[0], rest.str());
+          function_config.function_contract.emplace_back(split[0], rest.str());
         }
         else if(split[0] == "assert" && split.size() >= 3)
         {
@@ -214,13 +217,15 @@ void c_wranglert::configure_functions(const jsont &config)
         }
         else if(
           (split[0] == "for" || split[0] == "while" || split[0] == "loop") &&
-          split.size() >= 3 && split[2] == "invariant")
+          split.size() >= 3 &&
+          (split[2] == "invariant" || split[2] == "assigns" ||
+           split[2] == "decreases"))
         {
           std::ostringstream rest;
           join_strings(rest, split.begin() + 3, split.end(), ' ');
 
-          function_config.loop_invariants.emplace_back(
-            split[0], split[1], rest.str());
+          function_config.loop_contract.emplace_back(
+            split[0], split[1], split[2], rest.str());
         }
         else if(split[0] == "stub")
         {
@@ -406,16 +411,26 @@ static void mangle_function(
       return;
     }
 
-    for(const auto &entry : function_config.contract)
+    for(const auto &entry : function_config.function_contract)
       out << ' ' << CPROVER_PREFIX << entry.clause << '('
           << defines(entry.content) << ')';
 
     std::map<std::string, std::string> loop_invariants;
+    std::map<std::string, std::string> loop_assigns;
+    std::map<std::string, std::string> loop_decreases;
 
-    for(const auto &entry : function_config.loop_invariants)
-      loop_invariants[entry.loop_type + entry.identifier] = entry.content;
+    for(const auto &entry : function_config.loop_contract)
+    {
+      if(entry.clause == "invariant")
+        loop_invariants[entry.loop_type + entry.identifier] = entry.content;
+      if(entry.clause == "assigns")
+        loop_assigns[entry.loop_type + entry.identifier] = entry.content;
+      if(entry.clause == "decreases")
+        loop_decreases[entry.loop_type + entry.identifier] = entry.content;
+    }
 
-    if(loop_invariants.empty())
+    if(
+      loop_invariants.empty() && loop_assigns.empty() && loop_decreases.empty())
     {
       for(auto &t : declaration.initializer)
         out << t.text;
@@ -429,42 +444,67 @@ static void mangle_function(
       {
         const auto &token = *(t++);
         out << token.text;
+        std::string invariant;
+        std::string assigns;
+        std::string decreases;
 
         if(token == "while")
         {
           while_count++;
-          const auto &invariant =
+          invariant =
             loop_invariants.count("while" + std::to_string(while_count))
               ? loop_invariants["while" + std::to_string(while_count)]
               : loop_invariants
                   ["loop" + std::to_string(while_count + for_count)];
 
-          if(!invariant.empty())
-          {
-            auto t_end = match_bracket(t, '(', ')');
-            for(; t != t_end; t++)
-              out << t->text;
-            out << ' ' << CPROVER_PREFIX << "loop_invariant("
-                << defines(invariant) << ')';
-          }
+          assigns =
+            loop_assigns.count("while" + std::to_string(while_count))
+              ? loop_assigns["while" + std::to_string(while_count)]
+              : loop_assigns["loop" + std::to_string(while_count + for_count)];
+
+          decreases =
+            loop_decreases.count("while" + std::to_string(while_count))
+              ? loop_decreases["while" + std::to_string(while_count)]
+              : loop_decreases
+                  ["loop" + std::to_string(while_count + for_count)];
         }
         else if(token == "for")
         {
           for_count++;
-          const auto &invariant =
-            loop_invariants.count("for" + std::to_string(for_count))
-              ? loop_invariants["for" + std::to_string(for_count)]
-              : loop_invariants
-                  ["loop" + std::to_string(while_count + for_count)];
+          invariant = loop_invariants.count("for" + std::to_string(for_count))
+                        ? loop_invariants["for" + std::to_string(for_count)]
+                        : loop_invariants
+                            ["loop" + std::to_string(while_count + for_count)];
+          assigns =
+            loop_assigns.count("for" + std::to_string(for_count))
+              ? loop_assigns["for" + std::to_string(for_count)]
+              : loop_assigns["loop" + std::to_string(while_count + for_count)];
 
-          if(!invariant.empty())
-          {
-            auto t_end = match_bracket(t, '(', ')');
-            for(; t != t_end; t++)
-              out << t->text;
-            out << ' ' << CPROVER_PREFIX << "loop_invariant("
-                << defines(invariant) << ')';
-          }
+          decreases = loop_decreases.count("for" + std::to_string(for_count))
+                        ? loop_decreases["for" + std::to_string(for_count)]
+                        : loop_decreases
+                            ["loop" + std::to_string(while_count + for_count)];
+        }
+
+        auto t_end = match_bracket(t, '(', ')');
+        for(; t != t_end; t++)
+          out << t->text;
+
+        if(!assigns.empty())
+        {
+          out << ' ' << CPROVER_PREFIX << "assigns(" << defines(assigns) << ')';
+        }
+
+        if(!invariant.empty())
+        {
+          out << ' ' << CPROVER_PREFIX << "loop_invariant("
+              << defines(invariant) << ')';
+        }
+
+        if(!decreases.empty())
+        {
+          out << ' ' << CPROVER_PREFIX << "decreases(" << defines(decreases)
+              << ')';
         }
       }
     }
