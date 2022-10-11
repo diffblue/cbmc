@@ -255,6 +255,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
   solver_process->send(smt_set_logic_commandt{smt_logic_allt{}});
   solver_process->send(object_size_function.declaration);
+  solver_process->send(is_dynamic_object_function.declaration);
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
@@ -561,6 +562,8 @@ void smt2_incremental_decision_proceduret::define_object_sizes()
     define_dependent_functions(object.size);
     solver_process->send(object_size_function.make_definition(
       object.unique_id, convert_expr_to_smt(object.size)));
+    solver_process->send(is_dynamic_object_function.make_definition(
+      object.unique_id, object.is_dynamic));
   }
 }
 

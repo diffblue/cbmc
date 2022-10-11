@@ -11,6 +11,7 @@
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/smt_is_dynamic_object.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <solvers/stack_decision_procedure.h>
@@ -159,6 +160,11 @@ protected:
   /// stateful because it depends on the configuration of the number of object
   /// bits and how many bits wide the size type is configured to be.
   smt_object_sizet object_size_function;
+  /// Implementation of the SMT formula for the dynamic object status lookup
+  /// function. This is stateful because it depends on the configuration of the
+  /// number of object bits and how many bits wide the size type is configured
+  /// to be.
+  smt_is_dynamic_objectt is_dynamic_object_function;
   /// Precalculated type sizes used for pointer arithmetic.
   type_size_mapt pointer_sizes_map;
 };
