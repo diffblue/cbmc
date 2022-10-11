@@ -21,7 +21,7 @@ xmllang$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
 xml_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyyxml parser.y --defines=xml_y.tab.h -o $@
+	$(YACC) $(YFLAGS) -pyyxml parser.y --defines=xml_y.tab.h -o $@
 
 xml_y.tab.h: xml_y.tab.cpp
 

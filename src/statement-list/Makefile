@@ -30,7 +30,7 @@ all: statement-list$(LIBEXT)
 ###############################################################################
 
 statement_list_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyystatement_list parser.y --defines=statement_list_y.tab.h -o $@
+	$(YACC) $(YFLAGS) -pyystatement_list parser.y --defines=statement_list_y.tab.h -o $@
 
 statement_list_y.tab.h: statement_list_y.tab.cpp
 

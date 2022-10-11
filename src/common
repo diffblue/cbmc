@@ -61,6 +61,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   ifeq ($(origin CXX),default)
     CXX    = clang++
   endif
+  YFLAGS ?= -v
 else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS +=
   LINKLIB = ar rcT $@ $^
@@ -72,6 +73,7 @@ else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   ifeq ($(origin CXX),default)
     CXX    = clang++
   endif
+  YFLAGS ?= -v -Werror
 else
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
@@ -84,11 +86,11 @@ else
     CXX    = g++
     #CXX    = icpc
   endif
+  YFLAGS ?= -v -Werror
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison
 endif
-  YFLAGS ?= -v
 ifeq ($(origin LEX),default)
   LEX    = flex
 endif
@@ -119,9 +121,9 @@ ifeq ($(origin CXX),default)
   CXX = x86_64-w64-mingw32-g++
 endif
 ifeq ($(origin YACC),default)
-  YACC   = bison -y
+  YACC   = bison -y -Wno-error=yacc
 endif
-  YFLAGS ?= -v
+  YFLAGS ?= -v -Werror
 ifeq ($(origin LEX),default)
   LEX    = flex
 endif
@@ -147,9 +149,9 @@ ifeq ($(origin CXX),default)
   CXX = cl
 endif
 ifeq ($(origin YACC),default)
-  YACC   = win_bison -y
+  YACC   = win_bison -y -Wno-error=yacc
 endif
-  YFLAGS ?= -v
+  YFLAGS ?= -v -Werror
 ifeq ($(origin LEX),default)
   LEX    = win_flex
 endif
