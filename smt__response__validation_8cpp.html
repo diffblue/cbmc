@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('smt__response__validation_8cpp.html','
 <code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mp__arith_8h_source.html">util/mp_arith.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="range_8h_source.html">util/range.h</a>&gt;</code><br />
-<code>#include &quot;<a class="el" href="smt__array__theory_8h_source.html">smt_array_theory.h</a>&quot;</code><br />
+<code>#include &lt;<a class="el" href="smt__array__theory_8h_source.html">solvers/smt2_incremental/theories/smt_array_theory.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="smt__to__smt2__string_8h_source.html">smt_to_smt2_string.h</a>&quot;</code><br />
 <code>#include &lt;regex&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -106,7 +106,7 @@ $(document).ready(function(){initNavTree('smt__response__validation_8cpp.html','
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="smt__response__validation_8cpp__incl.svg" width="2582" height="1022"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="smt__response__validation_8cpp__incl.svg" width="2355" height="1036"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -190,7 +190,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00154">154</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00155">155</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -215,7 +215,7 @@ template&lt;typename... argumentst&gt; </div>
 <p>Builds a collection of error messages composed all error messages in the <code><a class="el" href="classresponse__or__errort.html" title="Holds either a valid parsed response or response sub-tree of type.">response_or_errort</a></code> typed arguments in <code>arguments</code>. </p>
 <p>This is a templated function in order to handle <code><a class="el" href="classresponse__or__errort.html" title="Holds either a valid parsed response or response sub-tree of type.">response_or_errort</a></code> instances which are specialised differently. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00062">62</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00063">63</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -247,7 +247,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00035">35</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00036">36</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -285,7 +285,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00048">48</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00049">49</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -316,7 +316,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 <p>Produces a human-readable representation of the given <code>parse_tree</code>, for use in error messaging. </p>
 <dl class="section note"><dt>Note</dt><dd>This is currently implemented using <code>pretty</code>, but this function is used instead of calling <code>pretty</code> directly so that will be more straight forward to replace with an implementation specific to our use case which is more easily readable by users of CBMC. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00105">105</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00106">106</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -354,7 +354,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00242">242</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00243">243</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +382,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00202">202</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00203">203</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -410,7 +410,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00228">228</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00229">229</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -438,7 +438,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00191">191</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00192">192</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +468,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>: A response or error in the case where the parse tree appears to be a get-value command. Returns empty otherwise. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>: Because this kind of response does not start with an identifying keyword, it will be considered that the response is intended to be a get-value response if it is composed of a collection of one or more pairs. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00128">128</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00129">129</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +508,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>: A response or error in the case where the parse tree appears to be a get-value command. Returns empty otherwise. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>: Because this kind of response does not start with an identifying keyword, it will be considered that the response is intended to be a get-value response if it is composed of a collection of one or more pairs. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00321">321</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00322">322</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -536,7 +536,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00213">213</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00214">214</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -566,7 +566,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 
 <p>Checks for valid bit vector constants of the form <code>(_ bv(value) (width))</code> for example - <code>(_ bv4 64)</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00165">165</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00166">166</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -596,7 +596,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00352">352</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00353">353</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -624,7 +624,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00111">111</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00112">112</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -662,7 +662,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00266">266</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00267">267</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -700,7 +700,7 @@ template&lt;typename argumentt , typename... argumentst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00288">288</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00289">289</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>
@@ -732,7 +732,7 @@ template&lt;typename smt_to_constructt , typename smt_baset  = smt_to_constructt
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00087">87</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__response__validation_8cpp_source.html#l00088">88</a> of file <a class="el" href="smt__response__validation_8cpp_source.html">smt_response_validation.cpp</a>.</p>
 
 </div>
 </div>

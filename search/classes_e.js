@@ -31,7 +31,7 @@ var searchData=
   ['nort_20766',['nort',['../structsmt__bit__vector__theoryt_1_1nort.html',1,'smt_bit_vector_theoryt']]],
   ['not_5fexprt_20767',['not_exprt',['../classnot__exprt.html',1,'']]],
   ['notequal_5fexprt_20768',['notequal_exprt',['../classnotequal__exprt.html',1,'']]],
-  ['nott_20769',['nott',['../structsmt__core__theoryt_1_1nott.html',1,'smt_core_theoryt::nott'],['../structsmt__bit__vector__theoryt_1_1nott.html',1,'smt_bit_vector_theoryt::nott']]],
+  ['nott_20769',['nott',['../structsmt__bit__vector__theoryt_1_1nott.html',1,'smt_bit_vector_theoryt::nott'],['../structsmt__core__theoryt_1_1nott.html',1,'smt_core_theoryt::nott']]],
   ['null_5fmessage_5fhandlert_20770',['null_message_handlert',['../classnull__message__handlert.html',1,'']]],
   ['null_5fpointer_5fexprt_20771',['null_pointer_exprt',['../classnull__pointer__exprt.html',1,'']]],
   ['nullary_5fexprt_20772',['nullary_exprt',['../classnullary__exprt.html',1,'']]],

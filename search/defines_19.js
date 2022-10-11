@@ -35,6 +35,6 @@ var searchData=
   ['zlib_5fver_5frevision_40969',['ZLIB_VER_REVISION',['../miniz_8h.html#ad3662b8749a50045ec1c120354fb7e9d',1,'miniz.h']]],
   ['zlib_5fver_5fsubrevision_40970',['ZLIB_VER_SUBREVISION',['../miniz_8h.html#a788ea49a5b65e12b11d7f274542d5af5',1,'miniz.h']]],
   ['zlib_5fvernum_40971',['ZLIB_VERNUM',['../miniz_8h.html#a6413cdfb4cdc0b5a09cf9b5f3f8f48ef',1,'miniz.h']]],
-  ['zlib_5fversion_40972',['zlib_version',['../miniz_8h.html#a1f228220c3e6935eb171761c61487059',1,'zlib_version():&#160;miniz.h'],['../miniz_8h.html#a51dc9dc65e483b3222c1f0f6a87eb76e',1,'ZLIB_VERSION():&#160;miniz.h']]],
+  ['zlib_5fversion_40972',['ZLIB_VERSION',['../miniz_8h.html#a51dc9dc65e483b3222c1f0f6a87eb76e',1,'ZLIB_VERSION():&#160;miniz.h'],['../miniz_8h.html#a1f228220c3e6935eb171761c61487059',1,'zlib_version():&#160;miniz.h']]],
   ['zlibversion_40973',['zlibVersion',['../miniz_8h.html#a47cb947a9520625a49ec8a0eaa8ecf7a',1,'miniz.h']]]
 ];
