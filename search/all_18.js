@@ -38,5 +38,5 @@ var searchData=
   ['xor_19417',['XOR',['../expr2statement__list_8cpp.html#a45cd11034d1a7d86c3a88d36f5e7f1ab',1,'expr2statement_list.cpp']]],
   ['xor_5fexprt_19418',['xor_exprt',['../classxor__exprt.html',1,'xor_exprt'],['../classxor__exprt.html#a4c29b85e3792e16424a43e6fca541953',1,'xor_exprt::xor_exprt()']]],
   ['xor_5ffkt_19419',['xor_fkt',['../mini_b_d_d_8cpp.html#a2148968e1421e60cb1ac14053f9c93bd',1,'miniBDD.cpp']]],
-  ['xort_19420',['xort',['../structsmt__bit__vector__theoryt_1_1xort.html',1,'smt_bit_vector_theoryt::xort'],['../structsmt__core__theoryt_1_1xort.html',1,'smt_core_theoryt::xort']]]
+  ['xort_19420',['xort',['../structsmt__core__theoryt_1_1xort.html',1,'smt_core_theoryt::xort'],['../structsmt__bit__vector__theoryt_1_1xort.html',1,'smt_bit_vector_theoryt::xort']]]
 ];

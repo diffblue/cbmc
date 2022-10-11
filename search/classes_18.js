@@ -7,5 +7,5 @@ var searchData=
   ['xmlt_21404',['xmlt',['../classxmlt.html',1,'']]],
   ['xnort_21405',['xnort',['../structsmt__bit__vector__theoryt_1_1xnort.html',1,'smt_bit_vector_theoryt']]],
   ['xor_5fexprt_21406',['xor_exprt',['../classxor__exprt.html',1,'']]],
-  ['xort_21407',['xort',['../structsmt__bit__vector__theoryt_1_1xort.html',1,'smt_bit_vector_theoryt::xort'],['../structsmt__core__theoryt_1_1xort.html',1,'smt_core_theoryt::xort']]]
+  ['xort_21407',['xort',['../structsmt__core__theoryt_1_1xort.html',1,'smt_core_theoryt::xort'],['../structsmt__bit__vector__theoryt_1_1xort.html',1,'smt_bit_vector_theoryt::xort']]]
 ];

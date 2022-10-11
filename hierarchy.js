@@ -303,7 +303,6 @@ var hierarchy =
     [ "recursive_initializationt::constructor_keyt", "structrecursive__initializationt_1_1constructor__keyt.html", null ],
     [ "constructor_oft< constructedt >", "classconstructor__oft.html", null ],
     [ "generic_parameter_specialization_mapt::container_paramt", "structgeneric__parameter__specialization__mapt_1_1container__paramt.html", null ],
-    [ "c_wranglert::contract_clauset", "structc__wranglert_1_1contract__clauset.html", null ],
     [ "conversion_dependenciest", "structconversion__dependenciest.html", null ],
     [ "ci_lazy_methodst::convert_method_resultt", "structci__lazy__methodst_1_1convert__method__resultt.html", null ],
     [ "java_bytecode_convert_methodt::converted_instructiont", "structjava__bytecode__convert__methodt_1_1converted__instructiont.html", null ],
@@ -612,6 +611,7 @@ var hierarchy =
     [ "interpretert::function_assignments_contextt", "structinterpretert_1_1function__assignments__contextt.html", null ],
     [ "interpretert::function_assignmentt", "structinterpretert_1_1function__assignmentt.html", null ],
     [ "function_assignst", "classfunction__assignst.html", null ],
+    [ "c_wranglert::function_contract_clauset", "structc__wranglert_1_1function__contract__clauset.html", null ],
     [ "function_filter_baset", "classfunction__filter__baset.html", [
       [ "file_filtert", "classfile__filtert.html", null ],
       [ "include_pattern_filtert", "classinclude__pattern__filtert.html", null ],
@@ -1005,12 +1005,12 @@ var hierarchy =
     [ "loop_analysist< goto_programt::targett >", "classloop__analysist.html", [
       [ "natural_loops_templatet< goto_programt, goto_programt::targett >", "classnatural__loops__templatet.html", null ]
     ] ],
+    [ "c_wranglert::loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", null ],
     [ "loop_idt", "structloop__idt.html", null ],
     [ "framet::loop_infot", "structframet_1_1loop__infot.html", null ],
     [ "loop_invariant_synthesizer_baset", "classloop__invariant__synthesizer__baset.html", [
       [ "enumerative_loop_invariant_synthesizert", "classenumerative__loop__invariant__synthesizert.html", null ]
     ] ],
-    [ "c_wranglert::loop_invariantt", "structc__wranglert_1_1loop__invariantt.html", null ],
     [ "loop_templatet< T >", "classloop__templatet.html", [
       [ "loop_with_parent_analysis_templatet< T >", "classloop__with__parent__analysis__templatet.html", null ]
     ] ],
@@ -1295,8 +1295,8 @@ var hierarchy =
         [ "java_qualifierst", "classjava__qualifierst.html", null ]
       ] ]
     ] ],
-    [ "boolbvt::quantifiert", "classboolbvt_1_1quantifiert.html", null ],
     [ "qdimacs_cnft::quantifiert", "classqdimacs__cnft_1_1quantifiert.html", null ],
+    [ "boolbvt::quantifiert", "classboolbvt_1_1quantifiert.html", null ],
     [ "range_domain_baset", "classrange__domain__baset.html", [
       [ "guarded_range_domaint", "classguarded__range__domaint.html", null ],
       [ "range_domaint", "classrange__domaint.html", null ]
@@ -1901,8 +1901,8 @@ var hierarchy =
     [ "statement_list_typecheckt::stl_label_locationt", "structstatement__list__typecheckt_1_1stl__label__locationt.html", null ],
     [ "smt_check_sat_response_kindt::storert< derivedt >", "classsmt__check__sat__response__kindt_1_1storert.html", null ],
     [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
-    [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
     [ "smt_sortt::storert< derivedt >", "classsmt__sortt_1_1storert.html", null ],
+    [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
     [ "smt_logict::storert< derivedt >", "classsmt__logict_1_1storert.html", null ],
     [ "smt_termt::storert< derivedt >", "classsmt__termt_1_1storert.html", null ],
     [ "smt_termt::storert< smt_assert_commandt >", "classsmt__termt_1_1storert.html", [
@@ -1912,10 +1912,10 @@ var hierarchy =
     [ "smt_check_sat_response_kindt::storert< smt_check_sat_responset >", "classsmt__check__sat__response__kindt_1_1storert.html", [
       [ "smt_check_sat_responset", "classsmt__check__sat__responset.html", null ]
     ] ],
-    [ "smt_sortt::storert< smt_declare_function_commandt >", "classsmt__sortt_1_1storert.html", [
+    [ "smt_termt::storert< smt_declare_function_commandt >", "classsmt__termt_1_1storert.html", [
       [ "smt_declare_function_commandt", "classsmt__declare__function__commandt.html", null ]
     ] ],
-    [ "smt_termt::storert< smt_declare_function_commandt >", "classsmt__termt_1_1storert.html", [
+    [ "smt_sortt::storert< smt_declare_function_commandt >", "classsmt__sortt_1_1storert.html", [
       [ "smt_declare_function_commandt", "classsmt__declare__function__commandt.html", null ]
     ] ],
     [ "smt_termt::storert< smt_define_function_commandt >", "classsmt__termt_1_1storert.html", [
@@ -2062,13 +2062,13 @@ var hierarchy =
     [ "union_find< exprt, irep_hash >", "classunion__find.html", null ],
     [ "union_find< irep_idt >", "classunion__find.html", null ],
     [ "union_find_replacet", "classunion__find__replacet.html", null ],
-    [ "float_bvt::unpacked_floatt", "structfloat__bvt_1_1unpacked__floatt.html", [
-      [ "float_bvt::biased_floatt", "structfloat__bvt_1_1biased__floatt.html", null ],
-      [ "float_bvt::unbiased_floatt", "structfloat__bvt_1_1unbiased__floatt.html", null ]
-    ] ],
     [ "float_utilst::unpacked_floatt", "structfloat__utilst_1_1unpacked__floatt.html", [
       [ "float_utilst::biased_floatt", "structfloat__utilst_1_1biased__floatt.html", null ],
       [ "float_utilst::unbiased_floatt", "structfloat__utilst_1_1unbiased__floatt.html", null ]
+    ] ],
+    [ "float_bvt::unpacked_floatt", "structfloat__bvt_1_1unpacked__floatt.html", [
+      [ "float_bvt::biased_floatt", "structfloat__bvt_1_1biased__floatt.html", null ],
+      [ "float_bvt::unbiased_floatt", "structfloat__bvt_1_1unbiased__floatt.html", null ]
     ] ],
     [ "smt_bit_vector_theoryt::unsigned_dividet", "structsmt__bit__vector__theoryt_1_1unsigned__dividet.html", null ],
     [ "smt_bit_vector_theoryt::unsigned_greater_than_or_equalt", "structsmt__bit__vector__theoryt_1_1unsigned__greater__than__or__equalt.html", null ],
@@ -2132,8 +2132,8 @@ var hierarchy =
     [ "xml_parse_treet", "classxml__parse__treet.html", null ],
     [ "xmlt", "classxmlt.html", null ],
     [ "smt_bit_vector_theoryt::xnort", "structsmt__bit__vector__theoryt_1_1xnort.html", null ],
-    [ "smt_bit_vector_theoryt::xort", "structsmt__bit__vector__theoryt_1_1xort.html", null ],
     [ "smt_core_theoryt::xort", "structsmt__core__theoryt_1_1xort.html", null ],
+    [ "smt_bit_vector_theoryt::xort", "structsmt__bit__vector__theoryt_1_1xort.html", null ],
     [ "smt_bit_vector_theoryt::zero_extendt", "structsmt__bit__vector__theoryt_1_1zero__extendt.html", null ],
     [ "zip_iteratort< first_iteratort, second_iteratort, same_size >", "structzip__iteratort.html", null ]
 ];

@@ -13,5 +13,5 @@ var searchData=
   ['qdimacs_5fcoret_20881',['qdimacs_coret',['../classqdimacs__coret.html',1,'']]],
   ['qualifierst_20882',['qualifierst',['../classqualifierst.html',1,'']]],
   ['quantifier_5fexprt_20883',['quantifier_exprt',['../classquantifier__exprt.html',1,'']]],
-  ['quantifiert_20884',['quantifiert',['../classboolbvt_1_1quantifiert.html',1,'boolbvt::quantifiert'],['../classqdimacs__cnft_1_1quantifiert.html',1,'qdimacs_cnft::quantifiert']]]
+  ['quantifiert_20884',['quantifiert',['../classqdimacs__cnft_1_1quantifiert.html',1,'qdimacs_cnft::quantifiert'],['../classboolbvt_1_1quantifiert.html',1,'boolbvt::quantifiert']]]
 ];

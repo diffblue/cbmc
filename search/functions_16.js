@@ -68,7 +68,7 @@ var searchData=
   ['values_35855',['values',['../classlet__exprt.html#aee56fe3309cf48143d32a4edddc83407',1,'let_exprt::values()'],['../classlet__exprt.html#a68dbb8184ce46c494763479238351683',1,'let_exprt::values() const']]],
   ['values_5fof_5fatomic_5fexprs_35856',['values_of_atomic_exprs',['../cover__instrument__mcdc_8cpp.html#abc21955950aeaac9db5239eef7d1d15a',1,'cover_instrument_mcdc.cpp']]],
   ['valuet_35857',['valuet',['../classvalue__set__dereferencet_1_1valuet.html#a51ae603b91edf91a39e5487d858c03a2',1,'value_set_dereferencet::valuet::valuet()'],['../classjava__annotationt_1_1valuet.html#a11a954147dc1ba293ce1ec0520c624ff',1,'java_annotationt::valuet::valuet()']]],
-  ['var_35858',['var',['../classmini__bddt.html#a8b8679a0fad8c56ebe37eaa5e462f500',1,'mini_bddt::var()'],['../classmini__bdd__mgrt.html#a0dd60a067235f056ff9f4fe942f4cdb1',1,'mini_bdd_mgrt::Var()']]],
+  ['var_35858',['Var',['../classmini__bdd__mgrt.html#a0dd60a067235f056ff9f4fe942f4cdb1',1,'mini_bdd_mgrt::Var()'],['../classmini__bddt.html#a8b8679a0fad8c56ebe37eaa5e462f500',1,'mini_bddt::var()']]],
   ['var_5fdeclarationt_35859',['var_declarationt',['../structstatement__list__parse__treet_1_1var__declarationt.html#a185c38eacb6ffc3b59a863078d265bac',1,'statement_list_parse_treet::var_declarationt']]],
   ['var_5fno_35860',['var_no',['../classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a',1,'literalt']]],
   ['var_5ftable_5fentryt_35861',['var_table_entryt',['../structmini__bdd__mgrt_1_1var__table__entryt.html#a4a4467e9a38c71b30407a3a805828929',1,'mini_bdd_mgrt::var_table_entryt']]],

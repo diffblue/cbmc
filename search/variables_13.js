@@ -156,7 +156,7 @@ var searchData=
   ['storage_38369',['storage',['../classai__baset.html#a234c6cd84591449841bffb6634543a85',1,'ai_baset']]],
   ['store_38370',['store',['../classsmt__array__theoryt.html#a212eca5bbd07d686f6c5d4d56c03aed1',1,'smt_array_theoryt']]],
   ['str_38371',['str',['../structstring__constraint__generatort_1_1parseint__argumentst.html#ab7cfb1e504d1ee44da3e38a5c4349469',1,'string_constraint_generatort::parseint_argumentst']]],
-  ['string_38372',['STRING',['../classformat__specifiert.html#a613b4577921f3dd5612267a8f8e32105',1,'format_specifiert::STRING()'],['../structgdb__apit_1_1pointer__valuet.html#aef4f70381ec5852f9dce6daea5d8fc8f',1,'gdb_apit::pointer_valuet::string()']]],
+  ['string_38372',['string',['../structgdb__apit_1_1pointer__valuet.html#aef4f70381ec5852f9dce6daea5d8fc8f',1,'gdb_apit::pointer_valuet::string()'],['../classformat__specifiert.html#a613b4577921f3dd5612267a8f8e32105',1,'format_specifiert::STRING()']]],
   ['string_5fabstraction_38373',['string_abstraction',['../structconfigt_1_1ansi__ct.html#ac2f6ecb6917cd13adb21e6950a1189d7',1,'configt::ansi_ct']]],
   ['string_5fargs_38374',['string_args',['../classstring__builtin__function__with__no__evalt.html#a233a5935faa0f5d6cae3e2ce3c180e9e',1,'string_builtin_function_with_no_evalt']]],
   ['string_5fcount_38375',['string_count',['../structstring__container__statisticst.html#a31c628f1ab86db426d631e3b156b794e',1,'string_container_statisticst']]],

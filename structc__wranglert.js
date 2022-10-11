@@ -1,9 +1,9 @@
 var structc__wranglert =
 [
     [ "assertiont", "structc__wranglert_1_1assertiont.html", "structc__wranglert_1_1assertiont" ],
-    [ "contract_clauset", "structc__wranglert_1_1contract__clauset.html", "structc__wranglert_1_1contract__clauset" ],
+    [ "function_contract_clauset", "structc__wranglert_1_1function__contract__clauset.html", "structc__wranglert_1_1function__contract__clauset" ],
     [ "functiont", "structc__wranglert_1_1functiont.html", "structc__wranglert_1_1functiont" ],
-    [ "loop_invariantt", "structc__wranglert_1_1loop__invariantt.html", "structc__wranglert_1_1loop__invariantt" ],
+    [ "loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", "structc__wranglert_1_1loop__contract__clauset" ],
     [ "objectt", "structc__wranglert_1_1objectt.html", "structc__wranglert_1_1objectt" ],
     [ "functionst", "structc__wranglert.html#a9fc369b358ad718feb1054f4b28ddd9a", null ],
     [ "objectst", "structc__wranglert.html#ab0ffe2ad05eeff74c1934ac7f0ff052d", null ],

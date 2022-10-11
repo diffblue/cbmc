@@ -1,8 +1,8 @@
 var c__wrangler_8cpp =
 [
     [ "c_wranglert", "structc__wranglert.html", "structc__wranglert" ],
-    [ "contract_clauset", "structc__wranglert_1_1contract__clauset.html", "structc__wranglert_1_1contract__clauset" ],
-    [ "loop_invariantt", "structc__wranglert_1_1loop__invariantt.html", "structc__wranglert_1_1loop__invariantt" ],
+    [ "function_contract_clauset", "structc__wranglert_1_1function__contract__clauset.html", "structc__wranglert_1_1function__contract__clauset" ],
+    [ "loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", "structc__wranglert_1_1loop__contract__clauset" ],
     [ "assertiont", "structc__wranglert_1_1assertiont.html", "structc__wranglert_1_1assertiont" ],
     [ "functiont", "structc__wranglert_1_1functiont.html", "structc__wranglert_1_1functiont" ],
     [ "objectt", "structc__wranglert_1_1objectt.html", "structc__wranglert_1_1objectt" ],
