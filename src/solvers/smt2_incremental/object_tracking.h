@@ -46,6 +46,8 @@ struct decision_procedure_objectt
   std::size_t unique_id;
   /// Expression which evaluates to the size of the object in bytes.
   exprt size;
+  /// This is true for heap allocated objects and false for stack allocated.
+  bool is_dynamic;
 };
 
 /// The model of addresses we use consists of a unique object identifier and an
