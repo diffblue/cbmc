@@ -5,9 +5,9 @@
 #include <util/c_types.h>
 #include <util/config.h>
 
+#include <solvers/smt2_incremental/ast/smt_sorts.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
-#include <solvers/smt2_incremental/smt_core_theory.h>
-#include <solvers/smt2_incremental/smt_sorts.h>
+#include <solvers/smt2_incremental/theories/smt_core_theory.h>
 
 static smt_declare_function_commandt make_object_size_function_declaration()
 {

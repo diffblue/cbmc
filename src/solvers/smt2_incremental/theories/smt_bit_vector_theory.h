@@ -3,7 +3,7 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_BIT_VECTOR_THEORY_H
 
-#include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 
 class smt_bit_vector_theoryt
 {

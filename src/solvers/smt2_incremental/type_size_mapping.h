@@ -8,9 +8,9 @@
 
 #include <util/expr.h>
 
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 
 #include <unordered_map>
 

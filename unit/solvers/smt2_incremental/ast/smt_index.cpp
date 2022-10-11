@@ -2,7 +2,7 @@
 
 #include <util/optional.h>
 
-#include <solvers/smt2_incremental/smt_index.h>
+#include <solvers/smt2_incremental/ast/smt_index.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("Test smt_indext.pretty is accessible.", "[core][smt2_incremental]")

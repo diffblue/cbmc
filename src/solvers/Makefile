@@ -193,25 +193,25 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2/smt2_parser.cpp \
       smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
+      smt2_incremental/ast/smt_commands.cpp \
+      smt2_incremental/ast/smt_index.cpp \
+      smt2_incremental/ast/smt_logics.cpp \
+      smt2_incremental/ast/smt_options.cpp \
+      smt2_incremental/ast/smt_responses.cpp \
+      smt2_incremental/ast/smt_sorts.cpp \
+      smt2_incremental/ast/smt_terms.cpp \
       smt2_incremental/construct_value_expr_from_smt.cpp \
       smt2_incremental/convert_expr_to_smt.cpp \
       smt2_incremental/object_tracking.cpp \
       smt2_incremental/type_size_mapping.cpp \
-      smt2_incremental/smt_array_theory.cpp \
-      smt2_incremental/smt_bit_vector_theory.cpp \
-      smt2_incremental/smt_commands.cpp \
-      smt2_incremental/smt_core_theory.cpp \
-      smt2_incremental/smt_index.cpp \
-      smt2_incremental/smt_logics.cpp \
       smt2_incremental/smt_object_size.cpp \
-      smt2_incremental/smt_options.cpp \
       smt2_incremental/smt_response_validation.cpp \
-      smt2_incremental/smt_responses.cpp \
       smt2_incremental/smt_solver_process.cpp \
-      smt2_incremental/smt_sorts.cpp \
-      smt2_incremental/smt_terms.cpp \
       smt2_incremental/smt_to_smt2_string.cpp \
       smt2_incremental/smt2_incremental_decision_procedure.cpp \
+      smt2_incremental/theories/smt_array_theory.cpp \
+      smt2_incremental/theories/smt_bit_vector_theory.cpp \
+      smt2_incremental/theories/smt_core_theory.cpp \
       # Empty last line
 
 include ../common

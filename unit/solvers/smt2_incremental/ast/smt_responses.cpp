@@ -1,9 +1,9 @@
 // Author: Diffblue Ltd.
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/smt2_incremental/smt_responses.h>
 #include <util/mp_arith.h>
+
+#include <solvers/smt2_incremental/ast/smt_responses.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("Test smt success response", "[core][smt2_incremental]")
 {

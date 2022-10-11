@@ -3,10 +3,11 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_COMMANDS_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_COMMANDS_H
 
-#include <solvers/smt2_incremental/smt_logics.h>
-#include <solvers/smt2_incremental/smt_options.h>
-#include <solvers/smt2_incremental/smt_terms.h>
 #include <util/irep.h>
+
+#include "smt_logics.h"
+#include "smt_options.h"
+#include "smt_terms.h"
 
 class smt_command_const_downcast_visitort;
 

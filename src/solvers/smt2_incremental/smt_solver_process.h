@@ -8,7 +8,7 @@ class smt_commandt;
 #include <util/message.h>
 #include <util/piped_process.h>
 
-#include <solvers/smt2_incremental/smt_responses.h>
+#include <solvers/smt2_incremental/ast/smt_responses.h>
 
 #include <memory>
 #include <sstream>

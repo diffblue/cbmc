@@ -2,8 +2,8 @@
 
 #include <util/mp_arith.h>
 
-#include <solvers/smt2_incremental/smt_array_theory.h>
 #include <solvers/smt2_incremental/smt_response_validation.h>
+#include <solvers/smt2_incremental/theories/smt_array_theory.h>
 #include <testing-utils/smt2irep.h>
 #include <testing-utils/use_catch.h>
 

@@ -1,8 +1,7 @@
 // Author: Diffblue Ltd.
 
+#include <solvers/smt2_incremental/ast/smt_sorts.h>
 #include <testing-utils/use_catch.h>
-
-#include <solvers/smt2_incremental/smt_sorts.h>
 
 TEST_CASE("Test smt_sortt.pretty is accessible.", "[core][smt2_incremental]")
 {

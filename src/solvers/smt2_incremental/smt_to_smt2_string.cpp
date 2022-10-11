@@ -4,11 +4,11 @@
 #include <util/string_utils.h>
 
 #include <solvers/smt2/smt2_conv.h>
-#include <solvers/smt2_incremental/smt_commands.h>
-#include <solvers/smt2_incremental/smt_index.h>
-#include <solvers/smt2_incremental/smt_logics.h>
-#include <solvers/smt2_incremental/smt_sorts.h>
-#include <solvers/smt2_incremental/smt_terms.h>
+#include <solvers/smt2_incremental/ast/smt_commands.h>
+#include <solvers/smt2_incremental/ast/smt_index.h>
+#include <solvers/smt2_incremental/ast/smt_logics.h>
+#include <solvers/smt2_incremental/ast/smt_sorts.h>
+#include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <functional>
@@ -367,7 +367,8 @@ public:
   {                                                                            \
     os << #the_name;                                                           \
   }
-#include "smt_logics.def"
+#include "solvers/smt2_incremental/ast/smt_logics.def"
+
 #undef LOGIC_ID
 };
 

@@ -1,11 +1,12 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_options.h>
+#include "smt_options.h"
 
 // Define the irep_idts for options.
 #define OPTION_ID(the_id)                                                      \
   const irep_idt ID_smt_option_##the_id{"smt_option_" #the_id};
-#include <solvers/smt2_incremental/smt_options.def>
+#include "smt_options.def"
+
 #undef OPTION_ID
 
 smt_optiont::smt_optiont(const irep_idt id) : irept(id)
@@ -41,7 +42,7 @@ void accept(const smt_optiont &option, const irep_idt &id, visitort &&visitor)
     return visitor.visit(static_cast<const smt_option_##the_id##t &>(option));
 // The include below is marked as nolint because including the same file
 // multiple times is required as part of the x macro pattern.
-#include <solvers/smt2_incremental/smt_options.def> // NOLINT(build/include)
+#include "smt_options.def" // NOLINT(build/include)
 #undef OPTION_ID
   UNREACHABLE;
 }

@@ -1,6 +1,6 @@
 // Author: Diffblue Ltd.
 
-#include <solvers/smt2_incremental/smt_core_theory.h>
+#include "smt_core_theory.h"
 
 const char *smt_core_theoryt::nott::identifier()
 {

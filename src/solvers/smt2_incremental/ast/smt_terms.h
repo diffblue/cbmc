@@ -6,9 +6,10 @@
 #include <util/irep.h>
 
 #include <solvers/smt2_incremental/response_or_error.h>
-#include <solvers/smt2_incremental/smt_index.h>
-#include <solvers/smt2_incremental/smt_sorts.h>
 #include <solvers/smt2_incremental/type_traits.h>
+
+#include "smt_index.h"
+#include "smt_sorts.h"
 
 #include <functional>
 #include <utility>
@@ -189,14 +190,14 @@ public:
 
   public:
     template <typename... function_type_argument_typest>
-    explicit factoryt(function_type_argument_typest &&... arguments) noexcept
+    explicit factoryt(function_type_argument_typest &&...arguments) noexcept
       : function{std::forward<function_type_argument_typest>(arguments)...}
     {
     }
 
     template <typename... argument_typest>
     smt_function_application_termt
-    operator()(argument_typest &&... arguments) const
+    operator()(argument_typest &&...arguments) const
     {
       function.validate(arguments...);
       auto return_sort = function.return_sort(arguments...);
@@ -208,7 +209,7 @@ public:
 
     template <typename... argument_typest>
     response_or_errort<smt_termt>
-    validation(argument_typest &&... arguments) const
+    validation(argument_typest &&...arguments) const
     {
       const auto validation_errors = function.validation_errors(arguments...);
       if(!validation_errors.empty())
