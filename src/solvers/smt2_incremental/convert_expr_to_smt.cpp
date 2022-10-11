@@ -1042,11 +1042,18 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt convert_expr_to_smt(
   const is_dynamic_object_exprt &is_dynamic_object,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const smt_is_dynamic_objectt::make_applicationt &apply_is_dynamic_object)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for is dynamic object expression: " +
-    is_dynamic_object.pretty());
+  const smt_termt &pointer = converted.at(is_dynamic_object.address());
+  const auto pointer_sort = pointer.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    pointer_sort, "Pointers should be encoded as bit vector sorted terms.");
+  const std::size_t pointer_width = pointer_sort->bit_width();
+  return apply_is_dynamic_object(
+    std::vector<smt_termt>{smt_bit_vector_theoryt::extract(
+      pointer_width - 1,
+      pointer_width - config.bv_encoding.object_bits)(pointer)});
 }
 
 static smt_termt convert_expr_to_smt(
@@ -1458,7 +1465,8 @@ static smt_termt dispatch_expr_to_smt_conversion(
   const sub_expression_mapt &converted,
   const smt_object_mapt &object_map,
   const type_size_mapt &pointer_sizes,
-  const smt_object_sizet::make_applicationt &call_object_size)
+  const smt_object_sizet::make_applicationt &call_object_size,
+  const smt_is_dynamic_objectt::make_applicationt &apply_is_dynamic_object)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
   {
@@ -1660,7 +1668,8 @@ static smt_termt dispatch_expr_to_smt_conversion(
     const auto is_dynamic_object =
       expr_try_dynamic_cast<is_dynamic_object_exprt>(expr))
   {
-    return convert_expr_to_smt(*is_dynamic_object, converted);
+    return convert_expr_to_smt(
+      *is_dynamic_object, converted, apply_is_dynamic_object);
   }
   if(
     const auto is_invalid_pointer =
@@ -1837,7 +1846,8 @@ smt_termt convert_expr_to_smt(
   const exprt &expr,
   const smt_object_mapt &object_map,
   const type_size_mapt &pointer_sizes,
-  const smt_object_sizet::make_applicationt &object_size)
+  const smt_object_sizet::make_applicationt &object_size,
+  const smt_is_dynamic_objectt::make_applicationt &is_dynamic_object)
 {
 #ifndef CPROVER_INVARIANT_DO_NOT_CHECK
   static bool in_conversion = false;
@@ -1856,7 +1866,12 @@ smt_termt convert_expr_to_smt(
     if(find_result != sub_expression_map.cend())
       return;
     smt_termt term = dispatch_expr_to_smt_conversion(
-      expr, sub_expression_map, object_map, pointer_sizes, object_size);
+      expr,
+      sub_expression_map,
+      object_map,
+      pointer_sizes,
+      object_size,
+      is_dynamic_object);
     sub_expression_map.emplace_hint(find_result, expr, std::move(term));
   });
   return std::move(sub_expression_map.at(lowered_expr));

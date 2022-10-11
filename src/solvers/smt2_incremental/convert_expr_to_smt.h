@@ -6,6 +6,7 @@
 #include <solvers/smt2_incremental/ast/smt_sorts.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/smt_is_dynamic_object.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
@@ -27,6 +28,7 @@ smt_termt convert_expr_to_smt(
   const exprt &expression,
   const smt_object_mapt &object_map,
   const type_size_mapt &pointer_sizes,
-  const smt_object_sizet::make_applicationt &object_size);
+  const smt_object_sizet::make_applicationt &object_size,
+  const smt_is_dynamic_objectt::make_applicationt &is_dynamic_object);
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_CONVERT_EXPR_TO_SMT_H

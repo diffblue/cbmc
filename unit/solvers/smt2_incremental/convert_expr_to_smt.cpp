@@ -59,6 +59,7 @@ struct expr_to_smt_conversion_test_environmentt
 
   smt_object_mapt object_map;
   smt_object_sizet object_size_function;
+  smt_is_dynamic_objectt is_dynamic_object_function;
   type_size_mapt pointer_sizes;
 
 private:
@@ -94,7 +95,8 @@ expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
     expression,
     object_map,
     pointer_sizes,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
 }
 
 TEST_CASE("\"array_typet\" to smt sort conversion", "[core][smt2_incremental]")
@@ -471,7 +473,8 @@ TEST_CASE(
       ns,
       test.pointer_sizes,
       test.object_map,
-      test.object_size_function.make_application);
+      test.object_size_function.make_application,
+      test.is_dynamic_object_function.make_application);
 
     INFO("Input expr: " + pointer_arith_expr.pretty(2, 0));
     const auto constructed_term = test.convert(pointer_arith_expr);
@@ -546,7 +549,8 @@ TEST_CASE(
       ns,
       test.pointer_sizes,
       test.object_map,
-      test.object_size_function.make_application);
+      test.object_size_function.make_application,
+      test.is_dynamic_object_function.make_application);
 
     INFO("Input expr: " + pointer_arith_expr.pretty(2, 0));
     const auto constructed_term = test.convert(pointer_arith_expr);
@@ -577,7 +581,8 @@ TEST_CASE(
       ns,
       test.pointer_sizes,
       test.object_map,
-      test.object_size_function.make_application);
+      test.object_size_function.make_application,
+      test.is_dynamic_object_function.make_application);
     INFO("Input expr: " + pointer_arith_expr.pretty(2, 0));
     const auto constructed_term = test.convert(pointer_arith_expr);
     const auto expected_term = smt_bit_vector_theoryt::subtract(
@@ -614,7 +619,8 @@ TEST_CASE(
       ns,
       test.pointer_sizes,
       test.object_map,
-      test.object_size_function.make_application);
+      test.object_size_function.make_application,
+      test.is_dynamic_object_function.make_application);
     INFO("Input expr: " + pointer_subtraction.pretty(2, 0));
     const auto constructed_term = test.convert(pointer_subtraction);
     const auto expected_term = smt_bit_vector_theoryt::signed_divide(
@@ -1674,6 +1680,30 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "expr to smt conversion for is_dynamic_object expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+  const symbol_exprt foo{"foo", unsignedbv_typet{32}};
+  const is_dynamic_object_exprt is_dynamic_object{address_of_exprt{foo}};
+  track_expression_objects(is_dynamic_object, ns, test.object_map);
+  const auto foo_id = 2;
+  CHECK(test.object_map.at(foo).unique_id == foo_id);
+  const auto object_bits = config.bv_encoding.object_bits;
+  const auto object = smt_bit_vector_constant_termt{foo_id, object_bits};
+  const auto offset = smt_bit_vector_constant_termt{0, 64 - object_bits};
+  INFO("Expression " + is_dynamic_object.pretty(1, 0));
+  CHECK(
+    test.convert(is_dynamic_object) ==
+    test.is_dynamic_object_function.make_application(std::vector<smt_termt>{
+      smt_bit_vector_theoryt::extract(63, 64 - object_bits)(
+        smt_bit_vector_theoryt::concat(object, offset))}));
+}
+
+TEST_CASE(
   "lower_address_of_array_index works correctly",
   "[core][smt2_incremental]")
 {
@@ -1718,7 +1748,8 @@ TEST_CASE(
       ns,
       test.pointer_sizes,
       test.object_map,
-      test.object_size_function.make_application);
+      test.object_size_function.make_application,
+      test.is_dynamic_object_function.make_application);
     const smt_termt expected = smt_core_theoryt::equal(
       smt_identifier_termt(symbol.get_identifier(), smt_bit_vector_sortt{64}),
       smt_bit_vector_theoryt::add(

@@ -322,12 +322,14 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
     ns,
     pointer_sizes_map,
     object_map,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
   return ::convert_expr_to_smt(
     substituted,
     object_map,
     pointer_sizes_map,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -377,7 +379,8 @@ array_exprt smt2_incremental_decision_proceduret::get_expr(
           from_integer(index, index_type),
           object_map,
           pointer_sizes_map,
-          object_size_function.make_application)),
+          object_size_function.make_application,
+          is_dynamic_object_function.make_application)),
       type.element_type()));
   }
   return array_exprt{elements, type};
@@ -443,7 +446,8 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         expr,
         object_map,
         pointer_sizes_map,
-        object_size_function.make_application);
+        object_size_function.make_application,
+        is_dynamic_object_function.make_application);
     }
     else
     {
