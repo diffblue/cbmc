@@ -482,6 +482,15 @@ var hierarchy =
     [ "value_sett::entryt", "structvalue__sett_1_1entryt.html", null ],
     [ "value_set_fit::entryt", "structvalue__set__fit_1_1entryt.html", null ],
     [ "enumerating_loop_accelerationt", "classenumerating__loop__accelerationt.html", null ],
+    [ "enumerator_baset", "classenumerator__baset.html", [
+      [ "alternatives_enumeratort", "classalternatives__enumeratort.html", null ],
+      [ "leaf_enumeratort", "classleaf__enumeratort.html", null ],
+      [ "non_leaf_enumeratort", "classnon__leaf__enumeratort.html", [
+        [ "binary_functional_enumeratort", "classbinary__functional__enumeratort.html", null ]
+      ] ],
+      [ "recursive_enumerator_placeholdert", "classrecursive__enumerator__placeholdert.html", null ]
+    ] ],
+    [ "enumerator_factoryt", "classenumerator__factoryt.html", null ],
     [ "printf_formattert::eol_exceptiont", "classprintf__formattert_1_1eol__exceptiont.html", null ],
     [ "messaget::eomt", "classmessaget_1_1eomt.html", null ],
     [ "smt_core_theoryt::equalt", "structsmt__core__theoryt_1_1equalt.html", null ],
@@ -1128,8 +1137,8 @@ var hierarchy =
     [ "nfat< T >", "structnfat.html", null ],
     [ "nfat< char >", "structnfat.html", null ],
     [ "string_dependenciest::node_hash", "structstring__dependenciest_1_1node__hash.html", null ],
-    [ "string_dependenciest::nodet", "classstring__dependenciest_1_1nodet.html", null ],
     [ "local_cfgt::nodet", "classlocal__cfgt_1_1nodet.html", null ],
+    [ "string_dependenciest::nodet", "classstring__dependenciest_1_1nodet.html", null ],
     [ "unsigned_union_find::nodet", "structunsigned__union__find_1_1nodet.html", null ],
     [ "cfg_dominators_templatet< P, T, post_dom >::nodet", "structcfg__dominators__templatet_1_1nodet.html", null ],
     [ "non_sharing_treet< derivedt, named_subtreest >", "classnon__sharing__treet.html", null ],
@@ -1223,8 +1232,8 @@ var hierarchy =
     [ "polynomialt", "classpolynomialt.html", null ],
     [ "java_bytecode_parsert::pool_entryt", "structjava__bytecode__parsert_1_1pool__entryt.html", null ],
     [ "postconditiont", "classpostconditiont.html", null ],
-    [ "bv_pointerst::postponedt", "structbv__pointerst_1_1postponedt.html", null ],
     [ "bv_pointers_widet::postponedt", "structbv__pointers__widet_1_1postponedt.html", null ],
+    [ "bv_pointerst::postponedt", "structbv__pointerst_1_1postponedt.html", null ],
     [ "preconditiont", "classpreconditiont.html", null ],
     [ "prefix_filtert", "classprefix__filtert.html", null ],
     [ "memory_snapshot_harness_generatort::preordert< Key >", "structmemory__snapshot__harness__generatort_1_1preordert.html", null ],
@@ -1899,12 +1908,12 @@ var hierarchy =
     [ "clauset::stept", "structclauset_1_1stept.html", null ],
     [ "statement_list_typecheckt::stl_jump_locationt", "structstatement__list__typecheckt_1_1stl__jump__locationt.html", null ],
     [ "statement_list_typecheckt::stl_label_locationt", "structstatement__list__typecheckt_1_1stl__label__locationt.html", null ],
-    [ "smt_check_sat_response_kindt::storert< derivedt >", "classsmt__check__sat__response__kindt_1_1storert.html", null ],
-    [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
-    [ "smt_sortt::storert< derivedt >", "classsmt__sortt_1_1storert.html", null ],
-    [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
     [ "smt_logict::storert< derivedt >", "classsmt__logict_1_1storert.html", null ],
+    [ "smt_sortt::storert< derivedt >", "classsmt__sortt_1_1storert.html", null ],
+    [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
+    [ "smt_check_sat_response_kindt::storert< derivedt >", "classsmt__check__sat__response__kindt_1_1storert.html", null ],
     [ "smt_termt::storert< derivedt >", "classsmt__termt_1_1storert.html", null ],
+    [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
     [ "smt_termt::storert< smt_assert_commandt >", "classsmt__termt_1_1storert.html", [
       [ "smt_assert_commandt", "classsmt__assert__commandt.html", null ],
       [ "smt_get_value_commandt", "classsmt__get__value__commandt.html", null ]
