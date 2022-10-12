@@ -70,6 +70,7 @@ SRC = accelerate/accelerate.cpp \
       splice_call.cpp \
       stack_depth.cpp \
       synthesizer/enumerative_loop_invariant_synthesizer.cpp \
+      synthesizer/expr_enumerator.cpp \
       synthesizer/synthesizer_utils.cpp \
       thread_instrumentation.cpp \
       undefined_functions.cpp \

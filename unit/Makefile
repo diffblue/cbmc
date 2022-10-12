@@ -59,6 +59,7 @@ SRC += analyses/ai/ai.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
+       goto-instrument/expr_enumerator/expr_enumerator.cpp \
        goto-programs/allocate_objects.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
@@ -246,6 +247,7 @@ BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/goto-instrument/nondet_static$(OBJEXT) \
           ../src/goto-instrument/full_slicer$(OBJEXT) \
           ../src/goto-instrument/unwindset$(OBJEXT) \
+          ../src/goto-instrument/synthesizer/expr_enumerator$(OBJEXT) \
           ../src/xmllang/xmllang$(LIBEXT) \
           ../src/goto-symex/goto-symex$(LIBEXT) \
           ../src/jsil/jsil$(LIBEXT) \
