@@ -14,21 +14,22 @@ Date:   March 2017
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 
-#include <util/std_code.h>
-#include <util/symbol_table.h>
 #include <util/refined_string_type.h>
+#include <util/std_code.h>
 #include <util/string_expr.h>
 
-#include <util/ieee_float.h> // should get rid of this
-#include <util/optional.h>
+#include <goto-programs/goto_instruction_code.h>
 
-#include <array>
-#include <unordered_set>
-#include <functional>
 #include "character_refine_preprocess.h"
 #include "java_types.h"
 
+#include <array>
+#include <functional>
+#include <unordered_set>
+
 class message_handlert;
+class symbol_table_baset;
+class symbolt;
 
 // Arbitrary limit of 10 arguments for the number of arguments to String.format
 #define MAX_FORMAT_ARGS 10

@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
 #include "goto_convert_class.h"

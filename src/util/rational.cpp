@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "rational.h"
 
-#include <algorithm>
 #include <ostream>
 
 #include "invariant.h"

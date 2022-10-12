@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_analysis_fi.h"
 
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 void value_set_analysis_fit::initialize(
   const goto_programt &goto_program)

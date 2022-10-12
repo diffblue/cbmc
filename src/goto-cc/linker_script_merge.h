@@ -13,7 +13,6 @@
 class cmdlinet;
 class exprt; // IWYU pragma: keep
 class goto_modelt;
-class goto_programt;
 class symbol_exprt; // IWYU pragma: keep
 class symbol_tablet;
 

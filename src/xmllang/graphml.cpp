@@ -11,8 +11,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 #include "graphml.h"
 
-#include <util/message.h>
-
 // include last to make sure #define stack(x) of parser.h does not
 // collide with std::stack included by graph.h
 #include "xml_parser.h"

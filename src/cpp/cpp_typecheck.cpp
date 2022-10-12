@@ -11,11 +11,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <algorithm>
-
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
-#include <util/symbol.h>
+#include <util/symbol_table.h>
 
 #include <ansi-c/builtin_factory.h>
 

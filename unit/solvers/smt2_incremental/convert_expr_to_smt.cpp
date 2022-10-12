@@ -6,7 +6,6 @@
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/constructor_of.h>
-#include <util/format.h>
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/std_expr.h>

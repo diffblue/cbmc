@@ -11,17 +11,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant_set.h"
 
-#include <iostream>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
-#include <util/std_code.h>
+#include <util/std_code_base.h>
 
 #include <langapi/language_util.h>
+
+#include <iostream>
 
 void inv_object_storet::output(std::ostream &out) const
 {

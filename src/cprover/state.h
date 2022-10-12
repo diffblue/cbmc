@@ -9,7 +9,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_STATE_H
 #define CPROVER_CPROVER_STATE_H
 
-#include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 
 class state_typet : public typet

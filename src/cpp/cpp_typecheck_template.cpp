@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/simplify_expr.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"

@@ -12,21 +12,12 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "havoc_assigns_clause_targets.h"
 
 #include <util/c_types.h>
-#include <util/format_expr.h>
-#include <util/format_type.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
-#include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
 #include <util/std_code.h>
-
-#include <ansi-c/c_expr.h>
-#include <langapi/language_util.h>
 
 #include "instrument_spec_assigns.h"
 #include "utils.h"
-
-#include <map>
 
 void havoc_assigns_clause_targetst::get_instructions(goto_programt &dest)
 {

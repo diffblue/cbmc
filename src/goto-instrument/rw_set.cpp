@@ -14,7 +14,6 @@ Date: February 2006
 #include "rw_set.h"
 
 #include <util/pointer_expr.h>
-#include <util/std_code.h>
 
 #include <langapi/language_util.h>
 

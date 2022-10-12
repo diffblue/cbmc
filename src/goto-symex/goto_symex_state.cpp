@@ -24,8 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include "goto_symex_is_constant.h"
-
-#include <iostream>
+#include "symex_target_equation.h"
 
 static void get_l1_name(exprt &expr);
 

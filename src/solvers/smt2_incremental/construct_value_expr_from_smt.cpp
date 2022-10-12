@@ -1,7 +1,6 @@
 // Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
-#include <util/bitvector_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>

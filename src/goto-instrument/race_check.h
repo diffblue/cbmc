@@ -14,9 +14,14 @@ Date: February 2006
 #ifndef CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
 #define CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
 
-#include <goto-programs/goto_functions.h>
+#ifdef LOCAL_MAY
+#  include <goto-programs/goto_functions.h>
+#endif
+
+#include <util/irep.h>
 
 class goto_modelt;
+class goto_programt;
 class value_setst;
 
 void race_check(

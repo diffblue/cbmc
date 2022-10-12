@@ -18,13 +18,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <ostream>
 

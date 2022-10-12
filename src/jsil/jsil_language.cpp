@@ -11,8 +11,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_language.h"
 
-#include <util/symbol_table.h>
 #include <util/get_base_name.h>
+#include <util/symbol_table.h>
 
 #include "expr2jsil.h"
 #include "jsil_convert.h"

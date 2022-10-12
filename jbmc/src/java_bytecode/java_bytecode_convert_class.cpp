@@ -15,17 +15,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include "ci_lazy_methods.h"
-#include "java_bytecode_convert_method.h"
 #include "java_root_class.h"
-#include "java_types.h"
-#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
+#include <util/symbol_table_base.h>
+
+#include "ci_lazy_methods.h"
+#include "java_bytecode_convert_method.h"
+#include "java_string_library_preprocess.h"
+#include "java_types.h"
+#include "java_utils.h"
 
 class java_bytecode_convert_classt
 {

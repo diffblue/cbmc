@@ -11,12 +11,15 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_parser.h"
 
+#include <util/std_code.h>
+#include <util/string_constant.h>
+
 #include "statement_list_parse_tree.h"
 #include "statement_list_parse_tree_io.h"
+
 #include <algorithm>
 #include <iostream>
 #include <iterator>
-#include <util/string_constant.h>
 
 statement_list_parsert statement_list_parser;
 

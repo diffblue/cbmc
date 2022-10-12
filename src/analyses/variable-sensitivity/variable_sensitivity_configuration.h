@@ -12,8 +12,7 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_CONFIGURATION_H
 
 #include <map>
-
-#include <util/exception_utils.h>
+#include <string>
 
 class optionst;
 

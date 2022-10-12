@@ -12,11 +12,11 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
 
-#include <memory>
-
-#include <util/symbol_table.h>
+#include <util/namespace.h>
 
 #include <goto-programs/goto_program.h>
+
+#include <memory>
 
 enum class coverage_criteriont;
 class cover_blocks_baset;

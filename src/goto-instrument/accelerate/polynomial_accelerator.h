@@ -15,8 +15,6 @@ Author: Matt Lewis
 #include <map>
 #include <set>
 
-#include <util/symbol_table.h>
-
 #include <goto-programs/goto_program.h>
 
 #include "polynomial.h"

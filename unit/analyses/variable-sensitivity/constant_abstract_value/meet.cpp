@@ -8,6 +8,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>

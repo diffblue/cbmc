@@ -12,23 +12,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
-#include <functional>
-#include <memory>
-
-#include <analyses/guard.h>
-
 #include <util/invariant.h>
 #include <util/nodiscard.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
+
+#include <analyses/guard.h>
 
 #include "call_stack.h"
 #include "field_sensitivity.h"
 #include "goto_state.h"
 #include "renaming_level.h"
-#include "symex_target_equation.h"
+
+#include <functional>
+#include <memory>
 
 class incremental_dirtyt;
+class symex_target_equationt;
 
 /// \brief Central data structure: state.
 ///

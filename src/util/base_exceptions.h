@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_UTIL_BASE_EXCEPTIONS_H
 #define CPROVER_UTIL_BASE_EXCEPTIONS_H
 
-#include "util/invariant.h"
+#include "invariant.h"
 
 class bad_cast_exceptiont:public invariant_failedt
 {

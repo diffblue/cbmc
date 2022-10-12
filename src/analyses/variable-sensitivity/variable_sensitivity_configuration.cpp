@@ -10,8 +10,10 @@
 /// domain abstractions are used, flow sensitivity, etc
 #include "variable_sensitivity_configuration.h"
 
-#include <limits>
+#include <util/exception_utils.h>
 #include <util/options.h>
+
+#include <limits>
 
 static void check_one_of_options(
   const optionst &options,

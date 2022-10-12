@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class language_filet;
 class languaget;
-class symbol_tablet;
 
 class language_modulet final
 {

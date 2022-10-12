@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 

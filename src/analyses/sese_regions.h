@@ -12,8 +12,6 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_ANALYSES_SESE_REGIONS_H
 #define CPROVER_ANALYSES_SESE_REGIONS_H
 
-#include <analyses/cfg_dominators.h>
-#include <analyses/natural_loops.h>
 #include <util/optional.h>
 
 class sese_region_analysist

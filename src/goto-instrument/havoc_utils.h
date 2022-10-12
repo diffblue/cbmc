@@ -14,11 +14,12 @@ Date: July 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_HAVOC_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_HAVOC_UTILS_H
 
+#include <util/expr.h>
+#include <util/expr_util.h>
+
 #include <set>
 
-#include <goto-programs/goto_program.h>
-
-#include <util/expr_util.h>
+class goto_programt;
 
 typedef std::set<exprt> assignst;
 

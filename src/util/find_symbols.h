@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "irep.h"
 
-#include <algorithm>
 #include <set>
 #include <unordered_set>
 

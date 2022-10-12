@@ -9,16 +9,16 @@ Author: Daniel Kroening
 /// \file
 /// Coverage Instrumentation for MC/DC
 
-#include "cover_instrument.h"
-
 #include <util/expr_util.h>
 
 #include <langapi/language_util.h>
 
+#include "cover_instrument.h"
+#include "cover_util.h"
+
 #include <algorithm>
 #include <iterator>
-
-#include "cover_util.h"
+#include <map>
 
 /// To recursively collect controlling exprs for for mcdc coverage.
 void collect_mcdc_controlling_rec(

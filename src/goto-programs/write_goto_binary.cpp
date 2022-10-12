@@ -16,7 +16,6 @@ Author: CM Wintersteiger
 #include <util/exception_utils.h>
 #include <util/irep_serialization.h>
 #include <util/message.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_model.h>
 

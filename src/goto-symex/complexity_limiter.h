@@ -12,6 +12,8 @@ Author: John Dumbell
 #ifndef CPROVER_GOTO_SYMEX_COMPLEXITY_LIMITER_H
 #define CPROVER_GOTO_SYMEX_COMPLEXITY_LIMITER_H
 
+#include <util/message.h>
+
 #include "complexity_violation.h"
 #include "symex_complexity_limit_exceeded_action.h"
 

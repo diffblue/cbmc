@@ -7,11 +7,12 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 \*******************************************************************/
 
 #include "json_symbol_table.h"
-#include "json_symbol.h"
 
 #include <util/exception_utils.h>
 #include <util/json.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include "json_symbol.h"
 
 void symbol_table_from_json(const jsont &in, symbol_table_baset &symbol_table)
 {

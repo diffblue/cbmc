@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H
 
-#include <util/symbol_table.h>
 #include <util/journalling_symbol_table.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
 
 #include "abstract_goto_model.h"
 #include "goto_functions.h"

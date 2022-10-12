@@ -7,7 +7,6 @@
 #include "ansi-c/expr2c.h"
 #include "goto-programs/goto_program.h"
 #include "util/std_expr.h"
-#include <util/namespace.h>
 
 /// Instrument program to check coverage of assume statements.
 /// \param function_id The name of the function under instrumentation.

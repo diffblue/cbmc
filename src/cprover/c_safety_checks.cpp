@@ -13,7 +13,6 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/options.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>

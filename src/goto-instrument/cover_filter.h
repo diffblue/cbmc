@@ -17,6 +17,8 @@ Author: Daniel Kroening
 
 #include <goto-programs/goto_functions.h>
 
+class symbolt;
+
 /// Base class for filtering functions
 class function_filter_baset
 {

@@ -10,7 +10,6 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include "freer.h"
 
-#include <iomanip>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -20,6 +19,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 #ifdef _WIN32
 // the ordering of includes is required
 // clang-format off
+#include <iomanip>
 #include <windows.h>
 #include <dbghelp.h>
 // clang-format on

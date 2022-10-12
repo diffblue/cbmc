@@ -15,11 +15,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
-#include <util/std_types.h>
 #include <util/c_types.h>
+#include <util/std_types.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -27,6 +26,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_name.h"
 #include "cpp_type2name.h"
 #include "cpp_util.h"
+
+#include <algorithm>
 
 bool cpp_typecheckt::has_const(const typet &type)
 {

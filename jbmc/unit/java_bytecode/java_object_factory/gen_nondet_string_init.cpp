@@ -7,16 +7,18 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <iostream>
+#include <java_bytecode/java_root_class.h>
+
+#include <util/namespace.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_object_factory.h>
-#include <java_bytecode/java_root_class.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
-#include <util/namespace.h>
-#include <util/std_code.h>
 
 #include <regex>
 

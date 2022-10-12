@@ -11,8 +11,6 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_instruction_code.h>
 
-#include <util/optional.h>
-
 #include <regex>
 
 class symbol_table_baset;

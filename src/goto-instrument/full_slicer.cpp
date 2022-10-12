@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "full_slicer_class.h"
 
 #include <util/find_symbols.h>
-#include <util/cprover_prefix.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/remove_skip.h>

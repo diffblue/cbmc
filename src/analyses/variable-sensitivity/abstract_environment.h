@@ -19,8 +19,6 @@
 
 #include "abstract_object.h"
 
-#include <memory>
-
 exprt simplify_vsd_expr(exprt src, const namespacet &ns);
 bool is_ptr_diff(const exprt &expr);
 bool is_ptr_comparison(const exprt &expr);

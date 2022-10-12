@@ -18,16 +18,12 @@ Date: February 2016
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/optional.h>
-#include <util/pointer_expr.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 
 #include <goto-instrument/loop_utils.h>
 
-#include <list>
 #include <map>
 #include <set>
 #include <string>
@@ -48,8 +44,6 @@ Date: February 2016
   " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
 
 class local_may_aliast;
-class instrument_spec_assignst;
-class cfg_infot;
 class function_pointer_obeys_contract_exprt;
 
 class code_contractst

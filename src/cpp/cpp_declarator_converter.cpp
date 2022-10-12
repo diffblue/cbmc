@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/source_location.h>
 #include <util/std_types.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"

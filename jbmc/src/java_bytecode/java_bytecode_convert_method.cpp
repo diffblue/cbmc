@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/prefix_filter.h> // IWYU pragma: keep
 #include <util/std_expr.h>
+#include <util/symbol_table_base.h>
 #include <util/threeval.h>
 
 #include <goto-programs/resolve_inherited_component.h>

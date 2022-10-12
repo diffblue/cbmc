@@ -11,8 +11,9 @@ Date: April 2016
 #include "variable_sensitivity_domain.h"
 
 #include <util/cprover_prefix.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <algorithm>
 

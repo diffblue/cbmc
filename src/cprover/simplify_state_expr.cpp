@@ -12,12 +12,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "simplify_state_expr.h"
 
 #include <util/arith_tools.h>
-#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
-#include <util/format_expr.h>
-#include <util/format_type.h>
-#include <util/mathematical_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -30,8 +26,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "may_be_same_object.h"
 #include "sentinel_dll.h"
 #include "state.h"
-
-#include <iostream>
 
 std::size_t allocate_counter = 0;
 

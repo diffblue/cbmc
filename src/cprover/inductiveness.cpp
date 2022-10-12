@@ -11,11 +11,9 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "inductiveness.h"
 
-#include <util/arith_tools.h>
 #include <util/console.h>
 #include <util/cout_message.h>
 #include <util/format_expr.h>
-#include <util/simplify_expr.h>
 
 #include <solvers/sat/satcheck.h>
 

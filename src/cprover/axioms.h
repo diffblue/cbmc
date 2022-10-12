@@ -14,8 +14,6 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/std_expr.h> // IWYU pragma: keep
 
-#include <solvers/decision_procedure.h>
-
 #include "sentinel_dll.h"
 #include "state.h"
 
@@ -24,6 +22,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+class decision_proceduret;
 
 class axiomst
 {

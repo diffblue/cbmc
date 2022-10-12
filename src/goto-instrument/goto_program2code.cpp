@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program2code.h"
 
-#include <sstream>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
@@ -20,6 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
+
+#include <sstream>
 
 void goto_program2codet::operator()()
 {

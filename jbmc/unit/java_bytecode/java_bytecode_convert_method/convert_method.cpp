@@ -6,21 +6,21 @@ Author: Diffblue Limited.
 
 \*******************************************************************/
 
-#include <testing-utils/expr_query.h>
-#include <testing-utils/use_catch.h>
-
-#include <util/irep.h>
-#include <util/symbol_table.h>
-
 #include <java-testing-utils/load_java_class.h>
-#include <java-testing-utils/require_type.h>
+#include <java_bytecode/java_bytecode_convert_method_class.h>
+
+#include <util/arith_tools.h>
+#include <util/irep.h>
 
 #include <goto-programs/class_hierarchy.h>
 
+#include <java-testing-utils/require_type.h>
 #include <java_bytecode/java_bytecode_convert_method.h>
-#include <java_bytecode/java_bytecode_convert_method_class.h>
+#include <java_bytecode/java_string_library_preprocess.h>
 #include <java_bytecode/java_utils.h>
+#include <testing-utils/expr_query.h>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "java_bytecode_convert_bridge_method",

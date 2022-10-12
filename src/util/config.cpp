@@ -8,9 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "config.h"
 
-#include <climits>
-#include <cstdlib>
-
 #include "arith_tools.h"
 #include "cmdline.h"
 #include "cprover_prefix.h"
@@ -20,7 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "string2int.h"
 #include "string_utils.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <climits>
+#include <cstdlib>
 
 configt config;
 

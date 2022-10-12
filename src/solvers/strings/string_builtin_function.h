@@ -7,7 +7,6 @@
 #include "string_constraint_generator.h"
 
 #include <util/mathematical_expr.h>
-#include <util/optional.h>
 #include <util/string_expr.h>
 
 #include <vector>

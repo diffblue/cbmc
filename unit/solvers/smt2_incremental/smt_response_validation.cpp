@@ -2,6 +2,7 @@
 
 #include <util/mp_arith.h> // IWYU pragma: keep
 
+#include <solvers/smt2_incremental/ast/smt_responses.h>
 #include <solvers/smt2_incremental/smt_response_validation.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
 #include <testing-utils/smt2irep.h>

@@ -13,6 +13,7 @@ Date: June 2003
 
 #include "goto_functions.h"
 
+#include <util/namespace.h>
 #include <util/symbol.h>
 
 #include <algorithm>

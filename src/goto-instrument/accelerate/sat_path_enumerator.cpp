@@ -18,8 +18,6 @@ Author: Matt Lewis
 #include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/std_code.h>
-
 #include "scratch_program.h"
 
 bool sat_path_enumeratort::next(patht &path)

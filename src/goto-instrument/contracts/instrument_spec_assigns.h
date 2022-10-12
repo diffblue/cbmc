@@ -14,24 +14,20 @@ Date: January 2022
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_INSTRUMENT_SPEC_ASSIGNS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_INSTRUMENT_SPEC_ASSIGNS_H
 
+#include <util/expr_util.h>
 #include <util/message.h>
+#include <util/namespace.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_program.h>
 
-#include <ansi-c/c_expr.h>
-
-#include "utils.h"
-
-#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 
 // forward declarations
 class conditional_target_group_exprt;
-class namespacet;
-class symbol_tablet;
-class symbolt;
 class cfg_infot;
+class goto_functionst;
 
 /// Class that represents a single conditional target.
 class conditional_target_exprt : public exprt

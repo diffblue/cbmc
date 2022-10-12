@@ -42,7 +42,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include <algorithm>
-#include <optional>
 
 class goto_check_ct
 {

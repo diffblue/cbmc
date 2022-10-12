@@ -19,7 +19,6 @@ Author: Diffblue Ltd.
 class message_handlert;
 class codet;
 class symbol_table_baset;
-class symbol_table_baset;
 
 irep_idt lambda_synthetic_class_name(
   const irep_idt &method_identifier,

@@ -11,12 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "get_module.h"
 
-#include <list>
-#include <set>
-
 #include "message.h"
 #include "range.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <list>
+#include <set>
 
 typedef std::list<const symbolt *> symbolptr_listt;
 

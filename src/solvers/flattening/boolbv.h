@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/endianness_map.h>
 #include <util/expr.h>
 #include <util/mp_arith.h>
-#include <util/optional.h>
 
 #include <solvers/lowering/functions.h>
 
@@ -26,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv_width.h"
 #include "bv_utils.h" // IWYU pragma: keep
 
-class array_comprehension_exprt;
 class binary_overflow_exprt;
 class bitreverse_exprt;
 class bswap_exprt;
@@ -37,7 +35,6 @@ class extractbit_exprt;
 class extractbits_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
-class member_exprt;
 class overflow_result_exprt;
 class replication_exprt;
 class unary_overflow_exprt;

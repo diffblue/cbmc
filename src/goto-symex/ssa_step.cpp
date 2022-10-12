@@ -9,6 +9,7 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 #include "ssa_step.h"
 
 #include <util/format_expr.h>
+#include <util/namespace.h>
 
 void SSA_stept::output(std::ostream &out) const
 {

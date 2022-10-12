@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/natural_loops.h>
 
-#include <util/std_code.h>
+class code_blockt;
 
 class goto_program2codet
 {

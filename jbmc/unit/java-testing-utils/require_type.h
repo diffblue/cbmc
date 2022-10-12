@@ -15,7 +15,6 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_TESTING_UTILS_REQUIRE_TYPE_H
 #define CPROVER_JAVA_TESTING_UTILS_REQUIRE_TYPE_H
 
-#include <util/optional.h>
 #include <util/std_types.h>
 #include <java_bytecode/java_types.h>
 

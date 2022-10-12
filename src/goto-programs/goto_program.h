@@ -21,10 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/deprecate.h>
 #include <util/invariant.h>
-#include <util/namespace.h>
 #include <util/source_location.h>
 
 class code_gotot;
+class namespacet;
 enum class validation_modet;
 
 /// The type of an instruction in a GOTO program.

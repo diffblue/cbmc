@@ -11,21 +11,11 @@ Date: September 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 
-// clang-format off
 #include <vector>
-
-#include <analyses/dirty.h>
-#include <analyses/locals.h>
 
 #include <goto-instrument/havoc_utils.h>
 
 #include <goto-programs/goto_convert_class.h>
-#include <goto-programs/goto_model.h>
-
-#include <util/expr_cast.h>
-#include <util/byte_operators.h>
-#include <util/message.h>
-// clang-format on
 
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,

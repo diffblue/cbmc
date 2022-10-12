@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parser.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/optional.h>
 
 #include "bytecode_info.h"
 #include "java_bytecode_parse_tree.h"

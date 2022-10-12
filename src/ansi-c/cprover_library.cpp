@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cprover_library.h"
 
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/symbol_table_base.h>
 
 #include "ansi_c_language.h"

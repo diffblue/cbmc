@@ -3,7 +3,6 @@
 #include <util/mp_arith.h> // IWYU pragma: keep
 
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
-#include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 

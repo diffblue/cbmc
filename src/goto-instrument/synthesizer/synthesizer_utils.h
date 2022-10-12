@@ -9,14 +9,15 @@ Author: Qinheping Hu
 #ifndef CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
 
-#include <goto-programs/goto_model.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/loop_ids.h>
 
-#include <analyses/loop_analysis.h>
-#include <goto-instrument/loop_utils.h>
+#include <map>
 
+class goto_functiont;
 class messaget;
+template <class T>
+class loop_templatet;
 
 typedef std::map<loop_idt, exprt> invariant_mapt;
 

@@ -12,10 +12,13 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #ifndef CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
 #define CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
 
+#include <util/std_code_base.h>
 #include <util/typecheck.h>
 
 #include "statement_list_parse_tree.h"
 
+class code_frontend_assignt;
+class code_labelt;
 class symbol_table_baset;
 class symbolt;
 

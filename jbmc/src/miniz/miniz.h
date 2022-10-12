@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 /* miniz.c v1.16 beta r1 - public domain deflate/inflate, zlib-subset, ZIP reading/writing/appending, PNG writing
    See "unlicense" statement at the end of this file.
    Rich Geldreich <richgel99@gmail.com>, last updated Oct. 13, 2013
@@ -176,7 +177,7 @@
 #ifdef _MSC_VER
 #include <util/pragma_push.def>
 #pragma warning(disable:4668)
-  // using #if/#elif on undefined macro
+// using #if/#elif on undefined macro
 #endif
 
 
@@ -528,7 +529,6 @@ typedef void *const voidpc;
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 /* ------------------- Types and macros */
 typedef uint8_t mz_uint8;

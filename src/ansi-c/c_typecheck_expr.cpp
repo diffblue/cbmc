@@ -9,10 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
-#include "c_typecheck_base.h"
-
-#include <sstream>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
@@ -31,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 #include <util/suffix.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 
@@ -39,9 +36,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "builtin_factory.h"
 #include "c_expr.h"
 #include "c_qualifiers.h"
+#include "c_typecheck_base.h"
 #include "expr2c.h"
 #include "padding.h"
 #include "type2name.h"
+
+#include <sstream>
 
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {

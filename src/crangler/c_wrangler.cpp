@@ -13,14 +13,9 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
-#include <util/file_util.h>
 #include <util/json.h>
-#include <util/optional.h>
-#include <util/prefix.h>
 #include <util/run.h>
 #include <util/string_utils.h>
-#include <util/suffix.h>
-#include <util/tempdir.h>
 
 #include "c_defines.h"
 #include "ctokenit.h"
@@ -31,7 +26,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <map>
 #include <regex>
 #include <sstream>
-#include <unordered_map>
 
 struct c_wranglert
 {

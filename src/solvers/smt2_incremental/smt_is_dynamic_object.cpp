@@ -2,7 +2,6 @@
 
 #include "smt_is_dynamic_object.h"
 
-#include <util/c_types.h>
 #include <util/config.h>
 
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>

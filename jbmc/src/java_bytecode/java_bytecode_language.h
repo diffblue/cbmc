@@ -181,8 +181,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              (checked in this order).\n"
 // clang-format on
 
-class symbolt;
-
 enum lazy_methods_modet
 {
   LAZY_METHODS_MODE_EAGER,

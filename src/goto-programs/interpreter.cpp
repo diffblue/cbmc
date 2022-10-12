@@ -27,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_container.h>
-#include <util/symbol_table.h>
 
 #include "goto_model.h"
 #include "interpreter_class.h"

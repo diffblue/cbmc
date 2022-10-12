@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_SOLVER_PROGRESS_H
 #define CPROVER_CPROVER_SOLVER_PROGRESS_H
 
-#include "solver_types.h"
+#include <cstddef>
 
 class solver_progresst
 {

@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include "path_storage.h"
 

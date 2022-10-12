@@ -13,8 +13,6 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/pointer_expr.h>
 
-#include "state.h"
-
 static void find_variables_rec(
   const exprt &src,
   std::unordered_set<symbol_exprt, irep_hash> &result)

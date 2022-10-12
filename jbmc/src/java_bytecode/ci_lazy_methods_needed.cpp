@@ -13,7 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <util/namespace.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/resolve_inherited_component.h>
 

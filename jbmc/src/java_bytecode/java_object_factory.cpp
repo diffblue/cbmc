@@ -12,13 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
+#include <util/interval_constraint.h>
 #include <util/message.h>
 #include <util/nondet_bool.h>
 #include <util/prefix.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
-#include <util/interval_constraint.h>
 
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_object_factory_parameters.h"

@@ -19,6 +19,7 @@
 #include "converters/statement_list_types.h"
 
 #include <util/bitvector_types.h>
+#include <util/std_code.h>
 
 #include <iterator>
 

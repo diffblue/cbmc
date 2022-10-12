@@ -14,17 +14,15 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <unordered_set>
 
 #include <util/std_code.h>
-#include <util/symbol.h>
-
-#include "code_with_references.h"
 
 class ci_lazy_methods_neededt;
 class json_objectt;
 class message_handlert;
 class select_pointer_typet;
 class symbol_table_baset;
-class symbol_tablet;
+class symbolt;
 struct java_object_factory_parameterst;
+struct object_creation_referencet;
 
 irep_idt clinit_wrapper_name(const irep_idt &class_name);
 irep_idt user_specified_clinit_name(const irep_idt &class_name);

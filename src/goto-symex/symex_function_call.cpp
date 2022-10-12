@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
-#include <util/prefix.h>
 #include <util/range.h>
 #include <util/std_code.h>
 

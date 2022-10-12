@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "prop_conv_solver.h"
 
-#include <util/range.h>
-
 #include <algorithm>
 #include <chrono>
 

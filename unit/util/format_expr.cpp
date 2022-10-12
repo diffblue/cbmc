@@ -6,7 +6,6 @@
 
 \*******************************************************************/
 
-#include <util/exception_utils.h>
 #include <util/expr.h>
 #include <util/format_expr.h>
 

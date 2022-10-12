@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "template_map.h"
 
-#include <util/c_types.h>
 #include <util/invariant.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 #include "cpp_template_parameter.h"

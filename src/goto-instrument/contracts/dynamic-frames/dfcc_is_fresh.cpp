@@ -9,6 +9,7 @@ Date: August 2022
 
 #include "dfcc_is_fresh.h"
 
+#include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/symbol.h>
 

@@ -73,15 +73,13 @@ Date:   September 2009
 
 #include <util/irep.h>
 
+#include "goto_program.h"
+
 #include <functional>
 
-#include "goto_function.h"
-
-class code_function_callt;
 class goto_functionst;
 class goto_model_functiont;
 class goto_modelt;
-class namespacet;
 class symbol_table_baset;
 class symbol_exprt;
 

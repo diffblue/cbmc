@@ -11,10 +11,10 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_convert.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/message.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_instruction_code.h>
 
 #include "jsil_parse_tree.h"
 

@@ -25,7 +25,6 @@ class exprt;
 class namespacet;
 class optionst;
 class symbol_table_baset;
-class symbol_tablet;
 class typet;
 
 #define OPT_FUNCTIONS \

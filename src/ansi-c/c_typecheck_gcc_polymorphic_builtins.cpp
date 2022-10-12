@@ -9,20 +9,20 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
-#include "c_typecheck_base.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_instruction_code.h>
 
-#include <atomic>
-
 #include "c_expr.h"
+#include "c_typecheck_base.h"
+
+#include <atomic>
 
 static symbol_exprt typecheck_sync_with_pointer_parameter(
   const irep_idt &identifier,

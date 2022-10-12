@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rational.h>
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <langapi/language_util.h>
 

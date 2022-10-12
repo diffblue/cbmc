@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
 #include <goto-programs/goto_model.h>

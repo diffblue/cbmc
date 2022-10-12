@@ -7,6 +7,7 @@ Author: Qinheping Hu
 
 #include <util/format_expr.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
 
 #include <climits>
 

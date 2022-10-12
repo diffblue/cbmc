@@ -19,6 +19,7 @@ Author: Daniel Kroening
 #include <util/config.h>
 #include <util/format_expr.h>
 #include <util/merge_irep.h>
+#include <util/namespace.h>
 #include <util/range.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>

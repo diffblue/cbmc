@@ -13,9 +13,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_HAVOC_ASSIGNS_CLAUSE_TARGETS_H
 
 #include "instrument_spec_assigns.h"
-#include <util/expr.h>
 
-class namespacet;
 class symbol_table_baset;
 class goto_programt;
 class goto_functionst;

@@ -7,14 +7,15 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "builtin_factory.h"
-#include "ansi_c_internal_additions.h"
-
-#include "ansi_c_parser.h"
-#include "ansi_c_typecheck.h"
 
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/string_utils.h>
+#include <util/symbol_table.h>
+
+#include "ansi_c_internal_additions.h"
+#include "ansi_c_parser.h"
+#include "ansi_c_typecheck.h"
 
 #include <sstream>
 

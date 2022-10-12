@@ -10,7 +10,7 @@
 #define CPROVER_GOTO_PROGRAMS_DESTRUCTOR_TREE_H
 
 #include <util/graph.h>
-#include <util/std_code.h>
+#include <util/std_code_base.h>
 
 typedef std::size_t node_indext;
 

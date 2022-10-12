@@ -12,18 +12,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
 
-#include <stack>
-
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/sparse_vector.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
 
 #include "goto_functions.h"
 #include "goto_trace.h"
 #include "json_goto_trace.h"
+
+#include <stack>
 
 class interpretert
 {

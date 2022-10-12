@@ -7,16 +7,18 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "ci_lazy_methods.h"
-#include "java_bytecode_language.h"
-#include "java_class_loader.h"
-#include "java_entry_point.h"
-#include "remove_exceptions.h"
 
 #include <util/expr_iterator.h>
 #include <util/namespace.h>
 #include <util/suffix.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/resolve_inherited_component.h>
+
+#include "java_bytecode_language.h"
+#include "java_class_loader.h"
+#include "java_entry_point.h"
+#include "remove_exceptions.h"
 
 /// Constructor for lazy-method loading
 /// \param symbol_table: the symbol table to use

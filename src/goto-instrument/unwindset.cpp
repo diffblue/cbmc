@@ -12,10 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
+#include <util/symbol_table.h>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>
 #endif
+
+#include <goto-programs/abstract_goto_model.h>
 
 #include <fstream>
 

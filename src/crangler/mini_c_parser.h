@@ -12,12 +12,12 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CRANGLER_MINI_C_PARSER_H
 #define CPROVER_CRANGLER_MINI_C_PARSER_H
 
-#include "cscanner.h"
+#include <util/optional.h>
+
+#include "ctoken.h"
 
 #include <iosfwd>
 #include <vector>
-
-#include <util/optional.h>
 
 struct c_declarationt
 {

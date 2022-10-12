@@ -16,8 +16,6 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/allocate_objects.h>
 
-#include <util/symbol_table.h>
-
 struct c_object_factory_parameterst;
 
 class symbol_factoryt

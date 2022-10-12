@@ -66,9 +66,7 @@ static int isatty(int) { return 0; }
 #include <util/pragma_wnull_conversion.def> // IWYU pragma: keep
 #include <util/pragma_wdeprecated_register.def> // IWYU pragma: keep
 
-#include <set>
 #include <istream>
-#include <cstdio>
 
 #include "cscanner.h"
 

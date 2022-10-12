@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "complexity_limiter.h"
 #include "symex_config.h"
+#include "symex_target_equation.h"
 
 class address_of_exprt;
-class code_function_callt;
 class function_application_exprt;
 class goto_symex_statet;
 class path_storaget;

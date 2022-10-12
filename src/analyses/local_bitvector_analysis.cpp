@@ -11,11 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "local_bitvector_analysis.h"
 
-#include <algorithm>
-
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
+
+#include <algorithm>
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {

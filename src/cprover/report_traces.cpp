@@ -13,8 +13,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/console.h>
 #include <util/format_expr.h>
-
-#include "state.h"
+#include <util/pointer_expr.h>
 
 #include <iomanip>
 

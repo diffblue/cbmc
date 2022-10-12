@@ -11,17 +11,17 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_entry_point.h"
 
-#include <goto-programs/adjust_float_expressions.h>
-#include <goto-programs/goto_functions.h>
-
-#include <linking/static_lifetime_init.h>
-
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/goto_functions.h>
+
+#include <linking/static_lifetime_init.h>
 
 /// Postfix for the artificial data block that is created when calling a main
 /// symbol that is a function block.

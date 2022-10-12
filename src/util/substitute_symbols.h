@@ -12,9 +12,12 @@ Author: Daniel Kroening, dkr@amazon.com
 /// \file util/substitute_symbols.h
 /// Symbol Substitution
 
-#include "expr.h"
+#include "irep.h"
+#include "optional.h"
 
 #include <map>
+
+class exprt;
 
 /// Substitute free occurrences of the variables given
 /// by their identifiers in the keys of the map in the

@@ -9,17 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C Language Type Checking
 
-#include "c_typecheck_base.h"
-
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/range.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include "ansi_c_declaration.h"
 #include "c_expr.h"
+#include "c_typecheck_base.h"
 
 void c_typecheck_baset::start_typecheck_code()
 {

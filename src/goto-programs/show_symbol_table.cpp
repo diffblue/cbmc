@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_symbol_table.h"
 
-#include <algorithm>
 #include <iostream>
 #include <memory>
 

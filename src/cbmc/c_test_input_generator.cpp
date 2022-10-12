@@ -11,12 +11,9 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "c_test_input_generator.h"
 
-#include <goto-checker/goto_trace_storage.h>
-
-#include <langapi/language_util.h>
-
 #include <util/json.h>
 #include <util/json_stream.h>
+#include <util/namespace.h>
 #include <util/options.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>
@@ -27,6 +24,9 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-programs/json_goto_trace.h>
 #include <goto-programs/xml_expr.h>
 #include <goto-programs/xml_goto_trace.h>
+
+#include <goto-checker/goto_trace_storage.h>
+#include <langapi/language_util.h>
 
 c_test_input_generatort::c_test_input_generatort(
   ui_message_handlert &ui_message_handler,

@@ -9,7 +9,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_FLATTEN_OK_EXPR_H
 #define CPROVER_CPROVER_FLATTEN_OK_EXPR_H
 
-#include "state.h"
+class exprt;
+class state_ok_exprt;
 
 // X_ok(p, s) <-->
 //   live_object(p)

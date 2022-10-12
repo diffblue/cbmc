@@ -14,10 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 #include <util/typecheck.h>
 
 #include "designator.h"
+
+#include <map>
 
 class ansi_c_declarationt;
 class c_bit_field_typet;

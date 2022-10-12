@@ -8,21 +8,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
-#include <fstream>
-
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/symbol_table.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 
 #include "ansi_c_entry_point.h"
-#include "ansi_c_typecheck.h"
-#include "ansi_c_parser.h"
-#include "expr2c.h"
-#include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
+#include "ansi_c_parser.h"
+#include "ansi_c_typecheck.h"
+#include "c_preprocess.h"
+#include "expr2c.h"
 #include "type2name.h"
+
+#include <fstream>
 
 std::set<std::string> ansi_c_languaget::extensions() const
 {

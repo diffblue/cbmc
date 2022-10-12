@@ -11,22 +11,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program.h"
 
-#include "validate_code.h"
-
-#include <iomanip>
-
 #include <util/expr_iterator.h>
 #include <util/find_symbols.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 #include <util/validate.h>
 
 #include <langapi/language_util.h>
+
+#include "validate_code.h"
+
+#include <iomanip>
+#include <map>
 
 goto_programt::instructiont goto_programt::make_incomplete_goto(
   const code_gotot &_code,

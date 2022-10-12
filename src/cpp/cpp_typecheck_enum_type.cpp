@@ -9,15 +9,15 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_enum_type.h"
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 {

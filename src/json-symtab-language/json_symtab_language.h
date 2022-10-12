@@ -11,15 +11,16 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JSON_SYMTAB_LANGUAGE_JSON_SYMTAB_LANGUAGE_H
 #define CPROVER_JSON_SYMTAB_LANGUAGE_JSON_SYMTAB_LANGUAGE_H
 
-#include <set>
-#include <string>
-
-#include <goto-programs/goto_functions.h>
-#include <langapi/language.h>
-
 #include <util/json.h>
 #include <util/make_unique.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_functions.h>
+
+#include <langapi/language.h>
+
+#include <set>
+#include <string>
 
 class json_symtab_languaget : public languaget
 {

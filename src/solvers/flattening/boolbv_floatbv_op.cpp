@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include <util/bitvector_types.h>
 #include <util/c_types.h>

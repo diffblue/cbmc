@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/invariant.h>
-#include <util/simplify_utils.h>
 #include <util/std_expr.h>
 
 exprt guard_exprt::guard_expr(exprt expr) const

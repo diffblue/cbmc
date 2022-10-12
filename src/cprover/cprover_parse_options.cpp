@@ -16,10 +16,14 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/options.h>
+#include <util/parse_options.h>
 #include <util/signal_catcher.h>
 #include <util/ui_message.h>
-#include <util/unicode.h>
 #include <util/version.h>
+
+#ifdef _WIN32
+#  include <util/unicode.h>
+#endif
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_inline.h>
@@ -27,7 +31,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/set_properties.h>
-#include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
 #include <ansi-c/ansi_c_language.h>

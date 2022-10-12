@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
+#include <util/symbol_table_base.h>
 
 #include "cpp_type2name.h"
 

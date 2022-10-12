@@ -12,12 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_UNWINDSET_H
 #define CPROVER_GOTO_INSTRUMENT_UNWINDSET_H
 
-#include <goto-programs/goto_model.h>
+#include <util/irep.h>
+#include <util/optional.h>
 
 #include <list>
 #include <map>
 #include <string>
 
+class abstract_goto_modelt;
 class message_handlert;
 
 class unwindsett

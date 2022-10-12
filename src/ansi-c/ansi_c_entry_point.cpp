@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_functions.h>
 

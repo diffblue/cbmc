@@ -5,9 +5,23 @@
  Author: Owen Jones, owen.jones@diffblue.com
 
 \*******************************************************************/
+
 #include "variable_sensitivity_object_factory.h"
+
+#include <util/namespace.h>
+
+#include "constant_abstract_value.h"
+#include "constant_pointer_abstract_object.h"
+#include "data_dependency_context.h"
 #include "full_array_abstract_object.h"
+#include "full_struct_abstract_object.h"
+#include "interval_abstract_value.h"
 #include "liveness_context.h"
+#include "two_value_array_abstract_object.h"
+#include "two_value_pointer_abstract_object.h"
+#include "two_value_struct_abstract_object.h"
+#include "two_value_union_abstract_object.h"
+#include "value_set_abstract_object.h"
 #include "value_set_pointer_abstract_object.h"
 
 template <class context_classt>

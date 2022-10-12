@@ -13,7 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/json.h>
 #include <util/std_code.h>
 #include <util/suffix.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_instruction_code.h>

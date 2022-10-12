@@ -16,8 +16,9 @@ Date: July 2017
 #include "splice_call.h"
 
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/string_utils.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <goto-programs/goto_functions.h>
 

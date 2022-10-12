@@ -17,7 +17,6 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
-#include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>

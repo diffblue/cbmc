@@ -13,6 +13,7 @@ Date: May 2018
 
 #include "goto_function.h"
 
+#include <util/namespace.h>
 #include <util/symbol.h>
 
 /// Return in \p dest the identifiers of the local variables declared in the \p

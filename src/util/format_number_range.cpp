@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "exception_utils.h"
 #include "invariant.h"
-#include "optional.h"
 
 #include "format_number_range.h"
 

@@ -13,9 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/mathematical_expr.h>
 #include <util/std_types.h>
+#include <util/symbol_table_base.h>
 
 #include "ansi_c_declaration.h"
 #include "c_storage_spec.h"

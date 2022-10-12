@@ -13,6 +13,7 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
+#include <util/namespace.h>
 #include <util/string2int.h>
 #include <util/symbol.h>
 #include <util/xml.h>

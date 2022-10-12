@@ -15,7 +15,6 @@ Author: Diffblue Ltd.
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/make_unique.h>
 #include <util/pointer_expr.h>

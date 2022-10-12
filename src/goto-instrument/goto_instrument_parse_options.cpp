@@ -108,6 +108,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set_fi_fp_removal.h"
 
 #include "accelerate/accelerate.h"
+#include "synthesizer/enumerative_loop_invariant_synthesizer.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()

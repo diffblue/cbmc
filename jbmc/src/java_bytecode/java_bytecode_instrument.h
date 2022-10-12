@@ -17,7 +17,6 @@ Date:   June 2017
 class code_blockt;
 class message_handlert;
 class symbol_table_baset;
-class symbol_table_baset;
 class symbolt;
 class source_locationt;
 

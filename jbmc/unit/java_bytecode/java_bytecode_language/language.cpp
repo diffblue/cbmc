@@ -8,8 +8,6 @@ Author: Diffblue Limited.
 
 #include <testing-utils/use_catch.h>
 
-#include <util/symbol_table.h>
-
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
 #include <java_bytecode/java_bytecode_language.h>

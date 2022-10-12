@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_typecheck.h"
 
+#include <util/symbol_table.h>
+
 #include "ansi_c_parse_tree.h"
 
 void ansi_c_typecheckt::typecheck()

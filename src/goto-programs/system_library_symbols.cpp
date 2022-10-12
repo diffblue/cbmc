@@ -14,7 +14,6 @@ Author: Thomas Kiley
 #include <util/prefix.h>
 #include <util/suffix.h>
 #include <util/symbol.h>
-#include <util/type.h>
 #include <sstream>
 
 system_library_symbolst::system_library_symbolst(bool init):

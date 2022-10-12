@@ -11,8 +11,6 @@ Author: Diffblue Ltd.
 
 #include "c_nondet_symbol_factory.h"
 
-#include <ansi-c/c_object_factory_parameters.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
@@ -20,9 +18,12 @@ Author: Diffblue Ltd.
 #include <util/nondet_bool.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
 
 #include <goto-programs/allocate_objects.h>
 #include <goto-programs/goto_functions.h>
+
+#include <ansi-c/c_object_factory_parameters.h>
 
 /// Creates a nondet for expr, including calling itself recursively to make
 /// appropriate symbols to point to if expr is a pointer.

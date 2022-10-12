@@ -15,13 +15,11 @@ Author: Matt Lewis
 #include <map>
 #include <set>
 #include <string>
-#include <algorithm>
 
 #include <goto-programs/goto_program.h>
 
 #include <ansi-c/expr2c.h>
 
-#include <util/symbol_table.h>
 #include <util/options.h>
 #include <util/std_code.h>
 #include <util/find_symbols.h>

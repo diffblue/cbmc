@@ -10,16 +10,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
 
-#include <map>
-#include <set>
-
-#include <goto-programs/goto_program.h>
 #include <util/cprover_prefix.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_program.h>
 
 #include "wmm.h"
+
+#include <map>
+#include <set>
 
 class goto_functionst;
 class messaget;

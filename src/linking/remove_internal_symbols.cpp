@@ -17,7 +17,7 @@ Author: Daniel Kroening
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 

@@ -6,16 +6,7 @@ Author: Daniel Poetzl
 
 \******************************************************************/
 
-#include <algorithm>
-
 #include "memory_snapshot_harness_generator.h"
-#include "memory_snapshot_harness_generator_options.h"
-
-#include <goto-programs/goto_convert_functions.h>
-
-#include <json/json_parser.h>
-
-#include <json-symtab-language/json_symbol_table.h>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -24,6 +15,16 @@ Author: Daniel Poetzl
 #include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_model.h>
+
+#include <json-symtab-language/json_symbol_table.h>
+#include <json/json_parser.h>
+
+#include "memory_snapshot_harness_generator_options.h"
+
+#include <algorithm>
 
 void memory_snapshot_harness_generatort::handle_option(
   const std::string &option,

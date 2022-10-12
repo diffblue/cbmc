@@ -93,7 +93,6 @@
 #include "narrow.h"
 #include "optional.h"
 #include "piped_process.h"
-#include "string_utils.h"
 
 #include <cstring> // library for strerror function (on linux)
 #include <iostream>

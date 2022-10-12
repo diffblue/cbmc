@@ -16,22 +16,24 @@ Date:   April 2017
 ///   java standard library. In particular methods from java.lang.String,
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
-#include <goto-programs/allocate_objects.h>
-#include <goto-programs/class_identifier.h>
+#include "java_string_library_preprocess.h"
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/floatbv_expr.h>
+#include <util/ieee_float.h>
 #include <util/refined_string_type.h>
 #include <util/std_code.h>
 #include <util/string_expr.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/allocate_objects.h>
+#include <goto-programs/class_identifier.h>
 
 #include "java_types.h"
 #include "java_utils.h"
-
-#include "java_string_library_preprocess.h"
 
 /// \return tag of a struct prefixed by "java::" or symbolic tag
 ///   empty string if not symbol or struct

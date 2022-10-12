@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/prefix.h>
 #include <util/suffix.h>
-#include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
 #include <json/json_parser.h>

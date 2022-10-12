@@ -13,10 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table_base.h>
+#include <util/symbol.h>
 
 code_inputt::code_inputt(
   std::vector<exprt> arguments,

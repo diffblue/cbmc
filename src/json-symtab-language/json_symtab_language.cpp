@@ -9,10 +9,13 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 \*******************************************************************/
 
 #include "json_symtab_language.h"
-#include "json_symbol_table.h"
-#include <json/json_parser.h>
 
+#include <util/symbol_table.h>
+
+#include <json/json_parser.h>
 #include <linking/linking.h>
+
+#include "json_symbol_table.h"
 
 /// Parse a goto program in json form.
 /// \param instream: The input stream

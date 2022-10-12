@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <cctype>
 #include <climits>
-#include <iostream>
 
 #if defined (_WIN32)
 #define EX_OK 0

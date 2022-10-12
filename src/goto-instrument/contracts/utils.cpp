@@ -18,6 +18,7 @@ Date: September 2021
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
+#include <util/symbol.h>
 
 #include <goto-programs/cfg.h>
 

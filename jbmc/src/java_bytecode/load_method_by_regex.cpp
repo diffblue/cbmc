@@ -9,10 +9,10 @@ Author: Diffblue Ltd.
 
 #include "load_method_by_regex.h"
 
-#include <regex>
-
 #include <util/prefix.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <regex>
 
 /// For a given user provided pattern, return a regex, having dealt with the
 /// cases where the user has not prefixed with java:: or suffixed with the

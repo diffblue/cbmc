@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class struct_exprt;
 class struct_typet;
-class symbolt;
 
 // adds expected members for a root class,
 // which is usually java.lang.Object

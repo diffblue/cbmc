@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "namespace.h"
 
-#include <algorithm>
-
 #include "c_types.h"
 #include "std_expr.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <algorithm>
 
 namespace_baset::~namespace_baset()
 {

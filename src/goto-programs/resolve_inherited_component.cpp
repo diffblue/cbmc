@@ -10,9 +10,7 @@ Author: Diffblue Ltd.
 
 #include <util/range.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
-
-#include <algorithm>
+#include <util/symbol_table_base.h>
 
 /// See the operator() method comment
 /// \param symbol_table: The symbol table to resolve the component against

@@ -6,10 +6,11 @@
 #ifndef CPROVER_UTIL_JOURNALLING_SYMBOL_TABLE_H
 #define CPROVER_UTIL_JOURNALLING_SYMBOL_TABLE_H
 
-#include <utility>
-#include <unordered_set>
 #include "irep.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <unordered_set>
+#include <utility>
 
 /// \brief A symbol table wrapper that records which entries have been
 /// updated/removed

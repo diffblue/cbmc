@@ -19,6 +19,8 @@ Date:   March 2017
 #include <util/bitvector_expr.h>
 #include <util/std_expr.h>
 
+#include <goto-programs/goto_instruction_code.h>
+
 /// converts based on a function on expressions
 /// \param expr_function: A reference to a function on expressions
 /// \param target: A position in a goto program

@@ -14,8 +14,6 @@ Author: Matt Lewis
 
 #include <map>
 
-#include <util/symbol_table.h>
-
 #include <goto-programs/goto_program.h>
 
 #include <analyses/natural_loops.h>

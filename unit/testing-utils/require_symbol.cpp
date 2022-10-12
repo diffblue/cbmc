@@ -7,9 +7,10 @@ Author: Diffblue Limited.
 \*******************************************************************/
 
 #include "require_symbol.h"
-#include "use_catch.h"
 
 #include <util/symbol_table.h>
+
+#include <testing-utils/use_catch.h>
 
 /// Verify whether a given identifier is found in the symbol table and return it
 /// \param symbol_table: The symbol table to look in

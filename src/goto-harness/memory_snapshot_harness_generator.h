@@ -9,16 +9,19 @@ Author: Daniel Poetzl
 #ifndef CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H
 #define CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H
 
-#include <list>
-#include <string>
+#include <util/optional.h>
+
+#include <goto-programs/goto_program.h>
 
 #include "goto_harness_generator.h"
 #include "recursive_initialization.h"
 
-#include <goto-programs/goto_model.h>
+#include <list>
+#include <string>
 
-#include <util/message.h>
-#include <util/optional.h>
+class goto_functionst;
+class message_handlert;
+class symbol_table_baset;
 
 /// Generates a harness which first assigns global variables with values from
 /// a given memory snapshot and then calls a specified function. The called

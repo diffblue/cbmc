@@ -26,7 +26,6 @@ class class_hierarchyt;
 class goto_functionst;
 class goto_model_functiont;
 class goto_modelt;
-class symbol_tablet;
 class symbol_table_baset;
 
 // For all of the following the class-hierarchy and non-class-hierarchy

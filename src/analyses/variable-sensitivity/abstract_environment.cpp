@@ -6,15 +6,14 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
-#include <analyses/variable-sensitivity/abstract_object_statistics.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-
 #include <util/expr_util.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/simplify_expr_class.h>
 #include <util/simplify_utils.h>
 #include <util/symbol_table.h>
+
+#include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 #include <algorithm>
 #include <map>
@@ -24,6 +23,10 @@
 #ifdef DEBUG
 #  include <iostream>
 #endif
+
+#include "abstract_object_statistics.h"
+#include "context_abstract_object.h"
+#include "interval_abstract_value.h"
 
 typedef exprt (
   *assume_function)(abstract_environmentt &, const exprt &, const namespacet &);

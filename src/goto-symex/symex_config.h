@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_CONFIG_H
 #define CPROVER_GOTO_SYMEX_SYMEX_CONFIG_H
 
+class optionst;
+
 /// Configuration used for a symbolic execution
 struct symex_configt final
 {

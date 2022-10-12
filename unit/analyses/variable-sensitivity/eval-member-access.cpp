@@ -6,16 +6,16 @@
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <analyses/variable-sensitivity/abstract_environment.h>
-#include <analyses/variable-sensitivity/abstract_object.h>
-#include <analyses/variable-sensitivity/full_array_abstract_object.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
 #include <util/symbol_table.h>
+
+#include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/abstract_object.h>
+#include <analyses/variable-sensitivity/context_abstract_object.h>
+#include <analyses/variable-sensitivity/full_array_abstract_object.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <testing-utils/use_catch.h>
 
 void test_array(
   std::vector<int> contents,

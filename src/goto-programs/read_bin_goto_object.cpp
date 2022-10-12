@@ -13,9 +13,9 @@ Date: June 2006
 
 #include "read_bin_goto_object.h"
 
-#include <util/message.h>
-#include <util/symbol_table.h>
 #include <util/irep_serialization.h>
+#include <util/message.h>
+#include <util/symbol_table_base.h>
 
 #include "goto_functions.h"
 #include "write_goto_binary.h"

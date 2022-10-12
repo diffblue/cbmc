@@ -14,7 +14,6 @@ Author: Daniel Poetzl
 
 #include "bitvector_types.h" // IWYU pragma: keep
 #include "c_types.h"         // IWYU pragma: keep
-#include "pointer_expr.h"
 #include "validate_helpers.h"
 
 #define CALL_ON_TYPE(type_type)                                                \

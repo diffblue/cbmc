@@ -23,6 +23,7 @@ class goto_modelt;
 class goto_model_functiont;
 class message_handlert;
 class optionst;
+class symbol_tablet;
 
 #define OPT_COVER                                                              \
   "(cover):"                                                                   \
