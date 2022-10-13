@@ -111,8 +111,8 @@ xmlt xml(const source_locationt &location)
   if(!location.get_column().empty())
     result.set_attribute("column", id2string(location.get_column()));
 
-  if(!location.get_function().empty())
-    result.set_attribute("function", id2string(location.get_function()));
+  if(!location.get_functionX().empty())
+    result.set_attribute("function", id2string(location.get_functionX()));
 
   return result;
 }

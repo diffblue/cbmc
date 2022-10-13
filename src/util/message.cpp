@@ -23,7 +23,7 @@ void message_handlert::print(
   const irep_idt &file=location.get_file();
   const irep_idt &line=location.get_line();
   const irep_idt &column=location.get_column();
-  const irep_idt &function=location.get_function();
+  const irep_idt &function = location.get_functionX();
 
   if(!file.empty())
   {

@@ -61,7 +61,7 @@ public:
   // 3) The name of the function is not strictly a source location.
   // It will be removed.
   DEPRECATED(SINCE(2022, 10, 13, "use identifier of containing function"))
-  const irep_idt &get_function() const
+  const irep_idt &get_functionX() const
   {
     return get(ID_function);
   }

@@ -197,14 +197,13 @@ irep_idt SSA_stept::get_property_id() const
   else if(source.pc->is_goto())
   {
     // this is likely an unwinding assertion
-    property_id = id2string(source.pc->source_location().get_function()) +
-                  ".unwind." + std::to_string(source.pc->loop_number);
+    property_id = id2string(source.function_id) + ".unwind." +
+                  std::to_string(source.pc->loop_number);
   }
   else if(source.pc->is_function_call())
   {
     // this is likely a recursion unwinding assertion
-    property_id =
-      id2string(source.pc->source_location().get_function()) + ".recursion";
+    property_id = id2string(source.function_id) + ".recursion";
   }
   else
   {

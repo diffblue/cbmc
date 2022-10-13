@@ -28,7 +28,7 @@ std::string source_locationt::as_string(bool print_cwd) const
   const irep_idt &file=get_file();
   const irep_idt &line=get_line();
   const irep_idt &column=get_column();
-  const irep_idt &function=get_function();
+  const irep_idt &function = get_functionX();
   const irep_idt &bytecode=get_java_bytecode_index();
 
   if(!file.empty())
