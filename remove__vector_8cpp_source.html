@@ -279,196 +279,195 @@ $(document).ready(function(){initNavTree('remove__vector_8cpp_source.html',''); 
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> dimension = numeric_cast_v&lt;std::size_t&gt;(vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>());</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype = vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>();</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(subtype.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_signedbv);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <a class="code" href="classexprt.html">exprt</a> minus_one = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(-1, subtype);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      <a class="code" href="classexprt.html">exprt</a> zero = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, subtype);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> operands;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      operands.reserve(dimension);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> is_float =</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(binary_expr.lhs().type()).<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() ==</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        ID_floatbv;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> new_id;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <span class="keywordflow">if</span>(binary_expr.id() == ID_vector_notequal)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordflow">if</span>(is_float)</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          new_id = ID_ieee_float_notequal;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;          new_id = ID_notequal;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(binary_expr.id() == ID_vector_equal)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">if</span>(is_float)</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;          new_id = ID_ieee_float_equal;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;          new_id = ID_equal;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="comment">// just strip the &quot;vector-&quot; prefix</span></div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        new_id = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(binary_expr.id()).substr(7);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; dimension; ++i)</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      {</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <a class="code" href="classexprt.html">exprt</a> index = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(i, vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        operands.push_back(</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;          <a class="code" href="classif__exprt.html">if_exprt</a>{<a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a>{<a class="code" href="classindex__exprt.html">index_exprt</a>{binary_expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>(), index},</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                                         new_id,</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                                         <a class="code" href="classindex__exprt.html">index_exprt</a>{binary_expr.<a class="code" href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">rhs</a>(), index}},</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                   minus_one,</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                   zero});</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      }</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      expr = <a class="code" href="classarray__exprt.html">array_exprt</a>{std::move(operands),</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                         <a class="code" href="classarray__typet.html">array_typet</a>{subtype, vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>()}};</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = std::move(source_location);</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    }</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    {</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(ID_array);</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    }</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_typecast)</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    {</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;op = <a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr).<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>();</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keywordflow">if</span>(op.type().id() != ID_array)</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      {</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="comment">// (vector-type) x ==&gt; { x, x, ..., x }</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <a class="code" href="classarray__typet.html">array_typet</a> array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> dimension =</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          numeric_cast_v&lt;std::size_t&gt;(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>()));</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <a class="code" href="classexprt.html">exprt</a> casted_op =</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;          <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(op, array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>());</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        expr = <a class="code" href="classarray__exprt.html">array_exprt</a>(<a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>(dimension, casted_op), array_type);</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = std::move(source_location);</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      }</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector &amp;&amp;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>() == <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(op.type()).<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>())</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      {</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="comment">// do component-wise typecast:</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="comment">// (vector-type) x -&gt; array((vector-sub-type)x[0], ...)</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keyword">const</span> std::size_t dimension =</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;          numeric_cast_v&lt;std::size_t&gt;(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>()));</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> subtype = array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>();</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> elements;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        elements.reserve(dimension);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; dimension; i++)</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        {</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;          <a class="code" href="classexprt.html">exprt</a> index = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(i, array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;          elements.push_back(</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{<a class="code" href="classindex__exprt.html">index_exprt</a>{op, std::move(index)}, subtype});</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        }</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <a class="code" href="classarray__exprt.html">array_exprt</a> array_expr(std::move(elements), array_type);</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        array_expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        expr.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(array_expr);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      }</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    }</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  }</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;}</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160; </div>
-<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">  293</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;{</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="remove__vector_8cpp.html#ab2a39c0259601e15941b3948225c82c2">have_to_remove_vector</a>(type))</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_union)</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  {</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <a class="code" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_union_type=</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      <a class="code" href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a>(type);</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160; </div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">for</span>(struct_union_typet::componentst::iterator</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        it=struct_union_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().begin();</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        it!=struct_union_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().end();</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        it++)</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    {</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(it-&gt;type());</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    }</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  }</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_code)</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  {</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(type);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>());</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;parameter : code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>())</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(parameter.type());</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  }</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer ||</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex ||</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  {</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype());</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  }</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  {</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <a class="code" href="classvector__typet.html">vector_typet</a> &amp;vector_type=<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>());</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="comment">// Replace by an array with appropriate number of members.</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    <a class="code" href="classarray__typet.html">array_typet</a> array_type(vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>(), vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>());</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    array_type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    type=array_type;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  }</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;}</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160; </div>
-<div class="line"><a name="l00339"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a3c18863d887a73428f1ddaa69210d3ba">  339</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol)</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;{</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>);</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;}</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
-<div class="line"><a name="l00346"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a4b88c47385d630492deba0461774fc0a">  346</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;{</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;named_symbol : symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol_table.<a class="code" href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">get_writeable_ref</a>(named_symbol.first));</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;}</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a59301590ca2a2ea129bbc43d902a9983">  353</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function)</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;{</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : goto_function.body.instructions)</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    i.transform([](<a class="code" href="classexprt.html">exprt</a> e) -&gt; <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> {</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="remove__vector_8cpp.html#ab2a39c0259601e15941b3948225c82c2">have_to_remove_vector</a>(e))</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;      {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(e);</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        <span class="keywordflow">return</span> e;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      }</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    });</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;}</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
-<div class="line"><a name="l00368"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a27c4d82dabea546fb157bfd06537bffc">  368</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;{</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(gf_entry.second);</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;}</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
-<div class="line"><a name="l00375"></a><span class="lineno"><a class="line" href="remove__vector_8h.html#a344f148e72edc5f1a7f2a8d6e53e89f2">  375</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;{</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol_table);</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(goto_functions);</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;}</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160; </div>
-<div class="line"><a name="l00384"></a><span class="lineno"><a class="line" href="remove__vector_8h.html#ac0932edd1232236734a80df2d92552c0">  384</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;{</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>);</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;}</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <a class="code" href="classexprt.html">exprt</a> minus_one = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(-1, subtype);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <a class="code" href="classexprt.html">exprt</a> zero = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, subtype);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> operands;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      operands.reserve(dimension);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> is_float =</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(binary_expr.lhs().type()).<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() ==</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        ID_floatbv;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> new_id;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keywordflow">if</span>(binary_expr.id() == ID_vector_notequal)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">if</span>(is_float)</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;          new_id = ID_ieee_float_notequal;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          new_id = ID_notequal;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(binary_expr.id() == ID_vector_equal)</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      {</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">if</span>(is_float)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;          new_id = ID_ieee_float_equal;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;          new_id = ID_equal;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <span class="comment">// just strip the &quot;vector-&quot; prefix</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        new_id = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(binary_expr.id()).substr(7);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; dimension; ++i)</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      {</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <a class="code" href="classexprt.html">exprt</a> index = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(i, vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        operands.push_back(</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          <a class="code" href="classif__exprt.html">if_exprt</a>{<a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a>{<a class="code" href="classindex__exprt.html">index_exprt</a>{binary_expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>(), index},</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                                         new_id,</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                                         <a class="code" href="classindex__exprt.html">index_exprt</a>{binary_expr.<a class="code" href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">rhs</a>(), index}},</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                   minus_one,</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                   zero});</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      expr = <a class="code" href="classarray__exprt.html">array_exprt</a>{std::move(operands),</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                         <a class="code" href="classarray__typet.html">array_typet</a>{subtype, vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>()}};</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = std::move(source_location);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    {</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(ID_array);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_typecast)</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    {</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;op = <a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr).<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>();</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      <span class="keywordflow">if</span>(op.type().id() != ID_array)</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <span class="comment">// (vector-type) x ==&gt; { x, x, ..., x }</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <a class="code" href="classarray__typet.html">array_typet</a> array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> dimension =</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          numeric_cast_v&lt;std::size_t&gt;(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>()));</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <a class="code" href="classexprt.html">exprt</a> casted_op =</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(op, array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>());</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        expr = <a class="code" href="classarray__exprt.html">array_exprt</a>(<a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>(dimension, casted_op), array_type);</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = std::move(source_location);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      }</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector &amp;&amp;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>() == <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(op.type()).<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>())</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      {</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="comment">// do component-wise typecast:</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="comment">// (vector-type) x -&gt; array((vector-sub-type)x[0], ...)</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keyword">const</span> std::size_t dimension =</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;          numeric_cast_v&lt;std::size_t&gt;(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>()));</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> subtype = array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>();</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> elements;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        elements.reserve(dimension);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; dimension; i++)</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        {</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;          <a class="code" href="classexprt.html">exprt</a> index = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(i, array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;          elements.push_back(</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{<a class="code" href="classindex__exprt.html">index_exprt</a>{op, std::move(index)}, subtype});</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <a class="code" href="classarray__exprt.html">array_exprt</a> array_expr(std::move(elements), array_type);</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        array_expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        expr.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(array_expr);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;      }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    }</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  }</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;}</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160; </div>
+<div class="line"><a name="l00292"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">  292</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;{</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="remove__vector_8cpp.html#ab2a39c0259601e15941b3948225c82c2">have_to_remove_vector</a>(type))</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_union)</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <a class="code" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_union_type=</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      <a class="code" href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a>(type);</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160; </div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordflow">for</span>(struct_union_typet::componentst::iterator</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        it=struct_union_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().begin();</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        it!=struct_union_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().end();</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        it++)</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    {</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(it-&gt;type());</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    }</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_code)</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  {</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(type);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>());</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;parameter : code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>())</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(parameter.type());</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  }</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer ||</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex ||</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  {</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype());</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;  }</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  {</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <a class="code" href="classvector__typet.html">vector_typet</a> &amp;vector_type=<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160; </div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>());</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="comment">// Replace by an array with appropriate number of members.</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <a class="code" href="classarray__typet.html">array_typet</a> array_type(vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>(), vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>());</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    array_type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    type=array_type;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  }</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;}</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
+<div class="line"><a name="l00338"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a3c18863d887a73428f1ddaa69210d3ba">  338</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol)</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;{</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>);</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;}</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
+<div class="line"><a name="l00345"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a4b88c47385d630492deba0461774fc0a">  345</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;{</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;named_symbol : symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol_table.<a class="code" href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">get_writeable_ref</a>(named_symbol.first));</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;}</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
+<div class="line"><a name="l00352"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a59301590ca2a2ea129bbc43d902a9983">  352</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function)</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;{</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : goto_function.body.instructions)</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    i.transform([](<a class="code" href="classexprt.html">exprt</a> e) -&gt; <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> {</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="remove__vector_8cpp.html#ab2a39c0259601e15941b3948225c82c2">have_to_remove_vector</a>(e))</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      {</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(e);</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        <span class="keywordflow">return</span> e;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      }</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    });</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;}</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160; </div>
+<div class="line"><a name="l00367"></a><span class="lineno"><a class="line" href="remove__vector_8cpp.html#a27c4d82dabea546fb157bfd06537bffc">  367</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;{</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(gf_entry.second);</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;}</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
+<div class="line"><a name="l00374"></a><span class="lineno"><a class="line" href="remove__vector_8h.html#a344f148e72edc5f1a7f2a8d6e53e89f2">  374</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;{</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(symbol_table);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(goto_functions);</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;}</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160; </div>
+<div class="line"><a name="l00383"></a><span class="lineno"><a class="line" href="remove__vector_8h.html#ac0932edd1232236734a80df2d92552c0">  383</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;{</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  <a class="code" href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a>(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassstruct__union__typet_html_ade06a6cf374b926cb0fdb3f6ca81dbcf"><div class="ttname"><a href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">struct_union_typet::components</a></div><div class="ttdeci">const componentst &amp; components() const</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00147">std_types.h:147</a></div></div>
@@ -496,7 +495,7 @@ $(document).ready(function(){initNavTree('remove__vector_8cpp_source.html',''); 
 <div class="ttc" id="aclassvector__typet_html"><div class="ttname"><a href="classvector__typet.html">vector_typet</a></div><div class="ttdoc">The vector type.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l01007">std_types.h:1007</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a8fde3eed9e33fa5845c048d8c613d9bd"><div class="ttname"><a href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a></div><div class="ttdeci">const binary_exprt &amp; to_binary_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a binary_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00660">std_expr.h:660</a></div></div>
-<div class="ttc" id="aremove__vector_8cpp_html_a9e5a2feab045d34891eb46187af9ebf0"><div class="ttname"><a href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a></div><div class="ttdeci">static void remove_vector(typet &amp;)</div><div class="ttdoc">removes vector data type</div><div class="ttdef"><b>Definition:</b> <a href="remove__vector_8cpp_source.html#l00293">remove_vector.cpp:293</a></div></div>
+<div class="ttc" id="aremove__vector_8cpp_html_a9e5a2feab045d34891eb46187af9ebf0"><div class="ttname"><a href="remove__vector_8cpp.html#a9e5a2feab045d34891eb46187af9ebf0">remove_vector</a></div><div class="ttdeci">static void remove_vector(typet &amp;)</div><div class="ttdoc">removes vector data type</div><div class="ttdef"><b>Definition:</b> <a href="remove__vector_8cpp_source.html#l00292">remove_vector.cpp:292</a></div></div>
 <div class="ttc" id="aclassarray__typet_html_af68ee4db52013b51d0465c51259a8ed6"><div class="ttname"><a href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">array_typet::size</a></div><div class="ttdeci">const exprt &amp; size() const</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00800">std_types.h:800</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a528308f263b96302993893c926e7d666"><div class="ttname"><a href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a></div><div class="ttdeci">const code_typet &amp; to_code_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a code_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00744">std_types.h:744</a></div></div>
