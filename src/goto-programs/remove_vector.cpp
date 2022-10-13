@@ -188,7 +188,6 @@ static void remove_vector(exprt &expr)
       const auto dimension = numeric_cast_v<std::size_t>(vector_type.size());
 
       const typet &subtype = vector_type.element_type();
-      PRECONDITION(subtype.id() == ID_signedbv);
       exprt minus_one = from_integer(-1, subtype);
       exprt zero = from_integer(0, subtype);
 
