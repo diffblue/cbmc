@@ -43,7 +43,8 @@ static inline bool failed(bool error_indicator)
 
 static void run_symtab2gb(
   const std::vector<std::string> &symtab_filenames,
-  const std::string &gb_filename)
+  const std::string &gb_filename,
+  const std::string &cmdline_verbosity)
 {
   // try opening all the files first to make sure we can
   // even read/write what we want
@@ -65,6 +66,8 @@ static void run_symtab2gb(
   }
 
   stream_message_handlert message_handler{std::cerr};
+  messaget::eval_verbosity(
+    cmdline_verbosity, messaget::M_STATISTICS, message_handler);
 
   auto const symtab_language = new_json_symtab_language();
   symtab_language->set_message_handler(message_handler);
@@ -138,7 +141,7 @@ int symtab2gb_parse_optionst::doit()
   }
   register_languages();
   config.set(cmdline);
-  run_symtab2gb(symtab_filenames, gb_filename);
+  run_symtab2gb(symtab_filenames, gb_filename, cmdline.get_value("verbosity"));
   return CPROVER_EXIT_SUCCESS;
 }
 
@@ -162,5 +165,6 @@ void symtab2gb_parse_optionst::help()
        "--out <outfile>                          specify the filename of\n"
        "                                         the resulting binary\n"
        "                                         (default: a.out)\n"
+       " --verbosity #                verbosity level\n"
     << messaget::eom;
 }
