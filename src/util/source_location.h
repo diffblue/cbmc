@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_SOURCE_LOCATION_H
 #define CPROVER_UTIL_SOURCE_LOCATION_H
 
+#include "deprecate.h"
 #include "irep.h"
 #include "optional.h"
 
@@ -52,6 +53,14 @@ public:
     return get(ID_column);
   }
 
+  // This method is problematic for the following reasons:
+  // 1) There is ambiguity whether
+  //    the returned string is an identifier or human-readable.
+  // 2) Furthermore, the linker renames functions, and is unable
+  //    to adjust all source locations.
+  // 3) The name of the function is not strictly a source location.
+  // It will be removed.
+  DEPRECATED(SINCE(2022, 10, 13, "use identifier of containing function"))
   const irep_idt &get_function() const
   {
     return get(ID_function);
@@ -117,6 +126,7 @@ public:
     set(ID_column, column);
   }
 
+  DEPRECATED(SINCE(2022, 10, 13, "use identifier of containing function"))
   void set_function(const irep_idt &function)
   {
     set(ID_function, function);
