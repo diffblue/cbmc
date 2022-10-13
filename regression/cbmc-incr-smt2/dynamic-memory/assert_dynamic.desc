@@ -1,0 +1,11 @@
+CORE
+assert_dynamic.c
+--trace
+Passing problem to incremental SMT2 solving
+line 16 assertion __CPROVER_DYNAMIC_OBJECT\(pointer\)\: FAILURE
+make_dynamic\=FALSE
+^EXIT=10$
+^SIGNAL=0$
+--
+make_dynamic\=TRUE
+--
