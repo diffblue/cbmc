@@ -33,9 +33,9 @@ void show_assignment(const bv_pointers_widet &solver)
     if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_not)
       continue;
     auto value = solver.l_get(entry.second);
-#  if 0
+#if 0
     std::cout << "|| " << format(expr) << " --> " << value << "\n";
-#  endif
+#endif
   }
 #endif
 

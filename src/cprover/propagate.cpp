@@ -46,6 +46,14 @@ void propagate(
     auto &next_state = implication.rhs.arguments().front();
     auto lambda_expr = lambda_exprt({state_expr()}, work.invariant);
     auto instance = lambda_expr.instantiate({next_state});
+
+#if 0
+    std::cout << consolet::faint;
+    std::cout << f.source_location.get_line() << ' ' << 'b' << ' ';
+    std::cout << consolet::reset << consolet::cyan << format(instance);
+    std::cout << consolet::reset << '\n';
+#endif
+
     auto simplified1 = simplify_state_expr(instance, address_taken, ns);
     auto simplified1a = simplify_state_expr(simplified1, address_taken, ns);
     if(simplified1 != simplified1a)
@@ -63,6 +71,14 @@ void propagate(
       // Sxx(ς) ⇒ Syy(ς[update])
       auto &state = to_symbol_expr(
         to_function_application_expr(implication.lhs).function());
+
+#if 0
+      std::cout << consolet::faint;
+      std::cout << f.source_location.get_line() << ' ' << 'B' << ' ';
+      std::cout << consolet::reset << consolet::cyan << format(simplified2);
+      std::cout << consolet::reset << '\n';
+#endif
+
       propagator(state, simplified2, work.path);
     }
     else if(
@@ -75,6 +91,14 @@ void propagate(
       auto &state = to_symbol_expr(function_application.function());
       auto cond1 = to_and_expr(implication.lhs).op1();
       auto cond2 = implies_exprt(cond1, simplified2);
+
+#if 0
+      std::cout << consolet::faint;
+      std::cout << f.source_location.get_line() << ' ' << 'C' << ' ';
+      std::cout << consolet::reset << consolet::cyan << format(cond2);
+      std::cout << consolet::reset << '\n';
+#endif
+
       propagator(state, cond2, work.path);
     }
   }

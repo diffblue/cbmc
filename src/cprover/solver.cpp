@@ -327,6 +327,7 @@ void solver(
       auto frame_ref = find_frame(frame_map, symbol);
       auto &f = frames[frame_ref.index];
 
+#if 0
       if(solver_options.verbose)
       {
         // print the current invariants in the frame
@@ -341,6 +342,7 @@ void solver(
         std::cout << "\u2192" << consolet::faint << std::setw(2)
                   << frame_ref.index << consolet::reset << ' ';
       }
+#endif
 
       // trivially true?
       if(invariant.is_true())

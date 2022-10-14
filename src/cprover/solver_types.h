@@ -51,10 +51,10 @@ public:
 
   symbol_exprt symbol;
 
-  // our current hypothesis invariant
+  // our current hypothesis invariant, conjoined
   std::vector<exprt> invariants;
 
-  // auxiliary facts
+  // auxiliary facts, conjoined
   std::vector<exprt> auxiliaries;
 
   // formulas where this frame is on the rhs of ⇒
