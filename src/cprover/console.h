@@ -20,6 +20,7 @@ class consolet
 public:
   static void init();
 
+  // colors
   static std::ostream &blue(std::ostream &);
   static std::ostream &cyan(std::ostream &);
   static std::ostream &green(std::ostream &);
@@ -32,6 +33,12 @@ public:
   static std::ostream &underline(std::ostream &);
 
   static std::ostream &reset(std::ostream &);
+
+  // cursor movement
+  static std::ostream &cursorup(std::ostream &);
+
+  // deletion
+  static std::ostream &cleareol(std::ostream &); // erase to end of line
 
   static bool is_terminal()
   {
