@@ -57,6 +57,10 @@ var dir_40e09ba5875136afe5f64e800a389a0d =
     [ "simplify_state_expr.h", "simplify__state__expr_8h.html", "simplify__state__expr_8h" ],
     [ "solver.cpp", "solver_8cpp.html", "solver_8cpp" ],
     [ "solver.h", "solver_8h.html", "solver_8h" ],
+    [ "solver_progress.cpp", "solver__progress_8cpp.html", null ],
+    [ "solver_progress.h", "solver__progress_8h.html", [
+      [ "solver_progresst", "classsolver__progresst.html", "classsolver__progresst" ]
+    ] ],
     [ "solver_types.h", "solver__types_8h.html", "solver__types_8h" ],
     [ "state.cpp", "state_8cpp.html", null ],
     [ "state.h", "state_8h.html", "state_8h" ],

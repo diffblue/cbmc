@@ -11,6 +11,5 @@ var solver_8cpp =
     [ "property_predicate", "solver_8cpp.html#abc786c23d4e0afaddc20c9684203aeec", null ],
     [ "setup_frames", "solver_8cpp.html#a849780edfe1d545e59fc53277c245c51", null ],
     [ "solver", "solver_8cpp.html#a3288ed247c7e9903148a1d2d5b9fedf1", null ],
-    [ "solver", "solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c", null ],
-    [ "solver_progress", "solver_8cpp.html#a84e5e30bc3dacf0c909f8f855bf6653d", null ]
+    [ "solver", "solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c", null ]
 ];

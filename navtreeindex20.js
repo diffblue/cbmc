@@ -1,5 +1,7 @@
 var NAVTREEINDEX20 =
 {
+"classcopy__on__write__pointeet.html#ae2ab1eb09bc4d5cea43a83b319a26dbc":[4,0,263,10],
+"classcopy__on__writet.html":[4,0,264],
 "classcopy__on__writet.html#a16a33ff8d75c4b33c4c2fd2d4245773d":[4,0,264,9],
 "classcopy__on__writet.html#a1988948dac72cbfc7d8cfcdd6e0e7637":[4,0,264,7],
 "classcopy__on__writet.html#a26148994b90f181400cd4a81c6946d71":[4,0,264,10],
@@ -247,7 +249,5 @@ var NAVTREEINDEX20 =
 "classcpp__idt.html":[4,0,292],
 "classcpp__idt.html#a02f96b03a4486e7824a2710545594e25":[4,0,292,0],
 "classcpp__idt.html#a085b2ee51c3439d7bc15b30658911228":[4,0,292,18],
-"classcpp__idt.html#a09716bd8a2efce1fddd8b8c76031c696":[4,0,292,20],
-"classcpp__idt.html#a0ea014b9d8dfb3507e457d14f89fb571":[4,0,292,29],
-"classcpp__idt.html#a29d9533b8fd07c4db9aaa27fff602baf":[4,0,292,4]
+"classcpp__idt.html#a09716bd8a2efce1fddd8b8c76031c696":[4,0,292,20]
 };

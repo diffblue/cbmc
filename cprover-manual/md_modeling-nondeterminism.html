@@ -89,7 +89,7 @@ Sources of Nondeterminism</h3>
 Uninterpreted Functions</h3>
 <p>It may be necessary to check parts of a program independently. Nondeterminism can be used to over-approximate the behavior of a part of the system which is not being checked. Rather than calling a complex or unrelated function, a nondeterministic stub is used. However, separate calls to the function can return different results, even for the same inputs.</p>
 <p>If the function output only depends on its inputs, this can introduce spurious errors. To avoid this problem, functions whose names begin with the prefix <code>__CPROVER_uninterpreted_</code> are treated as uninterpreted functions. Their value is non-deterministic but different invocations will return the same value if their inputs are the same. Note that uninterpreted functions are not supported by all back-end solvers.</p>
-<p>Last modified: 2022-10-13 14:15:49 +0100 </p>
+<p>Last modified: 2022-10-14 15:05:36 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

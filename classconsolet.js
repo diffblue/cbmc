@@ -3,6 +3,8 @@ var classconsolet =
     [ "redirectt", "classconsolet_1_1redirectt.html", "classconsolet_1_1redirectt" ],
     [ "blue", "classconsolet.html#a3e58b3ba685e068692127229244bb0b2", null ],
     [ "bold", "classconsolet.html#a964ec4b301c6348d589421cf5a7fdfdb", null ],
+    [ "cleareol", "classconsolet.html#ad42d9d885090d609d449ffc17a8fb0c7", null ],
+    [ "cursorup", "classconsolet.html#a1ee07c9847880f2360b6ebdc8bff2a6c", null ],
     [ "cyan", "classconsolet.html#a7943f0d88683078e1570b08485c7ed36", null ],
     [ "err", "classconsolet.html#abddbcc733b86e863557a87365ec66540", null ],
     [ "faint", "classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb", null ],

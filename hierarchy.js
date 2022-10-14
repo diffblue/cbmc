@@ -1363,8 +1363,8 @@ var hierarchy =
     [ "mini_bdd_mgrt::reverse_keyt", "structmini__bdd__mgrt_1_1reverse__keyt.html", null ],
     [ "smt_bit_vector_theoryt::rotate_leftt", "structsmt__bit__vector__theoryt_1_1rotate__leftt.html", null ],
     [ "smt_bit_vector_theoryt::rotate_rightt", "structsmt__bit__vector__theoryt_1_1rotate__rightt.html", null ],
-    [ "float_bvt::rounding_mode_bitst", "structfloat__bvt_1_1rounding__mode__bitst.html", null ],
     [ "float_utilst::rounding_mode_bitst", "structfloat__utilst_1_1rounding__mode__bitst.html", null ],
+    [ "float_bvt::rounding_mode_bitst", "structfloat__bvt_1_1rounding__mode__bitst.html", null ],
     [ "taint_parse_treet::rulet", "classtaint__parse__treet_1_1rulet.html", null ],
     [ "rw_range_sett", "classrw__range__sett.html", [
       [ "rw_range_set_value_sett", "classrw__range__set__value__sett.html", [
@@ -1868,6 +1868,7 @@ var hierarchy =
     ] ],
     [ "solver_factoryt", "classsolver__factoryt.html", null ],
     [ "solver_optionst", "classsolver__optionst.html", null ],
+    [ "solver_progresst", "classsolver__progresst.html", null ],
     [ "solver_resource_limitst", "classsolver__resource__limitst.html", [
       [ "prop_conv_solvert", "classprop__conv__solvert.html", null ]
     ] ],
@@ -1908,12 +1909,12 @@ var hierarchy =
     [ "clauset::stept", "structclauset_1_1stept.html", null ],
     [ "statement_list_typecheckt::stl_jump_locationt", "structstatement__list__typecheckt_1_1stl__jump__locationt.html", null ],
     [ "statement_list_typecheckt::stl_label_locationt", "structstatement__list__typecheckt_1_1stl__label__locationt.html", null ],
-    [ "smt_logict::storert< derivedt >", "classsmt__logict_1_1storert.html", null ],
     [ "smt_sortt::storert< derivedt >", "classsmt__sortt_1_1storert.html", null ],
-    [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
-    [ "smt_check_sat_response_kindt::storert< derivedt >", "classsmt__check__sat__response__kindt_1_1storert.html", null ],
-    [ "smt_termt::storert< derivedt >", "classsmt__termt_1_1storert.html", null ],
+    [ "smt_logict::storert< derivedt >", "classsmt__logict_1_1storert.html", null ],
     [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
+    [ "smt_termt::storert< derivedt >", "classsmt__termt_1_1storert.html", null ],
+    [ "smt_check_sat_response_kindt::storert< derivedt >", "classsmt__check__sat__response__kindt_1_1storert.html", null ],
+    [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
     [ "smt_termt::storert< smt_assert_commandt >", "classsmt__termt_1_1storert.html", [
       [ "smt_assert_commandt", "classsmt__assert__commandt.html", null ],
       [ "smt_get_value_commandt", "classsmt__get__value__commandt.html", null ]
@@ -2071,13 +2072,13 @@ var hierarchy =
     [ "union_find< exprt, irep_hash >", "classunion__find.html", null ],
     [ "union_find< irep_idt >", "classunion__find.html", null ],
     [ "union_find_replacet", "classunion__find__replacet.html", null ],
-    [ "float_utilst::unpacked_floatt", "structfloat__utilst_1_1unpacked__floatt.html", [
-      [ "float_utilst::biased_floatt", "structfloat__utilst_1_1biased__floatt.html", null ],
-      [ "float_utilst::unbiased_floatt", "structfloat__utilst_1_1unbiased__floatt.html", null ]
-    ] ],
     [ "float_bvt::unpacked_floatt", "structfloat__bvt_1_1unpacked__floatt.html", [
       [ "float_bvt::biased_floatt", "structfloat__bvt_1_1biased__floatt.html", null ],
       [ "float_bvt::unbiased_floatt", "structfloat__bvt_1_1unbiased__floatt.html", null ]
+    ] ],
+    [ "float_utilst::unpacked_floatt", "structfloat__utilst_1_1unpacked__floatt.html", [
+      [ "float_utilst::biased_floatt", "structfloat__utilst_1_1biased__floatt.html", null ],
+      [ "float_utilst::unbiased_floatt", "structfloat__utilst_1_1unbiased__floatt.html", null ]
     ] ],
     [ "smt_bit_vector_theoryt::unsigned_dividet", "structsmt__bit__vector__theoryt_1_1unsigned__dividet.html", null ],
     [ "smt_bit_vector_theoryt::unsigned_greater_than_or_equalt", "structsmt__bit__vector__theoryt_1_1unsigned__greater__than__or__equalt.html", null ],

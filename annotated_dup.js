@@ -1105,6 +1105,7 @@ var annotated_dup =
     [ "solver_factoryt", "classsolver__factoryt.html", "classsolver__factoryt" ],
     [ "solver_hardnesst", "structsolver__hardnesst.html", "structsolver__hardnesst" ],
     [ "solver_optionst", "classsolver__optionst.html", "classsolver__optionst" ],
+    [ "solver_progresst", "classsolver__progresst.html", "classsolver__progresst" ],
     [ "solver_resource_limitst", "classsolver__resource__limitst.html", "classsolver__resource__limitst" ],
     [ "sort_based_cast_to_bit_vector_convertert", "structsort__based__cast__to__bit__vector__convertert.html", "structsort__based__cast__to__bit__vector__convertert" ],
     [ "sort_based_literal_convertert", "structsort__based__literal__convertert.html", "structsort__based__literal__convertert" ],
