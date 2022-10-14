@@ -19,6 +19,10 @@ void solver_progresst::operator()(size_t current)
 {
   if(verbose)
   {
+    if(current != 0)
+      std::cout << '\n';
+    std::cout << consolet::orange << "Processing property " << (current + 1)
+              << '/' << total << consolet::reset << '\n';
   }
   else
   {
@@ -44,6 +48,7 @@ void solver_progresst::finished()
 {
   if(verbose)
   {
+    std::cout << '\n';
   }
   else
   {

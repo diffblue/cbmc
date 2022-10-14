@@ -14,9 +14,11 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/format_expr.h>
 #include <util/simplify_expr.h>
 
+#include "console.h"
 #include "simplify_state_expr.h"
 #include "state.h"
 
+#include <iomanip>
 #include <iostream>
 
 void propagate(
@@ -28,15 +30,16 @@ void propagate(
   const std::function<void(const symbol_exprt &, exprt, const workt::patht &)>
     &propagator)
 {
+  auto &f = frames[work.frame.index];
+
   if(verbose)
   {
-    std::cout << "PROP";
-    for(const auto &p : work.path)
-      std::cout << ' ' << p.index;
-    std::cout << ": " << format(work.invariant) << '\n';
+    std::cout << '\n';
+    std::cout << consolet::faint;
+    std::cout << ' ' << std::setw(2) << work.frame.index << ' ';
+    std::cout << consolet::reset << consolet::cyan << format(work.invariant);
+    std::cout << consolet::reset << '\n';
   }
-
-  auto &f = frames[work.frame.index];
 
   for(const auto &implication : f.implications)
   {
@@ -52,6 +55,7 @@ void propagate(
       std::cout << "SIMPa: " << format(simplified1a) << "\n";
       abort();
     }
+
     auto simplified2 = simplify_expr(simplified1, ns);
 
     if(implication.lhs.id() == ID_function_application)
@@ -69,8 +73,9 @@ void propagate(
       auto &function_application =
         to_function_application_expr(to_and_expr(implication.lhs).op0());
       auto &state = to_symbol_expr(function_application.function());
-      auto cond = to_and_expr(implication.lhs).op1();
-      propagator(state, implies_exprt(cond, simplified2), work.path);
+      auto cond1 = to_and_expr(implication.lhs).op1();
+      auto cond2 = implies_exprt(cond1, simplified2);
+      propagator(state, cond2, work.path);
     }
   }
 }

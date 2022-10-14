@@ -220,7 +220,11 @@ bool is_subsumed(
       return true; // b is subsumed by a conjunct in a
 
   cout_message_handlert message_handler;
+#if 0
   message_handler.set_verbosity(verbose ? 10 : 1);
+#else
+  message_handler.set_verbosity(1);
+#endif
   satcheckt satcheck(message_handler);
   bv_pointers_widet solver(ns, satcheck, message_handler);
   axiomst axioms(solver, address_taken, verbose, ns);
@@ -295,7 +299,7 @@ void solver(
   take_time_resourcet stop_time(property.stop);
 
   if(solver_options.verbose)
-    std::cout << "\nDoing " << format(property.condition) << '\n';
+    std::cout << "Doing " << format(property.condition) << '\n';
 
   for(auto &frame : frames)
     frame.reset();
@@ -325,31 +329,50 @@ void solver(
 
       if(solver_options.verbose)
       {
-        std::cout << "F: " << format(symbol) << " <- " << format(invariant)
-                  << '\n';
+        // print the current invariants in the frame
+        for(const auto &invariant : f.invariants)
+        {
+          std::cout << consolet::faint << consolet::blue;
+          std::cout << 'I' << std::setw(2) << frame_ref.index << ' ';
+          std::cout << format(invariant);
+          std::cout << consolet::reset << '\n';
+        }
+
+        std::cout << "\u2192" << consolet::faint << std::setw(2)
+                  << frame_ref.index << consolet::reset << ' ';
       }
 
-      // check if already subsumed
-      if(is_subsumed(
-           f.invariants,
-           f.auxiliaries,
-           invariant,
-           address_taken,
-           solver_options.verbose,
-           ns))
+      // trivially true?
+      if(invariant.is_true())
       {
         if(solver_options.verbose)
-          std::cout << "*** SUBSUMED\n";
+          std::cout << "trivial\n";
+      }
+      else if(is_subsumed(
+                f.invariants,
+                f.auxiliaries,
+                invariant,
+                address_taken,
+                solver_options.verbose,
+                ns))
+      {
+        if(solver_options.verbose)
+          std::cout << "subsumed " << format(invariant) << '\n';
       }
       else if(count_frame(path, frame_ref) > solver_options.loop_limit)
       {
         // loop limit exceeded, drop it
         if(solver_options.verbose)
-          std::cout << "*** DROPPED\n";
-        dropped.push_back(workt(frame_ref, invariant, path));
+          std::cout << consolet::red << "dropped" << consolet::reset << ' '
+                    << format(invariant) << '\n';
+        dropped.emplace_back(frame_ref, invariant, path);
       }
       else
       {
+        // propagate
+        if(solver_options.verbose)
+          std::cout << format(invariant) << '\n';
+
         auto new_path = path;
         new_path.push_back(frame_ref);
         queue.emplace_back(f.ref, std::move(invariant), std::move(new_path));
@@ -367,11 +390,13 @@ void solver(
 
     frames[work.frame.index].add_invariant(work.invariant);
 
+#if 0
     if(solver_options.verbose)
     {
       dump(frames, property, true, true);
       std::cout << '\n';
     }
+#endif
 
     auto counterexample_found = ::counterexample_found(
       frames, work, address_taken, solver_options.verbose, ns);
@@ -401,11 +426,13 @@ solver_resultt solver(
 {
   const auto address_taken = ::address_taken(constraints);
 
+#if 0
   if(solver_options.verbose)
   {
     for(auto &a : address_taken)
       std::cout << "address_taken: " << format(a) << '\n';
   }
+#endif
 
   auto frames = setup_frames(constraints);
 

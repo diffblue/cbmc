@@ -33,11 +33,13 @@ void show_assignment(const bv_pointers_widet &solver)
     if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_not)
       continue;
     auto value = solver.l_get(entry.second);
+#  if 0
     std::cout << "|| " << format(expr) << " --> " << value << "\n";
+#  endif
   }
 #endif
 
-#if 1
+#if 0
   for(auto &entry : solver.get_map().get_mapping())
   {
     const auto &identifier = entry.first;
@@ -47,12 +49,14 @@ void show_assignment(const bv_pointers_widet &solver)
   }
 #endif
 
+#if 0
   for(auto &entry : solver.get_symbols())
   {
     const auto &identifier = entry.first;
     auto value = solver.l_get(entry.second);
     std::cout << "|| " << identifier << " --> " << value << "\n";
   }
+#endif
 }
 
 static exprt evaluator_rec(

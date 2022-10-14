@@ -74,8 +74,10 @@ void axiomst::evaluate_fc()
         operands_equal,
         equal_exprt(
           *a_it, typecast_exprt::conditional_cast(*b_it, a_it->type())));
+#if 0
       if(verbose)
         std::cout << "EVALUATE: " << format(implication) << '\n';
+#endif
       dest << replace(implication);
     }
   }
@@ -752,11 +754,13 @@ void axiomst::emit()
     constraint.visit_pre([this](const exprt &src) { node(src); });
 
     auto constraint_replaced = replace(constraint);
+#if 0
     if(verbose)
     {
       std::cout << "CONSTRAINT1: " << format(constraint) << "\n";
       std::cout << "CONSTRAINT2: " << format(constraint_replaced) << "\n";
     }
+#endif
     dest << constraint_replaced;
   }
 
