@@ -1639,6 +1639,21 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
           new_expr.op1().type() = new_expr.op0().type();
         return changed(simplify_inequality(new_expr)); // do again!
       }
+      else if(expr.op0().id() == ID_plus)
+      {
+        // NULL + 1 == NULL is false
+        const plus_exprt &plus = to_plus_expr(expr.op0());
+        if(
+          plus.operands().size() == 2 && plus.op0().is_constant() &&
+          plus.op1().is_constant() &&
+          ((is_null_pointer(to_constant_expr(plus.op0())) &&
+            !plus.op1().is_zero()) ||
+           (is_null_pointer(to_constant_expr(plus.op1())) &&
+            !plus.op0().is_zero())))
+        {
+          return false_exprt();
+        }
+      }
     }
 
     // all we are doing with pointers
