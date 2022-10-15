@@ -383,7 +383,8 @@ void symex_assignt::assign_byte_extract(
   else
     UNREACHABLE;
 
-  const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
+  const byte_update_exprt new_rhs{
+    byte_update_id, lhs.op(), lhs.offset(), rhs, lhs.get_bits_per_byte()};
   const expr_skeletont new_skeleton =
     full_lhs.compose(expr_skeletont::remove_op0(lhs));
   assign_rec(lhs.op(), new_skeleton, new_rhs, guard);
