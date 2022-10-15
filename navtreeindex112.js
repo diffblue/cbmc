@@ -1,5 +1,9 @@
 var NAVTREEINDEX112 =
 {
+"satcheck__cadical_8h.html":[5,0,2,24,7,16],
+"satcheck__cadical_8h_source.html":[5,0,2,24,7,16],
+"satcheck__core_8h.html":[5,0,2,24,7,17],
+"satcheck__core_8h_source.html":[5,0,2,24,7,17],
 "satcheck__glucose_8cpp.html":[5,0,2,24,7,18],
 "satcheck__glucose_8cpp.html#a40b69ebeceecc72659aee95f58495208":[5,0,2,24,7,18,0],
 "satcheck__glucose_8cpp_source.html":[5,0,2,24,7,18],
@@ -245,9 +249,5 @@ var NAVTREEINDEX112 =
 "simplify__expr_8cpp.html#aa6920c7db8a4b9332defc3c3851354ba":[5,0,2,27,189,10],
 "simplify__expr_8cpp.html#aab1b4b9f54bb8ccec38862533156ca20":[5,0,2,27,189,9],
 "simplify__expr_8cpp.html#abbafad2ae15f15c637b3f7e038b69f14":[5,0,2,27,189,0],
-"simplify__expr_8cpp.html#ad0861996d9551b80f8fc42e33034b5b9":[5,0,2,27,189,8],
-"simplify__expr_8cpp.html#add6c18f1ed55f7fb53f9dc07f953424e":[5,0,2,27,189,7],
-"simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc":[5,0,2,27,189,2],
-"simplify__expr_8cpp_source.html":[5,0,2,27,189],
-"simplify__expr_8h.html":[5,0,2,27,190]
+"simplify__expr_8cpp.html#ad0861996d9551b80f8fc42e33034b5b9":[5,0,2,27,189,8]
 };

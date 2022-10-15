@@ -150,27 +150,27 @@ Functions</h2></td></tr>
 <tr class="memitem:a1e03dc08002145c78d793bab698c0ffc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcomplex__exprt.html">complex_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a1e03dc08002145c78d793bab698c0ffc">bv_to_complex_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;bitvector_expr, const <a class="el" href="classcomplex__typet.html">complex_typet</a> &amp;complex_type, const <a class="el" href="classendianness__mapt.html">endianness_mapt</a> &amp;endianness_map, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a1e03dc08002145c78d793bab698c0ffc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a bitvector-typed expression <code>bitvector_expr</code> to a complex-typed expression.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a1e03dc08002145c78d793bab698c0ffc">More...</a><br /></td></tr>
 <tr class="separator:a1e03dc08002145c78d793bab698c0ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8c94e1d49de19a2fe0ec17c57eefa04"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#aa8c94e1d49de19a2fe0ec17c57eefa04">unpack_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, bool unpack_byte_array)</td></tr>
-<tr class="memdesc:aa8c94e1d49de19a2fe0ec17c57eefa04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an object into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#aa8c94e1d49de19a2fe0ec17c57eefa04">More...</a><br /></td></tr>
-<tr class="separator:aa8c94e1d49de19a2fe0ec17c57eefa04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc0a7cac376e81ebb69ffb52a0a241f7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#abc0a7cac376e81ebb69ffb52a0a241f7">instantiate_byte_array</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, std::size_t lower_bound, std::size_t upper_bound, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:abc0a7cac376e81ebb69ffb52a0a241f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the individual bytes to be used in an update.  <a href="solvers_2lowering_2byte__operators_8cpp.html#abc0a7cac376e81ebb69ffb52a0a241f7">More...</a><br /></td></tr>
-<tr class="separator:abc0a7cac376e81ebb69ffb52a0a241f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01dd2713370fd62f82f5368d5f9477b5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a01dd2713370fd62f82f5368d5f9477b5">unpack_array_vector_no_known_bounds</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, std::size_t el_bytes, bool little_endian, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a01dd2713370fd62f82f5368d5f9477b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an array or vector into its individual bytes when no maximum number of bytes is known.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a01dd2713370fd62f82f5368d5f9477b5">More...</a><br /></td></tr>
-<tr class="separator:a01dd2713370fd62f82f5368d5f9477b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b8bf9b98e1d63584dcf22a2c1fb61b2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a9b8bf9b98e1d63584dcf22a2c1fb61b2">unpack_array_vector</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;src_size, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;element_bits, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a9b8bf9b98e1d63584dcf22a2c1fb61b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an array or vector into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a9b8bf9b98e1d63584dcf22a2c1fb61b2">More...</a><br /></td></tr>
-<tr class="separator:a9b8bf9b98e1d63584dcf22a2c1fb61b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7b41dfb351392822789169c86f48dd2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#af7b41dfb351392822789169c86f48dd2">process_bit_fields</a> (<a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;&amp;bit_fields, std::size_t total_bits, <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;dest, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:af7b41dfb351392822789169c86f48dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract bytes from a sequence of bitvector-typed elements.  <a href="solvers_2lowering_2byte__operators_8cpp.html#af7b41dfb351392822789169c86f48dd2">More...</a><br /></td></tr>
-<tr class="separator:af7b41dfb351392822789169c86f48dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c72d344a1751db51246711f94d5062d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classarray__exprt.html">array_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a0c72d344a1751db51246711f94d5062d">unpack_struct</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a0c72d344a1751db51246711f94d5062d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a struct-typed expression into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a0c72d344a1751db51246711f94d5062d">More...</a><br /></td></tr>
-<tr class="separator:a0c72d344a1751db51246711f94d5062d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5befc45acc71387a103cf0787e121e06"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classarray__exprt.html">array_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a5befc45acc71387a103cf0787e121e06">unpack_complex</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, bool little_endian, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a5befc45acc71387a103cf0787e121e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a <a class="el" href="classcomplex__exprt.html" title="Complex constructor from a pair of numbers.">complex_exprt</a> into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a5befc45acc71387a103cf0787e121e06">More...</a><br /></td></tr>
-<tr class="separator:a5befc45acc71387a103cf0787e121e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eedcaa27018bb370cb19b601ad628f8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">unpack_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, bool unpack_byte_array)</td></tr>
+<tr class="memdesc:a1eedcaa27018bb370cb19b601ad628f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an object into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">More...</a><br /></td></tr>
+<tr class="separator:a1eedcaa27018bb370cb19b601ad628f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23dc3d7fbd8aa034be208f48630b3d15"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a23dc3d7fbd8aa034be208f48630b3d15">instantiate_byte_array</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, std::size_t lower_bound, std::size_t upper_bound, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a23dc3d7fbd8aa034be208f48630b3d15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the individual bytes to be used in an update.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a23dc3d7fbd8aa034be208f48630b3d15">More...</a><br /></td></tr>
+<tr class="separator:a23dc3d7fbd8aa034be208f48630b3d15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7abe1942cd3a6a144be91a154016d574"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a7abe1942cd3a6a144be91a154016d574">unpack_array_vector_no_known_bounds</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, std::size_t el_bytes, bool little_endian, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a7abe1942cd3a6a144be91a154016d574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an array or vector into its individual bytes when no maximum number of bytes is known.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a7abe1942cd3a6a144be91a154016d574">More...</a><br /></td></tr>
+<tr class="separator:a7abe1942cd3a6a144be91a154016d574"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d114b21bd36a944f31f7fc96d2fa315"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a0d114b21bd36a944f31f7fc96d2fa315">unpack_array_vector</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;src_size, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;element_bits, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a0d114b21bd36a944f31f7fc96d2fa315"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an array or vector into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a0d114b21bd36a944f31f7fc96d2fa315">More...</a><br /></td></tr>
+<tr class="separator:a0d114b21bd36a944f31f7fc96d2fa315"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0a79e0826324fd981268f4dd6efa06c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#aa0a79e0826324fd981268f4dd6efa06c">process_bit_fields</a> (<a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;&amp;bit_fields, std::size_t total_bits, <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;dest, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:aa0a79e0826324fd981268f4dd6efa06c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract bytes from a sequence of bitvector-typed elements.  <a href="solvers_2lowering_2byte__operators_8cpp.html#aa0a79e0826324fd981268f4dd6efa06c">More...</a><br /></td></tr>
+<tr class="separator:aa0a79e0826324fd981268f4dd6efa06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa60cbc6fd2560812af60cc84693c3631"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classarray__exprt.html">array_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#aa60cbc6fd2560812af60cc84693c3631">unpack_struct</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, bool little_endian, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;offset_bytes, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt; &amp;max_bytes, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:aa60cbc6fd2560812af60cc84693c3631"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a struct-typed expression into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#aa60cbc6fd2560812af60cc84693c3631">More...</a><br /></td></tr>
+<tr class="separator:aa60cbc6fd2560812af60cc84693c3631"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a790158f602004d1804e82c2fa5254e09"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classarray__exprt.html">array_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a790158f602004d1804e82c2fa5254e09">unpack_complex</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, bool little_endian, const std::size_t bits_per_byte, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a790158f602004d1804e82c2fa5254e09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a <a class="el" href="classcomplex__exprt.html" title="Complex constructor from a pair of numbers.">complex_exprt</a> into its individual bytes.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a790158f602004d1804e82c2fa5254e09">More...</a><br /></td></tr>
+<tr class="separator:a790158f602004d1804e82c2fa5254e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b3b31c1e6356946eacd2f50c3cf5028"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a9b3b31c1e6356946eacd2f50c3cf5028">lower_byte_extract_array_vector</a> (const <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;src, const <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;unpacked, const <a class="el" href="classtypet.html">typet</a> &amp;subtype, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;element_bits, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a9b3b31c1e6356946eacd2f50c3cf5028"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a byte extraction of an array/vector-typed result to byte extraction of the individual components that make up an <a class="el" href="classarray__exprt.html">array_exprt</a> or <a class="el" href="classvector__exprt.html">vector_exprt</a>.  <a href="solvers_2lowering_2byte__operators_8cpp.html#a9b3b31c1e6356946eacd2f50c3cf5028">More...</a><br /></td></tr>
 <tr class="separator:a9b3b31c1e6356946eacd2f50c3cf5028"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -589,12 +589,12 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02377">2377</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02494">2494</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
-<a id="abc0a7cac376e81ebb69ffb52a0a241f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc0a7cac376e81ebb69ffb52a0a241f7">&#9670;&nbsp;</a></span>instantiate_byte_array()</h2>
+<a id="a23dc3d7fbd8aa034be208f48630b3d15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23dc3d7fbd8aa034be208f48630b3d15">&#9670;&nbsp;</a></span>instantiate_byte_array()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -623,6 +623,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
@@ -645,13 +651,14 @@ Functions</h2></td></tr>
     <tr><td class="paramname">src</td><td>Source expression of array or vector type </td></tr>
     <tr><td class="paramname">lower_bound</td><td>First index into <code>src</code> to be included in the result </td></tr>
     <tr><td class="paramname">upper_bound</td><td>First index into <code>src</code> to be excluded from the result </td></tr>
+    <tr><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramname">ns</td><td>Namespace </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Sequence of bytes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00419">419</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00421">421</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -684,7 +691,7 @@ Functions</h2></td></tr>
 <p>rewrite byte extraction from an array to byte extraction from a concatenation of array index expressions </p>
 <p>Rewrite a byte extract expression to more fundamental operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01099">1099</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01156">1156</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -744,7 +751,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">src</td><td>Original byte extract expression </td></tr>
-    <tr><td class="paramname">unpacked</td><td>Byte extraction with root operand expanded into array (via <a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#aa8c94e1d49de19a2fe0ec17c57eefa04">unpack_rec</a>) </td></tr>
+    <tr><td class="paramname">unpacked</td><td>Byte extraction with root operand expanded into array (via <a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">unpack_rec</a>) </td></tr>
     <tr><td class="paramname">subtype</td><td>Array/vector element type </td></tr>
     <tr><td class="paramname">element_bits</td><td>bit width of array/vector elements </td></tr>
     <tr><td class="paramname">ns</td><td>Namespace </td></tr>
@@ -753,7 +760,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An array or vector expression. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00992">992</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01044">1044</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -801,14 +808,14 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">src</td><td>Original byte extract expression </td></tr>
-    <tr><td class="paramname">unpacked</td><td>Byte extraction with root operand expanded into array (via <a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#aa8c94e1d49de19a2fe0ec17c57eefa04">unpack_rec</a>) </td></tr>
+    <tr><td class="paramname">unpacked</td><td>Byte extraction with root operand expanded into array (via <a class="el" href="solvers_2lowering_2byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">unpack_rec</a>) </td></tr>
     <tr><td class="paramname">ns</td><td>Namespace </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An expression if the subtype size is known, else <code>nullopt</code> so that a fall-back to more generic code can be used. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01068">1068</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01124">1124</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -848,7 +855,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Semantically equivalent expression that does not contain any <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> or <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02392">2392</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02509">2509</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -910,7 +917,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expression reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02080">2080</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02185">2185</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -950,7 +957,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Semantically equivalent expression such that the top-level expression no longer is a <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> or <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a>. Use <a class="el" href="expr__lowering_8h.html#a93c60391ab50d0492973de726b71a1e3">lower_byte_operators</a> to also remove all byte operators from any operands of <code>src</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02286">2286</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02400">2400</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1019,7 +1026,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array/vector expression reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01757">1757</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01841">1841</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1088,7 +1095,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array/vector expression reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01597">1597</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01671">1671</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1185,7 +1192,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array comprehension reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01471">1471</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01538">1538</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1254,7 +1261,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array/vector expression reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01405">1405</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01472">1472</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1323,7 +1330,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array comprehension reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01349">1349</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01416">1416</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1392,7 +1399,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Struct expression reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01858">1858</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l01952">1952</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1461,7 +1468,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Union expression reflecting all updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02048">2048</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l02153">2153</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -1511,8 +1518,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="af7b41dfb351392822789169c86f48dd2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7b41dfb351392822789169c86f48dd2">&#9670;&nbsp;</a></span>process_bit_fields()</h2>
+<a id="aa0a79e0826324fd981268f4dd6efa06c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0a79e0826324fd981268f4dd6efa06c">&#9670;&nbsp;</a></span>process_bit_fields()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1559,6 +1566,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
@@ -1584,17 +1597,18 @@ Functions</h2></td></tr>
     <tr><td class="paramdir"></td><td class="paramname">little_endian</td><td>true, iff assumed endianness is little-endian </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">offset_bytes</td><td>if set, bytes prior to this offset will be filled with nil values </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">max_bytes</td><td>if set, use as upper bound of the number of bytes to unpack </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">ns</td><td>namespace for type lookups </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00625">625</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00636">636</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a9b8bf9b98e1d63584dcf22a2c1fb61b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b8bf9b98e1d63584dcf22a2c1fb61b2">&#9670;&nbsp;</a></span>unpack_array_vector()</h2>
+<a id="a0d114b21bd36a944f31f7fc96d2fa315"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d114b21bd36a944f31f7fc96d2fa315">&#9670;&nbsp;</a></span>unpack_array_vector()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1641,6 +1655,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
@@ -1666,18 +1686,19 @@ Functions</h2></td></tr>
     <tr><td class="paramname">little_endian</td><td>true, iff assumed endianness is little-endian </td></tr>
     <tr><td class="paramname">offset_bytes</td><td>if set, bytes prior to this offset will be filled with nil values </td></tr>
     <tr><td class="paramname">max_bytes</td><td>if set, use as upper bound of the number of bytes to unpack </td></tr>
+    <tr><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramname">ns</td><td>namespace for type lookups </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array expression holding unpacked elements or array comprehension </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00517">517</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00526">526</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a01dd2713370fd62f82f5368d5f9477b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01dd2713370fd62f82f5368d5f9477b5">&#9670;&nbsp;</a></span>unpack_array_vector_no_known_bounds()</h2>
+<a id="a7abe1942cd3a6a144be91a154016d574"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7abe1942cd3a6a144be91a154016d574">&#9670;&nbsp;</a></span>unpack_array_vector_no_known_bounds()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1706,6 +1727,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
@@ -1728,18 +1755,19 @@ Functions</h2></td></tr>
     <tr><td class="paramname">src</td><td>array/vector to unpack </td></tr>
     <tr><td class="paramname">el_bytes</td><td>byte width of array/vector elements </td></tr>
     <tr><td class="paramname">little_endian</td><td>true, iff assumed endianness is little-endian </td></tr>
+    <tr><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramname">ns</td><td>namespace for type lookups </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Array expression holding unpacked elements or array comprehension </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00458">458</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00462">462</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a5befc45acc71387a103cf0787e121e06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5befc45acc71387a103cf0787e121e06">&#9670;&nbsp;</a></span>unpack_complex()</h2>
+<a id="a790158f602004d1804e82c2fa5254e09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a790158f602004d1804e82c2fa5254e09">&#9670;&nbsp;</a></span>unpack_complex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1758,6 +1786,12 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">bool&#160;</td>
           <td class="paramname"><em>little_endian</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1783,18 +1817,19 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">src</td><td>complex-typed expression to unpack </td></tr>
     <tr><td class="paramname">little_endian</td><td>true, iff assumed endianness is little-endian </td></tr>
+    <tr><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramname">ns</td><td>namespace for type lookups </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classarray__exprt.html" title="Array constructor from list of elements.">array_exprt</a> holding unpacked elements </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00778">778</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00809">809</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aa8c94e1d49de19a2fe0ec17c57eefa04"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8c94e1d49de19a2fe0ec17c57eefa04">&#9670;&nbsp;</a></span>unpack_rec()</h2>
+<a id="a1eedcaa27018bb370cb19b601ad628f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1eedcaa27018bb370cb19b601ad628f8">&#9670;&nbsp;</a></span>unpack_rec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1829,6 +1864,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>, </td>
         </tr>
@@ -1858,6 +1899,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">little_endian</td><td>true, iff assumed endianness is little-endian </td></tr>
     <tr><td class="paramname">offset_bytes</td><td>if set, bytes prior to this offset will be filled with nil values </td></tr>
     <tr><td class="paramname">max_bytes</td><td>if set, use as upper bound of the number of bytes to unpack </td></tr>
+    <tr><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramname">ns</td><td>namespace for type lookups </td></tr>
     <tr><td class="paramname">unpack_byte_array</td><td>if true, return unmodified <code>src</code> iff it is an </td></tr>
   </table>
@@ -1865,12 +1907,12 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>array of bytes in the sequence found in memory </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00824">824</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00863">863</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a0c72d344a1751db51246711f94d5062d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c72d344a1751db51246711f94d5062d">&#9670;&nbsp;</a></span>unpack_struct()</h2>
+<a id="aa60cbc6fd2560812af60cc84693c3631"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa60cbc6fd2560812af60cc84693c3631">&#9670;&nbsp;</a></span>unpack_struct()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1905,6 +1947,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
@@ -1928,13 +1976,14 @@ Functions</h2></td></tr>
     <tr><td class="paramname">little_endian</td><td>true, iff assumed endianness is little-endian </td></tr>
     <tr><td class="paramname">offset_bytes</td><td>if set, bytes prior to this offset will be filled with nil values </td></tr>
     <tr><td class="paramname">max_bytes</td><td>if set, use as upper bound of the number of bytes to unpack </td></tr>
+    <tr><td class="paramname">bits_per_byte</td><td>number of bits that make up a byte </td></tr>
     <tr><td class="paramname">ns</td><td>namespace for type lookups </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classarray__exprt.html" title="Array constructor from list of elements.">array_exprt</a> holding unpacked elements </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00655">655</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html#l00674">674</a> of file <a class="el" href="solvers_2lowering_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,9 @@
 var NAVTREEINDEX107 =
 {
+"namespace_ca_di_ca_l.html":[3,0,0],
+"namespace_glucose.html":[3,0,2],
+"namespace_minisat.html":[3,0,4],
+"namespacedetail.html":[4,0,0],
 "namespacedetail.html":[3,0,1],
 "namespaceharness__options__parser.html":[3,0,3],
 "namespacemembers.html":[3,1,0],
@@ -245,9 +249,5 @@ var NAVTREEINDEX107 =
 "pattern_8h.html":[5,0,1,0,1,104],
 "pattern_8h_source.html":[5,0,1,0,1,104],
 "pbs__dimacs__cnf_8cpp.html":[5,0,2,24,7,8],
-"pbs__dimacs__cnf_8cpp_source.html":[5,0,2,24,7,8],
-"pbs__dimacs__cnf_8h.html":[5,0,2,24,7,9],
-"pbs__dimacs__cnf_8h_source.html":[5,0,2,24,7,9],
-"piped__process_8cpp.html":[5,0,2,27,151],
-"piped__process_8cpp.html#aeca034f67218340ecb2261a22c2f3dcd":[5,0,2,27,151,0]
+"pbs__dimacs__cnf_8cpp_source.html":[5,0,2,24,7,8]
 };

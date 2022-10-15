@@ -221,7 +221,7 @@ var searchData=
   ['get_5fbin_5fnumeral_9941',['get_bin_numeral',['../classsmt2__tokenizert.html#a5a5c045337d09f4aeaa8f57a0d084357',1,'smt2_tokenizert']]],
   ['get_5fbit_9942',['get_bit',['../classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063',1,'custom_bitvector_domaint']]],
   ['get_5fbit_5fnr_9943',['get_bit_nr',['../classcustom__bitvector__analysist.html#abfec5f3858670f9fba8011a54954318e',1,'custom_bitvector_analysist']]],
-  ['get_5fbits_5fper_5fbyte_9944',['get_bits_per_byte',['../classbswap__exprt.html#a92423b8af0a54075314441dcf674d78c',1,'bswap_exprt']]],
+  ['get_5fbits_5fper_5fbyte_9944',['get_bits_per_byte',['../classbswap__exprt.html#a92423b8af0a54075314441dcf674d78c',1,'bswap_exprt::get_bits_per_byte()'],['../classbyte__extract__exprt.html#a68529f11bc874d072680bb0d0b238bda',1,'byte_extract_exprt::get_bits_per_byte()'],['../classbyte__update__exprt.html#adbc3fcb92f0f2710696ba57ecebf3600',1,'byte_update_exprt::get_bits_per_byte()']]],
   ['get_5fblock_5ffor_5fpcrange_9945',['get_block_for_pcrange',['../classjava__bytecode__convert__methodt.html#a5775e6e90650cba35f485dc9a7249257',1,'java_bytecode_convert_methodt']]],
   ['get_5fbool_9946',['get_bool',['../classprop__conv__solvert.html#a42ebf45b2df3a0e7787f70af9d818021',1,'prop_conv_solvert::get_bool()'],['../classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1',1,'irept::get_bool()']]],
   ['get_5fbool_5foption_9947',['get_bool_option',['../classoptionst.html#a6fcce35026ee271847c3622218a3a2b1',1,'optionst']]],

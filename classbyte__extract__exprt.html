@@ -119,8 +119,8 @@ $(document).ready(function(){initNavTree('classbyte__extract__exprt.html',''); i
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad0a6c3e4a6d67f808455eca765fd155e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#ad0a6c3e4a6d67f808455eca765fd155e">byte_extract_exprt</a> (<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> _id, const <a class="el" href="classexprt.html">exprt</a> &amp;_op, const <a class="el" href="classexprt.html">exprt</a> &amp;_offset, const <a class="el" href="classtypet.html">typet</a> &amp;_type)</td></tr>
-<tr class="separator:ad0a6c3e4a6d67f808455eca765fd155e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2722216ffc282d50a94a54a5487d984a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#a2722216ffc282d50a94a54a5487d984a">byte_extract_exprt</a> (<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> _id, const <a class="el" href="classexprt.html">exprt</a> &amp;_op, const <a class="el" href="classexprt.html">exprt</a> &amp;_offset, std::size_t bits_per_byte, const <a class="el" href="classtypet.html">typet</a> &amp;_type)</td></tr>
+<tr class="separator:a2722216ffc282d50a94a54a5487d984a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e9fe2877103a3f1c82e7dc83a8da6a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#a0e9fe2877103a3f1c82e7dc83a8da6a1">op</a> ()</td></tr>
 <tr class="separator:a0e9fe2877103a3f1c82e7dc83a8da6a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff6e0476347b31a58e874004c5cd25d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#aff6e0476347b31a58e874004c5cd25d1">offset</a> ()</td></tr>
@@ -129,6 +129,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ace44c0eb8ba39f599e1bafb98dd3a84b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ec98d0d6876570d5b03324094c49787"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#a7ec98d0d6876570d5b03324094c49787">offset</a> () const</td></tr>
 <tr class="separator:a7ec98d0d6876570d5b03324094c49787"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68529f11bc874d072680bb0d0b238bda"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#a68529f11bc874d072680bb0d0b238bda">get_bits_per_byte</a> () const</td></tr>
+<tr class="separator:a68529f11bc874d072680bb0d0b238bda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f7efab7e02767f72750c9589d038ec1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbyte__extract__exprt.html#a5f7efab7e02767f72750c9589d038ec1">set_bits_per_byte</a> (std::size_t bits_per_byte)</td></tr>
+<tr class="separator:a5f7efab7e02767f72750c9589d038ec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classbinary__exprt"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classbinary__exprt')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classbinary__exprt.html">binary_exprt</a></td></tr>
 <tr class="memitem:a33394dce61450c8687261c545aad1ac2 inherit pub_methods_classbinary__exprt"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbinary__exprt.html#a33394dce61450c8687261c545aad1ac2">binary_exprt</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;_lhs, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;_id, <a class="el" href="classexprt.html">exprt</a> _rhs)</td></tr>
 <tr class="separator:a33394dce61450c8687261c545aad1ac2 inherit pub_methods_classbinary__exprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -478,8 +482,8 @@ Additional Inherited Members</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00028">28</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad0a6c3e4a6d67f808455eca765fd155e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad0a6c3e4a6d67f808455eca765fd155e">&#9670;&nbsp;</a></span>byte_extract_exprt()</h2>
+<a id="a2722216ffc282d50a94a54a5487d984a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2722216ffc282d50a94a54a5487d984a">&#9670;&nbsp;</a></span>byte_extract_exprt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -508,6 +512,12 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
           <td class="paramname"><em>_type</em>&#160;</td>
         </tr>
@@ -529,6 +539,33 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a68529f11bc874d072680bb0d0b238bda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68529f11bc874d072680bb0d0b238bda">&#9670;&nbsp;</a></span>get_bits_per_byte()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t byte_extract_exprt::get_bits_per_byte </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00052">52</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
+
+</div>
+</div>
 <a id="aff6e0476347b31a58e874004c5cd25d1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aff6e0476347b31a58e874004c5cd25d1">&#9670;&nbsp;</a></span>offset() <span class="overload">[1/2]</span></h2>
 
@@ -552,7 +589,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00044">44</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00047">47</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
 
 </div>
 </div>
@@ -579,7 +616,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00047">47</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00050">50</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
 
 </div>
 </div>
@@ -606,7 +643,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00043">43</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00046">46</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
 
 </div>
 </div>
@@ -633,7 +670,35 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00046">46</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00049">49</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
+
+</div>
+</div>
+<a id="a5f7efab7e02767f72750c9589d038ec1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f7efab7e02767f72750c9589d038ec1">&#9670;&nbsp;</a></span>set_bits_per_byte()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void byte_extract_exprt::set_bits_per_byte </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>bits_per_byte</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="byte__operators_8h_source.html#l00057">57</a> of file <a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>.</p>
 
 </div>
 </div>
