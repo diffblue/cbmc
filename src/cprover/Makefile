@@ -27,6 +27,7 @@ SRC = address_taken.cpp \
       state_encoding_targets.cpp \
       solver.cpp \
       solver_progress.cpp \
+      solver_types.cpp \
       variable_encoding.cpp \
       wcwidth.c \
       # Empty last line

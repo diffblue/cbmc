@@ -45,28 +45,6 @@ frame_mapt build_frame_map(const std::vector<framet> &frames)
   return frame_map;
 }
 
-void framet::add_invariant(exprt invariant)
-{
-  if(invariant.id() == ID_and)
-  {
-    for(const auto &conjunct : to_and_expr(invariant).operands())
-      add_invariant(conjunct);
-  }
-  else
-    invariants.push_back(std::move(invariant));
-}
-
-void framet::add_auxiliary(exprt invariant)
-{
-  if(invariant.id() == ID_and)
-  {
-    for(const auto &conjunct : to_and_expr(invariant).operands())
-      add_auxiliary(conjunct);
-  }
-  else
-    auxiliaries.push_back(std::move(invariant));
-}
-
 std::vector<framet> setup_frames(const std::vector<exprt> &constraints)
 {
   std::set<symbol_exprt> states_set;
