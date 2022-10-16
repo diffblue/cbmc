@@ -254,8 +254,8 @@ exprt simplify_invariant(exprt expr, const namespacet &ns)
 }
 
 bool is_subsumed(
-  const std::vector<exprt> &a1,
-  const std::vector<exprt> &a2,
+  const std::unordered_set<exprt, irep_hash> &a1,
+  const std::unordered_set<exprt, irep_hash> &a2,
   const exprt &b,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,
   bool verbose,
@@ -264,13 +264,11 @@ bool is_subsumed(
   if(b.is_true())
     return true; // anything subsumes 'true'
 
-  for(auto &a_conjunct : a1)
-    if(a_conjunct.is_false())
-      return true; // 'false' subsumes anything
+  if(a1.find(false_exprt()) != a1.end())
+    return true; // 'false' subsumes anything
 
-  for(auto &a_conjunct : a1)
-    if(a_conjunct == b)
-      return true; // b is subsumed by a conjunct in a
+  if(a1.find(b) != a1.end())
+    return true; // b is subsumed by a conjunct in a
 
   cout_message_handlert message_handler;
 #if 0
@@ -406,8 +404,8 @@ void solver(
           std::cout << "trivial\n";
       }
       else if(is_subsumed(
-                f.invariants,
-                f.auxiliaries,
+                f.invariants_set,
+                f.auxiliaries_set,
                 invariant,
                 address_taken,
                 solver_options.verbose,
