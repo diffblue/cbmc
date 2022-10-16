@@ -13,6 +13,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
+#include "in_interval_expr.h"
 #include "state.h"
 
 void format_hooks()
@@ -141,5 +142,13 @@ void format_hooks()
         return os << "nondet " << format(side_effect_expr.type());
       else
         return os << "side-effect-" << side_effect_expr.get_statement();
+    });
+
+  add_format_hook(
+    "in_interval", [](std::ostream &os, const exprt &expr) -> std::ostream & {
+      const auto &in_interval_expr = to_in_interval_expr(expr);
+      return os << format(in_interval_expr.value()) << " in ["
+                << format(in_interval_expr.lower()) << ", "
+                << format(in_interval_expr.upper()) << ']';
     });
 }

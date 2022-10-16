@@ -11,8 +11,10 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "solver.h"
 
+#include <util/arith_tools.h>
 #include <util/cout_message.h>
 #include <util/format_expr.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 #include <solvers/sat/satcheck.h>
@@ -23,6 +25,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "console.h"
 #include "counterexample_found.h"
 #include "free_symbols.h"
+#include "in_interval_expr.h"
 #include "propagate.h"
 #include "report_properties.h"
 #include "report_traces.h"
@@ -178,6 +181,78 @@ void dump(
   }
 }
 
+static bool is_plus_one(const exprt &a, const exprt &b)
+{
+  if(a.id() == ID_constant && b.id() == ID_constant)
+  {
+    auto v_a = numeric_cast<mp_integer>(to_constant_expr(a));
+    auto v_b = numeric_cast<mp_integer>(to_constant_expr(b));
+    if(v_a.has_value() && v_b.has_value() && v_a.value() + 1 == v_b.value())
+      return true;
+  }
+
+  return false;
+}
+
+static optionalt<in_interval_exprt>
+make_in_interval(const exprt &a, const exprt &b)
+{
+  if(a.id() == ID_equal && b.id() == ID_equal)
+  {
+    if(to_equal_expr(a).lhs() == to_equal_expr(b).lhs())
+    {
+      // we look for x=a && x=a+1 on integers
+      if(is_plus_one(to_equal_expr(a).rhs(), to_equal_expr(b).rhs()))
+        return in_interval_exprt(
+          to_equal_expr(a).lhs(),
+          to_equal_expr(a).rhs(),
+          to_equal_expr(b).rhs());
+      else if(is_plus_one(to_equal_expr(b).rhs(), to_equal_expr(a).rhs()))
+        return make_in_interval(b, a);
+      else
+        return {};
+    }
+    else
+      return {};
+  }
+  else if(a.id() == ID_equal && b.id() == "in_interval")
+  {
+    return {};
+  }
+  else if(a.id() == "in_interval" && b.id() == ID_equal)
+  {
+    return make_in_interval(b, a);
+  }
+  else
+    return {};
+}
+
+exprt simplify_invariant(exprt expr, const namespacet &ns)
+{
+  expr = simplify_expr(expr, ns);
+
+  if(expr.id() == ID_or)
+  {
+    auto &ops = to_or_expr(expr).operands();
+    bool replacement_done = false;
+    for(std::size_t i = 1; i < ops.size(); i++)
+    {
+      auto in_interval = make_in_interval(ops[i - 1], ops[i]);
+      if(in_interval.has_value())
+      {
+        ops[i - 1] = false_exprt();
+        ops[i] = in_interval.value();
+        replacement_done = true;
+      }
+    }
+
+    if(replacement_done)
+      expr = simplify_expr(expr, ns);
+  }
+
+  return expr;
+}
+
 bool is_subsumed(
   const std::vector<exprt> &a1,
   const std::vector<exprt> &a2,
@@ -321,6 +396,8 @@ void solver(
                   << frame_ref.index << consolet::reset << ' ';
       }
 #endif
+
+      invariant = simplify_invariant(invariant, ns);
 
       // trivially true?
       if(invariant.is_true())
