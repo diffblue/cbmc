@@ -17,6 +17,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <chrono>
 #include <unordered_map>
+#include <unordered_set>
 
 class frame_reft
 {
@@ -53,9 +54,11 @@ public:
 
   // our current hypothesis invariant
   std::vector<exprt> invariants;
+  std::unordered_set<exprt, irep_hash> invariants_set;
 
   // auxiliary facts
   std::vector<exprt> auxiliaries;
+  std::unordered_set<exprt, irep_hash> auxiliaries_set;
 
   // formulas where this frame is on the rhs of ⇒
   struct implicationt
@@ -84,7 +87,9 @@ public:
   void reset()
   {
     invariants.clear();
+    invariants_set.clear();
     auxiliaries.clear();
+    auxiliaries_set.clear();
   }
 
   frame_reft ref;

@@ -26,7 +26,10 @@ void framet::add_invariant(exprt invariant)
       add_invariant(conjunct);
   }
   else
+  {
+    invariants_set.insert(invariant);
     invariants.push_back(std::move(invariant));
+  }
 }
 
 void framet::add_auxiliary(exprt invariant)
@@ -37,7 +40,10 @@ void framet::add_auxiliary(exprt invariant)
       add_auxiliary(conjunct);
   }
   else
+  {
+    auxiliaries_set.insert(invariant);
     auxiliaries.push_back(std::move(invariant));
+  }
 }
 
 frame_mapt build_frame_map(const std::vector<framet> &frames)
