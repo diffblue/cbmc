@@ -90,6 +90,16 @@ public:
   frame_reft ref;
 };
 
+frame_mapt build_frame_map(const std::vector<framet> &frames);
+
+frame_reft find_frame(const frame_mapt &, const symbol_exprt &frame_symbol);
+
+void find_implications(
+  const std::vector<exprt> &constraints,
+  std::vector<framet> &);
+
+std::vector<framet> setup_frames(const std::vector<exprt> &constraints);
+
 class propertyt
 {
 public:
@@ -135,6 +145,10 @@ public:
   using tracet = std::vector<trace_statet>;
   tracet trace;
 };
+
+std::vector<propertyt> find_properties(
+  const std::vector<exprt> &constraints,
+  const std::vector<framet> &);
 
 struct workt
 {
