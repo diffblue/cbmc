@@ -188,9 +188,8 @@ public:
 
   explicit constant_propagator_ait(
     const goto_functiont &goto_function,
-    should_track_valuet should_track_value = track_all_values):
-    dirty(goto_function),
-    should_track_value(should_track_value)
+    should_track_valuet should_track_value = track_all_values)
+    : dirty(goto_function.body), should_track_value(should_track_value)
   {
   }
 
@@ -210,7 +209,7 @@ public:
     goto_functionst::goto_functiont &goto_function,
     const namespacet &ns,
     should_track_valuet should_track_value = track_all_values)
-    : dirty(goto_function), should_track_value(should_track_value)
+    : dirty(goto_function.body), should_track_value(should_track_value)
   {
     operator()(function_identifier, goto_function, ns);
     replace(goto_function, ns);

@@ -111,7 +111,7 @@ class function_cfg_infot : public cfg_infot
 {
 public:
   explicit function_cfg_infot(const goto_functiont &_goto_function)
-    : is_dirty(_goto_function), locals(_goto_function)
+    : is_dirty(_goto_function.body), locals(_goto_function)
   {
     parameters.insert(
       _goto_function.parameter_identifiers.begin(),
@@ -143,7 +143,7 @@ class loop_cfg_infot : public cfg_infot
 {
 public:
   loop_cfg_infot(goto_functiont &_goto_function, const loopt &loop)
-    : is_dirty(_goto_function)
+    : is_dirty(_goto_function.body)
   {
     for(const auto &t : loop)
     {
@@ -205,10 +205,7 @@ public:
     goto_program.get_decl_identifiers(locals);
 
     // collect dirty locals
-    goto_functiont goto_function;
-    goto_function.body.copy_from(goto_program);
-
-    dirtyt is_dirty(goto_function);
+    dirtyt is_dirty(goto_program);
     const auto &dirty_ids = is_dirty.get_dirty_ids();
     dirty.insert(dirty_ids.begin(), dirty_ids.end());
   }

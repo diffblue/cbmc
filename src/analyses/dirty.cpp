@@ -16,9 +16,9 @@ Date: March 2013
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
-void dirtyt::build(const goto_functiont &goto_function)
+void dirtyt::build(const goto_programt &goto_program)
 {
-  for(const auto &i : goto_function.body.instructions)
+  for(const auto &i : goto_program.instructions)
   {
     if(i.is_other())
     {
@@ -108,12 +108,12 @@ void dirtyt::output(std::ostream &out) const
 
 /// Analyse the given function with dirtyt if it hasn't been seen before
 /// \param id: function id to analyse
-/// \param function: function to analyse
+/// \param goto_program: body of function to analyse
 void incremental_dirtyt::populate_dirty_for_function(
   const irep_idt &id,
-  const goto_functionst::goto_functiont &function)
+  const goto_programt &goto_program)
 {
   auto insert_result = dirty_processed_functions.insert(id);
   if(insert_result.second)
-    dirty.add_function(function);
+    dirty.add_function(goto_program);
 }

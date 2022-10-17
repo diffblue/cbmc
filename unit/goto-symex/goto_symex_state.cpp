@@ -48,8 +48,8 @@ SCENARIO(
 
   // Initialize dirty field of state
   incremental_dirtyt dirty;
-  goto_functiont function;
-  dirty.populate_dirty_for_function("fun", function);
+  goto_programt function_body;
+  dirty.populate_dirty_for_function("fun", function_body);
   state.dirty = &dirty;
 
   GIVEN("An L1 lhs and an L2 rhs of type int")

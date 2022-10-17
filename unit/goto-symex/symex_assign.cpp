@@ -59,8 +59,8 @@ SCENARIO(
 
   // Initialize dirty field of state
   incremental_dirtyt dirty;
-  goto_functiont function;
-  dirty.populate_dirty_for_function("fun", function);
+  goto_programt function_body;
+  dirty.populate_dirty_for_function("fun", function_body);
   state.dirty = &dirty;
 
   // Initialize symbol table with an integer symbol `foo`, and a boolean g

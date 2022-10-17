@@ -38,7 +38,6 @@ private:
 
 public:
   bool initialized;
-  typedef goto_functionst::goto_functiont goto_functiont;
 
   /// \post dirtyt objects that are created through this constructor are not
   /// safe to use. If you copied a dirtyt (for example, by adding an object
@@ -48,9 +47,9 @@ public:
   {
   }
 
-  explicit dirtyt(const goto_functiont &goto_function) : initialized(false)
+  explicit dirtyt(const goto_programt &goto_program) : initialized(false)
   {
-    build(goto_function);
+    build(goto_program);
     initialized = true;
   }
 
@@ -81,9 +80,9 @@ public:
     return dirty;
   }
 
-  void add_function(const goto_functiont &goto_function)
+  void add_function(const goto_programt &goto_program)
   {
-    build(goto_function);
+    build(goto_program);
     initialized = true;
   }
 
@@ -92,12 +91,12 @@ public:
     // dirtyts should not be initialized twice
     PRECONDITION(!initialized);
     for(const auto &gf_entry : goto_functions.function_map)
-      build(gf_entry.second);
+      build(gf_entry.second.body);
     initialized = true;
   }
 
 protected:
-  void build(const goto_functiont &goto_function);
+  void build(const goto_programt &);
 
   // variables whose address is taken
   std::unordered_set<irep_idt> dirty;
@@ -119,7 +118,7 @@ class incremental_dirtyt
 public:
   void populate_dirty_for_function(
     const irep_idt &id,
-    const goto_functionst::goto_functiont &function);
+    const goto_programt &goto_program);
 
   bool operator()(const irep_idt &id) const
   {

@@ -27,11 +27,10 @@ class local_may_aliast
 public:
   typedef goto_functionst::goto_functiont goto_functiont;
 
-  explicit local_may_aliast(
-    const goto_functiont &_goto_function):
-    dirty(_goto_function),
-    locals(_goto_function),
-    cfg(_goto_function.body)
+  explicit local_may_aliast(const goto_functiont &_goto_function)
+    : dirty(_goto_function.body),
+      locals(_goto_function),
+      cfg(_goto_function.body)
   {
     build(_goto_function);
   }

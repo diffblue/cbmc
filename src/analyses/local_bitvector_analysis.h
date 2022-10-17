@@ -27,7 +27,7 @@ public:
   local_bitvector_analysist(
     const goto_functiont &_goto_function,
     const namespacet &ns)
-    : dirty(_goto_function),
+    : dirty(_goto_function.body),
       locals(_goto_function),
       cfg(_goto_function.body),
       ns(ns)

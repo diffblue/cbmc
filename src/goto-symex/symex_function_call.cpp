@@ -230,7 +230,8 @@ void goto_symext::symex_function_call_post_clean(
   const goto_functionst::goto_functiont &goto_function =
     get_goto_function(identifier);
 
-  path_storage.dirty.populate_dirty_for_function(identifier, goto_function);
+  path_storage.dirty.populate_dirty_for_function(
+    identifier, goto_function.body);
 
   auto emplace_safe_pointers_result =
     path_storage.safe_pointers.emplace(identifier, local_safe_pointerst{});
