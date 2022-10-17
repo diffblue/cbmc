@@ -11,7 +11,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -86,7 +86,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -189,7 +189,7 @@ jobs:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
       - name: Checkout CBMC project source code to obtain access to scripts
         if: always()
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install golang toolchain to run the notification step
         if: always()
         run: brew install go
@@ -207,7 +207,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: nuget/setup-nuget@v1
@@ -301,7 +301,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout CBMC source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Set Image Tag
