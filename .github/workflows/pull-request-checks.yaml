@@ -9,7 +9,7 @@ jobs:
   check-ubuntu-20_04-make-gcc:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -77,7 +77,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -148,7 +148,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -189,7 +189,7 @@ jobs:
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -248,7 +248,7 @@ jobs:
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -305,7 +305,7 @@ jobs:
   check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -352,7 +352,7 @@ jobs:
   check-ubuntu-20_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -389,7 +389,7 @@ jobs:
   check-macos-11-make-clang:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -439,7 +439,7 @@ jobs:
   check-macos-12-cmake-clang:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -483,7 +483,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: nuget/setup-nuget@v1
@@ -535,7 +535,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: nuget/setup-nuget@v1
@@ -600,7 +600,7 @@ jobs:
   check-clang-format:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
           fetch-depth: 0
@@ -621,7 +621,7 @@ jobs:
   check-cpplint:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
           fetch-depth: 0
@@ -644,7 +644,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: nuget/setup-nuget@v1
@@ -692,7 +692,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -760,14 +760,14 @@ jobs:
   check-string-table:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check for unused irep ids
         run: ./scripts/string_table_check.sh
 
   check-docker-image:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Download test dependencies
@@ -791,7 +791,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Download testing and coverage dependencies
