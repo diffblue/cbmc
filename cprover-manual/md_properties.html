@@ -317,7 +317,7 @@ Malloc failure mode</h3>
 <p>Calling <code>malloc</code> may fail for a number of reasons and the function may return a NULL pointer. The users can choose if and how they want the <code>malloc</code>-related failures to occur. The option <code>--malloc-fail-null</code> results in <code>malloc</code> returning the NULL pointer when failing. The option <code>--malloc-fail-assert</code> places additional properties inside <code>malloc</code> that are checked and if failing the verification is terminated (by <code>assume(false)</code>). One such property is that the allocated size is not too large, i.e.&#160;internally representable. When neither of those two options are used, CBMC will assume that <code>malloc</code> does not fail.</p>
 <p>Malloc may also fail for external reasons which are not modelled by CProver. If you want to replicate this behaviour use the option <code>--malloc-may-fail</code> in conjunction with one of the above modes of failure.</p>
 <p>These malloc failure options need to be set when the C library model is added to the program. Typically this is upon invoking CBMC, but if the user has chosen to do so via <code>goto-instrument --add-library</code>, then the malloc failure mode needs to be specified with that <code>goto-instrument</code> invocation, i.e., as an option to <code>goto-instrument</code>.</p>
-<p>Last modified: 2022-10-17 16:35:32 +0200 </p>
+<p>Last modified: 2022-10-18 16:17:26 +0200 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
