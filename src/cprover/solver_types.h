@@ -95,6 +95,10 @@ public:
   frame_reft ref;
 };
 
+frame_mapt build_frame_map(const std::vector<framet> &frames);
+
+frame_reft find_frame(const frame_mapt &, const symbol_exprt &frame_symbol);
+
 class propertyt
 {
 public:

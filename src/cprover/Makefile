@@ -14,6 +14,7 @@ SRC = address_taken.cpp \
       free_symbols.cpp \
       generalization.cpp \
       help_formatter.cpp \
+      inductiveness.cpp \
       instrument_contracts.cpp \
       instrument_given_invariants.cpp \
       may_alias.cpp \
