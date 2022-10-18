@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^Generated 1 VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This should be fully solved by constant propagation when union field-sensitivity
+is in place.

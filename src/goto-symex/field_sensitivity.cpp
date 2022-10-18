@@ -9,8 +9,10 @@ Author: Michael Tautschnig
 #include "field_sensitivity.h"
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
+#include <util/c_types.h>
+#include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
-#include <util/std_expr.h>
 
 #include "goto_symex_state.h"
 #include "symex_target.h"
@@ -26,7 +28,7 @@ exprt field_sensitivityt::apply(
   if(write)
     return std::move(ssa_expr);
   else
-    return get_fields(ns, state, ssa_expr);
+    return get_fields(ns, state, ssa_expr, true);
 }
 
 exprt field_sensitivityt::apply(
@@ -43,7 +45,7 @@ exprt field_sensitivityt::apply(
 
   if(!write && is_ssa_expr(expr))
   {
-    return get_fields(ns, state, to_ssa_expr(expr));
+    return get_fields(ns, state, to_ssa_expr(expr), true);
   }
   else if(
     !write && expr.id() == ID_member &&
@@ -69,7 +71,9 @@ exprt field_sensitivityt::apply(
     if(
       is_ssa_expr(member.struct_op()) &&
       (member.struct_op().type().id() == ID_struct ||
-       member.struct_op().type().id() == ID_struct_tag))
+       member.struct_op().type().id() == ID_struct_tag ||
+       member.struct_op().type().id() == ID_union ||
+       member.struct_op().type().id() == ID_union_tag))
     {
       // place the entire member expression, not just the struct operand, in an
       // SSA expression
@@ -83,6 +87,40 @@ exprt field_sensitivityt::apply(
         return state.rename(std::move(tmp), ns).get();
       else
         return std::move(tmp);
+    }
+  }
+  else if(
+    !write && (expr.id() == ID_byte_extract_little_endian ||
+               expr.id() == ID_byte_extract_big_endian))
+  {
+    const byte_extract_exprt &be = to_byte_extract_expr(expr);
+    if(
+      (be.op().type().id() == ID_union ||
+       be.op().type().id() == ID_union_tag) &&
+      is_ssa_expr(be.op()) && be.offset().is_constant())
+    {
+      const union_typet &type = to_union_type(ns.follow(be.op().type()));
+      for(const auto &comp : type.components())
+      {
+        ssa_exprt tmp = to_ssa_expr(be.op());
+        bool was_l2 = !tmp.get_level_2().empty();
+        tmp.remove_level_2();
+        const member_exprt member{tmp.get_original_expr(), comp};
+        auto recursive_member =
+          get_subexpression_at_offset(member, be.offset(), be.type(), ns);
+        if(
+          recursive_member.has_value() &&
+          (recursive_member->id() == ID_member ||
+           recursive_member->id() == ID_index))
+        {
+          tmp.type() = be.type();
+          tmp.set_expression(*recursive_member);
+          if(was_l2)
+            return state.rename(std::move(tmp), ns).get();
+          else
+            return std::move(tmp);
+        }
+      }
     }
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
@@ -141,7 +179,7 @@ exprt field_sensitivityt::apply(
         {
           // Expand the array and return `{array[0]; array[1]; ...}[index]`
           exprt expanded_array =
-            get_fields(ns, state, to_ssa_expr(index.array()));
+            get_fields(ns, state, to_ssa_expr(index.array()), true);
           return index_exprt{std::move(expanded_array), index.index()};
         }
       }
@@ -154,33 +192,48 @@ exprt field_sensitivityt::apply(
 exprt field_sensitivityt::get_fields(
   const namespacet &ns,
   goto_symex_statet &state,
-  const ssa_exprt &ssa_expr) const
+  const ssa_exprt &ssa_expr,
+  bool disjoined_fields_only) const
 {
-  if(ssa_expr.type().id() == ID_struct || ssa_expr.type().id() == ID_struct_tag)
+  if(
+    ssa_expr.type().id() == ID_struct ||
+    ssa_expr.type().id() == ID_struct_tag ||
+    (!disjoined_fields_only && (ssa_expr.type().id() == ID_union ||
+                                ssa_expr.type().id() == ID_union_tag)))
   {
-    const struct_typet &type = to_struct_type(ns.follow(ssa_expr.type()));
+    const struct_union_typet &type =
+      to_struct_union_type(ns.follow(ssa_expr.type()));
     const struct_union_typet::componentst &components = type.components();
 
-    struct_exprt::operandst fields;
+    exprt::operandst fields;
     fields.reserve(components.size());
 
-    const exprt &struct_op = ssa_expr.get_original_expr();
+    const exprt &compound_op = ssa_expr.get_original_expr();
 
     for(const auto &comp : components)
     {
       ssa_exprt tmp = ssa_expr;
       bool was_l2 = !tmp.get_level_2().empty();
       tmp.remove_level_2();
-      tmp.set_expression(member_exprt{struct_op, comp.get_name(), comp.type()});
+      tmp.set_expression(
+        member_exprt{compound_op, comp.get_name(), comp.type()});
+      exprt field = get_fields(ns, state, tmp, disjoined_fields_only);
       if(was_l2)
       {
-        fields.push_back(state.rename(get_fields(ns, state, tmp), ns).get());
+        fields.emplace_back(state.rename(std::move(field), ns).get());
       }
       else
-        fields.push_back(get_fields(ns, state, tmp));
+        fields.emplace_back(std::move(field));
     }
 
-    return struct_exprt(std::move(fields), ssa_expr.type());
+    if(
+      disjoined_fields_only && (ssa_expr.type().id() == ID_struct ||
+                                ssa_expr.type().id() == ID_struct_tag))
+    {
+      return struct_exprt{std::move(fields), ssa_expr.type()};
+    }
+    else
+      return field_sensitive_ssa_exprt{ssa_expr, std::move(fields)};
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
@@ -207,15 +260,19 @@ exprt field_sensitivityt::get_fields(
       bool was_l2 = !tmp.get_level_2().empty();
       tmp.remove_level_2();
       tmp.set_expression(index);
+      exprt element = get_fields(ns, state, tmp, disjoined_fields_only);
       if(was_l2)
       {
-        elements.push_back(state.rename(get_fields(ns, state, tmp), ns).get());
+        elements.emplace_back(state.rename(std::move(element), ns).get());
       }
       else
-        elements.push_back(get_fields(ns, state, tmp));
+        elements.emplace_back(std::move(element));
     }
 
-    return array_exprt(std::move(elements), type);
+    if(disjoined_fields_only)
+      return array_exprt(std::move(elements), type);
+    else
+      return field_sensitive_ssa_exprt{ssa_expr, std::move(elements)};
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
   else
@@ -230,7 +287,7 @@ void field_sensitivityt::field_assignments(
   symex_targett &target,
   bool allow_pointer_unsoundness) const
 {
-  const exprt lhs_fs = get_fields(ns, state, lhs);
+  const exprt lhs_fs = get_fields(ns, state, lhs, false);
 
   if(lhs != lhs_fs)
   {
@@ -292,9 +349,66 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(const auto &comp : components)
     {
-      const exprt member_rhs =
-        simplify_opt(member_exprt{ssa_rhs, comp.get_name(), comp.type()}, ns);
+      const exprt member_rhs = apply(
+        ns,
+        state,
+        simplify_opt(member_exprt{ssa_rhs, comp.get_name(), comp.type()}, ns),
+        false);
+
       const exprt &member_lhs = *fs_it;
+      if(
+        auto fs_ssa =
+          expr_try_dynamic_cast<field_sensitive_ssa_exprt>(member_lhs))
+      {
+        field_assignments_rec(
+          ns,
+          state,
+          fs_ssa->get_object_ssa(),
+          member_rhs,
+          target,
+          allow_pointer_unsoundness);
+      }
+
+      field_assignments_rec(
+        ns, state, member_lhs, member_rhs, target, allow_pointer_unsoundness);
+      ++fs_it;
+    }
+  }
+  else if(
+    ssa_rhs.type().id() == ID_union || ssa_rhs.type().id() == ID_union_tag)
+  {
+    const union_typet &type = to_union_type(ns.follow(ssa_rhs.type()));
+    const struct_union_typet::componentst &components = type.components();
+
+    PRECONDITION(
+      components.empty() ||
+      (lhs_fs.has_operands() && lhs_fs.operands().size() == components.size()));
+
+    exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
+    for(const auto &comp : components)
+    {
+      const exprt member_rhs = apply(
+        ns,
+        state,
+        simplify_opt(
+          make_byte_extract(
+            ssa_rhs, from_integer(0, c_index_type()), comp.type()),
+          ns),
+        false);
+
+      const exprt &member_lhs = *fs_it;
+      if(
+        auto fs_ssa =
+          expr_try_dynamic_cast<field_sensitive_ssa_exprt>(member_lhs))
+      {
+        field_assignments_rec(
+          ns,
+          state,
+          fs_ssa->get_object_ssa(),
+          member_rhs,
+          target,
+          allow_pointer_unsoundness);
+      }
 
       field_assignments_rec(
         ns, state, member_lhs, member_rhs, target, allow_pointer_unsoundness);
@@ -314,9 +428,26 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(std::size_t i = 0; i < array_size; ++i)
     {
-      const exprt index_rhs = simplify_opt(
-        index_exprt{ssa_rhs, from_integer(i, type->index_type())}, ns);
+      const exprt index_rhs = apply(
+        ns,
+        state,
+        simplify_opt(
+          index_exprt{ssa_rhs, from_integer(i, type->index_type())}, ns),
+        false);
+
       const exprt &index_lhs = *fs_it;
+      if(
+        auto fs_ssa =
+          expr_try_dynamic_cast<field_sensitive_ssa_exprt>(index_lhs))
+      {
+        field_assignments_rec(
+          ns,
+          state,
+          fs_ssa->get_object_ssa(),
+          index_rhs,
+          target,
+          allow_pointer_unsoundness);
+      }
 
       field_assignments_rec(
         ns, state, index_lhs, index_rhs, target, allow_pointer_unsoundness);
@@ -333,6 +464,17 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(const exprt &op : ssa_rhs.operands())
     {
+      if(auto fs_ssa = expr_try_dynamic_cast<field_sensitive_ssa_exprt>(*fs_it))
+      {
+        field_assignments_rec(
+          ns,
+          state,
+          fs_ssa->get_object_ssa(),
+          op,
+          target,
+          allow_pointer_unsoundness);
+      }
+
       field_assignments_rec(
         ns, state, *fs_it, op, target, allow_pointer_unsoundness);
       ++fs_it;
@@ -344,7 +486,9 @@ void field_sensitivityt::field_assignments_rec(
   }
 }
 
-bool field_sensitivityt::is_divisible(const ssa_exprt &expr) const
+bool field_sensitivityt::is_divisible(
+  const ssa_exprt &expr,
+  bool disjoined_fields_only) const
 {
   if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
     return true;
@@ -359,6 +503,13 @@ bool field_sensitivityt::is_divisible(const ssa_exprt &expr) const
     return true;
   }
 #endif
+
+  if(
+    !disjoined_fields_only &&
+    (expr.type().id() == ID_union || expr.type().id() == ID_union_tag))
+  {
+    return true;
+  }
 
   return false;
 }
