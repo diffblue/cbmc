@@ -1683,6 +1683,40 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   if(!offset.has_value() || *offset < 0)
     return unchanged(expr);
 
+  // byte_extract(byte_update(root, offset_u, value), offset_e) so that the
+  // update does not affect what is being extracted simplifies to
+  // byte_extract(root, offset_e)
+  if(
+    expr.op().id() == ID_byte_update_big_endian ||
+    expr.op().id() == ID_byte_update_little_endian)
+  {
+    const byte_update_exprt &bu = to_byte_update_expr(expr.op());
+    const auto update_offset = numeric_cast<mp_integer>(bu.offset());
+    if(update_offset.has_value())
+    {
+      if(
+        *offset * expr.get_bits_per_byte() + *el_size <=
+        *update_offset * bu.get_bits_per_byte())
+      {
+        auto tmp = expr;
+        tmp.op() = bu.op();
+        return changed(simplify_byte_extract(tmp)); // recursive call
+      }
+      else
+      {
+        const auto update_size = pointer_offset_bits(bu.value().type(), ns);
+        if(
+          update_size.has_value() &&
+          *offset >= *update_offset * bu.get_bits_per_byte() + *update_size)
+        {
+          auto tmp = expr;
+          tmp.op() = bu.op();
+          return changed(simplify_byte_extract(tmp)); // recursive call
+        }
+      }
+    }
+  }
+
   // don't do any of the following if endianness doesn't match, as
   // bytes need to be swapped
   if(
