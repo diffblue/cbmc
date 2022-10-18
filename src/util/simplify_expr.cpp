@@ -1705,6 +1705,19 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     }
   }
 
+  if(
+    (expr.type().id() == ID_union || expr.type().id() == ID_union_tag) &&
+    to_union_type(ns.follow(expr.type())).components().empty())
+  {
+    return empty_union_exprt{expr.type()};
+  }
+  else if(
+    (expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag) &&
+    to_struct_type(ns.follow(expr.type())).components().empty())
+  {
+    return struct_exprt{{}, expr.type()};
+  }
+
   // no proper simplification for expr.type()==void
   // or types of unknown size
   if(!el_size.has_value() || *el_size == 0)

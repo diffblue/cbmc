@@ -264,6 +264,9 @@ optionalt<exprt> bits2expr(
     const union_typet &union_type = to_union_type(type);
     const union_typet::componentst &components = union_type.components();
 
+    if(components.empty() && bits.empty())
+      return empty_union_exprt{type};
+
     for(const auto &component : components)
     {
       auto val = bits2expr(bits, component.type(), little_endian, ns);
