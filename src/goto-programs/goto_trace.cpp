@@ -13,11 +13,10 @@ Author: Daniel Kroening
 
 #include "goto_trace.h"
 
-#include <ostream>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/format_expr.h>
 #include <util/merge_irep.h>
 #include <util/range.h>
@@ -27,6 +26,8 @@ Author: Daniel Kroening
 #include <langapi/language_util.h>
 
 #include "printf_formatter.h"
+
+#include <ostream>
 
 static optionalt<symbol_exprt> get_object_rec(const exprt &src)
 {
@@ -195,7 +196,7 @@ static std::string numeric_representation(
   for(const auto c : result)
   {
     oss << c;
-    if(++i % 8 == 0 && result.size() != i)
+    if(++i % config.ansi_c.char_width == 0 && result.size() != i)
       oss << ' ';
   }
   if(options.base_prefix)
