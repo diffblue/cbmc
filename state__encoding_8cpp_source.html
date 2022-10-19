@@ -1339,14 +1339,16 @@ $(document).ready(function(){initNavTree('state__encoding_8cpp_source.html','');
 <div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160; </div>
 <div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;  <a class="code" href="equality__propagation_8cpp.html#a3de76997fca41782edc7c7ae73a15169">equality_propagation</a>(container.<a class="code" href="classcontainer__encoding__targett.html#adbf585a9106891485537a5a8ffe48633">constraints</a>);</div>
 <div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160; </div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;  <span class="keywordflow">if</span>(solver_options.<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>)</div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;  {</div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;    <a class="code" href="classascii__encoding__targett.html">ascii_encoding_targett</a> dest(std::cout);</div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    dest &lt;&lt; container;</div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;  }</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160; </div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(container.<a class="code" href="classcontainer__encoding__targett.html#adbf585a9106891485537a5a8ffe48633">constraints</a>, solver_options, ns);</div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;}</div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;  <span class="keywordflow">if</span>(solver_options.<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>)</div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;  {</div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    <a class="code" href="classascii__encoding__targett.html">ascii_encoding_targett</a> dest(std::cout);</div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    dest &lt;&lt; container;</div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;  }</div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160; </div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(container.<a class="code" href="classcontainer__encoding__targett.html#adbf585a9106891485537a5a8ffe48633">constraints</a>, solver_options, ns);</div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassexprt_html_a716fd9c320aac24015294f0f094a068d"><div class="ttname"><a href="classexprt.html#a716fd9c320aac24015294f0f094a068d">exprt::op2</a></div><div class="ttdeci">exprt &amp; op2()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00131">expr.h:131</a></div></div>
@@ -1467,7 +1469,7 @@ $(document).ready(function(){initNavTree('state__encoding_8cpp_source.html','');
 <div class="ttc" id="aclassstate__encodingt_html_ad6b5c44fb4686fa5098d59779e4a901f"><div class="ttname"><a href="classstate__encodingt.html#ad6b5c44fb4686fa5098d59779e4a901f">state_encodingt::incoming_symbols</a></div><div class="ttdeci">std::vector&lt; symbol_exprt &gt; incoming_symbols(loct) const</div><div class="ttdef"><b>Definition:</b> <a href="state__encoding_8cpp_source.html#l00121">state_encoding.cpp:121</a></div></div>
 <div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
-<div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00283">solver.cpp:283</a></div></div>
+<div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00287">solver.cpp:287</a></div></div>
 <div class="ttc" id="aclassreallocate__exprt_html"><div class="ttname"><a href="classreallocate__exprt.html">reallocate_exprt</a></div><div class="ttdef"><b>Definition:</b> <a href="state_8h_source.html#l00312">state.h:312</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="aclassside__effect__expr__nondett_html"><div class="ttname"><a href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a></div><div class="ttdoc">A side_effect_exprt that returns a non-deterministically chosen value.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01519">std_code.h:1519</a></div></div>
