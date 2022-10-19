@@ -3318,8 +3318,14 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
           << ")";
     }
     else
-      UNEXPECTEDCASE(
-        "unknown pointer constant: " + id2string(expr.get_value()));
+    {
+      // just treat the pointer as a bit vector
+      const std::size_t width = boolbv_width(expr_type);
+
+      const mp_integer value = bvrep2integer(expr.get_value(), width, false);
+
+      out << "(_ bv" << value << " " << width << ")";
+    }
   }
   else if(expr_type.id()==ID_bool)
   {
