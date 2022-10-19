@@ -4786,7 +4786,17 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         {
           out << "(define-fun " << smt2_identifier;
           out << " () ";
-          convert_type(equal_expr.lhs().type());
+          if(
+            equal_expr.lhs().type().id() != ID_array ||
+            use_array_theory(prepared_rhs))
+          {
+            convert_type(equal_expr.lhs().type());
+          }
+          else
+          {
+            std::size_t width = boolbv_width(equal_expr.lhs().type());
+            out << "(_ BitVec " << width << ")";
+          }
           out << ' ';
           convert_expr(prepared_rhs);
           out << ')' << '\n';
