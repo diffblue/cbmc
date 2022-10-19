@@ -1245,11 +1245,13 @@ solver_resultt state_encoding_solver(
 
   equality_propagation(container.constraints);
 
+#if 0
   if(solver_options.verbose)
   {
     ascii_encoding_targett dest(std::cout);
     dest << container;
   }
+#endif
 
   return solver(container.constraints, solver_options, ns);
 }
