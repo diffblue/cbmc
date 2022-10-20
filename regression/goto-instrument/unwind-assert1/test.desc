@@ -1,8 +1,10 @@
 CORE
 main.c
 --unwind 10 --unwinding-assertions
+^\[main.unwind.1\] line 5 unwinding assertion loop 0: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+^\[main.\d+\] line 5 assertion: SUCCESS$

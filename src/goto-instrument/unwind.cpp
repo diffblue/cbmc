@@ -153,8 +153,13 @@ void goto_unwindt::unwind(
       unwind_strategy == unwind_strategyt::ASSERT_ASSUME ||
       unwind_strategy == unwind_strategyt::ASSERT_PARTIAL)
     {
+      const std::string loop_number = std::to_string(t->loop_number);
+      source_locationt source_location_annotated = loop_head->source_location();
+      source_location_annotated.set_property_class("unwind");
+      source_location_annotated.set_comment(
+        "unwinding assertion loop " + loop_number);
       goto_programt::targett assertion = rest_program.add(
-        goto_programt::make_assertion(exit_cond, loop_head->source_location()));
+        goto_programt::make_assertion(exit_cond, source_location_annotated));
       unwind_log.insert(assertion, loop_head->location_number);
     }
 
