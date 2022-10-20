@@ -505,7 +505,7 @@ jobs:
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1
       - name: Prepare ccache
         uses: actions/cache@v3
         with:
@@ -524,7 +524,7 @@ jobs:
         run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
       - name: Print ccache stats
         run: clcache -s
-      - uses: ilammy/msvc-dev-cmd@v1.4.1
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Test cbmc
         run: |
           Set-Location build
@@ -559,7 +559,7 @@ jobs:
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1
       - name: Initialise Developer Command Line
         uses: ilammy/msvc-dev-cmd@v1
       - name: Prepare ccache
@@ -656,7 +656,7 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1
       - name: Prepare ccache
         uses: actions/cache@v3
         with:
@@ -835,7 +835,7 @@ jobs:
           echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
           cmake --build build --target coverage -- -j2
       - name: Upload coverage statistics to Codecov
-        uses: codecov/codecov-action@v3.0.0
+        uses: codecov/codecov-action@v3
         with:
           files: build/html/coverage.info
           fail_ci_if_error: true

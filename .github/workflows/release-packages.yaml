@@ -63,7 +63,7 @@ jobs:
           echo "deb_package_name=ubuntu-20.04-$deb_package_name" >> $GITHUB_OUTPUT
       - name: Get release info
         id: get_release_info
-        uses: bruceadams/get-release@v1.2.0
+        uses: bruceadams/get-release@v1
       - name: Upload binary packages
         uses: actions/upload-release-asset@v1
         with:
@@ -151,7 +151,7 @@ jobs:
           echo "deb_package_name=ubuntu-18.04-$deb_package_name" >> $GITHUB_OUTPUT
       - name: Get release info
         id: get_release_info
-        uses: bruceadams/get-release@v1.2.0
+        uses: bruceadams/get-release@v1
       - name: Upload binary packages
         uses: actions/upload-release-asset@v1
         with:
@@ -219,7 +219,7 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1
       - name: Setup code sign environment
         run: |
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH
@@ -281,7 +281,7 @@ jobs:
           & signtool.exe verify /pa ${{ steps.create_packages.outputs.msi_installer }}
       - name: Get release info
         id: get_release_info
-        uses: bruceadams/get-release@v1.2.0
+        uses: bruceadams/get-release@v1
       - name: Upload binary packages
         uses: actions/upload-release-asset@v1
         with:
