@@ -99,13 +99,10 @@ $(document).ready(function(){initNavTree('solver_8cpp.html',''); initResizable()
 <code>#include &lt;<a class="el" href="cout__message_8h_source.html">util/cout_message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="format__expr_8h_source.html">util/format_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="satcheck_8h_source.html">solvers/sat/satcheck.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="address__taken_8h_source.html">address_taken.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="axioms_8h_source.html">axioms.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="bv__pointers__wide_8h_source.html">bv_pointers_wide.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="console_8h_source.html">console.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="counterexample__found_8h_source.html">counterexample_found.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="free__symbols_8h_source.html">free_symbols.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="inductiveness_8h_source.html">inductiveness.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="propagate_8h_source.html">propagate.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="report__properties_8h_source.html">report_properties.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="report__traces_8h_source.html">report_traces.h</a>&quot;</code><br />
@@ -121,7 +118,7 @@ $(document).ready(function(){initNavTree('solver_8cpp.html',''); initResizable()
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="solver_8cpp__incl.svg" width="2870" height="963"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="solver_8cpp__incl.svg" width="1798" height="1098"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -134,24 +131,6 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a318454dc4d7f0ac52526a83b1583556b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="solver__types_8h.html#ab329f3319995f204264247e9ec3d1c7f">frame_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a318454dc4d7f0ac52526a83b1583556b">build_frame_map</a> (const std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;frames)</td></tr>
-<tr class="separator:a318454dc4d7f0ac52526a83b1583556b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a849780edfe1d545e59fc53277c245c51"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a849780edfe1d545e59fc53277c245c51">setup_frames</a> (const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;constraints)</td></tr>
-<tr class="separator:a849780edfe1d545e59fc53277c245c51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48fe685e81139bfea81626b379787929"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a48fe685e81139bfea81626b379787929">find_implications</a> (const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;constraints, std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;frames)</td></tr>
-<tr class="separator:a48fe685e81139bfea81626b379787929"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a157b887ec64af34a2ef5ccb02033d5fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classframe__reft.html">frame_reft</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a157b887ec64af34a2ef5ccb02033d5fc">find_frame</a> (const <a class="el" href="solver__types_8h.html#ab329f3319995f204264247e9ec3d1c7f">frame_mapt</a> &amp;frame_map, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;frame_symbol)</td></tr>
-<tr class="separator:a157b887ec64af34a2ef5ccb02033d5fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ec7fe6408fa586918e1b58cbc099df7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classpropertyt.html">propertyt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a2ec7fe6408fa586918e1b58cbc099df7">find_properties</a> (const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;constraints, const std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;frames)</td></tr>
-<tr class="separator:a2ec7fe6408fa586918e1b58cbc099df7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc786c23d4e0afaddc20c9684203aeec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#abc786c23d4e0afaddc20c9684203aeec">property_predicate</a> (const <a class="el" href="classimplies__exprt.html">implies_exprt</a> &amp;src)</td></tr>
-<tr class="separator:abc786c23d4e0afaddc20c9684203aeec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6cbcce31a6971622e2ac74e2d67f3bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#ad6cbcce31a6971622e2ac74e2d67f3bd">dump</a> (const std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;frames, const <a class="el" href="classpropertyt.html">propertyt</a> &amp;property, bool values, bool implications)</td></tr>
-<tr class="separator:ad6cbcce31a6971622e2ac74e2d67f3bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2f86421b780ee4f8502dea2691c2946"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#ad2f86421b780ee4f8502dea2691c2946">is_subsumed</a> (const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;a1, const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;a2, const <a class="el" href="classexprt.html">exprt</a> &amp;b, const std::unordered_set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;<a class="el" href="address__taken_8h.html#a7124b95af608caf5ea63e773250a6a59">address_taken</a>, bool verbose, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="separator:ad2f86421b780ee4f8502dea2691c2946"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34aced9e7d506052781ffade390a5bdc"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a> (const <a class="el" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a> &amp;path, <a class="el" href="classframe__reft.html">frame_reft</a> f)</td></tr>
-<tr class="separator:a34aced9e7d506052781ffade390a5bdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9065b6af619d5b871e86e0faed9b494c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a> (std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;frames, const std::unordered_set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;<a class="el" href="address__taken_8h.html#a7124b95af608caf5ea63e773250a6a59">address_taken</a>, const <a class="el" href="classsolver__optionst.html">solver_optionst</a> &amp;solver_options, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, std::vector&lt; <a class="el" href="classpropertyt.html">propertyt</a> &gt; &amp;properties, std::size_t property_index)</td></tr>
 <tr class="separator:a9065b6af619d5b871e86e0faed9b494c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3288ed247c7e9903148a1d2d5b9fedf1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="solver_8h.html#a7ded4e07f7714ed7771328d660370d5c">solver_resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver_8cpp.html#a3288ed247c7e9903148a1d2d5b9fedf1">solver</a> (const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;constraints, const <a class="el" href="classsolver__optionst.html">solver_optionst</a> &amp;solver_options, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
@@ -162,282 +141,6 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a318454dc4d7f0ac52526a83b1583556b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a318454dc4d7f0ac52526a83b1583556b">&#9670;&nbsp;</a></span>build_frame_map()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="solver__types_8h.html#ab329f3319995f204264247e9ec3d1c7f">frame_mapt</a> build_frame_map </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>frames</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00038">38</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a34aced9e7d506052781ffade390a5bdc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34aced9e7d506052781ffade390a5bdc">&#9670;&nbsp;</a></span>count_frame()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t count_frame </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a> &amp;&#160;</td>
-          <td class="paramname"><em>path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classframe__reft.html">frame_reft</a>&#160;</td>
-          <td class="paramname"><em>f</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00262">262</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ad6cbcce31a6971622e2ac74e2d67f3bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6cbcce31a6971622e2ac74e2d67f3bd">&#9670;&nbsp;</a></span>dump()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dump </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>frames</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classpropertyt.html">propertyt</a> &amp;&#160;</td>
-          <td class="paramname"><em>property</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>values</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>implications</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00169">169</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a157b887ec64af34a2ef5ccb02033d5fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a157b887ec64af34a2ef5ccb02033d5fc">&#9670;&nbsp;</a></span>find_frame()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classframe__reft.html">frame_reft</a> find_frame </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="solver__types_8h.html#ab329f3319995f204264247e9ec3d1c7f">frame_mapt</a> &amp;&#160;</td>
-          <td class="paramname"><em>frame_map</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>frame_symbol</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00121">121</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a48fe685e81139bfea81626b379787929"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48fe685e81139bfea81626b379787929">&#9670;&nbsp;</a></span>find_implications()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void find_implications </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>constraints</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>frames</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00088">88</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2ec7fe6408fa586918e1b58cbc099df7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ec7fe6408fa586918e1b58cbc099df7">&#9670;&nbsp;</a></span>find_properties()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="classpropertyt.html">propertyt</a>&gt; find_properties </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>constraints</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classframet.html">framet</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>frames</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00131">131</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ad2f86421b780ee4f8502dea2691c2946"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2f86421b780ee4f8502dea2691c2946">&#9670;&nbsp;</a></span>is_subsumed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool is_subsumed </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>a1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>a2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::unordered_set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>address_taken</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>verbose</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
-          <td class="paramname"><em>ns</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00203">203</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="abc786c23d4e0afaddc20c9684203aeec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc786c23d4e0afaddc20c9684203aeec">&#9670;&nbsp;</a></span>property_predicate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classexprt.html">exprt</a> property_predicate </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classimplies__exprt.html">implies_exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>src</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00163">163</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a849780edfe1d545e59fc53277c245c51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a849780edfe1d545e59fc53277c245c51">&#9670;&nbsp;</a></span>setup_frames()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="classframet.html">framet</a>&gt; setup_frames </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>constraints</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00070">70</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a3288ed247c7e9903148a1d2d5b9fedf1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3288ed247c7e9903148a1d2d5b9fedf1">&#9670;&nbsp;</a></span>solver() <span class="overload">[1/2]</span></h2>
 
@@ -470,7 +173,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00422">422</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00094">94</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
 
 </div>
 </div>
@@ -524,7 +227,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00287">287</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver_8cpp_source.html#l00052">52</a> of file <a class="el" href="solver_8cpp_source.html">solver.cpp</a>.</p>
 
 </div>
 </div>

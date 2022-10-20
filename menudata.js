@@ -345,6 +345,7 @@ var menudata={children:[
 {text:"Enumerator",url:"globals_eval.html",children:[
 {text:"_",url:"globals_eval.html#index__5F"},
 {text:"a",url:"globals_eval_a.html#index_a"},
+{text:"b",url:"globals_eval_b.html#index_b"},
 {text:"c",url:"globals_eval_c.html#index_c"},
 {text:"d",url:"globals_eval_d.html#index_d"},
 {text:"e",url:"globals_eval_e.html#index_e"},

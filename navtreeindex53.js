@@ -1,5 +1,7 @@
 var NAVTREEINDEX53 =
 {
+"classremove__java__newt.html#ae3f300bacd2bbc450733d7c88e79ac9a":[4,0,942,5],
+"classremove__returnst.html":[4,0,943],
 "classremove__returnst.html#a067bd0b0ad0b4bc12849d8f8422661c8":[4,0,943,7],
 "classremove__returnst.html#a116c349e793c41b104b2649fcb505e78":[4,0,943,3],
 "classremove__returnst.html#a34b590fdd59865c493aa6c0c97e8a601":[4,0,943,9],
@@ -247,7 +249,5 @@ var NAVTREEINDEX53 =
 "classsat__path__enumeratort.html#aa428585b56183d45a892fd6749d64169":[4,0,964,1],
 "classsat__path__enumeratort.html#abda9f838ab9b9a133e1d2dca6b3b4bbb":[4,0,964,0],
 "classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc":[4,0,964,15],
-"classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a":[4,0,964,9],
-"classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4":[4,0,964,5],
-"classsat__path__enumeratort.html#af23413bad5fa130fce7a406ecd6ecd95":[4,0,964,2]
+"classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a":[4,0,964,9]
 };

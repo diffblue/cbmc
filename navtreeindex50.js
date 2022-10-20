@@ -1,5 +1,7 @@
 var NAVTREEINDEX50 =
 {
+"classpolynomial__acceleratort.html#a1a49cd43d82a5ebb89a17097cb46e606":[4,0,873,1],
+"classpolynomial__acceleratort.html#a2d74e96f711ad02e69f3481296132f22":[4,0,873,3],
 "classpolynomial__acceleratort.html#a33fa2248bc9d8dcfd316cfd13ea52219":[4,0,873,6],
 "classpolynomial__acceleratort.html#a3cf78413904d19842aef9e108b6d6467":[4,0,873,27],
 "classpolynomial__acceleratort.html#a49ec2643b2e27f0349a5594f0fbb7571":[4,0,873,22],
@@ -247,7 +249,5 @@ var NAVTREEINDEX50 =
 "classqbf__bdd__coret.html#a20ac8262c7b74d34c7ccb351bf07bbd8":[4,0,894,7],
 "classqbf__bdd__coret.html#a2c51a0c19bec13b42de05a08935efbfe":[4,0,894,11],
 "classqbf__bdd__coret.html#a4f908da3ec9c6dd9ec54933cf7d5860d":[4,0,894,1],
-"classqbf__bdd__coret.html#a81cf1e19a8a160eaa48b2b407e585d70":[4,0,894,2],
-"classqbf__bdd__coret.html#a88f8ba9ed99043b3dff6c98122fe5d31":[4,0,894,5],
-"classqbf__bdd__coret.html#a93d5d8c29956aabcc318dbc20d390d0a":[4,0,894,13]
+"classqbf__bdd__coret.html#a81cf1e19a8a160eaa48b2b407e585d70":[4,0,894,2]
 };
