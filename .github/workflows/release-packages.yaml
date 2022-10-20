@@ -219,7 +219,7 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
       - name: Setup code sign environment
         run: |
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH

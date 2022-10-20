@@ -505,7 +505,7 @@ jobs:
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
@@ -559,7 +559,7 @@ jobs:
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
       - name: Initialise Developer Command Line
         uses: ilammy/msvc-dev-cmd@v1
       - name: Prepare ccache
@@ -656,7 +656,7 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
       - name: Prepare ccache
         uses: actions/cache@v2
         with:
