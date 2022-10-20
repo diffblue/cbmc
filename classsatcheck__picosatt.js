@@ -10,7 +10,7 @@ var classsatcheck__picosatt =
     [ "lcnf", "classsatcheck__picosatt.html#ae32467d73c9173e44d63bf6dbb7b8552", null ],
     [ "set_assignment", "classsatcheck__picosatt.html#a3900d146e3f96515f3ef74978260e078", null ],
     [ "set_assumptions", "classsatcheck__picosatt.html#a51d2f013e9cfab2c9f0c3ba94ee2273a", null ],
-    [ "solver_text", "classsatcheck__picosatt.html#a0b0d97b3353df2e065c6eac67a581f2d", null ],
+    [ "solver_text", "classsatcheck__picosatt.html#a6186cf7ead909ee9483f958373693aaf", null ],
     [ "assumptions", "classsatcheck__picosatt.html#a135c1456e0ac33474e28c8d0a48b5a5a", null ],
     [ "picosat", "classsatcheck__picosatt.html#a4e3154075b00f1e0ac3e7b41ad6eba94", null ]
 ];

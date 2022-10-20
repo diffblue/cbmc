@@ -5,7 +5,7 @@ var classpbs__dimacs__cnft =
     [ "do_prop_solve", "classpbs__dimacs__cnft.html#a96629036ddbc6fe84ece50faf926bd84", null ],
     [ "l_get", "classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e", null ],
     [ "pbs_solve", "classpbs__dimacs__cnft.html#aab1a46db3221f484a17928d45ae1e741", null ],
-    [ "solver_text", "classpbs__dimacs__cnft.html#a6b06d8a7cbe0816a12cebecab3803c75", null ],
+    [ "solver_text", "classpbs__dimacs__cnft.html#a51ad366c178bd53e0de9f84d61df4e04", null ],
     [ "write_dimacs_pb", "classpbs__dimacs__cnft.html#ab001af208004d6262a92fd72bfdd9300", null ],
     [ "assigned", "classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa", null ],
     [ "binary_search", "classpbs__dimacs__cnft.html#a2da856cfe06247a43d188fdad4b9862b", null ],

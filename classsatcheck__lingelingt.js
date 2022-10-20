@@ -11,7 +11,7 @@ var classsatcheck__lingelingt =
     [ "set_assignment", "classsatcheck__lingelingt.html#aa20d8b6d5f869f60dc08e03b00fc497b", null ],
     [ "set_assumptions", "classsatcheck__lingelingt.html#a396353c2ae02b9c558f1ff8b8ced5e27", null ],
     [ "set_frozen", "classsatcheck__lingelingt.html#ac35d3530e2238b6c54f2d25316d8cc7d", null ],
-    [ "solver_text", "classsatcheck__lingelingt.html#a3bea21558c9aa958e70ad1b47bb4c39f", null ],
+    [ "solver_text", "classsatcheck__lingelingt.html#abcd221bc04a701004aea4b49859dba5e", null ],
     [ "assumptions", "classsatcheck__lingelingt.html#a2e28417f19adb86258ca87a0feb8d671", null ],
     [ "solver", "classsatcheck__lingelingt.html#aec38b620eca334ee157fcbea20adb81b", null ]
 ];

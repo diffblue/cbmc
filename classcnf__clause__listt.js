@@ -11,6 +11,6 @@ var classcnf__clause__listt =
     [ "l_get", "classcnf__clause__listt.html#a054636797ddeb05aff4ce5002e85f4ef", null ],
     [ "lcnf", "classcnf__clause__listt.html#aedc3ad1a976eacb893d53f3e1b98549a", null ],
     [ "no_clauses", "classcnf__clause__listt.html#a6230d4799244bdf4161ca9933aa8cee2", null ],
-    [ "solver_text", "classcnf__clause__listt.html#ae0b4c6af86df691cdb79a4ea7005493a", null ],
+    [ "solver_text", "classcnf__clause__listt.html#aae92a9b9f203cc7d5c605466e465ddcc", null ],
     [ "clauses", "classcnf__clause__listt.html#a8cdceda047383c0049f01ce64594035e", null ]
 ];

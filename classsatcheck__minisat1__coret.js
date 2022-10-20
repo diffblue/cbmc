@@ -5,6 +5,6 @@ var classsatcheck__minisat1__coret =
     [ "do_prop_solve", "classsatcheck__minisat1__coret.html#a0b42109eb91dfde09f1c3c9f88740658", null ],
     [ "has_in_core", "classsatcheck__minisat1__coret.html#abea221fce1c6a61143cb6eb2ce08176a", null ],
     [ "is_in_core", "classsatcheck__minisat1__coret.html#adf3350bae154270244a1ab851c30b980", null ],
-    [ "solver_text", "classsatcheck__minisat1__coret.html#ab18901f7cd8fdb6dd917ef0908ddf867", null ],
+    [ "solver_text", "classsatcheck__minisat1__coret.html#a06abeb2bd6e2c28a890ff6e7f84681e4", null ],
     [ "in_core", "classsatcheck__minisat1__coret.html#a4a7135abfc7115f0860be2bbccfa6e32", null ]
 ];

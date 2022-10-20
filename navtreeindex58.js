@@ -1,6 +1,5 @@
 var NAVTREEINDEX58 =
 {
-"classsmt2__solvert.html#a1c7df402b48ad9bb473e95986ad62797":[4,0,1035,3],
 "classsmt2__solvert.html#a419c83eef1ae682060810beef438ce70":[4,0,1035,5],
 "classsmt2__solvert.html#a57265709b6446395bdceff27adf66f2f":[4,0,1035,8],
 "classsmt2__solvert.html#a5dc5b1517dd8375cc6eb3bf0a55af418":[4,0,1035,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX58 =
 "classsmt__indext.html#a0067754ddcc557e831cc56c84f25f49a":[4,0,1069,9],
 "classsmt__indext.html#a03b253c617775718b1ea6354fa32329d":[4,0,1069,6],
 "classsmt__indext.html#a0f61744832500d849987610c2a241060":[4,0,1069,5],
-"classsmt__indext.html#a0fd0f0b7d9f7e9a01f503d596333eb06":[4,0,1069,11]
+"classsmt__indext.html#a0fd0f0b7d9f7e9a01f503d596333eb06":[4,0,1069,11],
+"classsmt__indext.html#a4924f2845a5023d67e22ef133ce7bcd2":[4,0,1069,7]
 };

@@ -11,7 +11,7 @@ var classsatcheck__minisat1__baset =
     [ "lcnf", "classsatcheck__minisat1__baset.html#a84b162c9f27f38af03ebde3ae500e8d5", null ],
     [ "set_assignment", "classsatcheck__minisat1__baset.html#a2fad6e734a4481f225b519f64d08853c", null ],
     [ "set_assumptions", "classsatcheck__minisat1__baset.html#aceb586ce2d4526b2f4295f422a465205", null ],
-    [ "solver_text", "classsatcheck__minisat1__baset.html#a5a30f4edcb1231d75b3ad1509f5c0ffd", null ],
+    [ "solver_text", "classsatcheck__minisat1__baset.html#a689691e528fbc1624bddb273b09610b2", null ],
     [ "assumptions", "classsatcheck__minisat1__baset.html#aaa25ed4a53d583e27d8ca44392170201", null ],
     [ "empty_clause_added", "classsatcheck__minisat1__baset.html#a7387d1d1658e812999d6100e44cb3bda", null ],
     [ "solver", "classsatcheck__minisat1__baset.html#a5b6082699457be001ddd483eccb7239d", null ]

@@ -43,7 +43,7 @@ var classpropt =
     [ "set_frozen", "classpropt.html#a5159411e93dce18b8000ea2463df8580", null ],
     [ "set_time_limit_seconds", "classpropt.html#aea7db410a2087e8f704cc07b5808f880", null ],
     [ "set_variable_name", "classpropt.html#a3532718b9e468242b154e4578e3e3e54", null ],
-    [ "solver_text", "classpropt.html#af14234fa9eae485535d476048ba294c5", null ],
+    [ "solver_text", "classpropt.html#a80688ba4d267ceff0010292cac4ad874", null ],
     [ "lcnf_bv", "classpropt.html#a48e9eb2be0c17576a07e327f510b2664", null ],
     [ "log", "classpropt.html#afdb08f757ee6d3a90a7732de7372dade", null ],
     [ "number_of_solver_calls", "classpropt.html#a25097449a89daebd56c55496f038f286", null ]

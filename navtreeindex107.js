@@ -1,6 +1,5 @@
 var NAVTREEINDEX107 =
 {
-"namespace_ca_di_ca_l.html":[3,0,0],
 "namespace_glucose.html":[3,0,2],
 "namespace_minisat.html":[3,0,4],
 "namespacedetail.html":[4,0,0],
@@ -13,8 +12,8 @@ var NAVTREEINDEX107 =
 "namespacerequire__expr.html":[3,0,5],
 "namespacerequire__goto__statements.html":[3,0,6],
 "namespacerequire__goto__statements.html":[4,0,1],
-"namespacerequire__parse__tree.html":[4,0,2],
 "namespacerequire__parse__tree.html":[3,0,7],
+"namespacerequire__parse__tree.html":[4,0,2],
 "namespacerequire__symbol.html":[3,0,8],
 "namespacerequire__type.html":[4,0,3],
 "namespacerequire__type.html":[3,0,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX107 =
 "pattern_8h.html":[5,0,1,0,1,104],
 "pattern_8h_source.html":[5,0,1,0,1,104],
 "pbs__dimacs__cnf_8cpp.html":[5,0,2,24,7,8],
-"pbs__dimacs__cnf_8cpp_source.html":[5,0,2,24,7,8]
+"pbs__dimacs__cnf_8cpp_source.html":[5,0,2,24,7,8],
+"pbs__dimacs__cnf_8h.html":[5,0,2,24,7,9]
 };

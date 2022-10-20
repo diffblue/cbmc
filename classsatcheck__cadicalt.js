@@ -10,7 +10,7 @@ var classsatcheck__cadicalt =
     [ "lcnf", "classsatcheck__cadicalt.html#aadda3dffc12c44bc711084f58947c222", null ],
     [ "set_assignment", "classsatcheck__cadicalt.html#a71ba8f87c0cbe77a2f3a28d3df0b9841", null ],
     [ "set_assumptions", "classsatcheck__cadicalt.html#a41a4686ffca6785ca88bfc5fc64e2478", null ],
-    [ "solver_text", "classsatcheck__cadicalt.html#a6f9600f2cc15e447792c61d1d8ece244", null ],
+    [ "solver_text", "classsatcheck__cadicalt.html#ae14ddc85f30628842448c4f19eca5ef8", null ],
     [ "assumptions", "classsatcheck__cadicalt.html#aa1e344b09ddfbae0860ed6c5f56daf15", null ],
     [ "solver", "classsatcheck__cadicalt.html#a888a7bda766dc7fc8b9443918ebd346b", null ]
 ];

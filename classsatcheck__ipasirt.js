@@ -10,7 +10,7 @@ var classsatcheck__ipasirt =
     [ "lcnf", "classsatcheck__ipasirt.html#acfd01274b59391a3b500225468d6164a", null ],
     [ "set_assignment", "classsatcheck__ipasirt.html#ad50076f45d812ca80d2516db0599f869", null ],
     [ "set_assumptions", "classsatcheck__ipasirt.html#a1d005b143adc36fd5f6db6aaf7618edf", null ],
-    [ "solver_text", "classsatcheck__ipasirt.html#af69fd5aeb3a6399222fca2d5f3a5126a", null ],
+    [ "solver_text", "classsatcheck__ipasirt.html#a494e861f1809085534de463c70ab050b", null ],
     [ "assumptions", "classsatcheck__ipasirt.html#a505bdc6e2208e0e14309b82b1efc3ecd", null ],
     [ "solver", "classsatcheck__ipasirt.html#a9cd3203417189a6b081c9dbf98ecfd07", null ]
 ];

@@ -3,7 +3,6 @@ var classqdimacs__cnft =
     [ "quantifiert", "classqdimacs__cnft_1_1quantifiert.html", "classqdimacs__cnft_1_1quantifiert" ],
     [ "quantifierst", "classqdimacs__cnft.html#a55fee24d30362908bdf682b25eb4d211", null ],
     [ "qdimacs_cnft", "classqdimacs__cnft.html#afbaffe624174c49b122bd99b77acf9d2", null ],
-    [ "~qdimacs_cnft", "classqdimacs__cnft.html#a2589daa54d804766495c71530a70212d", null ],
     [ "add_existential_quantifier", "classqdimacs__cnft.html#adaa5c3ceac48d00f1913024f5fc4e05e", null ],
     [ "add_quantifier", "classqdimacs__cnft.html#a0d56bed6628c6afd51bc87cc0af5dadb", null ],
     [ "add_quantifier", "classqdimacs__cnft.html#a6f66183549b2aeeb0eb71f3ee4b1b74d", null ],
@@ -14,7 +13,7 @@ var classqdimacs__cnft =
     [ "is_quantified", "classqdimacs__cnft.html#afc3c6db8e688367069f3a4de33747aa8", null ],
     [ "operator==", "classqdimacs__cnft.html#a7f3920aa1a098a992d5be78aa53b2484", null ],
     [ "set_quantifier", "classqdimacs__cnft.html#a3aaac3cd13874f78da7f1f1c312ed0f0", null ],
-    [ "solver_text", "classqdimacs__cnft.html#a038254f7f14b237ec5f8a4d0a9a60994", null ],
+    [ "solver_text", "classqdimacs__cnft.html#a815cb34a870f78bd719445f48353b188", null ],
     [ "write_prefix", "classqdimacs__cnft.html#a265424fe1b4f2b5029d94c59c8d600cc", null ],
     [ "write_qdimacs_cnf", "classqdimacs__cnft.html#a331681cc5a4b40e193b7f6bb373b1fc5", null ],
     [ "quantifiers", "classqdimacs__cnft.html#aa8701a21ff66f19cf978eeb8dfb2c149", null ]

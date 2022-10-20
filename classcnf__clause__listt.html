@@ -137,8 +137,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a52c2a60f5d3227c06e347c7df165069b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedc3ad1a976eacb893d53f3e1b98549a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcnf__clause__listt.html#aedc3ad1a976eacb893d53f3e1b98549a">lcnf</a> (const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv) override</td></tr>
 <tr class="separator:aedc3ad1a976eacb893d53f3e1b98549a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0b4c6af86df691cdb79a4ea7005493a"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcnf__clause__listt.html#ae0b4c6af86df691cdb79a4ea7005493a">solver_text</a> () override</td></tr>
-<tr class="separator:ae0b4c6af86df691cdb79a4ea7005493a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae92a9b9f203cc7d5c605466e465ddcc"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcnf__clause__listt.html#aae92a9b9f203cc7d5c605466e465ddcc">solver_text</a> () const override</td></tr>
+<tr class="separator:aae92a9b9f203cc7d5c605466e465ddcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a054636797ddeb05aff4ce5002e85f4ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtvt.html">tvt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcnf__clause__listt.html#a054636797ddeb05aff4ce5002e85f4ef">l_get</a> (<a class="el" href="classliteralt.html">literalt</a>) const override</td></tr>
 <tr class="separator:a054636797ddeb05aff4ce5002e85f4ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6230d4799244bdf4161ca9933aa8cee2"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcnf__clause__listt.html#a6230d4799244bdf4161ca9933aa8cee2">no_clauses</a> () const override</td></tr>
@@ -603,8 +603,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ae0b4c6af86df691cdb79a4ea7005493a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0b4c6af86df691cdb79a4ea7005493a">&#9670;&nbsp;</a></span>solver_text()</h2>
+<a id="aae92a9b9f203cc7d5c605466e465ddcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae92a9b9f203cc7d5c605466e465ddcc">&#9670;&nbsp;</a></span>solver_text()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -613,10 +613,10 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::string cnf_clause_listt::solver_text </td>
+          <td class="memname">std::string cnf_clause_listt::solver_text </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -626,9 +626,9 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classpropt.html#af14234fa9eae485535d476048ba294c5">propt</a>.</p>
+<p>Implements <a class="el" href="classpropt.html#a80688ba4d267ceff0010292cac4ad874">propt</a>.</p>
 
-<p>Reimplemented in <a class="el" href="classpbs__dimacs__cnft.html#a6b06d8a7cbe0816a12cebecab3803c75">pbs_dimacs_cnft</a>, <a class="el" href="classdimacs__cnft.html#a76c459c32d015a9fb27ba64378399283">dimacs_cnft</a>, <a class="el" href="classsatcheck__zchaff__baset.html#a8175f256b869ffd9cf2ac84a4c4d0383">satcheck_zchaff_baset</a>, <a class="el" href="classexternal__satt.html#af7bd0e6f608dd56af525fe77827e5694">external_satt</a>, and <a class="el" href="classsatcheck__zcoret.html#ad99689fe66d35f1158f21d2c8ebfc9d5">satcheck_zcoret</a>.</p>
+<p>Reimplemented in <a class="el" href="classpbs__dimacs__cnft.html#a51ad366c178bd53e0de9f84d61df4e04">pbs_dimacs_cnft</a>, <a class="el" href="classdimacs__cnft.html#a624776501b7303f28781e8fe9ce389e4">dimacs_cnft</a>, <a class="el" href="classsatcheck__zchaff__baset.html#a8035ab481ed48724fb31c402761c952e">satcheck_zchaff_baset</a>, <a class="el" href="classexternal__satt.html#a286629776272f68c6191927fd44bcd28">external_satt</a>, and <a class="el" href="classsatcheck__zcoret.html#acfe6bccc05295002a9e5f15db2f26692">satcheck_zcoret</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="cnf__clause__list_8h_source.html#l00034">34</a> of file <a class="el" href="cnf__clause__list_8h_source.html">cnf_clause_list.h</a>.</p>
 

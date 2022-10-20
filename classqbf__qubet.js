@@ -1,8 +1,8 @@
 var classqbf__qubet =
 [
     [ "qbf_qubet", "classqbf__qubet.html#a07807ab41f06e40930799e33072b734d", null ],
-    [ "~qbf_qubet", "classqbf__qubet.html#a0b62e2d67b2288c99bc4fdaf0bee9df6", null ],
-    [ "l_get", "classqbf__qubet.html#aaf0defa995c6139705f6a00c075a25b9", null ],
+    [ "~qbf_qubet", "classqbf__qubet.html#abfbfa2bca0ef3f1fe8bcc48c8ddd7d4f", null ],
+    [ "l_get", "classqbf__qubet.html#a392e222ab47cdc8891391f98b8970652", null ],
     [ "prop_solve", "classqbf__qubet.html#a931f401b4f421f8bb109b56f4984210b", null ],
-    [ "solver_text", "classqbf__qubet.html#a4a821e12372ea102d89e446d2aeb5978", null ]
+    [ "solver_text", "classqbf__qubet.html#a3548f89f0e5326dbc3f63eb0516c9728", null ]
 ];
