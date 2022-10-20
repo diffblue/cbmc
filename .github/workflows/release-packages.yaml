@@ -59,8 +59,8 @@ jobs:
           cd build
           ninja package
           deb_package_name="$(ls *.deb)"
-          echo "::set-output name=deb_package::./build/$deb_package_name"
-          echo "::set-output name=deb_package_name::ubuntu-20.04-$deb_package_name"
+          echo "deb_package=./build/$deb_package_name" >> $GITHUB_OUTPUT
+          echo "deb_package_name=ubuntu-20.04-$deb_package_name" >> $GITHUB_OUTPUT
       - name: Get release info
         id: get_release_info
         uses: bruceadams/get-release@v1.2.0
@@ -147,8 +147,8 @@ jobs:
           cd build
           ninja package
           deb_package_name="$(ls *.deb)"
-          echo "::set-output name=deb_package::./build/$deb_package_name"
-          echo "::set-output name=deb_package_name::ubuntu-18.04-$deb_package_name"
+          echo "deb_package=./build/$deb_package_name" >> $GITHUB_OUTPUT
+          echo "deb_package_name=ubuntu-18.04-$deb_package_name" >> $GITHUB_OUTPUT
       - name: Get release info
         id: get_release_info
         uses: bruceadams/get-release@v1.2.0
@@ -251,8 +251,8 @@ jobs:
           $cpack = "$(Split-Path -Parent (Get-Command cmake).Source)\cpack.exe"
           & $cpack . -C Release
           $msi_name = Get-ChildItem -Filter *.msi -Name
-          Write-Output "::set-output name=msi_installer::build/$msi_name"
-          Write-Output "::set-output name=msi_name::$msi_name"
+          echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
+        echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
       - name: Decode signing certificate
         id: decode_certificate
         run: |
