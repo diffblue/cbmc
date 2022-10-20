@@ -252,7 +252,7 @@ jobs:
           & $cpack . -C Release
           $msi_name = Get-ChildItem -Filter *.msi -Name
           echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
-        echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
+          echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
       - name: Decode signing certificate
         id: decode_certificate
         run: |
