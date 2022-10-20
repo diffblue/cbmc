@@ -75,7 +75,8 @@ void propagate(
       auto &state = to_symbol_expr(function_application.function());
       auto cond1 = to_and_expr(implication.lhs).op1();
       auto cond2 = implies_exprt(cond1, simplified2);
-      propagator(state, cond2, work.path);
+      auto simplified = simplify_expr(cond2, ns);
+      propagator(state, simplified, work.path);
     }
   }
 }

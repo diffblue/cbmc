@@ -12,6 +12,7 @@ SRC = address_taken.cpp \
       flatten_ok_expr.cpp \
       format_hooks.cpp \
       free_symbols.cpp \
+      generalization.cpp \
       help_formatter.cpp \
       inductiveness.cpp \
       instrument_contracts.cpp \

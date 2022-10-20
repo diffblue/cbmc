@@ -18,6 +18,20 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <iostream>
 #include <set>
 
+void framet::add_auxiliary(exprt invariant)
+{
+  if(invariant.id() == ID_and)
+  {
+    for(const auto &conjunct : to_and_expr(invariant).operands())
+      add_auxiliary(conjunct);
+  }
+  else
+  {
+    auxiliaries_set.insert(invariant);
+    auxiliaries.push_back(std::move(invariant));
+  }
+}
+
 void framet::add_invariant(exprt invariant)
 {
   if(invariant.id() == ID_and)
@@ -32,17 +46,17 @@ void framet::add_invariant(exprt invariant)
   }
 }
 
-void framet::add_auxiliary(exprt invariant)
+void framet::add_obligation(exprt obligation)
 {
-  if(invariant.id() == ID_and)
+  if(obligation.id() == ID_and)
   {
-    for(const auto &conjunct : to_and_expr(invariant).operands())
-      add_auxiliary(conjunct);
+    for(const auto &conjunct : to_and_expr(obligation).operands())
+      add_obligation(conjunct);
   }
   else
   {
-    auxiliaries_set.insert(invariant);
-    auxiliaries.push_back(std::move(invariant));
+    obligations_set.insert(obligation);
+    obligations.push_back(std::move(obligation));
   }
 }
 
@@ -179,6 +193,9 @@ void dump(
     {
       for(auto &i : f.invariants)
         std::cout << "  invariant: " << format(i) << '\n';
+
+      for(auto &i : f.obligations)
+        std::cout << " obligation: " << format(i) << '\n';
 
       for(auto &i : f.auxiliaries)
         std::cout << "  auxiliary: " << format(i) << '\n';
