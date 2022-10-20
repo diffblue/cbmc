@@ -58,7 +58,7 @@ public:
   virtual literalt lor(literalt a, literalt b);
   virtual literalt lor(const bvt &bv);
 
-  virtual const std::string solver_text();
+  virtual std::string solver_text() const;
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
 

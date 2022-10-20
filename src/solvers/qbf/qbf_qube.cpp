@@ -29,7 +29,7 @@ tvt qbf_qubet::l_get(literalt) const
   UNREACHABLE;
 }
 
-const std::string qbf_qubet::solver_text()
+std::string qbf_qubet::solver_text() const
 {
   return "QuBE";
 }

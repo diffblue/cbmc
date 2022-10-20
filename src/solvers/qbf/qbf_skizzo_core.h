@@ -19,7 +19,7 @@ public:
   qbf_skizzo_coret();
   virtual ~qbf_skizzo_coret();
 
-  virtual const std::string solver_text();
+  virtual std::string solver_text() const;
   virtual resultt prop_solve();
 
   virtual bool is_in_core(literalt l) const;

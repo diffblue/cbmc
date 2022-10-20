@@ -27,7 +27,7 @@ tvt qbf_quantort::l_get(literalt) const
   UNREACHABLE;
 }
 
-const std::string qbf_quantort::solver_text()
+std::string qbf_quantort::solver_text() const
 {
   return "Quantor";
 }

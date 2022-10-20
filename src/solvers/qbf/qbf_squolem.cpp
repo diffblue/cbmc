@@ -26,7 +26,7 @@ tvt qbf_squolemt::l_get(literalt a) const
   UNREACHABLE;
 }
 
-const std::string qbf_squolemt::solver_text()
+std::string qbf_squolemt::solver_text() const
 {
   return "Squolem";
 }

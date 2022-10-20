@@ -108,7 +108,7 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_minisat1_baset::solver_text()
+std::string satcheck_minisat1_baset::solver_text() const
 {
   return "MiniSAT 1.14p";
 }
@@ -257,7 +257,7 @@ satcheck_minisat1_baset::~satcheck_minisat1_baset()
   delete solver;
 }
 
-const std::string satcheck_minisat1_prooft::solver_text()
+std::string satcheck_minisat1_prooft::solver_text() const
 {
   return "MiniSAT + Proof";
 }
@@ -277,7 +277,7 @@ propt::resultt satcheck_minisat1_coret::do_prop_solve()
   return r;
 }
 
-const std::string satcheck_minisat1_coret::solver_text()
+std::string satcheck_minisat1_coret::solver_text() const
 {
   return "MiniSAT + Core";
 }

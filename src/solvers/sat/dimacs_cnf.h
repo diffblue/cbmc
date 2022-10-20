@@ -24,7 +24,7 @@ public:
 
   // dummy functions
 
-  const std::string solver_text() override
+  std::string solver_text() const override
   {
     return "DIMACS CNF";
   }
@@ -48,7 +48,7 @@ public:
   dimacs_cnf_dumpt(std::ostream &_out, message_handlert &message_handler);
   virtual ~dimacs_cnf_dumpt() { }
 
-  const std::string solver_text() override
+  std::string solver_text() const override
   {
     return "DIMACS CNF Dumper";
   }

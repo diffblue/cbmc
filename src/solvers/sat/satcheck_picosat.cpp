@@ -43,7 +43,7 @@ tvt satcheck_picosatt::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_picosatt::solver_text()
+std::string satcheck_picosatt::solver_text() const
 {
   return "PicoSAT";
 }

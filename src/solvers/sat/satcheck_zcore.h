@@ -20,7 +20,7 @@ public:
   satcheck_zcoret();
   virtual ~satcheck_zcoret();
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
   tvt l_get(literalt a) const override;
 
   bool is_in_core(literalt l) const

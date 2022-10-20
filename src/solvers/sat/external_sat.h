@@ -22,7 +22,7 @@ public:
     return false;
   }
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
 
   bool is_in_conflict(literalt) const override;
   void set_assignment(literalt, bool) override;

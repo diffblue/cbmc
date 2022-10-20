@@ -39,7 +39,7 @@ qbf_skizzo_coret::~qbf_skizzo_coret()
 {
 }
 
-const std::string qbf_skizzo_coret::solver_text()
+std::string qbf_skizzo_coret::solver_text() const
 {
   return "Skizzo/Core";
 }

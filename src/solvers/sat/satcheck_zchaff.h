@@ -24,7 +24,7 @@ public:
   explicit satcheck_zchaff_baset(CSolver *_solver);
   virtual ~satcheck_zchaff_baset();
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
   tvt l_get(literalt a) const override;
   void set_assignment(literalt a, bool value) override;
   virtual void copy_cnf();

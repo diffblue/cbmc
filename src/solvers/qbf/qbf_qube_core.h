@@ -26,7 +26,7 @@ public:
   explicit qbf_qube_coret(message_handlert &message_handler);
   virtual ~qbf_qube_coret();
 
-  virtual const std::string solver_text();
+  virtual std::string solver_text() const;
   virtual resultt prop_solve();
 
   virtual bool is_in_core(literalt l) const;

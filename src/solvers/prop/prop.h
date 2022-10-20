@@ -93,7 +93,7 @@ public:
   virtual bvt new_variables(std::size_t width);
 
   // solving
-  virtual const std::string solver_text()=0;
+  virtual std::string solver_text() const = 0;
   enum class resultt { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR };
   resultt prop_solve();
 

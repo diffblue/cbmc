@@ -52,7 +52,7 @@ public:
 
   // dummy functions
 
-  const std::string solver_text() override
+  std::string solver_text() const override
   {
     return "PBS - Pseudo Boolean/CNF Solver and Optimizer";
   }

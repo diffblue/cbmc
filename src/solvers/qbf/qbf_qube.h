@@ -18,7 +18,7 @@ public:
   explicit qbf_qubet(message_handlert &message_handler);
   virtual ~qbf_qubet();
 
-  virtual const std::string solver_text();
+  virtual std::string solver_text() const;
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
 };

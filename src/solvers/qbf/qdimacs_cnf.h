@@ -27,7 +27,7 @@ public:
 
   // dummy functions
 
-  virtual const std::string solver_text()
+  virtual std::string solver_text() const
   {
     return "QDIMACS CNF";
   }

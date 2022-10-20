@@ -58,7 +58,7 @@ tvt satcheck_booleforce_baset::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_booleforce_baset::solver_text()
+std::string satcheck_booleforce_baset::solver_text() const
 {
   return std::string("Booleforce version ")+booleforce_version();
 }

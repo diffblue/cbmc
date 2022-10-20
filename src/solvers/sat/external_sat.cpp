@@ -21,7 +21,7 @@ external_satt::external_satt(message_handlert &message_handler, std::string cmd)
 {
 }
 
-const std::string external_satt::solver_text()
+std::string external_satt::solver_text() const
 {
   return "External SAT solver";
 }

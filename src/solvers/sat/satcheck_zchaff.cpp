@@ -51,7 +51,7 @@ tvt satcheck_zchaff_baset::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_zchaff_baset::solver_text()
+std::string satcheck_zchaff_baset::solver_text() const
 {
   return solver->version();
 }

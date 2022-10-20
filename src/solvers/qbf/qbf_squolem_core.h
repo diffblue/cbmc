@@ -26,7 +26,7 @@ public:
   qbf_squolem_coret();
   virtual ~qbf_squolem_coret();
 
-  virtual const std::string solver_text();
+  virtual std::string solver_text() const;
   virtual resultt prop_solve();
 
   virtual tvt l_get(literalt a) const;

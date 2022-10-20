@@ -71,7 +71,7 @@ class satcheck_glucose_no_simplifiert:
 {
 public:
   using satcheck_glucose_baset<Glucose::Solver>::satcheck_glucose_baset;
-  const std::string solver_text() override;
+  std::string solver_text() const override;
 };
 
 class satcheck_glucose_simplifiert:
@@ -79,7 +79,7 @@ class satcheck_glucose_simplifiert:
 {
 public:
   using satcheck_glucose_baset<Glucose::SimpSolver>::satcheck_glucose_baset;
-  const std::string solver_text() override;
+  std::string solver_text() const override;
   void set_frozen(literalt a) override;
   bool is_eliminated(literalt a) const;
 };

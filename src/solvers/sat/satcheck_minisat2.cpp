@@ -99,12 +99,12 @@ void satcheck_minisat2_baset<T>::clear_interrupt()
   solver->clearInterrupt();
 }
 
-const std::string satcheck_minisat_no_simplifiert::solver_text()
+std::string satcheck_minisat_no_simplifiert::solver_text() const
 {
   return "MiniSAT 2.2.1 without simplifier";
 }
 
-const std::string satcheck_minisat_simplifiert::solver_text()
+std::string satcheck_minisat_simplifiert::solver_text() const
 {
   return "MiniSAT 2.2.1 with simplifier";
 }

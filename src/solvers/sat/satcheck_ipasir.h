@@ -24,7 +24,7 @@ public:
   virtual ~satcheck_ipasirt() override;
 
   /// This method returns the description produced by the linked SAT solver
-  const std::string solver_text() override;
+  std::string solver_text() const override;
 
   /// This method returns the truth value for a literal of the current SAT model
   tvt l_get(literalt a) const override final;
