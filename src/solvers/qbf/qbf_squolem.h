@@ -24,16 +24,16 @@ protected:
 
 public:
   qbf_squolemt();
-  virtual ~qbf_squolemt();
+  ~qbf_squolemt() override;
 
-  virtual std::string solver_text() const;
-  virtual resultt prop_solve();
-  virtual tvt l_get(literalt a) const;
+  std::string solver_text() const override;
+  resultt prop_solve() override;
+  tvt l_get(literalt a) const override;
 
-  virtual void lcnf(const bvt &bv);
-  virtual void add_quantifier(const quantifiert &quantifier);
-  virtual void set_quantifier(const quantifiert::typet type, const literalt l);
-  virtual void set_no_variables(size_t no);
+  void lcnf(const bvt &bv) override;
+  void add_quantifier(const quantifiert &quantifier) override;
+  void set_quantifier(const quantifiert::typet type, const literalt l) override;
+  void set_no_variables(size_t no) override;
   virtual size_t no_clauses() const { return squolem.clauses(); }
 };
 

@@ -24,29 +24,29 @@ protected:
 
 public:
   qbf_squolem_coret();
-  virtual ~qbf_squolem_coret();
+  ~qbf_squolem_coret() override;
 
-  virtual std::string solver_text() const;
-  virtual resultt prop_solve();
+  std::string solver_text() const override;
+  resultt prop_solve() override;
 
-  virtual tvt l_get(literalt a) const;
-  virtual bool is_in_core(literalt l) const;
+  tvt l_get(literalt a) const override;
+  bool is_in_core(literalt l) const override;
 
   void set_debug_filename(const std::string &str);
 
-  virtual void lcnf(const bvt &bv);
-  virtual void add_quantifier(const quantifiert &quantifier);
-  virtual void set_quantifier(const quantifiert::typet type, const literalt l);
-  virtual void set_no_variables(size_t no);
+  void lcnf(const bvt &bv) override;
+  void add_quantifier(const quantifiert &quantifier) override;
+  void set_quantifier(const quantifiert::typet type, const literalt l) override;
+  void set_no_variables(size_t no) override;
   virtual size_t no_clauses() const { return squolem->clauses(); }
 
-  virtual modeltypet m_get(literalt a) const;
+  modeltypet m_get(literalt a) const override;
 
-  virtual void write_qdimacs_cnf(std::ostream &out);
+  void write_qdimacs_cnf(std::ostream &out) override;
 
   void reset(void);
 
-  virtual const exprt f_get(literalt l);
+  const exprt f_get(literalt l) override;
 
 private:
   typedef std::unordered_map<unsigned, exprt> function_cachet;

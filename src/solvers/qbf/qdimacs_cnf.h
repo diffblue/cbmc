@@ -21,13 +21,12 @@ public:
     : dimacs_cnft(message_handler)
   {
   }
-  virtual ~qdimacs_cnft() { }
 
   virtual void write_qdimacs_cnf(std::ostream &out);
 
   // dummy functions
 
-  virtual std::string solver_text() const
+  std::string solver_text() const override
   {
     return "QDIMACS CNF";
   }
