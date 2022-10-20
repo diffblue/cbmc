@@ -83,7 +83,7 @@ tvt qbf_bdd_coret::l_get(literalt a) const
   UNREACHABLE;
 }
 
-const std::string qbf_bdd_coret::solver_text()
+std::string qbf_bdd_coret::solver_text() const
 {
   return "QBF/BDD/CORE";
 }

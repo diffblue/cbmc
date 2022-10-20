@@ -43,7 +43,7 @@ tvt satcheck_lingelingt::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_lingelingt::solver_text()
+std::string satcheck_lingelingt::solver_text() const
 {
   return "Lingeling";
 }

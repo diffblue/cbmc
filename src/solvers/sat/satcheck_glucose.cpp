@@ -78,12 +78,12 @@ void satcheck_glucose_baset<T>::set_polarity(literalt a, bool value)
   }
 }
 
-const std::string satcheck_glucose_no_simplifiert::solver_text()
+std::string satcheck_glucose_no_simplifiert::solver_text() const
 {
   return "Glucose Syrup without simplifier";
 }
 
-const std::string satcheck_glucose_simplifiert::solver_text()
+std::string satcheck_glucose_simplifiert::solver_text() const
 {
   return "Glucose Syrup with simplifier";
 }

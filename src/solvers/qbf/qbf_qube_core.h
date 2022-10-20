@@ -24,14 +24,14 @@ protected:
 
 public:
   explicit qbf_qube_coret(message_handlert &message_handler);
-  virtual ~qbf_qube_coret();
+  ~qbf_qube_coret() override;
 
-  virtual const std::string solver_text();
+  std::string solver_text() const override;
   virtual resultt prop_solve();
 
-  virtual bool is_in_core(literalt l) const;
+  bool is_in_core(literalt l) const override;
 
-  virtual tvt l_get(literalt a) const
+  tvt l_get(literalt a) const override
   {
     unsigned v=a.var_no();
 
@@ -49,9 +49,9 @@ public:
     return tvt::unknown();
   }
 
-  virtual modeltypet m_get(literalt a) const;
+  modeltypet m_get(literalt a) const override;
 
-  virtual const exprt f_get(literalt)
+  const exprt f_get(literalt) override
   {
     INVARIANT(false, "qube does not support full certificates.");
   }

@@ -31,12 +31,12 @@ protected:
 
 public:
   qbf_bdd_certificatet(void);
-  virtual ~qbf_bdd_certificatet(void);
+  ~qbf_bdd_certificatet(void) override;
 
-  virtual literalt new_variable(void);
+  literalt new_variable(void) override;
 
-  virtual tvt l_get(literalt a) const;
-  virtual const exprt f_get(literalt l);
+  tvt l_get(literalt a) const override;
+  const exprt f_get(literalt l) override;
 };
 
 
@@ -50,20 +50,20 @@ private:
 
 public:
   qbf_bdd_coret();
-  virtual ~qbf_bdd_coret();
+  ~qbf_bdd_coret() override;
 
-  virtual literalt new_variable();
+  literalt new_variable() override;
 
-  virtual void lcnf(const bvt &bv);
-  virtual literalt lor(literalt a, literalt b);
-  virtual literalt lor(const bvt &bv);
+  void lcnf(const bvt &bv) override;
+  literalt lor(literalt a, literalt b) override;
+  literalt lor(const bvt &bv) override;
 
-  virtual const std::string solver_text();
-  virtual resultt prop_solve();
-  virtual tvt l_get(literalt a) const;
+  std::string solver_text() const override;
+  resultt prop_solve() override;
+  tvt l_get(literalt a) const override;
 
-  virtual bool is_in_core(literalt l) const;
-  virtual modeltypet m_get(literalt a) const;
+  bool is_in_core(literalt l) const override;
+  modeltypet m_get(literalt a) const override;
 
 protected:
   void compress_certificate(void);

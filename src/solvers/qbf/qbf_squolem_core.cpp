@@ -74,7 +74,7 @@ tvt qbf_squolem_coret::l_get(literalt a) const
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 
-const std::string qbf_squolem_coret::solver_text()
+std::string qbf_squolem_coret::solver_text() const
 {
   return "Squolem (Certifying)";
 }

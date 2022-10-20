@@ -21,7 +21,7 @@ public:
   satcheck_picosatt();
   ~satcheck_picosatt();
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) override;

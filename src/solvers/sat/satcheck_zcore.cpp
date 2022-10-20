@@ -29,7 +29,7 @@ tvt satcheck_zcoret::l_get(literalt a) const
   return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 
-const std::string satcheck_zcoret::solver_text()
+std::string satcheck_zcoret::solver_text() const
 {
   return "ZCore";
 }

@@ -147,7 +147,7 @@ public:
     return bdd_map.size();
   }
 
-  const std::string solver_text() override
+  std::string solver_text() const override
   {
     return "BDDs";
   }

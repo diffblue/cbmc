@@ -38,7 +38,7 @@ tvt satcheck_cadicalt::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_cadicalt::solver_text()
+std::string satcheck_cadicalt::solver_text() const
 {
   return std::string("CaDiCaL ") + solver->version();
 }

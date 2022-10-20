@@ -24,7 +24,7 @@ public:
 
   virtual ~satcheck_minisat1_baset();
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) final;
@@ -68,7 +68,7 @@ public:
   satcheck_minisat1_prooft();
   ~satcheck_minisat1_prooft();
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
   simple_prooft &get_resolution_proof();
   // void set_partition_id(unsigned p_id);
 
@@ -84,7 +84,7 @@ public:
   satcheck_minisat1_coret();
   ~satcheck_minisat1_coret();
 
-  const std::string solver_text() override;
+  std::string solver_text() const override;
 
   bool has_in_core() const
   {

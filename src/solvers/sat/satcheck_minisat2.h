@@ -83,7 +83,7 @@ class satcheck_minisat_no_simplifiert:
 {
 public:
   using satcheck_minisat2_baset<Minisat::Solver>::satcheck_minisat2_baset;
-  const std::string solver_text() override;
+  std::string solver_text() const override;
 };
 
 class satcheck_minisat_simplifiert:
@@ -91,7 +91,7 @@ class satcheck_minisat_simplifiert:
 {
 public:
   using satcheck_minisat2_baset<Minisat::SimpSolver>::satcheck_minisat2_baset;
-  const std::string solver_text() override final;
+  std::string solver_text() const override final;
   void set_frozen(literalt a) override final;
   bool is_eliminated(literalt a) const;
 };

@@ -31,7 +31,7 @@ public:
 
   void lcnf(const bvt &bv) override;
 
-  const std::string solver_text() override
+  std::string solver_text() const override
   { return "CNF clause list"; }
 
   tvt l_get(literalt) const override

@@ -59,7 +59,7 @@ tvt satcheck_ipasirt::l_get(literalt a) const
   return result;
 }
 
-const std::string satcheck_ipasirt::solver_text()
+std::string satcheck_ipasirt::solver_text() const
 {
   return std::string(ipasir_signature());
 }

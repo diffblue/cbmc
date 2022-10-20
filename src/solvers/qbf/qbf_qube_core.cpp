@@ -26,7 +26,7 @@ qbf_qube_coret::~qbf_qube_coret()
 {
 }
 
-const std::string qbf_qube_coret::solver_text()
+std::string qbf_qube_coret::solver_text() const
 {
   return "QuBE w/ toplevel assignments";
 }

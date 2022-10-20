@@ -16,11 +16,11 @@ class qbf_qubet:public qdimacs_cnft
 {
 public:
   explicit qbf_qubet(message_handlert &message_handler);
-  virtual ~qbf_qubet();
+  ~qbf_qubet() override;
 
-  virtual const std::string solver_text();
+  std::string solver_text() const override;
   virtual resultt prop_solve();
-  virtual tvt l_get(literalt a) const;
+  tvt l_get(literalt a) const override;
 };
 
 #endif // CPROVER_SOLVERS_QBF_QBF_QUBE_H

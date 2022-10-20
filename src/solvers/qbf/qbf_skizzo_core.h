@@ -17,13 +17,13 @@ class qbf_skizzo_coret:public qbf_bdd_certificatet
 {
 public:
   qbf_skizzo_coret();
-  virtual ~qbf_skizzo_coret();
+  ~qbf_skizzo_coret() override;
 
-  virtual const std::string solver_text();
-  virtual resultt prop_solve();
+  std::string solver_text() const override;
+  resultt prop_solve() override;
 
-  virtual bool is_in_core(literalt l) const;
-  virtual modeltypet m_get(literalt a) const;
+  bool is_in_core(literalt l) const override;
+  modeltypet m_get(literalt a) const override;
 
 protected:
   std::string qbf_tmp_file;
