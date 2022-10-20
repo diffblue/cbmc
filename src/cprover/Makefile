@@ -13,6 +13,7 @@ SRC = address_taken.cpp \
       format_hooks.cpp \
       free_symbols.cpp \
       help_formatter.cpp \
+      inductiveness.cpp \
       instrument_contracts.cpp \
       instrument_given_invariants.cpp \
       may_alias.cpp \
@@ -27,6 +28,7 @@ SRC = address_taken.cpp \
       state_encoding_targets.cpp \
       solver.cpp \
       solver_progress.cpp \
+      solver_types.cpp \
       variable_encoding.cpp \
       wcwidth.c \
       # Empty last line

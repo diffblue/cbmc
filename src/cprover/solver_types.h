@@ -17,6 +17,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <chrono>
 #include <unordered_map>
+#include <unordered_set>
 
 class frame_reft
 {
@@ -53,9 +54,11 @@ public:
 
   // our current hypothesis invariant
   std::vector<exprt> invariants;
+  std::unordered_set<exprt, irep_hash> invariants_set;
 
   // auxiliary facts
   std::vector<exprt> auxiliaries;
+  std::unordered_set<exprt, irep_hash> auxiliaries_set;
 
   // formulas where this frame is on the rhs of ⇒
   struct implicationt
@@ -84,11 +87,23 @@ public:
   void reset()
   {
     invariants.clear();
+    invariants_set.clear();
     auxiliaries.clear();
+    auxiliaries_set.clear();
   }
 
   frame_reft ref;
 };
+
+frame_mapt build_frame_map(const std::vector<framet> &frames);
+
+frame_reft find_frame(const frame_mapt &, const symbol_exprt &frame_symbol);
+
+void find_implications(
+  const std::vector<exprt> &constraints,
+  std::vector<framet> &);
+
+std::vector<framet> setup_frames(const std::vector<exprt> &constraints);
 
 class propertyt
 {
@@ -135,6 +150,10 @@ public:
   using tracet = std::vector<trace_statet>;
   tracet trace;
 };
+
+std::vector<propertyt> find_properties(
+  const std::vector<exprt> &constraints,
+  const std::vector<framet> &);
 
 struct workt
 {
