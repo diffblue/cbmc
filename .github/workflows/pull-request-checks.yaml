@@ -29,7 +29,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-PR
@@ -99,7 +99,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
@@ -168,7 +168,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-make-clang-smt-z3-${{ github.ref }}-${{ github.sha }}-PR
@@ -209,7 +209,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
@@ -268,7 +268,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-PR
@@ -317,7 +317,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
@@ -364,7 +364,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
@@ -403,7 +403,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}-PR
@@ -453,7 +453,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
@@ -507,7 +507,7 @@ jobs:
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PR
@@ -563,7 +563,7 @@ jobs:
       - name: Initialise Developer Command Line
         uses: ilammy/msvc-dev-cmd@v1
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-msbuild-make-${{ github.ref }}-${{ github.sha }}-PR
@@ -658,7 +658,7 @@ jobs:
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PKG
@@ -721,7 +721,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-18.04-Release-${{ github.ref }}-${{ github.sha }}-PR
@@ -811,7 +811,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
