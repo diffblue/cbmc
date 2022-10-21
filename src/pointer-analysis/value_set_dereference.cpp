@@ -477,17 +477,19 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   std::cout << "O: " << format(root_object) << '\n';
   #endif
 
-  valuet result;
-
   if(root_object.id() == ID_null_object)
   {
-    if(o.offset().is_zero())
-      result.pointer = null_pointer_exprt{pointer_type};
-    else
-      return valuet{};
+    if(!o.offset().is_zero())
+      return {};
+
+    valuet result;
+    result.pointer = null_pointer_exprt{pointer_type};
+    return result;
   }
   else if(root_object.id()==ID_dynamic_object)
   {
+    valuet result;
+
     // constraint that it actually is a dynamic object
     // this is also our guard
     result.pointer_guard = is_dynamic_object_exprt(pointer_expr);
@@ -495,6 +497,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     // can't remove here, turn into *p
     result.value = dereference_exprt{pointer_expr};
     result.pointer = pointer_expr;
+
+    return result;
   }
   else if(root_object.id()==ID_integer_address)
   {
@@ -514,8 +518,10 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         pointer_offset(pointer_expr),
         to_array_type(memory_symbol.type).element_type());
 
+      valuet result;
       result.value=index_expr;
       result.pointer = address_of_exprt{index_expr};
+      return result;
     }
     else if(dereference_type_compare(
               to_array_type(memory_symbol.type).element_type(),
@@ -526,9 +532,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         symbol_expr,
         pointer_offset(pointer_expr),
         to_array_type(memory_symbol.type).element_type());
+
+      valuet result;
       result.value=typecast_exprt(index_expr, dereference_type);
       result.pointer =
         typecast_exprt{address_of_exprt{index_expr}, pointer_type};
+      return result;
     }
     else
     {
@@ -536,18 +545,19 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // Won't do this without a commitment to an endianness.
 
       if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
-      {
-      }
-      else
-      {
-        result.value = make_byte_extract(
-          symbol_expr, pointer_offset(pointer_expr), dereference_type);
-        result.pointer = address_of_exprt{result.value};
-      }
+        return {};
+
+      valuet result;
+      result.value = make_byte_extract(
+        symbol_expr, pointer_offset(pointer_expr), dereference_type);
+      result.pointer = address_of_exprt{result.value};
+      return result;
     }
   }
   else
   {
+    valuet result;
+
     // something generic -- really has to be a symbol
     address_of_exprt object_pointer(object);
 
@@ -651,17 +661,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     result.pointer = typecast_exprt::conditional_cast(
       address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
 
-    if(memory_model(result.value, dereference_type, offset, ns))
-    {
-      // ok, done
-    }
-    else
-    {
-      return valuet(); // give up, no way that this is ok
-    }
-  }
+    if(!memory_model(result.value, dereference_type, offset, ns))
+      return {}; // give up, no way that this is ok
 
-  return result;
+    return result;
+  }
 }
 
 static bool is_a_bv_type(const typet &type)
