@@ -142,9 +142,9 @@ exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   bool display_points_to_sets)
 {
-  if(pointer.type().id()!=ID_pointer)
-    throw "dereference expected pointer type, but got "+
-          pointer.type().pretty();
+  PRECONDITION_WITH_DIAGNOSTICS(
+    pointer.type().id() == ID_pointer,
+    "dereference expected pointer type, but got " + pointer.type().pretty());
 
   // we may get ifs due to recursive calls
   if(pointer.id()==ID_if)
@@ -465,8 +465,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     return valuet();
   }
 
-  if(what.id()!=ID_object_descriptor)
-    throw "unknown points-to: "+what.id_string();
+  PRECONDITION_WITH_DIAGNOSTICS(
+    what.id() == ID_object_descriptor,
+    "unknown points-to: " + what.id_string());
 
   const object_descriptor_exprt &o=to_object_descriptor_expr(what);
 
