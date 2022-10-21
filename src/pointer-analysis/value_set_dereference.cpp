@@ -575,8 +575,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const typet &object_type = object.type();
     const typet &root_object_type = root_object.type();
 
-    exprt root_object_subexpression=root_object;
-
     if(
       dereference_type_compare(object_type, dereference_type, ns) &&
       o.offset().is_zero())
@@ -640,7 +638,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     // try to build a member/index expression - do not use byte_extract
     auto subexpr = get_subexpression_at_offset(
-      root_object_subexpression, o.offset(), dereference_type, ns);
+      root_object, o.offset(), dereference_type, ns);
     if(subexpr.has_value())
       simplify(subexpr.value(), ns);
     if(
