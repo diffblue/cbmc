@@ -31,6 +31,7 @@ Author: Daniel Kroening, dkr@amazon.com
 bool is_subsumed(
   const std::unordered_set<exprt, irep_hash> &a1,
   const std::unordered_set<exprt, irep_hash> &a2,
+  const std::unordered_set<exprt, irep_hash> &a3,
   const exprt &b,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,
   bool verbose,
@@ -62,6 +63,9 @@ bool is_subsumed(
     axioms << a_conjunct;
 
   for(auto &a_conjunct : a2)
+    axioms << a_conjunct;
+
+  for(auto &a_conjunct : a3)
     axioms << a_conjunct;
 
   axioms.set_to_false(b);
@@ -136,12 +140,19 @@ inductiveness_resultt inductiveness_check(
 
       if(solver_options.verbose)
       {
-        // print the current invariants in the frame
+        // print the current invariants and obligations in the frame
         for(const auto &invariant : f.invariants)
         {
           std::cout << consolet::faint << consolet::blue;
           std::cout << 'I' << std::setw(2) << frame_ref.index << ' ';
           std::cout << format(invariant);
+          std::cout << consolet::reset << '\n';
+        }
+        for(const auto &obligation : f.obligations)
+        {
+          std::cout << consolet::faint << consolet::blue;
+          std::cout << 'O' << std::setw(2) << frame_ref.index << ' ';
+          std::cout << format(obligation);
           std::cout << consolet::reset << '\n';
         }
       }
@@ -158,6 +169,7 @@ inductiveness_resultt inductiveness_check(
       }
       else if(is_subsumed(
                 f.invariants_set,
+                f.obligations_set,
                 f.auxiliaries_set,
                 invariant,
                 address_taken,
@@ -182,7 +194,7 @@ inductiveness_resultt inductiveness_check(
           std::cout << format(invariant) << '\n';
 
         // store in frame
-        frames[frame_ref.index].add_invariant(invariant);
+        frames[frame_ref.index].add_obligation(invariant);
 
         // add to queue
         auto new_path = path;
@@ -191,12 +203,19 @@ inductiveness_resultt inductiveness_check(
       }
     };
 
-  // stick non-true frames into the queue
+  // stick invariants into the queue
   for(std::size_t frame_index = 0; frame_index < frames.size(); frame_index++)
   {
     frame_reft frame_ref(frame_index);
     for(auto &cond : frames[frame_index].invariants)
       queue.emplace_back(frame_ref, cond, workt::patht{frame_ref});
+  }
+
+  // clean up the obligations
+  for(auto &frame : frames)
+  {
+    frame.obligations.clear();
+    frame.obligations_set.clear();
   }
 
   while(!queue.empty())
@@ -218,16 +237,17 @@ inductiveness_resultt inductiveness_check(
     if(counterexample_found)
     {
       property.trace = counterexample_found.value();
-      return inductiveness_resultt::BASE_CASE_FAIL;
+      return inductiveness_resultt::base_case_fail(std::move(work));
     }
 
     propagate(
       frames, work, address_taken, solver_options.verbose, ns, propagator);
+
+    // did we drop anything?
+    if(!dropped.empty())
+      return inductiveness_resultt::step_case_fail(std::move(dropped.front()));
   }
 
-  // did we drop anything?
-  if(dropped.empty())
-    return inductiveness_resultt::INDUCTIVE;
-  else
-    return inductiveness_resultt::STEP_CASE_FAIL;
+  // done, saturated
+  return inductiveness_resultt::inductive();
 }

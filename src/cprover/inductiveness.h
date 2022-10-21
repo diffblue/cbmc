@@ -16,11 +16,41 @@ Author: Daniel Kroening, dkr@amazon.com
 
 class solver_optionst;
 
-enum inductiveness_resultt
+class inductiveness_resultt
 {
-  INDUCTIVE,
-  BASE_CASE_FAIL,
-  STEP_CASE_FAIL
+public:
+  enum outcomet
+  {
+    INDUCTIVE,
+    BASE_CASE_FAIL,
+    STEP_CASE_FAIL
+  } outcome;
+
+  static inductiveness_resultt inductive()
+  {
+    return inductiveness_resultt(INDUCTIVE);
+  }
+
+  static inductiveness_resultt base_case_fail(workt refuted)
+  {
+    auto result = inductiveness_resultt(BASE_CASE_FAIL);
+    result.work = std::move(refuted);
+    return result;
+  }
+
+  static inductiveness_resultt step_case_fail(workt dropped)
+  {
+    auto result = inductiveness_resultt(STEP_CASE_FAIL);
+    result.work = std::move(dropped);
+    return result;
+  }
+
+  optionalt<workt> work;
+
+private:
+  explicit inductiveness_resultt(outcomet __outcome) : outcome(__outcome)
+  {
+  }
 };
 
 inductiveness_resultt inductiveness_check(

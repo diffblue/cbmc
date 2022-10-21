@@ -18,6 +18,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "address_taken.h"
 #include "console.h"
 #include "counterexample_found.h"
+#include "generalization.h"
 #include "inductiveness.h"
 #include "propagate.h"
 #include "report_properties.h"
@@ -62,32 +63,53 @@ void solver(
   property.start = std::chrono::steady_clock::now();
   take_time_resourcet stop_time(property.stop);
 
-  if(solver_options.verbose)
-    std::cout << "Doing " << format(property.condition) << '\n';
-
-  // clean up
+  // Clean up
   for(auto &frame : frames)
     frame.reset();
 
-  // we start with I = P
+  // We start with I = P.
   frames[property.frame.index].add_invariant(property.condition);
 
-  auto result = inductiveness_check(
-    frames, address_taken, solver_options, ns, properties, property_index);
-
-  switch(result)
+  for(unsigned iteration = 0; true; iteration++)
   {
-  case inductiveness_resultt::INDUCTIVE:
-    property.status = propertyt::PASS;
-    break;
+    if(iteration == 3) // limit the effort
+    {
+      property.status = propertyt::DROPPED;
+      return; // give up
+    }
 
-  case inductiveness_resultt::BASE_CASE_FAIL:
-    property.status = propertyt::REFUTED;
-    break;
+    if(solver_options.verbose)
+      std::cout << "Doing " << format(property.condition) << " iteration "
+                << iteration + 1 << '\n';
 
-  case inductiveness_resultt::STEP_CASE_FAIL:
-    property.status = propertyt::DROPPED;
-    break;
+    auto result = inductiveness_check(
+      frames, address_taken, solver_options, ns, properties, property_index);
+
+    switch(result.outcome)
+    {
+    case inductiveness_resultt::INDUCTIVE:
+      property.status = propertyt::PASS;
+      return; // done
+
+    case inductiveness_resultt::BASE_CASE_FAIL:
+      if(iteration == 0)
+      {
+        // no generalization done, so this is a counterexample
+        property.status = propertyt::REFUTED;
+        return; // DONE
+      }
+      else
+      {
+        // Invariant was generalized too much. Try something weaker.
+        property.status = propertyt::DROPPED;
+        return;
+      }
+
+    case inductiveness_resultt::STEP_CASE_FAIL:
+      // Invariant is too weak or too strong to be inductive.
+      generalization(frames, *result.work, property, solver_options);
+      break;
+    }
   }
 }
 

@@ -56,6 +56,10 @@ public:
   std::vector<exprt> invariants;
   std::unordered_set<exprt, irep_hash> invariants_set;
 
+  // inferred obligations
+  std::vector<exprt> obligations;
+  std::unordered_set<exprt, irep_hash> obligations_set;
+
   // auxiliary facts
   std::vector<exprt> auxiliaries;
   std::unordered_set<exprt, irep_hash> auxiliaries_set;
@@ -81,13 +85,16 @@ public:
   // tracking source code origin
   source_locationt source_location = source_locationt::nil();
 
-  void add_invariant(exprt);
   void add_auxiliary(exprt);
+  void add_invariant(exprt);
+  void add_obligation(exprt);
 
   void reset()
   {
     invariants.clear();
     invariants_set.clear();
+    obligations.clear();
+    obligations_set.clear();
     auxiliaries.clear();
     auxiliaries_set.clear();
   }
