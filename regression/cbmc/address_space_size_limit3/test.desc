@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE thorough-smt-backend
 main.i
 --32 --little-endian --object-bits 25 --pointer-check
 ^EXIT=10$

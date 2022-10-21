@@ -577,23 +577,27 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value = typecast_exprt::conditional_cast(object, dereference_type);
       result.pointer =
         typecast_exprt::conditional_cast(object_pointer, pointer_type);
+
+      return result;
     }
-    else if(
+
+    // this is relative to the root object
+    exprt offset;
+    if(o.offset().is_constant())
+      offset = o.offset();
+    else
+      offset = simplify_expr(pointer_offset(pointer_expr), ns);
+
+    if(
       root_object_type.id() == ID_array &&
       dereference_type_compare(
         to_array_type(root_object_type).element_type(), dereference_type, ns) &&
       pointer_offset_bits(to_array_type(root_object_type).element_type(), ns) ==
-        pointer_offset_bits(dereference_type, ns))
+        pointer_offset_bits(dereference_type, ns) &&
+      offset.is_constant())
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
-      exprt offset;
-
-      // this should work as the object is essentially the root object
-      if(o.offset().is_constant())
-        offset=o.offset();
-      else
-        offset=pointer_offset(pointer_expr);
 
       // are we doing a byte?
       auto element_size =
@@ -605,18 +609,25 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
           to_array_type(root_object_type).element_type().pretty();
       }
 
-      exprt element_size_expr = from_integer(*element_size, offset.type());
+      const auto offset_int =
+        numeric_cast_v<mp_integer>(to_constant_expr(offset));
 
-      exprt adjusted_offset =
-        simplify_expr(div_exprt{offset, element_size_expr}, ns);
+      if(offset_int % *element_size == 0)
+      {
+        index_exprt index_expr{
+          root_object,
+          from_integer(
+            offset_int / *element_size,
+            to_array_type(root_object_type).index_type())};
+        result.value =
+          typecast_exprt::conditional_cast(index_expr, dereference_type);
+        result.pointer = typecast_exprt::conditional_cast(
+          address_of_exprt{index_expr}, pointer_type);
 
-      index_exprt index_expr{root_object, adjusted_offset};
-      result.value =
-        typecast_exprt::conditional_cast(index_expr, dereference_type);
-      result.pointer = typecast_exprt::conditional_cast(
-        address_of_exprt{index_expr}, pointer_type);
+        return result;
+      }
     }
-    else
+
     {
       // try to build a member/index expression - do not use byte_extract
       auto subexpr = get_subexpression_at_offset(
@@ -640,13 +651,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value=o.root_object();
       result.pointer = typecast_exprt::conditional_cast(
         address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
-
-      // this is relative to the root object
-      exprt offset;
-      if(o.offset().id()==ID_unknown)
-        offset=pointer_offset(pointer_expr);
-      else
-        offset=o.offset();
 
       if(memory_model(result.value, dereference_type, offset, ns))
       {

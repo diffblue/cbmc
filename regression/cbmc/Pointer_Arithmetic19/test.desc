@@ -1,7 +1,7 @@
 CORE new-smt-backend
 main.c
 --program-only
-ASSERT\(\{ 42, 43 \}\[POINTER_OFFSET\(p!0@1#2\) / \d+l*\] == 43\)$
+ASSERT\(byte_extract_little_endian\(\{ 42, 43 \}, POINTER_OFFSET\(p!0@1#2\), signed int\) == 43\)$
 ^EXIT=0$
 ^SIGNAL=0$
 --
