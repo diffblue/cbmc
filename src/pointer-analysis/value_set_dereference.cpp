@@ -611,12 +611,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // are we doing a byte?
       auto element_size =
         pointer_offset_size(to_array_type(root_object_type).element_type(), ns);
-
-      if(!element_size.has_value() || *element_size == 0)
-      {
-        throw "unknown or invalid type size of:\n" +
-          to_array_type(root_object_type).element_type().pretty();
-      }
+      CHECK_RETURN(element_size.has_value());
+      CHECK_RETURN(*element_size > 0);
 
       const auto offset_int =
         numeric_cast_v<mp_integer>(to_constant_expr(offset));
