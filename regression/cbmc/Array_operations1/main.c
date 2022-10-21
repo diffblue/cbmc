@@ -54,6 +54,14 @@ void test_copy()
   __CPROVER_array_copy(array1, array3);
   __CPROVER_assert(array1[10] == 11, "array1[10] is OK");
   __CPROVER_assert(array1[99] == 42, "expected to fail");
+
+  int a[1];
+  struct
+  {
+    int a[1];
+  } s;
+  __CPROVER_array_copy(a, s.a);
+  __CPROVER_assert(a[0] == s.a[0], "array copied");
 }
 
 void test_replace()
