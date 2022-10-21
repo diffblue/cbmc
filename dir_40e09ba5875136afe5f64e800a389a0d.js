@@ -35,6 +35,8 @@ var dir_40e09ba5875136afe5f64e800a389a0d =
     [ "format_hooks.h", "format__hooks_8h.html", "format__hooks_8h" ],
     [ "free_symbols.cpp", "free__symbols_8cpp.html", "free__symbols_8cpp" ],
     [ "free_symbols.h", "free__symbols_8h.html", "free__symbols_8h" ],
+    [ "generalization.cpp", "generalization_8cpp.html", "generalization_8cpp" ],
+    [ "generalization.h", "generalization_8h.html", "generalization_8h" ],
     [ "help_formatter.cpp", "help__formatter_8cpp.html", null ],
     [ "help_formatter.h", "help__formatter_8h.html", "help__formatter_8h" ],
     [ "inductiveness.cpp", "inductiveness_8cpp.html", "inductiveness_8cpp" ],
