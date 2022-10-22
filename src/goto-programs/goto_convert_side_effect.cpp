@@ -49,6 +49,7 @@ void goto_convertt::remove_assignment(
   if(statement==ID_assign)
   {
     auto &old_assignment = to_side_effect_expr_assign(expr);
+    exprt new_lhs = skip_typecast(old_assignment.lhs());
 
     if(
       result_is_used && !address_taken &&
@@ -57,10 +58,10 @@ void goto_convertt::remove_assignment(
       if(!old_assignment.rhs().is_constant())
         make_temp_symbol(old_assignment.rhs(), "assign", dest, mode);
 
-      replacement_expr_opt = old_assignment.rhs();
+      replacement_expr_opt =
+        typecast_exprt::conditional_cast(old_assignment.rhs(), new_lhs.type());
     }
 
-    exprt new_lhs = skip_typecast(old_assignment.lhs());
     exprt new_rhs =
       typecast_exprt::conditional_cast(old_assignment.rhs(), new_lhs.type());
     code_assignt new_assignment(std::move(new_lhs), std::move(new_rhs));
@@ -115,6 +116,7 @@ void goto_convertt::remove_assignment(
     }
 
     const binary_exprt &binary_expr = to_binary_expr(expr);
+    exprt new_lhs = skip_typecast(binary_expr.op0());
     const typet &op0_type = binary_expr.op0().type();
 
     PRECONDITION(
@@ -129,10 +131,10 @@ void goto_convertt::remove_assignment(
       assignment_lhs_needs_temporary(binary_expr.op0()))
     {
       make_temp_symbol(rhs, "assign", dest, mode);
-      replacement_expr_opt = rhs;
+      replacement_expr_opt =
+        typecast_exprt::conditional_cast(rhs, new_lhs.type());
     }
 
-    exprt new_lhs = skip_typecast(binary_expr.op0());
     rhs = typecast_exprt::conditional_cast(rhs, new_lhs.type());
     rhs.add_source_location() = expr.source_location();
     code_assignt assignment(new_lhs, rhs);

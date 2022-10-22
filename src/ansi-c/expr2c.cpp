@@ -1834,8 +1834,12 @@ std::string expr2ct::convert_constant(
   {
     const auto width = to_bitvector_type(type).get_width();
 
-    mp_integer int_value =
-      bvrep2integer(value, width, type.id() == ID_signedbv);
+    mp_integer int_value = bvrep2integer(
+      value,
+      width,
+      type.id() == ID_signedbv ||
+        (type.id() == ID_c_bit_field &&
+         to_c_bit_field_type(type).underlying_type().id() == ID_signedbv));
 
     const irep_idt &c_type =
       type.id() == ID_c_bit_field
