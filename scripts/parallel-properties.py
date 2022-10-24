@@ -21,7 +21,8 @@ A typical usage of this script will be:
 
     scripts/parallel-properties.py -J 32 binary.gb --timeout 600
 
-See --help for the list of available command-line options.
+See --help for the list of available command-line options. Any additional
+options to be passed to CBMC can be added to the command line.
 """
 
 import argparse
@@ -213,23 +214,13 @@ def output_result(result_entry, stats, status, verbose):
     return (result, result_str)
 
 
-def verify_one(goto_binary, unwind, unwindset, unwinding_assertions, depth,
-               object_bits, prop, verbose, timeout, stats):
+def verify_one(goto_binary, cbmc_args, prop, verbose, timeout, stats):
     # run CBMC with extended statistics
     cbmc_cmd = ['cbmc', '--verbosity', '8', goto_binary,
                 '--property', prop['name'], '--reachability-slice',
                 # '--full-slice',
                 '--slice-formula']
-    if unwind:
-        cbmc_cmd.extend(['--unwind', unwind])
-    if unwindset:
-        cbmc_cmd.extend(['--unwindset', unwindset])
-    if unwinding_assertions:
-        cbmc_cmd.extend(['--unwinding-assertions'])
-    if depth:
-        cbmc_cmd.extend(['--depth', str(depth)])
-    if object_bits:
-        cbmc_cmd.extend(['--object-bits', str(object_bits)])
+    cbmc_cmd.extend(cbmc_args)
     (cbmc_ret, stderr_output, t, cnf_vars, cnf_clauses) = run_cmd_with_timeout(
             cbmc_cmd, timeout, verbose)
     result_entry = {'time': t, 'property': prop, 'variables': cnf_vars,
@@ -244,8 +235,7 @@ def verify_one(goto_binary, unwind, unwindset, unwinding_assertions, depth,
         return output_result(result_entry, stats, C_ERROR, verbose)
 
 
-def verify(goto_binary, unwind, unwindset, unwinding_assertions, depth,
-           object_bits, verbose, timeout, n_jobs, stats):
+def verify(goto_binary, cbmc_args, verbose, timeout, n_jobs, stats):
     # find names of desired properties
     show_prop_cmd = ['goto-instrument', '--verbosity', '4', '--json-ui',
                      '--show-properties', goto_binary]
@@ -259,10 +249,8 @@ def verify(goto_binary, unwind, unwindset, unwinding_assertions, depth,
     lock = multiprocessing.Lock()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=n_jobs) as e:
-        future_to_result = {e.submit(verify_one, goto_binary, unwind,
-                                     unwindset, unwinding_assertions, depth,
-                                     object_bits, prop, verbose, timeout,
-                                     stats): prop
+        future_to_result = {e.submit(verify_one, goto_binary, cbmc_args,
+                                     prop, verbose, timeout, stats): prop
                             for prop in json_props[1]['properties']}
         for future in concurrent.futures.as_completed(future_to_result):
             prop = future_to_result[future]
@@ -296,39 +284,17 @@ def main():
             action='store_true',
             help='enable verbose output')
     parser.add_argument(
-            '--unwind',
-            type=str,
-            help='loop unwinding, forwarded to CBMC'),
-    parser.add_argument(
-            '--unwindset',
-            type=str,
-            help='loop unwinding, forwarded to CBMC'),
-    parser.add_argument(
-            '--unwinding-assertions',
-            action='store_true',
-            help='enable unwinding assertions, forwarded to CBMC'),
-    parser.add_argument(
-            '--depth',
-            type=int,
-            help='symex depth, forwarded to CBMC'),
-    parser.add_argument(
-            '--object-bits',
-            type=int,
-            help='object bits, forwarded to CBMC'),
-    parser.add_argument(
             'goto_binary',
             help='instrumented goto binary to verify')
-    args = parser.parse_args()
+    args, cbmc_args = parser.parse_known_args()
 
     logger = get_logger(args.verbose)
 
     stats = {}
     results = {}
     results['results'] = verify(
-            args.goto_binary, args.unwind, args.unwindset,
-            args.unwinding_assertions,
-            args.depth, args.object_bits, args.verbose,
-            args.timeout, args.parallel, stats)
+            args.goto_binary, cbmc_args, args.verbose, args.timeout,
+            args.parallel, stats)
 
     if args.statistics:
         results['statistics'] = stats
