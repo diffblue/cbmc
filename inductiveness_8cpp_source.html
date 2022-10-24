@@ -104,15 +104,15 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="inductiveness_8h.html">inductiveness.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="arith__tools_8h.html">util/arith_tools.h</a>&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cout__message_8h.html">util/cout_message.h</a>&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="format__expr_8h.html">util/format_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="simplify__expr_8h.html">util/simplify_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="satcheck_8h.html">solvers/sat/satcheck.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="axioms_8h.html">axioms.h</a>&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="bv__pointers__wide_8h.html">bv_pointers_wide.h</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="console_8h.html">console.h</a>&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="console_8h.html">util/console.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cout__message_8h.html">util/cout_message.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="format__expr_8h.html">util/format_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="simplify__expr_8h.html">util/simplify_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="satcheck_8h.html">solvers/sat/satcheck.h</a>&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="axioms_8h.html">axioms.h</a>&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="bv__pointers__wide_8h.html">bv_pointers_wide.h</a>&quot;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="counterexample__found_8h.html">counterexample_found.h</a>&quot;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="propagate_8h.html">propagate.h</a>&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="solver_8h.html">solver.h</a>&quot;</span></div>
@@ -126,7 +126,7 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a3,</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;b,</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordtype">bool</span> verbose,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>,</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
@@ -140,13 +140,13 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="classcout__message__handlert.html">cout_message_handlert</a> message_handler;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(verbose ? 10 : 1);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a> ? 10 : 1);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(1);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  satcheckt satcheck(message_handler);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="classbv__pointers__widet.html">bv_pointers_widet</a> <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(ns, satcheck, message_handler);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classaxiomst.html">axiomst</a> axioms(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, verbose, ns);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classaxiomst.html">axiomst</a> axioms(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, <a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>, ns);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// check if a =&gt; b is valid,</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// or (!a || b) is valid,</span></div>
@@ -169,7 +169,7 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">switch</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>())</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0ae832e8985e3878039c2ca0e08761f26d">decision_proceduret::resultt::D_SATISFIABLE</a>:</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">if</span>(verbose)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>)</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <a class="code" href="counterexample__found_8cpp.html#aa238be26edb566710c23725f6de63dae">show_assignment</a>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a884d24c603cadb4630432f52133d3027">decision_proceduret::resultt::D_UNSATISFIABLE</a>:</div>
@@ -367,6 +367,7 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:90</a></div></div>
 <div class="ttc" id="aaxioms_8h_html"><div class="ttname"><a href="axioms_8h.html">axioms.h</a></div></div>
 <div class="ttc" id="acounterexample__found_8cpp_html_a1d92090d3e7e5ab279e9c014da1c2e24"><div class="ttname"><a href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a></div><div class="ttdeci">optionalt&lt; propertyt::tracet &gt; counterexample_found(const std::vector&lt; framet &gt; &amp;frames, const workt &amp;work, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, bool verbose, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="counterexample__found_8cpp_source.html#l00176">counterexample_found.cpp:176</a></div></div>
+<div class="ttc" id="aclasssolver__optionst_html_aa545bb83c80cb75098f43195293a39cf"><div class="ttname"><a href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">solver_optionst::verbose</a></div><div class="ttdeci">bool verbose</div><div class="ttdef"><b>Definition:</b> <a href="solver_8h_source.html#l00028">solver.h:28</a></div></div>
 <div class="ttc" id="acout__message_8h_html"><div class="ttname"><a href="cout__message_8h.html">cout_message.h</a></div></div>
 <div class="ttc" id="aclassbv__pointers__widet_html"><div class="ttname"><a href="classbv__pointers__widet.html">bv_pointers_widet</a></div><div class="ttdef"><b>Definition:</b> <a href="bv__pointers__wide_8h_source.html#l00020">bv_pointers_wide.h:20</a></div></div>
 <div class="ttc" id="acounterexample__found_8cpp_html_aa238be26edb566710c23725f6de63dae"><div class="ttname"><a href="counterexample__found_8cpp.html#aa238be26edb566710c23725f6de63dae">show_assignment</a></div><div class="ttdeci">void show_assignment(const bv_pointers_widet &amp;solver)</div><div class="ttdef"><b>Definition:</b> <a href="counterexample__found_8cpp_source.html#l00027">counterexample_found.cpp:27</a></div></div>

@@ -1,6 +1,5 @@
 var NAVTREEINDEX30 =
 {
-"classfrequency__mapt.html#a301f494f9d0020a9b0ba5f6896f2dfeb":[4,0,468,3],
 "classfrequency__mapt.html#a58511ddfb5ddf631a0ed0b188f341126":[4,0,468,2],
 "classfrequency__mapt.html#a69cd77ec7e035b5e9f6cc1cd8b95b47d":[4,0,468,1],
 "classfrequency__mapt.html#ae4a100f198fc6e9287df28850d54337c":[4,0,468,4],
@@ -249,5 +248,6 @@ var NAVTREEINDEX30 =
 "classgdb__apit.html#ad478fe14bd94dde8f0cfd6227ca524aa":[4,0,489,19],
 "classgdb__apit.html#ad6d704bb08b371fdc1f09eeac1b0e334":[4,0,489,30],
 "classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b":[4,0,489,15],
-"classgdb__apit.html#adce3627fd3d799ce4747b5c666599fcf":[4,0,489,12]
+"classgdb__apit.html#adce3627fd3d799ce4747b5c666599fcf":[4,0,489,12],
+"classgdb__apit.html#ae01de1c63b4e60a257af6d1689faf1ea":[4,0,489,20]
 };

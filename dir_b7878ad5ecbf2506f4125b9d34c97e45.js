@@ -34,6 +34,11 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     ] ],
     [ "config.cpp", "config_8cpp.html", "config_8cpp" ],
     [ "config.h", "config_8h.html", "config_8h" ],
+    [ "console.cpp", "console_8cpp.html", null ],
+    [ "console.h", "console_8h.html", [
+      [ "consolet", "classconsolet.html", "classconsolet" ],
+      [ "redirectt", "classconsolet_1_1redirectt.html", "classconsolet_1_1redirectt" ]
+    ] ],
     [ "constructor_of.h", "constructor__of_8h.html", "constructor__of_8h" ],
     [ "container_utils.h", "container__utils_8h.html", "container__utils_8h" ],
     [ "cout_message.cpp", "cout__message_8cpp.html", null ],
@@ -125,6 +130,8 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "get_module.cpp", "get__module_8cpp.html", "get__module_8cpp" ],
     [ "get_module.h", "get__module_8h.html", "get__module_8h" ],
     [ "graph.h", "graph_8h.html", "graph_8h" ],
+    [ "help_formatter.cpp", "help__formatter_8cpp.html", null ],
+    [ "help_formatter.h", "help__formatter_8h.html", "help__formatter_8h" ],
     [ "identifier.cpp", "identifier_8cpp.html", null ],
     [ "identifier.h", "identifier_8h.html", "identifier_8h" ],
     [ "ieee_float.cpp", "ieee__float_8cpp.html", null ],

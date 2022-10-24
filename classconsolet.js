@@ -17,7 +17,6 @@ var classconsolet =
     [ "reset", "classconsolet.html#a6d3593d920e93f841bee945e27eb85b2", null ],
     [ "underline", "classconsolet.html#a414348bd56961176c20ac2bdddd343dc", null ],
     [ "use_SGR", "classconsolet.html#a093a646b91107e87d57ed51fcdff59f2", null ],
-    [ "wcwidth", "classconsolet.html#a829187141ae38d93b02a7313249493b5", null ],
     [ "width", "classconsolet.html#a8b2f0cf55009c8500ca6d802ff36e67e", null ],
     [ "yellow", "classconsolet.html#a2d57c6ac6783df486733eed31b21a54d", null ],
     [ "_err", "classconsolet.html#a36d551e46b783c671bbc2d842ae5be81", null ],

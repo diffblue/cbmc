@@ -1,7 +1,5 @@
 var NAVTREEINDEX76 =
 {
-"full__slicer_8h_source.html":[5,0,2,13,40],
-"full__slicer__class_8h.html":[5,0,2,13,41],
 "full__slicer__class_8h_source.html":[5,0,2,13,41],
 "full__struct__abstract__object_8cpp.html":[5,0,2,0,0,22],
 "full__struct__abstract__object_8cpp_source.html":[5,0,2,0,0,22],
@@ -249,5 +247,7 @@ var NAVTREEINDEX76 =
 "gcc__builtin__headers__arm_8h.html#a4aa5e03952d3ad7a9961cda21add56d9":[5,0,2,1,61,16],
 "gcc__builtin__headers__arm_8h.html#a4b8cfa744e5f09287117d3d37f6af254":[5,0,2,1,61,14],
 "gcc__builtin__headers__arm_8h.html#a4dc12bb5033c3d678a7bc8a2fa5bd2c0":[5,0,2,1,61,47],
-"gcc__builtin__headers__arm_8h.html#a4e99c6c444ccc34137788b4077f9bb02":[5,0,2,1,61,130]
+"gcc__builtin__headers__arm_8h.html#a4e99c6c444ccc34137788b4077f9bb02":[5,0,2,1,61,130],
+"gcc__builtin__headers__arm_8h.html#a4eea1db5acaf68eccd910bb638121555":[5,0,2,1,61,93],
+"gcc__builtin__headers__arm_8h.html#a4f11ba7f953884135b16a3f5f23cb125":[5,0,2,1,61,4]
 };
