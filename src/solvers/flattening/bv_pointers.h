@@ -67,6 +67,12 @@ protected:
     const exprt &index);
   NODISCARD
   bvt offset_arithmetic(
+    const pointer_typet &type,
+    const bvt &bv,
+    const exprt &factor,
+    const exprt &index);
+  NODISCARD
+  bvt offset_arithmetic(
     const pointer_typet &,
     const bvt &,
     const mp_integer &factor,

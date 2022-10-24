@@ -264,8 +264,8 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
       UNREACHABLE;
 
     // get size
-    auto size = pointer_offset_size(array_type.element_type(), ns);
-    CHECK_RETURN(size.has_value() && *size >= 0);
+    auto size = size_of_expr(array_type.element_type(), ns);
+    CHECK_RETURN(size.has_value());
 
     bv = offset_arithmetic(type, bv, *size, index);
     CHECK_RETURN(bv.size()==bits);
@@ -842,6 +842,28 @@ bvt bv_pointerst::offset_arithmetic(
   bv_index=bv_utils.extension(bv_index, offset_bits, rep);
 
   return offset_arithmetic(type, bv, factor, bv_index);
+}
+
+bvt bv_pointerst::offset_arithmetic(
+  const pointer_typet &type,
+  const bvt &bv,
+  const exprt &factor,
+  const exprt &index)
+{
+  bvt bv_factor = convert_bv(factor);
+  bvt bv_index =
+    convert_bv(typecast_exprt::conditional_cast(index, factor.type()));
+
+  bv_utilst::representationt rep = factor.type().id() == ID_signedbv
+                                     ? bv_utilst::representationt::SIGNED
+                                     : bv_utilst::representationt::UNSIGNED;
+
+  bv_index = bv_utils.multiplier(bv_index, bv_factor, rep);
+
+  const std::size_t offset_bits = get_offset_width(type);
+  bv_index = bv_utils.extension(bv_index, offset_bits, rep);
+
+  return offset_arithmetic(type, bv, 1, bv_index);
 }
 
 bvt bv_pointerst::offset_arithmetic(
