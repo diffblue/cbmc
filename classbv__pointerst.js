@@ -22,6 +22,7 @@ var classbv__pointerst =
     [ "offset_arithmetic", "classbv__pointerst.html#a3cc788298809ee241b8d0aa9a5f1b443", null ],
     [ "offset_arithmetic", "classbv__pointerst.html#a297459c1ea845b27a636dd39f918ee01", null ],
     [ "offset_arithmetic", "classbv__pointerst.html#a3f65ea0bd6e0b3a9dbb2b985ca593df3", null ],
+    [ "offset_arithmetic", "classbv__pointerst.html#acdbc3575917e9712cc45a488a2b08bfe", null ],
     [ "offset_literals", "classbv__pointerst.html#ae674fa38b1681be35f34fec0e69a7a77", null ],
     [ "pointer_logic", "classbv__pointerst.html#a2bfca0993635241a742ca3e98520559d", null ],
     [ "postponed_list", "classbv__pointerst.html#a4fb72a87c9c759ced9df5280e65493f0", null ]

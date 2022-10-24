@@ -218,10 +218,10 @@ var NAVTREEINDEX12 =
 "classbv__pointerst.html#a1975e0ab6b2817df29b3d54774ceb68b":[4,0,126,10],
 "classbv__pointerst.html#a27da48889926f73cc911bdad349de51c":[4,0,126,6],
 "classbv__pointerst.html#a297459c1ea845b27a636dd39f918ee01":[4,0,126,20],
-"classbv__pointerst.html#a2bfca0993635241a742ca3e98520559d":[4,0,126,23],
+"classbv__pointerst.html#a2bfca0993635241a742ca3e98520559d":[4,0,126,24],
 "classbv__pointerst.html#a3cc788298809ee241b8d0aa9a5f1b443":[4,0,126,19],
 "classbv__pointerst.html#a3f65ea0bd6e0b3a9dbb2b985ca593df3":[4,0,126,21],
-"classbv__pointerst.html#a4fb72a87c9c759ced9df5280e65493f0":[4,0,126,24],
+"classbv__pointerst.html#a4fb72a87c9c759ced9df5280e65493f0":[4,0,126,25],
 "classbv__pointerst.html#a5c8e15c661d272bc2af4f517ab508ae8":[4,0,126,14],
 "classbv__pointerst.html#a6272fe1bd5184a772fff5135b35fea4b":[4,0,126,4],
 "classbv__pointerst.html#a63c1652c1b3eb6373302dfd2d3b5a4a0":[4,0,126,12],
@@ -234,9 +234,10 @@ var NAVTREEINDEX12 =
 "classbv__pointerst.html#ac9ff755d6254b48e12ac63eecbd0a8e1":[4,0,126,16],
 "classbv__pointerst.html#aca26f834139587796aefdead1aa57635":[4,0,126,9],
 "classbv__pointerst.html#acd0a6a2fc0bf2ad1b16b421c12b1ef99":[4,0,126,3],
+"classbv__pointerst.html#acdbc3575917e9712cc45a488a2b08bfe":[4,0,126,22],
 "classbv__pointerst.html#ad5b614797a4c4511cde33d807806a7ba":[4,0,126,7],
 "classbv__pointerst.html#ad66fbf7acb68038f34433277d3a6586a":[4,0,126,17],
-"classbv__pointerst.html#ae674fa38b1681be35f34fec0e69a7a77":[4,0,126,22],
+"classbv__pointerst.html#ae674fa38b1681be35f34fec0e69a7a77":[4,0,126,23],
 "classbv__pointerst.html#af7a0d2775487740c970ef0bbacc68e7a":[4,0,126,8],
 "classbv__refinementt.html":[4,0,127],
 "classbv__refinementt.html#a04644ff79d5e61f4e6eeff9549438904":[4,0,127,14],
@@ -248,6 +249,5 @@ var NAVTREEINDEX12 =
 "classbv__refinementt.html#a53f0c1cde2baa0398e3520423ba22cb0":[4,0,127,15],
 "classbv__refinementt.html#a56a7b80c83a4f1099d37bde09e93561c":[4,0,127,10],
 "classbv__refinementt.html#a5b1aabf4e79eafd798c83b081694f84d":[4,0,127,4],
-"classbv__refinementt.html#a6874895d94890ba1471e7d6a5f0b0090":[4,0,127,7],
-"classbv__refinementt.html#a6c6a18794a7f4c539c1c9c88bcce8ece":[4,0,127,6]
+"classbv__refinementt.html#a6874895d94890ba1471e7d6a5f0b0090":[4,0,127,7]
 };
