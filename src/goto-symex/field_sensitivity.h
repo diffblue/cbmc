@@ -128,6 +128,7 @@ public:
   apply(const namespacet &ns, goto_symex_statet &state, exprt expr, bool write)
     const;
   /// \copydoc apply(const namespacet&,goto_symex_statet&,exprt,bool) const
+  NODISCARD
   exprt apply(
     const namespacet &ns,
     goto_symex_statet &state,
@@ -142,6 +143,7 @@ public:
   /// \return Expanded expression; for example, for a \p ssa_expr of some struct
   ///   type, a `struct_exprt` with each component now being an SSA expression
   ///   is built.
+  NODISCARD
   exprt get_fields(
     const namespacet &ns,
     goto_symex_statet &state,
@@ -172,6 +174,7 @@ private:
     symex_targett &target,
     bool allow_pointer_unsoundness);
 
+  NODISCARD
   exprt simplify_opt(exprt e, const namespacet &ns) const;
 };
 
