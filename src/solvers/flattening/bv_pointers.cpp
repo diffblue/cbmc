@@ -732,7 +732,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     to_typecast_expr(expr).op().type().id() == ID_pointer)
   {
     // pointer to int
-    bvt op0 = convert_pointer_type(to_typecast_expr(expr).op());
+    bvt op0 = convert_bv(to_typecast_expr(expr).op());
 
     // squeeze it in!
     std::size_t width=boolbv_width(expr.type());
