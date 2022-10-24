@@ -79,7 +79,8 @@ bool can_evaluate_to_constant(const exprt &expression)
 {
   return can_cast_expr<constant_exprt>(skip_typecast(expression)) ||
          can_cast_expr<symbol_exprt>(skip_typecast(expression)) ||
-         can_cast_expr<plus_exprt>(skip_typecast(expression));
+         can_cast_expr<plus_exprt>(skip_typecast(expression)) ||
+         can_cast_expr<mult_exprt>(skip_typecast(expression));
 }
 
 bool check_index_structure(const exprt &index_expr)

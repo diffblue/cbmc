@@ -142,9 +142,9 @@ exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   bool display_points_to_sets)
 {
-  if(pointer.type().id()!=ID_pointer)
-    throw "dereference expected pointer type, but got "+
-          pointer.type().pretty();
+  PRECONDITION_WITH_DIAGNOSTICS(
+    pointer.type().id() == ID_pointer,
+    "dereference expected pointer type, but got " + pointer.type().pretty());
 
   // we may get ifs due to recursive calls
   if(pointer.id()==ID_if)
@@ -465,8 +465,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     return valuet();
   }
 
-  if(what.id()!=ID_object_descriptor)
-    throw "unknown points-to: "+what.id_string();
+  PRECONDITION_WITH_DIAGNOSTICS(
+    what.id() == ID_object_descriptor,
+    "unknown points-to: " + what.id_string());
 
   const object_descriptor_exprt &o=to_object_descriptor_expr(what);
 
@@ -477,17 +478,19 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   std::cout << "O: " << format(root_object) << '\n';
   #endif
 
-  valuet result;
-
   if(root_object.id() == ID_null_object)
   {
-    if(o.offset().is_zero())
-      result.pointer = null_pointer_exprt{pointer_type};
-    else
-      return valuet{};
+    if(!o.offset().is_zero())
+      return {};
+
+    valuet result;
+    result.pointer = null_pointer_exprt{pointer_type};
+    return result;
   }
   else if(root_object.id()==ID_dynamic_object)
   {
+    valuet result;
+
     // constraint that it actually is a dynamic object
     // this is also our guard
     result.pointer_guard = is_dynamic_object_exprt(pointer_expr);
@@ -495,6 +498,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     // can't remove here, turn into *p
     result.value = dereference_exprt{pointer_expr};
     result.pointer = pointer_expr;
+
+    return result;
   }
   else if(root_object.id()==ID_integer_address)
   {
@@ -514,8 +519,10 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         pointer_offset(pointer_expr),
         to_array_type(memory_symbol.type).element_type());
 
+      valuet result;
       result.value=index_expr;
       result.pointer = address_of_exprt{index_expr};
+      return result;
     }
     else if(dereference_type_compare(
               to_array_type(memory_symbol.type).element_type(),
@@ -526,9 +533,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         symbol_expr,
         pointer_offset(pointer_expr),
         to_array_type(memory_symbol.type).element_type());
+
+      valuet result;
       result.value=typecast_exprt(index_expr, dereference_type);
       result.pointer =
         typecast_exprt{address_of_exprt{index_expr}, pointer_type};
+      return result;
     }
     else
     {
@@ -536,18 +546,19 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // Won't do this without a commitment to an endianness.
 
       if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
-      {
-      }
-      else
-      {
-        result.value = make_byte_extract(
-          symbol_expr, pointer_offset(pointer_expr), dereference_type);
-        result.pointer = address_of_exprt{result.value};
-      }
+        return {};
+
+      valuet result;
+      result.value = make_byte_extract(
+        symbol_expr, pointer_offset(pointer_expr), dereference_type);
+      result.pointer = address_of_exprt{result.value};
+      return result;
     }
   }
   else
   {
+    valuet result;
+
     // something generic -- really has to be a symbol
     address_of_exprt object_pointer(object);
 
@@ -565,8 +576,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const typet &object_type = object.type();
     const typet &root_object_type = root_object.type();
 
-    exprt root_object_subexpression=root_object;
-
     if(
       dereference_type_compare(object_type, dereference_type, ns) &&
       o.offset().is_zero())
@@ -577,89 +586,81 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value = typecast_exprt::conditional_cast(object, dereference_type);
       result.pointer =
         typecast_exprt::conditional_cast(object_pointer, pointer_type);
+
+      return result;
     }
-    else if(
+
+    // this is relative to the root object
+    exprt offset;
+    if(o.offset().is_constant())
+      offset = o.offset();
+    else
+      offset = simplify_expr(pointer_offset(pointer_expr), ns);
+
+    if(
       root_object_type.id() == ID_array &&
       dereference_type_compare(
         to_array_type(root_object_type).element_type(), dereference_type, ns) &&
       pointer_offset_bits(to_array_type(root_object_type).element_type(), ns) ==
-        pointer_offset_bits(dereference_type, ns))
+        pointer_offset_bits(dereference_type, ns) &&
+      offset.is_constant())
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
-      exprt offset;
-
-      // this should work as the object is essentially the root object
-      if(o.offset().is_constant())
-        offset=o.offset();
-      else
-        offset=pointer_offset(pointer_expr);
 
       // are we doing a byte?
       auto element_size =
         pointer_offset_size(to_array_type(root_object_type).element_type(), ns);
+      CHECK_RETURN(element_size.has_value());
+      CHECK_RETURN(*element_size > 0);
 
-      if(!element_size.has_value() || *element_size == 0)
+      const auto offset_int =
+        numeric_cast_v<mp_integer>(to_constant_expr(offset));
+
+      if(offset_int % *element_size == 0)
       {
-        throw "unknown or invalid type size of:\n" +
-          to_array_type(root_object_type).element_type().pretty();
-      }
-
-      exprt element_size_expr = from_integer(*element_size, offset.type());
-
-      exprt adjusted_offset =
-        simplify_expr(div_exprt{offset, element_size_expr}, ns);
-
-      index_exprt index_expr{root_object, adjusted_offset};
-      result.value =
-        typecast_exprt::conditional_cast(index_expr, dereference_type);
-      result.pointer = typecast_exprt::conditional_cast(
-        address_of_exprt{index_expr}, pointer_type);
-    }
-    else
-    {
-      // try to build a member/index expression - do not use byte_extract
-      auto subexpr = get_subexpression_at_offset(
-        root_object_subexpression, o.offset(), dereference_type, ns);
-      if(subexpr.has_value())
-        simplify(subexpr.value(), ns);
-      if(
-        subexpr.has_value() &&
-        subexpr.value().id() != ID_byte_extract_little_endian &&
-        subexpr.value().id() != ID_byte_extract_big_endian)
-      {
-        // Successfully found a member, array index, or combination thereof
-        // that matches the desired type and offset:
-        result.value = subexpr.value();
+        index_exprt index_expr{
+          root_object,
+          from_integer(
+            offset_int / *element_size,
+            to_array_type(root_object_type).index_type())};
+        result.value =
+          typecast_exprt::conditional_cast(index_expr, dereference_type);
         result.pointer = typecast_exprt::conditional_cast(
-          address_of_exprt{skip_typecast(subexpr.value())}, pointer_type);
+          address_of_exprt{index_expr}, pointer_type);
+
         return result;
       }
-
-      // we extract something from the root object
-      result.value=o.root_object();
-      result.pointer = typecast_exprt::conditional_cast(
-        address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
-
-      // this is relative to the root object
-      exprt offset;
-      if(o.offset().id()==ID_unknown)
-        offset=pointer_offset(pointer_expr);
-      else
-        offset=o.offset();
-
-      if(memory_model(result.value, dereference_type, offset, ns))
-      {
-        // ok, done
-      }
-      else
-      {
-        return valuet(); // give up, no way that this is ok
-      }
     }
-  }
 
-  return result;
+    // try to build a member/index expression - do not use byte_extract
+    auto subexpr = get_subexpression_at_offset(
+      root_object, o.offset(), dereference_type, ns);
+    if(subexpr.has_value())
+      simplify(subexpr.value(), ns);
+    if(
+      subexpr.has_value() &&
+      subexpr.value().id() != ID_byte_extract_little_endian &&
+      subexpr.value().id() != ID_byte_extract_big_endian)
+    {
+      // Successfully found a member, array index, or combination thereof
+      // that matches the desired type and offset:
+      result.value = subexpr.value();
+      result.pointer = typecast_exprt::conditional_cast(
+        address_of_exprt{skip_typecast(subexpr.value())}, pointer_type);
+      return result;
+    }
+
+    // we extract something from the root object
+    result.value = o.root_object();
+    result.pointer = typecast_exprt::conditional_cast(
+      address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
+
+    if(!memory_model(result.value, dereference_type, offset, ns))
+      return {}; // give up, no way that this is ok
+
+    return result;
+  }
 }
 
 static bool is_a_bv_type(const typet &type)
