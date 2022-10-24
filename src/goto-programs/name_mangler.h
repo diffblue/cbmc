@@ -70,6 +70,9 @@ public:
       symbolt new_sym;
       new_sym = sym;
       new_sym.name = mangled;
+      new_sym.base_name = mangled;
+      if(new_sym.pretty_name.empty())
+        new_sym.pretty_name = sym.base_name;
       new_sym.is_file_local = false;
 
       new_syms.push_back(new_sym);
