@@ -11,10 +11,10 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "propagate.h"
 
+#include <util/console.h>
 #include <util/format_expr.h>
 #include <util/simplify_expr.h>
 
-#include "console.h"
 #include "simplify_state_expr.h"
 #include "state.h"
 

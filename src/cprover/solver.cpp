@@ -11,12 +11,12 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "solver.h"
 
+#include <util/console.h>
 #include <util/cout_message.h>
 #include <util/format_expr.h>
 #include <util/std_expr.h>
 
 #include "address_taken.h"
-#include "console.h"
 #include "counterexample_found.h"
 #include "generalization.h"
 #include "inductiveness.h"

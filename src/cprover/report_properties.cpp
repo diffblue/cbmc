@@ -11,9 +11,8 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "report_properties.h"
 
+#include <util/console.h>
 #include <util/cout_message.h>
-
-#include "console.h"
 
 #include <iomanip>
 
