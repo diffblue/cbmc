@@ -965,12 +965,17 @@ static bool is_zero_width(const typet &type, const namespacet &ns)
     return true;
   else if(type.id() == ID_struct_tag)
     return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
-  else if(type.id() == ID_struct)
-    return to_struct_type(type).components().empty();
   else if(type.id() == ID_union_tag)
     return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
-  else if(type.id() == ID_union)
-    return to_union_type(type).components().empty();
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    for(const auto &comp : to_struct_union_type(type).components())
+    {
+      if(!is_zero_width(comp.type(), ns))
+        return false;
+    }
+    return true;
+  }
   else
     return false;
 }
