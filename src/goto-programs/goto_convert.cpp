@@ -1920,7 +1920,7 @@ void goto_convert(
   message_handlert &message_handler)
 {
   // find main symbol
-  const symbol_tablet::symbolst::const_iterator s_it=
+  const symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find("main");
 
   DATA_INVARIANT(

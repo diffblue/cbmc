@@ -26,7 +26,7 @@ class member_exprt;
 class namespacet;
 class struct_exprt;
 class symbol_exprt;
-class symbol_tablet;
+class symbol_table_baset;
 class typecast_exprt;
 
 class remove_const_function_pointerst
@@ -37,7 +37,7 @@ public:
   remove_const_function_pointerst(
     message_handlert &message_handler,
     const namespacet &ns,
-    const symbol_tablet &symbol_table);
+    const symbol_table_baset &symbol_table);
 
   bool operator()(const exprt &base_expression, functionst &out_functions);
 
@@ -103,7 +103,7 @@ private:
 
   messaget log;
   const namespacet &ns;
-  const symbol_tablet &symbol_table;
+  const symbol_table_baset &symbol_table;
 };
 
 #define OPT_REMOVE_CONST_FUNCTION_POINTERS \

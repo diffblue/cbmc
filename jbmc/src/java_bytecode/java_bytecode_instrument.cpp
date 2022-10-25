@@ -591,7 +591,7 @@ void java_bytecode_instrument_uncaught_exceptions(
 ///   this flag is set to true.
 /// \param message_handler: stream to report status and warnings
 void java_bytecode_instrument(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const bool throw_runtime_exceptions,
   message_handlert &message_handler)
 {

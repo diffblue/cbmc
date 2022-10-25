@@ -21,14 +21,15 @@ Author: Michael Tautschnig, tautschn@amazon.com
 class jsil_convertt
 {
 public:
-  jsil_convertt(symbol_tablet &_symbol_table) : symbol_table(_symbol_table)
+  explicit jsil_convertt(symbol_table_baset &_symbol_table)
+    : symbol_table(_symbol_table)
   {
   }
 
   bool operator()(const jsil_parse_treet &parse_tree, message_handlert &);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 
   bool convert_code(const symbolt &symbol, codet &code);
 };
@@ -116,7 +117,7 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 
 bool jsil_convert(
   const jsil_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   jsil_convertt jsil_convert{symbol_table};

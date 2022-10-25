@@ -26,8 +26,8 @@ class json_symtab_languaget : public languaget
 public:
   bool parse(std::istream &instream, const std::string &path) override;
 
-  bool
-  typecheck(symbol_tablet &symbol_table, const std::string &module) override;
+  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
+    override;
 
   void show_parse(std::ostream &out) override;
 
@@ -57,7 +57,7 @@ public:
     return util_make_unique<json_symtab_languaget>();
   }
 
-  bool generate_support_functions(symbol_tablet &symbol_table) override
+  bool generate_support_functions(symbol_table_baset &symbol_table) override
   {
     // check if entry point is already there
     bool entry_point_exists =

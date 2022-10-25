@@ -338,7 +338,7 @@ void goto_symext::symex_with_state(
     ~reset_namespacet()
     {
       // Get symbol table 1, the outer symbol table from the GOTO program
-      const symbol_tablet &st = ns.get_symbol_table();
+      const symbol_table_baset &st = ns.get_symbol_table();
       // Move a new namespace containing this symbol table over the top of the
       // current one
       ns = namespacet(st);
@@ -478,7 +478,7 @@ void goto_symext::symex_from_entry_point_of(
 
 void goto_symext::initialize_path_storage_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
-  symbol_tablet &new_symbol_table)
+  symbol_table_baset &new_symbol_table)
 {
   auto state = initialize_entry_point_state(get_goto_function);
 

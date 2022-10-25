@@ -34,7 +34,7 @@ bool is_clinit_function(const irep_idt &function_id);
 bool is_user_specified_clinit_function(const irep_idt &function_id);
 
 void create_static_initializer_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   const bool thread_safe,
   const bool is_user_clinit_needed);
@@ -59,7 +59,7 @@ code_ifthenelset get_clinit_wrapper_body(
 
 /// \return map associating classes to the symbols they declare
 std::unordered_multimap<irep_idt, symbolt>
-class_to_declared_symbols(const symbol_tablet &symbol_table);
+class_to_declared_symbols(const symbol_table_baset &symbol_table);
 
 /// Create the body of a user_specified_clinit function for a given class, which
 /// includes assignments for all static fields of the class to values read from
@@ -102,7 +102,7 @@ class stub_global_initializer_factoryt
 
 public:
   void create_stub_global_initializer_symbols(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::unordered_set<irep_idt> &stub_globals_set,
     synthetic_methods_mapt &synthetic_methods);
 
@@ -115,7 +115,7 @@ public:
 };
 
 void create_stub_global_initializers(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::unordered_set<irep_idt> &stub_globals_set,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);

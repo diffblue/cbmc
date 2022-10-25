@@ -23,13 +23,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 
 code_function_callt function_to_call(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &id,
   const irep_idt &argument)
 {
   // already there?
 
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(id);
 
   if(s_it==symbol_table.symbols.end())

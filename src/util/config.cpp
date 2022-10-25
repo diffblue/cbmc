@@ -1251,8 +1251,7 @@ static unsigned unsigned_from_ns(
   return numeric_cast_v<unsigned>(int_value);
 }
 
-void configt::set_from_symbol_table(
-  const symbol_tablet &symbol_table)
+void configt::set_from_symbol_table(const symbol_table_baset &symbol_table)
 {
   // maybe not compiled from C/C++
   if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "int_width")==
@@ -1312,7 +1311,7 @@ void configt::set_from_symbol_table(
 /// Sets the number of bits used for object addresses
 /// \param symbol_table: The symbol table
 void configt::set_object_bits_from_symbol_table(
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   // has been overridden by command line option,
   //   thus do not apply language defaults

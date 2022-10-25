@@ -20,7 +20,7 @@ Author: CM Wintersteiger
 class goto_functionst;
 class goto_modelt;
 class message_handlert;
-class symbol_tablet;
+class symbol_table_baset;
 
 bool write_goto_binary(
   std::ostream &out,
@@ -29,9 +29,9 @@ bool write_goto_binary(
 
 bool write_goto_binary(
   std::ostream &out,
-  const symbol_tablet &,
+  const symbol_table_baset &,
   const goto_functionst &,
-  int version=GOTO_BINARY_VERSION);
+  int version = GOTO_BINARY_VERSION);
 
 bool write_goto_binary(
   const std::string &filename,

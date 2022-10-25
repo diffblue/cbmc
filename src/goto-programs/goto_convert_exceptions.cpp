@@ -237,7 +237,7 @@ symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 {
   irep_idt id="$exception_flag";
 
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(id);
 
   if(s_it==symbol_table.symbols.end())

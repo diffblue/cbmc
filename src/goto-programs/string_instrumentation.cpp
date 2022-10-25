@@ -53,7 +53,7 @@ exprt buffer_size(const exprt &what)
 class string_instrumentationt
 {
 public:
-  explicit string_instrumentationt(symbol_tablet &_symbol_table)
+  explicit string_instrumentationt(symbol_table_baset &_symbol_table)
     : symbol_table(_symbol_table), ns(_symbol_table)
   {
   }
@@ -62,7 +62,7 @@ public:
   void operator()(goto_functionst &dest);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
 
   void make_type(exprt &dest, const typet &type)
@@ -160,7 +160,7 @@ protected:
 };
 
 void string_instrumentation(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt &dest)
 {
   string_instrumentationt string_instrumentation{symbol_table};
@@ -168,7 +168,7 @@ void string_instrumentation(
 }
 
 void string_instrumentation(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &dest)
 {
   string_instrumentationt string_instrumentation{symbol_table};

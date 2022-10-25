@@ -54,12 +54,12 @@ bool does_pattern_miss_descriptor(const std::string &pattern)
 /// If the pattern doesn't include the java:: prefix, prefix that
 /// \param pattern: The user provided pattern
 /// \return The lambda to execute.
-std::function<std::vector<irep_idt>(const symbol_tablet &symbol_table)>
+std::function<std::vector<irep_idt>(const symbol_table_baset &symbol_table)>
 build_load_method_by_regex(const std::string &pattern)
 {
   std::regex regex = build_regex_from_pattern(pattern);
 
-  return [=](const symbol_tablet &symbol_table) {
+  return [=](const symbol_table_baset &symbol_table) {
     std::vector<irep_idt> matched_methods;
     for(const auto &symbol : symbol_table.symbols)
     {

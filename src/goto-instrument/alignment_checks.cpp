@@ -20,7 +20,7 @@ Author:
 #include <ostream>
 
 void print_struct_alignment_problems(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   std::ostream &out)
 {
   for(const auto &symbol_pair : symbol_table.symbols)

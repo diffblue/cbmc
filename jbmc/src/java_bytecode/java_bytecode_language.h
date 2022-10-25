@@ -204,7 +204,7 @@ public:
   lazy_class_to_declared_symbols_mapt() = default;
 
   std::unordered_multimap<irep_idt, symbolt> &
-  get(const symbol_tablet &symbol_table);
+  get(const symbol_table_baset &symbol_table);
 
   void reinitialize();
 
@@ -293,12 +293,10 @@ public:
     std::istream &instream,
     const std::string &path) override;
 
-  bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+  bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
-  bool typecheck(
-    symbol_tablet &context,
-    const std::string &module) override;
+  bool
+  typecheck(symbol_table_baset &context, const std::string &module) override;
 
   virtual bool final(symbol_table_baset &context) override;
 
@@ -371,7 +369,7 @@ protected:
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
 
-  bool do_ci_lazy_method_conversion(symbol_tablet &);
+  bool do_ci_lazy_method_conversion(symbol_table_baset &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
   optionalt<java_bytecode_language_optionst> language_options;

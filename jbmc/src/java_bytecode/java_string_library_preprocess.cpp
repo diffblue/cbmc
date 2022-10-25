@@ -215,7 +215,8 @@ java_string_library_preprocesst::get_string_type_base_classes(
 /// \param class_name: a name for the class such as "java.lang.String"
 /// \param symbol_table: symbol table to which the class will be added
 void java_string_library_preprocesst::add_string_type(
-  const irep_idt &class_name, symbol_tablet &symbol_table)
+  const irep_idt &class_name,
+  symbol_table_baset &symbol_table)
 {
   irep_idt class_symbol_name = "java::" + id2string(class_name);
   symbolt tmp_string_symbol;
@@ -364,7 +365,7 @@ exprt::operandst java_string_library_preprocesst::process_operands(
 /// \param symbol_table: symbol table
 /// \return type of the "data" component
 static const typet &
-get_data_type(const typet &type, const symbol_tablet &symbol_table)
+get_data_type(const typet &type, const symbol_table_baset &symbol_table)
 {
   PRECONDITION(type.id() == ID_struct || type.id() == ID_struct_tag);
   if(type.id() == ID_struct_tag)
@@ -384,7 +385,7 @@ get_data_type(const typet &type, const symbol_tablet &symbol_table)
 /// \param symbol_table: symbol table
 /// \return type of the "length" component
 static const typet &
-get_length_type(const typet &type, const symbol_tablet &symbol_table)
+get_length_type(const typet &type, const symbol_table_baset &symbol_table)
 {
   PRECONDITION(type.id() == ID_struct || type.id() == ID_struct_tag);
   if(type.id() == ID_struct_tag)
@@ -403,7 +404,8 @@ get_length_type(const typet &type, const symbol_tablet &symbol_table)
 /// \param expr: an expression of structured type with length component
 /// \param symbol_table: symbol table
 /// \return expression representing the "length" member
-static exprt get_length(const exprt &expr, const symbol_tablet &symbol_table)
+static exprt
+get_length(const exprt &expr, const symbol_table_baset &symbol_table)
 {
   return member_exprt(
     expr, "length", get_length_type(expr.type(), symbol_table));
@@ -413,7 +415,7 @@ static exprt get_length(const exprt &expr, const symbol_tablet &symbol_table)
 /// \param expr: an expression of structured type with data component
 /// \param symbol_table: symbol table
 /// \return expression representing the "data" member
-static exprt get_data(const exprt &expr, const symbol_tablet &symbol_table)
+static exprt get_data(const exprt &expr, const symbol_table_baset &symbol_table)
 {
   return member_exprt(expr, "data", get_data_type(expr.type(), symbol_table));
 }

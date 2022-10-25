@@ -302,7 +302,7 @@ void java_bytecode_convert_method_lazy(
   symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &m,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   symbolt method_symbol;

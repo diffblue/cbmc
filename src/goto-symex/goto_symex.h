@@ -48,7 +48,7 @@ public:
   /// \param guard_manager: Manager for creating guards
   goto_symext(
     message_handlert &mh,
-    const symbol_tablet &outer_symbol_table,
+    const symbol_table_baset &outer_symbol_table,
     symex_target_equationt &_target,
     const optionst &options,
     path_storaget &path_storage,
@@ -107,7 +107,7 @@ public:
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_table_baset &new_symbol_table);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -231,7 +231,7 @@ protected:
   /// part of symbolic execution added to it; those object are stored in the
   /// symbol table passed as the `new_symbol_table` argument to the `symex_*`
   /// methods.
-  const symbol_tablet &outer_symbol_table;
+  const symbol_table_baset &outer_symbol_table;
 
   /// Initialized just before symbolic execution begins, to point to
   /// both `outer_symbol_table` and the symbol table owned by the

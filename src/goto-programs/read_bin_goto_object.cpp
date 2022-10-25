@@ -25,7 +25,7 @@ Date: June 2006
 /// \return true on error, false otherwise
 static bool read_bin_goto_object(
   std::istream &in,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &functions,
   irep_serializationt &irepconverter)
 {
@@ -176,7 +176,7 @@ static bool read_bin_goto_object(
 bool read_bin_goto_object(
   std::istream &in,
   const std::string &filename,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 {

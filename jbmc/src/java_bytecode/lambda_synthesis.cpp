@@ -76,7 +76,7 @@ get_lambda_method_handle(
 
 static optionalt<java_class_typet::java_lambda_method_handlet>
 lambda_method_handle(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &method_identifier,
   const java_method_typet &dynamic_method_type)
 {
@@ -203,7 +203,7 @@ get_interface_methods(const irep_idt &interface_id, const namespacet &ns)
 }
 
 static const java_class_typet::methodt *try_get_unique_unimplemented_method(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const struct_tag_typet &functional_interface_tag,
   const irep_idt &method_identifier,
   const int instruction_address,
@@ -403,7 +403,7 @@ static symbolt implemented_method_symbol(
 void create_invokedynamic_synthetic_classes(
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   message_handlert &message_handler)
 {
@@ -629,7 +629,7 @@ get_unboxing_method(const pointer_typet &maybe_boxed_type)
 /// (i.e., if it is non-static and its 'this' parameter is a non-final type)
 exprt make_function_expr(
   const symbolt &function_symbol,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   const auto &method_type = to_java_method_type(function_symbol.type);
   if(!method_type.has_this())

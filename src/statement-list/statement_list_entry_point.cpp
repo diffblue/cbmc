@@ -39,7 +39,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// \param main_symbol_name: Name of the symbol to look for.
 /// \return False if there is exactly one match, true otherwise.
 static bool is_main_symbol_invalid(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const irep_idt &main_symbol_name)
 {
@@ -80,7 +80,7 @@ static bool is_main_symbol_invalid(
 /// \param main_symbol_location: Source location of the main symbol.
 static void add_initialize_call(
   code_blockt &function_body,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const source_locationt &main_symbol_location)
 {
   symbolt init = symbol_table.lookup_ref(INITIALIZE_FUNCTION);
@@ -96,7 +96,7 @@ static void add_initialize_call(
 /// \param main_function_block: Main symbol of this application.
 static void add_main_function_block_call(
   code_blockt &function_body,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const symbolt &main_function_block)
 {
   const code_typet &function_type = to_code_type(main_function_block.type);
@@ -121,7 +121,8 @@ static void add_main_function_block_call(
 
 /// Creates __CPROVER_initialize and adds it to the symbol table.
 /// \param [out] symbol_table: Symbol table that should contain the function.
-static void generate_statement_list_init_function(symbol_tablet &symbol_table)
+static void
+generate_statement_list_init_function(symbol_table_baset &symbol_table)
 {
   symbolt init;
   init.name = INITIALIZE_FUNCTION;
@@ -143,7 +144,7 @@ static void generate_statement_list_init_function(symbol_tablet &symbol_table)
 
 /// Creates __CPROVER_rounding_mode and adds it to the symbol table.
 /// \param [out] symbol_table: Symbol table that should contain the symbol.
-static void generate_rounding_mode(symbol_tablet &symbol_table)
+static void generate_rounding_mode(symbol_table_baset &symbol_table)
 {
   symbolt rounding_mode;
   rounding_mode.name = rounding_mode_identifier();
@@ -164,7 +165,7 @@ static void generate_rounding_mode(symbol_tablet &symbol_table)
 /// \param message_handler: Handler that is responsible for error messages.
 bool generate_statement_list_start_function(
   const symbolt &main,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   PRECONDITION(!main.value.is_nil());
@@ -196,7 +197,7 @@ bool generate_statement_list_start_function(
 }
 
 bool statement_list_entry_point(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   // Check if the entry point is already present and return if it is.

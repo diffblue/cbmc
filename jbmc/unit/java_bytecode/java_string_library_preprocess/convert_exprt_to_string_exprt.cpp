@@ -23,7 +23,7 @@ refined_string_exprt convert_exprt_to_string_exprt_unit_test(
   const exprt &deref,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   return preprocess.convert_exprt_to_string_exprt(

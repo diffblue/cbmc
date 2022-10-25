@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 bool cpp_typecheck(
   cpp_parse_treet &cpp_parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler);
 
@@ -41,29 +41,32 @@ class cpp_typecheckt:public c_typecheck_baset
 public:
   cpp_typecheckt(
     cpp_parse_treet &_cpp_parse_tree,
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const std::string &_module,
-    message_handlert &message_handler):
-    c_typecheck_baset(_symbol_table, _module, message_handler),
-    cpp_parse_tree(_cpp_parse_tree),
-    template_counter(0),
-    anon_counter(0),
-    disable_access_control(false)
+    message_handlert &message_handler)
+    : c_typecheck_baset(_symbol_table, _module, message_handler),
+      cpp_parse_tree(_cpp_parse_tree),
+      template_counter(0),
+      anon_counter(0),
+      disable_access_control(false)
   {
   }
 
   cpp_typecheckt(
     cpp_parse_treet &_cpp_parse_tree,
-    symbol_tablet &_symbol_table1,
-    const symbol_tablet &_symbol_table2,
+    symbol_table_baset &_symbol_table1,
+    const symbol_table_baset &_symbol_table2,
     const std::string &_module,
-    message_handlert &message_handler):
-    c_typecheck_baset(_symbol_table1, _symbol_table2,
-                      _module, message_handler),
-    cpp_parse_tree(_cpp_parse_tree),
-    template_counter(0),
-    anon_counter(0),
-    disable_access_control(false)
+    message_handlert &message_handler)
+    : c_typecheck_baset(
+        _symbol_table1,
+        _symbol_table2,
+        _module,
+        message_handler),
+      cpp_parse_tree(_cpp_parse_tree),
+      template_counter(0),
+      anon_counter(0),
+      disable_access_control(false)
   {
   }
 

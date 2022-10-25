@@ -414,8 +414,8 @@ void cpp_declarator_convertert::get_final_identifier()
     {
       // Is there already an `extern "C"' function with the same name
       // and the same signature?
-      symbol_tablet::symbolst::const_iterator
-        c_it=cpp_typecheck.symbol_table.symbols.find(identifier);
+      symbol_table_baset::symbolst::const_iterator c_it =
+        cpp_typecheck.symbol_table.symbols.find(identifier);
 
       if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
          c_it->second.type.id()==ID_code &&

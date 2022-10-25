@@ -59,7 +59,7 @@ static void instrument_cover_goals(
 /// \param goal_filters: goal filters to discard certain goals
 void cover_instrumenterst::add_from_criterion(
   coverage_criteriont criterion,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const goal_filterst &goal_filters)
 {
   switch(criterion)

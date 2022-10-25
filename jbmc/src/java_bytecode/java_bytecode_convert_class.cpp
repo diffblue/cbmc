@@ -31,7 +31,7 @@ class java_bytecode_convert_classt
 {
 public:
   java_bytecode_convert_classt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
     method_bytecodet &method_bytecode,
@@ -105,7 +105,7 @@ public:
 
 private:
   messaget log;
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const size_t max_array_length;
   method_bytecodet &method_bytecode;
   java_string_library_preprocesst &string_preprocess;
@@ -790,7 +790,7 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-void add_java_array_types(symbol_tablet &symbol_table)
+void add_java_array_types(symbol_table_baset &symbol_table)
 {
   const std::string letters="ijsbcfdza";
 
@@ -1003,7 +1003,7 @@ void add_java_array_types(symbol_tablet &symbol_table)
 
 bool java_bytecode_convert_class(
   const java_class_loadert::parse_tree_with_overlayst &parse_trees,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
   method_bytecodet &method_bytecode,
@@ -1188,7 +1188,7 @@ void convert_java_annotations(
 /// corresponding outer classes.
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   const std::string qualified_class_name = "java::" + id2string(class_name);
   PRECONDITION(symbol_table.has_symbol(qualified_class_name));

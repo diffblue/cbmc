@@ -29,33 +29,33 @@ class c_typecheck_baset:
 {
 public:
   c_typecheck_baset(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const std::string &_module,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    namespacet(_symbol_table),
-    symbol_table(_symbol_table),
-    module(_module),
-    mode(ID_C),
-    break_is_allowed(false),
-    continue_is_allowed(false),
-    case_is_allowed(false)
+    message_handlert &_message_handler)
+    : typecheckt(_message_handler),
+      namespacet(_symbol_table),
+      symbol_table(_symbol_table),
+      module(_module),
+      mode(ID_C),
+      break_is_allowed(false),
+      continue_is_allowed(false),
+      case_is_allowed(false)
   {
   }
 
   c_typecheck_baset(
-    symbol_tablet &_symbol_table1,
-    const symbol_tablet &_symbol_table2,
+    symbol_table_baset &_symbol_table1,
+    const symbol_table_baset &_symbol_table2,
     const std::string &_module,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    namespacet(_symbol_table1, _symbol_table2),
-    symbol_table(_symbol_table1),
-    module(_module),
-    mode(ID_C),
-    break_is_allowed(false),
-    continue_is_allowed(false),
-    case_is_allowed(false)
+    message_handlert &_message_handler)
+    : typecheckt(_message_handler),
+      namespacet(_symbol_table1, _symbol_table2),
+      symbol_table(_symbol_table1),
+      module(_module),
+      mode(ID_C),
+      break_is_allowed(false),
+      continue_is_allowed(false),
+      case_is_allowed(false)
   {
   }
 
@@ -65,7 +65,7 @@ public:
   virtual void typecheck_expr(exprt &expr);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const irep_idt module;
   const irep_idt mode;
   symbolt current_symbol;

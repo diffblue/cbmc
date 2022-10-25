@@ -23,7 +23,7 @@ Author: CM Wintersteiger
 /// Writes a goto program to disc, using goto binary format
 bool write_goto_binary(
   std::ostream &out,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const goto_functionst &goto_functions,
   irep_serializationt &irepconverter)
 {
@@ -140,7 +140,7 @@ bool write_goto_binary(
 /// Writes a goto program to disc
 bool write_goto_binary(
   std::ostream &out,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const goto_functionst &goto_functions,
   int version)
 {

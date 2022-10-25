@@ -101,7 +101,7 @@ bool ansi_c_languaget::parse(
 }
 
 bool ansi_c_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local)
 {
@@ -109,7 +109,7 @@ bool ansi_c_languaget::typecheck(
 }
 
 bool ansi_c_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
@@ -135,7 +135,7 @@ bool ansi_c_languaget::typecheck(
 }
 
 bool ansi_c_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // This creates __CPROVER_start and __CPROVER_initialize:
   return ansi_c_entry_point(

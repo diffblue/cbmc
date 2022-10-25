@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
-class goto_functionst;
 class goto_modelt;
 class message_handlert;
 

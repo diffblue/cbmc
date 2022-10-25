@@ -201,7 +201,7 @@ void symbol_factoryt::gen_nondet_array_init(
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt base_name,
   const typet &type,
   const source_locationt &loc,

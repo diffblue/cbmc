@@ -34,7 +34,7 @@ static bool parse_caller_callee(
 bool splice_call(
   goto_functionst &goto_functions,
   const std::string &callercallee,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   messaget message(message_handler);

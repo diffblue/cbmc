@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class dereference_callbackt;
 class messaget;
-class symbol_tablet;
+class symbol_table_baset;
 
 /// Wrapper for a function dereferencing pointer expressions using a value set.
 class value_set_dereferencet final
@@ -33,7 +33,7 @@ public:
   /// \param _log: Messaget object for displaying points-to set
   value_set_dereferencet(
     const namespacet &_ns,
-    symbol_tablet &_new_symbol_table,
+    symbol_table_baset &_new_symbol_table,
     dereference_callbackt &_dereference_callback,
     const irep_idt _language_mode,
     bool _exclude_null_derefs,
@@ -97,7 +97,7 @@ public:
 
 private:
   const namespacet &ns;
-  symbol_tablet &new_symbol_table;
+  symbol_table_baset &new_symbol_table;
   dereference_callbackt &dereference_callback;
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.

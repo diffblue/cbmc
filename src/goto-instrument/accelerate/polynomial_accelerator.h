@@ -32,11 +32,11 @@ class polynomial_acceleratort
 public:
   polynomial_acceleratort(
     message_handlert &message_handler,
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goto_functionst &_goto_functions,
     guard_managert &guard_manager)
     : message_handler(message_handler),
-      symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
+      symbol_table(const_cast<symbol_table_baset &>(_symbol_table)),
       ns(symbol_table),
       goto_functions(_goto_functions),
       guard_manager(guard_manager),
@@ -47,12 +47,12 @@ public:
 
   polynomial_acceleratort(
     message_handlert &message_handler,
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goto_functionst &_goto_functions,
     exprt &_loop_counter,
     guard_managert &guard_manager)
     : message_handler(message_handler),
-      symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
+      symbol_table(const_cast<symbol_table_baset &>(_symbol_table)),
       ns(symbol_table),
       goto_functions(_goto_functions),
       guard_manager(guard_manager),
@@ -149,7 +149,7 @@ protected:
 
   void ensure_no_overflows(goto_programt &program);
 
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const namespacet ns;
   const goto_functionst &goto_functions;
   guard_managert &guard_manager;

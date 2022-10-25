@@ -68,8 +68,7 @@ public:
   /// complete. Functions introduced here are visible to lazy loading and
   /// can influence its decisions (e.g. picking the types of input parameters
   /// and globals), whereas anything introduced during `final` cannot.
-  virtual bool generate_support_functions(
-    symbol_tablet &symbol_table)=0;
+  virtual bool generate_support_functions(symbol_table_baset &symbol_table) = 0;
 
   // add external dependencies of a given module to set
 
@@ -113,14 +112,12 @@ public:
 
   // type check interfaces of currently parsed file
 
-  virtual bool interfaces(
-    symbol_tablet &symbol_table);
+  virtual bool interfaces(symbol_table_baset &symbol_table);
 
   // type check a module in the currently parsed file
 
-  virtual bool typecheck(
-    symbol_tablet &symbol_table,
-    const std::string &module)=0;
+  virtual bool
+  typecheck(symbol_table_baset &symbol_table, const std::string &module) = 0;
 
   /// \brief Is it possible to call three-argument typecheck() on this object?
   virtual bool can_keep_file_local()
@@ -138,7 +135,7 @@ public:
   /// This function should only be called on objects for which a call to
   /// can_keep_symbols() returns `true`.
   virtual bool typecheck(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::string &module,
     const bool keep_file_local)
   {

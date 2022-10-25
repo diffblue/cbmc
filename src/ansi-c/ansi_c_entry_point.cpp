@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const c_object_factory_parameterst &object_factory_parameters)
 {
   exprt::operandst main_arguments;
@@ -56,7 +56,7 @@ exprt::operandst build_function_environment(
 void record_function_outputs(
   const symbolt &function,
   code_blockt &init_code,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   bool has_return_value =
     to_code_type(function.type).return_type() != void_type();
@@ -104,7 +104,7 @@ void record_function_outputs(
 }
 
 bool ansi_c_entry_point(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const c_object_factory_parameterst &object_factory_parameters)
 {
@@ -124,7 +124,7 @@ bool ansi_c_entry_point(
         equal_range(symbol_table.symbol_base_map, config.main.value()))
     {
       // look it up
-      symbol_tablet::symbolst::const_iterator s_it =
+      symbol_table_baset::symbolst::const_iterator s_it =
         symbol_table.symbols.find(symbol_name_entry.second);
 
       if(s_it==symbol_table.symbols.end())
@@ -156,7 +156,7 @@ bool ansi_c_entry_point(
     main_symbol=ID_main;
 
   // look it up
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(main_symbol);
 
   if(s_it==symbol_table.symbols.end())
@@ -190,7 +190,7 @@ bool ansi_c_entry_point(
 /// \return Returns false if the _start method was generated correctly
 bool generate_ansi_c_start_function(
   const symbolt &symbol,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const c_object_factory_parameterst &object_factory_parameters)
 {
@@ -203,7 +203,7 @@ bool generate_ansi_c_start_function(
   // build call to initialization function
 
   {
-    symbol_tablet::symbolst::const_iterator init_it=
+    symbol_table_baset::symbolst::const_iterator init_it =
       symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())

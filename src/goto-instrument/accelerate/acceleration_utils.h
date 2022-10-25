@@ -40,7 +40,7 @@ protected:
 
 public:
   acceleration_utilst(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &message_handler,
     const goto_functionst &_goto_functions,
     exprt &_loop_counter)
@@ -53,7 +53,7 @@ public:
   }
 
   acceleration_utilst(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &message_handler,
     const goto_functionst &_goto_functions)
     : message_handler(message_handler),
@@ -154,7 +154,7 @@ public:
 
   symbolt fresh_symbol(std::string base, typet type);
 
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   const goto_functionst &goto_functions;
   exprt &loop_counter;

@@ -200,7 +200,7 @@ public:
     const irep_idt &_function_id,
     const goto_functionst &_functions,
     cfg_infot &_cfg_info,
-    symbol_tablet &_st,
+    symbol_table_baset &_st,
     message_handlert &_message_handler)
     : function_id(_function_id),
       functions(_functions),
@@ -483,7 +483,7 @@ protected:
   cfg_infot &cfg_info;
 
   /// Program symbol table
-  symbol_tablet &st;
+  symbol_table_baset &st;
 
   /// Program namespace
   const namespacet ns;

@@ -125,7 +125,7 @@ prefix_filtert get_context(const optionst &options)
 }
 
 std::unordered_multimap<irep_idt, symbolt> &
-lazy_class_to_declared_symbols_mapt::get(const symbol_tablet &symbol_table)
+lazy_class_to_declared_symbols_mapt::get(const symbol_table_baset &symbol_table)
 {
   if(!initialized)
   {
@@ -456,7 +456,7 @@ bool java_bytecode_languaget::parse(
 /// \param symbol_table: global symbol table
 static void infer_opaque_type_fields(
   const java_bytecode_parse_treet &parse_tree,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   namespacet ns(symbol_table);
   for(const auto &method : parse_tree.parsed_class.methods)
@@ -520,7 +520,8 @@ static void infer_opaque_type_fields(
 /// \param symbol_table: global symbol table; a symbol may be added
 /// \return java.lang.Class typed symbol expression
 static symbol_exprt get_or_create_class_literal_symbol(
-  const irep_idt &class_id, symbol_tablet &symbol_table)
+  const irep_idt &class_id,
+  symbol_table_baset &symbol_table)
 {
   struct_tag_typet java_lang_Class("java::java.lang.Class");
   symbol_exprt symbol_expr(
@@ -563,7 +564,7 @@ static symbol_exprt get_or_create_class_literal_symbol(
 /// \return ldc result
 static exprt get_ldc_result(
   const exprt &ldc_arg0,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   bool string_refinement_enabled)
 {
   if(ldc_arg0.id() == ID_type)
@@ -600,7 +601,7 @@ static exprt get_ldc_result(
 ///   which changes how string literals are structured.
 static void generate_constant_global_variables(
   java_bytecode_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   bool string_refinement_enabled)
 {
   for(auto &method : parse_tree.parsed_class.methods)
@@ -690,7 +691,7 @@ static void create_stub_global_symbol(
 ///   including start_class_id itself.
 static irep_idt get_any_incomplete_ancestor_for_stub_static_field(
   const irep_idt &start_class_id,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy)
 {
   // Depth-first search: return the first stub ancestor, or irep_idt() if none
@@ -806,7 +807,7 @@ static void create_stub_global_symbols(
 }
 
 bool java_bytecode_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &)
 {
   PRECONDITION(language_options.has_value());
@@ -1055,7 +1056,7 @@ bool java_bytecode_languaget::typecheck(
 }
 
 bool java_bytecode_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   PRECONDITION(language_options.has_value());
 
@@ -1115,7 +1116,7 @@ bool java_bytecode_languaget::generate_support_functions(
 ///   from the main entry point (usually provided with the --function command-
 ///   line option) (side-effect on the symbol_table). Returns false on success.
 bool java_bytecode_languaget::do_ci_lazy_method_conversion(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(symbol_table);

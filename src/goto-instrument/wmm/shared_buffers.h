@@ -28,13 +28,15 @@ class value_setst;
 class shared_bufferst
 {
 public:
-  shared_bufferst(symbol_tablet &_symbol_table, unsigned _nb_threads,
-    messaget &_message):
-    symbol_table(_symbol_table),
-    nb_threads(_nb_threads+1),
-    uniq(0),
-    cav11(false),
-    message(_message)
+  shared_bufferst(
+    symbol_table_baset &_symbol_table,
+    unsigned _nb_threads,
+    messaget &_message)
+    : symbol_table(_symbol_table),
+      nb_threads(_nb_threads + 1),
+      uniq(0),
+      cav11(false),
+      message(_message)
   {
   }
 
@@ -175,7 +177,7 @@ public:
 
   void weak_memory(
     value_setst &value_sets,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     goto_programt &goto_program,
     memory_modelt model,
     goto_functionst &goto_functions);
@@ -188,7 +190,7 @@ public:
   {
   protected:
     shared_bufferst &shared_buffers;
-    symbol_tablet &symbol_table;
+    symbol_table_baset &symbol_table;
     goto_functionst &goto_functions;
 
     /* for thread marking (dynamic) */
@@ -200,9 +202,12 @@ public:
     std::set<irep_idt> past_writes;
 
   public:
-    cfg_visitort(shared_bufferst &_shared, symbol_tablet &_symbol_table,
+    cfg_visitort(
+      shared_bufferst &_shared,
+      symbol_table_baset &_symbol_table,
       goto_functionst &_goto_functions)
-      :shared_buffers(_shared), symbol_table(_symbol_table),
+      : shared_buffers(_shared),
+        symbol_table(_symbol_table),
         goto_functions(_goto_functions)
     {
       current_thread = 0;
@@ -217,7 +222,7 @@ public:
   };
 
 protected:
-  class symbol_tablet &symbol_table;
+  class symbol_table_baset &symbol_table;
 
   // number of threads interfering
   unsigned nb_threads;

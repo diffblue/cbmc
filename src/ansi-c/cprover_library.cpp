@@ -8,16 +8,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cprover_library.h"
 
-#include <sstream>
-
 #include <util/config.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include "ansi_c_language.h"
 
+#include <sstream>
+
 static std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const bool force_load)
 {
   std::ostringstream library_text;
@@ -58,7 +58,7 @@ static std::string get_cprover_library_text(
 
 std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const struct cprover_library_entryt cprover_library[],
   const std::string &prologue,
   const bool force_load)
@@ -76,7 +76,7 @@ std::string get_cprover_library_text(
 
     if(functions.find(id)!=functions.end())
     {
-      symbol_tablet::symbolst::const_iterator old=
+      symbol_table_baset::symbolst::const_iterator old =
         symbol_table.symbols.find(id);
 
       if(
@@ -97,7 +97,7 @@ std::string get_cprover_library_text(
 
 void cprover_c_library_factory(
   const std::set<irep_idt> &functions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   if(config.ansi_c.lib==configt::ansi_ct::libt::LIB_NONE)
@@ -111,7 +111,7 @@ void cprover_c_library_factory(
 
 void add_library(
   const std::string &src,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const std::set<irep_idt> &keep)
 {
@@ -129,7 +129,7 @@ void add_library(
 
 void cprover_c_library_factory_force_load(
   const std::set<irep_idt> &functions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   std::string library_text =

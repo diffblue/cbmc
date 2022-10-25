@@ -307,7 +307,8 @@ static void clinit_wrapper_do_recursive_calls(
 /// \param symbol_table: global symbol table
 /// \return true if a static initializer wrapper is needed
 static bool needs_clinit_wrapper(
-  const irep_idt &class_name, const symbol_tablet &symbol_table)
+  const irep_idt &class_name,
+  const symbol_table_baset &symbol_table)
 {
   if(symbol_table.has_symbol(clinit_function_name(class_name)))
     return true;
@@ -332,7 +333,7 @@ static void create_function_symbol(
   const irep_idt &function_name,
   const irep_idt &function_base_name,
   const synthetic_method_typet &synthetic_method_type,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
   symbolt function_symbol;
@@ -359,7 +360,7 @@ static void create_function_symbol(
 // Create symbol for the "clinit_wrapper"
 static void create_clinit_wrapper_function_symbol(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
   create_function_symbol(
@@ -374,7 +375,7 @@ static void create_clinit_wrapper_function_symbol(
 // Create symbol for the "user_specified_clinit"
 static void create_user_specified_clinit_function_symbol(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
   create_function_symbol(
@@ -398,7 +399,7 @@ static void create_user_specified_clinit_function_symbol(
 ///   clinit_wrapper thread safe will be created.
 static void create_clinit_wrapper_symbols(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   const bool thread_safe)
 {
@@ -780,7 +781,7 @@ code_ifthenelset get_clinit_wrapper_body(
 
 /// \return map associating classes to the symbols they declare
 std::unordered_multimap<irep_idt, symbolt>
-class_to_declared_symbols(const symbol_tablet &symbol_table)
+class_to_declared_symbols(const symbol_table_baset &symbol_table)
 {
   std::unordered_multimap<irep_idt, symbolt> result;
   for(const auto &symbol_pair : symbol_table)
@@ -876,7 +877,7 @@ code_blockt get_user_specified_clinit_body(
 ///   synthetic user_specified_clinit function should be created. This is true
 ///   if a file was given with the --static-values option and false otherwise.
 void create_static_initializer_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   const bool thread_safe,
   const bool is_user_clinit_needed)
@@ -927,7 +928,7 @@ static itertype advance_to_next_key(itertype in, itertype end)
 ///   static initialiser such that we get a callback to provide its body as and
 ///   when it is required.
 void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::unordered_set<irep_idt> &stub_globals_set,
   synthetic_methods_mapt &synthetic_methods)
 {

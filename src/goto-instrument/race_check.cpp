@@ -34,7 +34,8 @@ Date: February 2006
 class w_guardst
 {
 public:
-  explicit w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
+  explicit w_guardst(symbol_table_baset &_symbol_table)
+    : symbol_table(_symbol_table)
   {
   }
 
@@ -60,14 +61,14 @@ public:
   void add_initialization(goto_programt &goto_program) const;
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 };
 
 const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
 {
   const irep_idt identifier=id2string(object)+"$w_guard";
 
-  const symbol_tablet::symbolst::const_iterator it=
+  const symbol_table_baset::symbolst::const_iterator it =
     symbol_table.symbols.find(identifier);
 
   if(it!=symbol_table.symbols.end())
@@ -160,7 +161,7 @@ static bool has_shared_entries(const namespacet &ns, const rw_set_baset &rw_set)
 // after
 static void race_check(
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
   L_M_ARG(const goto_functionst::goto_functiont &goto_function)
   goto_programt &goto_program,
@@ -264,7 +265,7 @@ static void race_check(
 
 void race_check(
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,

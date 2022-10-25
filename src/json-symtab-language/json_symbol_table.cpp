@@ -13,7 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/json.h>
 #include <util/symbol_table.h>
 
-void symbol_table_from_json(const jsont &in, symbol_tablet &symbol_table)
+void symbol_table_from_json(const jsont &in, symbol_table_baset &symbol_table)
 {
   if(!in.is_object())
   {

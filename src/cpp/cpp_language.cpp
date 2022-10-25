@@ -119,7 +119,7 @@ bool cpp_languaget::parse(
 }
 
 bool cpp_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module)
 {
   if(module.empty())
@@ -136,8 +136,7 @@ bool cpp_languaget::typecheck(
   return linking(symbol_table, new_symbol_table, get_message_handler());
 }
 
-bool cpp_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+bool cpp_languaget::generate_support_functions(symbol_table_baset &symbol_table)
 {
   return ansi_c_entry_point(
     symbol_table, get_message_handler(), object_factory_params);

@@ -244,7 +244,7 @@ void cpp_typecheckt::typecheck_function_template(
 
   // check if we have it already
 
-  symbol_tablet::symbolst::const_iterator previous_symbol=
+  symbol_table_baset::symbolst::const_iterator previous_symbol =
     symbol_table.symbols.find(symbol_name);
 
   if(previous_symbol!=symbol_table.symbols.end())
@@ -570,7 +570,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     throw 0;
   }
 
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find((*id_set.begin())->identifier);
 
   assert(s_it!=symbol_table.symbols.end());

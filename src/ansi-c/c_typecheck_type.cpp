@@ -812,7 +812,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     identifier=type.find(ID_tag).get(ID_identifier);
 
     // does it exist already?
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table_baset::symbolst::const_iterator s_it =
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
@@ -1387,7 +1387,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   enum_tag_symbol.type.add_subtype() = underlying_type;
 
   // is it in the symbol table already?
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
 
   if(s_it!=symbol_table.symbols.end())
@@ -1457,7 +1457,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   irep_idt identifier=tag.get(ID_identifier);
 
   // is it in the symbol table?
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
 
   if(s_it!=symbol_table.symbols.end())
@@ -1617,7 +1617,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 {
   const irep_idt &identifier = to_typedef_type(type).get_identifier();
 
-  symbol_tablet::symbolst::const_iterator s_it =
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
 
   if(s_it == symbol_table.symbols.end())

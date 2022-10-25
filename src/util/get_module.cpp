@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 typedef std::list<const symbolt *> symbolptr_listt;
 
 const symbolt &get_module_by_name(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
@@ -31,7 +31,7 @@ const symbolt &get_module_by_name(
   for(const auto &symbol_name_entry :
       equal_range(symbol_table.symbol_base_map, module))
   {
-    symbol_tablet::symbolst::const_iterator it2 =
+    symbol_table_baset::symbolst::const_iterator it2 =
       symbol_table.symbols.find(symbol_name_entry.second);
 
     if(it2==symbol_table.symbols.end())
@@ -67,7 +67,7 @@ const symbolt &get_module_by_name(
 }
 
 const symbolt &get_module(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {

@@ -284,7 +284,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     irep_idt identifier = d.get_name();
 
     // look it up
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table_baset::symbolst::const_iterator s_it =
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())

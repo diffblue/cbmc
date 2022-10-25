@@ -33,7 +33,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   std::string identifier=
     cpp_scopes.current_scope().prefix+id2string(final_name);
 
-  symbol_tablet::symbolst::const_iterator it=
+  symbol_table_baset::symbolst::const_iterator it =
     symbol_table.symbols.find(identifier);
 
   if(it!=symbol_table.symbols.end())

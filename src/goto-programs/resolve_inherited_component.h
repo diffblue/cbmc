@@ -19,12 +19,12 @@ Author: Diffblue Ltd.
 #include <functional>
 
 class symbolt;
-class symbol_tablet;
+class symbol_table_baset;
 
 class resolve_inherited_componentt
 {
 public:
-  explicit resolve_inherited_componentt(const symbol_tablet &symbol_table);
+  explicit resolve_inherited_componentt(const symbol_table_baset &symbol_table);
 
   class inherited_componentt
   {
@@ -59,13 +59,13 @@ public:
     const irep_idt &class_name, const irep_idt &component_name);
 
 private:
-  const symbol_tablet &symbol_table;
+  const symbol_table_baset &symbol_table;
 };
 
 optionalt<resolve_inherited_componentt::inherited_componentt>
 get_inherited_method_implementation(
   const irep_idt &call_basename,
   const irep_idt &classname,
-  const symbol_tablet &symbol_table);
+  const symbol_table_baset &symbol_table);
 
 #endif // CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H

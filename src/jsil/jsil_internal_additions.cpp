@@ -21,7 +21,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_types.h"
 
-void jsil_internal_additions(symbol_tablet &dest)
+void jsil_internal_additions(symbol_table_baset &dest)
 {
   // add __CPROVER_rounding_mode
 

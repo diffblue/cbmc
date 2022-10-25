@@ -26,7 +26,7 @@ Date: April 2016
 /// <-> subclass relationship, pointing from parent to child.
 /// \param symbol_table: global symbol table, which will be searched for struct
 ///   types.
-void class_hierarchy_grapht::populate(const symbol_tablet &symbol_table)
+void class_hierarchy_grapht::populate(const symbol_table_baset &symbol_table)
 {
   // Add nodes for all classes:
   for(const auto &symbol_pair : symbol_table.symbols)
@@ -147,7 +147,7 @@ void class_hierarchyt::get_children_trans_rec(
 /// class names to a data structure that contains lists of parent and child
 /// classes for each struct type (ie class).
 /// \param symbol_table: The symbol table to analyze
-void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
+void class_hierarchyt::operator()(const symbol_table_baset &symbol_table)
 {
   for(const auto &symbol_pair : symbol_table.symbols)
   {

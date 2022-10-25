@@ -86,7 +86,7 @@ std::string cpp_typecheckt::to_string(const typet &type)
 
 bool cpp_typecheck(
   cpp_parse_treet &cpp_parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
@@ -271,11 +271,12 @@ void cpp_typecheckt::do_not_typechecked()
 
 void cpp_typecheckt::clean_up()
 {
-  symbol_tablet::symbolst::const_iterator it=symbol_table.symbols.begin();
+  symbol_table_baset::symbolst::const_iterator it =
+    symbol_table.symbols.begin();
 
   while(it!=symbol_table.symbols.end())
   {
-    symbol_tablet::symbolst::const_iterator cur_it = it;
+    symbol_table_baset::symbolst::const_iterator cur_it = it;
     it++;
 
     const symbolt &symbol=cur_it->second;

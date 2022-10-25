@@ -106,14 +106,15 @@ public:
 
   void show_parse(std::ostream &out);
 
-  bool generate_support_functions(symbol_tablet &symbol_table);
+  bool generate_support_functions(symbol_table_baset &symbol_table);
 
-  bool
-  typecheck(symbol_tablet &symbol_table, const bool keep_file_local = false);
+  bool typecheck(
+    symbol_table_baset &symbol_table,
+    const bool keep_file_local = false);
 
   bool final(symbol_table_baset &symbol_table);
 
-  bool interfaces(symbol_tablet &symbol_table);
+  bool interfaces(symbol_table_baset &symbol_table);
 
   // The method must have been added to the symbol table and registered
   // in lazy_method_map (currently always in language_filest::typecheck)
@@ -142,12 +143,12 @@ public:
 
 protected:
   bool typecheck_module(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     language_modulet &module,
     const bool keep_file_local);
 
   bool typecheck_module(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::string &module,
     const bool keep_file_local);
 };

@@ -15,10 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep.h>
 
 class goto_modelt;
-class symbol_tablet;
+class symbol_table_baset;
 
 class code_function_callt function_to_call(
-  symbol_tablet &,
+  symbol_table_baset &,
   const irep_idt &id,
   const irep_idt &argument);
 

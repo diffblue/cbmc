@@ -175,7 +175,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
                         id2string(suffix);
 
   // already there?
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
   if(s_it!=symbol_table.symbols.end())
     return s_it->second;

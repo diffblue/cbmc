@@ -16,15 +16,11 @@ class exprt;
 class goto_functionst;
 class goto_modelt;
 class goto_programt;
-class symbol_tablet;
+class symbol_table_baset;
 
-void string_instrumentation(
-  symbol_tablet &,
-  goto_programt &);
+void string_instrumentation(symbol_table_baset &, goto_programt &);
 
-void string_instrumentation(
-  symbol_tablet &,
-  goto_functionst &);
+void string_instrumentation(symbol_table_baset &, goto_functionst &);
 
 void string_instrumentation(goto_modelt &);
 

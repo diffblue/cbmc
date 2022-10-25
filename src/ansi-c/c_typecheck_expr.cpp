@@ -771,7 +771,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       irep_idt identifier = declaration.declarators().front().get_name();
 
       // look it up
-      symbol_tablet::symbolst::const_iterator s_it =
+      symbol_table_baset::symbolst::const_iterator s_it =
         symbol_table.symbols.find(identifier);
 
       if(s_it == symbol_table.symbols.end())

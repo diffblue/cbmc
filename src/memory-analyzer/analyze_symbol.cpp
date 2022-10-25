@@ -22,7 +22,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <cstdlib>
 
 gdb_value_extractort::gdb_value_extractort(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const std::vector<std::string> &args)
   : gdb_api(args),
     symbol_table(symbol_table),

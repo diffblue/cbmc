@@ -14,16 +14,17 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/range.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_functions.h>
 
 #include <linking/static_lifetime_init.h>
 
-static void create_initialize(symbol_tablet &symbol_table)
+static void create_initialize(symbol_table_baset &symbol_table)
 {
   symbolt initialize;
   initialize.name = INITIALIZE_FUNCTION;
@@ -49,7 +50,7 @@ static void create_initialize(symbol_tablet &symbol_table)
 }
 
 bool jsil_entry_point(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   // check if main is already there
@@ -68,7 +69,7 @@ bool jsil_entry_point(
         equal_range(symbol_table.symbol_base_map, config.main.value()))
     {
       // look it up
-      symbol_tablet::symbolst::const_iterator s_it =
+      symbol_table_baset::symbolst::const_iterator s_it =
         symbol_table.symbols.find(symbol_name_entry.second);
 
       if(s_it==symbol_table.symbols.end())
@@ -100,7 +101,7 @@ bool jsil_entry_point(
     main_symbol=ID_main;
 
   // look it up
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(main_symbol);
 
   if(s_it==symbol_table.symbols.end())
@@ -129,7 +130,7 @@ bool jsil_entry_point(
   // build call to initialization function
 
   {
-    symbol_tablet::symbolst::const_iterator init_it=
+    symbol_table_baset::symbolst::const_iterator init_it =
       symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())

@@ -41,7 +41,7 @@ static bool find_pattern(
 static bool convert(
   const irep_idt &identifier,
   const std::ostringstream &s,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   std::istringstream in(s.str());
@@ -96,7 +96,7 @@ static bool convert(
 //! \return 'true' on error
 bool builtin_factory(
   const irep_idt &identifier,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &mh)
 {
   // we search for "space" "identifier" "("

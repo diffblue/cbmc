@@ -13,10 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 
 class source_locationt;
-class symbol_tablet;
+class symbol_table_baset;
 
 void static_lifetime_init(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &source_location);
 
 #define INITIALIZE_FUNCTION CPROVER_PREFIX "initialize"

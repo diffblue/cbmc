@@ -109,7 +109,7 @@ static void get_symbols(
 /// \param keep_file_local: keep file-local functions with bodies even if we
 ///                         would otherwise remove them
 void remove_internal_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &mh,
   const bool keep_file_local)
 {
@@ -132,7 +132,7 @@ void remove_internal_symbols(
 /// \param keep: set of symbol names to keep in the symbol table regardless
 ///              of usage or kind
 void remove_internal_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &mh,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
@@ -168,9 +168,9 @@ void remove_internal_symbols(
   // plus any extra symbols we wish to keep
   special.insert(keep.begin(), keep.end());
 
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
+  for(symbol_table_baset::symbolst::const_iterator it =
+        symbol_table.symbols.begin();
+      it != symbol_table.symbols.end();
       it++)
   {
     // already marked?
@@ -236,14 +236,13 @@ void remove_internal_symbols(
   }
 
   // remove all that are _not_ exported!
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
-      ) // no it++
+  for(symbol_table_baset::symbolst::const_iterator it =
+        symbol_table.symbols.begin();
+      it != symbol_table.symbols.end();) // no it++
   {
     if(exported.find(it->first)==exported.end())
     {
-      symbol_tablet::symbolst::const_iterator next=std::next(it);
+      symbol_table_baset::symbolst::const_iterator next = std::next(it);
       symbol_table.erase(it);
       it=next;
     }

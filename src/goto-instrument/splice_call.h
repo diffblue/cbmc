@@ -19,12 +19,12 @@ Date: July 2017
 
 class goto_functionst;
 class message_handlert;
-class symbol_tablet;
+class symbol_table_baset;
 
 bool splice_call(
-    goto_functionst &goto_functions,
-    const std::string &callercallee,
-    const symbol_tablet &symbol_table,
-    message_handlert &message_handler);
+  goto_functionst &goto_functions,
+  const std::string &callercallee,
+  const symbol_table_baset &symbol_table,
+  message_handlert &message_handler);
 
 #endif // CPROVER_GOTO_INSTRUMENT_SPLICE_CALL_H

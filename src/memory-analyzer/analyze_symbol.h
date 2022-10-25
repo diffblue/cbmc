@@ -37,7 +37,7 @@ class gdb_value_extractort
 {
 public:
   gdb_value_extractort(
-    const symbol_tablet &symbol_table,
+    const symbol_table_baset &symbol_table,
     const std::vector<std::string> &args);
 
   /// For each input symbol in \p symbols: map its value address to its

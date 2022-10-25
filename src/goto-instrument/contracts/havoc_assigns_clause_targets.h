@@ -16,7 +16,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/expr.h>
 
 class namespacet;
-class symbol_tablet;
+class symbol_table_baset;
 class goto_programt;
 class goto_functionst;
 class message_handlert;
@@ -59,7 +59,7 @@ public:
     const goto_functionst &_functions,
     cfg_infot &_cfg_info,
     const source_locationt &_source_location,
-    symbol_tablet &_st,
+    symbol_table_baset &_st,
     message_handlert &_message_handler)
     : instrument_spec_assignst(
         _function_id,

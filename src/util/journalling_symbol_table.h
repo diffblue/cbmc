@@ -115,7 +115,7 @@ public:
   }
 
   virtual void
-  erase(const symbol_tablet::symbolst::const_iterator &entry) override
+  erase(const symbol_table_baset::symbolst::const_iterator &entry) override
   {
     const irep_idt entry_name = entry->first;
     base_symbol_table.erase(entry);

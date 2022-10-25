@@ -16,6 +16,7 @@ Author: Peter Schrammel
 
 class goto_modelt;
 class message_handlert;
+class symbol_table_baset;
 
 void remove_java_new(
   const irep_idt &function_identifier,

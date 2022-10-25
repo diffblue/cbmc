@@ -17,7 +17,7 @@ Author: Diffblue Ltd.
 /// See the operator() method comment
 /// \param symbol_table: The symbol table to resolve the component against
 resolve_inherited_componentt::resolve_inherited_componentt(
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
   : symbol_table(symbol_table)
 {
 }
@@ -128,7 +128,7 @@ optionalt<resolve_inherited_componentt::inherited_componentt>
 get_inherited_method_implementation(
   const irep_idt &call_basename,
   const irep_idt &classname,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   resolve_inherited_componentt call_resolver{symbol_table};
   auto exclude_abstract_methods = [&](const symbolt &symbol) {

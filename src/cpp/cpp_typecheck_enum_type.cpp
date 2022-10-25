@@ -123,7 +123,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
   // check if we have it
 
-  symbol_tablet::symbolst::const_iterator previous_symbol=
+  symbol_table_baset::symbolst::const_iterator previous_symbol =
     symbol_table.symbols.find(symbol_name);
 
   if(previous_symbol!=symbol_table.symbols.end())

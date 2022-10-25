@@ -84,6 +84,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 class class_hierarchyt;
 class goto_modelt;
 class message_handlert;
+class symbol_table_baset;
 
 void remove_instanceof(
   const irep_idt &function_identifier,

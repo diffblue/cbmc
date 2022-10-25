@@ -30,7 +30,7 @@ bool json_symtab_languaget::parse(
 /// \param module: A useless parameter, there for interface consistency.
 /// \return boolean signifying success or failure of the typechecking.
 bool json_symtab_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module)
 {
   (void)module; // unused parameter

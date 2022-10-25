@@ -113,7 +113,7 @@ goto_programt::targett remove_virtual_function(
   virtual_dispatch_fallback_actiont fallback_action);
 
 goto_programt::targett remove_virtual_function(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,

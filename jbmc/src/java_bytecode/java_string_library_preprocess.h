@@ -60,7 +60,8 @@ public:
   }
   std::vector<irep_idt> get_string_type_base_classes(
     const irep_idt &class_name);
-  void add_string_type(const irep_idt &class_name, symbol_tablet &symbol_table);
+  void
+  add_string_type(const irep_idt &class_name, symbol_table_baset &symbol_table);
   bool is_known_string_type(irep_idt class_name);
 
   static bool implements_java_char_sequence_pointer(const typet &type)
@@ -198,7 +199,7 @@ private:
     const exprt &deref,
     const source_locationt &loc,
     const irep_idt &function_id,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     code_blockt &init_code);
 
   refined_string_exprt convert_exprt_to_string_exprt(

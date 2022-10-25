@@ -34,7 +34,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
   const namespacet &ns,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
   : log(message_handler), ns(ns), symbol_table(symbol_table)
 {}
 
