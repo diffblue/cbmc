@@ -47,7 +47,7 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
 
   symex_state = symex.initialize_entry_point_state(get_goto_function);
 
-  symex.symex_with_state(*symex_state, get_goto_function, symex_symbol_table);
+  symex_symbol_table = symex.symex_with_state(*symex_state, get_goto_function);
 
   if(do_slice)
   {

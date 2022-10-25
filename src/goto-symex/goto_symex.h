@@ -98,11 +98,11 @@ public:
   /// having the state around afterwards.
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  /// symbolic execution
-  virtual void symex_from_entry_point_of(
-    const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+  /// \return A symbol table holding the symbols added during symbolic
+  ///   execution.
+  NODISCARD
+  virtual symbol_tablet
+  symex_from_entry_point_of(const get_goto_functiont &get_goto_function);
 
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
@@ -117,13 +117,13 @@ public:
   ///   \ref get_goto_functiont)
   /// \param saved_state: The symbolic execution state to resume from
   /// \param saved_equation: The equation as previously built up
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  ///   symbolic execution
-  virtual void resume_symex_from_saved_state(
+  /// \return A symbol table holding the symbols added during symbolic
+  ///   execution.
+  NODISCARD
+  virtual symbol_tablet resume_symex_from_saved_state(
     const get_goto_functiont &get_goto_function,
     const statet &saved_state,
-    symex_target_equationt *saved_equation,
-    symbol_tablet &new_symbol_table);
+    symex_target_equationt *saved_equation);
 
   //// \brief Symbolically execute the entire program starting from entry point
   ///
@@ -135,12 +135,11 @@ public:
   /// \param state: The symbolic execution state to use for the execution
   /// \param get_goto_functions: A functor to retrieve function bodies to
   ///   execute
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  ///   symbolic execution
-  virtual void symex_with_state(
-    statet &state,
-    const get_goto_functiont &get_goto_functions,
-    symbol_tablet &new_symbol_table);
+  /// \return A symbol table holding the symbols added during symbolic
+  ///   execution.
+  NODISCARD
+  virtual symbol_tablet
+  symex_with_state(statet &state, const get_goto_functiont &get_goto_functions);
 
   /// \brief Set when states are pushed onto the workqueue
   /// If this flag is set at the end of a symbolic execution run, it means that

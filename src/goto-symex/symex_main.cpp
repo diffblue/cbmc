@@ -320,10 +320,9 @@ void goto_symext::symex_threaded_step(
   }
 }
 
-void goto_symext::symex_with_state(
+symbol_tablet goto_symext::symex_with_state(
   statet &state,
-  const get_goto_functiont &get_goto_function,
-  symbol_tablet &new_symbol_table)
+  const get_goto_functiont &get_goto_function)
 {
   // resets the namespace to only wrap a single symbol table, and does so upon
   // destruction of an object of this type; instantiating the type is thus all
@@ -360,28 +359,27 @@ void goto_symext::symex_with_state(
 
   symex_threaded_step(state, get_goto_function);
   if(should_pause_symex)
-    return;
+    return state.symbol_table;
+
   while(!state.call_stack().empty())
   {
     state.has_saved_jump_target = false;
     state.has_saved_next_instruction = false;
     symex_threaded_step(state, get_goto_function);
     if(should_pause_symex)
-      return;
+      return state.symbol_table;
   }
 
   // Clients may need to construct a namespace with both the names in
   // the original goto-program and the names generated during symbolic
   // execution, so return the names generated through symbolic execution
-  // through `new_symbol_table`.
-  new_symbol_table = state.symbol_table;
+  return state.symbol_table;
 }
 
-void goto_symext::resume_symex_from_saved_state(
+symbol_tablet goto_symext::resume_symex_from_saved_state(
   const get_goto_functiont &get_goto_function,
   const statet &saved_state,
-  symex_target_equationt *const saved_equation,
-  symbol_tablet &new_symbol_table)
+  symex_target_equationt *const saved_equation)
 {
   // saved_state contains a pointer to a symex_target_equationt that is
   // almost certainly stale. This is because equations are owned by bmcts,
@@ -393,10 +391,7 @@ void goto_symext::resume_symex_from_saved_state(
 
   // Do NOT do the same initialization that `symex_with_state` does for a
   // fresh state, as that would clobber the saved state's program counter
-  symex_with_state(
-      state,
-      get_goto_function,
-      new_symbol_table);
+  return symex_with_state(state, get_goto_function);
 }
 
 std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
@@ -466,13 +461,12 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   return state;
 }
 
-void goto_symext::symex_from_entry_point_of(
-  const get_goto_functiont &get_goto_function,
-  symbol_tablet &new_symbol_table)
+symbol_tablet goto_symext::symex_from_entry_point_of(
+  const get_goto_functiont &get_goto_function)
 {
   auto state = initialize_entry_point_state(get_goto_function);
 
-  symex_with_state(*state, get_goto_function, new_symbol_table);
+  return symex_with_state(*state, get_goto_function);
 }
 
 void goto_symext::initialize_path_storage_from_entry_point_of(

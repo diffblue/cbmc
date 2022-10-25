@@ -101,11 +101,8 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
     unwindset);
   setup_symex(symex);
 
-  symex.resume_symex_from_saved_state(
-    goto_symext::get_goto_function(goto_model),
-    path.state,
-    &path.equation,
-    symex_symbol_table);
+  symex_symbol_table = symex.resume_symex_from_saved_state(
+    goto_symext::get_goto_function(goto_model), path.state, &path.equation);
 
   const auto symex_stop = std::chrono::steady_clock::now();
   symex_runtime += std::chrono::duration<double>(symex_stop - symex_start);
