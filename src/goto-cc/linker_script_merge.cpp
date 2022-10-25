@@ -8,10 +8,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include "linker_script_merge.h"
 
-#include <algorithm>
-#include <fstream>
-#include <iterator>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cmdline.h>
@@ -21,15 +17,18 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 #include <util/run.h>
 #include <util/tempfile.h>
 
-#include <json/json_parser.h>
-
-#include <linking/static_lifetime_init.h>
-
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 
+#include <json/json_parser.h>
+#include <linking/static_lifetime_init.h>
+
 #include "compile.h"
+
+#include <algorithm>
+#include <fstream> // IWYU pragma: keep
+#include <iterator>
 
 int linker_script_merget::add_linker_script_definitions()
 {

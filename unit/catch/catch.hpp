@@ -1,3 +1,5 @@
+// IWYU pragma: private, include <testing-utils/use_catch.h>
+
 /*
  *  Catch v2.13.6
  *  Generated: 2021-04-16 18:23:38.044268

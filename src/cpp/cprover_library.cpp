@@ -27,8 +27,8 @@ static std::string get_cprover_library_text(
   // make Doxygen skip this part
   /// \cond
   const struct cprover_library_entryt cprover_library[] =
-#include "cprover_library.inc"
-    ; // NOLINT(whitespace/semicolon)
+#include "cprover_library.inc" // IWYU pragma: keep
+    ;                          // NOLINT(whitespace/semicolon)
   /// \endcond
 
   return get_cprover_library_text(

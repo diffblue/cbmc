@@ -21,13 +21,13 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 class address_of_exprt;
 class dereference_exprt;
-class index_exprt;
-class member_exprt;
+class index_exprt;  // IWYU pragma: keep
+class member_exprt; // IWYU pragma: keep
 class namespacet;
-class struct_exprt;
-class symbol_exprt;
+class struct_exprt; // IWYU pragma: keep
+class symbol_exprt; // IWYU pragma: keep
 class symbol_table_baset;
-class typecast_exprt;
+class typecast_exprt; // IWYU pragma: keep
 
 class remove_const_function_pointerst
 {

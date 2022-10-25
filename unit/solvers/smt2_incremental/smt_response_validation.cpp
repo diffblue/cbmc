@@ -1,6 +1,6 @@
 // Author: Diffblue Ltd.
 
-#include <util/mp_arith.h>
+#include <util/mp_arith.h> // IWYU pragma: keep
 
 #include <solvers/smt2_incremental/smt_response_validation.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>

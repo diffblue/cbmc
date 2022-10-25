@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "taint_analysis.h"
 
-#include <iostream>
-#include <fstream>
-
 #include <util/invariant.h>
 #include <util/json.h>
 #include <util/message.h>
@@ -28,6 +25,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/custom_bitvector_analysis.h>
 
 #include "taint_parser.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 class taint_analysist
 {

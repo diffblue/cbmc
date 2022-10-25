@@ -145,6 +145,6 @@ std::string cubes(const mini_bddt &u);
 bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment);
 
 // inline functions
-#include "miniBDD.inc"
+#include "miniBDD.inc" // IWYU pragma: keep
 
 #endif // CPROVER_SOLVERS_BDD_MINIBDD_MINIBDD_H

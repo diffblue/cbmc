@@ -9,16 +9,17 @@
 /// \file
 /// Value Set Abstract Object
 
+#include <util/arith_tools.h>
+#include <util/make_unique.h>
+#include <util/simplify_expr.h>
+
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/widened_range.h>
 
-#include <util/arith_tools.h>
-#include <util/make_unique.h>
-#include <util/simplify_expr.h>
+#include "context_abstract_object.h" // IWYU pragma: keep
 
 #include <algorithm>
 

@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <util/unicode.h>
 #endif
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 
 void gcc_message_handlert::print(

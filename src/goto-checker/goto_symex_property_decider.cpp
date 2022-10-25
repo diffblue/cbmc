@@ -13,7 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/ui_message.h>
 
-#include <solvers/prop/prop.h>
+#include <solvers/prop/prop.h> // IWYU pragma: keep
 
 goto_symex_property_decidert::goto_symex_property_decidert(
   const optionst &options,

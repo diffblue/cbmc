@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_MAY_BE_SAME_OBJECT_H
 #define CPROVER_CPROVER_MAY_BE_SAME_OBJECT_H
 
-#include <util/std_expr.h>
+#include <util/std_expr.h> // IWYU pragma: keep
 
 #include <unordered_set>
 

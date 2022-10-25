@@ -6,11 +6,11 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <util/exception_utils.h>
+#include <util/exception_utils.h> // IWYU pragma: keep
 #include <util/file_util.h>
 #include <util/tempdir.h>
+
+#include <testing-utils/use_catch.h>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>

@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_dimacs.h"
 
-#include <fstream>
-#include <iostream>
-
 #include <solvers/sat/dimacs_cnf.h>
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 bool bv_dimacst::write_dimacs()
 {

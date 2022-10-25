@@ -19,7 +19,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <goto-programs/goto_instruction_code.h>
 
 #include "assignments_from_json.h"
-#include "ci_lazy_methods_needed.h"
+#include "ci_lazy_methods_needed.h" // IWYU pragma: keep
 #include "java_object_factory.h"
 #include "java_object_factory_parameters.h"
 #include "java_types.h"

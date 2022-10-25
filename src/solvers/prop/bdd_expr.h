@@ -21,7 +21,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <util/expr.h>
 
-#include <solvers/bdd/bdd.h>
+#include <solvers/bdd/bdd.h> // IWYU pragma: keep
 
 #include <unordered_map>
 

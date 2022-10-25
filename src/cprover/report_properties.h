@@ -13,7 +13,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #define CPROVER_CPROVER_REPORT_PROPERTIES_H
 
 #include "solver.h"
-#include "solver_types.h"
+#include "solver_types.h" // IWYU pragma: keep
 
 void report_properties(const std::vector<propertyt> &);
 

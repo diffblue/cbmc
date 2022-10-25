@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #endif
 
 #include <util/arith_tools.h>
-#include <util/base_exceptions.h>
+#include <util/base_exceptions.h> // IWYU pragma: keep
 
 #include "cpp_type2name.h"
 

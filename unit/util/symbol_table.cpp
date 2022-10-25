@@ -2,10 +2,11 @@
 
 /// \file Tests for symbol_tablet
 
+#include <util/exception_utils.h> // IWYU pragma: keep
+#include <util/journalling_symbol_table.h>
+
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
-#include <util/exception_utils.h>
-#include <util/journalling_symbol_table.h>
 
 TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
 {

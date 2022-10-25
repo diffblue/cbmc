@@ -8,12 +8,12 @@
 #include <util/invariant.h>
 
 #include <analyses/dirty.h>
-#include <analyses/local_safe_pointers.h>
-
-#include <memory>
+#include <analyses/local_safe_pointers.h> // IWYU pragma: keep
 
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
+
+#include <memory>
 
 class cmdlinet;
 class optionst;

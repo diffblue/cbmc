@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_UTIL_CONSOLE_H
 #define CPROVER_UTIL_CONSOLE_H
 
-#include <cstddef>
+#include <cstddef> // IWYU pragma: keep
 #include <iosfwd>
 
 class consolet

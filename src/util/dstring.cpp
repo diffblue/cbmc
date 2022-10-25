@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dstring.h"
 
+#include <ostream> // IWYU pragma: keep
+
 std::ostream &dstringt::operator<<(std::ostream &out) const
 {
   return out << as_string();

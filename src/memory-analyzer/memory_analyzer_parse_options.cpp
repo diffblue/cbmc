@@ -27,7 +27,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include "analyze_symbol.h"
 
 #include <algorithm>
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 
 memory_analyzer_parse_optionst::memory_analyzer_parse_optionst(

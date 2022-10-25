@@ -29,9 +29,9 @@
 #include "json_parser.h"
 #include "json_y.tab.h"
 
-#include <util/pragma_wsign_compare.def>
-#include <util/pragma_wnull_conversion.def>
-#include <util/pragma_wdeprecated_register.def>
+#include <util/pragma_wsign_compare.def> // IWYU pragma: keep
+#include <util/pragma_wnull_conversion.def> // IWYU pragma: keep
+#include <util/pragma_wdeprecated_register.def> // IWYU pragma: keep
 
 %}
 

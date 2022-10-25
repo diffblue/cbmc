@@ -17,9 +17,9 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_ENVIROMENT_H
 
-#include <memory>
+#include "abstract_object.h"
 
-#include <analyses/variable-sensitivity/abstract_object.h>
+#include <memory>
 
 exprt simplify_vsd_expr(exprt src, const namespacet &ns);
 bool is_ptr_diff(const exprt &expr);

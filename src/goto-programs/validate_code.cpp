@@ -12,10 +12,10 @@ Author: Daniel Poetzl
 #  include <iostream>
 #endif
 
-#include "goto_instruction_code.h"
-
-#include <util/std_code.h>
+#include <util/std_code.h> // IWYU pragma: keep
 #include <util/validate_helpers.h>
+
+#include "goto_instruction_code.h" // IWYU pragma: keep
 
 #define CALL_ON_CODE(code_type)                                                \
   C<codet, code_type>()(code, std::forward<Args>(args)...)

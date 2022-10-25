@@ -15,16 +15,16 @@ Date: February 2013
 
 #include "reaching_definitions.h"
 
-#include <memory>
-
-#include <util/base_exceptions.h>
+#include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/make_unique.h>
 #include <util/pointer_offset_size.h>
 
 #include <pointer-analysis/value_set_analysis_fi.h>
 
-#include "is_threaded.h"
 #include "dirty.h"
+#include "is_threaded.h"
+
+#include <memory>
 
 /// This ensures that all domains are constructed with the appropriate pointer
 /// back to the analysis engine itself.  Using a factory is a tad verbose

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_STD_TYPES_H
 
 #include "expr.h"
-#include "expr_cast.h"
+#include "expr_cast.h" // IWYU pragma: keep
 #include "invariant.h"
 #include "mp_arith.h"
 #include "validate.h"

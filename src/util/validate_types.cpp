@@ -12,8 +12,8 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
-#include "bitvector_types.h"
-#include "c_types.h"
+#include "bitvector_types.h" // IWYU pragma: keep
+#include "c_types.h"         // IWYU pragma: keep
 #include "pointer_expr.h"
 #include "validate_helpers.h"
 

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Convert file contents to C strings
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <string>
 

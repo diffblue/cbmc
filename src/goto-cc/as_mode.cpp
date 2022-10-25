@@ -19,9 +19,6 @@ Author: Michael Tautschnig
 #include <sysexits.h>
 #endif
 
-#include <fstream>
-#include <iostream>
-
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
@@ -33,6 +30,9 @@ Author: Michael Tautschnig
 #include "compile.h"
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 static std::string assembler_name(
   const cmdlinet &cmdline,

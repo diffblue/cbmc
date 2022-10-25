@@ -43,7 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/static_lifetime_init.h>
 
 #include <cstdlib> // exit()
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <memory>
 

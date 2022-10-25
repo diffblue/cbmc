@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_GENERALIZATION_H
 #define CPROVER_CPROVER_GENERALIZATION_H
 
-#include "solver_types.h"
+#include "solver_types.h" // IWYU pragma: keep
 
 class solver_optionst;
 

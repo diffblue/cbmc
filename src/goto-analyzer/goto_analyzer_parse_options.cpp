@@ -41,7 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unreachable_instructions.h"
 
 #include <cstdlib> // exit()
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <memory>
 

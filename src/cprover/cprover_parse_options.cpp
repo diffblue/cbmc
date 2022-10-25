@@ -40,7 +40,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "instrument_given_invariants.h"
 #include "state_encoding.h"
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 
 static void show_goto_functions(const goto_modelt &goto_model)

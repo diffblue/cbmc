@@ -11,13 +11,13 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "ci_lazy_methods_needed.h"
 
-#include <goto-programs/resolve_inherited_component.h>
-
 #include <util/namespace.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
-#include "generic_parameter_specialization_map.h"
+#include <goto-programs/resolve_inherited_component.h>
+
+#include "generic_parameter_specialization_map.h" // IWYU pragma: keep
 #include "java_static_initializers.h"
 #include "java_types.h"
 #include "select_pointer_type.h"

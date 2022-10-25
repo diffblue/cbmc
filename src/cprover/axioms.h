@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_AXIOMS_H
 #define CPROVER_CPROVER_AXIOMS_H
 
-#include <util/std_expr.h>
+#include <util/std_expr.h> // IWYU pragma: keep
 
 #include <solvers/decision_procedure.h>
 

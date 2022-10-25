@@ -35,7 +35,7 @@ Author: Peter Schrammel
 #include "unified_diff.h"
 
 #include <cstdlib> // exit()
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv)

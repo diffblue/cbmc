@@ -12,7 +12,7 @@ Author: Daniel Kroening <dkr@amazon.com>
 #ifndef CPROVER_CPROVER_REPORT_TRACES_H
 #define CPROVER_CPROVER_REPORT_TRACES_H
 
-#include "solver_types.h"
+#include "solver_types.h" // IWYU pragma: keep
 
 void report_traces(
   const std::vector<framet> &frames,

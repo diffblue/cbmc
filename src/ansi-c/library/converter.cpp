@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <string>
 

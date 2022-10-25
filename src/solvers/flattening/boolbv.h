@@ -21,10 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/lowering/functions.h>
 
-#include "bv_utils.h"
-#include "boolbv_width.h"
-#include "boolbv_map.h"
 #include "arrays.h"
+#include "boolbv_map.h"
+#include "boolbv_width.h"
+#include "bv_utils.h" // IWYU pragma: keep
 
 class array_comprehension_exprt;
 class binary_overflow_exprt;

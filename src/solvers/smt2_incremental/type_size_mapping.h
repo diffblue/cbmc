@@ -6,14 +6,14 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_TYPE_SIZE_MAPPING_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_TYPE_SIZE_MAPPING_H
 
-#include <util/expr.h>
+#include <util/expr.h> // IWYU pragma: keep
 
-#include <solvers/smt2_incremental/ast/smt_terms.h>
-#include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/ast/smt_terms.h>   // IWYU pragma: keep
+#include <solvers/smt2_incremental/object_tracking.h> // IWYU pragma: keep
 #include <solvers/smt2_incremental/smt_is_dynamic_object.h>
-#include <solvers/smt2_incremental/smt_object_size.h>
+#include <solvers/smt2_incremental/smt_object_size.h> // IWYU pragma: keep
 
-#include <unordered_map>
+#include <unordered_map> // IWYU pragma: keep
 
 using type_size_mapt = std::unordered_map<typet, smt_termt, irep_full_hash>;
 

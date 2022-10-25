@@ -10,8 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
+#include <util/json.h>
+#include <util/make_unique.h>
+#include <util/prefix_filter.h>
+#include <util/symbol.h> // IWYU pragma: keep
+
+#include <langapi/language.h>
+
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"
+#include "code_with_references.h" // IWYU pragma: keep
 #include "java_class_loader.h"
 #include "java_object_factory_parameters.h"
 #include "java_static_initializers.h"
@@ -20,12 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "synthetic_methods_map.h"
 
 #include <memory>
-
-#include <util/json.h>
-#include <util/make_unique.h>
-#include <util/prefix_filter.h>
-
-#include <langapi/language.h>
 
 // clang-format off
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \

@@ -11,10 +11,10 @@
 #include <util/message.h>
 
 class cmdlinet;
-class exprt;
+class exprt; // IWYU pragma: keep
 class goto_modelt;
 class goto_programt;
-class symbol_exprt;
+class symbol_exprt; // IWYU pragma: keep
 class symbol_tablet;
 
 /// \brief Patterns of expressions that should be replaced

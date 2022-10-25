@@ -30,7 +30,7 @@ bool cbmc_invariants_should_throw = false;
 // Backtraces compiler and C library specific
 // So we should include something explicitly from the C library
 // to check if the C library is glibc.
-#include <assert.h>
+#include <assert.h> // IWYU pragma: keep
 #if defined(__GLIBC__) || defined(__APPLE__)
 
 // GCC needs LINKFLAGS="-rdynamic" to give function names in the backtrace

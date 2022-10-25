@@ -11,16 +11,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_program.h"
 
-#include <fstream>
-#include <iostream>
-
-#include <goto-symex/symex_target_equation.h>
-
-#include <langapi/language_util.h>
-
-#include <util/byte_operators.h>
+#include <util/byte_operators.h> // IWYU pragma: keep
 #include <util/json_irep.h>
 #include <util/ui_message.h>
+
+#include <goto-symex/symex_target_equation.h>
+#include <langapi/language_util.h>
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 /// Output a single SSA step
 /// \param ns: Namespace

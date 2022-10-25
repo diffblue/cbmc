@@ -6,16 +6,18 @@
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <analyses/variable-sensitivity/abstract_object.h>
-
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/symbol_table.h>
+
+#include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/abstract_object.h>
+#include <testing-utils/use_catch.h>
+
+// NOLINTNEXTLINE(whitespace/line_length)
+#include <analyses/variable-sensitivity/constant_abstract_value.h> // IWYU pragma: keep
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 
 SCENARIO(
   "merge abstract object",

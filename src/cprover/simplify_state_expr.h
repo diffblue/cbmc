@@ -13,7 +13,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #define CPROVER_CPROVER_SIMPLIFY_STATE_EXPR_H
 
 #include <util/namespace.h>
-#include <util/std_expr.h>
+#include <util/std_expr.h> // IWYU pragma: keep
 
 #include <unordered_set>
 

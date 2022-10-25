@@ -11,10 +11,6 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "c_wrangler.h"
 
-#include "c_defines.h"
-#include "ctokenit.h"
-#include "mini_c_parser.h"
-
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/file_util.h>
@@ -26,7 +22,11 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/suffix.h>
 #include <util/tempdir.h>
 
-#include <fstream>
+#include "c_defines.h"
+#include "ctokenit.h"
+#include "mini_c_parser.h"
+
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <map>
 #include <regex>

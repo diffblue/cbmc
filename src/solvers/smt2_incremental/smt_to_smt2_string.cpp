@@ -13,7 +13,7 @@
 
 #include <functional>
 #include <iostream>
-#include <sstream>
+#include <sstream> // IWYU pragma: keep
 #include <stack>
 #include <string>
 

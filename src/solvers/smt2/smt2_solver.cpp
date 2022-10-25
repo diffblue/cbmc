@@ -6,21 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "smt2_parser.h"
-
-#include "smt2_format.h"
-
-#include <fstream>
-#include <iostream>
-
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 
-#include <solvers/sat/satcheck.h>
 #include <solvers/flattening/boolbv.h>
+#include <solvers/sat/satcheck.h>
+
+#include "smt2_format.h"
+#include "smt2_parser.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 class smt2_solvert:public smt2_parsert
 {

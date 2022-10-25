@@ -6,10 +6,10 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <util/exception_utils.h>
+#include <util/exception_utils.h> // IWYU pragma: keep
 #include <util/format_number_range.h>
+
+#include <testing-utils/use_catch.h>
 
 TEST_CASE(
   "Format a range of unsigned numbers",

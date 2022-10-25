@@ -20,8 +20,8 @@ class cmdlinet;
 class message_handlert;
 class namespacet;
 class optionst;
-class propt;
-class decision_proceduret;
+class propt;               // IWYU pragma: keep
+class decision_proceduret; // IWYU pragma: keep
 class stack_decision_proceduret;
 
 class solver_factoryt final

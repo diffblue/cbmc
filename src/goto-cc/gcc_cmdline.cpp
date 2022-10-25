@@ -11,12 +11,12 @@ Author: CM Wintersteiger, 2006
 
 #include "gcc_cmdline.h"
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 #include <util/prefix.h>
+
+#include <cstring>
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
 
 // clang-format off
 // non-gcc options
