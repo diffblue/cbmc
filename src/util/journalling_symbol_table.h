@@ -143,6 +143,12 @@ public:
   using symbol_table_baset::begin;
   using symbol_table_baset::end;
 
+  void validate(
+    const validation_modet vm = validation_modet::INVARIANT) const override
+  {
+    base_symbol_table.validate(vm);
+  }
+
   const changesett &get_inserted() const
   {
     return inserted;

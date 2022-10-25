@@ -239,6 +239,9 @@ public:
 
   virtual const_iteratort begin() const;
   virtual const_iteratort end() const;
+
+  virtual void
+  validate(const validation_modet vm = validation_modet::INVARIANT) const = 0;
 };
 
 std::ostream &

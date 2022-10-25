@@ -88,6 +88,12 @@ public:
   using symbol_table_baset::begin;
   using symbol_table_baset::end;
 
+  void validate(
+    const validation_modet vm = validation_modet::INVARIANT) const override
+  {
+    base_symbol_table.validate(vm);
+  }
+
   /// Try to find the next free identity for the passed-in prefix in
   /// this symbol table.
   /// \remark
