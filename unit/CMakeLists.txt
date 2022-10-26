@@ -89,6 +89,9 @@ target_link_libraries(
         json-symtab-language
         statement-list
 )
+if(WITH_MEMORY_ANALYZER)
+  target_link_libraries(unit memory-analyzer-lib)
+endif()
 
 add_test(
     NAME unit

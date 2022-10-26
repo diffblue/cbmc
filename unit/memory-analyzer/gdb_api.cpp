@@ -7,20 +7,18 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
+#include <util/run.h>
+#include <util/tempfile.h>
+
+#include <memory-analyzer/gdb_api.h>
 #include <testing-utils/use_catch.h>
 
 #include <cstdio>
+#include <fstream>
+#include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
-
-#include <fstream>
-#include <iostream>
-
-#include <memory-analyzer/gdb_api.cpp>
-
-#include <util/run.h>
-#include <util/tempfile.h>
 
 struct compile_test_filet
 {
