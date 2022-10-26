@@ -23,8 +23,7 @@ void cover_assume_instrumentert::instrument(
 {
   if(i_it->is_assume())
   {
-    const auto assume_condition =
-      expr2c(i_it->condition(), namespacet{symbol_tablet()});
+    const auto assume_condition = expr2c(i_it->condition(), ns);
     const auto comment_before =
       "assert(false) before assume(" + assume_condition + ")";
     const auto comment_after =
