@@ -4,7 +4,7 @@ Module: Goto Checker using Single Path Symbolic Execution for Java
 
 Author: Jeannie Moulton
 
- \*******************************************************************/
+\*******************************************************************/
 
 #include "java_single_path_symex_checker.h"
 #include "java_trace_validation.h"
