@@ -1621,19 +1621,14 @@ static exprt lower_byte_update_array_vector_unbounded(
              plus_exprt{last_index, from_integer(1, last_index.type())}}};
 
   // The actual value of a partial update at the end.
-  exprt last_update_value = lower_byte_operators(
+  exprt last_update_value = lower_byte_update(
     byte_update_exprt{
       src.id(),
       index_exprt{src.op(), last_index},
-      from_integer(0, src.offset().type()),
-      byte_extract_exprt{
-        extract_opcode,
-        value_as_byte_array,
-        mult_exprt{
-          typecast_exprt::conditional_cast(last_index, subtype_size.type()),
-          subtype_size},
-        src.get_bits_per_byte(),
-        array_typet{bv_typet{src.get_bits_per_byte()}, tail_size}},
+      unary_minus_exprt{mult_exprt{
+        typecast_exprt::conditional_cast(last_index, subtype_size.type()),
+        subtype_size}},
+      value_as_byte_array,
       src.get_bits_per_byte()},
     ns);
 
@@ -1675,10 +1670,6 @@ static exprt lower_byte_update_array_vector_non_const(
   const optionalt<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
-  const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
-                                    ? ID_byte_extract_little_endian
-                                    : ID_byte_extract_big_endian;
-
   // do all arithmetic below using index/offset types - the array theory
   // back-end is really picky about indices having the same type
   auto subtype_size_opt = size_of_expr(subtype, ns);
@@ -1699,6 +1690,8 @@ static exprt lower_byte_update_array_vector_non_const(
 
   // compute the number of bytes (from the update value) that are going to be
   // consumed for updating the first element
+  const exprt update_size =
+    from_integer(value_as_byte_array.operands().size(), subtype_size.type());
   exprt initial_bytes = minus_exprt{subtype_size, update_offset};
   exprt update_bound;
   if(non_const_update_bound.has_value())
@@ -1711,8 +1704,7 @@ static exprt lower_byte_update_array_vector_non_const(
     DATA_INVARIANT(
       value_as_byte_array.id() == ID_array,
       "value should be an array expression if the update bound is constant");
-    update_bound =
-      from_integer(value_as_byte_array.operands().size(), initial_bytes.type());
+    update_bound = update_size;
   }
   initial_bytes =
     if_exprt{binary_predicate_exprt{initial_bytes, ID_lt, update_bound},
@@ -1720,19 +1712,15 @@ static exprt lower_byte_update_array_vector_non_const(
              update_bound};
   simplify(initial_bytes, ns);
 
-  // encode the first update: update the original element at first_index with
-  // initial_bytes-many bytes extracted from value_as_byte_array
-  exprt first_update_value = lower_byte_operators(
+  // encode the first update: update the original element at first_index (the
+  // actual update will only be initial_bytes-many bytes from
+  // value_as_byte_array)
+  exprt first_update_value = lower_byte_update(
     byte_update_exprt{
       src.id(),
       index_exprt{src.op(), first_index},
       update_offset,
-      byte_extract_exprt{
-        extract_opcode,
-        value_as_byte_array,
-        from_integer(0, src.offset().type()),
-        src.get_bits_per_byte(),
-        array_typet{bv_typet{src.get_bits_per_byte()}, initial_bytes}},
+      value_as_byte_array,
       src.get_bits_per_byte()},
     ns);
 
@@ -1768,63 +1756,45 @@ static exprt lower_byte_update_array_vector_non_const(
 
   with_exprt result{src.op(), first_index, first_update_value};
 
+  auto lower_byte_update_array_vector_non_const_one_element =
+    [&src,
+     &first_index,
+     &initial_bytes,
+     &subtype_size,
+     &value_as_byte_array,
+     &ns,
+     &result](std::size_t i) -> void {
+    exprt where = simplify_expr(
+      plus_exprt{first_index, from_integer(i, first_index.type())}, ns);
+
+    exprt neg_offset_expr = simplify_expr(
+      unary_minus_exprt{plus_exprt{
+        initial_bytes,
+        mult_exprt{subtype_size, from_integer(i - 1, subtype_size.type())}}},
+      ns);
+
+    exprt element = lower_byte_update(
+      byte_update_exprt{
+        src.id(),
+        index_exprt{src.op(), where},
+        neg_offset_expr,
+        value_as_byte_array,
+        src.get_bits_per_byte()},
+      ns);
+
+    result.add_to_operands(std::move(where), std::move(element));
+  };
+
   std::size_t i = 1;
   for(; offset + step_size <= value_as_byte_array.operands().size();
       offset += step_size, ++i)
   {
-    exprt where = simplify_expr(
-      plus_exprt{first_index, from_integer(i, first_index.type())}, ns);
-
-    exprt offset_expr = simplify_expr(
-      plus_exprt{
-        initial_bytes,
-        mult_exprt{subtype_size, from_integer(i - 1, subtype_size.type())}},
-      ns);
-
-    exprt element = lower_byte_operators(
-      byte_update_exprt{
-        src.id(),
-        index_exprt{src.op(), where},
-        from_integer(0, src.offset().type()),
-        byte_extract_exprt{
-          extract_opcode,
-          value_as_byte_array,
-          std::move(offset_expr),
-          src.get_bits_per_byte(),
-          array_typet{bv_typet{src.get_bits_per_byte()}, subtype_size}},
-        src.get_bits_per_byte()},
-      ns);
-
-    result.add_to_operands(std::move(where), std::move(element));
+    lower_byte_update_array_vector_non_const_one_element(i);
   }
 
   // do the tail
   if(offset < value_as_byte_array.operands().size())
-  {
-    const std::size_t tail_size =
-      value_as_byte_array.operands().size() - offset;
-
-    exprt where = simplify_expr(
-      plus_exprt{first_index, from_integer(i, first_index.type())}, ns);
-
-    exprt element = lower_byte_operators(
-      byte_update_exprt{
-        src.id(),
-        index_exprt{src.op(), where},
-        from_integer(0, src.offset().type()),
-        byte_extract_exprt{
-          extract_opcode,
-          value_as_byte_array,
-          from_integer(offset, src.offset().type()),
-          src.get_bits_per_byte(),
-          array_typet{
-            bv_typet{src.get_bits_per_byte()},
-            from_integer(tail_size, size_type())}},
-        src.get_bits_per_byte()},
-      ns);
-
-    result.add_to_operands(std::move(where), std::move(element));
-  }
+    lower_byte_update_array_vector_non_const_one_element(i);
 
   return simplify_expr(std::move(result), ns);
 }
@@ -2333,9 +2303,14 @@ static exprt lower_byte_update(
     if_exprt mask_shifted{
       offset_ge_zero,
       shl_exprt{mask, offset_in_bits},
-      lshr_exprt{mask, offset_in_bits}};
+      lshr_exprt{mask, unary_minus_exprt{offset_in_bits}}};
     if(!is_little_endian)
+    {
       mask_shifted.true_case().swap(mask_shifted.false_case());
+      to_shift_expr(mask_shifted.true_case())
+        .distance()
+        .swap(to_shift_expr(mask_shifted.false_case()).distance());
+    }
 
     // original_bits &= ~mask
     bitand_exprt bitand_expr{val_before, bitnot_exprt{mask_shifted}};
@@ -2365,9 +2340,14 @@ static exprt lower_byte_update(
     if_exprt value_shifted{
       offset_ge_zero,
       shl_exprt{zero_extended, offset_in_bits},
-      lshr_exprt{zero_extended, offset_in_bits}};
+      lshr_exprt{zero_extended, unary_minus_exprt{offset_in_bits}}};
     if(!is_little_endian)
+    {
       value_shifted.true_case().swap(value_shifted.false_case());
+      to_shift_expr(value_shifted.true_case())
+        .distance()
+        .swap(to_shift_expr(value_shifted.false_case()).distance());
+    }
 
     // original_bits |= newvalue
     bitor_exprt bitor_expr{bitand_expr, value_shifted};

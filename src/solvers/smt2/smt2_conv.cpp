@@ -3142,7 +3142,16 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
   else
   {
     if(components.size()==1)
-      convert_expr(expr.op0());
+    {
+      const exprt &op = expr.op0();
+      // may need to flatten array-theory arrays in there
+      if(op.type().id() == ID_array && use_array_theory(op))
+        flatten_array(op);
+      else if(op.type().id() == ID_bool)
+        flatten2bv(op);
+      else
+        convert_expr(op);
+    }
     else
     {
       // SMT-LIB 2 concat is binary only
@@ -3153,7 +3162,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         exprt op=expr.operands()[i-1];
 
         // may need to flatten array-theory arrays in there
-        if(op.type().id() == ID_array)
+        if(op.type().id() == ID_array && use_array_theory(op))
           flatten_array(op);
         else if(op.type().id() == ID_bool)
           flatten2bv(op);
