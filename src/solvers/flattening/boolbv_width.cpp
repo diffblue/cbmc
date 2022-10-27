@@ -222,7 +222,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     cache_entry = defined_entryt{0};
   }
   else
-    UNIMPLEMENTED;
+  {
+    UNIMPLEMENTED_FEATURE(
+      "boolbv_widtht::get_entry(" + id2string(type_id) + ")");
+  }
 
   return cache_entry;
 }
