@@ -63,7 +63,7 @@ jobs:
           echo "deb_package_name=ubuntu-20.04-$deb_package_name" >> $GITHUB_OUTPUT
       - name: Get release info
         id: get_release_info
-        uses: bruceadams/get-release@v1
+        uses: bruceadams/get-release@v1.3.2
       - name: Upload binary packages
         uses: actions/upload-release-asset@v1
         with:
@@ -151,7 +151,7 @@ jobs:
           echo "deb_package_name=ubuntu-18.04-$deb_package_name" >> $GITHUB_OUTPUT
       - name: Get release info
         id: get_release_info
-        uses: bruceadams/get-release@v1
+        uses: bruceadams/get-release@v1.3.2
       - name: Upload binary packages
         uses: actions/upload-release-asset@v1
         with:
@@ -281,7 +281,7 @@ jobs:
           & signtool.exe verify /pa ${{ steps.create_packages.outputs.msi_installer }}
       - name: Get release info
         id: get_release_info
-        uses: bruceadams/get-release@v1
+        uses: bruceadams/get-release@v1.3.2
       - name: Upload binary packages
         uses: actions/upload-release-asset@v1
         with:
