@@ -190,9 +190,6 @@ jobs:
       - name: Checkout CBMC project source code to obtain access to scripts
         if: always()
         uses: actions/checkout@v3
-      - name: Install golang toolchain to run the notification step
-        if: always()
-        run: brew install go
       - name: Slack notification of CI status
         if: success() || failure()
         env:
@@ -200,6 +197,7 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "${{ job.status == 'success' && 'Homebrew PR submitted successfully' || 'Homebrew PR failed' }}"
         run: go run scripts/slack_notification_action.go
 
   windows-msi-package:
