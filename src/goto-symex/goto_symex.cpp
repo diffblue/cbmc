@@ -45,8 +45,12 @@ void goto_symext::symex_assign(
   exprt lhs = clean_expr(o_lhs, state, true);
   exprt rhs = clean_expr(o_rhs, state, false);
 
-  DATA_INVARIANT(
-    lhs.type() == rhs.type(), "assignments must be type consistent");
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    lhs.type() == rhs.type(),
+    "assignments must be type consistent, got",
+    lhs.type().pretty(),
+    rhs.type().pretty(),
+    state.source.pc->source_location());
 
   log.conditional_output(
     log.debug(), [this, &lhs](messaget::mstreamt &mstream) {
