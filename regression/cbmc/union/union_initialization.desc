@@ -1,0 +1,13 @@
+CORE broken-smt-backend
+union_initialization.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ should fail: FAILURE$
+^\*\* 1 of 1 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This fails when using the SMT backend with Z3 with the error message
+"invalid function/constant definition, sort mismatch".
