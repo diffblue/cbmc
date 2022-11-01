@@ -1,0 +1,18 @@
+{
+  "sources": [
+    "main.c"
+  ],
+  "functions": [
+    {
+      "f1": [
+        "requires *x1 > 1 && *x1 < 10000",
+        "ensures __CPROVER_return_value == *x1 + 2"
+      ],
+      "f2": [
+        "requires *x2 > 1 && *x2 < 10000",
+        "ensures __CPROVER_return_value == *x2 + 1"
+      ]
+    }
+  ],
+  "output": "stdout"
+}

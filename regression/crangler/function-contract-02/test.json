@@ -1,0 +1,14 @@
+{
+  "sources": [
+    "main.c"
+  ],
+  "functions": [
+    {
+      "foo": [
+        "assigns *x",
+        "ensures __CPROVER_return_value == *x + 5"
+      ]
+    }
+  ],
+  "output": "stdout"
+}

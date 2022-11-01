@@ -1,0 +1,9 @@
+CORE
+test.json
+
+\_\_CPROVER\_requires.*\_\_CPROVER\_requires.*\_\_CPROVER_ensures
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Annotate function contracts to function f1.
