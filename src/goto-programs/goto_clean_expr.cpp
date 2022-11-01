@@ -392,12 +392,12 @@ void goto_convertt::clean_expr(
         exprt new_lhs = skip_typecast(lhs);
         exprt new_rhs = typecast_exprt::conditional_cast(
           side_effect_assign.rhs(), new_lhs.type());
-        code_assignt assignment(std::move(new_lhs), std::move(new_rhs));
+        code_assignt assignment(std::move(new_lhs), new_rhs);
         assignment.add_source_location()=expr.source_location();
         convert_assign(assignment, dest, mode);
 
         if(result_is_used)
-          expr = must_use_rhs ? side_effect_assign.rhs() : lhs;
+          expr = must_use_rhs ? new_rhs : lhs;
         else
           expr.make_nil();
         return;
