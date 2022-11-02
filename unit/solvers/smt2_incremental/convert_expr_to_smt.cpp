@@ -1239,15 +1239,30 @@ TEST_CASE(
       array_typet{value_type, from_integer(10, signed_size_type())}};
     const exprt index = from_integer(42, unsignedbv_typet{64});
     const exprt value = from_integer(12, value_type);
-    const with_exprt with{array, index, value};
-    INFO("Expression being converted: " + with.pretty(2, 0));
+    with_exprt with{array, index, value};
     const smt_termt expected = smt_array_theoryt::store(
       smt_identifier_termt{
         "my_array",
         smt_array_sortt{smt_bit_vector_sortt{64}, smt_bit_vector_sortt{8}}},
       smt_bit_vector_constant_termt{42, 64},
       smt_bit_vector_constant_termt{12, 8});
-    CHECK(test.convert(with) == expected);
+    SECTION("Single where/new_value pair update")
+    {
+      INFO("Expression being converted: " + with.pretty(2, 0));
+      CHECK(test.convert(with) == expected);
+    }
+    SECTION("Dual where/new_value pair update")
+    {
+      exprt index2 = from_integer(24, unsignedbv_typet{64});
+      exprt value2 = from_integer(21, value_type);
+      with.add_to_operands(std::move(index2), std::move(value2));
+      const smt_termt expected2 = smt_array_theoryt::store(
+        expected,
+        smt_bit_vector_constant_termt{24, 64},
+        smt_bit_vector_constant_termt{21, 8});
+      INFO("Expression being converted: " + with.pretty(2, 0));
+      CHECK(test.convert(with) == expected2);
+    }
   }
 }
 
