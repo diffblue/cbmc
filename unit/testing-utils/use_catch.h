@@ -42,4 +42,6 @@ Author: Michael Tautschnig
 class irept;
 std::ostream &operator<<(std::ostream &os, const irept &value);
 
+#include <solvers/smt2_incremental/smt_to_smt2_string.h>
+
 #endif // CPROVER_TESTING_UTILS_USE_CATCH_H

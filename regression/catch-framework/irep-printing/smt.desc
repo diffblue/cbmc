@@ -1,0 +1,13 @@
+CORE
+[smt_error_printing]
+
+Bool \=\= \(_ BitVec 8\)
+\(_ bv42 8\) \=\= false
+\(check\-sat\) \=\= \(set\-logic ALL\)
+^EXIT=0$
+^SIGNAL=0$
+--
+\{\?\}
+--
+Test that when unit tests fail on mismatching smt data structures, the ireps are
+pretty-printed and not printed as catch's default of {?}.

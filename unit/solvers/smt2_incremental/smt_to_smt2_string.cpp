@@ -244,3 +244,16 @@ TEST_CASE("SMT exists term to string conversion", "[core][smt2_incremental]")
       "(exists ((i (_ BitVec 8)) (j Bool)) (or (= i i) j))");
   }
 }
+
+// This test is expected to fail so that we can test the error printing of the
+// unit test framework for regressions. It is not included in the [core] or
+// default set of tests, so that the usual output is not polluted with
+// irrelevant error messages.
+TEST_CASE(
+  "Catch2 printing of SMT data structures for test failures.",
+  "[smt_error_printing]" XFAIL)
+{
+  CHECK(smt_bool_sortt{} == smt_bit_vector_sortt{8});
+  CHECK(smt_bit_vector_constant_termt{42, 8} == smt_bool_literal_termt{false});
+  CHECK(smt_check_sat_commandt{} == smt_set_logic_commandt{smt_logic_allt{}});
+}
