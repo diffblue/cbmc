@@ -4,6 +4,7 @@ SRC = address_taken.cpp \
       c_safety_checks.cpp \
       cprover_main.cpp \
       cprover_parse_options.cpp \
+      constant_propagation.cpp \
       counterexample_found.cpp \
       endianness_map_wide.cpp \
       equality_propagation.cpp \

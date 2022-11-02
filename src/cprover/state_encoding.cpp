@@ -19,6 +19,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <goto-programs/goto_model.h>
 
+#include "constant_propagation.h"
 #include "equality_propagation.h"
 #include "instrument_contracts.h"
 #include "sentinel_dll.h"
@@ -1244,6 +1245,8 @@ solver_resultt state_encoding_solver(
   state_encoding(goto_model, program_is_inlined, contract, container);
 
   equality_propagation(container.constraints);
+
+  constant_propagation(container.constraints);
 
 #if 0
   if(solver_options.verbose)
