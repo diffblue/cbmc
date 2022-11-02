@@ -1252,6 +1252,35 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "expr to smt conversion for concatenation_exprt expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+  SECTION("Bit vector types")
+  {
+    const exprt bit_vector_1 =
+      symbol_exprt{"my_bit_vector_1", signedbv_typet{8}};
+    const exprt bit_vector_2 =
+      symbol_exprt{"my_bit_vector_2", signedbv_typet{9}};
+    const exprt bit_vector_3 =
+      symbol_exprt{"my_bit_vector_3", signedbv_typet{10}};
+    const concatenation_exprt concatenation{
+      {bit_vector_1, bit_vector_2, bit_vector_3}, signedbv_typet{27}};
+    INFO("Expression being converted: " + concatenation.pretty(2, 0));
+    const smt_identifier_termt smt_id_1{
+      "my_bit_vector_1", smt_bit_vector_sortt{8}};
+    const smt_identifier_termt smt_id_2{
+      "my_bit_vector_2", smt_bit_vector_sortt{9}};
+    const smt_identifier_termt smt_id_3{
+      "my_bit_vector_3", smt_bit_vector_sortt{10}};
+    const smt_termt expected = smt_bit_vector_theoryt::concat(
+      smt_bit_vector_theoryt::concat(smt_id_1, smt_id_2), smt_id_3);
+    CHECK(test.convert(concatenation) == expected);
+  }
+}
+
+TEST_CASE(
   "expr to smt conversion for extract bits expressions",
   "[core][smt2_incremental]")
 {
