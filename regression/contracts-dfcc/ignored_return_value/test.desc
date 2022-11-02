@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract get_at_idx
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test exposes a bug where CBMC would crash on a program where a function
+with a return value has a postcondition that mentions __CPROVER_return_value,
+but the caller does not assign the return value to anything.

@@ -1,0 +1,13 @@
+KNOWNBUG
+main.c
+--dfcc main --apply-code-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.\d+\] .* assertion x == 0: SUCCESS$
+^\[foo.\d+\] .* : FAILURE$
+^VERIFICATION FAILED$
+--
+--
+--check-code-contracts not implemented yet.
+--apply-code-contracts is the current name for the flag. This should be
+updated as the flag changes.

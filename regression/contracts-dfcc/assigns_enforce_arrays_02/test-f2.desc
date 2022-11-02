@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract f2
+^\[f2.assigns.\d+\] line \d+ Check that a\[.*0\] is assignable: SUCCESS$
+^\[f2.assigns.\d+\] line \d+ Check that a\[.*5\] is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test ensures that assigns clauses correctly check for global variables,
+and access using *ptr vs POINTER_OBJECT(ptr).

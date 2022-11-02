@@ -1,0 +1,16 @@
+CORE
+main.c
+--dfcc main --enforce-contract f1
+^EXIT=0$
+^SIGNAL=0$
+^\[f1.postcondition.\d+\] line \d+ Check ensures clause of contract contract::f1 for function f1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The purpose of this test is to ensure that we can safely use __CPROVER_exists within both
+positive and negative contexts (ENSURES and REQUIRES clauses).
+
+With the SAT backend existential quantifiers in a positive context,
+e.g., the ENSURES clause being enforced in this case,
+are supported only if the quantifier is bound to a constant range.

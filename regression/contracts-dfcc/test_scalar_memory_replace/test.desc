@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^\[foo.precondition.\d+\] line \d+ Check requires clause of contract contract::foo for function foo: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion \_\_CPROVER\_r\_ok\(n, sizeof\(int\)\): SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion o >\= 10 \&\& o \=\= \*n \+ 5: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether __CPROVER_is_fresh works properly for scalars (replace context).
+It tests both positive and negative cases for __CPROVER_is_fresh.

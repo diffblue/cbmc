@@ -38,6 +38,7 @@ DIRS = cbmc \
        statement-list \
        systemc \
        contracts \
+       contracts-dfcc \
        acceleration \
        k-induction \
        goto-harness \

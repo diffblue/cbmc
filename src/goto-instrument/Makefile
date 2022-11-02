@@ -17,6 +17,17 @@ SRC = accelerate/accelerate.cpp \
       branch.cpp \
       call_sequences.cpp \
       contracts/contracts.cpp \
+      contracts/dynamic-frames/dfcc_utils.cpp \
+      contracts/dynamic-frames/dfcc_library.cpp \
+      contracts/dynamic-frames/dfcc_is_fresh.cpp \
+      contracts/dynamic-frames/dfcc_is_freeable.cpp \
+      contracts/dynamic-frames/dfcc_instrument.cpp \
+      contracts/dynamic-frames/dfcc_spec_functions.cpp \
+      contracts/dynamic-frames/dfcc_contract_functions.cpp \
+      contracts/dynamic-frames/dfcc_wrapper_program.cpp \
+      contracts/dynamic-frames/dfcc_contract_handler.cpp \
+      contracts/dynamic-frames/dfcc_swap_and_wrap.cpp \
+      contracts/dynamic-frames/dfcc.cpp \
       contracts/havoc_assigns_clause_targets.cpp \
       contracts/instrument_spec_assigns.cpp \
       contracts/memory_predicates.cpp \

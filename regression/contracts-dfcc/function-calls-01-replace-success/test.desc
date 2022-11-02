@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract f
+^\[f.precondition.\d+\] .* Check requires clause of contract contract::f for function f: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Here we test contract replacement at a call site where contract pre-conditions
+hold. Assuming the contract post conditions during replacement allows to satisfy
+downstream assertions.

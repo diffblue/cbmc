@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract f
+^\[f.postcondition.\d+\] .* Check ensures clause of contract contract::f for function f: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+f is checked against its contract. f calls g and g is not replaced by its
+contract. f violates the preconditions of g, in turn g violates its post
+conditions and in turn f violates its post conditions.

@@ -1,0 +1,9 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that __CPROVER_object_whole can be used both on arrays and scalars.

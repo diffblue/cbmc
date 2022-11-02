@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo --replace-call-with-contract quz
+^\[bar.assigns.\d+\].*Check that \*y is assignable: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks whether checks write set for sub-function calls.

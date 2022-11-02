@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^\[bar.assigns.\d+\] line \d+ Check that havoc_object\(\(void \*\)a->u\.b->c\) is allowed by the assigns clause: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks that __CPROVER_havoc_object(x) is detected as a write to POINTER_OBJECT(x).

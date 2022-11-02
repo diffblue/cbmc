@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo4 _ --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^\[foo4.assigns.\d+\] line \d+ Check that \*c is assignable: SUCCESS$
+^\[foo4.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC parses correctly all standard cases for assigns clauses.

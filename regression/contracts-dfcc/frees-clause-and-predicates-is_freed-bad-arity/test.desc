@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo
+^main.c.*error: wrong number of function arguments: expected 1, but got 2$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks bad uses of __CPROVER_was_freed are rejected.

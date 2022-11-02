@@ -1,0 +1,9 @@
+CORE
+main.c
+--dfcc main --enforce-contract g
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+We check g against its contract, the post conditions are expected to hold.

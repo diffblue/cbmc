@@ -1,0 +1,11 @@
+CORE
+main.c
+--enforce-contract foo
+^main.c.*error: expected 1 argument for __CPROVER_typed_target, found 2$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+This test checks that incorrect uses of __CPROVER_typed_target are detected and
+rejected.

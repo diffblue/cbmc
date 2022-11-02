@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract f4
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether CBMC properly evaluates write set of members
+from the same object.

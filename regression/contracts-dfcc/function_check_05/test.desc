@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+--dfcc main --check-code-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.\d+\] assertion y == 0: FAILURE$
+^\[main.assertion.\d+\] assertion z == 1: SUCCESS$
+^\[foo.\d+\] : SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Contract checking does not properly havoc function calls.

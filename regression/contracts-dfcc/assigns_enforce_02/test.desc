@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.assigns.\d+\] line 6 Check that \*x is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that verification fails if an expression outside the assigns clause is assigned within the function.

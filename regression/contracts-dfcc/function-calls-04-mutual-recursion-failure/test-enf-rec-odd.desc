@@ -1,0 +1,14 @@
+CORE
+main_odd.c
+--dfcc main --enforce-contract-rec odd
+^\[odd.precondition.\d+\] .* Check requires clause of contract contract::odd for function odd: SUCCESS$
+^\[odd.postcondition.\d+\] .* Check ensures clause of contract contract::odd for function odd: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This model tries to prove the contract of odd handling the recursive call using
+--enforce-contract-rec.
+We expect the analysis to fail because odd contains a bug which allows to falsify
+its post conditions.

@@ -1,0 +1,10 @@
+CORE
+main.c
+--enforce-contract foo _ --function foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that we can use a function with a contract as entry point
+for the analysis when its contract gets enforced.

@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract f --replace-call-with-contract g
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+We check f against its contract while replacing g by its contract.
+Verification is expected to succeed.

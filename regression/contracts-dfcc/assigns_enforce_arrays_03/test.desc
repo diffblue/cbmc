@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract assign_out_under
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Checks whether verification fails when a function has an array 
+as parameter, an empty assigns clause and attempts to modify the object
+pointed to by the pointer.

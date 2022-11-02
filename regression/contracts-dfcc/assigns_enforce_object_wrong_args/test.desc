@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract baz
+^EXIT=(1|64)$
+^SIGNAL=0$
+^.*error: wrong number of function arguments: expected 1, but got 0$
+^CONVERSION ERROR$
+--
+--
+Check that incorrect uses of `__CPROVER_object_whole` in assigns clauses are detected.

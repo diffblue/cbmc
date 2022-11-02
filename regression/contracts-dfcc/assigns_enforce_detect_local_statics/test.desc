@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract bar
+^\[foo.assigns.\d+\] line 17 Check that \*y is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 20 Check that \*yy is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks whether static local and global variables are correctly tracked
+in assigns clause verification, accross subfunction calls.

@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract f1
+^EXIT=10$
+^SIGNAL=0$
+^\[f1.assigns.\d+\] line \d+ Check that \*b is assignable: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+This test checks that variables which mask a formal parameter are logically distinct from the formal parameter itself. Specifically, we check that the masked variable may alias a parameter in the assigns clause, while the formal parameter does not, so verification fails, but not because of the masking variable.

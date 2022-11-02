@@ -1,0 +1,15 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+\[foo.postcondition.\d+\] line \d+ Check ensures clause of contract contract::foo for function foo: SUCCESS$
+\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS
+\[foo.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS
+\[foo.assigns.\d+\] line \d+ Check that z is assignable: SUCCESS
+\[main.assertion.\d+\] line \d+ assertion \!\(n \< 4\): SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether assuming __CPROVER_is_fresh will guarantee a new freshly
+allocated pointer (no aliasing) for structs.

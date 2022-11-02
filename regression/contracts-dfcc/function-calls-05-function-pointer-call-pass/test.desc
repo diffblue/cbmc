@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+\[foo.postcondition.\d+\] line \d+ Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Checks that frame condition checking is propagated
+through function pointer calls.

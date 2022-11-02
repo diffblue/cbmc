@@ -1,0 +1,15 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.assertion.\d+\].*in1 is rw_ok: SUCCESS$
+^\[foo.assertion.\d+\].*in2 is rw_ok: SUCCESS$
+^\[foo.assertion.\d+\].*in1 and in2 do not alias: SUCCESS$
+^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that using __CPROVER_is_fresh in postconditions when checking
+a contract will effectively fail if objects can alias with objects seen by
+__CPROVER_is_fresh in preconditions.

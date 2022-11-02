@@ -71,7 +71,7 @@ void code_contractst::check_apply_loop_contracts(
 
   // replace bound variables by fresh instances
   if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
-    add_quantified_variable(invariant, mode);
+    add_quantified_variable(symbol_table, invariant, mode);
 
   // instrument
   //
@@ -132,6 +132,7 @@ void code_contractst::check_apply_loop_contracts(
   // We find and replace all "__CPROVER_loop_entry" subexpressions in invariant.
   std::map<exprt, exprt> history_var_map;
   replace_history_parameter(
+    symbol_table,
     invariant,
     history_var_map,
     loop_head_location,
@@ -485,169 +486,11 @@ void code_contractst::check_apply_loop_contracts(
   }
 }
 
-void code_contractst::add_quantified_variable(
-  exprt &expression,
-  const irep_idt &mode)
-{
-  if(expression.id() == ID_not || expression.id() == ID_typecast)
-  {
-    // For unary connectives, recursively check for
-    // nested quantified formulae in the term
-    auto &unary_expression = to_unary_expr(expression);
-    add_quantified_variable(unary_expression.op(), mode);
-  }
-  if(expression.id() == ID_notequal || expression.id() == ID_implies)
-  {
-    // For binary connectives, recursively check for
-    // nested quantified formulae in the left and right terms
-    auto &binary_expression = to_binary_expr(expression);
-    add_quantified_variable(binary_expression.lhs(), mode);
-    add_quantified_variable(binary_expression.rhs(), mode);
-  }
-  if(expression.id() == ID_if)
-  {
-    // For ternary connectives, recursively check for
-    // nested quantified formulae in all three terms
-    auto &if_expression = to_if_expr(expression);
-    add_quantified_variable(if_expression.cond(), mode);
-    add_quantified_variable(if_expression.true_case(), mode);
-    add_quantified_variable(if_expression.false_case(), mode);
-  }
-  if(expression.id() == ID_and || expression.id() == ID_or)
-  {
-    // For multi-ary connectives, recursively check for
-    // nested quantified formulae in all terms
-    auto &multi_ary_expression = to_multi_ary_expr(expression);
-    for(auto &operand : multi_ary_expression.operands())
-    {
-      add_quantified_variable(operand, mode);
-    }
-  }
-  else if(expression.id() == ID_exists || expression.id() == ID_forall)
-  {
-    // When a quantifier expression is found, create a fresh symbol for each
-    // quantified variable and rewrite the expression to use those fresh
-    // symbols.
-    auto &quantifier_expression = to_quantifier_expr(expression);
-    std::vector<symbol_exprt> fresh_variables;
-    fresh_variables.reserve(quantifier_expression.variables().size());
-    for(const auto &quantified_variable : quantifier_expression.variables())
-    {
-      // 1. create fresh symbol
-      symbolt new_symbol = new_tmp_symbol(
-        quantified_variable.type(),
-        quantified_variable.source_location(),
-        mode,
-        symbol_table);
-
-      // 2. add created fresh symbol to expression map
-      fresh_variables.push_back(new_symbol.symbol_expr());
-    }
-
-    // use fresh symbols
-    exprt where = quantifier_expression.instantiate(fresh_variables);
-
-    // recursively check for nested quantified formulae
-    add_quantified_variable(where, mode);
-
-    // replace previous variables and body
-    quantifier_expression.variables() = fresh_variables;
-    quantifier_expression.where() = std::move(where);
-  }
-}
-
-void code_contractst::replace_history_parameter(
-  exprt &expr,
-  std::map<exprt, exprt> &parameter2history,
-  source_locationt location,
-  const irep_idt &mode,
-  goto_programt &history,
-  const irep_idt &id)
-{
-  for(auto &op : expr.operands())
-  {
-    replace_history_parameter(
-      op, parameter2history, location, mode, history, id);
-  }
-
-  if(expr.id() == ID_old || expr.id() == ID_loop_entry)
-  {
-    const auto &parameter = to_history_expr(expr, id).expression();
-
-    const auto &id = parameter.id();
-    if(
-      id == ID_dereference || id == ID_member || id == ID_symbol ||
-      id == ID_ptrmember || id == ID_constant || id == ID_typecast ||
-      id == ID_index)
-    {
-      auto it = parameter2history.find(parameter);
-
-      if(it == parameter2history.end())
-      {
-        // 0. Create a skip target to jump to, if the parameter is invalid
-        goto_programt skip_program;
-        const auto skip_target =
-          skip_program.add(goto_programt::make_skip(location));
-
-        // 1. Create a temporary symbol expression that represents the
-        // history variable
-        symbol_exprt tmp_symbol =
-          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
-            .symbol_expr();
-
-        // 2. Associate the above temporary variable to it's corresponding
-        // expression
-        parameter2history[parameter] = tmp_symbol;
-
-        // 3. Add the required instructions to the instructions list
-        // 3.1. Declare the newly created temporary variable
-        history.add(goto_programt::make_decl(tmp_symbol, location));
-
-        // 3.2. Skip storing the history if the expression is invalid
-        history.add(goto_programt::make_goto(
-          skip_target,
-          not_exprt{all_dereferences_are_valid(parameter, ns)},
-          location));
-
-        // 3.3. Add an assignment such that the value pointed to by the new
-        // temporary variable is equal to the value of the corresponding
-        // parameter
-        history.add(
-          goto_programt::make_assignment(tmp_symbol, parameter, location));
-
-        // 3.4. Add a skip target
-        history.destructive_append(skip_program);
-      }
-
-      expr = parameter2history[parameter];
-    }
-    else
-    {
-      log.error() << "Tracking history of " << parameter.id()
-                  << " expressions is not supported yet." << messaget::eom;
-      throw 0;
-    }
-  }
-}
-
-void code_contractst::generate_history_variables_initialization(
-  exprt &clause,
-  const irep_idt &mode,
-  goto_programt &program)
-{
-  std::map<exprt, exprt> parameter2history;
-  goto_programt history;
-  // Find and replace "old" expression in the "expression" variable
-  replace_history_parameter(
-    clause, parameter2history, clause.source_location(), mode, history, ID_old);
-  // Add all the history variable initialization instructions
-  program.destructive_append(history);
-}
-
 /// This function generates instructions for all contract constraint, i.e.,
 /// assumptions and assertions based on requires and ensures clauses.
 static void generate_contract_constraints(
-  code_contractst &contract,
+  symbol_tablet &symbol_table,
+  goto_convertt &converter,
   exprt &instantiated_clause,
   const irep_idt &mode,
   const std::function<void(goto_programt &)> &is_fresh_update,
@@ -658,19 +501,17 @@ static void generate_contract_constraints(
     has_subexpr(instantiated_clause, ID_exists) ||
     has_subexpr(instantiated_clause, ID_forall))
   {
-    contract.add_quantified_variable(instantiated_clause, mode);
+    add_quantified_variable(symbol_table, instantiated_clause, mode);
   }
 
   goto_programt constraint;
   if(location.get_property_class() == ID_assume)
   {
-    contract.get_converter().goto_convert(
-      code_assumet(instantiated_clause), constraint, mode);
+    converter.goto_convert(code_assumet(instantiated_clause), constraint, mode);
   }
   else
   {
-    contract.get_converter().goto_convert(
-      code_assertt(instantiated_clause), constraint, mode);
+    converter.goto_convert(code_assertt(instantiated_clause), constraint, mode);
   }
   constraint.instructions.back().source_location_nonconst() = location;
   is_fresh_update(constraint);
@@ -804,7 +645,8 @@ void code_contractst::apply_function_contract(
                             .append(function.c_str()));
     _location.set_property_class(ID_precondition);
     generate_contract_constraints(
-      *this,
+      symbol_table,
+      converter,
       instantiated_clause,
       mode,
       [&is_fresh](goto_programt &requires) {
@@ -833,7 +675,7 @@ void code_contractst::apply_function_contract(
       to_lambda_expr(clause).application(instantiation_values);
     instantiated_clause.add_source_location() = clause.source_location();
     generate_history_variables_initialization(
-      instantiated_clause, mode, new_program);
+      symbol_table, instantiated_clause, mode, new_program);
     instantiated_ensures_clauses.push_back(instantiated_clause);
   }
 
@@ -893,7 +735,8 @@ void code_contractst::apply_function_contract(
     _location.set_comment("Assume ensures clause");
     _location.set_property_class(ID_assume);
     generate_contract_constraints(
-      *this,
+      symbol_table,
+      converter,
       clause,
       mode,
       [&is_fresh](goto_programt &ensures) { is_fresh.update_ensures(ensures); },
@@ -1473,7 +1316,8 @@ void code_contractst::add_contract_check(
     _location.set_comment("Assume requires clause");
     _location.set_property_class(ID_assume);
     generate_contract_constraints(
-      *this,
+      symbol_table,
+      converter,
       instantiated_clause,
       function_symbol.mode,
       [&visitor](goto_programt &requires) {
@@ -1491,7 +1335,7 @@ void code_contractst::add_contract_check(
       to_lambda_expr(clause).application(instantiation_values);
     instantiated_clause.add_source_location() = clause.source_location();
     generate_history_variables_initialization(
-      instantiated_clause, function_symbol.mode, check);
+      symbol_table, instantiated_clause, function_symbol.mode, check);
     instantiated_ensures_clauses.push_back(instantiated_clause);
   }
 
@@ -1515,7 +1359,8 @@ void code_contractst::add_contract_check(
     _location.set_comment("Check ensures clause");
     _location.set_property_class(ID_postcondition);
     generate_contract_constraints(
-      *this,
+      symbol_table,
+      converter,
       clause,
       function_symbol.mode,
       [&visitor](goto_programt &ensures) { visitor.update_ensures(ensures); },

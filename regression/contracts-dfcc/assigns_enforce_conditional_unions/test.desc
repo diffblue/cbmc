@@ -1,0 +1,17 @@
+CORE
+main.c
+--dfcc main --enforce-contract update _ --pointer-check --pointer-overflow-check --signed-overflow-check --unsigned-overflow-check --conversion-check
+^\[is_high_level.assigns.\d+\] line 52 Check that latch is assignable: SUCCESS$
+^\[is_high_level.assigns.\d+\] line 53 Check that once is assignable: SUCCESS$
+^\[update.assigns.\d+\] line 87 Check that state->digest.high_level.first.ctx->flags is assignable: SUCCESS$
+^\[update.assigns.\d+\] line 93 Check that state->digest.high_level.second.ctx->flags is assignable: SUCCESS$
+^\[update.assigns.\d+\] line 98 Check that state->digest.high_level.second.ctx->flags is assignable: FAILURE$
+^\[update.assigns.\d+\] line 103 Check that state->digest.high_level.first.ctx->flags is assignable: FAILURE$
+^\[update.assigns.\d+\] line 107 Check that state->digest.high_level.second.ctx->flags is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Tests that conditional assignments to whole objects and lvalues are supported,
+when conditions determine how to interpret a union type.

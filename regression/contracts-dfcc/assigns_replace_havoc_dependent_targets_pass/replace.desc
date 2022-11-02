@@ -1,0 +1,12 @@
+CORE
+main_replace.c
+--dfcc main --replace-call-with-contract resize_vec --enforce-contract resize_vec_incr10 _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
+^\[resize_vec.assigns.\d+\].*Check that the assigns clause of contract::resize_vec is included in the caller's assigns clause: SUCCESS$
+^\[resize_vec.frees.\d+\].*Check that the frees clause of contract::resize_vec is included in the caller's frees clause: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Shows that we can successfully check that the assigns and frees clause of
+a callee (resize_vec) are included in the caller's (resize_vec_incr10).

@@ -10,15 +10,18 @@ Date: September 2021
 
 #include "utils.h"
 
-#include <goto-programs/cfg.h>
-
+#include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
+#include <util/mathematical_expr.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 
+#include <goto-programs/cfg.h>
+
+#include <ansi-c/c_expr.h>
 #include <langapi/language_util.h>
 
 static void append_safe_havoc_code_for_expr(
@@ -267,4 +270,174 @@ void widen_assigns(assignst &assigns)
       result.emplace(e);
   }
   assigns = result;
+}
+
+void add_quantified_variable(
+  symbol_tablet &symbol_table,
+  exprt &expression,
+  const irep_idt &mode)
+{
+  if(expression.id() == ID_not || expression.id() == ID_typecast)
+  {
+    // For unary connectives, recursively check for
+    // nested quantified formulae in the term
+    auto &unary_expression = to_unary_expr(expression);
+    add_quantified_variable(symbol_table, unary_expression.op(), mode);
+  }
+  if(expression.id() == ID_notequal || expression.id() == ID_implies)
+  {
+    // For binary connectives, recursively check for
+    // nested quantified formulae in the left and right terms
+    auto &binary_expression = to_binary_expr(expression);
+    add_quantified_variable(symbol_table, binary_expression.lhs(), mode);
+    add_quantified_variable(symbol_table, binary_expression.rhs(), mode);
+  }
+  if(expression.id() == ID_if)
+  {
+    // For ternary connectives, recursively check for
+    // nested quantified formulae in all three terms
+    auto &if_expression = to_if_expr(expression);
+    add_quantified_variable(symbol_table, if_expression.cond(), mode);
+    add_quantified_variable(symbol_table, if_expression.true_case(), mode);
+    add_quantified_variable(symbol_table, if_expression.false_case(), mode);
+  }
+  if(expression.id() == ID_and || expression.id() == ID_or)
+  {
+    // For multi-ary connectives, recursively check for
+    // nested quantified formulae in all terms
+    auto &multi_ary_expression = to_multi_ary_expr(expression);
+    for(auto &operand : multi_ary_expression.operands())
+    {
+      add_quantified_variable(symbol_table, operand, mode);
+    }
+  }
+  else if(expression.id() == ID_exists || expression.id() == ID_forall)
+  {
+    // When a quantifier expression is found, create a fresh symbol for each
+    // quantified variable and rewrite the expression to use those fresh
+    // symbols.
+    auto &quantifier_expression = to_quantifier_expr(expression);
+    std::vector<symbol_exprt> fresh_variables;
+    fresh_variables.reserve(quantifier_expression.variables().size());
+    for(const auto &quantified_variable : quantifier_expression.variables())
+    {
+      // 1. create fresh symbol
+      symbolt new_symbol = new_tmp_symbol(
+        quantified_variable.type(),
+        quantified_variable.source_location(),
+        mode,
+        symbol_table);
+
+      // 2. add created fresh symbol to expression map
+      fresh_variables.push_back(new_symbol.symbol_expr());
+    }
+
+    // use fresh symbols
+    exprt where = quantifier_expression.instantiate(fresh_variables);
+
+    // recursively check for nested quantified formulae
+    add_quantified_variable(symbol_table, where, mode);
+
+    // replace previous variables and body
+    quantifier_expression.variables() = fresh_variables;
+    quantifier_expression.where() = std::move(where);
+  }
+}
+
+void replace_history_parameter(
+  symbol_tablet &symbol_table,
+  exprt &expr,
+  std::map<exprt, exprt> &parameter2history,
+  source_locationt location,
+  const irep_idt &mode,
+  goto_programt &history,
+  const irep_idt &id)
+{
+  for(auto &op : expr.operands())
+  {
+    replace_history_parameter(
+      symbol_table, op, parameter2history, location, mode, history, id);
+  }
+
+  if(expr.id() == ID_old || expr.id() == ID_loop_entry)
+  {
+    const auto &parameter = to_history_expr(expr, id).expression();
+
+    const auto &id = parameter.id();
+    if(
+      id == ID_dereference || id == ID_member || id == ID_symbol ||
+      id == ID_ptrmember || id == ID_constant || id == ID_typecast ||
+      id == ID_index)
+    {
+      auto it = parameter2history.find(parameter);
+
+      if(it == parameter2history.end())
+      {
+        // 0. Create a skip target to jump to, if the parameter is invalid
+        goto_programt skip_program;
+        const auto skip_target =
+          skip_program.add(goto_programt::make_skip(location));
+
+        // 1. Create a temporary symbol expression that represents the
+        // history variable
+        symbol_exprt tmp_symbol =
+          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
+            .symbol_expr();
+
+        // 2. Associate the above temporary variable to it's corresponding
+        // expression
+        parameter2history[parameter] = tmp_symbol;
+
+        // 3. Add the required instructions to the instructions list
+        // 3.1. Declare the newly created temporary variable
+        history.add(goto_programt::make_decl(tmp_symbol, location));
+
+        // 3.2. Skip storing the history if the expression is invalid
+        history.add(goto_programt::make_goto(
+          skip_target,
+          not_exprt{
+            all_dereferences_are_valid(parameter, namespacet(symbol_table))},
+          location));
+
+        // 3.3. Add an assignment such that the value pointed to by the new
+        // temporary variable is equal to the value of the corresponding
+        // parameter
+        history.add(
+          goto_programt::make_assignment(tmp_symbol, parameter, location));
+
+        // 3.4. Add a skip target
+        history.destructive_append(skip_program);
+      }
+
+      expr = parameter2history[parameter];
+    }
+    else
+    {
+      throw invalid_source_file_exceptiont(
+        "Tracking history of " + id2string(parameter.id()) +
+          " expressions is not supported yet.",
+        expr.source_location());
+    }
+  }
+}
+
+void generate_history_variables_initialization(
+  symbol_tablet &symbol_table,
+  exprt &clause,
+  const irep_idt &mode,
+  goto_programt &program)
+{
+  std::map<exprt, exprt> parameter2history;
+  goto_programt history;
+  // Find and replace "old" expression in the "expression" variable
+  replace_history_parameter(
+    symbol_table,
+    clause,
+    parameter2history,
+    clause.source_location(),
+    mode,
+    history,
+    ID_old);
+  // Add all the history variable initialization instructions
+  program.destructive_append(history);
 }

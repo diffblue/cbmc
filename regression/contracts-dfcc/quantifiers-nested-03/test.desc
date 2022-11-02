@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract f1
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test case checks the handling of an exists expression
+nested within a conjunction.

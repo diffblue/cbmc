@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --enforce-contract f
+^\[f.assigns.\d+\] .* Check that a is assignable: SUCCESS$
+^\[f.postcondition.\d+\] .* Check ensures clause of contract contract::f for function f: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that locally declared static variables are automatically
+added to the write set of a function, and illustrates how the local static `a`
+defined in `f` can be referred to in contract clauses using
+__CPROVER_ID "f::1::a" to express state invariants and state transitions.

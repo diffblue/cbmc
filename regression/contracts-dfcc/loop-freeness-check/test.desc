@@ -1,0 +1,13 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.assigns.\d+\].*Check that i is assignable: SUCCESS$
+^\[foo.assigns.\d+\].*Check that arr\[\(.*\)i\] is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that program with loops can be instrumented and that
+loops can be automatically unwound by cbmc in a second step, with the
+instrumentation scaling automatically.

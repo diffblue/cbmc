@@ -1,0 +1,8 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo9 _ --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Checks whether CBMC parses correctly all standard cases for assigns clauses.

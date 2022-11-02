@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract f
+^\[.*\].*No recursive call to function f when checking contract f: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that when checking a contract against a function using
+--enforce-contract, if the function is recursive then the verification fails.
+The switch --enforce-contract-rec needs to be used instead.

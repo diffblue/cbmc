@@ -1,0 +1,14 @@
+CORE
+main_bar.c
+--dfcc main --enforce-contract bar
+^\[bar.postcondition.\d+\].*Check ensures clause of contract contract::bar for function bar: SUCCESS$
+^\[bar.assertion.\d+\].*x is r_ok: SUCCESS$
+^\[bar.assigns.\d+\].*Check that \*x is assignable: SUCCESS$
+^\[bar.assertion.\d+\].*deref x is r_ok: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that bar satisfies its contract (bar gets replaced by its contract
+test-foo.desc).

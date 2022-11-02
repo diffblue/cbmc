@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion foo\(\&n\) != 15: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Check whether CBMC doesn't crash when enforcing trivial contracts, i.e.,
+the postcondition is true (default when missing) and therefore there is
+nothing to check/assert.

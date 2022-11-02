@@ -1,0 +1,11 @@
+CORE
+main_even.c
+--dfcc main --enforce-contract even
+^\[.*\].*No recursive call to function even when checking contract even: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Must fails because even calls itself through odd and the recursive call is not
+handled when using --enforce-contract (--enforce-contract-rec must be used).

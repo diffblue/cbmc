@@ -1,0 +1,19 @@
+CORE
+main_foo.c
+--dfcc main --enforce-contract foo --replace-call-with-contract bar
+^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^\[foo.assertion.\d+\].*x1 r_ok: SUCCESS$
+^\[foo.assertion.\d+\].*x2 r_ok: SUCCESS$
+^\[foo.assertion.\d+\].*deref x2 r_ok: SUCCESS$
+^\[foo.assertion.\d+\].*deref x2 r_ok: SUCCESS$
+^\[foo.assertion.\d+\].*x2 updated: SUCCESS$
+^\[bar.precondition.\d+\].*Check requires clause of contract contract::bar for function bar: SUCCESS$
+^\[bar.assigns.\d+\].*Check that the assigns clause of contract::bar is included in the caller's assigns clause: SUCCESS$
+^\[bar.frees.\d+\].*Check that the frees clause of contract::bar is included in the caller's frees clause: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that __CPROVER_is_fresh assumed as postconditions in the contract of bar
+allows to satisfy the __CPROVER_is_fresh post condition of foo.

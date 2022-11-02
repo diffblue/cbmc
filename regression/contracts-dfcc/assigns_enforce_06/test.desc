@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract f
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that verification succeeds when functions
+are called from within a loop.

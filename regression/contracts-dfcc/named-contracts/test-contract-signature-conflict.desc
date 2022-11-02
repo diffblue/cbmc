@@ -1,0 +1,10 @@
+CORE
+main-contract-signature-conflict.c
+--dfcc main --enforce-contract foo
+^.*function 'foo' and the corresponding pure contract symbol 'contract::foo' have incompatible type signatures.*$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+This test checks that contracts on function declarations with a matching name
+but different type are rejected.

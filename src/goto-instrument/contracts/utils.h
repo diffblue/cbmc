@@ -187,4 +187,32 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
 /// *(b+i) when `i` is a known constant, keep the expression in the result.
 void widen_assigns(assignst &assigns);
 
+/// This function recursively searches \p expression to find nested or
+/// non-nested quantified expressions. When a quantified expression is found,
+/// a fresh quantified variable is added to the symbol table and \p expression
+/// is updated to use this fresh variable.
+void add_quantified_variable(
+  symbol_tablet &symbol_table,
+  exprt &expression,
+  const irep_idt &mode);
+
+/// This function recursively identifies the "old" expressions within expr
+/// and replaces them with correspoding history variables.
+void replace_history_parameter(
+  symbol_tablet &symbol_table,
+  exprt &expr,
+  std::map<exprt, exprt> &parameter2history,
+  source_locationt location,
+  const irep_idt &mode,
+  goto_programt &history,
+  const irep_idt &id);
+
+/// This function generates all the instructions required to initialize
+/// history variables.
+void generate_history_variables_initialization(
+  symbol_tablet &symbol_table,
+  exprt &clause,
+  const irep_idt &mode,
+  goto_programt &program);
+
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

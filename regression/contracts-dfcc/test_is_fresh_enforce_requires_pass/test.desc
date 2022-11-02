@@ -1,0 +1,16 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.assertion.\d+\].*in1 is rw_ok: SUCCESS$
+^\[foo.assertion.\d+\].*in2 is rw_ok: SUCCESS$
+^\[foo.assertion.\d+\].*in1 and in2 do not alias: SUCCESS$
+^\[foo.assertion.\d+\].*in1 is zero: SUCCESS$
+^\[foo.assertion.\d+\].*in2 is zero: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that using __CPROVER_is_fresh in preconditions when checking
+a contract will effectively allocate fresh and distinct objects.
+The rw_ok and sepatation checks are done using assertions inside the function.

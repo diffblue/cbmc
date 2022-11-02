@@ -1157,9 +1157,72 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
   }
 
+  bool use_dfcc = cmdline.isset(FLAG_DFCC);
+  if(use_dfcc)
+  {
+    if(cmdline.get_values(FLAG_DFCC).size() != 1)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Redundant options detected",
+        "--" FLAG_DFCC,
+        "Use a single " FLAG_DFCC " option");
+    }
+
+    if(cmdline.isset(FLAG_LOOP_CONTRACTS))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Incompatible options detected",
+        "--" FLAG_DFCC " and --" FLAG_LOOP_CONTRACTS,
+        "Use either --" FLAG_DFCC " or --" FLAG_LOOP_CONTRACTS);
+    }
+
+    do_indirect_call_and_rtti_removal();
+
+    const irep_idt harness_id(cmdline.get_value(FLAG_DFCC));
+
+    std::set<irep_idt> to_replace(
+      cmdline.get_values(FLAG_REPLACE_CALL).begin(),
+      cmdline.get_values(FLAG_REPLACE_CALL).end());
+
+    if(
+      !cmdline.get_values(FLAG_ENFORCE_CONTRACT).empty() &&
+      !cmdline.get_values(FLAG_ENFORCE_CONTRACT_REC).empty())
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Mutually exclusive options detected",
+        "--" FLAG_ENFORCE_CONTRACT " and --" FLAG_ENFORCE_CONTRACT_REC
+        "Use either --" FLAG_ENFORCE_CONTRACT
+        " or --" FLAG_ENFORCE_CONTRACT_REC);
+    }
+
+    auto &to_enforce = !cmdline.get_values(FLAG_ENFORCE_CONTRACT_REC).empty()
+                         ? cmdline.get_values(FLAG_ENFORCE_CONTRACT_REC)
+                         : cmdline.get_values(FLAG_ENFORCE_CONTRACT);
+
+    bool allow_recursive_calls =
+      !cmdline.get_values(FLAG_ENFORCE_CONTRACT_REC).empty();
+
+    std::set<std::string> to_exclude_from_nondet_static(
+      cmdline.get_values("nondet-static-exclude").begin(),
+      cmdline.get_values("nondet-static-exclude").end());
+
+    dfcc(
+      options,
+      goto_model,
+      harness_id,
+      to_enforce.empty() ? optionalt<irep_idt>{}
+                         : optionalt<irep_idt>{to_enforce.front()},
+      allow_recursive_calls,
+      to_replace,
+      false,
+      to_exclude_from_nondet_static,
+      log.get_message_handler());
+  }
+
   if(
-    cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
-    cmdline.isset(FLAG_ENFORCE_CONTRACT))
+    !use_dfcc &&
+    (cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
+     cmdline.isset(FLAG_ENFORCE_CONTRACT)))
   {
     do_indirect_call_and_rtti_removal();
     code_contractst contracts(goto_model, log);
@@ -1911,10 +1974,12 @@ void goto_instrument_parse_optionst::help()
     "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
     "\n"
     "Code contracts:\n"
+    HELP_DFCC
     HELP_LOOP_CONTRACTS
     HELP_LOOP_INVARIANT_SYNTHESIZER
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
+    HELP_ENFORCE_CONTRACT_REC
     "\n"
     "User-interface options:\n"
     HELP_FLUSH
