@@ -133,133 +133,136 @@ $(document).ready(function(){initNavTree('goto__instrument__parse__options_8h_so
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="unwindset_8h.html">unwindset.h</a>&quot;</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="contracts_8h.html">contracts/contracts.h</a>&quot;</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="enumerative__loop__invariant__synthesizer_8h.html">synthesizer/enumerative_loop_invariant_synthesizer.h</a>&quot;</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="weak__memory_8h.html">wmm/weak_memory.h</a>&quot;</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6">   48</a></span>&#160;<span class="preprocessor">#define GOTO_INSTRUMENT_OPTIONS \</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">  OPT_DOCUMENT_PROPERTIES \</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">  OPT_DUMP_C \</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">  &quot;(dot)(xml)&quot; \</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">  OPT_GOTO_CHECK \</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">  OPT_REMOVE_POINTERS \</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">  &quot;(no-simplify)&quot; \</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">  OPT_UNINITIALIZED_CHECK \</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">  OPT_WMM \</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">  &quot;(race-check)&quot; \</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">  OPT_UNWINDSET \</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">  &quot;(unwindset-file):&quot; \</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">  &quot;(unwinding-assertions)(partial-loops)(continue-as-loops)&quot; \</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">  &quot;(log):&quot; \</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">  &quot;(call-graph)(reachable-call-graph)&quot; \</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">  OPT_INSERT_FINAL_ASSERT_FALSE \</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">  OPT_SHOW_CLASS_HIERARCHY \</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">  &quot;(isr):&quot; \</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">  &quot;(stack-depth):(nondet-static)&quot; \</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">  &quot;(nondet-static-exclude):&quot; \</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">  &quot;(function-enter):(function-exit):(branch):&quot; \</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">  OPT_SHOW_GOTO_FUNCTIONS \</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">  OPT_SHOW_PROPERTIES \</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">  &quot;(drop-unused-functions)&quot; \</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">  &quot;(show-value-sets)&quot; \</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">  &quot;(show-global-may-alias)&quot; \</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">  &quot;(show-local-bitvector-analysis)(show-custom-bitvector-analysis)&quot; \</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">  &quot;(show-escape-analysis)(escape-analysis)&quot; \</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">  &quot;(custom-bitvector-analysis)&quot; \</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">  &quot;(show-struct-alignment)(interval-analysis)(show-intervals)&quot; \</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">  &quot;(show-uninitialized)(show-locations)&quot; \</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">  &quot;(full-slice)(reachability-slice)(slice-global-inits)&quot; \</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">  &quot;(fp-reachability-slice):&quot; \</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">  &quot;(inline)(partial-inline)(function-inline):(log):(no-caching)&quot; \</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">  &quot;(value-set-fi-fp-removal)&quot; \</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">  OPT_REMOVE_CONST_FUNCTION_POINTERS \</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">  &quot;(print-internal-representation)&quot; \</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">  &quot;(remove-function-pointers)&quot; \</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">  &quot;(show-claims)(property):&quot; \</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">  &quot;(show-symbol-table)(show-points-to)(show-rw-set)&quot; \</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">  OPT_TIMESTAMP \</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">  &quot;(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)&quot; \</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">  &quot;(verbosity):(version)(xml-ui)(json-ui)&quot; \</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">  &quot;(accelerate)(constant-propagator)&quot; \</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">  &quot;(k-induction):(step-case)(base-case)&quot; \</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">  &quot;(show-call-sequences)(check-call-sequence)&quot; \</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">  &quot;(interpreter)(show-reaching-definitions)&quot; \</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">  &quot;(list-symbols)(list-undefined-functions)&quot; \</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">  &quot;(z3)(add-library)(show-dependence-graph)&quot; \</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">  &quot;(horn)(skip-loops):(model-argc-argv):&quot; \</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">  &quot;(&quot; FLAG_LOOP_CONTRACTS &quot;)&quot; \</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">  &quot;(&quot; FLAG_REPLACE_CALL &quot;):&quot; \</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">  &quot;(&quot; FLAG_ENFORCE_CONTRACT &quot;):&quot; \</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">  &quot;(show-threaded)(list-calls-args)&quot; \</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">  &quot;(undefined-function-is-assume-false)&quot; \</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">  &quot;(remove-function-body):&quot;\</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">  OPT_AGGRESSIVE_SLICER \</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">  OPT_FLUSH \</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">  &quot;(splice-call):&quot; \</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">  OPT_REMOVE_CALLS_NO_BODY \</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">  OPT_REPLACE_FUNCTION_BODY \</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">  OPT_GOTO_PROGRAM_STATS \</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">  &quot;(show-local-safe-pointers)(show-safe-dereferences)&quot; \</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">  &quot;(show-sese-regions)&quot; \</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">  OPT_REPLACE_CALLS \</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">  &quot;(validate-goto-binary)&quot; \</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">  OPT_VALIDATE \</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">  OPT_ANSI_C_LANGUAGE \</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">  OPT_RESTRICT_FUNCTION_POINTER \</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">  OPT_NONDET_VOLATILE \</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">  &quot;(ensure-one-backedge-per-target)&quot; \</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">  OPT_CONFIG_LIBRARY \</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">  OPT_SYNTHESIZE_LOOP_INVARIANTS \</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">  // empty last line</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html">  125</a></span>&#160;<span class="keyword">class </span><a class="code" href="classgoto__instrument__parse__optionst.html">goto_instrument_parse_optionst</a> : <span class="keyword">public</span> <a class="code" href="classparse__options__baset.html">parse_options_baset</a></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classgoto__instrument__parse__optionst.html#af8821207915bba43813f040f8266aeba">doit</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a31d2fa12cad08c7e791d509503123fa9">help</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#aecd92189d8b3d526c389240ff2492124">  131</a></span>&#160;  <a class="code" href="classgoto__instrument__parse__optionst.html#aecd92189d8b3d526c389240ff2492124">goto_instrument_parse_optionst</a>(<span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> **argv)</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    : <a class="code" href="classparse__options__baset.html">parse_options_baset</a>(</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <a class="code" href="goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6">GOTO_INSTRUMENT_OPTIONS</a>,</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        argc,</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        argv,</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="stringliteral">&quot;goto-instrument&quot;</span>),</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <a class="code" href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">function_pointer_removal_done</a>(false),</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <a class="code" href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">partial_inlining_done</a>(false),</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <a class="code" href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">remove_returns_done</a>(false)</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  }</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a0794bec370e42758b4225358ceb271d3">register_languages</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="dfcc_8h.html">contracts/dynamic-frames/dfcc.h</a>&quot;</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="enumerative__loop__invariant__synthesizer_8h.html">synthesizer/enumerative_loop_invariant_synthesizer.h</a>&quot;</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="weak__memory_8h.html">wmm/weak_memory.h</a>&quot;</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">// clang-format off</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6">   49</a></span>&#160;<span class="preprocessor">#define GOTO_INSTRUMENT_OPTIONS \</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">  OPT_DOCUMENT_PROPERTIES \</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">  OPT_DUMP_C \</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">  &quot;(dot)(xml)&quot; \</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">  OPT_GOTO_CHECK \</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">  OPT_REMOVE_POINTERS \</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">  &quot;(no-simplify)&quot; \</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">  OPT_UNINITIALIZED_CHECK \</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">  OPT_WMM \</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">  &quot;(race-check)&quot; \</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">  OPT_UNWINDSET \</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">  &quot;(unwindset-file):&quot; \</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">  &quot;(unwinding-assertions)(partial-loops)(continue-as-loops)&quot; \</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">  &quot;(log):&quot; \</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">  &quot;(call-graph)(reachable-call-graph)&quot; \</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">  OPT_INSERT_FINAL_ASSERT_FALSE \</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">  OPT_SHOW_CLASS_HIERARCHY \</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">  &quot;(isr):&quot; \</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">  &quot;(stack-depth):(nondet-static)&quot; \</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">  &quot;(nondet-static-exclude):&quot; \</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">  &quot;(function-enter):(function-exit):(branch):&quot; \</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">  OPT_SHOW_GOTO_FUNCTIONS \</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">  OPT_SHOW_PROPERTIES \</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">  &quot;(drop-unused-functions)&quot; \</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">  &quot;(show-value-sets)&quot; \</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">  &quot;(show-global-may-alias)&quot; \</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">  &quot;(show-local-bitvector-analysis)(show-custom-bitvector-analysis)&quot; \</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">  &quot;(show-escape-analysis)(escape-analysis)&quot; \</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">  &quot;(custom-bitvector-analysis)&quot; \</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">  &quot;(show-struct-alignment)(interval-analysis)(show-intervals)&quot; \</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">  &quot;(show-uninitialized)(show-locations)&quot; \</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">  &quot;(full-slice)(reachability-slice)(slice-global-inits)&quot; \</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">  &quot;(fp-reachability-slice):&quot; \</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">  &quot;(inline)(partial-inline)(function-inline):(log):(no-caching)&quot; \</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">  &quot;(value-set-fi-fp-removal)&quot; \</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">  OPT_REMOVE_CONST_FUNCTION_POINTERS \</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">  &quot;(print-internal-representation)&quot; \</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">  &quot;(remove-function-pointers)&quot; \</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">  &quot;(show-claims)(property):&quot; \</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">  &quot;(show-symbol-table)(show-points-to)(show-rw-set)&quot; \</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">  OPT_TIMESTAMP \</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">  &quot;(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)&quot; \</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">  &quot;(verbosity):(version)(xml-ui)(json-ui)&quot; \</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">  &quot;(accelerate)(constant-propagator)&quot; \</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">  &quot;(k-induction):(step-case)(base-case)&quot; \</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">  &quot;(show-call-sequences)(check-call-sequence)&quot; \</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">  &quot;(interpreter)(show-reaching-definitions)&quot; \</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">  &quot;(list-symbols)(list-undefined-functions)&quot; \</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">  &quot;(z3)(add-library)(show-dependence-graph)&quot; \</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">  &quot;(horn)(skip-loops):(model-argc-argv):&quot; \</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">  OPT_DFCC \</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">  &quot;(&quot; FLAG_LOOP_CONTRACTS &quot;)&quot; \</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">  &quot;(&quot; FLAG_REPLACE_CALL &quot;):&quot; \</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">  &quot;(&quot; FLAG_ENFORCE_CONTRACT &quot;):&quot; \</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">  OPT_ENFORCE_CONTRACT_REC \</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">  &quot;(show-threaded)(list-calls-args)&quot; \</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">  &quot;(undefined-function-is-assume-false)&quot; \</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">  &quot;(remove-function-body):&quot;\</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">  OPT_AGGRESSIVE_SLICER \</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">  OPT_FLUSH \</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">  &quot;(splice-call):&quot; \</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">  OPT_REMOVE_CALLS_NO_BODY \</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">  OPT_REPLACE_FUNCTION_BODY \</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">  OPT_GOTO_PROGRAM_STATS \</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">  &quot;(show-local-safe-pointers)(show-safe-dereferences)&quot; \</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">  &quot;(show-sese-regions)&quot; \</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">  OPT_REPLACE_CALLS \</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">  &quot;(validate-goto-binary)&quot; \</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">  OPT_VALIDATE \</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">  OPT_ANSI_C_LANGUAGE \</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">  OPT_RESTRICT_FUNCTION_POINTER \</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">  OPT_NONDET_VOLATILE \</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">  &quot;(ensure-one-backedge-per-target)&quot; \</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">  OPT_CONFIG_LIBRARY \</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">  OPT_SYNTHESIZE_LOOP_INVARIANTS \</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">  // empty last line</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">// clang-format on</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html">  128</a></span>&#160;<span class="keyword">class </span><a class="code" href="classgoto__instrument__parse__optionst.html">goto_instrument_parse_optionst</a> : <span class="keyword">public</span> <a class="code" href="classparse__options__baset.html">parse_options_baset</a></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;{</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classgoto__instrument__parse__optionst.html#af8821207915bba43813f040f8266aeba">doit</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a31d2fa12cad08c7e791d509503123fa9">help</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#aecd92189d8b3d526c389240ff2492124">  134</a></span>&#160;  <a class="code" href="classgoto__instrument__parse__optionst.html#aecd92189d8b3d526c389240ff2492124">goto_instrument_parse_optionst</a>(<span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> **argv)</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    : <a class="code" href="classparse__options__baset.html">parse_options_baset</a>(</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <a class="code" href="goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6">GOTO_INSTRUMENT_OPTIONS</a>,</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        argc,</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        argv,</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="stringliteral">&quot;goto-instrument&quot;</span>),</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <a class="code" href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">function_pointer_removal_done</a>(false),</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <a class="code" href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">partial_inlining_done</a>(false),</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      <a class="code" href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">remove_returns_done</a>(false)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  }</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a9678503a80fbb133d42af370c48f478c">get_goto_program</a>();</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a43c9c8d025999c4578038501c6d011b5">instrument_goto_program</a>();</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a0794bec370e42758b4225358ceb271d3">register_languages</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a475905940982c1d56e52f2696d2a58a9">do_indirect_call_and_rtti_removal</a>(<span class="keywordtype">bool</span> force=<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#ab5812bfc716478537d46f6efc52bbed4">do_remove_const_function_pointers_only</a>();</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#aa6f11c3ae4603fef4550b810982759fb">do_partial_inlining</a>();</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#ad1a8d6841692c6af9477017258199b33">do_remove_returns</a>();</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">  154</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">function_pointer_removal_done</a>;</div>
-<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">  155</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">partial_inlining_done</a>;</div>
-<div class="line"><a name="l00156"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">  156</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">remove_returns_done</a>;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a2faba2ccf0daabde929add988f549d88">  158</a></span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> <a class="code" href="classgoto__instrument__parse__optionst.html#a2faba2ccf0daabde929add988f549d88">goto_model</a>;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;};</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a9678503a80fbb133d42af370c48f478c">get_goto_program</a>();</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a43c9c8d025999c4578038501c6d011b5">instrument_goto_program</a>();</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a475905940982c1d56e52f2696d2a58a9">do_indirect_call_and_rtti_removal</a>(<span class="keywordtype">bool</span> force=<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#ab5812bfc716478537d46f6efc52bbed4">do_remove_const_function_pointers_only</a>();</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#aa6f11c3ae4603fef4550b810982759fb">do_partial_inlining</a>();</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classgoto__instrument__parse__optionst.html#ad1a8d6841692c6af9477017258199b33">do_remove_returns</a>();</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">  157</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">function_pointer_removal_done</a>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">  158</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">partial_inlining_done</a>;</div>
+<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">  159</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">remove_returns_done</a>;</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="preprocessor">#endif // CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="classgoto__instrument__parse__optionst.html#a2faba2ccf0daabde929add988f549d88">  161</a></span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> <a class="code" href="classgoto__instrument__parse__optionst.html#a2faba2ccf0daabde929add988f549d88">goto_model</a>;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;};</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="preprocessor">#endif // CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a31d2fa12cad08c7e791d509503123fa9"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a31d2fa12cad08c7e791d509503123fa9">goto_instrument_parse_optionst::help</a></div><div class="ttdeci">void help() override</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l01755">goto_instrument_parse_options.cpp:1755</a></div></div>
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html">goto_instrument_parse_optionst</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00125">goto_instrument_parse_options.h:125</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a31d2fa12cad08c7e791d509503123fa9"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a31d2fa12cad08c7e791d509503123fa9">goto_instrument_parse_optionst::help</a></div><div class="ttdeci">void help() override</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l01818">goto_instrument_parse_options.cpp:1818</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html">goto_instrument_parse_optionst</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00128">goto_instrument_parse_options.h:128</a></div></div>
 <div class="ttc" id="aclassparse__options__baset_html"><div class="ttname"><a href="classparse__options__baset.html">parse_options_baset</a></div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8h_source.html#l00019">parse_options.h:19</a></div></div>
 <div class="ttc" id="aclassgoto__instrument__parse__optionst_html_ad1a8d6841692c6af9477017258199b33"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#ad1a8d6841692c6af9477017258199b33">goto_instrument_parse_optionst::do_remove_returns</a></div><div class="ttdeci">void do_remove_returns()</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l00988">goto_instrument_parse_options.cpp:988</a></div></div>
 <div class="ttc" id="aclassgoto__instrument__parse__optionst_html_aa6f11c3ae4603fef4550b810982759fb"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#aa6f11c3ae4603fef4550b810982759fb">goto_instrument_parse_optionst::do_partial_inlining</a></div><div class="ttdeci">void do_partial_inlining()</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l00974">goto_instrument_parse_options.cpp:974</a></div></div>
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_aecd92189d8b3d526c389240ff2492124"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#aecd92189d8b3d526c389240ff2492124">goto_instrument_parse_optionst::goto_instrument_parse_optionst</a></div><div class="ttdeci">goto_instrument_parse_optionst(int argc, const char **argv)</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00131">goto_instrument_parse_options.h:131</a></div></div>
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a591a4c80e9c1873b8caf4bb36cd0061e"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">goto_instrument_parse_optionst::function_pointer_removal_done</a></div><div class="ttdeci">bool function_pointer_removal_done</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00154">goto_instrument_parse_options.h:154</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_aecd92189d8b3d526c389240ff2492124"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#aecd92189d8b3d526c389240ff2492124">goto_instrument_parse_optionst::goto_instrument_parse_optionst</a></div><div class="ttdeci">goto_instrument_parse_optionst(int argc, const char **argv)</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00134">goto_instrument_parse_options.h:134</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a591a4c80e9c1873b8caf4bb36cd0061e"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a591a4c80e9c1873b8caf4bb36cd0061e">goto_instrument_parse_optionst::function_pointer_removal_done</a></div><div class="ttdeci">bool function_pointer_removal_done</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00157">goto_instrument_parse_options.h:157</a></div></div>
 <div class="ttc" id="avalidation__interface_8h_html"><div class="ttname"><a href="validation__interface_8h.html">validation_interface.h</a></div></div>
 <div class="ttc" id="acount__eloc_8h_html"><div class="ttname"><a href="count__eloc_8h.html">count_eloc.h</a></div></div>
 <div class="ttc" id="agoto__check__c_8h_html"><div class="ttname"><a href="goto__check__c_8h.html">goto_check_c.h</a></div></div>
@@ -273,7 +276,7 @@ $(document).ready(function(){initNavTree('goto__instrument__parse__options_8h_so
 <div class="ttc" id="areplace__calls_8h_html"><div class="ttname"><a href="replace__calls_8h.html">replace_calls.h</a></div></div>
 <div class="ttc" id="adocument__properties_8h_html"><div class="ttname"><a href="document__properties_8h.html">document_properties.h</a></div></div>
 <div class="ttc" id="agenerate__function__bodies_8h_html"><div class="ttname"><a href="generate__function__bodies_8h.html">generate_function_bodies.h</a></div></div>
-<div class="ttc" id="agoto__instrument__parse__options_8h_html_a3fe45de7b46288d5f774d2d01873e6b6"><div class="ttname"><a href="goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6">GOTO_INSTRUMENT_OPTIONS</a></div><div class="ttdeci">#define GOTO_INSTRUMENT_OPTIONS</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00048">goto_instrument_parse_options.h:48</a></div></div>
+<div class="ttc" id="agoto__instrument__parse__options_8h_html_a3fe45de7b46288d5f774d2d01873e6b6"><div class="ttname"><a href="goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6">GOTO_INSTRUMENT_OPTIONS</a></div><div class="ttdeci">#define GOTO_INSTRUMENT_OPTIONS</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00049">goto_instrument_parse_options.h:49</a></div></div>
 <div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a475905940982c1d56e52f2696d2a58a9"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a475905940982c1d56e52f2696d2a58a9">goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal</a></div><div class="ttdeci">void do_indirect_call_and_rtti_removal(bool force=false)</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l00939">goto_instrument_parse_options.cpp:939</a></div></div>
 <div class="ttc" id="arestrict__function__pointers_8h_html"><div class="ttname"><a href="restrict__function__pointers_8h.html">restrict_function_pointers.h</a></div></div>
 <div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a9678503a80fbb133d42af370c48f478c"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a9678503a80fbb133d42af370c48f478c">goto_instrument_parse_optionst::get_goto_program</a></div><div class="ttdeci">void get_goto_program()</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l00999">goto_instrument_parse_options.cpp:999</a></div></div>
@@ -281,20 +284,21 @@ $(document).ready(function(){initNavTree('goto__instrument__parse__options_8h_so
 <div class="ttc" id="ashow__properties_8h_html"><div class="ttname"><a href="show__properties_8h.html">show_properties.h</a></div></div>
 <div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a43c9c8d025999c4578038501c6d011b5"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a43c9c8d025999c4578038501c6d011b5">goto_instrument_parse_optionst::instrument_goto_program</a></div><div class="ttdeci">void instrument_goto_program()</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8cpp_source.html#l01016">goto_instrument_parse_options.cpp:1016</a></div></div>
 <div class="ttc" id="aparse__options_8h_html"><div class="ttname"><a href="parse__options_8h.html">parse_options.h</a></div></div>
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a519daabb0890b27607a58fee25c69497"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">goto_instrument_parse_optionst::partial_inlining_done</a></div><div class="ttdeci">bool partial_inlining_done</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00155">goto_instrument_parse_options.h:155</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a519daabb0890b27607a58fee25c69497"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a519daabb0890b27607a58fee25c69497">goto_instrument_parse_optionst::partial_inlining_done</a></div><div class="ttdeci">bool partial_inlining_done</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00158">goto_instrument_parse_options.h:158</a></div></div>
 <div class="ttc" id="acontracts_8h_html"><div class="ttname"><a href="contracts_8h.html">contracts.h</a></div></div>
 <div class="ttc" id="auninitialized_8h_html"><div class="ttname"><a href="uninitialized_8h.html">uninitialized.h</a></div></div>
 <div class="ttc" id="aaggressive__slicer_8h_html"><div class="ttname"><a href="aggressive__slicer_8h.html">aggressive_slicer.h</a></div></div>
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a647c354b3eb673d99989e81b89f2850c"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">goto_instrument_parse_optionst::remove_returns_done</a></div><div class="ttdeci">bool remove_returns_done</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00156">goto_instrument_parse_options.h:156</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a647c354b3eb673d99989e81b89f2850c"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a647c354b3eb673d99989e81b89f2850c">goto_instrument_parse_optionst::remove_returns_done</a></div><div class="ttdeci">bool remove_returns_done</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00159">goto_instrument_parse_options.h:159</a></div></div>
 <div class="ttc" id="aclass__hierarchy_8h_html"><div class="ttname"><a href="class__hierarchy_8h.html">class_hierarchy.h</a></div></div>
 <div class="ttc" id="aremove__const__function__pointers_8h_html"><div class="ttname"><a href="remove__const__function__pointers_8h.html">remove_const_function_pointers.h</a></div></div>
+<div class="ttc" id="adfcc_8h_html"><div class="ttname"><a href="dfcc_8h.html">dfcc.h</a></div><div class="ttdoc">Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra...</div></div>
 <div class="ttc" id="aansi__c__language_8h_html"><div class="ttname"><a href="ansi__c__language_8h.html">ansi_c_language.h</a></div></div>
 <div class="ttc" id="aenumerative__loop__invariant__synthesizer_8h_html"><div class="ttname"><a href="enumerative__loop__invariant__synthesizer_8h.html">enumerative_loop_invariant_synthesizer.h</a></div></div>
 <div class="ttc" id="agoto__program__dereference_8h_html"><div class="ttname"><a href="goto__program__dereference_8h.html">goto_program_dereference.h</a></div></div>
 <div class="ttc" id="anondet__volatile_8h_html"><div class="ttname"><a href="nondet__volatile_8h.html">nondet_volatile.h</a></div></div>
 <div class="ttc" id="atimestamper_8h_html"><div class="ttname"><a href="timestamper_8h.html">timestamper.h</a></div><div class="ttdoc">Emit timestamps.</div></div>
 <div class="ttc" id="aconfig_8h_html"><div class="ttname"><a href="config_8h.html">config.h</a></div></div>
-<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a2faba2ccf0daabde929add988f549d88"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a2faba2ccf0daabde929add988f549d88">goto_instrument_parse_optionst::goto_model</a></div><div class="ttdeci">goto_modelt goto_model</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00158">goto_instrument_parse_options.h:158</a></div></div>
+<div class="ttc" id="aclassgoto__instrument__parse__optionst_html_a2faba2ccf0daabde929add988f549d88"><div class="ttname"><a href="classgoto__instrument__parse__optionst.html#a2faba2ccf0daabde929add988f549d88">goto_instrument_parse_optionst::goto_model</a></div><div class="ttdeci">goto_modelt goto_model</div><div class="ttdef"><b>Definition:</b> <a href="goto__instrument__parse__options_8h_source.html#l00161">goto_instrument_parse_options.h:161</a></div></div>
 <div class="ttc" id="aunwindset_8h_html"><div class="ttname"><a href="unwindset_8h.html">unwindset.h</a></div></div>
 <div class="ttc" id="adump__c_8h_html"><div class="ttname"><a href="dump__c_8h.html">dump_c.h</a></div></div>
 <div class="ttc" id="aui__message_8h_html"><div class="ttname"><a href="ui__message_8h.html">ui_message.h</a></div></div>

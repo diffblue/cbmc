@@ -12,6 +12,7 @@ var modules =
     [ "goto-checker", "group__goto-checker.html", null ],
     [ "goto-diff", "group__goto-diff.html", null ],
     [ "goto-harness", "group__goto-harness.html", null ],
+    [ "Code Contracts", "group__contracts-module.html", "group__contracts-module" ],
     [ "goto-instrument", "group__goto-instrument.html", null ],
     [ "goto-programs", "group__goto-programs.html", null ],
     [ "goto-symex", "group__goto-symex.html", null ],

@@ -144,7 +144,7 @@ Macros</h2></td></tr>
 </ol>
 <p>Formally speaking, 2, 3 and 4 are an artificial distinction as they are all really parts of the "what domain" question. However they correspond to parts of our code architecture, so ... they should stay.</p>
 <p>Ideally, the cross product of options should be supported but ... in practice there will always be ones that are not meaningful. Those should give errors. In addition there are some analyses which are currently stand alone as they don't fit directly in to this model. For example the unwind bounds analysis, which is both the task, the abstract interpreter and the output. Where possible these should be integrated / support the other options. In the case of the unwind analysis this means the domain and it's sensitivity should be configurable.</p>
-<h2><a class="anchor" id="autotoc_md102"></a>
+<h2><a class="anchor" id="autotoc_md182"></a>
 Task</h2>
 <p>Tasks are implemented by the relevant file in goto-analyze/static_*. At the moment they are each responsible for building the domain / using the other options. As much as possible of this code should be shared. Some of these inherit from messaget. They all probably should.</p>
 <p>Show : Prints out the domains for inspection or further use.</p>
@@ -152,13 +152,13 @@ Task</h2>
 reachable" (the assertion never holds), "UNKNOWN" (the assertion may or may not hold). This is implemented using domain_simplify().</p>
 <p>Simplify : Generates a new goto program with branch conditions, assertions, assumptions and assignments simplified using the information in the domain (again using domain_simplify()). This task is intended to be used as a preprocessing step for other analysis.</p>
 <p>Instrument : (Not implemented yet) Use the domains to add assume() statements to the code giving invariants generated from the domain. These assumes don't reduce the space of possible executions; they make existing invariants explicit. Again, intended as a preprocessing step.</p>
-<h2><a class="anchor" id="autotoc_md103"></a>
+<h2><a class="anchor" id="autotoc_md183"></a>
 Abstract Interpreter</h2>
 <p>This option is effectively about how we compute the fix-point(s) / which child class of <a class="el" href="classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func...">ai_baset</a> we use. I.E. ait&lt;domainT&gt; or concurrency_aware_ait&lt;domainT&gt;, etc. For migrating / refactor / unifying with the pointer analysis code we might want a location_insensitive_ait&lt;domainT&gt; or something but this is not urgent. We will need a context_aware_ait&lt;domainT&gt;.</p>
-<h2><a class="anchor" id="autotoc_md104"></a>
+<h2><a class="anchor" id="autotoc_md184"></a>
 Domain</h2>
 <p>Which child of <a class="el" href="classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type...">ai_domain_baset</a> we use to represent the abstract state at each location / implement the transformers. I expect most of these will be non-relational (i.e. an abstract object for each variable) due to the cost of implementing effective non-relational domains in this style vs. using 2LS. The exception might be equalities, which we could implement here.</p>
-<h2><a class="anchor" id="autotoc_md105"></a>
+<h2><a class="anchor" id="autotoc_md185"></a>
 Output</h2>
 <p>Text, XML, JSON plus some others for specific domains such as dependence graphs in DOT format. </p>
 

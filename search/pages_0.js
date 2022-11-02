@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['background_2dconcepts_41131',['background-concepts',['../group__module__hidden.html',1,'(Global Namespace)'],['../background-concepts.html',1,'cprover_documentation']]]
+  ['assigns_20clauses_41795',['Assigns Clauses',['../contracts-assigns.html',1,'contracts-user']]]
 ];

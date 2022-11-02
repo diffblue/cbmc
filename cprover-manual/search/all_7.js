@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['static_2dfunctions_28',['static-functions',['../md_static-functions.html',1,'']]]
+  ['static_2dfunctions_17',['static-functions',['../md_static-functions.html',1,'']]]
 ];
