@@ -107,9 +107,9 @@ $(document).ready(function(){initNavTree('classfield__sensitivityt.html',''); in
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae3e147bc0b5e8f9aa4e3b0473a0549f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#ae3e147bc0b5e8f9aa4e3b0473a0549f4">field_sensitivityt</a> (std::size_t max_array_size, bool <a class="el" href="classfield__sensitivityt.html#a191ae665484df4a4971364500152abf8">should_simplify</a>)</td></tr>
 <tr class="separator:ae3e147bc0b5e8f9aa4e3b0473a0549f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a216e3f4af2e54290ce498984033440"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#a1a216e3f4af2e54290ce498984033440">field_assignments</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classssa__exprt.html">ssa_exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;target, bool allow_pointer_unsoundness)</td></tr>
-<tr class="memdesc:a1a216e3f4af2e54290ce498984033440"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign to the individual fields of a non-expanded symbol <code>lhs</code>.  <a href="classfield__sensitivityt.html#a1a216e3f4af2e54290ce498984033440">More...</a><br /></td></tr>
-<tr class="separator:a1a216e3f4af2e54290ce498984033440"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb85cf6b9db2203521e695cc227d1435"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_assignments</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classssa__exprt.html">ssa_exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;target, bool allow_pointer_unsoundness) const</td></tr>
+<tr class="memdesc:acb85cf6b9db2203521e695cc227d1435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign to the individual fields of a non-expanded symbol <code>lhs</code>.  <a href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">More...</a><br /></td></tr>
+<tr class="separator:acb85cf6b9db2203521e695cc227d1435"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8283bec88669c814dcc228231a2fbc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classexprt.html">exprt</a> expr, bool write) const</td></tr>
 <tr class="memdesc:ab8283bec88669c814dcc228231a2fbc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn an expression <code>expr</code> into a field-sensitive SSA expression.  <a href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">More...</a><br /></td></tr>
 <tr class="separator:ab8283bec88669c814dcc228231a2fbc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,17 +125,14 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a8f58be852dddb59202984905fbc2a83d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#a8f58be852dddb59202984905fbc2a83d">field_assignments_rec</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classexprt.html">exprt</a> &amp;lhs_fs, const <a class="el" href="classexprt.html">exprt</a> &amp;ssa_rhs, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;target, bool allow_pointer_unsoundness)</td></tr>
-<tr class="memdesc:a8f58be852dddb59202984905fbc2a83d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign to the individual fields <code>lhs_fs</code> of a non-expanded symbol <code>lhs</code>.  <a href="classfield__sensitivityt.html#a8f58be852dddb59202984905fbc2a83d">More...</a><br /></td></tr>
-<tr class="separator:a8f58be852dddb59202984905fbc2a83d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6df64c3f8c27b7dbe784a6dd1233ce9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#ab6df64c3f8c27b7dbe784a6dd1233ce9">field_assignments_rec</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classexprt.html">exprt</a> &amp;lhs_fs, const <a class="el" href="classexprt.html">exprt</a> &amp;ssa_rhs, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;target, bool allow_pointer_unsoundness) const</td></tr>
+<tr class="memdesc:ab6df64c3f8c27b7dbe784a6dd1233ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign to the individual fields <code>lhs_fs</code> of a non-expanded symbol <code>lhs</code>.  <a href="classfield__sensitivityt.html#ab6df64c3f8c27b7dbe784a6dd1233ce9">More...</a><br /></td></tr>
+<tr class="separator:ab6df64c3f8c27b7dbe784a6dd1233ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3bac8a76ca90048cd93cd1bf4967478"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#aa3bac8a76ca90048cd93cd1bf4967478">simplify_opt</a> (<a class="el" href="classexprt.html">exprt</a> e, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="separator:aa3bac8a76ca90048cd93cd1bf4967478"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a0114b6f5e11fa8183f592084cf88e99f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#a0114b6f5e11fa8183f592084cf88e99f">run_apply</a> = true</td></tr>
-<tr class="memdesc:a0114b6f5e11fa8183f592084cf88e99f"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether or not to invoke <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>  <a href="classfield__sensitivityt.html#a0114b6f5e11fa8183f592084cf88e99f">More...</a><br /></td></tr>
-<tr class="separator:a0114b6f5e11fa8183f592084cf88e99f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6e675e5a676c38dcfe93e75f3ebee92"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#aa6e675e5a676c38dcfe93e75f3ebee92">max_field_sensitivity_array_size</a></td></tr>
 <tr class="separator:aa6e675e5a676c38dcfe93e75f3ebee92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a191ae665484df4a4971364500152abf8"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#a191ae665484df4a4971364500152abf8">should_simplify</a></td></tr>
@@ -153,7 +150,7 @@ Symbols representing structs</h3>
 <p>In an rvalue, a symbol struct_expr which has a struct type with fields field1, field2, etc, will be replaced by <code>{struct_expr..field_name1; struct_expr..field_name2; …}</code>. See <a class="el" href="classfield__sensitivityt.html#a91e8618128b3975c5a3dce07404a2d26">field_sensitivityt::get_fields</a>.</p>
 <h3><a class="anchor" id="autotoc_md115"></a>
 Assignment to a struct</h3>
-<p>When the symbol is on the left-hand-side, for instance for an assignment <code>struct_expr = other_struct</code>, the assignment is replaced by a sequence of assignments: <code>struct_expr..field_name1 = other_struct..field_name1;</code> <code>struct_expr..field_name2 = other_struct..field_name2;</code> etc. See <a class="el" href="classfield__sensitivityt.html#a1a216e3f4af2e54290ce498984033440">field_sensitivityt::field_assignments</a>.</p>
+<p>When the symbol is on the left-hand-side, for instance for an assignment <code>struct_expr = other_struct</code>, the assignment is replaced by a sequence of assignments: <code>struct_expr..field_name1 = other_struct..field_name1;</code> <code>struct_expr..field_name2 = other_struct..field_name2;</code> etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>.</p>
 <h3><a class="anchor" id="autotoc_md116"></a>
 Array access</h3>
 <p>An index expression <code>array[index]</code> when index is constant and array has constant size is replaced by the symbol <code>array[[index]]</code>; note the use of <code>[[</code> and <code>]]</code> to visually distinguish the symbol from the index expression. When <code>index</code> is not a constant, <code>array[index]</code> is replaced by <code>{array[[0]]; array[[1]]; …index]</code>. Note that this process does not apply to arrays whose size is not constant, and arrays whose size exceed the bound <code>max_field_sensitivity_array_size</code>. See <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>.</p>
@@ -162,7 +159,7 @@ Symbols representing arrays</h3>
 <p>In an rvalue, a symbol <code>array</code> which has array type will be replaced by <code>{array[[0]]; array[[1]]; …}[index]</code>. See <a class="el" href="classfield__sensitivityt.html#a91e8618128b3975c5a3dce07404a2d26">field_sensitivityt::get_fields</a>.</p>
 <h3><a class="anchor" id="autotoc_md118"></a>
 Assignment to an array</h3>
-<p>When the array symbol is on the left-hand-side, for instance for an assignment <code>array = other_array</code>, the assignment is replaced by a sequence of assignments: <code>array[[0]] = other_array[[0]]</code>; <code>array[[1]] = other_array[[1]]</code>; etc. See <a class="el" href="classfield__sensitivityt.html#a1a216e3f4af2e54290ce498984033440">field_sensitivityt::field_assignments</a>. </p>
+<p>When the array symbol is on the left-hand-side, for instance for an assignment <code>array = other_array</code>, the assignment is replaced by a sequence of assignments: <code>array[[0]] = other_array[[0]]</code>; <code>array[[1]] = other_array[[1]]</code>; etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00082">82</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -320,8 +317,8 @@ Assignment to an array</h3>
 
 </div>
 </div>
-<a id="a1a216e3f4af2e54290ce498984033440"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a216e3f4af2e54290ce498984033440">&#9670;&nbsp;</a></span>field_assignments()</h2>
+<a id="acb85cf6b9db2203521e695cc227d1435"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb85cf6b9db2203521e695cc227d1435">&#9670;&nbsp;</a></span>field_assignments()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +362,7 @@ Assignment to an array</h3>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -383,12 +380,12 @@ Assignment to an array</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00228">228</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00225">225</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a8f58be852dddb59202984905fbc2a83d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f58be852dddb59202984905fbc2a83d">&#9670;&nbsp;</a></span>field_assignments_rec()</h2>
+<a id="ab6df64c3f8c27b7dbe784a6dd1233ce9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6df64c3f8c27b7dbe784a6dd1233ce9">&#9670;&nbsp;</a></span>field_assignments_rec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -435,7 +432,7 @@ Assignment to an array</h3>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -458,7 +455,7 @@ Assignment to an array</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00258">258</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00252">252</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -505,7 +502,7 @@ Assignment to an array</h3>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expanded expression; for example, for a <code>ssa_expr</code> of some struct type, a <code><a class="el" href="classstruct__exprt.html" title="Struct constructor from list of elements.">struct_exprt</a></code> with each component now being an SSA expression is built. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00157">157</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00154">154</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,7 +531,7 @@ Assignment to an array</h3>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>False, if and only if, <code>expr</code> would be a single field-sensitive SSA expression. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00353">353</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00347">347</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -572,7 +569,7 @@ Assignment to an array</h3>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00372">372</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00366">366</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -596,32 +593,6 @@ Assignment to an array</h3>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00165">165</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
-
-</div>
-</div>
-<a id="a0114b6f5e11fa8183f592084cf88e99f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0114b6f5e11fa8183f592084cf88e99f">&#9670;&nbsp;</a></span>run_apply</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool field_sensitivityt::run_apply = true</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>whether or not to invoke <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a> </p>
 
 <p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00163">163</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
 
@@ -647,7 +618,7 @@ Assignment to an array</h3>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00167">167</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00165">165</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
 
 </div>
 </div>

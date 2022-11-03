@@ -299,7 +299,7 @@ Symbols representing structs</h3>
 <p>In an rvalue, a symbol struct_expr which has a struct type with fields field1, field2, etc, will be replaced by <code>{struct_expr..field_name1; struct_expr..field_name2; …}</code>. See <a class="el" href="classfield__sensitivityt.html#a91e8618128b3975c5a3dce07404a2d26">field_sensitivityt::get_fields</a>.</p>
 <h3><a class="anchor" id="autotoc_md115"></a>
 Assignment to a struct</h3>
-<p>When the symbol is on the left-hand-side, for instance for an assignment <code>struct_expr = other_struct</code>, the assignment is replaced by a sequence of assignments: <code>struct_expr..field_name1 = other_struct..field_name1;</code> <code>struct_expr..field_name2 = other_struct..field_name2;</code> etc. See <a class="el" href="classfield__sensitivityt.html#a1a216e3f4af2e54290ce498984033440">field_sensitivityt::field_assignments</a>.</p>
+<p>When the symbol is on the left-hand-side, for instance for an assignment <code>struct_expr = other_struct</code>, the assignment is replaced by a sequence of assignments: <code>struct_expr..field_name1 = other_struct..field_name1;</code> <code>struct_expr..field_name2 = other_struct..field_name2;</code> etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>.</p>
 <h3><a class="anchor" id="autotoc_md116"></a>
 Array access</h3>
 <p>An index expression <code>array[index]</code> when index is constant and array has constant size is replaced by the symbol <code>array[[index]]</code>; note the use of <code>[[</code> and <code>]]</code> to visually distinguish the symbol from the index expression. When <code>index</code> is not a constant, <code>array[index]</code> is replaced by <code>{array[[0]]; array[[1]]; …index]</code>. Note that this process does not apply to arrays whose size is not constant, and arrays whose size exceed the bound <code>max_field_sensitivity_array_size</code>. See <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>.</p>
@@ -308,7 +308,7 @@ Symbols representing arrays</h3>
 <p>In an rvalue, a symbol <code>array</code> which has array type will be replaced by <code>{array[[0]]; array[[1]]; …}[index]</code>. See <a class="el" href="classfield__sensitivityt.html#a91e8618128b3975c5a3dce07404a2d26">field_sensitivityt::get_fields</a>.</p>
 <h3><a class="anchor" id="autotoc_md118"></a>
 Assignment to an array</h3>
-<p>When the array symbol is on the left-hand-side, for instance for an assignment <code>array = other_array</code>, the assignment is replaced by a sequence of assignments: <code>array[[0]] = other_array[[0]]</code>; <code>array[[1]] = other_array[[1]]</code>; etc. See <a class="el" href="classfield__sensitivityt.html#a1a216e3f4af2e54290ce498984033440">field_sensitivityt::field_assignments</a>.</p>
+<p>When the array symbol is on the left-hand-side, for instance for an assignment <code>array = other_array</code>, the assignment is replaced by a sequence of assignments: <code>array[[0]] = other_array[[0]]</code>; <code>array[[1]] = other_array[[1]]</code>; etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>.</p>
 <h1><a class="anchor" id="analysis_techniques_section"></a>
 Analysis techniques</h1>
 <h2><a class="anchor" id="BMC_section"></a>
@@ -620,7 +620,7 @@ Flattening and Lowering</h2>
 <h2><a class="anchor" id="verification_condition_subsection"></a>
 Verification Condition</h2>
 <p>In the CPROVER framework, the term <b>verification condition</b> is used in a somewhat non-standard way. Let a program and a set of assertions be given. We transform the program into an (acyclic) SSA (i.e., an SSA with all loops unrolled a finite number of times) and turn it into a logical formula, as described above. Note that in this case, the formula will also contain information about what the program does after the assertion is reached: this part of the formula, is, in fact, irrelevant for deciding whether the program can satisfy the assertion or not. The <em>verification condition</em> is the part of the formula that only covers the program execution until the line that checks the assertion has been executed, with everything that comes after it removed.</p>
-<p>Last modified: 2022-11-03 14:11:35 +0000 </p>
+<p>Last modified: 2022-11-03 20:46:31 +0200 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
