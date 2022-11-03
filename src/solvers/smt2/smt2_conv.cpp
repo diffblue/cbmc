@@ -4556,7 +4556,31 @@ void smt2_convt::flatten2bv(const exprt &expr)
   }
   else if(type.id()==ID_array)
   {
-    convert_expr(expr);
+    if(use_array_theory(expr))
+    {
+      // concatenate elements
+      const array_typet &array_type = to_array_type(type);
+
+      mp_integer size =
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
+      out << "(let ((?aflop ";
+      convert_expr(expr);
+      out << ")) ";
+
+      out << "(concat";
+
+      for(mp_integer i = 0; i != size; ++i)
+      {
+        out << " (select ?aflop ";
+        convert_expr(from_integer(i, array_type.index_type()));
+        out << ')';
+      }
+
+      out << "))"; // concat, let
+    }
+    else
+      convert_expr(expr);
   }
   else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
@@ -5441,7 +5465,7 @@ bool smt2_convt::use_array_theory(const exprt &expr)
   }
   else
   {
-    // arrays inside structs get flattened
+    // arrays inside structs or unions get flattened
     if(expr.id()==ID_with)
       return use_array_theory(to_with_expr(expr).old());
     else if(expr.id()==ID_member)
