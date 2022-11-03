@@ -1,0 +1,11 @@
+CORE
+test.json
+
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+int f1\(int \*x1\)\n \_\_CPROVER\_requires\(\*x1\>1\&\&\*x1\<10000\) \_\_CPROVER\_ensures\(.*\=\=\*x1\+2\)
+int f2\(int \*x2\)\n \_\_CPROVER\_requires\(\*x2\>1\&\&\*x2\<10000\) \_\_CPROVER\_ensures\(.*\=\=\*x2\+1\)
+--
+--
+Annotate function contracts to functions f1 and f2.
