@@ -1,0 +1,13 @@
+CORE
+deref.c
+
+^EXIT=1$
+^SIGNAL=0$
+only bitvectors of size multiple of 8 can be dereferenced
+^CONVERSION ERROR$
+--
+--
+This is checking that dereferenced __CPROVER_bitvectors always have a size
+that is a multiple of 8.
+
+For more information, please have a look at https://github.com/diffblue/cbmc/issues/7104
