@@ -727,20 +727,23 @@ TEST_CASE(
   }
 }
 
-SCENARIO(
+TEMPLATE_TEST_CASE(
   "Bitwise \"AND\" expressions are converted to SMT terms",
-  "[core][smt2_incremental]")
+  "[core][smt2_incrzmental]",
+  signedbv_typet,
+  unsignedbv_typet,
+  bv_typet)
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
-  GIVEN("three integer bitvectors and their smt-term equivalents")
+  GIVEN("three bitvectors and their smt-term equivalents")
   {
     const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
     const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
     const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
 
-    const auto one_bvint = from_integer(1, signedbv_typet{8});
-    const auto three_bvint = from_integer(3, signedbv_typet{8});
-    const auto five_bvint = from_integer(5, signedbv_typet{8});
+    const auto one_bvint = from_integer(1, TestType{8});
+    const auto three_bvint = from_integer(3, TestType{8});
+    const auto five_bvint = from_integer(5, TestType{8});
 
     WHEN("a bitand_exprt with two of them as arguments is converted")
     {
@@ -766,8 +769,7 @@ SCENARIO(
       // support direct construction with multiple operands - so we have to
       // construct its parent class and downcast it.
       const exprt::operandst and_operands{one_bvint, three_bvint, five_bvint};
-      const multi_ary_exprt first_step{
-        ID_bitand, and_operands, signedbv_typet{8}};
+      const multi_ary_exprt first_step{ID_bitand, and_operands, TestType{8}};
       const auto bitand_expr = to_bitand_expr(first_step);
 
       const auto constructed_term = test.convert(bitand_expr);
@@ -800,20 +802,23 @@ SCENARIO(
   }
 }
 
-SCENARIO(
+TEMPLATE_TEST_CASE(
   "Bitwise \"OR\" expressions are converted to SMT terms",
-  "[core][smt2_incremental]")
+  "[core][smt2_incremental]",
+  signedbv_typet,
+  unsignedbv_typet,
+  bv_typet)
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
-  GIVEN("three integer bitvectors and their smt-term equivalents")
+  GIVEN("three bitvectors and their smt-term equivalents")
   {
     const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
     const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
     const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
 
-    const auto one_bvint = from_integer(1, signedbv_typet{8});
-    const auto three_bvint = from_integer(3, signedbv_typet{8});
-    const auto five_bvint = from_integer(5, signedbv_typet{8});
+    const auto one_bvint = from_integer(1, TestType{8});
+    const auto three_bvint = from_integer(3, TestType{8});
+    const auto five_bvint = from_integer(5, TestType{8});
 
     WHEN("a bitor_exprt with two of them as arguments is converted")
     {
@@ -840,8 +845,7 @@ SCENARIO(
     WHEN("a ternary bitor_exprt gets connverted to smt terms")
     {
       const exprt::operandst or_operands{one_bvint, three_bvint, five_bvint};
-      const multi_ary_exprt first_step{
-        ID_bitor, or_operands, signedbv_typet{8}};
+      const multi_ary_exprt first_step{ID_bitor, or_operands, TestType{8}};
       const auto bitor_expr = to_bitor_expr(first_step);
 
       const auto constructed_term = test.convert(bitor_expr);
@@ -877,20 +881,23 @@ SCENARIO(
   }
 }
 
-SCENARIO(
+TEMPLATE_TEST_CASE(
   "Bitwise \"XOR\" expressions are converted to SMT terms",
-  "[core][smt2_incremental]")
+  "[core][smt2_incremental]",
+  signedbv_typet,
+  unsignedbv_typet,
+  bv_typet)
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
-  GIVEN("three integer bitvectors and their smt-term equivalents")
+  GIVEN("three bitvectors and their smt-term equivalents")
   {
     const smt_termt smt_term_one = smt_bit_vector_constant_termt{1, 8};
     const smt_termt smt_term_three = smt_bit_vector_constant_termt{3, 8};
     const smt_termt smt_term_five = smt_bit_vector_constant_termt{5, 8};
 
-    const auto one_bvint = from_integer(1, signedbv_typet{8});
-    const auto three_bvint = from_integer(3, signedbv_typet{8});
-    const auto five_bvint = from_integer(5, signedbv_typet{8});
+    const auto one_bvint = from_integer(1, TestType{8});
+    const auto three_bvint = from_integer(3, TestType{8});
+    const auto five_bvint = from_integer(5, TestType{8});
 
     WHEN("a bitxor_exprt with two of them as arguments is converted")
     {
@@ -913,8 +920,7 @@ SCENARIO(
     WHEN("a ternary bitxor_exprt gets connverted to smt terms")
     {
       const exprt::operandst xor_operands{one_bvint, three_bvint, five_bvint};
-      const multi_ary_exprt first_step{
-        ID_bitxor, xor_operands, signedbv_typet{8}};
+      const multi_ary_exprt first_step{ID_bitxor, xor_operands, TestType{8}};
       const auto bitxor_expr = to_bitxor_expr(first_step);
 
       const auto constructed_term = test.convert(bitxor_expr);
@@ -949,14 +955,17 @@ SCENARIO(
   }
 }
 
-SCENARIO(
+TEMPLATE_TEST_CASE(
   "Bitwise \"NOT\" expressions are converted to SMT terms (1's complement)",
-  "[core][smt2_incremental]")
+  "[core][smt2_incremental]",
+  signedbv_typet,
+  unsignedbv_typet,
+  bv_typet)
 {
   auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
-  GIVEN("An integer bitvector")
+  GIVEN("An bitvector")
   {
-    const auto one_bvint = from_integer(1, signedbv_typet{8});
+    const auto one_bvint = from_integer(1, TestType{8});
 
     WHEN("A bitnot_exprt is constructed and converted to an SMT term")
     {
