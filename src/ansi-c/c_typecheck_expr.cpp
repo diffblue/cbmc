@@ -1805,6 +1805,17 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
       error() << "dereferencing void pointer" << eom;
       throw 0;
     }
+
+    if(is_signed_or_unsigned_bitvector(expr.type()))
+    {
+      auto bv_type_width = to_bitvector_type(expr.type()).get_width();
+      if(bv_type_width % 8 != 0)
+      {
+        throw invalid_source_file_exceptiont{
+          "only bitvectors of size multiple of 8 can be dereferenced",
+          expr.source_location()};
+      }
+    }
   }
   else
   {
