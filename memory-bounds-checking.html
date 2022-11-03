@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('memory-bounds-checking.html',''); init
 <div class="line">  *p1 = 1;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Here the verification condition generated for the pointer dereference should fail: for <code>p1</code> in <code>*p1</code>, <code>__CPROVER_POINTER_OFFSET</code> will evaluate to 1 (owing to the increment <code>p1++</code>, and <code>__CPROVER_OBJECT_SIZE</code> will also evaluate to 1. Consequently, the less-than comparison in the verification condition evaluates to false.</p>
-<p>Last modified: 2022-11-02 16:44:03 +0000 </p>
+<p>Last modified: 2022-11-03 09:54:22 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
