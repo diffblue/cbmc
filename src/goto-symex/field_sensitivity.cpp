@@ -23,7 +23,7 @@ exprt field_sensitivityt::apply(
   ssa_exprt ssa_expr,
   bool write) const
 {
-  if(!run_apply || write)
+  if(write)
     return std::move(ssa_expr);
   else
     return get_fields(ns, state, ssa_expr);
@@ -35,9 +35,6 @@ exprt field_sensitivityt::apply(
   exprt expr,
   bool write) const
 {
-  if(!run_apply)
-    return expr;
-
   if(expr.id() != ID_address_of)
   {
     Forall_operands(it, expr)
@@ -46,7 +43,7 @@ exprt field_sensitivityt::apply(
 
   if(!write && is_ssa_expr(expr))
   {
-    return apply(ns, state, to_ssa_expr(expr), write);
+    return get_fields(ns, state, to_ssa_expr(expr));
   }
   else if(
     !write && expr.id() == ID_member &&
@@ -231,17 +228,14 @@ void field_sensitivityt::field_assignments(
   const ssa_exprt &lhs,
   const exprt &rhs,
   symex_targett &target,
-  bool allow_pointer_unsoundness)
+  bool allow_pointer_unsoundness) const
 {
-  const exprt lhs_fs = apply(ns, state, lhs, false);
+  const exprt lhs_fs = get_fields(ns, state, lhs);
 
   if(lhs != lhs_fs)
   {
-    bool run_apply_bak = run_apply;
-    run_apply = false;
     field_assignments_rec(
       ns, state, lhs_fs, rhs, target, allow_pointer_unsoundness);
-    run_apply = run_apply_bak;
   }
 }
 
@@ -261,7 +255,7 @@ void field_sensitivityt::field_assignments_rec(
   const exprt &lhs_fs,
   const exprt &ssa_rhs,
   symex_targett &target,
-  bool allow_pointer_unsoundness)
+  bool allow_pointer_unsoundness) const
 {
   if(is_ssa_expr(lhs_fs))
   {
