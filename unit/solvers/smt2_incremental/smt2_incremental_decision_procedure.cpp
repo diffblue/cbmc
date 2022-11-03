@@ -15,6 +15,7 @@
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
+#include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
@@ -23,6 +24,8 @@
 // means that we get error messages showing the smt formula expressed as SMT2
 // strings instead of `{?}` being printed. It works because catch uses the
 // appropriate overload of `operator<<` where it exists.
+#include <util/byte_operators.h>
+
 #include <goto-symex/path_storage.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
@@ -733,4 +736,166 @@ TEST_CASE(
       smt_bit_vector_constant_termt{2, smt_index_sort}},
     smt_assertion};
   REQUIRE(test.sent_commands == expected_commands);
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret byte update-extract commands.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  SECTION("byte_extract - byte from int correctly extracted.")
+  {
+    const auto int64_type = signedbv_typet(64);
+    const auto byte_type = signedbv_typet(8);
+    const auto extracted_byte_symbol =
+      make_test_symbol("extracted_byte", byte_type);
+    const auto original_int_symbol =
+      make_test_symbol("original_int", int64_type);
+    const auto byte_extract = make_byte_extract(
+      original_int_symbol.symbol_expr(),
+      from_integer(1, int64_type),
+      byte_type);
+    const typecast_exprt typecast_expr{byte_extract, byte_type};
+    const equal_exprt equal_expr{
+      extracted_byte_symbol.symbol_expr(), typecast_expr};
+    test.sent_commands.clear();
+    test.procedure.set_to(equal_expr, true);
+    const smt_bit_vector_sortt smt_int64_type{64};
+    const smt_bit_vector_sortt smt_byte_type{8};
+    const smt_identifier_termt extracted_byte_term{
+      "extracted_byte", smt_byte_type};
+    const smt_identifier_termt original_int{"original_int", smt_int64_type};
+    const smt_termt smt_equal_term = smt_core_theoryt::equal(
+      extracted_byte_term,
+      smt_bit_vector_theoryt::extract(15, 8)(original_int));
+    const auto smt_assertion = smt_assert_commandt{smt_equal_term};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt(extracted_byte_term, {}),
+      smt_declare_function_commandt(original_int, {}),
+      smt_assertion};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+  SECTION("byte_extract - int from byte correctly extracted.")
+  {
+    const auto byte_type = signedbv_typet(8);
+    const auto int16_type = signedbv_typet(16);
+    const auto ptr_type = signedbv_typet(32);
+    const auto extracted_int_symbol =
+      make_test_symbol("extracted_int", int16_type);
+    const auto original_byte_array_symbol = make_test_symbol(
+      "original_byte_array", array_typet(byte_type, from_integer(2, ptr_type)));
+    const auto byte_extract = make_byte_extract(
+      original_byte_array_symbol.symbol_expr(),
+      from_integer(0, ptr_type),
+      int16_type);
+    const equal_exprt equal_expr{
+      extracted_int_symbol.symbol_expr(), byte_extract};
+    test.sent_commands.clear();
+    test.procedure.set_to(equal_expr, true);
+    const smt_bit_vector_sortt smt_int16_type{16};
+    const smt_bit_vector_sortt smt_ptr_type{32};
+    const smt_bit_vector_sortt smt_byte_type{8};
+    const smt_identifier_termt extracted_int_term{
+      "extracted_int", smt_int16_type};
+    const smt_identifier_termt original_byte_array_term{
+      "original_byte_array", smt_array_sortt{smt_ptr_type, smt_byte_type}};
+    const smt_termt smt_equal_term = smt_core_theoryt::equal(
+      extracted_int_term,
+      smt_bit_vector_theoryt::concat(
+        smt_array_theoryt::select(
+          original_byte_array_term,
+          smt_bit_vector_constant_termt{1, smt_ptr_type}),
+        smt_array_theoryt::select(
+          original_byte_array_term,
+          smt_bit_vector_constant_termt{0, smt_ptr_type})));
+    const auto smt_assertion = smt_assert_commandt{smt_equal_term};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt(extracted_int_term, {}),
+      smt_declare_function_commandt(original_byte_array_term, {}),
+      smt_assertion};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+  SECTION("byte_update - write bytes into int.")
+  {
+    const auto int64_type = signedbv_typet(64);
+    const auto byte_type = signedbv_typet(8);
+    const auto result_int_symbol = make_test_symbol("result_int", int64_type);
+    const auto original_int_symbol =
+      make_test_symbol("original_int", int64_type);
+    const auto byte_update = make_byte_update(
+      original_int_symbol.symbol_expr(),
+      from_integer(1, int64_type),
+      from_integer(0x0B, byte_type));
+    const equal_exprt equal_expr{result_int_symbol.symbol_expr(), byte_update};
+    test.sent_commands.clear();
+    test.procedure.set_to(equal_expr, true);
+    const smt_bit_vector_sortt smt_value_type{64};
+    const smt_identifier_termt result_int_term{"result_int", smt_value_type};
+    const smt_identifier_termt original_int_term{
+      "original_int", smt_value_type};
+    const smt_termt smt_equal_term = smt_core_theoryt::equal(
+      result_int_term,
+      smt_bit_vector_theoryt::make_or(
+        smt_bit_vector_theoryt::make_and(
+          original_int_term,
+          smt_bit_vector_constant_termt{0xFFFFFFFFFFFF00FF, 64}),
+        smt_bit_vector_constant_termt{0x0B00, 64}));
+    const auto smt_assertion = smt_assert_commandt{smt_equal_term};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{result_int_term, {}},
+      smt_declare_function_commandt{original_int_term, {}},
+      smt_assertion};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+  SECTION("byte_update - writes int into byte array.")
+  {
+    const auto int32_type = signedbv_typet(32);
+    const auto int16_type = signedbv_typet(16);
+    const auto byte_type = signedbv_typet(8);
+    const array_typet byte_array_type{byte_type, from_integer(2, int32_type)};
+    const auto result_array_symbol =
+      make_test_symbol("result_array", byte_array_type);
+    const auto original_array_symbol =
+      make_test_symbol("original_array", byte_array_type);
+    const auto byte_update = make_byte_update(
+      original_array_symbol.symbol_expr(),
+      from_integer(0, int32_type),
+      from_integer(0x0102, int16_type));
+    const equal_exprt equal_expr{
+      result_array_symbol.symbol_expr(), byte_update};
+    test.sent_commands.clear();
+    test.procedure.set_to(equal_expr, true);
+    const smt_bit_vector_sortt smt_byte_type{8};
+    const smt_bit_vector_sortt smt_index_type{32};
+    const smt_array_sortt smt_array_type{smt_index_type, smt_byte_type};
+    const smt_identifier_termt result_array_term{
+      "result_array", smt_array_type};
+    const smt_identifier_termt original_array_term{
+      "original_array", smt_array_type};
+    const smt_identifier_termt index_0_term{"index_0", smt_index_type};
+    const smt_identifier_termt index_1_term{"index_1", smt_index_type};
+    const smt_termt smt_equal_term = smt_core_theoryt::equal(
+      result_array_term,
+      smt_array_theoryt::store(
+        smt_array_theoryt::store(
+          original_array_term,
+          index_0_term,
+          smt_bit_vector_constant_termt{2, smt_byte_type}),
+        index_1_term,
+        smt_bit_vector_constant_termt{1, smt_byte_type}));
+    const auto smt_assertion = smt_assert_commandt{smt_equal_term};
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{result_array_term, {}},
+      smt_declare_function_commandt{original_array_term, {}},
+      smt_define_function_commandt{
+        index_0_term.identifier(),
+        {},
+        smt_bit_vector_constant_termt{0, smt_index_type}},
+      smt_define_function_commandt{
+        index_1_term.identifier(),
+        {},
+        smt_bit_vector_constant_termt{1, smt_index_type}},
+      smt_assertion};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
 }
