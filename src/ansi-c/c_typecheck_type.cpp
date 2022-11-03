@@ -1007,24 +1007,24 @@ void c_typecheck_baset::typecheck_compound_body(
     }
   }
 
-  // We allow an incomplete (C99) array as _last_ member!
-  // Zero-length is allowed everywhere.
-
-  if(type.id()==ID_struct ||
-     type.id()==ID_union)
+  // We allow an incomplete array as _last_ member of a struct,
+  // C11 6.7.2.1 §18. These are called "flexible array members".
+  // Zero-length (a gcc extension) is allowed everywhere.
+  if(type.id() == ID_struct)
   {
     for(struct_union_typet::componentst::iterator
         it=components.begin();
         it!=components.end();
         it++)
     {
-      typet &c_type=it->type();
+      typet &component_type = it->type();
 
-      if(c_type.id()==ID_array &&
-         to_array_type(c_type).is_incomplete())
+      if(
+        component_type.id() == ID_array &&
+        to_array_type(component_type).is_incomplete())
       {
         // needs to be last member
-        if(type.id()==ID_struct && it!=--components.end())
+        if(it != --components.end())
         {
           error().source_location=it->source_location();
           error() << "flexible struct member must be last member" << eom;
@@ -1032,8 +1032,27 @@ void c_typecheck_baset::typecheck_compound_body(
         }
 
         // make it zero-length
-        to_array_type(c_type).size() = from_integer(0, c_index_type());
-        c_type.set(ID_C_flexible_array_member, true);
+        to_array_type(component_type).size() = from_integer(0, c_index_type());
+        component_type.set(ID_C_flexible_array_member, true);
+      }
+    }
+  }
+
+  // Flexible array members are not allowed in unions in ISO C.
+  // We allow this as an extension on Windows.
+  if(type.id() == ID_union && config.ansi_c.os != configt::ansi_ct::ost::OS_WIN)
+  {
+    for(const auto &component : components)
+    {
+      auto &component_type = component.type();
+
+      if(
+        component_type.id() == ID_array &&
+        to_array_type(component_type).is_incomplete())
+      {
+        throw invalid_source_file_exceptiont(
+          "flexible array members are not allowed in a union",
+          component.source_location());
       }
     }
   }

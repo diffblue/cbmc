@@ -1,0 +1,7 @@
+CORE gcc-only
+union_flexible_array_member.c
+
+^EXIT=1$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
