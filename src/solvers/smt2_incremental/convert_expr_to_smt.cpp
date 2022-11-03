@@ -1007,13 +1007,10 @@ static smt_termt convert_array_update_to_smt(
   const sub_expression_mapt &converted)
 {
   smt_termt array = converted.at(with.old());
-  auto it = ++with.operands().begin();
-  while(it != with.operands().end())
+  for(auto it = ++with.operands().begin(); it != with.operands().end(); it += 2)
   {
-    const smt_termt &index_term = converted.at(*it);
-    ++it;
-    const smt_termt &value_term = converted.at(*it);
-    ++it;
+    const smt_termt &index_term = converted.at(it[0]);
+    const smt_termt &value_term = converted.at(it[1]);
     array = smt_array_theoryt::store(array, index_term, value_term);
   }
   return array;
