@@ -199,8 +199,8 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
   const std::size_t width = boolbv_width(type);
   PRECONDITION(bv.size() >= offset + width);
 
-  // most significant bit first
   std::string value;
+  value.reserve(width);
 
   for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
@@ -214,8 +214,12 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
     }
     // clang-format on
 
-    value=ch+value;
+    value += ch;
   }
+
+  // The above collects bits starting with the least significant bit,
+  // but we need the most significant bit first.
+  std::reverse(value.begin(), value.end());
 
   switch(bvtype)
   {
