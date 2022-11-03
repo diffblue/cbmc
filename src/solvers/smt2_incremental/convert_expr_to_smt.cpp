@@ -1003,26 +1003,25 @@ static smt_termt convert_expr_to_smt(
 }
 
 static smt_termt convert_array_update_to_smt(
-  const exprt &old,
-  const exprt &index,
-  const exprt &new_value,
+  const with_exprt &with,
   const sub_expression_mapt &converted)
 {
-  const smt_termt &old_array_term = converted.at(old);
-  const smt_termt &index_term = converted.at(index);
-  const smt_termt &value_term = converted.at(new_value);
-  return smt_array_theoryt::store(old_array_term, index_term, value_term);
+  smt_termt array = converted.at(with.old());
+  for(auto it = ++with.operands().begin(); it != with.operands().end(); it += 2)
+  {
+    const smt_termt &index_term = converted.at(it[0]);
+    const smt_termt &value_term = converted.at(it[1]);
+    array = smt_array_theoryt::store(array, index_term, value_term);
+  }
+  return array;
 }
 
 static smt_termt convert_expr_to_smt(
   const with_exprt &with,
   const sub_expression_mapt &converted)
 {
-  if(const auto array_type = type_try_dynamic_cast<array_typet>(with.type()))
-  {
-    return convert_array_update_to_smt(
-      with.old(), with.where(), with.new_value(), converted);
-  }
+  if(can_cast_type<array_typet>(with.type()))
+    return convert_array_update_to_smt(with, converted);
   // 'with' expression is also used to update struct fields, but for now we do
   // not support them, so we fail.
   UNIMPLEMENTED_FEATURE(
