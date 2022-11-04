@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-cprover-smt-backend
 main.c
 --floatbv
 ^EXIT=0$
@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Fixing this test for the CPROVER SMT2 solver (or any other SMT2 solver
+supporting FPA) requires addressing the TODO "bit-wise floatbv to bv".

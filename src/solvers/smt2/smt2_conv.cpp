@@ -987,6 +987,10 @@ std::string smt2_convt::type2id(const typet &type) const
     ieee_float_spect spec(to_floatbv_type(type));
     return "f"+std::to_string(spec.width())+"_"+std::to_string(spec.f);
   }
+  else if(type.id() == ID_bv)
+  {
+    return "B" + std::to_string(to_bitvector_type(type).get_width());
+  }
   else if(type.id()==ID_unsignedbv)
   {
     return "u"+std::to_string(to_unsignedbv_type(type).get_width());

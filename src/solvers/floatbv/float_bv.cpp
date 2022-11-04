@@ -78,6 +78,23 @@ exprt float_bvt::convert(const exprt &expr) const
   {
     return not_exprt(is_zero(to_typecast_expr(expr).op()));
   }
+  else if(
+    expr.id() == ID_typecast && expr.type().id() == ID_bv &&
+    to_typecast_expr(expr).op().type().id() == ID_floatbv) // float -> raw bv
+  {
+    const typecast_exprt &tc = to_typecast_expr(expr);
+    const bitvector_typet &dest_type = to_bitvector_type(expr.type());
+    const floatbv_typet &src_type = to_floatbv_type(tc.op().type());
+    if(
+      dest_type.get_width() != src_type.get_width() ||
+      dest_type.get_width() == 0)
+    {
+      return nil_exprt{};
+    }
+
+    return extractbits_exprt{
+      to_typecast_expr(expr).op(), dest_type.get_width() - 1, 0, dest_type};
+  }
   else if(expr.id()==ID_floatbv_plus)
   {
     const auto &float_expr = to_ieee_float_op_expr(expr);
