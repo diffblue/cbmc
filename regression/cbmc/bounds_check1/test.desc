@@ -1,4 +1,4 @@
-CORE broken-z3-smt-backend
+CORE thorough-smt-backend
 main.c
 --bounds-check --pointer-check
 ^EXIT=10$
@@ -12,3 +12,6 @@ payload\[\(.*\)[kl]2\]: FAILURE
 \[\(.*\)i\]: FAILURE
 dest\[\(.*\)j\]: FAILURE
 payload\[\(.*\)[kl]\]: FAILURE
+--
+Appears to take Z3 more than 10 minutes to solve, and approximately 500 seconds
+when using the in-tree SMT solver.
