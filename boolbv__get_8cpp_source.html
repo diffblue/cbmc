@@ -293,8 +293,8 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <span class="keyword">const</span> std::size_t width = <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(type);</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(bv.size() &gt;= offset + width);</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="comment">// most significant bit first</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  std::string value;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  std::string value;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  value.reserve(width);</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordflow">for</span>(std::size_t bit_nr=offset; bit_nr&lt;offset+width; bit_nr++)</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  {</div>
@@ -308,200 +308,204 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    }</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">// clang-format on</span></div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    value=ch+value;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    value += ch;</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  }</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="keywordflow">switch</span>(bvtype)</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  {</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a723d46ced1074f7f8e39c13fd6fb8e29">bvtypet::IS_UNKNOWN</a>:</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_string || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty);</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string)</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    {</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> int_value=<a class="code" href="mp__arith_8cpp.html#a13e6897151a875d15c17fd7843d430be">binary2integer</a>(value, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> s;</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="keywordflow">if</span>(int_value&gt;=<a class="code" href="classboolbvt.html#a4c9ece0fc463cd401e189f7e228cf3a2">string_numbering</a>.<a class="code" href="classnumberingt.html#aa0b9210ed0824ff5d6a6a7ca64fe2e17">size</a>())</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        s=<a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        s = <a class="code" href="classboolbvt.html#a4c9ece0fc463cd401e189f7e228cf3a2">string_numbering</a>[numeric_cast_v&lt;std::size_t&gt;(int_value)];</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>(s, type);</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    }</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>{<a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(), type};</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="comment">// The above collects bits starting with the least significant bit,</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="comment">// but we need the most significant bit first.</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  std::reverse(value.begin(), value.end());</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">switch</span>(bvtype)</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a723d46ced1074f7f8e39c13fd6fb8e29">bvtypet::IS_UNKNOWN</a>:</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_string || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string)</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    {</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> int_value=<a class="code" href="mp__arith_8cpp.html#a13e6897151a875d15c17fd7843d430be">binary2integer</a>(value, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> s;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      <span class="keywordflow">if</span>(int_value&gt;=<a class="code" href="classboolbvt.html#a4c9ece0fc463cd401e189f7e228cf3a2">string_numbering</a>.<a class="code" href="classnumberingt.html#aa0b9210ed0824ff5d6a6a7ca64fe2e17">size</a>())</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        s=<a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        s = <a class="code" href="classboolbvt.html#a4c9ece0fc463cd401e189f7e228cf3a2">string_numbering</a>[numeric_cast_v&lt;std::size_t&gt;(int_value)];</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>(s, type);</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    }</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a1f02d830a012539ad7ceb7877f018f93">bvtypet::IS_RANGE</a>:</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> int_value = <a class="code" href="mp__arith_8cpp.html#a13e6897151a875d15c17fd7843d430be">binary2integer</a>(value, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> from = <a class="code" href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a>(type.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(ID_from));</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>(<a class="code" href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a>(int_value + from), type);</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  }</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>{<a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(), type};</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    }</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a1f02d830a012539ad7ceb7877f018f93">bvtypet::IS_RANGE</a>:</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> int_value = <a class="code" href="mp__arith_8cpp.html#a13e6897151a875d15c17fd7843d430be">binary2integer</a>(value, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> from = <a class="code" href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a>(type.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(ID_from));</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673af7777db2243b813fe7492fa5111b2efd">bvtypet::IS_C_BIT_FIELD</a>:</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a6a232ce09991dbfc884e9dd451c98011">bvtypet::IS_VERILOG_UNSIGNED</a>:</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a6bff1a2d9d5aa9dcbf74bcdeec349def">bvtypet::IS_VERILOG_SIGNED</a>:</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a432d9270d511cf62a5439ec03ac89a17">bvtypet::IS_C_BOOL</a>:</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a6837eff055a73fcbc90fa5db8edf002c">bvtypet::IS_FIXED</a>:</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a94e47574eb4d9bce3e18f02c37a1a04e">bvtypet::IS_FLOAT</a>:</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673aef8d9a368fb0f7b0fa241d707fa45d00">bvtypet::IS_UNSIGNED</a>:</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673abfc2b785411e8d05cd0c32485fbcabbc">bvtypet::IS_SIGNED</a>:</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a198a49603f1c031f7f359f120bc51260">bvtypet::IS_BV</a>:</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a3e9bd43e672839b2fd870909d7126a21">bvtypet::IS_C_ENUM</a>:</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  {</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> bvrep = <a class="code" href="arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a>(</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      width, [&amp;value](<span class="keywordtype">size_t</span> i) { <span class="keywordflow">return</span> value[value.size() - i - 1] == <span class="charliteral">&#39;1&#39;</span>; });</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>(bvrep, type);</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  }</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;}</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
-<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">  270</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">boolbvt::bv_get</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv, <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <a class="code" href="classnil__exprt.html">nil_exprt</a> skeleton;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  skeleton.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() = type;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a6a623e2bc1860eaf6fa1303b6433bec6">bv_get_rec</a>(skeleton, bv, 0);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;}</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno"><a class="line" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">  277</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">boolbvt::bv_get_cache</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool) <span class="comment">// boolean?</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a8f2eb906e533286456a7fbae76235319">get</a>(expr);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <span class="comment">// look up literals in cache</span></div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  bv_cachet::const_iterator it=<a class="code" href="classboolbvt.html#a0d8076e400571d7b9fd0c0e856cc3d4b">bv_cache</a>.find(expr);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(it != <a class="code" href="classboolbvt.html#a0d8076e400571d7b9fd0c0e856cc3d4b">bv_cache</a>.end());</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>(<a class="code" href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a>(int_value + from), type);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673af7777db2243b813fe7492fa5111b2efd">bvtypet::IS_C_BIT_FIELD</a>:</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a6a232ce09991dbfc884e9dd451c98011">bvtypet::IS_VERILOG_UNSIGNED</a>:</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a6bff1a2d9d5aa9dcbf74bcdeec349def">bvtypet::IS_VERILOG_SIGNED</a>:</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a432d9270d511cf62a5439ec03ac89a17">bvtypet::IS_C_BOOL</a>:</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a6837eff055a73fcbc90fa5db8edf002c">bvtypet::IS_FIXED</a>:</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a94e47574eb4d9bce3e18f02c37a1a04e">bvtypet::IS_FLOAT</a>:</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673aef8d9a368fb0f7b0fa241d707fa45d00">bvtypet::IS_UNSIGNED</a>:</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673abfc2b785411e8d05cd0c32485fbcabbc">bvtypet::IS_SIGNED</a>:</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a198a49603f1c031f7f359f120bc51260">bvtypet::IS_BV</a>:</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a3e9bd43e672839b2fd870909d7126a21">bvtypet::IS_C_ENUM</a>:</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  {</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> bvrep = <a class="code" href="arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a>(</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      width, [&amp;value](<span class="keywordtype">size_t</span> i) { <span class="keywordflow">return</span> value[value.size() - i - 1] == <span class="charliteral">&#39;1&#39;</span>; });</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>(bvrep, type);</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  }</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  }</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;}</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
+<div class="line"><a name="l00274"></a><span class="lineno"><a class="line" href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">  274</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">boolbvt::bv_get</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv, <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <a class="code" href="classnil__exprt.html">nil_exprt</a> skeleton;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  skeleton.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() = type;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a6a623e2bc1860eaf6fa1303b6433bec6">bv_get_rec</a>(skeleton, bv, 0);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;}</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
+<div class="line"><a name="l00281"></a><span class="lineno"><a class="line" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">  281</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">boolbvt::bv_get_cache</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool) <span class="comment">// boolean?</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a8f2eb906e533286456a7fbae76235319">get</a>(expr);</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">bv_get</a>(it-&gt;second, expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;}</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
-<div class="line"><a name="l00289"></a><span class="lineno"><a class="line" href="classboolbvt.html#a6693ac5e0bf4202a5830f71599cfa953">  289</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classboolbvt.html#a6693ac5e0bf4202a5830f71599cfa953">boolbvt::bv_get_unbounded_array</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="comment">// first, try to get size</span></div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="comment">// look up literals in cache</span></div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  bv_cachet::const_iterator it=<a class="code" href="classboolbvt.html#a0d8076e400571d7b9fd0c0e856cc3d4b">bv_cache</a>.find(expr);</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(it != <a class="code" href="classboolbvt.html#a0d8076e400571d7b9fd0c0e856cc3d4b">bv_cache</a>.end());</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">bv_get</a>(it-&gt;second, expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;}</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type=expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;size_expr=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>();</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  <a class="code" href="classexprt.html">exprt</a> size=<a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="classboolbvt.html#a8f2eb906e533286456a7fbae76235319">get</a>(size_expr), <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>);</div>
+<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="classboolbvt.html#a6693ac5e0bf4202a5830f71599cfa953">  293</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classboolbvt.html#a6693ac5e0bf4202a5830f71599cfa953">boolbvt::bv_get_unbounded_array</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  <span class="comment">// first, try to get size</span></div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="comment">// get the numeric value, unless it&#39;s infinity</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> size_mpint = 0;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <span class="keywordflow">if</span>(size.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>() &amp;&amp; size.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_infinity)</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  {</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> size_opt = numeric_cast&lt;mp_integer&gt;(size);</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">if</span>(size_opt.has_value() &amp;&amp; *size_opt &gt;= 0)</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      size_mpint = *size_opt;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  }</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="comment">// search array indices</span></div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keyword">typedef</span> std::map&lt;mp_integer, exprt&gt; valuest;</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  valuest values;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> opt_num = <a class="code" href="classarrayst.html#a51808e843bf891753f8e49014dac39c9">arrays</a>.<a class="code" href="classunion__find.html#a1a123e4668edacafc4358d45d29279bf">get_number</a>(expr);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">if</span>(opt_num.has_value())</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  {</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="comment">// get root</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> number = <a class="code" href="classarrayst.html#a51808e843bf891753f8e49014dac39c9">arrays</a>.<a class="code" href="classunion__find.html#a9b52f160a057cde837a8ecfcce15b989">find_number</a>(*opt_num);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    assert(number&lt;<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.size());</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    index_mapt::const_iterator it=<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.find(number);</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    assert(it!=<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.end());</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarrayst.html#ac7868d6f14949469054dad3be4904938">index_sett</a> &amp;index_set=it-&gt;second;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keywordflow">for</span>(index_sett::const_iterator it1=</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        index_set.begin();</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        it1!=index_set.end();</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        it1++)</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    {</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      <a class="code" href="classindex__exprt.html">index_exprt</a> index(expr, *it1);</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;      <a class="code" href="classexprt.html">exprt</a> value=<a class="code" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">bv_get_cache</a>(index);</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;      <a class="code" href="classexprt.html">exprt</a> index_value=<a class="code" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">bv_get_cache</a>(*it1);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      <span class="keywordflow">if</span>(!index_value.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      {</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> index_mpint = numeric_cast&lt;mp_integer&gt;(index_value);</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type=expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;size_expr=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>();</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <a class="code" href="classexprt.html">exprt</a> size=<a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="classboolbvt.html#a8f2eb906e533286456a7fbae76235319">get</a>(size_expr), <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <span class="comment">// get the numeric value, unless it&#39;s infinity</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> size_mpint = 0;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160; </div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="keywordflow">if</span>(size.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>() &amp;&amp; size.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_infinity)</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> size_opt = numeric_cast&lt;mp_integer&gt;(size);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordflow">if</span>(size_opt.has_value() &amp;&amp; *size_opt &gt;= 0)</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      size_mpint = *size_opt;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <span class="comment">// search array indices</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keyword">typedef</span> std::map&lt;mp_integer, exprt&gt; valuest;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  valuest values;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> opt_num = <a class="code" href="classarrayst.html#a51808e843bf891753f8e49014dac39c9">arrays</a>.<a class="code" href="classunion__find.html#a1a123e4668edacafc4358d45d29279bf">get_number</a>(expr);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="keywordflow">if</span>(opt_num.has_value())</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  {</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="comment">// get root</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> number = <a class="code" href="classarrayst.html#a51808e843bf891753f8e49014dac39c9">arrays</a>.<a class="code" href="classunion__find.html#a9b52f160a057cde837a8ecfcce15b989">find_number</a>(*opt_num);</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160; </div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    assert(number&lt;<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.size());</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    index_mapt::const_iterator it=<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.find(number);</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    assert(it!=<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.end());</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarrayst.html#ac7868d6f14949469054dad3be4904938">index_sett</a> &amp;index_set=it-&gt;second;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">for</span>(index_sett::const_iterator it1=</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        index_set.begin();</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        it1!=index_set.end();</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;        it1++)</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    {</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      <a class="code" href="classindex__exprt.html">index_exprt</a> index(expr, *it1);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      <a class="code" href="classexprt.html">exprt</a> value=<a class="code" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">bv_get_cache</a>(index);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      <a class="code" href="classexprt.html">exprt</a> index_value=<a class="code" href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">bv_get_cache</a>(*it1);</div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="keywordflow">if</span>(index_mpint.has_value())</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        {</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;          <span class="keywordflow">if</span>(value.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;            values[*index_mpint] =</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;              <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).subtype());</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;            values[*index_mpint] = value;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        }</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;      }</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    }</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  }</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <span class="keywordflow">if</span>(values.size() != size_mpint)</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  {</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    result = <a class="code" href="classarray__list__exprt.html">array_list_exprt</a>({}, <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type));</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      <span class="keywordflow">if</span>(!index_value.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      {</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> index_mpint = numeric_cast&lt;mp_integer&gt;(index_value);</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160; </div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;        <span class="keywordflow">if</span>(index_mpint.has_value())</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        {</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;          <span class="keywordflow">if</span>(value.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;            values[*index_mpint] =</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;              <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).subtype());</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;            values[*index_mpint] = value;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      }</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    }</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  }</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <a class="code" href="classexprt.html">exprt</a> result;</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().reserve(values.size()*2);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="keywordflow">for</span>(valuest::const_iterator it=values.begin();</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        it!=values.end();</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        it++)</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    {</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      <a class="code" href="classexprt.html">exprt</a> index=<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(it-&gt;first, size.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      result.<a class="code" href="classexprt.html#af3e85c53e888c1a6d58ce016ce6bccdd">add_to_operands</a>(std::move(index), <a class="code" href="classexprt.html">exprt</a>{it-&gt;second});</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    }</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  }</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  {</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="comment">// set the size</span></div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    result=<a class="code" href="classexprt.html">exprt</a>(ID_array, type);</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="comment">// allocate operands</span></div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    std::size_t size_int = numeric_cast_v&lt;std::size_t&gt;(size_mpint);</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().resize(size_int, <a class="code" href="classexprt.html">exprt</a>{ID_unknown});</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="keywordflow">if</span>(values.size() != size_mpint)</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  {</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    result = <a class="code" href="classarray__list__exprt.html">array_list_exprt</a>({}, <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type));</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().reserve(values.size()*2);</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160; </div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordflow">for</span>(valuest::const_iterator it=values.begin();</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        it!=values.end();</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        it++)</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    {</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      <a class="code" href="classexprt.html">exprt</a> index=<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(it-&gt;first, size.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      result.<a class="code" href="classexprt.html#af3e85c53e888c1a6d58ce016ce6bccdd">add_to_operands</a>(std::move(index), <a class="code" href="classexprt.html">exprt</a>{it-&gt;second});</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    }</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  }</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  {</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <span class="comment">// set the size</span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    result=<a class="code" href="classexprt.html">exprt</a>(ID_array, type);</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="comment">// search uninterpreted functions</span></div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <span class="keywordflow">for</span>(valuest::iterator it=values.begin();</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        it!=values.end();</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        it++)</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="keywordflow">if</span>(it-&gt;first&gt;=0 &amp;&amp; it-&gt;first&lt;size_mpint)</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;        result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[numeric_cast_v&lt;std::size_t&gt;(it-&gt;first)].swap(</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;          it-&gt;second);</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  }</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;}</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
-<div class="line"><a name="l00387"></a><span class="lineno"><a class="line" href="classboolbvt.html#a04c4f06ddb5cc56b57bb753b8d7092bd">  387</a></span>&#160;<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="classboolbvt.html#aef28c240526a8d9d5c9f24265c9483f2">boolbvt::get_value</a>(</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv,</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  std::size_t offset,</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  std::size_t width)</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;{</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> value=0;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> weight=1;</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="keywordflow">for</span>(std::size_t bit_nr=offset; bit_nr&lt;offset+width; bit_nr++)</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  {</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    assert(bit_nr&lt;bv.size());</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#adf97d3193105345ee1332f2bf08ebaed">l_get</a>(bv[bit_nr]).<a class="code" href="classtvt.html#ae0303c2ab852fb3ac3d696ea25578a60">get_value</a>())</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faffe62c0c68be1431c8aacf617bb08c8c">tvt::tv_enumt::TV_FALSE</a>:   <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faf6c667a41be8a115e86241d8088859c5">tvt::tv_enumt::TV_TRUE</a>:    value+=weight; <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a>: <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;     <span class="keywordflow">default</span>: assert(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    }</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    weight*=2;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  }</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordflow">return</span> value;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;}</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="comment">// allocate operands</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    std::size_t size_int = numeric_cast_v&lt;std::size_t&gt;(size_mpint);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().resize(size_int, <a class="code" href="classexprt.html">exprt</a>{ID_unknown});</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160; </div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="comment">// search uninterpreted functions</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160; </div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">for</span>(valuest::iterator it=values.begin();</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;        it!=values.end();</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        it++)</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      <span class="keywordflow">if</span>(it-&gt;first&gt;=0 &amp;&amp; it-&gt;first&lt;size_mpint)</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[numeric_cast_v&lt;std::size_t&gt;(it-&gt;first)].swap(</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;          it-&gt;second);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  }</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160; </div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;}</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160; </div>
+<div class="line"><a name="l00391"></a><span class="lineno"><a class="line" href="classboolbvt.html#a04c4f06ddb5cc56b57bb753b8d7092bd">  391</a></span>&#160;<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="classboolbvt.html#aef28c240526a8d9d5c9f24265c9483f2">boolbvt::get_value</a>(</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv,</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  std::size_t offset,</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  std::size_t width)</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;{</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> value=0;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> weight=1;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160; </div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="keywordflow">for</span>(std::size_t bit_nr=offset; bit_nr&lt;offset+width; bit_nr++)</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  {</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    assert(bit_nr&lt;bv.size());</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#adf97d3193105345ee1332f2bf08ebaed">l_get</a>(bv[bit_nr]).<a class="code" href="classtvt.html#ae0303c2ab852fb3ac3d696ea25578a60">get_value</a>())</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    {</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faffe62c0c68be1431c8aacf617bb08c8c">tvt::tv_enumt::TV_FALSE</a>:   <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faf6c667a41be8a115e86241d8088859c5">tvt::tv_enumt::TV_TRUE</a>:    value+=weight; <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a>: <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;     <span class="keywordflow">default</span>: assert(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    }</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    weight*=2;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  }</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <span class="keywordflow">return</span> value;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="ac__types_8h_html_a6558000ad89576ccc4c7b92d6de5432c"><div class="ttname"><a href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a></div><div class="ttdeci">const union_tag_typet &amp; to_union_tag_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a union_tag_typet.</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8h_source.html#l00202">c_types.h:202</a></div></div>
@@ -567,7 +571,7 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="ttc" id="asimplify__expr_8cpp_html_adebe9c3e4a7aac67777c20e448f6f2bc"><div class="ttname"><a href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a></div><div class="ttdeci">exprt simplify_expr(exprt src, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03000">simplify_expr.cpp:3000</a></div></div>
 <div class="ttc" id="aclassarrayst_html_ac7868d6f14949469054dad3be4904938"><div class="ttname"><a href="classarrayst.html#ac7868d6f14949469054dad3be4904938">arrayst::index_sett</a></div><div class="ttdeci">std::set&lt; exprt &gt; index_sett</div><div class="ttdef"><b>Definition:</b> <a href="arrays_8h_source.html#l00081">arrays.h:81</a></div></div>
 <div class="ttc" id="aclassirept_html_ae8e3838afb6cbf4dbe3c11aaf4cc4d1a"><div class="ttname"><a href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">irept::get_string</a></div><div class="ttdeci">const std::string &amp; get_string(const irep_idt &amp;name) const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00409">irep.h:409</a></div></div>
-<div class="ttc" id="aclassboolbvt_html_a91f491c2318e208204caa9d2b7a4fb1f"><div class="ttname"><a href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">boolbvt::bv_get_cache</a></div><div class="ttdeci">exprt bv_get_cache(const exprt &amp;expr) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__get_8cpp_source.html#l00277">boolbv_get.cpp:277</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_a91f491c2318e208204caa9d2b7a4fb1f"><div class="ttname"><a href="classboolbvt.html#a91f491c2318e208204caa9d2b7a4fb1f">boolbvt::bv_get_cache</a></div><div class="ttdeci">exprt bv_get_cache(const exprt &amp;expr) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__get_8cpp_source.html#l00281">boolbv_get.cpp:281</a></div></div>
 <div class="ttc" id="aclassirept_html_afa2098e6870bd6fb415025781a3a5db1"><div class="ttname"><a href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">irept::is_nil</a></div><div class="ttdeci">bool is_nil() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00376">irep.h:376</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassempty__union__exprt_html"><div class="ttname"><a href="classempty__union__exprt.html">empty_union_exprt</a></div><div class="ttdoc">Union constructor to support unions without any member (a GCC/Clang feature).</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01773">std_expr.h:1773</a></div></div>
@@ -576,7 +580,7 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="ttc" id="aclasscomplex__exprt_html"><div class="ttname"><a href="classcomplex__exprt.html">complex_exprt</a></div><div class="ttdoc">Complex constructor from a pair of numbers.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01857">std_expr.h:1857</a></div></div>
 <div class="ttc" id="aclassfalse__exprt_html"><div class="ttname"><a href="classfalse__exprt.html">false_exprt</a></div><div class="ttdoc">The Boolean constant false.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03016">std_expr.h:3016</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_aef28c240526a8d9d5c9f24265c9483f2"><div class="ttname"><a href="classboolbvt.html#aef28c240526a8d9d5c9f24265c9483f2">boolbvt::get_value</a></div><div class="ttdeci">mp_integer get_value(const bvt &amp;bv)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8h_source.html#l00090">boolbv.h:90</a></div></div>
-<div class="ttc" id="aclassboolbvt_html_a6693ac5e0bf4202a5830f71599cfa953"><div class="ttname"><a href="classboolbvt.html#a6693ac5e0bf4202a5830f71599cfa953">boolbvt::bv_get_unbounded_array</a></div><div class="ttdeci">virtual exprt bv_get_unbounded_array(const exprt &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__get_8cpp_source.html#l00289">boolbv_get.cpp:289</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_a6693ac5e0bf4202a5830f71599cfa953"><div class="ttname"><a href="classboolbvt.html#a6693ac5e0bf4202a5830f71599cfa953">boolbvt::bv_get_unbounded_array</a></div><div class="ttdeci">virtual exprt bv_get_unbounded_array(const exprt &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__get_8cpp_source.html#l00293">boolbv_get.cpp:293</a></div></div>
 <div class="ttc" id="aclassboolbv__mapt_html_a5eebe4f3b24117d49921202b5cbca844"><div class="ttname"><a href="classboolbv__mapt.html#a5eebe4f3b24117d49921202b5cbca844">boolbv_mapt::get_map_entry</a></div><div class="ttdeci">optionalt&lt; std::reference_wrapper&lt; const map_entryt &gt; &gt; get_map_entry(const irep_idt &amp;identifier) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__map_8h_source.html#l00057">boolbv_map.h:57</a></div></div>
 <div class="ttc" id="aclassboolbv__mapt_1_1map__entryt_html_ac913ab3e92528c4448a1adb1b341f936"><div class="ttname"><a href="classboolbv__mapt_1_1map__entryt.html#ac913ab3e92528c4448a1adb1b341f936">boolbv_mapt::map_entryt::type</a></div><div class="ttdeci">typet type</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__map_8h_source.html#l00032">boolbv_map.h:32</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
@@ -584,7 +588,7 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="ttc" id="aclassmember__exprt_html"><div class="ttname"><a href="classmember__exprt.html">member_exprt</a></div><div class="ttdoc">Extract member of struct or union.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02793">std_expr.h:2793</a></div></div>
 <div class="ttc" id="aboolbv__type_8h_html_ae4f182da032d611204c51b0936984673a3e9bd43e672839b2fd870909d7126a21"><div class="ttname"><a href="boolbv__type_8h.html#ae4f182da032d611204c51b0936984673a3e9bd43e672839b2fd870909d7126a21">bvtypet::IS_C_ENUM</a></div><div class="ttdeci">@ IS_C_ENUM</div></div>
 <div class="ttc" id="aclasspropt_html_adf97d3193105345ee1332f2bf08ebaed"><div class="ttname"><a href="classpropt.html#adf97d3193105345ee1332f2bf08ebaed">propt::l_get</a></div><div class="ttdeci">virtual tvt l_get(literalt a) const =0</div></div>
-<div class="ttc" id="aclassboolbvt_html_a4766aa97d9a3ac8b3de9b33904e19faf"><div class="ttname"><a href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">boolbvt::bv_get</a></div><div class="ttdeci">exprt bv_get(const bvt &amp;bv, const typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__get_8cpp_source.html#l00270">boolbv_get.cpp:270</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_a4766aa97d9a3ac8b3de9b33904e19faf"><div class="ttname"><a href="classboolbvt.html#a4766aa97d9a3ac8b3de9b33904e19faf">boolbvt::bv_get</a></div><div class="ttdeci">exprt bv_get(const bvt &amp;bv, const typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__get_8cpp_source.html#l00274">boolbv_get.cpp:274</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_a4c9ece0fc463cd401e189f7e228cf3a2"><div class="ttname"><a href="classboolbvt.html#a4c9ece0fc463cd401e189f7e228cf3a2">boolbvt::string_numbering</a></div><div class="ttdeci">numberingt&lt; irep_idt &gt; string_numbering</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8h_source.html#l00277">boolbv.h:277</a></div></div>
 <div class="ttc" id="amp__arith_8cpp_html_a13e6897151a875d15c17fd7843d430be"><div class="ttname"><a href="mp__arith_8cpp.html#a13e6897151a875d15c17fd7843d430be">binary2integer</a></div><div class="ttdeci">const mp_integer binary2integer(const std::string &amp;n, bool is_signed)</div><div class="ttdoc">convert binary string representation to mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="mp__arith_8cpp_source.html#l00117">mp_arith.cpp:117</a></div></div>
