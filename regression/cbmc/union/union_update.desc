@@ -1,4 +1,4 @@
-CORE broken-z3-smt-backend
+CORE
 union_update.c
 
 ^EXIT=10$
@@ -8,6 +8,3 @@ union_update.c
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
---
-This fails when using the SMT backend with Z3 with the error message
-"store expects the first argument sort to be an array".

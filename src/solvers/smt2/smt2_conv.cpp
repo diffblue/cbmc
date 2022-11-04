@@ -5459,20 +5459,18 @@ bool smt2_convt::use_array_theory(const exprt &expr)
   const typet &type = expr.type();
   PRECONDITION(type.id()==ID_array);
 
-  if(use_datatypes)
+  // a union is always flattened; else always use array theory when we have
+  // datatypes
+  if(expr.id() == ID_with)
+    return use_array_theory(to_with_expr(expr).old());
+  else if(auto member = expr_try_dynamic_cast<member_exprt>(expr))
   {
-    return true; // always use array theory when we have datatypes
+    // arrays inside structs get flattened, unless we have datatypes
+    return use_datatypes && member->compound().type().id() != ID_union &&
+           member->compound().type().id() != ID_union_tag;
   }
   else
-  {
-    // arrays inside structs or unions get flattened
-    if(expr.id()==ID_with)
-      return use_array_theory(to_with_expr(expr).old());
-    else if(expr.id()==ID_member)
-      return false;
-    else
-      return true;
-  }
+    return true;
 }
 
 void smt2_convt::convert_type(const typet &type)
