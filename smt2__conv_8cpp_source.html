@@ -5533,392 +5533,390 @@ $(document).ready(function(){initNavTree('smt2__conv_8cpp_source.html',''); init
 <div class="line"><a name="l05459"></a><span class="lineno"> 5459</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
 <div class="line"><a name="l05460"></a><span class="lineno"> 5460</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array);</div>
 <div class="line"><a name="l05461"></a><span class="lineno"> 5461</span>&#160; </div>
-<div class="line"><a name="l05462"></a><span class="lineno"> 5462</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
-<div class="line"><a name="l05463"></a><span class="lineno"> 5463</span>&#160;  {</div>
-<div class="line"><a name="l05464"></a><span class="lineno"> 5464</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// always use array theory when we have datatypes</span></div>
-<div class="line"><a name="l05465"></a><span class="lineno"> 5465</span>&#160;  }</div>
-<div class="line"><a name="l05466"></a><span class="lineno"> 5466</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05462"></a><span class="lineno"> 5462</span>&#160;  <span class="comment">// a union is always flattened; else always use array theory when we have</span></div>
+<div class="line"><a name="l05463"></a><span class="lineno"> 5463</span>&#160;  <span class="comment">// datatypes</span></div>
+<div class="line"><a name="l05464"></a><span class="lineno"> 5464</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_with)</div>
+<div class="line"><a name="l05465"></a><span class="lineno"> 5465</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsmt2__convt.html#a06b8dece720bc9c30730f87054b6e058">use_array_theory</a>(<a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(expr).old());</div>
+<div class="line"><a name="l05466"></a><span class="lineno"> 5466</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keyword">auto</span> member = expr_try_dynamic_cast&lt;member_exprt&gt;(expr))</div>
 <div class="line"><a name="l05467"></a><span class="lineno"> 5467</span>&#160;  {</div>
-<div class="line"><a name="l05468"></a><span class="lineno"> 5468</span>&#160;    <span class="comment">// arrays inside structs or unions get flattened</span></div>
-<div class="line"><a name="l05469"></a><span class="lineno"> 5469</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_with)</div>
-<div class="line"><a name="l05470"></a><span class="lineno"> 5470</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsmt2__convt.html#a06b8dece720bc9c30730f87054b6e058">use_array_theory</a>(<a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(expr).old());</div>
-<div class="line"><a name="l05471"></a><span class="lineno"> 5471</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
-<div class="line"><a name="l05472"></a><span class="lineno"> 5472</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l05473"></a><span class="lineno"> 5473</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05474"></a><span class="lineno"> 5474</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l05475"></a><span class="lineno"> 5475</span>&#160;  }</div>
-<div class="line"><a name="l05476"></a><span class="lineno"> 5476</span>&#160;}</div>
-<div class="line"><a name="l05477"></a><span class="lineno"> 5477</span>&#160; </div>
-<div class="line"><a name="l05478"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951"> 5478</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">smt2_convt::convert_type</a>(<span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)</div>
-<div class="line"><a name="l05479"></a><span class="lineno"> 5479</span>&#160;{</div>
-<div class="line"><a name="l05480"></a><span class="lineno"> 5480</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l05481"></a><span class="lineno"> 5481</span>&#160;  {</div>
-<div class="line"><a name="l05482"></a><span class="lineno"> 5482</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type);</div>
-<div class="line"><a name="l05483"></a><span class="lineno"> 5483</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>());</div>
-<div class="line"><a name="l05484"></a><span class="lineno"> 5484</span>&#160; </div>
-<div class="line"><a name="l05485"></a><span class="lineno"> 5485</span>&#160;    <span class="comment">// we always use array theory for top-level arrays</span></div>
-<div class="line"><a name="l05486"></a><span class="lineno"> 5486</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype = array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>();</div>
-<div class="line"><a name="l05487"></a><span class="lineno"> 5487</span>&#160; </div>
-<div class="line"><a name="l05488"></a><span class="lineno"> 5488</span>&#160;    <span class="comment">// Arrays map the index type to the element type.</span></div>
-<div class="line"><a name="l05489"></a><span class="lineno"> 5489</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(Array &quot;</span>;</div>
-<div class="line"><a name="l05490"></a><span class="lineno"> 5490</span>&#160;    <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>());</div>
-<div class="line"><a name="l05491"></a><span class="lineno"> 5491</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l05492"></a><span class="lineno"> 5492</span>&#160; </div>
-<div class="line"><a name="l05493"></a><span class="lineno"> 5493</span>&#160;    <span class="keywordflow">if</span>(subtype.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool &amp;&amp; !<a class="code" href="classsmt2__convt.html#ab3af992cf30f861e62096c3a7787dfb7">use_array_of_bool</a>)</div>
-<div class="line"><a name="l05494"></a><span class="lineno"> 5494</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec 1)&quot;</span>;</div>
-<div class="line"><a name="l05495"></a><span class="lineno"> 5495</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05496"></a><span class="lineno"> 5496</span>&#160;      <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>());</div>
-<div class="line"><a name="l05497"></a><span class="lineno"> 5497</span>&#160; </div>
-<div class="line"><a name="l05498"></a><span class="lineno"> 5498</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05499"></a><span class="lineno"> 5499</span>&#160;  }</div>
-<div class="line"><a name="l05500"></a><span class="lineno"> 5500</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool)</div>
-<div class="line"><a name="l05501"></a><span class="lineno"> 5501</span>&#160;  {</div>
-<div class="line"><a name="l05502"></a><span class="lineno"> 5502</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Bool&quot;</span>;</div>
-<div class="line"><a name="l05503"></a><span class="lineno"> 5503</span>&#160;  }</div>
-<div class="line"><a name="l05504"></a><span class="lineno"> 5504</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
-<div class="line"><a name="l05505"></a><span class="lineno"> 5505</span>&#160;  {</div>
-<div class="line"><a name="l05506"></a><span class="lineno"> 5506</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
-<div class="line"><a name="l05507"></a><span class="lineno"> 5507</span>&#160;    {</div>
-<div class="line"><a name="l05508"></a><span class="lineno"> 5508</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
-<div class="line"><a name="l05509"></a><span class="lineno"> 5509</span>&#160;    }</div>
-<div class="line"><a name="l05510"></a><span class="lineno"> 5510</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05511"></a><span class="lineno"> 5511</span>&#160;    {</div>
-<div class="line"><a name="l05512"></a><span class="lineno"> 5512</span>&#160;      std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
-<div class="line"><a name="l05513"></a><span class="lineno"> 5513</span>&#160; </div>
-<div class="line"><a name="l05514"></a><span class="lineno"> 5514</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05515"></a><span class="lineno"> 5515</span>&#160;    }</div>
-<div class="line"><a name="l05516"></a><span class="lineno"> 5516</span>&#160;  }</div>
-<div class="line"><a name="l05517"></a><span class="lineno"> 5517</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
-<div class="line"><a name="l05518"></a><span class="lineno"> 5518</span>&#160;  {</div>
-<div class="line"><a name="l05519"></a><span class="lineno"> 5519</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
-<div class="line"><a name="l05520"></a><span class="lineno"> 5520</span>&#160;    {</div>
-<div class="line"><a name="l05521"></a><span class="lineno"> 5521</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
-<div class="line"><a name="l05522"></a><span class="lineno"> 5522</span>&#160;    }</div>
-<div class="line"><a name="l05523"></a><span class="lineno"> 5523</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05524"></a><span class="lineno"> 5524</span>&#160;    {</div>
-<div class="line"><a name="l05525"></a><span class="lineno"> 5525</span>&#160;      std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
-<div class="line"><a name="l05526"></a><span class="lineno"> 5526</span>&#160; </div>
-<div class="line"><a name="l05527"></a><span class="lineno"> 5527</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05528"></a><span class="lineno"> 5528</span>&#160;    }</div>
-<div class="line"><a name="l05529"></a><span class="lineno"> 5529</span>&#160;  }</div>
-<div class="line"><a name="l05530"></a><span class="lineno"> 5530</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
-<div class="line"><a name="l05531"></a><span class="lineno"> 5531</span>&#160;  {</div>
-<div class="line"><a name="l05532"></a><span class="lineno"> 5532</span>&#160;    <span class="comment">// These may appear in structs.</span></div>
-<div class="line"><a name="l05533"></a><span class="lineno"> 5533</span>&#160;    <span class="comment">// We replace this by &quot;Bool&quot; in order to keep the same</span></div>
-<div class="line"><a name="l05534"></a><span class="lineno"> 5534</span>&#160;    <span class="comment">// member count.</span></div>
-<div class="line"><a name="l05535"></a><span class="lineno"> 5535</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Bool&quot;</span>;</div>
-<div class="line"><a name="l05536"></a><span class="lineno"> 5536</span>&#160;  }</div>
-<div class="line"><a name="l05537"></a><span class="lineno"> 5537</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
-<div class="line"><a name="l05538"></a><span class="lineno"> 5538</span>&#160;  {</div>
-<div class="line"><a name="l05539"></a><span class="lineno"> 5539</span>&#160;    std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
-<div class="line"><a name="l05540"></a><span class="lineno"> 5540</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#ad1c6cf9a3abb501691b279783f4f8c41">CHECK_RETURN_WITH_DIAGNOSTICS</a>(</div>
-<div class="line"><a name="l05541"></a><span class="lineno"> 5541</span>&#160;      <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(<a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(type)).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().empty() || width != 0,</div>
-<div class="line"><a name="l05542"></a><span class="lineno"> 5542</span>&#160;      <span class="stringliteral">&quot;failed to get width of union&quot;</span>);</div>
-<div class="line"><a name="l05543"></a><span class="lineno"> 5543</span>&#160; </div>
-<div class="line"><a name="l05544"></a><span class="lineno"> 5544</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05545"></a><span class="lineno"> 5545</span>&#160;  }</div>
-<div class="line"><a name="l05546"></a><span class="lineno"> 5546</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer)</div>
-<div class="line"><a name="l05547"></a><span class="lineno"> 5547</span>&#160;  {</div>
-<div class="line"><a name="l05548"></a><span class="lineno"> 5548</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
-<div class="line"><a name="l05549"></a><span class="lineno"> 5549</span>&#160;        &lt;&lt; <a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05550"></a><span class="lineno"> 5550</span>&#160;  }</div>
-<div class="line"><a name="l05551"></a><span class="lineno"> 5551</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bv ||</div>
-<div class="line"><a name="l05552"></a><span class="lineno"> 5552</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_fixedbv ||</div>
-<div class="line"><a name="l05553"></a><span class="lineno"> 5553</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_unsignedbv ||</div>
-<div class="line"><a name="l05554"></a><span class="lineno"> 5554</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_signedbv ||</div>
-<div class="line"><a name="l05555"></a><span class="lineno"> 5555</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bool)</div>
-<div class="line"><a name="l05556"></a><span class="lineno"> 5556</span>&#160;  {</div>
-<div class="line"><a name="l05557"></a><span class="lineno"> 5557</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
-<div class="line"><a name="l05558"></a><span class="lineno"> 5558</span>&#160;        &lt;&lt; <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05559"></a><span class="lineno"> 5559</span>&#160;  }</div>
-<div class="line"><a name="l05560"></a><span class="lineno"> 5560</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_enum)</div>
-<div class="line"><a name="l05561"></a><span class="lineno"> 5561</span>&#160;  {</div>
-<div class="line"><a name="l05562"></a><span class="lineno"> 5562</span>&#160;    <span class="comment">// these have an underlying type</span></div>
-<div class="line"><a name="l05563"></a><span class="lineno"> 5563</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
-<div class="line"><a name="l05564"></a><span class="lineno"> 5564</span>&#160;        &lt;&lt; <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(<a class="code" href="c__types_8h.html#a549a7ed5b2f9355d44ea5c8c4f804c03">to_c_enum_type</a>(type).underlying_type()).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>()</div>
-<div class="line"><a name="l05565"></a><span class="lineno"> 5565</span>&#160;        &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05566"></a><span class="lineno"> 5566</span>&#160;  }</div>
-<div class="line"><a name="l05567"></a><span class="lineno"> 5567</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_enum_tag)</div>
-<div class="line"><a name="l05568"></a><span class="lineno"> 5568</span>&#160;  {</div>
-<div class="line"><a name="l05569"></a><span class="lineno"> 5569</span>&#160;    <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#aa14679493b0ac7bea8197a3ac6d1bf7f">to_c_enum_tag_type</a>(type)));</div>
-<div class="line"><a name="l05570"></a><span class="lineno"> 5570</span>&#160;  }</div>
-<div class="line"><a name="l05571"></a><span class="lineno"> 5571</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_floatbv)</div>
-<div class="line"><a name="l05572"></a><span class="lineno"> 5572</span>&#160;  {</div>
-<div class="line"><a name="l05573"></a><span class="lineno"> 5573</span>&#160;    <span class="keyword">const</span> <a class="code" href="classfloatbv__typet.html">floatbv_typet</a> &amp;floatbv_type=<a class="code" href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a>(type);</div>
-<div class="line"><a name="l05574"></a><span class="lineno"> 5574</span>&#160; </div>
-<div class="line"><a name="l05575"></a><span class="lineno"> 5575</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a24602b6faffcc115bfd06ff8f01b7361">use_FPA_theory</a>)</div>
-<div class="line"><a name="l05576"></a><span class="lineno"> 5576</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ FloatingPoint &quot;</span></div>
-<div class="line"><a name="l05577"></a><span class="lineno"> 5577</span>&#160;          &lt;&lt; floatbv_type.<a class="code" href="classfloatbv__typet.html#a7f0f17e749a233031d2996bf53570524">get_e</a>() &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
-<div class="line"><a name="l05578"></a><span class="lineno"> 5578</span>&#160;          &lt;&lt; floatbv_type.<a class="code" href="classfloatbv__typet.html#a539abc065a2fff8c3d65eddf670d2ad5">get_f</a>() + 1 &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05579"></a><span class="lineno"> 5579</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05580"></a><span class="lineno"> 5580</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
-<div class="line"><a name="l05581"></a><span class="lineno"> 5581</span>&#160;          &lt;&lt; floatbv_type.<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05582"></a><span class="lineno"> 5582</span>&#160;  }</div>
-<div class="line"><a name="l05583"></a><span class="lineno"> 5583</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_rational ||</div>
-<div class="line"><a name="l05584"></a><span class="lineno"> 5584</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_real)</div>
-<div class="line"><a name="l05585"></a><span class="lineno"> 5585</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Real&quot;</span>;</div>
-<div class="line"><a name="l05586"></a><span class="lineno"> 5586</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_integer)</div>
-<div class="line"><a name="l05587"></a><span class="lineno"> 5587</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Int&quot;</span>;</div>
-<div class="line"><a name="l05588"></a><span class="lineno"> 5588</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex)</div>
-<div class="line"><a name="l05589"></a><span class="lineno"> 5589</span>&#160;  {</div>
-<div class="line"><a name="l05590"></a><span class="lineno"> 5590</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
-<div class="line"><a name="l05591"></a><span class="lineno"> 5591</span>&#160;    {</div>
-<div class="line"><a name="l05592"></a><span class="lineno"> 5592</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
-<div class="line"><a name="l05593"></a><span class="lineno"> 5593</span>&#160;    }</div>
-<div class="line"><a name="l05594"></a><span class="lineno"> 5594</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05595"></a><span class="lineno"> 5595</span>&#160;    {</div>
-<div class="line"><a name="l05596"></a><span class="lineno"> 5596</span>&#160;      std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
-<div class="line"><a name="l05597"></a><span class="lineno"> 5597</span>&#160; </div>
-<div class="line"><a name="l05598"></a><span class="lineno"> 5598</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05599"></a><span class="lineno"> 5599</span>&#160;    }</div>
-<div class="line"><a name="l05600"></a><span class="lineno"> 5600</span>&#160;  }</div>
-<div class="line"><a name="l05601"></a><span class="lineno"> 5601</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bit_field)</div>
-<div class="line"><a name="l05602"></a><span class="lineno"> 5602</span>&#160;  {</div>
-<div class="line"><a name="l05603"></a><span class="lineno"> 5603</span>&#160;    <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="c__bit__field__replacement__type_8cpp.html#a22935afaf022a150b6fcc96170ae7ca2">c_bit_field_replacement_type</a>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(type), <a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>));</div>
-<div class="line"><a name="l05604"></a><span class="lineno"> 5604</span>&#160;  }</div>
-<div class="line"><a name="l05605"></a><span class="lineno"> 5605</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_state)</div>
-<div class="line"><a name="l05606"></a><span class="lineno"> 5606</span>&#160;  {</div>
-<div class="line"><a name="l05607"></a><span class="lineno"> 5607</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;state&quot;</span>;</div>
-<div class="line"><a name="l05608"></a><span class="lineno"> 5608</span>&#160;  }</div>
-<div class="line"><a name="l05609"></a><span class="lineno"> 5609</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05610"></a><span class="lineno"> 5610</span>&#160;  {</div>
-<div class="line"><a name="l05611"></a><span class="lineno"> 5611</span>&#160;    <a class="code" href="smt2__conv_8cpp.html#ada278d95db0e85e0e9b66241773ca38b">UNEXPECTEDCASE</a>(<span class="stringliteral">&quot;unsupported type: &quot;</span>+type.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>());</div>
-<div class="line"><a name="l05612"></a><span class="lineno"> 5612</span>&#160;  }</div>
-<div class="line"><a name="l05613"></a><span class="lineno"> 5613</span>&#160;}</div>
-<div class="line"><a name="l05614"></a><span class="lineno"> 5614</span>&#160; </div>
-<div class="line"><a name="l05615"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#afce5171557de1d67f387880c3e8696ab"> 5615</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsmt2__convt.html#a093ab95cde0c0f3179edddba8ff1a149">smt2_convt::find_symbols</a>(<span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)</div>
-<div class="line"><a name="l05616"></a><span class="lineno"> 5616</span>&#160;{</div>
-<div class="line"><a name="l05617"></a><span class="lineno"> 5617</span>&#160;  std::set&lt;irep_idt&gt; recstack;</div>
-<div class="line"><a name="l05618"></a><span class="lineno"> 5618</span>&#160;  <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(type, recstack);</div>
-<div class="line"><a name="l05619"></a><span class="lineno"> 5619</span>&#160;}</div>
-<div class="line"><a name="l05620"></a><span class="lineno"> 5620</span>&#160; </div>
-<div class="line"><a name="l05621"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9"> 5621</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">smt2_convt::find_symbols_rec</a>(</div>
-<div class="line"><a name="l05622"></a><span class="lineno"> 5622</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l05623"></a><span class="lineno"> 5623</span>&#160;  std::set&lt;irep_idt&gt; &amp;recstack)</div>
-<div class="line"><a name="l05624"></a><span class="lineno"> 5624</span>&#160;{</div>
-<div class="line"><a name="l05625"></a><span class="lineno"> 5625</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l05626"></a><span class="lineno"> 5626</span>&#160;  {</div>
-<div class="line"><a name="l05627"></a><span class="lineno"> 5627</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type);</div>
-<div class="line"><a name="l05628"></a><span class="lineno"> 5628</span>&#160;    <a class="code" href="classsmt2__convt.html#a093ab95cde0c0f3179edddba8ff1a149">find_symbols</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>());</div>
-<div class="line"><a name="l05629"></a><span class="lineno"> 5629</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>(), recstack);</div>
-<div class="line"><a name="l05630"></a><span class="lineno"> 5630</span>&#160;  }</div>
-<div class="line"><a name="l05631"></a><span class="lineno"> 5631</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex)</div>
-<div class="line"><a name="l05632"></a><span class="lineno"> 5632</span>&#160;  {</div>
-<div class="line"><a name="l05633"></a><span class="lineno"> 5633</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype(), recstack);</div>
-<div class="line"><a name="l05634"></a><span class="lineno"> 5634</span>&#160; </div>
-<div class="line"><a name="l05635"></a><span class="lineno"> 5635</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp;</div>
-<div class="line"><a name="l05636"></a><span class="lineno"> 5636</span>&#160;       <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type)==<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
-<div class="line"><a name="l05637"></a><span class="lineno"> 5637</span>&#160;    {</div>
-<div class="line"><a name="l05638"></a><span class="lineno"> 5638</span>&#160;      <span class="keyword">const</span> std::string smt_typename =</div>
-<div class="line"><a name="l05639"></a><span class="lineno"> 5639</span>&#160;        <span class="stringliteral">&quot;complex.&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.size());</div>
-<div class="line"><a name="l05640"></a><span class="lineno"> 5640</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = smt_typename;</div>
-<div class="line"><a name="l05641"></a><span class="lineno"> 5641</span>&#160; </div>
-<div class="line"><a name="l05642"></a><span class="lineno"> 5642</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-datatypes ((&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; 0)) &quot;</span></div>
-<div class="line"><a name="l05643"></a><span class="lineno"> 5643</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;(((mk-&quot;</span> &lt;&lt; smt_typename;</div>
-<div class="line"><a name="l05644"></a><span class="lineno"> 5644</span>&#160; </div>
-<div class="line"><a name="l05645"></a><span class="lineno"> 5645</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.imag &quot;</span>;</div>
-<div class="line"><a name="l05646"></a><span class="lineno"> 5646</span>&#160;      <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype());</div>
-<div class="line"><a name="l05647"></a><span class="lineno"> 5647</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05648"></a><span class="lineno"> 5648</span>&#160; </div>
-<div class="line"><a name="l05649"></a><span class="lineno"> 5649</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.real &quot;</span>;</div>
-<div class="line"><a name="l05650"></a><span class="lineno"> 5650</span>&#160;      <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype());</div>
-<div class="line"><a name="l05651"></a><span class="lineno"> 5651</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05652"></a><span class="lineno"> 5652</span>&#160; </div>
-<div class="line"><a name="l05653"></a><span class="lineno"> 5653</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))))\n&quot;</span>;</div>
-<div class="line"><a name="l05654"></a><span class="lineno"> 5654</span>&#160;    }</div>
-<div class="line"><a name="l05655"></a><span class="lineno"> 5655</span>&#160;  }</div>
-<div class="line"><a name="l05656"></a><span class="lineno"> 5656</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
-<div class="line"><a name="l05657"></a><span class="lineno"> 5657</span>&#160;  {</div>
-<div class="line"><a name="l05658"></a><span class="lineno"> 5658</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type).element_type(), recstack);</div>
-<div class="line"><a name="l05659"></a><span class="lineno"> 5659</span>&#160; </div>
-<div class="line"><a name="l05660"></a><span class="lineno"> 5660</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp;</div>
-<div class="line"><a name="l05661"></a><span class="lineno"> 5661</span>&#160;       <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type)==<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
-<div class="line"><a name="l05662"></a><span class="lineno"> 5662</span>&#160;    {</div>
-<div class="line"><a name="l05663"></a><span class="lineno"> 5663</span>&#160;      <span class="keyword">const</span> <a class="code" href="classvector__typet.html">vector_typet</a> &amp;vector_type=<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type);</div>
+<div class="line"><a name="l05468"></a><span class="lineno"> 5468</span>&#160;    <span class="comment">// arrays inside structs get flattened, unless we have datatypes</span></div>
+<div class="line"><a name="l05469"></a><span class="lineno"> 5469</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp; member-&gt;compound().type().id() != ID_union &amp;&amp;</div>
+<div class="line"><a name="l05470"></a><span class="lineno"> 5470</span>&#160;           member-&gt;compound().type().id() != ID_union_tag;</div>
+<div class="line"><a name="l05471"></a><span class="lineno"> 5471</span>&#160;  }</div>
+<div class="line"><a name="l05472"></a><span class="lineno"> 5472</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05473"></a><span class="lineno"> 5473</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l05474"></a><span class="lineno"> 5474</span>&#160;}</div>
+<div class="line"><a name="l05475"></a><span class="lineno"> 5475</span>&#160; </div>
+<div class="line"><a name="l05476"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951"> 5476</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">smt2_convt::convert_type</a>(<span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)</div>
+<div class="line"><a name="l05477"></a><span class="lineno"> 5477</span>&#160;{</div>
+<div class="line"><a name="l05478"></a><span class="lineno"> 5478</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l05479"></a><span class="lineno"> 5479</span>&#160;  {</div>
+<div class="line"><a name="l05480"></a><span class="lineno"> 5480</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type);</div>
+<div class="line"><a name="l05481"></a><span class="lineno"> 5481</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>());</div>
+<div class="line"><a name="l05482"></a><span class="lineno"> 5482</span>&#160; </div>
+<div class="line"><a name="l05483"></a><span class="lineno"> 5483</span>&#160;    <span class="comment">// we always use array theory for top-level arrays</span></div>
+<div class="line"><a name="l05484"></a><span class="lineno"> 5484</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype = array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>();</div>
+<div class="line"><a name="l05485"></a><span class="lineno"> 5485</span>&#160; </div>
+<div class="line"><a name="l05486"></a><span class="lineno"> 5486</span>&#160;    <span class="comment">// Arrays map the index type to the element type.</span></div>
+<div class="line"><a name="l05487"></a><span class="lineno"> 5487</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(Array &quot;</span>;</div>
+<div class="line"><a name="l05488"></a><span class="lineno"> 5488</span>&#160;    <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>());</div>
+<div class="line"><a name="l05489"></a><span class="lineno"> 5489</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l05490"></a><span class="lineno"> 5490</span>&#160; </div>
+<div class="line"><a name="l05491"></a><span class="lineno"> 5491</span>&#160;    <span class="keywordflow">if</span>(subtype.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool &amp;&amp; !<a class="code" href="classsmt2__convt.html#ab3af992cf30f861e62096c3a7787dfb7">use_array_of_bool</a>)</div>
+<div class="line"><a name="l05492"></a><span class="lineno"> 5492</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec 1)&quot;</span>;</div>
+<div class="line"><a name="l05493"></a><span class="lineno"> 5493</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05494"></a><span class="lineno"> 5494</span>&#160;      <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>());</div>
+<div class="line"><a name="l05495"></a><span class="lineno"> 5495</span>&#160; </div>
+<div class="line"><a name="l05496"></a><span class="lineno"> 5496</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05497"></a><span class="lineno"> 5497</span>&#160;  }</div>
+<div class="line"><a name="l05498"></a><span class="lineno"> 5498</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool)</div>
+<div class="line"><a name="l05499"></a><span class="lineno"> 5499</span>&#160;  {</div>
+<div class="line"><a name="l05500"></a><span class="lineno"> 5500</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Bool&quot;</span>;</div>
+<div class="line"><a name="l05501"></a><span class="lineno"> 5501</span>&#160;  }</div>
+<div class="line"><a name="l05502"></a><span class="lineno"> 5502</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
+<div class="line"><a name="l05503"></a><span class="lineno"> 5503</span>&#160;  {</div>
+<div class="line"><a name="l05504"></a><span class="lineno"> 5504</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
+<div class="line"><a name="l05505"></a><span class="lineno"> 5505</span>&#160;    {</div>
+<div class="line"><a name="l05506"></a><span class="lineno"> 5506</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
+<div class="line"><a name="l05507"></a><span class="lineno"> 5507</span>&#160;    }</div>
+<div class="line"><a name="l05508"></a><span class="lineno"> 5508</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05509"></a><span class="lineno"> 5509</span>&#160;    {</div>
+<div class="line"><a name="l05510"></a><span class="lineno"> 5510</span>&#160;      std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
+<div class="line"><a name="l05511"></a><span class="lineno"> 5511</span>&#160; </div>
+<div class="line"><a name="l05512"></a><span class="lineno"> 5512</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05513"></a><span class="lineno"> 5513</span>&#160;    }</div>
+<div class="line"><a name="l05514"></a><span class="lineno"> 5514</span>&#160;  }</div>
+<div class="line"><a name="l05515"></a><span class="lineno"> 5515</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
+<div class="line"><a name="l05516"></a><span class="lineno"> 5516</span>&#160;  {</div>
+<div class="line"><a name="l05517"></a><span class="lineno"> 5517</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
+<div class="line"><a name="l05518"></a><span class="lineno"> 5518</span>&#160;    {</div>
+<div class="line"><a name="l05519"></a><span class="lineno"> 5519</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
+<div class="line"><a name="l05520"></a><span class="lineno"> 5520</span>&#160;    }</div>
+<div class="line"><a name="l05521"></a><span class="lineno"> 5521</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05522"></a><span class="lineno"> 5522</span>&#160;    {</div>
+<div class="line"><a name="l05523"></a><span class="lineno"> 5523</span>&#160;      std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
+<div class="line"><a name="l05524"></a><span class="lineno"> 5524</span>&#160; </div>
+<div class="line"><a name="l05525"></a><span class="lineno"> 5525</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05526"></a><span class="lineno"> 5526</span>&#160;    }</div>
+<div class="line"><a name="l05527"></a><span class="lineno"> 5527</span>&#160;  }</div>
+<div class="line"><a name="l05528"></a><span class="lineno"> 5528</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
+<div class="line"><a name="l05529"></a><span class="lineno"> 5529</span>&#160;  {</div>
+<div class="line"><a name="l05530"></a><span class="lineno"> 5530</span>&#160;    <span class="comment">// These may appear in structs.</span></div>
+<div class="line"><a name="l05531"></a><span class="lineno"> 5531</span>&#160;    <span class="comment">// We replace this by &quot;Bool&quot; in order to keep the same</span></div>
+<div class="line"><a name="l05532"></a><span class="lineno"> 5532</span>&#160;    <span class="comment">// member count.</span></div>
+<div class="line"><a name="l05533"></a><span class="lineno"> 5533</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Bool&quot;</span>;</div>
+<div class="line"><a name="l05534"></a><span class="lineno"> 5534</span>&#160;  }</div>
+<div class="line"><a name="l05535"></a><span class="lineno"> 5535</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
+<div class="line"><a name="l05536"></a><span class="lineno"> 5536</span>&#160;  {</div>
+<div class="line"><a name="l05537"></a><span class="lineno"> 5537</span>&#160;    std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
+<div class="line"><a name="l05538"></a><span class="lineno"> 5538</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#ad1c6cf9a3abb501691b279783f4f8c41">CHECK_RETURN_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l05539"></a><span class="lineno"> 5539</span>&#160;      <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(<a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(type)).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().empty() || width != 0,</div>
+<div class="line"><a name="l05540"></a><span class="lineno"> 5540</span>&#160;      <span class="stringliteral">&quot;failed to get width of union&quot;</span>);</div>
+<div class="line"><a name="l05541"></a><span class="lineno"> 5541</span>&#160; </div>
+<div class="line"><a name="l05542"></a><span class="lineno"> 5542</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05543"></a><span class="lineno"> 5543</span>&#160;  }</div>
+<div class="line"><a name="l05544"></a><span class="lineno"> 5544</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer)</div>
+<div class="line"><a name="l05545"></a><span class="lineno"> 5545</span>&#160;  {</div>
+<div class="line"><a name="l05546"></a><span class="lineno"> 5546</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
+<div class="line"><a name="l05547"></a><span class="lineno"> 5547</span>&#160;        &lt;&lt; <a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05548"></a><span class="lineno"> 5548</span>&#160;  }</div>
+<div class="line"><a name="l05549"></a><span class="lineno"> 5549</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bv ||</div>
+<div class="line"><a name="l05550"></a><span class="lineno"> 5550</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_fixedbv ||</div>
+<div class="line"><a name="l05551"></a><span class="lineno"> 5551</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_unsignedbv ||</div>
+<div class="line"><a name="l05552"></a><span class="lineno"> 5552</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_signedbv ||</div>
+<div class="line"><a name="l05553"></a><span class="lineno"> 5553</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bool)</div>
+<div class="line"><a name="l05554"></a><span class="lineno"> 5554</span>&#160;  {</div>
+<div class="line"><a name="l05555"></a><span class="lineno"> 5555</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
+<div class="line"><a name="l05556"></a><span class="lineno"> 5556</span>&#160;        &lt;&lt; <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05557"></a><span class="lineno"> 5557</span>&#160;  }</div>
+<div class="line"><a name="l05558"></a><span class="lineno"> 5558</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_enum)</div>
+<div class="line"><a name="l05559"></a><span class="lineno"> 5559</span>&#160;  {</div>
+<div class="line"><a name="l05560"></a><span class="lineno"> 5560</span>&#160;    <span class="comment">// these have an underlying type</span></div>
+<div class="line"><a name="l05561"></a><span class="lineno"> 5561</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
+<div class="line"><a name="l05562"></a><span class="lineno"> 5562</span>&#160;        &lt;&lt; <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(<a class="code" href="c__types_8h.html#a549a7ed5b2f9355d44ea5c8c4f804c03">to_c_enum_type</a>(type).underlying_type()).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>()</div>
+<div class="line"><a name="l05563"></a><span class="lineno"> 5563</span>&#160;        &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05564"></a><span class="lineno"> 5564</span>&#160;  }</div>
+<div class="line"><a name="l05565"></a><span class="lineno"> 5565</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_enum_tag)</div>
+<div class="line"><a name="l05566"></a><span class="lineno"> 5566</span>&#160;  {</div>
+<div class="line"><a name="l05567"></a><span class="lineno"> 5567</span>&#160;    <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#aa14679493b0ac7bea8197a3ac6d1bf7f">to_c_enum_tag_type</a>(type)));</div>
+<div class="line"><a name="l05568"></a><span class="lineno"> 5568</span>&#160;  }</div>
+<div class="line"><a name="l05569"></a><span class="lineno"> 5569</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_floatbv)</div>
+<div class="line"><a name="l05570"></a><span class="lineno"> 5570</span>&#160;  {</div>
+<div class="line"><a name="l05571"></a><span class="lineno"> 5571</span>&#160;    <span class="keyword">const</span> <a class="code" href="classfloatbv__typet.html">floatbv_typet</a> &amp;floatbv_type=<a class="code" href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a>(type);</div>
+<div class="line"><a name="l05572"></a><span class="lineno"> 5572</span>&#160; </div>
+<div class="line"><a name="l05573"></a><span class="lineno"> 5573</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a24602b6faffcc115bfd06ff8f01b7361">use_FPA_theory</a>)</div>
+<div class="line"><a name="l05574"></a><span class="lineno"> 5574</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ FloatingPoint &quot;</span></div>
+<div class="line"><a name="l05575"></a><span class="lineno"> 5575</span>&#160;          &lt;&lt; floatbv_type.<a class="code" href="classfloatbv__typet.html#a7f0f17e749a233031d2996bf53570524">get_e</a>() &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><a name="l05576"></a><span class="lineno"> 5576</span>&#160;          &lt;&lt; floatbv_type.<a class="code" href="classfloatbv__typet.html#a539abc065a2fff8c3d65eddf670d2ad5">get_f</a>() + 1 &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05577"></a><span class="lineno"> 5577</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05578"></a><span class="lineno"> 5578</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span></div>
+<div class="line"><a name="l05579"></a><span class="lineno"> 5579</span>&#160;          &lt;&lt; floatbv_type.<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05580"></a><span class="lineno"> 5580</span>&#160;  }</div>
+<div class="line"><a name="l05581"></a><span class="lineno"> 5581</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_rational ||</div>
+<div class="line"><a name="l05582"></a><span class="lineno"> 5582</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_real)</div>
+<div class="line"><a name="l05583"></a><span class="lineno"> 5583</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Real&quot;</span>;</div>
+<div class="line"><a name="l05584"></a><span class="lineno"> 5584</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_integer)</div>
+<div class="line"><a name="l05585"></a><span class="lineno"> 5585</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;Int&quot;</span>;</div>
+<div class="line"><a name="l05586"></a><span class="lineno"> 5586</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex)</div>
+<div class="line"><a name="l05587"></a><span class="lineno"> 5587</span>&#160;  {</div>
+<div class="line"><a name="l05588"></a><span class="lineno"> 5588</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a>)</div>
+<div class="line"><a name="l05589"></a><span class="lineno"> 5589</span>&#160;    {</div>
+<div class="line"><a name="l05590"></a><span class="lineno"> 5590</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
+<div class="line"><a name="l05591"></a><span class="lineno"> 5591</span>&#160;    }</div>
+<div class="line"><a name="l05592"></a><span class="lineno"> 5592</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05593"></a><span class="lineno"> 5593</span>&#160;    {</div>
+<div class="line"><a name="l05594"></a><span class="lineno"> 5594</span>&#160;      std::size_t width=<a class="code" href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">boolbv_width</a>(type);</div>
+<div class="line"><a name="l05595"></a><span class="lineno"> 5595</span>&#160; </div>
+<div class="line"><a name="l05596"></a><span class="lineno"> 5596</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(_ BitVec &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05597"></a><span class="lineno"> 5597</span>&#160;    }</div>
+<div class="line"><a name="l05598"></a><span class="lineno"> 5598</span>&#160;  }</div>
+<div class="line"><a name="l05599"></a><span class="lineno"> 5599</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bit_field)</div>
+<div class="line"><a name="l05600"></a><span class="lineno"> 5600</span>&#160;  {</div>
+<div class="line"><a name="l05601"></a><span class="lineno"> 5601</span>&#160;    <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="c__bit__field__replacement__type_8cpp.html#a22935afaf022a150b6fcc96170ae7ca2">c_bit_field_replacement_type</a>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(type), <a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>));</div>
+<div class="line"><a name="l05602"></a><span class="lineno"> 5602</span>&#160;  }</div>
+<div class="line"><a name="l05603"></a><span class="lineno"> 5603</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_state)</div>
+<div class="line"><a name="l05604"></a><span class="lineno"> 5604</span>&#160;  {</div>
+<div class="line"><a name="l05605"></a><span class="lineno"> 5605</span>&#160;    <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;state&quot;</span>;</div>
+<div class="line"><a name="l05606"></a><span class="lineno"> 5606</span>&#160;  }</div>
+<div class="line"><a name="l05607"></a><span class="lineno"> 5607</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05608"></a><span class="lineno"> 5608</span>&#160;  {</div>
+<div class="line"><a name="l05609"></a><span class="lineno"> 5609</span>&#160;    <a class="code" href="smt2__conv_8cpp.html#ada278d95db0e85e0e9b66241773ca38b">UNEXPECTEDCASE</a>(<span class="stringliteral">&quot;unsupported type: &quot;</span>+type.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>());</div>
+<div class="line"><a name="l05610"></a><span class="lineno"> 5610</span>&#160;  }</div>
+<div class="line"><a name="l05611"></a><span class="lineno"> 5611</span>&#160;}</div>
+<div class="line"><a name="l05612"></a><span class="lineno"> 5612</span>&#160; </div>
+<div class="line"><a name="l05613"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#afce5171557de1d67f387880c3e8696ab"> 5613</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsmt2__convt.html#a093ab95cde0c0f3179edddba8ff1a149">smt2_convt::find_symbols</a>(<span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)</div>
+<div class="line"><a name="l05614"></a><span class="lineno"> 5614</span>&#160;{</div>
+<div class="line"><a name="l05615"></a><span class="lineno"> 5615</span>&#160;  std::set&lt;irep_idt&gt; recstack;</div>
+<div class="line"><a name="l05616"></a><span class="lineno"> 5616</span>&#160;  <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(type, recstack);</div>
+<div class="line"><a name="l05617"></a><span class="lineno"> 5617</span>&#160;}</div>
+<div class="line"><a name="l05618"></a><span class="lineno"> 5618</span>&#160; </div>
+<div class="line"><a name="l05619"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9"> 5619</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">smt2_convt::find_symbols_rec</a>(</div>
+<div class="line"><a name="l05620"></a><span class="lineno"> 5620</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l05621"></a><span class="lineno"> 5621</span>&#160;  std::set&lt;irep_idt&gt; &amp;recstack)</div>
+<div class="line"><a name="l05622"></a><span class="lineno"> 5622</span>&#160;{</div>
+<div class="line"><a name="l05623"></a><span class="lineno"> 5623</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l05624"></a><span class="lineno"> 5624</span>&#160;  {</div>
+<div class="line"><a name="l05625"></a><span class="lineno"> 5625</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type);</div>
+<div class="line"><a name="l05626"></a><span class="lineno"> 5626</span>&#160;    <a class="code" href="classsmt2__convt.html#a093ab95cde0c0f3179edddba8ff1a149">find_symbols</a>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>());</div>
+<div class="line"><a name="l05627"></a><span class="lineno"> 5627</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>(), recstack);</div>
+<div class="line"><a name="l05628"></a><span class="lineno"> 5628</span>&#160;  }</div>
+<div class="line"><a name="l05629"></a><span class="lineno"> 5629</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex)</div>
+<div class="line"><a name="l05630"></a><span class="lineno"> 5630</span>&#160;  {</div>
+<div class="line"><a name="l05631"></a><span class="lineno"> 5631</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype(), recstack);</div>
+<div class="line"><a name="l05632"></a><span class="lineno"> 5632</span>&#160; </div>
+<div class="line"><a name="l05633"></a><span class="lineno"> 5633</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp;</div>
+<div class="line"><a name="l05634"></a><span class="lineno"> 5634</span>&#160;       <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type)==<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
+<div class="line"><a name="l05635"></a><span class="lineno"> 5635</span>&#160;    {</div>
+<div class="line"><a name="l05636"></a><span class="lineno"> 5636</span>&#160;      <span class="keyword">const</span> std::string smt_typename =</div>
+<div class="line"><a name="l05637"></a><span class="lineno"> 5637</span>&#160;        <span class="stringliteral">&quot;complex.&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.size());</div>
+<div class="line"><a name="l05638"></a><span class="lineno"> 5638</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = smt_typename;</div>
+<div class="line"><a name="l05639"></a><span class="lineno"> 5639</span>&#160; </div>
+<div class="line"><a name="l05640"></a><span class="lineno"> 5640</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-datatypes ((&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; 0)) &quot;</span></div>
+<div class="line"><a name="l05641"></a><span class="lineno"> 5641</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;(((mk-&quot;</span> &lt;&lt; smt_typename;</div>
+<div class="line"><a name="l05642"></a><span class="lineno"> 5642</span>&#160; </div>
+<div class="line"><a name="l05643"></a><span class="lineno"> 5643</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.imag &quot;</span>;</div>
+<div class="line"><a name="l05644"></a><span class="lineno"> 5644</span>&#160;      <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype());</div>
+<div class="line"><a name="l05645"></a><span class="lineno"> 5645</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05646"></a><span class="lineno"> 5646</span>&#160; </div>
+<div class="line"><a name="l05647"></a><span class="lineno"> 5647</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.real &quot;</span>;</div>
+<div class="line"><a name="l05648"></a><span class="lineno"> 5648</span>&#160;      <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype());</div>
+<div class="line"><a name="l05649"></a><span class="lineno"> 5649</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05650"></a><span class="lineno"> 5650</span>&#160; </div>
+<div class="line"><a name="l05651"></a><span class="lineno"> 5651</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))))\n&quot;</span>;</div>
+<div class="line"><a name="l05652"></a><span class="lineno"> 5652</span>&#160;    }</div>
+<div class="line"><a name="l05653"></a><span class="lineno"> 5653</span>&#160;  }</div>
+<div class="line"><a name="l05654"></a><span class="lineno"> 5654</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector)</div>
+<div class="line"><a name="l05655"></a><span class="lineno"> 5655</span>&#160;  {</div>
+<div class="line"><a name="l05656"></a><span class="lineno"> 5656</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type).element_type(), recstack);</div>
+<div class="line"><a name="l05657"></a><span class="lineno"> 5657</span>&#160; </div>
+<div class="line"><a name="l05658"></a><span class="lineno"> 5658</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp;</div>
+<div class="line"><a name="l05659"></a><span class="lineno"> 5659</span>&#160;       <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type)==<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
+<div class="line"><a name="l05660"></a><span class="lineno"> 5660</span>&#160;    {</div>
+<div class="line"><a name="l05661"></a><span class="lineno"> 5661</span>&#160;      <span class="keyword">const</span> <a class="code" href="classvector__typet.html">vector_typet</a> &amp;vector_type=<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type);</div>
+<div class="line"><a name="l05662"></a><span class="lineno"> 5662</span>&#160; </div>
+<div class="line"><a name="l05663"></a><span class="lineno"> 5663</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> size = numeric_cast_v&lt;mp_integer&gt;(vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>());</div>
 <div class="line"><a name="l05664"></a><span class="lineno"> 5664</span>&#160; </div>
-<div class="line"><a name="l05665"></a><span class="lineno"> 5665</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> size = numeric_cast_v&lt;mp_integer&gt;(vector_type.<a class="code" href="classvector__typet.html#aab0ed47eb7936114e49965e4b1a4a4bc">size</a>());</div>
-<div class="line"><a name="l05666"></a><span class="lineno"> 5666</span>&#160; </div>
-<div class="line"><a name="l05667"></a><span class="lineno"> 5667</span>&#160;      <span class="keyword">const</span> std::string smt_typename =</div>
-<div class="line"><a name="l05668"></a><span class="lineno"> 5668</span>&#160;        <span class="stringliteral">&quot;vector.&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.size());</div>
-<div class="line"><a name="l05669"></a><span class="lineno"> 5669</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = smt_typename;</div>
-<div class="line"><a name="l05670"></a><span class="lineno"> 5670</span>&#160; </div>
-<div class="line"><a name="l05671"></a><span class="lineno"> 5671</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-datatypes ((&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; 0)) &quot;</span></div>
-<div class="line"><a name="l05672"></a><span class="lineno"> 5672</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;(((mk-&quot;</span> &lt;&lt; smt_typename;</div>
-<div class="line"><a name="l05673"></a><span class="lineno"> 5673</span>&#160; </div>
-<div class="line"><a name="l05674"></a><span class="lineno"> 5674</span>&#160;      <span class="keywordflow">for</span>(<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> i=0; i!=size; ++i)</div>
-<div class="line"><a name="l05675"></a><span class="lineno"> 5675</span>&#160;      {</div>
-<div class="line"><a name="l05676"></a><span class="lineno"> 5676</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l05677"></a><span class="lineno"> 5677</span>&#160;        <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type).element_type());</div>
-<div class="line"><a name="l05678"></a><span class="lineno"> 5678</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l05679"></a><span class="lineno"> 5679</span>&#160;      }</div>
-<div class="line"><a name="l05680"></a><span class="lineno"> 5680</span>&#160; </div>
-<div class="line"><a name="l05681"></a><span class="lineno"> 5681</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))))\n&quot;</span>;</div>
-<div class="line"><a name="l05682"></a><span class="lineno"> 5682</span>&#160;    }</div>
-<div class="line"><a name="l05683"></a><span class="lineno"> 5683</span>&#160;  }</div>
-<div class="line"><a name="l05684"></a><span class="lineno"> 5684</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct)</div>
-<div class="line"><a name="l05685"></a><span class="lineno"> 5685</span>&#160;  {</div>
-<div class="line"><a name="l05686"></a><span class="lineno"> 5686</span>&#160;    <span class="comment">// Cater for mutually recursive struct types</span></div>
-<div class="line"><a name="l05687"></a><span class="lineno"> 5687</span>&#160;    <span class="keywordtype">bool</span> need_decl=<span class="keyword">false</span>;</div>
-<div class="line"><a name="l05688"></a><span class="lineno"> 5688</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp;</div>
-<div class="line"><a name="l05689"></a><span class="lineno"> 5689</span>&#160;       <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type)==<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
-<div class="line"><a name="l05690"></a><span class="lineno"> 5690</span>&#160;    {</div>
-<div class="line"><a name="l05691"></a><span class="lineno"> 5691</span>&#160;      <span class="keyword">const</span> std::string smt_typename =</div>
-<div class="line"><a name="l05692"></a><span class="lineno"> 5692</span>&#160;        <span class="stringliteral">&quot;struct.&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.size());</div>
-<div class="line"><a name="l05693"></a><span class="lineno"> 5693</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = smt_typename;</div>
-<div class="line"><a name="l05694"></a><span class="lineno"> 5694</span>&#160;      need_decl=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l05695"></a><span class="lineno"> 5695</span>&#160;    }</div>
-<div class="line"><a name="l05696"></a><span class="lineno"> 5696</span>&#160; </div>
-<div class="line"><a name="l05697"></a><span class="lineno"> 5697</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components =</div>
-<div class="line"><a name="l05698"></a><span class="lineno"> 5698</span>&#160;      <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(type).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
-<div class="line"><a name="l05699"></a><span class="lineno"> 5699</span>&#160; </div>
-<div class="line"><a name="l05700"></a><span class="lineno"> 5700</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : components)</div>
-<div class="line"><a name="l05701"></a><span class="lineno"> 5701</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type(), recstack);</div>
-<div class="line"><a name="l05702"></a><span class="lineno"> 5702</span>&#160; </div>
-<div class="line"><a name="l05703"></a><span class="lineno"> 5703</span>&#160;    <span class="comment">// Declare the corresponding SMT type if we haven&#39;t already.</span></div>
-<div class="line"><a name="l05704"></a><span class="lineno"> 5704</span>&#160;    <span class="keywordflow">if</span>(need_decl)</div>
-<div class="line"><a name="l05705"></a><span class="lineno"> 5705</span>&#160;    {</div>
-<div class="line"><a name="l05706"></a><span class="lineno"> 5706</span>&#160;      <span class="keyword">const</span> std::string &amp;smt_typename = <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
-<div class="line"><a name="l05707"></a><span class="lineno"> 5707</span>&#160; </div>
-<div class="line"><a name="l05708"></a><span class="lineno"> 5708</span>&#160;      <span class="comment">// We&#39;re going to create a datatype named something like `struct.0&#39;.</span></div>
-<div class="line"><a name="l05709"></a><span class="lineno"> 5709</span>&#160;      <span class="comment">// It&#39;s going to have a single constructor named `mk-struct.0&#39; with an</span></div>
-<div class="line"><a name="l05710"></a><span class="lineno"> 5710</span>&#160;      <span class="comment">// argument for each member of the struct.  The declaration that</span></div>
-<div class="line"><a name="l05711"></a><span class="lineno"> 5711</span>&#160;      <span class="comment">// creates this type looks like:</span></div>
-<div class="line"><a name="l05712"></a><span class="lineno"> 5712</span>&#160;      <span class="comment">//</span></div>
-<div class="line"><a name="l05713"></a><span class="lineno"> 5713</span>&#160;      <span class="comment">// (declare-datatypes ((struct.0 0)) (((mk-struct.0</span></div>
-<div class="line"><a name="l05714"></a><span class="lineno"> 5714</span>&#160;      <span class="comment">//                                   (struct.0.component1 type1)</span></div>
-<div class="line"><a name="l05715"></a><span class="lineno"> 5715</span>&#160;      <span class="comment">//                                   ...</span></div>
-<div class="line"><a name="l05716"></a><span class="lineno"> 5716</span>&#160;      <span class="comment">//                                   (struct.0.componentN typeN)))))</span></div>
-<div class="line"><a name="l05717"></a><span class="lineno"> 5717</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-datatypes ((&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; 0)) &quot;</span></div>
-<div class="line"><a name="l05718"></a><span class="lineno"> 5718</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;(((mk-&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l05719"></a><span class="lineno"> 5719</span>&#160; </div>
-<div class="line"><a name="l05720"></a><span class="lineno"> 5720</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : components)</div>
-<div class="line"><a name="l05721"></a><span class="lineno"> 5721</span>&#160;      {</div>
-<div class="line"><a name="l05722"></a><span class="lineno"> 5722</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name()</div>
-<div class="line"><a name="l05723"></a><span class="lineno"> 5723</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l05724"></a><span class="lineno"> 5724</span>&#160;        <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type());</div>
-<div class="line"><a name="l05725"></a><span class="lineno"> 5725</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;) &quot;</span>;</div>
-<div class="line"><a name="l05726"></a><span class="lineno"> 5726</span>&#160;      }</div>
+<div class="line"><a name="l05665"></a><span class="lineno"> 5665</span>&#160;      <span class="keyword">const</span> std::string smt_typename =</div>
+<div class="line"><a name="l05666"></a><span class="lineno"> 5666</span>&#160;        <span class="stringliteral">&quot;vector.&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.size());</div>
+<div class="line"><a name="l05667"></a><span class="lineno"> 5667</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = smt_typename;</div>
+<div class="line"><a name="l05668"></a><span class="lineno"> 5668</span>&#160; </div>
+<div class="line"><a name="l05669"></a><span class="lineno"> 5669</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-datatypes ((&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; 0)) &quot;</span></div>
+<div class="line"><a name="l05670"></a><span class="lineno"> 5670</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;(((mk-&quot;</span> &lt;&lt; smt_typename;</div>
+<div class="line"><a name="l05671"></a><span class="lineno"> 5671</span>&#160; </div>
+<div class="line"><a name="l05672"></a><span class="lineno"> 5672</span>&#160;      <span class="keywordflow">for</span>(<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> i=0; i!=size; ++i)</div>
+<div class="line"><a name="l05673"></a><span class="lineno"> 5673</span>&#160;      {</div>
+<div class="line"><a name="l05674"></a><span class="lineno"> 5674</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l05675"></a><span class="lineno"> 5675</span>&#160;        <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type).element_type());</div>
+<div class="line"><a name="l05676"></a><span class="lineno"> 5676</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l05677"></a><span class="lineno"> 5677</span>&#160;      }</div>
+<div class="line"><a name="l05678"></a><span class="lineno"> 5678</span>&#160; </div>
+<div class="line"><a name="l05679"></a><span class="lineno"> 5679</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))))\n&quot;</span>;</div>
+<div class="line"><a name="l05680"></a><span class="lineno"> 5680</span>&#160;    }</div>
+<div class="line"><a name="l05681"></a><span class="lineno"> 5681</span>&#160;  }</div>
+<div class="line"><a name="l05682"></a><span class="lineno"> 5682</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct)</div>
+<div class="line"><a name="l05683"></a><span class="lineno"> 5683</span>&#160;  {</div>
+<div class="line"><a name="l05684"></a><span class="lineno"> 5684</span>&#160;    <span class="comment">// Cater for mutually recursive struct types</span></div>
+<div class="line"><a name="l05685"></a><span class="lineno"> 5685</span>&#160;    <span class="keywordtype">bool</span> need_decl=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l05686"></a><span class="lineno"> 5686</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a8454df7c4321967cb6c7ef84a59ce56a">use_datatypes</a> &amp;&amp;</div>
+<div class="line"><a name="l05687"></a><span class="lineno"> 5687</span>&#160;       <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type)==<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
+<div class="line"><a name="l05688"></a><span class="lineno"> 5688</span>&#160;    {</div>
+<div class="line"><a name="l05689"></a><span class="lineno"> 5689</span>&#160;      <span class="keyword">const</span> std::string smt_typename =</div>
+<div class="line"><a name="l05690"></a><span class="lineno"> 5690</span>&#160;        <span class="stringliteral">&quot;struct.&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.size());</div>
+<div class="line"><a name="l05691"></a><span class="lineno"> 5691</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = smt_typename;</div>
+<div class="line"><a name="l05692"></a><span class="lineno"> 5692</span>&#160;      need_decl=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l05693"></a><span class="lineno"> 5693</span>&#160;    }</div>
+<div class="line"><a name="l05694"></a><span class="lineno"> 5694</span>&#160; </div>
+<div class="line"><a name="l05695"></a><span class="lineno"> 5695</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components =</div>
+<div class="line"><a name="l05696"></a><span class="lineno"> 5696</span>&#160;      <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(type).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
+<div class="line"><a name="l05697"></a><span class="lineno"> 5697</span>&#160; </div>
+<div class="line"><a name="l05698"></a><span class="lineno"> 5698</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : components)</div>
+<div class="line"><a name="l05699"></a><span class="lineno"> 5699</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type(), recstack);</div>
+<div class="line"><a name="l05700"></a><span class="lineno"> 5700</span>&#160; </div>
+<div class="line"><a name="l05701"></a><span class="lineno"> 5701</span>&#160;    <span class="comment">// Declare the corresponding SMT type if we haven&#39;t already.</span></div>
+<div class="line"><a name="l05702"></a><span class="lineno"> 5702</span>&#160;    <span class="keywordflow">if</span>(need_decl)</div>
+<div class="line"><a name="l05703"></a><span class="lineno"> 5703</span>&#160;    {</div>
+<div class="line"><a name="l05704"></a><span class="lineno"> 5704</span>&#160;      <span class="keyword">const</span> std::string &amp;smt_typename = <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.at(type);</div>
+<div class="line"><a name="l05705"></a><span class="lineno"> 5705</span>&#160; </div>
+<div class="line"><a name="l05706"></a><span class="lineno"> 5706</span>&#160;      <span class="comment">// We&#39;re going to create a datatype named something like `struct.0&#39;.</span></div>
+<div class="line"><a name="l05707"></a><span class="lineno"> 5707</span>&#160;      <span class="comment">// It&#39;s going to have a single constructor named `mk-struct.0&#39; with an</span></div>
+<div class="line"><a name="l05708"></a><span class="lineno"> 5708</span>&#160;      <span class="comment">// argument for each member of the struct.  The declaration that</span></div>
+<div class="line"><a name="l05709"></a><span class="lineno"> 5709</span>&#160;      <span class="comment">// creates this type looks like:</span></div>
+<div class="line"><a name="l05710"></a><span class="lineno"> 5710</span>&#160;      <span class="comment">//</span></div>
+<div class="line"><a name="l05711"></a><span class="lineno"> 5711</span>&#160;      <span class="comment">// (declare-datatypes ((struct.0 0)) (((mk-struct.0</span></div>
+<div class="line"><a name="l05712"></a><span class="lineno"> 5712</span>&#160;      <span class="comment">//                                   (struct.0.component1 type1)</span></div>
+<div class="line"><a name="l05713"></a><span class="lineno"> 5713</span>&#160;      <span class="comment">//                                   ...</span></div>
+<div class="line"><a name="l05714"></a><span class="lineno"> 5714</span>&#160;      <span class="comment">//                                   (struct.0.componentN typeN)))))</span></div>
+<div class="line"><a name="l05715"></a><span class="lineno"> 5715</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-datatypes ((&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; 0)) &quot;</span></div>
+<div class="line"><a name="l05716"></a><span class="lineno"> 5716</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;(((mk-&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l05717"></a><span class="lineno"> 5717</span>&#160; </div>
+<div class="line"><a name="l05718"></a><span class="lineno"> 5718</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : components)</div>
+<div class="line"><a name="l05719"></a><span class="lineno"> 5719</span>&#160;      {</div>
+<div class="line"><a name="l05720"></a><span class="lineno"> 5720</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name()</div>
+<div class="line"><a name="l05721"></a><span class="lineno"> 5721</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l05722"></a><span class="lineno"> 5722</span>&#160;        <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type());</div>
+<div class="line"><a name="l05723"></a><span class="lineno"> 5723</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;) &quot;</span>;</div>
+<div class="line"><a name="l05724"></a><span class="lineno"> 5724</span>&#160;      }</div>
+<div class="line"><a name="l05725"></a><span class="lineno"> 5725</span>&#160; </div>
+<div class="line"><a name="l05726"></a><span class="lineno"> 5726</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))))&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a name="l05727"></a><span class="lineno"> 5727</span>&#160; </div>
-<div class="line"><a name="l05728"></a><span class="lineno"> 5728</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))))&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l05729"></a><span class="lineno"> 5729</span>&#160; </div>
-<div class="line"><a name="l05730"></a><span class="lineno"> 5730</span>&#160;      <span class="comment">// Let&#39;s also declare convenience functions to update individual</span></div>
-<div class="line"><a name="l05731"></a><span class="lineno"> 5731</span>&#160;      <span class="comment">// members of the struct whil we&#39;re at it.  The functions are</span></div>
-<div class="line"><a name="l05732"></a><span class="lineno"> 5732</span>&#160;      <span class="comment">// named like `update-struct.0.component1&#39;.  Their declarations</span></div>
-<div class="line"><a name="l05733"></a><span class="lineno"> 5733</span>&#160;      <span class="comment">// look like:</span></div>
-<div class="line"><a name="l05734"></a><span class="lineno"> 5734</span>&#160;      <span class="comment">//</span></div>
-<div class="line"><a name="l05735"></a><span class="lineno"> 5735</span>&#160;      <span class="comment">// (declare-fun update-struct.0.component1</span></div>
-<div class="line"><a name="l05736"></a><span class="lineno"> 5736</span>&#160;      <span class="comment">//         ((s struct.0)     ; first arg -- the struct to update</span></div>
-<div class="line"><a name="l05737"></a><span class="lineno"> 5737</span>&#160;      <span class="comment">//          (v type1))       ; second arg -- the value to update</span></div>
-<div class="line"><a name="l05738"></a><span class="lineno"> 5738</span>&#160;      <span class="comment">//         struct.0          ; the output type</span></div>
-<div class="line"><a name="l05739"></a><span class="lineno"> 5739</span>&#160;      <span class="comment">//         (mk-struct.0      ; build the new struct...</span></div>
-<div class="line"><a name="l05740"></a><span class="lineno"> 5740</span>&#160;      <span class="comment">//          v                ; the updated value</span></div>
-<div class="line"><a name="l05741"></a><span class="lineno"> 5741</span>&#160;      <span class="comment">//          (struct.0.component2 s)  ; retain the other members</span></div>
-<div class="line"><a name="l05742"></a><span class="lineno"> 5742</span>&#160;      <span class="comment">//          ...</span></div>
-<div class="line"><a name="l05743"></a><span class="lineno"> 5743</span>&#160;      <span class="comment">//          (struct.0.componentN s)))</span></div>
-<div class="line"><a name="l05744"></a><span class="lineno"> 5744</span>&#160; </div>
-<div class="line"><a name="l05745"></a><span class="lineno"> 5745</span>&#160;      <span class="keywordflow">for</span>(struct_union_typet::componentst::const_iterator</div>
-<div class="line"><a name="l05746"></a><span class="lineno"> 5746</span>&#160;          it=components.begin();</div>
-<div class="line"><a name="l05747"></a><span class="lineno"> 5747</span>&#160;          it!=components.end();</div>
-<div class="line"><a name="l05748"></a><span class="lineno"> 5748</span>&#160;          ++it)</div>
-<div class="line"><a name="l05749"></a><span class="lineno"> 5749</span>&#160;      {</div>
-<div class="line"><a name="l05750"></a><span class="lineno"> 5750</span>&#160;        <span class="keyword">const</span> <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_union_typet::componentt</a> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>=*it;</div>
-<div class="line"><a name="l05751"></a><span class="lineno"> 5751</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(define-fun update-&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span></div>
-<div class="line"><a name="l05752"></a><span class="lineno"> 5752</span>&#160;            &lt;&lt; <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name() &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
-<div class="line"><a name="l05753"></a><span class="lineno"> 5753</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;((s &quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;) &quot;</span></div>
-<div class="line"><a name="l05754"></a><span class="lineno"> 5754</span>&#160;            &lt;&lt;  <span class="stringliteral">&quot;(v &quot;</span>;</div>
-<div class="line"><a name="l05755"></a><span class="lineno"> 5755</span>&#160;        <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type());</div>
-<div class="line"><a name="l05756"></a><span class="lineno"> 5756</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)) &quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
-<div class="line"><a name="l05757"></a><span class="lineno"> 5757</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;(mk-&quot;</span> &lt;&lt; smt_typename</div>
-<div class="line"><a name="l05758"></a><span class="lineno"> 5758</span>&#160;            &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l05759"></a><span class="lineno"> 5759</span>&#160; </div>
-<div class="line"><a name="l05760"></a><span class="lineno"> 5760</span>&#160;        <span class="keywordflow">for</span>(struct_union_typet::componentst::const_iterator</div>
-<div class="line"><a name="l05761"></a><span class="lineno"> 5761</span>&#160;            it2=components.begin();</div>
-<div class="line"><a name="l05762"></a><span class="lineno"> 5762</span>&#160;            it2!=components.end();</div>
-<div class="line"><a name="l05763"></a><span class="lineno"> 5763</span>&#160;            ++it2)</div>
-<div class="line"><a name="l05764"></a><span class="lineno"> 5764</span>&#160;        {</div>
-<div class="line"><a name="l05765"></a><span class="lineno"> 5765</span>&#160;          <span class="keywordflow">if</span>(it==it2)</div>
-<div class="line"><a name="l05766"></a><span class="lineno"> 5766</span>&#160;            <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;v &quot;</span>;</div>
-<div class="line"><a name="l05767"></a><span class="lineno"> 5767</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l05768"></a><span class="lineno"> 5768</span>&#160;          {</div>
-<div class="line"><a name="l05769"></a><span class="lineno"> 5769</span>&#160;            <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span></div>
-<div class="line"><a name="l05770"></a><span class="lineno"> 5770</span>&#160;                &lt;&lt; it2-&gt;get_name() &lt;&lt; <span class="stringliteral">&quot; s) &quot;</span>;</div>
-<div class="line"><a name="l05771"></a><span class="lineno"> 5771</span>&#160;          }</div>
-<div class="line"><a name="l05772"></a><span class="lineno"> 5772</span>&#160;        }</div>
-<div class="line"><a name="l05773"></a><span class="lineno"> 5773</span>&#160; </div>
-<div class="line"><a name="l05774"></a><span class="lineno"> 5774</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l05775"></a><span class="lineno"> 5775</span>&#160;      }</div>
-<div class="line"><a name="l05776"></a><span class="lineno"> 5776</span>&#160; </div>
-<div class="line"><a name="l05777"></a><span class="lineno"> 5777</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l05778"></a><span class="lineno"> 5778</span>&#160;    }</div>
-<div class="line"><a name="l05779"></a><span class="lineno"> 5779</span>&#160;  }</div>
-<div class="line"><a name="l05780"></a><span class="lineno"> 5780</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union)</div>
-<div class="line"><a name="l05781"></a><span class="lineno"> 5781</span>&#160;  {</div>
-<div class="line"><a name="l05782"></a><span class="lineno"> 5782</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">union_typet::componentst</a> &amp;components =</div>
-<div class="line"><a name="l05783"></a><span class="lineno"> 5783</span>&#160;      <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(type).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
-<div class="line"><a name="l05784"></a><span class="lineno"> 5784</span>&#160; </div>
-<div class="line"><a name="l05785"></a><span class="lineno"> 5785</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : components)</div>
-<div class="line"><a name="l05786"></a><span class="lineno"> 5786</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type(), recstack);</div>
-<div class="line"><a name="l05787"></a><span class="lineno"> 5787</span>&#160;  }</div>
-<div class="line"><a name="l05788"></a><span class="lineno"> 5788</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
-<div class="line"><a name="l05789"></a><span class="lineno"> 5789</span>&#160;  {</div>
-<div class="line"><a name="l05790"></a><span class="lineno"> 5790</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;parameters=</div>
-<div class="line"><a name="l05791"></a><span class="lineno"> 5791</span>&#160;      <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(type).<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>();</div>
-<div class="line"><a name="l05792"></a><span class="lineno"> 5792</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;param : parameters)</div>
-<div class="line"><a name="l05793"></a><span class="lineno"> 5793</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(param.type(), recstack);</div>
-<div class="line"><a name="l05794"></a><span class="lineno"> 5794</span>&#160; </div>
-<div class="line"><a name="l05795"></a><span class="lineno"> 5795</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(type).return_type(), recstack);</div>
-<div class="line"><a name="l05796"></a><span class="lineno"> 5796</span>&#160;  }</div>
-<div class="line"><a name="l05797"></a><span class="lineno"> 5797</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer)</div>
-<div class="line"><a name="l05798"></a><span class="lineno"> 5798</span>&#160;  {</div>
-<div class="line"><a name="l05799"></a><span class="lineno"> 5799</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(type).base_type(), recstack);</div>
-<div class="line"><a name="l05800"></a><span class="lineno"> 5800</span>&#160;  }</div>
-<div class="line"><a name="l05801"></a><span class="lineno"> 5801</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
-<div class="line"><a name="l05802"></a><span class="lineno"> 5802</span>&#160;  {</div>
-<div class="line"><a name="l05803"></a><span class="lineno"> 5803</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;struct_tag = <a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type);</div>
-<div class="line"><a name="l05804"></a><span class="lineno"> 5804</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keywordtype">id</span> = struct_tag.get_identifier();</div>
-<div class="line"><a name="l05805"></a><span class="lineno"> 5805</span>&#160; </div>
-<div class="line"><a name="l05806"></a><span class="lineno"> 5806</span>&#160;    <span class="keywordflow">if</span>(recstack.find(<span class="keywordtype">id</span>) == recstack.end())</div>
-<div class="line"><a name="l05807"></a><span class="lineno"> 5807</span>&#160;    {</div>
-<div class="line"><a name="l05808"></a><span class="lineno"> 5808</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;base_struct = <a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(struct_tag);</div>
-<div class="line"><a name="l05809"></a><span class="lineno"> 5809</span>&#160;      recstack.insert(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l05810"></a><span class="lineno"> 5810</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(base_struct, recstack);</div>
-<div class="line"><a name="l05811"></a><span class="lineno"> 5811</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[base_struct];</div>
-<div class="line"><a name="l05812"></a><span class="lineno"> 5812</span>&#160;    }</div>
-<div class="line"><a name="l05813"></a><span class="lineno"> 5813</span>&#160;  }</div>
-<div class="line"><a name="l05814"></a><span class="lineno"> 5814</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
-<div class="line"><a name="l05815"></a><span class="lineno"> 5815</span>&#160;  {</div>
-<div class="line"><a name="l05816"></a><span class="lineno"> 5816</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;union_tag = <a class="code" href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a>(type);</div>
-<div class="line"><a name="l05817"></a><span class="lineno"> 5817</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keywordtype">id</span> = union_tag.get_identifier();</div>
-<div class="line"><a name="l05818"></a><span class="lineno"> 5818</span>&#160; </div>
-<div class="line"><a name="l05819"></a><span class="lineno"> 5819</span>&#160;    <span class="keywordflow">if</span>(recstack.find(<span class="keywordtype">id</span>) == recstack.end())</div>
-<div class="line"><a name="l05820"></a><span class="lineno"> 5820</span>&#160;    {</div>
-<div class="line"><a name="l05821"></a><span class="lineno"> 5821</span>&#160;      recstack.insert(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l05822"></a><span class="lineno"> 5822</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(union_tag), recstack);</div>
-<div class="line"><a name="l05823"></a><span class="lineno"> 5823</span>&#160;    }</div>
-<div class="line"><a name="l05824"></a><span class="lineno"> 5824</span>&#160;  }</div>
-<div class="line"><a name="l05825"></a><span class="lineno"> 5825</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_state)</div>
-<div class="line"><a name="l05826"></a><span class="lineno"> 5826</span>&#160;  {</div>
-<div class="line"><a name="l05827"></a><span class="lineno"> 5827</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type) == <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
-<div class="line"><a name="l05828"></a><span class="lineno"> 5828</span>&#160;    {</div>
-<div class="line"><a name="l05829"></a><span class="lineno"> 5829</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = <span class="stringliteral">&quot;state&quot;</span>;</div>
-<div class="line"><a name="l05830"></a><span class="lineno"> 5830</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-sort state 0)\n&quot;</span>;</div>
-<div class="line"><a name="l05831"></a><span class="lineno"> 5831</span>&#160;    }</div>
-<div class="line"><a name="l05832"></a><span class="lineno"> 5832</span>&#160;  }</div>
-<div class="line"><a name="l05833"></a><span class="lineno"> 5833</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_mathematical_function)</div>
-<div class="line"><a name="l05834"></a><span class="lineno"> 5834</span>&#160;  {</div>
-<div class="line"><a name="l05835"></a><span class="lineno"> 5835</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;mathematical_function_type =</div>
-<div class="line"><a name="l05836"></a><span class="lineno"> 5836</span>&#160;      <a class="code" href="mathematical__types_8h.html#a516c2dadf52addd013a19bc7389b3f03">to_mathematical_function_type</a>(type);</div>
-<div class="line"><a name="l05837"></a><span class="lineno"> 5837</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;d_type : mathematical_function_type.domain())</div>
-<div class="line"><a name="l05838"></a><span class="lineno"> 5838</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(d_type, recstack);</div>
-<div class="line"><a name="l05839"></a><span class="lineno"> 5839</span>&#160; </div>
-<div class="line"><a name="l05840"></a><span class="lineno"> 5840</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(mathematical_function_type.codomain(), recstack);</div>
-<div class="line"><a name="l05841"></a><span class="lineno"> 5841</span>&#160;  }</div>
-<div class="line"><a name="l05842"></a><span class="lineno"> 5842</span>&#160;}</div>
-<div class="line"><a name="l05843"></a><span class="lineno"> 5843</span>&#160; </div>
-<div class="line"><a name="l05844"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#a3b9ecf0f8dff9c67ce9d0e0390dbbc5e"> 5844</a></span>&#160;std::size_t <a class="code" href="classsmt2__convt.html#a3b9ecf0f8dff9c67ce9d0e0390dbbc5e">smt2_convt::get_number_of_solver_calls</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l05845"></a><span class="lineno"> 5845</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l05846"></a><span class="lineno"> 5846</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classsmt2__convt.html#a09a02c087bee60eeae4982a6352231cc">number_of_solver_calls</a>;</div>
-<div class="line"><a name="l05847"></a><span class="lineno"> 5847</span>&#160;}</div>
+<div class="line"><a name="l05728"></a><span class="lineno"> 5728</span>&#160;      <span class="comment">// Let&#39;s also declare convenience functions to update individual</span></div>
+<div class="line"><a name="l05729"></a><span class="lineno"> 5729</span>&#160;      <span class="comment">// members of the struct whil we&#39;re at it.  The functions are</span></div>
+<div class="line"><a name="l05730"></a><span class="lineno"> 5730</span>&#160;      <span class="comment">// named like `update-struct.0.component1&#39;.  Their declarations</span></div>
+<div class="line"><a name="l05731"></a><span class="lineno"> 5731</span>&#160;      <span class="comment">// look like:</span></div>
+<div class="line"><a name="l05732"></a><span class="lineno"> 5732</span>&#160;      <span class="comment">//</span></div>
+<div class="line"><a name="l05733"></a><span class="lineno"> 5733</span>&#160;      <span class="comment">// (declare-fun update-struct.0.component1</span></div>
+<div class="line"><a name="l05734"></a><span class="lineno"> 5734</span>&#160;      <span class="comment">//         ((s struct.0)     ; first arg -- the struct to update</span></div>
+<div class="line"><a name="l05735"></a><span class="lineno"> 5735</span>&#160;      <span class="comment">//          (v type1))       ; second arg -- the value to update</span></div>
+<div class="line"><a name="l05736"></a><span class="lineno"> 5736</span>&#160;      <span class="comment">//         struct.0          ; the output type</span></div>
+<div class="line"><a name="l05737"></a><span class="lineno"> 5737</span>&#160;      <span class="comment">//         (mk-struct.0      ; build the new struct...</span></div>
+<div class="line"><a name="l05738"></a><span class="lineno"> 5738</span>&#160;      <span class="comment">//          v                ; the updated value</span></div>
+<div class="line"><a name="l05739"></a><span class="lineno"> 5739</span>&#160;      <span class="comment">//          (struct.0.component2 s)  ; retain the other members</span></div>
+<div class="line"><a name="l05740"></a><span class="lineno"> 5740</span>&#160;      <span class="comment">//          ...</span></div>
+<div class="line"><a name="l05741"></a><span class="lineno"> 5741</span>&#160;      <span class="comment">//          (struct.0.componentN s)))</span></div>
+<div class="line"><a name="l05742"></a><span class="lineno"> 5742</span>&#160; </div>
+<div class="line"><a name="l05743"></a><span class="lineno"> 5743</span>&#160;      <span class="keywordflow">for</span>(struct_union_typet::componentst::const_iterator</div>
+<div class="line"><a name="l05744"></a><span class="lineno"> 5744</span>&#160;          it=components.begin();</div>
+<div class="line"><a name="l05745"></a><span class="lineno"> 5745</span>&#160;          it!=components.end();</div>
+<div class="line"><a name="l05746"></a><span class="lineno"> 5746</span>&#160;          ++it)</div>
+<div class="line"><a name="l05747"></a><span class="lineno"> 5747</span>&#160;      {</div>
+<div class="line"><a name="l05748"></a><span class="lineno"> 5748</span>&#160;        <span class="keyword">const</span> <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_union_typet::componentt</a> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>=*it;</div>
+<div class="line"><a name="l05749"></a><span class="lineno"> 5749</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(define-fun update-&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span></div>
+<div class="line"><a name="l05750"></a><span class="lineno"> 5750</span>&#160;            &lt;&lt; <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name() &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><a name="l05751"></a><span class="lineno"> 5751</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;((s &quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;) &quot;</span></div>
+<div class="line"><a name="l05752"></a><span class="lineno"> 5752</span>&#160;            &lt;&lt;  <span class="stringliteral">&quot;(v &quot;</span>;</div>
+<div class="line"><a name="l05753"></a><span class="lineno"> 5753</span>&#160;        <a class="code" href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">convert_type</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type());</div>
+<div class="line"><a name="l05754"></a><span class="lineno"> 5754</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;)) &quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><a name="l05755"></a><span class="lineno"> 5755</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;(mk-&quot;</span> &lt;&lt; smt_typename</div>
+<div class="line"><a name="l05756"></a><span class="lineno"> 5756</span>&#160;            &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l05757"></a><span class="lineno"> 5757</span>&#160; </div>
+<div class="line"><a name="l05758"></a><span class="lineno"> 5758</span>&#160;        <span class="keywordflow">for</span>(struct_union_typet::componentst::const_iterator</div>
+<div class="line"><a name="l05759"></a><span class="lineno"> 5759</span>&#160;            it2=components.begin();</div>
+<div class="line"><a name="l05760"></a><span class="lineno"> 5760</span>&#160;            it2!=components.end();</div>
+<div class="line"><a name="l05761"></a><span class="lineno"> 5761</span>&#160;            ++it2)</div>
+<div class="line"><a name="l05762"></a><span class="lineno"> 5762</span>&#160;        {</div>
+<div class="line"><a name="l05763"></a><span class="lineno"> 5763</span>&#160;          <span class="keywordflow">if</span>(it==it2)</div>
+<div class="line"><a name="l05764"></a><span class="lineno"> 5764</span>&#160;            <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;v &quot;</span>;</div>
+<div class="line"><a name="l05765"></a><span class="lineno"> 5765</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l05766"></a><span class="lineno"> 5766</span>&#160;          {</div>
+<div class="line"><a name="l05767"></a><span class="lineno"> 5767</span>&#160;            <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; smt_typename &lt;&lt; <span class="stringliteral">&quot;.&quot;</span></div>
+<div class="line"><a name="l05768"></a><span class="lineno"> 5768</span>&#160;                &lt;&lt; it2-&gt;get_name() &lt;&lt; <span class="stringliteral">&quot; s) &quot;</span>;</div>
+<div class="line"><a name="l05769"></a><span class="lineno"> 5769</span>&#160;          }</div>
+<div class="line"><a name="l05770"></a><span class="lineno"> 5770</span>&#160;        }</div>
+<div class="line"><a name="l05771"></a><span class="lineno"> 5771</span>&#160; </div>
+<div class="line"><a name="l05772"></a><span class="lineno"> 5772</span>&#160;        <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;))&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l05773"></a><span class="lineno"> 5773</span>&#160;      }</div>
+<div class="line"><a name="l05774"></a><span class="lineno"> 5774</span>&#160; </div>
+<div class="line"><a name="l05775"></a><span class="lineno"> 5775</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l05776"></a><span class="lineno"> 5776</span>&#160;    }</div>
+<div class="line"><a name="l05777"></a><span class="lineno"> 5777</span>&#160;  }</div>
+<div class="line"><a name="l05778"></a><span class="lineno"> 5778</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union)</div>
+<div class="line"><a name="l05779"></a><span class="lineno"> 5779</span>&#160;  {</div>
+<div class="line"><a name="l05780"></a><span class="lineno"> 5780</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">union_typet::componentst</a> &amp;components =</div>
+<div class="line"><a name="l05781"></a><span class="lineno"> 5781</span>&#160;      <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(type).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
+<div class="line"><a name="l05782"></a><span class="lineno"> 5782</span>&#160; </div>
+<div class="line"><a name="l05783"></a><span class="lineno"> 5783</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : components)</div>
+<div class="line"><a name="l05784"></a><span class="lineno"> 5784</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type(), recstack);</div>
+<div class="line"><a name="l05785"></a><span class="lineno"> 5785</span>&#160;  }</div>
+<div class="line"><a name="l05786"></a><span class="lineno"> 5786</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
+<div class="line"><a name="l05787"></a><span class="lineno"> 5787</span>&#160;  {</div>
+<div class="line"><a name="l05788"></a><span class="lineno"> 5788</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;parameters=</div>
+<div class="line"><a name="l05789"></a><span class="lineno"> 5789</span>&#160;      <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(type).<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>();</div>
+<div class="line"><a name="l05790"></a><span class="lineno"> 5790</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;param : parameters)</div>
+<div class="line"><a name="l05791"></a><span class="lineno"> 5791</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(param.type(), recstack);</div>
+<div class="line"><a name="l05792"></a><span class="lineno"> 5792</span>&#160; </div>
+<div class="line"><a name="l05793"></a><span class="lineno"> 5793</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(type).return_type(), recstack);</div>
+<div class="line"><a name="l05794"></a><span class="lineno"> 5794</span>&#160;  }</div>
+<div class="line"><a name="l05795"></a><span class="lineno"> 5795</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer)</div>
+<div class="line"><a name="l05796"></a><span class="lineno"> 5796</span>&#160;  {</div>
+<div class="line"><a name="l05797"></a><span class="lineno"> 5797</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(type).base_type(), recstack);</div>
+<div class="line"><a name="l05798"></a><span class="lineno"> 5798</span>&#160;  }</div>
+<div class="line"><a name="l05799"></a><span class="lineno"> 5799</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
+<div class="line"><a name="l05800"></a><span class="lineno"> 5800</span>&#160;  {</div>
+<div class="line"><a name="l05801"></a><span class="lineno"> 5801</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;struct_tag = <a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type);</div>
+<div class="line"><a name="l05802"></a><span class="lineno"> 5802</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keywordtype">id</span> = struct_tag.get_identifier();</div>
+<div class="line"><a name="l05803"></a><span class="lineno"> 5803</span>&#160; </div>
+<div class="line"><a name="l05804"></a><span class="lineno"> 5804</span>&#160;    <span class="keywordflow">if</span>(recstack.find(<span class="keywordtype">id</span>) == recstack.end())</div>
+<div class="line"><a name="l05805"></a><span class="lineno"> 5805</span>&#160;    {</div>
+<div class="line"><a name="l05806"></a><span class="lineno"> 5806</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;base_struct = <a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(struct_tag);</div>
+<div class="line"><a name="l05807"></a><span class="lineno"> 5807</span>&#160;      recstack.insert(<span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l05808"></a><span class="lineno"> 5808</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(base_struct, recstack);</div>
+<div class="line"><a name="l05809"></a><span class="lineno"> 5809</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[base_struct];</div>
+<div class="line"><a name="l05810"></a><span class="lineno"> 5810</span>&#160;    }</div>
+<div class="line"><a name="l05811"></a><span class="lineno"> 5811</span>&#160;  }</div>
+<div class="line"><a name="l05812"></a><span class="lineno"> 5812</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
+<div class="line"><a name="l05813"></a><span class="lineno"> 5813</span>&#160;  {</div>
+<div class="line"><a name="l05814"></a><span class="lineno"> 5814</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;union_tag = <a class="code" href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a>(type);</div>
+<div class="line"><a name="l05815"></a><span class="lineno"> 5815</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keywordtype">id</span> = union_tag.get_identifier();</div>
+<div class="line"><a name="l05816"></a><span class="lineno"> 5816</span>&#160; </div>
+<div class="line"><a name="l05817"></a><span class="lineno"> 5817</span>&#160;    <span class="keywordflow">if</span>(recstack.find(<span class="keywordtype">id</span>) == recstack.end())</div>
+<div class="line"><a name="l05818"></a><span class="lineno"> 5818</span>&#160;    {</div>
+<div class="line"><a name="l05819"></a><span class="lineno"> 5819</span>&#160;      recstack.insert(<span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l05820"></a><span class="lineno"> 5820</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(<a class="code" href="classsmt2__convt.html#a3d7e6da28011aaf600d7777b468e1978">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(union_tag), recstack);</div>
+<div class="line"><a name="l05821"></a><span class="lineno"> 5821</span>&#160;    }</div>
+<div class="line"><a name="l05822"></a><span class="lineno"> 5822</span>&#160;  }</div>
+<div class="line"><a name="l05823"></a><span class="lineno"> 5823</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_state)</div>
+<div class="line"><a name="l05824"></a><span class="lineno"> 5824</span>&#160;  {</div>
+<div class="line"><a name="l05825"></a><span class="lineno"> 5825</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.find(type) == <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>.end())</div>
+<div class="line"><a name="l05826"></a><span class="lineno"> 5826</span>&#160;    {</div>
+<div class="line"><a name="l05827"></a><span class="lineno"> 5827</span>&#160;      <a class="code" href="classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d">datatype_map</a>[type] = <span class="stringliteral">&quot;state&quot;</span>;</div>
+<div class="line"><a name="l05828"></a><span class="lineno"> 5828</span>&#160;      <a class="code" href="classsmt2__convt.html#a5c0de919e944acdf7c0543b4f902384d">out</a> &lt;&lt; <span class="stringliteral">&quot;(declare-sort state 0)\n&quot;</span>;</div>
+<div class="line"><a name="l05829"></a><span class="lineno"> 5829</span>&#160;    }</div>
+<div class="line"><a name="l05830"></a><span class="lineno"> 5830</span>&#160;  }</div>
+<div class="line"><a name="l05831"></a><span class="lineno"> 5831</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_mathematical_function)</div>
+<div class="line"><a name="l05832"></a><span class="lineno"> 5832</span>&#160;  {</div>
+<div class="line"><a name="l05833"></a><span class="lineno"> 5833</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;mathematical_function_type =</div>
+<div class="line"><a name="l05834"></a><span class="lineno"> 5834</span>&#160;      <a class="code" href="mathematical__types_8h.html#a516c2dadf52addd013a19bc7389b3f03">to_mathematical_function_type</a>(type);</div>
+<div class="line"><a name="l05835"></a><span class="lineno"> 5835</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;d_type : mathematical_function_type.domain())</div>
+<div class="line"><a name="l05836"></a><span class="lineno"> 5836</span>&#160;      <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(d_type, recstack);</div>
+<div class="line"><a name="l05837"></a><span class="lineno"> 5837</span>&#160; </div>
+<div class="line"><a name="l05838"></a><span class="lineno"> 5838</span>&#160;    <a class="code" href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">find_symbols_rec</a>(mathematical_function_type.codomain(), recstack);</div>
+<div class="line"><a name="l05839"></a><span class="lineno"> 5839</span>&#160;  }</div>
+<div class="line"><a name="l05840"></a><span class="lineno"> 5840</span>&#160;}</div>
+<div class="line"><a name="l05841"></a><span class="lineno"> 5841</span>&#160; </div>
+<div class="line"><a name="l05842"></a><span class="lineno"><a class="line" href="classsmt2__convt.html#a3b9ecf0f8dff9c67ce9d0e0390dbbc5e"> 5842</a></span>&#160;std::size_t <a class="code" href="classsmt2__convt.html#a3b9ecf0f8dff9c67ce9d0e0390dbbc5e">smt2_convt::get_number_of_solver_calls</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l05843"></a><span class="lineno"> 5843</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l05844"></a><span class="lineno"> 5844</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classsmt2__convt.html#a09a02c087bee60eeae4982a6352231cc">number_of_solver_calls</a>;</div>
+<div class="line"><a name="l05845"></a><span class="lineno"> 5845</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclasswith__exprt_html"><div class="ttname"><a href="classwith__exprt.html">with_exprt</a></div><div class="ttdoc">Operator to update elements in structs and arrays.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02423">std_expr.h:2423</a></div></div>
@@ -5964,13 +5962,13 @@ $(document).ready(function(){initNavTree('smt2__conv_8cpp_source.html',''); init
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="aclassstruct__union__typet_html_aa4d97744163d87515d75598fb31412e1"><div class="ttname"><a href="classstruct__union__typet.html#aa4d97744163d87515d75598fb31412e1">struct_union_typet::get_component</a></div><div class="ttdeci">const componentt &amp; get_component(const irep_idt &amp;component_name) const</div><div class="ttdoc">Get the reference to a component with given name.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8cpp_source.html#l00063">std_types.cpp:63</a></div></div>
 <div class="ttc" id="aclasssmt2__convt_html_a4dca75fabf4bb103e97549787b46fb71"><div class="ttname"><a href="classsmt2__convt.html#a4dca75fabf4bb103e97549787b46fb71">smt2_convt::wheret</a></div><div class="ttdeci">wheret</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8h_source.html#l00224">smt2_conv.h:224</a></div></div>
-<div class="ttc" id="aclasssmt2__convt_html_a3b9ecf0f8dff9c67ce9d0e0390dbbc5e"><div class="ttname"><a href="classsmt2__convt.html#a3b9ecf0f8dff9c67ce9d0e0390dbbc5e">smt2_convt::get_number_of_solver_calls</a></div><div class="ttdeci">std::size_t get_number_of_solver_calls() const override</div><div class="ttdoc">Return the number of incremental solver calls.</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8cpp_source.html#l05844">smt2_conv.cpp:5844</a></div></div>
+<div class="ttc" id="aclasssmt2__convt_html_a3b9ecf0f8dff9c67ce9d0e0390dbbc5e"><div class="ttname"><a href="classsmt2__convt.html#a3b9ecf0f8dff9c67ce9d0e0390dbbc5e">smt2_convt::get_number_of_solver_calls</a></div><div class="ttdeci">std::size_t get_number_of_solver_calls() const override</div><div class="ttdoc">Return the number of incremental solver calls.</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8cpp_source.html#l05842">smt2_conv.cpp:5842</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a447364e31f4a2d52b37e5922fc6565e5"><div class="ttname"><a href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a></div><div class="ttdeci">const struct_typet &amp; to_struct_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00308">std_types.h:308</a></div></div>
 <div class="ttc" id="aclassaddress__of__exprt_html_ad81853a6acc7627a48fcfa8087e3aa5d"><div class="ttname"><a href="classaddress__of__exprt.html#ad81853a6acc7627a48fcfa8087e3aa5d">address_of_exprt::object</a></div><div class="ttdeci">exprt &amp; object()</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00432">pointer_expr.h:432</a></div></div>
 <div class="ttc" id="aclasssmt2__convt_html_a4dca75fabf4bb103e97549787b46fb71ab1a326c06d88bf042f73d70f50197905"><div class="ttname"><a href="classsmt2__convt.html#a4dca75fabf4bb103e97549787b46fb71ab1a326c06d88bf042f73d70f50197905">smt2_convt::wheret::END</a></div><div class="ttdeci">@ END</div></div>
 <div class="ttc" id="aclasssmt2__convt_html_ab207a182467b1914af633c354c42bc76"><div class="ttname"><a href="classsmt2__convt.html#ab207a182467b1914af633c354c42bc76">smt2_convt::letify</a></div><div class="ttdeci">letifyt letify</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8h_source.html#l00167">smt2_conv.h:167</a></div></div>
 <div class="ttc" id="afloat__bv_8h_html_a49a4051b27a4a01a8788ae69aad9cacb"><div class="ttname"><a href="float__bv_8h.html#a49a4051b27a4a01a8788ae69aad9cacb">float_bv</a></div><div class="ttdeci">exprt float_bv(const exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="float__bv_8h_source.html#l00187">float_bv.h:187</a></div></div>
-<div class="ttc" id="aclasssmt2__convt_html_a04ad5d0bfe1bcedb3695e12decf16951"><div class="ttname"><a href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">smt2_convt::convert_type</a></div><div class="ttdeci">void convert_type(const typet &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8cpp_source.html#l05478">smt2_conv.cpp:5478</a></div></div>
+<div class="ttc" id="aclasssmt2__convt_html_a04ad5d0bfe1bcedb3695e12decf16951"><div class="ttname"><a href="classsmt2__convt.html#a04ad5d0bfe1bcedb3695e12decf16951">smt2_convt::convert_type</a></div><div class="ttdeci">void convert_type(const typet &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8cpp_source.html#l05476">smt2_conv.cpp:5476</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a87428d539e489cce31742459e3ed3206"><div class="ttname"><a href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a></div><div class="ttdeci">const struct_union_typet &amp; to_struct_union_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_union_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00214">std_types.h:214</a></div></div>
 <div class="ttc" id="aclassnondet__symbol__exprt_html_a7e8fad41f6afddc9e6af5297f306c1a8"><div class="ttname"><a href="classnondet__symbol__exprt.html#a7e8fad41f6afddc9e6af5297f306c1a8">nondet_symbol_exprt::get_identifier</a></div><div class="ttdeci">const irep_idt &amp; get_identifier() const</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00270">std_expr.h:270</a></div></div>
 <div class="ttc" id="aliteral_8h_html_afe9a214e6401c7ef6920677a5a066fdf"><div class="ttname"><a href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a></div><div class="ttdeci">literalt pos(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00194">literal.h:194</a></div></div>
@@ -6224,7 +6222,7 @@ $(document).ready(function(){initNavTree('smt2__conv_8cpp_source.html',''); init
 <div class="ttc" id="aclasssmt2__convt_html_a3e8f12482655394a5e416f1ece37bf4f"><div class="ttname"><a href="classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f">smt2_convt::boolbv_width</a></div><div class="ttdeci">boolbv_widtht boolbv_width</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8h_source.html#l00103">smt2_conv.h:103</a></div></div>
 <div class="ttc" id="aclassieee__floatt_html_a26cf444d0baba122c17fafa9f0221a32"><div class="ttname"><a href="classieee__floatt.html#a26cf444d0baba122c17fafa9f0221a32">ieee_floatt::spec</a></div><div class="ttdeci">ieee_float_spect spec</div><div class="ttdef"><b>Definition:</b> <a href="ieee__float_8h_source.html#l00135">ieee_float.h:135</a></div></div>
 <div class="ttc" id="aclassfixedbv__typet_html"><div class="ttname"><a href="classfixedbv__typet.html">fixedbv_typet</a></div><div class="ttdoc">Fixed-width bit-vector with signed fixed-point interpretation.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__types_8h_source.html#l00260">bitvector_types.h:260</a></div></div>
-<div class="ttc" id="aclasssmt2__convt_html_ad3cbd518f478cb27cfea11a4078e72c9"><div class="ttname"><a href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">smt2_convt::find_symbols_rec</a></div><div class="ttdeci">void find_symbols_rec(const typet &amp;type, std::set&lt; irep_idt &gt; &amp;recstack)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8cpp_source.html#l05621">smt2_conv.cpp:5621</a></div></div>
+<div class="ttc" id="aclasssmt2__convt_html_ad3cbd518f478cb27cfea11a4078e72c9"><div class="ttname"><a href="classsmt2__convt.html#ad3cbd518f478cb27cfea11a4078e72c9">smt2_convt::find_symbols_rec</a></div><div class="ttdeci">void find_symbols_rec(const typet &amp;type, std::set&lt; irep_idt &gt; &amp;recstack)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__conv_8cpp_source.html#l05619">smt2_conv.cpp:5619</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="aclassbitvector__typet_html_a58a53462090549eb112cdf4ef6e49ac4"><div class="ttname"><a href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">bitvector_typet::get_width</a></div><div class="ttdeci">std::size_t get_width() const</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00876">std_types.h:876</a></div></div>
 <div class="ttc" id="afloatbv__expr_8h_html_a3d7729d9249730bf469f3dbc308822c9"><div class="ttname"><a href="floatbv__expr_8h.html#a3d7729d9249730bf469f3dbc308822c9">to_ieee_float_op_expr</a></div><div class="ttdeci">const ieee_float_op_exprt &amp; to_ieee_float_op_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an ieee_float_op_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="floatbv__expr_8h_source.html#l00425">floatbv_expr.h:425</a></div></div>
