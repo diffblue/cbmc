@@ -524,6 +524,21 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
     const auto simplified_expr = simplify_expr(expr, ns);
     REQUIRE(simplified_expr == expr);
   }
+
+  SECTION("Simplifying (unsigned)(B ? 4 : 5) > 3")
+  {
+    signedbv_typet sbv{4};
+    unsignedbv_typet ubv{4};
+
+    symbol_exprt b{"B", bool_typet{}};
+    if_exprt if_b{b, from_integer(4, sbv), from_integer(5, sbv)};
+
+    binary_relation_exprt comparison_gt{
+      typecast_exprt{if_b, ubv}, ID_gt, from_integer(3, ubv)};
+    exprt simp = simplify_expr(comparison_gt, ns);
+
+    REQUIRE(simp == true_exprt{});
+  }
 }
 
 TEST_CASE("Simplify bitor", "[core][util]")
