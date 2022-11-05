@@ -117,6 +117,7 @@ public:
   // for assume, assert, goto
   bool cond_value;
   exprt cond_expr;
+  exprt original_condition;
 
   // for assert
   irep_idt property_id;
@@ -161,6 +162,7 @@ public:
     full_lhs.make_nil();
     full_lhs_value.make_nil();
     cond_expr.make_nil();
+    original_condition.make_nil();
   }
 
   /// Use \p dest to establish sharing among ireps.
