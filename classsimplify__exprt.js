@@ -72,6 +72,7 @@ var classsimplify__exprt =
     [ "simplify_shifts", "classsimplify__exprt.html#a7b701da4ded3c35513c096e143cb3954", null ],
     [ "simplify_sign", "classsimplify__exprt.html#afa8fb811e6cb143aab8ecf14d92e3c96", null ],
     [ "simplify_typecast", "classsimplify__exprt.html#a8882bef0a744bc7aff9906f444f801cb", null ],
+    [ "simplify_typecast_preorder", "classsimplify__exprt.html#aeab1c0a9ff45d4e28b8a611b12595e3a", null ],
     [ "simplify_unary_minus", "classsimplify__exprt.html#afafed7fdb8f66a7729cca98556bd538a", null ],
     [ "simplify_unary_plus", "classsimplify__exprt.html#acf34a72251edef88be8528cd91491607", null ],
     [ "simplify_update", "classsimplify__exprt.html#ac913c4764c2a86583aaf19e8056bad42", null ],
