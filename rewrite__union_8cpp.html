@@ -99,6 +99,7 @@ $(document).ready(function(){initNavTree('rewrite__union_8cpp.html',''); initRes
 <code>#include &lt;<a class="el" href="byte__operators_8h_source.html">util/byte_operators.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -106,7 +107,7 @@ $(document).ready(function(){initNavTree('rewrite__union_8cpp.html',''); initRes
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="rewrite__union_8cpp__incl.svg" width="1896" height="1231"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="rewrite__union_8cpp__incl.svg" width="2010" height="1246"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -127,6 +128,12 @@ Functions</h2></td></tr>
 <tr class="separator:a48d154a1d1dc8de80eb5b9344e621749"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a538c7e03b6f8f87a928d6009439788f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rewrite__union_8cpp.html#a538c7e03b6f8f87a928d6009439788f5">rewrite_union</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
 <tr class="separator:a538c7e03b6f8f87a928d6009439788f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7574824cc27b9ab2201b71f9dedff69"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rewrite__union_8cpp.html#ad7574824cc27b9ab2201b71f9dedff69">restore_union_rec</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:ad7574824cc27b9ab2201b71f9dedff69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undo the union access -&gt; byte_extract replacement that rewrite_union did for the purpose of displaying expressions to users.  <a href="rewrite__union_8cpp.html#ad7574824cc27b9ab2201b71f9dedff69">More...</a><br /></td></tr>
+<tr class="separator:ad7574824cc27b9ab2201b71f9dedff69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a487f071e7371163b9036d8fed4e4797b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rewrite__union_8cpp.html#a487f071e7371163b9036d8fed4e4797b">restore_union</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a487f071e7371163b9036d8fed4e4797b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undo the union access -&gt; byte_extract replacement that rewrite_union did for the purpose of displaying expressions to users.  <a href="rewrite__union_8cpp.html#a487f071e7371163b9036d8fed4e4797b">More...</a><br /></td></tr>
+<tr class="separator:a487f071e7371163b9036d8fed4e4797b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Symbolic Execution of ANSI-C </p>
@@ -157,7 +164,94 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00022">22</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00023">23</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a487f071e7371163b9036d8fed4e4797b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a487f071e7371163b9036d8fed4e4797b">&#9670;&nbsp;</a></span>restore_union()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void restore_union </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Undo the union access -&gt; byte_extract replacement that rewrite_union did for the purpose of displaying expressions to users. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>expression to inspect and possibly transform </td></tr>
+    <tr><td class="paramname">ns</td><td>namespace </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00175">175</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ad7574824cc27b9ab2201b71f9dedff69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7574824cc27b9ab2201b71f9dedff69">&#9670;&nbsp;</a></span>restore_union_rec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool restore_union_rec </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Undo the union access -&gt; byte_extract replacement that rewrite_union did for the purpose of displaying expressions to users. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>expression to inspect and possibly transform </td></tr>
+    <tr><td class="paramname">ns</td><td>namespace </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if, and only if, the expression is unmodified </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00126">126</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
 
 </div>
 </div>
@@ -179,7 +273,7 @@ Functions</h2></td></tr>
 
 <p>We rewrite u.c for unions u into byte_extract(u, 0), and { .c = v } into byte_update(NIL, 0, v) </p>
 
-<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00065">65</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00066">66</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
 
 </div>
 </div>
@@ -199,7 +293,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00109">109</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00110">110</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +313,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00098">98</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00099">99</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +333,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00115">115</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00116">116</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +353,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00043">43</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rewrite__union_8cpp_source.html#l00044">44</a> of file <a class="el" href="rewrite__union_8cpp_source.html">rewrite_union.cpp</a>.</p>
 
 </div>
 </div>

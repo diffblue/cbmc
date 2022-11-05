@@ -63,6 +63,7 @@ var classgoto__trace__stept =
     [ "internal", "classgoto__trace__stept.html#a3038be97b047373fca0e93f26df63f98", null ],
     [ "io_args", "classgoto__trace__stept.html#a70000cff1337b2bb3faa0ef649840872", null ],
     [ "io_id", "classgoto__trace__stept.html#af842260da7d11a93b5c95ddbde40eaca", null ],
+    [ "original_condition", "classgoto__trace__stept.html#a247ae95edd6fd98371ff7dc33256d816", null ],
     [ "pc", "classgoto__trace__stept.html#a6e32e5798688582ca114893464346fc4", null ],
     [ "property_id", "classgoto__trace__stept.html#a8e0b5341c8b69f75190ef6aa47d7b021", null ],
     [ "step_nr", "classgoto__trace__stept.html#ac832db11169ea5266df444e197588660", null ],
