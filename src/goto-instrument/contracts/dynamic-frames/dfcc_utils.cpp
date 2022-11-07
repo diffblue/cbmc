@@ -100,6 +100,7 @@ const symbolt &dfcc_utilst::create_symbol(
     source_location,
     mode,
     goto_model.symbol_table);
+  symbol.module = module;
   symbol.is_lvalue = true;
   symbol.is_state_var = true;
   symbol.is_thread_local = true;
@@ -125,6 +126,7 @@ const symbolt &dfcc_utilst::create_static_symbol(
     source_location,
     mode,
     goto_model.symbol_table);
+  symbol.module = module;
   symbol.is_static_lifetime = true;
   symbol.value = initial_value;
   symbol.value.set(ID_C_no_nondet_initialization, no_nondet_initialization);

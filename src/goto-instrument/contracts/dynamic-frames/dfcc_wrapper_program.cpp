@@ -228,8 +228,8 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
                            id2string(wrapper_symbol.name),
                            "__contract_return_value",
                            wrapper_symbol.location,
-                           wrapper_symbol.module,
                            wrapper_symbol.mode,
+                           wrapper_symbol.module,
                            false)
                          .symbol_expr();
 
