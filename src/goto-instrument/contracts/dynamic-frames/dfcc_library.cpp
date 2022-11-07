@@ -454,8 +454,7 @@ void dfcc_libraryt::fix_malloc_free_calls()
 
           if(fun_name == (CONTRACTS_PREFIX "malloc"))
             to_symbol_expr(ins->call_function()).set_identifier("malloc");
-
-          if(fun_name == (CONTRACTS_PREFIX "free"))
+          else if(fun_name == (CONTRACTS_PREFIX "free"))
             to_symbol_expr(ins->call_function()).set_identifier("free");
         }
       }

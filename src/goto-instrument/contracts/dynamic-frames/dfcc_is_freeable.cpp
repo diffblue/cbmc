@@ -55,8 +55,7 @@ void dfcc_is_freeablet::rewrite_calls(
             .set_identifier(library.get_dfcc_fun_name(dfcc_funt::IS_FREEABLE));
           target->call_arguments().push_back(write_set);
         }
-
-        if(fun_name == CPROVER_PREFIX "was_freed")
+        else if(fun_name == CPROVER_PREFIX "was_freed")
         {
           // insert call to precondition for vacuity checking
           auto inst = goto_programt::make_function_call(
