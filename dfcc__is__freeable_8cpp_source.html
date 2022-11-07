@@ -149,31 +149,30 @@ $(document).ready(function(){initNavTree('dfcc__is__freeable_8cpp_source.html','
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            .<a class="code" href="classsymbol__exprt.html#a09983568780d97b1c33420c5efa1b7df">set_identifier</a>(<a class="code" href="classdfcc__is__freeablet.html#a72e592a1747c116405482869133729ab">library</a>.<a class="code" href="classdfcc__libraryt.html#aab083f42e5dc5680bdc974a14e453d9d">get_dfcc_fun_name</a>(<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca0a6f938522ddc6da8229dc6b80359227">dfcc_funt::IS_FREEABLE</a>));</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;          target-&gt;call_arguments().push_back(write_set);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordflow">if</span>(fun_name == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;was_freed&quot;</span>)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          <span class="comment">// insert call to precondition for vacuity checking</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;          <span class="keyword">auto</span> inst = <a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            <a class="code" href="classcode__function__callt.html">code_function_callt</a>{</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;              <a class="code" href="classdfcc__is__freeablet.html#a72e592a1747c116405482869133729ab">library</a></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                .<a class="code" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                  [<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac543dc0cf23dc7e8304f3c59c73b6b03">dfcc_funt::REPLACE_ENSURES_WAS_FREED_PRECONDITIONS</a>]</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                .symbol_expr(),</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;              {target-&gt;call_arguments().at(0), write_set}},</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            target-&gt;<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>());</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;          program.<a class="code" href="classgoto__programt.html#a32df6bf5af52e1065afd63fc549bd906">insert_before_swap</a>(target, inst);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          target++;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;          <span class="comment">// redirect call to library implementation</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;          <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(target-&gt;call_function())</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            .<a class="code" href="classsymbol__exprt.html#a09983568780d97b1c33420c5efa1b7df">set_identifier</a>(<a class="code" href="classdfcc__is__freeablet.html#a72e592a1747c116405482869133729ab">library</a>.<a class="code" href="classdfcc__libraryt.html#aab083f42e5dc5680bdc974a14e453d9d">get_dfcc_fun_name</a>(<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57caa6004cea15b69066e7618db63f29573a">dfcc_funt::WAS_FREED</a>));</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;          target-&gt;call_arguments().push_back(write_set);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    target++;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fun_name == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;was_freed&quot;</span>)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;          <span class="comment">// insert call to precondition for vacuity checking</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          <span class="keyword">auto</span> inst = <a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            <a class="code" href="classcode__function__callt.html">code_function_callt</a>{</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;              <a class="code" href="classdfcc__is__freeablet.html#a72e592a1747c116405482869133729ab">library</a></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                .<a class="code" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                  [<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac543dc0cf23dc7e8304f3c59c73b6b03">dfcc_funt::REPLACE_ENSURES_WAS_FREED_PRECONDITIONS</a>]</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                .symbol_expr(),</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;              {target-&gt;call_arguments().at(0), write_set}},</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            target-&gt;<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>());</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;          program.<a class="code" href="classgoto__programt.html#a32df6bf5af52e1065afd63fc549bd906">insert_before_swap</a>(target, inst);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;          target++;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;          <span class="comment">// redirect call to library implementation</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;          <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(target-&gt;call_function())</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            .<a class="code" href="classsymbol__exprt.html#a09983568780d97b1c33420c5efa1b7df">set_identifier</a>(<a class="code" href="classdfcc__is__freeablet.html#a72e592a1747c116405482869133729ab">library</a>.<a class="code" href="classdfcc__libraryt.html#aab083f42e5dc5680bdc974a14e453d9d">get_dfcc_fun_name</a>(<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57caa6004cea15b69066e7618db63f29573a">dfcc_funt::WAS_FREED</a>));</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;          target-&gt;call_arguments().push_back(write_set);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      }</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    target++;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  }</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00036">dstring.h:36</a></div></div>
