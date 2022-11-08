@@ -5633,7 +5633,7 @@ def CheckIncludeLine(filename, clean_lines, linenum, include_state, error, modul
     if has_src >= 0:
         module_name = module_name[has_src+4:]
     deps_name = os.path.dirname(include)
-    if deps_name and module_deps:
+    if deps_name and module_deps is not None:
         may_use = any(deps_name.startswith(module) for module in module_deps)
         if not may_use:
             error(filename, linenum, 'build/include', 4,
