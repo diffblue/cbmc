@@ -11,6 +11,7 @@
 #include <util/string_utils.h>
 #include <util/symbol.h>
 
+#include <solvers/lowering/expr_lowering.h>
 #include <solvers/smt2_incremental/ast/smt_commands.h>
 #include <solvers/smt2_incremental/ast/smt_responses.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>
@@ -257,19 +258,23 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
-  const exprt &expr)
+  const exprt &in_expr)
 {
   if(
-    expression_handle_identifiers.find(expr) !=
+    expression_handle_identifiers.find(in_expr) !=
     expression_handle_identifiers.cend())
   {
     return;
   }
 
-  define_dependent_functions(expr);
+  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+
+  define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
-    "B" + std::to_string(handle_sequence()), {}, convert_expr_to_smt(expr)};
-  expression_handle_identifiers.emplace(expr, function.identifier());
+    "B" + std::to_string(handle_sequence()),
+    {},
+    convert_expr_to_smt(lowered_expr)};
+  expression_handle_identifiers.emplace(in_expr, function.identifier());
   identifier_table.emplace(
     function.identifier().identifier(), function.identifier());
   solver_process->send(function);
@@ -283,15 +288,23 @@ void smt2_incremental_decision_proceduret::define_index_identifiers(
       return;
     if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
     {
-      const auto index_expr = with_expr->where();
-      const auto index_term = convert_expr_to_smt(index_expr);
-      const auto index_identifier = "index_" + std::to_string(index_sequence());
-      const auto index_definition =
-        smt_define_function_commandt{index_identifier, {}, index_term};
-      expression_identifiers.emplace(index_expr, index_definition.identifier());
-      identifier_table.emplace(index_identifier, index_definition.identifier());
-      solver_process->send(
-        smt_define_function_commandt{index_identifier, {}, index_term});
+      for(auto operand_ite = ++with_expr->operands().begin();
+          operand_ite != with_expr->operands().end();
+          operand_ite += 2)
+      {
+        const auto index_expr = *operand_ite;
+        const auto index_term = convert_expr_to_smt(index_expr);
+        const auto index_identifier =
+          "index_" + std::to_string(index_sequence());
+        const auto index_definition =
+          smt_define_function_commandt{index_identifier, {}, index_term};
+        expression_identifiers.emplace(
+          index_expr, index_definition.identifier());
+        identifier_table.emplace(
+          index_identifier, index_definition.identifier());
+        solver_process->send(
+          smt_define_function_commandt{index_identifier, {}, index_term});
+      }
     }
   });
 }
@@ -476,22 +489,25 @@ smt2_incremental_decision_proceduret::get_number_of_solver_calls() const
   return number_of_solver_calls;
 }
 
-void smt2_incremental_decision_proceduret::set_to(const exprt &expr, bool value)
+void smt2_incremental_decision_proceduret::set_to(
+  const exprt &in_expr,
+  bool value)
 {
-  PRECONDITION(can_cast_type<bool_typet>(expr.type()));
+  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+  PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
-          << expr.pretty(2, 0) << messaget::eom;
+          << lowered_expr.pretty(2, 0) << messaget::eom;
   });
 
-  define_dependent_functions(expr);
+  define_dependent_functions(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
     const auto expression_handle_identifier =
-      expression_handle_identifiers.find(expr);
+      expression_handle_identifiers.find(lowered_expr);
     if(expression_handle_identifier != expression_handle_identifiers.cend())
       return expression_handle_identifier->second;
     else
-      return convert_expr_to_smt(expr);
+      return convert_expr_to_smt(lowered_expr);
   }();
   if(!value)
     converted_term = smt_core_theoryt::make_not(converted_term);
