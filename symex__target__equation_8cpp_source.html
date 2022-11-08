@@ -503,308 +503,310 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;      step.guard_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.guard);</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    }</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    ++step_index;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  }</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;}</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160; </div>
-<div class="line"><a name="l00425"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#a5db20d7e9bc04b5d7e4a5264bdb7c126">  425</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#a5db20d7e9bc04b5d7e4a5264bdb7c126">symex_target_equationt::convert_assumptions</a>(</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;{</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  std::size_t step_index = 0;</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  {</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keywordflow">if</span>(step.is_assume())</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    {</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      <span class="keywordflow">if</span>(step.ignore)</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        step.cond_handle = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      {</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;            step.output(mstream);</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;            mstream &lt;&lt; messaget::eom;</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;          });</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160; </div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        decision_procedure, [step_index, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;          hardness.<a class="code" href="structsolver__hardnesst.html#a46077c5b44c65e20cf48ba029b1fc88e">register_ssa</a>(step_index, step.guard, step.source.pc);</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        });</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    }</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    ++step_index;</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  }</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;}</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160; </div>
+<div class="line"><a name="l00427"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#a5db20d7e9bc04b5d7e4a5264bdb7c126">  427</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#a5db20d7e9bc04b5d7e4a5264bdb7c126">symex_target_equationt::convert_assumptions</a>(</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;{</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  std::size_t step_index = 0;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  {</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keywordflow">if</span>(step.is_assume())</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    {</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;      <span class="keywordflow">if</span>(step.ignore)</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        step.cond_handle = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;      {</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;            step.output(mstream);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;            mstream &lt;&lt; messaget::eom;</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;          });</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;      }</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    }</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    ++step_index;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  }</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;}</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
-<div class="line"><a name="l00453"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#ae43abcb537bf4488360d39dfc0ab533e">  453</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#ae43abcb537bf4488360d39dfc0ab533e">symex_target_equationt::convert_goto_instructions</a>(</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;{</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  std::size_t step_index = 0;</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  {</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <span class="keywordflow">if</span>(step.is_goto())</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    {</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      <span class="keywordflow">if</span>(step.ignore)</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;        step.cond_handle = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;      {</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;            step.output(mstream);</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;            mstream &lt;&lt; messaget::eom;</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;          });</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;      }</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    }</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    ++step_index;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  }</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;}</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
-<div class="line"><a name="l00480"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#ade4f3ce72dcfde0f881abf7b78f2b947">  480</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#ade4f3ce72dcfde0f881abf7b78f2b947">symex_target_equationt::convert_constraints</a>(</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;{</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  std::size_t step_index = 0;</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  {</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    <span class="keywordflow">if</span>(step.is_constraint() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    {</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;      <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(<a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;        step.output(mstream);</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      });</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160; </div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160; </div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;        decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;    }</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    ++step_index;</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  }</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;}</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160; </div>
-<div class="line"><a name="l00503"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#af8370bf4376e3a4092f42588804fd876">  503</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#af8370bf4376e3a4092f42588804fd876">symex_target_equationt::convert_assertions</a>(</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure,</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;  <span class="keywordtype">bool</span> optimized_for_single_assertions)</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;{</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;  <span class="comment">// we find out if there is only _one_ assertion,</span></div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  <span class="comment">// which allows for a simpler formula</span></div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160; </div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;  std::size_t number_of_assertions=<a class="code" href="classsymex__target__equationt.html#a54838787162090302b8a377b7e1e4b92">count_assertions</a>();</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      }</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    }</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    ++step_index;</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  }</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;}</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
+<div class="line"><a name="l00455"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#ae43abcb537bf4488360d39dfc0ab533e">  455</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#ae43abcb537bf4488360d39dfc0ab533e">symex_target_equationt::convert_goto_instructions</a>(</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;{</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  std::size_t step_index = 0;</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  {</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="keywordflow">if</span>(step.is_goto())</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    {</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;      <span class="keywordflow">if</span>(step.ignore)</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;        step.cond_handle = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;      {</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;        <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;            step.output(mstream);</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;            mstream &lt;&lt; messaget::eom;</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;          });</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160; </div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;      }</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    }</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    ++step_index;</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  }</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;}</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160; </div>
+<div class="line"><a name="l00482"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#ade4f3ce72dcfde0f881abf7b78f2b947">  482</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#ade4f3ce72dcfde0f881abf7b78f2b947">symex_target_equationt::convert_constraints</a>(</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;{</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  std::size_t step_index = 0;</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  {</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    <span class="keywordflow">if</span>(step.is_constraint() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    {</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;      <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(<a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;        step.output(mstream);</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      });</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160; </div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160; </div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;        decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    }</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    ++step_index;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;  }</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;}</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160; </div>
+<div class="line"><a name="l00505"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#af8370bf4376e3a4092f42588804fd876">  505</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#af8370bf4376e3a4092f42588804fd876">symex_target_equationt::convert_assertions</a>(</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure,</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;  <span class="keywordtype">bool</span> optimized_for_single_assertions)</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;{</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;  <span class="comment">// we find out if there is only _one_ assertion,</span></div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;  <span class="comment">// which allows for a simpler formula</span></div>
 <div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160; </div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  <span class="keywordflow">if</span>(number_of_assertions==0)</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160; </div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;  <span class="keywordflow">if</span>(number_of_assertions == 1 &amp;&amp; optimized_for_single_assertions)</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  {</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    std::size_t step_index = 0;</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    {</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;      <span class="comment">// hide already converted assertions in the error trace</span></div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;      <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; step.converted)</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        step.hidden = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160; </div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;      <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;      {</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;        step.converted = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">set_to_false</a>(step.cond_expr);</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;        step.cond_handle = <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160; </div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;        <span class="keywordflow">return</span>; <span class="comment">// prevent further assumptions!</span></div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;      }</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(step.is_assume())</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;      {</div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160; </div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;      }</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;      ++step_index;</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    }</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160; </div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// unreachable</span></div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;  }</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160; </div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;  <span class="comment">// We do (NOT a1) OR (NOT a2) ...</span></div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;  <span class="comment">// where the a&#39;s are the assertions</span></div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">or_exprt::operandst</a> disjuncts;</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  disjuncts.reserve(number_of_assertions);</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160; </div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;  <a class="code" href="classexprt.html">exprt</a> <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>=<a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  std::size_t number_of_assertions=<a class="code" href="classsymex__target__equationt.html#a54838787162090302b8a377b7e1e4b92">count_assertions</a>();</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160; </div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;  <span class="keywordflow">if</span>(number_of_assertions==0)</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160; </div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  <span class="keywordflow">if</span>(number_of_assertions == 1 &amp;&amp; optimized_for_single_assertions)</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;  {</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    std::size_t step_index = 0;</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    {</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;      <span class="comment">// hide already converted assertions in the error trace</span></div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;      <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; step.converted)</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;        step.hidden = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160; </div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;      <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;      {</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;        step.converted = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">set_to_false</a>(step.cond_expr);</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;        step.cond_handle = <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160; </div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;        <span class="keywordflow">return</span>; <span class="comment">// prevent further assumptions!</span></div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;      }</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(step.is_assume())</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;      {</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160; </div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;      }</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;      ++step_index;</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    }</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160; </div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// unreachable</span></div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;  }</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160; </div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;  <span class="comment">// We do (NOT a1) OR (NOT a2) ...</span></div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  <span class="comment">// where the a&#39;s are the assertions</span></div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">or_exprt::operandst</a> disjuncts;</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;  disjuncts.reserve(number_of_assertions);</div>
 <div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160; </div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;  std::vector&lt;goto_programt::const_targett&gt; involved_steps;</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;  <a class="code" href="classexprt.html">exprt</a> <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>=<a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
 <div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160; </div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;  {</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    <span class="comment">// hide already converted assertions in the error trace</span></div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;    <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; step.converted)</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;      step.hidden = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160; </div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;    <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    {</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;      <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(<a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        step.output(mstream);</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;      });</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;      <a class="code" href="classimplies__exprt.html">implies_exprt</a> <a class="code" href="goto__check__c_8cpp.html#a5ce29488705971f68782d8dec4e5e8fe">implication</a>(</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;        <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>,</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;        step.cond_expr);</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160; </div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;      <span class="comment">// do the conversion</span></div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;      step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(<a class="code" href="goto__check__c_8cpp.html#a5ce29488705971f68782d8dec4e5e8fe">implication</a>);</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160; </div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;        decision_procedure,</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        [&amp;involved_steps, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;          involved_steps.push_back(step.source.pc);</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        });</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160; </div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;      <span class="comment">// store disjunct</span></div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;      disjuncts.push_back(<a class="code" href="classnot__exprt.html">not_exprt</a>(step.cond_handle));</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    }</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(step.is_assume())</div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    {</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;      <span class="comment">// the assumptions have been converted before</span></div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;      <span class="comment">// avoid deep nesting of ID_and expressions</span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>.id()==ID_and)</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;        <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>.copy_to_operands(step.cond_handle);</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;        <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a> = <a class="code" href="classand__exprt.html">and_exprt</a>(<a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>, step.cond_handle);</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160; </div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;        decision_procedure,</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;        [&amp;involved_steps, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;          involved_steps.push_back(step.source.pc);</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        });</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    }</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  }</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160; </div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> assertion_disjunction = <a class="code" href="std__expr_8cpp.html#a4d859ac2f51f3b898154a185ddd2daa2">disjunction</a>(disjuncts);</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  <span class="comment">// the below is &#39;true&#39; if there are no assertions</span></div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(assertion_disjunction);</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    decision_procedure,</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    [&amp;assertion_disjunction, &amp;involved_steps](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;      hardness.<a class="code" href="structsolver__hardnesst.html#a74431039b6e6e65360fef194ebf1f44a">register_assertion_ssas</a>(assertion_disjunction, involved_steps);</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    });</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;}</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160; </div>
-<div class="line"><a name="l00615"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#adc4cf75bc92621ee42992970650da38c">  615</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#adc4cf75bc92621ee42992970650da38c">symex_target_equationt::convert_function_calls</a>(</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;{</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  std::size_t step_index = 0;</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;  {</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    <span class="keywordflow">if</span>(!step.ignore)</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    {</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;      <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">and_exprt::operandst</a> conjuncts;</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;      step.converted_function_arguments.reserve(step.ssa_function_arguments.size());</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160; </div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;arg : step.ssa_function_arguments)</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;      {</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;        <span class="keywordflow">if</span>(arg.is_constant() ||</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;           arg.id()==ID_string_constant)</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;          step.converted_function_arguments.push_back(arg);</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;        {</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;          <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> identifier=<span class="stringliteral">&quot;symex::args::&quot;</span>+<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsymex__target__equationt.html#a5abd34fc0f761879b3daa6c5da1d2bf2">argument_count</a>++);</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;          <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> symbol(identifier, arg.type());</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160; </div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;          <a class="code" href="classequal__exprt.html">equal_exprt</a> eq(arg, symbol);</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(eq);</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160; </div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>(eq, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;          conjuncts.push_back(eq);</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;          step.converted_function_arguments.push_back(symbol);</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;        }</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;      }</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;        decision_procedure,</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        [step_index, &amp;conjuncts, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;          hardness.<a class="code" href="structsolver__hardnesst.html#a46077c5b44c65e20cf48ba029b1fc88e">register_ssa</a>(</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;            step_index, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(conjuncts), step.source.pc);</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;        });</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    }</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    ++step_index;</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  }</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;}</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160; </div>
-<div class="line"><a name="l00655"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#ad54e1428de563fb6ed477b5c68eefe85">  655</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#ad54e1428de563fb6ed477b5c68eefe85">symex_target_equationt::convert_io</a>(<a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;{</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;  std::size_t step_index = 0;</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  {</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="keywordflow">if</span>(!step.ignore)</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    {</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;      <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">and_exprt::operandst</a> conjuncts;</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;arg : step.io_args)</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;      {</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;        <span class="keywordflow">if</span>(arg.is_constant() ||</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;           arg.id()==ID_string_constant)</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;          step.converted_io_args.push_back(arg);</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        {</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;          <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> identifier =</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;            <span class="stringliteral">&quot;symex::io::&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsymex__target__equationt.html#a46d4f6fc6138f440d6e88a633b681c1c">io_count</a>++);</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;          <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> symbol(identifier, arg.type());</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160; </div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;          <a class="code" href="classequal__exprt.html">equal_exprt</a> eq(arg, symbol);</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(eq);</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160; </div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>(eq, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;          conjuncts.push_back(eq);</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;          step.converted_io_args.push_back(symbol);</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;        }</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;      }</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;        decision_procedure,</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;        [step_index, &amp;conjuncts, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;          hardness.<a class="code" href="structsolver__hardnesst.html#a46077c5b44c65e20cf48ba029b1fc88e">register_ssa</a>(</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;            step_index, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(conjuncts), step.source.pc);</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;        });</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    }</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    ++step_index;</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;  }</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;}</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160; </div>
-<div class="line"><a name="l00696"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">  696</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">symex_target_equationt::merge_ireps</a>(<a class="code" href="class_s_s_a__stept.html">SSA_stept</a> &amp;SSA_step)</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;{</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#a9f7a94652344890a8d5d52d410f72c7f">guard</a>);</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160; </div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#afcbcb34e32a8a04fcab0cef96bc3d7b8">ssa_lhs</a>);</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#a675cabac5bb270f6f6bbf34821ced255">ssa_full_lhs</a>);</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#abaeebd80f90b953146e41c17c236e3df">original_full_lhs</a>);</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#aa0fd1ad856ec63e093ecedef7f38e285">ssa_rhs</a>);</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160; </div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#a3977bf4be5f66320bbf67e6259e57817">cond_expr</a>);</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;  std::vector&lt;goto_programt::const_targett&gt; involved_steps;</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160; </div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;  {</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;    <span class="comment">// hide already converted assertions in the error trace</span></div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; step.converted)</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;      step.hidden = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160; </div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    {</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160; </div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;      <a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a7cc6696f178e195a879d412a65d2c605">conditional_output</a>(<a class="code" href="classsymex__target__equationt.html#ae3ab1a53fd4de0a888edaaa2176f6e1e">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>(), [&amp;step](<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;mstream) {</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        step.output(mstream);</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;      });</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;      <a class="code" href="classimplies__exprt.html">implies_exprt</a> <a class="code" href="goto__check__c_8cpp.html#a5ce29488705971f68782d8dec4e5e8fe">implication</a>(</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;        <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>,</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        step.cond_expr);</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160; </div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;      <span class="comment">// do the conversion</span></div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;      step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(<a class="code" href="goto__check__c_8cpp.html#a5ce29488705971f68782d8dec4e5e8fe">implication</a>);</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160; </div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;        decision_procedure,</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        [&amp;involved_steps, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;          involved_steps.push_back(step.source.pc);</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;        });</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160; </div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;      <span class="comment">// store disjunct</span></div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;      disjuncts.push_back(<a class="code" href="classnot__exprt.html">not_exprt</a>(step.cond_handle));</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    }</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(step.is_assume())</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    {</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;      <span class="comment">// the assumptions have been converted before</span></div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;      <span class="comment">// avoid deep nesting of ID_and expressions</span></div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>.id()==ID_and)</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;        <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>.copy_to_operands(step.cond_handle);</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;        <a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a> = <a class="code" href="classand__exprt.html">and_exprt</a>(<a class="code" href="classsymex__target__equationt.html#a6455078d774e40505d5a7da988a525bb">assumption</a>, step.cond_handle);</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160; </div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;        decision_procedure,</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        [&amp;involved_steps, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;          involved_steps.push_back(step.source.pc);</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        });</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    }</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;  }</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160; </div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> assertion_disjunction = <a class="code" href="std__expr_8cpp.html#a4d859ac2f51f3b898154a185ddd2daa2">disjunction</a>(disjuncts);</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  <span class="comment">// the below is &#39;true&#39; if there are no assertions</span></div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(assertion_disjunction);</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    decision_procedure,</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    [&amp;assertion_disjunction, &amp;involved_steps](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;      hardness.<a class="code" href="structsolver__hardnesst.html#a74431039b6e6e65360fef194ebf1f44a">register_assertion_ssas</a>(assertion_disjunction, involved_steps);</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;    });</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;}</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160; </div>
+<div class="line"><a name="l00617"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#adc4cf75bc92621ee42992970650da38c">  617</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#adc4cf75bc92621ee42992970650da38c">symex_target_equationt::convert_function_calls</a>(</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;{</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;  std::size_t step_index = 0;</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;  {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keywordflow">if</span>(!step.ignore)</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;    {</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;      <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">and_exprt::operandst</a> conjuncts;</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;      step.converted_function_arguments.reserve(step.ssa_function_arguments.size());</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160; </div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;arg : step.ssa_function_arguments)</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;      {</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;        <span class="keywordflow">if</span>(arg.is_constant() ||</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;           arg.id()==ID_string_constant)</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;          step.converted_function_arguments.push_back(arg);</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;        {</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;          <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> identifier=<span class="stringliteral">&quot;symex::args::&quot;</span>+<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsymex__target__equationt.html#a5abd34fc0f761879b3daa6c5da1d2bf2">argument_count</a>++);</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;          <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> symbol(identifier, arg.type());</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160; </div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;          <a class="code" href="classequal__exprt.html">equal_exprt</a> eq(arg, symbol);</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(eq);</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160; </div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>(eq, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;          conjuncts.push_back(eq);</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;          step.converted_function_arguments.push_back(symbol);</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;        }</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;      }</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        decision_procedure,</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        [step_index, &amp;conjuncts, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;          hardness.<a class="code" href="structsolver__hardnesst.html#a46077c5b44c65e20cf48ba029b1fc88e">register_ssa</a>(</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;            step_index, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(conjuncts), step.source.pc);</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;        });</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    }</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    ++step_index;</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;  }</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;}</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160; </div>
+<div class="line"><a name="l00657"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#ad54e1428de563fb6ed477b5c68eefe85">  657</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#ad54e1428de563fb6ed477b5c68eefe85">symex_target_equationt::convert_io</a>(<a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;{</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  std::size_t step_index = 0;</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;  {</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;    <span class="keywordflow">if</span>(!step.ignore)</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    {</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;      <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">and_exprt::operandst</a> conjuncts;</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;arg : step.io_args)</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;      {</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;        <span class="keywordflow">if</span>(arg.is_constant() ||</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;           arg.id()==ID_string_constant)</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;          step.converted_io_args.push_back(arg);</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;        {</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;          <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> identifier =</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;            <span class="stringliteral">&quot;symex::io::&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsymex__target__equationt.html#a46d4f6fc6138f440d6e88a633b681c1c">io_count</a>++);</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;          <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> symbol(identifier, arg.type());</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160; </div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;          <a class="code" href="classequal__exprt.html">equal_exprt</a> eq(arg, symbol);</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(eq);</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160; </div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>(eq, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;          conjuncts.push_back(eq);</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;          step.converted_io_args.push_back(symbol);</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;        }</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;      }</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;        decision_procedure,</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;        [step_index, &amp;conjuncts, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;          hardness.<a class="code" href="structsolver__hardnesst.html#a46077c5b44c65e20cf48ba029b1fc88e">register_ssa</a>(</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;            step_index, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(conjuncts), step.source.pc);</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;        });</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    }</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    ++step_index;</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;  }</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;}</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160; </div>
+<div class="line"><a name="l00698"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">  698</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">symex_target_equationt::merge_ireps</a>(<a class="code" href="class_s_s_a__stept.html">SSA_stept</a> &amp;SSA_step)</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;{</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#a9f7a94652344890a8d5d52d410f72c7f">guard</a>);</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160; </div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#afcbcb34e32a8a04fcab0cef96bc3d7b8">ssa_lhs</a>);</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#a675cabac5bb270f6f6bbf34821ced255">ssa_full_lhs</a>);</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#abaeebd80f90b953146e41c17c236e3df">original_full_lhs</a>);</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#aa0fd1ad856ec63e093ecedef7f38e285">ssa_rhs</a>);</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160; </div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : SSA_step.<a class="code" href="class_s_s_a__stept.html#adfa356e14cb0e8e934d32a35bfbc7848">io_args</a>)</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(step);</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160; </div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;arg : SSA_step.<a class="code" href="class_s_s_a__stept.html#a260ce57d152e0ee448c1ede316f59229">ssa_function_arguments</a>)</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(arg);</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160; </div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;  <span class="comment">// converted_io_args is merged in convert_io</span></div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;}</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160; </div>
-<div class="line"><a name="l00716"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#a0e0dbd57fa44b031792c9069cbd963e0">  716</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#a3e2c8cbe1c1ffee27fa791a9497b5a4c">symex_target_equationt::output</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;  {</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    step.output(out);</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;--------------\n&quot;</span>;</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;  }</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;}</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(SSA_step.<a class="code" href="class_s_s_a__stept.html#a3977bf4be5f66320bbf67e6259e57817">cond_expr</a>);</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160; </div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;step : SSA_step.<a class="code" href="class_s_s_a__stept.html#adfa356e14cb0e8e934d32a35bfbc7848">io_args</a>)</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(step);</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160; </div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;arg : SSA_step.<a class="code" href="class_s_s_a__stept.html#a260ce57d152e0ee448c1ede316f59229">ssa_function_arguments</a>)</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(arg);</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160; </div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;  <span class="comment">// converted_io_args is merged in convert_io</span></div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;}</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160; </div>
+<div class="line"><a name="l00718"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#a0e0dbd57fa44b031792c9069cbd963e0">  718</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__target__equationt.html#a3e2c8cbe1c1ffee27fa791a9497b5a4c">symex_target_equationt::output</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;step : <a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>)</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;  {</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    step.output(out);</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;--------------\n&quot;</span>;</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;  }</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
@@ -825,7 +827,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="ttc" id="astructsymex__targett_1_1sourcet_html_aad3ac89e4973cc1a27a60944a1b29b53"><div class="ttname"><a href="structsymex__targett_1_1sourcet.html#aad3ac89e4973cc1a27a60944a1b29b53">symex_targett::sourcet::pc</a></div><div class="ttdeci">goto_programt::const_targett pc</div><div class="ttdef"><b>Definition:</b> <a href="symex__target_8h_source.html#l00042">symex_target.h:42</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a4ff7dd53c201e241ca4e86221a0e7259"><div class="ttname"><a href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">messaget::status</a></div><div class="ttdeci">mstreamt &amp; status() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00414">message.h:414</a></div></div>
 <div class="ttc" id="aclassdecision__proceduret_html"><div class="ttname"><a href="classdecision__proceduret.html">decision_proceduret</a></div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8h_source.html#l00020">decision_procedure.h:20</a></div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_ae43abcb537bf4488360d39dfc0ab533e"><div class="ttname"><a href="classsymex__target__equationt.html#ae43abcb537bf4488360d39dfc0ab533e">symex_target_equationt::convert_goto_instructions</a></div><div class="ttdeci">void convert_goto_instructions(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts goto instructions: convert the expression representing the condition of this goto.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00453">symex_target_equation.cpp:453</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_ae43abcb537bf4488360d39dfc0ab533e"><div class="ttname"><a href="classsymex__target__equationt.html#ae43abcb537bf4488360d39dfc0ab533e">symex_target_equationt::convert_goto_instructions</a></div><div class="ttdeci">void convert_goto_instructions(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts goto instructions: convert the expression representing the condition of this goto.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00455">symex_target_equation.cpp:455</a></div></div>
 <div class="ttc" id="asymex__target__equation_8cpp_html_a05de0ca5461191c049cf1be1ef445b62"><div class="ttname"><a href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a></div><div class="ttdeci">static std::function&lt; void(solver_hardnesst &amp;)&gt; hardness_register_ssa(std::size_t step_index, const SSA_stept &amp;step)</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00023">symex_target_equation.cpp:23</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_ab99495a691c992776d679fd3a320c4f0"><div class="ttname"><a href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">symex_target_equationt::merge_irep</a></div><div class="ttdeci">merge_irept merge_irep</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8h_source.html#l00288">symex_target_equation.h:288</a></div></div>
 <div class="ttc" id="asolver__hardness_8h_html"><div class="ttname"><a href="solver__hardness_8h.html">solver_hardness.h</a></div></div>
@@ -869,10 +871,10 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="ttc" id="aclass_s_s_a__stept_html_a3977bf4be5f66320bbf67e6259e57817"><div class="ttname"><a href="class_s_s_a__stept.html#a3977bf4be5f66320bbf67e6259e57817">SSA_stept::cond_expr</a></div><div class="ttdeci">exprt cond_expr</div><div class="ttdef"><b>Definition:</b> <a href="ssa__step_8h_source.html#l00149">ssa_step.h:149</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_aca72aeb3c818cdafa50ee9b200997fea"><div class="ttname"><a href="classsymex__target__equationt.html#aca72aeb3c818cdafa50ee9b200997fea">symex_target_equationt::dead</a></div><div class="ttdeci">virtual void dead(const exprt &amp;guard, const ssa_exprt &amp;ssa_lhs, const sourcet &amp;source)</div><div class="ttdoc">Remove a variable from the scope.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00161">symex_target_equation.cpp:161</a></div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_ad54e1428de563fb6ed477b5c68eefe85"><div class="ttname"><a href="classsymex__target__equationt.html#ad54e1428de563fb6ed477b5c68eefe85">symex_target_equationt::convert_io</a></div><div class="ttdeci">void convert_io(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts I/O: for each argument build an equality between its symbol and the argument itself.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00655">symex_target_equation.cpp:655</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_ad54e1428de563fb6ed477b5c68eefe85"><div class="ttname"><a href="classsymex__target__equationt.html#ad54e1428de563fb6ed477b5c68eefe85">symex_target_equationt::convert_io</a></div><div class="ttdeci">void convert_io(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts I/O: for each argument build an equality between its symbol and the argument itself.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00657">symex_target_equation.cpp:657</a></div></div>
 <div class="ttc" id="aclassexprt_html_a10c073e5cdd14b181d56cf53def8b378"><div class="ttname"><a href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a></div><div class="ttdeci">std::vector&lt; exprt &gt; operandst</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00058">expr.h:58</a></div></div>
 <div class="ttc" id="aclassfalse__exprt_html"><div class="ttname"><a href="classfalse__exprt.html">false_exprt</a></div><div class="ttdoc">The Boolean constant false.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03016">std_expr.h:3016</a></div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_ade4f3ce72dcfde0f881abf7b78f2b947"><div class="ttname"><a href="classsymex__target__equationt.html#ade4f3ce72dcfde0f881abf7b78f2b947">symex_target_equationt::convert_constraints</a></div><div class="ttdeci">void convert_constraints(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts constraints: set the represented condition to True.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00480">symex_target_equation.cpp:480</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_ade4f3ce72dcfde0f881abf7b78f2b947"><div class="ttname"><a href="classsymex__target__equationt.html#ade4f3ce72dcfde0f881abf7b78f2b947">symex_target_equationt::convert_constraints</a></div><div class="ttdeci">void convert_constraints(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts constraints: set the represented condition to True.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00482">symex_target_equation.cpp:482</a></div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebcaa84cc046d48610b05c21fd3670d0c829"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebcaa84cc046d48610b05c21fd3670d0c829">goto_trace_stept::typet::INPUT</a></div><div class="ttdeci">@ INPUT</div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebca4b79dc4675c4a6d6a9631357cf09f934"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca4b79dc4675c4a6d6a9631357cf09f934">goto_trace_stept::typet::ATOMIC_END</a></div><div class="ttdeci">@ ATOMIC_END</div></div>
 <div class="ttc" id="aclassdecision__proceduret_html_ab923ff426a9db983d0b14376e2c3d7b9"><div class="ttname"><a href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">decision_proceduret::handle</a></div><div class="ttdeci">virtual exprt handle(const exprt &amp;expr)=0</div><div class="ttdoc">Generate a handle, which is an expression that has the same value as the argument in any model that i...</div></div>
@@ -884,11 +886,11 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="ttc" id="aclasssymex__target__equationt_html_aa725da80bb10735331d97bbbb7046e7f"><div class="ttname"><a href="classsymex__target__equationt.html#aa725da80bb10735331d97bbbb7046e7f">symex_target_equationt::convert_guards</a></div><div class="ttdeci">void convert_guards(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts guards: convert the expression the guard represents.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00402">symex_target_equation.cpp:402</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_a87ca00c8c0510831cc0377bf49fc70a7"><div class="ttname"><a href="classsymex__target__equationt.html#a87ca00c8c0510831cc0377bf49fc70a7">symex_target_equationt::shared_write</a></div><div class="ttdeci">virtual void shared_write(const exprt &amp;guard, const ssa_exprt &amp;ssa_object, unsigned atomic_section_id, const sourcet &amp;source)</div><div class="ttdoc">Write to a shared variable ssa_object: we effectively assign a value from this thread to be visible b...</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00046">symex_target_equation.cpp:46</a></div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebca043c46947879f703e26fb528952786ba"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca043c46947879f703e26fb528952786ba">goto_trace_stept::typet::SPAWN</a></div><div class="ttdeci">@ SPAWN</div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_aa624913e1d25f5ceae5833869c90e9b8"><div class="ttname"><a href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">symex_target_equationt::merge_ireps</a></div><div class="ttdeci">void merge_ireps(SSA_stept &amp;SSA_step)</div><div class="ttdoc">Merging causes identical ireps to be shared.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00696">symex_target_equation.cpp:696</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_aa624913e1d25f5ceae5833869c90e9b8"><div class="ttname"><a href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">symex_target_equationt::merge_ireps</a></div><div class="ttdeci">void merge_ireps(SSA_stept &amp;SSA_step)</div><div class="ttdoc">Merging causes identical ireps to be shared.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00698">symex_target_equation.cpp:698</a></div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebca55e6eaaefb11cf68e4d140056c85de3d"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca55e6eaaefb11cf68e4d140056c85de3d">goto_trace_stept::typet::MEMORY_BARRIER</a></div><div class="ttdeci">@ MEMORY_BARRIER</div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebca59f60bf0ee8fb693f106825cc2124f78"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca59f60bf0ee8fb693f106825cc2124f78">goto_trace_stept::typet::SHARED_WRITE</a></div><div class="ttdeci">@ SHARED_WRITE</div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_a6a12b7bbc59d55c023ee9fe04f91e5ca"><div class="ttname"><a href="classsymex__target__equationt.html#a6a12b7bbc59d55c023ee9fe04f91e5ca">symex_target_equationt::atomic_begin</a></div><div class="ttdeci">virtual void atomic_begin(const exprt &amp;guard, unsigned atomic_section_id, const sourcet &amp;source)</div><div class="ttdoc">Record a beginning of an atomic section.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00086">symex_target_equation.cpp:86</a></div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_af8370bf4376e3a4092f42588804fd876"><div class="ttname"><a href="classsymex__target__equationt.html#af8370bf4376e3a4092f42588804fd876">symex_target_equationt::convert_assertions</a></div><div class="ttdeci">void convert_assertions(decision_proceduret &amp;decision_procedure, bool optimized_for_single_assertions=true)</div><div class="ttdoc">Converts assertions: build a disjunction of negated assertions.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00503">symex_target_equation.cpp:503</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_af8370bf4376e3a4092f42588804fd876"><div class="ttname"><a href="classsymex__target__equationt.html#af8370bf4376e3a4092f42588804fd876">symex_target_equationt::convert_assertions</a></div><div class="ttdeci">void convert_assertions(decision_proceduret &amp;decision_procedure, bool optimized_for_single_assertions=true)</div><div class="ttdoc">Converts assertions: build a disjunction of negated assertions.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00505">symex_target_equation.cpp:505</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_a9ebc61641fe268d830f34b9e7ceb8499"><div class="ttname"><a href="classsymex__target__equationt.html#a9ebc61641fe268d830f34b9e7ceb8499">symex_target_equationt::assertion</a></div><div class="ttdeci">virtual void assertion(const exprt &amp;guard, const exprt &amp;cond, const std::string &amp;msg, const sourcet &amp;source)</div><div class="ttdoc">Record an assertion.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00282">symex_target_equation.cpp:282</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_a8da8163238bc0f28481e82f1bef9b97b"><div class="ttname"><a href="classsymex__target__equationt.html#a8da8163238bc0f28481e82f1bef9b97b">symex_target_equationt::output_fmt</a></div><div class="ttdeci">virtual void output_fmt(const exprt &amp;guard, const sourcet &amp;source, const irep_idt &amp;output_id, const irep_idt &amp;fmt, const std::list&lt; exprt &gt; &amp;args)</div><div class="ttdoc">Record formatted output.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00233">symex_target_equation.cpp:233</a></div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebca4b8bb3c94a9676b5f34ace4d7102e5b9"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca4b8bb3c94a9676b5f34ace4d7102e5b9">goto_trace_stept::typet::GOTO</a></div><div class="ttdeci">@ GOTO</div></div>
@@ -896,7 +898,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="ttc" id="aclass_s_s_a__stept_html_abaeebd80f90b953146e41c17c236e3df"><div class="ttname"><a href="class_s_s_a__stept.html#abaeebd80f90b953146e41c17c236e3df">SSA_stept::original_full_lhs</a></div><div class="ttdeci">exprt original_full_lhs</div><div class="ttdef"><b>Definition:</b> <a href="ssa__step_8h_source.html#l00144">ssa_step.h:144</a></div></div>
 <div class="ttc" id="astructsolver__hardnesst_html"><div class="ttname"><a href="structsolver__hardnesst.html">solver_hardnesst</a></div><div class="ttdoc">A structure that facilitates collecting the complexity statistics from a decision procedure.</div><div class="ttdef"><b>Definition:</b> <a href="solver__hardness_8h_source.html#l00042">solver_hardness.h:42</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_aef9ee57424e0af94bf81ce6075c0a444"><div class="ttname"><a href="classsymex__target__equationt.html#aef9ee57424e0af94bf81ce6075c0a444">symex_target_equationt::function_call</a></div><div class="ttdeci">virtual void function_call(const exprt &amp;guard, const irep_idt &amp;function_id, const std::vector&lt; renamedt&lt; exprt, L2 &gt;&gt; &amp;ssa_function_arguments, const sourcet &amp;source, bool hidden)</div><div class="ttdoc">Record a function call.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00181">symex_target_equation.cpp:181</a></div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_adc4cf75bc92621ee42992970650da38c"><div class="ttname"><a href="classsymex__target__equationt.html#adc4cf75bc92621ee42992970650da38c">symex_target_equationt::convert_function_calls</a></div><div class="ttdeci">void convert_function_calls(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts function calls: for each argument build an equality between its symbol and the argument itse...</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00615">symex_target_equation.cpp:615</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_adc4cf75bc92621ee42992970650da38c"><div class="ttname"><a href="classsymex__target__equationt.html#adc4cf75bc92621ee42992970650da38c">symex_target_equationt::convert_function_calls</a></div><div class="ttdeci">void convert_function_calls(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts function calls: for each argument build an equality between its symbol and the argument itse...</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00617">symex_target_equation.cpp:617</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_a3180b42854c3ead00d443f3b2cd24343"><div class="ttname"><a href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">symex_target_equationt::SSA_steps</a></div><div class="ttdeci">SSA_stepst SSA_steps</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8h_source.html#l00250">symex_target_equation.h:250</a></div></div>
 <div class="ttc" id="aclass_s_s_a__stept_html_aa0fd1ad856ec63e093ecedef7f38e285"><div class="ttname"><a href="class_s_s_a__stept.html#aa0fd1ad856ec63e093ecedef7f38e285">SSA_stept::ssa_rhs</a></div><div class="ttdeci">exprt ssa_rhs</div><div class="ttdef"><b>Definition:</b> <a href="ssa__step_8h_source.html#l00145">ssa_step.h:145</a></div></div>
 <div class="ttc" id="ac__safety__checks_8cpp_html_a1675f729dc854238dd23840d004c7c0a"><div class="ttname"><a href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a></div><div class="ttdeci">static exprt guard(const exprt::operandst &amp;guards, exprt cond)</div><div class="ttdef"><b>Definition:</b> <a href="c__safety__checks_8cpp_source.html#l00070">c_safety_checks.cpp:70</a></div></div>
@@ -912,7 +914,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebca63771a1670297d9e33bd3d28630ef7f9"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca63771a1670297d9e33bd3d28630ef7f9">goto_trace_stept::typet::SHARED_READ</a></div><div class="ttdeci">@ SHARED_READ</div></div>
 <div class="ttc" id="astructsymex__targett_1_1sourcet_html"><div class="ttname"><a href="structsymex__targett_1_1sourcet.html">symex_targett::sourcet</a></div><div class="ttdoc">Identifies source in the context of symbolic execution.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target_8h_source.html#l00036">symex_target.h:36</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a9b00d066828dcda2059ead6b91f55d86"><div class="ttname"><a href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">messaget::debug</a></div><div class="ttdeci">mstreamt &amp; debug() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00429">message.h:429</a></div></div>
-<div class="ttc" id="aclasssymex__target__equationt_html_a5db20d7e9bc04b5d7e4a5264bdb7c126"><div class="ttname"><a href="classsymex__target__equationt.html#a5db20d7e9bc04b5d7e4a5264bdb7c126">symex_target_equationt::convert_assumptions</a></div><div class="ttdeci">void convert_assumptions(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts assumptions: convert the expression the assumption represents.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00425">symex_target_equation.cpp:425</a></div></div>
+<div class="ttc" id="aclasssymex__target__equationt_html_a5db20d7e9bc04b5d7e4a5264bdb7c126"><div class="ttname"><a href="classsymex__target__equationt.html#a5db20d7e9bc04b5d7e4a5264bdb7c126">symex_target_equationt::convert_assumptions</a></div><div class="ttdeci">void convert_assumptions(decision_proceduret &amp;decision_procedure)</div><div class="ttdoc">Converts assumptions: convert the expression the assumption represents.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00427">symex_target_equation.cpp:427</a></div></div>
 <div class="ttc" id="aclassgoto__trace__stept_html_a6cd0384a4a8c5dbfba0817c5972e5ebcafe8f37b06a5aa2e00985a4efffab6c2b"><div class="ttname"><a href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebcafe8f37b06a5aa2e00985a4efffab6c2b">goto_trace_stept::typet::FUNCTION_CALL</a></div><div class="ttdeci">@ FUNCTION_CALL</div></div>
 <div class="ttc" id="aclasstrue__exprt_html"><div class="ttname"><a href="classtrue__exprt.html">true_exprt</a></div><div class="ttdoc">The Boolean constant true.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03007">std_expr.h:3007</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_af59570036030e88ae2ef90910f1cb20c"><div class="ttname"><a href="classsymex__target__equationt.html#af59570036030e88ae2ef90910f1cb20c">symex_target_equationt::decl</a></div><div class="ttdeci">virtual void decl(const exprt &amp;guard, const ssa_exprt &amp;ssa_lhs, const exprt &amp;initializer, const sourcet &amp;source, assignment_typet assignment_type)</div><div class="ttdoc">Declare a fresh variable.</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8cpp_source.html#l00135">symex_target_equation.cpp:135</a></div></div>
