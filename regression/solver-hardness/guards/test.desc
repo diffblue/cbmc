@@ -1,0 +1,13 @@
+CORE
+main.c
+--write-solver-stats-to 'solver_hardness.json'
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line 12 should fail: FAILURE$
+^VERIFICATION FAILED$
+\{"GOTO":"GOTO \d+","GOTO_ID":\d+,"SAT_hardness":\{"ClauseSet":\[\d+.*\],"Clauses":[1-9]\d*,"Literals":[1-9]\d*,"Variables":[1-9]\d*},"SSA_expr":"goto_symex::\\\\guard#1 ∧ goto_symex::\\\\guard#2","Source":\{"file":"main.c","function":"main","line":"\d+","workingDirectory":".*"\}\}
+--
+^warning: ignoring
+\{"GOTO":"GOTO \d+","GOTO_ID":\d+,"SAT_hardness":\{"ClauseSet":\[\d+.*\],"Clauses":[1-9]\d*,"Literals":[1-9]\d*,"Variables":[1-9]\d*},"SSA_expr":"true","Source":\{"file":"main.c","function":"main","line":"\d+","workingDirectory":".*"\}\}
+--
+"true" must not yield any clauses.

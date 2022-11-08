@@ -416,7 +416,9 @@ void symex_target_equationt::convert_guards(
 
       step.guard_handle = decision_procedure.handle(step.guard);
       with_solver_hardness(
-        decision_procedure, hardness_register_ssa(step_index, step));
+        decision_procedure, [step_index, &step](solver_hardnesst &hardness) {
+          hardness.register_ssa(step_index, step.guard, step.source.pc);
+        });
     }
     ++step_index;
   }
