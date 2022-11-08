@@ -669,3 +669,68 @@ TEST_CASE(
     REQUIRE(test.sent_commands == expected_commands);
   }
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret multi-ary with_exprt introduces "
+  "correct number of indexes.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const signedbv_typet index_type{32};
+  const signedbv_typet value_type{8};
+  const array_typet array_type{value_type, from_integer(3, index_type)};
+  const auto original_array_symbol =
+    make_test_symbol("original_array", array_type);
+  const auto result_array_symbol = make_test_symbol("result_array", array_type);
+  with_exprt with_expr{
+    original_array_symbol.symbol_expr(),
+    from_integer(0, index_type),
+    from_integer(0, value_type)};
+  with_expr.add_to_operands(
+    from_integer(1, index_type), from_integer(1, value_type));
+  with_expr.add_to_operands(
+    from_integer(2, index_type), from_integer(2, value_type));
+  const equal_exprt equal_expr{result_array_symbol.symbol_expr(), with_expr};
+  test.sent_commands.clear();
+  test.procedure.set_to(equal_expr, true);
+
+  const smt_bit_vector_sortt smt_index_sort{32};
+  const smt_bit_vector_sortt smt_value_sort{8};
+  const smt_array_sortt smt_array_sort{smt_index_sort, smt_value_sort};
+  const smt_identifier_termt smt_original_array_term{
+    "original_array", smt_array_sort};
+  const smt_identifier_termt smt_result_array_term{
+    "result_array", smt_array_sort};
+  const smt_identifier_termt index_0_term{"index_0", smt_index_sort};
+  const smt_identifier_termt index_1_term{"index_1", smt_index_sort};
+  const smt_identifier_termt index_2_term{"index_2", smt_index_sort};
+  const smt_termt store_term = smt_array_theoryt::store(
+    smt_array_theoryt::store(
+      smt_array_theoryt::store(
+        smt_original_array_term,
+        index_0_term,
+        smt_bit_vector_constant_termt{0, smt_value_sort}),
+      index_1_term,
+      smt_bit_vector_constant_termt{1, smt_value_sort}),
+    index_2_term,
+    smt_bit_vector_constant_termt{2, smt_value_sort});
+  const auto smt_assertion = smt_assert_commandt{
+    smt_core_theoryt::equal(smt_result_array_term, store_term)};
+  const std::vector<smt_commandt> expected_commands{
+    smt_declare_function_commandt(smt_result_array_term, {}),
+    smt_declare_function_commandt(smt_original_array_term, {}),
+    smt_define_function_commandt{
+      index_0_term.identifier(),
+      {},
+      smt_bit_vector_constant_termt{0, smt_index_sort}},
+    smt_define_function_commandt{
+      index_1_term.identifier(),
+      {},
+      smt_bit_vector_constant_termt{1, smt_index_sort}},
+    smt_define_function_commandt{
+      index_2_term.identifier(),
+      {},
+      smt_bit_vector_constant_termt{2, smt_index_sort}},
+    smt_assertion};
+  REQUIRE(test.sent_commands == expected_commands);
+}

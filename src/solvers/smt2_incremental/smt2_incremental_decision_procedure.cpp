@@ -283,15 +283,23 @@ void smt2_incremental_decision_proceduret::define_index_identifiers(
       return;
     if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
     {
-      const auto index_expr = with_expr->where();
-      const auto index_term = convert_expr_to_smt(index_expr);
-      const auto index_identifier = "index_" + std::to_string(index_sequence());
-      const auto index_definition =
-        smt_define_function_commandt{index_identifier, {}, index_term};
-      expression_identifiers.emplace(index_expr, index_definition.identifier());
-      identifier_table.emplace(index_identifier, index_definition.identifier());
-      solver_process->send(
-        smt_define_function_commandt{index_identifier, {}, index_term});
+      for(auto operand_ite = ++with_expr->operands().begin();
+          operand_ite != with_expr->operands().end();
+          operand_ite += 2)
+      {
+        const auto index_expr = *operand_ite;
+        const auto index_term = convert_expr_to_smt(index_expr);
+        const auto index_identifier =
+          "index_" + std::to_string(index_sequence());
+        const auto index_definition =
+          smt_define_function_commandt{index_identifier, {}, index_term};
+        expression_identifiers.emplace(
+          index_expr, index_definition.identifier());
+        identifier_table.emplace(
+          index_identifier, index_definition.identifier());
+        solver_process->send(
+          smt_define_function_commandt{index_identifier, {}, index_term});
+      }
     }
   });
 }
