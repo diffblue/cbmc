@@ -940,6 +940,18 @@ static exprt unpack_rec(
         ns,
         true);
     }
+    else if(!union_type.components().empty())
+    {
+      member_exprt member{src, union_type.components().front()};
+      return unpack_rec(
+        member,
+        little_endian,
+        offset_bytes,
+        max_bytes,
+        bits_per_byte,
+        ns,
+        true);
+    }
   }
   else if(src.type().id() == ID_pointer)
   {
