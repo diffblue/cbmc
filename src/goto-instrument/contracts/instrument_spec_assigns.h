@@ -442,6 +442,12 @@ public:
     const exprt &expr,
     goto_programt &dest);
 
+  /// Generates inclusion check instructions for inductive checks of
+  /// the write set
+  /// \param lhs the assignment lhs or argument to havoc/havoc_object
+  /// \param dest destination program to append instructions to
+  void check_inclusion_induction(const exprt &lhs, goto_programt &dest) const;
+
   /// Instruments a sequence of instructions with inclusion checks.
   ///   If `pred` is not provided,
   ///     then all instructions are instrumented.
@@ -547,11 +553,13 @@ protected:
   /// \param allow_null_lhs if true, allow the lhs to be NULL
   /// \param include_stack_allocated if true, include stack allocated targets
   /// in the inclusion check.
+  /// \param is_inductive_check if true, assertions are for inductive check.
   /// \param dest destination program to append instructions to
   void inclusion_check_assertion(
     const car_exprt &lhs,
     bool allow_null_lhs,
     bool include_stack_allocated,
+    bool is_inductive_check,
     goto_programt &dest) const;
 
   /// \brief Adds an assignment in dest to invalidate the tracked car if

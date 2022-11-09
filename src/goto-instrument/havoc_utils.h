@@ -64,12 +64,6 @@ public:
 
   /// \brief Append goto instructions to havoc a single expression `expr`
   ///
-  /// If `expr` is an array index or object dereference expression,
-  /// with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant `i`,
-  /// then instructions are generated to havoc the entire underlying object.
-  /// Otherwise, e.g. for a[0] or *(b+i) when `i` is a known constant,
-  /// the instructions are generated to only havoc the scalar value of `expr`.
-  ///
   /// \param location The source location to annotate on the havoc instruction
   /// \param expr The expression to havoc
   /// \param dest The destination goto program to append the instructions to

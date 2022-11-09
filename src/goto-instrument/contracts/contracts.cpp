@@ -89,10 +89,9 @@ void code_contractst::check_apply_loop_contracts(
   //
   //                               ... preamble ...
   //                        ,-     initialize loop_entry history vars;
-  //                        |      entered_loop = false
-  // loop assigns check     |      initial_invariant_val = invariant_expr;
-  //  - unchecked, temps    |      in_base_case = true;
-  // func assigns check     |      snapshot (write_set);
+  // loop assigns check     |      entered_loop = false
+  //  - unchecked, temps    |      initial_invariant_val = invariant_expr;
+  // func assigns check     |      in_base_case = true;
   //  - disabled via pragma |      goto HEAD;
   //                        |    STEP:
   //                  --.   |      assert (initial_invariant_val);
@@ -104,10 +103,12 @@ void code_contractst::check_apply_loop_contracts(
   // loop assigns check     ,-     ... eval guard ...
   //  + assertions added    |      if (!guard)
   // func assigns check     |        goto EXIT;
-  //  - disabled via pragma `-     ... loop body ...
+  //  - disabled via pragma |      snapshot (write_set);
+  //                        `-     ... loop body ...
   //                        ,-     entered_loop = true
   //                        |      if (in_base_case)
   //                        |        goto STEP;
+  //                        |      assert CAR_begin in CAR_end
   // loop assigns check     |      assert (invariant_expr);
   //  - unchecked, temps    |      new_variant_val = decreases_clause_expr;
   // func assigns check     |      assert (new_variant_val < old_variant_val);
@@ -256,9 +257,8 @@ void code_contractst::check_apply_loop_contracts(
 
   // Insert instrumentation
   // This must be done before havocing the write set.
-  // FIXME: this is not true for write set targets that
-  // might depend on other write set targets.
-  pre_loop_head_instrs.destructive_append(snapshot_instructions);
+  goto_function.body.destructive_insert(
+    std::next(loop_head), snapshot_instructions);
 
   // Insert a jump to the loop head
   // (skipping over the step case initialization code below)
@@ -386,6 +386,17 @@ void code_contractst::check_apply_loop_contracts(
   // and execute an arbitrary iteration.
   pre_loop_end_instrs.add(goto_programt::make_goto(
     step_case_target, in_base_case, loop_head_location));
+
+  // Adding checks that demonstrating that the loop assigns clause is an
+  // inductive invariant.
+  // CAR_begin should be included in CAR_end
+  goto_programt assigns_inductive_check_instrs;
+  for(const auto &target : to_havoc)
+  {
+    instrument_spec_assigns.check_inclusion_induction(
+      target, assigns_inductive_check_instrs);
+    pre_loop_end_instrs.destructive_append(assigns_inductive_check_instrs);
+  }
 
   // The following code is only reachable in the step case,
   // i.e., when in_base_case == false,

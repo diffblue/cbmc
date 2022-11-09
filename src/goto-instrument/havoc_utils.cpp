@@ -31,15 +31,6 @@ void havoc_utilst::append_havoc_code_for_expr(
   const exprt &expr,
   goto_programt &dest) const
 {
-  if(expr.id() == ID_index || expr.id() == ID_dereference)
-  {
-    address_of_exprt address_of_expr(expr);
-    if(!is_constant(address_of_expr))
-    {
-      append_object_havoc_code_for_expr(location, address_of_expr, dest);
-      return;
-    }
-  }
   append_scalar_havoc_code_for_expr(location, expr, dest);
 }
 

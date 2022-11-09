@@ -5,9 +5,9 @@ main.c
 ^SIGNAL=0$
 ^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
-^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: FAILURE$
+^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is inductively assignable: FAILURE$
 ^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assertion.\d+\] .* assertion b->data\[5\] == 0: FAILURE$
+^\*\* 1 of 12 failed \(2 iterations\)
 ^VERIFICATION FAILED$
 --
 --

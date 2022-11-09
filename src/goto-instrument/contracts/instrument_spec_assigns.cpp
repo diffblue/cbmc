@@ -149,7 +149,17 @@ void instrument_spec_assignst::check_inclusion_assignment(
   // create temporary car but do not track
   const auto car = create_car_expr(true_exprt{}, lhs);
   create_snapshot(car, dest);
-  inclusion_check_assertion(car, false, true, dest);
+  inclusion_check_assertion(car, false, true, false, dest);
+}
+
+void instrument_spec_assignst::check_inclusion_induction(
+  const exprt &lhs,
+  goto_programt &dest) const
+{
+  // create temporary car but do not track
+  const auto car = create_car_expr(true_exprt{}, lhs);
+  create_snapshot(car, dest);
+  inclusion_check_assertion(car, false, true, true, dest);
 }
 
 void instrument_spec_assignst::track_static_locals(goto_programt &dest)
@@ -313,7 +323,7 @@ void instrument_spec_assignst::
   create_snapshot(car, dest);
 
   // check inclusion, allowing null and not allowing stack allocated locals
-  inclusion_check_assertion(car, true, false, dest);
+  inclusion_check_assertion(car, true, false, false, dest);
 
   // invalidate aliases of the freed object
   invalidate_heap_and_spec_aliases(car, dest);
@@ -680,6 +690,7 @@ void instrument_spec_assignst::inclusion_check_assertion(
   const car_exprt &car,
   bool allow_null_lhs,
   bool include_stack_allocated,
+  bool is_inductive_check,
   goto_programt &dest) const
 {
   source_locationt source_location(car.source_location());
@@ -705,7 +716,10 @@ void instrument_spec_assignst::inclusion_check_assertion(
   else
     comment += id2string(orig_comment);
 
-  comment += " is assignable";
+  if(is_inductive_check)
+    comment += " is inductively assignable";
+  else
+    comment += " is assignable";
   source_location.set_comment(comment);
 
   dest.add(goto_programt::make_assertion(
