@@ -247,11 +247,11 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
          std::string::npos;
 }
 
-void widen_assigns(assignst &assigns)
+void widen_assigns(assignst &assigns, const namespacet &ns)
 {
   assignst result;
 
-  havoc_utils_is_constantt is_constant(assigns);
+  havoc_utils_is_constantt is_constant(assigns, ns);
 
   for(const auto &e : assigns)
   {

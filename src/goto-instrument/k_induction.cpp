@@ -28,14 +28,16 @@ public:
     goto_functiont &_goto_function,
     bool _base_case,
     bool _step_case,
-    unsigned _k)
+    unsigned _k,
+    const namespacet &ns)
     : function_id(_function_id),
       goto_function(_goto_function),
       local_may_alias(_goto_function),
       natural_loops(_goto_function.body),
       base_case(_base_case),
       step_case(_step_case),
-      k(_k)
+      k(_k),
+      ns(ns)
   {
     k_induction();
   }
@@ -48,6 +50,8 @@ protected:
 
   const bool base_case, step_case;
   const unsigned k;
+
+  const namespacet &ns;
 
   void k_induction();
 
@@ -97,7 +101,7 @@ void k_inductiont::process_loop(
 
     // build the havocking code
     goto_programt havoc_code;
-    havoc_utilst havoc_gen(assigns);
+    havoc_utilst havoc_gen(assigns, ns);
     havoc_gen.append_full_havoc_code(loop_head->source_location(), havoc_code);
 
     // unwind to get k+1 copies
@@ -165,5 +169,13 @@ void k_induction(
   unsigned k)
 {
   for(auto &gf_entry : goto_model.goto_functions.function_map)
-    k_inductiont(gf_entry.first, gf_entry.second, base_case, step_case, k);
+  {
+    k_inductiont(
+      gf_entry.first,
+      gf_entry.second,
+      base_case,
+      step_case,
+      k,
+      namespacet{goto_model.symbol_table});
+  }
 }

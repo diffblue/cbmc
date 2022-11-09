@@ -204,7 +204,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   if(!symbol_expr_lhs)
     return {};
 
-  if(!goto_symex_is_constantt()(rhs))
+  if(!goto_symex_is_constantt(ns)(rhs))
     return {};
 
   return try_evaluate_pointer_comparison(

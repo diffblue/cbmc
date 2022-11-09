@@ -89,8 +89,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
       {
         const auto &final_domain = constant_propagator[test_instruction];
 
-        REQUIRE(final_domain.values.is_constant(local_x.symbol_expr()));
-        REQUIRE(final_domain.values.is_constant(local_y.symbol_expr()));
+        REQUIRE(final_domain.values.is_constant(local_x.symbol_expr(), ns));
+        REQUIRE(final_domain.values.is_constant(local_y.symbol_expr(), ns));
       }
     }
 
@@ -103,8 +103,8 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
       {
         const auto &final_domain = constant_propagator[test_instruction];
 
-        REQUIRE(final_domain.values.is_constant(local_x.symbol_expr()));
-        REQUIRE(!final_domain.values.is_constant(local_y.symbol_expr()));
+        REQUIRE(final_domain.values.is_constant(local_x.symbol_expr(), ns));
+        REQUIRE(!final_domain.values.is_constant(local_y.symbol_expr(), ns));
       }
     }
   }
@@ -181,8 +181,9 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
       {
         const auto &final_domain = constant_propagator[test_instruction];
 
-        REQUIRE(final_domain.values.is_constant(bool_local.symbol_expr()));
-        REQUIRE(final_domain.values.is_constant(c_bool_local.symbol_expr()));
+        REQUIRE(final_domain.values.is_constant(bool_local.symbol_expr(), ns));
+        REQUIRE(
+          final_domain.values.is_constant(c_bool_local.symbol_expr(), ns));
       }
     }
   }
@@ -332,7 +333,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
         {
           exprt bool_local = bool_locals[i].symbol_expr();
 
-          REQUIRE(final_domain.values.is_constant(bool_local));
+          REQUIRE(final_domain.values.is_constant(bool_local, ns));
 
           final_domain.values.replace_const.replace(bool_local);
 
@@ -349,7 +350,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
         {
           exprt c_bool_local = c_bool_locals[i].symbol_expr();
 
-          REQUIRE(final_domain.values.is_constant(c_bool_local));
+          REQUIRE(final_domain.values.is_constant(c_bool_local, ns));
 
           final_domain.values.replace_const.replace(c_bool_local);
 

@@ -27,11 +27,13 @@ public:
 
   havoc_loopst(
     function_assignst &_function_assigns,
-    goto_functiont &_goto_function)
+    goto_functiont &_goto_function,
+    const namespacet &ns)
     : goto_function(_goto_function),
       local_may_alias(_goto_function),
       function_assigns(_function_assigns),
-      natural_loops(_goto_function.body)
+      natural_loops(_goto_function.body),
+      ns(ns)
   {
     havoc_loops();
   }
@@ -41,6 +43,7 @@ protected:
   local_may_aliast local_may_alias;
   function_assignst &function_assigns;
   natural_loops_mutablet natural_loops;
+  const namespacet &ns;
 
   typedef std::set<exprt> assignst;
   typedef const natural_loops_mutablet::natural_loopt loopt;
@@ -66,7 +69,7 @@ void havoc_loopst::havoc_loop(
 
   // build the havocking code
   goto_programt havoc_code;
-  havoc_utilst havoc_gen(assigns);
+  havoc_utilst havoc_gen(assigns, ns);
   havoc_gen.append_full_havoc_code(loop_head->source_location(), havoc_code);
 
   // Now havoc at the loop head. Use insert_swap to
@@ -118,5 +121,8 @@ void havoc_loops(goto_modelt &goto_model)
   function_assignst function_assigns(goto_model.goto_functions);
 
   for(auto &gf_entry : goto_model.goto_functions.function_map)
-    havoc_loopst(function_assigns, gf_entry.second);
+  {
+    havoc_loopst(
+      function_assigns, gf_entry.second, namespacet{goto_model.symbol_table});
+  }
 }

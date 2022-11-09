@@ -17,6 +17,11 @@ Author: Michael Tautschig, tautschn@amazon.com
 
 class goto_symex_is_constantt : public is_constantt
 {
+public:
+  explicit goto_symex_is_constantt(const namespacet &ns) : is_constantt(ns)
+  {
+  }
+
 protected:
   bool is_constant(const exprt &expr) const override
   {
