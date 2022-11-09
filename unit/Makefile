@@ -94,7 +94,6 @@ SRC += analyses/ai/ai.cpp \
        pointer-analysis/value_set.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \
        solvers/floatbv/float_utils.cpp \
-       solvers/lowering/byte_operators.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
        solvers/sat/satcheck_cadical.cpp \
@@ -159,6 +158,7 @@ SRC += analyses/ai/ai.cpp \
        util/json_array.cpp \
        util/json_object.cpp \
        util/lazy.cpp \
+       util/lower_byte_operators.cpp \
        util/memory_info.cpp \
        util/message.cpp \
        util/optional.cpp \

@@ -46,6 +46,7 @@ SRC = arith_tools.cpp \
       json_stream.cpp \
       lispexpr.cpp \
       lispirep.cpp \
+      lower_byte_operators.cpp \
       mathematical_expr.cpp \
       mathematical_types.cpp \
       memory_info.cpp \

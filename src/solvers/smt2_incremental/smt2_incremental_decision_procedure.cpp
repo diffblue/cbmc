@@ -3,6 +3,7 @@
 #include "smt2_incremental_decision_procedure.h"
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/expr.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
@@ -11,7 +12,6 @@
 #include <util/string_utils.h>
 #include <util/symbol.h>
 
-#include <solvers/lowering/expr_lowering.h>
 #include <solvers/smt2_incremental/ast/smt_commands.h>
 #include <solvers/smt2_incremental/ast/smt_responses.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>

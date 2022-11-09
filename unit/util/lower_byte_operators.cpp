@@ -6,10 +6,6 @@
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/lowering/expr_lowering.h>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
@@ -24,7 +20,9 @@
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
 
-TEST_CASE("byte extract and bits", "[core][solvers][lowering][byte_extract]")
+#include <testing-utils/use_catch.h>
+
+TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
 {
   // this test does require a proper architecture to be set so that byte extract
   // uses adequate endianness
@@ -94,7 +92,7 @@ TEST_CASE("byte extract and bits", "[core][solvers][lowering][byte_extract]")
   }
 }
 
-SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
+SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
 {
   // this test does require a proper architecture to be set so that byte extract
   // uses adequate endianness
@@ -362,7 +360,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
   }
 }
 
-SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
+SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
 {
   // this test does require a proper architecture to be set so that byte extract
   // uses adequate endianness

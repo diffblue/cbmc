@@ -6,19 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
-#include <util/bitvector_expr.h>
-#include <util/byte_operators.h>
-#include <util/c_types.h>
-#include <util/endianness_map.h>
-#include <util/expr_util.h>
-#include <util/namespace.h>
-#include <util/narrow.h>
-#include <util/pointer_offset_size.h>
-#include <util/simplify_expr.h>
-#include <util/string_constant.h>
-
-#include "expr_lowering.h"
+#include "arith_tools.h"
+#include "bitvector_expr.h"
+#include "byte_operators.h"
+#include "c_types.h"
+#include "endianness_map.h"
+#include "expr_util.h"
+#include "namespace.h"
+#include "narrow.h"
+#include "pointer_offset_size.h"
+#include "simplify_expr.h"
+#include "string_constant.h"
 
 #include <algorithm>
 
