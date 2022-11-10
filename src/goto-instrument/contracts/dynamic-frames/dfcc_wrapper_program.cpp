@@ -887,7 +887,7 @@ void dfcc_wrapper_programt::assert_function_pointer_obeys_contract(
 
   exprt::operandst disjuncts;
 
-  for(int i = 0; i < expr.contract_pointers().size(); i++)
+  for(std::size_t i = 0; i < expr.contract_pointers().size(); i++)
   {
     const exprt &contract_pointer = expr.contract_pointers().at(i);
     if(contract_pointer.id() == ID_address_of)
@@ -918,7 +918,7 @@ void dfcc_wrapper_programt::assume_function_pointer_obeys_contract(
   const function_pointer_obeys_contract_exprt &expr,
   goto_programt &dest)
 {
-  for(int i = 0; i < expr.contract_pointers().size(); i++)
+  for(std::size_t i = 0; i < expr.contract_pointers().size(); i++)
   {
     const exprt &contract_pointer = expr.contract_pointers().at(i);
 
