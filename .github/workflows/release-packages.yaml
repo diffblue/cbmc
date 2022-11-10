@@ -288,12 +288,14 @@ jobs:
           asset_name: ${{ steps.create_packages.outputs.msi_name }}
           asset_content_type: application/x-msi
       - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
+        if: success() || failure()
         env:
           SLACK_CHANNEL: team_open_source
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "${{ job.status == 'success' && 'Windows package built and uploaded successfully' || 'Windows package build failed' }}"
+        run: go run scripts/slack_notification_action.go
 
   push-docker-image-dockerhub:
     runs-on: ubuntu-20.04
