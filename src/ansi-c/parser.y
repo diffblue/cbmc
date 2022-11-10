@@ -3299,7 +3299,7 @@ cprover_function_contract:
           set($$, ID_C_spec_requires);
           mto($$, $3);
         }
-        | TOK_CPROVER_ENSURES_CONTRACT '(' unary_expression ',' unary_expression ')'
+        | TOK_CPROVER_ENSURES_CONTRACT '(' unary_expression ',' unary_expression_list ')'
         {
           $$=$1;
           set($$, ID_C_spec_ensures_contract);
@@ -3309,7 +3309,7 @@ cprover_function_contract:
           tmp.add_source_location()=parser_stack($$).source_location();
           parser_stack($$).add_to_operands(std::move(tmp));
         }
-        | TOK_CPROVER_REQUIRES_CONTRACT '(' unary_expression ',' unary_expression ')'
+        | TOK_CPROVER_REQUIRES_CONTRACT '(' unary_expression ',' unary_expression_list ')'
         {
           $$=$1;
           set($$, ID_C_spec_requires_contract);
