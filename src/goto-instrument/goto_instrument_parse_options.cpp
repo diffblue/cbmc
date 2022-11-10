@@ -662,6 +662,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-lexical-loops"))
     {
       show_lexical_loops(goto_model, std::cout);
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("print-internal-representation"))
