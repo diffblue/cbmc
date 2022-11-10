@@ -157,6 +157,7 @@ A few things to note here:
 
 - @ref contracts-functions
   - @ref contracts-requires-ensures
+  - @ref contracts-requires-ensures-contract
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-loops

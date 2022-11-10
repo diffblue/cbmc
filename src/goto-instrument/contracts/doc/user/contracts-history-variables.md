@@ -48,6 +48,7 @@ TODO: Document `__CPROVER_loop_entry` and `__CPROVER_loop_old`.
 
 - @ref contracts-functions
   - @ref contracts-requires-ensures
+  - @ref contracts-requires-ensures-contract
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-loops
