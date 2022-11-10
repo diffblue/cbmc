@@ -141,6 +141,9 @@ protected:
 
   std::unordered_set<irep_idt> summarized;
 
+  /// Name of loops we are going to unwind.
+  std::list<std::string> loop_names;
+
 public:
   /// Translates a function_pointer_obeys_contract_exprt into an assertion
   /// ```

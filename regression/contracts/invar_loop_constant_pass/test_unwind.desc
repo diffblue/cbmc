@@ -1,0 +1,14 @@
+CORE
+main.c
+--apply-loop-contracts --unwind 1 --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assigns.\d+\] .* Check that s is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that r is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion r == 0: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion s == 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+This test checks that there is no loop after contract transforamtion.
