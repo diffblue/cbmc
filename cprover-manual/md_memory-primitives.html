@@ -100,6 +100,30 @@ Memory Objects</h2>
 <div class="line">assert(p != q);</div>
 </div><!-- fragment --><p>CBMC would report verification successful on this code snippet. However, assuming that <code>malloc()</code> could reuse deallocated addresses, the assertion could fail.</p>
 <p>The memory objects in CBMC are independent of each other. That is, for example, when incrementing a pointer past the bounds of an object, the pointer will never point into another memory object (such as could happen when running on a real machine). To verify that pointers stay within the bounds of their pointees, the CBMC option <code>--pointer-overflow-check</code> can be used.</p>
+<h3><a class="anchor" id="malloc-modelling"></a>
+Malloc modelling</h3>
+<p>CBMC ships a model of <code>malloc</code> that seeks to emulate the behaviour of the C standard library. This model is configurable to suit the assumptions the software under scrutiny may be making. One common assumption, matched by CBMC’s default configuration, is that dynamic memory allocation always succeeds and <code>malloc</code> never returns a <code>NULL</code> pointer. Code making such an assumption will look as follows:</p>
+<div class="fragment"><div class="line">int *p = malloc(sizeof(int));</div>
+<div class="line">*p = 42; // unconditional dereference, no check for p being NULL</div>
+</div><!-- fragment --><p>This extends to the case of <code>malloc(0)</code>, and CBMC returns a valid pointer to an object. The size of that object is zero, implying that any attempt to read from or write to this object will result in an out-of-bounds access. The ensuing undefined behaviour can be detected by running CBMC with <code>--pointer-check</code>.</p>
+<p>In an actual execution, however, memory allocation may fail for a number of reasons and <code>malloc</code> would return a NULL pointer. CBMC’s model can, therefore, also be configured to fail allocating memory when the requested allocation size is larger than representable under CBMC’s object-offset model (as described in <a href="#memory-and-pointers-in-cbmc">Memory and pointers in CBMC</a>), or even non-deterministically fail (for any size). Any such failure can either result in calls to <code>malloc</code> returning <code>NULL</code>, or reporting such a call as a failed property. The following command line options facilitate the above failure configurations:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Flag </th><th class="markdownTableHeadNone">Check  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>--malloc-fail-null</code> </td><td class="markdownTableBodyNone">return NULL when emulating an allocation failure  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>--malloc-may-fail</code> </td><td class="markdownTableBodyNone">non-deterministically fail to allocate  </td></tr>
+</table>
+<p>Note that the use of <code>--malloc-may-fail</code> also requires <code>--malloc-fail-null</code>. The following code example demonstrates the effect of these options:</p>
+<div class="fragment"><div class="line">int error = 0;</div>
+<div class="line">int *p = malloc(sizeof(int));</div>
+<div class="line">if(p != NULL)</div>
+<div class="line">  *p = 42;</div>
+<div class="line">else</div>
+<div class="line">  error = 1;</div>
+</div><!-- fragment --><p>Under CBMC’s default model of <code>malloc</code>, the <code>else</code> branch is unreachable. When running CBMC with <code>--malloc-fail-null --malloc-may-fail</code>, <code>p</code> would non-deterministically be set to <code>NULL</code>, making all branches in the above code reachable.</p>
+<p>These malloc failure options need to be set when the C library model is added to the program. Typically this is upon invoking CBMC, but if the user has chosen to do so via goto-instrument (using <code>goto-instrument --add-library</code>), then the malloc failure mode needs to be specified with that <code>goto-instrument</code> invocation, i.e., as an option to <code>goto-instrument</code>.</p>
 <h2><a class="anchor" id="uninitialized-pointers"></a>
 Uninitialized pointers</h2>
 <p>In verification tools, uninitialized variables are typically treated as having a nondeterministic value. Programs can thus be verified on a set of potential inputs. For example:</p>
@@ -158,7 +182,7 @@ Detecting potential misuses of memory primitives</h1>
 </ul>
 <p>Using them on invalid pointers, however, may still be unintended in user programs.</p>
 <p><sup>1</sup> Pointers with negative offsets never point to memory objects. Negative values are used internally to detect pointer underflows.</p>
-<p>Last modified: 2022-11-10 16:09:02 +0100 </p>
+<p>Last modified: 2022-11-10 21:57:04 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
