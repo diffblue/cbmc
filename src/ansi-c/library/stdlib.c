@@ -503,7 +503,7 @@ void *realloc(void *ptr, __CPROVER_size_t malloc_size)
   if(malloc_size==0)
   {
     free(ptr);
-    return malloc(1);
+    return malloc(0);
   }
 
   // this shouldn't move if the new size isn't bigger
