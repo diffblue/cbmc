@@ -1,5 +1,6 @@
 var NAVTREEINDEX75 =
 {
+"dfcc__is__fresh_8h_source.html":[6,0,2,13,1,1,12],
 "dfcc__library_8cpp.html":[6,0,2,13,1,1,13],
 "dfcc__library_8cpp.html#a09d8ff7694c0cb6391fb2b457107f088":[6,0,2,13,1,1,13,2],
 "dfcc__library_8cpp.html#a1452411ce0ce9cd02d4600a3c7da457c":[6,0,2,13,1,1,13,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX75 =
 "endianness__map_8cpp_source.html":[6,0,2,27,37],
 "endianness__map_8h.html":[6,0,2,27,38],
 "endianness__map_8h.html#a5dca12e77281e17b2e92f8ea5611118f":[6,0,2,27,38,1],
-"endianness__map_8h_source.html":[6,0,2,27,38],
-"endianness__map__wide_8cpp.html":[6,0,2,6,13]
+"endianness__map_8h_source.html":[6,0,2,27,38]
 };

@@ -19,6 +19,7 @@ var classcode__contractst =
     [ "goto_functions", "classcode__contractst.html#ad0398cb77a366c365d783a2f2afc3dd2", null ],
     [ "goto_model", "classcode__contractst.html#a2e5815107621ad091ce54e5cd47d4168", null ],
     [ "log", "classcode__contractst.html#a3d86532be9a926aa43ad05b6a0526154", null ],
+    [ "loop_names", "classcode__contractst.html#accfee04723c3fd9a7704246906873d75", null ],
     [ "ns", "classcode__contractst.html#a00713cdaad0d6c49ea879a300c9c3747", null ],
     [ "summarized", "classcode__contractst.html#a89a113a0eb07ab4ea94e58f649e32673", null ],
     [ "symbol_table", "classcode__contractst.html#a4e0f5509d76b1d2a3ae1a3daca1f454a", null ]

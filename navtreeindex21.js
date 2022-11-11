@@ -1,5 +1,6 @@
 var NAVTREEINDEX21 =
 {
+"classcpp__idt.html#a09716bd8a2efce1fddd8b8c76031c696":[5,0,292,20],
 "classcpp__idt.html#a0ea014b9d8dfb3507e457d14f89fb571":[5,0,292,29],
 "classcpp__idt.html#a29d9533b8fd07c4db9aaa27fff602baf":[5,0,292,4],
 "classcpp__idt.html#a2acb4c3120b29546fe269a5455171a8a":[5,0,292,30],
@@ -248,6 +249,5 @@ var NAVTREEINDEX21 =
 "classcpp__template__args__non__tct.html":[5,0,309],
 "classcpp__template__args__tct.html":[5,0,310],
 "classcpp__template__args__tct.html#a1523f50e86720e47764c6a34f234a462":[5,0,310,0],
-"classcpp__token__buffert.html":[5,0,311],
-"classcpp__token__buffert.html#a021ac8005a1c6120be82fdd7ec2ef1bf":[5,0,311,8]
+"classcpp__token__buffert.html":[5,0,311]
 };

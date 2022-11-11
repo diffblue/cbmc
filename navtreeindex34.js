@@ -1,5 +1,6 @@
 var NAVTREEINDEX34 =
 {
+"classgoto__inlinet_1_1goto__inline__logt.html#ae9c7f30a6579bdf57ab6e683cbaf1e02":[5,0,526,0,2],
 "classgoto__inlinet_1_1goto__inline__logt_1_1goto__inline__log__infot.html":[5,0,526,0,0],
 "classgoto__inlinet_1_1goto__inline__logt_1_1goto__inline__log__infot.html#a0e711bc2f3d309cd1e892e1fbbb6c1a6":[5,0,526,0,0,2],
 "classgoto__inlinet_1_1goto__inline__logt_1_1goto__inline__log__infot.html#a2dbbd7f0e2a31b3a6a82b8679b24ef10":[5,0,526,0,0,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX34 =
 "classgoto__programt_1_1instructiont.html#a6ca260b89e876e05bdd4b9388836d2ce":[5,0,536,0,34],
 "classgoto__programt_1_1instructiont.html#a724460bf153c4839c0bf1480e83e64f5":[5,0,536,0,20],
 "classgoto__programt_1_1instructiont.html#a759ec4a5b8eb9c1ff16534b05b08a0d7":[5,0,536,0,66],
-"classgoto__programt_1_1instructiont.html#a75bcaaf66b7d0c9f2393fbc9e3f9addf":[5,0,536,0,57],
-"classgoto__programt_1_1instructiont.html#a76e9d4a43c1c25b698a8c370a81efa7c":[5,0,536,0,52]
+"classgoto__programt_1_1instructiont.html#a75bcaaf66b7d0c9f2393fbc9e3f9addf":[5,0,536,0,57]
 };
