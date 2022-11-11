@@ -2130,8 +2130,8 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="line"><a name="l02078"></a><span class="lineno"> 2078</span>&#160; </div>
 <div class="line"><a name="l02079"></a><span class="lineno"> 2079</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
 <div class="line"><a name="l02080"></a><span class="lineno"> 2080</span>&#160;  {</div>
-<div class="line"><a name="l02081"></a><span class="lineno"> 2081</span>&#160;    <span class="keywordflow">if</span>(o_it-&gt;type().id()==ID_code)</div>
-<div class="line"><a name="l02082"></a><span class="lineno"> 2082</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l02081"></a><span class="lineno"> 2081</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l02082"></a><span class="lineno"> 2082</span>&#160;      o_it-&gt;type().id() != ID_code, <span class="stringliteral">&quot;struct member must not be of code type&quot;</span>);</div>
 <div class="line"><a name="l02083"></a><span class="lineno"> 2083</span>&#160; </div>
 <div class="line"><a name="l02084"></a><span class="lineno"> 2084</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_is_padding() &amp;&amp; !include_padding_components)</div>
 <div class="line"><a name="l02085"></a><span class="lineno"> 2085</span>&#160;    {</div>
