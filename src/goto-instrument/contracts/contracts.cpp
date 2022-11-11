@@ -36,6 +36,8 @@ Date: February 2016
 #include <ansi-c/c_expr.h>
 #include <goto-instrument/havoc_utils.h>
 #include <goto-instrument/nondet_static.h>
+#include <goto-instrument/unwind.h>
+#include <goto-instrument/unwindset.h>
 #include <langapi/language_util.h>
 
 #include "cfg_info.h"
@@ -1016,6 +1018,17 @@ void code_contractst::apply_loop_contract(
     goto_functions.update();
     natural_loops_mutablet updated_loops(goto_function.body);
 
+    // We will unwind all transformed loops twice. Store the names of
+    // to-unwind-loops here and perform the unwinding after transformation done.
+    // As described in `check_apply_loop_contracts`, loops with loop contracts
+    // will be transformed to a loop that execute exactly twice: one for base
+    // case and one for step case. So we unwind them here to avoid users
+    // incorrectly unwind them only once.
+    std::string to_unwind = id2string(function_name) + "." +
+                            std::to_string(loop_node.end_target->loop_number) +
+                            ":2";
+    loop_names.push_back(to_unwind);
+
     check_apply_loop_contracts(
       function_name,
       goto_function,
@@ -1459,6 +1472,12 @@ void code_contractst::apply_loop_contracts(
                   "of static/global variables."
                << messaget::eom;
   nondet_static(goto_model, to_exclude_from_nondet_init);
+
+  // unwind all transformed loops twice.
+  unwindsett unwindset{goto_model};
+  unwindset.parse_unwindset(loop_names, log.get_message_handler());
+  goto_unwindt goto_unwind;
+  goto_unwind(goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSUME);
 }
 
 void code_contractst::enforce_contracts(
