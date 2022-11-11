@@ -877,22 +877,38 @@ void dfcc_wrapper_programt::assert_function_pointer_obeys_contract(
   const irep_idt &property_class,
   goto_programt &dest)
 {
-  function_pointer_contracts.insert(
-    expr.contract_symbol_expr().get_identifier());
   source_locationt loc(expr.source_location());
   loc.set_property_class(property_class);
   std::stringstream comment;
   comment << "Assert function pointer '"
           << from_expr_using_mode(
                ns, contract_symbol.mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.address_of_contract())
-          << "'";
+          << "' obeys contract ";
+
+  exprt::operandst disjuncts;
+
+  for(std::size_t i = 0; i < expr.contract_pointers().size(); i++)
+  {
+    const exprt &contract_pointer = expr.contract_pointers().at(i);
+    if(contract_pointer.id() == ID_address_of)
+    {
+      function_pointer_contracts.insert(
+        to_symbol_expr(to_address_of_expr(contract_pointer).object())
+          .get_identifier());
+    }
+    if(i > 0)
+      comment << " or ";
+
+    comment << "'"
+            << from_expr_using_mode(ns, contract_symbol.mode, contract_pointer)
+            << "'";
+    disjuncts.push_back(equal_exprt{expr.function_pointer(), contract_pointer});
+  }
   loc.set_comment(comment.str());
-  code_assertt assert_expr(
-    equal_exprt{expr.function_pointer(), expr.address_of_contract()});
+
+  code_assertt assert_expr{or_exprt{disjuncts}};
   assert_expr.add_source_location() = loc;
+
   goto_programt instructions;
   converter.goto_convert(assert_expr, instructions, contract_symbol.mode);
   dest.destructive_append(instructions);
@@ -902,21 +918,60 @@ void dfcc_wrapper_programt::assume_function_pointer_obeys_contract(
   const function_pointer_obeys_contract_exprt &expr,
   goto_programt &dest)
 {
-  function_pointer_contracts.insert(
-    expr.contract_symbol_expr().get_identifier());
+  for(std::size_t i = 0; i < expr.contract_pointers().size(); i++)
+  {
+    const exprt &contract_pointer = expr.contract_pointers().at(i);
 
-  source_locationt loc(expr.source_location());
-  std::stringstream comment;
-  comment << "Assume function pointer '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.contract_symbol_expr())
-          << "'";
-  loc.set_comment(comment.str());
-  dest.add(goto_programt::make_assignment(
-    expr.function_pointer(), expr.address_of_contract(), loc));
+    if(contract_pointer.id() == ID_address_of)
+    {
+      function_pointer_contracts.insert(
+        to_symbol_expr(to_address_of_expr(contract_pointer).object())
+          .get_identifier());
+    }
+
+    const auto &loc = contract_pointer.source_location();
+    if(i == 0)
+    {
+      // First is assignment unconditional
+      // ```
+      // function_pointer := contract_pointer;
+      // ```
+      dest.add(goto_programt::make_assignment(
+        expr.function_pointer(), contract_pointer, loc));
+    }
+    else
+    {
+      // Remaining are nondet
+      // ```
+      // DECL skip: bool
+      // ASSIGN skip = nondet_bool;
+      // IF skip goto skip_label;
+      // function_pointer = contract_pointer;
+      // skip_label:
+      // DEAD skip;
+      // ```
+      const auto skip_var = utils
+                              .create_symbol(
+                                bool_typet(),
+                                wrapped_symbol.name,
+                                "skip",
+                                loc,
+                                wrapper_symbol.mode,
+                                wrapper_symbol.module,
+                                false)
+                              .symbol_expr();
+      dest.add(goto_programt::make_decl(skip_var, loc));
+      dest.add(goto_programt::make_assignment(
+        skip_var, side_effect_expr_nondett(bool_typet(), loc), loc));
+      auto goto_instr =
+        dest.add(goto_programt::make_incomplete_goto(skip_var, loc));
+      dest.add(goto_programt::make_assignment(
+        expr.function_pointer(), contract_pointer, loc));
+      auto skip_target = dest.add(goto_programt::make_skip(loc));
+      goto_instr->complete_goto(skip_target);
+      dest.add(goto_programt::make_dead(skip_var, loc));
+    }
+  }
 }
 
 void dfcc_wrapper_programt::encode_function_call()

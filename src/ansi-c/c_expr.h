@@ -329,11 +329,11 @@ class function_pointer_obeys_contract_exprt : public exprt
 public:
   explicit function_pointer_obeys_contract_exprt(
     exprt _function_pointer,
-    exprt _contract)
+    exprt _contract_pointers)
     : exprt(ID_function_pointer_obeys_contract, empty_typet{})
   {
     add_to_operands(std::move(_function_pointer));
-    add_to_operands(std::move(_contract));
+    add_to_operands(std::move(_contract_pointers));
   }
 
   static void check(
@@ -344,6 +344,13 @@ public:
       vm,
       expr.operands().size() == 2,
       "function pointer obeys contract expression must have two operands");
+
+    DATA_CHECK(
+      vm,
+      expr.operands()[1].id() == ID_expression_list,
+      "function pointer obeys contract expression second operand must be an "
+      "ID_expression_list expression, found " +
+        id2string(expr.operands()[1].id()));
   }
 
   static void validate(
@@ -364,24 +371,14 @@ public:
     return op0();
   }
 
-  const symbol_exprt &contract_symbol_expr() const
+  const exprt::operandst &contract_pointers() const
   {
-    return to_symbol_expr(op1().operands().at(0));
+    return op1().operands();
   }
 
-  symbol_exprt &contract_symbol_expr()
+  exprt::operandst &contract_pointers()
   {
-    return to_symbol_expr(op1().operands().at(0));
-  }
-
-  const exprt &address_of_contract() const
-  {
-    return op1();
-  }
-
-  exprt &address_of_contract()
-  {
-    return op1();
+    return op1().operands();
   }
 };
 

@@ -9,17 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C Language Type Checking
 
-#include "c_typecheck_base.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
 #include "ansi_c_declaration.h"
 #include "c_expr.h"
+#include "c_typecheck_base.h"
 
 void c_typecheck_baset::start_typecheck_code()
 {
@@ -1101,11 +1101,11 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
 {
   if(!can_cast_expr<function_pointer_obeys_contract_exprt>(expr))
   {
-    error().source_location = expr.source_location();
-    error() << "expected ID_function_pointer_obeys_contract expression in "
-               "requires_contract/ensures_contract clause, found "
-            << expr.id() << eom;
-    throw 0;
+    throw invalid_source_file_exceptiont(
+      "expected ID_function_pointer_obeys_contract expression in "
+      "requires_contract/ensures_contract clause, found " +
+        id2string(expr.id()),
+      expr.source_location());
   }
 
   auto &obeys_expr = to_function_pointer_obeys_contract_expr(expr);
@@ -1121,60 +1121,73 @@ void c_typecheck_baset::typecheck_spec_function_pointer_obeys_contract(
     function_pointer.type().id() != ID_pointer ||
     to_pointer_type(function_pointer.type()).base_type().id() != ID_code)
   {
-    error().source_location = expr.source_location();
-    error() << "the first parameter of the clause must be a function pointer "
-               "expression"
-            << eom;
-    throw 0;
+    throw invalid_source_file_exceptiont(
+      "the first parameter of the clause must be a function pointer expression",
+      expr.source_location());
   }
 
   if(!function_pointer.get_bool(ID_C_lvalue))
   {
-    error().source_location = function_pointer.source_location();
-    error() << "first parameter of the clause must be an lvalue" << eom;
-    throw 0;
+    throw invalid_source_file_exceptiont(
+      "the first parameter of the clause must be an lvalue",
+      function_pointer.source_location());
   }
 
   if(has_subexpr(function_pointer, ID_side_effect))
   {
-    error().source_location = function_pointer.source_location();
-    error() << "first parameter of the clause must have no side-effects" << eom;
-    throw 0;
+    throw invalid_source_file_exceptiont(
+      "the first parameter of the clause must have no side-effects",
+      function_pointer.source_location());
   }
 
   if(has_subexpr(function_pointer, ID_if))
   {
-    error().source_location = function_pointer.source_location();
-    error() << "first parameter of the clause must have no ternary operator"
-            << eom;
-    throw 0;
+    throw invalid_source_file_exceptiont(
+      "the first parameter of the clause must have no ternary operator",
+      function_pointer.source_location());
   }
 
-  // second parameter must be the address of a function symbol
-  auto &address_of_contract = obeys_expr.address_of_contract();
-  typecheck_expr(address_of_contract);
+  // second parameter must be a list of size 1 or 2 with:
+  // - a function symbol with compatible type
+  // - a null value
+  auto contract_pointers_size = obeys_expr.contract_pointers().size();
+  if(contract_pointers_size < 1 || contract_pointers_size > 2)
+  {
+    throw invalid_source_file_exceptiont(
+      "requires_contract/ensures_contract clauses must have two or three "
+      "parameters",
+      obeys_expr.source_location());
+  }
 
+  auto &first_target = obeys_expr.contract_pointers().at(0);
+  typecheck_expr(first_target);
   if(
-    address_of_contract.id() != ID_address_of ||
-    to_address_of_expr(address_of_contract).object().id() != ID_symbol ||
-    address_of_contract.type().id() != ID_pointer ||
-    to_pointer_type(address_of_contract.type()).base_type().id() != ID_code)
+    first_target.id() != ID_address_of ||
+    to_address_of_expr(first_target).object().id() != ID_symbol ||
+    first_target.type().id() != ID_pointer ||
+    to_pointer_type(first_target.type()).base_type().id() != ID_code ||
+    function_pointer.type() != first_target.type())
   {
-    error().source_location = expr.source_location();
-    error() << "the second parameter of the requires_contract/ensures_contract "
-               "clause must be a function symbol"
-            << eom;
-    throw 0;
+    throw invalid_source_file_exceptiont(
+      "the second parameter of the clause must be a pointer to a contract "
+      "symbol with the same type as the first parameter",
+      first_target.source_location());
   }
 
-  if(function_pointer.type() != address_of_contract.type())
+  if(contract_pointers_size == 2)
   {
-    error().source_location = expr.source_location();
-    error() << "the first and second parameter of the "
-               "requires_contract/ensures_contract clause must have the same "
-               "function pointer type "
-            << eom;
-    throw 0;
+    auto &second_target = obeys_expr.contract_pointers().at(1);
+    typecheck_expr(second_target);
+    auto simplified = simplify_expr(second_target, namespacet(symbol_table));
+    if(
+      !simplified.is_constant() ||
+      !is_null_pointer(to_constant_expr(simplified)))
+      throw invalid_source_file_exceptiont(
+        "the (optional) third parameter of the clause must be NULL",
+        second_target.source_location());
+    // add typecast around NULL
+    obeys_expr.contract_pointers()[1] =
+      typecast_exprt(simplified, function_pointer.type());
   }
 }
 
