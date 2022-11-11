@@ -105,6 +105,7 @@ const symbolt &dfcc_utilst::create_symbol(
   symbol.is_state_var = true;
   symbol.is_thread_local = true;
   symbol.is_file_local = true;
+  symbol.is_auxiliary = true;
   symbol.is_parameter = is_parameter;
   return symbol;
 }
@@ -134,6 +135,7 @@ const symbolt &dfcc_utilst::create_static_symbol(
   symbol.is_state_var = true;
   symbol.is_thread_local = true;
   symbol.is_file_local = true;
+  symbol.is_auxiliary = true;
   symbol.is_parameter = false;
   return symbol;
 }
