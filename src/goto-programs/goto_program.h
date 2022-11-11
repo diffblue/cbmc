@@ -395,7 +395,15 @@ public:
 
     /// Returns the first (and only) successor for the usual case of a single
     /// target
-    targett get_target() const
+    const_targett get_target() const
+    {
+      PRECONDITION(targets.size() == 1);
+      return targets.front();
+    }
+
+    /// Returns the first (and only) successor for the usual case of a single
+    /// target
+    targett get_target()
     {
       PRECONDITION(targets.size()==1);
       return targets.front();

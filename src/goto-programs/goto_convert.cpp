@@ -243,7 +243,7 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
 
   // mark the goto targets
   unsigned cnt = 0;
-  for(const auto &i : dest.instructions)
+  for(auto &i : dest.instructions)
     if(i.is_goto())
       i.get_target()->target_number = (++cnt);
 
