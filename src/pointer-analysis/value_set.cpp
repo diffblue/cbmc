@@ -1286,8 +1286,10 @@ void value_sett::assign(
       const typet &subtype = c.type();
       const irep_idt &name = c.get_name();
 
-      // ignore methods and padding
-      if(subtype.id() == ID_code || c.get_is_padding())
+      // ignore padding
+      DATA_INVARIANT(
+        subtype.id() != ID_code, "struct member must not be of code type");
+      if(c.get_is_padding())
         continue;
 
       member_exprt lhs_member(lhs, name, subtype);
@@ -1792,8 +1794,10 @@ void value_sett::erase_struct_union_symbol(
     const typet &subtype = c.type();
     const irep_idt &name = c.get_name();
 
-    // ignore methods and padding
-    if(subtype.id() == ID_code || c.get_is_padding())
+    // ignore padding
+    DATA_INVARIANT(
+      subtype.id() != ID_code, "struct/union member must not be of code type");
+    if(c.get_is_padding())
       continue;
 
     erase_symbol_rec(subtype, erase_prefix + "." + id2string(name), ns);

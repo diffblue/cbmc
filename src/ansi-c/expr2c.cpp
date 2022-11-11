@@ -2078,8 +2078,8 @@ std::string expr2ct::convert_struct(
 
   for(const auto &component : struct_type.components())
   {
-    if(o_it->type().id()==ID_code)
-      continue;
+    DATA_INVARIANT(
+      o_it->type().id() != ID_code, "struct member must not be of code type");
 
     if(component.get_is_padding() && !include_padding_components)
     {

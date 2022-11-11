@@ -703,7 +703,10 @@ exprt gdb_value_extractort::get_struct_value(
   {
     const struct_typet::componentt &component = struct_type.components()[i];
 
-    if(component.get_is_padding() || component.type().id() == ID_code)
+    DATA_INVARIANT(
+      component.type().id() != ID_code,
+      "struct member must not be of code type");
+    if(component.get_is_padding())
     {
       continue;
     }

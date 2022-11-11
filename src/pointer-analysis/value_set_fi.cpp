@@ -992,8 +992,11 @@ void value_set_fit::assign(
       const typet &subtype=c_it->type();
       const irep_idt &name = c_it->get_name();
 
-      // ignore methods
-      if(subtype.id()==ID_code)
+      // ignore padding
+      DATA_INVARIANT(
+        subtype.id() != ID_code,
+        "struct/union member must not be of code type");
+      if(c_it->get_is_padding())
         continue;
 
       member_exprt lhs_member(lhs, name, subtype);

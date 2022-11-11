@@ -147,10 +147,12 @@ std::string graphml_witnesst::convert_assign_rec(
       assign.rhs().operands().begin();
     for(const auto &comp : components)
     {
-      if(comp.type().id()==ID_code ||
-         comp.get_is_padding() ||
-         // for some reason #is_padding gets lost in *some* cases
-         has_prefix(id2string(comp.get_name()), "$pad"))
+      DATA_INVARIANT(
+        comp.type().id() != ID_code, "struct member must not be of code type");
+      if(
+        comp.get_is_padding() ||
+        // for some reason #is_padding gets lost in *some* cases
+        has_prefix(id2string(comp.get_name()), "$pad"))
         continue;
 
       INVARIANT(
