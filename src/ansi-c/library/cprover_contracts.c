@@ -110,7 +110,9 @@ __CPROVER_contracts_car_create(void *ptr, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
 #pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
 #pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
 #pragma CPROVER check disable "pointer-primitive"
 #pragma CPROVER check disable "unsigned-overflow"
 #pragma CPROVER check disable "signed-overflow"
@@ -140,6 +142,15 @@ void __CPROVER_contracts_car_set_create(
   __CPROVER_size_t max_elems)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(set, sizeof(__CPROVER_contracts_car_set_t)),
@@ -148,6 +159,7 @@ __CPROVER_HIDE:;
   set->max_elems = max_elems;
   set->elems =
     __CPROVER_allocate(max_elems * sizeof(__CPROVER_contracts_car_t), 1);
+#pragma CPROVER check pop
 }
 
 /// \brief Inserts a \ref __CPROVER_contracts_car_t snapshotted from \p ptr
@@ -164,6 +176,7 @@ void __CPROVER_contracts_car_set_insert(
 {
 __CPROVER_HIDE:;
 #pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
 #pragma CPROVER check disable "pointer"
 #pragma CPROVER check disable "pointer-overflow"
 #pragma CPROVER check disable "pointer-primitive"
@@ -200,6 +213,15 @@ void __CPROVER_contracts_car_set_remove(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
   __CPROVER_size_t idx = set->max_elems;
   __CPROVER_contracts_car_t *elem = set->elems;
@@ -211,6 +233,7 @@ CAR_SET_REMOVE_LOOP:
     ++elem;
     --idx;
   }
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if \p candidate is included in one of \p set 's elements.
@@ -222,6 +245,15 @@ __CPROVER_bool __CPROVER_contracts_car_set_contains(
   __CPROVER_contracts_car_t candidate)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_bool incl = 0;
   __CPROVER_size_t idx = set->max_elems;
   __CPROVER_contracts_car_t *elem = set->elems;
@@ -239,6 +271,7 @@ CAR_SET_CONTAINS_LOOP:
   }
 
   return incl;
+#pragma CPROVER check pop
 }
 
 /// \brief Initialises a \ref __CPROVER_contracts_obj_set_t object to use it
@@ -253,6 +286,15 @@ void __CPROVER_contracts_obj_set_create_indexed_by_object_id(
   __CPROVER_contracts_obj_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(set, sizeof(__CPROVER_contracts_obj_set_t)),
@@ -271,6 +313,7 @@ __CPROVER_HIDE:;
     .is_empty = 1,
     .indexed_by_object_id = 1,
     .elems = __CPROVER_allocate(nof_objects * sizeof(*(set->elems)), 1)};
+#pragma CPROVER check pop
 }
 
 /// \brief Initialises a \ref __CPROVER_contracts_obj_set_t object to use it
@@ -283,6 +326,16 @@ void __CPROVER_contracts_obj_set_create_append(
   __CPROVER_size_t max_elems)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(set, sizeof(__CPROVER_contracts_obj_set_t)),
@@ -295,12 +348,23 @@ __CPROVER_HIDE:;
     .is_empty = 1,
     .indexed_by_object_id = 0,
     .elems = __CPROVER_allocate(max_elems * sizeof(*(set->elems)), 1)};
+#pragma CPROVER check pop
 }
 
 /// @brief Releases resources used by \p set.
 void __CPROVER_contracts_obj_set_release(__CPROVER_contracts_obj_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(set, sizeof(__CPROVER_contracts_obj_set_t)),
@@ -308,6 +372,7 @@ __CPROVER_HIDE:;
   __CPROVER_assert(__CPROVER_rw_ok(&(set->elems), 0), "set->elems writable");
 #endif
   __CPROVER_deallocate(set->elems);
+#pragma CPROVER check pop
 }
 
 /// \brief Adds the \p ptr to \p set.
@@ -319,6 +384,16 @@ void __CPROVER_contracts_obj_set_add(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->indexed_by_object_id, "indexed by object id");
@@ -327,6 +402,7 @@ __CPROVER_HIDE:;
   set->nof_elems = set->elems[object_id] ? set->nof_elems : set->nof_elems + 1;
   set->elems[object_id] = ptr;
   set->is_empty = 0;
+#pragma CPROVER check pop
 }
 
 /// \brief Appends \p ptr to \p set.
@@ -338,6 +414,16 @@ void __CPROVER_contracts_obj_set_append(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(!(set->indexed_by_object_id), "not indexed by object id");
   __CPROVER_assert(set->watermark < set->max_elems, "no OOB access");
@@ -346,6 +432,7 @@ __CPROVER_HIDE:;
   set->elems[set->watermark] = ptr;
   set->watermark += 1;
   set->is_empty = 0;
+#pragma CPROVER check pop
 }
 
 /// \brief Removes \p ptr form \p set if \p ptr exists in \p set,
@@ -357,6 +444,16 @@ void __CPROVER_contracts_obj_set_remove(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->indexed_by_object_id, "indexed by object id");
@@ -365,6 +462,7 @@ __CPROVER_HIDE:;
   set->nof_elems = set->elems[object_id] ? set->nof_elems - 1 : set->nof_elems;
   set->is_empty = set->nof_elems == 0;
   set->elems[object_id] = 0;
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if a pointer with the same object id as \p ptr is contained in
@@ -377,12 +475,23 @@ __CPROVER_bool __CPROVER_contracts_obj_set_contains(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->indexed_by_object_id, "indexed by object id");
   __CPROVER_assert(object_id < set->max_elems, "no OOB access");
 #endif
   return set->elems[object_id] != 0;
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if \p ptr is contained in \p set.
@@ -394,12 +503,23 @@ __CPROVER_bool __CPROVER_contracts_obj_set_contains_exact(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->indexed_by_object_id, "indexed by object id");
   __CPROVER_assert(object_id < set->max_elems, "no OOB access");
 #endif
   return set->elems[object_id] == ptr;
+#pragma CPROVER check pop
 }
 
 /// \brief Initialises a \ref __CPROVER_contracts_write_set_t object.
@@ -426,6 +546,16 @@ void __CPROVER_contracts_write_set_create(
   __CPROVER_bool assert_ensures_ctx)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_w_ok(set, sizeof(__CPROVER_contracts_write_set_t)),
@@ -454,6 +584,7 @@ __CPROVER_HIDE:;
   set->assert_requires_ctx = assert_requires_ctx;
   set->assume_ensures_ctx = assume_ensures_ctx;
   set->assert_ensures_ctx = assert_ensures_ctx;
+#pragma CPROVER check pop
 }
 
 /// \brief Releases resources used by \p set.
@@ -461,6 +592,16 @@ void __CPROVER_contracts_write_set_release(
   __CPROVER_contracts_write_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(set, sizeof(__CPROVER_contracts_write_set_t)),
@@ -490,6 +631,7 @@ __CPROVER_HIDE:;
   __CPROVER_deallocate(set->deallocated.elems);
   // do not free set->linked_is_fresh->elems or set->deallocated_linked->elems
   // since they are owned by someone else.
+#pragma CPROVER check pop
 }
 
 /// \brief Inserts a snapshot of the range starting at \p ptr of size \p size
@@ -505,7 +647,18 @@ void __CPROVER_contracts_write_set_insert_assignable(
   __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_contracts_car_set_insert(&(set->contract_assigns), idx, ptr, size);
+#pragma CPROVER check pop
+
 }
 
 /// \brief Inserts a snapshot of the range of bytes covering the whole object
@@ -524,11 +677,22 @@ void __CPROVER_contracts_write_set_insert_object_whole(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   __CPROVER_contracts_car_set_insert(
     &(set->contract_assigns),
     idx,
     ((char *)ptr) - __CPROVER_POINTER_OFFSET(ptr),
     __CPROVER_OBJECT_SIZE(ptr));
+#pragma CPROVER check pop
 }
 
 /// \brief Inserts a snapshot of the range of bytes starting at \p ptr and
@@ -547,11 +711,21 @@ void __CPROVER_contracts_write_set_insert_object_from(
   __CPROVER_size_t idx,
   void *ptr)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_contracts_car_set_insert(
     &(set->contract_assigns),
     idx,
     ptr,
     __CPROVER_OBJECT_SIZE(ptr) - __CPROVER_POINTER_OFFSET(ptr));
+#pragma CPROVER check pop
 }
 
 /// \brief Inserts a snapshot of the range of bytes starting at \p ptr of
@@ -571,7 +745,17 @@ void __CPROVER_contracts_write_set_insert_object_upto(
   __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_contracts_car_set_insert(&(set->contract_assigns), idx, ptr, size);
+#pragma CPROVER check pop
 }
 
 /// \brief Adds the freeable pointer \p ptr to \p set->contract_frees.
@@ -582,6 +766,16 @@ void __CPROVER_contracts_write_set_add_freeable(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   // we don't check yet that the pointer satisfies
   // the __CPROVER_contracts_is_freeable as precondition.
   // preconditions will be checked if there is an actual attempt
@@ -616,6 +810,7 @@ __CPROVER_HIDE:;
     set->contract_frees_replacement.is_empty = 0;
   }
 #endif
+#pragma CPROVER check pop
 }
 
 /// \brief Adds the pointer \p ptr to \p set->allocated.
@@ -627,6 +822,16 @@ void __CPROVER_contracts_write_set_add_allocated(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #if DFCC_DEBUG
   // call inlined below
   __CPROVER_contracts_obj_set_add(&(set->allocated), ptr);
@@ -638,6 +843,7 @@ __CPROVER_HIDE:;
   set->allocated.elems[object_id] = ptr;
   set->allocated.is_empty = 0;
 #endif
+#pragma CPROVER check pop
 }
 
 /// \brief Records that an object is dead by removing the pointer \p ptr from
@@ -652,6 +858,16 @@ void __CPROVER_contracts_write_set_record_dead(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   // manually inlined below
   __CPROVER_contracts_obj_set_remove(&(set->allocated), ptr);
@@ -663,6 +879,7 @@ __CPROVER_HIDE:;
   set->allocated.is_empty = set->allocated.nof_elems == 0;
   set->allocated.elems[object_id] = 0;
 #endif
+#pragma CPROVER check pop
 }
 
 /// \brief Records that an object is deallocated by adding the pointer \p ptr to
@@ -677,6 +894,16 @@ void __CPROVER_contracts_write_set_record_deallocated(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->replacement == 0, "!replacement");
 #endif
@@ -723,6 +950,7 @@ __CPROVER_HIDE:;
     --idx;
   }
 #endif
+#pragma CPROVER check pop
 }
 
 /// \brief Returns true iff \p set->deallocated is empty.
@@ -734,7 +962,18 @@ __CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(
   __CPROVER_contracts_write_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   return set->allocated.is_empty & set->deallocated.is_empty;
+#pragma CPROVER check pop
+
 }
 
 /// \brief Checks if an assignment to the range of bytes starting at \p ptr and
@@ -753,6 +992,16 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_assignment(
 // manually inlined below
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
+
   __CPROVER_assert(set->replacement == 0, "!replacement");
   __CPROVER_assert(
     ((ptr == 0) | __CPROVER_rw_ok(ptr, size)),
@@ -770,12 +1019,15 @@ __CPROVER_HIDE:;
     return 1;
 
   return __CPROVER_contracts_car_set_contains(&(set->contract_assigns), car);
+#pragma CPROVER check pop
 }
 #else
 {
 __CPROVER_HIDE:;
 #  pragma CPROVER check push
+#  pragma CPROVER check disable "bounds"
 #  pragma CPROVER check disable "pointer"
+#  pragma CPROVER check disable "pointer-overflow"
 #  pragma CPROVER check disable "pointer-primitive"
 #  pragma CPROVER check disable "unsigned-overflow"
 #  pragma CPROVER check disable "signed-overflow"
@@ -844,8 +1096,16 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_array_set(
   void *dest)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   return __CPROVER_contracts_write_set_check_assignment(
     set, dest, __CPROVER_OBJECT_SIZE(dest) - __CPROVER_POINTER_OFFSET(dest));
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if the operation `array_copy(dest, ...)` is allowed according
@@ -864,8 +1124,16 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_array_copy(
   void *dest)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   return __CPROVER_contracts_write_set_check_assignment(
     set, dest, __CPROVER_OBJECT_SIZE(dest) - __CPROVER_POINTER_OFFSET(dest));
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if the operation `array_replace(dest, src)` is allowed
@@ -888,12 +1156,20 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_array_replace(
   void *src)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_size_t src_size =
     __CPROVER_OBJECT_SIZE(src) - __CPROVER_POINTER_OFFSET(src);
   __CPROVER_size_t dest_size =
     __CPROVER_OBJECT_SIZE(dest) - __CPROVER_POINTER_OFFSET(dest);
   __CPROVER_size_t size = dest_size < src_size ? dest_size : src_size;
   return __CPROVER_contracts_write_set_check_assignment(set, dest, size);
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if a `havoc_object(ptr)` is allowed according to \p set.
@@ -909,10 +1185,18 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_havoc_object(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   return __CPROVER_contracts_write_set_check_assignment(
     set,
     (char *)ptr - __CPROVER_POINTER_OFFSET(ptr),
     __CPROVER_OBJECT_SIZE(ptr));
+#pragma CPROVER check pop
 }
 
 /// \brief Checks if the deallocation of \p ptr is allowed according to \p set.
@@ -930,6 +1214,13 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_deallocate(
   void *ptr)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->replacement == 0, "!replacement");
 #endif
@@ -945,6 +1236,7 @@ __CPROVER_HIDE:;
 #endif
   return (ptr == 0) | (set->contract_frees.elems[object_id] == ptr) |
          (set->allocated.elems[object_id] == ptr);
+#pragma CPROVER check pop
 }
 
 /// \brief Checks the inclusion of the \p candidate->contract_assigns elements
@@ -963,6 +1255,13 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_assigns_clause_inclusion(
   __CPROVER_contracts_write_set_ptr_t candidate)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     reference->replacement == 0, "reference set in !replacement");
@@ -983,6 +1282,7 @@ SET_CHECK_ASSIGNS_CLAUSE_INCLUSION_LOOP:
     ++current;
   }
   return incl;
+#pragma CPROVER check pop
 }
 
 /// \brief Checks the inclusion of the \p candidate->contract_frees elements
@@ -1001,6 +1301,13 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_frees_clause_inclusion(
   __CPROVER_contracts_write_set_ptr_t candidate)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     reference->replacement == 0, "reference set in !replacement");
@@ -1029,6 +1336,7 @@ SET_CHECK_FREES_CLAUSE_INCLUSION_LOOP:
   }
 
   return all_incl;
+#pragma CPROVER check pop
 }
 
 /// \brief Models the instrumented version of the free function.
@@ -1049,6 +1357,13 @@ void __CPROVER_contracts_write_set_deallocate_freeable(
   __CPROVER_contracts_write_set_ptr_t target)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(set->replacement == 1, "set is in replacement");
   __CPROVER_assert(
@@ -1062,13 +1377,6 @@ SET_DEALLOCATE_FREEABLE_LOOP:
     void *ptr = *current;
 
     // call free only iff the pointer is valid preconditions are met
-#pragma CPROVER check push
-#pragma CPROVER check disable "pointer"
-#pragma CPROVER check disable "pointer-primitive"
-#pragma CPROVER check disable "unsigned-overflow"
-#pragma CPROVER check disable "signed-overflow"
-#pragma CPROVER check disable "undefined-shift"
-#pragma CPROVER check disable "conversion"
     // skip checks on r_ok, dynamic_object and pointer_offset
     __CPROVER_bool preconditions =
       (ptr == 0) | (__CPROVER_r_ok(ptr, 0) & __CPROVER_DYNAMIC_OBJECT(ptr) &
@@ -1089,6 +1397,7 @@ SET_DEALLOCATE_FREEABLE_LOOP:
     --idx;
     ++current;
   }
+#pragma CPROVER check pop
 }
 
 /// \brief Links \p is_fresh_set to
@@ -1099,6 +1408,15 @@ void __CPROVER_contracts_link_is_fresh(
   __CPROVER_contracts_obj_set_ptr_t is_fresh_set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(write_set != 0, "write_set not NULL");
 #endif
@@ -1110,6 +1428,7 @@ __CPROVER_HIDE:;
   {
     write_set->linked_is_fresh = 0;
   }
+#pragma CPROVER check pop
 }
 
 /// \brief Links \p write_set_to_link->allocated to
@@ -1121,6 +1440,15 @@ void __CPROVER_contracts_link_allocated(
   __CPROVER_contracts_write_set_ptr_t write_set_to_link)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     write_set_postconditions != 0, "write_set_postconditions not NULL");
@@ -1134,6 +1462,7 @@ __CPROVER_HIDE:;
   {
     write_set_postconditions->linked_allocated = 0;
   }
+#pragma CPROVER check pop
 }
 
 /// \brief Links \p write_set_to_link->deallocated to
@@ -1146,6 +1475,15 @@ void __CPROVER_contracts_link_deallocated(
   __CPROVER_contracts_write_set_ptr_t write_set_to_link)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     write_set_postconditions != 0, "write_set_postconditions not NULL");
@@ -1159,6 +1497,7 @@ __CPROVER_HIDE:;
   {
     write_set_postconditions->linked_deallocated = 0;
   }
+#pragma CPROVER check pop
 }
 
 /// \brief Models the instrumented interface of the `malloc` function
@@ -1194,9 +1533,19 @@ __CPROVER_bool __CPROVER_contracts_is_fresh(
   __CPROVER_size_t size,
   __CPROVER_contracts_write_set_ptr_t write_set)
 {
+__CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   if(!write_set)
     return __VERIFIER_nondet_bool();
-__CPROVER_HIDE:;
+
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(write_set, sizeof(__CPROVER_contracts_write_set_t)),
@@ -1204,13 +1553,6 @@ __CPROVER_HIDE:;
   __CPROVER_assert(
     write_set->linked_is_fresh, "set->linked_is_fresh is not NULL");
 #endif
-#pragma CPROVER check push
-#pragma CPROVER check disable "pointer"
-#pragma CPROVER check disable "pointer-primitive"
-#pragma CPROVER check disable "pointer-overflow"
-#pragma CPROVER check disable "signed-overflow"
-#pragma CPROVER check disable "unsigned-overflow"
-#pragma CPROVER check disable "conversion"
   if(write_set->assume_requires_ctx)
   {
 #ifdef DFCC_DEBUG
@@ -1321,11 +1663,21 @@ void *__CPROVER_contracts_write_set_havoc_get_assignable_target(
   __CPROVER_size_t idx)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_contracts_car_t car = set->contract_assigns.elems[idx];
   if(car.is_writable)
     return car.lb;
   else
     return (void *)0;
+#pragma CPROVER check pop
 }
 
 /// \brief Havocs the whole object pointed to by the lower bound pointer of the
@@ -1336,10 +1688,20 @@ void __CPROVER_contracts_write_set_havoc_object_whole(
   __CPROVER_size_t idx)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_assert(idx < set->contract_assigns.max_elems, "no OOB access");
   __CPROVER_contracts_car_t car = set->contract_assigns.elems[idx];
   if(car.is_writable)
     __CPROVER_havoc_object(car.lb);
+#pragma CPROVER check pop
 }
 
 /// \brief Havocs the range of bytes represented byt the element stored at index
@@ -1349,12 +1711,24 @@ void __CPROVER_contracts_write_set_havoc_slice(
   __CPROVER_size_t idx)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert(idx < set->contract_assigns.max_elems, "no OOB access");
 #endif
   __CPROVER_contracts_car_t car = set->contract_assigns.elems[idx];
-  if(car.is_writable)
-    __CPROVER_havoc_slice(car.lb, car.size);
+#pragma CPROVER check pop
+  if(car.is_writable) {
+    char nondet_bytes[car.size];
+    __CPROVER_array_replace(car.lb, nondet_bytes);
+  }
 }
 
 /// \brief Implementation of the `is_freeable` front-end predicate.
@@ -1372,6 +1746,15 @@ __CPROVER_bool __CPROVER_contracts_is_freeable(
   __CPROVER_contracts_write_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_assert(
     (set != 0) &
       ((set->assume_requires_ctx == 1) | (set->assert_requires_ctx == 1) |
@@ -1396,6 +1779,7 @@ __CPROVER_HIDE:;
                                 (!__CPROVER_malloc_is_new_array);
   return is_null_or_valid_pointer & is_dynamic_object & has_offset_zero &
          is_not_deallocated & is_not_alloca & is_not_array;
+#pragma CPROVER check pop
 }
 
 /// \brief Returns true iff the pointer \p ptr is found in \p set->deallocated.
@@ -1404,6 +1788,15 @@ __CPROVER_bool __CPROVER_contracts_was_freed(
   __CPROVER_contracts_write_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_assert(
     (set != 0) &
       ((set->assume_ensures_ctx == 1) | (set->assert_ensures_ctx == 1)),
@@ -1418,6 +1811,7 @@ __CPROVER_HIDE:;
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
   return set->linked_deallocated->elems[object_id] == ptr;
 #endif
+#pragma CPROVER check pop
 }
 
 /// \brief Asserts that \p ptr is found in \p set->contract_frees.
@@ -1430,6 +1824,15 @@ void __CPROVER_contracts_check_replace_ensures_was_freed_preconditions(
   __CPROVER_contracts_write_set_ptr_t set)
 {
 __CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "bounds"
+#pragma CPROVER check disable "pointer"
+#pragma CPROVER check disable "pointer-overflow"
+#pragma CPROVER check disable "pointer-primitive"
+#pragma CPROVER check disable "unsigned-overflow"
+#pragma CPROVER check disable "signed-overflow"
+#pragma CPROVER check disable "undefined-shift"
+#pragma CPROVER check disable "conversion"
   __CPROVER_assert(
     set && ((set->assume_ensures_ctx == 1) | (set->assert_ensures_ctx == 1)),
     "__CPROVER_was_freed is used only in ensures clauses");
@@ -1450,5 +1853,6 @@ __CPROVER_HIDE:;
       "contract's frees clause");
 #endif
   }
+#pragma CPROVER check pop
 }
 #endif
