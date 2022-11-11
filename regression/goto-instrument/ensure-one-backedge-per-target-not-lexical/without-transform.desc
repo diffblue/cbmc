@@ -1,0 +1,7 @@
+CORE
+main.c
+--show-lexical-loops
+^16 is head of \{ 16, 17, 22, 23, 24, 25 \(backedge\) \}$
+Note not all loops were in lexical loop form
+^EXIT=0$
+^SIGNAL=0$

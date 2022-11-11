@@ -11,6 +11,8 @@ Author: Diffblue Ltd.
 
 #include "ensure_one_backedge_per_target.h"
 
+#include <analyses/natural_loops.h>
+
 #include "goto_model.h"
 
 #include <algorithm>
@@ -84,9 +86,89 @@ bool ensure_one_backedge_per_target(
   return true;
 }
 
+struct instruction_location_numbert : public goto_programt::targett
+{
+  // Implicit conversion from a goto_programt::targett is permitted.
+  // NOLINTNEXTLINE(runtime/explicit)
+  instruction_location_numbert(goto_programt::targett target)
+    : goto_programt::targett(target)
+  {
+  }
+
+  instruction_location_numbert() = default;
+};
+
+inline bool operator<(
+  const instruction_location_numbert &i1,
+  const instruction_location_numbert &i2)
+{
+  return i1->location_number < i2->location_number;
+}
+
 bool ensure_one_backedge_per_target(goto_programt &goto_program)
 {
-  bool any_change = false;
+  natural_loops_templatet<goto_programt, instruction_location_numbert>
+    natural_loops{goto_program};
+  std::set<instruction_location_numbert> modified_loops;
+
+  for(auto it1 = natural_loops.loop_map.begin();
+      it1 != natural_loops.loop_map.end();
+      ++it1)
+  {
+    DATA_INVARIANT(!it1->second.empty(), "loops cannot have no instructions");
+    // skip over lexical loops
+    if(
+      (*std::prev(it1->second.end()))->is_goto() &&
+      (*std::prev(it1->second.end()))->get_target() == it1->first)
+      continue;
+    if(modified_loops.find(it1->first) != modified_loops.end())
+      continue;
+    // it1 refers to a loop that isn't a lexical loop, now see whether any other
+    // loop is nested within it1
+    for(auto it2 = natural_loops.loop_map.begin();
+        it2 != natural_loops.loop_map.end();
+        ++it2)
+    {
+      if(it1 == it2)
+        continue;
+
+      if(std::includes(
+           it1->second.begin(),
+           it1->second.end(),
+           it2->second.begin(),
+           it2->second.end()))
+      {
+        // make sure that loops with overlapping body are properly nested by a
+        // back edge; this will be a disconnected edge, which
+        // ensure_one_backedge_per_target connects
+        if(
+          modified_loops.find(it2->first) == modified_loops.end() &&
+          (!(*std::prev(it2->second.end()))->is_goto() ||
+           (*std::prev(it2->second.end()))->get_target() != it2->first))
+        {
+          auto new_goto = goto_program.insert_after(
+            *std::prev(it2->second.end()),
+            goto_programt::make_goto(
+              it2->first, (*std::prev(it2->second.end()))->source_location()));
+          it2->second.insert_instruction(new_goto);
+          it1->second.insert_instruction(new_goto);
+          modified_loops.insert(it2->first);
+        }
+
+        goto_program.insert_after(
+          *std::prev(it1->second.end()),
+          goto_programt::make_goto(
+            it1->first, (*std::prev(it1->second.end()))->source_location()));
+        modified_loops.insert(it1->first);
+        break;
+      }
+    }
+  }
+
+  if(!modified_loops.empty())
+    goto_program.update();
+
+  bool any_change = !modified_loops.empty();
 
   for(auto it = goto_program.instructions.begin();
       it != goto_program.instructions.end();
