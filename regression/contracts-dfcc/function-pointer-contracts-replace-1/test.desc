@@ -1,0 +1,28 @@
+CORE
+main.c
+--restrict-function-pointer foo.CALL_F_IN/add_one --restrict-function-pointer main.CALL_F_OUT/add_one --dfcc main --enforce-contract foo --replace-call-with-contract get_add_one
+^\[foo.postcondition.\d+\] line 18 Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^\[foo.postcondition.\d+\] line 20 Assert function pointer '\*f_out_wrapper' obeys contract 'add_one' or '\(fun_t\)NULL': SUCCESS$
+^\[foo.assertion.\d+\] line 30 then branch is reachable, expecting FAILURE: FAILURE$
+^\[foo.pointer_dereference.\d+\] line 32 dereferenced function pointer must be add_one: SUCCESS$
+^\[foo.assertion.\d+\] line 37 else branch is reachable, expecting FAILURE: FAILURE$
+^\[main.assertion.\d+\] line 49 then branch is reachable, expecting FAILURE: FAILURE$
+^\[main.assertion.\d+\] line 51 f_out satisfies add_one: SUCCESS$
+^\[main.pointer_dereference.\d+\] line 51 dereferenced function pointer must be add_one: SUCCESS$
+^\[main.assertion.\d+\] line 55 else branch is reachable, expecting FAILURE: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+foo obtains function pointer f_in through get_add_one, which is replaced by
+its contract.
+When f_in is not NULL, foo calls f_in and the post condition of foo is that
+of add_one `__CPROVER_return_value == old(x) + 1`.
+When f_in is not NULL, foo returns x directly post condition of foo is that
+of add_one `__CPROVER_return_value == old(x)`.
+The function pointer f_out is ensured to satisfy the add_one contract or be NULL
+as a post condition.
+The main program calls f_out on a particular value if it is not null and asserts
+that the add_one post condition holds for a particular value.
+Assertions `assert(false)` are added to all branches to demonstrate reachability.
