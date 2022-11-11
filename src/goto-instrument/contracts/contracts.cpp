@@ -1204,20 +1204,9 @@ void code_contractst::assert_function_pointer_obeys_contract(
   const irep_idt &mode,
   goto_programt &dest)
 {
-  source_locationt loc(expr.source_location());
-  loc.set_property_class(property_class);
-  std::stringstream comment;
-  comment << "Assert function pointer '"
-          << from_expr_using_mode(ns, mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(ns, mode, expr.address_of_contract()) << "'";
-  loc.set_comment(comment.str());
-  code_assertt assert_expr(
-    equal_exprt{expr.function_pointer(), expr.address_of_contract()});
-  assert_expr.add_source_location() = loc;
-  goto_programt instructions;
-  converter.goto_convert(assert_expr, instructions, mode);
-  dest.destructive_append(instructions);
+  throw invalid_source_file_exceptiont(
+    "require_contracts or ensures_contract clauses are not supported",
+    expr.source_location());
 }
 
 void code_contractst::assume_function_pointer_obeys_contract(
@@ -1225,15 +1214,9 @@ void code_contractst::assume_function_pointer_obeys_contract(
   const irep_idt &mode,
   goto_programt &dest)
 {
-  source_locationt loc(expr.source_location());
-  std::stringstream comment;
-  comment << "Assume function pointer '"
-          << from_expr_using_mode(ns, mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(ns, mode, expr.address_of_contract()) << "'";
-  loc.set_comment(comment.str());
-  dest.add(goto_programt::make_assignment(
-    expr.function_pointer(), expr.address_of_contract(), loc));
+  throw invalid_source_file_exceptiont(
+    "require_contracts or ensures_contract clauses are not supported",
+    expr.source_location());
 }
 
 void code_contractst::add_contract_check(
