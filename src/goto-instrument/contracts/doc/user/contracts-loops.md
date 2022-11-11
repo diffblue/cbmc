@@ -147,6 +147,7 @@ and finally we verify the instrumented GOTO binary with desired checks.
 
 - @ref contracts-functions
   - @ref contracts-requires-ensures
+  - @ref contracts-requires-ensures-contract
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-loops

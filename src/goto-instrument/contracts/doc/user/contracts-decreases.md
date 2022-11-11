@@ -179,6 +179,7 @@ then the weakest possible invariant (i.e, `true`) is used to model an arbitrary 
 
 - @ref contracts-functions
   - @ref contracts-requires-ensures
+  - @ref contracts-requires-ensures-contract
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-loops
