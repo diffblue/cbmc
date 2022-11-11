@@ -1295,6 +1295,7 @@ __decltype          { if(PARSER.cpp98 &&
 {CPROVER_PREFIX}"frees"        { loc(); return TOK_CPROVER_FREES; }
 {CPROVER_PREFIX}"requires_contract" { loc(); return TOK_CPROVER_REQUIRES_CONTRACT; }
 {CPROVER_PREFIX}"ensures_contract" { loc(); return TOK_CPROVER_ENSURES_CONTRACT; }
+{CPROVER_PREFIX}"state_label"  { loc(); return TOK_CPROVER_STATE_LABEL; }
 
 "\xe2\x88\x80" |
 "\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */

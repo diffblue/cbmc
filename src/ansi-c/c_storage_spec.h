@@ -38,13 +38,14 @@ public:
     is_inline=false;
     is_weak=false;
     is_used = false;
+    is_state_label = false;
     alias.clear();
     asm_label.clear();
     section.clear();
   }
 
-  bool is_typedef, is_extern, is_static, is_register,
-       is_inline, is_thread_local, is_weak, is_used;
+  bool is_typedef, is_extern, is_static, is_register, is_inline,
+    is_thread_local, is_weak, is_used, is_state_label;
 
   // __attribute__((alias("foo")))
   irep_idt alias;
@@ -55,6 +56,7 @@ public:
 
   bool operator==(const c_storage_spect &other) const
   {
+    // clang-format off
     return is_typedef==other.is_typedef &&
            is_extern==other.is_extern &&
            is_static==other.is_static &&
@@ -63,9 +65,11 @@ public:
            is_inline==other.is_inline &&
            is_weak==other.is_weak &&
            is_used == other.is_used &&
+           is_state_label == other.is_state_label &&
            alias==other.alias &&
            asm_label==other.asm_label &&
            section==other.section;
+    // clang-format on
   }
 
   bool operator!=(const c_storage_spect &other) const
@@ -75,6 +79,7 @@ public:
 
   c_storage_spect &operator|=(const c_storage_spect &other)
   {
+    // clang-format off
     is_typedef      |=other.is_typedef;
     is_extern       |=other.is_extern;
     is_static       |=other.is_static;
@@ -83,6 +88,8 @@ public:
     is_thread_local |=other.is_thread_local;
     is_weak         |=other.is_weak;
     is_used         |=other.is_used;
+    is_state_label  |=other.is_state_label;
+    // clang-format on
     if(alias.empty())
       alias=other.alias;
     if(asm_label.empty())

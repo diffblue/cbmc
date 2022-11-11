@@ -67,4 +67,6 @@ void c_storage_spect::read(const typet &type)
     section =
       to_string_constant(to_type_with_subtype(type).subtype()).get_value();
   }
+  else if(type.id() == ID_state_label)
+    is_state_label = true;
 }

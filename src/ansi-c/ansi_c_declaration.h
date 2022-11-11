@@ -205,6 +205,16 @@ public:
     set(ID_is_used, is_used);
   }
 
+  bool get_is_state_label() const
+  {
+    return get_bool(ID_state_label);
+  }
+
+  void set_is_state_label(bool is_state_label)
+  {
+    set(ID_state_label, is_state_label);
+  }
+
   void to_symbol(
     const ansi_c_declaratort &,
     symbolt &symbol) const;

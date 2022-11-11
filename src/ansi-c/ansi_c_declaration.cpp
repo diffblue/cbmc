@@ -83,6 +83,8 @@ void ansi_c_declarationt::output(std::ostream &out) const
     out << " is_extern";
   if(get_is_static_assert())
     out << " is_static_assert";
+  if(get_is_state_label())
+    out << " is_state_label";
   out << "\n";
 
   out << "Type: " << type().pretty() << "\n";
@@ -156,6 +158,9 @@ void ansi_c_declarationt::to_symbol(
 
     if(get_is_inline())
       to_code_type(type).set_inlined(true);
+
+    if(get_is_state_label())
+      to_code_type(type).set_is_state_label(true);
 
     if(
       config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||

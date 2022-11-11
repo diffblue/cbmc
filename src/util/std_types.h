@@ -672,6 +672,16 @@ public:
     set(ID_C_inlined, value);
   }
 
+  bool get_is_state_label() const
+  {
+    return get_bool(ID_C_state_label);
+  }
+
+  void set_is_state_label(bool value)
+  {
+    set(ID_C_state_label, value);
+  }
+
   const irep_idt &get_access() const
   {
     return get(ID_access);

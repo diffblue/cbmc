@@ -210,6 +210,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
 %token TOK_CPROVER_FREES "__CPROVER_frees"
+%token TOK_CPROVER_STATE_LABEL "__CPROVER_state_label"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_XORXOR      "^^"
@@ -1452,6 +1453,7 @@ storage_class:
         | TOK_INLINE       { $$=$1; set($$, ID_inline); }
         | TOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
         | TOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
+        | TOK_CPROVER_STATE_LABEL { $$=$1; set($$, ID_state_label); }
         | msc_declspec     { $$=$1; }
         | TOK_MSC_FORCEINLINE
         {

@@ -172,6 +172,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_storage_spec.is_weak=true;
   else if(type.id() == ID_used)
     c_storage_spec.is_used = true;
+  else if(type.id() == ID_state_label)
+    c_storage_spec.is_state_label = true;
   else if(type.id()==ID_auto)
   {
     // ignore
