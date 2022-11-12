@@ -800,6 +800,42 @@ exprt smt2_parsert::function_application()
           else
             throw error() << "unexpected sort given as operand to to_fp";
         }
+        else if(id == "to_fp_unsigned")
+        {
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected number after to_fp_unsigned");
+
+          auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected second number after to_fp_unsigned");
+
+          auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error("expected ')' after to_fp_unsigned");
+
+          // width_f *includes* the hidden bit
+          const ieee_float_spect spec(width_f - 1, width_e);
+
+          auto rounding_mode = expression();
+
+          auto source_op = expression();
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error("expected ')' at the end of to_fp_unsigned");
+
+          if(source_op.type().id() == ID_unsignedbv)
+          {
+            // The operand is hard-wired to be interpreted
+            // as an unsigned number.
+            return floatbv_typecast_exprt(
+              source_op, rounding_mode, spec.to_type());
+          }
+          else
+            throw error()
+              << "unexpected sort given as operand to to_fp_unsigned";
+        }
         else
         {
           throw error() << "unknown indexed identifier '"
