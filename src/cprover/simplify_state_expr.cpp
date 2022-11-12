@@ -14,6 +14,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
@@ -46,6 +47,14 @@ static bool types_are_compatible(const typet &a, const typet &b)
     return true;
   else if(a.id() == ID_pointer && b.id() == ID_pointer)
     return true;
+  else
+    return false;
+}
+
+static bool is_char(const typet &type)
+{
+  if(type.id() == ID_signedbv || type.id() == ID_unsignedbv)
+    return to_bitvector_type(type).get_width() == config.ansi_c.char_width;
   else
     return false;
 }
@@ -161,6 +170,40 @@ exprt simplify_evaluate_update(
       if_exprt(simplified_same, new_value, simplified_new_evaluate_expr);
 
     return simplify_expr(if_expr, ns);
+  }
+  else if(is_char(simplified_new_evaluate_expr.type()))
+  {
+    // We are reading a byte. Use byte_extract.
+    //
+    // (ς[w:=v])(r) -->
+    //   IF same_object(w, r) THEN
+    //     byte_extract(v, r-w)
+    //   ELSE
+    //     ς(r)
+    //   ENDIF
+    auto new_value = update_state_expr.new_value();
+
+    auto offset_r = simplify_state_expr(
+      pointer_offset(evaluate_expr.address()), address_taken, ns);
+
+    auto offset_w = simplify_state_expr(
+      pointer_offset(update_state_expr.address()), address_taken, ns);
+
+    auto offset = minus_exprt(offset_r, offset_w);
+
+    auto same_object =
+      ::same_object(evaluate_expr.address(), update_state_expr.address());
+
+    auto simplified_same_object =
+      simplify_state_expr(same_object, address_taken, ns);
+
+    auto byte_extract =
+      make_byte_extract(new_value, offset, evaluate_expr.type());
+
+    return if_exprt(
+      std::move(simplified_same_object),
+      std::move(byte_extract),
+      std::move(simplified_new_evaluate_expr));
   }
   else
   {
