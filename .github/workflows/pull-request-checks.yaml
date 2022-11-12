@@ -343,8 +343,6 @@ jobs:
           export PATH=$PWD/bin:$PATH
           cd ../regression/cbmc
           sed -i '1s/^CORE\(.*\)broken-smt-backend/KNOWNBUG\1broken-smt-backend/' */*.desc
-          # the following test fails on some Unix systems
-          git checkout -- r_w_ok6
           # the following tests fail on Windows only
           git checkout -- memory_allocation1 printf1 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
