@@ -3644,21 +3644,35 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         element_size = *element_size_opt;
       }
 
-      out << "(bvadd ";
+      // First convert the pointer operand
+      out << "(let ((?pointerop ";
       convert_expr(p);
-      out << " ";
+      out << ")) ";
+
+      // The addition is done on the offset part only.
+      const std::size_t pointer_width = boolbv_width(p.type());
+      const std::size_t offset_bits =
+        pointer_width - config.bv_encoding.object_bits;
+
+      out << "(concat ";
+      out << "((_ extract " << pointer_width - 1 << ' ' << offset_bits
+          << ") ?pointerop) ";
+      out << "(bvadd ((_ extract " << offset_bits - 1 << " 0) ?pointerop) ";
 
       if(element_size >= 2)
       {
-        out << "(bvmul ";
+        out << "(bvmul ((_ extract " << offset_bits - 1 << " 0) ";
         convert_expr(i);
-        out << " (_ bv" << element_size << " " << boolbv_width(expr.type())
-            << "))";
+        out << ") (_ bv" << element_size << " " << offset_bits << "))";
       }
       else
+      {
+        out << "((_ extract " << offset_bits - 1 << " 0) ";
         convert_expr(i);
+        out << ')'; // extract
+      }
 
-      out << ')';
+      out << ")))"; // bvadd, concat, let
     }
     else
     {

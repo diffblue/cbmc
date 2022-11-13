@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 main.c
 --pointer-overflow-check --no-simplify
 ^\[main.pointer_arithmetic.\d+\] line 6 pointer arithmetic: pointer outside object bounds in p \+ \(signed (long (long )?)?int\)10: FAILURE
