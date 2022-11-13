@@ -2975,7 +2975,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
   }
   else // change, new expression is 'tmp'
   {
-    POSTCONDITION(as_const(tmp).type() == expr.type());
+    POSTCONDITION_WITH_DIAGNOSTICS(
+      as_const(tmp).type() == expr.type(), tmp.pretty(), expr.pretty());
 
 #ifdef USE_CACHE
     // save in cache
