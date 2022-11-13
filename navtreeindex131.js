@@ -1,6 +1,5 @@
 var NAVTREEINDEX131 =
 {
-"type_8cpp.html#add06993da9822f72cd5a70590e222586":[6,0,2,27,251,0],
 "type_8cpp_source.html":[6,0,2,27,251],
 "type_8h.html":[6,0,2,27,252],
 "type_8h.html#a2fcfab684428916efa3d67a06e4f0ae0":[6,0,2,27,252,6],
@@ -200,9 +199,10 @@ var NAVTREEINDEX131 =
 "user_guide.html":[0,1],
 "util_2byte__operators_8cpp.html":[6,0,2,27,14],
 "util_2byte__operators_8cpp.html#a0f91de25c75e38bfa5b06eef305a3e3d":[6,0,2,27,14,0],
-"util_2byte__operators_8cpp.html#a424b32f665812317348db304c92152e0":[6,0,2,27,14,3],
+"util_2byte__operators_8cpp.html#a424b32f665812317348db304c92152e0":[6,0,2,27,14,4],
 "util_2byte__operators_8cpp.html#a7f31ab42e2166fbb763afc06d41ff438":[6,0,2,27,14,1],
-"util_2byte__operators_8cpp.html#aae938949b73282792a89ff21cdbd4935":[6,0,2,27,14,2],
+"util_2byte__operators_8cpp.html#a832dc632042184111a0909b51bc3547d":[6,0,2,27,14,2],
+"util_2byte__operators_8cpp.html#aae938949b73282792a89ff21cdbd4935":[6,0,2,27,14,3],
 "util_2byte__operators_8cpp_source.html":[6,0,2,27,14],
 "util_8cpp.html":[6,0,2,13,0,29],
 "util_8cpp.html#a0d4714cfb438bd416ffc4c8cb1f66c57":[6,0,2,13,0,29,3],

@@ -8,7 +8,6 @@ var solvers_2lowering_2byte__operators_8cpp =
     [ "bv_to_struct_expr", "solvers_2lowering_2byte__operators_8cpp.html#a77b7426519585fb095c477b66865638f", null ],
     [ "bv_to_union_expr", "solvers_2lowering_2byte__operators_8cpp.html#a7d720e7994eeb8844461e2b1a93f45eb", null ],
     [ "bv_to_vector_expr", "solvers_2lowering_2byte__operators_8cpp.html#a680934bdff40935e76d4f8b632faeba1", null ],
-    [ "has_byte_operator", "solvers_2lowering_2byte__operators_8cpp.html#a832dc632042184111a0909b51bc3547d", null ],
     [ "instantiate_byte_array", "solvers_2lowering_2byte__operators_8cpp.html#a23dc3d7fbd8aa034be208f48630b3d15", null ],
     [ "lower_byte_extract", "solvers_2lowering_2byte__operators_8cpp.html#a2617c89da4cf231d07a0f9b4b67cd126", null ],
     [ "lower_byte_extract_array_vector", "solvers_2lowering_2byte__operators_8cpp.html#a9b3b31c1e6356946eacd2f50c3cf5028", null ],

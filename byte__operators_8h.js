@@ -4,6 +4,7 @@ var byte__operators_8h =
     [ "byte_update_exprt", "classbyte__update__exprt.html", "classbyte__update__exprt" ],
     [ "can_cast_expr< byte_extract_exprt >", "byte__operators_8h.html#afe1e66958362783a6dcc1c7f96de68ce", null ],
     [ "can_cast_expr< byte_update_exprt >", "byte__operators_8h.html#ad8fdf7967cbf612b2bde11a81db3a3dc", null ],
+    [ "has_byte_operator", "byte__operators_8h.html#a832dc632042184111a0909b51bc3547d", null ],
     [ "make_byte_extract", "byte__operators_8h.html#aae938949b73282792a89ff21cdbd4935", null ],
     [ "make_byte_update", "byte__operators_8h.html#a424b32f665812317348db304c92152e0", null ],
     [ "to_byte_extract_expr", "byte__operators_8h.html#af1763b1e9181575ca253edca181f1a1f", null ],
