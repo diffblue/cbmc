@@ -836,6 +836,33 @@ exprt smt2_parsert::function_application()
             throw error()
               << "unexpected sort given as operand to to_fp_unsigned";
         }
+        else if(id == "fp.to_sbv" || id == "fp.to_ubv")
+        {
+          // These are indexed by the number of bits of the result.
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error() << "expected number after " << id;
+
+          auto width = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error() << "expected ')' after " << id;
+
+          auto op = operands();
+
+          if(op.size() != 2)
+            throw error() << id << " takes two operands";
+
+          if(op[1].type().id() != ID_floatbv)
+            throw error() << id << " takes a FloatingPoint operand";
+
+          if(id == "fp.to_sbv")
+            return typecast_exprt(
+              floatbv_typecast_exprt(op[1], op[0], signedbv_typet(width)),
+              unsignedbv_typet(width));
+          else
+            return floatbv_typecast_exprt(
+              op[1], op[0], unsignedbv_typet(width));
+        }
         else
         {
           throw error() << "unknown indexed identifier '"
