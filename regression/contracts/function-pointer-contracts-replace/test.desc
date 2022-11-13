@@ -1,12 +1,9 @@
 CORE
 main.c
 --replace-call-with-contract foo
-^\[foo.precondition.\d+] line 19 Assert function pointer 'infun' obeys contract 'contract': SUCCESS$
-^\[main.assertion.\d+].* assertion outfun1 == contract: SUCCESS$
-^\[main.assertion.\d+].* assertion outfun2 == contract: SUCCESS$
-^EXIT=0$
+^file main.c line 19 function foo: require_contracts or ensures_contract clauses are not supported$
+^EXIT=6$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 --
 This test checks that, when replacing a call by its contract,
