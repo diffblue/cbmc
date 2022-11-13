@@ -887,6 +887,33 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
         new_expr.operands().erase(new_expr.operands().begin() + i + 1);
         no_change = false;
       }
+      else if(
+        skip_typecast(opi).id() == ID_extractbits &&
+        skip_typecast(opn).id() == ID_extractbits)
+      {
+        const extractbits_exprt &eb_i = to_extractbits_expr(skip_typecast(opi));
+        const extractbits_exprt &eb_n = to_extractbits_expr(skip_typecast(opn));
+
+        if(
+          eb_i.src() == eb_n.src() && eb_i.lower().is_constant() &&
+          eb_n.upper().is_constant() &&
+          numeric_cast_v<mp_integer>(to_constant_expr(eb_i.lower())) ==
+            numeric_cast_v<mp_integer>(to_constant_expr(eb_n.upper())) + 1)
+        {
+          extractbits_exprt eb_merged = eb_i;
+          eb_merged.lower() = eb_n.lower();
+          to_bitvector_type(eb_merged.type())
+            .set_width(
+              to_bitvector_type(eb_i.type()).get_width() +
+              to_bitvector_type(eb_n.type()).get_width());
+          opi = eb_merged;
+          // erase opn
+          new_expr.operands().erase(new_expr.operands().begin() + i + 1);
+          no_change = false;
+        }
+        else
+          ++i;
+      }
       else
         i++;
     }
@@ -1125,17 +1152,37 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
       if(!op_width.has_value() || *op_width <= 0)
         return unchanged(expr);
 
-      if(*start + 1 == offset && *end + *op_width == offset)
+      if(*start < offset && offset <= *end + *op_width)
       {
-        exprt tmp = *it;
-        if(tmp.type() != expr.type())
-          return unchanged(expr);
-
-        return std::move(tmp);
+        extractbits_exprt result = expr;
+        result.src() = *it;
+        result.lower() =
+          from_integer(*end - (offset - *op_width), expr.lower().type());
+        result.upper() =
+          from_integer(*start - (offset - *op_width), expr.upper().type());
+        return changed(simplify_extractbits(result));
       }
 
       offset -= *op_width;
     }
+  }
+  else if(auto eb_src = expr_try_dynamic_cast<extractbits_exprt>(expr.src()))
+  {
+    if(eb_src->upper().is_constant() && eb_src->lower().is_constant())
+    {
+      extractbits_exprt result = *eb_src;
+      result.type() = expr.type();
+      const mp_integer src_lower =
+        numeric_cast_v<mp_integer>(to_constant_expr(eb_src->lower()));
+      result.lower() = from_integer(src_lower + *end, eb_src->lower().type());
+      result.upper() = from_integer(src_lower + *start, eb_src->lower().type());
+      return changed(simplify_extractbits(result));
+    }
+  }
+  else if(*end == 0 && *start + 1 == *width)
+  {
+    typecast_exprt tc{expr.src(), expr.type()};
+    return changed(simplify_typecast(tc));
   }
 
   return unchanged(expr);
