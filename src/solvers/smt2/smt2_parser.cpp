@@ -1305,6 +1305,18 @@ void smt2_parsert::setup_expressions()
     return isnormal_exprt(op[0]);
   };
 
+  expressions["fp.isZero"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isZero takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isZero takes FloatingPoint operand");
+
+    return not_exprt(typecast_exprt(op[0], bool_typet()));
+  };
+
   expressions["fp"] = [this] { return function_application_fp(operands()); };
 
   expressions["fp.add"] = [this] {
