@@ -252,7 +252,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instruments <code>wrapper_function</code> adding assumptions based on requires clauses and assertions based on ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01239">1239</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01222">1222</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -352,7 +352,7 @@ Protected Attributes</h2></td></tr>
 <p>Applies loop contract transformations. </p>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01465">1465</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01448">1448</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -453,7 +453,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01223">1223</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01212">1212</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -475,7 +475,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Throws an exception if some function <code>functions</code> is found in the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01410">1410</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01393">1393</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -633,7 +633,7 @@ Protected Attributes</h2></td></tr>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init.</p>
 <p>Implementation: mangle the name of each function F into a new name, <code>__CPROVER_contracts_original_F</code> (<code>CF</code> for short). Then mint a new function called <code>F</code> that assumes <code>CF</code>'s <code>requires</code> clause, calls <code>CF</code>, and then asserts <code>CF</code>'s <code>ensures</code> clause. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01483">1483</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01466">1466</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -695,7 +695,7 @@ Protected Attributes</h2></td></tr>
 <p>Throws an exception if some <code>to_replace</code> functions are not found.</p>
 <p>Use this function when proving code that calls into an expensive function, <code>F</code>. You can write a contract for F using __CPROVER_requires and __CPROVER_ensures, and then use this function to replace all calls to <code>F</code> with an assertion that the <code>requires</code> clause holds followed by an assumption that the <code>ensures</code> clause holds. In order to ensure that <code>F</code> actually abides by its <code>ensures</code> and <code>requires</code> clauses, you should separately call <code>code_constractst::enforce_contracts()</code> on <code>F</code> and verify it using <code>cbmc --function F</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01425">1425</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01408">1408</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
