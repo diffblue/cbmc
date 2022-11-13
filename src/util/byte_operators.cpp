@@ -57,3 +57,23 @@ make_byte_update(const exprt &_op, const exprt &_offset, const exprt &_value)
   return byte_update_exprt{
     byte_update_id(), _op, _offset, _value, config.ansi_c.char_width};
 }
+
+bool has_byte_operator(const exprt &src)
+{
+  if(
+    src.id() == ID_byte_update_little_endian ||
+    src.id() == ID_byte_update_big_endian ||
+    src.id() == ID_byte_extract_little_endian ||
+    src.id() == ID_byte_extract_big_endian)
+  {
+    return true;
+  }
+
+  for(const auto &op : src.operands())
+  {
+    if(has_byte_operator(op))
+      return true;
+  }
+
+  return false;
+}

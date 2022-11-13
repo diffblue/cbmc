@@ -162,4 +162,8 @@ make_byte_extract(const exprt &_op, const exprt &_offset, const typet &_type);
 byte_update_exprt
 make_byte_update(const exprt &_op, const exprt &_offset, const exprt &_value);
 
+/// Return true iff \p src or one of its operands contain a byte extract or byte
+/// update expression.
+bool has_byte_operator(const exprt &src);
+
 #endif // CPROVER_UTIL_BYTE_OPERATORS_H

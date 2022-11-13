@@ -2483,21 +2483,6 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
   return result;
 }
 
-bool has_byte_operator(const exprt &src)
-{
-  if(src.id()==ID_byte_update_little_endian ||
-     src.id()==ID_byte_update_big_endian ||
-     src.id()==ID_byte_extract_little_endian ||
-     src.id()==ID_byte_extract_big_endian)
-    return true;
-
-  forall_operands(it, src)
-    if(has_byte_operator(*it))
-      return true;
-
-  return false;
-}
-
 exprt lower_byte_operators(const exprt &src, const namespacet &ns)
 {
   exprt tmp=src;

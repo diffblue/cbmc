@@ -41,6 +41,4 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns);
 ///   byte_extract_exprt or \ref byte_update_exprt.
 exprt lower_byte_operators(const exprt &src, const namespacet &ns);
 
-bool has_byte_operator(const exprt &src);
-
 #endif /* CPROVER_SOLVERS_LOWERING_EXPR_LOWERING_H */
