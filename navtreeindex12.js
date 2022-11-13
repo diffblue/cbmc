@@ -1,5 +1,15 @@
 var NAVTREEINDEX12 =
 {
+"classboolbv__mapt.html#a0c10a81abd178aef825c09bd1b8fe399":[5,0,115,10],
+"classboolbv__mapt.html#a4c6ef2a8ace1383fdcdb211bd8ba34b9":[5,0,115,9],
+"classboolbv__mapt.html#a5eebe4f3b24117d49921202b5cbca844":[5,0,115,5],
+"classboolbv__mapt.html#a8084879d6019505537914effe871f67a":[5,0,115,3],
+"classboolbv__mapt.html#a8787341e8ed18b99b1cf44fe0c97eeca":[5,0,115,6],
+"classboolbv__mapt.html#a8be7ca2e30e1784653df172d01a290e2":[5,0,115,7],
+"classboolbv__mapt.html#aa1077bc956a649ace220d4e6417e9f20":[5,0,115,8],
+"classboolbv__mapt.html#aaf6c62345eb09b73eb495c101cc7eb6b":[5,0,115,4],
+"classboolbv__mapt.html#ac01e8b096411895ac905632dadf3dd40":[5,0,115,2],
+"classboolbv__mapt.html#afc6097b333f1b3bb5f6901f6364085d0":[5,0,115,1],
 "classboolbv__mapt_1_1map__entryt.html":[5,0,115,0],
 "classboolbv__mapt_1_1map__entryt.html#a7c24f961ee35d183163a4a8854589c9f":[5,0,115,0,1],
 "classboolbv__mapt_1_1map__entryt.html#ac164851dccd5815049bd3d983fa1cfcf":[5,0,115,0,0],
@@ -239,15 +249,5 @@ var NAVTREEINDEX12 =
 "classbv__pointerst.html#ad5b614797a4c4511cde33d807806a7ba":[5,0,126,7],
 "classbv__pointerst.html#ad66fbf7acb68038f34433277d3a6586a":[5,0,126,17],
 "classbv__pointerst.html#ae674fa38b1681be35f34fec0e69a7a77":[5,0,126,23],
-"classbv__pointerst.html#af7a0d2775487740c970ef0bbacc68e7a":[5,0,126,8],
-"classbv__refinementt.html":[5,0,127],
-"classbv__refinementt.html#a04644ff79d5e61f4e6eeff9549438904":[5,0,127,14],
-"classbv__refinementt.html#a0aa456f76ac9b019671d919650472ce2":[5,0,127,21],
-"classbv__refinementt.html#a256693ae68f821dc8dc0d19c50c0b3f3":[5,0,127,11],
-"classbv__refinementt.html#a38b43be4f39f28b21510efa2e474d12a":[5,0,127,16],
-"classbv__refinementt.html#a4ccf3dd5b1f844a9d996bd3d10c8a209":[5,0,127,3],
-"classbv__refinementt.html#a4ccf7b92a027123494999b5c09b4e1c5":[5,0,127,24],
-"classbv__refinementt.html#a53f0c1cde2baa0398e3520423ba22cb0":[5,0,127,15],
-"classbv__refinementt.html#a56a7b80c83a4f1099d37bde09e93561c":[5,0,127,10],
-"classbv__refinementt.html#a5b1aabf4e79eafd798c83b081694f84d":[5,0,127,4]
+"classbv__pointerst.html#af7a0d2775487740c970ef0bbacc68e7a":[5,0,126,8]
 };

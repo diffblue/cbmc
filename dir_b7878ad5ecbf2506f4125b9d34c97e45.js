@@ -20,7 +20,7 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
       [ "bv_spect", "classbv__spect.html", "classbv__spect" ],
       [ "bv_arithmetict", "classbv__arithmetict.html", "classbv__arithmetict" ]
     ] ],
-    [ "byte_operators.cpp", "util_2byte__operators_8cpp.html", "util_2byte__operators_8cpp" ],
+    [ "byte_operators.cpp", "byte__operators_8cpp.html", "byte__operators_8cpp" ],
     [ "byte_operators.h", "byte__operators_8h.html", "byte__operators_8h" ],
     [ "c_types.cpp", "c__types_8cpp.html", "c__types_8cpp" ],
     [ "c_types.h", "c__types_8h.html", "c__types_8h" ],
@@ -187,6 +187,7 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "lispexpr.h", "lispexpr_8h.html", "lispexpr_8h" ],
     [ "lispirep.cpp", "lispirep_8cpp.html", "lispirep_8cpp" ],
     [ "lispirep.h", "lispirep_8h.html", "lispirep_8h" ],
+    [ "lower_byte_operators.cpp", "lower__byte__operators_8cpp.html", "lower__byte__operators_8cpp" ],
     [ "magic.h", "magic_8h.html", "magic_8h" ],
     [ "make_unique.h", "make__unique_8h.html", "make__unique_8h" ],
     [ "mathematical_expr.cpp", "mathematical__expr_8cpp.html", "mathematical__expr_8cpp" ],

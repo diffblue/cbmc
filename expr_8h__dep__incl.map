@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/expr.h" name="/home/runner/work/cbmc/cbmc/src/util/expr.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5154,5,5338,47"/>
-<area shape="rect" id="node2" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="15,109,199,151"/>
-<area shape="rect" id="node3" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="7464,332,7694,403"/>
-<area shape="rect" id="node4" href="$array__name_8cpp.html" title=" " alt="" coords="31,228,250,269"/>
-<area shape="rect" id="node5" href="$std__types_8h.html" title=" " alt="" coords="325,228,513,269"/>
-<area shape="rect" id="node6" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="376,109,564,151"/>
-<area shape="rect" id="node7" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="537,213,733,284"/>
-<area shape="rect" id="node8" href="$replace__symbol_8h.html" title=" " alt="" coords="639,102,823,158"/>
-<area shape="rect" id="node9" href="$guard__expr_8h.html" title=" " alt="" coords="847,102,1034,158"/>
-<area shape="rect" id="node10" href="$bdd__expr_8h.html" title="Binary decision diagram." alt="" coords="1058,102,1242,158"/>
-<area shape="rect" id="node11" href="$simplify__utils_8h.html" title=" " alt="" coords="1266,102,1450,158"/>
-<area shape="rect" id="node12" href="$invariant__set_8h.html" title=" " alt="" coords="1474,109,1721,151"/>
-<area shape="rect" id="node13" href="$expr__iterator_8h.html" title=" " alt="" coords="1746,109,1954,151"/>
-<area shape="rect" id="node14" href="$object__numbering_8h.html" title=" " alt="" coords="1978,102,2172,158"/>
-<area shape="rect" id="node15" href="$simplify__expr__class_8h.html" title=" " alt="" coords="2196,102,2380,158"/>
-<area shape="rect" id="node16" href="$anonymous__member_8h.html" title=" " alt="" coords="2405,102,2612,158"/>
-<area shape="rect" id="node17" href="$ansi__c__convert__type_8h.html" title=" " alt="" coords="2636,102,2820,158"/>
-<area shape="rect" id="node18" href="$parser_8h.html" title=" " alt="" coords="2844,109,3028,151"/>
-<area shape="rect" id="node19" href="$convert__character__literal_8h.html" title=" " alt="" coords="3052,102,3252,158"/>
-<area shape="rect" id="node20" href="$convert__float__literal_8h.html" title=" " alt="" coords="3276,102,3460,158"/>
-<area shape="rect" id="node21" href="$convert__integer__literal_8h.html" title=" " alt="" coords="3485,102,3670,158"/>
-<area shape="rect" id="node22" href="$convert__string__literal_8h.html" title=" " alt="" coords="3695,102,3879,158"/>
-<area shape="rect" id="node23" href="$replace__expr_8h.html" title=" " alt="" coords="3903,102,4087,158"/>
-<area shape="rect" id="node24" href="$boolbv_8h.html" title=" " alt="" coords="4112,102,4313,158"/>
-<area shape="rect" id="node25" href="$equality_8h.html" title=" " alt="" coords="4314,221,4516,277"/>
-<area shape="rect" id="node26" href="$prop__conv__solver_8h.html" title=" " alt="" coords="4388,102,4572,158"/>
-<area shape="rect" id="node27" href="$pointer__logic_8h.html" title=" " alt="" coords="4597,102,4798,158"/>
-<area shape="rect" id="node28" href="$cpp__declarator_8h.html" title=" " alt="" coords="4730,228,4953,269"/>
-<area shape="rect" id="node29" href="$cpp__name_8h.html" title=" " alt="" coords="4874,109,5068,151"/>
-<area shape="rect" id="node30" href="$cpp__namespace__spec_8h.html" title=" " alt="" coords="4984,221,5204,277"/>
-<area shape="rect" id="node31" href="$cpp__template__parameter_8h.html" title=" " alt="" coords="5144,102,5348,158"/>
-<area shape="rect" id="node32" href="$cpp__template__args_8h.html" title=" " alt="" coords="5372,102,5576,158"/>
-<area shape="rect" id="node33" href="$template__map_8h.html" title=" " alt="" coords="5432,228,5654,269"/>
-<area shape="rect" id="node34" href="$add__failed__symbols_8h.html" title=" " alt="" coords="5652,102,5845,158"/>
-<area shape="rect" id="node35" href="$cpp__id_8h.html" title=" " alt="" coords="5870,109,6054,151"/>
-<area shape="rect" id="node36" href="$cpp__typecheck__fargs_8h.html" title=" " alt="" coords="6078,102,6290,158"/>
-<area shape="rect" id="node37" href="$cpp__token_8h.html" title=" " alt="" coords="6314,109,6508,151"/>
-<area shape="rect" id="node38" href="$solver_8h.html" title=" " alt="" coords="6532,109,6724,151"/>
-<area shape="rect" id="node39" href="$equality__propagation_8h.html" title=" " alt="" coords="6748,102,6943,158"/>
-<area shape="rect" id="node40" href="$substitute__symbols_8h.html" title=" " alt="" coords="6967,102,7151,158"/>
-<area shape="rect" id="node41" href="$variable__encoding_8h.html" title=" " alt="" coords="7175,102,7370,158"/>
-<area shape="rect" id="node42" href="$object__tracking_8h.html" title=" " alt="" coords="7394,102,7617,158"/>
-<area shape="rect" id="node43" href="$type__size__mapping_8h.html" title=" " alt="" coords="7487,213,7671,284"/>
-<area shape="rect" id="node44" href="$polynomial_8h.html" title=" " alt="" coords="7692,102,7885,158"/>
-<area shape="rect" id="node45" href="$havoc__assigns__clause__targets_8h.html" title=" " alt="" coords="7909,95,8102,165"/>
-<area shape="rect" id="node46" href="$remove__const__function__pointers_8h.html" title=" " alt="" coords="8127,102,8378,158"/>
-<area shape="rect" id="node47" href="$pointer__arithmetic_8h.html" title=" " alt="" coords="8402,102,8586,158"/>
-<area shape="rect" id="node48" href="$printf__formatter_8h.html" title=" " alt="" coords="8610,102,8794,158"/>
-<area shape="rect" id="node49" href="$expr__skeleton_8h.html" title=" " alt="" coords="8818,102,9017,158"/>
-<area shape="rect" id="node50" href="$goto__symex__is__constant_8h.html" title=" " alt="" coords="9041,102,9240,158"/>
-<area shape="rect" id="node51" href="$symex__assign_8h.html" title=" " alt="" coords="9264,102,9478,158"/>
-<area shape="rect" id="node52" href="$json__symbol_8cpp.html" title=" " alt="" coords="9503,102,9703,158"/>
-<area shape="rect" id="node53" href="$language_8cpp.html" title=" " alt="" coords="9727,109,9954,151"/>
-<area shape="rect" id="node54" href="$expr__lowering_8h.html" title=" " alt="" coords="8831,221,9026,277"/>
-<area shape="rect" id="node55" href="$cover__goals_8h.html" title=" " alt="" coords="10028,102,10212,158"/>
-<area shape="rect" id="node56" href="$qdimacs__core_8h.html" title=" " alt="" coords="10236,102,10420,158"/>
-<area shape="rect" id="node57" href="$construct__value__expr__from__smt_8h.html" title=" " alt="" coords="9744,213,9928,284"/>
-<area shape="rect" id="node58" href="$equation__symbol__mapping_8h.html" title=" " alt="" coords="10496,102,10710,158"/>
-<area shape="rect" id="node59" href="$pointer__offset__sum_8h.html" title=" " alt="" coords="10735,102,10919,158"/>
-<area shape="rect" id="node60" href="$ref__expr__set_8h.html" title=" " alt="" coords="10944,109,11150,151"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5316,5,5500,47"/>
+<area shape="rect" id="node2" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="192,109,376,151"/>
+<area shape="rect" id="node4" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="4015,332,4244,403"/>
+<area shape="rect" id="node5" href="$array__name_8cpp.html" title=" " alt="" coords="264,228,483,269"/>
+<area shape="rect" id="node6" href="$std__types_8h.html" title=" " alt="" coords="558,228,746,269"/>
+<area shape="rect" id="node7" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="609,109,797,151"/>
+<area shape="rect" id="node8" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="770,213,966,284"/>
+<area shape="rect" id="node9" href="$replace__symbol_8h.html" title=" " alt="" coords="872,102,1056,158"/>
+<area shape="rect" id="node10" href="$guard__expr_8h.html" title=" " alt="" coords="1080,102,1267,158"/>
+<area shape="rect" id="node11" href="$bdd__expr_8h.html" title="Binary decision diagram." alt="" coords="1291,102,1475,158"/>
+<area shape="rect" id="node12" href="$simplify__utils_8h.html" title=" " alt="" coords="1499,102,1683,158"/>
+<area shape="rect" id="node13" href="$invariant__set_8h.html" title=" " alt="" coords="1707,109,1954,151"/>
+<area shape="rect" id="node14" href="$expr__iterator_8h.html" title=" " alt="" coords="1979,109,2187,151"/>
+<area shape="rect" id="node15" href="$object__numbering_8h.html" title=" " alt="" coords="2211,102,2405,158"/>
+<area shape="rect" id="node16" href="$simplify__expr__class_8h.html" title=" " alt="" coords="2429,102,2613,158"/>
+<area shape="rect" id="node17" href="$anonymous__member_8h.html" title=" " alt="" coords="2638,102,2845,158"/>
+<area shape="rect" id="node18" href="$ansi__c__convert__type_8h.html" title=" " alt="" coords="2869,102,3053,158"/>
+<area shape="rect" id="node19" href="$parser_8h.html" title=" " alt="" coords="3077,109,3261,151"/>
+<area shape="rect" id="node20" href="$convert__character__literal_8h.html" title=" " alt="" coords="3285,102,3485,158"/>
+<area shape="rect" id="node21" href="$convert__float__literal_8h.html" title=" " alt="" coords="3509,102,3693,158"/>
+<area shape="rect" id="node22" href="$convert__integer__literal_8h.html" title=" " alt="" coords="3718,102,3903,158"/>
+<area shape="rect" id="node23" href="$convert__string__literal_8h.html" title=" " alt="" coords="3928,102,4112,158"/>
+<area shape="rect" id="node24" href="$replace__expr_8h.html" title=" " alt="" coords="4136,102,4320,158"/>
+<area shape="rect" id="node25" href="$boolbv_8h.html" title=" " alt="" coords="4345,102,4546,158"/>
+<area shape="rect" id="node26" href="$equality_8h.html" title=" " alt="" coords="4547,221,4749,277"/>
+<area shape="rect" id="node27" href="$prop__conv__solver_8h.html" title=" " alt="" coords="4621,102,4805,158"/>
+<area shape="rect" id="node28" href="$pointer__logic_8h.html" title=" " alt="" coords="4830,102,5031,158"/>
+<area shape="rect" id="node29" href="$cpp__declarator_8h.html" title=" " alt="" coords="4963,228,5186,269"/>
+<area shape="rect" id="node30" href="$cpp__name_8h.html" title=" " alt="" coords="5107,109,5301,151"/>
+<area shape="rect" id="node31" href="$cpp__namespace__spec_8h.html" title=" " alt="" coords="5217,221,5437,277"/>
+<area shape="rect" id="node32" href="$cpp__template__parameter_8h.html" title=" " alt="" coords="5377,102,5581,158"/>
+<area shape="rect" id="node33" href="$cpp__template__args_8h.html" title=" " alt="" coords="5605,102,5809,158"/>
+<area shape="rect" id="node34" href="$template__map_8h.html" title=" " alt="" coords="5665,228,5887,269"/>
+<area shape="rect" id="node35" href="$add__failed__symbols_8h.html" title=" " alt="" coords="5885,102,6078,158"/>
+<area shape="rect" id="node36" href="$cpp__id_8h.html" title=" " alt="" coords="6103,109,6287,151"/>
+<area shape="rect" id="node37" href="$cpp__typecheck__fargs_8h.html" title=" " alt="" coords="6311,102,6523,158"/>
+<area shape="rect" id="node38" href="$cpp__token_8h.html" title=" " alt="" coords="6547,109,6741,151"/>
+<area shape="rect" id="node39" href="$solver_8h.html" title=" " alt="" coords="6765,109,6957,151"/>
+<area shape="rect" id="node40" href="$equality__propagation_8h.html" title=" " alt="" coords="6981,102,7176,158"/>
+<area shape="rect" id="node41" href="$substitute__symbols_8h.html" title=" " alt="" coords="7200,102,7384,158"/>
+<area shape="rect" id="node42" href="$variable__encoding_8h.html" title=" " alt="" coords="7408,102,7603,158"/>
+<area shape="rect" id="node43" href="$object__tracking_8h.html" title=" " alt="" coords="7627,102,7850,158"/>
+<area shape="rect" id="node44" href="$type__size__mapping_8h.html" title=" " alt="" coords="7647,213,7831,284"/>
+<area shape="rect" id="node45" href="$polynomial_8h.html" title=" " alt="" coords="7925,102,8118,158"/>
+<area shape="rect" id="node46" href="$havoc__assigns__clause__targets_8h.html" title=" " alt="" coords="8142,95,8335,165"/>
+<area shape="rect" id="node47" href="$remove__const__function__pointers_8h.html" title=" " alt="" coords="8360,102,8611,158"/>
+<area shape="rect" id="node48" href="$pointer__arithmetic_8h.html" title=" " alt="" coords="8635,102,8819,158"/>
+<area shape="rect" id="node49" href="$printf__formatter_8h.html" title=" " alt="" coords="8843,102,9027,158"/>
+<area shape="rect" id="node50" href="$expr__skeleton_8h.html" title=" " alt="" coords="9051,102,9250,158"/>
+<area shape="rect" id="node51" href="$goto__symex__is__constant_8h.html" title=" " alt="" coords="9274,102,9473,158"/>
+<area shape="rect" id="node52" href="$symex__assign_8h.html" title=" " alt="" coords="9497,102,9711,158"/>
+<area shape="rect" id="node53" href="$json__symbol_8cpp.html" title=" " alt="" coords="9736,102,9936,158"/>
+<area shape="rect" id="node54" href="$language_8cpp.html" title=" " alt="" coords="9960,109,10187,151"/>
+<area shape="rect" id="node55" href="$cover__goals_8h.html" title=" " alt="" coords="10211,102,10395,158"/>
+<area shape="rect" id="node56" href="$qdimacs__core_8h.html" title=" " alt="" coords="10419,102,10603,158"/>
+<area shape="rect" id="node57" href="$construct__value__expr__from__smt_8h.html" title=" " alt="" coords="9201,213,9385,284"/>
+<area shape="rect" id="node58" href="$equation__symbol__mapping_8h.html" title=" " alt="" coords="10678,102,10893,158"/>
+<area shape="rect" id="node59" href="$pointer__offset__sum_8h.html" title=" " alt="" coords="10917,102,11101,158"/>
+<area shape="rect" id="node60" href="$ref__expr__set_8h.html" title=" " alt="" coords="11126,109,11333,151"/>
+<area shape="rect" id="node3" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="5,221,189,277"/>
 </map>

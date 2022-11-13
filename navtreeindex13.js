@@ -1,5 +1,15 @@
 var NAVTREEINDEX13 =
 {
+"classbv__refinementt.html":[5,0,127],
+"classbv__refinementt.html#a04644ff79d5e61f4e6eeff9549438904":[5,0,127,14],
+"classbv__refinementt.html#a0aa456f76ac9b019671d919650472ce2":[5,0,127,21],
+"classbv__refinementt.html#a256693ae68f821dc8dc0d19c50c0b3f3":[5,0,127,11],
+"classbv__refinementt.html#a38b43be4f39f28b21510efa2e474d12a":[5,0,127,16],
+"classbv__refinementt.html#a4ccf3dd5b1f844a9d996bd3d10c8a209":[5,0,127,3],
+"classbv__refinementt.html#a4ccf7b92a027123494999b5c09b4e1c5":[5,0,127,24],
+"classbv__refinementt.html#a53f0c1cde2baa0398e3520423ba22cb0":[5,0,127,15],
+"classbv__refinementt.html#a56a7b80c83a4f1099d37bde09e93561c":[5,0,127,10],
+"classbv__refinementt.html#a5b1aabf4e79eafd798c83b081694f84d":[5,0,127,4],
 "classbv__refinementt.html#a6874895d94890ba1471e7d6a5f0b0090":[5,0,127,7],
 "classbv__refinementt.html#a6c6a18794a7f4c539c1c9c88bcce8ece":[5,0,127,6],
 "classbv__refinementt.html#a6d838ac824927ac491705f3ed3fd09a6":[5,0,127,23],
@@ -239,15 +249,5 @@ var NAVTREEINDEX13 =
 "classc__typecastt.html#afd908af421d6388c6cc9612f31973929":[5,0,144,12],
 "classc__typecheck__baset.html":[5,0,145],
 "classc__typecheck__baset.html#a004bee106693ec327b9ffad66929542c":[5,0,145,17],
-"classc__typecheck__baset.html#a014c5f60b266915757c26374e7003946":[5,0,145,76],
-"classc__typecheck__baset.html#a0294d36b42040808703a7279ed41f839":[5,0,145,24],
-"classc__typecheck__baset.html#a02f1a47f2b8db323d4821ade079357d2":[5,0,145,48],
-"classc__typecheck__baset.html#a0348583dd54b206968318d2dbd40cccd":[5,0,145,134],
-"classc__typecheck__baset.html#a04ff210b2217b41a57d52ba1b36c8c4d":[5,0,145,36],
-"classc__typecheck__baset.html#a05bb93fe5472b8fbd0e590ff570868a3":[5,0,145,18],
-"classc__typecheck__baset.html#a05e157cfcaf3396341bccbc967e7cb2c":[5,0,145,10],
-"classc__typecheck__baset.html#a0619e6c4c4a8bc4d4f0c87968560ebef":[5,0,145,135],
-"classc__typecheck__baset.html#a06fa57b618c1c6129cbb2791b19f4574":[5,0,145,55],
-"classc__typecheck__baset.html#a0bfb864d97067a7f1c8bc041ca1715b7":[5,0,145,65],
-"classc__typecheck__baset.html#a0bfd71fad97aaa0052f5ce5dc1028de6":[5,0,145,31]
+"classc__typecheck__baset.html#a014c5f60b266915757c26374e7003946":[5,0,145,76]
 };

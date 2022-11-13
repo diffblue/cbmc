@@ -106,111 +106,107 @@ $(document).ready(function(){initNavTree('boolbv__byte__update_8cpp_source.html'
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="byte__operators_8h.html">util/byte_operators.h</a>&gt;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="src_2util_2invariant_8h.html">util/invariant.h</a>&gt;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="expr__lowering_8h.html">solvers/lowering/expr_lowering.h</a>&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00">   17</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00">boolbvt::convert_byte_update</a>(<span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;expr)</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;{</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="comment">// if we update (from) an unbounded array, lower the expression as the array</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="comment">// logic does not handle byte operators</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="classboolbvt.html#a41b09c6669f8dff27a80583b335fd212">is_unbounded_array</a>(expr.<a class="code" href="classbyte__update__exprt.html#abc0fd4257fb62d1bbee9b259278bd164">op</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()) ||</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="classboolbvt.html#a41b09c6669f8dff27a80583b335fd212">is_unbounded_array</a>(expr.<a class="code" href="classbyte__update__exprt.html#a6f086c89f073dba2c06dc4eb36188322">value</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()))</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(<a class="code" href="solvers_2lowering_2byte__operators_8cpp.html#ae47d5791744dda8efbc28b9b35c3df83">lower_byte_update</a>(expr, <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>));</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  }</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op = expr.<a class="code" href="classbyte__update__exprt.html#abc0fd4257fb62d1bbee9b259278bd164">op</a>();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;offset_expr=expr.<a class="code" href="classbyte__update__exprt.html#ac5cf5fc652c20594d26f0aeed2efc0b4">offset</a>();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value=expr.<a class="code" href="classbyte__update__exprt.html#a6f086c89f073dba2c06dc4eb36188322">value</a>();</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_update_little_endian ||</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_update_big_endian);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> little_endian = expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_update_little_endian;</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00">   15</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00">boolbvt::convert_byte_update</a>(<span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;expr)</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;{</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="comment">// if we update (from) an unbounded array, lower the expression as the array</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="comment">// logic does not handle byte operators</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <a class="code" href="classboolbvt.html#a41b09c6669f8dff27a80583b335fd212">is_unbounded_array</a>(expr.<a class="code" href="classbyte__update__exprt.html#abc0fd4257fb62d1bbee9b259278bd164">op</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()) ||</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="classboolbvt.html#a41b09c6669f8dff27a80583b335fd212">is_unbounded_array</a>(expr.<a class="code" href="classbyte__update__exprt.html#a6f086c89f073dba2c06dc4eb36188322">value</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()))</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(<a class="code" href="byte__operators_8h.html#a8e6c2cedefd8cfcf7af0d6f841a30ab7">lower_byte_update</a>(expr, <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>));</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  }</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op = expr.<a class="code" href="classbyte__update__exprt.html#abc0fd4257fb62d1bbee9b259278bd164">op</a>();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;offset_expr=expr.<a class="code" href="classbyte__update__exprt.html#ac5cf5fc652c20594d26f0aeed2efc0b4">offset</a>();</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value=expr.<a class="code" href="classbyte__update__exprt.html#a6f086c89f073dba2c06dc4eb36188322">value</a>();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_update_little_endian ||</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_update_big_endian);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> little_endian = expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_update_little_endian;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv=<a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(op);</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv=<a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(op);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;value_bv=<a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(value);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  std::size_t update_width=value_bv.size();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  std::size_t byte_width = expr.<a class="code" href="classbyte__update__exprt.html#adbc3fcb92f0f2710696ba57ecebf3600">get_bits_per_byte</a>();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">if</span>(update_width&gt;bv.size())</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    update_width=bv.size();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;value_bv=<a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(value);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  std::size_t update_width=value_bv.size();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  std::size_t byte_width = expr.<a class="code" href="classbyte__update__exprt.html#adbc3fcb92f0f2710696ba57ecebf3600">get_bits_per_byte</a>();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">if</span>(update_width&gt;bv.size())</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    update_width=bv.size();</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="comment">// see if the byte number is constant</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="comment">// see if the byte number is constant</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> index = numeric_cast&lt;mp_integer&gt;(offset_expr);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordflow">if</span>(index.has_value())</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// yes!</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> offset = *index * byte_width;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">if</span>(offset+update_width&gt;<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>(bv.size()) || offset&lt;0)</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="comment">// out of bounds</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_op = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(op.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_value = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(value.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> index = numeric_cast&lt;mp_integer&gt;(offset_expr);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordflow">if</span>(index.has_value())</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">// yes!</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> offset = *index * byte_width;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordflow">if</span>(offset+update_width&gt;<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>(bv.size()) || offset&lt;0)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <span class="comment">// out of bounds</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    {</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_op = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(op.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_value = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(value.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keyword">const</span> std::size_t offset_i = numeric_cast_v&lt;std::size_t&gt;(offset);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      <span class="keyword">const</span> std::size_t offset_i = numeric_cast_v&lt;std::size_t&gt;(offset);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; update_width; i++)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordtype">size_t</span> index_op = map_op.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(offset_i + i);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordtype">size_t</span> index_value = map_value.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(i);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; update_width; i++)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordtype">size_t</span> index_op = map_op.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(offset_i + i);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordtype">size_t</span> index_value = map_value.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(i);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;          index_op &lt; bv.size(), <span class="stringliteral">&quot;bit vector index shall be within bounds&quot;</span>);</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          index_op &lt; bv.size(), <span class="stringliteral">&quot;bit vector index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;          index_value &lt; value_bv.size(),</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;          <span class="stringliteral">&quot;bit vector index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        bv[index_op] = value_bv[index_value];</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">return</span> bv;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="comment">// byte_update with variable index</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordflow">for</span>(std::size_t offset=0; offset&lt;bv.size(); offset+=byte_width)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="comment">// index condition</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classequal__exprt.html">equal_exprt</a> <a class="code" href="classequalityt.html#ad5b574d434385c2ff031da9ad2e10ef4">equality</a>(</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      offset_expr, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(offset / byte_width, offset_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> equal=<a class="code" href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">convert</a>(<a class="code" href="classequalityt.html#ad5b574d434385c2ff031da9ad2e10ef4">equality</a>);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_op = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(op.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_value = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(value.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">for</span>(std::size_t bit=0; bit&lt;update_width; bit++)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">if</span>(offset+bit&lt;bv.size())</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        std::size_t bv_o=map_op.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(offset+bit);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        std::size_t value_bv_o=map_value.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(bit);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        bv[bv_o]=<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#a4de2b26ac13f43030627a89d8d53970c">lselect</a>(equal, value_bv[value_bv_o], bv[bv_o]);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  }</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keywordflow">return</span> bv;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          index_value &lt; value_bv.size(),</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;          <span class="stringliteral">&quot;bit vector index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        bv[index_op] = value_bv[index_value];</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">return</span> bv;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// byte_update with variable index</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">for</span>(std::size_t offset=0; offset&lt;bv.size(); offset+=byte_width)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="comment">// index condition</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="code" href="classequal__exprt.html">equal_exprt</a> <a class="code" href="classequalityt.html#ad5b574d434385c2ff031da9ad2e10ef4">equality</a>(</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      offset_expr, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(offset / byte_width, offset_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> equal=<a class="code" href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">convert</a>(<a class="code" href="classequalityt.html#ad5b574d434385c2ff031da9ad2e10ef4">equality</a>);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_op = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(op.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classendianness__mapt.html">endianness_mapt</a> map_value = <a class="code" href="classboolbvt.html#acba172f67186256da0af9735ef1c8670">endianness_map</a>(value.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), little_endian);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">for</span>(std::size_t bit=0; bit&lt;update_width; bit++)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keywordflow">if</span>(offset+bit&lt;bv.size())</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      {</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        std::size_t bv_o=map_op.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(offset+bit);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        std::size_t value_bv_o=map_value.<a class="code" href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">map_bit</a>(bit);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        bv[bv_o]=<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#a4de2b26ac13f43030627a89d8d53970c">lselect</a>(equal, value_bv[value_bv_o], bv[bv_o]);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  }</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keywordflow">return</span> bv;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
-<div class="ttc" id="aclassboolbvt_html_a7e29eaada26edd6b5f2ead47e4ecac00"><div class="ttname"><a href="classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00">boolbvt::convert_byte_update</a></div><div class="ttdeci">virtual bvt convert_byte_update(const byte_update_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__byte__update_8cpp_source.html#l00017">boolbv_byte_update.cpp:17</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_a7e29eaada26edd6b5f2ead47e4ecac00"><div class="ttname"><a href="classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00">boolbvt::convert_byte_update</a></div><div class="ttdeci">virtual bvt convert_byte_update(const byte_update_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__byte__update_8cpp_source.html#l00015">boolbv_byte_update.cpp:15</a></div></div>
 <div class="ttc" id="aclassbyte__update__exprt_html"><div class="ttname"><a href="classbyte__update__exprt.html">byte_update_exprt</a></div><div class="ttdoc">Expression corresponding to op() where the bytes starting at position offset (given in number of byte...</div><div class="ttdef"><b>Definition:</b> <a href="byte__operators_8h_source.html#l00090">byte_operators.h:90</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_a41b09c6669f8dff27a80583b335fd212"><div class="ttname"><a href="classboolbvt.html#a41b09c6669f8dff27a80583b335fd212">boolbvt::is_unbounded_array</a></div><div class="ttdeci">bool is_unbounded_array(const typet &amp;type) const override</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8cpp_source.html#l00518">boolbv.cpp:518</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="aclassbyte__update__exprt_html_ac5cf5fc652c20594d26f0aeed2efc0b4"><div class="ttname"><a href="classbyte__update__exprt.html#ac5cf5fc652c20594d26f0aeed2efc0b4">byte_update_exprt::offset</a></div><div class="ttdeci">const exprt &amp; offset() const</div><div class="ttdef"><b>Definition:</b> <a href="byte__operators_8h_source.html#l00122">byte_operators.h:122</a></div></div>
-<div class="ttc" id="asolvers_2lowering_2byte__operators_8cpp_html_ae47d5791744dda8efbc28b9b35c3df83"><div class="ttname"><a href="solvers_2lowering_2byte__operators_8cpp.html#ae47d5791744dda8efbc28b9b35c3df83">lower_byte_update</a></div><div class="ttdeci">static exprt lower_byte_update(const byte_update_exprt &amp;src, const exprt &amp;value_as_byte_array, const optionalt&lt; exprt &gt; &amp;non_const_update_bound, const namespacet &amp;ns)</div><div class="ttdoc">Apply a byte update src using the byte array value_as_byte_array as update value.</div><div class="ttdef"><b>Definition:</b> <a href="solvers_2lowering_2byte__operators_8cpp_source.html#l02167">byte_operators.cpp:2167</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
 <div class="ttc" id="aclassequal__exprt_html"><div class="ttname"><a href="classequal__exprt.html">equal_exprt</a></div><div class="ttdoc">Equality.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01305">std_expr.h:1305</a></div></div>
-<div class="ttc" id="aexpr__lowering_8h_html"><div class="ttname"><a href="expr__lowering_8h.html">expr_lowering.h</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
 <div class="ttc" id="abyte__operators_8h_html"><div class="ttname"><a href="byte__operators_8h.html">byte_operators.h</a></div><div class="ttdoc">Expression classes for byte-level operators.</div></div>
 <div class="ttc" id="aclassboolbvt_html_a9defaf85fe63872f900b1abb38275de8"><div class="ttname"><a href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">boolbvt::convert_bv</a></div><div class="ttdeci">virtual const bvt &amp; convert_bv(const exprt &amp;expr, const optionalt&lt; std::size_t &gt; expected_width={})</div><div class="ttdoc">Convert expression to vector of literalts, using an internal cache to speed up conversion if availabl...</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8cpp_source.html#l00039">boolbv.cpp:39</a></div></div>
@@ -219,6 +215,7 @@ $(document).ready(function(){initNavTree('boolbv__byte__update_8cpp_source.html'
 <div class="ttc" id="aclassendianness__mapt_html_abef0b5a4dd9c3b3c65592bfa022e56e6"><div class="ttname"><a href="classendianness__mapt.html#abef0b5a4dd9c3b3c65592bfa022e56e6">endianness_mapt::map_bit</a></div><div class="ttdeci">size_t map_bit(size_t bit) const</div><div class="ttdef"><b>Definition:</b> <a href="endianness__map_8h_source.html#l00047">endianness_map.h:47</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassprop__conv__solvert_html_aa7c020022f38d6901df99ce3e1eff5dc"><div class="ttname"><a href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">prop_conv_solvert::convert</a></div><div class="ttdeci">literalt convert(const exprt &amp;expr) override</div><div class="ttdoc">Convert a Boolean expression and return the corresponding literal.</div><div class="ttdef"><b>Definition:</b> <a href="prop__conv__solver_8cpp_source.html#l00156">prop_conv_solver.cpp:156</a></div></div>
+<div class="ttc" id="abyte__operators_8h_html_a8e6c2cedefd8cfcf7af0d6f841a30ab7"><div class="ttname"><a href="byte__operators_8h.html#a8e6c2cedefd8cfcf7af0d6f841a30ab7">lower_byte_update</a></div><div class="ttdeci">exprt lower_byte_update(const byte_update_exprt &amp;src, const namespacet &amp;ns)</div><div class="ttdoc">Rewrite a byte update expression to more fundamental operations.</div><div class="ttdef"><b>Definition:</b> <a href="lower__byte__operators_8cpp_source.html#l02407">lower_byte_operators.cpp:2407</a></div></div>
 <div class="ttc" id="aclassbyte__update__exprt_html_a6f086c89f073dba2c06dc4eb36188322"><div class="ttname"><a href="classbyte__update__exprt.html#a6f086c89f073dba2c06dc4eb36188322">byte_update_exprt::value</a></div><div class="ttdeci">const exprt &amp; value() const</div><div class="ttdef"><b>Definition:</b> <a href="byte__operators_8h_source.html#l00123">byte_operators.h:123</a></div></div>
 <div class="ttc" id="aclassbyte__update__exprt_html_adbc3fcb92f0f2710696ba57ecebf3600"><div class="ttname"><a href="classbyte__update__exprt.html#adbc3fcb92f0f2710696ba57ecebf3600">byte_update_exprt::get_bits_per_byte</a></div><div class="ttdeci">std::size_t get_bits_per_byte() const</div><div class="ttdef"><b>Definition:</b> <a href="byte__operators_8h_source.html#l00125">byte_operators.h:125</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>

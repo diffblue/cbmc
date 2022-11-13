@@ -427,7 +427,7 @@ var searchData=
   ['adjust_5fobject_5ftype_5frec_5130',['adjust_object_type_rec',['../classlinkingt.html#a39b7d6bd9b1e28215532f86fd76bd7ca',1,'linkingt']]],
   ['adjust_5ftype_5fif_5fnecessary_5131',['adjust_type_if_necessary',['../lambda__synthesis_8cpp.html#aa85986602d399db6ed9dde4f8a2b25a1',1,'lambda_synthesis.cpp']]],
   ['adjust_5ftype_5finfot_5132',['adjust_type_infot',['../structlinkingt_1_1adjust__type__infot.html',1,'linkingt::adjust_type_infot'],['../structlinkingt_1_1adjust__type__infot.html#a3d1ad83ac28c34921bbe78e59eb032e3',1,'linkingt::adjust_type_infot::adjust_type_infot()']]],
-  ['adjust_5fwidth_5133',['adjust_width',['../solvers_2lowering_2byte__operators_8cpp.html#a3a8e76527203aeab7d5b219949f785a1',1,'byte_operators.cpp']]],
+  ['adjust_5fwidth_5133',['adjust_width',['../lower__byte__operators_8cpp.html#a3a8e76527203aeab7d5b219949f785a1',1,'lower_byte_operators.cpp']]],
   ['adler_5134',['adler',['../structmz__stream__s.html#a24c6cf42b5b6a655f4664dd15203dce7',1,'mz_stream_s']]],
   ['adler32_5135',['adler32',['../miniz_8h.html#a88899508e9a73aad5db1854cd1cc87d7',1,'miniz.h']]],
   ['advance_5136',['advance',['../classdense__integer__mapt_1_1iterator__templatet.html#af5822010c126c7950b1852aaaa818191',1,'dense_integer_mapt::iterator_templatet']]],

@@ -113,7 +113,7 @@ $(document).ready(function(){initNavTree('byte__operators_8h.html',''); initResi
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="byte__operators_8h__dep__incl.svg" width="9494" height="408"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="byte__operators_8h__dep__incl.svg" width="9814" height="408"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -155,6 +155,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a832dc632042184111a0909b51bc3547d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="byte__operators_8h.html#a832dc632042184111a0909b51bc3547d">has_byte_operator</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src)</td></tr>
 <tr class="memdesc:a832dc632042184111a0909b51bc3547d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true iff <code>src</code> or one of its operands contain a byte extract or byte update expression.  <a href="byte__operators_8h.html#a832dc632042184111a0909b51bc3547d">More...</a><br /></td></tr>
 <tr class="separator:a832dc632042184111a0909b51bc3547d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2617c89da4cf231d07a0f9b4b67cd126"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="byte__operators_8h.html#a2617c89da4cf231d07a0f9b4b67cd126">lower_byte_extract</a> (const <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;src, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a2617c89da4cf231d07a0f9b4b67cd126"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a byte extract expression to more fundamental operations.  <a href="byte__operators_8h.html#a2617c89da4cf231d07a0f9b4b67cd126">More...</a><br /></td></tr>
+<tr class="separator:a2617c89da4cf231d07a0f9b4b67cd126"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e6c2cedefd8cfcf7af0d6f841a30ab7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="byte__operators_8h.html#a8e6c2cedefd8cfcf7af0d6f841a30ab7">lower_byte_update</a> (const <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a8e6c2cedefd8cfcf7af0d6f841a30ab7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite a byte update expression to more fundamental operations.  <a href="byte__operators_8h.html#a8e6c2cedefd8cfcf7af0d6f841a30ab7">More...</a><br /></td></tr>
+<tr class="separator:a8e6c2cedefd8cfcf7af0d6f841a30ab7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93c60391ab50d0492973de726b71a1e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="byte__operators_8h.html#a93c60391ab50d0492973de726b71a1e3">lower_byte_operators</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a93c60391ab50d0492973de726b71a1e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrite an expression possibly containing byte-extract or -update expressions to more fundamental operations.  <a href="byte__operators_8h.html#a93c60391ab50d0492973de726b71a1e3">More...</a><br /></td></tr>
+<tr class="separator:a93c60391ab50d0492973de726b71a1e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Expression classes for byte-level operators. </p>
@@ -241,7 +250,128 @@ template&lt;&gt; </div>
 
 <p>Return true iff <code>src</code> or one of its operands contain a byte extract or byte update expression. </p>
 
-<p class="definition">Definition at line <a class="el" href="util_2byte__operators_8cpp_source.html#l00061">61</a> of file <a class="el" href="util_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8cpp_source.html#l00061">61</a> of file <a class="el" href="byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2617c89da4cf231d07a0f9b4b67cd126"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2617c89da4cf231d07a0f9b4b67cd126">&#9670;&nbsp;</a></span>lower_byte_extract()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> lower_byte_extract </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rewrite a byte extract expression to more fundamental operations. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src</td><td>Byte extract expression </td></tr>
+    <tr><td class="paramname">ns</td><td>Namespace </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Semantically equivalent expression such that the top-level expression no longer is a <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> or <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a>. Use <a class="el" href="lower__byte__operators_8cpp.html#a93c60391ab50d0492973de726b71a1e3">lower_byte_operators</a> to also remove all byte operators from any operands of <code>src</code>.</dd></dl>
+<p>Rewrite a byte extract expression to more fundamental operations. </p>
+
+<p class="definition">Definition at line <a class="el" href="lower__byte__operators_8cpp_source.html#l01169">1169</a> of file <a class="el" href="lower__byte__operators_8cpp_source.html">lower_byte_operators.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a93c60391ab50d0492973de726b71a1e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93c60391ab50d0492973de726b71a1e3">&#9670;&nbsp;</a></span>lower_byte_operators()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> lower_byte_operators </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rewrite an expression possibly containing byte-extract or -update expressions to more fundamental operations. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src</td><td>Input expression </td></tr>
+    <tr><td class="paramname">ns</td><td>Namespace </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Semantically equivalent expression that does not contain any <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> or <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="lower__byte__operators_8cpp_source.html#l02501">2501</a> of file <a class="el" href="lower__byte__operators_8cpp_source.html">lower_byte_operators.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a8e6c2cedefd8cfcf7af0d6f841a30ab7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e6c2cedefd8cfcf7af0d6f841a30ab7">&#9670;&nbsp;</a></span>lower_byte_update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> lower_byte_update </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rewrite a byte update expression to more fundamental operations. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src</td><td>Byte update expression </td></tr>
+    <tr><td class="paramname">ns</td><td>Namespace </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Semantically equivalent expression such that the top-level expression no longer is a <a class="el" href="classbyte__extract__exprt.html">byte_extract_exprt</a> or <a class="el" href="classbyte__update__exprt.html">byte_update_exprt</a>. Use <a class="el" href="lower__byte__operators_8cpp.html#a93c60391ab50d0492973de726b71a1e3">lower_byte_operators</a> to also remove all byte operators from any operands of <code>src</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="lower__byte__operators_8cpp_source.html#l02407">2407</a> of file <a class="el" href="lower__byte__operators_8cpp_source.html">lower_byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +409,7 @@ template&lt;&gt; </div>
 
 <p>Construct a <a class="el" href="classbyte__extract__exprt.html" title="Expression of type type extracted from some object op starting at position offset (given in number of...">byte_extract_exprt</a> with endianness and byte width matching the current configuration. </p>
 
-<p class="definition">Definition at line <a class="el" href="util_2byte__operators_8cpp_source.html#l00048">48</a> of file <a class="el" href="util_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8cpp_source.html#l00048">48</a> of file <a class="el" href="byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>
@@ -317,7 +447,7 @@ template&lt;&gt; </div>
 
 <p>Construct a <a class="el" href="classbyte__update__exprt.html" title="Expression corresponding to op() where the bytes starting at position offset (given in number of byte...">byte_update_exprt</a> with endianness and byte width matching the current configuration. </p>
 
-<p class="definition">Definition at line <a class="el" href="util_2byte__operators_8cpp_source.html#l00055">55</a> of file <a class="el" href="util_2byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="byte__operators_8cpp_source.html#l00055">55</a> of file <a class="el" href="byte__operators_8cpp_source.html">byte_operators.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,15 @@
 var NAVTREEINDEX55 =
 {
+"classrw__range__sett.html#af5b2ab26cb3228b6ac30086cfea9866b":[5,0,971,1],
+"classrw__range__sett.html#af5b2ab26cb3228b6ac30086cfea9866ba3466fab4975481651940ed328aa990e4":[5,0,971,1,1],
+"classrw__range__sett.html#af5b2ab26cb3228b6ac30086cfea9866bab0fd672e9591bf9401e3daa9aac90c03":[5,0,971,1,0],
+"classrw__range__sett.html#af75db4108fe202564575cb4a12a62d5e":[5,0,971,7],
+"classrw__set__baset.html":[5,0,972],
+"classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f":[5,0,972,14],
+"classrw__set__baset.html#a21175c179c5ef55cc7a4e7bad7995c30":[5,0,972,7],
+"classrw__set__baset.html#a2d6fbb6c81f6c054a9b1efe6d3d50886":[5,0,972,6],
+"classrw__set__baset.html#a312d58d6e58bc9b243809caed82dfcac":[5,0,972,5],
+"classrw__set__baset.html#a414392c009609c9629cfcc29bf15d7c8":[5,0,972,4],
 "classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1":[5,0,972,12],
 "classrw__set__baset.html#a8ff02b03363a9fac3469fa6e11cc9d50":[5,0,972,2],
 "classrw__set__baset.html#a96ca77aacd5e945e480586ef53eee3e7":[5,0,972,1],
@@ -239,15 +249,5 @@ var NAVTREEINDEX55 =
 "classsaturating__minus__exprt.html":[5,0,999],
 "classsaturating__minus__exprt.html#a797daaf43a263b291d48b4fbbb92d6ba":[5,0,999,0],
 "classsaturating__plus__exprt.html":[5,0,1000],
-"classsaturating__plus__exprt.html#a21a5fe8b9a132460dc554ba6f2c555a4":[5,0,1000,1],
-"classsaturating__plus__exprt.html#a2e0abc74ce0ab790a748c82e57e78cae":[5,0,1000,0],
-"classsave__scopet.html":[5,0,1001],
-"classsave__scopet.html#a018e015c8afdf97194fb6d306ef50fb8":[5,0,1001,2],
-"classsave__scopet.html#a0c80a277d48f9f5eccb6df79b9869502":[5,0,1001,3],
-"classsave__scopet.html#a17ca16a2747c001b105bd9756af6b712":[5,0,1001,0],
-"classsave__scopet.html#acc9020a79cac9dd70e3a42e865a258c8":[5,0,1001,1],
-"classscratch__programt.html":[5,0,1003],
-"classscratch__programt.html#a00b26b99d120a4577682d7e284dcaf60":[5,0,1003,0],
-"classscratch__programt.html#a0bc3676a4da9a95eb8de8408caf14f3e":[5,0,1003,15],
-"classscratch__programt.html#a1581ae3acac69434a700ca9f1ff680ff":[5,0,1003,8]
+"classsaturating__plus__exprt.html#a21a5fe8b9a132460dc554ba6f2c555a4":[5,0,1000,1]
 };
