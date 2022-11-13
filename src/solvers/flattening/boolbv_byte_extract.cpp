@@ -14,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 
-#include <solvers/lowering/expr_lowering.h>
-
 bvt map_bv(const endianness_mapt &map, const bvt &src)
 {
   PRECONDITION(map.number_of_bits() == src.size());

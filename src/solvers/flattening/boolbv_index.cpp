@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
-#include <solvers/lowering/expr_lowering.h>
-
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
   const exprt &array=expr.array();

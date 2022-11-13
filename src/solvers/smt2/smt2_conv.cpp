@@ -38,7 +38,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
 #include <solvers/floatbv/float_bv.h>
-#include <solvers/lowering/expr_lowering.h>
 #include <solvers/prop/literal_expr.h>
 
 #include "smt2_tokenizer.h"
