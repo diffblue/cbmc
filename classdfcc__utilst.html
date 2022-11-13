@@ -262,7 +262,7 @@ Protected Attributes</h2></td></tr>
 <p>Adds a parameter with given <code>base_name</code> and <code>type</code> to the given <code>function_id</code>. </p>
 <p>Both the symbol and the goto_function are updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00228">228</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00230">230</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -294,7 +294,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds the given symbol as parameter to the given <a class="el" href="classcode__typet.html" title="Base type of functions.">code_typet</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00205">205</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00207">207</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -327,7 +327,7 @@ Protected Attributes</h2></td></tr>
 <p>Adds the given symbol as parameter to the function symbol's code_type. </p>
 <p>Also adds the corresponding parameter to its goto_function if it exists in the function map of the goto model. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00215">215</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00217">217</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -366,7 +366,7 @@ Protected Attributes</h2></td></tr>
 <p>Creates a new function symbol and and goto_function entry in the <code>goto_functions_map</code> by cloning the given <code>function_id</code>. </p>
 <p>The cloned function symbol has <code>new_function_id</code> as name The cloned parameters symbols have <code>new_function_id::name</code> as name Returns the new function symbol </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00334">334</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00336">336</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -428,7 +428,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the new function symbol </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00239">239</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00241">241</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -490,7 +490,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Clones the old_params into the new_params list, applying the trans_param function to generate the names of the cloned params. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00287">287</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00289">289</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -511,7 +511,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Regenerates the CPROVER_INITIALIZE function which defines all global statics of the goto model. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00141">141</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00143">143</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -549,7 +549,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Creates a new parameter symbol for the given function_id. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00186">186</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00188">188</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -618,7 +618,7 @@ Protected Attributes</h2></td></tr>
 <p>Adds a new static symbol named <code>prefix::base_name</code> of type <code>type</code> with value <code>initial_value</code> in the symbol table, returns the created symbol. </p>
 <p>If a symbol of the same name already exists the name will be decorated with a unique suffix. By default the symbol is be protected against nondet initialisation by tagging the its value field with a ID_C_no_nondet_initialization attribute as understood by <a class="el" href="nondet__static_8h.html#a3779909dc5d3b2f94bd137c9f0ae5350">nondet_static</a>. This is because the static instrumentation variables are meant to keep their initial values for the instrumentation to work as intended. To allow nondet-initialisation of the symbol, just set <code>no_nondet_initialization</code> to <code>false</code> when calling the method. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00112">112</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00113">113</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -703,7 +703,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Creates names for anonymous parameters and declares them in the symbol table if needed (using goto_convert requires all function parameters to have names). </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00157">157</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00159">159</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -786,7 +786,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>True iff <code>function_id</code> is loop free. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00520">520</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00522">522</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -816,7 +816,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00538">538</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00540">540</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -838,7 +838,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Inlines the given function, aborts on recursive calls during inlining. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00466">466</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00468">468</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -888,7 +888,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Inlines the given function, and returns function symbols that caused warnings. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00488">488</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00490">490</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -910,7 +910,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns the expression <code>&amp;expr[0]</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00458">458</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00460">460</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -932,7 +932,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns the expression <code>expr == NULL</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00439">439</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00441">441</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -954,7 +954,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns the expression <code>sizeof(expr)</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00444">444</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00446">446</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -986,7 +986,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Sets the given hide flag on all instructions of the function if it exists. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00526">526</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00528">528</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1063,7 +1063,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- fragment --><p>Any other goto_function calling <code>foo</code> still calls <code>foo</code> which has become a wrapper for <code>wrapped_foo</code>.</p>
 <p>By generating a new body for <code>foo</code>, one can implement contract checking logic, contract replacement logic, etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00357">357</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00359">359</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
