@@ -43,6 +43,15 @@ void propagate(
 
   for(const auto &implication : f.implications)
   {
+    if(verbose)
+    {
+      std::cout << consolet::green;
+      std::cout << 'C' << consolet::faint << std::setw(2) << work.frame.index
+                << consolet::reset << ' ';
+      std::cout << consolet::green << format(implication.as_expr());
+      std::cout << consolet::reset << '\n';
+    }
+
     auto &next_state = implication.rhs.arguments().front();
     auto lambda_expr = lambda_exprt({state_expr()}, work.invariant);
     auto instance = lambda_expr.instantiate({next_state});
