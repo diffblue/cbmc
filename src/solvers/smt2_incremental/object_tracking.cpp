@@ -5,6 +5,8 @@
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -49,6 +51,7 @@ static decision_procedure_objectt make_null_object()
   null_object.unique_id = 0;
   null_object.base_expression = null_pointer_exprt{pointer_type(void_type())};
   null_object.size = from_integer(0, size_type());
+  null_object.is_dynamic = false;
   return null_object;
 }
 
@@ -60,6 +63,7 @@ static decision_procedure_objectt make_invalid_pointer_object()
   invalid_pointer_object.unique_id = 1;
   invalid_pointer_object.base_expression = make_invalid_pointer_expr();
   invalid_pointer_object.size = from_integer(0, size_type());
+  invalid_pointer_object.is_dynamic = false;
   return invalid_pointer_object;
 }
 
@@ -75,6 +79,23 @@ smt_object_mapt initial_smt_object_map()
   object_map.emplace(
     std::move(invalid_pointer_object_base), std::move(invalid_pointer_object));
   return object_map;
+}
+
+/// This function returns true for heap allocated objects or false for stack
+/// allocated objects.
+static bool is_dynamic(const exprt &object)
+{
+  // This check corresponds to the symbols created in
+  // `goto_symext::symex_allocate`, which implements the `__CPROVER_allocate`
+  // intrinsic function used by the standard library models.
+  const bool dynamic_type = object.type().get_bool(ID_C_dynamic);
+  if(dynamic_type)
+    return true;
+  const auto symbol = expr_try_dynamic_cast<symbol_exprt>(object);
+  bool symbol_is_dynamic =
+    symbol &&
+    has_prefix(id2string(symbol->get_identifier()), SYMEX_DYNAMIC_PREFIX);
+  return symbol_is_dynamic;
 }
 
 void track_expression_objects(
@@ -93,6 +114,7 @@ void track_expression_objects(
       object.base_expression = object_base;
       object.unique_id = object_map.size();
       object.size = *size;
+      object.is_dynamic = is_dynamic(object_base);
       object_map.emplace_hint(find_result, object_base, std::move(object));
     });
 }

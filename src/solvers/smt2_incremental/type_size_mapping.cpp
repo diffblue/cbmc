@@ -15,7 +15,8 @@ void associate_pointer_sizes(
   const namespacet &ns,
   type_size_mapt &type_size_map,
   const smt_object_mapt &object_map,
-  const smt_object_sizet::make_applicationt &object_size)
+  const smt_object_sizet::make_applicationt &object_size,
+  const smt_is_dynamic_objectt::make_applicationt &is_dynamic_object)
 {
   expression.visit_pre([&](const exprt &sub_expression) {
     if(
@@ -42,7 +43,11 @@ void associate_pointer_sizes(
         pointer_size_expr = pointer_size_opt.value();
       }
       auto pointer_size_term = convert_expr_to_smt(
-        pointer_size_expr, object_map, type_size_map, object_size);
+        pointer_size_expr,
+        object_map,
+        type_size_map,
+        object_size,
+        is_dynamic_object);
       type_size_map.emplace_hint(
         find_result, pointer_type->base_type(), pointer_size_term);
     }

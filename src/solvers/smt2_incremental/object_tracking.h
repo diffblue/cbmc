@@ -43,9 +43,11 @@ struct decision_procedure_objectt
   /// to deferencing a pointer to this object with a zero offset.
   exprt base_expression;
   /// Number which uniquely identifies this particular object.
-  std::size_t unique_id;
+  std::size_t unique_id = 0;
   /// Expression which evaluates to the size of the object in bytes.
   exprt size;
+  /// This is true for heap allocated objects and false for stack allocated.
+  bool is_dynamic = false;
 };
 
 /// The model of addresses we use consists of a unique object identifier and an

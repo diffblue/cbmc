@@ -11,6 +11,7 @@
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <solvers/smt2_incremental/smt_is_dynamic_object.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <solvers/stack_decision_procedure.h>
@@ -92,8 +93,9 @@ protected:
   /// \note This function is non-const because it mutates the object_map.
   smt_termt convert_expr_to_smt(const exprt &expr);
   void define_index_identifiers(const exprt &expr);
-  /// Sends the solver the definitions of the object sizes.
-  void define_object_sizes();
+  /// Sends the solver the definitions of the object sizes and dynamic memory
+  /// statuses.
+  void define_object_properties();
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
   /// This includes the symbols defined outside of the decision procedure but
@@ -149,16 +151,21 @@ protected:
   /// This map is used to track object related state. See documentation in
   /// object_tracking.h for details.
   smt_object_mapt object_map;
-  /// The size of each object is separately defined as a pre-solving step.
-  /// `object_size_defined[object ID]` is set to true for objects where the size
-  /// has been defined. This is used to avoid defining the size of the same
-  /// object multiple times in the case where multiple rounds of solving are
-  /// carried out.
-  std::vector<bool> object_size_defined;
+  /// The size of each object and the dynamic object stus is separately defined
+  /// as a pre-solving step. `object_properties_defined[object ID]` is set to
+  /// true for objects where the size has been defined. This is used to avoid
+  /// defining the size of the same object multiple times in the case where
+  /// multiple rounds of solving are carried out.
+  std::vector<bool> object_properties_defined;
   /// Implementation of the SMT formula for the object size function. This is
   /// stateful because it depends on the configuration of the number of object
   /// bits and how many bits wide the size type is configured to be.
   smt_object_sizet object_size_function;
+  /// Implementation of the SMT formula for the dynamic object status lookup
+  /// function. This is stateful because it depends on the configuration of the
+  /// number of object bits and how many bits wide the size type is configured
+  /// to be.
+  smt_is_dynamic_objectt is_dynamic_object_function;
   /// Precalculated type sizes used for pointer arithmetic.
   type_size_mapt pointer_sizes_map;
 };

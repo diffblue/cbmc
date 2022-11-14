@@ -113,6 +113,7 @@ struct decision_procedure_test_environmentt final
   std::vector<smt_commandt> sent_commands;
   null_message_handlert message_handler;
   smt_object_sizet object_size_function;
+  smt_is_dynamic_objectt is_dynamic_object_function;
   smt2_incremental_decision_proceduret procedure{
     ns,
     util_make_unique<smt_mock_solver_processt>(
@@ -177,7 +178,8 @@ TEST_CASE(
       std::vector<smt_commandt>{
         smt_set_option_commandt{smt_option_produce_modelst{true}},
         smt_set_logic_commandt{smt_logic_allt{}},
-        test.object_size_function.declaration});
+        test.object_size_function.declaration,
+        test.is_dynamic_object_function.declaration});
     test.sent_commands.clear();
     SECTION("Set symbol to true.")
     {
@@ -464,6 +466,10 @@ TEST_CASE(
   const auto invalid_pointer_object_size_definition =
     test.object_size_function.make_definition(
       1, smt_bit_vector_constant_termt{0, 32});
+  const auto null_object_dynamic_definition =
+    test.is_dynamic_object_function.make_definition(0, false);
+  const auto invalid_pointer_object_dynamic_definition =
+    test.is_dynamic_object_function.make_definition(1, false);
   const symbolt foo = make_test_symbol("foo", signedbv_typet{16});
   const smt_identifier_termt foo_term{"foo", smt_bit_vector_sortt{16}};
   const exprt expr_42 = from_integer({42}, signedbv_typet{16});
@@ -480,6 +486,8 @@ TEST_CASE(
       smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
       invalid_pointer_object_size_definition,
       null_object_size_definition,
+      null_object_dynamic_definition,
+      invalid_pointer_object_dynamic_definition,
       smt_check_sat_commandt{}};
     REQUIRE(
       (test.sent_commands.size() == expected_commands.size() &&

@@ -4,6 +4,7 @@
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/namespace.h>
+#include <util/pointer_predicates.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -198,4 +199,33 @@ TEST_CASE("Tracking object sizes.", "[core][smt2_incremental]")
   const auto object = object_map.find(base_object);
   REQUIRE(object != object_map.end());
   REQUIRE(object->second.size == expected_size);
+}
+
+static typet make_type_dynamic(typet base_type)
+{
+  base_type.set(ID_C_dynamic, true);
+  return base_type;
+}
+
+TEST_CASE("Tracking dynamic object status.", "[core][smt2_incremental]")
+{
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  smt_object_mapt object_map = initial_smt_object_map();
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  exprt base_object;
+  bool expected_dynamic_status;
+  using rowt =
+    std::pair<decltype(base_object), decltype(expected_dynamic_status)>;
+  std::tie(base_object, expected_dynamic_status) = GENERATE_REF(
+    rowt{from_integer(0, unsignedbv_typet{(8)}), false},
+    rowt{symbol_exprt{"foo", bool_typet{}}, false},
+    rowt{symbol_exprt{SYMEX_DYNAMIC_PREFIX "bar", bool_typet{}}, true},
+    rowt{from_integer(42, make_type_dynamic(signedbv_typet{16})), true});
+  INFO("base_object is - " + base_object.pretty(1, 0));
+  track_expression_objects(address_of_exprt{base_object}, ns, object_map);
+  const auto object = object_map.find(base_object);
+  REQUIRE(object != object_map.end());
+  REQUIRE(object->second.is_dynamic == expected_dynamic_status);
 }

@@ -109,6 +109,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/smt2_incremental/convert_expr_to_smt.cpp \
        solvers/smt2_incremental/object_tracking.cpp \
        solvers/smt2_incremental/smt2_incremental_decision_procedure.cpp \
+       solvers/smt2_incremental/smt_is_dynamic_object.cpp \
        solvers/smt2_incremental/smt_object_size.cpp \
        solvers/smt2_incremental/smt_response_validation.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \

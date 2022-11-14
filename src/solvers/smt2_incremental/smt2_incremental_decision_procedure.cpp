@@ -255,6 +255,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
   solver_process->send(smt_set_logic_commandt{smt_logic_allt{}});
   solver_process->send(object_size_function.declaration);
+  solver_process->send(is_dynamic_object_function.declaration);
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
@@ -321,12 +322,14 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
     ns,
     pointer_sizes_map,
     object_map,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
   return ::convert_expr_to_smt(
     substituted,
     object_map,
     pointer_sizes_map,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -376,7 +379,8 @@ array_exprt smt2_incremental_decision_proceduret::get_expr(
           from_integer(index, index_type),
           object_map,
           pointer_sizes_map,
-          object_size_function.make_application)),
+          object_size_function.make_application,
+          is_dynamic_object_function.make_application)),
       type.element_type()));
   }
   return array_exprt{elements, type};
@@ -442,7 +446,8 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         expr,
         object_map,
         pointer_sizes_map,
-        object_size_function.make_application);
+        object_size_function.make_application,
+        is_dynamic_object_function.make_application);
     }
     else
     {
@@ -548,26 +553,28 @@ static decision_proceduret::resultt lookup_decision_procedure_result(
   UNREACHABLE;
 }
 
-void smt2_incremental_decision_proceduret::define_object_sizes()
+void smt2_incremental_decision_proceduret::define_object_properties()
 {
-  object_size_defined.resize(object_map.size());
+  object_properties_defined.resize(object_map.size());
   for(const auto &key_value : object_map)
   {
     const decision_procedure_objectt &object = key_value.second;
-    if(object_size_defined[object.unique_id])
+    if(object_properties_defined[object.unique_id])
       continue;
     else
-      object_size_defined[object.unique_id] = true;
+      object_properties_defined[object.unique_id] = true;
     define_dependent_functions(object.size);
     solver_process->send(object_size_function.make_definition(
       object.unique_id, convert_expr_to_smt(object.size)));
+    solver_process->send(is_dynamic_object_function.make_definition(
+      object.unique_id, object.is_dynamic));
   }
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  define_object_sizes();
+  define_object_properties();
   const smt_responset result = get_response_to_command(
     *solver_process, smt_check_sat_commandt{}, identifier_table);
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())
