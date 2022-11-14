@@ -98,6 +98,8 @@ $(document).ready(function(){initNavTree('object__tracking_8cpp.html',''); initR
 <code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string__constant_8h_source.html">util/string_constant.h</a>&gt;</code><br />
@@ -106,7 +108,7 @@ $(document).ready(function(){initNavTree('object__tracking_8cpp.html',''); initR
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="object__tracking_8cpp__incl.svg" width="1623" height="1052"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="object__tracking_8cpp__incl.svg" width="1559" height="1052"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -127,6 +129,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ac0aac4f3af9b87913983aa709eeb55e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__tracking_8cpp.html#ac0aac4f3af9b87913983aa709eeb55e1">initial_smt_object_map</a> ()</td></tr>
 <tr class="memdesc:ac0aac4f3af9b87913983aa709eeb55e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an initial object map containing the null object.  <a href="object__tracking_8cpp.html#ac0aac4f3af9b87913983aa709eeb55e1">More...</a><br /></td></tr>
 <tr class="separator:ac0aac4f3af9b87913983aa709eeb55e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af996f5598cf8a9e0663f67df55e170f0"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__tracking_8cpp.html#af996f5598cf8a9e0663f67df55e170f0">is_dynamic</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;object)</td></tr>
+<tr class="memdesc:af996f5598cf8a9e0663f67df55e170f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns true for heap allocated objects or false for stack allocated objects.  <a href="object__tracking_8cpp.html#af996f5598cf8a9e0663f67df55e170f0">More...</a><br /></td></tr>
+<tr class="separator:af996f5598cf8a9e0663f67df55e170f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33c252767da9c80dbf0c85ebc5fd7f3c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__tracking_8cpp.html#a33c252767da9c80dbf0c85ebc5fd7f3c">track_expression_objects</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map)</td></tr>
 <tr class="memdesc:a33c252767da9c80dbf0c85ebc5fd7f3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds all the object expressions in the given expression and adds them to the object map for cases where the map does not contain them already.  <a href="object__tracking_8cpp.html#a33c252767da9c80dbf0c85ebc5fd7f3c">More...</a><br /></td></tr>
 <tr class="separator:a33c252767da9c80dbf0c85ebc5fd7f3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,7 +159,7 @@ Functions</h2></td></tr>
 <p>The model of addresses we use consists of a unique object identifier and an offset. </p>
 <p>In order to encode the offset identifiers we need to assign unique identifiers to the objects. This function finds the base object expression in an address of expression for which a unique identifier needs to be assigned. </p>
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00017">17</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00019">19</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>
@@ -176,7 +181,37 @@ Functions</h2></td></tr>
 <p>Constructs an initial object map containing the null object. </p>
 <p>The null object must be added at construction in order to ensure it is allocated a unique identifier of 0. </p>
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00066">66</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00070">70</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+
+</div>
+</div>
+<a id="af996f5598cf8a9e0663f67df55e170f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af996f5598cf8a9e0663f67df55e170f0">&#9670;&nbsp;</a></span>is_dynamic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool is_dynamic </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>object</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function returns true for heap allocated objects or false for stack allocated objects. </p>
+
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00086">86</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>
@@ -197,7 +232,7 @@ Functions</h2></td></tr>
 
 <p>Create the invalid pointer constant. </p>
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00012">12</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00014">14</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +259,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00055">55</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00058">58</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +286,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00046">46</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00048">48</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>
@@ -284,7 +319,7 @@ Functions</h2></td></tr>
 <p>Finds whether all base object expressions in the given expression are already tracked in the given object map. </p>
 <p>This supports writing invariants on the base object expressions already being tracked in the map in contexts where the map is const. </p>
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00100">100</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00122">122</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>
@@ -330,7 +365,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00080">80</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="object__tracking_8cpp_source.html#l00101">101</a> of file <a class="el" href="object__tracking_8cpp_source.html">object_tracking.cpp</a>.</p>
 
 </div>
 </div>

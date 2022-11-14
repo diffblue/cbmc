@@ -1160,8 +1160,8 @@ var hierarchy =
     [ "nondet_volatilet", "classnondet__volatilet.html", null ],
     [ "sharing_mapt< keyT, valueT, fail_if_equal, hashT, equalT >::noop_value_comparatort", "structsharing__mapt_1_1noop__value__comparatort.html", null ],
     [ "smt_bit_vector_theoryt::nort", "structsmt__bit__vector__theoryt_1_1nort.html", null ],
-    [ "smt_core_theoryt::nott", "structsmt__core__theoryt_1_1nott.html", null ],
     [ "smt_bit_vector_theoryt::nott", "structsmt__bit__vector__theoryt_1_1nott.html", null ],
+    [ "smt_core_theoryt::nott", "structsmt__core__theoryt_1_1nott.html", null ],
     [ "numberingt< keyt, hasht >", "classnumberingt.html", null ],
     [ "numberingt< dstringt >", "classnumberingt.html", null ],
     [ "numberingt< exprt, irep_hash >", "classnumberingt.html", null ],
@@ -1246,8 +1246,8 @@ var hierarchy =
     [ "polynomialt", "classpolynomialt.html", null ],
     [ "java_bytecode_parsert::pool_entryt", "structjava__bytecode__parsert_1_1pool__entryt.html", null ],
     [ "postconditiont", "classpostconditiont.html", null ],
-    [ "bv_pointers_widet::postponedt", "structbv__pointers__widet_1_1postponedt.html", null ],
     [ "bv_pointerst::postponedt", "structbv__pointerst_1_1postponedt.html", null ],
+    [ "bv_pointers_widet::postponedt", "structbv__pointers__widet_1_1postponedt.html", null ],
     [ "preconditiont", "classpreconditiont.html", null ],
     [ "prefix_filtert", "classprefix__filtert.html", null ],
     [ "memory_snapshot_harness_generatort::preordert< Key >", "structmemory__snapshot__harness__generatort_1_1preordert.html", null ],
@@ -1864,6 +1864,7 @@ var hierarchy =
     [ "smt_index_const_downcast_visitort", "classsmt__index__const__downcast__visitort.html", [
       [ "smt_index_output_visitort", "classsmt__index__output__visitort.html", null ]
     ] ],
+    [ "smt_is_dynamic_objectt", "structsmt__is__dynamic__objectt.html", null ],
     [ "smt_logic_const_downcast_visitort", "classsmt__logic__const__downcast__visitort.html", [
       [ "smt_logic_to_string_convertert", "classsmt__logic__to__string__convertert.html", null ]
     ] ],
@@ -1908,8 +1909,8 @@ var hierarchy =
     [ "state_encodingt", "classstate__encodingt.html", null ],
     [ "check_call_sequencet::state_hash", "structcheck__call__sequencet_1_1state__hash.html", null ],
     [ "statement_list_parse_treet", "classstatement__list__parse__treet.html", null ],
-    [ "check_call_sequencet::statet", "structcheck__call__sequencet_1_1statet.html", null ],
     [ "help_formattert::statet", "structhelp__formattert_1_1statet.html", null ],
+    [ "check_call_sequencet::statet", "structcheck__call__sequencet_1_1statet.html", null ],
     [ "nfat< T >::statet", "structnfat_1_1statet.html", null ],
     [ "static_analysis_baset", "classstatic__analysis__baset.html", [
       [ "static_analysist< T >", "classstatic__analysist.html", [
@@ -1923,12 +1924,12 @@ var hierarchy =
     [ "clauset::stept", "structclauset_1_1stept.html", null ],
     [ "statement_list_typecheckt::stl_jump_locationt", "structstatement__list__typecheckt_1_1stl__jump__locationt.html", null ],
     [ "statement_list_typecheckt::stl_label_locationt", "structstatement__list__typecheckt_1_1stl__label__locationt.html", null ],
-    [ "smt_sortt::storert< derivedt >", "classsmt__sortt_1_1storert.html", null ],
-    [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
     [ "smt_logict::storert< derivedt >", "classsmt__logict_1_1storert.html", null ],
-    [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
+    [ "smt_sortt::storert< derivedt >", "classsmt__sortt_1_1storert.html", null ],
     [ "smt_termt::storert< derivedt >", "classsmt__termt_1_1storert.html", null ],
+    [ "smt_indext::storert< derivedt >", "classsmt__indext_1_1storert.html", null ],
     [ "smt_check_sat_response_kindt::storert< derivedt >", "classsmt__check__sat__response__kindt_1_1storert.html", null ],
+    [ "smt_optiont::storert< derivedt >", "classsmt__optiont_1_1storert.html", null ],
     [ "smt_termt::storert< smt_assert_commandt >", "classsmt__termt_1_1storert.html", [
       [ "smt_assert_commandt", "classsmt__assert__commandt.html", null ],
       [ "smt_get_value_commandt", "classsmt__get__value__commandt.html", null ]
@@ -2156,8 +2157,8 @@ var hierarchy =
     [ "xml_parse_treet", "classxml__parse__treet.html", null ],
     [ "xmlt", "classxmlt.html", null ],
     [ "smt_bit_vector_theoryt::xnort", "structsmt__bit__vector__theoryt_1_1xnort.html", null ],
-    [ "smt_core_theoryt::xort", "structsmt__core__theoryt_1_1xort.html", null ],
     [ "smt_bit_vector_theoryt::xort", "structsmt__bit__vector__theoryt_1_1xort.html", null ],
+    [ "smt_core_theoryt::xort", "structsmt__core__theoryt_1_1xort.html", null ],
     [ "smt_bit_vector_theoryt::zero_extendt", "structsmt__bit__vector__theoryt_1_1zero__extendt.html", null ],
     [ "zip_iteratort< first_iteratort, second_iteratort, same_size >", "structzip__iteratort.html", null ]
 ];

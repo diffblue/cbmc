@@ -16,6 +16,10 @@ var dir_87ec3d57b8dc96609a95189b1ea15a24 =
       [ "smt2_incremental_decision_proceduret", "classsmt2__incremental__decision__proceduret.html", "classsmt2__incremental__decision__proceduret" ],
       [ "sequencet", "classsmt2__incremental__decision__proceduret_1_1sequencet.html", "classsmt2__incremental__decision__proceduret_1_1sequencet" ]
     ] ],
+    [ "smt_is_dynamic_object.cpp", "smt__is__dynamic__object_8cpp.html", "smt__is__dynamic__object_8cpp" ],
+    [ "smt_is_dynamic_object.h", "smt__is__dynamic__object_8h.html", [
+      [ "smt_is_dynamic_objectt", "structsmt__is__dynamic__objectt.html", "structsmt__is__dynamic__objectt" ]
+    ] ],
     [ "smt_object_size.cpp", "smt__object__size_8cpp.html", "smt__object__size_8cpp" ],
     [ "smt_object_size.h", "smt__object__size_8h.html", [
       [ "smt_object_sizet", "structsmt__object__sizet.html", "structsmt__object__sizet" ]

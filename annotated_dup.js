@@ -1089,6 +1089,7 @@ var annotated_dup =
     [ "smt_index_const_downcast_visitort", "classsmt__index__const__downcast__visitort.html", "classsmt__index__const__downcast__visitort" ],
     [ "smt_index_output_visitort", "classsmt__index__output__visitort.html", "classsmt__index__output__visitort" ],
     [ "smt_indext", "classsmt__indext.html", "classsmt__indext" ],
+    [ "smt_is_dynamic_objectt", "structsmt__is__dynamic__objectt.html", "structsmt__is__dynamic__objectt" ],
     [ "smt_logic_const_downcast_visitort", "classsmt__logic__const__downcast__visitort.html", null ],
     [ "smt_logic_to_string_convertert", "classsmt__logic__to__string__convertert.html", "classsmt__logic__to__string__convertert" ],
     [ "smt_logict", "classsmt__logict.html", "classsmt__logict" ],

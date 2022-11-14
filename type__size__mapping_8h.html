@@ -98,6 +98,7 @@ $(document).ready(function(){initNavTree('type__size__mapping_8h.html',''); init
 <div class="textblock"><code>#include &lt;<a class="el" href="expr_8h_source.html">util/expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="smt__terms_8h_source.html">solvers/smt2_incremental/ast/smt_terms.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="object__tracking_8h_source.html">solvers/smt2_incremental/object_tracking.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="smt__is__dynamic__object_8h_source.html">solvers/smt2_incremental/smt_is_dynamic_object.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="smt__object__size_8h_source.html">solvers/smt2_incremental/smt_object_size.h</a>&gt;</code><br />
 <code>#include &lt;unordered_map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -105,7 +106,7 @@ $(document).ready(function(){initNavTree('type__size__mapping_8h.html',''); init
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="type__size__mapping_8h__incl.svg" width="2055" height="1290"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="type__size__mapping_8h__incl.svg" width="2106" height="1290"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -126,9 +127,9 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa161e0532e1ab72a4dfeb705fb611665"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type__size__mapping_8h.html#aa161e0532e1ab72a4dfeb705fb611665">associate_pointer_sizes</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a> &amp;type_size_map, const <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map, const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;<a class="el" href="pointer__predicates_8h.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>)</td></tr>
-<tr class="memdesc:aa161e0532e1ab72a4dfeb705fb611665"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function populates the (pointer) type -&gt; size map.  <a href="type__size__mapping_8h.html#aa161e0532e1ab72a4dfeb705fb611665">More...</a><br /></td></tr>
-<tr class="separator:aa161e0532e1ab72a4dfeb705fb611665"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a441366c97ba0972b8f6ce0276e6016fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type__size__mapping_8h.html#a441366c97ba0972b8f6ce0276e6016fc">associate_pointer_sizes</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a> &amp;type_size_map, const <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map, const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;<a class="el" href="pointer__predicates_8h.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>, const <a class="el" href="structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</td></tr>
+<tr class="memdesc:a441366c97ba0972b8f6ce0276e6016fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function populates the (pointer) type -&gt; size map.  <a href="type__size__mapping_8h.html#a441366c97ba0972b8f6ce0276e6016fc">More...</a><br /></td></tr>
+<tr class="separator:a441366c97ba0972b8f6ce0276e6016fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utilities for making a map of types to associated sizes. </p>
@@ -147,13 +148,13 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="type__size__mapping_8h_source.html#l00017">17</a> of file <a class="el" href="type__size__mapping_8h_source.html">type_size_mapping.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="type__size__mapping_8h_source.html#l00018">18</a> of file <a class="el" href="type__size__mapping_8h_source.html">type_size_mapping.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aa161e0532e1ab72a4dfeb705fb611665"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa161e0532e1ab72a4dfeb705fb611665">&#9670;&nbsp;</a></span>associate_pointer_sizes()</h2>
+<a id="a441366c97ba0972b8f6ce0276e6016fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a441366c97ba0972b8f6ce0276e6016fc">&#9670;&nbsp;</a></span>associate_pointer_sizes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -186,7 +187,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;&#160;</td>
-          <td class="paramname"><em>object_size</em>&#160;</td>
+          <td class="paramname"><em>object_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03">smt_is_dynamic_objectt::make_applicationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>is_dynamic_object</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -204,6 +211,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">type_size_map</td><td>A map of types to terms expressing the size of the type (in bytes). This function adds new entries to the map for instances of pointer.base_type() from <code>expression</code> which are not already keys in the map. </td></tr>
     <tr><td class="paramname">object_map</td><td>passed through to convert_expr_to_smt </td></tr>
     <tr><td class="paramname">object_size</td><td>passed through to convert_expr_to_smt </td></tr>
+    <tr><td class="paramname">is_dynamic_object</td><td>passed through to convert_expr_to_smt </td></tr>
   </table>
   </dd>
 </dl>

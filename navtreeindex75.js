@@ -1,5 +1,6 @@
 var NAVTREEINDEX75 =
 {
+"dfcc__contract__mode_8h.html#aca46d96b7bc82a0be2fde065a61067a5a8c46d8d9d3402788403e2f6911153089":[6,0,2,13,1,1,6,0,0],
 "dfcc__contract__mode_8h_source.html":[6,0,2,13,1,1,6],
 "dfcc__instrument_8cpp.html":[6,0,2,13,1,1,7],
 "dfcc__instrument_8cpp_source.html":[6,0,2,13,1,1,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX75 =
 "elf__reader_8h.html":[6,0,2,14,18],
 "elf__reader_8h.html#a51cffab487a1f8964f189467534938ee":[6,0,2,14,18,7],
 "elf__reader_8h.html#a9a40f6072025c8a7040332b51b2a962d":[6,0,2,14,18,11],
-"elf__reader_8h.html#aa7f707336b09ab45d0f2d221166bba6e":[6,0,2,14,18,10],
-"elf__reader_8h.html#aa8892efbafd6e7e8fe65a95f3b37b2cf":[6,0,2,14,18,13]
+"elf__reader_8h.html#aa7f707336b09ab45d0f2d221166bba6e":[6,0,2,14,18,10]
 };

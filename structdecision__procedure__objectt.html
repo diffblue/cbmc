@@ -114,12 +114,15 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a686fe5dba418fe2355ab78d5d625311f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdecision__procedure__objectt.html#a686fe5dba418fe2355ab78d5d625311f">base_expression</a></td></tr>
 <tr class="memdesc:a686fe5dba418fe2355ab78d5d625311f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expression for the root of the object.  <a href="structdecision__procedure__objectt.html#a686fe5dba418fe2355ab78d5d625311f">More...</a><br /></td></tr>
 <tr class="separator:a686fe5dba418fe2355ab78d5d625311f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf0517bdc601e0c700a1b0f71d29a427"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdecision__procedure__objectt.html#abf0517bdc601e0c700a1b0f71d29a427">unique_id</a></td></tr>
+<tr class="memitem:abf0517bdc601e0c700a1b0f71d29a427"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdecision__procedure__objectt.html#abf0517bdc601e0c700a1b0f71d29a427">unique_id</a> = 0</td></tr>
 <tr class="memdesc:abf0517bdc601e0c700a1b0f71d29a427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number which uniquely identifies this particular object.  <a href="structdecision__procedure__objectt.html#abf0517bdc601e0c700a1b0f71d29a427">More...</a><br /></td></tr>
 <tr class="separator:abf0517bdc601e0c700a1b0f71d29a427"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accd6e0ebec7c198506f17f46b40ab244"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdecision__procedure__objectt.html#accd6e0ebec7c198506f17f46b40ab244">size</a></td></tr>
 <tr class="memdesc:accd6e0ebec7c198506f17f46b40ab244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expression which evaluates to the size of the object in bytes.  <a href="structdecision__procedure__objectt.html#accd6e0ebec7c198506f17f46b40ab244">More...</a><br /></td></tr>
 <tr class="separator:accd6e0ebec7c198506f17f46b40ab244"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a2604daf0577c670a93333f4078df18"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdecision__procedure__objectt.html#a6a2604daf0577c670a93333f4078df18">is_dynamic</a> = false</td></tr>
+<tr class="memdesc:a6a2604daf0577c670a93333f4078df18"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is true for heap allocated objects and false for stack allocated.  <a href="structdecision__procedure__objectt.html#a6a2604daf0577c670a93333f4078df18">More...</a><br /></td></tr>
+<tr class="separator:a6a2604daf0577c670a93333f4078df18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Information the decision procedure holds about each object. </p>
@@ -142,6 +145,24 @@ Public Attributes</h2></td></tr>
 <p>This is expression equivalent to deferencing a pointer to this object with a zero offset. </p>
 
 <p class="definition">Definition at line <a class="el" href="object__tracking_8h_source.html#l00044">44</a> of file <a class="el" href="object__tracking_8h_source.html">object_tracking.h</a>.</p>
+
+</div>
+</div>
+<a id="a6a2604daf0577c670a93333f4078df18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a2604daf0577c670a93333f4078df18">&#9670;&nbsp;</a></span>is_dynamic</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool decision_procedure_objectt::is_dynamic = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This is true for heap allocated objects and false for stack allocated. </p>
+
+<p class="definition">Definition at line <a class="el" href="object__tracking_8h_source.html#l00050">50</a> of file <a class="el" href="object__tracking_8h_source.html">object_tracking.h</a>.</p>
 
 </div>
 </div>
@@ -170,7 +191,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::size_t decision_procedure_objectt::unique_id</td>
+          <td class="memname">std::size_t decision_procedure_objectt::unique_id = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">

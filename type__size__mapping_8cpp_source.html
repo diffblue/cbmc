@@ -104,44 +104,49 @@ $(document).ready(function(){initNavTree('type__size__mapping_8cpp_source.html',
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="convert__expr__to__smt_8h.html">solvers/smt2_incremental/convert_expr_to_smt.h</a>&gt;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="type__size__mapping_8h.html#aa161e0532e1ab72a4dfeb705fb611665">   13</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="type__size__mapping_8cpp.html#aa161e0532e1ab72a4dfeb705fb611665">associate_pointer_sizes</a>(</div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="type__size__mapping_8h.html#a441366c97ba0972b8f6ce0276e6016fc">   13</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="type__size__mapping_8cpp.html#a441366c97ba0972b8f6ce0276e6016fc">associate_pointer_sizes</a>(</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expression,</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <a class="code" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a> &amp;type_size_map,</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">const</span> <a class="code" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map,</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_object_sizet::make_applicationt</a> &amp;<a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>)</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  expression.<a class="code" href="classexprt.html#a8a4ea14980805786fbf1a3b05a51e620">visit_pre</a>([&amp;](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;sub_expression) {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a> =</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        type_try_dynamic_cast&lt;pointer_typet&gt;(sub_expression.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()))</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      const auto find_result = type_size_map.find(pointer_type-&gt;base_type());</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      if(find_result != type_size_map.cend())</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        return;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      exprt pointer_size_expr;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="comment">// There&#39;s a special case for a pointer subtype here: the case where the</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="comment">// pointer is `void *`. This means that we don&#39;t know the underlying base</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="comment">// type, so we&#39;re just assigning a size expression value of 1 (given that</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="comment">// this is going to be used in a multiplication and 1 is the identity</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="comment">// value for multiplication)</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      if(is_void_pointer(*pointer_type))</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        pointer_size_expr = from_integer(1, size_type());</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        auto pointer_size_opt = size_of_expr(pointer_type-&gt;base_type(), ns);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        PRECONDITION(pointer_size_opt.has_value());</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        pointer_size_expr = pointer_size_opt.value();</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <span class="keyword">auto</span> pointer_size_term = <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        pointer_size_expr, object_map, type_size_map, <a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      type_size_map.emplace_hint(</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        find_result, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>-&gt;<a class="code" href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">base_type</a>(), pointer_size_term);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  });</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_object_sizet::make_applicationt</a> &amp;<a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>,</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  expression.<a class="code" href="classexprt.html#a8a4ea14980805786fbf1a3b05a51e620">visit_pre</a>([&amp;](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;sub_expression) {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a> =</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        type_try_dynamic_cast&lt;pointer_typet&gt;(sub_expression.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()))</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      const auto find_result = type_size_map.find(pointer_type-&gt;base_type());</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      if(find_result != type_size_map.cend())</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        return;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      exprt pointer_size_expr;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="comment">// There&#39;s a special case for a pointer subtype here: the case where the</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="comment">// pointer is `void *`. This means that we don&#39;t know the underlying base</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="comment">// type, so we&#39;re just assigning a size expression value of 1 (given that</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="comment">// this is going to be used in a multiplication and 1 is the identity</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      <span class="comment">// value for multiplication)</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      if(is_void_pointer(*pointer_type))</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        pointer_size_expr = from_integer(1, size_type());</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        auto pointer_size_opt = size_of_expr(pointer_type-&gt;base_type(), ns);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        PRECONDITION(pointer_size_opt.has_value());</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        pointer_size_expr = pointer_size_opt.value();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keyword">auto</span> pointer_size_term = <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        pointer_size_expr,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        object_map,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        type_size_map,</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        is_dynamic_object);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      type_size_map.emplace_hint(</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        find_result, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>-&gt;<a class="code" href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">base_type</a>(), pointer_size_term);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  });</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="apointer__offset__size_8h_html"><div class="ttname"><a href="pointer__offset__size_8h.html">pointer_offset_size.h</a></div></div>
@@ -152,15 +157,15 @@ $(document).ready(function(){initNavTree('type__size__mapping_8cpp_source.html',
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:90</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
+<div class="ttc" id="atype__size__mapping_8cpp_html_a441366c97ba0972b8f6ce0276e6016fc"><div class="ttname"><a href="type__size__mapping_8cpp.html#a441366c97ba0972b8f6ce0276e6016fc">associate_pointer_sizes</a></div><div class="ttdeci">void associate_pointer_sizes(const exprt &amp;expression, const namespacet &amp;ns, type_size_mapt &amp;type_size_map, const smt_object_mapt &amp;object_map, const smt_object_sizet::make_applicationt &amp;object_size, const smt_is_dynamic_objectt::make_applicationt &amp;is_dynamic_object)</div><div class="ttdoc">This function populates the (pointer) type -&gt; size map.</div><div class="ttdef"><b>Definition:</b> <a href="type__size__mapping_8cpp_source.html#l00013">type_size_mapping.cpp:13</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html"><div class="ttname"><a href="pointer__expr_8h.html">pointer_expr.h</a></div></div>
 <div class="ttc" id="ac__types_8cpp_html_a875507bd5fb82fbd7b6640ac105aa8b0"><div class="ttname"><a href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a></div><div class="ttdeci">pointer_typet pointer_type(const typet &amp;subtype)</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00240">c_types.cpp:240</a></div></div>
 <div class="ttc" id="apointer__predicates_8cpp_html_a4f4f8c2889a0c8ee9c61a7389bd29cbc"><div class="ttname"><a href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a></div><div class="ttdeci">exprt object_size(const exprt &amp;pointer)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__predicates_8cpp_source.html#l00033">pointer_predicates.cpp:33</a></div></div>
 <div class="ttc" id="aclasssmt__function__application__termt_1_1factoryt_html"><div class="ttname"><a href="classsmt__function__application__termt_1_1factoryt.html">smt_function_application_termt::factoryt&lt; smt_command_functiont &gt;</a></div></div>
-<div class="ttc" id="aobject__tracking_8h_html_a82f38e2f57d09b07c6804208e832cb8c"><div class="ttname"><a href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a></div><div class="ttdeci">std::unordered_map&lt; exprt, decision_procedure_objectt, irep_hash &gt; smt_object_mapt</div><div class="ttdoc">Mapping from an object's base expression to the set of information about it which we track.</div><div class="ttdef"><b>Definition:</b> <a href="object__tracking_8h_source.html#l00089">object_tracking.h:89</a></div></div>
+<div class="ttc" id="aobject__tracking_8h_html_a82f38e2f57d09b07c6804208e832cb8c"><div class="ttname"><a href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a></div><div class="ttdeci">std::unordered_map&lt; exprt, decision_procedure_objectt, irep_hash &gt; smt_object_mapt</div><div class="ttdoc">Mapping from an object's base expression to the set of information about it which we track.</div><div class="ttdef"><b>Definition:</b> <a href="object__tracking_8h_source.html#l00091">object_tracking.h:91</a></div></div>
 <div class="ttc" id="aclasspointer__typet_html_a8670ac230937c81124d9a84965f27717"><div class="ttname"><a href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">pointer_typet::base_type</a></div><div class="ttdeci">const typet &amp; base_type() const</div><div class="ttdoc">The type of the data what we point to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00035">pointer_expr.h:35</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8a4ea14980805786fbf1a3b05a51e620"><div class="ttname"><a href="classexprt.html#a8a4ea14980805786fbf1a3b05a51e620">exprt::visit_pre</a></div><div class="ttdeci">void visit_pre(std::function&lt; void(exprt &amp;)&gt;)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00245">expr.cpp:245</a></div></div>
-<div class="ttc" id="atype__size__mapping_8h_html_adfc99be25653a8feeac43c1192a1992e"><div class="ttname"><a href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a></div><div class="ttdeci">std::unordered_map&lt; typet, smt_termt, irep_full_hash &gt; type_size_mapt</div><div class="ttdef"><b>Definition:</b> <a href="type__size__mapping_8h_source.html#l00017">type_size_mapping.h:17</a></div></div>
-<div class="ttc" id="atype__size__mapping_8cpp_html_aa161e0532e1ab72a4dfeb705fb611665"><div class="ttname"><a href="type__size__mapping_8cpp.html#aa161e0532e1ab72a4dfeb705fb611665">associate_pointer_sizes</a></div><div class="ttdeci">void associate_pointer_sizes(const exprt &amp;expression, const namespacet &amp;ns, type_size_mapt &amp;type_size_map, const smt_object_mapt &amp;object_map, const smt_object_sizet::make_applicationt &amp;object_size)</div><div class="ttdoc">This function populates the (pointer) type -&gt; size map.</div><div class="ttdef"><b>Definition:</b> <a href="type__size__mapping_8cpp_source.html#l00013">type_size_mapping.cpp:13</a></div></div>
+<div class="ttc" id="atype__size__mapping_8h_html_adfc99be25653a8feeac43c1192a1992e"><div class="ttname"><a href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a></div><div class="ttdeci">std::unordered_map&lt; typet, smt_termt, irep_full_hash &gt; type_size_mapt</div><div class="ttdef"><b>Definition:</b> <a href="type__size__mapping_8h_source.html#l00018">type_size_mapping.h:18</a></div></div>
 <div class="ttc" id="ac__types_8h_html"><div class="ttname"><a href="c__types_8h.html">c_types.h</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8h_html"><div class="ttname"><a href="convert__expr__to__smt_8h.html">convert_expr_to_smt.h</a></div></div>
 <!-- start footer part -->
