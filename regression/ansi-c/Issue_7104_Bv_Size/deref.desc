@@ -3,7 +3,7 @@ deref.c
 
 ^EXIT=1$
 ^SIGNAL=0$
-only bitvectors of size multiple of 8 can be dereferenced
+only bitvectors of size multiple of 8 bits can be dereferenced
 ^CONVERSION ERROR$
 --
 --
