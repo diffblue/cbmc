@@ -1071,7 +1071,22 @@ void value_sett::get_value_set_rec(
   }
   else
   {
-    insert(dest, exprt(ID_unknown, original_type));
+    object_mapt pointer_expr_set;
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, pointer_expr_set, "", original_type, ns);
+
+    for(const auto &object_map_entry : pointer_expr_set.read())
+    {
+      offsett offset = object_map_entry.second;
+
+      // kill any offset
+      offset.reset();
+
+      insert(dest, object_map_entry.first, offset);
+    }
+
+    if(pointer_expr_set.read().empty())
+      insert(dest, exprt(ID_unknown, original_type));
   }
 
   #ifdef DEBUG
