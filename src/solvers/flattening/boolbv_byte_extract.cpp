@@ -42,9 +42,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   const std::size_t width = boolbv_width(expr.type());
   if(width % 8 != 0)
   {
-    throw invalid_source_file_exceptiont{
-      "only bitvectors of size multiple of 8 bits can be dereferenced",
-      expr.source_location()};
+    // throw invalid_source_file_exceptiont{
+    //   "only bitvectors of size multiple of 8 bits can be dereferenced",
+    //   expr.source_location()};
+    conversion_failed(expr);
   }
 
   // special treatment for bit-fields and big-endian:
