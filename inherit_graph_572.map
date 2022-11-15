@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structpath__storaget_1_1patht.html" title="Information saved at a conditional goto to resume execution." alt="" coords="5,5,160,32"/>
+<area shape="rect" id="node1" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="5,31,117,57"/>
+<area shape="rect" id="node2" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="165,5,249,32"/>
+<area shape="rect" id="node3" href="$classpath__lifot.html" title="LIFO save queue: depth&#45;first search, try to finish paths." alt="" coords="165,56,249,83"/>
 </map>

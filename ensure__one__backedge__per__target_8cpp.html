@@ -89,12 +89,14 @@ $(document).ready(function(){initNavTree('ensure__one__backedge__per__target_8cp
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">ensure_one_backedge_per_target.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="ensure__one__backedge__per__target_8h_source.html">ensure_one_backedge_per_target.h</a>&quot;</code><br />
+<code>#include &lt;<a class="el" href="natural__loops_8h_source.html">analyses/natural_loops.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="goto__model_8h_source.html">goto_model.h</a>&quot;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -102,18 +104,25 @@ $(document).ready(function(){initNavTree('ensure__one__backedge__per__target_8cp
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="ensure__one__backedge__per__target_8cpp__incl.svg" width="1947" height="1007"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="ensure__one__backedge__per__target_8cpp__incl.svg" width="1896" height="738"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
 <p><a href="ensure__one__backedge__per__target_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinstruction__location__numbert.html">instruction_location_numbert</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a5bf1d6ff8c802e1df3e1695ff143fb15"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a> (const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;a, const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;b)</td></tr>
 <tr class="separator:a5bf1d6ff8c802e1df3e1695ff143fb15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc6d3ba8c392806c378468b051346160"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a> (<a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;it, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="separator:acc6d3ba8c392806c378468b051346160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add044df44c2c70e44dc3edf7ae8d2cde"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ensure__one__backedge__per__target_8cpp.html#add044df44c2c70e44dc3edf7ae8d2cde">operator&lt;</a> (const <a class="el" href="structinstruction__location__numbert.html">instruction_location_numbert</a> &amp;i1, const <a class="el" href="structinstruction__location__numbert.html">instruction_location_numbert</a> &amp;i2)</td></tr>
+<tr class="separator:add044df44c2c70e44dc3edf7ae8d2cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9b1496bf5658e98228399c0e57bfeb9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ensure__one__backedge__per__target_8cpp.html#ab9b1496bf5658e98228399c0e57bfeb9">ensure_one_backedge_per_target</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:ab9b1496bf5658e98228399c0e57bfeb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to force the given <code>goto_program</code> into a form such that each backedge (branch going backwards in lexical program order) has a unique target.  <a href="ensure__one__backedge__per__target_8cpp.html#ab9b1496bf5658e98228399c0e57bfeb9">More...</a><br /></td></tr>
 <tr class="separator:ab9b1496bf5658e98228399c0e57bfeb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,7 +157,7 @@ Functions</h2></td></tr>
 <p>Try to force the given <code>goto_program</code> into a form such that each backedge (branch going backwards in lexical program order) has a unique target. </p>
 <p>This is achieved by redirecting backedges or possibly introducing a new one. Note this may not always succeed; client code must check whether the condition holds of any backedge target it is interested in. Note this overload updates <code>goto_model_function's</code> location numbers and incoming-edges sets. </p><dl class="section return"><dt>Returns</dt><dd>true if any change is made. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00101">101</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00183">183</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
 
 </div>
 </div>
@@ -171,7 +180,7 @@ Functions</h2></td></tr>
 <p>Try to force the given <code>goto_program</code> into a form such that each backedge (branch going backwards in lexical program order) has a unique target. </p>
 <p>This is achieved by redirecting backedges or possibly introducing a new one. Note this may not always succeed; client code must check whether the condition holds of any backedge target it is interested in. Note this overload updates <code>goto_model's</code> location numbers and incoming-edges sets. </p><dl class="section return"><dt>Returns</dt><dd>true if any change is made. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00115">115</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00197">197</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
 
 </div>
 </div>
@@ -194,7 +203,7 @@ Functions</h2></td></tr>
 <p>Try to force the given <code>goto_program</code> into a form such that each backedge (branch going backwards in lexical program order) has a unique target. </p>
 <p>This is achieved by redirecting backedges or possibly introducing a new one. Note this may not always succeed; client code must check whether the condition holds of any backedge target it is interested in. Note this overload leaves <code>goto_program's</code> location numbers and incoming- edges sets inconsistent; the client should call <a class="el" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">goto_programt::update</a>. </p><dl class="section return"><dt>Returns</dt><dd>true if any change is made. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00087">87</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00108">108</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +233,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00025">25</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00027">27</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
 
 </div>
 </div>
@@ -262,7 +271,45 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00018">18</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00020">20</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
+
+</div>
+</div>
+<a id="add044df44c2c70e44dc3edf7ae8d2cde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add044df44c2c70e44dc3edf7ae8d2cde">&#9670;&nbsp;</a></span>operator&lt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structinstruction__location__numbert.html">instruction_location_numbert</a> &amp;&#160;</td>
+          <td class="paramname"><em>i1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structinstruction__location__numbert.html">instruction_location_numbert</a> &amp;&#160;</td>
+          <td class="paramname"><em>i2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html#l00101">101</a> of file <a class="el" href="ensure__one__backedge__per__target_8cpp_source.html">ensure_one_backedge_per_target.cpp</a>.</p>
 
 </div>
 </div>

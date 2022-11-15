@@ -603,6 +603,7 @@ var annotated_dup =
     [ "initial_state_exprt", "classinitial__state__exprt.html", "classinitial__state__exprt" ],
     [ "inlining_decoratort", "classinlining__decoratort.html", "classinlining__decoratort" ],
     [ "insert_final_assert_falset", "classinsert__final__assert__falset.html", "classinsert__final__assert__falset" ],
+    [ "instruction_location_numbert", "structinstruction__location__numbert.html", "structinstruction__location__numbert" ],
     [ "instrument_spec_assignst", "classinstrument__spec__assignst.html", "classinstrument__spec__assignst" ],
     [ "instrumenter_pensievet", "classinstrumenter__pensievet.html", "classinstrumenter__pensievet" ],
     [ "instrumentert", "classinstrumentert.html", "classinstrumentert" ],

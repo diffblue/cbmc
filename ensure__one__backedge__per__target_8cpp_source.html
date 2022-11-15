@@ -103,135 +103,225 @@ $(document).ready(function(){initNavTree('ensure__one__backedge__per__target_8cp
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="ensure__one__backedge__per__target_8h.html">ensure_one_backedge_per_target.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__model_8h.html">goto_model.h</a>&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="natural__loops_8h.html">analyses/natural_loops.h</a>&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__model_8h.html">goto_model.h</a>&quot;</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">   18</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a>(</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;a,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;b)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordflow">return</span> a-&gt;location_number &lt; b-&gt;location_number;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;}</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">   25</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;it,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">auto</span> &amp;instruction = *it;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  std::vector&lt;goto_programt::targett&gt; backedges;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// Check if this instruction has multiple incoming edges from (lexically)</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">// lower down the program. These aren&#39;t necessarily loop backedges (in fact</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// the program might be acyclic), but that&#39;s the most common case.</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> predecessor : instruction.incoming_edges)</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">if</span>(predecessor-&gt;location_number &gt; instruction.location_number)</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      backedges.push_back(predecessor);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">if</span>(backedges.size() &lt; 2)</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  std::sort(backedges.begin(), backedges.end(), <a class="code" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a>);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">   20</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a>(</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;a,</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;b)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">return</span> a-&gt;location_number &lt; b-&gt;location_number;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;}</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">   27</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;it,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">auto</span> &amp;instruction = *it;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  std::vector&lt;goto_programt::targett&gt; backedges;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// Check if this instruction has multiple incoming edges from (lexically)</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="comment">// lower down the program. These aren&#39;t necessarily loop backedges (in fact</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="comment">// the program might be acyclic), but that&#39;s the most common case.</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> predecessor : instruction.incoming_edges)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">if</span>(predecessor-&gt;location_number &gt; instruction.location_number)</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      backedges.push_back(predecessor);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">if</span>(backedges.size() &lt; 2)</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keyword">auto</span> last_backedge = backedges.back();</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  backedges.pop_back();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="comment">// Can&#39;t transform if the bottom of the (probably) loop is of unexpected</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="comment">// form:</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">if</span>(!last_backedge-&gt;is_goto() || last_backedge-&gt;targets.size() &gt; 1)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="comment">// If the last backedge is a conditional jump, add an extra unconditional</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="comment">// backedge after it:</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordflow">if</span>(!last_backedge-&gt;condition().is_true())</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">auto</span> new_goto =</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      goto_program.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(last_backedge, <a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(it));</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="comment">// Turn the existing `if(x) goto head; succ: ...`</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="comment">// into `if(!x) goto succ; goto head; succ: ...`</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    last_backedge-&gt;condition_nonconst() = <a class="code" href="classnot__exprt.html">not_exprt</a>(last_backedge-&gt;condition());</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    last_backedge-&gt;set_target(std::next(new_goto));</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="comment">// Use the new backedge as the one true way to the header:</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    last_backedge = new_goto;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="comment">// Redirect all but one of the backedges to the last one.</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="comment">// For example, transform</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="comment">// &quot;a: if(x) goto a; if(y) goto a;&quot; into</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">// &quot;a: if(x) goto b; if(y) b: goto a;&quot;</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// In the common case where this is a natural loop this corresponds to</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="comment">// branching to the bottom of the loop on a `continue` statement.</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> backedge : backedges)</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  {</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">if</span>(backedge-&gt;is_goto() &amp;&amp; backedge-&gt;targets.size() == 1)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      backedge-&gt;set_target(last_backedge);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8h.html#ab9b1496bf5658e98228399c0e57bfeb9">   87</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keywordtype">bool</span> any_change = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      it != goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      ++it)</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    any_change |= <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(it, goto_program);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  std::sort(backedges.begin(), backedges.end(), <a class="code" href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a>);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keyword">auto</span> last_backedge = backedges.back();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  backedges.pop_back();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="comment">// Can&#39;t transform if the bottom of the (probably) loop is of unexpected</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="comment">// form:</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordflow">if</span>(!last_backedge-&gt;is_goto() || last_backedge-&gt;targets.size() &gt; 1)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="comment">// If the last backedge is a conditional jump, add an extra unconditional</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// backedge after it:</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">if</span>(!last_backedge-&gt;condition().is_true())</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">auto</span> new_goto =</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      goto_program.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(last_backedge, <a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(it));</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">// Turn the existing `if(x) goto head; succ: ...`</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="comment">// into `if(!x) goto succ; goto head; succ: ...`</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    last_backedge-&gt;condition_nonconst() = <a class="code" href="classnot__exprt.html">not_exprt</a>(last_backedge-&gt;condition());</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    last_backedge-&gt;set_target(std::next(new_goto));</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="comment">// Use the new backedge as the one true way to the header:</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    last_backedge = new_goto;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="comment">// Redirect all but one of the backedges to the last one.</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">// For example, transform</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// &quot;a: if(x) goto a; if(y) goto a;&quot; into</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="comment">// &quot;a: if(x) goto b; if(y) b: goto a;&quot;</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="comment">// In the common case where this is a natural loop this corresponds to</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="comment">// branching to the bottom of the loop on a `continue` statement.</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> backedge : backedges)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">if</span>(backedge-&gt;is_goto() &amp;&amp; backedge-&gt;targets.size() == 1)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      backedge-&gt;set_target(last_backedge);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="structinstruction__location__numbert.html">   89</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structinstruction__location__numbert.html">instruction_location_numbert</a> : <span class="keyword">public</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;{</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="comment">// Implicit conversion from a goto_programt::targett is permitted.</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="comment">// NOLINTNEXTLINE(runtime/explicit)</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno"><a class="line" href="structinstruction__location__numbert.html#aeafb7014f206b6880adb79c04267303f">   93</a></span>&#160;  <a class="code" href="structinstruction__location__numbert.html#aeafb7014f206b6880adb79c04267303f">instruction_location_numbert</a>(<a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> target)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    : <a class="code" href="classgoto__programt.html">goto_programt</a>::targett(target)</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  {</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  }</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordflow">return</span> any_change;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <a class="code" href="structinstruction__location__numbert.html#a0b783304bbccee50d4ff25bdffb53aec">instruction_location_numbert</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;};</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8h.html#adb18c974dccbd24d3bebf6a0878ce25a">  101</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(<a class="code" href="classgoto__model__functiont.html">goto_model_functiont</a> &amp;goto_model_function)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keyword">auto</span> &amp;goto_function = goto_model_function.<a class="code" href="classgoto__model__functiont.html#a72c5cbcfe587446276ff164033afc56e">get_goto_function</a>();</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(goto_function.body))</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  {</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    goto_function.body.update();</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    goto_model_function.<a class="code" href="classgoto__model__functiont.html#ad20a93277452fd9cc4e21db66059d8c6">compute_location_numbers</a>();</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  }</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;}</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8h.html#af996c03747d2c5e4e4c89d43a89677aa">  115</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordtype">bool</span> any_change = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;id_and_function : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    any_change |= <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(id_and_function.second.body);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordflow">if</span>(any_change)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="keywordflow">return</span> any_change;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;}</div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8cpp.html#add044df44c2c70e44dc3edf7ae8d2cde">  101</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#add044df44c2c70e44dc3edf7ae8d2cde">operator&lt;</a>(</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keyword">const</span> <a class="code" href="structinstruction__location__numbert.html">instruction_location_numbert</a> &amp;i1,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keyword">const</span> <a class="code" href="structinstruction__location__numbert.html">instruction_location_numbert</a> &amp;i2)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">return</span> i1-&gt;location_number &lt; i2-&gt;location_number;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8h.html#ab9b1496bf5658e98228399c0e57bfeb9">  108</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet&lt;goto_programt, instruction_location_numbert&gt;</a></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    natural_loops{goto_program};</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  std::set&lt;instruction_location_numbert&gt; modified_loops;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it1 = natural_loops.loop_map.begin();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      it1 != natural_loops.loop_map.end();</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      ++it1)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(!it1-&gt;second.empty(), <span class="stringliteral">&quot;loops cannot have no instructions&quot;</span>);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">// skip over lexical loops</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      (*std::prev(it1-&gt;second.end()))-&gt;is_goto() &amp;&amp;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      (*std::prev(it1-&gt;second.end()))-&gt;get_target() == it1-&gt;first)</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">if</span>(modified_loops.find(it1-&gt;first) != modified_loops.end())</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">// it1 refers to a loop that isn&#39;t a lexical loop, now see whether any other</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">// loop is nested within it1</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> it2 = natural_loops.loop_map.begin();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        it2 != natural_loops.loop_map.end();</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        ++it2)</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    {</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordflow">if</span>(it1 == it2)</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordflow">if</span>(std::includes(</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;           it1-&gt;second.begin(),</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;           it1-&gt;second.end(),</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;           it2-&gt;second.begin(),</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;           it2-&gt;second.end()))</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="comment">// make sure that loops with overlapping body are properly nested by a</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="comment">// back edge; this will be a disconnected edge, which</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="comment">// ensure_one_backedge_per_target connects</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;          modified_loops.find(it2-&gt;first) == modified_loops.end() &amp;&amp;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;          (!(*std::prev(it2-&gt;second.end()))-&gt;is_goto() ||</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;           (*std::prev(it2-&gt;second.end()))-&gt;get_target() != it2-&gt;first))</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;          <span class="keyword">auto</span> new_goto = goto_program.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;            *std::prev(it2-&gt;second.end()),</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            <a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;              it2-&gt;first, (*std::prev(it2-&gt;second.end()))-&gt;source_location()));</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;          it2-&gt;second.insert_instruction(new_goto);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;          it1-&gt;second.insert_instruction(new_goto);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          modified_loops.insert(it2-&gt;first);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        }</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        goto_program.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;          *std::prev(it1-&gt;second.end()),</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;          <a class="code" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;            it1-&gt;first, (*std::prev(it1-&gt;second.end()))-&gt;source_location()));</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        modified_loops.insert(it1-&gt;first);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keywordflow">if</span>(!modified_loops.empty())</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keywordtype">bool</span> any_change = !modified_loops.empty();</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      it != goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      ++it)</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  {</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    any_change |= <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(it, goto_program);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keywordflow">return</span> any_change;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;}</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
+<div class="line"><a name="l00183"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8h.html#adb18c974dccbd24d3bebf6a0878ce25a">  183</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(<a class="code" href="classgoto__model__functiont.html">goto_model_functiont</a> &amp;goto_model_function)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;{</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  <span class="keyword">auto</span> &amp;goto_function = goto_model_function.<a class="code" href="classgoto__model__functiont.html#a72c5cbcfe587446276ff164033afc56e">get_goto_function</a>();</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(goto_function.body))</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    goto_function.body.update();</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    goto_model_function.<a class="code" href="classgoto__model__functiont.html#ad20a93277452fd9cc4e21db66059d8c6">compute_location_numbers</a>();</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  }</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;}</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno"><a class="line" href="ensure__one__backedge__per__target_8h.html#af996c03747d2c5e4e4c89d43a89677aa">  197</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;{</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <span class="keywordtype">bool</span> any_change = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;id_and_function : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    any_change |= <a class="code" href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a>(id_and_function.second.body);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="keywordflow">if</span>(any_change)</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keywordflow">return</span> any_change;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassgoto__programt_html_a2d19ab1e24b01874b1371c8272da146b"><div class="ttname"><a href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">goto_programt::update</a></div><div class="ttdeci">void update()</div><div class="ttdoc">Update all indices.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00617">goto_program.cpp:617</a></div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div></div>
+<div class="ttc" id="aensure__one__backedge__per__target_8cpp_html_add044df44c2c70e44dc3edf7ae8d2cde"><div class="ttname"><a href="ensure__one__backedge__per__target_8cpp.html#add044df44c2c70e44dc3edf7ae8d2cde">operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const instruction_location_numbert &amp;i1, const instruction_location_numbert &amp;i2)</div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00101">ensure_one_backedge_per_target.cpp:101</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00025">goto_model.h:25</a></div></div>
-<div class="ttc" id="aensure__one__backedge__per__target_8cpp_html_a5bf1d6ff8c802e1df3e1695ff143fb15"><div class="ttname"><a href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a></div><div class="ttdeci">static bool location_number_less_than(const goto_programt::targett &amp;a, const goto_programt::targett &amp;b)</div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00018">ensure_one_backedge_per_target.cpp:18</a></div></div>
-<div class="ttc" id="aensure__one__backedge__per__target_8cpp_html_acc6d3ba8c392806c378468b051346160"><div class="ttname"><a href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a></div><div class="ttdeci">bool ensure_one_backedge_per_target(goto_programt::targett &amp;it, goto_programt &amp;goto_program)</div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00025">ensure_one_backedge_per_target.cpp:25</a></div></div>
+<div class="ttc" id="aensure__one__backedge__per__target_8cpp_html_a5bf1d6ff8c802e1df3e1695ff143fb15"><div class="ttname"><a href="ensure__one__backedge__per__target_8cpp.html#a5bf1d6ff8c802e1df3e1695ff143fb15">location_number_less_than</a></div><div class="ttdeci">static bool location_number_less_than(const goto_programt::targett &amp;a, const goto_programt::targett &amp;b)</div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00020">ensure_one_backedge_per_target.cpp:20</a></div></div>
+<div class="ttc" id="aensure__one__backedge__per__target_8cpp_html_acc6d3ba8c392806c378468b051346160"><div class="ttname"><a href="ensure__one__backedge__per__target_8cpp.html#acc6d3ba8c392806c378468b051346160">ensure_one_backedge_per_target</a></div><div class="ttdeci">bool ensure_one_backedge_per_target(goto_programt::targett &amp;it, goto_programt &amp;goto_program)</div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00027">ensure_one_backedge_per_target.cpp:27</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_ae34f002c1001fe7430f617688016e473"><div class="ttname"><a href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a></div><div class="ttdeci">static instructiont make_goto(targett _target, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01038">goto_program.h:1038</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00510">invariant.h:510</a></div></div>
+<div class="ttc" id="astructinstruction__location__numbert_html_a0b783304bbccee50d4ff25bdffb53aec"><div class="ttname"><a href="structinstruction__location__numbert.html#a0b783304bbccee50d4ff25bdffb53aec">instruction_location_numbert::instruction_location_numbert</a></div><div class="ttdeci">instruction_location_numbert()=default</div></div>
 <div class="ttc" id="aclassgoto__model__functiont_html_ad20a93277452fd9cc4e21db66059d8c6"><div class="ttname"><a href="classgoto__model__functiont.html#ad20a93277452fd9cc4e21db66059d8c6">goto_model_functiont::compute_location_numbers</a></div><div class="ttdeci">void compute_location_numbers()</div><div class="ttdoc">Re-number our goto_function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00209">goto_model.h:209</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html"><div class="ttname"><a href="classnatural__loops__templatet.html">natural_loops_templatet</a></div><div class="ttdoc">Main driver for working out if a class (normally goto_programt) has any natural loops.</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00047">natural_loops.h:47</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00600">goto_program.h:600</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html_ae63ccd9b824a94422f0bcead059bcaa2"><div class="ttname"><a href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_modelt::goto_functions</a></div><div class="ttdeci">goto_functionst goto_functions</div><div class="ttdoc">GOTO functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00033">goto_model.h:33</a></div></div>
+<div class="ttc" id="astructinstruction__location__numbert_html"><div class="ttname"><a href="structinstruction__location__numbert.html">instruction_location_numbert</a></div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00089">ensure_one_backedge_per_target.cpp:89</a></div></div>
+<div class="ttc" id="anatural__loops_8h_html"><div class="ttname"><a href="natural__loops_8h.html">natural_loops.h</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_ab0e44849e3d2a7afe582edb65c726b7e"><div class="ttname"><a href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">goto_functionst::update</a></div><div class="ttdeci">void update()</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00083">goto_functions.h:83</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00072">goto_program.h:72</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a99b8eada755daa37331c52e53d2ee0b3"><div class="ttname"><a href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">goto_programt::insert_after</a></div><div class="ttdeci">targett insert_after(const_targett target)</div><div class="ttdoc">Insertion after the instruction pointed-to by the given instruction iterator target.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00686">goto_program.h:686</a></div></div>
 <div class="ttc" id="aensure__one__backedge__per__target_8h_html"><div class="ttname"><a href="ensure__one__backedge__per__target_8h.html">ensure_one_backedge_per_target.h</a></div></div>
 <div class="ttc" id="aclassgoto__model__functiont_html_a72c5cbcfe587446276ff164033afc56e"><div class="ttname"><a href="classgoto__model__functiont.html#a72c5cbcfe587446276ff164033afc56e">goto_model_functiont::get_goto_function</a></div><div class="ttdeci">goto_functionst::goto_functiont &amp; get_goto_function()</div><div class="ttdoc">Get GOTO function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00225">goto_model.h:225</a></div></div>
+<div class="ttc" id="astructinstruction__location__numbert_html_aeafb7014f206b6880adb79c04267303f"><div class="ttname"><a href="structinstruction__location__numbert.html#aeafb7014f206b6880adb79c04267303f">instruction_location_numbert::instruction_location_numbert</a></div><div class="ttdeci">instruction_location_numbert(goto_programt::targett target)</div><div class="ttdef"><b>Definition:</b> <a href="ensure__one__backedge__per__target_8cpp_source.html#l00093">ensure_one_backedge_per_target.cpp:93</a></div></div>
 <div class="ttc" id="aclassgoto__model__functiont_html"><div class="ttname"><a href="classgoto__model__functiont.html">goto_model_functiont</a></div><div class="ttdoc">Interface providing access to a single function in a GOTO model, plus its associated symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00182">goto_model.h:182</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00594">goto_program.h:594</a></div></div>
 <div class="ttc" id="aclassnot__exprt_html"><div class="ttname"><a href="classnot__exprt.html">not_exprt</a></div><div class="ttdoc">Boolean negation.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02277">std_expr.h:2277</a></div></div>
