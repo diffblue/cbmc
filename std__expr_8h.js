@@ -72,6 +72,7 @@ var std__expr_8h =
     [ "can_cast_expr< array_of_exprt >", "std__expr_8h.html#a7ee6c6a661bf6a74241269b1d6d881e9", null ],
     [ "can_cast_expr< binary_exprt >", "std__expr_8h.html#ac8b0a8ce24a951cd6be54a65c14c7976", null ],
     [ "can_cast_expr< binary_relation_exprt >", "std__expr_8h.html#aabc4d1dc7a029b2e61e0aefcfb053450", null ],
+    [ "can_cast_expr< binding_exprt >", "std__expr_8h.html#a23a96388c0e4f27bf6edd7f2425cca42", null ],
     [ "can_cast_expr< class_method_descriptor_exprt >", "std__expr_8h.html#a5bf216386bc6a3c7df3d6b9d1bd41f8c", null ],
     [ "can_cast_expr< complex_exprt >", "std__expr_8h.html#a07e5f2947d71d70a104de08e35891b46", null ],
     [ "can_cast_expr< complex_imag_exprt >", "std__expr_8h.html#a46469f0e98d68b8994b7b065e6d74c3c", null ],

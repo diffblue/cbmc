@@ -1746,7 +1746,7 @@ Friends</h2></td></tr>
 <li>Any object whose base-name ends with <code>auto_object</code> is automatically initialised when dereferenced for the first time, creating a tree of pointers leading to fresh objects each time such a pointer is dereferenced. If new objects are created by this mechanism then state will be altered (by <code>symex_assign</code>) to initialise them. See <a class="el" href="auto__objects_8cpp.html">auto_objects.cpp</a> for details. </li>
 </ol>
 
-<p class="definition">Definition at line <a class="el" href="symex__dereference_8cpp_source.html#l00475">475</a> of file <a class="el" href="symex__dereference_8cpp_source.html">symex_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__dereference_8cpp_source.html#l00479">479</a> of file <a class="el" href="symex__dereference_8cpp_source.html">symex_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -1781,7 +1781,7 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>is_in_quantifier</em>&#160;</td>
+          <td class="paramname"><em>is_in_binding_expression</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1797,7 +1797,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>If <code>expr</code> is a <a class="el" href="classdereference__exprt.html">dereference_exprt</a>, replace it with explicit references to the objects it may point to. </p>
-<p>Otherwise recursively apply this function to <code>expr's</code> operands, with special cases for address-of (handled by <a class="el" href="classgoto__symext.html#ab9d9303185ce67a4d44ff2f342ad0a8e">goto_symext::address_arithmetic</a>) and certain common expression patterns such as <code>&amp;struct.flexible_array[0]</code> (see inline comments in code). Note that <code>write</code> is used to alter behaviour when this function is operating on the LHS of an assignment. Similarly <code>is_in_quantifier</code> indicates when the dereference is inside a quantifier (related to scoping when dereference caching is enabled). For full details of this method's pointer replacement and potential side- effects see <a class="el" href="classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0">goto_symext::dereference</a> </p>
+<p>Otherwise recursively apply this function to <code>expr's</code> operands, with special cases for address-of (handled by <a class="el" href="classgoto__symext.html#ab9d9303185ce67a4d44ff2f342ad0a8e">goto_symext::address_arithmetic</a>) and certain common expression patterns such as <code>&amp;struct.flexible_array[0]</code> (see inline comments in code). Note that <code>write</code> is used to alter behaviour when this function is operating on the LHS of an assignment. Similarly <code>is_in_binding_expression</code> indicates when the dereference is inside a binding expression (related to scoping when dereference caching is enabled). For full details of this method's pointer replacement and potential side- effects see <a class="el" href="classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0">goto_symext::dereference</a> </p>
 
 <p class="definition">Definition at line <a class="el" href="symex__dereference_8cpp_source.html#l00257">257</a> of file <a class="el" href="symex__dereference_8cpp_source.html">symex_dereference.cpp</a>.</p>
 
