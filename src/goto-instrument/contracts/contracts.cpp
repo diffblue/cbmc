@@ -654,17 +654,6 @@ void code_contractst::apply_function_contract(
       _location);
   }
 
-  // Translate requires_contract(ptr, contract) clauses to assertions
-  for(auto &expr : type.requires_contract())
-  {
-    assert_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(
-        to_lambda_expr(expr).application(instantiation_values)),
-      ID_precondition,
-      mode,
-      new_program);
-  }
-
   // Generate all the instructions required to initialize history variables
   exprt::operandst instantiated_ensures_clauses;
   for(auto clause : type.ensures())
@@ -740,16 +729,6 @@ void code_contractst::apply_function_contract(
       [&is_fresh](goto_programt &ensures) { is_fresh.update_ensures(ensures); },
       new_program,
       _location);
-  }
-
-  // Translate ensures_contract(ptr, contract) clauses to assumptions
-  for(auto &expr : type.ensures_contract())
-  {
-    assume_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(
-        to_lambda_expr(expr).application(instantiation_values)),
-      mode,
-      new_program);
   }
 
   // Kill return value variable if fresh
@@ -1194,27 +1173,6 @@ void code_contractst::enforce_contract(const irep_idt &function)
   add_contract_check(original, mangled, wrapper.body);
 }
 
-void code_contractst::assert_function_pointer_obeys_contract(
-  const function_pointer_obeys_contract_exprt &expr,
-  const irep_idt &property_class,
-  const irep_idt &mode,
-  goto_programt &dest)
-{
-  throw invalid_source_file_exceptiont(
-    "require_contracts or ensures_contract clauses are not supported",
-    expr.source_location());
-}
-
-void code_contractst::assume_function_pointer_obeys_contract(
-  const function_pointer_obeys_contract_exprt &expr,
-  const irep_idt &mode,
-  goto_programt &dest)
-{
-  throw invalid_source_file_exceptiont(
-    "require_contracts or ensures_contract clauses are not supported",
-    expr.source_location());
-}
-
 void code_contractst::add_contract_check(
   const irep_idt &wrapper_function,
   const irep_idt &mangled_function,
@@ -1331,16 +1289,6 @@ void code_contractst::add_contract_check(
     instantiated_ensures_clauses.push_back(instantiated_clause);
   }
 
-  // Translate requires_contract(ptr, contract) clauses to assumptions
-  for(auto &expr : code_type.requires_contract())
-  {
-    assume_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(
-        to_lambda_expr(expr).application(instantiation_values)),
-      function_symbol.mode,
-      check);
-  }
-
   // ret=mangled_function(parameter1, ...)
   check.add(goto_programt::make_function_call(call, source_location));
 
@@ -1360,16 +1308,6 @@ void code_contractst::add_contract_check(
       _location);
   }
 
-  // Translate ensures_contract(ptr, contract) clauses to assertions
-  for(auto &expr : code_type.ensures_contract())
-  {
-    assert_function_pointer_obeys_contract(
-      to_function_pointer_obeys_contract_expr(
-        to_lambda_expr(expr).application(instantiation_values)),
-      ID_postcondition,
-      function_symbol.mode,
-      check);
-  }
   if(code_type.return_type() != empty_typet())
   {
     check.add(goto_programt::make_set_return_value(

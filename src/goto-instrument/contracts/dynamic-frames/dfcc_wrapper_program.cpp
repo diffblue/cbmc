@@ -249,11 +249,9 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
   encode_ensures_write_set();
   encode_is_fresh_set();
   encode_requires_clauses();
-  encode_requires_contract_clauses();
   encode_contract_write_set();
   encode_function_call();
   encode_ensures_clauses();
-  encode_ensures_contract_clauses();
 }
 
 void dfcc_wrapper_programt::add_to_dest(
@@ -796,127 +794,6 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
 
   // add the ensures program to the postconditions section
   postconditions.destructive_append(ensures_program);
-}
-
-void dfcc_wrapper_programt::encode_requires_contract_clauses()
-{
-  const auto &requires_contract = contract_code_type.requires_contract();
-
-  if(contract_mode == dfcc_contract_modet::CHECK)
-  {
-    for(auto &expr : requires_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-
-      assume_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance), preconditions);
-    }
-  }
-  else
-  {
-    for(auto &expr : requires_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-
-      assert_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance),
-        ID_precondition,
-        preconditions);
-    }
-  }
-}
-
-void dfcc_wrapper_programt::encode_ensures_contract_clauses()
-{
-  const auto &ensures_contract = contract_code_type.ensures_contract();
-
-  if(contract_mode == dfcc_contract_modet::CHECK)
-  {
-    for(auto &expr : ensures_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-      assert_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance),
-        ID_postcondition,
-        postconditions);
-    }
-  }
-  else
-  {
-    for(auto &expr : ensures_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-      assume_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance), postconditions);
-    }
-  }
-}
-
-void dfcc_wrapper_programt::assert_function_pointer_obeys_contract(
-  const function_pointer_obeys_contract_exprt &expr,
-  const irep_idt &property_class,
-  goto_programt &dest)
-{
-  function_pointer_contracts.insert(
-    expr.contract_symbol_expr().get_identifier());
-  source_locationt loc(expr.source_location());
-  loc.set_property_class(property_class);
-  std::stringstream comment;
-  comment << "Assert function pointer '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.address_of_contract())
-          << "'";
-  loc.set_comment(comment.str());
-  code_assertt assert_expr(
-    equal_exprt{expr.function_pointer(), expr.address_of_contract()});
-  assert_expr.add_source_location() = loc;
-  goto_programt instructions;
-  converter.goto_convert(assert_expr, instructions, contract_symbol.mode);
-  dest.destructive_append(instructions);
-}
-
-void dfcc_wrapper_programt::assume_function_pointer_obeys_contract(
-  const function_pointer_obeys_contract_exprt &expr,
-  goto_programt &dest)
-{
-  function_pointer_contracts.insert(
-    expr.contract_symbol_expr().get_identifier());
-
-  source_locationt loc(expr.source_location());
-  std::stringstream comment;
-  comment << "Assume function pointer '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.contract_symbol_expr())
-          << "'";
-  loc.set_comment(comment.str());
-  dest.add(goto_programt::make_assignment(
-    expr.function_pointer(), expr.address_of_contract(), loc));
 }
 
 void dfcc_wrapper_programt::encode_function_call()

@@ -860,16 +860,6 @@ void c_typecheck_baset::typecheck_declaration(
             parameter_identifier, p.type());
         }
 
-        for(auto &expr : code_type.requires_contract())
-        {
-          typecheck_spec_function_pointer_obeys_contract(expr);
-          std::string clause_type = "function pointer preconditions";
-          check_history_expr_return_value(expr, clause_type);
-          lambda_exprt lambda{temporary_parameter_symbols, expr};
-          lambda.add_source_location() = expr.source_location();
-          expr.swap(lambda);
-        }
-
         for(auto &requires : code_type.requires())
         {
           typecheck_expr(requires);
@@ -898,18 +888,6 @@ void c_typecheck_baset::typecheck_declaration(
           lambda_exprt lambda{temporary_parameter_symbols, frees};
           lambda.add_source_location() = frees.source_location();
           frees.swap(lambda);
-        }
-
-        for(auto &expr : code_type.ensures_contract())
-        {
-          typecheck_spec_function_pointer_obeys_contract(expr);
-          disallow_subexpr_by_id(
-            expr,
-            ID_loop_entry,
-            CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
-          lambda_exprt lambda{temporary_parameter_symbols, expr};
-          lambda.add_source_location() = expr.source_location();
-          expr.swap(lambda);
         }
 
         for(auto &ensures : code_type.ensures())
@@ -954,9 +932,7 @@ void c_typecheck_baset::typecheck_declaration(
         new_symbol.type.remove(ID_C_spec_assigns);
         new_symbol.type.remove(ID_C_spec_frees);
         new_symbol.type.remove(ID_C_spec_ensures);
-        new_symbol.type.remove(ID_C_spec_ensures_contract);
         new_symbol.type.remove(ID_C_spec_requires);
-        new_symbol.type.remove(ID_C_spec_requires_contract);
       }
     }
   }

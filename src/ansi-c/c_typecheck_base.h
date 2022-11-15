@@ -157,7 +157,6 @@ protected:
   /// is found in expr.
   virtual void check_was_freed(const exprt &expr, std::string &clause_type);
 
-  virtual void typecheck_spec_function_pointer_obeys_contract(exprt &expr);
   virtual void typecheck_spec_assigns(exprt::operandst &targets);
   virtual void typecheck_spec_frees(exprt::operandst &targets);
   virtual void typecheck_conditional_targets(

@@ -233,37 +233,8 @@ protected:
   /// Encodes preconditions, instruments them to check for side effects
   void encode_requires_clauses();
 
-  /// Encodes function pointer preconditions
-  void encode_requires_contract_clauses();
-
   /// Encodes postconditions, instruments them to check for side effects
   void encode_ensures_clauses();
-
-  /// Encodes function pointer postconditions
-  void encode_ensures_contract_clauses();
-
-  /// Translates a function_pointer_obeys_contract_exprt into an assertion
-  /// ```
-  /// ASSERT function_pointer == contract;
-  /// ```
-  ///
-  /// \param expr expression to translate
-  /// \param property_class property class to use for the generated assertions
-  /// \param dest goto_program where generated instructions are appended
-  void assert_function_pointer_obeys_contract(
-    const function_pointer_obeys_contract_exprt &expr,
-    const irep_idt &property_class,
-    goto_programt &dest);
-
-  /// Translates a function_pointer_obeys_contract_exprt into an assignment
-  /// ```
-  /// ASSIGN function_pointer = contract;
-  /// ```
-  /// \param expr expression to translate
-  /// \param dest goto_program where generated instructions are appended
-  void assume_function_pointer_obeys_contract(
-    const function_pointer_obeys_contract_exprt &expr,
-    goto_programt &dest);
 
   /// Encodes the function call section of the wrapper program.
   void encode_function_call();

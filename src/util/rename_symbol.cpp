@@ -187,31 +187,11 @@ bool rename_symbolt::rename(typet &dest) const
       result = false;
     }
 
-    const exprt &spec_ensures_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_ensures_contract));
-    if(
-      spec_ensures_contract.is_not_nil() &&
-      have_to_rename(spec_ensures_contract))
-    {
-      rename(static_cast<exprt &>(dest.add(ID_C_spec_ensures_contract)));
-      result = false;
-    }
-
     const exprt &spec_requires =
       static_cast<const exprt &>(dest.find(ID_C_spec_requires));
     if(spec_requires.is_not_nil() && have_to_rename(spec_requires))
     {
       rename(static_cast<exprt &>(dest.add(ID_C_spec_requires)));
-      result = false;
-    }
-
-    const exprt &spec_requires_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_requires_contract));
-    if(
-      spec_requires_contract.is_not_nil() &&
-      have_to_rename(spec_requires_contract))
-    {
-      rename(static_cast<exprt &>(dest.add(ID_C_spec_requires_contract)));
       result = false;
     }
   }
@@ -288,28 +268,10 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
     if(spec_ensures.is_not_nil() && have_to_rename(spec_ensures))
       return true;
 
-    const exprt &spec_ensures_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_ensures_contract));
-    if(
-      spec_ensures_contract.is_not_nil() &&
-      have_to_rename(spec_ensures_contract))
-    {
-      return true;
-    }
-
     const exprt &spec_requires =
       static_cast<const exprt &>(dest.find(ID_C_spec_requires));
     if(spec_requires.is_not_nil() && have_to_rename(spec_requires))
       return true;
-
-    const exprt &spec_requires_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_requires_contract));
-    if(
-      spec_requires_contract.is_not_nil() &&
-      have_to_rename(spec_requires_contract))
-    {
-      return true;
-    }
   }
   else if(dest.id()==ID_c_enum_tag ||
           dest.id()==ID_struct_tag ||
