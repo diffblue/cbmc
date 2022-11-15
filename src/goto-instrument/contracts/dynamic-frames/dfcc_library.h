@@ -130,7 +130,9 @@ enum class dfcc_funt
   /// \see __CPROVER_contracts_was_freed
   WAS_FREED,
   /// \see __CPROVER_contracts_check_replace_ensures_was_freed_preconditions
-  REPLACE_ENSURES_WAS_FREED_PRECONDITIONS
+  REPLACE_ENSURES_WAS_FREED_PRECONDITIONS,
+  /// \see __CPROVER_contracts_obeys_contract
+  OBEYS_CONTRACT,
 };
 
 class goto_modelt;

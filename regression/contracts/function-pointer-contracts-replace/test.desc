@@ -1,0 +1,10 @@
+CORE
+main.c
+ --restrict-function-pointer foo.CALL/arr_fun_contract --enforce-contract foo --replace-call-with-contract get_arr_fun
+^file main.c line 19 function get_arr_fun: __CPROVER_obeys_contract is not supported in this version$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+This test checks uses of the unsupported __CPROVER_obeys_contract predicate
+trigger errors.

@@ -1,0 +1,12 @@
+CORE
+main.c
+--restrict-function-pointer foo.CALL/arr_fun_contract --dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that when a function taking a function pointer as input satisfying a given
+contract is checked against its contract, the function pointer can be called
+like a regular function pointer and establishes the post conditions specified
+by its contract.

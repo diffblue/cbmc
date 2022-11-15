@@ -484,6 +484,24 @@ void code_contractst::check_apply_loop_contracts(
   }
 }
 
+/// Throws an exception if a contract uses unsupported constructs like:
+/// - obeys_contract predicates
+static void throw_on_unsupported(const goto_programt &program)
+{
+  for(const auto &it : program.instructions)
+  {
+    if(
+      it.is_function_call() && it.call_function().id() == ID_symbol &&
+      to_symbol_expr(it.call_function()).get_identifier() == CPROVER_PREFIX
+        "obeys_contract")
+    {
+      throw invalid_source_file_exceptiont(
+        CPROVER_PREFIX "obeys_contract is not supported in this version",
+        it.source_location());
+    }
+  }
+}
+
 /// This function generates instructions for all contract constraint, i.e.,
 /// assumptions and assertions based on requires and ensures clauses.
 static void generate_contract_constraints(
@@ -513,6 +531,7 @@ static void generate_contract_constraints(
   }
   constraint.instructions.back().source_location_nonconst() = location;
   is_fresh_update(constraint);
+  throw_on_unsupported(constraint);
   program.destructive_append(constraint);
 }
 

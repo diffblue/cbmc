@@ -150,6 +150,9 @@ protected:
   // contracts
   virtual void
   typecheck_typed_target_call(side_effect_expr_function_callt &expr);
+  /// Checks an obeys_contract predicate occurrence
+  virtual void
+  typecheck_obeys_contract_call(side_effect_expr_function_callt &expr);
   /// Checks that no history expr or return_value exists in expr
   virtual void
   check_history_expr_return_value(const exprt &expr, std::string &clause_type);

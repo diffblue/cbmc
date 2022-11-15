@@ -33,11 +33,10 @@ class dfcc_libraryt;
 class dfcc_utilst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
-class function_pointer_obeys_contract_exprt;
 
 /// \brief Generates the body of a wrapper function from a contract
-/// specified using requires, requires_contract, assigns, frees, ensures,
-/// ensures_contract clauses attached to a function symbol. The desired mode
+/// specified using requires, assigns, frees, ensures,
+/// clauses attached to a function symbol. The desired mode
 /// CHECK or REPLACE is given to the constructor of the class.
 ///
 /// \details The body of the wrapper is divided into a number of sections

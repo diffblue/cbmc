@@ -510,5 +510,6 @@ int foo()
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-memory-predicates
+- @ref contracts-function-pointer-predicates
 - @ref contracts-history-variables
 - @ref contracts-quantifiers

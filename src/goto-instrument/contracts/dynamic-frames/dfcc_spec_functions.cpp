@@ -358,7 +358,11 @@ void dfcc_spec_functionst::to_spec_assigns_function(
   goto_model.goto_functions.update();
 
   // instrument for side-effects checking
-  instrument.instrument_function(function_id);
+  std::set<irep_idt> function_pointer_contracts;
+  instrument.instrument_function(function_id, function_pointer_contracts);
+  INVARIANT(
+    function_pointer_contracts.size() == 0,
+    "discovered function pointer contracts unexpectedly");
   utils.set_hide(function_id, true);
 }
 
@@ -412,7 +416,11 @@ void dfcc_spec_functionst::to_spec_frees_function(
   goto_model.goto_functions.update();
 
   // instrument for side-effects checking
-  instrument.instrument_function(function_id);
+  std::set<irep_idt> function_pointer_contracts;
+  instrument.instrument_function(function_id, function_pointer_contracts);
+  INVARIANT(
+    function_pointer_contracts.size() == 0,
+    "discovered function pointer contracts unexpectedly");
 
   utils.set_hide(function_id, true);
 }

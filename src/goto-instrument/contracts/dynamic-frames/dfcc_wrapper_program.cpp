@@ -26,8 +26,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include "dfcc_contract_functions.h"
 #include "dfcc_instrument.h"
-#include "dfcc_is_freeable.h"
-#include "dfcc_is_fresh.h"
 #include "dfcc_library.h"
 #include "dfcc_utils.h"
 
@@ -700,20 +698,14 @@ void dfcc_wrapper_programt::encode_requires_clauses()
     codet requires_statement(statement_type, {std::move(requires)}, sl);
     converter.goto_convert(requires_statement, requires_program, language_mode);
   }
-
   const auto address_of_requires_write_set = addr_of_requires_write_set;
-
-  // rewrite is_fresh predicates
-  dfcc_is_fresht is_fresh(library, message_handler);
-  is_fresh.rewrite_calls(requires_program, address_of_requires_write_set);
-
-  // rewrite is_freeable predicates
-  dfcc_is_freeablet is_freeable(library, message_handler);
-  is_freeable.rewrite_calls(requires_program, address_of_requires_write_set);
 
   // instrument for side effects
   instrument.instrument_goto_program(
-    wrapper_id, requires_program, address_of_requires_write_set);
+    wrapper_id,
+    requires_program,
+    address_of_requires_write_set,
+    function_pointer_contracts);
 
   // append resulting program to preconditions section
   preconditions.destructive_append(requires_program);
@@ -763,31 +755,23 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
 
   const auto address_of_ensures_write_set = addr_of_ensures_write_set;
 
-  // rewrite is_fresh predicates
-  dfcc_is_fresht is_fresh(library, message_handler);
-  is_fresh.rewrite_calls(ensures_program, address_of_ensures_write_set);
-
-  // rewrite was_freed predicates
   // When checking an ensures clause we link the contract write set to the
-  // ensures write set to know what was deallocated by the function and pass
-  // it to the was_freed predicate and perform the checks
-  {
-    auto function_symbol =
-      library.dfcc_fun_symbol[dfcc_funt::LINK_DEALLOCATED].symbol_expr();
-    code_function_callt call(function_symbol);
-    auto &arguments = call.arguments();
-    arguments.emplace_back(address_of_ensures_write_set);
-    arguments.emplace_back(addr_of_contract_write_set);
-    link_deallocated_contract.add(
-      goto_programt::make_function_call(call, wrapper_sl));
-  }
-
-  dfcc_is_freeablet is_freeable(library, message_handler);
-  is_freeable.rewrite_calls(ensures_program, address_of_ensures_write_set);
+  // ensures write set to know what was deallocated by the function so that
+  // the was_freed predicate can perform its checks
+  code_function_callt call(
+    library.dfcc_fun_symbol[dfcc_funt::LINK_DEALLOCATED].symbol_expr());
+  auto &arguments = call.arguments();
+  arguments.emplace_back(address_of_ensures_write_set);
+  arguments.emplace_back(addr_of_contract_write_set);
+  link_deallocated_contract.add(
+    goto_programt::make_function_call(call, wrapper_sl));
 
   // instrument for side effects
   instrument.instrument_goto_program(
-    wrapper_id, ensures_program, address_of_ensures_write_set);
+    wrapper_id,
+    ensures_program,
+    address_of_ensures_write_set,
+    function_pointer_contracts);
 
   // add the snapshot program in the history section
   history.destructive_append(history_snapshot_program);

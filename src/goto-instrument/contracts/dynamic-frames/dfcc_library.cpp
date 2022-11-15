@@ -126,7 +126,8 @@ const std::map<dfcc_funt, irep_idt> create_dfcc_fun_to_name()
     {dfcc_funt::IS_FREEABLE, CONTRACTS_PREFIX "is_freeable"},
     {dfcc_funt::WAS_FREED, CONTRACTS_PREFIX "was_freed"},
     {dfcc_funt::REPLACE_ENSURES_WAS_FREED_PRECONDITIONS,
-     CONTRACTS_PREFIX "check_replace_ensures_was_freed_preconditions"}};
+     CONTRACTS_PREFIX "check_replace_ensures_was_freed_preconditions"},
+    {dfcc_funt::OBEYS_CONTRACT, CONTRACTS_PREFIX "obeys_contract"}};
 }
 
 const std::map<irep_idt, dfcc_funt> create_dfcc_hook()
