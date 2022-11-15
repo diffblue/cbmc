@@ -762,6 +762,16 @@ void goto_convertt::do_function_call_symbol(
     code_function_callt function_call(lhs, function, arguments);
     function_call.add_source_location() = function.source_location();
 
+    // remove void-typed assignments, which may have been created when the
+    // front-end was unable to detect them in type checking for a lack of
+    // available declarations
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_empty)
+    {
+      function_call.lhs().make_nil();
+    }
+
     copy(function_call, FUNCTION_CALL, dest);
 
     return;
@@ -1434,6 +1444,16 @@ void goto_convertt::do_function_call_symbol(
     // insert function call
     code_function_callt function_call(lhs, function, arguments);
     function_call.add_source_location()=function.source_location();
+
+    // remove void-typed assignments, which may have been created when the
+    // front-end was unable to detect them in type checking for a lack of
+    // available declarations
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_empty)
+    {
+      function_call.lhs().make_nil();
+    }
 
     copy(function_call, FUNCTION_CALL, dest);
   }
