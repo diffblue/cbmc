@@ -77,6 +77,12 @@ CI, should succeed), `THOROUGH` (takes too long to be run in CI, should
 succeed), `FUTURE` (will succeed when a planned feature is added) or
 `KNOWNBUG` (will succeed when a bug is fixed).
 
+Test descriptions may also include a number of tags. `test.pl -I<tag>` will only
+run tests with a particular `<tag>`, and `test.pl -X<tag>` will run all tests
+except for those with a particular `<tag>`. See
+[regression/README.md](https://github.com/diffblue/cbmc/blob/develop/regression/README.md)
+for the current set of tags and their intended use.
+
 \subsubsection compilation-and-development-subsubsection-running-regression-tests-with-make Running regression tests with make
 
 If you have compiled using `make` then you can run the regression tests
