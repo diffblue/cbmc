@@ -478,15 +478,18 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           code_assignt assign{it->full_lhs, it->full_lhs_value};
           val.data = convert_assign_rec(lhs_id, assign);
 
-          xmlt &val_s = edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          irep_idt function_id = it->function_id;
-          const symbolt *symbol_ptr = nullptr;
-          if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
+          if(!it->function_id.empty())
           {
-            function_id = lhs_id.substr(0, lhs_id.find("::"));
+            xmlt &val_s = edge.new_element("data");
+            val_s.set_attribute("key", "assumption.scope");
+            irep_idt function_id = it->function_id;
+            const symbolt *symbol_ptr = nullptr;
+            if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
+            {
+              function_id = lhs_id.substr(0, lhs_id.find("::"));
+            }
+            val_s.data = id2string(function_id);
           }
-          val_s.data = id2string(function_id);
 
           if(has_prefix(val.data, "\\result ="))
           {
