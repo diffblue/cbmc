@@ -595,10 +595,35 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     is_number(minus_expr.type()) && operands[0].type().id() == ID_pointer &&
     operands[1].type().id() == ID_pointer)
   {
-    // pointer arithmetic: rewrite "p-p" to "0"
+    exprt ptr_op0 = simplify_object(operands[0]).expr;
+    exprt ptr_op1 = simplify_object(operands[1]).expr;
 
-    if(operands[0]==operands[1])
-      return from_integer(0, minus_expr.type());
+    auto address_of = expr_try_dynamic_cast<address_of_exprt>(ptr_op0);
+    if(ptr_op0 == ptr_op1 && address_of)
+    {
+      exprt offset_op0 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[0], minus_expr.type()});
+      exprt offset_op1 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[1], minus_expr.type()});
+
+      const auto object_size =
+        pointer_offset_size(address_of->object().type(), ns);
+      auto element_size =
+        size_of_expr(to_pointer_type(operands[0].type()).base_type(), ns);
+
+      if(
+        offset_op0.is_constant() && offset_op1.is_constant() &&
+        object_size.has_value() && element_size.has_value() &&
+        numeric_cast_v<mp_integer>(to_constant_expr(offset_op0)) <=
+          *object_size &&
+        numeric_cast_v<mp_integer>(to_constant_expr(offset_op1)) <=
+          *object_size)
+      {
+        return changed(simplify_rec(div_exprt{
+          minus_exprt{offset_op0, offset_op1},
+          typecast_exprt{*element_size, minus_expr.type()}}));
+      }
+    }
   }
 
   return unchanged(expr);
