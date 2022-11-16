@@ -109,13 +109,6 @@ __CPROVER_contracts_car_t
 __CPROVER_contracts_car_create(void *ptr, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
-#pragma CPROVER check push
-#pragma CPROVER check disable "pointer"
-#pragma CPROVER check disable "pointer-primitive"
-#pragma CPROVER check disable "unsigned-overflow"
-#pragma CPROVER check disable "signed-overflow"
-#pragma CPROVER check disable "undefined-shift"
-#pragma CPROVER check disable "conversion"
   __CPROVER_assert(
     ((ptr == 0) | __CPROVER_rw_ok(ptr, size)),
     "ptr NULL or writable up to size");
@@ -129,7 +122,6 @@ __CPROVER_HIDE:;
     "no offset bits overflow on CAR upper bound computation");
   return (__CPROVER_contracts_car_t){
     .is_writable = ptr != 0, .size = size, .lb = ptr, .ub = (char *)ptr + size};
-#pragma CPROVER check pop
 }
 
 /// \brief Initialises a __CPROVER_contracts_car_set_ptr_t object
@@ -163,14 +155,6 @@ void __CPROVER_contracts_car_set_insert(
   __CPROVER_size_t size)
 {
 __CPROVER_HIDE:;
-#pragma CPROVER check push
-#pragma CPROVER check disable "pointer"
-#pragma CPROVER check disable "pointer-overflow"
-#pragma CPROVER check disable "pointer-primitive"
-#pragma CPROVER check disable "unsigned-overflow"
-#pragma CPROVER check disable "signed-overflow"
-#pragma CPROVER check disable "undefined-shift"
-#pragma CPROVER check disable "conversion"
 #ifdef DFCC_DEBUG
   __CPROVER_assert((set != 0) & (idx < set->max_elems), "no OOB access");
 #endif
@@ -188,7 +172,6 @@ __CPROVER_HIDE:;
   __CPROVER_contracts_car_t *elem = set->elems + idx;
   *elem = (__CPROVER_contracts_car_t){
     .is_writable = ptr != 0, .size = size, .lb = ptr, .ub = (char *)ptr + size};
-#pragma CPROVER check pop
 }
 
 /// \brief Invalidates all cars in the \p set that point into the same object
@@ -1062,18 +1045,10 @@ SET_DEALLOCATE_FREEABLE_LOOP:
     void *ptr = *current;
 
     // call free only iff the pointer is valid preconditions are met
-#pragma CPROVER check push
-#pragma CPROVER check disable "pointer"
-#pragma CPROVER check disable "pointer-primitive"
-#pragma CPROVER check disable "unsigned-overflow"
-#pragma CPROVER check disable "signed-overflow"
-#pragma CPROVER check disable "undefined-shift"
-#pragma CPROVER check disable "conversion"
     // skip checks on r_ok, dynamic_object and pointer_offset
     __CPROVER_bool preconditions =
       (ptr == 0) | (__CPROVER_r_ok(ptr, 0) & __CPROVER_DYNAMIC_OBJECT(ptr) &
                     (__CPROVER_POINTER_OFFSET(ptr) == 0));
-#pragma CPROVER check pop
     // If there is aliasing between the pointers in the freeable set,
     // and we attempt to free again one of the already freed pointers,
     // the r_ok condition above will fail, preventing us to deallocate
@@ -1204,13 +1179,6 @@ __CPROVER_HIDE:;
   __CPROVER_assert(
     write_set->linked_is_fresh, "set->linked_is_fresh is not NULL");
 #endif
-#pragma CPROVER check push
-#pragma CPROVER check disable "pointer"
-#pragma CPROVER check disable "pointer-primitive"
-#pragma CPROVER check disable "pointer-overflow"
-#pragma CPROVER check disable "signed-overflow"
-#pragma CPROVER check disable "unsigned-overflow"
-#pragma CPROVER check disable "conversion"
   if(write_set->assume_requires_ctx)
   {
 #ifdef DFCC_DEBUG
@@ -1311,7 +1279,6 @@ __CPROVER_HIDE:;
     __CPROVER_assume(0);
     return 0; // to silence libcheck
   }
-#pragma CPROVER check pop
 }
 
 /// \brief Returns the start address of the conditional address range found at

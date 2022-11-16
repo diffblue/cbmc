@@ -248,6 +248,9 @@ void dfcct::link_model_and_load_dfcc_library()
   // load the dfcc library before instrumentation starts
   library.load(other_symbols);
 
+  // disable checks on all library functions
+  library.disable_checks();
+
   // add C prover lib again to fetch any dependencies of the dfcc functions
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);

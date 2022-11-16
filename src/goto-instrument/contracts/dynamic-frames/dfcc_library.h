@@ -244,6 +244,10 @@ public:
   /// Sets the given hide flag on all instructions of all library functions
   void set_hide(bool hide);
 
+  /// Adds "checked" pragmas to instructions of all library functions
+  /// instructions. By default checks are not disabled.
+  void disable_checks();
+
   /// Returns true iff the given function_id is one of `__CPROVER_assignable`,
   /// `__CPROVER_object_whole`, `__CPROVER_object_from`,
   /// `__CPROVER_object_upto`, `__CPROVER_freeable`
