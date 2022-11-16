@@ -2208,6 +2208,81 @@ void smt2_convt::convert_expr(const exprt &expr)
         "overflow check should not be performed on unsupported type",
         op_type.id_string());
   }
+  else if(expr.id() == ID_saturating_plus || expr.id() == ID_saturating_minus)
+  {
+    const bool subtract = expr.id() == ID_saturating_minus;
+    const auto &op_type = expr.type();
+    const auto &op0 = to_binary_expr(expr).op0();
+    const auto &op1 = to_binary_expr(expr).op1();
+
+    if(op_type.id() == ID_signedbv)
+    {
+      auto width = to_signedbv_type(op_type).get_width();
+
+      // compute sum with one extra bit
+      out << "(let ((?sum (";
+      out << (subtract ? "bvsub" : "bvadd");
+      out << " ((_ sign_extend 1) ";
+      convert_expr(op0);
+      out << ")";
+      out << " ((_ sign_extend 1) ";
+      convert_expr(op1);
+      out << ")))) "; // sign_extend, bvadd/sub
+
+      // pick one of MAX, MIN, or the sum
+      out << "(ite (= "
+             "((_ extract "
+          << width << " " << width
+          << ") ?sum) "
+             "((_ extract "
+          << (width - 1) << " " << (width - 1) << ") ?sum)";
+      out << ") "; // =
+
+      // no overflow and no underflow case, return the sum
+      out << "((_ extract " << width - 1 << " 0) ?sum) ";
+
+      // MAX
+      out << "(ite (= ((_ extract " << width << " " << width << ") ?sum) #b0) ";
+      convert_expr(to_signedbv_type(op_type).largest_expr());
+
+      // MIN
+      convert_expr(to_signedbv_type(op_type).smallest_expr());
+      out << ")))"; // ite, ite, let
+    }
+    else if(op_type.id() == ID_unsignedbv)
+    {
+      auto width = to_unsignedbv_type(op_type).get_width();
+
+      // compute sum with one extra bit
+      out << "(let ((?sum (" << (subtract ? "bvsub" : "bvadd");
+      out << " ((_ zero_extend 1) ";
+      convert_expr(op0);
+      out << ")";
+      out << " ((_ zero_extend 1) ";
+      convert_expr(op1);
+      out << "))))"; // zero_extend, bvsub/bvadd
+
+      // pick one of MAX, MIN, or the sum
+      out << "(ite (= ((_ extract " << width << " " << width << ") ?sum) #b0) ";
+
+      // no overflow and no underflow case, return the sum
+      out << " ((_ extract " << width - 1 << " 0) ?sum) ";
+
+      // overflow when adding, underflow when subtracting
+      if(subtract)
+        convert_expr(to_unsignedbv_type(op_type).smallest_expr());
+      else
+        convert_expr(to_unsignedbv_type(op_type).largest_expr());
+
+      // MIN
+      out << "))"; // ite, let
+    }
+    else
+      INVARIANT_WITH_DIAGNOSTICS(
+        false,
+        "saturating_plus/minus on unsupported type",
+        op_type.id_string());
+  }
   else if(expr.id()==ID_array)
   {
     defined_expressionst::const_iterator it=defined_expressions.find(expr);
