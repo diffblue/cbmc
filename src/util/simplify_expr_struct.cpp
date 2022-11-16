@@ -104,21 +104,20 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       }
     }
   }
-  else if(op.id()==ID_struct ||
-          op.id()==ID_constant)
+  else if(op.id() == ID_struct)
   {
-    if(op_type.id()==ID_struct)
+    // pull out the right member
+    const struct_typet &struct_type = to_struct_type(op_type);
+    if(struct_type.has_component(component_name))
     {
-      // pull out the right member
-      const struct_typet &struct_type=to_struct_type(op_type);
-      if(struct_type.has_component(component_name))
-      {
-        std::size_t number=struct_type.component_number(component_name);
-        DATA_INVARIANT(
-          op.operands()[number].type() == expr.type(),
-          "member expression type must match component type");
-        return op.operands()[number];
-      }
+      std::size_t number = struct_type.component_number(component_name);
+      DATA_INVARIANT(
+        op.operands().size() > number,
+        "struct expression must have sufficiently many operands");
+      DATA_INVARIANT(
+        op.operands()[number].type() == expr.type(),
+        "member expression type must match component type");
+      return op.operands()[number];
     }
   }
   else if(op.id()==ID_byte_extract_little_endian ||

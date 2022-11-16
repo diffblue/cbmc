@@ -98,7 +98,8 @@ static struct_exprt bv_to_struct_expr(
 
     if(component_bits == 0)
     {
-      operands.push_back(constant_exprt{irep_idt{}, comp.type()});
+      operands.push_back(
+        bv_to_expr(bitvector_expr, comp.type(), endianness_map, ns));
       continue;
     }
 
@@ -123,7 +124,7 @@ static struct_exprt bv_to_struct_expr(
 
 /// Convert a bitvector-typed expression \p bitvector_expr to a union-typed
 /// expression. See \ref bv_to_expr for an overview.
-static union_exprt bv_to_union_expr(
+static exprt bv_to_union_expr(
   const exprt &bitvector_expr,
   const union_typet &union_type,
   const endianness_mapt &endianness_map,
@@ -131,9 +132,8 @@ static union_exprt bv_to_union_expr(
 {
   const union_typet::componentst &components = union_type.components();
 
-  // empty union, handled the same way as done in expr_initializert
   if(components.empty())
-    return union_exprt{irep_idt{}, nil_exprt{}, union_type};
+    return empty_union_exprt{union_type};
 
   const auto widest_member = union_type.find_widest_union_component(ns);
 
@@ -147,7 +147,7 @@ static union_exprt bv_to_union_expr(
   {
     return union_exprt{
       components.front().get_name(),
-      constant_exprt{irep_idt{}, components.front().type()},
+      bv_to_expr(bitvector_expr, components.front().type(), endianness_map, ns),
       union_type};
   }
 
@@ -371,13 +371,13 @@ static exprt bv_to_expr(
   }
   else if(target_type.id() == ID_union_tag)
   {
-    union_exprt result = bv_to_union_expr(
+    exprt result = bv_to_union_expr(
       bitvector_expr,
       ns.follow_tag(to_union_tag_type(target_type)),
       endianness_map,
       ns);
     result.type() = target_type;
-    return std::move(result);
+    return result;
   }
   else if(target_type.id() == ID_array)
   {
