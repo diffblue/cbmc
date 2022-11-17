@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract bar
+^\[foo.assertion.\d+\] line 1 undefined function should be unreachable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test checks that functions without bodies result in analysis failures.

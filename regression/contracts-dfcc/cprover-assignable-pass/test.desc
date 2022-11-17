@@ -5,7 +5,10 @@ CALL __CPROVER_object_whole
 CALL __CPROVER_object_upto
 CALL __CPROVER_object_from
 CALL __CPROVER_assignable
-^\[__CPROVER_object_(assignable|from|upto|whole).*.\d+\] Built-in __CPROVER_object_(assignable|from|upto|whole) should not be called after contracts transformation: FAILURE$
+^\[__CPROVER_assignable.assertion.\d+\].*undefined function should be unreachable: FAILURE$
+^\[__CPROVER_object_from.assertion.\d+\].*undefined function should be unreachable: FAILURE$
+^\[__CPROVER_object_upto.assertion.\d+\].*undefined function should be unreachable: FAILURE$
+^\[__CPROVER_object_whole.assertion.\d+\].*undefined function should be unreachable: FAILURE$
 ^\[my_write_set.assertion.\d+\] .* target null or writable: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -14,8 +17,11 @@ CALL __CPROVER_assignable
 CALL __CPROVER_typed_target
 --
 This test checks that:
-- built-in __CPROVER_assignable_t functions are supported;
+- built-in __CPROVER_assignable, __CPROVER_object_from, __CPROVER_object_upto,
+  __CPROVER_object_whole functions are supported in the front-end;
 - GOTO conversion preserves calls to __CPROVER_object_whole,
   __CPROVER_object_upto, __CPROVER_object_from;
+- reachability assertions are inserted in front-end functions and allow to
+  detect when front-end functions are used outside of contracts clauses;
 - GOTO conversion translates __CPROVER_typed_target to __CPROVER_assignable;
 - user-defined checks embedded in `my_write_set` persist after conversion.
