@@ -11,8 +11,6 @@ SRC = auto_objects.cpp \
       memory_model_tso.cpp \
       partial_order_concurrency.cpp \
       path_storage.cpp \
-      postcondition.cpp \
-      precondition.cpp \
       renaming_level.cpp \
       show_program.cpp \
       show_vcc.cpp \
