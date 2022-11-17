@@ -800,6 +800,69 @@ exprt smt2_parsert::function_application()
           else
             throw error() << "unexpected sort given as operand to to_fp";
         }
+        else if(id == "to_fp_unsigned")
+        {
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected number after to_fp_unsigned");
+
+          auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error("expected second number after to_fp_unsigned");
+
+          auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error("expected ')' after to_fp_unsigned");
+
+          // width_f *includes* the hidden bit
+          const ieee_float_spect spec(width_f - 1, width_e);
+
+          auto rounding_mode = expression();
+
+          auto source_op = expression();
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error("expected ')' at the end of to_fp_unsigned");
+
+          if(source_op.type().id() == ID_unsignedbv)
+          {
+            // The operand is hard-wired to be interpreted
+            // as an unsigned number.
+            return floatbv_typecast_exprt(
+              source_op, rounding_mode, spec.to_type());
+          }
+          else
+            throw error()
+              << "unexpected sort given as operand to to_fp_unsigned";
+        }
+        else if(id == "fp.to_sbv" || id == "fp.to_ubv")
+        {
+          // These are indexed by the number of bits of the result.
+          if(next_token() != smt2_tokenizert::NUMERAL)
+            throw error() << "expected number after " << id;
+
+          auto width = std::stoll(smt2_tokenizer.get_buffer());
+
+          if(next_token() != smt2_tokenizert::CLOSE)
+            throw error() << "expected ')' after " << id;
+
+          auto op = operands();
+
+          if(op.size() != 2)
+            throw error() << id << " takes two operands";
+
+          if(op[1].type().id() != ID_floatbv)
+            throw error() << id << " takes a FloatingPoint operand";
+
+          if(id == "fp.to_sbv")
+            return typecast_exprt(
+              floatbv_typecast_exprt(op[1], op[0], signedbv_typet(width)),
+              unsignedbv_typet(width));
+          else
+            return floatbv_typecast_exprt(
+              op[1], op[0], unsignedbv_typet(width));
+        }
         else
         {
           throw error() << "unknown indexed identifier '"
@@ -1267,6 +1330,18 @@ void smt2_parsert::setup_expressions()
       throw error("fp.isNormal takes FloatingPoint operand");
 
     return isnormal_exprt(op[0]);
+  };
+
+  expressions["fp.isZero"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isZero takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isZero takes FloatingPoint operand");
+
+    return not_exprt(typecast_exprt(op[0], bool_typet()));
   };
 
   expressions["fp"] = [this] { return function_application_fp(operands()); };

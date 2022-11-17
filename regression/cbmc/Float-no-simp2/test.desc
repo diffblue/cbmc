@@ -1,4 +1,4 @@
-CORE broken-cprover-smt-backend
+CORE
 main.c
 --floatbv --no-simplify
 ^EXIT=0$
