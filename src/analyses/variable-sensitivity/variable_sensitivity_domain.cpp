@@ -452,6 +452,10 @@ void variable_sensitivity_domaint::assume(exprt expr, namespacet ns)
 {
   ai_simplify(expr, ns);
   abstract_state.assume(expr, ns);
+
+  // Sets bottom, not needed for this domain but useful for inheriting
+  if(abstract_state.is_bottom())
+    this->make_bottom();
 }
 
 bool variable_sensitivity_domaint::assign(
