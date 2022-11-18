@@ -1286,7 +1286,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
       // the next member would be misaligned, abort
       if(
-        !component_bits.has_value() || *component_bits == 0 ||
+        !component_bits.has_value() ||
         *component_bits % src.get_bits_per_byte() != 0)
       {
         failed = true;
@@ -1992,7 +1992,7 @@ static exprt lower_byte_update_struct(
     else if(!offset_bytes.has_value())
     {
       // The offset to update is not constant; abort the attempt to update
-      // indiviual struct members and instead turn the operand-to-be-updated
+      // individual struct members and instead turn the operand-to-be-updated
       // into a byte array, which we know how to update even if the offset is
       // non-constant.
       auto src_size_opt = size_of_expr(src.type(), ns);
