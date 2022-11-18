@@ -209,6 +209,29 @@ dfcc_libraryt::get_havoc_hook(const irep_idt &function_id) const
     return {};
 }
 
+static void add_checked_pragmas(source_locationt &sl)
+{
+  sl.add_pragma("disable:pointer-check");
+  sl.add_pragma("disable:pointer-primitive-check");
+  sl.add_pragma("disable:pointer-overflow-check");
+  sl.add_pragma("disable:signed-overflow-check");
+  sl.add_pragma("disable:unsigned-overflow-check");
+  sl.add_pragma("disable:conversion-check");
+  sl.add_pragma("disable:undefined-shift-check");
+}
+
+void dfcc_libraryt::disable_checks()
+{
+  for(const auto &pair : dfcc_fun_to_name)
+  {
+    auto &function = goto_model.goto_functions.function_map[pair.second];
+    for(auto &inst : function.body.instructions)
+    {
+      add_checked_pragmas(inst.source_location_nonconst());
+    }
+  }
+}
+
 std::set<irep_idt> dfcc_libraryt::get_missing_funs()
 {
   std::set<irep_idt> missing;
