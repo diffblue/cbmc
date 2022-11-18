@@ -1,5 +1,7 @@
 var NAVTREEINDEX122 =
 {
+"structcfg__base__nodet.html#a4df834abc6526d0c26a792d954381c37":[5,0,159,1],
+"structcfg__base__nodet.html#a59549ad55e5fad45568f0a3555a32eab":[5,0,159,2],
 "structcfg__dominators__templatet_1_1nodet.html":[5,0,161,0],
 "structcfg__dominators__templatet_1_1nodet.html#a4ac3df8c441c484760ac5fe67b83fac3":[5,0,161,0,0],
 "structcheck__call__sequencet_1_1call__stack__entryt.html":[5,0,167,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX122 =
 "structcpp__typecheck__resolvet_1_1matcht.html#aefd2d6e65e1bc638dfbb217009f596fd":[5,0,315,0,2],
 "structcpp__typecheck__resolvet_1_1matcht.html#af1fccafbbadf8025e98ff80561db0067":[5,0,315,0,5],
 "structcpp__typecheckt_1_1method__bodyt.html":[5,0,316,2],
-"structcpp__typecheckt_1_1method__bodyt.html#a0f415d58f140baeff1b9695643444fb7":[5,0,316,2,3],
-"structcpp__typecheckt_1_1method__bodyt.html#a1e6141b7e5ab214f977a32a829251e3b":[5,0,316,2,1],
-"structcpp__typecheckt_1_1method__bodyt.html#ad90d70d1c7c485af6f891d60be83dcec":[5,0,316,2,0]
+"structcpp__typecheckt_1_1method__bodyt.html#a0f415d58f140baeff1b9695643444fb7":[5,0,316,2,3]
 };

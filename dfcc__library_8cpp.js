@@ -1,6 +1,7 @@
 var dfcc__library_8cpp =
 [
     [ "CONTRACTS_PREFIX", "dfcc__library_8cpp.html#a1dd179d135b66894881ae95e5138aa3f", null ],
+    [ "add_checked_pragmas", "dfcc__library_8cpp.html#aa699ce3736b7645af2d4502a17dc65df", null ],
     [ "create_assignable_builtin_names", "dfcc__library_8cpp.html#aebefb46e560a36be60961b019227423b", null ],
     [ "create_dfcc_fun_to_name", "dfcc__library_8cpp.html#a09d8ff7694c0cb6391fb2b457107f088", null ],
     [ "create_dfcc_hook", "dfcc__library_8cpp.html#a1452411ce0ce9cd02d4600a3c7da457c", null ],

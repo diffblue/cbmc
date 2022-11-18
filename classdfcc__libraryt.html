@@ -140,6 +140,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a52b01a3df22b1804205880e9ce122c43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a52b01a3df22b1804205880e9ce122c43">set_hide</a> (bool hide)</td></tr>
 <tr class="memdesc:a52b01a3df22b1804205880e9ce122c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the given hide flag on all instructions of all library functions.  <a href="classdfcc__libraryt.html#a52b01a3df22b1804205880e9ce122c43">More...</a><br /></td></tr>
 <tr class="separator:a52b01a3df22b1804205880e9ce122c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbd1ff30e88053a0738af9c7508349d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#adbd1ff30e88053a0738af9c7508349d3">disable_checks</a> ()</td></tr>
+<tr class="memdesc:adbd1ff30e88053a0738af9c7508349d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds "checked" pragmas to instructions of all library functions instructions.  <a href="classdfcc__libraryt.html#adbd1ff30e88053a0738af9c7508349d3">More...</a><br /></td></tr>
+<tr class="separator:adbd1ff30e88053a0738af9c7508349d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4344ee9423b3135843a9087094531155"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a4344ee9423b3135843a9087094531155">is_front_end_builtin</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id) const</td></tr>
 <tr class="memdesc:a4344ee9423b3135843a9087094531155"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the given function_id is one of <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code>, <code>__CPROVER_freeable</code>  <a href="classdfcc__libraryt.html#a4344ee9423b3135843a9087094531155">More...</a><br /></td></tr>
 <tr class="separator:a4344ee9423b3135843a9087094531155"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -304,7 +307,29 @@ Private Attributes</h2></td></tr>
 
 <p>Generates instructions to initialize the instrumented function map symbol from the given set of instrumented function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00526">526</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00549">549</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="adbd1ff30e88053a0738af9c7508349d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbd1ff30e88053a0738af9c7508349d3">&#9670;&nbsp;</a></span>disable_checks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfcc_libraryt::disable_checks </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds "checked" pragmas to instructions of all library functions instructions. </p>
+<p>By default checks are not disabled. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00223">223</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +359,7 @@ Private Attributes</h2></td></tr>
 <p>Fixes function calls to malloc and free in library functions. </p>
 <p>Change calls to <code>__CPROVER_contracts_malloc</code> into calls to <code>malloc</code> Change calls to <code>__CPROVER_contracts_free</code> into calls to <code>free</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00434">434</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00457">457</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -356,7 +381,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the dfcc_funt that corresponds to the given id if any. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00337">337</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00360">360</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -378,7 +403,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the name of the given dfcc_funt. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00351">351</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00374">374</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -447,7 +472,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the "__dfcc_instrumented_functions" symbol or creates it if it does not exist already. </p>
 <p>This symbol is an unbounded map of booleans indexed by function pointer ID, meant to have value true for instrumented functions and false for non-instrumented functions. Initialisation instructions for this map are generated by <a class="el" href="classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c">add_instrumented_functions_map_init_instructions</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00505">505</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00528">528</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -476,7 +501,7 @@ Private Attributes</h2></td></tr>
 
 <p>Collects the names of all library functions currently missing from the goto_model into <code>missing</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00212">212</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00235">235</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -497,7 +522,7 @@ Private Attributes</h2></td></tr>
 
 <p>Adds an ASSERT(false) body to all front-end functions __CPROVER_object_whole __CPROVER_object_upto __CPROVER_object_from __CPROVER_assignable __CPROVER_freeable To make sure they cannot be used in a proof unexpectedly without causing verification errors. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00465">465</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00488">488</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -526,7 +551,7 @@ Private Attributes</h2></td></tr>
 
 <p>Inlines library functions that need to be inlined before use. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00378">378</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00401">401</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -548,7 +573,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the given id is one of the library symbols. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00346">346</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00369">369</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +619,7 @@ Private Attributes</h2></td></tr>
 <p>After calling this function, all library types and functions are present in the the goto_model. </p>
 <p>Any other functions that the DFCC functions rely on and need to be instrumented will be added to <code>to_instrument</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00251">251</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00274">274</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -616,7 +641,7 @@ Private Attributes</h2></td></tr>
 
 <p>Sets the given hide flag on all instructions of all library functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00498">498</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00521">521</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -644,7 +669,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00400">400</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00423">423</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>

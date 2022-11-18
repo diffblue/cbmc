@@ -2,6 +2,7 @@ var classdfcc__libraryt =
 [
     [ "dfcc_libraryt", "classdfcc__libraryt.html#abf2a449239d88bc96d09b89d1830019e", null ],
     [ "add_instrumented_functions_map_init_instructions", "classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c", null ],
+    [ "disable_checks", "classdfcc__libraryt.html#adbd1ff30e88053a0738af9c7508349d3", null ],
     [ "fix_malloc_free_calls", "classdfcc__libraryt.html#a334c15606b46cb27ff90c52988c43dc7", null ],
     [ "get_dfcc_fun", "classdfcc__libraryt.html#ad7f1bbffdd2db34f390d65c97ae81dab", null ],
     [ "get_dfcc_fun_name", "classdfcc__libraryt.html#aab083f42e5dc5680bdc974a14e453d9d", null ],
