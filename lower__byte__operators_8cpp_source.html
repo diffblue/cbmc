@@ -1268,7 +1268,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160; </div>
 <div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;      <span class="comment">// the next member would be misaligned, abort</span></div>
 <div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;        !component_bits.has_value() || *component_bits == 0 ||</div>
+<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;        !component_bits.has_value() ||</div>
 <div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;        *component_bits % src.<a class="code" href="classbyte__extract__exprt.html#a68529f11bc874d072680bb0d0b238bda">get_bits_per_byte</a>() != 0)</div>
 <div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;      {</div>
 <div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;        <a class="code" href="symtab2gb__parse__options_8cpp.html#ad19f4a5a730c9cb39387429ece68e2af">failed</a> = <span class="keyword">true</span>;</div>
@@ -1913,7 +1913,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01992"></a><span class="lineno"> 1992</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!offset_bytes.has_value())</div>
 <div class="line"><a name="l01993"></a><span class="lineno"> 1993</span>&#160;    {</div>
 <div class="line"><a name="l01994"></a><span class="lineno"> 1994</span>&#160;      <span class="comment">// The offset to update is not constant; abort the attempt to update</span></div>
-<div class="line"><a name="l01995"></a><span class="lineno"> 1995</span>&#160;      <span class="comment">// indiviual struct members and instead turn the operand-to-be-updated</span></div>
+<div class="line"><a name="l01995"></a><span class="lineno"> 1995</span>&#160;      <span class="comment">// individual struct members and instead turn the operand-to-be-updated</span></div>
 <div class="line"><a name="l01996"></a><span class="lineno"> 1996</span>&#160;      <span class="comment">// into a byte array, which we know how to update even if the offset is</span></div>
 <div class="line"><a name="l01997"></a><span class="lineno"> 1997</span>&#160;      <span class="comment">// non-constant.</span></div>
 <div class="line"><a name="l01998"></a><span class="lineno"> 1998</span>&#160;      <span class="keyword">auto</span> src_size_opt = <a class="code" href="pointer__offset__size_8cpp.html#a22ecef14fd8d85a84c6a579261f56044">size_of_expr</a>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), ns);</div>
