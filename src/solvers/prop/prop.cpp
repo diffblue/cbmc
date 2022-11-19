@@ -11,6 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 /// asserts a==b in the propositional formula
 void propt::set_equal(literalt a, literalt b)
 {
+  if(b.is_constant())
+  {
+    if(b.is_true())
+      lcnf({a});
+    else
+      lcnf({!a});
+
+    return;
+  }
+
   lcnf(a, !b);
   lcnf(!a, b);
 }
