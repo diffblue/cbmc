@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
@@ -589,8 +590,9 @@ void value_sett::get_value_set_rec(
       // pointer-to-pointer -- we just ignore these
       get_value_set_rec(op, dest, suffix, original_type, ns);
     }
-    else if(op_type.id()==ID_unsignedbv ||
-            op_type.id()==ID_signedbv)
+    else if(
+      op_type.id() == ID_unsignedbv || op_type.id() == ID_signedbv ||
+      op_type.id() == ID_bv)
     {
       // integer-to-pointer
 
@@ -1052,9 +1054,39 @@ void value_sett::get_value_set_rec(
     value_set_with_local_definition.get_value_set_rec(
       let_expr.where(), dest, suffix, original_type, ns);
   }
+  else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
+  {
+    object_mapt pointer_expr_set;
+    get_value_set_rec(eb->src(), pointer_expr_set, "", eb->src().type(), ns);
+
+    for(const auto &object_map_entry : pointer_expr_set.read())
+    {
+      offsett offset = object_map_entry.second;
+
+      // kill any offset
+      offset.reset();
+
+      insert(dest, object_map_entry.first, offset);
+    }
+  }
   else
   {
-    insert(dest, exprt(ID_unknown, original_type));
+    object_mapt pointer_expr_set;
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, pointer_expr_set, "", original_type, ns);
+
+    for(const auto &object_map_entry : pointer_expr_set.read())
+    {
+      offsett offset = object_map_entry.second;
+
+      // kill any offset
+      offset.reset();
+
+      insert(dest, object_map_entry.first, offset);
+    }
+
+    if(pointer_expr_set.read().empty())
+      insert(dest, exprt(ID_unknown, original_type));
   }
 
   #ifdef DEBUG
