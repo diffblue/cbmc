@@ -9,11 +9,10 @@ Author: Qinheping Hu
 #ifndef CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_EXPR_ENUMERATOR_H
 #define CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_EXPR_ENUMERATOR_H
 
-#include <util/std_expr.h>
-
-#include "synthesizer_utils.h"
+#include <util/expr.h>
 
 #include <map>
+#include <set>
 
 typedef std::list<exprt> expr_listt;
 typedef std::set<exprt> expr_sett;

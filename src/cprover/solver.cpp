@@ -11,26 +11,17 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "solver.h"
 
-#include <util/console.h>
-#include <util/cout_message.h>
 #include <util/format_expr.h>
-#include <util/std_expr.h>
 
 #include "address_taken.h"
-#include "counterexample_found.h"
 #include "generalization.h"
 #include "inductiveness.h"
-#include "propagate.h"
 #include "report_properties.h"
 #include "report_traces.h"
 #include "solver_progress.h"
 #include "solver_types.h"
-#include "state.h"
 
-#include <iomanip>
 #include <iostream>
-#include <map>
-#include <set>
 
 class take_time_resourcet
 {

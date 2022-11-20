@@ -42,7 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "contracts/contracts.h"
 #include "contracts/dynamic-frames/dfcc.h"
-#include "synthesizer/enumerative_loop_invariant_synthesizer.h"
+#include "synthesizer/loop_invariant_synthesizer_base.h"
 #include "wmm/weak_memory.h"
 
 // clang-format off

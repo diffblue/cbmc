@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_MATHEMATICAL_TYPES_H
 #define CPROVER_UTIL_MATHEMATICAL_TYPES_H
 
-#include "expr_cast.h"
+#include "expr_cast.h" // IWYU pragma: keep
 #include "invariant.h"
 #include "type.h"
 

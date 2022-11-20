@@ -3,7 +3,6 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
-#include <util/mp_arith.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 

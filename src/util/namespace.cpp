@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "namespace.h"
 
-#include <algorithm>
-
 #include "c_types.h"
 #include "std_expr.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <algorithm>
 
 namespace_baset::~namespace_baset()
 {
@@ -139,7 +139,7 @@ bool namespacet::lookup(
   const irep_idt &name,
   const symbolt *&symbol) const
 {
-  symbol_tablet::symbolst::const_iterator it;
+  symbol_table_baset::symbolst::const_iterator it;
 
   if(symbol_table1!=nullptr)
   {
@@ -190,7 +190,7 @@ bool multi_namespacet::lookup(
   const irep_idt &name,
   const symbolt *&symbol) const
 {
-  symbol_tablet::symbolst::const_iterator s_it;
+  symbol_table_baset::symbolst::const_iterator s_it;
 
   for(symbol_table_listt::const_iterator
       c_it=symbol_table_list.begin();

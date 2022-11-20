@@ -14,11 +14,10 @@ Author: Qinheping Hu
 // NOLINTNEXTLINE(whitespace/line_length)
 #define CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_ENUMERATIVE_LOOP_INVARIANT_SYNTHESIZER_H
 
-#include <goto-programs/goto_model.h>
-
 #include "loop_invariant_synthesizer_base.h"
 
 class messaget;
+class goto_modelt;
 
 /// Enumerative loop invariant synthesizers.
 /// It is designed for `goto_model` containing only checks instrumented by

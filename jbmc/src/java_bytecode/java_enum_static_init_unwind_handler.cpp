@@ -10,13 +10,14 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Unwind loops in static initializers
 
 #include "java_enum_static_init_unwind_handler.h"
-#include "java_utils.h"
 
 #include <util/invariant.h>
-#include <util/ssa_expr.h>
+#include <util/ssa_expr.h> // IWYU pragma: keep
 #include <util/suffix.h>
 
 #include <goto-symex/call_stack.h>
+
+#include "java_utils.h"
 
 /// Check if we may be in a function that loops over the cases of an
 /// enumeration (note we return a candidate function that matches a pattern;

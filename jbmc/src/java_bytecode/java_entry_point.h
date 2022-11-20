@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep.h>
 #include <util/symbol.h>
 
-class code_blockt;
+class code_blockt; // IWYU pragma: keep
 class select_pointer_typet;
 class symbol_table_baset;
 struct java_object_factory_parameterst;

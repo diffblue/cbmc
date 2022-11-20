@@ -8,7 +8,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "call_graph_test_utils.h"
 
-#include <util/std_code.h>
+#include <util/std_code_base.h>
 
 symbolt
 create_void_function_symbol(const irep_idt &name, const codet &code)

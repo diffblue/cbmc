@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
 #include "goto_convert_class.h"
@@ -1920,7 +1919,7 @@ void goto_convert(
   message_handlert &message_handler)
 {
   // find main symbol
-  const symbol_tablet::symbolst::const_iterator s_it=
+  const symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find("main");
 
   DATA_INVARIANT(

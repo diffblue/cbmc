@@ -9,10 +9,13 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 \*******************************************************************/
 
 #include "json_symtab_language.h"
-#include "json_symbol_table.h"
-#include <json/json_parser.h>
 
+#include <util/symbol_table.h>
+
+#include <json/json_parser.h>
 #include <linking/linking.h>
+
+#include "json_symbol_table.h"
 
 /// Parse a goto program in json form.
 /// \param instream: The input stream
@@ -30,7 +33,7 @@ bool json_symtab_languaget::parse(
 /// \param module: A useless parameter, there for interface consistency.
 /// \return boolean signifying success or failure of the typechecking.
 bool json_symtab_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module)
 {
   (void)module; // unused parameter

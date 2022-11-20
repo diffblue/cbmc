@@ -39,15 +39,14 @@ public:
     std::istream &instream,
     const std::string &path) override;
 
-  bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+  bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
-  bool
-  typecheck(symbol_tablet &symbol_table, const std::string &module) override;
+  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
+    override;
 
   bool merge_symbol_table(
-    symbol_tablet &dest,
-    symbol_tablet &src,
+    symbol_table_baset &dest,
+    symbol_table_baset &src,
     const std::string &module,
     class replace_symbolt &replace_symbol) const;
 

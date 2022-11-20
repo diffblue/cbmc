@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -1228,7 +1229,7 @@ void cpp_typecheckt::typecheck_expr_member(
   if(expr.type().id()==ID_code)
   {
     // Check if the function body has to be typechecked
-    symbol_tablet::symbolst::const_iterator it=
+    symbol_table_baset::symbolst::const_iterator it =
       symbol_table.symbols.find(component_name);
 
     assert(it!=symbol_table.symbols.end());
@@ -2248,7 +2249,7 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
   if(expr.id()==ID_symbol)
   {
     // Check if the function body has to be typechecked
-    symbol_tablet::symbolst::const_iterator it=
+    symbol_table_baset::symbolst::const_iterator it =
       symbol_table.symbols.find(expr.get(ID_identifier));
 
     assert(it != symbol_table.symbols.end());

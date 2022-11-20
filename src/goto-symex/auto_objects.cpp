@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 exprt goto_symext::make_auto_object(const typet &type, statet &state)
 {

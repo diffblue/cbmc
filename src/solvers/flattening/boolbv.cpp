@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mp_arith.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/string2int.h>
 #include <util/string_constant.h>
 
 #include <solvers/floatbv/float_utils.h>

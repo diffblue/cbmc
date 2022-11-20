@@ -17,8 +17,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <cstring>
 #include <regex>
 
-#include <iostream>
-
 #include "gdb_api.h"
 
 #include <util/prefix.h>

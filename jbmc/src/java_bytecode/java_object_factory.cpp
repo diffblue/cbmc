@@ -12,13 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
+#include <util/interval_constraint.h>
 #include <util/message.h>
 #include <util/nondet_bool.h>
 #include <util/prefix.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>
-#include <util/interval_constraint.h>
 
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_object_factory_parameters.h"
@@ -1336,7 +1337,7 @@ static void array_loop_init_code(
   const source_locationt &location,
   const array_element_generatort &element_generator,
   const allocate_local_symbolt &allocate_local_symbol,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   const symbol_exprt &array_init_symexpr =
     allocate_local_symbol(init_array_expr.type(), "array_data_init");
@@ -1378,7 +1379,7 @@ code_blockt gen_nondet_array_init(
   const source_locationt &location,
   const array_element_generatort &element_generator,
   const allocate_local_symbolt &allocate_local_symbol,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const size_t max_nondet_array_length)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
@@ -1657,7 +1658,7 @@ exprt object_factory(
   const typet &type,
   const irep_idt base_name,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
   lifetimet lifetime,
   const source_locationt &location,

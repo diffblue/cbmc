@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_dereference_state.h"
 
-#include <util/symbol_table.h>
-
 /// Get or create a failed symbol for the given pointer-typed expression. These
 /// are used as placeholders when dereferencing expressions that are illegal to
 /// dereference, such as null pointers. The \ref add_failed_symbols pass must

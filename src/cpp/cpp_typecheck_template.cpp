@@ -9,16 +9,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
-#include <util/base_exceptions.h>
+#include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/simplify_expr.h>
+#include <util/symbol_table_base.h>
 
-#include "cpp_type2name.h"
-#include "cpp_declarator_converter.h"
-#include "cpp_template_type.h"
 #include "cpp_convert_type.h"
+#include "cpp_declarator_converter.h"
 #include "cpp_template_args.h"
+#include "cpp_template_type.h"
+#include "cpp_type2name.h"
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
@@ -244,7 +244,7 @@ void cpp_typecheckt::typecheck_function_template(
 
   // check if we have it already
 
-  symbol_tablet::symbolst::const_iterator previous_symbol=
+  symbol_table_baset::symbolst::const_iterator previous_symbol =
     symbol_table.symbols.find(symbol_name);
 
   if(previous_symbol!=symbol_table.symbols.end())
@@ -570,7 +570,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     throw 0;
   }
 
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find((*id_set.begin())->identifier);
 
   assert(s_it!=symbol_table.symbols.end());

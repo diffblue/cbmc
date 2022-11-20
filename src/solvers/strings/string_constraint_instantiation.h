@@ -12,9 +12,9 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
 
-#include <set>
+#include <util/std_expr.h> // IWYU pragma: keep
 
-#include <util/std_expr.h>
+#include <set>
 
 class string_constraintt;
 struct string_not_contains_constraintt;

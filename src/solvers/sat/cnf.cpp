@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cnf.h"
 
 #include <algorithm>
-#include <set>
 
 #include <util/invariant.h>
 

@@ -11,12 +11,12 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "java_bytecode_convert_method_class.h"
 
-#include "java_types.h"
-
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/string2int.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include "java_types.h"
 
 #include <iostream>
 

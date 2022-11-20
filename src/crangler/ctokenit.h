@@ -12,7 +12,9 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CRANGLER_CTOKENIT_H
 #define CPROVER_CRANGLER_CTOKENIT_H
 
-#include "cscanner.h"
+#include "ctoken.h"
+
+#include <vector>
 
 class ctokenitt
 {

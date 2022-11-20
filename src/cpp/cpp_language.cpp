@@ -11,23 +11,23 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_language.h"
 
-#include <cstring>
-#include <fstream>
-
 #include <util/config.h>
 #include <util/get_base_name.h>
-
-#include <linking/linking.h>
-#include <linking/remove_internal_symbols.h>
+#include <util/symbol_table.h>
 
 #include <ansi-c/ansi_c_entry_point.h>
 #include <ansi-c/c_preprocess.h>
+#include <linking/linking.h>
+#include <linking/remove_internal_symbols.h>
 
 #include "cpp_internal_additions.h"
-#include "expr2cpp.h"
 #include "cpp_parser.h"
-#include "cpp_typecheck.h"
 #include "cpp_type2name.h"
+#include "cpp_typecheck.h"
+#include "expr2cpp.h"
+
+#include <cstring>
+#include <fstream>
 
 std::set<std::string> cpp_languaget::extensions() const
 {
@@ -119,7 +119,7 @@ bool cpp_languaget::parse(
 }
 
 bool cpp_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module)
 {
   if(module.empty())
@@ -136,8 +136,7 @@ bool cpp_languaget::typecheck(
   return linking(symbol_table, new_symbol_table, get_message_handler());
 }
 
-bool cpp_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+bool cpp_languaget::generate_support_functions(symbol_table_baset &symbol_table)
 {
   return ansi_c_entry_point(
     symbol_table, get_message_handler(), object_factory_params);

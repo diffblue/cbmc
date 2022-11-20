@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_FORMAT_TYPE_H
 #define CPROVER_UTIL_FORMAT_TYPE_H
 
-#include "format.h"
+#include "format.h" // IWYU pragma: keep
 
 class typet;
 

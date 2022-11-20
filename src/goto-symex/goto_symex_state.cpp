@@ -10,12 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "goto_symex_state.h"
-#include "goto_symex_is_constant.h"
-
-#include <iostream>
 
 #include <util/as_const.h>
-#include <util/base_exceptions.h>
+#include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
@@ -25,6 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 #include <pointer-analysis/add_failed_symbols.h>
+
+#include "goto_symex_is_constant.h"
+#include "symex_target_equation.h"
 
 static void get_l1_name(exprt &expr);
 

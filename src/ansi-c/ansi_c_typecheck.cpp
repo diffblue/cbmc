@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_typecheck.h"
 
+#include <util/symbol_table.h>
+
 #include "ansi_c_parse_tree.h"
 
 void ansi_c_typecheckt::typecheck()
@@ -23,7 +25,7 @@ void ansi_c_typecheckt::typecheck()
 
 bool ansi_c_typecheck(
   ansi_c_parse_treet &ansi_c_parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {

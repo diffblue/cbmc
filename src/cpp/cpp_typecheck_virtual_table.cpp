@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol_table_base.h>
+
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 {

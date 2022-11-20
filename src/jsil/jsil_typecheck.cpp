@@ -567,7 +567,7 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
      identifier=="eval" ||
      identifier=="nan")
   {
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table_baset::symbolst::const_iterator s_it =
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
@@ -595,8 +595,8 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
       symbol_expr.set_identifier(identifier);
     }
 
-    symbol_tablet::symbolst::const_iterator s_it=
-    symbol_table.symbols.find(identifier);
+    symbol_table_baset::symbolst::const_iterator s_it =
+      symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
     {
@@ -898,7 +898,7 @@ void jsil_typecheckt::typecheck()
 }
 
 bool jsil_typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   jsil_typecheckt jsil_typecheck(symbol_table, message_handler);

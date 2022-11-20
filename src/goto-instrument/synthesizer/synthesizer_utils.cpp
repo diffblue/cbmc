@@ -8,6 +8,8 @@ Author: Qinheping Hu
 
 #include "synthesizer_utils.h"
 
+#include <analyses/natural_loops.h>
+
 goto_programt::const_targett get_loop_end_from_loop_head_and_content(
   const goto_programt::const_targett &loop_head,
   const loop_templatet<goto_programt::const_targett> &loop)

@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "find_symbols.h"
 
 #include "c_types.h"
-#include "expr_iterator.h"
-#include "range.h"
 #include "std_expr.h"
 
 /// Kinds of symbols to be considered by \ref find_symbols.

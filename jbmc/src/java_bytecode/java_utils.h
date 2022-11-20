@@ -158,7 +158,7 @@ optionalt<resolve_inherited_componentt::inherited_componentt>
 get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   bool include_interfaces);
 
 bool is_non_null_library_global(const irep_idt &);

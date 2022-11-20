@@ -16,8 +16,6 @@
 
 #include "interval.h"
 
-#include <ostream>
-
 #include "arith_tools.h"
 #include "bitvector_expr.h"
 #include "c_types.h"

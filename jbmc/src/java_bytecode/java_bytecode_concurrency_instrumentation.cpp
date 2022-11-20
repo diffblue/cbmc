@@ -7,9 +7,6 @@ Author: Kurt Degiogrio, kurt.degiorgio@diffblue.com
 \*******************************************************************/
 
 #include "java_bytecode_concurrency_instrumentation.h"
-#include "expr2java.h"
-#include "java_types.h"
-#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
@@ -17,7 +14,11 @@ Author: Kurt Degiogrio, kurt.degiorgio@diffblue.com
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include "expr2java.h"
+#include "java_types.h"
+#include "java_utils.h"
 
 // Disable linter to allow an std::string constant.
 const std::string next_thread_id = CPROVER_PREFIX "_next_thread_id";// NOLINT(*)
@@ -33,7 +34,7 @@ const std::string thread_id = CPROVER_PREFIX "_thread_id";// NOLINT(*)
 /// /param is_static_lifetime: if true this symbol will be set as static
 /// /return returns new or existing symbol.
 static symbolt add_or_get_symbol(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &name,
   const irep_idt &base_name,
   const typet &type,
@@ -101,7 +102,7 @@ static const std::string get_thread_block_identifier(
 /// \param object: expression representing a 'java.Lang.Object'. This object is
 ///   used to achieve object-level locking by calling monitoroenter/monitorexit.
 static codet get_monitor_call(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   bool is_enter,
   const exprt &object)
 {
@@ -206,7 +207,7 @@ static void monitor_exits(codet &code, const codet &monitorexit)
 /// \param symbol: writeable symbol hosting code to synchronize
 /// \param sync_object: object to use as a lock
 static void instrument_synchronized_code(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   symbolt &symbol,
   const exprt &sync_object)
 {
@@ -271,7 +272,7 @@ static void instrument_synchronized_code(
 static void instrument_start_thread(
   const code_function_callt &f_code,
   codet &code,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 1);
 
@@ -341,7 +342,7 @@ static void instrument_start_thread(
 static void instrument_end_thread(
   const code_function_callt &f_code,
   codet &code,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 1);
   (void)symbol_table; // unused parameter
@@ -375,7 +376,7 @@ static void instrument_end_thread(
 static void instrument_get_current_thread_id(
   const code_function_callt &f_code,
   codet &code,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 0);
 
@@ -406,7 +407,7 @@ static void instrument_get_current_thread_id(
 static void instrument_get_monitor_count(
   const code_function_callt &f_code,
   codet &code,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 1);
 
@@ -484,10 +485,10 @@ static void instrument_get_monitor_count(
 /// symex. See https://github.com/diffblue/cbmc/issues/1630/for more details.
 ///
 /// \param symbol_table: a symbol table
-void convert_threadblock(symbol_tablet &symbol_table)
+void convert_threadblock(symbol_table_baset &symbol_table)
 {
-  using instrument_callbackt =
-    std::function<void(const code_function_callt&, codet&, symbol_tablet&)>;
+  using instrument_callbackt = std::function<void(
+    const code_function_callt &, codet &, symbol_table_baset &)>;
   using expr_replacement_mapt =
     std::unordered_map<const exprt, instrument_callbackt, irep_hash>;
 
@@ -603,7 +604,7 @@ void convert_threadblock(symbol_tablet &symbol_table)
 /// \param symbol_table: a symbol table
 /// \param message_handler: status output
 void convert_synchronized_methods(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   namespacet ns(symbol_table);

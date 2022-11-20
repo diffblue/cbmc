@@ -14,11 +14,11 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 class jsil_parse_treet;
 class message_handlert;
-class symbol_tablet;
+class symbol_table_baset;
 
 bool jsil_convert(
   const jsil_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 
 #endif // CPROVER_JSIL_JSIL_CONVERT_H

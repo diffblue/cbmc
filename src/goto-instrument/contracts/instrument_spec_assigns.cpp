@@ -13,7 +13,6 @@ Date: January 2022
 
 #include "instrument_spec_assigns.h"
 
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
@@ -21,6 +20,7 @@ Date: January 2022
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 
+#include <ansi-c/c_expr.h>
 #include <langapi/language_util.h>
 
 #include "cfg_info.h"

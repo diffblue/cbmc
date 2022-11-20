@@ -8,15 +8,17 @@
 
 #include "constant_pointer_abstract_object.h"
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
-#include <ostream>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 
 #include "abstract_object_statistics.h"
+
+#include <ostream>
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &type)

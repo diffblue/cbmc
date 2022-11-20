@@ -12,7 +12,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "instrument_contracts.h"
 
 #include <util/c_types.h>
-#include <util/format_expr.h>
 #include <util/mathematical_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
@@ -22,8 +21,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <goto-programs/goto_model.h>
 
 #include <ansi-c/expr2c.h>
-
-#include <iostream>
 
 #define MAX_TEXT 20
 

@@ -8,9 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "config.h"
 
-#include <climits>
-#include <cstdlib>
-
 #include "arith_tools.h"
 #include "cmdline.h"
 #include "cprover_prefix.h"
@@ -20,7 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "string2int.h"
 #include "string_utils.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <climits>
+#include <cstdlib>
 
 configt config;
 
@@ -1251,8 +1251,7 @@ static unsigned unsigned_from_ns(
   return numeric_cast_v<unsigned>(int_value);
 }
 
-void configt::set_from_symbol_table(
-  const symbol_tablet &symbol_table)
+void configt::set_from_symbol_table(const symbol_table_baset &symbol_table)
 {
   // maybe not compiled from C/C++
   if(symbol_table.symbols.find(CPROVER_PREFIX "architecture_" "int_width")==
@@ -1312,7 +1311,7 @@ void configt::set_from_symbol_table(
 /// Sets the number of bits used for object addresses
 /// \param symbol_table: The symbol table
 void configt::set_object_bits_from_symbol_table(
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   // has been overridden by command line option,
   //   thus do not apply language defaults

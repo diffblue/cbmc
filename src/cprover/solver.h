@@ -12,7 +12,10 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_SOLVER_H
 #define CPROVER_CPROVER_SOLVER_H
 
-#include <util/expr.h>
+#include <vector>
+
+class exprt;
+class namespacet;
 
 enum class solver_resultt
 {

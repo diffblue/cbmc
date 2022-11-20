@@ -11,8 +11,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_language.h"
 
-#include <util/symbol_table.h>
 #include <util/get_base_name.h>
+#include <util/symbol_table.h>
 
 #include "expr2jsil.h"
 #include "jsil_convert.h"
@@ -32,7 +32,7 @@ void jsil_languaget::modules_provided(std::set<std::string> &modules)
 }
 
 /// Adding symbols for all procedure declarations
-bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
+bool jsil_languaget::interfaces(symbol_table_baset &symbol_table)
 {
   if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
     return true;
@@ -77,7 +77,7 @@ bool jsil_languaget::parse(
 
 /// Converting from parse tree and type checking.
 bool jsil_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &)
 {
   if(jsil_typecheck(symbol_table, get_message_handler()))
@@ -87,7 +87,7 @@ bool jsil_languaget::typecheck(
 }
 
 bool jsil_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   return jsil_entry_point(
     symbol_table,

@@ -4,12 +4,10 @@ Module: Goto Checker using Bounded Model Checking for Java
 
 Author: Jeannie Moulton
 
- \*******************************************************************/
+\*******************************************************************/
 
 #include "java_multi_path_symex_checker.h"
 #include "java_trace_validation.h"
-
-#include <solvers/prop/prop.h>
 
 goto_tracet java_multi_path_symex_checkert::build_full_trace() const
 {

@@ -12,8 +12,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_CPROVER_PARSE_OPTIONS_H
 #define CPROVER_CPROVER_CPROVER_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
-
 #define CPROVER_OPTIONS                                                        \
   "(help)?h(version)"                                                          \
   "(smt2)(text)(outfile):"                                                     \

@@ -20,16 +20,12 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <ansi-c/expr2c_class.h>
 
-#include <util/message.h>
 #include <util/namespace.h>
-#include <util/pointer_expr.h>
-#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/allocate_objects.h>
 
-class gdb_apit;
-class exprt;
+class pointer_typet;
 class source_locationt;
 
 /// Interface for extracting values from GDB (building on \ref gdb_apit)
@@ -37,7 +33,7 @@ class gdb_value_extractort
 {
 public:
   gdb_value_extractort(
-    const symbol_tablet &symbol_table,
+    const symbol_table_baset &symbol_table,
     const std::vector<std::string> &args);
 
   /// For each input symbol in \p symbols: map its value address to its

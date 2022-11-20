@@ -18,12 +18,9 @@
 
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 
-class smt_commandt;
-class message_handlert;
 class namespacet;
-class smt_base_solver_processt;
+class smt_base_solver_processt; // IWYU pragma: keep
 
 class smt2_incremental_decision_proceduret final
   : public stack_decision_proceduret

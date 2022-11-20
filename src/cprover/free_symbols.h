@@ -12,9 +12,10 @@ Author: Daniel Kroening, dkr@amazon.com
 /// \file
 /// Free Symbols
 
-#include <util/std_expr.h>
-
 #include <functional>
+
+class exprt;
+class symbol_exprt;
 
 void free_symbols(
   const exprt &,

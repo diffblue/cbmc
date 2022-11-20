@@ -13,6 +13,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// IWYU pragma: private, include <util/optional.h>
+// IWYU pragma: private, include "optional.h"
+
 #pragma once
 
 #ifndef NONSTD_OPTIONAL_LITE_HPP

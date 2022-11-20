@@ -12,9 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_AXIOMS_H
 #define CPROVER_CPROVER_AXIOMS_H
 
-#include <util/std_expr.h>
-
-#include <solvers/decision_procedure.h>
+#include <util/std_expr.h> // IWYU pragma: keep
 
 #include "sentinel_dll.h"
 #include "state.h"
@@ -24,6 +22,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+class decision_proceduret;
 
 class axiomst
 {

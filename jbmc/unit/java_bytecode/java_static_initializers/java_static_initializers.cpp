@@ -6,20 +6,19 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <java_bytecode/java_static_initializers.h>
-
-#include <java_bytecode/ci_lazy_methods_needed.h>
-#include <java_bytecode/java_types.h>
-#include <java_bytecode/java_utils.h>
-
-#include <testing-utils/expr_query.h>
-#include <testing-utils/use_catch.h>
-
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/json.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/goto_instruction_code.h>
+
+#include <java_bytecode/ci_lazy_methods_needed.h>
+#include <java_bytecode/code_with_references.h> // IWYU pragma: keep
+#include <java_bytecode/java_static_initializers.h>
+#include <java_bytecode/java_types.h>
+#include <java_bytecode/java_utils.h>
+#include <testing-utils/expr_query.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO("is_clinit_function", "[core][java_static_initializers]")
 {

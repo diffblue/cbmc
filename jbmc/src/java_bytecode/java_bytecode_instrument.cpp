@@ -10,12 +10,12 @@ Date:   June 2017
 
 #include "java_bytecode_instrument.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_instruction_code.h>
 
 #include "java_expr.h"
 #include "java_types.h"
@@ -591,7 +591,7 @@ void java_bytecode_instrument_uncaught_exceptions(
 ///   this flag is set to true.
 /// \param message_handler: stream to report status and warnings
 void java_bytecode_instrument(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const bool throw_runtime_exceptions,
   message_handlert &message_handler)
 {

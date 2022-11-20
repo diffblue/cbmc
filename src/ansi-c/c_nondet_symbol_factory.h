@@ -16,13 +16,11 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/allocate_objects.h>
 
-#include <util/symbol_table.h>
-
 struct c_object_factory_parameterst;
 
 class symbol_factoryt
 {
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const source_locationt &loc;
   namespacet ns;
   const c_object_factory_parameterst &object_factory_params;
@@ -35,7 +33,7 @@ public:
   typedef std::set<irep_idt> recursion_sett;
 
   symbol_factoryt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const source_locationt &loc,
     const irep_idt &name_prefix,
     const c_object_factory_parameterst &object_factory_params,
@@ -87,7 +85,7 @@ private:
 
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt base_name,
   const typet &type,
   const source_locationt &,

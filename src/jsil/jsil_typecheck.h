@@ -26,10 +26,10 @@ class codet;
 class message_handlert;
 class side_effect_expr_throwt;
 class symbol_exprt;
-class symbol_tablet;
+class symbol_table_baset;
 
 bool jsil_typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 
 bool jsil_typecheck(

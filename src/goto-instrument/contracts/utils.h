@@ -11,21 +11,11 @@ Date: September 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 
-// clang-format off
 #include <vector>
-
-#include <analyses/dirty.h>
-#include <analyses/locals.h>
 
 #include <goto-instrument/havoc_utils.h>
 
 #include <goto-programs/goto_convert_class.h>
-#include <goto-programs/goto_model.h>
-
-#include <util/expr_cast.h>
-#include <util/byte_operators.h>
-#include <util/message.h>
-// clang-format on
 
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
@@ -192,14 +182,14 @@ void widen_assigns(assignst &assigns);
 /// a fresh quantified variable is added to the symbol table and \p expression
 /// is updated to use this fresh variable.
 void add_quantified_variable(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expression,
   const irep_idt &mode);
 
 /// This function recursively identifies the "old" expressions within expr
 /// and replaces them with correspoding history variables.
 void replace_history_parameter(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
   source_locationt location,
@@ -210,7 +200,7 @@ void replace_history_parameter(
 /// This function generates all the instructions required to initialize
 /// history variables.
 void generate_history_variables_initialization(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &clause,
   const irep_idt &mode,
   goto_programt &program);

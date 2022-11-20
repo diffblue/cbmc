@@ -15,7 +15,6 @@ Date: October 2012
 
 #include <util/find_symbols.h>
 #include <util/invariant.h>
-#include <util/optional.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 

@@ -7,14 +7,15 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "builtin_factory.h"
-#include "ansi_c_internal_additions.h"
-
-#include "ansi_c_parser.h"
-#include "ansi_c_typecheck.h"
 
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/string_utils.h>
+#include <util/symbol_table.h>
+
+#include "ansi_c_internal_additions.h"
+#include "ansi_c_parser.h"
+#include "ansi_c_typecheck.h"
 
 #include <sstream>
 
@@ -41,7 +42,7 @@ static bool find_pattern(
 static bool convert(
   const irep_idt &identifier,
   const std::ostringstream &s,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   std::istringstream in(s.str());
@@ -96,7 +97,7 @@ static bool convert(
 //! \return 'true' on error
 bool builtin_factory(
   const irep_idt &identifier,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &mh)
 {
   // we search for "space" "identifier" "("

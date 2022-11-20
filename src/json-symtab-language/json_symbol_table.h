@@ -10,8 +10,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #define CPROVER_JSON_SYMTAB_LANGUAGE_JSON_SYMBOL_TABLE_H
 
 class jsont;
-class symbol_tablet;
+class symbol_table_baset;
 
-void symbol_table_from_json(const jsont &, symbol_tablet &);
+void symbol_table_from_json(const jsont &, symbol_table_baset &);
 
 #endif

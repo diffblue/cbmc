@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-#include <iostream>
-
 exprt boolbvt::get(const exprt &expr) const
 {
   if(expr.id()==ID_symbol ||

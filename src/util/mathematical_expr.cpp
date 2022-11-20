@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_expr.h"
 #include "mathematical_types.h"
 
-#include <map>
-
 function_application_exprt::function_application_exprt(
   const exprt &_function,
   argumentst _arguments)

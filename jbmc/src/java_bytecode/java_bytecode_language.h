@@ -10,8 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
+#include <util/json.h>
+#include <util/make_unique.h>
+#include <util/prefix_filter.h>
+#include <util/symbol.h> // IWYU pragma: keep
+
+#include <langapi/language.h>
+
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"
+#include "code_with_references.h" // IWYU pragma: keep
 #include "java_class_loader.h"
 #include "java_object_factory_parameters.h"
 #include "java_static_initializers.h"
@@ -20,12 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "synthetic_methods_map.h"
 
 #include <memory>
-
-#include <util/json.h>
-#include <util/make_unique.h>
-#include <util/prefix_filter.h>
-
-#include <langapi/language.h>
 
 // clang-format off
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
@@ -179,8 +181,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              (checked in this order).\n"
 // clang-format on
 
-class symbolt;
-
 enum lazy_methods_modet
 {
   LAZY_METHODS_MODE_EAGER,
@@ -204,7 +204,7 @@ public:
   lazy_class_to_declared_symbols_mapt() = default;
 
   std::unordered_multimap<irep_idt, symbolt> &
-  get(const symbol_tablet &symbol_table);
+  get(const symbol_table_baset &symbol_table);
 
   void reinitialize();
 
@@ -293,12 +293,10 @@ public:
     std::istream &instream,
     const std::string &path) override;
 
-  bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+  bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
-  bool typecheck(
-    symbol_tablet &context,
-    const std::string &module) override;
+  bool
+  typecheck(symbol_table_baset &context, const std::string &module) override;
 
   virtual bool final(symbol_table_baset &context) override;
 
@@ -371,7 +369,7 @@ protected:
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
 
-  bool do_ci_lazy_method_conversion(symbol_tablet &);
+  bool do_ci_lazy_method_conversion(symbol_table_baset &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
   optionalt<java_bytecode_language_optionst> language_options;

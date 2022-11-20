@@ -36,7 +36,7 @@ public:
   bool parse(std::istream &instream, const std::string &path) override;
 
   /// Currently unused.
-  bool generate_support_functions(symbol_tablet &symbol_table) override;
+  bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
   /// Converts the current parse tree into a symbol table.
   /// \param [out] symbol_table: Object that shall be filled by this function.
@@ -47,12 +47,12 @@ public:
   ///   should be included in the table.
   /// \return False if no errors occurred, true otherwise.
   bool typecheck(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::string &module,
     const bool keep_file_local) override;
 
-  bool
-  typecheck(symbol_tablet &symbol_table, const std::string &module) override;
+  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
+    override;
 
   bool can_keep_file_local() override;
 

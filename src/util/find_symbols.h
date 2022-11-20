@@ -12,12 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "irep.h"
 
-#include <algorithm>
 #include <set>
 #include <unordered_set>
 
 class exprt;
-class symbol_exprt;
+class symbol_exprt; // IWYU pragma: keep
 class typet;
 
 typedef std::unordered_set<irep_idt> find_symbols_sett;

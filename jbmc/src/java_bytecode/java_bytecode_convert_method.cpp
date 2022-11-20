@@ -13,17 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include "bytecode_info.h"
-#include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
-#include "java_expr.h"
-#include "java_static_initializers.h"
-#include "java_string_library_preprocess.h"
-#include "java_string_literal_expr.h"
-#include "java_types.h"
-#include "java_utils.h"
-#include "lambda_synthesis.h"
-#include "pattern.h"
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
@@ -34,13 +24,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
-#include <util/prefix_filter.h>
+#include <util/prefix_filter.h> // IWYU pragma: keep
 #include <util/std_expr.h>
+#include <util/symbol_table_base.h>
 #include <util/threeval.h>
 
 #include <goto-programs/resolve_inherited_component.h>
 
 #include <analyses/uncaught_exceptions_analysis.h>
+
+#include "bytecode_info.h"
+#include "java_bytecode_convert_method.h"
+#include "java_expr.h"
+#include "java_static_initializers.h"
+#include "java_string_library_preprocess.h"
+#include "java_string_literal_expr.h"
+#include "java_types.h"
+#include "java_utils.h"
+#include "lambda_synthesis.h"
+#include "pattern.h"
 
 #include <algorithm>
 #include <limits>
@@ -302,7 +304,7 @@ void java_bytecode_convert_method_lazy(
   symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &m,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   symbolt method_symbol;

@@ -6,7 +6,8 @@
 // You may however use and modify this without restriction.
 
 #include "bigint.hh"
-#include "allocainc.h"
+
+#include "allocainc.h" // IWYU pragma: keep
 
 #include <cctype>
 #include <climits>

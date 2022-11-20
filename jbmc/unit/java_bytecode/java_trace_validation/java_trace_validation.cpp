@@ -7,6 +7,7 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <util/byte_operators.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/symbol_table.h>
 

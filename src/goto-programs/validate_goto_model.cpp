@@ -9,8 +9,6 @@ Date: Oct 2018
 
 #include "validate_goto_model.h"
 
-#include <set>
-
 #include <util/pointer_expr.h>
 
 #include "goto_functions.h"

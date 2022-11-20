@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
-#include <util/std_code.h>
 
 #include "is_threaded.h"
 

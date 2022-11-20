@@ -4,7 +4,7 @@ Module: Goto Checker using Bounded Model Checking for Java
 
 Author: Daniel Kroening, Peter Schrammel
 
- \*******************************************************************/
+\*******************************************************************/
 
 /// \file
 /// Goto Checker using Bounded Model Checking for Java

@@ -11,10 +11,10 @@ Author: Daniel Kroening
 
 #include "ms_link_cmdline.h"
 
-#include <fstream>
-#include <iostream>
-
 #include <util/unicode.h>
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings

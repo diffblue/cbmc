@@ -12,7 +12,9 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_EQUALITY_PROPAGATION_H
 #define CPROVER_CPROVER_EQUALITY_PROPAGATION_H
 
-#include <util/expr.h>
+#include <vector>
+
+class exprt;
 
 void equality_propagation(std::vector<exprt> &);
 

@@ -11,6 +11,8 @@ Author: Qinheping Hu
 
 #include "enumerative_loop_invariant_synthesizer.h"
 
+#include <analyses/natural_loops.h>
+
 void enumerative_loop_invariant_synthesizert::init_candidates()
 {
   for(auto &function_p : goto_model.goto_functions.function_map)

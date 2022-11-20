@@ -12,10 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
+#include <util/symbol_table.h>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>
 #endif
+
+#include <goto-programs/abstract_goto_model.h>
 
 #include <fstream>
 
@@ -53,7 +56,7 @@ void unwindsett::parse_unwindset_one_loop(
     // 1) Just a function name to limit recursion.
     // 2) F.N where F is a function name and N is a loop number.
     // 3) F.L where F is a function name and L is a label.
-    const symbol_tablet &symbol_table = goto_model.get_symbol_table();
+    const symbol_table_baset &symbol_table = goto_model.get_symbol_table();
     const symbolt *maybe_fn = symbol_table.lookup(id);
     if(maybe_fn && maybe_fn->type.id() == ID_code)
     {

@@ -17,7 +17,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #define LOG(message, irep)                                                     \
   do                                                                           \
@@ -34,7 +34,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
   const namespacet &ns,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
   : log(message_handler), ns(ns), symbol_table(symbol_table)
 {}
 

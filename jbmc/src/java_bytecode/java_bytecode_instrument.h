@@ -17,7 +17,6 @@ Date:   June 2017
 class code_blockt;
 class message_handlert;
 class symbol_table_baset;
-class symbol_tablet;
 class symbolt;
 class source_locationt;
 
@@ -28,7 +27,7 @@ void java_bytecode_instrument_symbol(
   message_handlert &_message_handler);
 
 void java_bytecode_instrument(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const bool throw_runtime_exceptions,
   message_handlert &_message_handler);
 

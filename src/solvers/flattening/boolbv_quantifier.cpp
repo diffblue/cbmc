@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
-#include <util/optional.h>
-#include <util/range.h>
 #include <util/simplify_expr.h>
 
 /// A method to detect equivalence between experts that can contain typecast

@@ -11,6 +11,8 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "free_symbols.h"
 
+#include <util/std_expr.h>
+
 #include <unordered_set>
 
 static void free_symbols_rec(

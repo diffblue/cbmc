@@ -649,7 +649,7 @@ bool generate_java_start_function(
 
   // build call to initialization function
   {
-    symbol_tablet::symbolst::const_iterator init_it=
+    symbol_table_baset::symbolst::const_iterator init_it =
       symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())

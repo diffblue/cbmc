@@ -21,7 +21,6 @@ class namespacet;
 class struct_typet;
 class typet;
 class member_exprt;
-class constant_exprt;
 
 optionalt<mp_integer> member_offset(
   const struct_typet &type,

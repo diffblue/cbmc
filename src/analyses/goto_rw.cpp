@@ -10,24 +10,23 @@ Date: April 2010
 
 #include "goto_rw.h"
 
-#include <memory>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
 #include <util/expr_util.h>
 #include <util/make_unique.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
-#include <util/std_code.h>
-
-#include <langapi/language_util.h>
 
 #include <goto-programs/goto_functions.h>
 
+#include <langapi/language_util.h>
 #include <pointer-analysis/goto_program_dereference.h>
+
+#include <memory>
 
 range_domain_baset::~range_domain_baset()
 {

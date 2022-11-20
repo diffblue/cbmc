@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <langapi/language_util.h>
 
@@ -1519,7 +1519,7 @@ void linkingt::typecheck()
 
   for(const auto &symbol_pair : src_symbol_table.symbols)
   {
-    symbol_tablet::symbolst::const_iterator m_it =
+    symbol_table_baset::symbolst::const_iterator m_it =
       main_symbol_table.symbols.find(symbol_pair.first);
 
     if(
@@ -1544,8 +1544,8 @@ void linkingt::typecheck()
 }
 
 bool linking(
-  symbol_tablet &dest_symbol_table,
-  const symbol_tablet &new_symbol_table,
+  symbol_table_baset &dest_symbol_table,
+  const symbol_table_baset &new_symbol_table,
   message_handlert &message_handler)
 {
   linkingt linking(

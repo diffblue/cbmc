@@ -8,7 +8,9 @@ Author: Qinheping Hu
 
 #include <util/c_types.h>
 #include <util/format_expr.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
+#include <util/symbol_table.h>
 
 #include <goto-instrument/synthesizer/expr_enumerator.h>
 #include <testing-utils/use_catch.h>

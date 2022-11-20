@@ -11,11 +11,8 @@ Author: Matt Lewis
 
 #include "overflow_instrumenter.h"
 
-#include <iostream>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
-#include <util/std_code.h>
 
 #include <goto-programs/goto_program.h>
 

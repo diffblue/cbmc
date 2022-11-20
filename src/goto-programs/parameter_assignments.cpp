@@ -14,15 +14,14 @@ Date:   September 2015
 #include "parameter_assignments.h"
 
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include "goto_model.h"
 
 class parameter_assignmentst
 {
 public:
-  explicit parameter_assignmentst(symbol_tablet &_symbol_table):
-    symbol_table(_symbol_table)
+  explicit parameter_assignmentst(symbol_table_baset &_symbol_table)
+    : symbol_table(_symbol_table)
   {
   }
 
@@ -30,7 +29,7 @@ public:
     goto_functionst &goto_functions);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 
   void do_function_calls(
     goto_programt &goto_program);
@@ -91,7 +90,7 @@ void parameter_assignmentst::operator()(goto_functionst &goto_functions)
 
 /// removes returns
 void parameter_assignments(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
   parameter_assignmentst rr(symbol_table);

@@ -10,7 +10,6 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <util/exception_utils.h>
 #include <util/symbol.h>
 
 SCENARIO(

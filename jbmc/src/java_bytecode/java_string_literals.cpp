@@ -20,8 +20,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table_base.h>
 #include <util/unicode.h>
 
-#include <sstream>
-
 /// Convert UCS-2 or UTF-16 to an array expression.
 /// \param in: wide string to convert
 /// \return Returns a Java char array containing the same wchars.

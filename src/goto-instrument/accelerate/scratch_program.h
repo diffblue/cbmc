@@ -36,7 +36,7 @@ struct scratch_program_symext : public goto_symext
 {
   scratch_program_symext(
     message_handlert &mh,
-    const symbol_tablet &outer_symbol_table,
+    const symbol_table_baset &outer_symbol_table,
     symex_target_equationt &_target,
     const optionst &options,
     path_storaget &path_storage,
@@ -62,7 +62,7 @@ class scratch_programt:public goto_programt
 {
 public:
   scratch_programt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &mh,
     guard_managert &guard_manager)
     : constant_propagation(true),
@@ -104,7 +104,7 @@ public:
 protected:
   std::unique_ptr<goto_symex_statet> symex_state;
   goto_functionst functions;
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   symbol_tablet symex_symbol_table;
   namespacet ns;
   symex_target_equationt equation;

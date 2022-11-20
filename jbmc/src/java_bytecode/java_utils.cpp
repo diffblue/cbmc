@@ -6,10 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "java_utils.h"
-
 #include "java_root_class.h"
-#include "java_string_library_preprocess.h"
 
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -19,6 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/string_utils.h>
+#include <util/symbol_table_base.h>
+
+#include "java_string_library_preprocess.h"
+#include "java_utils.h"
 
 #include <set>
 #include <unordered_set>
@@ -451,7 +452,7 @@ optionalt<resolve_inherited_componentt::inherited_componentt>
 get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   bool include_interfaces)
 {
   resolve_inherited_componentt component_resolver{symbol_table};

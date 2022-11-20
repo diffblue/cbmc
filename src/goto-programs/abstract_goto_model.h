@@ -14,7 +14,8 @@ Author: Diffblue Ltd.
 
 #include "goto_functions.h"
 #include "validate_goto_model.h"
-#include <util/symbol_table.h>
+
+class symbol_tablet;
 
 /// Abstract interface to eager or lazy GOTO models
 class abstract_goto_modelt

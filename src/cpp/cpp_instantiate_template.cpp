@@ -16,7 +16,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #endif
 
 #include <util/arith_tools.h>
-#include <util/base_exceptions.h>
+#include <util/base_exceptions.h> // IWYU pragma: keep
+#include <util/symbol_table_base.h>
 
 #include "cpp_type2name.h"
 
@@ -175,7 +176,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
                         id2string(suffix);
 
   // already there?
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
   if(s_it!=symbol_table.symbols.end())
     return s_it->second;

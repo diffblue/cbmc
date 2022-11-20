@@ -8,25 +8,22 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include "compound_block_locations.h"
 
+#include <util/cmdline.h>
+#include <util/config.h>
+#include <util/options.h>
+#include <util/std_code.h>
+#include <util/tempfile.h>
+
+#include <goto-programs/goto_model.h>
+
+#include <ansi-c/ansi_c_language.h>
+#include <cbmc/cbmc_parse_options.h>
+#include <goto-instrument/goto_program2code.h>
+#include <langapi/mode.h>
 #include <testing-utils/use_catch.h>
 
 #include <fstream>
 #include <utility>
-
-#include <ansi-c/ansi_c_language.h>
-
-#include <cbmc/cbmc_parse_options.h>
-
-#include <goto-instrument/goto_program2code.h>
-
-#include <goto-programs/goto_model.h>
-
-#include <langapi/mode.h>
-
-#include <util/cmdline.h>
-#include <util/config.h>
-#include <util/options.h>
-#include <util/tempfile.h>
 
 SCENARIO("Compound blocks should have a location")
 {

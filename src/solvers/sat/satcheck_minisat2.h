@@ -23,8 +23,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 namespace Minisat // NOLINT(readability/namespace)
 {
-class Solver; // NOLINT(readability/identifiers)
-class SimpSolver; // NOLINT(readability/identifiers)
+// NOLINTNEXTLINE(readability/identifiers)
+class Solver; // IWYU pragma: keep
+// NOLINTNEXTLINE(readability/identifiers)
+class SimpSolver; // IWYU pragma: keep
 }
 
 template <typename T>

@@ -1,9 +1,9 @@
 // Author: Diffblue Ltd.
 
-#include <util/mp_arith.h>
+#include <util/mp_arith.h> // IWYU pragma: keep
 
 #include <solvers/smt2_incremental/ast/smt_commands.h>
-#include <solvers/smt2_incremental/ast/smt_logics.h>
+#include <solvers/smt2_incremental/ast/smt_logics.h> // IWYU pragma: keep
 #include <solvers/smt2_incremental/ast/smt_sorts.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>

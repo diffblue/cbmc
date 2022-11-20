@@ -12,13 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
 
-#include "ci_lazy_methods_needed.h"
 #include "java_bytecode_convert_method_class.h"
 #include "java_bytecode_parse_tree.h"
-#include "java_string_library_preprocess.h"
-
-#include <util/message.h>
-#include <util/symbol_table.h>
 
 class class_hierarchyt;
 class prefix_filtert;
@@ -56,7 +51,7 @@ void java_bytecode_convert_method_lazy(
   symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &);
 
 typedef expanding_vectort<std::vector<java_bytecode_convert_methodt::variablet>>

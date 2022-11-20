@@ -11,7 +11,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_LIFT_CLINIT_CALLS_H
 #define CPROVER_JAVA_BYTECODE_LIFT_CLINIT_CALLS_H
 
-#include <util/std_code.h>
+#include <util/std_code_base.h>
 
 codet lift_clinit_calls(codet input);
 

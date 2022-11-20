@@ -81,7 +81,7 @@ bool language_filest::parse()
 }
 
 bool language_filest::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const bool keep_file_local)
 {
   // typecheck interfaces
@@ -161,7 +161,7 @@ bool language_filest::typecheck(
 }
 
 bool language_filest::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   std::set<std::string> languages;
 
@@ -189,8 +189,7 @@ bool language_filest::final(symbol_table_baset &symbol_table)
   return false;
 }
 
-bool language_filest::interfaces(
-  symbol_tablet &symbol_table)
+bool language_filest::interfaces(symbol_table_baset &symbol_table)
 {
   for(auto &file : file_map)
   {
@@ -202,7 +201,7 @@ bool language_filest::interfaces(
 }
 
 bool language_filest::typecheck_module(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local)
 {
@@ -220,7 +219,7 @@ bool language_filest::typecheck_module(
 }
 
 bool language_filest::typecheck_module(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   language_modulet &module,
   const bool keep_file_local)
 {

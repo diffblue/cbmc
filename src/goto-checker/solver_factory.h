@@ -12,16 +12,15 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 #define CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 
-#include <memory>
-
+#include <solvers/prop/prop.h>
 #include <solvers/smt2/smt2_dec.h>
+
+#include <memory>
 
 class cmdlinet;
 class message_handlert;
 class namespacet;
 class optionst;
-class propt;
-class decision_proceduret;
 class stack_decision_proceduret;
 
 class solver_factoryt final

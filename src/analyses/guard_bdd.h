@@ -13,7 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_ANALYSES_GUARD_BDD_H
 #define CPROVER_ANALYSES_GUARD_BDD_H
 
-#include <solvers/bdd/bdd.h>
+#include <solvers/bdd/bdd.h> // IWYU pragma: keep
 
 class bdd_exprt;
 class exprt;

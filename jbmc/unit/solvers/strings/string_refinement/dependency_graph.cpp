@@ -19,8 +19,6 @@ Author: Diffblue Ltd.
 #ifdef DEBUG
 #include <iostream>
 #include <java_bytecode/java_bytecode_language.h>
-#include <langapi/mode.h>
-#include <util/symbol_table.h>
 #endif
 
 typet length_type()
@@ -97,8 +95,6 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
 #ifdef DEBUG // useful output for visualizing the graph
       {
         register_language(new_java_bytecode_language);
-        symbol_tablet symbol_table;
-        namespacet ns(symbol_table);
         dependencies.output_dot(std::cerr);
       }
 #endif

@@ -18,7 +18,6 @@ Date: June 2003
 
 #include <unordered_set>
 
-class goto_functionst;
 class goto_modelt;
 class message_handlert;
 class symbol_tablet;

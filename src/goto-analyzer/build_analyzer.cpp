@@ -22,7 +22,6 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include <goto-programs/goto_model.h>
 
-#include <util/message.h>
 #include <util/options.h>
 
 /// Ideally this should be a pure function of options.

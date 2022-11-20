@@ -28,13 +28,13 @@ void statement_list_languaget::set_language_options(const optionst &options)
 }
 
 bool statement_list_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   return statement_list_entry_point(symbol_table, get_message_handler());
 }
 
 bool statement_list_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local)
 {
@@ -82,7 +82,7 @@ bool statement_list_languaget::can_keep_file_local()
 }
 
 bool statement_list_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module)
 {
   return typecheck(symbol_table, module, true);

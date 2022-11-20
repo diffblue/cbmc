@@ -21,17 +21,13 @@ Date: February 2016
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
 #include <util/mathematical_expr.h>
-#include <util/mathematical_types.h>
 #include <util/message.h>
-#include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
 #include <util/std_code.h>
 
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
 
-#include <analyses/local_bitvector_analysis.h>
 #include <analyses/local_may_alias.h>
 #include <ansi-c/c_expr.h>
 #include <goto-instrument/havoc_utils.h>

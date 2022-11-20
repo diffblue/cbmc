@@ -12,11 +12,14 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #ifndef CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
 #define CPROVER_STATEMENT_LIST_STATEMENT_LIST_TYPECHECK_H
 
+#include <util/std_code_base.h>
 #include <util/typecheck.h>
 
 #include "statement_list_parse_tree.h"
 
-class symbol_tablet;
+class code_frontend_assignt;
+class code_labelt;
+class symbol_table_baset;
 class symbolt;
 
 /// Create a new statement_list_typecheckt object and perform a type check to
@@ -31,7 +34,7 @@ class symbolt;
 /// \return False if no errors occurred, true otherwise.
 bool statement_list_typecheck(
   const statement_list_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler);
 
@@ -49,7 +52,7 @@ public:
   ///   messages.
   statement_list_typecheckt(
     const statement_list_parse_treet &parse_tree,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::string &module,
     message_handlert &message_handler);
 
@@ -62,7 +65,7 @@ private:
   const statement_list_parse_treet &parse_tree;
 
   /// Reference to the symbol table that should be filled during the typecheck.
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 
   /// Name of the module this typecheck belongs to.
   const irep_idt module;

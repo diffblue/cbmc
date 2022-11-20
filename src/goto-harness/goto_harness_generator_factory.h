@@ -15,7 +15,7 @@ Author: Diffblue Ltd.
 #include <memory>
 #include <string>
 
-class goto_harness_generatort;
+class goto_harness_generatort; // IWYU pragma: keep
 class goto_modelt;
 
 #define GOTO_HARNESS_GENERATOR_TYPE_OPT "harness-type"

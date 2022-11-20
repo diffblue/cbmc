@@ -6,16 +6,7 @@ Author: Daniel Poetzl
 
 \******************************************************************/
 
-#include <algorithm>
-
 #include "memory_snapshot_harness_generator.h"
-#include "memory_snapshot_harness_generator_options.h"
-
-#include <goto-programs/goto_convert_functions.h>
-
-#include <json/json_parser.h>
-
-#include <json-symtab-language/json_symbol_table.h>
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -24,6 +15,16 @@ Author: Daniel Poetzl
 #include <util/string2int.h>
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
+
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_model.h>
+
+#include <json-symtab-language/json_symbol_table.h>
+#include <json/json_parser.h>
+
+#include "memory_snapshot_harness_generator_options.h"
+
+#include <algorithm>
 
 void memory_snapshot_harness_generatort::handle_option(
   const std::string &option,
@@ -134,7 +135,7 @@ void memory_snapshot_harness_generatort::validate_options(
       goto_model.goto_functions);
   }
 
-  const symbol_tablet &symbol_table = goto_model.symbol_table;
+  const symbol_table_baset &symbol_table = goto_model.symbol_table;
 
   const symbolt *called_function_symbol =
     symbol_table.lookup(entry_location.function_name);
@@ -181,7 +182,7 @@ void memory_snapshot_harness_generatort::add_init_section(
 
 const symbolt &memory_snapshot_harness_generatort::fresh_symbol_copy(
   const symbolt &snapshot_symbol,
-  symbol_tablet &symbol_table) const
+  symbol_table_baset &symbol_table) const
 {
   symbolt &tmp_symbol = get_fresh_aux_symbol(
     snapshot_symbol.type,
@@ -205,7 +206,7 @@ size_t memory_snapshot_harness_generatort::pointer_depth(const typet &t) const
 }
 
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
-  const symbol_tablet &snapshot,
+  const symbol_table_baset &snapshot,
   goto_modelt &goto_model) const
 {
   recursive_initializationt recursive_initialization{
@@ -254,7 +255,7 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   for(const auto &pair : ordered_snapshot_symbols)
   {
     const symbolt &snapshot_symbol = pair.second;
-    symbol_tablet &symbol_table = goto_model.symbol_table;
+    symbol_table_baset &symbol_table = goto_model.symbol_table;
 
     auto should_get_fresh = [&symbol_table](const symbolt &symbol) {
       return symbol_table.lookup(symbol.base_name) == nullptr &&
@@ -325,7 +326,7 @@ void memory_snapshot_harness_generatort::
 
 void memory_snapshot_harness_generatort::get_memory_snapshot(
   const std::string &file,
-  symbol_tablet &snapshot) const
+  symbol_table_baset &snapshot) const
 {
   jsont json;
 

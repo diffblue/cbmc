@@ -9,7 +9,6 @@
 #include <util/nodiscard.h>
 #include <util/range.h>
 #include <util/std_expr.h>
-#include <util/string_utils.h>
 #include <util/symbol.h>
 
 #include <solvers/smt2_incremental/ast/smt_commands.h>
@@ -23,6 +22,7 @@
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
 #include <stack>
+#include <unordered_set>
 
 /// Issues a command to the solving process which is expected to optionally
 /// return a success status followed by the actual response of interest.

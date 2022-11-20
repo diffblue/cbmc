@@ -4,7 +4,7 @@ Module: Goto Checker using Single Path Symbolic Execution for Java
 
 Author: Daniel Kroening, Peter Schrammel
 
- \*******************************************************************/
+\*******************************************************************/
 
 /// \file
 /// Goto Checker using Single Path Symbolic Execution for Java

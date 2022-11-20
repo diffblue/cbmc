@@ -12,7 +12,6 @@ Date: June 2003
 
 #include <util/prefix.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
 #include <linking/static_lifetime_init.h>

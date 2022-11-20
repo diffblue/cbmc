@@ -12,6 +12,9 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_STATE_ENCODING_H
 #define CPROVER_CPROVER_STATE_ENCODING_H
 
+#include <util/irep.h>
+#include <util/optional.h>
+
 #include "solver.h"
 
 #include <iosfwd>

@@ -15,6 +15,7 @@ Author: Daniel Kroening
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
 

@@ -13,20 +13,20 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
-#include <chrono>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-
+#include <util/namespace.h>
 #include <util/string2int.h>
 #include <util/symbol.h>
 #include <util/xml.h>
 
-#include <langapi/language_util.h>
-
 #include <goto-programs/goto_functions.h>
 
+#include <langapi/language_util.h>
 #include <linking/static_lifetime_init.h>
+
+#include <chrono>
+#include <ctime>
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 class coverage_recordt
 {

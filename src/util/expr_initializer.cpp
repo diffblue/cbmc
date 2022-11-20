@@ -14,8 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "c_types.h"
 #include "magic.h"
-#include "namespace.h"
-#include "pointer_offset_size.h"
+#include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
 
 template <bool nondet>

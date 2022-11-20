@@ -13,17 +13,13 @@ Date: January 2010
 
 #include "uninitialized.h"
 
-#include <util/std_code.h>
-#include <util/symbol_table.h>
-
 #include <analyses/uninitialized_domain.h>
 
 class uninitializedt
 {
 public:
-  explicit uninitializedt(symbol_tablet &_symbol_table):
-    symbol_table(_symbol_table),
-    ns(_symbol_table)
+  explicit uninitializedt(symbol_table_baset &_symbol_table)
+    : symbol_table(_symbol_table), ns(_symbol_table)
   {
   }
 
@@ -32,7 +28,7 @@ public:
     goto_programt &goto_program);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   uninitialized_analysist uninitialized_analysis;
 

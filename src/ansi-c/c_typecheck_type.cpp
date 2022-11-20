@@ -9,28 +9,27 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C++ Language Type Checking
 
-#include "c_typecheck_base.h"
-
-#include <unordered_set>
-
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
+#include <util/symbol_table_base.h>
 
 #include "ansi_c_convert_type.h"
 #include "ansi_c_declaration.h"
 #include "c_qualifiers.h"
+#include "c_typecheck_base.h"
 #include "gcc_types.h"
 #include "padding.h"
 #include "type2name.h"
 #include "typedef_type.h"
+
+#include <unordered_set>
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
@@ -812,7 +811,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     identifier=type.find(ID_tag).get(ID_identifier);
 
     // does it exist already?
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table_baset::symbolst::const_iterator s_it =
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
@@ -1387,7 +1386,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   enum_tag_symbol.type.add_subtype() = underlying_type;
 
   // is it in the symbol table already?
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
 
   if(s_it!=symbol_table.symbols.end())
@@ -1457,7 +1456,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   irep_idt identifier=tag.get(ID_identifier);
 
   // is it in the symbol table?
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
 
   if(s_it!=symbol_table.symbols.end())
@@ -1617,7 +1616,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 {
   const irep_idt &identifier = to_typedef_type(type).get_identifier();
 
-  symbol_tablet::symbolst::const_iterator s_it =
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
 
   if(s_it == symbol_table.symbols.end())

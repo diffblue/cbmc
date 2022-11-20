@@ -12,15 +12,12 @@ Author: Diffblue Ltd.
 #include <solvers/hardness_collector.h>
 #include <solvers/prop/prop_conv_solver.h>
 
-#include <fstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include <goto-programs/goto_program.h>
-
-#include <util/optional.h>
 
 /// A structure that facilitates collecting the complexity statistics from a
 /// decision procedure. The idea is to associate some solver complexity metric

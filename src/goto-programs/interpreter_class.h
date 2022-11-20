@@ -12,24 +12,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
 
-#include <stack>
-
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/sparse_vector.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
 
 #include "goto_functions.h"
 #include "goto_trace.h"
 #include "json_goto_trace.h"
 
+#include <stack>
+
 class interpretert
 {
 public:
   interpretert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goto_functionst &_goto_functions,
     message_handlert &_message_handler)
     : output(_message_handler),
@@ -99,7 +99,7 @@ public:
 
 protected:
   messaget output;
-  const symbol_tablet &symbol_table;
+  const symbol_table_baset &symbol_table;
 
   // This is a cache so that we don't have to create it when a call needs it
   const namespacet ns;

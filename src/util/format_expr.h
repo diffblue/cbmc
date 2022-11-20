@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_FORMAT_EXPR_H
 #define CPROVER_UTIL_FORMAT_EXPR_H
 
-#include "format.h"
+#include "format.h" // IWYU pragma: keep
 #include "irep.h"
 
 #include <functional>

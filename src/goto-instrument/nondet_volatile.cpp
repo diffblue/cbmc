@@ -20,7 +20,6 @@ Date: September 2011
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_utils.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -58,19 +57,20 @@ private:
     goto_programt &post);
 
   void nondet_volatile_rhs(
-    const symbol_tablet &symbol_table,
+    const symbol_table_baset &symbol_table,
     exprt &expr,
     goto_programt &pre,
     goto_programt &post);
 
   void nondet_volatile_lhs(
-    const symbol_tablet &symbol_table,
+    const symbol_table_baset &symbol_table,
     exprt &expr,
     goto_programt &pre,
     goto_programt &post);
 
-  void
-  nondet_volatile(symbol_tablet &symbol_table, goto_programt &goto_program);
+  void nondet_volatile(
+    symbol_table_baset &symbol_table,
+    goto_programt &goto_program);
 
   const symbolt &typecheck_variable(const irep_idt &id, const namespacet &ns);
 
@@ -162,7 +162,7 @@ void nondet_volatilet::handle_volatile_expression(
 }
 
 void nondet_volatilet::nondet_volatile_rhs(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   exprt &expr,
   goto_programt &pre,
   goto_programt &post)
@@ -183,7 +183,7 @@ void nondet_volatilet::nondet_volatile_rhs(
 }
 
 void nondet_volatilet::nondet_volatile_lhs(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   exprt &expr,
   goto_programt &pre,
   goto_programt &post)
@@ -212,7 +212,7 @@ void nondet_volatilet::nondet_volatile_lhs(
 }
 
 void nondet_volatilet::nondet_volatile(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt &goto_program)
 {
   namespacet ns(symbol_table);

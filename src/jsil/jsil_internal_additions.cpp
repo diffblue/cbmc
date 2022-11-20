@@ -11,17 +11,15 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_internal_additions.h"
 
-#include <goto-programs/adjust_float_expressions.h>
-
-#include <util/std_types.h>
-#include <util/cprover_prefix.h>
-#include <util/symbol_table.h>
-
 #include <util/c_types.h>
+#include <util/std_types.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/adjust_float_expressions.h>
 
 #include "jsil_types.h"
 
-void jsil_internal_additions(symbol_tablet &dest)
+void jsil_internal_additions(symbol_table_baset &dest)
 {
   // add __CPROVER_rounding_mode
 

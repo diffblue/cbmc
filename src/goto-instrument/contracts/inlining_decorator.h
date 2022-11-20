@@ -16,7 +16,6 @@ Date: August 2022
 
 #include <regex>
 #include <set>
-#include <sstream>
 
 /// Decorator for a \ref message_handlert used during function inlining that
 /// collect names of GOTO functions creating warnings and allows to turn

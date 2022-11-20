@@ -17,14 +17,14 @@ Date: May 2007
 #include <iosfwd>
 #include <string>
 
-class symbol_tablet;
+class symbol_table_baset;
 class goto_functionst;
 class message_handlert;
 
 bool read_bin_goto_object(
   std::istream &in,
   const std::string &filename,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions,
   message_handlert &message_handler);
 

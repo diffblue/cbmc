@@ -48,16 +48,15 @@ public:
     std::istream &instream,
     const std::string &path) override;
 
-  bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+  bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
   bool typecheck(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::string &module,
     const bool keep_file_local) override;
 
   bool typecheck(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     const std::string &module,
     const bool keep_file_local,
     const std::set<irep_idt> &keep);
@@ -67,8 +66,8 @@ public:
     return true;
   }
 
-  bool
-  typecheck(symbol_tablet &symbol_table, const std::string &module) override
+  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
+    override
   {
     return typecheck(symbol_table, module, true);
   }

@@ -15,8 +15,6 @@ Author: Matt Lewis
 #include <map>
 #include <set>
 
-#include <util/symbol_table.h>
-
 #include <goto-programs/goto_program.h>
 
 #include <analyses/natural_loops.h>
@@ -32,7 +30,7 @@ class disjunctive_polynomial_accelerationt
 public:
   disjunctive_polynomial_accelerationt(
     message_handlert &message_handler,
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     goto_functionst &_goto_functions,
     goto_programt &_goto_program,
     natural_loops_mutablet::natural_loopt &_loop,
@@ -84,7 +82,7 @@ protected:
 
   bool depends_on_array(const exprt &e, exprt &array);
 
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   goto_functionst &goto_functions;
   goto_programt &goto_program;

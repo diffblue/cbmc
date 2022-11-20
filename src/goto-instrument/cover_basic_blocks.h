@@ -12,8 +12,6 @@ Author: Daniel Kroening
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
 
-#include <unordered_set>
-
 #include <util/optional.h>
 
 #include <goto-programs/goto_program.h>

@@ -12,16 +12,16 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "axioms.h"
 
 #include <util/arith_tools.h>
-#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/format_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
-#include <util/simplify_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol.h>
+
+#include <solvers/decision_procedure.h>
 
 #include "simplify_state_expr.h"
 

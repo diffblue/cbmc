@@ -6,10 +6,11 @@
 #ifndef CPROVER_UTIL_JOURNALLING_SYMBOL_TABLE_H
 #define CPROVER_UTIL_JOURNALLING_SYMBOL_TABLE_H
 
-#include <utility>
-#include <unordered_set>
 #include "irep.h"
-#include "symbol_table.h"
+#include "symbol_table_base.h"
+
+#include <unordered_set>
+#include <utility>
 
 /// \brief A symbol table wrapper that records which entries have been
 /// updated/removed
@@ -115,7 +116,7 @@ public:
   }
 
   virtual void
-  erase(const symbol_tablet::symbolst::const_iterator &entry) override
+  erase(const symbol_table_baset::symbolst::const_iterator &entry) override
   {
     const irep_idt entry_name = entry->first;
     base_symbol_table.erase(entry);
@@ -142,6 +143,12 @@ public:
 
   using symbol_table_baset::begin;
   using symbol_table_baset::end;
+
+  void validate(
+    const validation_modet vm = validation_modet::INVARIANT) const override
+  {
+    base_symbol_table.validate(vm);
+  }
 
   const changesett &get_inserted() const
   {

@@ -2,15 +2,16 @@
 /// \author Diffblue Ltd.
 /// Unit tests for checking the piped process communication mechanism.
 
-#include <util/optional.h>
 #include <util/piped_process.h>
 #include <util/string_utils.h>
 
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
+#ifdef _WIN32
 // Used for testing destructor/timing
 #include <chrono>
+#endif
 
 TEST_CASE(
   "Creating a sub process and reading its output.",

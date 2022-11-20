@@ -29,7 +29,6 @@ Author: Peter Schrammel
 
 #include <langapi/language_util.h>
 
-#include <algorithm>
 #include <array>
 
 /// Assign value `rhs` to `lhs`, recording any newly-known constants in

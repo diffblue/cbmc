@@ -15,18 +15,17 @@ Author: Daniel Kroening
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
-
-#include <langapi/language_util.h>
-#include <langapi/mode.h>
-
-#include <goto-symex/symex_target_equation.h>
+#include <util/symbol.h>
 
 #include <ansi-c/expr2c.h>
+#include <goto-symex/symex_target_equation.h>
+#include <langapi/language_util.h>
+#include <langapi/mode.h>
 
 #include "goto_program.h"
 #include "goto_trace.h"

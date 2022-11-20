@@ -16,7 +16,7 @@ Author: Michael Tautschnig
 
 static std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   std::ostringstream library_text;
 
@@ -27,8 +27,8 @@ static std::string get_cprover_library_text(
   // make Doxygen skip this part
   /// \cond
   const struct cprover_library_entryt cprover_library[] =
-#include "cprover_library.inc"
-    ; // NOLINT(whitespace/semicolon)
+#include "cprover_library.inc" // IWYU pragma: keep
+    ;                          // NOLINT(whitespace/semicolon)
   /// \endcond
 
   return get_cprover_library_text(
@@ -37,7 +37,7 @@ static std::string get_cprover_library_text(
 
 void cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   if(config.ansi_c.lib == configt::ansi_ct::libt::LIB_NONE)

@@ -12,14 +12,15 @@
 
 #include "write_stack.h"
 
-#include <unordered_set>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
 #include "abstract_environment.h"
+#include "write_stack_entry.h"
+
+#include <unordered_set>
 
 /// Build a topstack
 write_stackt::write_stackt() : stack(), top_stack(true)

@@ -785,6 +785,33 @@ jobs:
       - name: Smoke test goto-analyzer
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-analyzer /mnt/smoke/test.goto --unreachable-functions
 
+  include-what-you-use:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison iwyu
+      - name: Configure using CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+      - name: Run include-what-you-use
+        run: |
+          iwyu_tool -p build/compile_commands.json -j2 | tee includes.txt
+          if sed '/minisat2-src/,/^--$/d' includes.txt | grep '^- ' -B1 ; then
+            echo "Unnecessary includes found. Use '// IWYU pragma: keep' to override this."
+            exit 1
+          fi
+
   codecov-coverage-report:
     runs-on: ubuntu-20.04
     steps:

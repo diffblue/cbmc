@@ -8,7 +8,6 @@
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
-#include <util/options.h>
 
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/read_goto_binary.h>
@@ -22,8 +21,6 @@
 #endif
 
 #include <langapi/language.h>
-
-#include <fstream>
 
 //! @cond Doxygen_suppress_Lambda_in_initializer_list
 lazy_goto_modelt::lazy_goto_modelt(

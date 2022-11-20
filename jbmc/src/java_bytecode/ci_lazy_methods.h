@@ -27,6 +27,7 @@ class ci_lazy_methods_neededt;
 class java_class_loadert;
 class message_handlert;
 class select_pointer_typet;
+class symbol_table_baset;
 
 // Map from method id to class_method_and_bytecodet
 class method_bytecodet
@@ -90,14 +91,14 @@ typedef std::function<
   bool(const irep_idt &function_id, ci_lazy_methods_neededt)>
   method_convertert;
 
-typedef std::function<std::vector<irep_idt>(const symbol_tablet &)>
+typedef std::function<std::vector<irep_idt>(const symbol_table_baset &)>
   load_extra_methodst;
 
 class ci_lazy_methodst
 {
 public:
   ci_lazy_methodst(
-    const symbol_tablet &symbol_table,
+    const symbol_table_baset &symbol_table,
     const irep_idt &main_class,
     const std::vector<irep_idt> &main_jar_classes,
     const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points,
@@ -108,7 +109,7 @@ public:
 
   // not const since messaget
   bool operator()(
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     method_bytecodet &method_bytecode,
     const method_convertert &method_converter,
     message_handlert &message_handler);
@@ -127,18 +128,18 @@ private:
     const class_method_descriptor_exprt &called_function,
     const std::unordered_set<irep_idt> &instantiated_classes,
     std::unordered_set<irep_idt> &callable_methods,
-    symbol_tablet &symbol_table);
+    symbol_table_baset &symbol_table);
 
   void gather_needed_globals(
     const exprt &e,
-    const symbol_tablet &symbol_table,
-    symbol_tablet &needed);
+    const symbol_table_baset &symbol_table,
+    symbol_table_baset &needed);
 
   irep_idt get_virtual_method_target(
     const std::unordered_set<irep_idt> &instantiated_classes,
     const irep_idt &call_basename,
     const irep_idt &classname,
-    const symbol_tablet &symbol_table);
+    const symbol_table_baset &symbol_table);
 
   static irep_idt build_virtual_method_name(
     const irep_idt &class_name,
@@ -154,7 +155,7 @@ private:
   const synthetic_methods_mapt &synthetic_methods;
 
   std::unordered_set<irep_idt> entry_point_methods(
-    const symbol_tablet &symbol_table,
+    const symbol_table_baset &symbol_table,
     message_handlert &message_handler);
 
   struct convert_method_resultt
@@ -168,7 +169,7 @@ private:
     std::unordered_set<irep_idt> &methods_already_populated,
     const bool class_initializer_already_seen,
     const irep_idt &method_name,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     std::unordered_set<irep_idt> &methods_to_convert_later,
     std::unordered_set<irep_idt> &instantiated_classes,
     std::unordered_set<class_method_descriptor_exprt, irep_hash>
@@ -180,7 +181,7 @@ private:
     std::unordered_set<irep_idt> &instantiated_classes,
     const std::unordered_set<class_method_descriptor_exprt, irep_hash>
       &virtual_functions,
-    symbol_tablet &symbol_table);
+    symbol_table_baset &symbol_table);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H

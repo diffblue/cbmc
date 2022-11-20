@@ -20,7 +20,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <unistd.h>
 
 #include <algorithm>
-#include <exception>
 #include <forward_list>
 #include <map>
 

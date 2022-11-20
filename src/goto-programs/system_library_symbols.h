@@ -19,7 +19,6 @@ Author: Thomas Kiley
 #include <util/irep.h>
 
 class symbolt;
-class typet;
 
 class system_library_symbolst
 {

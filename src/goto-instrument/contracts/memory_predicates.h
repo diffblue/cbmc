@@ -14,7 +14,13 @@ Date: July 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_MEMORY_PREDICATES_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_MEMORY_PREDICATES_H
 
-#include "contracts.h"
+#include <util/message.h>
+#include <util/symbol.h>
+
+#include <goto-programs/goto_program.h>
+
+class code_contractst;
+class goto_functionst;
 
 class is_fresh_baset
 {

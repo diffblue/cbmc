@@ -10,7 +10,6 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include "freer.h"
 
-#include <iomanip>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -20,6 +19,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 #ifdef _WIN32
 // the ordering of includes is required
 // clang-format off
+#include <iomanip>
 #include <windows.h>
 #include <dbghelp.h>
 // clang-format on
@@ -30,7 +30,7 @@ bool cbmc_invariants_should_throw = false;
 // Backtraces compiler and C library specific
 // So we should include something explicitly from the C library
 // to check if the C library is glibc.
-#include <assert.h>
+#include <assert.h> // IWYU pragma: keep
 #if defined(__GLIBC__) || defined(__APPLE__)
 
 // GCC needs LINKFLAGS="-rdynamic" to give function names in the backtrace

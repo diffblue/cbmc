@@ -14,7 +14,7 @@
 #include <functional>
 #include <utility>
 
-class BigInt;
+class BigInt; // IWYU pragma: keep
 using mp_integer = BigInt;
 
 class smt_term_const_downcast_visitort;

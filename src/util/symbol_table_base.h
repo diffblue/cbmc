@@ -6,10 +6,10 @@
 #ifndef CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 #define CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 
+#include "symbol.h" // IWYU pragma: keep
+
 #include <map>
 #include <unordered_map>
-
-#include "symbol.h"
 
 typedef std::multimap<irep_idt, irep_idt> symbol_base_mapt;
 typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
@@ -239,6 +239,9 @@ public:
 
   virtual const_iteratort begin() const;
   virtual const_iteratort end() const;
+
+  virtual void
+  validate(const validation_modet vm = validation_modet::INVARIANT) const = 0;
 };
 
 std::ostream &

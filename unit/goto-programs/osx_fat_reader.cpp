@@ -13,7 +13,7 @@ Author: Diffblue Ltd.
 #include <util/exception_utils.h>
 #endif
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 
 TEST_CASE("OSX fat binary reader", "[core][goto-programs][osx_fat_reader]")
 {

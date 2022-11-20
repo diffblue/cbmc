@@ -8,21 +8,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
-#include <fstream>
-
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/symbol_table.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 
 #include "ansi_c_entry_point.h"
-#include "ansi_c_typecheck.h"
-#include "ansi_c_parser.h"
-#include "expr2c.h"
-#include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
+#include "ansi_c_parser.h"
+#include "ansi_c_typecheck.h"
+#include "c_preprocess.h"
+#include "expr2c.h"
 #include "type2name.h"
+
+#include <fstream>
 
 std::set<std::string> ansi_c_languaget::extensions() const
 {
@@ -101,7 +102,7 @@ bool ansi_c_languaget::parse(
 }
 
 bool ansi_c_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local)
 {
@@ -109,7 +110,7 @@ bool ansi_c_languaget::typecheck(
 }
 
 bool ansi_c_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
@@ -135,7 +136,7 @@ bool ansi_c_languaget::typecheck(
 }
 
 bool ansi_c_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // This creates __CPROVER_start and __CPROVER_initialize:
   return ansi_c_entry_point(

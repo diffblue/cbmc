@@ -11,12 +11,12 @@ Author: Daniel Kroening
 
 #include "ms_cl_cmdline.h"
 
+#include <util/unicode.h>
+
 #include <climits>
 #include <cstdlib>
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
-
-#include <util/unicode.h>
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings

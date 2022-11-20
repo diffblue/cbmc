@@ -11,18 +11,19 @@ Author: Peter Schrammel
 
 #include "remove_java_new.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/expr_initializer.h>
+#include <util/namespace.h>
+#include <util/pointer_offset_size.h>
+#include <util/std_code.h>
+
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 
 #include "java_types.h"
 #include "java_utils.h"
-
-#include <util/arith_tools.h>
-#include <util/c_types.h>
-#include <util/expr_initializer.h>
-#include <util/pointer_offset_size.h>
-#include <util/std_code.h>
 
 class remove_java_newt
 {

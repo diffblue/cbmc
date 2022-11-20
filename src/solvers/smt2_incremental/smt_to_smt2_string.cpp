@@ -12,8 +12,7 @@
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
 #include <functional>
-#include <iostream>
-#include <sstream>
+#include <sstream> // IWYU pragma: keep
 #include <stack>
 #include <string>
 

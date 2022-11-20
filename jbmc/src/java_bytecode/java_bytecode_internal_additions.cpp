@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_exceptions.h"
 
 #include <util/c_types.h>
-#include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>

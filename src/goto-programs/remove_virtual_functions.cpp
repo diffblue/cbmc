@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
-#include <util/symbol_table.h>
 
 #include "class_hierarchy.h"
 #include "class_identifier.h"
@@ -811,7 +810,7 @@ void remove_virtual_functions(
 /// \return Returns a pointer to the statement in the supplied GOTO
 ///   program after replaced function call
 goto_programt::targett remove_virtual_function(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,

@@ -13,8 +13,8 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
-#include "bitvector_expr.h"
-#include "pointer_expr.h"
+#include "bitvector_expr.h" // IWYU pragma: keep
+#include "pointer_expr.h"   // IWYU pragma: keep
 #include "ssa_expr.h"
 
 #define CALL_ON_EXPR(expr_type)                                                \

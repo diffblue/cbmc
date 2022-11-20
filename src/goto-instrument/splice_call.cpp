@@ -16,8 +16,9 @@ Date: July 2017
 #include "splice_call.h"
 
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/string_utils.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -34,7 +35,7 @@ static bool parse_caller_callee(
 bool splice_call(
   goto_functionst &goto_functions,
   const std::string &callercallee,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   messaget message(message_handler);

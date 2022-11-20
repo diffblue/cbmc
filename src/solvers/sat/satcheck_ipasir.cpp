@@ -6,15 +6,15 @@ Author: Norbert Manthey, nmanthey@amazon.com
 
 \*******************************************************************/
 
-#include <algorithm>
-
-#include <util/exception_utils.h>
-#include <util/invariant.h>
-#include <util/threeval.h>
-
-#include "satcheck_ipasir.h"
-
 #ifdef HAVE_IPASIR
+
+#  include "satcheck_ipasir.h"
+
+#  include <util/exception_utils.h>
+#  include <util/invariant.h>
+#  include <util/threeval.h>
+
+#  include <algorithm>
 
 extern "C"
 {

@@ -10,15 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Output of the verification conditions (VCCs)
 
 #include "show_vcc.h"
-#include "symex_target_equation.h"
-
-#include <fstream>
-#include <iostream>
 
 #include <util/exception_utils.h>
 #include <util/format_expr.h>
 #include <util/json_irep.h>
 #include <util/ui_message.h>
+
+#include "symex_target_equation.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 /// Output equations from \p equation in plain text format to the given output
 /// stream \p out.

@@ -12,11 +12,11 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
 
-#include <memory>
-
-#include <util/symbol_table.h>
+#include <util/namespace.h>
 
 #include <goto-programs/goto_program.h>
+
+#include <memory>
 
 enum class coverage_criteriont;
 class cover_blocks_baset;
@@ -28,7 +28,7 @@ class cover_instrumenter_baset
 public:
   virtual ~cover_instrumenter_baset() = default;
   cover_instrumenter_baset(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters,
     const irep_idt &_coverage_criterion)
     : coverage_criterion(_coverage_criterion),
@@ -104,7 +104,7 @@ class cover_instrumenterst
 public:
   void add_from_criterion(
     coverage_criteriont,
-    const symbol_tablet &,
+    const symbol_table_baset &,
     const goal_filterst &);
 
   /// Applies all instrumenters to the given goto program
@@ -132,7 +132,7 @@ class cover_location_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_location_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "location")
   {
@@ -152,7 +152,7 @@ class cover_branch_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_branch_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "branch")
   {
@@ -172,7 +172,7 @@ class cover_condition_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_condition_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "condition")
   {
@@ -192,7 +192,7 @@ class cover_decision_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_decision_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "decision")
   {
@@ -212,7 +212,7 @@ class cover_mcdc_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_mcdc_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "MC/DC")
   {
@@ -232,7 +232,7 @@ class cover_path_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_path_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "path")
   {
@@ -252,7 +252,7 @@ class cover_assertion_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_assertion_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "assertion")
   {
@@ -272,7 +272,7 @@ class cover_cover_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_cover_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "cover")
   {
@@ -297,7 +297,7 @@ class cover_assume_instrumentert : public cover_instrumenter_baset
 {
 public:
   cover_assume_instrumentert(
-    const symbol_tablet &_symbol_table,
+    const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters)
     : cover_instrumenter_baset(_symbol_table, _goal_filters, "location")
   {

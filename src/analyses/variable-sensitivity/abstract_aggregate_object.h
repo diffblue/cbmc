@@ -12,11 +12,14 @@
 #ifndef CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 #define CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 
+#include <util/namespace.h>
+
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <stack>
 
 #include "abstract_object_statistics.h"
+
+#include <stack>
 
 class abstract_aggregate_tag
 {

@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
-#include <goto-programs/remove_returns.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
@@ -41,7 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unreachable_instructions.h"
 
 #include <cstdlib> // exit()
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <memory>
 

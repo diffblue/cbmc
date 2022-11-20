@@ -15,12 +15,12 @@ Author:
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <ostream>
 
 void print_struct_alignment_problems(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   std::ostream &out)
 {
   for(const auto &symbol_pair : symbol_table.symbols)

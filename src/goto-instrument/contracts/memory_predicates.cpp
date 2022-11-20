@@ -16,15 +16,14 @@ Date: July 2021
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/fresh_symbol.h>
 #include <util/prefix.h>
 
 #include <goto-programs/goto_convert_functions.h>
 
 #include <ansi-c/ansi_c_language.h>
-#include <ansi-c/expr2c.h>
 #include <linking/static_lifetime_init.h>
 
+#include "contracts.h"
 #include "instrument_spec_assigns.h"
 #include "utils.h"
 

@@ -8,8 +8,6 @@ Author: Diffblue Ltd.
 
 #include "string_refinement_util.h"
 
-#include <algorithm>
-#include <iostream>
 #include <numeric>
 
 #include <util/arith_tools.h>

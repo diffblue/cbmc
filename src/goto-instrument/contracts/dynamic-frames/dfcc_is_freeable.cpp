@@ -8,6 +8,7 @@ Date: August 2022
 \*******************************************************************/
 #include "dfcc_is_freeable.h"
 
+#include <util/cprover_prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 

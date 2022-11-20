@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include "anonymous_member.h"
 #include "c_typecheck_base.h"

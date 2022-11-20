@@ -9,13 +9,13 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for value_sett
 
-#include <testing-utils/use_catch.h>
-
-#include <pointer-analysis/value_set.h>
-
 #include <util/arith_tools.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/symbol_table.h>
+
+#include <pointer-analysis/value_set.h>
+#include <testing-utils/use_catch.h>
 
 static bool object_descriptor_matches(
   const exprt &descriptor_expr, const exprt &target)

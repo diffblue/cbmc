@@ -10,12 +10,12 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <cctype>
 #include <iostream>
-#include <sstream>
 
 #ifdef _WIN32
 #  include <io.h>
 #  include <windows.h>
 #  define isatty _isatty
+#  include <util/unicode.h>
 #else
 #  include <unistd.h>
 #endif
@@ -23,7 +23,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/invariant.h>
 #include <util/run.h>
 #include <util/string_utils.h>
-#include <util/unicode.h>
 
 #ifdef _WIN32
 class windows_coutt : public std::streambuf

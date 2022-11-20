@@ -12,7 +12,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #ifndef CPROVER_STATEMENT_LIST_CONVERTERS_CONVERT_STRING_VALUE_H
 #define CPROVER_STATEMENT_LIST_CONVERTERS_CONVERT_STRING_VALUE_H
 
-#include <util/std_code.h>
 #include <util/string_constant.h>
 
 /// Converts a string into a Statement List identifier.

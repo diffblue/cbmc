@@ -18,6 +18,7 @@ Date: September 2021
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
+#include <util/symbol.h>
 
 #include <goto-programs/cfg.h>
 
@@ -273,7 +274,7 @@ void widen_assigns(assignst &assigns)
 }
 
 void add_quantified_variable(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expression,
   const irep_idt &mode)
 {
@@ -345,7 +346,7 @@ void add_quantified_variable(
 }
 
 void replace_history_parameter(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
   source_locationt location,
@@ -422,7 +423,7 @@ void replace_history_parameter(
 }
 
 void generate_history_variables_initialization(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &clause,
   const irep_idt &mode,
   goto_programt &program)

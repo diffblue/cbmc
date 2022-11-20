@@ -10,9 +10,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Statement List Language Type Checking
 
 #include "statement_list_typecheck.h"
-#include "converters/statement_list_types.h"
-
-#include <goto-programs/goto_instruction_code.h>
 
 #include <util/cprover_prefix.h>
 #include <util/message.h>
@@ -20,7 +17,11 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_instruction_code.h>
+
+#include "converters/statement_list_types.h"
 
 /// Size of pointers in Siemens TIA.
 #define STATEMENT_LIST_PTR_WIDTH 64
@@ -80,7 +81,7 @@ static code_typet::parametert create_data_block_parameter(
 
 bool statement_list_typecheck(
   const statement_list_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
@@ -116,7 +117,7 @@ statement_list_typecheckt::stl_jump_locationt::stl_jump_locationt(
 
 statement_list_typecheckt::statement_list_typecheckt(
   const statement_list_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
   : typecheckt(message_handler),

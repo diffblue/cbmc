@@ -7,7 +7,11 @@ Author: John Dumbell
 \*******************************************************************/
 
 #include "complexity_limiter.h"
+
+#include <util/options.h>
+
 #include "goto_symex_state.h"
+
 #include <cmath>
 
 complexity_limitert::complexity_limitert(

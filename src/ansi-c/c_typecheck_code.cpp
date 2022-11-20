@@ -9,17 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C Language Type Checking
 
-#include "c_typecheck_base.h"
-
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/range.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include "ansi_c_declaration.h"
 #include "c_expr.h"
+#include "c_typecheck_base.h"
 
 void c_typecheck_baset::start_typecheck_code()
 {
@@ -284,7 +284,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     irep_idt identifier = d.get_name();
 
     // look it up
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table_baset::symbolst::const_iterator s_it =
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())

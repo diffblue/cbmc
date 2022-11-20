@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/c_types.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &current_mode,

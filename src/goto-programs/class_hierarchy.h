@@ -29,7 +29,7 @@ Date: April 2016
   " --show-class-hierarchy       show the class hierarchy\n"
 // clang-format on
 
-class symbol_tablet;
+class symbol_table_baset;
 class json_stream_arrayt;
 class ui_message_handlert;
 
@@ -54,10 +54,10 @@ public:
   typedef std::map<irep_idt, entryt> class_mapt;
   class_mapt class_map;
 
-  void operator()(const symbol_tablet &);
+  void operator()(const symbol_table_baset &);
 
   class_hierarchyt() = default;
-  explicit class_hierarchyt(const symbol_tablet &symbol_table)
+  explicit class_hierarchyt(const symbol_table_baset &symbol_table)
   {
     (*this)(symbol_table);
   }
@@ -107,7 +107,7 @@ public:
   /// Maps class identifiers onto node indices
   typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;
 
-  void populate(const symbol_tablet &);
+  void populate(const symbol_table_baset &);
 
   /// Get map from class identifier to node index
   /// \return map from class identifier to node index
