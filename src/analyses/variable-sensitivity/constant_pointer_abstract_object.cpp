@@ -21,13 +21,6 @@
 #include <ostream>
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const typet &type)
-  : abstract_pointer_objectt(type)
-{
-  PRECONDITION(type.id() == ID_pointer);
-}
-
-constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)

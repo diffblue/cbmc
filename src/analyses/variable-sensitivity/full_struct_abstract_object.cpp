@@ -27,13 +27,6 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
 {
 }
 
-full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t)
-  : abstract_aggregate_baset(t)
-{
-  PRECONDITION(t.id() == ID_struct);
-  DATA_INVARIANT(verify(), "Structural invariants maintained");
-}
-
 full_struct_abstract_objectt::full_struct_abstract_objectt(
   const typet &t,
   bool top,

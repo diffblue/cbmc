@@ -29,7 +29,7 @@ abstract_object_pointert
 create_context_abstract_object(const abstract_object_pointert &abstract_object)
 {
   return abstract_object_pointert(
-    new context_classt{abstract_object, abstract_object->type()});
+    new context_classt{abstract_object, abstract_object->type(), true, false});
 }
 
 template <class abstract_object_classt>

@@ -12,12 +12,6 @@
 #include <util/pointer_expr.h>
 
 two_value_pointer_abstract_objectt::two_value_pointer_abstract_objectt(
-  const typet &type)
-  : abstract_pointer_objectt(type)
-{
-}
-
-two_value_pointer_abstract_objectt::two_value_pointer_abstract_objectt(
   const typet &type,
   bool top,
   bool bottom)

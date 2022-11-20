@@ -34,13 +34,6 @@
 class write_location_contextt : public context_abstract_objectt
 {
 public:
-  explicit write_location_contextt(
-    const abstract_object_pointert child,
-    const typet &type)
-    : context_abstract_objectt(child, type)
-  {
-  }
-
   write_location_contextt(
     const abstract_object_pointert child,
     const typet &type,

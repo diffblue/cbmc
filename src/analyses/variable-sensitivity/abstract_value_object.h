@@ -240,10 +240,6 @@ class abstract_value_objectt : public abstract_objectt,
                                public abstract_value_tag
 {
 public:
-  explicit abstract_value_objectt(const typet &type) : abstract_objectt(type)
-  {
-  }
-
   abstract_value_objectt(const typet &type, bool tp, bool bttm)
     : abstract_objectt(type, tp, bttm)
   {

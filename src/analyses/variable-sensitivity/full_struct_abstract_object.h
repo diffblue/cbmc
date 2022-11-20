@@ -33,9 +33,6 @@ public:
    */
   full_struct_abstract_objectt(const full_struct_abstract_objectt &ao);
 
-  /// \param type: the type the abstract_object is representing
-  explicit full_struct_abstract_objectt(const typet &type);
-
   /// Start the abstract object at either top or bottom or
   /// neither asserts if both top and bottom are true
   ///

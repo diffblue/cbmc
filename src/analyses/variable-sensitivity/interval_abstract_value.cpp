@@ -224,11 +224,6 @@ static inline constant_interval_exprt interval_from_relation(const exprt &e)
     the_constant_part_of_the_relation, the_constant_part_of_the_relation);
 }
 
-interval_abstract_valuet::interval_abstract_valuet(const typet &t)
-  : abstract_value_objectt(t), interval(t)
-{
-}
-
 interval_abstract_valuet::interval_abstract_valuet(
   const typet &t,
   bool tp,
